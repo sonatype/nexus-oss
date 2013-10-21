@@ -15,6 +15,7 @@ package org.sonatype.nexus.atlas
 
 import groovy.transform.ToString
 import org.sonatype.nexus.atlas.SupportZipGenerator.Request
+import org.sonatype.nexus.atlas.SupportZipGenerator.Result
 
 /**
  * Generates a support ZIP file.
@@ -38,7 +39,17 @@ interface SupportZipGenerator
 
     boolean log
 
-    boolean limitSize
+    boolean limitFileSizes
+
+    boolean limitZipSize
+  }
+
+  @ToString(includePackage=false, includeNames=true)
+  static class Result
+  {
+    boolean truncated
+
+    File file
   }
 
   /**
@@ -49,5 +60,5 @@ interface SupportZipGenerator
   /**
    * Generate a support ZIP for the given request.
    */
-  File generate(Request request)
+  Result generate(Request request)
 }

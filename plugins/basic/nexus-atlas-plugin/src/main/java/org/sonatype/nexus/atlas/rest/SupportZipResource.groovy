@@ -62,12 +62,13 @@ implements Resource
   @RequiresPermissions('nexus:atlas')
   Map generateZip(final SupportZipGenerator.Request request) {
     assert request
-    def file = supportZipGenerator.generate(request)
+    def result = supportZipGenerator.generate(request)
 
     return [
-        'file': file.canonicalPath,
-        'name': file.name,
-        'size': file.length()
+        'file': result.file.canonicalPath,
+        'name': result.file.name,
+        'size': result.file.length(),
+        'truncated': result.truncated
     ]
   }
 

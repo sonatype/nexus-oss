@@ -104,6 +104,25 @@
   padding-left: 10px;
 }
 
+.nx-atlas-view-supportzip-created-truncated-warning {
+  padding-top: 10px;
+  padding-bottom: 20px;
+  text-align: center;
+}
+
+.nx-atlas-view-supportzip-created-truncated-warning img {
+  vertical-align: bottom;
+  padding-right: 5px;
+}
+
+.nx-atlas-view-supportzip-created-truncated-warning span {
+  padding: 6px;
+  background-color: #fff8f7;
+  border: solid 1px #d04437;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+}
+
 .nx-atlas-view-supportzip .x-form-item-label,
 .nx-atlas-view-supportzip-created .x-form-item-label {
   font: bold 11px arial, tahoma, verdana, helvetica;

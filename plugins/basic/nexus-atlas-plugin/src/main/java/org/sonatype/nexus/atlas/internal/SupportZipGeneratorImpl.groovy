@@ -20,6 +20,7 @@ import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type
 import org.sonatype.nexus.atlas.SupportBundleCustomizer
 import org.sonatype.nexus.atlas.SupportZipGenerator
 import org.sonatype.nexus.atlas.SupportZipGenerator.Request
+import org.sonatype.nexus.atlas.SupportZipGenerator.Result
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration
 import org.sonatype.sisu.goodies.common.ByteSize
 import org.sonatype.sisu.goodies.common.ComponentSupport
@@ -50,12 +51,15 @@ implements SupportZipGenerator
 
   private final File supportDir
 
+  private final ByteSize maxFileSize
+
   private final ByteSize maxZipFileSize
 
   @Inject
   SupportZipGeneratorImpl(final ApplicationConfiguration applicationConfiguration,
                           final List<SupportBundleCustomizer> bundleCustomizers,
-                          final @Named('${atlas.supportZipGenerator.maxZipFileSize:-30mb}') ByteSize maxZipFileSize)
+                          final @Named('${atlas.supportZipGenerator.maxZipFileSize:-30mb}') ByteSize maxFileSize,
+                          final @Named('${atlas.supportZipGenerator.maxZipFileSize:-20mb}') ByteSize maxZipFileSize)
   {
     assert applicationConfiguration
     this.bundleCustomizers = checkNotNull(bundleCustomizers)
@@ -64,7 +68,9 @@ implements SupportZipGenerator
     supportDir = applicationConfiguration.getWorkingDirectory('support')
     log.info 'Support directory: {}', supportDir
 
-    // FIXME: Need to sort this out, see notes below
+    this.maxFileSize = maxFileSize
+    log.info 'Maximum included file size: {}', maxFileSize
+
     this.maxZipFileSize = maxZipFileSize
     log.info 'Maximum ZIP file size: {}', maxZipFileSize
   }
@@ -116,7 +122,7 @@ implements SupportZipGenerator
   }
 
   @Override
-  File generate(final Request request) {
+  Result generate(final Request request) {
     assert request
 
     log.info 'Generating support ZIP: {}', request
@@ -141,7 +147,7 @@ implements SupportZipGenerator
         it.prepare()
       }
 
-      return createZip(sources, request.limitSize)
+      return createZip(request, sources)
     }
     catch (Exception e) {
       log.error 'Failed to create support ZIP', e
@@ -173,7 +179,7 @@ implements SupportZipGenerator
   /**
    * Create a ZIP file with content from given sources.
    */
-  private File createZip(final List<ContentSource> sources, final boolean limitSize) {
+  private Result createZip(final Request request, final List<ContentSource> sources) {
     def prefix = uniquePrefix()
 
     // Write zip to temporary file first
@@ -242,6 +248,21 @@ implements SupportZipGenerator
       }
     }
 
+    // maximum size of included content
+    final int maxContentSize = this.maxFileSize.toBytes()
+
+    // size of chunks for appending source content and detecting max ZIP size
+    final int chunkSize = 4 * 1024
+
+    // leave some fudge room so we can close the zip file and write marker tokens if needed
+    final int maxZipSize = maxZipFileSize.toBytes() - (chunkSize * 2)
+
+    // token added to files to indicate truncation has occurred
+    final String TRUNCATED_TOKEN = '** TRUNCATED **'
+
+    // flag to indicate if any content was truncated
+    boolean truncated = false
+
     try {
       // add directory entries
       addDirectoryEntries()
@@ -249,30 +270,45 @@ implements SupportZipGenerator
       // TODO: Sort out how to deal with obfuscation, if its specific or general
       // TODO: ... this should be a detail of the content source
 
-      // size of buffer for appending source content and detecting max ZIP size
-      final int bufferSize = 4 * 1024
-
       // add content entries, sorted so highest priority are processed first
       sources.sort().each { source ->
         log.debug 'Adding content entry: {} {} bytes', source, source.size
         def entry = addEntry source.path
 
-        // FIXME: Need to decide if we want to do this or not, as its very fudgy and complex
-        // FIXME: May be fine to simply limit _each_ included file to a max size
-        // FIXME: ... and then if we find we are constantly making zip larger > max upload can support
-        // FIXME: ... we can then revisit this?
+        source.content.withStream { InputStream input ->
+          // truncate content which is larger than maximum file size
+          if (request.limitFileSizes && source.size > maxContentSize) {
+            log.warn 'Truncating source contents; exceeds maximum included file size: {}', source.path
+            zip << TRUNCATED_TOKEN
+            truncated = true
+            input.skip(source.size - maxContentSize)
+          }
 
-        source.content.eachByte(bufferSize) { byte[] buff, len ->
-          // TODO: check if there is enough room in the compressed file for given bytes
-          // TODO: this is not going to be super accurate, but on small buffer scale
-          // TODO: should be plenty to allow us to know when the compressed file is full?
-          zip.write(buff)
+          // write source content to the zip stream in chunks
+          byte[] buff = new byte[chunkSize]
+          int len
+          while ((len = input.read(buff)) != -1) {
+            // truncate content if max ZIP size reached
+            if (request.limitZipSize && stream.count + len > maxZipSize) {
+              log.warn 'Truncating source contents; max ZIP size reached: {}', source.path
+              zip << TRUNCATED_TOKEN
+              truncated = true
+              break
+            }
 
-          // flush so we can detect compressed size for partially written files
-          zip.flush()
+            zip.write buff, 0, len
+
+            // flush so we can detect compressed size for partially written files
+            zip.flush()
+          }
         }
 
         closeEntry entry
+      }
+
+      // add marker to top of file if we truncated anything
+      if (truncated) {
+        addEntry 'truncated'
       }
     }
     finally {
@@ -280,16 +316,27 @@ implements SupportZipGenerator
     }
 
     if (log.debugEnabled) {
-      log.debug 'ZIP (in={} out={}) bytes, compressed: {}%',
+      log.debug 'ZIP file (in={} out={}) bytes, compressed: {}%',
           totalUncompressed,
           stream.count,
           percentCompressed(stream.count, totalUncompressed)
     }
 
-    // Move the file into place
+    // move the file into place
     def target = new File(supportDir, "${prefix}.zip")
     Files.move(file.toPath(), target.toPath())
-    log.info 'Created support ZIP file: {}', target
-    return target
+
+    // complain again if truncated
+    if (truncated) {
+      log.warn 'Created truncated support ZIP file: {}', target
+    }
+    else {
+      log.info 'Created support ZIP file: {}', target
+    }
+
+    return new Result(
+        file: target,
+        truncated: truncated
+    )
   }
 }

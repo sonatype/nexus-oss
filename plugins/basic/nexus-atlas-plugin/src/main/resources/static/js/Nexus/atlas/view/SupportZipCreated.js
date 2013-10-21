@@ -43,19 +43,27 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
   /**
    * @override
    */
-  initComponent: function() {
+  initComponent: function () {
     var me = this,
         icons = Nexus.atlas.Icons;
+
+    me.truncatedWarning = NX.create('Ext.Component', {
+      cls: 'nx-atlas-view-supportzip-created-truncated-warning',
+      html: '<span>' + icons.get('warning').img +
+          'Support ZIP contents have been truncated due to exceeded size limits.</span>',
+      hidden: true
+    });
 
     Ext.apply(me, {
       items: [
         {
-          xtype: 'panel',
+          xtype: 'component',
           border: false,
           cls: 'nx-atlas-view-supportzip-created-description',
           html: icons.get('zip').variant('x32').img + '<div>Support ZIP has been created.' +
               '<br/><br/>You can reference this file on the filesystem or download the file from your browser.</div>'
         },
+        me.truncatedWarning,
         {
           xtype: 'form',
           itemId: 'form',
@@ -79,10 +87,14 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
               xtype: 'hidden',
               name: 'name'
             },
-            // TODO: Show this to the user?
+            // TODO: Show these to the user?
             {
               xtype: 'hidden',
               name: 'size'
+            },
+            {
+              xtype: 'hidden',
+              name: 'truncated'
             }
           ],
 
@@ -99,7 +111,7 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
           // Download on ENTER
           key: Ext.EventObject.ENTER,
           scope: me,
-          fn: function() {
+          fn: function () {
             var btn = Ext.getCmp('nx-atlas-button-supportzip-download');
             btn.fireEvent('click', btn);
           }
@@ -121,11 +133,13 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
    *
    * @public
    */
-  setValues: function(values) {
+  setValues: function (values) {
     this.down('form').getForm().setValues(values);
 
-    // retain fileName
-    this.values = values.fileName;
+    // if truncated show the warning
+    if (values.truncated) {
+      this.truncatedWarning.show();
+    }
   },
 
   /**
@@ -133,7 +147,7 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
    *
    * @public
    */
-  getValues: function() {
+  getValues: function () {
     return this.down('form').getForm().getValues();
   }
 });

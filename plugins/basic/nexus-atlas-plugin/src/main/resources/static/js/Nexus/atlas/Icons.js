@@ -45,6 +45,7 @@ NX.define('Nexus.atlas.Icons', {
       icons: {
         arrow_refresh:      'arrow_refresh.png',
         download:           iconConfig('download.png'),
+        error:              iconConfig('error.png'),
         file_extension_zip: iconConfig('file_extension_zip.png'),
         globe_place:        iconConfig('globe_place.png'),
         printer:            iconConfig('printer.png'),
@@ -54,6 +55,7 @@ NX.define('Nexus.atlas.Icons', {
         print:            '@printer',
         refresh:          '@arrow_refresh',
         sysinfo:          '@server_information',
+        warning:          '@error',
         zip:              '@file_extension_zip'
       }
     });

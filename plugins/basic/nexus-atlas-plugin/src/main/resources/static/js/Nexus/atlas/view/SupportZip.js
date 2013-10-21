@@ -38,7 +38,7 @@ NX.define('Nexus.atlas.view.SupportZip', {
   /**
    * @override
    */
-  initComponent: function() {
+  initComponent: function () {
     var me = this,
         icons = Nexus.atlas.Icons;
 
@@ -89,13 +89,6 @@ NX.define('Nexus.atlas.view.SupportZip', {
                     },
                     {
                       xtype: 'checkbox',
-                      name: 'metrics',
-                      boxLabel: 'Metrics',
-                      helpText: 'Includes component metrics',
-                      checked: true
-                    },
-                    {
-                      xtype: 'checkbox',
                       name: 'configuration',
                       boxLabel: 'Configuration',
                       helpText: 'Include configuration files',
@@ -114,6 +107,13 @@ NX.define('Nexus.atlas.view.SupportZip', {
                       boxLabel: 'Log',
                       helpText: 'Include log files',
                       checked: true
+                    },
+                    {
+                      xtype: 'checkbox',
+                      name: 'metrics',
+                      boxLabel: 'Metrics',
+                      helpText: 'Includes system and component metrics',
+                      checked: true
                     }
                   ]
                 },
@@ -125,9 +125,16 @@ NX.define('Nexus.atlas.view.SupportZip', {
                   items: [
                     {
                       xtype: 'checkbox',
-                      name: 'limitSize',
-                      boxLabel: 'Limit Zip File Size',
-                      helpText: 'Limit the size of the created ZIP file to no more than 30 MB.',
+                      name: 'limitFileSizes',
+                      boxLabel: 'Limit Included File Sizes',
+                      helpText: 'Limit the size of files includes in the support ZIP to no more than 30 MB each.',
+                      checked: true
+                    },
+                    {
+                      xtype: 'checkbox',
+                      name: 'limitZipSize',
+                      boxLabel: 'Limit Maximum ZIP File Size',
+                      helpText: 'Limit the maximum size of the support ZIP file to no more than 20 MB.',
                       checked: true
                     }
                   ]}
@@ -150,7 +157,7 @@ NX.define('Nexus.atlas.view.SupportZip', {
    *
    * @public
    */
-  getValues: function() {
+  getValues: function () {
     return this.down('form').getForm().getValues();
   }
 });

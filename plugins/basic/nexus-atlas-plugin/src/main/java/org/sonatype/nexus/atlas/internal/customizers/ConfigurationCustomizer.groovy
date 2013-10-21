@@ -75,5 +75,8 @@ implements SupportBundleCustomizer
     [ 'nexus.xml', 'capabilities.xml' ].each {
       maybeIncludeFile new File(configDir, it), 'work/conf'
     }
+
+    // HACK: For truncation testing
+    maybeIncludeFile new File(configDir, 'junk.txt'), 'testing'
   }
 }
