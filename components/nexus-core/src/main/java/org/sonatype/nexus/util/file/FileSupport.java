@@ -125,13 +125,14 @@ public final class FileSupport
 
   /**
    * Writes out the content of a string payload into a file using given charset. The file will be overwritten
-   * if exists.
+   * if exists and parent directories will be created if needed.
    */
   public static void writeFile(final Path file, final Charset charset, final String payload)
       throws IOException
   {
     checkNotNull(file);
     checkNotNull(charset);
+    checkNotNull(payload);
     Files.createDirectories(file.getParent());
     try (final BufferedWriter writer = Files.newBufferedWriter(file, charset)) {
       writer.write(payload);
