@@ -14,9 +14,11 @@
 package org.sonatype.nexus.proxy.item;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import javax.inject.Inject;
@@ -36,9 +38,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class DefaultLinkPersister
     implements LinkPersister
 {
+  private static final Charset LINK_CHARSET = Charsets.UTF_8;
+
   private static final String LINK_PREFIX = "LINK to ";
 
-  private static final byte[] LINK_PREFIX_BYTES = LINK_PREFIX.getBytes(Charsets.UTF_8);
+  private static final byte[] LINK_PREFIX_BYTES = LINK_PREFIX.getBytes(LINK_CHARSET);
 
   private final RepositoryItemUidFactory repositoryItemUidFactory;
 
@@ -63,8 +67,10 @@ public class DefaultLinkPersister
       throws NoSuchRepositoryException, IOException
   {
     if (locator != null) {
-      try (final InputStream fis = locator.getContent()) {
-        final String linkBody = StreamSupport.asString(fis, Charsets.UTF_8);
+      try (final InputStream is = locator.getContent()) {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        StreamSupport.copy(is, baos);
+        final String linkBody = new String(baos.toByteArray(), LINK_CHARSET);
         final String uidStr = linkBody.substring(LINK_PREFIX.length(), linkBody.length());
         return repositoryItemUidFactory.createUid(uidStr);
       }
@@ -79,7 +85,7 @@ public class DefaultLinkPersister
   {
     try {
       final String linkBody = LINK_PREFIX + link.getTarget().toString();
-      StreamSupport.copy(new ByteArrayInputStream(linkBody.getBytes(Charsets.UTF_8)), os);
+      StreamSupport.copy(new ByteArrayInputStream(linkBody.getBytes(LINK_CHARSET)), os);
       os.flush();
     }
     finally {
