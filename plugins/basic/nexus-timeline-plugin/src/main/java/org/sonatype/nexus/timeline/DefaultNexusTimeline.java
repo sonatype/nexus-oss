@@ -25,7 +25,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.timeline.Timeline;
 import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
