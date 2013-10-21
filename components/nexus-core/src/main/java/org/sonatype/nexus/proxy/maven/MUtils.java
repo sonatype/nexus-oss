@@ -15,12 +15,14 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Locale;
 
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.util.io.StreamSupport;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -53,7 +55,9 @@ public class MUtils
       throws IOException
   {
     try {
-      return readDigest(StreamSupport.asString(inputStream));
+      try (final InputStreamReader isr = new InputStreamReader(inputStream, Charsets.UTF_8)) {
+        return readDigest(CharStreams.toString(isr));
+      }
     }
     finally {
       Closeables.close(inputStream, true);
