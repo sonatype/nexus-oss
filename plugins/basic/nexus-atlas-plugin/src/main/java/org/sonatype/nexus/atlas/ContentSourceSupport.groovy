@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.atlas
 
-import groovy.transform.ToString
 import org.sonatype.nexus.atlas.SupportBundle.ContentSource
 import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority
 import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type
@@ -27,7 +26,6 @@ import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.DEFA
  *
  * @since 2.7
  */
-@ToString(includePackage=false, includeFields=true, includes='type,path,priority')
 abstract class ContentSourceSupport
 extends ComponentSupport
 implements ContentSource
@@ -73,5 +71,14 @@ implements ContentSource
   @Override
   int compareTo(final ContentSource obj) {
     priority.order <=> obj.priority.order
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "type=" + type +
+        ", path='" + path + '\'' +
+        ", priority=" + priority +
+        '}';
   }
 }

@@ -331,14 +331,7 @@ implements SupportZipGenerator
     // move the file into place
     def target = new File(supportDir, "${prefix}.zip")
     Files.move(file.toPath(), target.toPath())
-
-    // complain again if truncated
-    if (truncated) {
-      log.warn 'Created truncated support ZIP file: {}', target
-    }
-    else {
-      log.info 'Created support ZIP file: {}', target
-    }
+    log.info 'Created support ZIP file: {}', target
 
     return new Result(
         file: target,

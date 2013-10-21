@@ -50,7 +50,7 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
     me.truncatedWarning = NX.create('Ext.Component', {
       cls: 'nx-atlas-view-supportzip-created-truncated-warning',
       html: '<span>' + icons.get('warning').img +
-          'Support ZIP contents have been truncated due to exceeded size limits.</span>',
+          'Contents have been truncated due to exceeded size limits.</span>',
       hidden: true
     });
 
