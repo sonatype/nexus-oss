@@ -62,13 +62,13 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
-import com.google.common.io.ByteStreams;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.io.ByteStreams.limit;
 
 /**
  * Clean-room re-implementation of {@code /content} resource, using plain Servlet API.
@@ -480,7 +480,7 @@ public class NexusContentServlet
         if (contentNeeded) {
           try (final InputStream in = file.getInputStream()) {
             in.skip(range.lowerEndpoint());
-            sendContent(ByteStreams.limit(in, bodySize), response);
+            sendContent(limit(in, bodySize), response);
           }
         }
       }
@@ -632,9 +632,6 @@ public class NexusContentServlet
   /**
    * Sends content by copying all bytes from the input stream to the output stream while setting the preferred buffer
    * size. At the end, it flushes response buffer.
-   * <p>
-   * Inspired from {@link ByteStreams#copy(InputStream, OutputStream)} (version 14.0.1) to expose configurable buffer
-   * sizes and adapted for current use case.
    */
   private void sendContent(final InputStream from, final HttpServletResponse response) throws IOException {
     int bufferSize = BUFFER_SIZE;

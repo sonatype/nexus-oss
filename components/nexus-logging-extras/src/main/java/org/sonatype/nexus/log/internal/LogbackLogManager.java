@@ -47,6 +47,7 @@ import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.util.file.FileSupport;
+import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -63,7 +64,6 @@ import ch.qos.logback.core.util.StatusPrinter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.io.ByteStreams;
 import com.google.inject.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -441,7 +441,7 @@ public class LogbackLogManager
                   throws IOException
               {
                 try (final InputStream in = participant.getConfiguration()) {
-                  ByteStreams.copy(in, output);
+                  StreamSupport.copy(in, output);
                 }
               }
             });
