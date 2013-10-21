@@ -15,14 +15,12 @@ package org.sonatype.nexus.util.io;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.nexus.util.file.FileSupport;
 
-import com.google.common.io.CharStreams;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Stream related support class. Offers static helper methods for common stream related operations
@@ -59,6 +57,9 @@ public final class StreamSupport
    * parameter.
    */
   public static long copy(final InputStream from, final OutputStream to, final int bufferSize) throws IOException {
+    checkNotNull(from);
+    checkNotNull(to);
+    checkArgument(bufferSize > 0);
     final byte[] buf = new byte[bufferSize];
     long count = 0;
     while (true) {
@@ -71,23 +72,4 @@ public final class StreamSupport
     }
     return count;
   }
-
-  /**
-   * Shortcut method for {@link #asString(InputStream, Charset)} that uses {@link FileSupport#DEFAULT_CHARSET}.
-   */
-  public static String asString(final InputStream is) throws IOException {
-    return asString(is, FileSupport.DEFAULT_CHARSET);
-  }
-
-  /**
-   * Consumes complete stream and attempts to build a string out of it using passed in charset. It is the caller
-   * liability to use this method with streams of a reasonable sized content. This method does not protect against
-   * such (mis)use.
-   */
-  public static String asString(final InputStream is, final Charset cs) throws IOException {
-    try (final InputStreamReader isr = new InputStreamReader(is, cs)) {
-      return CharStreams.toString(isr);
-    }
-  }
-
 }
