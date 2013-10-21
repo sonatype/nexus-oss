@@ -59,7 +59,7 @@ implements SupportBundleCustomizer
     // add source for nexus.log
     supportBundle << new GeneratedContentSourceSupport(LOG, 'nexus.log') {
       {
-        this.priority = LOW
+        this.withPriority(LOW)
       }
 
       @Override

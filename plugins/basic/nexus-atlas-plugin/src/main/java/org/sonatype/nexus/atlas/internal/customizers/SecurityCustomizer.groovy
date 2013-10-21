@@ -17,6 +17,7 @@ import org.sonatype.nexus.atlas.FileContentSourceSupport
 import org.sonatype.nexus.atlas.SupportBundle
 import org.sonatype.nexus.atlas.SupportBundleCustomizer
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration
+import org.sonatype.security.model.source.SecurityModelConfigurationSource
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
 import javax.inject.Inject
@@ -39,9 +40,14 @@ implements SupportBundleCustomizer
 {
   private final ApplicationConfiguration applicationConfiguration
 
+  private final SecurityModelConfigurationSource securityModelConfigurationSource
+
   @Inject
-  SecurityCustomizer(final ApplicationConfiguration applicationConfiguration) {
+  SecurityCustomizer(final ApplicationConfiguration applicationConfiguration,
+                     final SecurityModelConfigurationSource securityModelConfigurationSource)
+  {
     this.applicationConfiguration = checkNotNull(applicationConfiguration)
+    this.securityModelConfigurationSource = checkNotNull(securityModelConfigurationSource)
   }
 
   @Override

@@ -14,9 +14,11 @@
 package org.sonatype.nexus.atlas.internal.customizers
 
 import org.sonatype.nexus.atlas.FileContentSourceSupport
+import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
 import org.sonatype.nexus.atlas.SupportBundle
 import org.sonatype.nexus.atlas.SupportBundleCustomizer
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration
+import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
 import javax.inject.Inject
@@ -25,6 +27,7 @@ import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.HIGH
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.REQUIRED
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.CONFIG
 
 /**
@@ -47,12 +50,15 @@ implements SupportBundleCustomizer
 
   @Override
   void customize(final SupportBundle supportBundle) {
+    // nexus.xml
+    supportBundle << new NexusXmlContentSource()
+
     // helper to include a file
     def maybeIncludeFile = { File file, String prefix ->
       if (file.exists()) {
         log.debug 'Including file: {}', file
         supportBundle << new FileContentSourceSupport(CONFIG, "$prefix/${file.name}", file)
-            .setPriority(HIGH)
+            .withPriority(HIGH)
       }
       else {
         log.trace 'Skipping non-existent file: {}', file
@@ -61,7 +67,8 @@ implements SupportBundleCustomizer
 
     // include installation configuration
     def installDir = applicationConfiguration.installDirectory
-    if (installDir) { // could be null
+    if (installDir) {
+      // could be null
       maybeIncludeFile new File(installDir, 'conf/jetty.xml'), 'install/conf'
       maybeIncludeFile new File(installDir, 'conf/nexus.properties'), 'install/conf'
       maybeIncludeFile new File(installDir, 'bin/jsw/conf/wrapper.conf'), 'install/bin/jsw/conf'
@@ -72,11 +79,41 @@ implements SupportBundleCustomizer
     assert configDir.exists()
 
     // capture specific files (we don't want .bak, .tmp and other garbage)
-    [ 'nexus.xml', 'capabilities.xml' ].each {
+    ['capabilities.xml'].each {
       maybeIncludeFile new File(configDir, it), 'work/conf'
     }
 
     // HACK: For truncation testing
     maybeIncludeFile new File(configDir, 'junk.txt'), 'testing'
+  }
+
+  /**
+   * Source for nexus.xml
+   */
+  private class NexusXmlContentSource
+  extends GeneratedContentSourceSupport
+  {
+    NexusXmlContentSource() {
+      super(CONFIG, 'work/conf/nexus.xml')
+      this.priority = REQUIRED
+    }
+
+    @Override
+    protected void generate(final File file) {
+      def model = applicationConfiguration.configurationModel
+
+      // obfuscate sensitive content
+      model.smtpConfiguration?.password = PASSWORD_TOKEN
+      model.remoteProxySettings?.httpProxySettings?.authentication?.password = PASSWORD_TOKEN
+      model.remoteProxySettings?.httpsProxySettings?.authentication?.password = PASSWORD_TOKEN
+      model.repositories.each { repo ->
+        repo.remoteStorage?.authentication?.password = PASSWORD_TOKEN
+      }
+
+      def writer = new NexusConfigurationXpp3Writer()
+      file.withOutputStream { output ->
+        writer.write(output, model)
+      }
+    }
   }
 }

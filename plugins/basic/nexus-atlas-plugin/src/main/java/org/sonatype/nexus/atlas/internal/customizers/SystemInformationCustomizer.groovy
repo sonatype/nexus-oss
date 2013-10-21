@@ -50,7 +50,7 @@ implements SupportBundleCustomizer
   void customize(final SupportBundle supportBundle) {
     supportBundle << new GeneratedContentSourceSupport(SYSINFO, 'sysinfo.json') {
       {
-        this.priority = REQUIRED
+        this.withPriority(REQUIRED)
       }
 
       @Override

@@ -65,7 +65,7 @@ implements SupportBundleCustomizer
     // add thread-dump
     supportBundle << new GeneratedContentSourceSupport(THREAD, 'threads.txt') {
       {
-        this.priority = HIGH
+        this.withPriority(HIGH)
       }
       @Override
       protected void generate(final File file) {
@@ -78,7 +78,7 @@ implements SupportBundleCustomizer
     // add healthchecks
     supportBundle << new GeneratedContentSourceSupport(SYSINFO, 'healthcheck.txt') {
       {
-        this.priority = OPTIONAL
+        this.withPriority(OPTIONAL)
       }
       @Override
       protected void generate(final File file) {
@@ -103,7 +103,7 @@ implements SupportBundleCustomizer
     // add metrics
     supportBundle << new GeneratedContentSourceSupport(METRICS, 'metrics.txt') {
       {
-        this.priority = OPTIONAL
+        this.withPriority(OPTIONAL)
       }
       @Override
       protected void generate(final File file) {

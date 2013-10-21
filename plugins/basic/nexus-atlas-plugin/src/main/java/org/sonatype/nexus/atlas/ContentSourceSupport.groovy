@@ -30,11 +30,15 @@ abstract class ContentSourceSupport
 extends ComponentSupport
 implements ContentSource
 {
+  public static final String PASSWORD_TOKEN = '****' // field must be public to avoid confusing it with a property
+
+  // TODO: See if groovy handles final properties or not
+
   private final Type type
 
   private final String path
 
-  private Priority priority = DEFAULT
+  Priority priority = DEFAULT
 
   ContentSourceSupport(final Type type, final String path) {
     this.type = checkNotNull(type)
@@ -59,7 +63,7 @@ implements ContentSource
   /**
    * Set priority, returns self reference.
    */
-  def setPriority(final Priority priority) {
+  def withPriority(final Priority priority) {
     assert priority
     this.priority = priority
     return this
