@@ -13,14 +13,11 @@
 
 package org.sonatype.nexus.tasks;
 
-import org.sonatype.plugin.ExtensionPoint;
-
 /**
  * Performs the actual reindexing.
  *
  * @author Alin Dreghiciu
  */
-@ExtensionPoint
 public interface ReindexTaskHandler
 {
   public void reindexAllRepositories(String path, boolean fullReindex)

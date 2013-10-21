@@ -17,8 +17,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.inject.Singleton;
-
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreIteratorRequest;
@@ -27,15 +25,12 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * Local storage.
  *
  * @author cstamas
  */
-@ExtensionPoint
-@Singleton
 public interface LocalRepositoryStorage
 {
   /**
