@@ -64,7 +64,7 @@ implements SupportZipGenerator
   @Inject
   SupportZipGeneratorImpl(final ApplicationConfiguration applicationConfiguration,
                           final List<SupportBundleCustomizer> bundleCustomizers,
-                          final @Named('${atlas.supportZipGenerator.maxZipFileSize:-30mb}') ByteSize maxFileSize,
+                          final @Named('${atlas.supportZipGenerator.maxFileSize:-30mb}') ByteSize maxFileSize,
                           final @Named('${atlas.supportZipGenerator.maxZipFileSize:-20mb}') ByteSize maxZipFileSize)
   {
     assert applicationConfiguration
