@@ -122,12 +122,12 @@ public class DefaultNexusTimeline
         "Moving legacy timeline index from '" + legacyIndexDir.getAbsolutePath() + "' to '"
             + newIndexDir.getAbsolutePath() + "'.");
 
-    if (!newIndexDir.exists()) {
-      Files.createDirectories(newIndexDir.toPath());
-    }
-
+    Files.createDirectories(newIndexDir.toPath());
     for (File legacyIndexFile : legacyIndexFiles) {
-      DirSupport.move(legacyIndexDir.toPath(), new File(newIndexDir, legacyIndexFile.getName()).toPath());
+      // legacy was just plain Lucene index (so, we move lucene files from here into a SUBDIRECTORY)
+      if (Files.isRegularFile(legacyIndexFile.toPath())) {
+        Files.move(legacyIndexFile.toPath(), new File(newIndexDir, legacyIndexFile.getName()).toPath());
+      }
     }
   }
 
