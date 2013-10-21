@@ -16,10 +16,6 @@ package org.sonatype.nexus.rest.feeds.sources;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.inject.Singleton;
-
-import org.sonatype.plugin.ExtensionPoint;
-
 import com.sun.syndication.feed.synd.SyndFeed;
 
 /**
@@ -27,8 +23,6 @@ import com.sun.syndication.feed.synd.SyndFeed;
  *
  * @author cstamas
  */
-@ExtensionPoint
-@Singleton
 public interface FeedSource
 {
   /**

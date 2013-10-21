@@ -42,6 +42,7 @@
         </Arg>
         <Set name="host">${application-host}</Set>
         <Set name="port">${application-port-ssl}</Set>
+        <Set name="forwarded">true</Set>
       </New>
     </Arg>
   </Call>

@@ -16,19 +16,14 @@ package org.sonatype.nexus.proxy.attributes;
 import java.io.File;
 import java.util.Set;
 
-import javax.inject.Singleton;
-
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * The Interface StorageFileItemInspector.
  *
  * @deprecated Use {@link StorageItemInspector} instead.
  */
-@ExtensionPoint
-@Singleton
 @Deprecated
 public interface StorageFileItemInspector
 {
