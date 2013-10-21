@@ -22,7 +22,6 @@ public class WalkerException
 
   public WalkerException(WalkerContext walkerContext, String message) {
     super(message, walkerContext.getStopCause());
-
     this.walkerContext = walkerContext;
   }
 

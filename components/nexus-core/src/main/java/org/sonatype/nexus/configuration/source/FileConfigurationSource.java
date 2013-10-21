@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,8 +38,6 @@ import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writ
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
 import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
-import org.sonatype.nexus.util.file.DirSupport;
-import org.sonatype.nexus.util.file.FileSupport;
 import org.sonatype.security.events.SecurityConfigurationChanged;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
@@ -330,7 +330,7 @@ public class FileConfigurationSource
     // Create the dir if doesn't exist, throw runtime exception on failure
     // bad bad bad
     try {
-      DirSupport.mkdirs(file.getParentFile().toPath());
+      Files.createDirectories(file.getParentFile().toPath());
     }
     catch (IOException e) {
       String message =
@@ -376,6 +376,6 @@ public class FileConfigurationSource
 
     // backup the file
     File backup = new File(file.getParentFile(), file.getName() + ".bak");
-    FileSupport.copy(file.toPath(), backup.toPath());
+    Files.copy(file.toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING);
   }
 }

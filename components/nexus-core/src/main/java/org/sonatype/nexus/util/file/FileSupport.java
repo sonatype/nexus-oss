@@ -45,59 +45,8 @@ public final class FileSupport
       StandardCopyOption.REPLACE_EXISTING
   };
 
-  public static final CopyOption[] DEFAULT_MOVE_OPTIONS = {
-      StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES
-  };
-
   private FileSupport() {
     // no instance
-  }
-
-  // DELETE
-
-  public static void delete(final Path file) throws IOException {
-    validateFile(file);
-    Files.delete(file);
-  }
-
-  public static boolean deleteIfExists(final Path file) throws IOException {
-    checkNotNull(file);
-    return Files.deleteIfExists(file);
-  }
-
-  // COPY: file to file
-
-  public static void copy(final Path from, final Path to) throws IOException {
-    // "copy": overwrite if exists + make files appear as "new" + copy as link if link
-    copy(from, to, DEFAULT_COPY_OPTIONS);
-  }
-
-  public static boolean copyIfExists(final Path from, final Path to) throws IOException {
-    checkNotNull(from);
-    if (Files.exists(from)) {
-      copy(from, to);
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-
-  public static void copy(final Path from, final Path to, final CopyOption... options) throws IOException {
-    validateFile(from);
-    checkNotNull(to);
-    Files.copy(from, to, options);
-  }
-
-  public static boolean copyIfExists(final Path from, final Path to, final CopyOption... options) throws IOException {
-    checkNotNull(from);
-    if (Files.exists(from)) {
-      copy(from, to, options);
-      return true;
-    }
-    else {
-      return false;
-    }
   }
 
   // COPY: stream to file
@@ -108,42 +57,14 @@ public final class FileSupport
   }
 
   public static void copy(final InputStream from, final Path to, final CopyOption... options) throws IOException {
-    checkNotNull(to);
-    Files.copy(from, to, options);
-  }
-
-  // MOVE: file to file
-
-  public static void move(final Path from, final Path to) throws IOException {
-    // "move": overwrite if exists + make files appear as "new" + copy as link if link
-    move(from, to, DEFAULT_MOVE_OPTIONS);
-  }
-
-  public static boolean moveIfExists(final Path from, final Path to) throws IOException {
     checkNotNull(from);
-    if (Files.exists(from)) {
-      move(from, to);
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-
-  public static void move(final Path from, final Path to, final CopyOption... options) throws IOException {
-    validateFile(from);
     checkNotNull(to);
-    Files.move(from, to, options);
-  }
-
-  public static boolean moveIfExists(final Path from, final Path to, final CopyOption... options) throws IOException {
-    checkNotNull(from);
-    if (Files.exists(from)) {
-      move(from, to, options);
-      return true;
+    Files.createDirectories(to.getParent());
+    try (final InputStream is = from) {
+      Files.copy(is, to, options);
     }
-    else {
-      return false;
+    catch (IOException e) {
+      Files.delete(to);
     }
   }
 
@@ -158,7 +79,7 @@ public final class FileSupport
   public static String readFile(final Path file, final Charset charset)
       throws IOException
   {
-    checkNotNull(file);
+    validateFile(file);
     checkNotNull(charset);
     try (final BufferedReader reader = Files.newBufferedReader(file, charset)) {
       final StringBuilder result = new StringBuilder();
@@ -184,12 +105,12 @@ public final class FileSupport
   {
     checkNotNull(file);
     checkNotNull(charset);
+    Files.createDirectories(file.getParent());
     try (final BufferedWriter writer = Files.newBufferedWriter(file, charset)) {
       writer.write(payload);
       writer.flush();
     }
   }
-
 
   // Validation
 

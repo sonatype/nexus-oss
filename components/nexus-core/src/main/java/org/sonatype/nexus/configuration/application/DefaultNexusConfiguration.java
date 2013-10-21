@@ -16,6 +16,7 @@ package org.sonatype.nexus.configuration.application;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -72,7 +73,6 @@ import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
-import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
@@ -89,6 +89,7 @@ import com.google.common.collect.Collections2;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -260,7 +261,7 @@ public class DefaultNexusConfiguration
 
   private File forceMkdir(final File directory) {
     try {
-      DirSupport.mkdirs(directory.toPath());
+      Files.createDirectories(directory.toPath());
       return directory;
     }
     catch (IOException e) {

@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -51,8 +52,6 @@ import org.sonatype.nexus.proxy.storage.local.AbstractLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.util.ItemPathUtils;
-import org.sonatype.nexus.util.file.DirSupport;
-import org.sonatype.nexus.util.file.FileSupport;
 
 import com.google.common.base.Strings;
 import com.google.common.io.Closeables;
@@ -135,7 +134,7 @@ public class DefaultFSLocalRepositoryStorage
     }
     else {
       try {
-        DirSupport.mkdirs(file.toPath());
+        Files.createDirectories(file.toPath());
       }
       catch (IOException e) {
         throw new LocalStorageException("Could not create the baseDir directory for repository \""
@@ -156,7 +155,7 @@ public class DefaultFSLocalRepositoryStorage
   {
     if (!repoBase.exists()) {
       try {
-        DirSupport.mkdirs(repoBase.toPath());
+        Files.createDirectories(repoBase.toPath());
       }
       catch (IOException e) {
         throw new LocalStorageException(
@@ -253,9 +252,7 @@ public class DefaultFSLocalRepositoryStorage
           }
           catch (NoSuchRepositoryException e) {
             getLogger().warn("Stale link object found on UID: {}, deleting it.", uid);
-
-            FileSupport.delete(target.toPath());
-
+            Files.delete(target.toPath());
             throw new ItemNotFoundException(reasonFor(request, repository,
                 "Path %s not found in local storage of repository %s", request.getRequestPath(),
                 RepositoryStringUtils.getHumanizedNameString(repository)), e);

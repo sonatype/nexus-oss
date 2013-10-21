@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -199,6 +200,7 @@ public class FileUtils
     return null;
   }
 
+  @Deprecated
   public static void move(File source, File destination)
       throws IOException
   {
@@ -213,7 +215,7 @@ public class FileUtils
       throw new FileNotFoundException("Source file doesn't exists " + source);
     }
 
-    DirSupport.mkdirs(destination.getParentFile().toPath());
+    Files.createDirectories(destination.getParentFile().toPath());
     if (!destination.exists()) {
       if (!source.renameTo(destination)) {
         throw new IOException("Failed to move '" + source + "' to '" + destination + "'");

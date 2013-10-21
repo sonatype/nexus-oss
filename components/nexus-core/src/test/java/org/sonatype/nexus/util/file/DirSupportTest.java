@@ -113,15 +113,6 @@ public class DirSupportTest
   }
 
   @Test
-  public void mkdirs() throws IOException {
-    final Path dir31 = root.toPath().resolve("dir3").resolve("dir31");
-    DirSupport.mkdirs(dir31);
-    assertThat(dir31.toFile(), exists());
-    assertThat(dir31.toFile(), isDirectory());
-    assertThat(dir31.toFile(), isEmptyDirectory());
-  }
-
-  @Test
   public void copy() throws IOException {
     final Path target = util.createTempDir().toPath();
     DirSupport.copy(root.toPath(), target);

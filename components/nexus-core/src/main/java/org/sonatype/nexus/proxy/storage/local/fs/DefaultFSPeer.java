@@ -21,6 +21,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.List;
 
@@ -43,7 +45,6 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.file.DirSupport;
-import org.sonatype.nexus.util.file.FileSupport;
 import org.sonatype.nexus.util.io.StreamSupport;
 
 import com.google.common.base.Throwables;
@@ -124,7 +125,7 @@ public class DefaultFSPeer
       // NXCM-4852: Proxy remote peer response premature end (should be translated by RRS)
       {
         try {
-          FileSupport.deleteIfExists(hiddenTarget.toPath());
+          Files.deleteIfExists(hiddenTarget.toPath());
         }
         catch (IOException e1) {
           // best effort to delete, we already have what to throw
@@ -135,7 +136,7 @@ public class DefaultFSPeer
       }
       catch (IOException e) {
         try {
-          FileSupport.deleteIfExists(hiddenTarget.toPath());
+          Files.deleteIfExists(hiddenTarget.toPath());
         }
         catch (IOException e1) {
           // best effort to delete, we already have what to throw
@@ -168,7 +169,7 @@ public class DefaultFSPeer
             // NEXUS-4871 prevent zero length/corrupt files
             target.length() == 0)) {
           try {
-            FileSupport.delete(target.toPath());
+            Files.delete(target.toPath());
           }
           catch (IOException e1) {
             getLogger().warn("Could not delete file: " + target.getAbsolutePath(), e);
@@ -179,7 +180,7 @@ public class DefaultFSPeer
             // NEXUS-4871 prevent zero length/corrupt files
             hiddenTarget.length() == 0)) {
           try {
-            FileSupport.delete(hiddenTarget.toPath());
+            Files.delete(hiddenTarget.toPath());
           }
           catch (IOException e1) {
             getLogger().warn("Could not delete file: " + target.getAbsolutePath(), e);
@@ -203,7 +204,7 @@ public class DefaultFSPeer
     else {
       // we have no content, we talk about directory
       try {
-        DirSupport.mkdirs(target.toPath());
+        Files.createDirectories(target.toPath());
       }
       catch (IOException e) {
         Throwables.propagate(e);
@@ -323,7 +324,7 @@ public class DefaultFSPeer
       throws LocalStorageException
   {
     try {
-      DirSupport.mkdirs(target.toPath());
+      Files.createDirectories(target.toPath());
     }
     catch (IOException e) {
       throw new LocalStorageException(String.format(
@@ -349,6 +350,6 @@ public class DefaultFSPeer
   protected void handleRenameOperation(final File hiddenTarget, final File target)
       throws IOException
   {
-    FileSupport.move(hiddenTarget.toPath(), target.toPath());
+    Files.move(hiddenTarget.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
   }
 }

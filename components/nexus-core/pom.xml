@@ -245,11 +245,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-resource-scanner</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.sisu.pr</groupId>
       <artifactId>sisu-problem-reporter</artifactId>
     </dependency>

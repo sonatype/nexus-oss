@@ -46,18 +46,9 @@ public class FileSupportTest
   }
 
   @Test
-  public void delete() throws IOException {
-    final Path file1 = root.toPath().resolve("file1.txt");
-    FileSupport.delete(file1);
-    assertThat(file1.toFile(), not(exists()));
+  public void testSomething()
+  {
+    // just a dummy UT
   }
 
-  @Test
-  public void deleteIfExists() throws IOException {
-    final Path file1 = root.toPath().resolve("file1.txt");
-    final Path file2 = root.toPath().resolve("file-not-exists.txt");
-    assertThat(FileSupport.deleteIfExists(file2), is(false));
-    assertThat(FileSupport.deleteIfExists(file1), is(true));
-    assertThat(file1.toFile(), not(exists()));
-  }
 }

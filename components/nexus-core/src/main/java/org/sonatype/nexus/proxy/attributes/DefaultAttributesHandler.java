@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -449,7 +450,7 @@ public class DefaultAttributesHandler
           finally {
             if (deleteTmpFile && tmpFile != null) {
               try {
-                FileSupport.delete(tmpFile.toPath());
+                Files.delete(tmpFile.toPath());
               }
               catch (IOException e) {
                 tmpFile.deleteOnExit();

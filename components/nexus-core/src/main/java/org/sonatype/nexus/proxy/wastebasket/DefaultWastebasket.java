@@ -15,6 +15,11 @@ package org.sonatype.nexus.proxy.wastebasket;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,12 +38,8 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.walker.AffirmativeStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
-import org.sonatype.nexus.util.file.FileSupport;
-import org.sonatype.sisu.resource.scanner.Listener;
-import org.sonatype.sisu.resource.scanner.Scanner;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Throwables;
 
 @Named
 @Singleton
@@ -54,19 +55,15 @@ public class DefaultWastebasket
 
   private Walker walker;
 
-  private final Scanner scanner;
-
   private final RepositoryRegistry repositoryRegistry;
 
   @Inject
   public DefaultWastebasket(final ApplicationConfiguration applicationConfiguration,
                             final Walker walker,
-                            final @Named("serial") Scanner scanner,
                             final RepositoryRegistry repositoryRegistry)
   {
     this.applicationConfiguration = applicationConfiguration;
     this.walker = walker;
-    this.scanner = scanner;
     this.repositoryRegistry = repositoryRegistry;
   }
 
@@ -81,10 +78,6 @@ public class DefaultWastebasket
   @VisibleForTesting
   void setWalker(final Walker walker) {
     this.walker = walker;
-  }
-
-  protected Scanner getScanner() {
-    return scanner;
   }
 
   protected RepositoryRegistry getRepositoryRegistry() {
@@ -141,39 +134,26 @@ public class DefaultWastebasket
     // check for existence, is this needed at all?
     if (basketFile.isDirectory()) {
       final long limitDate = System.currentTimeMillis() - age;
-      getScanner().scan(basketFile, new Listener()
+      Files.walkFileTree(basketFile.toPath(), new SimpleFileVisitor<Path>()
       {
         @Override
-        public void onFile(File file) {
-          if (age == ALL || file.lastModified() < limitDate) {
-            try {
-              FileSupport.delete(file.toPath());
-            }
-            catch (IOException e) {
-              Throwables.propagate(e);
-            }
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+            throws IOException
+        {
+          if (age == ALL || file.toFile().lastModified() < limitDate) {
+            Files.delete(file);
           }
+          return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public void onExitDirectory(File directory) {
-          if (!basketFile.equals(directory) && directory.list().length == 0) {
-            try {
-              FileSupport.delete(directory.toPath());
-            }
-            catch (IOException e) {
-              Throwables.propagate(e);
-            }
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc)
+            throws IOException
+        {
+          if (!basketFile.equals(dir.toFile()) && dir.toFile().list().length == 0) {
+            Files.delete(dir);
           }
-        }
-
-        public void onEnterDirectory(File directory) {
-        }
-
-        public void onEnd() {
-        }
-
-        public void onBegin() {
+          return FileVisitResult.CONTINUE;
         }
       });
     }

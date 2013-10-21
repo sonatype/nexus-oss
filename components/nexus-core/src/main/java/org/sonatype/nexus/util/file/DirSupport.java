@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
@@ -49,36 +48,6 @@ public final class DirSupport
   }
 
   // Visitors
-
-  public static class DelegatingFileVisitor<T>
-      extends SimpleFileVisitor<T>
-  {
-    private final FileVisitor<T> delegate;
-
-    public DelegatingFileVisitor(final FileVisitor<T> delegate) {
-      this.delegate = checkNotNull(delegate);
-    }
-
-    @Override
-    public FileVisitResult preVisitDirectory(final T fileRef, final BasicFileAttributes attrs) throws IOException {
-      return delegate.preVisitDirectory(fileRef, attrs);
-    }
-
-    @Override
-    public FileVisitResult visitFile(final T fileRef, final BasicFileAttributes attrs) throws IOException {
-      return delegate.visitFile(fileRef, attrs);
-    }
-
-    @Override
-    public FileVisitResult visitFileFailed(final T fileRef, final IOException exc) throws IOException {
-      return delegate.visitFileFailed(fileRef, exc);
-    }
-
-    @Override
-    public FileVisitResult postVisitDirectory(final T fileRef, final IOException exc) throws IOException {
-      return delegate.postVisitDirectory(fileRef, exc);
-    }
-  }
 
   public static class FunctionVisitor
       extends SimpleFileVisitor<Path>
@@ -137,7 +106,7 @@ public final class DirSupport
     public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes a) throws IOException {
       final Path targetPath = to.resolve(from.relativize(dir));
       if (!Files.exists(targetPath)) {
-        Files.createDirectory(targetPath);
+        Files.createDirectories(targetPath);
       }
       return FileVisitResult.CONTINUE;
     }
@@ -217,28 +186,33 @@ public final class DirSupport
   // DELETE: removes directory subtree with directory itself recursively
 
   public static void delete(final Path dir) throws IOException {
-    validateDirectory(dir);
-    Files.walkFileTree(dir, DEFAULT_FILE_VISIT_OPTIONS, Integer.MAX_VALUE,
-        new SimpleFileVisitor<Path>()
-        {
-          @Override
-          public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-            Files.delete(file);
-            return FileVisitResult.CONTINUE;
-          }
-
-          @Override
-          public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) throws IOException {
-            if (exc != null) {
-              throw exc;
-            }
-            else {
-              Files.delete(dir);
+    validateDirectoryOrFile(dir);
+    if (Files.isDirectory(dir)) {
+      Files.walkFileTree(dir, DEFAULT_FILE_VISIT_OPTIONS, Integer.MAX_VALUE,
+          new SimpleFileVisitor<Path>()
+          {
+            @Override
+            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+              Files.delete(file);
               return FileVisitResult.CONTINUE;
             }
+
+            @Override
+            public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) throws IOException {
+              if (exc != null) {
+                throw exc;
+              }
+              else {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+              }
+            }
           }
-        }
-    );
+      );
+    }
+    else {
+      Files.delete(dir);
+    }
   }
 
   public static boolean deleteIfExists(final Path dir) throws IOException {
@@ -252,17 +226,9 @@ public final class DirSupport
     }
   }
 
-  // MKDIR: create directories
-
-  public static Path mkdirs(final Path dir) throws IOException {
-    checkNotNull(dir);
-    return Files.createDirectories(dir);
-  }
-
   // COPY: recursive copy of whole directory tree
 
   public static void copy(final Path from, final Path to) throws IOException {
-    // "copy": overwrite if exists + make files appear as "new" + copy as link if link
     copy(from, to, StandardCopyOption.REPLACE_EXISTING);
   }
 
@@ -278,10 +244,16 @@ public final class DirSupport
   }
 
   public static void copy(final Path from, final Path to, final CopyOption... options) throws IOException {
-    validateDirectory(from);
+    validateDirectoryOrFile(from);
     checkNotNull(to);
-    Files.walkFileTree(from, DEFAULT_FILE_VISIT_OPTIONS, Integer.MAX_VALUE,
-        new CopyVisitor(from, to, options));
+    if (Files.isDirectory(from)) {
+      Files.walkFileTree(from, DEFAULT_FILE_VISIT_OPTIONS, Integer.MAX_VALUE,
+          new CopyVisitor(from, to, options));
+    }
+    else {
+      Files.createDirectories(to.getParent());
+      Files.copy(from, to, options);
+    }
   }
 
   public static boolean copyIfExists(final Path from, final Path to, final CopyOption... options) throws IOException {
@@ -298,7 +270,6 @@ public final class DirSupport
   // MOVE: recursive copy of whole directory tree and then deleting it
 
   public static void move(final Path from, final Path to) throws IOException {
-    // "move": overwrite if exists + transfer attributes (last mod time) + copy as link if link
     copy(from, to, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
     delete(from);
   }
@@ -332,6 +303,13 @@ public final class DirSupport
     for (Path path : paths) {
       checkNotNull(path, "Path must be non-null");
       checkArgument(Files.isDirectory(path), SimpleFormat.template("%s is not a directory", path));
+    }
+  }
+
+  private static void validateDirectoryOrFile(final Path... paths) {
+    for (Path path : paths) {
+      checkNotNull(path, "Path must be non-null");
+      checkArgument(Files.exists(path), SimpleFormat.template("%s does not exists", path));
     }
   }
 
