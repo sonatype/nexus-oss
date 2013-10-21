@@ -56,7 +56,7 @@ class SupportBundle
       LOW(100),
       DEFAULT(50),
       HIGH(10),
-      REQUIRED(1)
+      REQUIRED(0)
 
       final int order
 

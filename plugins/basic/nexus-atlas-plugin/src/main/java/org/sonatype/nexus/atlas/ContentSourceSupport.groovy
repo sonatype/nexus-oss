@@ -34,8 +34,6 @@ implements ContentSource
 
   public static final String EMAIL_TOKEN = 'user@domain'
 
-  // TODO: See if groovy handles final properties or not
-
   private final Type type
 
   private final String path
