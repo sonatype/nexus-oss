@@ -34,7 +34,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * FS directory related support class. Offers static helper methods for common FS related operations
- * used in Nexus core and plugins for manipulating FS directories (aka "folders").
+ * used in Nexus core and plugins for manipulating FS directories (aka "folders"). Goal of this class is
+ * to utilize new Java7 NIO Files and related classes for better error detection.
  *
  * @author cstamas
  * @since 2.7.0
@@ -120,6 +121,11 @@ public final class DirSupport
 
   // CLEAN: remove files recursively of a directory but keeping the directory structure intact
 
+  /**
+   * Cleans an existing directory from any (non-directory) files recursively. Accepts only existing
+   * directories, and when returns, it's guaranteed that this directory might contain only subdirectories
+   * that also might contain only subdirectories (recursively).
+   */
   public static void clean(final Path dir) throws IOException {
     validateDirectory(dir);
     Files.walkFileTree(dir, DEFAULT_FILE_VISIT_OPTIONS, Integer.MAX_VALUE,
@@ -134,6 +140,10 @@ public final class DirSupport
     );
   }
 
+  /**
+   * Invokes {@link #clean(Path)} if passed in path exists and is a directory. Also, in that case {@code true} is
+   * returned, and in any other case (path does not exists) {@code false} is returned.
+   */
   public static boolean cleanIfExists(final Path dir) throws IOException {
     checkNotNull(dir);
     if (Files.exists(dir)) {
@@ -147,6 +157,11 @@ public final class DirSupport
 
   // EMPTY: removes directory subtree with directory itself left intact
 
+  /**
+   * Empties an existing directory, by recursively removing all it's siblings, regular files and directories. Accepts
+   * only existing directories, and when returns, it's guaranteed that passed in directory will be emptied (will
+   * have no siblings, not counting OS specific ones, will be "empty" as per current OS is empty defined).
+   */
   public static void empty(final Path dir) throws IOException {
     validateDirectory(dir);
     Files.walkFileTree(dir, DEFAULT_FILE_VISIT_OPTIONS, Integer.MAX_VALUE,
@@ -172,6 +187,10 @@ public final class DirSupport
     );
   }
 
+  /**
+   * Invokes {@link #empty(Path)} if passed in path exists and is a directory. Also, in that case {@code true} is
+   * returned, and in any other case (path does not exists) {@code false} is returned.
+   */
   public static boolean emptyIfExists(final Path dir) throws IOException {
     checkNotNull(dir);
     if (Files.exists(dir)) {
@@ -185,6 +204,10 @@ public final class DirSupport
 
   // DELETE: removes directory subtree with directory itself recursively
 
+  /**
+   * Deletes a file or directory recursively. This method accepts paths denoting regular files and directories. In case
+   * of directory, this method will recursively delete all of it siblings and the passed in directory too.
+   */
   public static void delete(final Path dir) throws IOException {
     validateDirectoryOrFile(dir);
     if (Files.isDirectory(dir)) {
@@ -215,6 +238,10 @@ public final class DirSupport
     }
   }
 
+  /**
+   * Invokes {@link #delete(Path)} if passed in path exists. Also, in that case {@code true} is
+   * returned, and in any other case (path does not exists) {@code false} is returned.
+   */
   public static boolean deleteIfExists(final Path dir) throws IOException {
     checkNotNull(dir);
     if (Files.exists(dir)) {
@@ -228,10 +255,20 @@ public final class DirSupport
 
   // COPY: recursive copy of whole directory tree
 
+  /**
+   * Invokes {@link #copy(Path, Path, CopyOption...)} using "default" options that are:
+   * <pre>
+   *   {@link StandardCopyOption#REPLACE_EXISTING}
+   * </pre>
+   */
   public static void copy(final Path from, final Path to) throws IOException {
     copy(from, to, StandardCopyOption.REPLACE_EXISTING);
   }
 
+  /**
+   * Invokes {@link #copy(Path, Path)} if passed in "from" path exists and returns {@code true}. If "from" path
+   * does not exists, {@code false} is returned.
+   */
   public static boolean copyIfExists(final Path from, final Path to) throws IOException {
     checkNotNull(from);
     if (Files.exists(from)) {
@@ -243,6 +280,11 @@ public final class DirSupport
     }
   }
 
+  /**
+   * Copies path "from" to path "to". This method accepts both existing regular files and existing directories. If
+   * "from" is a directory, a recursive copy happens of the whole subtree with "from" directory as root. Caller may
+   * alter behaviour of Copy operation using copy options, as seen on {@link Files#copy(Path, Path, CopyOption...)}.
+   */
   public static void copy(final Path from, final Path to, final CopyOption... options) throws IOException {
     validateDirectoryOrFile(from);
     checkNotNull(to);
@@ -256,6 +298,10 @@ public final class DirSupport
     }
   }
 
+  /**
+   * Invokes {@link #copy(Path, Path, CopyOption...)} if passed in "from" path exists and returns {@code true}. If
+   * "from" path does not exists, {@code false} is returned.
+   */
   public static boolean copyIfExists(final Path from, final Path to, final CopyOption... options) throws IOException {
     checkNotNull(from);
     if (Files.exists(from)) {
@@ -269,11 +315,19 @@ public final class DirSupport
 
   // MOVE: recursive copy of whole directory tree and then deleting it
 
+  /**
+   * Performs a move operation, but as a sequence of "copy" and then "delete" (not a real move!). This method accepts
+   * existing Paths that might denote a regular file or a directory.
+   */
   public static void move(final Path from, final Path to) throws IOException {
     copy(from, to, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
     delete(from);
   }
 
+  /**
+   * Invokes {@link #move(Path, Path)} if passed in "from" path exists and returns {@code true}. If
+   * "from" path does not exists, {@code false} is returned.
+   */
   public static boolean moveIfExists(final Path from, final Path to) throws IOException {
     checkNotNull(from);
     if (Files.exists(from)) {
@@ -287,11 +341,19 @@ public final class DirSupport
 
   // APPLY: applies a function to dir tree, the function should not have any IO "side effect"
 
+  /**
+   * Traverses the subtree starting with "from" and applies passed in {@link Function} onto files and directories.
+   * This method accepts only existing directories.
+   */
   public static void apply(final Path from, final Function<Path, FileVisitResult> func) throws IOException {
     validateDirectory(from);
     Files.walkFileTree(from, DEFAULT_FILE_VISIT_OPTIONS, Integer.MAX_VALUE, new FunctionVisitor(func));
   }
 
+  /**
+   * Traverses the subtree starting with "from" and applies passed in {@link Function} onto files only.
+   * This method accepts only existing directories.
+   */
   public static void applyToFiles(final Path from, final Function<Path, FileVisitResult> func) throws IOException {
     validateDirectory(from);
     Files.walkFileTree(from, DEFAULT_FILE_VISIT_OPTIONS, Integer.MAX_VALUE, new FunctionFileVisitor(func));
@@ -299,6 +361,9 @@ public final class DirSupport
 
   // Validation
 
+  /**
+   * Enforce all passed in paths are non-null and is existing directory.
+   */
   private static void validateDirectory(final Path... paths) {
     for (Path path : paths) {
       checkNotNull(path, "Path must be non-null");
@@ -306,6 +371,9 @@ public final class DirSupport
     }
   }
 
+  /**
+   * Enforce all passed in paths are non-null and exist.
+   */
   private static void validateDirectoryOrFile(final Path... paths) {
     for (Path path : paths) {
       checkNotNull(path, "Path must be non-null");

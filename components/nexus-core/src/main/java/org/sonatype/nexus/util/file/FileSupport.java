@@ -32,7 +32,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * FS regular file related support class. Offers static helper methods for common FS related operations
- * used in Nexus core and plugins for manipulating FS files (aka "regular files").
+ * used in Nexus core and plugins for manipulating FS files (aka "regular files"). Goal of this class is
+ * to utilize new Java7 NIO Files and related classes for better error detection.
  *
  * @author cstamas
  * @since 2.7.0
@@ -41,21 +42,32 @@ public final class FileSupport
 {
   public static final Charset DEFAULT_CHARSET = Charsets.UTF_8;
 
-  public static final CopyOption[] DEFAULT_COPY_OPTIONS = {
-      StandardCopyOption.REPLACE_EXISTING
-  };
-
   private FileSupport() {
     // no instance
   }
 
   // COPY: stream to file
 
+  /**
+   * Invokes {@link #copy(InputStream, Path, CopyOption...)} with default copy options of:
+   * <pre>
+   *   StandardCopyOption.REPLACE_EXISTING
+   * </pre>
+   * Hence, this method would copy the complete  content of passed input stream into a file at path "to",
+   * possibly overwriting it if file already exists. The passed in stream will be attempted to be
+   * completely consumed. In any outcome (success or exception), the stream will be closed.
+   */
   public static void copy(final InputStream from, final Path to) throws IOException {
     // "copy": overwrite if exists + make files appear as "new" + copy as link if link
-    copy(from, to, DEFAULT_COPY_OPTIONS);
+    copy(from, to, StandardCopyOption.REPLACE_EXISTING);
   }
 
+  /**
+   * This method attempts to copy the complete content of passed input stream into a file at path "to". using copy
+   * options as passed in by user. For acceptable copy options see {@link Files#copy(InputStream, Path, CopyOption...)}
+   * method. The passed in stream will be attempted to be completely consumed. In any outcome (success or exception),
+   * the stream will be closed.
+   */
   public static void copy(final InputStream from, final Path to, final CopyOption... options) throws IOException {
     checkNotNull(from);
     checkNotNull(to);
@@ -70,12 +82,20 @@ public final class FileSupport
 
   // READ: reading them up as String
 
+  /**
+   * Shorthand method for method {@link #readFile(Path, Charset)} that uses {@link #DEFAULT_CHARSET}.
+   */
   public static String readFile(final Path file)
       throws IOException
   {
     return readFile(file, DEFAULT_CHARSET);
   }
 
+  /**
+   * Reads up the contents of the file, using given charset into a stream. It is the caller liability to
+   * ensure this is actually suitable, as file is relatively small. This method does not have any protection
+   * to filter out such bad/malicious attempts.
+   */
   public static String readFile(final Path file, final Charset charset)
       throws IOException
   {
@@ -94,12 +114,19 @@ public final class FileSupport
     }
   }
 
+  /**
+   * Shorthand method for method {@link #writeFile(Path, Charset, String)} that uses {@link #DEFAULT_CHARSET}.
+   */
   public static void writeFile(final Path file, final String payload)
       throws IOException
   {
     writeFile(file, DEFAULT_CHARSET, payload);
   }
 
+  /**
+   * Writes out the content of a string payload into a file using given charset. The file will be overwritten
+   * if exists.
+   */
   public static void writeFile(final Path file, final Charset charset, final String payload)
       throws IOException
   {
@@ -114,6 +141,9 @@ public final class FileSupport
 
   // Validation
 
+  /**
+   * Enforces that passed in paths are non-null and denote an existing regular file.
+   */
   private static void validateFile(final Path... paths) {
     for (Path path : paths) {
       checkNotNull(path, "Path must be non-null");
