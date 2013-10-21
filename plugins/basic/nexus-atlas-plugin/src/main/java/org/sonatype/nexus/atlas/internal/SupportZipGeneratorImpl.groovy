@@ -51,8 +51,14 @@ implements SupportZipGenerator
 
   private final File supportDir
 
+  /**
+   * The maximum (uncompressed) size of any one file that is included into the ZIP file when limit files is enabled.
+   */
   private final ByteSize maxFileSize
 
+  /**
+   * The maximum (compressed) size of the entire ZIP file when limit ZIP size is enabled.
+   */
   private final ByteSize maxZipFileSize
 
   @Inject
