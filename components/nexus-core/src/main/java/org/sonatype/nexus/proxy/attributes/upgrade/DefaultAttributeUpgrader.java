@@ -345,7 +345,6 @@ public class DefaultAttributeUpgrader
       final File target = new File(new File(attributesDirectory, repoId), MARKER_FILENAME);
       // this step is needed if new repo added while upgrade not done: it will NOT have legacy attributes
       // as other reposes, that were present in old/upgraded instance
-      Files.createDirectories(target.getParentFile().toPath());
       FileSupport.writeFile(target.toPath(), MARKER_TEXT);
     }
   }
