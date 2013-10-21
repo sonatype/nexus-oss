@@ -80,7 +80,7 @@ implements SupportBundleCustomizer
         supportBundle << new FileContentSourceSupport(CONFIG, "$prefix/${file.name}", file)
       }
       else {
-        log.trace 'Skipping non-existent file: {}', file
+        log.debug 'Skipping non-existent file: {}', file
       }
     }
 

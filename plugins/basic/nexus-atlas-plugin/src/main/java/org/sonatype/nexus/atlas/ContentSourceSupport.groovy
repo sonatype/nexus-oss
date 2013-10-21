@@ -30,7 +30,9 @@ abstract class ContentSourceSupport
 extends ComponentSupport
 implements ContentSource
 {
-  public static final String PASSWORD_TOKEN = '****' // field must be public to avoid confusing it with a property
+  public static final String PASSWORD_TOKEN = '****'
+
+  public static final String EMAIL_TOKEN = 'user@domain'
 
   // TODO: See if groovy handles final properties or not
 

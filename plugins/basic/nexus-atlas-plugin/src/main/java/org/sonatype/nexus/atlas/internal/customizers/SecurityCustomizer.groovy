@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.atlas.internal.customizers
 
-import org.sonatype.nexus.atlas.FileContentSourceSupport
+import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
 import org.sonatype.nexus.atlas.SupportBundle
 import org.sonatype.nexus.atlas.SupportBundleCustomizer
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration
@@ -25,7 +25,8 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.CONFIG
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.HIGH
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.SECURITY
 
 /**
  * Adds system security files to support bundle.
@@ -52,24 +53,81 @@ implements SupportBundleCustomizer
 
   @Override
   void customize(final SupportBundle supportBundle) {
-    // helper to include a file
-    def maybeIncludeFile = { File file, String prefix ->
-      if (file.exists()) {
-        log.debug 'Including file: {}', file
-        supportBundle << new FileContentSourceSupport(CONFIG, "$prefix/${file.name}", file)
-      }
-      else {
-        log.trace 'Skipping non-existent file: {}', file
-      }
+    // security.xml
+    supportBundle << new SecurityXmlContentSource()
+
+    // security-configuration.xml
+    supportBundle << new SecurityConfigurationXmlContentSource()
+  }
+
+  /**
+   * Source for obfuscated security.xml
+   */
+  @SuppressWarnings("UnnecessaryQualifiedReference")
+  private class SecurityXmlContentSource
+  extends GeneratedContentSourceSupport
+  {
+    SecurityXmlContentSource() {
+      super(SECURITY, 'work/conf/security.xml')
+      this.priority = HIGH
     }
 
-    // include runtime configuration
-    def configDir = applicationConfiguration.configurationDirectory
-    assert configDir.exists()
+    @Override
+    protected void generate(final File file) {
+      def source = new File(applicationConfiguration.configurationDirectory, 'security.xml')
+      if (!source.exists()) {
+        log.debug 'Skipping non-existent file: {}', source
+        return
+      }
 
-    // capture specific files (we don't want .bak, .tmp and other garbage)
-    [ 'security.xml', 'security-configuration.xml' ].each {
-      maybeIncludeFile new File(configDir, it), 'work/conf'
+      source.withInputStream { input ->
+        log.debug 'Reading: {}', source
+        def model = new org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader().read(input)
+
+        // obfuscate sensitive content
+        for (user in model?.users) {
+          user.password = PASSWORD_TOKEN
+          user.email = EMAIL_TOKEN
+        }
+
+        file.withOutputStream { output ->
+          new org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer().write(output, model)
+        }
+      }
+    }
+  }
+
+  /**
+   * Source for obfuscated security-configuration.xml
+   */
+  @SuppressWarnings("UnnecessaryQualifiedReference")
+  private class SecurityConfigurationXmlContentSource
+  extends GeneratedContentSourceSupport
+  {
+    SecurityConfigurationXmlContentSource() {
+      super(SECURITY, 'work/conf/security-configuration.xml')
+      this.priority = HIGH
+    }
+
+    @Override
+    protected void generate(final File file) {
+      def source = new File(applicationConfiguration.configurationDirectory, 'security-configuration.xml')
+      if (!source.exists()) {
+        log.debug 'Skipping non-existent file: {}', source
+        return
+      }
+
+      source.withInputStream { input ->
+        log.debug 'Reading: {}', source
+        def model = new org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Reader().read(input)
+
+        // obfuscate sensitive content
+        model.anonymousPassword = PASSWORD_TOKEN
+
+        file.withOutputStream { output ->
+          new org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer().write(output, model)
+        }
+      }
     }
   }
 }

@@ -18,6 +18,7 @@ import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
 import org.sonatype.nexus.atlas.SupportBundle
 import org.sonatype.nexus.atlas.SupportBundleCustomizer
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration
+import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
@@ -61,7 +62,7 @@ implements SupportBundleCustomizer
             .withPriority(HIGH)
       }
       else {
-        log.trace 'Skipping non-existent file: {}', file
+        log.debug 'Skipping non-existent file: {}', file
       }
     }
 
@@ -88,7 +89,7 @@ implements SupportBundleCustomizer
   }
 
   /**
-   * Source for nexus.xml
+   * Source for obfuscated nexus.xml
    */
   private class NexusXmlContentSource
   extends GeneratedContentSourceSupport
@@ -100,19 +101,27 @@ implements SupportBundleCustomizer
 
     @Override
     protected void generate(final File file) {
-      def model = applicationConfiguration.configurationModel
-
-      // obfuscate sensitive content
-      model.smtpConfiguration?.password = PASSWORD_TOKEN
-      model.remoteProxySettings?.httpProxySettings?.authentication?.password = PASSWORD_TOKEN
-      model.remoteProxySettings?.httpsProxySettings?.authentication?.password = PASSWORD_TOKEN
-      model.repositories.each { repo ->
-        repo.remoteStorage?.authentication?.password = PASSWORD_TOKEN
+      def source = new File(applicationConfiguration.configurationDirectory, 'nexus.xml')
+      if (!source.exists()) {
+        log.debug 'Skipping non-existent file: {}', source
+        return
       }
 
-      def writer = new NexusConfigurationXpp3Writer()
-      file.withOutputStream { output ->
-        writer.write(output, model)
+      source.withInputStream { input ->
+        log.debug 'Reading: {}', source
+        def model = new NexusConfigurationXpp3Reader().read(input)
+
+        // obfuscate sensitive content
+        model.smtpConfiguration?.password = PASSWORD_TOKEN
+        model.remoteProxySettings?.httpProxySettings?.authentication?.password = PASSWORD_TOKEN
+        model.remoteProxySettings?.httpsProxySettings?.authentication?.password = PASSWORD_TOKEN
+        model.repositories.each { repo ->
+          repo.remoteStorage?.authentication?.password = PASSWORD_TOKEN
+        }
+
+        file.withOutputStream { output ->
+          new NexusConfigurationXpp3Writer().write(output, model)
+        }
       }
     }
   }
