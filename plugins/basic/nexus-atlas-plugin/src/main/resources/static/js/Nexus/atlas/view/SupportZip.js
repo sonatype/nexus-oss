@@ -96,22 +96,22 @@ NX.define('Nexus.atlas.view.SupportZip', {
                     },
                     {
                       xtype: 'checkbox',
-                      name: 'configurationFiles',
-                      boxLabel: 'Configuration Files',
+                      name: 'configuration',
+                      boxLabel: 'Configuration',
                       helpText: 'Include configuration files',
                       checked: true
                     },
                     {
                       xtype: 'checkbox',
-                      name: 'securityFiles',
-                      boxLabel: 'Security Files',
-                      helpText: 'Include security files',
+                      name: 'security',
+                      boxLabel: 'Security Configuration',
+                      helpText: 'Include security configuration files',
                       checked: true
                     },
                     {
                       xtype: 'checkbox',
-                      name: 'logFiles',
-                      boxLabel: 'Log Files',
+                      name: 'log',
+                      boxLabel: 'Log',
                       helpText: 'Include log files',
                       checked: true
                     }
@@ -127,7 +127,7 @@ NX.define('Nexus.atlas.view.SupportZip', {
                       xtype: 'checkbox',
                       name: 'limitSize',
                       boxLabel: 'Limit Zip File Size',
-                      helpText: 'Limit the size of the generate zip to no more than 30 MB.',
+                      helpText: 'Limit the size of the created ZIP file to no more than 30 MB.',
                       checked: true
                     }
                   ]}

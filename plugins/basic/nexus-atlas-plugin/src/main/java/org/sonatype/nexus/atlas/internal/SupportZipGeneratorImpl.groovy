@@ -52,15 +52,10 @@ implements SupportZipGenerator
 
   private final ByteSize maxZipFileSize
 
-  // FIXME: "30mb" is failing to parse, need to look at the parsing logic again and see WTF is going on :-(
-  // FIXME: This is fixed in latest goodies
-
-  // NOTE: max is 30mb, using 28mb for fudge buffer
-
   @Inject
   SupportZipGeneratorImpl(final ApplicationConfiguration applicationConfiguration,
                           final List<SupportBundleCustomizer> bundleCustomizers,
-                          final @Named('${atlas.supportZipGenerator.maxZipFileSize:-28m}') ByteSize maxZipFileSize)
+                          final @Named('${atlas.supportZipGenerator.maxZipFileSize:-30mb}') ByteSize maxZipFileSize)
   {
     assert applicationConfiguration
     this.bundleCustomizers = checkNotNull(bundleCustomizers)
@@ -93,13 +88,13 @@ implements SupportZipGenerator
     if (request.metrics) {
       types << METRICS
     }
-    if (request.configurationFiles) {
+    if (request.configuration) {
       types << CONFIG
     }
-    if (request.securityFiles) {
+    if (request.security) {
       types << SECURITY
     }
-    if (request.logFiles) {
+    if (request.log) {
       types << LOG
     }
     return types
@@ -254,6 +249,9 @@ implements SupportZipGenerator
       // TODO: Sort out how to deal with obfuscation, if its specific or general
       // TODO: ... this should be a detail of the content source
 
+      // size of buffer for appending source content and detecting max ZIP size
+      final int bufferSize = 4 * 1024
+
       // add content entries, sorted so highest priority are processed first
       sources.sort().each { source ->
         log.debug 'Adding content entry: {} {} bytes', source, source.size
@@ -264,7 +262,7 @@ implements SupportZipGenerator
         // FIXME: ... and then if we find we are constantly making zip larger > max upload can support
         // FIXME: ... we can then revisit this?
 
-        source.content.eachByte(4 * 1024) { byte[] buff, len ->
+        source.content.eachByte(bufferSize) { byte[] buff, len ->
           // TODO: check if there is enough room in the compressed file for given bytes
           // TODO: this is not going to be super accurate, but on small buffer scale
           // TODO: should be plenty to allow us to know when the compressed file is full?

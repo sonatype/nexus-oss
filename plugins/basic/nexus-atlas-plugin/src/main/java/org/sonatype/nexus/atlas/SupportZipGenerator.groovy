@@ -32,11 +32,11 @@ interface SupportZipGenerator
 
     boolean metrics
 
-    boolean configurationFiles
+    boolean configuration
 
-    boolean securityFiles
+    boolean security
 
-    boolean logFiles
+    boolean log
 
     boolean limitSize
   }
