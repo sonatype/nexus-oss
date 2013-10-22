@@ -63,9 +63,8 @@ public class ProxyMetadataRequestStrategy
   public void onRemoteAccess(ProxyRepository proxy, ResourceStoreRequest request, StorageItem item)
       throws ItemNotFoundException, IllegalOperationException
   {
-    // do this only if item in question is file, has name of "repomd.xml", and is here
-    // Note: item might be null if not present in local cache!
-    if (item instanceof StorageFileItem && Yum.NAME_OF_REPOMD_XML.equals(item.getName())) {
+    // do this only if request path in question has name of "repomd.xml"
+    if (Yum.NAME_OF_REPOMD_XML.equals(request.getRequestPath())) {
       try {
         final ResourceStoreRequest wrequest = new ResourceStoreRequest(request);
         wrequest.setRequestPath(RepositoryItemUid.PATH_ROOT + Yum.PATH_OF_REPODATA);
