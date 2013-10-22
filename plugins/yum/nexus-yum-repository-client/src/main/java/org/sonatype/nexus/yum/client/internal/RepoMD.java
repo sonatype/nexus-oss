@@ -42,6 +42,7 @@ public class RepoMD
 
   public RepoMD(final InputStream in) {
     locations = parse(in);
+    log.debug("Locations: {}", locations);
   }
 
   public RepoMD(final File file) {
