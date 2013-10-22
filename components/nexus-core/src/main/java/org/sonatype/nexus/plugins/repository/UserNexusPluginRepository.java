@@ -21,8 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.util.file.DirSupport;
-
 import com.google.common.base.Throwables;
 
 import static com.google.common.base.Preconditions.checkNotNull;

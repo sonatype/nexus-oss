@@ -42,7 +42,6 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.nexus.util.file.FileSupport;
 import org.sonatype.nexus.util.io.StreamSupport;
 
 import com.google.common.annotations.VisibleForTesting;
