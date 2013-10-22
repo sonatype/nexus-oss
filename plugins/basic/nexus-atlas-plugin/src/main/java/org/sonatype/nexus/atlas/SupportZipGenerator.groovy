@@ -24,31 +24,67 @@ import org.sonatype.nexus.atlas.SupportZipGenerator.Result
  */
 interface SupportZipGenerator
 {
+  /**
+   * Request to generate a support ZIP file.
+   */
   @ToString(includePackage=false, includeNames=true)
   static class Request
   {
+    /**
+     * Include system information report.
+     */
     boolean systemInformation
 
+    /**
+     * Include thread dump.
+     */
     boolean threadDump
 
+    /**
+     * Include metrics.
+     */
     boolean metrics
 
+    /**
+     * Include configuration files.
+     */
     boolean configuration
 
+    /**
+     * Include security files.
+     */
     boolean security
 
+    /**
+     * Include log files.
+     */
     boolean log
 
+    /**
+     * Limit the size of files included in the ZIP.
+     */
     boolean limitFileSizes
 
+    /**
+     * Limit the total size of the generated ZIP file.
+     */
     boolean limitZipSize
   }
 
+  /**
+   * Result of support ZIP generate request.
+   */
   @ToString(includePackage=false, includeNames=true)
   static class Result
   {
+    /**
+     * True if the ZIP or any of its contents had been truncated.
+     */
     boolean truncated
 
+    /**
+     * The location of the generated ZIP file.
+     */
     File file
   }
 
