@@ -43,6 +43,7 @@ import org.sonatype.nexus.proxy.item.uid.IsItemAttributeMetacontentAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.util.CompositeException;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.util.io.StreamSupport;
@@ -273,7 +274,7 @@ public class DefaultFSPeer
       if (files != null) {
         for (File file : files) {
           if (file.isFile() || file.isDirectory()) {
-            result.add(retrieveItem(repository, repositoryBaseDir, request, file));
+            result.add(file);
           }
         }
       }
@@ -335,21 +336,55 @@ public class DefaultFSPeer
 
   // ==
 
-  public static final String FILE_COPY_STREAM_BUFFER_SIZE_KEY = "upload.stream.bufferSize";
+  private static final String FILE_COPY_STREAM_BUFFER_SIZE_KEY = "upload.stream.bufferSize";
 
-  private int copyStreamBufferSize = -1;
+  private static final int FILE_COPY_STREAM_BUFFER_SIZE = SystemPropertiesHelper
+      .getInteger(FILE_COPY_STREAM_BUFFER_SIZE_KEY, 4096);
 
   protected int getCopyStreamBufferSize() {
-    if (copyStreamBufferSize == -1) {
-      copyStreamBufferSize = SystemPropertiesHelper.getInteger(FILE_COPY_STREAM_BUFFER_SIZE_KEY, 4096);
-    }
-
-    return this.copyStreamBufferSize;
+    return FILE_COPY_STREAM_BUFFER_SIZE;
   }
+
+  // ==
+
+  public static final String RENAME_RETRY_COUNT_KEY = "rename.retry.count";
+
+  public static final int RENAME_RETRY_COUNT = SystemPropertiesHelper.getInteger(RENAME_RETRY_COUNT_KEY, 0);
+
+  public static final String RENAME_RETRY_DELAY_KEY = "rename.retry.delay";
+
+  public static final long RENAME_RETRY_DELAY = SystemPropertiesHelper.getLong(RENAME_RETRY_DELAY_KEY, 0L);
 
   protected void handleRenameOperation(final File hiddenTarget, final File target)
       throws IOException
   {
-    Files.move(hiddenTarget.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    if (RENAME_RETRY_COUNT == 0) {
+      // just do it once, no retries, no fuss
+      Files.move(hiddenTarget.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
+    else {
+      // do it 1 + retries needed, record problems
+      final List<IOException> exceptions = Lists.newArrayListWithCapacity(1 + RENAME_RETRY_COUNT);
+      boolean success = false;
+      for (int i = 1; i <= (RENAME_RETRY_COUNT + 1); i++) {
+        try {
+          Files.move(hiddenTarget.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+          success = true;
+          break;
+        }
+        catch (IOException e) {
+          exceptions.add(e);
+          try {
+            Thread.sleep(RENAME_RETRY_DELAY);
+          }
+          catch (InterruptedException e1) {
+            // ignore
+          }
+        }
+      }
+      if (!success) {
+        throw new IOException("Rename operation failed", new CompositeException(exceptions));
+      }
+    }
   }
 }
