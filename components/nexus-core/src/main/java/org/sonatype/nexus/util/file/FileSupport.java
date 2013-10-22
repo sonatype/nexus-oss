@@ -103,12 +103,18 @@ public final class FileSupport
     checkNotNull(charset);
     try (final BufferedReader reader = Files.newBufferedReader(file, charset)) {
       final StringBuilder result = new StringBuilder();
+      String line1 = reader.readLine();
+      String line2 = reader.readLine();
       while (true) {
-        final String line = reader.readLine();
-        if (line == null) {
+        if (line1 == null) {
           break;
         }
-        result.append(line).append("\n");
+        result.append(line1);
+        if (line2 != null) {
+          result.append("\n");
+        }
+        line1 = line2;
+        line2 = reader.readLine();
       }
       return result.toString();
     }
