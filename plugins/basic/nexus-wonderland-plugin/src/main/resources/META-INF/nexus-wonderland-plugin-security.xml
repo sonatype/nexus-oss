@@ -16,24 +16,28 @@
 <security>
   <version>2.0.3</version>
 
+  <!--
+  FIXME: Just putting something here for now, unsure if this file can be empty or not.
+  -->
+
   <roles>
     <role>
-      <id>atlas</id>
-      <name>Atlas: Support Tools</name>
-      <description>Gives access to Atlas support tools</description>
+      <id>wonderland</id>
+      <name>Wonderland</name>
+      <description>Gives access to Wonderland</description>
       <sessionTimeout>60</sessionTimeout>
       <privileges>
-        <privilege>atlas-all</privilege>
+        <privilege>wonderland-all</privilege>
       </privileges>
     </role>
   </roles>
 
   <privileges>
     <privilege>
-      <id>atlas-all</id>
+      <id>wonderland-all</id>
       <type>method</type>
-      <name>Atlas: Support Tools</name>
-      <description>Give permission use Atlas support tools</description>
+      <name>Wonderland</name>
+      <description>Give permission use Wonderland</description>
       <properties>
         <property>
           <key>method</key>
@@ -41,7 +45,7 @@
         </property>
         <property>
           <key>permission</key>
-          <value>nexus:atlas</value>
+          <value>nexus:wonderland</value>
         </property>
       </properties>
     </privilege>

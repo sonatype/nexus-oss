@@ -244,9 +244,18 @@
       <scope>provided</scope>
     </dependency>
 
-	<dependency>
+    <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-atlas-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-wonderland-plugin</artifactId>
       <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>

@@ -13,37 +13,21 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<security>
-  <version>2.0.3</version>
+<enunciate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.26.xsd">
 
-  <roles>
-    <role>
-      <id>atlas</id>
-      <name>Atlas: Support Tools</name>
-      <description>Gives access to Atlas support tools</description>
-      <sessionTimeout>60</sessionTimeout>
-      <privileges>
-        <privilege>atlas-all</privilege>
-      </privileges>
-    </role>
-  </roles>
+  <services>
+    <rest defaultRestSubcontext="service/siesta"/>
+  </services>
 
-  <privileges>
-    <privilege>
-      <id>atlas-all</id>
-      <type>method</type>
-      <name>Atlas: Support Tools</name>
-      <description>Give permission use Atlas support tools</description>
-      <properties>
-        <property>
-          <key>method</key>
-          <value>*</value>
-        </property>
-        <property>
-          <key>permission</key>
-          <value>nexus:atlas</value>
-        </property>
-      </properties>
-    </privilege>
-  </privileges>
-</security>
+  <modules>
+    <docs disabled="false"
+          title="${pluginName} REST API"
+          copyright="Sonatype, Inc. ${copyright.year}"
+          includeExampleXml="true"
+          includeExampleJson="true"
+          includeDefaultDownloads="false">
+    </docs>
+  </modules>
+
+</enunciate>
