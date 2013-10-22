@@ -165,10 +165,14 @@ implements SystemInformationGenerator
     def lookupComponent = { String className ->
       Class type
       try {
+        log.trace 'Looking up component: {}', className
         type = getClass().classLoader.loadClass(className)
         def iter = beanLocator.locate(Key.get(type)).iterator()
         if (iter.hasNext()) {
           return iter.next().getValue()
+        }
+        else {
+          log.trace 'Component not found: {}', className
         }
       }
       catch (Exception e) {
