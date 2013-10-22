@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.wonderland.internal;
 
 import javax.inject.Inject;
@@ -29,8 +30,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class AuthTicketServiceImpl
-  extends ComponentSupport
-  implements AuthTicketService
+    extends ComponentSupport
+    implements AuthTicketService
 {
   private final AuthTicketGenerator authTicketGenerator;
 
@@ -45,16 +46,15 @@ public class AuthTicketServiceImpl
   }
 
   @Override
-    public String createTicket() {
-      String ticket = authTicketGenerator.generate();
-      authTicketCache.add(ticket);
-      return ticket;
-    }
+  public String createTicket() {
+    String ticket = authTicketGenerator.generate();
+    authTicketCache.add(ticket);
+    return ticket;
+  }
 
-    @Override
-    public boolean redeemTicket(final String ticket) {
-      checkNotNull(ticket);
-      return authTicketCache.remove(ticket);
-    }
-
+  @Override
+  public boolean redeemTicket(final String ticket) {
+    checkNotNull(ticket);
+    return authTicketCache.remove(ticket);
+  }
 }
