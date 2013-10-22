@@ -55,20 +55,6 @@ implements ContentSource
     return path
   }
 
-  @Override
-  Priority getPriority() {
-    return priority
-  }
-
-  /**
-   * Set priority, returns self reference.
-   */
-  def withPriority(final Priority priority) {
-    assert priority
-    this.priority = priority
-    return this
-  }
-
   /**
    * Compare by priority order.
    */
