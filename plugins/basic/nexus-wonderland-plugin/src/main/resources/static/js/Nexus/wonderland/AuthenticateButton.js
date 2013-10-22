@@ -13,10 +13,23 @@ NX.define('Nexus.wonderland.AuthenticateButton', {
   extend: 'Ext.Button',
 
   requires: [
-    'Nexus.wonderland.Icons'
+    'Nexus.siesta',
+    'Nexus.wonderland.Icons',
+    'Nexus.wonderland.view.AuthenticateWindow'
   ],
 
-  xtype: 'nx-wonderland-authbutton',
+  mixins: [
+    'Nexus.LogAwareMixin'
+  ],
+
+  xtype: 'nx-wonderland-button-authenticate',
+  cls: 'nx-wonderland-button-authenticate',
+
+  /**
+   * @cfg message
+   * @type String
+   */
+  message: 'You have requested an operation which requires validation of your credentials.',
 
   /**
    * @override
@@ -27,12 +40,41 @@ NX.define('Nexus.wonderland.AuthenticateButton', {
 
     Ext.apply(me, {
       cls: 'x-btn-text-icon',
-      iconCls: icons.get('lock').cls
+      iconCls: icons.get('lock').cls,
+      scope: me,
+      handler: me.showWindow
     });
 
-    // TODO: Sort out how we can intercept the click event, deal with authwindow, then fire event back upstream?
-    // TODO: Perhaps have to add a new event?
-
     me.constructor.superclass.initComponent.apply(me, arguments);
+
+    // register events
+    me.addEvents(
+        /**
+         * @event authenticated
+         * @param {Button} self
+         * @param {String} authentication ticket
+         */
+        'authenticated'
+    );
+  },
+
+  /**
+   * @private
+   */
+  showWindow: function () {
+    var me = this;
+
+    var win = NX.create('Nexus.wonderland.view.AuthenticateWindow', {
+      message: me.message,
+      animateTarget: me.getEl(),
+      listeners: {
+        // HACK: propagate event from window to button, controller does not have context of the button
+        'authenticated': function(window, authticket) {
+          me.fireEvent('authenticated', me, authticket);
+        }
+      }
+    });
+
+    win.show();
   }
 });

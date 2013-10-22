@@ -11,4 +11,24 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-/* TODO */
+.nx-wonderland-view-authenticate-description {
+  font: normal 11px arial, tahoma, verdana, helvetica;
+  padding: 10px;
+}
+
+.nx-wonderland-view-authenticate-description img {
+  float: left;
+  padding: 10px;
+}
+
+.nx-wonderland-view-authenticate-description div {
+  padding-right: 10px;
+}
+
+.nx-wonderland-view-authenticate .x-form-item-label {
+  font: bold 11px arial, tahoma, verdana, helvetica;
+}
+
+/*.nx-wonderland-view-authenticate .x-panel-body {*/
+  /*padding-bottom: 20px;*/
+/*}*/

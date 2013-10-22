@@ -24,9 +24,65 @@ NX.define('Nexus.wonderland.controller.Wonderland', {
     'Nexus.siesta'
   ],
 
-  init: function() {
+  init: function () {
     var me = this;
 
-    // TODO
+    me.control({
+      '#nx-wonderland-view-authenticate': {
+        'validate-credentials': me.validateCredentials
+      }
+    });
+  },
+
+  /**
+   * @private
+   *
+   * @param {AuthenticateWindow} authwin
+   * @param {String} username
+   * @param {String} password
+   */
+  validateCredentials: function (authwin, username, password) {
+    var me = this, mask;
+
+    mask = new Ext.LoadMask(authwin.getEl(), {
+      msg: 'Authenticating'
+    });
+    mask.show();
+
+    Ext.Ajax.request({
+      url: Nexus.siesta.basePath + '/wonderland/authenticate',
+      method: 'POST',
+      suppressStatus: [
+        403 // Used to signal from the server unauthenticated state, don't display an error box for this response
+      ],
+
+      jsonData: {
+        u: Sonatype.utils.base64.encode(username),
+        p: Sonatype.utils.base64.encode(password)
+      },
+
+      scope: me,
+
+      callback: function () {
+        mask.hide();
+      },
+
+      success: function (response) {
+        me.logDebug('Authenticated');
+
+        var authTicket = Ext.decode(response.responseText);
+        me.logDebug('Ticket: ' + authTicket.t);
+
+        // fire event and close window
+        authwin.fireEvent('authenticated', me, authTicket.t);
+        authwin.close();
+      },
+
+      failure: function (response) {
+        if (response.status === 403) {
+          authwin.markInvalid();
+        }
+      }
+    });
   }
 });
