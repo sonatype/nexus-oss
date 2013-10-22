@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.item;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -54,11 +55,9 @@ public class DefaultLinkPersister
   public boolean isLinkContent(final ContentLocator locator)
       throws IOException
   {
-    if (locator != null) {
-      final byte[] buf = ContentLocatorUtils.getFirstBytes(LINK_PREFIX_BYTES.length, locator);
-      if (buf != null) {
-        return Arrays.equals(buf, LINK_PREFIX_BYTES);
-      }
+    final byte[] buf = getLinkPrefixBytes(locator);
+    if (buf != null) {
+      return Arrays.equals(buf, LINK_PREFIX_BYTES);
     }
     return false;
   }
@@ -92,4 +91,27 @@ public class DefaultLinkPersister
       Closeables.close(os, true);
     }
   }
+
+  // ==
+
+  /**
+   * Reads up first bytes (exactly as many as many makes the {@link #LINK_PREFIX_BYTES}) from ContentLocator's content. It returns byte array of
+   * exact size of count, or null (ie. if file is smaller).
+   *
+   * @param locator the ContentLocator to read from.
+   * @return returns byte array read up, or {@code null} if locator is {@code null}, have not enough length.
+   */
+  protected byte[] getLinkPrefixBytes(final ContentLocator locator)
+      throws IOException
+  {
+    if (locator != null && locator.getLength() > LINK_PREFIX_BYTES.length) {
+      try (final DataInputStream dis = new DataInputStream(locator.getContent())) {
+        final byte[] buf = new byte[LINK_PREFIX_BYTES.length];
+        dis.readFully(buf);
+        return buf;
+      }
+    }
+    return null;
+  }
+
 }
