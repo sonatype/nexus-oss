@@ -18,6 +18,10 @@ import java.io.InputStream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * @deprecated No replacement exists, and this class is unused and will be removed in future releases.
+ */
+@Deprecated
 public class ContentLocatorUtils
 {
   /**
@@ -27,7 +31,9 @@ public class ContentLocatorUtils
    * @param count   the count of bytes to read up (and hence, the size of byte array to be returned).
    * @param locator the ContentLocator to read from.
    * @return returns byte array of size count or null.
+   * @deprecated No replacement exists, and this method is unused and will be removed in future releases.
    */
+  @Deprecated
   public static byte[] getFirstBytes(final int count, final ContentLocator locator)
       throws IOException
   {
