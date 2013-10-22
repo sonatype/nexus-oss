@@ -25,11 +25,13 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
+import org.sonatype.nexus.yum.internal.capabilities.ProxyMetadataRequestStrategy;
 import org.sonatype.nexus.yum.internal.task.RepositoryScanningTask;
 
 import org.slf4j.Logger;
@@ -56,16 +58,20 @@ public class YumRegistryImpl
 
   private final YumFactory yumFactory;
 
+  private final ProxyMetadataRequestStrategy proxyMetadataRequestStrategy;
+
   private int maxNumberOfParallelThreads;
 
   @Inject
   public YumRegistryImpl(final NexusConfiguration nexusConfiguration,
                          final NexusScheduler nexusScheduler,
-                         final YumFactory yumFactory)
+                         final YumFactory yumFactory,
+                         final ProxyMetadataRequestStrategy proxyMetadataRequestStrategy)
   {
     this.nexusConfiguration = checkNotNull(nexusConfiguration);
     this.nexusScheduler = checkNotNull(nexusScheduler);
     this.yumFactory = checkNotNull(yumFactory);
+    this.proxyMetadataRequestStrategy = checkNotNull(proxyMetadataRequestStrategy);
     this.maxNumberOfParallelThreads = DEFAULT_MAX_NUMBER_PARALLEL_THREADS;
   }
 
@@ -83,6 +89,10 @@ public class YumRegistryImpl
         runScanningTask(yum);
       }
 
+      if (repository.getRepositoryKind().isFacetAvailable(MavenProxyRepository.class)) {
+        repository.registerRequestStrategy(ProxyMetadataRequestStrategy.class.getName(), proxyMetadataRequestStrategy);
+      }
+
       return yum;
     }
     return yums.get(repository.getId());
@@ -92,6 +102,7 @@ public class YumRegistryImpl
   public Yum unregister(final String repositoryId) {
     final Yum yum = yums.remove(repositoryId);
     if (yum != null) {
+      yum.getNexusRepository().unregisterRequestStrategy(ProxyMetadataRequestStrategy.class.getName());
       LOG.info("Unregistered repository '{}' as Yum repository", repositoryId);
     }
     return yum;

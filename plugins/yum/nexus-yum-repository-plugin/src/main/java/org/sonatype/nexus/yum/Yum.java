@@ -33,7 +33,9 @@ public interface Yum
 
   String PATH_OF_REPODATA = "repodata";
 
-  String PATH_OF_REPOMD_XML = PATH_OF_REPODATA + "/repomd.xml";
+  String NAME_OF_REPOMD_XML = "repomd.xml";
+
+  String PATH_OF_REPOMD_XML = PATH_OF_REPODATA + "/" + NAME_OF_REPOMD_XML;
 
   /**
    * Configures if deletes from a Nexus repository should result in Yum metadata regeneration.
