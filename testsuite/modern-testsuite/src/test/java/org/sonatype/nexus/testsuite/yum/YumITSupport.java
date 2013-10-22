@@ -92,8 +92,8 @@ public class YumITSupport
     restApi.save();
   }
 
-  protected Repository createYumEnabledRepository(final String repositoryId) {
-    final Repository repository = repositories()
+  protected MavenHostedRepository createYumEnabledRepository(final String repositoryId) {
+    final MavenHostedRepository repository = repositories()
         .create(MavenHostedRepository.class, repositoryId)
         .excludeFromSearchResults()
         .save();
@@ -103,8 +103,8 @@ public class YumITSupport
     return repository;
   }
 
-  protected Repository createYumEnabledProxyRepository(final String repositoryId, final String remoteUrl) {
-    final Repository repository = repositories()
+  protected MavenProxyRepository createYumEnabledProxyRepository(final String repositoryId, final String remoteUrl) {
+    final MavenProxyRepository repository = repositories()
         .create(MavenProxyRepository.class, repositoryId)
         .doNotDownloadRemoteIndexes()
         .asProxyOf(remoteUrl)
@@ -115,8 +115,8 @@ public class YumITSupport
     return repository;
   }
 
-  protected GroupRepository createYumEnabledGroupRepository(final String repositoryId, final String... memberIds) {
-    final GroupRepository repository = repositories().create(MavenGroupRepository.class, repositoryId)
+  protected MavenGroupRepository createYumEnabledGroupRepository(final String repositoryId, final String... memberIds) {
+    final MavenGroupRepository repository = repositories().create(MavenGroupRepository.class, repositoryId)
         .ofRepositories(memberIds)
         .save();
 
