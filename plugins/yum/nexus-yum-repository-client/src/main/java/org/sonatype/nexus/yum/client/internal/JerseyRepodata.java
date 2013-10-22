@@ -99,6 +99,52 @@ public class JerseyRepodata
   }
 
   @Override
+  public String getMetadataPath(final String repositoryId,
+                           final MetadataType metadataType)
+      throws IOException
+  {
+    try {
+      final String url = ensureUrlEndsWithSlash(repositoryId);
+      final String location = getLocationOfMetadata(url, metadataType);
+      if (location != null) {
+        return "/" + location;
+      }
+      throw new NexusClientNotFoundException(
+          "Could not find metadata type '" + metadataType.getType() + "'", null
+      );
+    }
+    catch (UniformInterfaceException e) {
+      throw getNexusClient().convert(e);
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
+    }
+  }
+
+  @Override
+  public String getMetadataUrl(final String repositoryId,
+                                final MetadataType metadataType)
+      throws IOException
+  {
+    try {
+      final String url = ensureUrlEndsWithSlash(repositoryId);
+      final String location = getLocationOfMetadata(url, metadataType);
+      if (location != null) {
+        return url + location;
+      }
+      throw new NexusClientNotFoundException(
+          "Could not find metadata type '" + metadataType.getType() + "'", null
+      );
+    }
+    catch (UniformInterfaceException e) {
+      throw getNexusClient().convert(e);
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
+    }
+  }
+
+  @Override
   public String getIndex(final String repositoryId, final String version) {
     return getIndex(repositoryId, version, null);
   }
