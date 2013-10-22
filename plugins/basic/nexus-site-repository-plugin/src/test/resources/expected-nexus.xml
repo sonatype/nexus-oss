@@ -400,9 +400,5 @@
     <password>{gMgOtG9/+P8Hi/8watltehGjdjQnweo/CfSvaA0MPZU=}</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
-  <errorReporting>
-    <jiraUrl>https://issues.sonatype.org</jiraUrl>
-    <jiraProject>PR</jiraProject>
-  </errorReporting>
   <notification />
 </nexusConfiguration>

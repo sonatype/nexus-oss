@@ -29,7 +29,6 @@ import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.email.NexusEmailer;
-import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.nexus.notification.NotificationCheat;
 import org.sonatype.nexus.notification.NotificationManager;
 import org.sonatype.nexus.notification.NotificationTarget;
@@ -41,7 +40,6 @@ import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
-import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettingsDTO;
 import org.sonatype.nexus.rest.model.RemoteProxySettingsDTO;
@@ -75,8 +73,6 @@ public abstract class AbstractGlobalConfigurationPlexusResource
 
   private AuthenticationInfoConverter authenticationInfoConverter;
 
-  private ErrorReportingManager errorReportingManager;
-
   @Inject
   public void setNexusEmailer(final NexusEmailer nexusEmailer) {
     this.nexusEmailer = nexusEmailer;
@@ -102,11 +98,6 @@ public abstract class AbstractGlobalConfigurationPlexusResource
     this.authenticationInfoConverter = authenticationInfoConverter;
   }
 
-  @Inject
-  public void setErrorReportingManager(final ErrorReportingManager errorReportingManager) {
-    this.errorReportingManager = errorReportingManager;
-  }
-
   protected NexusEmailer getNexusEmailer() {
     return nexusEmailer;
   }
@@ -125,10 +116,6 @@ public abstract class AbstractGlobalConfigurationPlexusResource
 
   protected AuthenticationInfoConverter getAuthenticationInfoConverter() {
     return authenticationInfoConverter;
-  }
-
-  protected ErrorReportingManager getErrorReportingManager() {
-    return errorReportingManager;
   }
 
   public static SmtpSettings convert(NexusEmailer nexusEmailer) {
@@ -153,22 +140,6 @@ public abstract class AbstractGlobalConfigurationPlexusResource
     }
 
     result.setSystemEmailAddress(nexusEmailer.getSMTPSystemEmailAddress().getMailAddress());
-
-    return result;
-  }
-
-  public static ErrorReportingSettings convert(ErrorReportingManager errorReportingManager) {
-    ErrorReportingSettings result = new ErrorReportingSettings();
-
-    result.setJiraUsername(errorReportingManager.getJIRAUsername());
-    if (StringUtils.isEmpty(errorReportingManager.getJIRAPassword())) {
-      result.setJiraPassword(errorReportingManager.getJIRAPassword());
-    }
-    else {
-      result.setJiraPassword(PASSWORD_PLACE_HOLDER);
-    }
-    result.setUseGlobalProxy(true);
-    result.setReportErrorsAutomatically(errorReportingManager.isEnabled());
 
     return result;
   }

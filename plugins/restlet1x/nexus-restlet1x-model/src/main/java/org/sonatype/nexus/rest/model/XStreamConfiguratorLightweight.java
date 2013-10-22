@@ -92,8 +92,6 @@ public class XStreamConfiguratorLightweight
     // Maven POM
     xstream.alias("project", Model.class);
 
-    xstream.processAnnotations(ErrorReportResponse.class);
-    xstream.processAnnotations(ErrorReportRequest.class);
     xstream.processAnnotations(ArtifactResolveResourceResponse.class);
     xstream.processAnnotations(GlobalConfigurationListResourceResponse.class);
     xstream.processAnnotations(GlobalConfigurationResourceResponse.class);

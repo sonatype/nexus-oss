@@ -149,10 +149,6 @@
     <password>{Q7+6FrXbFWAHR6vn3kpMt7EJv60r4sKCli2HJQl59/U=}</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
-  <errorReporting>
-    <jiraUrl>https://issues.sonatype.org</jiraUrl>
-    <jiraProject>PR</jiraProject>
-  </errorReporting>
   <notification>
     <notificationTargets>
       <notificationTarget>
