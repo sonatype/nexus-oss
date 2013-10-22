@@ -15,6 +15,7 @@ package org.sonatype.nexus.testsuite.yum;
 
 import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.core.subsystem.repository.Repository;
+import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
 
 import org.junit.Test;
 
@@ -39,7 +40,8 @@ public class YumProxyMetadataIT
   @Test
   public void cleanUp() throws Exception {
     final Repository hosted = createYumEnabledRepository(repositoryIdForTest());
-    final Repository proxy = createYumEnabledProxyRepository(repositoryIdForTest() + "-proxy", hosted.contentUri());
+    final MavenProxyRepository proxy = createYumEnabledProxyRepository(repositoryIdForTest() + "-proxy", hosted.contentUri());
+    proxy.withArtifactMaxAge(0).save(); // make it ALWAYS check remote
 
     // upload to hosted
     content().upload(
@@ -62,9 +64,6 @@ public class YumProxyMetadataIT
         testData().resolveFile("/rpms/test-artifact-1.2.3-1.noarch.rpm")
     );
     waitForNexusToSettleDown();
-
-    // delete manually, this simulates "expiration"
-    content().delete(Location.repositoryLocation(proxy.id(), "/repodata/repomd.xml"));
 
     // verify proxy got it, and old primary path is not existing anymore (as hash included in file name changed)
     {
