@@ -61,7 +61,7 @@ NX.define('Nexus.atlas.view.SupportZip', {
               cls: 'nx-atlas-view-supportzip-form',
               layoutConfig: {
                 labelSeparator: '',
-                labelWidth: 100
+                labelWidth: 70
               },
               border: false,
               monitorValid: true,
