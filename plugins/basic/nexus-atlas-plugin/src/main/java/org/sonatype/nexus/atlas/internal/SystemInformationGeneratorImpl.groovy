@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.atlas.internal
 
+import com.google.inject.Key
 import org.sonatype.appcontext.AppContext
 import org.sonatype.guice.bean.locators.BeanLocator
 import org.sonatype.nexus.ApplicationStatusSource
@@ -69,6 +70,7 @@ implements SystemInformationGenerator
     log.info 'Generating system information report'
 
     // HACK: provide local references to prevent problems with Groovy BUG accessing private fields
+    def beanLocator = this.beanLocator
     def applicationConfiguration = this.applicationConfiguration
     def systemStatus = this.applicationStatusSource.systemStatus
     def appContext = this.appContext
@@ -159,6 +161,22 @@ implements SystemInformationGenerator
       return data
     }
 
+    // helper to lookup a component dynamically by class-name
+    def lookupComponent = { String className ->
+      Class type
+      try {
+        type = getClass().classLoader.loadClass(className)
+        def iter = beanLocator.locate(Key.get(type)).iterator()
+        if (iter.hasNext()) {
+          return iter.next().getValue()
+        }
+      }
+      catch (Exception e) {
+        log.trace 'Unable to load class: {}; ignoring', className, e
+      }
+      return null
+    }
+
     def reportNexusLicense = {
       def data = [
           'licenseInstalled': systemStatus.licenseInstalled
@@ -169,9 +187,24 @@ implements SystemInformationGenerator
             'licenseExpired': systemStatus.licenseExpired,
             'trialLicense': systemStatus.trialLicense
         ]
-        // NOTE: We should be able to resolve required components if licenseInstalled is true
-        // TODO: report license key (via lookup of ProductLicenseManager)
-        // TODO: report active users (via lookup of NexusAccessManager)
+
+        // Add license details if we can resolve the license manager component
+        def plm = lookupComponent('org.sonatype.licensing.product.ProductLicenseManager')
+        if (plm) {
+          def license = plm.licenseDetails
+          data += [
+              'evaluation': license.evaluation,
+              'licensedUsers': license.licensedUsers,
+              'rawFeatures': license.rawFeatures.join(','),
+              'featureSet': license.featureSet.collect { it.id }.join(','),
+              'effectiveDate': license.effectiveDate,
+              'expirationDate': license.expirationDate,
+              'contactName': license.contactName,
+              'contactEmail': license.contactEmailAddress,
+              'contactCompany': license.contactCompany,
+              'contactCountry': license.contactCountry
+          ]
+        }
       }
 
       return data
