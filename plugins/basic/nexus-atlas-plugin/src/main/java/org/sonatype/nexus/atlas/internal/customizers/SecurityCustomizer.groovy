@@ -80,8 +80,8 @@ implements SupportBundleCustomizer
         return
       }
 
+      log.debug 'Reading: {}', source
       source.withInputStream { input ->
-        log.debug 'Reading: {}', source
         def model = new org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader().read(input)
 
         // obfuscate sensitive content
@@ -117,8 +117,8 @@ implements SupportBundleCustomizer
         return
       }
 
+      log.debug 'Reading: {}', source
       source.withInputStream { input ->
-        log.debug 'Reading: {}', source
         def model = new org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Reader().read(input)
 
         // obfuscate sensitive content

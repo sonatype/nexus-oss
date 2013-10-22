@@ -72,15 +72,15 @@ implements SupportBundleCustomizer
         return
       }
 
+      log.debug 'Reading: {}', source
       source.withInputStream { input ->
-        log.debug 'Reading: {}', source
         def model = new NexusConfigurationXpp3Reader().read(input)
 
         // obfuscate sensitive content
         model.smtpConfiguration?.password = PASSWORD_TOKEN
         model.remoteProxySettings?.httpProxySettings?.authentication?.password = PASSWORD_TOKEN
         model.remoteProxySettings?.httpsProxySettings?.authentication?.password = PASSWORD_TOKEN
-        model.repositories.each { repo ->
+        model.repositories?.each { repo ->
           repo.remoteStorage?.authentication?.password = PASSWORD_TOKEN
         }
 
