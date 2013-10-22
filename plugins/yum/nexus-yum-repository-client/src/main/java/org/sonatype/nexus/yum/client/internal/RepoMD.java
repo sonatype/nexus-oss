@@ -27,12 +27,16 @@ import com.google.common.io.Closeables;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @since yum 3.0
  */
 public class RepoMD
 {
+
+  private static final Logger log = LoggerFactory.getLogger(RepoMD.class);
 
   private final Map<String, String> locations;
 
@@ -45,6 +49,7 @@ public class RepoMD
     try {
       in = new BufferedInputStream(new FileInputStream(file));
       locations = parse(in);
+      log.debug("Locations: {}", locations);
     }
     catch (FileNotFoundException e) {
       throw Throwables.propagate(e);
