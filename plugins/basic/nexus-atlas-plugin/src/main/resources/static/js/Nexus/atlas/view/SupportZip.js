@@ -52,8 +52,8 @@ NX.define('Nexus.atlas.view.SupportZip', {
               border: false,
               html: icons.get('zip').variant('x32').img +
                   '<div>Creates a ZIP file containing useful support information about your server. ' +
-                  'No information will be sent to Sonatype when creating the ZIP file.' +
-                  '<br/><br/>Select the contents and options for ZIP creation:</div>'
+                  'No information will be sent to Sonatype when creating the support ZIP file.' +
+                  '<br/><br/>Select the contents and options for support ZIP creation:</div>'
             },
             {
               xtype: 'form',
