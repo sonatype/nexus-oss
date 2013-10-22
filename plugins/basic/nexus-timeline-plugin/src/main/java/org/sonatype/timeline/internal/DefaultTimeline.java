@@ -30,7 +30,6 @@ import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineFilter;
 import org.sonatype.timeline.TimelineRecord;
 
-import com.sun.tools.internal.ws.processor.util.DirectoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

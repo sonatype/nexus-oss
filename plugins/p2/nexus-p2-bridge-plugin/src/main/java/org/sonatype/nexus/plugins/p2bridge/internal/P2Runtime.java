@@ -37,12 +37,11 @@ import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactExcep
 import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryManager;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 
+import com.google.common.base.Strings;
 import org.codehaus.plexus.archiver.UnArchiver;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.core.runtime.internal.adaptor.EclipseEnvironmentInfo;
 
 @Named
@@ -106,30 +105,21 @@ class P2Runtime
 
     // if temporary plugin directory exists, remove it to avoid the fact that eclipse stores absolute paths to
     // installed bundles (see NXCM-4475)
-    if (p2BridgeRuntimeDir.exists()) {
-      try {
-        FileUtils.deleteDirectory(p2BridgeRuntimeDir);
-        if (p2BridgeRuntimeDir.exists()) {
-          throw new RuntimeException(
-              "Cannot delete nexus-p2-bridge temporary directory " + p2BridgeRuntimeDir.getAbsolutePath()
-          );
-        }
-      }
-      catch (IOException e) {
-        throw new RuntimeException(
-            "Cannot delete nexus-p2-bridge temporary directory " + p2BridgeRuntimeDir.getAbsolutePath(), e
-        );
-      }
+    try {
+      DirSupport.deleteIfExists(p2BridgeRuntimeDir.toPath());
     }
-    if (!p2BridgeRuntimeDir.exists()) {
-      try {
-        Files.createDirectories(p2BridgeRuntimeDir.toPath());
-      }
-      catch (IOException e) {
-        throw new RuntimeException(
-            "Cannot create nexus-p2-bridge temporary directory " + p2BridgeRuntimeDir.getAbsolutePath(), e
-        );
-      }
+    catch (IOException e) {
+      throw new RuntimeException(
+          "Cannot delete nexus-p2-bridge temporary directory " + p2BridgeRuntimeDir.getAbsolutePath(), e
+      );
+    }
+    try {
+      Files.createDirectories(p2BridgeRuntimeDir.toPath());
+    }
+    catch (IOException e) {
+      throw new RuntimeException(
+          "Cannot create nexus-p2-bridge temporary directory " + p2BridgeRuntimeDir.getAbsolutePath(), e
+      );
     }
     // create a fresh eclipse instance
     try {
@@ -184,7 +174,7 @@ class P2Runtime
     initParams.put("org.eclipse.equinox.simpleconfigurator.exclusiveInstallation", "false");
     initParams.put("osgi.java.profile.bootdelegation", "none");
     final String bridgedPackages = scanBridgedPackages(new File(p2BridgePluginDir, "p2-runtime/bridge"));
-    if (StringUtils.isNotBlank(bridgedPackages)) {
+    if (!Strings.isNullOrEmpty(bridgedPackages)) {
       initParams.put("org.osgi.framework.system.packages.extra", bridgedPackages);
     }
     if (LOGGING_ENABLED) {
@@ -204,12 +194,10 @@ class P2Runtime
       }
     });
     for (final File manifestFile : manifests) {
-      InputStream is = null;
-      try {
-        is = new FileInputStream(manifestFile);
+      try (InputStream is = new FileInputStream(manifestFile)) {
         final Manifest manifest = new Manifest(is);
         final String pkg = manifest.getMainAttributes().getValue("Export-Package");
-        if (StringUtils.isNotBlank(pkg)) {
+        if (!Strings.isNullOrEmpty(pkg)) {
           if (bridgedPackages.length() > 0) {
             bridgedPackages.append(",");
           }
@@ -218,9 +206,6 @@ class P2Runtime
       }
       catch (final IOException e) {
         throw new RuntimeException(e);
-      }
-      finally {
-        IOUtil.close(is);
       }
     }
     return bridgedPackages.toString();
