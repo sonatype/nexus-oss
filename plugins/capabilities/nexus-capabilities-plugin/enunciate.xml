@@ -17,7 +17,7 @@
            xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.26.xsd">
 
   <services>
-    <rest defaultRestSubcontext="service/local"/>
+    <rest defaultRestSubcontext="service/siesta"/>
   </services>
 
   <modules>
