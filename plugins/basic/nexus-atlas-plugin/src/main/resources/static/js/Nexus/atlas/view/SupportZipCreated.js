@@ -102,7 +102,7 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
           buttonAlign: 'right',
           buttons: [
             { text: 'Close', xtype: 'link-button', handler: me.close, scope: me },
-            { text: 'Download', xtype: 'nx-wonderland-authbutton', formBind: true, id: 'nx-atlas-button-supportzip-download' }
+            { text: 'Download', xtype: 'nx-wonderland-button-authenticate', formBind: true, id: 'nx-atlas-button-supportzip-download' }
           ]
         }
       ],

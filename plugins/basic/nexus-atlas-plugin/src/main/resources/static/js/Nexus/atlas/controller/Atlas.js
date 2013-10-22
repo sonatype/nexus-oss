@@ -46,7 +46,7 @@ NX.define('Nexus.atlas.controller.Atlas', {
         'click': me.createSupportZip
       },
       '#nx-atlas-button-supportzip-download': {
-        'click': me.downloadSupportZip
+        'authenticated': me.downloadSupportZip
       }
     });
 
@@ -185,7 +185,6 @@ NX.define('Nexus.atlas.controller.Atlas', {
         win.setValues(obj);
         win.show();
       }
-      // TODO: handle failure
     });
   },
 
@@ -194,15 +193,40 @@ NX.define('Nexus.atlas.controller.Atlas', {
    *
    * @private
    */
-  downloadSupportZip: function(button) {
+  downloadSupportZip: function(button, authTicket) {
     var me = this,
         win = button.up('nx-atlas-view-supportzip-created'),
-        fileName = win.getValues().name;
+        fileName = win.getValues().name,
+        dframe,
+        dwin;
 
-    // close the dialog
-    win.close();
+    // encode ticket for query-parameter
+    authTicket = Sonatype.utils.base64.encode(authTicket);
 
-    // download zip
-    Sonatype.utils.openWindow(Nexus.siesta.basePath + '/atlas/support-zip/' + fileName);
+    // FIXME: Move download bits to common place so it can be re-used
+    // FIXME: Also may want to revisit using window.open vs a dynamically generated form
+    // FIXME: ... and/or a link (which can support html5 download attribute)
+
+    // create the download frame if needed
+    dframe = Ext.get('nx-download-frame');
+    if (!dframe) {
+      dframe = Ext.getBody().createChild({
+        tag: 'iframe',
+        cls: 'x-hidden',
+        id: 'nx-download-frame',
+        name: 'nx-download-frame'
+      });
+      me.logDebug('Created download-frame: ' + dframe);
+    }
+
+    // open new window in hidden download-from to initiate download
+    dwin = NX.global.open(Nexus.siesta.basePath + '/atlas/support-zip/' + fileName + '?t=' + authTicket, 'nx-download-frame');
+    if (dwin == null) {
+      alert('Download window pop-up was blocked!');
+    }
+    else {
+      // close the dialog
+      win.close();
+    }
   }
 });
