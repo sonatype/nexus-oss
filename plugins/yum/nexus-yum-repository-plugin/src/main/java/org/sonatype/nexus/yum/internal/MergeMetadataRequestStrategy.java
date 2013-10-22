@@ -98,7 +98,7 @@ public class MergeMetadataRequestStrategy
           MergeMetadataTask.createTaskFor(nexusScheduler, groupRepository).get();
         }
         catch (Exception e) {
-          log.debug(
+          log.warn(
               "Could not merge Yum metadata on group {} due to {}/{}",
               groupRepository.getId(), e.getClass().getName(), e.getMessage(), log.isDebugEnabled() ? e : null
           );
