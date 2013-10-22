@@ -29,6 +29,9 @@ class SupportBundle
   static interface ContentSource
     extends Comparable<ContentSource>
   {
+    /**
+     * Support bundle content source inclusion type.
+     */
     static enum Type
     {
       SYSINFO,
@@ -50,6 +53,9 @@ class SupportBundle
      */
     String getPath()
 
+    /**
+     * Support bundle content source inclusion priority.
+     */
     static enum Priority
     {
       OPTIONAL(999),
