@@ -52,6 +52,8 @@ public class ProxyMetadataRequestStrategy
 {
   private static final Logger log = LoggerFactory.getLogger(ProxyMetadataRequestStrategy.class);
 
+  private static final String REPOMD_XML_PATH = "/" + Yum.PATH_OF_REPOMD_XML;
+
   private final Walker walker;
 
   @Inject
@@ -63,8 +65,8 @@ public class ProxyMetadataRequestStrategy
   public void onRemoteAccess(ProxyRepository proxy, ResourceStoreRequest request, StorageItem item)
       throws ItemNotFoundException, IllegalOperationException
   {
-    // do this only if request path in question has name of "repomd.xml"
-    if (Yum.NAME_OF_REPOMD_XML.equals(request.getRequestPath())) {
+    // do this only if request path in question asks for "repomd.xml"
+    if (REPOMD_XML_PATH.equals(request.getRequestPath())) {
       try {
         final ResourceStoreRequest wrequest = new ResourceStoreRequest(request);
         wrequest.setRequestPath(RepositoryItemUid.PATH_ROOT + Yum.PATH_OF_REPODATA);
