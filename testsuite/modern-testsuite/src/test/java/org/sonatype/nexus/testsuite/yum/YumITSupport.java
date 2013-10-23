@@ -71,11 +71,7 @@ public class YumITSupport
     return configuration
         .setLogPattern("%d{HH:mm:ss.SSS} %-5level - %msg%n")
         .setLogLevel("org.sonatype.nexus.yum", "DEBUG")
-        .setLogLevel("org.sonatype.nexus.plugins.capabilities", "DEBUG")
         .addPlugins(
-            artifactResolver().resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins", "nexus-capabilities-plugin"
-            ),
             artifactResolver().resolvePluginFromDependencyManagement(
                 "org.sonatype.nexus.plugins", "nexus-yum-repository-plugin"
             )
@@ -150,8 +146,10 @@ public class YumITSupport
   protected void waitForNexusToSettleDown()
       throws Exception
   {
+    remoteLogger().info("Waiting for Nexus to settle down...");
     client().getSubsystem(Events.class).waitForCalmPeriod();
     scheduler().waitForAllTasksToStop();
+    remoteLogger().info("Nexus is quiet. Done waiting.");
   }
 
 }

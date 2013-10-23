@@ -26,6 +26,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
@@ -56,16 +57,20 @@ public class YumRegistryImpl
 
   private final YumFactory yumFactory;
 
+  private final MergeMetadataRequestStrategy mergeMetadataRequestStrategy;
+
   private int maxNumberOfParallelThreads;
 
   @Inject
   public YumRegistryImpl(final NexusConfiguration nexusConfiguration,
                          final NexusScheduler nexusScheduler,
-                         final YumFactory yumFactory)
+                         final YumFactory yumFactory,
+                         final MergeMetadataRequestStrategy mergeMetadataRequestStrategy)
   {
     this.nexusConfiguration = checkNotNull(nexusConfiguration);
     this.nexusScheduler = checkNotNull(nexusScheduler);
     this.yumFactory = checkNotNull(yumFactory);
+    this.mergeMetadataRequestStrategy = checkNotNull(mergeMetadataRequestStrategy);
     this.maxNumberOfParallelThreads = DEFAULT_MAX_NUMBER_PARALLEL_THREADS;
   }
 
@@ -83,6 +88,10 @@ public class YumRegistryImpl
         runScanningTask(yum);
       }
 
+      if (repository.getRepositoryKind().isFacetAvailable(GroupRepository.class)) {
+        repository.registerRequestStrategy(MergeMetadataRequestStrategy.class.getName(), mergeMetadataRequestStrategy);
+      }
+
       return yum;
     }
     return yums.get(repository.getId());
@@ -92,6 +101,7 @@ public class YumRegistryImpl
   public Yum unregister(final String repositoryId) {
     final Yum yum = yums.remove(repositoryId);
     if (yum != null) {
+      yum.getNexusRepository().unregisterRequestStrategy(MergeMetadataRequestStrategy.class.getName());
       LOG.info("Unregistered repository '{}' as Yum repository", repositoryId);
     }
     return yum;
