@@ -35,7 +35,12 @@ public class CoreLoggerContributor
   public Set<String> getLoggers() {
     return Sets.newHashSet(
         "org.sonatype.nexus",
-        "org.sonatype.nexus.apachehttpclient"
+        "org.sonatype.nexus.apachehttpclient",
+        "org.sonatype.nexus.configuration",
+        "org.sonatype.nexus.plugins",
+        "org.sonatype.nexus.proxy",
+        "org.sonatype.nexus.tasks",
+        "org.sonatype.nexus.threads"
     );
   }
 
