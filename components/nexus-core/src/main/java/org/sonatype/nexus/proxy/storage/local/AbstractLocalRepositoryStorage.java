@@ -143,7 +143,6 @@ public abstract class AbstractLocalRepositoryStorage
    * @param uid the uid
    * @return the absolute url from base
    */
-  @Deprecated
   public URL getAbsoluteUrlFromBase(Repository repository, ResourceStoreRequest request)
       throws LocalStorageException
   {

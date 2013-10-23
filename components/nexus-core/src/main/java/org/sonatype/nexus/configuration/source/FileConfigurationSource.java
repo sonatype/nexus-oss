@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -40,8 +42,6 @@ import org.sonatype.security.events.SecurityConfigurationChanged;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
-
-import org.codehaus.plexus.util.FileUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -329,7 +329,10 @@ public class FileConfigurationSource
   {
     // Create the dir if doesn't exist, throw runtime exception on failure
     // bad bad bad
-    if (!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
+    try {
+      Files.createDirectories(file.getParentFile().toPath());
+    }
+    catch (IOException e) {
       String message =
           "\r\n******************************************************************************\r\n"
               + "* Could not create configuration file [ " + file.toString() + "]!!!! *\r\n"
@@ -337,7 +340,7 @@ public class FileConfigurationSource
               + "******************************************************************************";
 
       getLogger().error(message);
-      throw new IOException("Could not create configuration file " + file.getAbsolutePath());
+      throw new IOException("Could not create configuration file " + file.getAbsolutePath(), e);
     }
 
     // Clone the conf so we can encrypt the passwords
@@ -373,6 +376,6 @@ public class FileConfigurationSource
 
     // backup the file
     File backup = new File(file.getParentFile(), file.getName() + ".bak");
-    FileUtils.copyFile(file, backup);
+    Files.copy(file.toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING);
   }
 }

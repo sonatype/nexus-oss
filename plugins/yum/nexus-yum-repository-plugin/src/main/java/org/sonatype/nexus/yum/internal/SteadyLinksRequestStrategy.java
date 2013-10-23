@@ -13,15 +13,11 @@
 
 package org.sonatype.nexus.yum.internal;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.AccessDeniedException;
-import org.sonatype.nexus.proxy.IllegalOperationException;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -31,7 +27,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RequestStrategy;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.io.Closeables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +43,7 @@ public class SteadyLinksRequestStrategy
     implements RequestStrategy
 {
 
-  private static final Logger LOG = LoggerFactory.getLogger(YumRegistryImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(SteadyLinksRequestStrategy.class);
 
   @VisibleForTesting
   static final String REQUEST_PATH_ORIGINAL =
@@ -71,36 +66,24 @@ public class SteadyLinksRequestStrategy
               )
           );
           if (repomd instanceof StorageFileItem) {
-            InputStream in = null;
-            try {
-              in = ((StorageFileItem) repomd).getInputStream();
-
+            try (InputStream in = ((StorageFileItem) repomd).getInputStream()) {
               final String newRequestPath = matchRequestPath(requestPath, in);
-              if (newRequestPath != null) {
+              if (newRequestPath != null && !requestPath.equals(newRequestPath)) {
                 request.pushRequestPath(newRequestPath);
 
                 request.getRequestContext().put(REQUEST_PATH_ORIGINAL, requestPath);
                 request.getRequestContext().put(REQUEST_PATH_NEW, newRequestPath);
 
-                LOG.debug("Request changed from '{}' to '{}'", requestPath, newRequestPath);
+                log.debug("Request {}:{} changed to {}", repository, requestPath, newRequestPath);
               }
-            }
-            finally {
-              Closeables.closeQuietly(in);
             }
           }
         }
-        catch (final IOException e) {
-          // TODO maybe log a warn?
-        }
-        catch (ItemNotFoundException e) {
-          // TODO maybe log a warn?
-        }
-        catch (IllegalOperationException e) {
-          // TODO maybe log a warn?
-        }
-        catch (AccessDeniedException e) {
-          // TODO maybe log a warn?
+        catch (final Exception e) {
+          log.debug(
+              "Could not change request {}:{} due to {}/{}",
+              repository, requestPath, e.getClass().getName(), e.getMessage()
+          );
         }
       }
     }

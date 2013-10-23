@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -71,12 +72,12 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.CompositeException;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import com.google.common.base.Strings;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.search.BooleanClause;
@@ -533,9 +534,9 @@ public class DefaultIndexerManager
     logger.debug("Added indexing context {} for repository {}", ctx.getId(), repository.getId());
   }
 
-  private File getRepositoryIndexDirectory(final Repository repository) {
+  private File getRepositoryIndexDirectory(final Repository repository) throws IOException {
     File indexDirectory = new File(getWorkingDirectory(), getContextId(repository.getId()));
-    indexDirectory.mkdirs();
+    Files.createDirectories(indexDirectory.toPath());
     return indexDirectory;
   }
 
@@ -838,7 +839,7 @@ public class DefaultIndexerManager
             gav.getClassifier());
 
     // store extension if classifier is not empty
-    if (!StringUtils.isEmpty(ai.classifier)) {
+    if (!Strings.isNullOrEmpty(ai.classifier)) {
       ai.packaging = gav.getExtension();
     }
 
@@ -1479,9 +1480,7 @@ public class DefaultIndexerManager
 
       targetDir = new File(getTempDirectory(), "nx-index-" + Long.toHexString(System.nanoTime()));
 
-      if (!targetDir.mkdirs()) {
-        throw new IOException("Could not create temp dir for packing indexes: " + targetDir);
-      }
+      Files.createDirectories(targetDir.toPath());
 
       IndexPackingRequest packReq = new IndexPackingRequest(context, targetDir);
       packReq.setCreateIncrementalChunks(true);
@@ -1511,7 +1510,7 @@ public class DefaultIndexerManager
             logger.debug("Cleanup of temp files...");
           }
 
-          FileUtils.deleteDirectory(targetDir);
+          DirSupport.deleteIfExists(targetDir.toPath());
         }
         catch (IOException e) {
           lastException = e;
@@ -2024,7 +2023,7 @@ public class DefaultIndexerManager
         filters.add(0, new ArtifactInfoFilter()
         {
           public boolean accepts(IndexingContext ctx, ArtifactInfo ai) {
-            return StringUtils.isBlank(ai.classifier);
+            return Strings.isNullOrEmpty(ai.classifier);
           }
         });
       }
@@ -2344,9 +2343,8 @@ public class DefaultIndexerManager
 
     File location = File.createTempFile(indexId, null, getTempDirectory());
 
-    if (!location.delete() || !location.mkdir()) {
-      throw new IOException("Could not create temporary directory " + location);
-    }
+    Files.delete(location.toPath());
+    Files.createDirectories(location.toPath());
 
     final DefaultIndexingContext temporary = new DefaultIndexingContext(indexId, //
         repository.getId(), //
@@ -2385,7 +2383,7 @@ public class DefaultIndexerManager
     }
     finally {
       temporary.close(false);
-      FileUtils.deleteDirectory(location);
+      DirSupport.deleteIfExists(location.toPath());
     }
   }
 

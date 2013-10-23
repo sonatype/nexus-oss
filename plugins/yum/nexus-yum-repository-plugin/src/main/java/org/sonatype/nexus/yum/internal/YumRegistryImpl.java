@@ -27,9 +27,11 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.capabilities.ProxyMetadataRequestStrategy;
 import org.sonatype.nexus.yum.internal.task.RepositoryScanningTask;
@@ -78,7 +80,17 @@ public class YumRegistryImpl
   @Override
   public Yum register(final MavenRepository repository) {
     if (!yums.containsKey(repository.getId())) {
-      final Yum yum = yumFactory.create(getTemporaryDirectory(), repository);
+      Yum yum;
+      if (repository.getRepositoryKind().isFacetAvailable(HostedRepository.class)) {
+        yum = yumFactory.createHosted(getTemporaryDirectory(), repository.adaptToFacet(HostedRepository.class));
+      }
+      else if (repository.getRepositoryKind().isFacetAvailable(GroupRepository.class)) {
+        yum = yumFactory.createGroup(repository.adaptToFacet(GroupRepository.class));
+      }
+      else {
+        throw new IllegalArgumentException("Only hosted and groups are supported");
+      }
+
       yums.put(repository.getId(), yum);
 
       LOG.info("Registered repository '{}' as Yum repository", repository.getId());
@@ -86,7 +98,7 @@ public class YumRegistryImpl
       createVirtualYumConfigFile(repository);
 
       if (repository.getRepositoryKind().isFacetAvailable(HostedRepository.class)) {
-        runScanningTask(yum);
+        runScanningTask((YumHosted) yum);
       }
 
       if (repository.getRepositoryKind().isFacetAvailable(MavenProxyRepository.class)) {
@@ -103,6 +115,7 @@ public class YumRegistryImpl
     final Yum yum = yums.remove(repositoryId);
     if (yum != null) {
       yum.getNexusRepository().unregisterRequestStrategy(ProxyMetadataRequestStrategy.class.getName());
+      yum.getNexusRepository().unregisterRequestStrategy(MergeMetadataRequestStrategy.class.getName());
       LOG.info("Unregistered repository '{}' as Yum repository", repositoryId);
     }
     return yum;
@@ -114,7 +127,7 @@ public class YumRegistryImpl
     return yums.get(repositoryId);
   }
 
-  private void runScanningTask(final Yum yum) {
+  private void runScanningTask(final YumHosted yum) {
     RepositoryScanningTask task = nexusScheduler.createTaskInstance(RepositoryScanningTask.class);
     task.setYum(yum);
     nexusScheduler.submit(RepositoryScanningTask.ID, task);

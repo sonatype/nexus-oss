@@ -14,6 +14,8 @@
 package org.sonatype.nexus.proxy.item;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,62 +27,51 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.util.io.StreamSupport;
 
-import org.codehaus.plexus.util.IOUtil;
+import com.google.common.base.Charsets;
+import com.google.common.io.Closeables;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named
 @Singleton
 public class DefaultLinkPersister
     implements LinkPersister
 {
-  private static final String UTF8_CHARSET = "UTF-8";
+  private static final Charset LINK_CHARSET = Charsets.UTF_8;
 
   private static final String LINK_PREFIX = "LINK to ";
 
-  private static final byte[] LINK_PREFIX_BYTES = LINK_PREFIX.getBytes(Charset.forName(UTF8_CHARSET));
+  private static final byte[] LINK_PREFIX_BYTES = LINK_PREFIX.getBytes(LINK_CHARSET);
 
   private final RepositoryItemUidFactory repositoryItemUidFactory;
 
   @Inject
   public DefaultLinkPersister(final RepositoryItemUidFactory repositoryItemUidFactory) {
-    this.repositoryItemUidFactory = repositoryItemUidFactory;
+    this.repositoryItemUidFactory = checkNotNull(repositoryItemUidFactory);
   }
 
   public boolean isLinkContent(final ContentLocator locator)
       throws IOException
   {
-    if (locator != null) {
-      final byte[] buf = ContentLocatorUtils.getFirstBytes(LINK_PREFIX_BYTES.length, locator);
-
-      if (buf != null) {
-        return Arrays.equals(buf, LINK_PREFIX_BYTES);
-      }
-      else {
-        return false;
-      }
+    final byte[] buf = getLinkPrefixBytes(locator);
+    if (buf != null) {
+      return Arrays.equals(buf, LINK_PREFIX_BYTES);
     }
-    else {
-      return false;
-    }
+    return false;
   }
 
   public RepositoryItemUid readLinkContent(final ContentLocator locator)
       throws NoSuchRepositoryException, IOException
   {
     if (locator != null) {
-      InputStream fis = null;
-
-      try {
-        fis = locator.getContent();
-
-        final String linkBody = IOUtil.toString(fis, UTF8_CHARSET);
-
+      try (final InputStream is = locator.getContent()) {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        StreamSupport.copy(is, baos);
+        final String linkBody = new String(baos.toByteArray(), LINK_CHARSET);
         final String uidStr = linkBody.substring(LINK_PREFIX.length(), linkBody.length());
-
         return repositoryItemUidFactory.createUid(uidStr);
-      }
-      finally {
-        IOUtil.close(fis);
       }
     }
     else {
@@ -93,13 +84,34 @@ public class DefaultLinkPersister
   {
     try {
       final String linkBody = LINK_PREFIX + link.getTarget().toString();
-
-      IOUtil.copy(new ByteArrayInputStream(linkBody.getBytes(UTF8_CHARSET)), os);
-
+      StreamSupport.copy(new ByteArrayInputStream(linkBody.getBytes(LINK_CHARSET)), os);
       os.flush();
     }
     finally {
-      IOUtil.close(os);
+      Closeables.close(os, true);
     }
   }
+
+  // ==
+
+  /**
+   * Reads up first bytes (exactly as many as many makes the {@link #LINK_PREFIX_BYTES}) from ContentLocator's content. It returns byte array of
+   * exact size of count, or null (ie. if file is smaller).
+   *
+   * @param locator the ContentLocator to read from.
+   * @return returns byte array read up, or {@code null} if locator is {@code null}, have not enough length.
+   */
+  protected byte[] getLinkPrefixBytes(final ContentLocator locator)
+      throws IOException
+  {
+    if (locator != null && locator.getLength() > LINK_PREFIX_BYTES.length) {
+      try (final DataInputStream dis = new DataInputStream(locator.getContent())) {
+        final byte[] buf = new byte[LINK_PREFIX_BYTES.length];
+        dis.readFully(buf);
+        return buf;
+      }
+    }
+    return null;
+  }
+
 }

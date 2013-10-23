@@ -22,7 +22,9 @@ NX.define('Nexus.atlas.controller.Atlas', {
 
   requires: [
     'Nexus.siesta',
-    'Nexus.atlas.view.Panel'
+    'Nexus.atlas.view.Panel',
+    'Nexus.atlas.view.SupportZipCreated',
+    'Nexus.util.DownloadHelper'
   ],
 
   init: function() {
@@ -35,11 +37,17 @@ NX.define('Nexus.atlas.controller.Atlas', {
       '#nx-atlas-view-sysinfo-button-refresh': {
         'click': me.refreshSysInfo
       },
+      '#nx-atlas-view-sysinfo-button-download': {
+        'click': me.downloadSysInfo
+      },
       '#nx-atlas-view-sysinfo-button-print': {
         'click': me.printSysInfo
       },
-      '#nx-atlas-button-create-zip': {
+      '#nx-atlas-button-supportzip-create': {
         'click': me.createSupportZip
+      },
+      '#nx-atlas-button-supportzip-download': {
+        'authenticated': me.downloadSupportZip
       }
     });
 
@@ -90,6 +98,7 @@ NX.define('Nexus.atlas.controller.Atlas', {
         var obj = Ext.decode(response.responseText);
         panel.setInfo(obj);
       }
+      // TODO: handle failure
     });
   },
 
@@ -100,6 +109,15 @@ NX.define('Nexus.atlas.controller.Atlas', {
    */
   refreshSysInfo: function(button) {
     this.loadSysInfo(Ext.getCmp('nx-atlas-view-sysinfo'));
+  },
+
+  /**
+   * Download system information report.
+   *
+   * @private
+   */
+  downloadSysInfo: function(button) {
+    Nexus.util.DownloadHelper.downloadUrl(Nexus.siesta.basePath + '/atlas/system-information');
   },
 
   /**
@@ -162,9 +180,33 @@ NX.define('Nexus.atlas.controller.Atlas', {
         mask.hide()
       },
       success: function(response, opts) {
-        //var obj = Ext.decode(response.responseText);
-        //panel.setInfo(obj);
+        var obj = Ext.decode(response.responseText),
+            win = NX.create('Nexus.atlas.view.SupportZipCreated');
+
+        win.setValues(obj);
+        win.show();
       }
     });
+  },
+
+  /**
+   * Download support ZIP file.
+   *
+   * @private
+   */
+  downloadSupportZip: function(button, authTicket) {
+    var me = this,
+        win = button.up('nx-atlas-view-supportzip-created'),
+        fileName = win.getValues().name;
+
+    // encode ticket for query-parameter
+    authTicket = Sonatype.utils.base64.encode(authTicket);
+
+    if (Nexus.util.DownloadHelper.downloadUrl(
+        Nexus.siesta.basePath + '/atlas/support-zip/' + fileName + '?t=' + authTicket))
+    {
+      // if download was initated close the window
+      win.close();
+    }
   }
 });

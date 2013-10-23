@@ -16,16 +16,19 @@
   font: normal 11px arial, tahoma, verdana, helvetica;
 }
 
-.nx-atlas-view-panel-description {
+.nx-atlas-view-panel-description,
+.nx-atlas-view-supportzip-created-description {
   padding: 10px;
 }
 
-.nx-atlas-view-panel-description img {
+.nx-atlas-view-panel-description img,
+.nx-atlas-view-supportzip-created-description img {
   float: left;
   padding-right: 10px;
 }
 
-.nx-atlas-view-panel-description div {
+.nx-atlas-view-panel-description div,
+.nx-atlas-view-supportzip-created-description div {
   vertical-align: middle;
 }
 
@@ -88,6 +91,39 @@
   padding-left: 20px;
 }
 
-.nx-atlas-view-supportzip .x-form-item-label {
+.nx-atlas-view-supportzip .x-form-cb-label {
+  font: normal 11px arial, tahoma, verdana, helvetica;
+}
+
+.nx-atlas-view-supportzip-created .x-window-ml div {
+  background-color: white;
+}
+
+.nx-atlas-view-supportzip-created .x-form {
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+.nx-atlas-view-supportzip-created-truncated-warning {
+  padding-top: 10px;
+  padding-bottom: 20px;
+  text-align: center;
+}
+
+.nx-atlas-view-supportzip-created-truncated-warning img {
+  vertical-align: bottom;
+  padding-right: 5px;
+}
+
+.nx-atlas-view-supportzip-created-truncated-warning span {
+  padding: 6px;
+  background-color: #fff8f7;
+  border: solid 1px #d04437;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+}
+
+.nx-atlas-view-supportzip .x-form-item-label,
+.nx-atlas-view-supportzip-created .x-form-item-label {
   font: bold 11px arial, tahoma, verdana, helvetica;
 }

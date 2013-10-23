@@ -140,10 +140,8 @@ public class DefaultWalker
       else if (context.getStopCause() instanceof TaskInterruptedException) {
         getLogger().info(
             "Canceled walking on repository {} from path \"{}\", cause: {}",
-            new Object[]{
                 RepositoryStringUtils.getHumanizedNameString(context.getRepository()), fromPath,
-                context.getStopCause().getMessage()
-            });
+                context.getStopCause().getMessage());
       }
       else {
         // we have a cause, report any non-ItemNotFounds with stack trace
@@ -151,18 +149,14 @@ public class DefaultWalker
         if (context.getStopCause() instanceof ItemNotFoundException) {
           getLogger().debug(
               "Aborted walking on repository {} from path \"{}\", cause: {}",
-              new Object[]{
                   RepositoryStringUtils.getHumanizedNameString(context.getRepository()),
-                  fromPath, context.getStopCause().getMessage()
-              });
+                  fromPath, context.getStopCause().getMessage());
         }
         else {
-          getLogger().info(
+          getLogger().warn(
               "Aborted walking on repository {} from path \"{}\", cause: {}",
-              new Object[]{
                   RepositoryStringUtils.getHumanizedNameString(context.getRepository()),
-                  fromPath, context.getStopCause().getMessage()
-              });
+                  fromPath, context.getStopCause().getMessage(), context.getStopCause());
         }
 
         throw new WalkerException(context, "Aborted walking on repository ID='"

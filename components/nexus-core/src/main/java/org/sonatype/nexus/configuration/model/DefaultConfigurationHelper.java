@@ -80,12 +80,6 @@ public class DefaultConfigurationHelper
   }
 
   protected void handlePasswords(final Configuration config, final boolean encrypt, final boolean mask) {
-    if (config.getErrorReporting() != null
-        && StringUtils.isNotEmpty(config.getErrorReporting().getJiraPassword())) {
-      CErrorReporting errorConfig = config.getErrorReporting();
-      errorConfig.setJiraPassword(encryptDecryptPassword(errorConfig.getJiraPassword(), encrypt, mask));
-    }
-
     if (config.getSmtpConfiguration() != null
         && StringUtils.isNotEmpty(config.getSmtpConfiguration().getPassword())) {
       CSmtpConfiguration smtpConfig = config.getSmtpConfiguration();

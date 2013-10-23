@@ -19,14 +19,20 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.nexus.util.file.FileSupport;
 
 /**
  * Some utils that should end in plexus-utils.
  *
  * @author cstamas
+ * @deprecated Do not use it, will be removed in future releases. Use {@link FileSupport} or {@link DirSupport} instead.
  */
+@Deprecated
 public class FileUtils
 {
   private static Set<File> roots = null;
@@ -194,6 +200,7 @@ public class FileUtils
     return null;
   }
 
+  @Deprecated
   public static void move(File source, File destination)
       throws IOException
   {
@@ -208,7 +215,7 @@ public class FileUtils
       throw new FileNotFoundException("Source file doesn't exists " + source);
     }
 
-    destination.getParentFile().mkdirs();
+    Files.createDirectories(destination.getParentFile().toPath());
     if (!destination.exists()) {
       if (!source.renameTo(destination)) {
         throw new IOException("Failed to move '" + source + "' to '" + destination + "'");

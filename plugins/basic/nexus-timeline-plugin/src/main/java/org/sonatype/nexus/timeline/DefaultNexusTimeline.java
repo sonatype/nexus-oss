@@ -16,6 +16,7 @@ package org.sonatype.nexus.timeline;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,7 +31,6 @@ import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
 
 import com.google.common.base.Predicate;
-import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,12 +121,12 @@ public class DefaultNexusTimeline
         "Moving legacy timeline index from '" + legacyIndexDir.getAbsolutePath() + "' to '"
             + newIndexDir.getAbsolutePath() + "'.");
 
-    if (!newIndexDir.exists()) {
-      newIndexDir.mkdirs();
-    }
-
+    Files.createDirectories(newIndexDir.toPath());
     for (File legacyIndexFile : legacyIndexFiles) {
-      FileUtils.rename(legacyIndexFile, new File(newIndexDir, legacyIndexFile.getName()));
+      // legacy was just plain Lucene index (so, we move lucene files from here into a SUBDIRECTORY)
+      if (Files.isRegularFile(legacyIndexFile.toPath())) {
+        Files.move(legacyIndexFile.toPath(), new File(newIndexDir, legacyIndexFile.getName()).toPath());
+      }
     }
   }
 

@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -84,8 +85,8 @@ public class P2ProxyMetadataSource
 
     try {
       final File artifactRepositoryDir = File.createTempFile("artifacts", "");
-      artifactRepositoryDir.delete();
-      artifactRepositoryDir.mkdirs();
+      Files.delete(artifactRepositoryDir.toPath());
+      Files.createDirectories(artifactRepositoryDir.toPath());
 
       final File artifactMappingsXmlFile = File.createTempFile("p2proxy.artifact-mappings", ".xml");
       try {
@@ -169,8 +170,8 @@ public class P2ProxyMetadataSource
 
     try {
       final File metadataRepositoryDir = File.createTempFile("content", "");
-      metadataRepositoryDir.delete();
-      metadataRepositoryDir.mkdirs();
+      Files.delete(metadataRepositoryDir.toPath());
+      Files.createDirectories(metadataRepositoryDir.toPath());
 
       try {
         String username = null;

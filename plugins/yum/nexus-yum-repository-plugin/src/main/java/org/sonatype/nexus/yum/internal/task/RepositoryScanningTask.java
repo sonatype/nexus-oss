@@ -23,6 +23,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.internal.RpmScanner;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
@@ -44,7 +45,7 @@ public class RepositoryScanningTask
 
   public static final String ID = "RepositoryScanningTask";
 
-  private Yum yum;
+  private YumHosted yum;
 
   private final RpmScanner scanner;
 
@@ -97,7 +98,7 @@ public class RepositoryScanningTask
     return "Scanning repository '" + yum.getNexusRepository().getId() + "'";
   }
 
-  public void setYum(final Yum yum) {
+  public void setYum(final YumHosted yum) {
     this.yum = yum;
   }
 

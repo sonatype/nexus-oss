@@ -17,7 +17,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
@@ -33,12 +32,9 @@ import org.restlet.resource.Variant;
 public class ExceptionPlexusResource
     extends AbstractPlexusResource
 {
-  private final ErrorReportingManager manager;
-
   @Inject
-  public ExceptionPlexusResource(final ErrorReportingManager manager) {
+  public ExceptionPlexusResource() {
     this.setModifiable(true);
-    this.manager = manager;
   }
 
   @Override

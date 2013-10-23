@@ -19,7 +19,6 @@ import java.io.InputStream;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.codehaus.plexus.util.IOUtil;
 
 /**
  * @author juven
@@ -78,11 +77,8 @@ public abstract class AbstractMetadataProcessor
   protected Metadata readMetadata(String path)
       throws IOException
   {
-    InputStream mdStream = metadataHelper.retrieveContent(path + METADATA_SUFFIX);
-
-    try {
+    try (final InputStream mdStream = metadataHelper.retrieveContent(path + METADATA_SUFFIX)) {
       Metadata md = MetadataBuilder.read(mdStream);
-
       return md;
     }
     catch (IOException e) {
@@ -92,11 +88,7 @@ public abstract class AbstractMetadataProcessor
       else {
         metadataHelper.logger.info("Failed to parse metadata from '" + path + "'");
       }
-
       return null;
-    }
-    finally {
-      IOUtil.close(mdStream);
     }
   }
 

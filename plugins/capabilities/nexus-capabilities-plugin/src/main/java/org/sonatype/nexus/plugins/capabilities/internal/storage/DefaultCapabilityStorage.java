@@ -72,6 +72,13 @@ public class DefaultCapabilityStorage
     configurationFile = new File(applicationConfiguration.getConfigurationDirectory(), "capabilities.xml");
   }
 
+  /**
+   * @since 2.7
+   */
+  public File getConfigurationFile() {
+    return configurationFile;
+  }
+
   @Override
   public void add(final CapabilityStorageItem item)
       throws IOException

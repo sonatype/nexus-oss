@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
@@ -29,6 +30,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.google.common.io.Closeables;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -82,12 +84,11 @@ public class DefaultFSAttributeStorage
     }
     else {
       getLogger().info("Attribute storage directory does not exists, creating it here: " + workingDirectory);
-
-      if (!workingDirectory.mkdirs()) {
-        if (!workingDirectory.isDirectory()) {
-          throw new IllegalArgumentException("Could not create the attribute storage directory on path "
-              + workingDirectory.getAbsolutePath());
-        }
+      try {
+        Files.createDirectories(workingDirectory.toPath());
+      }
+      catch (IOException e) {
+        Throwables.propagate(e);
       }
     }
 
@@ -185,8 +186,7 @@ public class DefaultFSAttributeStorage
         }
 
         File target = getFileFromBase(uid);
-
-        target.getParentFile().mkdirs();
+        Files.createDirectories(target.getParentFile().toPath());
 
         if (target.getParentFile().exists() && target.getParentFile().isDirectory()) {
           FileOutputStream fos = null;

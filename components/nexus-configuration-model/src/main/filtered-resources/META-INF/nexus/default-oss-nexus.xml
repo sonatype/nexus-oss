@@ -14,7 +14,7 @@
 
 -->
 <nexusConfiguration>
-  <version>2.2.0</version>
+  <version>${nexus.configuration.version}</version>
   <nexusVersion>${project.version}</nexusVersion>
   <globalConnectionSettings>
     <connectionTimeout>20000</connectionTimeout>
@@ -304,10 +304,5 @@
     <password>smtp-password</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
-  <errorReporting>
-    <enabled>false</enabled>
-    <jiraUrl>https://issues.sonatype.org</jiraUrl>
-    <jiraProject>PR</jiraProject>
-  </errorReporting>
   <notification />
 </nexusConfiguration>

@@ -39,6 +39,7 @@ import org.sonatype.nexus.logging.LoggerContributor;
 import org.sonatype.nexus.logging.LoggingConfigurator;
 import org.sonatype.nexus.logging.model.LevelXO;
 import org.sonatype.nexus.logging.model.LoggerXO;
+import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.sisu.goodies.common.TestAccessible;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
@@ -49,7 +50,6 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Maps.EntryTransformer;
-import com.google.common.io.ByteStreams;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -292,7 +292,7 @@ public class LoggingConfiguratorImpl
             new TemplateParameters().set("loggers", loggers)
         );
         try (final InputStream in = new ByteArrayInputStream(content.getBytes())) {
-          ByteStreams.copy(in, output);
+          StreamSupport.copy(in, output);
         }
       }
     });

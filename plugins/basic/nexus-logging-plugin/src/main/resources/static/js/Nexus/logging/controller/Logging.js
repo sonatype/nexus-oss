@@ -25,7 +25,8 @@ NX.define('Nexus.logging.controller.Logging', {
     'Nexus.logging.Icons',
     'Nexus.logging.view.Panel',
     'Nexus.logging.view.Add',
-    'Nexus.logging.view.Mark'
+    'Nexus.logging.view.Mark',
+    'Nexus.util.DownloadHelper'
   ],
 
   init: function () {
@@ -306,7 +307,7 @@ NX.define('Nexus.logging.controller.Logging', {
    * @private
    */
   downloadLog: function () {
-    Sonatype.utils.openWindow(Nexus.siesta.basePath + '/logging/log');
+    Nexus.util.DownloadHelper.downloadUrl(Nexus.siesta.basePath + '/logging/log');
   },
 
   /**

@@ -23,6 +23,7 @@ import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -32,6 +33,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.RpmScanner;
@@ -107,13 +109,18 @@ public class GenerateMetadataTaskConcurrencyTest
   {
     final File tmpDir = copyToTempDir(rpmsDir());
 
-    final MavenRepository repository = mock(MavenRepository.class);
+    final MavenHostedRepository repository = mock(MavenHostedRepository.class);
     when(repository.getId()).thenReturn("REPO");
     when(repository.getLocalUrl()).thenReturn(tmpDir.getAbsolutePath());
     when(repository.getProviderRole()).thenReturn(Repository.class.getName());
     when(repository.getProviderHint()).thenReturn("maven2");
+    when(repository.adaptToFacet(HostedRepository.class)).thenReturn(repository);
+    when(repository.adaptToFacet(MavenRepository.class)).thenReturn(repository);
+    when(repository.adaptToFacet(MavenHostedRepository.class)).thenReturn(repository);
     final RepositoryKind repositoryKind = mock(RepositoryKind.class);
     when(repositoryKind.isFacetAvailable(HostedRepository.class)).thenReturn(true);
+    when(repositoryKind.isFacetAvailable(MavenRepository.class)).thenReturn(true);
+    when(repositoryKind.isFacetAvailable(MavenHostedRepository.class)).thenReturn(true);
     when(repository.getRepositoryKind()).thenReturn(repositoryKind);
 
     final File rpm1 = createDummyRpm(RPM_NAME_1, "1", new File(tmpDir, "rpm1"));
@@ -124,7 +131,7 @@ public class GenerateMetadataTaskConcurrencyTest
     for (int index = 0; index < MAX_PARALLEL_SCHEDULER_THREADS; index++) {
       futures.add(nexusScheduler.submit("WaitTask", nexusScheduler.createTaskInstance(WaitTask.class)));
     }
-    final Yum yum = yumRegistry.register(repository);
+    final YumHosted yum = (YumHosted) yumRegistry.register(repository);
 
     // when
     final String file1 = "rpm1/" + rpm1.getName();

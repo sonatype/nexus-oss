@@ -16,7 +16,6 @@ package org.sonatype.nexus.log.internal;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -31,6 +30,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -47,6 +47,8 @@ import org.sonatype.nexus.log.LogConfigurationParticipant;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
+import org.sonatype.nexus.util.file.FileSupport;
+import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -60,13 +62,10 @@ import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.util.StatusPrinter;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.io.ByteStreams;
 import com.google.inject.Injector;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,14 +132,14 @@ public class LogbackLogManager
     eventBus.register(this);
   }
 
-  // ==
-
   @Subscribe
   public void on(final NexusInitializedEvent evt) {
     configure();
   }
 
-  // ==
+  private LoggerContext getLoggerContext() {
+    return (LoggerContext) LoggerFactory.getILoggerFactory();
+  }
 
   @Override
   public synchronized void configure() {
@@ -185,7 +184,7 @@ public class LogbackLogManager
   public Map<String, LoggerLevel> getLoggers() {
     Map<String, LoggerLevel> loggers = Maps.newHashMap();
 
-    LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+    LoggerContext loggerContext = getLoggerContext();
     for (ch.qos.logback.classic.Logger logger : loggerContext.getLoggerList()) {
       String name = logger.getName();
       Level level = logger.getLevel();
@@ -202,7 +201,7 @@ public class LogbackLogManager
   public Set<File> getLogFiles() {
     HashSet<File> files = new HashSet<File>();
 
-    LoggerContext ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
+    LoggerContext ctx = getLoggerContext();
 
     for (Logger l : ctx.getLoggerList()) {
       ch.qos.logback.classic.Logger log = (ch.qos.logback.classic.Logger) l;
@@ -372,22 +371,15 @@ public class LogbackLogManager
     prepareConfigurationFiles();
     String logConfigDir = getLogConfigDir();
     File logConfigPropsFile = new File(logConfigDir, LOG_CONF_PROPS);
-    InputStream in = null;
-    try {
-      in = new FileInputStream(logConfigPropsFile);
-
+    try(final InputStream in = new FileInputStream(logConfigPropsFile)) {
       Properties properties = new Properties();
       properties.load(in);
-
       return properties;
-    }
-    finally {
-      IOUtil.close(in);
     }
   }
 
   private void saveConfigurationProperties(final Properties properties)
-      throws FileNotFoundException, IOException
+      throws IOException
   {
     final File configurationFile = new File(getLogConfigDir(), LOG_CONF_PROPS);
     logger.debug("Saving configuration: {}", configurationFile);
@@ -408,7 +400,7 @@ public class LogbackLogManager
   private String getLogConfigDir() {
     String logConfigDir = System.getProperty(KEY_LOG_CONFIG_DIR);
 
-    if (StringUtils.isEmpty(logConfigDir)) {
+    if (Strings.isNullOrEmpty(logConfigDir)) {
       logConfigDir = applicationConfiguration.getConfigurationDirectory().getAbsolutePath();
 
       System.setProperty(KEY_LOG_CONFIG_DIR, logConfigDir);
@@ -424,8 +416,9 @@ public class LogbackLogManager
     if (!logConfigPropsFile.exists()) {
       try {
         URL configUrl = this.getClass().getResource(LOG_CONF_PROPS_RESOURCE);
-
-        FileUtils.copyURLToFile(configUrl, logConfigPropsFile);
+        try (final InputStream is = configUrl.openStream()) {
+          FileSupport.copy(is, logConfigPropsFile.toPath());
+        }
       }
       catch (IOException e) {
         throw new IllegalStateException("Could not create logback.properties as "
@@ -449,7 +442,7 @@ public class LogbackLogManager
                   throws IOException
               {
                 try (final InputStream in = participant.getConfiguration()) {
-                  ByteStreams.copy(in, output);
+                  StreamSupport.copy(in, output);
                 }
               }
             });
@@ -508,7 +501,7 @@ public class LogbackLogManager
   private void reconfigure() {
     String logConfigDir = getLogConfigDir();
 
-    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+    LoggerContext lc = getLoggerContext();
 
     try {
       JoranConfigurator configurator = new JoranConfigurator();
@@ -525,7 +518,7 @@ public class LogbackLogManager
   }
 
   private void injectAppenders() {
-    LoggerContext ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
+    LoggerContext ctx = getLoggerContext();
 
     for (Logger l : ctx.getLoggerList()) {
       ch.qos.logback.classic.Logger log = (ch.qos.logback.classic.Logger) l;
@@ -564,4 +557,31 @@ public class LogbackLogManager
     }
   }
 
+  /**
+   * Convert a {@link LoggerLevel} into a Logback {@link Level}.
+   */
+  private Level convert(final LoggerLevel level) {
+    return Level.valueOf(level.name());
+  }
+
+  @Override
+  public void setLoggerLevel(final String name, final @Nullable LoggerLevel level) {
+    Level newLevel = level != null ? convert(level): null;
+    getLoggerContext().getLogger(name).setLevel(newLevel);
+  }
+
+  @Override
+  @Nullable
+  public LoggerLevel getLoggerLevel(final String name) {
+    Level level = getLoggerContext().getLogger(name).getLevel();
+    if (level != null) {
+      return convert(level);
+    }
+    return null;
+  }
+
+  @Override
+  public LoggerLevel getLoggerEffectiveLevel(final String name) {
+    return convert(getLoggerContext().getLogger(name).getEffectiveLevel());
+  }
 }
