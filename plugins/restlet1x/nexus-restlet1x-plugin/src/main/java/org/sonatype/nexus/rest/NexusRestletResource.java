@@ -13,14 +13,9 @@
 
 package org.sonatype.nexus.rest;
 
-import java.util.concurrent.ConcurrentMap;
-
-import org.sonatype.nexus.error.reporting.ErrorReportRequest;
-import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.RestletResource;
 
-import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -131,24 +126,6 @@ public class NexusRestletResource
   }
 
   protected void handleError(Throwable throwable) {
-    Context c = getContext();
-    ConcurrentMap<String, Object> attrs = c.getAttributes();
-    ErrorReportingManager manager =
-        (ErrorReportingManager) attrs.get(ErrorReportingManager.class.getName());
-
-    if (manager != null) {
-      ErrorReportRequest request = new ErrorReportRequest();
-
-      request.getContext().putAll(getContext().getAttributes());
-
-      request.setThrowable(throwable);
-
-      try {
-        manager.handleError(request);
-      }
-      catch (IssueSubmissionException e) {
-        logger.error("Unable to submit error report to jira", e);
-      }
-    }
+    logger.debug("ERROR: {}", throwable, throwable);
   }
 }

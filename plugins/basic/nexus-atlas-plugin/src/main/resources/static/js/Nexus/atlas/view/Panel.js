@@ -64,9 +64,8 @@ NX.define('Nexus.atlas.view.Panel', {
           plain: true,
           layoutOnTabChange: true,
           items: [
-            { xtype: 'nx-atlas-view-sysinfo' }
-            // NOTE: disabled for now, will re-enable later
-            //{ xtype: 'nx-atlas-view-supportzip' }
+            { xtype: 'nx-atlas-view-sysinfo' },
+            { xtype: 'nx-atlas-view-supportzip' }
           ],
           activeTab: 0
         }

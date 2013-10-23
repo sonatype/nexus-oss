@@ -37,11 +37,6 @@ NX.define('Sonatype.repoServer.referenceData', {
       sslEnabled : "",
       tlsEnabled : ""
     },
-    errorReportingSettings : {
-      jiraUsername : "",
-      jiraPassword : "",
-      reportErrorsAutomatically : false
-    },
     globalConnectionSettings : {
       connectionTimeout : 0,
       retrievalRetryCount : 0,

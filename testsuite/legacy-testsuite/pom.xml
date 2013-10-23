@@ -109,6 +109,16 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.http-testing-harness</groupId>
+      <artifactId>server-provider</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.http-testing-harness</groupId>
+      <artifactId>junit-runner</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
       <scope>test</scope>
@@ -129,12 +139,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-client</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu.pr</groupId>
-      <artifactId>sisu-pr-testutil</artifactId>
       <scope>test</scope>
     </dependency>
 
