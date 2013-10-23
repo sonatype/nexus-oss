@@ -33,7 +33,7 @@
       <id>atlas-all</id>
       <type>method</type>
       <name>Atlas: Support Tools</name>
-      <description>Give permission use Atlas support tools</description>
+      <description>Give permission to use Atlas support tools</description>
       <properties>
         <property>
           <key>method</key>
