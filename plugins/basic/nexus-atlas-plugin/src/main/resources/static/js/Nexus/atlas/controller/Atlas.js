@@ -23,7 +23,8 @@ NX.define('Nexus.atlas.controller.Atlas', {
   requires: [
     'Nexus.siesta',
     'Nexus.atlas.view.Panel',
-    'Nexus.atlas.view.SupportZipCreated'
+    'Nexus.atlas.view.SupportZipCreated',
+    'Nexus.util.DownloadHelper'
   ],
 
   init: function() {
@@ -116,7 +117,7 @@ NX.define('Nexus.atlas.controller.Atlas', {
    * @private
    */
   downloadSysInfo: function(button) {
-    Sonatype.utils.openWindow(Nexus.siesta.basePath + '/atlas/system-information');
+    Nexus.util.DownloadHelper.downloadUrl(Nexus.siesta.basePath + '/atlas/system-information');
   },
 
   /**
@@ -196,36 +197,15 @@ NX.define('Nexus.atlas.controller.Atlas', {
   downloadSupportZip: function(button, authTicket) {
     var me = this,
         win = button.up('nx-atlas-view-supportzip-created'),
-        fileName = win.getValues().name,
-        dframe,
-        dwin;
+        fileName = win.getValues().name;
 
     // encode ticket for query-parameter
     authTicket = Sonatype.utils.base64.encode(authTicket);
 
-    // FIXME: Move download bits to common place so it can be re-used
-    // FIXME: Also may want to revisit using window.open vs a dynamically generated form
-    // FIXME: ... and/or a link (which can support html5 download attribute)
-
-    // create the download frame if needed
-    dframe = Ext.get('nx-download-frame');
-    if (!dframe) {
-      dframe = Ext.getBody().createChild({
-        tag: 'iframe',
-        cls: 'x-hidden',
-        id: 'nx-download-frame',
-        name: 'nx-download-frame'
-      });
-      me.logDebug('Created download-frame: ' + dframe);
-    }
-
-    // open new window in hidden download-from to initiate download
-    dwin = NX.global.open(Nexus.siesta.basePath + '/atlas/support-zip/' + fileName + '?t=' + authTicket, 'nx-download-frame');
-    if (dwin == null) {
-      alert('Download window pop-up was blocked!');
-    }
-    else {
-      // close the dialog
+    if (Nexus.util.DownloadHelper.downloadUrl(
+        Nexus.siesta.basePath + '/atlas/support-zip/' + fileName + '?t=' + authTicket))
+    {
+      // if download was initated close the window
       win.close();
     }
   }
