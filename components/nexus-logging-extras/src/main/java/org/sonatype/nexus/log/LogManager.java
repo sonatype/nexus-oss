@@ -19,6 +19,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.NexusStreamResponse;
 
 /**
@@ -69,7 +71,24 @@ public interface LogManager
 
   /**
    * Return mapping of existing loggers which have explicit levels configured (never null).
+   *
+   * @since 2.7
    */
   Map<String, LoggerLevel> getLoggers();
 
+  /**
+   * @since 2.7
+   */
+  void setLoggerLevel(String name, @Nullable LoggerLevel level);
+
+  /**
+   * @since 2.7
+   */
+  @Nullable
+  LoggerLevel getLoggerLevel(String name);
+
+  /**
+   * @since 2.7
+   */
+  LoggerLevel getLoggerEffectiveLevel(String name);
 }
