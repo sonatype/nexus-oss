@@ -248,6 +248,7 @@ public class YumHostedImpl
     }
   }
 
+  @Override
   public ScheduledTask<YumRepository> regenerate() {
     return addRpmAndRegenerate(null);
   }
