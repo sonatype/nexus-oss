@@ -127,7 +127,7 @@ NX.define('Nexus.atlas.view.SupportZip', {
                       xtype: 'checkbox',
                       name: 'limitFileSizes',
                       boxLabel: 'Limit Included File Sizes',
-                      helpText: 'Limit the size of files includes in the support ZIP to no more than 30 MB each.',
+                      helpText: 'Limit the size of files included in the support ZIP to no more than 30 MB each.',
                       checked: true
                     },
                     {
