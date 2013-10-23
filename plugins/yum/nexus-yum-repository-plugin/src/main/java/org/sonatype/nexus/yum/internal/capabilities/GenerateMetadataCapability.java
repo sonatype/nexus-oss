@@ -20,8 +20,10 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -44,11 +46,12 @@ public class GenerateMetadataCapability
   void configureYum(final Yum yum, GenerateMetadataCapabilityConfiguration config) {
     checkNotNull(yum);
     checkState(isConfigured());
+    checkArgument(yum instanceof YumHosted, "Yum must be a YumHosted");
 
-    yum.setAliases(config.aliases());
-    yum.setProcessDeletes(config.shouldProcessDeletes());
-    yum.setDeleteProcessingDelay(config.deleteProcessingDelay());
-    yum.setYumGroupsDefinitionFile(config.getYumGroupsDefinitionFile());
+    ((YumHosted) yum).setAliases(config.aliases());
+    ((YumHosted) yum).setProcessDeletes(config.shouldProcessDeletes());
+    ((YumHosted) yum).setDeleteProcessingDelay(config.deleteProcessingDelay());
+    ((YumHosted) yum).setYumGroupsDefinitionFile(config.getYumGroupsDefinitionFile());
   }
 
   @Override

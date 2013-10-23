@@ -24,6 +24,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapability;
 import org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapabilityConfiguration;
@@ -87,7 +88,7 @@ public class AliasResourceTest
   @Before
   public void prepareResource() {
     underTest = new AliasResource(yumRegistry, capabilityRegistry);
-    final Yum yum = mock(Yum.class);
+    final YumHosted yum = mock(YumHosted.class);
     when(yumRegistry.get(RELEASES)).thenReturn(yum);
     when(yum.getVersion(EXISTING_ALIAS)).thenReturn(TRUNK_VERSION);
     when(yum.getVersion(ALIAS_TO_CREATE)).thenReturn(VERSION_TO_CREATE);

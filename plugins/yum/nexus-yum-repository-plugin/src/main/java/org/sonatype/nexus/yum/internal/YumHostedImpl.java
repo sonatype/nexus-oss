@@ -28,10 +28,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.task.GenerateMetadataTask;
 import org.sonatype.nexus.yum.internal.task.TaskAlreadyScheduledException;
@@ -54,11 +55,11 @@ import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.ID;
  * @since yum 3.0
  */
 @Named
-public class YumImpl
-    implements Yum
+public class YumHostedImpl
+    implements YumHosted
 {
 
-  private final static Logger LOG = LoggerFactory.getLogger(YumImpl.class);
+  private final static Logger LOG = LoggerFactory.getLogger(YumHostedImpl.class);
 
   private static final int MAX_EXECUTION_COUNT = 100;
 
@@ -68,7 +69,7 @@ public class YumImpl
 
   private final ScheduledThreadPoolExecutor executor;
 
-  private final Repository repository;
+  private final HostedRepository repository;
 
   private final File temporaryDirectory;
 
@@ -91,11 +92,11 @@ public class YumImpl
       new HashMap<DelayedDirectoryDeletionTask, ScheduledFuture<?>>();
 
   @Inject
-  public YumImpl(final RepositoryURLBuilder repositoryURLBuilder,
-                 final NexusScheduler nexusScheduler,
-                 final ScheduledThreadPoolExecutor executor,
-                 final @Assisted Repository repository,
-                 final @Assisted File temporaryDirectory)
+  public YumHostedImpl(final RepositoryURLBuilder repositoryURLBuilder,
+                       final NexusScheduler nexusScheduler,
+                       final ScheduledThreadPoolExecutor executor,
+                       final @Assisted HostedRepository repository,
+                       final @Assisted File temporaryDirectory)
       throws MalformedURLException, URISyntaxException
 
   {
@@ -124,19 +125,19 @@ public class YumImpl
   }
 
   @Override
-  public Yum setProcessDeletes(final boolean processDeletes) {
+  public YumHosted setProcessDeletes(final boolean processDeletes) {
     this.processDeletes = processDeletes;
     return this;
   }
 
   @Override
-  public Yum setDeleteProcessingDelay(final long numberOfSeconds) {
+  public YumHosted setDeleteProcessingDelay(final long numberOfSeconds) {
     this.deleteProcessingDelay = numberOfSeconds;
     return this;
   }
 
   @Override
-  public Yum setYumGroupsDefinitionFile(final String yumGroupsDefinitionFile) {
+  public YumHosted setYumGroupsDefinitionFile(final String yumGroupsDefinitionFile) {
     this.yumGroupsDefinitionFile = yumGroupsDefinitionFile;
     return this;
   }
@@ -168,19 +169,19 @@ public class YumImpl
   }
 
   @Override
-  public Yum addAlias(final String alias, final String version) {
+  public YumHosted addAlias(final String alias, final String version) {
     aliases.put(alias, version);
     return this;
   }
 
   @Override
-  public Yum removeAlias(final String alias) {
+  public YumHosted removeAlias(final String alias) {
     aliases.remove(alias);
     return this;
   }
 
   @Override
-  public Yum setAliases(final Map<String, String> aliases) {
+  public YumHosted setAliases(final Map<String, String> aliases) {
     this.aliases.clear();
     this.aliases.putAll(aliases);
 
@@ -197,6 +198,11 @@ public class YumImpl
     return repository;
   }
 
+  @Override
+  public YumRepository getYumRepository() throws Exception {
+    return getYumRepository(null, null);
+  }
+
   ScheduledTask<YumRepository> createYumRepository(final String version,
                                                    final File yumRepoBaseDir,
                                                    final URL yumRepoUrl)
@@ -207,7 +213,7 @@ public class YumImpl
       task.setRpmDir(rpmBaseDir.getAbsolutePath());
       task.setRpmUrl(repositoryURLBuilder.getExposedRepositoryContentUrl(repository, true));
       task.setRepoDir(yumRepoBaseDir);
-      task.setRepoUrl(yumRepoUrl.toString());
+      task.setRepoUrl(yumRepoBaseDir == null ? null : yumRepoUrl.toString());
       task.setRepositoryId(repository.getId());
       task.setVersion(version);
       task.setYumGroupsDefinitionFile(getYumGroupsDefinitionFile());
@@ -242,14 +248,13 @@ public class YumImpl
     }
   }
 
-  @Override
   public ScheduledTask<YumRepository> regenerate() {
     return addRpmAndRegenerate(null);
   }
 
   @Override
-  public void markDirty(final String itemVersion) {
-    cache.markDirty(repository.getId(), itemVersion);
+  public void markDirty(final String version) {
+    cache.markDirty(repository.getId(), version);
   }
 
   @Override

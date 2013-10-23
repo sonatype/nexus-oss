@@ -17,9 +17,11 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumGroup;
+import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.internal.YumFactory;
-import org.sonatype.nexus.yum.internal.YumImpl;
+import org.sonatype.nexus.yum.internal.YumGroupImpl;
+import org.sonatype.nexus.yum.internal.YumHostedImpl;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -37,7 +39,11 @@ public class YumPluginModule
   @Override
   protected void configure() {
     bind(ScheduledThreadPoolExecutor.class).toInstance(new ScheduledThreadPoolExecutor(POOL_SIZE));
-    install(new FactoryModuleBuilder().implement(Yum.class, YumImpl.class).build(YumFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(YumHosted.class, YumHostedImpl.class)
+        .implement(YumGroup.class, YumGroupImpl.class)
+        .build(YumFactory.class)
+    );
   }
 
 }

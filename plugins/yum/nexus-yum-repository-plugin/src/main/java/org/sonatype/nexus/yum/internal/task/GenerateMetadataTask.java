@@ -34,6 +34,7 @@ import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumGroup;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.ListFileFactory;
@@ -282,8 +283,9 @@ public class GenerateMetadataTask
       try {
         final Repository repository = repositoryRegistry.getRepository(getRepositoryId());
         for (GroupRepository groupRepository : repositoryRegistry.getGroupsOfRepository(repository)) {
-          if (yumRegistry.isRegistered(repository.getId())) {
-            MergeMetadataTask.createTaskFor(nexusScheduler, groupRepository);
+          Yum yum = yumRegistry.get(groupRepository.getId());
+          if (yum != null && yum instanceof YumGroup) {
+            ((YumGroup) yum).markDirty();
           }
         }
       }

@@ -19,6 +19,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.Path;
 
 import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -91,13 +92,21 @@ public class VersionedResource
           "Couldn't find repository with id : " + repositoryId);
     }
 
+    if (!(yum instanceof YumHosted)) {
+      throw new ResourceException(
+          CLIENT_ERROR_BAD_REQUEST, "Repository " + repositoryId + " does not support versions"
+      );
+    }
+
+    YumHosted yumHosted = (YumHosted) yum;
+
     final String aliasVersion;
 
-    if (yum.getVersions().contains(version)) {
+    if (yumHosted.getVersions().contains(version)) {
       aliasVersion = version;
     }
     else {
-      aliasVersion = yum.getVersion(version);
+      aliasVersion = yumHosted.getVersion(version);
     }
 
     if (aliasVersion == null) {
@@ -107,7 +116,7 @@ public class VersionedResource
       );
     }
 
-    return yum.getYumRepository(aliasVersion, interpretation.getRepositoryUrl());
+    return yumHosted.getYumRepository(aliasVersion, interpretation.getRepositoryUrl());
   }
 
   @Override

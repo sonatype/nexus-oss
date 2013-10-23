@@ -18,11 +18,12 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
 
@@ -59,22 +60,17 @@ public class VersionedResourceTest
   @Inject
   private YumRegistry yumRegistry;
 
-  private MavenRepository repository;
-
   @Before
   public void registerRepository()
       throws Exception
   {
-    if (repository == null) {
-      repository = createRepository(TESTREPO);
-    }
-    final Yum yum = yumRegistry.register(repository);
+    final YumHosted yum = (YumHosted) yumRegistry.register(createRepository(TESTREPO));
     yum.addAlias(ALIAS, VERSION);
     waitFor(new Condition()
     {
       @Override
       public boolean isSatisfied() {
-        return yumRegistry.get(TESTREPO).getVersions().size() == 5;
+        return ((YumHosted) yumRegistry.get(TESTREPO)).getVersions().size() == 5;
       }
     });
   }
@@ -150,15 +146,21 @@ public class VersionedResourceTest
     return map;
   }
 
-  public MavenRepository createRepository(String id) {
-    final MavenRepository repo = mock(MavenRepository.class);
-    when(repo.getId()).thenReturn(id);
-    when(repo.getLocalUrl()).thenReturn(rpmsDir().toURI().toASCIIString());
-    when(repo.getProviderRole()).thenReturn(Repository.class.getName());
-    when(repo.getProviderHint()).thenReturn("maven2");
+  public MavenHostedRepository createRepository(String id) {
+    final MavenHostedRepository repository = mock(MavenHostedRepository.class);
+    when(repository.getId()).thenReturn(id);
+    when(repository.getLocalUrl()).thenReturn(rpmsDir().toURI().toASCIIString());
+    when(repository.getProviderRole()).thenReturn(Repository.class.getName());
+    when(repository.getProviderHint()).thenReturn("maven2");
+    when(repository.adaptToFacet(HostedRepository.class)).thenReturn(repository);
+    when(repository.adaptToFacet(MavenRepository.class)).thenReturn(repository);
+    when(repository.adaptToFacet(MavenHostedRepository.class)).thenReturn(repository);
+
     final RepositoryKind repositoryKind = mock(RepositoryKind.class);
-    when(repo.getRepositoryKind()).thenReturn(repositoryKind);
+    when(repository.getRepositoryKind()).thenReturn(repositoryKind);
     when(repositoryKind.isFacetAvailable(HostedRepository.class)).thenReturn(true);
-    return repo;
+    when(repositoryKind.isFacetAvailable(MavenRepository.class)).thenReturn(true);
+    when(repositoryKind.isFacetAvailable(MavenHostedRepository.class)).thenReturn(true);
+    return repository;
   }
 }
