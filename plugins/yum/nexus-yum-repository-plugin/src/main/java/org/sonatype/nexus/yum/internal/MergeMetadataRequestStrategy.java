@@ -87,6 +87,7 @@ public class MergeMetadataRequestStrategy
           }
         }
         try {
+          // this will trigger a merge if group yum metadata is dirty and will wait for the task to finish
           yum.getYumRepository();
         }
         catch (Exception e) {
