@@ -41,7 +41,6 @@ public class YumProxyMetadataIT
   public void cleanUp() throws Exception {
     final Repository hosted = createYumEnabledRepository(repositoryIdForTest());
     final MavenProxyRepository proxy = createYumEnabledProxyRepository(repositoryIdForTest() + "-proxy", hosted.contentUri());
-    proxy.withArtifactMaxAge(0).save(); // make it ALWAYS check remote
 
     // upload to hosted
     content().upload(

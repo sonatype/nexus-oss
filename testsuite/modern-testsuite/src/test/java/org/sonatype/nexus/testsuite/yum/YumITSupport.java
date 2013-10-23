@@ -20,9 +20,7 @@ import org.sonatype.nexus.capabilities.client.Capabilities;
 import org.sonatype.nexus.client.core.subsystem.ServerConfiguration;
 import org.sonatype.nexus.client.core.subsystem.config.RestApi;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
-import org.sonatype.nexus.client.core.subsystem.repository.GroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
-import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenGroupRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
@@ -104,6 +102,7 @@ public class YumITSupport
         .create(MavenProxyRepository.class, repositoryId)
         .doNotDownloadRemoteIndexes()
         .asProxyOf(remoteUrl)
+        .withItemMaxAge(0)
         .save();
 
     enableMetadataProxyFor(repositoryId);
