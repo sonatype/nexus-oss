@@ -74,24 +74,40 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
             labelSeparator: '',
             labelWidth: 40
           },
+          labelAlign: 'right',
           items: [
             {
               xtype: 'textfield',
-              fieldLabel: 'File',
+              fieldLabel: 'Name',
+              helpText: 'Support ZIP file name',
+              name: 'name',
+              readOnly: true,
+              anchor: '96%',
+              style: {
+                border: 0,
+                background: 'none'
+              }
+            },
+            {
+              xtype: 'numberfield',
+              fieldLabel: 'Size',
+              helpText: 'Size if ZIP file in bytes',  // FIXME: Would like to render in bytes/kilobytes/megabytes
+              name: 'size',
+              readOnly: true,
+              anchor: '96%',
+              style: {
+                border: 0,
+                background: 'none'
+              }
+            },
+            {
+              xtype: 'textfield',
+              fieldLabel: 'Path',
               helpText: 'Support ZIP file location',
               name: 'file',
               readOnly: true,
               selectOnFocus: true,
               anchor: '96%'
-            },
-            {
-              xtype: 'hidden',
-              name: 'name'
-            },
-            // TODO: Show these to the user?
-            {
-              xtype: 'hidden',
-              name: 'size'
             },
             {
               xtype: 'hidden',
