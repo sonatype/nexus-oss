@@ -48,7 +48,6 @@ public class NexusApplicationHandlePlexusResourceSecurityTest
         null,
         null,
         null,
-        null,
         null
     );
   }

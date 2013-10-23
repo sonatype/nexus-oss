@@ -22,7 +22,8 @@ NX.define('Nexus.atlas.controller.Atlas', {
 
   requires: [
     'Nexus.siesta',
-    'Nexus.atlas.view.Panel'
+    'Nexus.atlas.view.Panel',
+    'Nexus.atlas.view.SupportZipCreated'
   ],
 
   init: function() {
@@ -35,11 +36,17 @@ NX.define('Nexus.atlas.controller.Atlas', {
       '#nx-atlas-view-sysinfo-button-refresh': {
         'click': me.refreshSysInfo
       },
+      '#nx-atlas-view-sysinfo-button-download': {
+        'click': me.downloadSysInfo
+      },
       '#nx-atlas-view-sysinfo-button-print': {
         'click': me.printSysInfo
       },
-      '#nx-atlas-button-create-zip': {
+      '#nx-atlas-button-supportzip-create': {
         'click': me.createSupportZip
+      },
+      '#nx-atlas-button-supportzip-download': {
+        'authenticated': me.downloadSupportZip
       }
     });
 
@@ -90,6 +97,7 @@ NX.define('Nexus.atlas.controller.Atlas', {
         var obj = Ext.decode(response.responseText);
         panel.setInfo(obj);
       }
+      // TODO: handle failure
     });
   },
 
@@ -100,6 +108,15 @@ NX.define('Nexus.atlas.controller.Atlas', {
    */
   refreshSysInfo: function(button) {
     this.loadSysInfo(Ext.getCmp('nx-atlas-view-sysinfo'));
+  },
+
+  /**
+   * Download system information report.
+   *
+   * @private
+   */
+  downloadSysInfo: function(button) {
+    Sonatype.utils.openWindow(Nexus.siesta.basePath + '/atlas/system-information');
   },
 
   /**
@@ -162,9 +179,54 @@ NX.define('Nexus.atlas.controller.Atlas', {
         mask.hide()
       },
       success: function(response, opts) {
-        //var obj = Ext.decode(response.responseText);
-        //panel.setInfo(obj);
+        var obj = Ext.decode(response.responseText),
+            win = NX.create('Nexus.atlas.view.SupportZipCreated');
+
+        win.setValues(obj);
+        win.show();
       }
     });
+  },
+
+  /**
+   * Download support ZIP file.
+   *
+   * @private
+   */
+  downloadSupportZip: function(button, authTicket) {
+    var me = this,
+        win = button.up('nx-atlas-view-supportzip-created'),
+        fileName = win.getValues().name,
+        dframe,
+        dwin;
+
+    // encode ticket for query-parameter
+    authTicket = Sonatype.utils.base64.encode(authTicket);
+
+    // FIXME: Move download bits to common place so it can be re-used
+    // FIXME: Also may want to revisit using window.open vs a dynamically generated form
+    // FIXME: ... and/or a link (which can support html5 download attribute)
+
+    // create the download frame if needed
+    dframe = Ext.get('nx-download-frame');
+    if (!dframe) {
+      dframe = Ext.getBody().createChild({
+        tag: 'iframe',
+        cls: 'x-hidden',
+        id: 'nx-download-frame',
+        name: 'nx-download-frame'
+      });
+      me.logDebug('Created download-frame: ' + dframe);
+    }
+
+    // open new window in hidden download-from to initiate download
+    dwin = NX.global.open(Nexus.siesta.basePath + '/atlas/support-zip/' + fileName + '?t=' + authTicket, 'nx-download-frame');
+    if (dwin == null) {
+      alert('Download window pop-up was blocked!');
+    }
+    else {
+      // close the dialog
+      win.close();
+    }
   }
 });

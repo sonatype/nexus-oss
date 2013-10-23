@@ -336,12 +336,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
                     title : 'Scheduled Tasks',
                     tabId : 'schedules-config',
                     tabCode : Sonatype.repoServer.SchedulesEditPanel
-                  }, {
-                    enabled : sp.checkPermission('nexus:logs', sp.READ) || sp.checkPermission('nexus:configuration', sp.READ),
-                    title : 'System Files',
-                    tabId : 'view-logs',
-                    tabCode : Sonatype.repoServer.LogsViewPanel,
-                    tabTitle : 'System Files'
                   }]
             });
 
@@ -366,12 +360,8 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
                     title : 'Documentation',
                     tabId : 'Documentation',
                     tabCode : Sonatype.repoServer.Documentation
-                  }, {
-                    enabled : sp.checkPermission('nexus:settings', sp.READ),
-                    title : 'Report Problem',
-                    tabId : 'error-report',
-                    handler : Sonatype.utils.generateErrorReportHandler
-                  }]
+                  }
+              ]
             });
       },
 

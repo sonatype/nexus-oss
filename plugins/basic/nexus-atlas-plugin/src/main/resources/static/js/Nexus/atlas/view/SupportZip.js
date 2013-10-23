@@ -38,7 +38,7 @@ NX.define('Nexus.atlas.view.SupportZip', {
   /**
    * @override
    */
-  initComponent: function() {
+  initComponent: function () {
     var me = this,
         icons = Nexus.atlas.Icons;
 
@@ -51,9 +51,9 @@ NX.define('Nexus.atlas.view.SupportZip', {
               cls: 'nx-atlas-view-supportzip-description',
               border: false,
               html: icons.get('zip').variant('x32').img +
-                  '<div>Create a ZIP file containing useful support information about your server. ' +
-                  'No information will be sent to Sonatype when creating the ZIP file.' +
-                  '<br/><br/> Select the contents and options for generating the support ZIP file:</div>'
+                  '<div>Creates a ZIP file containing useful support information about your server. ' +
+                  'No information will be sent to Sonatype when creating the support ZIP file.' +
+                  '<br/><br/>Select the contents and options for support ZIP creation:</div>'
             },
             {
               xtype: 'form',
@@ -61,48 +61,86 @@ NX.define('Nexus.atlas.view.SupportZip', {
               cls: 'nx-atlas-view-supportzip-form',
               layoutConfig: {
                 labelSeparator: '',
-                labelWidth: 150
+                labelWidth: 70
               },
               border: false,
+              monitorValid: true,
               items: [
                 {
-                  xtype: 'checkbox',
-                  name: 'applicationProperties',
-                  fieldLabel: 'Application Properties',
-                  helpText: 'Includes memory and disk statistics, application and system properties and environment variables (recommended)',
-                  checked: true
+                  xtype: 'checkboxgroup',
+                  fieldLabel: 'Contents',
+                  columns: 1,
+                  allowBlank: false,
+                  anchor: '96%',
+                  items: [
+                    {
+                      xtype: 'checkbox',
+                      name: 'systemInformation',
+                      boxLabel: 'System Information',
+                      helpText: 'Includes system information report',
+                      checked: true
+                    },
+                    {
+                      xtype: 'checkbox',
+                      name: 'threadDump',
+                      boxLabel: 'Thread Dump',
+                      helpText: 'Include a JVM thread-dump',
+                      checked: true
+                    },
+                    {
+                      xtype: 'checkbox',
+                      name: 'configuration',
+                      boxLabel: 'Configuration',
+                      helpText: 'Include configuration files',
+                      checked: true
+                    },
+                    {
+                      xtype: 'checkbox',
+                      name: 'security',
+                      boxLabel: 'Security Configuration',
+                      helpText: 'Include security configuration files',
+                      checked: true
+                    },
+                    {
+                      xtype: 'checkbox',
+                      name: 'log',
+                      boxLabel: 'Log',
+                      helpText: 'Include log files',
+                      checked: true
+                    },
+                    {
+                      xtype: 'checkbox',
+                      name: 'metrics',
+                      boxLabel: 'Metrics',
+                      helpText: 'Includes system and component metrics',
+                      checked: true
+                    }
+                  ]
                 },
                 {
-                  xtype: 'checkbox',
-                  name: 'threadDump',
-                  fieldLabel: 'Thread Dump',
-                  helpText: 'Include a JVM thread-dump (recommended)',
-                  checked: true
-                },
-                {
-                  xtype: 'checkbox',
-                  name: 'configurationFiles',
-                  fieldLabel: 'Configuration Files',
-                  helpText: 'Include configuration files (recommended)',
-                  checked: true
-                },
-                {
-                  xtype: 'checkbox',
-                  name: 'logFiles',
-                  fieldLabel: 'Log Files',
-                  helpText: 'Include log files (recommended)',
-                  checked: true
-                },
-                {
-                  xtype: 'checkbox',
-                  name: 'limitSize',
-                  fieldLabel: 'Limit Zip File Size',
-                  helpText: 'Limit the size of the generate zip to no more than 30 MB.',
-                  checked: true
-                }
+                  xtype: 'checkboxgroup',
+                  fieldLabel: 'Options',
+                  columns: 1,
+                  anchor: '96%',
+                  items: [
+                    {
+                      xtype: 'checkbox',
+                      name: 'limitFileSizes',
+                      boxLabel: 'Limit Included File Sizes',
+                      helpText: 'Limit the size of files included in the support ZIP to no more than 30 MB each.',
+                      checked: true
+                    },
+                    {
+                      xtype: 'checkbox',
+                      name: 'limitZipSize',
+                      boxLabel: 'Limit Maximum ZIP File Size',
+                      helpText: 'Limit the maximum size of the support ZIP file to no more than 20 MB.',
+                      checked: true
+                    }
+                  ]}
               ],
               buttons: [
-                { text: 'Create', id: 'nx-atlas-button-create-zip' }
+                { text: 'Create', id: 'nx-atlas-button-supportzip-create', formBind: true }
               ],
               buttonAlign: 'left'
             }
@@ -119,7 +157,7 @@ NX.define('Nexus.atlas.view.SupportZip', {
    *
    * @public
    */
-  getValues: function() {
+  getValues: function () {
     return this.down('form').getForm().getValues();
   }
 });
