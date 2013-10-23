@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -133,14 +134,14 @@ public class LogbackLogManager
     eventBus.register(this);
   }
 
-  // ==
-
   @Subscribe
   public void on(final NexusInitializedEvent evt) {
     configure();
   }
 
-  // ==
+  private LoggerContext getLoggerContext() {
+    return (LoggerContext) LoggerFactory.getILoggerFactory();
+  }
 
   @Override
   public synchronized void configure() {
@@ -185,7 +186,7 @@ public class LogbackLogManager
   public Map<String, LoggerLevel> getLoggers() {
     Map<String, LoggerLevel> loggers = Maps.newHashMap();
 
-    LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+    LoggerContext loggerContext = getLoggerContext();
     for (ch.qos.logback.classic.Logger logger : loggerContext.getLoggerList()) {
       String name = logger.getName();
       Level level = logger.getLevel();
@@ -202,7 +203,7 @@ public class LogbackLogManager
   public Set<File> getLogFiles() {
     HashSet<File> files = new HashSet<File>();
 
-    LoggerContext ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
+    LoggerContext ctx = getLoggerContext();
 
     for (Logger l : ctx.getLoggerList()) {
       ch.qos.logback.classic.Logger log = (ch.qos.logback.classic.Logger) l;
@@ -508,7 +509,7 @@ public class LogbackLogManager
   private void reconfigure() {
     String logConfigDir = getLogConfigDir();
 
-    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+    LoggerContext lc = getLoggerContext();
 
     try {
       JoranConfigurator configurator = new JoranConfigurator();
@@ -525,7 +526,7 @@ public class LogbackLogManager
   }
 
   private void injectAppenders() {
-    LoggerContext ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
+    LoggerContext ctx = getLoggerContext();
 
     for (Logger l : ctx.getLoggerList()) {
       ch.qos.logback.classic.Logger log = (ch.qos.logback.classic.Logger) l;
@@ -564,4 +565,31 @@ public class LogbackLogManager
     }
   }
 
+  /**
+   * Convert a {@link LoggerLevel} into a Logback {@link Level}.
+   */
+  private Level convert(final LoggerLevel level) {
+    return Level.valueOf(level.name());
+  }
+
+  @Override
+  public void setLoggerLevel(final String name, final @Nullable LoggerLevel level) {
+    Level newLevel = level != null ? convert(level): null;
+    getLoggerContext().getLogger(name).setLevel(newLevel);
+  }
+
+  @Override
+  @Nullable
+  public LoggerLevel getLoggerLevel(final String name) {
+    Level level = getLoggerContext().getLogger(name).getLevel();
+    if (level != null) {
+      return convert(level);
+    }
+    return null;
+  }
+
+  @Override
+  public LoggerLevel getLoggerEffectiveLevel(final String name) {
+    return convert(getLoggerContext().getLogger(name).getEffectiveLevel());
+  }
 }
