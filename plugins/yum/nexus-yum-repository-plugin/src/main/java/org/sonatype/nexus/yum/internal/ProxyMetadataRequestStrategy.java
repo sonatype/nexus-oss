@@ -20,6 +20,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -27,6 +28,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.AbstractRequestStrategy;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RequestStrategy;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
@@ -76,9 +78,20 @@ public class ProxyMetadataRequestStrategy
         walker.walk(wcontext);
       }
       catch (WalkerException e) {
-        if (!(e.getWalkerContext().getStopCause() instanceof ItemNotFoundException)) {
-          log.warn("Failed to clean proxy YUM metadata", e);
-          throw e;
+        Throwable stopCause = e.getWalkerContext().getStopCause();
+        if (!(stopCause instanceof ItemNotFoundException)) {
+          if (stopCause != null) {
+            log.warn(
+                "Failed to clean proxy YUM metadata due to {}/{}",
+                stopCause.getClass().getName(), stopCause.getMessage(), log.isDebugEnabled() ? e : null
+            );
+          }
+          else {
+            log.warn(
+                "Failed to clean proxy YUM metadata due to {}/{}",
+                e.getClass().getName(), e.getMessage(), log.isDebugEnabled() ? e : null
+            );
+          }
         }
       }
     }
@@ -90,10 +103,18 @@ public class ProxyMetadataRequestStrategy
       extends AbstractFileWalkerProcessor
   {
     @Override
-    protected void processFileItem(final WalkerContext context, final StorageFileItem fItem) throws Exception {
+    protected void processFileItem(final WalkerContext context, final StorageFileItem fItem) {
       // delete all except the repomd.xml
       if (!fItem.getName().equals(Yum.NAME_OF_REPOMD_XML)) {
-        context.getRepository().deleteItem(true, fItem.getResourceStoreRequest());
+        try {
+          context.getRepository().deleteItem(true, fItem.getResourceStoreRequest());
+        }
+        catch (Exception e) {
+          log.warn(
+              "Failed to clean proxy YUM metadata due to {}/{}",
+              e.getClass().getName(), e.getMessage(), log.isDebugEnabled() ? e : null
+          );
+        }
       }
     }
   }
