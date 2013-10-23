@@ -104,6 +104,7 @@ implements Resource
     // pick authTicket from either query-param or header
     def authTicket
     if (authTicketParam) {
+      // query-param needs to be base64 decoded
       authTicket = Tokens.decodeBase64String(authTicketParam)
     }
     else {
@@ -119,6 +120,10 @@ implements Resource
     }
 
     def file = new File(supportZipGenerator.directory, fileName)
+
+    // ensure we do not leak references outside of the support directory, only direct children can be served
+    assert file.parentFile == supportZipGenerator.directory
+
     if (!file.exists()) {
       return Response.status(NOT_FOUND).build()
     }
