@@ -130,7 +130,7 @@ implements Resource
 
     log.debug 'Sending support ZIP file: {}', file
     return Response.ok(file.newInputStream())
-        .header('Content-Disposition', "attachment; filename='${fileName}'")
+        .header('Content-Disposition', "attachment; filename=\"${fileName}\"")
         .build()
   }
 }
