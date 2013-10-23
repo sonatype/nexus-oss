@@ -108,6 +108,7 @@ implements SupportBundleCustomizer
       @Override
       protected void generate(final File file) {
         file.withOutputStream {
+          // NOTE: there is no easy way to get out json report, so using the console reporter for now
           def reporter = new ConsoleReporter(
               metricsRegistry,
               new PrintStream(it),
