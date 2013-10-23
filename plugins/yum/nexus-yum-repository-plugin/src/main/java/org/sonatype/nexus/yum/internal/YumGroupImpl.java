@@ -109,6 +109,7 @@ public class YumGroupImpl
     try {
       lock.writeLock().lock();
       yumRepository = null;
+      log.debug("Marked {} as dirty.", repository.getId());
     }
     finally {
       lock.writeLock().unlock();
