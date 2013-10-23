@@ -75,7 +75,7 @@ Ext.override(Ext.form.Field, {
 
       helpMark = wrapDiv.createChild({
         tag : 'img',
-        src : Sonatype.config.resourcePath + '/static/images/icons/help.png',
+        src : Sonatype.config.resourcePath + '/static/icons/glyph_help.png',
         width : 16,
         height : 16,
         cls : helpClass
