@@ -193,6 +193,10 @@ button.st-icon-refresh {
 .form-label-helpmark {
     margin-left: 2px;
     vertical-align: middle;
+    opacity: 0.25;
+}
+.form-label-helpmark:hover {
+    opacity: 0.5;
 }
 
 .form-label-helpmark-combo {
@@ -201,6 +205,10 @@ button.st-icon-refresh {
     height: 16px;
     width: 16px;
     vertical-align: middle;
+    opacity: 0.25;
+}
+.form-label-helpmark-combo:hover {
+    opacity: 0.5;
 }
 
 .form-label-helpmark-check {
@@ -208,11 +216,19 @@ button.st-icon-refresh {
     height: 16px;
     width: 16px;
     vertical-align: middle;
+    opacity: 0.25;
+}
+.form-label-helpmark-check:hover {
+    opacity: 0.5;
 }
 
 .form-label-helpmark-textarea {
     margin-left: 2px;
     vertical-align: top;
+    opacity: 0.25;
+}
+.form-label-helpmark-textarea:hover {
+    opacity: 0.5;
 }
 
 .form-label-after-field {
