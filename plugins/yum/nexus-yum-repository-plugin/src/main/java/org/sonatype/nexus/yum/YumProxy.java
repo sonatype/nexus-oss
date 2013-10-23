@@ -11,33 +11,15 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.yum.internal;
-
-import java.io.File;
-
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.HostedRepository;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.yum.YumGroup;
-import org.sonatype.nexus.yum.YumHosted;
-import org.sonatype.nexus.yum.YumProxy;
+package org.sonatype.nexus.yum;
 
 /**
- * @since yum 3.0
+ * Provides access to Yum functionality around a Nexus proxy repository.
+ *
+ * @since 2.7
  */
-public interface YumFactory
+public interface YumProxy
+    extends Yum
 {
-
-  YumHosted createHosted(File temporaryDirectory, HostedRepository repository);
-
-  /**
-   * @since 2.7
-   */
-  YumProxy createProxy(ProxyRepository repository);
-
-  /**
-   * @since 2.7
-   */
-  YumGroup createGroup(GroupRepository repository);
 
 }

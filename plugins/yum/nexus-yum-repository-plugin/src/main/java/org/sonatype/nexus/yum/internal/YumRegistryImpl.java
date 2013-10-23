@@ -25,15 +25,14 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
-import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
-import org.sonatype.nexus.yum.internal.capabilities.ProxyMetadataRequestStrategy;
 import org.sonatype.nexus.yum.internal.task.RepositoryScanningTask;
 
 import org.slf4j.Logger;
@@ -60,20 +59,16 @@ public class YumRegistryImpl
 
   private final YumFactory yumFactory;
 
-  private final ProxyMetadataRequestStrategy proxyMetadataRequestStrategy;
-
   private int maxNumberOfParallelThreads;
 
   @Inject
   public YumRegistryImpl(final NexusConfiguration nexusConfiguration,
                          final NexusScheduler nexusScheduler,
-                         final YumFactory yumFactory,
-                         final ProxyMetadataRequestStrategy proxyMetadataRequestStrategy)
+                         final YumFactory yumFactory)
   {
     this.nexusConfiguration = checkNotNull(nexusConfiguration);
     this.nexusScheduler = checkNotNull(nexusScheduler);
     this.yumFactory = checkNotNull(yumFactory);
-    this.proxyMetadataRequestStrategy = checkNotNull(proxyMetadataRequestStrategy);
     this.maxNumberOfParallelThreads = DEFAULT_MAX_NUMBER_PARALLEL_THREADS;
   }
 
@@ -83,6 +78,9 @@ public class YumRegistryImpl
       Yum yum;
       if (repository.getRepositoryKind().isFacetAvailable(HostedRepository.class)) {
         yum = yumFactory.createHosted(getTemporaryDirectory(), repository.adaptToFacet(HostedRepository.class));
+      }
+      else if (repository.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
+        yum = yumFactory.createProxy(repository.adaptToFacet(ProxyRepository.class));
       }
       else if (repository.getRepositoryKind().isFacetAvailable(GroupRepository.class)) {
         yum = yumFactory.createGroup(repository.adaptToFacet(GroupRepository.class));
@@ -99,10 +97,6 @@ public class YumRegistryImpl
 
       if (repository.getRepositoryKind().isFacetAvailable(HostedRepository.class)) {
         runScanningTask((YumHosted) yum);
-      }
-
-      if (repository.getRepositoryKind().isFacetAvailable(MavenProxyRepository.class)) {
-        repository.registerRequestStrategy(ProxyMetadataRequestStrategy.class.getName(), proxyMetadataRequestStrategy);
       }
 
       return yum;

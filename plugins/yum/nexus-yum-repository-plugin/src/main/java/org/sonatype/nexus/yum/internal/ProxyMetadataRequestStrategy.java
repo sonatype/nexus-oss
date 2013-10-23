@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.yum.internal.capabilities;
+package org.sonatype.nexus.yum.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
