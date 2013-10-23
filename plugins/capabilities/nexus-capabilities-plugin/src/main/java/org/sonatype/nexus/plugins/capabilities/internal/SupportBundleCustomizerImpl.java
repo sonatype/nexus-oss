@@ -57,7 +57,7 @@ public class SupportBundleCustomizerImpl
 
     // capabilities.xml
     supportBundle.add(
-        new FileContentSourceSupport(Type.CONFIG, "work/conf/capabilities.xml", file)
+        new FileContentSourceSupport(Type.CONFIG, "work/conf/" + file.getName(), file)
     );
   }
 }

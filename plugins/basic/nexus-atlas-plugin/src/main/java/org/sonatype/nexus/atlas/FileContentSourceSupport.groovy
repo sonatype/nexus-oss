@@ -46,6 +46,7 @@ extends ContentSourceSupport
   @Override
   InputStream getContent() {
     assert file.exists()
+    log.debug 'Reading: {}', file
     return file.newInputStream()
   }
 
