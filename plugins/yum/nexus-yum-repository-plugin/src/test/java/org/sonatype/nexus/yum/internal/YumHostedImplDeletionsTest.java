@@ -20,10 +20,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.internal.task.GenerateMetadataTask;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class YumImplDeletionsTest
+public class YumHostedImplDeletionsTest
     extends TestSupport
 {
 
@@ -54,9 +54,9 @@ public class YumImplDeletionsTest
 
   private static final String REPO_ID = "snapshots";
 
-  private Yum yum;
+  private YumHosted yum;
 
-  private Repository repository;
+  private HostedRepository repository;
 
   private NexusScheduler nexusScheduler;
 
@@ -64,7 +64,7 @@ public class YumImplDeletionsTest
   public void prepareService()
       throws MalformedURLException, URISyntaxException
   {
-    repository = mock(Repository.class);
+    repository = mock(HostedRepository.class);
     when(repository.getId()).thenReturn(REPO_ID);
     when(repository.getLocalUrl()).thenReturn("/target");
 
@@ -73,7 +73,7 @@ public class YumImplDeletionsTest
         mock(GenerateMetadataTask.class)
     );
 
-    yum = new YumImpl(
+    yum = new YumHostedImpl(
         mock(RepositoryURLBuilder.class),
         nexusScheduler,
         new ScheduledThreadPoolExecutor(10),

@@ -18,6 +18,7 @@ import java.net.URL;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -34,7 +35,7 @@ import static junit.framework.Assert.assertNotSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class YumImplTest
+public class YumHostedImplTest
     extends YumNexusTestSupport
 {
 
@@ -47,11 +48,11 @@ public class YumImplTest
   @Inject
   private YumRegistry yumRegistry;
 
-  private YumImpl yum;
+  private YumHostedImpl yum;
 
   @Before
   public void activateService() {
-    yum = (YumImpl) yumRegistry.register(createRepository(SNAPSHOTS));
+    yum = (YumHostedImpl) yumRegistry.register(createRepository(SNAPSHOTS));
   }
 
   @Test
@@ -77,16 +78,22 @@ public class YumImplTest
     assertNotSame(repo1, repo2);
   }
 
-  public static MavenRepository createRepository(String id) {
-    final MavenRepository repo = mock(MavenRepository.class);
-    when(repo.getId()).thenReturn(id);
-    when(repo.getLocalUrl()).thenReturn(getTempUrl());
-    when(repo.getProviderRole()).thenReturn(Repository.class.getName());
-    when(repo.getProviderHint()).thenReturn("maven2");
+  public static MavenHostedRepository createRepository(String id) {
+    final MavenHostedRepository repository = mock(MavenHostedRepository.class);
+    when(repository.getId()).thenReturn(id);
+    when(repository.getLocalUrl()).thenReturn(getTempUrl());
+    when(repository.getProviderRole()).thenReturn(Repository.class.getName());
+    when(repository.getProviderHint()).thenReturn("maven2");
+    when(repository.adaptToFacet(HostedRepository.class)).thenReturn(repository);
+    when(repository.adaptToFacet(MavenRepository.class)).thenReturn(repository);
+    when(repository.adaptToFacet(MavenHostedRepository.class)).thenReturn(repository);
+
     final RepositoryKind repositoryKind = mock(RepositoryKind.class);
-    when(repo.getRepositoryKind()).thenReturn(repositoryKind);
+    when(repository.getRepositoryKind()).thenReturn(repositoryKind);
     when(repositoryKind.isFacetAvailable(HostedRepository.class)).thenReturn(true);
-    return repo;
+    when(repositoryKind.isFacetAvailable(MavenRepository.class)).thenReturn(true);
+    when(repositoryKind.isFacetAvailable(MavenHostedRepository.class)).thenReturn(true);
+    return repository;
   }
 
   private static String getTempUrl() {

@@ -17,6 +17,7 @@ import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
@@ -51,12 +52,18 @@ public class YumRegistryImplTest
   public void shouldScanRepository()
       throws Exception
   {
-    final MavenRepository repository = mock(MavenRepository.class);
+    final MavenHostedRepository repository = mock(MavenHostedRepository.class);
     when(repository.getId()).thenReturn(REPO_ID);
     when(repository.getLocalUrl()).thenReturn(rpmsDir().toURI().toASCIIString());
+    when(repository.adaptToFacet(HostedRepository.class)).thenReturn(repository);
+    when(repository.adaptToFacet(MavenRepository.class)).thenReturn(repository);
+    when(repository.adaptToFacet(MavenHostedRepository.class)).thenReturn(repository);
+
     final RepositoryKind repositoryKind = mock(RepositoryKind.class);
     when(repository.getRepositoryKind()).thenReturn(repositoryKind);
+    when(repositoryKind.isFacetAvailable(MavenRepository.class)).thenReturn(true);
     when(repositoryKind.isFacetAvailable(HostedRepository.class)).thenReturn(true);
+    when(repositoryKind.isFacetAvailable(MavenHostedRepository.class)).thenReturn(true);
 
     yumRegistry.register(repository);
 

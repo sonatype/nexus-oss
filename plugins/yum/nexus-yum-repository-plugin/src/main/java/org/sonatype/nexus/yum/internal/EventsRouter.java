@@ -36,8 +36,9 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumGroup;
+import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
-import org.sonatype.nexus.yum.internal.task.MergeMetadataTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -102,7 +103,11 @@ public class EventsRouter
         && (anyOfRepositoriesHasYumRepository(event.getAddedRepositoryIds())
         || anyOfRepositoriesHasYumRepository(event.getRemovedRepositoryIds())
         || anyOfRepositoriesHasYumRepository(event.getReorderedRepositoryIds()))) {
-      MergeMetadataTask.createTaskFor(nexusScheduler.get(), event.getGroupRepository());
+
+      Yum yum = yumRegistryProvider.get().get(event.getGroupRepository().getId());
+      if (yum instanceof YumGroup) {
+        ((YumGroup) yum).markDirty();
+      }
     }
   }
 
@@ -111,9 +116,9 @@ public class EventsRouter
   public void on(final RepositoryItemEventStore eventStore) {
     if (isRpmItemEvent(eventStore)) {
       final Yum yum = yumRegistryProvider.get().get(eventStore.getRepository().getId());
-      if (yum != null) {
-        yum.markDirty(getItemVersion(eventStore.getItem()));
-        yum.addRpmAndRegenerate(eventStore.getItem().getPath());
+      if (yum != null && yum instanceof YumHosted) {
+        ((YumHosted) yum).markDirty(getItemVersion(eventStore.getItem()));
+        ((YumHosted) yum).addRpmAndRegenerate(eventStore.getItem().getPath());
       }
     }
   }
@@ -122,12 +127,12 @@ public class EventsRouter
   @Subscribe
   public void on(RepositoryItemEventDelete itemEvent) {
     final Yum yum = yumRegistryProvider.get().get(itemEvent.getRepository().getId());
-    if (yum != null) {
+    if (yum != null && yum instanceof YumHosted) {
       if (isRpmItemEvent(itemEvent)) {
-        yum.regenerateWhenPathIsRemoved(itemEvent.getItem().getPath());
+        ((YumHosted) yum).regenerateWhenPathIsRemoved(itemEvent.getItem().getPath());
       }
       else if (isCollectionItem(itemEvent)) {
-        yum.regenerateWhenDirectoryIsRemoved(itemEvent.getItem().getPath());
+        ((YumHosted) yum).regenerateWhenDirectoryIsRemoved(itemEvent.getItem().getPath());
       }
     }
   }
@@ -145,8 +150,9 @@ public class EventsRouter
       log.debug("Yum metadata changed for {}. Looking if we should merge it...", repository.getId());
       List<GroupRepository> groups = repositoryRegistry.get().getGroupsOfRepository(repository);
       for (GroupRepository group : groups) {
-        if (yumRegistryProvider.get().isRegistered(group.getId())) {
-          MergeMetadataTask.createTaskFor(nexusScheduler.get(), group);
+        Yum yum = yumRegistryProvider.get().get(group.getId());
+        if (yum != null && yum instanceof YumGroup) {
+          ((YumGroup) yum).markDirty();
         }
       }
     }
