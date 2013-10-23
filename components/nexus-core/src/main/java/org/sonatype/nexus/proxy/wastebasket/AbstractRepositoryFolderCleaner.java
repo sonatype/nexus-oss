@@ -19,9 +19,8 @@ import java.io.IOException;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.nexus.util.file.DirSupport;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,66 +55,13 @@ public abstract class AbstractRepositoryFolderCleaner
   protected void delete(final File file, final boolean deleteForever)
       throws IOException
   {
+    File basketFile =
+        new File(getApplicationConfiguration().getWorkingDirectory(GLOBAL_TRASH_KEY), file.getName());
     if (!deleteForever) {
-      File basketFile =
-          new File(getApplicationConfiguration().getWorkingDirectory(GLOBAL_TRASH_KEY), file.getName());
-
-      if (file.isDirectory()) {
-        FileUtils.mkdir(basketFile.getAbsolutePath());
-
-        FileUtils.copyDirectoryStructure(file, basketFile);
-      }
-      else {
-        FileUtils.copyFile(file, basketFile);
-      }
-    }
-    if (file.isDirectory()) {
-      deleteFilesRecursively(file);
-    }
-    else {
-      FileUtils.forceDelete(file);
-    }
-  }
-
-  // This method prevents locked files on Windows from not allowing to delete unlocked files, i.e., it will keep on
-  // deleting other files even if it reaches a locked file first.
-  protected static void deleteFilesRecursively(File folder) {
-    TaskUtil.checkInterruption();
-
-    // First check if it's a directory to avoid future misuse.
-    if (folder.isDirectory()) {
-      File[] files = folder.listFiles();
-      for (File file : files) {
-        TaskUtil.checkInterruption();
-
-        if (file.isDirectory()) {
-          deleteFilesRecursively(file);
-        }
-        else {
-          try {
-            FileUtils.forceDelete(file);
-          }
-          catch (IOException ioe) {
-            ioe.printStackTrace();
-          }
-        }
-      }
-      // After cleaning the files, tries to delete the containing folder.
-      try {
-        FileUtils.forceDelete(folder);
-      }
-      catch (IOException ioe) {
-        // If the folder cannot be deleted it means there are locked files in it. But we don't need to log it
-        // here once the file locks had already been detected and logged in the for loop above.
-      }
-    }
-    else {
-      try {
-        FileUtils.forceDelete(folder);
-      }
-      catch (IOException ioe) {
-        ioe.printStackTrace();
-      }
+      // move to trash
+      DirSupport.moveIfExists(file.toPath(), basketFile.toPath());
+    } else {
+      DirSupport.deleteIfExists(file.toPath());
     }
   }
 }

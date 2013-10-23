@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -132,9 +133,12 @@ public class DefaultFSLocalRepositoryStorage
       }
     }
     else {
-      if (!file.mkdirs()) {
+      try {
+        Files.createDirectories(file.toPath());
+      }
+      catch (IOException e) {
         throw new LocalStorageException("Could not create the baseDir directory for repository \""
-            + repository.getName() + "\" (ID=\"" + repository.getId() + "\") on path " + file.getAbsolutePath());
+            + repository.getName() + "\" (ID=\"" + repository.getId() + "\") on path " + file.getAbsolutePath(), e);
       }
     }
 
@@ -150,7 +154,13 @@ public class DefaultFSLocalRepositoryStorage
       throws LocalStorageException
   {
     if (!repoBase.exists()) {
-      repoBase.mkdir();
+      try {
+        Files.createDirectories(repoBase.toPath());
+      }
+      catch (IOException e) {
+        throw new LocalStorageException(
+            "Cannot create repoBase directory at " + repoBase.getAbsolutePath() + " for repository " + repository, e);
+      }
     }
 
     File result = null;
@@ -242,9 +252,7 @@ public class DefaultFSLocalRepositoryStorage
           }
           catch (NoSuchRepositoryException e) {
             getLogger().warn("Stale link object found on UID: {}, deleting it.", uid);
-
-            target.delete();
-
+            Files.delete(target.toPath());
             throw new ItemNotFoundException(reasonFor(request, repository,
                 "Path %s not found in local storage of repository %s", request.getRequestPath(),
                 RepositoryStringUtils.getHumanizedNameString(repository)), e);

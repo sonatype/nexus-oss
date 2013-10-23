@@ -23,8 +23,7 @@ import org.sonatype.nexus.proxy.attributes.AbstractStorageItemInspector;
 import org.sonatype.nexus.proxy.item.ChecksummingContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-
-import com.google.common.io.ByteStreams;
+import org.sonatype.nexus.util.io.StreamSupport;
 
 import static com.google.common.io.ByteStreams.nullOutputStream;
 
@@ -83,7 +82,7 @@ public class DigestCalculatingInspector
           new ChecksummingContentLocator(sha1cl, MessageDigest.getInstance("MD5"),
               StorageFileItem.DIGEST_MD5_KEY, item.getItemContext());
       try (final InputStream is = md5cl.getContent()) {
-        ByteStreams.copy(is, nullOutputStream());
+        StreamSupport.copy(is, nullOutputStream(), 8192);
       }
       // we made sure that above operations will make values into context
       maybeGetFromContext(item);

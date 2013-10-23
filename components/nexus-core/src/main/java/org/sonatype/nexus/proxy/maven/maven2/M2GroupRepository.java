@@ -61,7 +61,6 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.DigesterUtils;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -161,16 +160,9 @@ public class M2GroupRepository
   private Metadata parseMetadata(StorageFileItem fileItem)
       throws IOException, MetadataException
   {
-    InputStream inputStream = null;
-
     Metadata metadata;
-    try {
-      inputStream = fileItem.getInputStream();
-
+    try (InputStream inputStream = fileItem.getInputStream()) {
       metadata = MetadataBuilder.read(inputStream);
-    }
-    finally {
-      IOUtil.close(inputStream);
     }
 
     MavenRepository repo = fileItem.getRepositoryItemUid().getRepository().adaptToFacet(MavenRepository.class);

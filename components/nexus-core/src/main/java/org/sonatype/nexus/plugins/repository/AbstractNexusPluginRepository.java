@@ -25,7 +25,6 @@ import org.sonatype.inject.Parameters;
 import org.sonatype.plugins.model.PluginMetadata;
 import org.sonatype.plugins.model.io.xpp3.PluginModelXpp3Reader;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -63,16 +62,12 @@ abstract class AbstractNexusPluginRepository
   final PluginMetadata getPluginMetadata(final URL pluginXml)
       throws IOException
   {
-    final InputStream in = pluginXml.openStream();
-    try {
+    try (final InputStream in = pluginXml.openStream()) {
       final Reader reader = new InterpolationFilterReader(ReaderFactory.newXmlReader(in), variables);
       return PLUGIN_METADATA_READER.read(reader, false);
     }
     catch (final XmlPullParserException e) {
       throw new IOException("Problem parsing: " + pluginXml + " reason: " + e);
-    }
-    finally {
-      IOUtil.close(in);
     }
   }
 }

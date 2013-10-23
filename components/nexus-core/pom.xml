@@ -244,6 +244,7 @@
       <artifactId>sisu-mailer</artifactId>
     </dependency>
 
+    <!-- FIXME: unused in core, but was in core and breaks plugins using it -->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-resource-scanner</artifactId>

@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Inject;
@@ -170,7 +171,7 @@ public class DefaultLvoPluginConfiguration
   protected void save() throws IOException {
     lock.lock();
 
-    configurationFile.getParentFile().mkdirs();
+    Files.createDirectories(configurationFile.getParentFile().toPath());
 
     Writer fw = null;
 

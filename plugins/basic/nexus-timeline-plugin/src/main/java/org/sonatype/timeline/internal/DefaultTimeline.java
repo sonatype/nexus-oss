@@ -23,13 +23,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.timeline.Timeline;
 import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineFilter;
 import org.sonatype.timeline.TimelineRecord;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +106,7 @@ public class DefaultTimeline
           // stopping it cleanly
           indexer.stop();
           // deleting index files
-          FileUtils.cleanDirectory(configuration.getIndexDirectory());
+          DirSupport.empty(configuration.getIndexDirectory().toPath());
           try {
             // creating new index from scratch
             indexer.start(configuration);

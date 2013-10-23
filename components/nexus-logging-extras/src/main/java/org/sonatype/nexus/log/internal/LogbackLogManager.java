@@ -16,7 +16,6 @@ package org.sonatype.nexus.log.internal;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -48,6 +47,8 @@ import org.sonatype.nexus.log.LogConfigurationParticipant;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
+import org.sonatype.nexus.util.file.FileSupport;
+import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -61,13 +62,10 @@ import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.util.StatusPrinter;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.io.ByteStreams;
 import com.google.inject.Injector;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -373,22 +371,15 @@ public class LogbackLogManager
     prepareConfigurationFiles();
     String logConfigDir = getLogConfigDir();
     File logConfigPropsFile = new File(logConfigDir, LOG_CONF_PROPS);
-    InputStream in = null;
-    try {
-      in = new FileInputStream(logConfigPropsFile);
-
+    try(final InputStream in = new FileInputStream(logConfigPropsFile)) {
       Properties properties = new Properties();
       properties.load(in);
-
       return properties;
-    }
-    finally {
-      IOUtil.close(in);
     }
   }
 
   private void saveConfigurationProperties(final Properties properties)
-      throws FileNotFoundException, IOException
+      throws IOException
   {
     final File configurationFile = new File(getLogConfigDir(), LOG_CONF_PROPS);
     logger.debug("Saving configuration: {}", configurationFile);
@@ -409,7 +400,7 @@ public class LogbackLogManager
   private String getLogConfigDir() {
     String logConfigDir = System.getProperty(KEY_LOG_CONFIG_DIR);
 
-    if (StringUtils.isEmpty(logConfigDir)) {
+    if (Strings.isNullOrEmpty(logConfigDir)) {
       logConfigDir = applicationConfiguration.getConfigurationDirectory().getAbsolutePath();
 
       System.setProperty(KEY_LOG_CONFIG_DIR, logConfigDir);
@@ -425,8 +416,9 @@ public class LogbackLogManager
     if (!logConfigPropsFile.exists()) {
       try {
         URL configUrl = this.getClass().getResource(LOG_CONF_PROPS_RESOURCE);
-
-        FileUtils.copyURLToFile(configUrl, logConfigPropsFile);
+        try (final InputStream is = configUrl.openStream()) {
+          FileSupport.copy(is, logConfigPropsFile.toPath());
+        }
       }
       catch (IOException e) {
         throw new IllegalStateException("Could not create logback.properties as "
@@ -450,7 +442,7 @@ public class LogbackLogManager
                   throws IOException
               {
                 try (final InputStream in = participant.getConfiguration()) {
-                  ByteStreams.copy(in, output);
+                  StreamSupport.copy(in, output);
                 }
               }
             });

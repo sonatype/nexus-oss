@@ -22,6 +22,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ import org.sonatype.timeline.TimelineRecord;
 import org.sonatype.timeline.proto.TimeLineRecordProtos;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Throwables;
 import org.codehaus.plexus.util.IOUtil;
 
 /**
@@ -82,11 +84,16 @@ public class DefaultTimelinePersistor
    * in.
    */
   protected synchronized void setConfiguration(final TimelineConfiguration configuration) {
-    this.persistDirectory = configuration.getPersistDirectory();
-    if (!this.persistDirectory.exists()) {
-      this.persistDirectory.mkdirs();
+    if (!configuration.getPersistDirectory().exists()) {
+      try {
+        Files.createDirectories(configuration.getPersistDirectory().toPath());
+      }
+      catch (IOException e) {
+        Throwables.propagate(e);
+      }
     }
-    this.rollingIntervalMillis = configuration.getPersistRollingIntervalMillis();
+    persistDirectory = configuration.getPersistDirectory();
+    rollingIntervalMillis = configuration.getPersistRollingIntervalMillis();
   }
 
   /**

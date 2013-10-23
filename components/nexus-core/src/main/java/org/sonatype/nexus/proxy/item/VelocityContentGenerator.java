@@ -27,7 +27,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.velocity.Velocity;
 
 import org.apache.velocity.VelocityContext;
-import org.codehaus.plexus.util.IOUtil;
 
 @Named(VelocityContentGenerator.ID)
 @Singleton
@@ -52,20 +51,15 @@ public class VelocityContentGenerator
   public ContentLocator generateContent(Repository repository, String path, StorageFileItem item)
       throws IllegalOperationException, ItemNotFoundException, LocalStorageException
   {
-    InputStreamReader isr = null;
+    final StringWriter sw = new StringWriter();
+    final VelocityContext vctx = new VelocityContext(item.getItemContext());
 
-    try {
-      StringWriter sw = new StringWriter();
-      VelocityContext vctx = new VelocityContext(item.getItemContext());
-      isr = new InputStreamReader(item.getInputStream(), "UTF-8");
+    try(final InputStreamReader isr = new InputStreamReader(item.getInputStream(), "UTF-8")) {
       velocity.getEngine().evaluate(vctx, sw, item.getRepositoryItemUid().toString(), isr);
       return new StringContentLocator(sw.toString());
     }
     catch (Exception e) {
       throw new LocalStorageException("Could not expand the template: " + item.getRepositoryItemUid().toString(), e);
-    }
-    finally {
-      IOUtil.close(isr);
     }
   }
 }

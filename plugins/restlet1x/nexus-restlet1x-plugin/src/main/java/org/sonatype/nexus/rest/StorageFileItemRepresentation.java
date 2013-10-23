@@ -21,9 +21,9 @@ import java.net.SocketException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.plexus.rest.resource.RestletResponseCustomizer;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
 import org.restlet.data.Tag;
@@ -73,7 +73,7 @@ public class StorageFileItemRepresentation
       throws IOException
   {
     try(final InputStream is = getStorageItem().getInputStream()) {
-      IOUtil.copy(is, outputStream, OUTPUT_BUFFER_SIZE);
+      StreamSupport.copy(is, outputStream, OUTPUT_BUFFER_SIZE);
     }
     catch (IOException e) {
       if ("EofException".equals(e.getClass().getSimpleName())) {

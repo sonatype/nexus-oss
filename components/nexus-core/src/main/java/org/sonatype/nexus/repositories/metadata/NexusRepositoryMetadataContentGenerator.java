@@ -29,8 +29,7 @@ import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
-
-import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.nexus.util.io.StreamSupport;
 
 @Named(NexusRepositoryMetadataContentGenerator.ID)
 @Singleton
@@ -49,11 +48,8 @@ public class NexusRepositoryMetadataContentGenerator
       throws IllegalOperationException, ItemNotFoundException, StorageException
   {
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    InputStream is = null;
-    try {
-      is = item.getInputStream();
-
-      IOUtil.copy(is, bos);
+    try (final InputStream is = item.getInputStream()) {
+      StreamSupport.copy(is, bos);
       String body = new String(bos.toByteArray(), "UTF-8");
       StringContentLocator result = null;
       if (item.getItemContext().getRequestAppRootUrl() != null) {
@@ -71,9 +67,6 @@ public class NexusRepositoryMetadataContentGenerator
     }
     catch (IOException e) {
       throw new LocalStorageException(e);
-    }
-    finally {
-      IOUtil.close(is);
     }
   }
 }

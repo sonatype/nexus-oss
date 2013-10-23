@@ -16,14 +16,11 @@ package org.sonatype.nexus.util;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import org.codehaus.plexus.util.IOUtil;
 
 /**
  * A util class to calculate various digests on Strings. Usaful for some simple password management.
@@ -118,23 +115,17 @@ public class DigesterUtils
    * Calculates a SHA1 digest for a file.
    */
   public static String getSha1Digest(File file) {
-    FileInputStream fis = null;
-
     try {
-      fis = new FileInputStream(file);
-
-      return getDigest("SHA1", fis);
+      try (FileInputStream fis = new FileInputStream(file)) {
+        return getDigest("SHA1", fis);
+      }
+      catch (NoSuchAlgorithmException e) {
+        // will not happen
+        return null;
+      }
     }
-    catch (NoSuchAlgorithmException e) {
-      // will not happen
+    catch (IOException e) {
       return null;
-    }
-    catch (FileNotFoundException e) {
-      // will not happen
-      return null;
-    }
-    finally {
-      IOUtil.close(fis);
     }
   }
 
@@ -176,23 +167,17 @@ public class DigesterUtils
    * Calculates a SHA1 digest for a file.
    */
   public static String getMd5Digest(File file) {
-    FileInputStream fis = null;
-
     try {
-      fis = new FileInputStream(file);
-
-      return getDigest("MD5", fis);
+      try (FileInputStream fis = new FileInputStream(file)) {
+        return getDigest("MD5", fis);
+      }
+      catch (NoSuchAlgorithmException e) {
+        // will not happen
+        return null;
+      }
     }
-    catch (NoSuchAlgorithmException e) {
-      // will not happen
+    catch (IOException e) {
       return null;
-    }
-    catch (FileNotFoundException e) {
-      // will not happen
-      return null;
-    }
-    finally {
-      IOUtil.close(fis);
     }
   }
 

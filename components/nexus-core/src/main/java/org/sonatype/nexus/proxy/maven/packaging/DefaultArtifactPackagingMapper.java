@@ -27,8 +27,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
-import org.codehaus.plexus.util.IOUtil;
-
 /**
  * A very simple artifact packaging mapper, that has everything for quick-start wired in this class. Also, it takes
  * into
@@ -95,11 +93,7 @@ public class DefaultArtifactPackagingMapper
 
             Properties userMappings = new Properties();
 
-            FileInputStream fis = null;
-
-            try {
-              fis = new FileInputStream(propertiesFile);
-
+            try (final FileInputStream fis =new FileInputStream(propertiesFile)) {
               userMappings.load(fis);
 
               if (userMappings.keySet().size() > 0) {
@@ -118,10 +112,6 @@ public class DefaultArtifactPackagingMapper
               getLogger().warn(
                   "Got IO exception during read of file: " + propertiesFile.getAbsolutePath());
             }
-            finally {
-              IOUtil.close(fis);
-            }
-
           }
           else {
             // make it silent if using defaults

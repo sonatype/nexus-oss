@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
@@ -243,9 +244,8 @@ public class Launcher
     log.info("Temp directory: {}", dir);
 
     if (!dir.exists()) {
-      if (dir.mkdirs()) {
-        log.debug("Created tmp dir: {}", dir);
-      }
+      Files.createDirectories(dir.toPath());
+      log.debug("Created tmp dir: {}", dir);
     }
     else if (!dir.isDirectory()) {
       log.warn("Tmp dir is configured to a location which is not a directory: {}", dir);

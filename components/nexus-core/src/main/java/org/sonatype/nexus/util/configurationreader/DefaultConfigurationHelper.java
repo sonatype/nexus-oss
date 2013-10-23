@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.util.concurrent.locks.Lock;
 
 import javax.inject.Named;
@@ -137,11 +138,11 @@ public class DefaultConfigurationHelper
   public <E> void save(E configuration, File configurationFile, ConfigurationWritter<E> writer, Lock lock) {
     lock.lock();
 
-    configurationFile.getParentFile().mkdirs();
-
     Writer fw = null;
 
     try {
+      Files.createDirectories(configurationFile.getParentFile().toPath());
+
       fw = new OutputStreamWriter(new FileOutputStream(configurationFile));
 
       writer.write(fw, configuration);

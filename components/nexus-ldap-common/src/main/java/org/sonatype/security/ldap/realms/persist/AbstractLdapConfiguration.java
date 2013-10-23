@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -176,8 +177,11 @@ public abstract class AbstractLdapConfiguration
     lock.lock();
     try {
       final File configurationFile = getConfigurationFile();
-      if (!configurationFile.getParentFile().exists() && !configurationFile.getParentFile().mkdirs()) {
-        String message =
+      try {
+        Files.createDirectories(configurationFile.getParentFile().toPath());
+      }
+      catch (IOException e) {
+        final String message =
             "\r\n******************************************************************************\r\n"
                 + "* Could not create configuration file [ "
                 + configurationFile.toString()
@@ -186,7 +190,7 @@ public abstract class AbstractLdapConfiguration
                 "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
                 + "******************************************************************************";
         getLogger().error(message);
-        throw new IOException("Could not create configuration file " + configurationFile.getAbsolutePath());
+        throw new IOException("Could not create configuration file " + configurationFile.getAbsolutePath(), e);
       }
 
       final Configuration configuration = this.configuration.clone();
