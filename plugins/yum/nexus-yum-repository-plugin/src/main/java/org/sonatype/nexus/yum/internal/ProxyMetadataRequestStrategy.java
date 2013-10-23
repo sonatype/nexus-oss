@@ -76,8 +76,10 @@ public class ProxyMetadataRequestStrategy
         walker.walk(wcontext);
       }
       catch (WalkerException e) {
-        log.warn("Failed to clean proxy YUM metadata", e);
-        throw e;
+        if (!(e.getWalkerContext().getStopCause() instanceof ItemNotFoundException)) {
+          log.warn("Failed to clean proxy YUM metadata", e);
+          throw e;
+        }
       }
     }
   }
