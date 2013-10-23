@@ -62,21 +62,17 @@ public class EventsRouter
 
   private final Provider<YumRegistry> yumRegistryProvider;
 
-  private final Provider<NexusScheduler> nexusScheduler;
-
   private final Provider<SteadyLinksRequestStrategy> steadyLinksStrategy;
 
   @Inject
   public EventsRouter(final Provider<RepositoryRegistry> repositoryRegistry,
                       final Provider<YumRegistry> yumRegistryProvider,
-                      final Provider<NexusScheduler> nexusScheduler,
                       final Provider<SteadyLinksRequestStrategy> steadyLinksStrategy,
                       final EventBus eventBus)
   {
     this.steadyLinksStrategy = checkNotNull(steadyLinksStrategy);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.yumRegistryProvider = checkNotNull(yumRegistryProvider);
-    this.nexusScheduler = checkNotNull(nexusScheduler);
     checkNotNull(eventBus).register(this);
   }
 
