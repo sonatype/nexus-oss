@@ -178,8 +178,7 @@ implements SupportZipGenerator
    * Generate a unique file prefix.
    */
   private String uniquePrefix() {
-    // TODO: Consider using a dateformat here instead?
-    return "support-${System.currentTimeMillis()}-${counter.incrementAndGet()}"
+    return "support-${new Date().format('yyyyMMdd-HHmmss')}-${counter.incrementAndGet()}"
   }
 
   /**
