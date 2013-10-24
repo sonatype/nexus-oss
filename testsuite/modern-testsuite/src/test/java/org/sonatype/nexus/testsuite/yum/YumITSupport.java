@@ -69,8 +69,7 @@ public class YumITSupport
   @Override
   protected NexusBundleConfiguration configureNexus(NexusBundleConfiguration configuration) {
     return configuration
-        .setLogPattern("%d{HH:mm:ss.SSS} %-5level - %msg%n")
-        .setLogLevel("org.sonatype.nexus.yum", "DEBUG")
+        .setLogLevel("org.sonatype.nexus.yum", "TRACE")
         .addPlugins(
             artifactResolver().resolvePluginFromDependencyManagement(
                 "org.sonatype.nexus.plugins", "nexus-yum-repository-plugin"
