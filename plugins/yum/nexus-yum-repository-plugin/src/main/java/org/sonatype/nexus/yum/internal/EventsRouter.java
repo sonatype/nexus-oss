@@ -26,15 +26,12 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumGroup;
 import org.sonatype.nexus.yum.YumHosted;
@@ -62,34 +59,14 @@ public class EventsRouter
 
   private final Provider<YumRegistry> yumRegistryProvider;
 
-  private final Provider<SteadyLinksRequestStrategy> steadyLinksStrategy;
-
   @Inject
   public EventsRouter(final Provider<RepositoryRegistry> repositoryRegistry,
                       final Provider<YumRegistry> yumRegistryProvider,
-                      final Provider<SteadyLinksRequestStrategy> steadyLinksStrategy,
                       final EventBus eventBus)
   {
-    this.steadyLinksStrategy = checkNotNull(steadyLinksStrategy);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.yumRegistryProvider = checkNotNull(yumRegistryProvider);
     checkNotNull(eventBus).register(this);
-  }
-
-  @AllowConcurrentEvents
-  @Subscribe
-  public void on(final RepositoryRegistryEventAdd event) {
-    event.getRepository().registerRequestStrategy(
-        SteadyLinksRequestStrategy.class.getName(), steadyLinksStrategy.get()
-    );
-  }
-
-  @AllowConcurrentEvents
-  @Subscribe
-  public void on(final RepositoryRegistryEventRemove event) {
-    event.getRepository().unregisterRequestStrategy(
-        SteadyLinksRequestStrategy.class.getName()
-    );
   }
 
   @AllowConcurrentEvents
