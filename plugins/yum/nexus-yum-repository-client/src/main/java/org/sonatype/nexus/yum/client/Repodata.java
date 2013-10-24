@@ -45,6 +45,19 @@ public interface Repodata
   <T> T getMetadata(String repositoryId, String version, MetadataType metadataType, Class<T> returnType)
       throws IOException;
 
+  /**
+   * Retrieves the repository path of given metadata type (primary.xml, repomd.xml, etc.) from the repository.
+   */
+  String getMetadataPath(String repositoryId, MetadataType metadataType)
+      throws IOException;
+
+  /**
+   * Retrieves the full repository URL of given metadata type (primary.xml, repomd.xml, etc.) from the repository.
+   */
+  String getMetadataUrl(String repositoryId, MetadataType metadataType)
+      throws IOException;
+
+
   String getIndex(String repositoryId, String version);
 
   String getIndex(String repositoryId, String version, String path);

@@ -11,40 +11,23 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.yum;
+package org.sonatype.nexus.yum.internal.capabilities;
 
-import java.io.File;
-import java.net.URL;
 import java.util.Map;
-import java.util.Set;
-
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.scheduling.ScheduledTask;
 
 /**
- * Provides access to Yum functionality around a Nexus repository.
- *
- * @since yum 3.0
+ * @since 2.7.0
  */
-public interface Yum
+public class ProxyMetadataCapabilityConfiguration
+    extends MetadataCapabilityConfigurationSupport
 {
 
-  static final long DEFAULT_DELETE_PROCESSING_DELAY = 10;
+  public ProxyMetadataCapabilityConfiguration(final Map<String, String> properties) {
+    super(properties);
+  }
 
-  String PATH_OF_REPODATA = "repodata";
-
-  String NAME_OF_REPOMD_XML = "repomd.xml";
-
-  String PATH_OF_REPOMD_XML = PATH_OF_REPODATA + "/" + NAME_OF_REPOMD_XML;
-
-  /**
-   * @return associated Nexus repository (never null)
-   */
-  Repository getNexusRepository();
-
-  YumRepository getYumRepository()
-      throws Exception;
-
-  File getBaseDir();
-
+  public Map<String, String> asMap() {
+    final Map<String, String> props = super.asMap();
+    return props;
+  }
 }

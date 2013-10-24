@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumHosted;
@@ -78,6 +79,9 @@ public class YumRegistryImpl
       if (repository.getRepositoryKind().isFacetAvailable(HostedRepository.class)) {
         yum = yumFactory.createHosted(getTemporaryDirectory(), repository.adaptToFacet(HostedRepository.class));
       }
+      else if (repository.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
+        yum = yumFactory.createProxy(repository.adaptToFacet(ProxyRepository.class));
+      }
       else if (repository.getRepositoryKind().isFacetAvailable(GroupRepository.class)) {
         yum = yumFactory.createGroup(repository.adaptToFacet(GroupRepository.class));
       }
@@ -104,6 +108,7 @@ public class YumRegistryImpl
   public Yum unregister(final String repositoryId) {
     final Yum yum = yums.remove(repositoryId);
     if (yum != null) {
+      yum.getNexusRepository().unregisterRequestStrategy(ProxyMetadataRequestStrategy.class.getName());
       yum.getNexusRepository().unregisterRequestStrategy(MergeMetadataRequestStrategy.class.getName());
       LOG.info("Unregistered repository '{}' as Yum repository", repositoryId);
     }

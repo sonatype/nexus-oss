@@ -13,38 +13,13 @@
 
 package org.sonatype.nexus.yum;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Map;
-import java.util.Set;
-
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.scheduling.ScheduledTask;
-
 /**
- * Provides access to Yum functionality around a Nexus repository.
+ * Provides access to Yum functionality around a Nexus proxy repository.
  *
- * @since yum 3.0
+ * @since 2.7
  */
-public interface Yum
+public interface YumProxy
+    extends Yum
 {
-
-  static final long DEFAULT_DELETE_PROCESSING_DELAY = 10;
-
-  String PATH_OF_REPODATA = "repodata";
-
-  String NAME_OF_REPOMD_XML = "repomd.xml";
-
-  String PATH_OF_REPOMD_XML = PATH_OF_REPODATA + "/" + NAME_OF_REPOMD_XML;
-
-  /**
-   * @return associated Nexus repository (never null)
-   */
-  Repository getNexusRepository();
-
-  YumRepository getYumRepository()
-      throws Exception;
-
-  File getBaseDir();
 
 }

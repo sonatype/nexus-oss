@@ -11,40 +11,28 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.yum;
+package org.sonatype.nexus.yum.client.capabilities;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Map;
-import java.util.Set;
-
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.nexus.capabilities.client.Capability;
+import org.sonatype.nexus.capabilities.client.spi.CapabilityProperty;
+import org.sonatype.nexus.capabilities.client.spi.CapabilityType;
 
 /**
- * Provides access to Yum functionality around a Nexus repository.
+ * Proxy Metadata capability.
  *
- * @since yum 3.0
+ * @since 2.7.0
  */
-public interface Yum
+@CapabilityType(ProxyMetadataCapability.TYPE_ID)
+public interface ProxyMetadataCapability
+    extends Capability<ProxyMetadataCapability>
 {
 
-  static final long DEFAULT_DELETE_PROCESSING_DELAY = 10;
+  String TYPE_ID = "yum.proxy";
 
-  String PATH_OF_REPODATA = "repodata";
+  @CapabilityProperty("repository")
+  String repository();
 
-  String NAME_OF_REPOMD_XML = "repomd.xml";
-
-  String PATH_OF_REPOMD_XML = PATH_OF_REPODATA + "/" + NAME_OF_REPOMD_XML;
-
-  /**
-   * @return associated Nexus repository (never null)
-   */
-  Repository getNexusRepository();
-
-  YumRepository getYumRepository()
-      throws Exception;
-
-  File getBaseDir();
+  @CapabilityProperty("repository")
+  ProxyMetadataCapability withRepository(String repository);
 
 }
