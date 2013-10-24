@@ -25,7 +25,6 @@ import org.sonatype.nexus.auth.NexusAuthorizationEvent;
 import org.sonatype.nexus.auth.ResourceInfo;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.rest.RemoteIPFinder;
-import org.sonatype.nexus.security.Constants;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -60,7 +59,7 @@ public class FailureLoggingHttpMethodPermissionFilter
   {
     recordAuthzFailureEvent(request, response);
 
-    request.setAttribute(Constants.REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE);
+    request.setAttribute(org.sonatype.nexus.web.Constants.ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE);
 
     return false;
   }
