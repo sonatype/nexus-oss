@@ -23,7 +23,7 @@ import com.google.common.collect.Lists;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
 
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link AuthenticatingFilter} that delegates token creation to {@link AuthenticationTokenFactory}s before falling
