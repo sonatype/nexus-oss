@@ -63,6 +63,10 @@ NX.define('Nexus.util.DownloadHelper', {
     // resolve the download frame
     frame = me.getFrame();
 
+    // TODO: Consider changing this to a dynamic form or 'a' link and automatically submit/click
+    // TODO: ... to make use of html5 download attribute and avoid needing to _open_ more windows
+    // TODO: Form method could be handy to GET/POST w/params vs link to just GET?
+
     // open new window in hidden download-from to initiate download
     win = NX.global.open(url, 'nx-download-frame');
     if (win == null) {
