@@ -146,9 +146,9 @@ public class MergeMetadataTask
             );
           }
         }
+        // all metadata files are available by now so lets use it
+        baseDirs.add(RepositoryUtils.getBaseDir(memberRepository));
       }
-      // all metadata files are available by now so lets use it
-      baseDirs.add(RepositoryUtils.getBaseDir(memberRepository));
     }
     return baseDirs;
   }
