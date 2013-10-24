@@ -68,6 +68,7 @@ public class ProxyMetadataRequestStrategy
     // do this only if request path in question asks for "repomd.xml"
     if (REPOMD_XML_PATH.equals(request.getRequestPath())) {
       try {
+        log.trace("Cleaning up Yum metadata from {}:/{}", proxy.getId(), Yum.PATH_OF_REPODATA);
         final ResourceStoreRequest wrequest = new ResourceStoreRequest(request);
         wrequest.setRequestPath(RepositoryItemUid.PATH_ROOT + Yum.PATH_OF_REPODATA);
         wrequest.getRequestContext().put(AccessManager.REQUEST_AUTHORIZED, Boolean.TRUE);
