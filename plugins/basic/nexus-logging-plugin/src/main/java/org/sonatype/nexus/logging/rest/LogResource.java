@@ -25,6 +25,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.sonatype.nexus.log.LogManager;
+import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.logging.LoggingPlugin;
 import org.sonatype.nexus.logging.model.MarkerXO;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -111,6 +112,9 @@ public class LogResource
   {
     checkNotNull(marker);
     checkArgument(StringUtils.isNotEmpty(marker.getMessage()));
+
+    // ensure that level for marking logger is enabled
+    logManager.setLoggerLevel(log.getName(), LoggerLevel.INFO);
 
     String asterixes = StringUtils.repeat("*", marker.getMessage().length() + 4);
     log.info("\n"
