@@ -28,38 +28,43 @@ NX.define('Nexus.logging.store.Logger', {
     'Nexus.siesta'
   ],
 
-  storeId: 'nx-logging-store-logger',
-  autoDestroy: true,
-  restful: true,
-
-  proxy: NX.create('Ext.data.HttpProxy', {
-    url: Nexus.siesta.basePath + '/logging/loggers'
-  }),
-
-  reader: NX.create('Ext.data.JsonReader', {
-    root: '',
-    idProperty: 'name',
-    fields: [
-      'name',
-      'level'
-    ]
-  }),
-
-  writer: NX.create('Ext.data.JsonWriter', {
-    encode: false,
-    render: function (params, baseParams, data) {
-      params.jsonData = data;
-    }
-  }),
-
-  sortInfo: { field: 'name', direction: 'ASC' },
-
   /**
    * @constructor
    */
   constructor: function () {
-    this.constructor.superclass.constructor.call(this);
-    Ext.apply(this.reader, {
+    var me = this;
+
+    Ext.apply(me, {
+      storeId: 'nx-logging-store-logger',
+      autoDestroy: true,
+      restful: true,
+
+      sortInfo: { field: 'name', direction: 'ASC' },
+
+      proxy: NX.create('Ext.data.HttpProxy', {
+        url: Nexus.siesta.basePath + '/logging/loggers'
+      }),
+
+      reader: NX.create('Ext.data.JsonReader', {
+        root: '',
+        idProperty: 'name',
+        fields: [
+          'name',
+          'level'
+        ]
+      }),
+
+      writer: NX.create('Ext.data.JsonWriter', {
+        encode: false,
+        render: function (params, baseParams, data) {
+          params.jsonData = data;
+        }
+      })
+    });
+
+    me.constructor.superclass.constructor.call(me);
+
+    Ext.apply(me.reader, {
       // HACK: without this create will fail as it will look for a successProperty in response
       getSuccess: function (obj) {
         return Ext.isDefined(obj);

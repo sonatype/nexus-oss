@@ -21,28 +21,40 @@ NX.define('Nexus.logging.view.LoggerLevel', {
   extend: 'Ext.form.ComboBox',
   xtype: 'nx-logging-combo-logger-level',
 
-  triggerAction: 'all',
-  lazyRender: true,
-  mode: 'local',
-  emptyText: 'Select...',
-  editable: false,
-  store: NX.create('Ext.data.ArrayStore', {
-    id: 0,
-    fields: [
-      'level',
-      'text'
-    ],
-    data: [
-      ['TRACE', 'TRACE'],
-      ['DEBUG', 'DEBUG'],
-      ['INFO', 'INFO'],
-      ['WARN', 'WARN'],
-      ['ERROR', 'ERROR'],
-      ['OFF', 'OFF'],
-      ['DEFAULT', 'DEFAULT']
-    ]
-  }),
-  valueField: 'level',
-  displayField: 'text'
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
+
+    Ext.apply(me, {
+      triggerAction: 'all',
+      lazyRender: true,
+      mode: 'local',
+      emptyText: 'Select...',
+      editable: false,
+
+      store: NX.create('Ext.data.ArrayStore', {
+        id: 0,
+        fields: [
+          'level',
+          'text'
+        ],
+        data: [
+          ['TRACE', 'TRACE'],
+          ['DEBUG', 'DEBUG'],
+          ['INFO', 'INFO'],
+          ['WARN', 'WARN'],
+          ['ERROR', 'ERROR'],
+          ['OFF', 'OFF'],
+          ['DEFAULT', 'DEFAULT']
+        ]
+      }),
+      valueField: 'level',
+      displayField: 'text'
+    });
+
+    me.constructor.superclass.initComponent.apply(me, arguments);
+  }
 
 });
