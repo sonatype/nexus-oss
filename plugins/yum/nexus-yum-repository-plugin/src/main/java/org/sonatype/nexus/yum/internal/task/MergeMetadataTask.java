@@ -59,7 +59,7 @@ public class MergeMetadataTask
     extends AbstractNexusTask<YumRepository>
 {
 
-  private static final Logger LOG = LoggerFactory.getLogger(MergeMetadataTask.class);
+  private static final Logger log = LoggerFactory.getLogger(MergeMetadataTask.class);
 
   public static final String ID = "MergeMetadataTask";
 
@@ -95,12 +95,12 @@ public class MergeMetadataTask
 
         final List<File> memberReposBaseDirs = getBaseDirsOfMemberRepositories();
         if (memberReposBaseDirs.size() > 1) {
-          LOG.debug("Merging repository group '{}' out of {}", groupRepository.getId(), memberReposBaseDirs);
+          log.debug("Merging repository group '{}' out of {}", groupRepository.getId(), memberReposBaseDirs);
           commandLineExecutor.exec(buildCommand(repoBaseDir, memberReposBaseDirs));
-          LOG.debug("Group repository '{}' merged", groupRepository.getId());
+          log.debug("Group repository '{}' merged", groupRepository.getId());
         }
         else {
-          LOG.debug(
+          log.debug(
               "Remove group repository {} Yum metadata, because there is only one member with Yum metadata",
               groupRepository.getId()
           );
@@ -124,7 +124,9 @@ public class MergeMetadataTask
   {
     final List<File> baseDirs = new ArrayList<File>();
     for (final Repository memberRepository : groupRepository.getMemberRepositories()) {
+      log.trace("Looking up latest Yum metadata in {} member of {}", memberRepository.getId(), groupRepository.getId());
       try {
+        log.trace("Retrieving {}:{}", memberRepository.getId(), "/" + PATH_OF_REPOMD_XML);
         final StorageItem repomdItem = memberRepository.retrieveItem(
             new ResourceStoreRequest("/" + PATH_OF_REPOMD_XML)
         );
@@ -133,6 +135,7 @@ public class MergeMetadataTask
             final RepoMD repomd = new RepoMD(in);
             // do we need them all or we can skip the sqllite ?
             for (final String location : repomd.getLocations()) {
+              log.trace("Retrieving {}:{}", memberRepository.getId(), "/" + location);
               memberRepository.retrieveItem(
                   new ResourceStoreRequest("/" + location)
               );
@@ -164,7 +167,7 @@ public class MergeMetadataTask
         }
       });
       for (File yumTmpDir : yumTmpDirs) {
-        LOG.debug("Deleting yum temp dir : {}", yumTmpDir);
+        log.debug("Deleting yum temp dir : {}", yumTmpDir);
         deleteQuietly(yumTmpDir);
       }
     }
