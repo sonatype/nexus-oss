@@ -22,7 +22,6 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.YumProxy;
 import org.sonatype.nexus.yum.YumRepository;
 
@@ -38,8 +37,6 @@ public class YumProxyImpl
     implements YumProxy
 {
 
-  private final NexusScheduler nexusScheduler;
-
   private final ProxyRepository repository;
 
   private final File baseDir;
@@ -47,13 +44,11 @@ public class YumProxyImpl
   private final YumRepository yumRepository;
 
   @Inject
-  public YumProxyImpl(final NexusScheduler nexusScheduler,
-                      final ProxyMetadataRequestStrategy proxyMetadataRequestStrategy,
+  public YumProxyImpl(final ProxyMetadataRequestStrategy proxyMetadataRequestStrategy,
                       final @Assisted ProxyRepository repository)
       throws MalformedURLException, URISyntaxException
 
   {
-    this.nexusScheduler = checkNotNull(nexusScheduler);
     this.repository = checkNotNull(repository);
     this.baseDir = RepositoryUtils.getBaseDir(repository);
     this.yumRepository = new YumRepositoryImpl(baseDir, repository.getId(), null);
