@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -120,34 +121,34 @@ public class MergeMetadataTask
   }
 
   private List<File> getBaseDirsOfMemberRepositories()
-      throws URISyntaxException, MalformedURLException
+      throws Exception
   {
     final List<File> baseDirs = new ArrayList<File>();
     for (final Repository memberRepository : groupRepository.getMemberRepositories()) {
       log.trace("Looking up latest Yum metadata in {} member of {}", memberRepository.getId(), groupRepository.getId());
+      StorageItem repomdItem = null;
       try {
         log.trace("Retrieving {}:{}", memberRepository.getId(), "/" + PATH_OF_REPOMD_XML);
-        final StorageItem repomdItem = memberRepository.retrieveItem(
+        repomdItem = memberRepository.retrieveItem(
             new ResourceStoreRequest("/" + PATH_OF_REPOMD_XML)
         );
-        if (repomdItem instanceof StorageFileItem) {
-          try (InputStream in = ((StorageFileItem) repomdItem).getInputStream()) {
-            final RepoMD repomd = new RepoMD(in);
-            // do we need them all or we can skip the sqllite ?
-            for (final String location : repomd.getLocations()) {
-              log.trace("Retrieving {}:{}", memberRepository.getId(), "/" + location);
-              memberRepository.retrieveItem(
-                  new ResourceStoreRequest("/" + location)
-              );
-            }
+      }
+      catch (ItemNotFoundException ignore) {
+        // skipping as it looks like member is not an Yum repository
+      }
+      if (repomdItem != null && repomdItem instanceof StorageFileItem) {
+        try (InputStream in = ((StorageFileItem) repomdItem).getInputStream()) {
+          final RepoMD repomd = new RepoMD(in);
+          for (final String location : repomd.getLocations()) {
+            log.trace("Retrieving {}:{}", memberRepository.getId(), "/" + location);
+            memberRepository.retrieveItem(
+                new ResourceStoreRequest("/" + location)
+            );
           }
         }
-        // all metadata files are available by now so lets use it
-        baseDirs.add(RepositoryUtils.getBaseDir(memberRepository));
       }
-      catch (Exception ignore) {
-        // we do not have all the necessary files in member repository to get it merged
-      }
+      // all metadata files are available by now so lets use it
+      baseDirs.add(RepositoryUtils.getBaseDir(memberRepository));
     }
     return baseDirs;
   }
