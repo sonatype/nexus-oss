@@ -16,8 +16,11 @@ package org.sonatype.appcontext.internal;
 /**
  * Guava, we love you :D But I'd like to keep dependencies to minimum.
  *
+ * @deprecated Avoid using this junk!
+ *
  * @author cstamas
  */
+@Deprecated
 public class Preconditions
 {
   /**
