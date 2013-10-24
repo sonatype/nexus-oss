@@ -12,6 +12,16 @@
  */
 /*global NX, Ext, Nexus*/
 
+//
+// FIXME: Need to refactor this class into a icon manager and accessor.
+// FIXME: The manager will be the single place where all icons are registered.
+// FIXME: The accessors will be the place where plugins ask for icons, and also where they register custom icons.
+// FIXME: ATM we have lots of duplicated icons in plugins, though they all share the same resource namespace under static/icons.
+// FIXME: This is duplication but could also lead to plugins contributing icons which are different and messing up their intended usage.
+//
+// FIXME: Also need to include the iconConfig stuff here which is duplicated all over now
+//
+
 /**
  * Support for icon containers.  An icon container is a helper to manage image/icon resources used by an application.
  *
