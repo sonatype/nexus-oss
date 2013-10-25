@@ -32,5 +32,11 @@ public enum LoggerLevel
   /**
    * @since 2.7
    */
-  ERROR
+  ERROR,
+  /**
+   * Level will be calculated as effective level.
+   *
+   * @since 2.7
+   */
+  DEFAULT
 }
