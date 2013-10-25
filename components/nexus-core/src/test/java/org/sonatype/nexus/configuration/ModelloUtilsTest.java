@@ -108,6 +108,24 @@ public class ModelloUtilsTest
     }
   };
 
+  public static final ModelUpgrader V2_V3_UPGRADER_FAILING = new ModelUpgrader()
+  {
+    @Override
+    public String fromVersion() {
+      return "2";
+    }
+
+    @Override
+    public String toVersion() {
+      return "3";
+    }
+
+    @Override
+    public void upgrade(final Reader reader, final Writer writer) throws IOException, XmlPullParserException {
+      throw new XmlPullParserException(getClass().getSimpleName());
+    }
+  };
+
   @Test
   public void plainUpgrade() throws Exception {
     final String payload = "<foo><version>1</version></foo>";
@@ -142,6 +160,42 @@ public class ModelloUtilsTest
 
     assertThat(dom.toString(), equalTo(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  <version>1</version>\n</foo>"));
+  }
+
+  @Test(expected = XmlPullParserException.class)
+  public void noVersionNode() throws Exception {
+    final String payload = "<foo></foo>";
+    final File file = util.createTempFile();
+    FileSupport.writeFile(file.toPath(), payload);
+
+    ModelloUtils.load("1", file, DOM_READER, Arrays.asList(V1_V2_UPGRADER, V2_V3_UPGRADER));
+  }
+
+  @Test(expected = XmlPullParserException.class)
+  public void emptyVersionNode() throws Exception {
+    final String payload = "<foo><version/></foo>";
+    final File file = util.createTempFile();
+    FileSupport.writeFile(file.toPath(), payload);
+
+    ModelloUtils.load("1", file, DOM_READER, Arrays.asList(V1_V2_UPGRADER, V2_V3_UPGRADER));
+  }
+
+  @Test(expected = XmlPullParserException.class)
+  public void corruptXmlModel() throws Exception {
+    final String payload = "<foo version/></foo>";
+    final File file = util.createTempFile();
+    FileSupport.writeFile(file.toPath(), payload);
+
+    ModelloUtils.load("1", file, DOM_READER, Arrays.asList(V1_V2_UPGRADER, V2_V3_UPGRADER));
+  }
+
+  @Test(expected = XmlPullParserException.class)
+  public void corruptXmlModelDuringUpgrade() throws Exception {
+    final String payload = "<foo><version>1</version></foo>";
+    final File file = util.createTempFile();
+    FileSupport.writeFile(file.toPath(), payload);
+
+    ModelloUtils.load("3", file, DOM_READER, Arrays.asList(V1_V2_UPGRADER, V2_V3_UPGRADER_FAILING));
   }
 
   @Test

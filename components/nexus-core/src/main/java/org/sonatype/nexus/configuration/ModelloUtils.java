@@ -30,6 +30,7 @@ import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -174,7 +175,8 @@ public class ModelloUtils
    * Note: this method method assumes few things about model: it is suited for Modello generated XML models,
    * modelled in "nexus way". They are expected to have 1st level sibling, having name {@code "version"} carrying
    * the version of the given XML model. The versions are opaque, they are not sorted and such, they are checked
-   * for plain equality.
+   * for plain equality. XML Models <em>without</em> "version" node, or having it's "version" node empty
+   * will be rejected with XmlPullParserException, kinda considered corrupt.
    * <p/>
    * Also, be aware that this method, even while loading the XML file and converting it into POJOs, will not
    * perform any semantic validation of it, that's the caller's duty to perform. In case of IO problem, or
@@ -203,7 +205,10 @@ public class ModelloUtils
       final Xpp3Dom dom = Xpp3DomBuilder.build(r);
       final Xpp3Dom versionNode = dom.getChild("version");
       if (versionNode != null) {
-        originalFileVersion = dom.getChild("version").getValue();
+        originalFileVersion = versionNode.getValue();
+        if (Strings.isNullOrEmpty(originalFileVersion)) {
+          throw new XmlPullParserException("Passed in XML model have empty version node!");
+        }
       }
       else {
         throw new XmlPullParserException("Passed in XML model does not have version node!");
