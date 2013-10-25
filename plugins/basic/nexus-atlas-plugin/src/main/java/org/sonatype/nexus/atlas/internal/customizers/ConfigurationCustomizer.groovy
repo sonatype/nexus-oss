@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.atlas.internal.customizers
 
+import org.sonatype.nexus.atlas.FileContentSourceSupport
 import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
 import org.sonatype.nexus.atlas.SupportBundle
 import org.sonatype.nexus.atlas.SupportBundleCustomizer
@@ -26,7 +27,8 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.REQUIRED
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.*
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.CONFIG
 
 /**
@@ -51,6 +53,33 @@ implements SupportBundleCustomizer
   void customize(final SupportBundle supportBundle) {
     // nexus.xml
     supportBundle << new NexusXmlContentSource()
+
+    // helper to include a file
+    def maybeIncludeFile = { File file, String prefix, Priority priority=null ->
+      if (file.exists()) {
+        log.debug 'Including file: {}', file
+        supportBundle << new FileContentSourceSupport(CONFIG, "$prefix/${file.name}", file) {
+          {
+            if (priority) {
+              this.priority = priority
+            }
+          }
+        }
+      }
+      else {
+        log.debug 'Skipping non-existent file: {}', file
+      }
+    }
+
+    // include installation configuration files
+    def installDir = applicationConfiguration.installDirectory
+    if (installDir) {
+      // could be null
+      maybeIncludeFile new File(installDir, 'conf/jetty.xml'), 'install/conf', HIGH
+      maybeIncludeFile new File(installDir, 'conf/nexus.properties'), 'install/conf', HIGH
+      maybeIncludeFile new File(installDir, 'bin/jsw/conf/wrapper.conf'), 'install/bin/jsw/conf', HIGH
+      maybeIncludeFile new File(installDir, 'bin/nexus.vmoptions'), 'install/bin', HIGH
+    }
   }
 
   /**
