@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
-import org.sonatype.nexus.rest.RemoteIPFinder;
+import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

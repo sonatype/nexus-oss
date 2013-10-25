@@ -49,12 +49,6 @@ public class NexusSecurityFilterModule
     bindNamedFilter("logout", new LogoutAuthenticationFilter());
     bindNamedFilter("perms", new FailureLoggingHttpMethodPermissionFilter());
 
-    bindTargetMappingFilter("trperms", "/service/local/repositories/(.*)/content(.*)", "/repositories/@1@2");
-    bindTargetMappingFilter("tiperms", "/service/local/repositories/(.*)/index_content(.*)", "/repositories/@1@2");
-
-    bindTargetMappingFilter("tgperms", "/service/local/repo_groups/(.*)/content(.*)", "/groups/@1@2");
-    bindTargetMappingFilter("tgiperms", "/service/local/repo_groups/(.*)/index_content(.*)", "/groups/@1@2");
-
     bindContentAuthcFilter("contentAuthcBasic", "Sonatype Nexus Repository Manager");
 
     bindTargetMappingFilter("contentTperms", "/content(.*)", "@1");
@@ -95,6 +89,8 @@ public class NexusSecurityFilterModule
     Key<Filter> key = Key.get(Filter.class, Names.named(name));
     bind(key).toProvider(defer(filter)).in(Scopes.SINGLETON);
   }
+
+  // FIXME: Consider bind(key).toInstance(filter); instead of defer if tests pass
 
   /**
    * Guice injects bound instances eagerly, so to avoid missing dependencies causing eager failures when this module

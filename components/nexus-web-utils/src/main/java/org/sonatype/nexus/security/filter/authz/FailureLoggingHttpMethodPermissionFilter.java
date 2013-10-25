@@ -24,7 +24,7 @@ import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthorizationEvent;
 import org.sonatype.nexus.auth.ResourceInfo;
 import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.rest.RemoteIPFinder;
+import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -81,7 +81,6 @@ public class FailureLoggingHttpMethodPermissionFilter
             ((HttpServletRequest) request).getRequestURI());
 
     eventBus.post(new NexusAuthorizationEvent(this, clientInfo, resInfo, false));
-
   }
 
   protected Object getAttribute(String key) {
