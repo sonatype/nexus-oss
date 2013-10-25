@@ -609,8 +609,10 @@ public class LogbackLogManager
 
   @Override
   public void setLoggerLevel(final String name, final @Nullable LoggerLevel level) {
-    // having a null value will result in NPE in logback internals
-    checkNotNull(level, "level");
+    if (level == null) {
+      unsetLoggerLevel(name);
+      return;
+    }
 
     if (Logger.ROOT_LOGGER_NAME.equals(name)) {
       try {
@@ -632,13 +634,12 @@ public class LogbackLogManager
         unsetLoggerLevel(name);
         if (customizedByUser) {
           overrides.put(name, calculated = getLoggerEffectiveLevel(name));
-          LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
         }
       }
       else {
         overrides.put(name, calculated = level);
-        LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
       }
+      LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
       if (calculated != null) {
         getLoggerContext().getLogger(name).setLevel(convert(calculated));
       }
@@ -647,9 +648,15 @@ public class LogbackLogManager
 
   @Override
   public void unsetLoggerLevel(final String name) {
-    overrides.remove(name);
-    LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
-    reconfigure();
+    if (overrides.remove(name) != null) {
+      LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
+    }
+    if (Logger.ROOT_LOGGER_NAME.equals(name)) {
+      setLoggerLevel(name, LoggerLevel.DEFAULT);
+    }
+    else {
+      getLoggerContext().getLogger(name).setLevel(null);
+    }
   }
 
   @Override
