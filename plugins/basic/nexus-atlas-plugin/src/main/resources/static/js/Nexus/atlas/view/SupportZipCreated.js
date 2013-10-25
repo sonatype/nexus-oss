@@ -82,19 +82,19 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
               helpText: 'Support ZIP file name',
               name: 'name',
               readOnly: true,
-              anchor: '96%',
+              grow: true,
               style: {
                 border: 0,
                 background: 'none'
               }
             },
             {
-              xtype: 'numberfield',
+              xtype: 'textfield',
               fieldLabel: 'Size',
               helpText: 'Size if ZIP file in bytes',  // FIXME: Would like to render in bytes/kilobytes/megabytes
               name: 'size',
               readOnly: true,
-              anchor: '96%',
+              grow: true,
               style: {
                 border: 0,
                 background: 'none'
