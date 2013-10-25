@@ -34,7 +34,7 @@ public class RemoteIPFinder
   /**
    * Returns the "real" IP address (as string) of the passed in {@link HttpServletRequest}.
    */
-  public static String findIP(HttpServletRequest request) {
+  public static String findIP(final HttpServletRequest request) {
     String forwardedIP = getFirstForwardedIp(request.getHeader(FORWARD_HEADER));
 
     if (forwardedIP != null) {
@@ -47,18 +47,17 @@ public class RemoteIPFinder
   /**
    * Returns the *left-most* resolvable IP from the given XFF string; otherwise null.
    */
-  public static String getFirstForwardedIp(String forwardedFor) {
+  public static String getFirstForwardedIp(final String forwardedFor) {
     if (!StringUtils.isEmpty(forwardedFor)) {
       return resolveIp(forwardedFor.split("\\s*,\\s*"));
     }
-
     return null;
   }
 
   /**
    * Returns the *left-most* resolvable IP from the given sequence.
    */
-  public static String resolveIp(String[] ipAddresses) {
+  public static String resolveIp(final String[] ipAddresses) {
     for (String ip : ipAddresses) {
       InetAddress ipAdd;
       try {
