@@ -115,7 +115,7 @@ NX.define('Nexus.logging.controller.Logging', {
         store = grid.getStore();
 
     me.controlSelection(grid);
-    store.on('write', me.showSuccessMessages, me);
+    store.on('write', me.onSuccessfulWrite, me);
     store.load();
   },
 
@@ -157,7 +157,7 @@ NX.define('Nexus.logging.controller.Logging', {
    * Shows success messages after records has been successfully written.
    * @private
    */
-  showSuccessMessages: function (store, action, result, res, rs) {
+  onSuccessfulWrite: function (store, action, result, res, rs) {
     if (Ext.isDefined(rs)) {
       Ext.each(rs, function (record) {
         var name = record.get('name');
@@ -172,6 +172,7 @@ NX.define('Nexus.logging.controller.Logging', {
           Nexus.messages.show('Logging', 'Logger removed: ' + name);
         }
       });
+      store.load();
     }
   },
 
