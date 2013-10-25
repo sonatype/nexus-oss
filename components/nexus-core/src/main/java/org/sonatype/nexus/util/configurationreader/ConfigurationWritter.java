@@ -16,6 +16,10 @@ package org.sonatype.nexus.util.configurationreader;
 import java.io.IOException;
 import java.io.Writer;
 
+/**
+ * @deprecated unused and will be removed in future.
+ */
+@Deprecated
 public interface ConfigurationWritter<E>
 {
 

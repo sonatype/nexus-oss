@@ -42,6 +42,10 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+/**
+ * @deprecated unused and will be removed in future.
+ */
+@Deprecated
 @SuppressWarnings("deprecation")
 @Singleton
 @Named
