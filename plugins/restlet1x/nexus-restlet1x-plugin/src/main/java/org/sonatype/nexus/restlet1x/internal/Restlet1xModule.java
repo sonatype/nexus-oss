@@ -54,9 +54,7 @@ public class Restlet1xModule
 
   private void bindNamedFilter(String name, Filter filter) {
     Key<Filter> key = Key.get(Filter.class, Names.named(name));
-    // HACK
-    bind(key).toInstance(filter);
-    //bind(key).toProvider(defer(filter)).in(Scopes.SINGLETON);
+    bind(key).toProvider(defer(filter)).in(Scopes.SINGLETON);
   }
 
   // FIXME: Consider bind(key).toInstance(filter); instead of defer if tests pass
