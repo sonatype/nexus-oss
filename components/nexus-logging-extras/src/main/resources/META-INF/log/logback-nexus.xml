@@ -16,8 +16,6 @@
 <included>
   <jmxConfigurator/>
 
-  <contextListener class="org.sonatype.nexus.log.internal.JulLevelChangePropagator"/>
-
   <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>${appender.pattern}</pattern>

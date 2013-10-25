@@ -59,6 +59,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.LoggerContextListener;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -526,20 +527,25 @@ public class LogbackLogManager
 
   private void reconfigure() {
     String logConfigDir = getLogConfigDir();
+    File file = new File(logConfigDir, LOG_CONF);
+    logger.debug("Reconfiguring: {}", file);
 
-    LoggerContext lc = getLoggerContext();
-
+    LoggerContext context = getLoggerContext();
     try {
       JoranConfigurator configurator = new JoranConfigurator();
-      configurator.setContext(lc);
-      lc.reset();
-      lc.getStatusManager().clear();
-      configurator.doConfigure(new File(logConfigDir, LOG_CONF));
+      configurator.setContext(context);
+      context.reset();
+      context.getStatusManager().clear();
+      configurator.doConfigure(file);
     }
-    catch (JoranException je) {
-      je.printStackTrace();
+    catch (JoranException e) {
+      e.printStackTrace();
     }
-    StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
+
+    // HACK: replace JUL level change propagator impl
+    installJulLevelChangePropagator(context);
+
+    StatusPrinter.printInCaseOfErrorsOrWarnings(context);
     injectAppenders();
 
     Configuration customizerConfiguration = new Configuration()
@@ -558,6 +564,20 @@ public class LogbackLogManager
     for (LogConfigurationCustomizer customizer : logConfigurationCustomizers) {
       customizer.customize(customizerConfiguration);
     }
+  }
+
+  /**
+   * Replace JUL level propagator with custom impl which handles NPE on level=null
+   * logback can not load this class from XML due to class-loader issues.
+   */
+  private void installJulLevelChangePropagator(final LoggerContext context) {
+    for (LoggerContextListener listener : context.getCopyOfListenerList()) {
+      if (listener instanceof ch.qos.logback.classic.jul.LevelChangePropagator) {
+        context.removeListener(listener);
+      }
+    }
+    context.addListener(new JulLevelChangePropagator(context));
+    logger.debug("JUL level change propagator installed");
   }
 
   private void injectAppenders() {
@@ -614,6 +634,7 @@ public class LogbackLogManager
       return;
     }
 
+    logger.debug("Set logger level: {}={}", name, level);
     if (Logger.ROOT_LOGGER_NAME.equals(name)) {
       try {
         LoggerLevel calculated = LoggerLevel.DEFAULT.equals(level) ? LoggerLevel.INFO : level;
@@ -648,6 +669,8 @@ public class LogbackLogManager
 
   @Override
   public void unsetLoggerLevel(final String name) {
+    logger.debug("Unset logger level: {}", name);
+
     if (overrides.remove(name) != null) {
       LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
     }
