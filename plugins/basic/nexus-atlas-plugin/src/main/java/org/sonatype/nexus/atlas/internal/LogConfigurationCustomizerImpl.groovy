@@ -11,27 +11,28 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.wonderland.internal
+package org.sonatype.nexus.atlas.internal
 
-import org.sonatype.nexus.logging.LoggerContributor
+import org.sonatype.nexus.log.LogConfigurationCustomizer
+import org.sonatype.nexus.log.LoggerLevel
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
 import javax.inject.Named
 import javax.inject.Singleton
 
 /**
- * Wonderland {@link LoggerContributor}.
+ * Atlas {@link LogConfigurationCustomizer}.
  *
  * @since 2.7
  */
 @Named
 @Singleton
-class LoggerContributorImpl
+class LogConfigurationCustomizerImpl
 extends ComponentSupport
-implements LoggerContributor
+implements LogConfigurationCustomizer
 {
   @Override
-  Set<String> getLoggers() {
-    return [ 'org.sonatype.nexus.wonderland' ]
+  void customize(LogConfigurationCustomizer.Configuration configuration) {
+    configuration.setLoggerLevel('org.sonatype.nexus.atlas', LoggerLevel.DEFAULT);
   }
 }
