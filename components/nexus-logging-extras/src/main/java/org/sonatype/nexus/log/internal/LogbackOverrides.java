@@ -48,6 +48,9 @@ public class LogbackOverrides
     // utility class
   }
 
+  /**
+   * Reads loggers/levels from logback-overrides.xml.
+   */
   static Map<String, LoggerLevel> read(final File overridesXml) {
     try {
       final Map<String, LoggerLevel> loggers = Maps.newHashMap();
@@ -78,6 +81,9 @@ public class LogbackOverrides
     }
   }
 
+  /**
+   * Writes loggers/levels to logback-overrides.xml.
+   */
   static void write(final File overridesXml,
                     final Map<String, LoggerLevel> overrides)
   {

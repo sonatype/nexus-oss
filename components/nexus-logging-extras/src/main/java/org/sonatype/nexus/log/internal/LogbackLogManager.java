@@ -618,6 +618,7 @@ public class LogbackLogManager
         Properties logProperties = loadConfigurationProperties();
         logProperties.setProperty(KEY_ROOT_LEVEL, calculated.name());
         saveConfigurationProperties(logProperties);
+        // we need to reconfigure as just settings ROOT logger level results in some loggers to be unset
         reconfigure();
       }
       catch (IOException e) {
