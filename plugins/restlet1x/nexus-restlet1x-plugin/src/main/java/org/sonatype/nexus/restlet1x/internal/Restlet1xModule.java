@@ -57,8 +57,6 @@ public class Restlet1xModule
     bind(key).toProvider(defer(filter)).in(Scopes.SINGLETON);
   }
 
-  // FIXME: Consider bind(key).toInstance(filter); instead of defer if tests pass
-
   /**
    * Guice injects bound instances eagerly, so to avoid missing dependencies causing eager failures when this module
    * is auto-installed (such as with Sisu's classpath scanning) we defer injection of the filter as much as possible.
