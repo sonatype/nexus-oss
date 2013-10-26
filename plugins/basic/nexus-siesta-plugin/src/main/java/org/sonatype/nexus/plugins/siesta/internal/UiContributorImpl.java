@@ -11,27 +11,28 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.siesta.ui;
+package org.sonatype.nexus.plugins.siesta.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
+import org.sonatype.nexus.plugins.siesta.SiestaPlugin;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
 
 /**
- * @since 2.6
+ * Siesta {@link UiContributor}.
+ *
+ * @since 2.7
  */
 @Named
 @Singleton
-public class SiestaUiContributor
-    implements UiContributor
+public class UiContributorImpl
+    extends UiContributorSupport
 {
-
-  public static final String ARTIFACT_ID = "nexus-siesta-plugin";
-
-  @Override
-  public UiContribution contribute(final boolean debug) {
-    return new UiContributionBuilder(this, OSS_PLUGIN_GROUP, ARTIFACT_ID).build(debug);
+  @Inject
+  public UiContributorImpl(final SiestaPlugin owner) {
+    super(owner);
   }
 }
