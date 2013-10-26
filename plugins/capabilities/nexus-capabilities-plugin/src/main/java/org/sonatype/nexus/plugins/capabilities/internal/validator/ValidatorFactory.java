@@ -59,4 +59,14 @@ public interface ValidatorFactory
    */
   UrlValidator validUrl(CapabilityType type, String propertyKey);
 
+  /**
+   * @since 2.7
+   */
+  IntegerValidator isAnInteger(CapabilityType type, String propertyKey);
+
+  /**
+   * @since 2.7
+   */
+  PositiveIntegerValidator isAPositiveInteger(CapabilityType type, String propertyKey);
+
 }
