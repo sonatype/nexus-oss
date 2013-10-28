@@ -15,6 +15,7 @@ package org.sonatype.nexus.configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
@@ -24,7 +25,8 @@ import org.sonatype.nexus.configuration.ModelUtils.CharacterModelReader;
 import org.sonatype.nexus.configuration.ModelUtils.CharacterModelUpgrader;
 import org.sonatype.nexus.configuration.ModelUtils.CharacterModelWriter;
 import org.sonatype.nexus.configuration.ModelUtils.CorruptModelException;
-import org.sonatype.nexus.configuration.ModelloUtils.VersionedModelloModelReader;
+import org.sonatype.nexus.configuration.ModelUtils.Versioned;
+import org.sonatype.nexus.configuration.ModelloUtils.VersionedInFieldXmlModelloModelHelper;
 import org.sonatype.nexus.util.file.FileSupport;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -46,13 +48,30 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 public class ModelUtilsTest
     extends TestSupport
 {
-  public static final CharacterModelReader<Xpp3Dom> DOM_READER = new VersionedModelloModelReader<Xpp3Dom>()
+  public static class DomReader
+      extends CharacterModelReader<Xpp3Dom>
+      implements Versioned
   {
+    private final VersionedInFieldXmlModelloModelHelper versionedModelloModelHelper = new VersionedInFieldXmlModelloModelHelper(
+        "version");
+
     @Override
-    public Xpp3Dom doRead(final Reader reader) throws IOException, XmlPullParserException {
-      return Xpp3DomBuilder.build(reader);
+    public Xpp3Dom read(final Reader reader) throws IOException, CorruptModelException {
+      try {
+        return Xpp3DomBuilder.build(reader);
+      }
+      catch (XmlPullParserException e) {
+        throw new CorruptModelException(e.getMessage(), e);
+      }
     }
-  };
+
+    @Override
+    public String readVersion(final InputStream input) throws IOException, CorruptModelException {
+      return versionedModelloModelHelper.readVersion(input);
+    }
+  }
+
+  public static final DomReader DOM_READER = new DomReader();
 
   public static final CharacterModelWriter<Xpp3Dom> DOM_WRITER = new CharacterModelWriter<Xpp3Dom>()
   {
@@ -96,6 +115,20 @@ public class ModelUtilsTest
       throw new CorruptModelException(getClass().getSimpleName());
     }
   };
+
+  @Test
+  public void versioning() throws Exception {
+    final String payload = "<foo><version>1</version></foo>";
+    final File file = util.createTempFile();
+    FileSupport.writeFile(file.toPath(), payload);
+
+    final String version;
+    try(final InputStream input = Files.newInputStream(file.toPath())) {
+      version = DOM_READER.readVersion(input);
+
+    }
+    assertThat(version, equalTo("1"));
+  }
 
   @Test
   public void plainUpgrade() throws Exception {

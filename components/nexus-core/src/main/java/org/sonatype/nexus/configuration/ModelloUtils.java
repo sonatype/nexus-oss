@@ -125,38 +125,42 @@ public class ModelloUtils
   }
 
   /**
-   * Versioned Modello model reader. Versioning here assumes that Modello uses XML and it contains a field named
-   * "version", that contains some string value.
+   * Versioned Modello helper. Versioning here assumes that Modello uses XML and it contains a node named as
+   * {@code fieldName} parameter, that contains some string value. This helper class is usable when extending {@link
+   * ModelloModelReader},
+   * implement {@link Versioned} and use this class constructed as appropriate.
    *
    * @since 2.7.0
    */
-  public static abstract class VersionedModelloModelReader<E>
-      extends ModelloModelReader<E>
-      implements Versioned
+  public static class VersionedInFieldXmlModelloModelHelper
   {
-    protected VersionedModelloModelReader() {
-      this(DEFAULT_CHARSET);
+    private final Charset charset;
+
+    private final String fieldName;
+
+    protected VersionedInFieldXmlModelloModelHelper(final String fieldName) {
+      this(DEFAULT_CHARSET, fieldName);
     }
 
-    protected VersionedModelloModelReader(final Charset charset) {
-      super(charset);
+    protected VersionedInFieldXmlModelloModelHelper(final Charset charset, final String fieldName) {
+      this.charset = checkNotNull(charset);
+      this.fieldName = checkNotNull(fieldName);
     }
 
-    @Override
     public String readVersion(final InputStream input) throws IOException, CorruptModelException {
       try (final Reader r = new InputStreamReader(input, charset)) {
         try {
           final Xpp3Dom dom = Xpp3DomBuilder.build(r);
-          final Xpp3Dom versionNode = dom.getChild("version");
+          final Xpp3Dom versionNode = dom.getChild(fieldName);
           if (versionNode != null) {
             final String originalFileVersion = versionNode.getValue();
             if (Strings.isNullOrEmpty(originalFileVersion)) {
-              throw new CorruptModelException("Passed in XML model have empty version node");
+              throw new CorruptModelException("Passed in XML model have empty " + fieldName + " node");
             }
             return originalFileVersion;
           }
           else {
-            throw new CorruptModelException("Passed in XML model does not have version node");
+            throw new CorruptModelException("Passed in XML model does not have " + fieldName + " node");
           }
         }
         catch (XmlPullParserException e) {

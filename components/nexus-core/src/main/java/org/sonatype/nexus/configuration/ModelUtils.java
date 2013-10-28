@@ -29,6 +29,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Objects;
 
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
@@ -333,7 +334,7 @@ public class ModelUtils
     checkNotNull(model, "model");
     checkNotNull(file, "File");
     checkNotNull(writer, "ModelWriter");
-    Files.createDirectories(file.getParentFile().toPath());
+    DirSupport.mkdir(file.getParentFile().toPath());
     final File backupFile = new File(file.getParentFile(), file.getName() + ".bak");
     final FileReplacer fileReplacer = new FileReplacer(file);
     fileReplacer.setDeleteBackupFile(false);
