@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -536,7 +535,7 @@ public class DefaultIndexerManager
 
   private File getRepositoryIndexDirectory(final Repository repository) throws IOException {
     File indexDirectory = new File(getWorkingDirectory(), getContextId(repository.getId()));
-    Files.createDirectories(indexDirectory.toPath());
+    DirSupport.mkdir(indexDirectory.toPath());
     return indexDirectory;
   }
 
@@ -1480,7 +1479,7 @@ public class DefaultIndexerManager
 
       targetDir = new File(getTempDirectory(), "nx-index-" + Long.toHexString(System.nanoTime()));
 
-      Files.createDirectories(targetDir.toPath());
+      DirSupport.mkdir(targetDir.toPath());
 
       IndexPackingRequest packReq = new IndexPackingRequest(context, targetDir);
       packReq.setCreateIncrementalChunks(true);
@@ -2343,8 +2342,8 @@ public class DefaultIndexerManager
 
     File location = File.createTempFile(indexId, null, getTempDirectory());
 
-    Files.delete(location.toPath());
-    Files.createDirectories(location.toPath());
+    DirSupport.delete(location.toPath());
+    DirSupport.mkdir(location.toPath());
 
     final DefaultIndexingContext temporary = new DefaultIndexingContext(indexId, //
         repository.getId(), //

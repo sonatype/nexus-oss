@@ -16,7 +16,6 @@ package org.sonatype.nexus.configuration.application;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -73,6 +72,7 @@ import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
@@ -254,14 +254,14 @@ public class DefaultNexusConfiguration
               + "]!!!! *\r\n"
               + "* Nexus cannot function properly until the process has read+write permissions to this folder *\r\n"
               + "******************************************************************************";
-      getLogger().error(message);
+      getLogger().error(message, e);
       throw Throwables.propagate(e);
     }
   }
 
   private File forceMkdir(final File directory) {
     try {
-      Files.createDirectories(directory.toPath());
+      DirSupport.mkdir(directory.toPath());
       return directory;
     }
     catch (IOException e) {
@@ -272,7 +272,7 @@ public class DefaultNexusConfiguration
               + "]!!!! *\r\n"
               + "* Nexus cannot function properly until the process has read+write permissions to this folder *\r\n"
               + "******************************************************************************";
-      getLogger().error(message);
+      getLogger().error(message, e);
       throw Throwables.propagate(e);
     }
   }

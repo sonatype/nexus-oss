@@ -21,11 +21,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.file.Files;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import org.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
@@ -178,7 +178,7 @@ public abstract class AbstractLdapConfiguration
     try {
       final File configurationFile = getConfigurationFile();
       try {
-        Files.createDirectories(configurationFile.getParentFile().toPath());
+        DirSupport.mkdir(configurationFile.getParentFile().toPath());
       }
       catch (IOException e) {
         final String message =
@@ -189,7 +189,7 @@ public abstract class AbstractLdapConfiguration
                 +
                 "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
                 + "******************************************************************************";
-        getLogger().error(message);
+        getLogger().error(message, e);
         throw new IOException("Could not create configuration file " + configurationFile.getAbsolutePath(), e);
       }
 
