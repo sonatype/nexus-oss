@@ -52,8 +52,11 @@ public class ModelUtilsTest
       extends CharacterModelReader<Xpp3Dom>
       implements Versioned
   {
-    private final VersionedInFieldXmlModelloModelHelper versionedModelloModelHelper = new VersionedInFieldXmlModelloModelHelper(
-        "version");
+    private final VersionedInFieldXmlModelloModelHelper versionedModelloModelHelper;
+
+    public DomReader() {
+      this.versionedModelloModelHelper = new VersionedInFieldXmlModelloModelHelper(charset, "version");
+    }
 
     @Override
     public Xpp3Dom read(final Reader reader) throws IOException, CorruptModelException {
@@ -125,9 +128,20 @@ public class ModelUtilsTest
     final String version;
     try(final InputStream input = Files.newInputStream(file.toPath())) {
       version = DOM_READER.readVersion(input);
-
     }
     assertThat(version, equalTo("1"));
+  }
+
+  @Test(expected = CorruptModelException.class)
+  public void versioningFieldWrong() throws Exception {
+    final String payload = "<foo><versionField>1</versionField></foo>";
+    final File file = util.createTempFile();
+    FileSupport.writeFile(file.toPath(), payload);
+
+    final String version;
+    try(final InputStream input = Files.newInputStream(file.toPath())) {
+      version = DOM_READER.readVersion(input);
+    }
   }
 
   @Test
