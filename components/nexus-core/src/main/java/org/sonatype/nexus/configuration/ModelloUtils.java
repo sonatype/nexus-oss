@@ -13,21 +13,24 @@
 
 package org.sonatype.nexus.configuration;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
+import org.sonatype.nexus.configuration.ModelUtils.CharacterModelReader;
+import org.sonatype.nexus.configuration.ModelUtils.CharacterModelUpgrader;
+import org.sonatype.nexus.configuration.ModelUtils.CharacterModelWriter;
+import org.sonatype.nexus.configuration.ModelUtils.CorruptModelException;
+import org.sonatype.nexus.configuration.ModelUtils.ModelReader;
+import org.sonatype.nexus.configuration.ModelUtils.ModelUpgrader;
+import org.sonatype.nexus.configuration.ModelUtils.Versioned;
 import org.sonatype.nexus.configuration.model.CProps;
-import org.sonatype.sisu.goodies.common.io.FileReplacer;
-import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
@@ -42,7 +45,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A simple utilities to handle Modello generated models CProps to Map converter, to ease handling of CProps. All
  * these methods are specific to Modello use in Nexus, but still, are generic enough to be used by Nexus Plugins
- * if needed.
+ * if needed. This class contains methods added in 2.7.0 that are "specialization" of methods from {@link ModelUtils},
+ * suited for <a href="https://github.com/sonatype/modello">Modello</a> generated models using Xpp3 IO (XML Pull
+ * Parser).
  *
  * @author cstamas
  */
@@ -89,204 +94,153 @@ public class ModelloUtils
   public static final Charset DEFAULT_CHARSET = Charsets.UTF_8;
 
   /**
-   * Model reader.
+   * Modello model reader. See {@link CharacterModelReader}. This class adds XmlPullParserException exception
+   * conversion.
    *
    * @since 2.7.0
    */
-  public static interface ModelReader<E>
+  public static abstract class ModelloModelReader<E>
+      extends CharacterModelReader<E>
   {
-    E read(Reader reader)
-        throws IOException, XmlPullParserException;
-  }
+    protected ModelloModelReader() {
+      this(DEFAULT_CHARSET);
+    }
 
-  /**
-   * Model writer.
-   *
-   * @since 2.7.0
-   */
-  public static interface ModelWriter<E>
-  {
-    void write(Writer writer, E model)
-        throws IOException;
-  }
-
-  /**
-   * Model upgrader.
-   *
-   * @since 2.7.0
-   */
-  public static interface ModelUpgrader
-  {
-    String fromVersion();
-
-    String toVersion();
-
-    void upgrade(Reader reader, Writer writer)
-        throws IOException, XmlPullParserException;
-  }
-
-  /**
-   * Adapter for {@link ModelUpgrader} to be used with {@link FileReplacer}.
-   */
-  private static class ModelUpgraderAdapter
-      implements ContentWriter
-  {
-    private final File file;
-
-    private final ModelUpgrader modelUpgrader;
-
-    private ModelUpgraderAdapter(final File file, final ModelUpgrader modelUpgrader) {
-      this.file = checkNotNull(file);
-      this.modelUpgrader = checkNotNull(modelUpgrader);
+    protected ModelloModelReader(final Charset charset) {
+      super(charset);
     }
 
     @Override
-    public void write(final BufferedOutputStream output) throws IOException {
-      try (final Reader reader = Files.newBufferedReader(file.toPath(), DEFAULT_CHARSET)) {
-        modelUpgrader.upgrade(reader,
-            new OutputStreamWriter(output, DEFAULT_CHARSET));
+    public E read(final Reader reader) throws IOException, CorruptModelException {
+      try {
+        return doRead(reader);
       }
       catch (XmlPullParserException e) {
-        throw new XmlPullParserExceptionRT(e);
+        throw new CorruptModelException("Model corrupted" + e.getMessage(), e);
+      }
+    }
+
+    public abstract E doRead(Reader reader)
+        throws IOException, XmlPullParserException;
+  }
+
+  /**
+   * Versioned Modello model reader. Versioning here assumes that Modello uses XML and it contains a field named
+   * "version", that contains some string value.
+   *
+   * @since 2.7.0
+   */
+  public static abstract class VersionedModelloModelReader<E>
+      extends ModelloModelReader<E>
+      implements Versioned
+  {
+    protected VersionedModelloModelReader() {
+      this(DEFAULT_CHARSET);
+    }
+
+    protected VersionedModelloModelReader(final Charset charset) {
+      super(charset);
+    }
+
+    @Override
+    public String readVersion(final InputStream input) throws IOException, CorruptModelException {
+      try (final Reader r = new InputStreamReader(input, charset)) {
+        try {
+          final Xpp3Dom dom = Xpp3DomBuilder.build(r);
+          final Xpp3Dom versionNode = dom.getChild("version");
+          if (versionNode != null) {
+            final String originalFileVersion = versionNode.getValue();
+            if (Strings.isNullOrEmpty(originalFileVersion)) {
+              throw new CorruptModelException("Passed in XML model have empty version node");
+            }
+            return originalFileVersion;
+          }
+          else {
+            throw new CorruptModelException("Passed in XML model does not have version node");
+          }
+        }
+        catch (XmlPullParserException e) {
+          throw new CorruptModelException("Passed in XML model cannot be parsed", e);
+        }
       }
     }
   }
 
+
   /**
-   * Trick class to make the XML parsing exception go through {@link FileReplacer}.
+   * Modello model writer. See {@link CharacterModelWriter}.
+   *
+   * @since 2.7.0
    */
-  private static class XmlPullParserExceptionRT
-      extends RuntimeException
+  public static abstract class ModelloModelWriter<E>
+      extends CharacterModelWriter<E>
   {
-    private XmlPullParserExceptionRT(final XmlPullParserException cause) {
-      super(cause);
+    protected ModelloModelWriter() {
+      this(DEFAULT_CHARSET);
     }
 
-    @Override
-    public XmlPullParserException getCause() {
-      return (XmlPullParserException) super.getCause();
+    protected ModelloModelWriter(final Charset charset) {
+      super(charset);
     }
   }
 
   /**
-   * Loads a model from a file using given writer. Also, checks the file version and if does not match with given
-   * {@code currentModelVersion} will attempt upgrade using passed in upgraders.
-   * <p/>
-   * Note: this method method assumes few things about model: it is suited for Modello generated XML models,
-   * modelled in "nexus way". They are expected to have 1st level sibling, having name {@code "version"} carrying
-   * the version of the given XML model. The versions are opaque, they are not sorted and such, they are checked
-   * for plain equality. XML Models <em>without</em> "version" node, or having it's "version" node empty
-   * will be rejected with XmlPullParserException, kinda considered corrupt.
-   * <p/>
-   * Also, be aware that this method, even while loading the XML file and converting it into POJOs, will not
-   * perform any semantic validation of it, that's the caller's duty to perform. In case of IO problem, or
-   * corrupted or XML file parsing failures, proper exception is thrown. So to say, only "syntactic" analysis
-   * happens here (XML is well formed and readable).
-   * <p/>
-   * Concurrency note: if concurrent invocation of this (thread safe method) is possible at client side,
-   * it's is caller role to ensure synchronization in caller code and make sure this method is not called
-   * concurrently, as IO side effects will have unexpected results. Invoking it multiple times is fine,
-   * but simultaneous invocation from same component (working on same file) should not happen.
+   * Modello model upgrader. See {@link CharacterModelUpgrader}. This class adds XmlPullParserException exception
+   * conversion.
+   *
+   * @since 2.7.0
+   */
+  public static abstract class ModelloModelUpgrader
+      extends CharacterModelUpgrader
+  {
+    private final Charset charset;
+
+    protected ModelloModelUpgrader(final String fromVersion, final String toVersion) {
+      this(fromVersion, toVersion, DEFAULT_CHARSET);
+    }
+
+    protected ModelloModelUpgrader(final String fromVersion, final String toVersion, final Charset charset) {
+      super(fromVersion, toVersion);
+      this.charset = checkNotNull(charset);
+    }
+
+    @Override
+    public void upgrade(final Reader reader, final Writer writer)
+        throws IOException, CorruptModelException
+    {
+      try {
+        doUpgrade(reader, writer);
+      }
+      catch (XmlPullParserException e) {
+        throw new CorruptModelException("Model corrupted" + e.getMessage(), e);
+      }
+    }
+
+    public abstract void doUpgrade(Reader reader, Writer writer)
+        throws IOException, XmlPullParserException;
+  }
+
+
+  /**
+   * See {@link ModelUtils#load(String, File, ModelReader, ModelUpgrader...)}.
    *
    * @since 2.7.0
    */
   public static <E> E load(final String currentModelVersion,
                            final File file,
-                           final ModelReader<E> reader,
-                           final List<ModelUpgrader> upgraders)
-      throws XmlPullParserException, IOException
+                           final ModelloModelReader<E> reader,
+                           final ModelloModelUpgrader... upgraders)
+      throws CorruptModelException, IOException
   {
-    checkNotNull(currentModelVersion, "currentModelVersion");
-    checkNotNull(file, "file");
-    checkNotNull(reader, "reader");
-    checkNotNull(upgraders, "upgraders");
-    final String originalFileVersion;
-    try (final Reader r = Files.newBufferedReader(file.toPath(), DEFAULT_CHARSET)) {
-      final Xpp3Dom dom = Xpp3DomBuilder.build(r);
-      final Xpp3Dom versionNode = dom.getChild("version");
-      if (versionNode != null) {
-        originalFileVersion = versionNode.getValue();
-        if (Strings.isNullOrEmpty(originalFileVersion)) {
-          throw new XmlPullParserException("Passed in XML model have empty version node!");
-        }
-      }
-      else {
-        throw new XmlPullParserException("Passed in XML model does not have version node!");
-      }
-    }
-
-    if (!Objects.equals(currentModelVersion, originalFileVersion)) {
-      // need upgrade
-      String currentFileVersion = originalFileVersion;
-      final Map<String, ModelUpgrader> upgradersMap = Maps.newHashMapWithExpectedSize(upgraders.size());
-      for (ModelUpgrader upgrader : upgraders) {
-        upgradersMap.put(upgrader.fromVersion(), upgrader);
-      }
-      final FileReplacer fileReplacer = new FileReplacer(file);
-      fileReplacer.setDeleteBackupFile(true);
-      ModelUpgrader upgrader = upgradersMap.get(currentFileVersion);
-      while (upgrader != null && !Objects.equals(currentModelVersion, currentFileVersion)) {
-        try {
-          fileReplacer.replace(new ModelUpgraderAdapter(file, upgrader));
-        }
-        catch (XmlPullParserExceptionRT e) {
-          // "peel off" the RT exception, as client code would handle XmlPullParserException anyway, is Modello specific
-          final XmlPullParserException ex = new XmlPullParserException(String
-              .format("Problem during upgrade step from %s to %s", upgrader.fromVersion(), upgrader.toVersion()));
-          ex.initCause(e.getCause());
-          throw ex;
-        }
-        catch (IOException e) {
-          final IOException ex = new IOException(String
-              .format("Problem during upgrade step from %s to %s", upgrader.fromVersion(), upgrader.toVersion()), e);
-          throw ex;
-        }
-        currentFileVersion = upgrader.toVersion();
-        upgrader = upgradersMap.get(currentFileVersion);
-      }
-
-      if (!Objects.equals(currentModelVersion, currentFileVersion)) {
-        // upgrade failed
-        throw new IOException(String
-            .format(
-                "Could not upgrade model to version %s, is upgraded to %s, originally was %s, available upgraders exists for versions %s",
-                currentModelVersion, currentFileVersion, originalFileVersion, upgradersMap.keySet()));
-      }
-    }
-
-    try (final Reader fr = Files.newBufferedReader(file.toPath(), DEFAULT_CHARSET)) {
-      E model = reader.read(fr);
-      // model.setVersion(currentModelVersion);
-      return model;
-    }
+    return ModelUtils.load(currentModelVersion, file, reader, upgraders);
   }
 
   /**
-   * Saves a model to a file using given writer, keeping the a backup of the file.
-   * <p/>
-   * Concurrency note: if concurrent invocation of this (thread safe method) is possible at client side,
-   * it's is caller role to ensure synchronization in caller code and make sure this method is not called
-   * concurrently, as IO side effects will have unexpected results. Invoking it multiple times is fine,
-   * but simultaneous invocation from same component (working on same file) should not happen.
+   * See {@link ModelloUtils#save(Object, File, ModelloModelWriter)}.
    *
    * @since 2.7.0
    */
-  public static <E> void save(final E model, final File file, final ModelWriter<E> writer) throws IOException {
-    checkNotNull(model, "model");
-    checkNotNull(file, "File");
-    checkNotNull(writer, "ModelWriter");
-    Files.createDirectories(file.getParentFile().toPath());
-    // we would need to have "last" backups but FileReplacer would need a change here
-    final FileReplacer fileReplacer = new FileReplacer(file);
-    fileReplacer.setDeleteBackupFile(true);
-    fileReplacer.replace(new ContentWriter()
-    {
-      @Override
-      public void write(final BufferedOutputStream output) throws IOException {
-        final OutputStreamWriter w = new OutputStreamWriter(output, DEFAULT_CHARSET);
-        writer.write(w, model);
-        w.flush();
-      }
-    });
+  public static <E> void save(final E model, final File file, final ModelloModelWriter<E> writer) throws IOException {
+    ModelUtils.save(model, file, writer);
   }
 }

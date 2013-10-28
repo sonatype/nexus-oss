@@ -19,11 +19,12 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
 import java.nio.file.Files;
-import java.util.Arrays;
 
-import org.sonatype.nexus.configuration.ModelloUtils.ModelReader;
-import org.sonatype.nexus.configuration.ModelloUtils.ModelUpgrader;
-import org.sonatype.nexus.configuration.ModelloUtils.ModelWriter;
+import org.sonatype.nexus.configuration.ModelUtils.CharacterModelReader;
+import org.sonatype.nexus.configuration.ModelUtils.CharacterModelUpgrader;
+import org.sonatype.nexus.configuration.ModelUtils.CharacterModelWriter;
+import org.sonatype.nexus.configuration.ModelUtils.CorruptModelException;
+import org.sonatype.nexus.configuration.ModelloUtils.VersionedModelloModelReader;
 import org.sonatype.nexus.util.file.FileSupport;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -38,22 +39,22 @@ import static org.hamcrest.Matchers.*;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 /**
- * UT for {@link ModelloUtils}.
+ * UT for {@link ModelUtils}.
  *
  * @since 2.7.0
  */
-public class ModelloUtilsTest
+public class ModelUtilsTest
     extends TestSupport
 {
-  public static final ModelReader<Xpp3Dom> DOM_READER = new ModelReader<Xpp3Dom>()
+  public static final CharacterModelReader<Xpp3Dom> DOM_READER = new VersionedModelloModelReader<Xpp3Dom>()
   {
     @Override
-    public Xpp3Dom read(final Reader reader) throws IOException, XmlPullParserException {
+    public Xpp3Dom doRead(final Reader reader) throws IOException, XmlPullParserException {
       return Xpp3DomBuilder.build(reader);
     }
   };
 
-  public static final ModelWriter<Xpp3Dom> DOM_WRITER = new ModelWriter<Xpp3Dom>()
+  public static final CharacterModelWriter<Xpp3Dom> DOM_WRITER = new CharacterModelWriter<Xpp3Dom>()
   {
     @Override
     public void write(final Writer writer, final Xpp3Dom model) throws IOException {
@@ -62,20 +63,10 @@ public class ModelloUtilsTest
     }
   };
 
-  public static final ModelUpgrader V1_V2_UPGRADER = new ModelUpgrader()
+  public static final CharacterModelUpgrader V1_V2_UPGRADER = new CharacterModelUpgrader("1", "2")
   {
     @Override
-    public String fromVersion() {
-      return "1";
-    }
-
-    @Override
-    public String toVersion() {
-      return "2";
-    }
-
-    @Override
-    public void upgrade(final Reader reader, final Writer writer) throws IOException, XmlPullParserException {
+    public void upgrade(final Reader reader, final Writer writer) throws IOException, CorruptModelException {
       final Xpp3Dom dom = DOM_READER.read(reader);
       dom.getChild("version").setValue(toVersion());
       final Xpp3Dom newnode = new Xpp3Dom("v2field");
@@ -85,20 +76,10 @@ public class ModelloUtilsTest
     }
   };
 
-  public static final ModelUpgrader V2_V3_UPGRADER = new ModelUpgrader()
+  public static final CharacterModelUpgrader V2_V3_UPGRADER = new CharacterModelUpgrader("2", "3")
   {
     @Override
-    public String fromVersion() {
-      return "2";
-    }
-
-    @Override
-    public String toVersion() {
-      return "3";
-    }
-
-    @Override
-    public void upgrade(final Reader reader, final Writer writer) throws IOException, XmlPullParserException {
+    public void upgrade(final Reader reader, final Writer writer) throws IOException, CorruptModelException {
       final Xpp3Dom dom = DOM_READER.read(reader);
       dom.getChild("version").setValue(toVersion());
       final Xpp3Dom newnode = new Xpp3Dom("v3field");
@@ -108,21 +89,11 @@ public class ModelloUtilsTest
     }
   };
 
-  public static final ModelUpgrader V2_V3_UPGRADER_FAILING = new ModelUpgrader()
+  public static final CharacterModelUpgrader V2_V3_UPGRADER_FAILING = new CharacterModelUpgrader("2", "3")
   {
     @Override
-    public String fromVersion() {
-      return "2";
-    }
-
-    @Override
-    public String toVersion() {
-      return "3";
-    }
-
-    @Override
-    public void upgrade(final Reader reader, final Writer writer) throws IOException, XmlPullParserException {
-      throw new XmlPullParserException(getClass().getSimpleName());
+    public void upgrade(final Reader reader, final Writer writer) throws IOException, CorruptModelException {
+      throw new CorruptModelException(getClass().getSimpleName());
     }
   };
 
@@ -132,7 +103,7 @@ public class ModelloUtilsTest
     final File file = util.createTempFile();
     FileSupport.writeFile(file.toPath(), payload);
 
-    final Xpp3Dom dom = ModelloUtils.load("3", file, DOM_READER, Arrays.asList(V1_V2_UPGRADER, V2_V3_UPGRADER));
+    final Xpp3Dom dom = ModelUtils.load("3", file, DOM_READER, V1_V2_UPGRADER, V2_V3_UPGRADER);
 
     assertThat(dom.toString(), equalTo(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  <version>3</version>\n  <v2field>foo</v2field>\n  <v3field>bar</v3field>\n</foo>"));
@@ -144,7 +115,7 @@ public class ModelloUtilsTest
     final File file = util.createTempFile();
     FileSupport.writeFile(file.toPath(), payload);
 
-    final Xpp3Dom dom = ModelloUtils.load("2", file, DOM_READER, Arrays.asList(V1_V2_UPGRADER, V2_V3_UPGRADER));
+    final Xpp3Dom dom = ModelUtils.load("2", file, DOM_READER, V1_V2_UPGRADER, V2_V3_UPGRADER);
 
     assertThat(dom.toString(), equalTo(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  <version>2</version>\n  <v2field>foo</v2field>\n</foo>"));
@@ -156,46 +127,46 @@ public class ModelloUtilsTest
     final File file = util.createTempFile();
     FileSupport.writeFile(file.toPath(), payload);
 
-    final Xpp3Dom dom = ModelloUtils.load("1", file, DOM_READER, Arrays.asList(V1_V2_UPGRADER, V2_V3_UPGRADER));
+    final Xpp3Dom dom = ModelUtils.load("1", file, DOM_READER, V1_V2_UPGRADER, V2_V3_UPGRADER);
 
     assertThat(dom.toString(), equalTo(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  <version>1</version>\n</foo>"));
   }
 
-  @Test(expected = XmlPullParserException.class)
+  @Test(expected = CorruptModelException.class)
   public void noVersionNode() throws Exception {
     final String payload = "<foo></foo>";
     final File file = util.createTempFile();
     FileSupport.writeFile(file.toPath(), payload);
 
-    ModelloUtils.load("1", file, DOM_READER, Arrays.asList(V1_V2_UPGRADER, V2_V3_UPGRADER));
+    ModelUtils.load("1", file, DOM_READER, V1_V2_UPGRADER, V2_V3_UPGRADER);
   }
 
-  @Test(expected = XmlPullParserException.class)
+  @Test(expected = CorruptModelException.class)
   public void emptyVersionNode() throws Exception {
     final String payload = "<foo><version/></foo>";
     final File file = util.createTempFile();
     FileSupport.writeFile(file.toPath(), payload);
 
-    ModelloUtils.load("1", file, DOM_READER, Arrays.asList(V1_V2_UPGRADER, V2_V3_UPGRADER));
+    ModelUtils.load("1", file, DOM_READER, V1_V2_UPGRADER, V2_V3_UPGRADER);
   }
 
-  @Test(expected = XmlPullParserException.class)
+  @Test(expected = CorruptModelException.class)
   public void corruptXmlModel() throws Exception {
     final String payload = "<foo version/></foo>";
     final File file = util.createTempFile();
     FileSupport.writeFile(file.toPath(), payload);
 
-    ModelloUtils.load("1", file, DOM_READER, Arrays.asList(V1_V2_UPGRADER, V2_V3_UPGRADER));
+    ModelUtils.load("1", file, DOM_READER, V1_V2_UPGRADER, V2_V3_UPGRADER);
   }
 
-  @Test(expected = XmlPullParserException.class)
+  @Test(expected = CorruptModelException.class)
   public void corruptXmlModelDuringUpgrade() throws Exception {
     final String payload = "<foo><version>1</version></foo>";
     final File file = util.createTempFile();
     FileSupport.writeFile(file.toPath(), payload);
 
-    ModelloUtils.load("3", file, DOM_READER, Arrays.asList(V1_V2_UPGRADER, V2_V3_UPGRADER_FAILING));
+    ModelUtils.load("3", file, DOM_READER, V1_V2_UPGRADER, V2_V3_UPGRADER_FAILING);
   }
 
   @Test
@@ -205,7 +176,7 @@ public class ModelloUtilsTest
     FileSupport.writeFile(file.toPath(), payload);
 
     try {
-      final Xpp3Dom dom = ModelloUtils.load("99", file, DOM_READER, Arrays.asList(V1_V2_UPGRADER, V2_V3_UPGRADER));
+      final Xpp3Dom dom = ModelUtils.load("99", file, DOM_READER, V1_V2_UPGRADER, V2_V3_UPGRADER);
     }
     catch (IOException e) {
       assertThat(e.getMessage(), startsWith("Could not upgrade model to version 99"));
@@ -216,14 +187,37 @@ public class ModelloUtilsTest
   public void plainSave() throws Exception {
     final String payload = "<foo><version>1</version></foo>";
     final File file = util.createTempFile();
+    final File backupFile = new File(file.getParentFile(), file.getName() + ".bak");
     Files.delete(file.toPath());
-
     final Xpp3Dom model = Xpp3DomBuilder.build(new StringReader(payload));
 
-    ModelloUtils.save(model, file, DOM_WRITER);
+    ModelUtils.save(model, file, DOM_WRITER);
 
     assertThat(file, exists());
     assertThat(FileSupport.readFile(file.toPath()), equalTo(
+        "<foo>\n  <version>1</version>\n</foo>"));
+    assertThat(backupFile, not(exists()));
+
+    ModelUtils.save(model, file, DOM_WRITER);
+
+    assertThat(file, exists());
+    assertThat(FileSupport.readFile(file.toPath()), equalTo(
+        "<foo>\n  <version>1</version>\n</foo>"));
+    assertThat(backupFile, exists());
+    assertThat(FileSupport.readFile(backupFile.toPath()), equalTo(
+        "<foo>\n  <version>1</version>\n</foo>"));
+
+    final Xpp3Dom newnode = new Xpp3Dom("second");
+    newnode.setValue("foo");
+    model.addChild(newnode);
+
+    ModelUtils.save(model, file, DOM_WRITER);
+
+    assertThat(file, exists());
+    assertThat(FileSupport.readFile(file.toPath()), equalTo(
+        "<foo>\n  <version>1</version>\n  <second>foo</second>\n</foo>"));
+    assertThat(backupFile, exists());
+    assertThat(FileSupport.readFile(backupFile.toPath()), equalTo(
         "<foo>\n  <version>1</version>\n</foo>"));
   }
 
