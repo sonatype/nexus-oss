@@ -25,6 +25,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.timeline.Timeline;
 import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
@@ -121,7 +122,7 @@ public class DefaultNexusTimeline
         "Moving legacy timeline index from '" + legacyIndexDir.getAbsolutePath() + "' to '"
             + newIndexDir.getAbsolutePath() + "'.");
 
-    Files.createDirectories(newIndexDir.toPath());
+    DirSupport.mkdir(newIndexDir.toPath());
     for (File legacyIndexFile : legacyIndexFiles) {
       // legacy was just plain Lucene index (so, we move lucene files from here into a SUBDIRECTORY)
       if (Files.isRegularFile(legacyIndexFile.toPath())) {

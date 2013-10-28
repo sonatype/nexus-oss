@@ -109,7 +109,7 @@ public final class DirSupport
     public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes a) throws IOException {
       final Path targetPath = to.resolve(from.relativize(dir));
       if (!Files.exists(targetPath)) {
-        Files.createDirectories(targetPath);
+        mkdir(targetPath);
       }
       return FileVisitResult.CONTINUE;
     }
@@ -129,7 +129,7 @@ public final class DirSupport
    * {@link Files#createDirectories(Path, FileAttribute[])} method, this method does support paths having last
    * path element a symlink too. In this case, it's verified that symlink points to a directory and is readable.
    */
-  public static void mdkir(final Path dir) throws IOException {
+  public static void mkdir(final Path dir) throws IOException {
     try {
       Files.createDirectories(dir);
     }
@@ -317,7 +317,7 @@ public final class DirSupport
           new CopyVisitor(from, to, options));
     }
     else {
-      Files.createDirectories(to.getParent());
+      mkdir(to.getParent());
       Files.copy(from, to, options);
     }
   }

@@ -68,9 +68,9 @@ public class DirSupportTest
     final File mkdirA = new File(root, "mkdir-a");
     final File mkdirAB = new File(mkdirA, "mkdir-ab");
     final File dir211 = new File(new File(new File(root, "dir2"), "dir21"), "dir211");
-    DirSupport.mdkir(mkdirAB.toPath()); // new
-    DirSupport.mdkir(mkdirA.toPath()); // existing
-    DirSupport.mdkir(dir211.toPath()); // existing structure
+    DirSupport.mkdir(mkdirAB.toPath()); // new
+    DirSupport.mkdir(mkdirA.toPath()); // existing
+    DirSupport.mkdir(dir211.toPath()); // existing structure
     assertThat(mkdirA, isDirectory());
     assertThat(mkdirAB, isDirectory());
     assertThat(dir211, isDirectory());
@@ -87,7 +87,7 @@ public class DirSupportTest
     catch (IOException e) {
       return;
     }
-    DirSupport.mdkir(dir1link);
+    DirSupport.mkdir(dir1link);
   }
 
   @Test

@@ -22,7 +22,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.file.Files;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Inject;
@@ -36,6 +35,7 @@ import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
 import org.sonatype.nexus.plugins.lvo.config.model.Configuration;
 import org.sonatype.nexus.plugins.lvo.config.model.io.xpp3.NexusLvoPluginConfigurationXpp3Reader;
 import org.sonatype.nexus.plugins.lvo.config.model.io.xpp3.NexusLvoPluginConfigurationXpp3Writer;
+import org.sonatype.nexus.util.file.DirSupport;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
@@ -171,7 +171,7 @@ public class DefaultLvoPluginConfiguration
   protected void save() throws IOException {
     lock.lock();
 
-    Files.createDirectories(configurationFile.getParentFile().toPath());
+    DirSupport.mkdir(configurationFile.getParentFile().toPath());
 
     Writer fw = null;
 

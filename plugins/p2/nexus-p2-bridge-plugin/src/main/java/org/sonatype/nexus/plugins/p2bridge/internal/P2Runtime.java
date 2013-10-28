@@ -18,7 +18,6 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -114,7 +113,7 @@ class P2Runtime
       );
     }
     try {
-      Files.createDirectories(p2BridgeRuntimeDir.toPath());
+      DirSupport.mkdir(p2BridgeRuntimeDir.toPath());
     }
     catch (IOException e) {
       throw new RuntimeException(

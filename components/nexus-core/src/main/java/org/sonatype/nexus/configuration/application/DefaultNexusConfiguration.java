@@ -261,7 +261,7 @@ public class DefaultNexusConfiguration
 
   private File forceMkdir(final File directory) {
     try {
-      DirSupport.mdkir(directory.toPath());
+      DirSupport.mkdir(directory.toPath());
       return directory;
     }
     catch (IOException e) {

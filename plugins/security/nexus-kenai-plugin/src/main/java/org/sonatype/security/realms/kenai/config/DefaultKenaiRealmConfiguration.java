@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.enterprise.inject.Typed;
@@ -37,6 +36,7 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.security.SecuritySystem;
 
 import org.codehaus.plexus.util.IOUtil;
@@ -114,7 +114,7 @@ public class DefaultKenaiRealmConfiguration
 
       File configFile = this.getConfigFile();
       // make the parent dirs first
-      Files.createDirectories(configFile.getParentFile().toPath());
+      DirSupport.mkdir(configFile.getParentFile().toPath());
 
       fileWriter = new FileWriter(configFile);
 
