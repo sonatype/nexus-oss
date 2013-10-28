@@ -23,7 +23,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.file.Files;
 import java.util.concurrent.locks.Lock;
 
 import javax.inject.Named;
@@ -36,6 +35,7 @@ import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.util.file.DirSupport;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -145,7 +145,7 @@ public class DefaultConfigurationHelper
     Writer fw = null;
 
     try {
-      Files.createDirectories(configurationFile.getParentFile().toPath());
+      DirSupport.mkdir(configurationFile.getParentFile().toPath());
 
       fw = new OutputStreamWriter(new FileOutputStream(configurationFile));
 

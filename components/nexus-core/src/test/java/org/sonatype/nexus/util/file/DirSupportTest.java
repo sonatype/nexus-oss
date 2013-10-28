@@ -64,6 +64,33 @@ public class DirSupportTest
   }
 
   @Test
+  public void mkdir() throws IOException {
+    final File mkdirA = new File(root, "mkdir-a");
+    final File mkdirAB = new File(mkdirA, "mkdir-ab");
+    final File dir211 = new File(new File(new File(root, "dir2"), "dir21"), "dir211");
+    DirSupport.mkdir(mkdirAB.toPath()); // new
+    DirSupport.mkdir(mkdirA.toPath()); // existing
+    DirSupport.mkdir(dir211.toPath()); // existing structure
+    assertThat(mkdirA, isDirectory());
+    assertThat(mkdirAB, isDirectory());
+    assertThat(dir211, isDirectory());
+  }
+
+  @Test
+  public void symlinkMkdir() throws IOException {
+    final Path dir1link = root.toPath().resolve("dir1-link");
+    try {
+      // not all OSes support symlink creation
+      // if symlink creation fails on given OS, just return from this test
+      Files.createSymbolicLink(dir1link, root.toPath().resolve("dir1"));
+    }
+    catch (IOException e) {
+      return;
+    }
+    DirSupport.mkdir(dir1link);
+  }
+
+  @Test
   public void clean() throws IOException {
     DirSupport.clean(root.toPath());
     assertThat(root, exists());

@@ -22,7 +22,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,6 +36,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
@@ -86,7 +86,7 @@ public class DefaultTimelinePersistor
   protected synchronized void setConfiguration(final TimelineConfiguration configuration) {
     if (!configuration.getPersistDirectory().exists()) {
       try {
-        Files.createDirectories(configuration.getPersistDirectory().toPath());
+        DirSupport.mkdir(configuration.getPersistDirectory().toPath());
       }
       catch (IOException e) {
         Throwables.propagate(e);

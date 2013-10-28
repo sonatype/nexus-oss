@@ -205,7 +205,7 @@ public class DefaultFSPeer
     else {
       // we have no content, we talk about directory
       try {
-        Files.createDirectories(target.toPath());
+        DirSupport.mkdir(target.toPath());
       }
       catch (IOException e) {
         Throwables.propagate(e);
@@ -325,7 +325,7 @@ public class DefaultFSPeer
       throws LocalStorageException
   {
     try {
-      Files.createDirectories(target.toPath());
+      DirSupport.mkdir(target.toPath());
     }
     catch (IOException e) {
       throw new LocalStorageException(String.format(
