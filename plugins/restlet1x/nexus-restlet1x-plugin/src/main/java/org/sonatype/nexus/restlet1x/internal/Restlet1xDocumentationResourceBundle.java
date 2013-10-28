@@ -11,20 +11,29 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.security;
+package org.sonatype.nexus.restlet1x.internal;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
 
 /**
- * Place for security constants. Some of these are used by current classes but were actually defined in some
- * deprecated,
- * and hence, removed classes.
- *
- * @author cstamas
- * @since 2.6
+ * @since 2.3
  */
-public interface Constants
+@Named
+@Singleton
+public class Restlet1xDocumentationResourceBundle
+    extends AbstractDocumentationNexusResourceBundle
 {
-  /**
-   * @see {@link org.sonatype.nexus.web.Constants#ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED_KEY}
-   */
-  String REQUEST_IS_AUTHZ_REJECTED = org.sonatype.nexus.web.Constants.ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED;
+  @Override
+  public String getPluginId() {
+    return "nexus-restlet1x-plugin";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Nexus Core API (Restlet 1.x)";
+  }
+
 }

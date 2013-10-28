@@ -106,7 +106,7 @@ public class NexusHttpAuthenticationFilterTest
     // setup the MOCK
     request = mock(HttpServletRequest.class);
     when(request.getAttribute(eq(NexusHttpAuthenticationFilter.ANONYMOUS_LOGIN))).thenReturn("true");
-    when(request.getAttribute(eq(Constants.REQUEST_IS_AUTHZ_REJECTED))).thenReturn(null);
+    when(request.getAttribute(eq(org.sonatype.nexus.web.Constants.ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED))).thenReturn(null);
     // end fun with mocks
 
     response = mock(HttpServletResponse.class);

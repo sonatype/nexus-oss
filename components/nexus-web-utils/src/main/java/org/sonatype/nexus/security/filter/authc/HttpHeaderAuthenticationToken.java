@@ -16,7 +16,7 @@ package org.sonatype.nexus.security.filter.authc;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.HostAuthenticationToken;
 
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link AuthenticationToken} with a principal extracted from an HTTP header. The principal is equal to HTTP header

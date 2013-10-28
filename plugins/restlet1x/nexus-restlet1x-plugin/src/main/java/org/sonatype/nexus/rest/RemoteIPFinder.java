@@ -15,28 +15,21 @@ package org.sonatype.nexus.rest;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.restlet.data.Form;
 import org.restlet.data.Request;
+
+import static org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER;
 
 /**
  * Restlet specific additions to {@link org.sonatype.nexus.web.RemoteIPFinder} helper class.
  */
 public class RemoteIPFinder
 {
-  /**
-   * @deprecated Use {@link org.sonatype.nexus.web.RemoteIPFinder#findIP(HttpServletRequest)} instead.
-   */
-  @Deprecated
-  public static String findIP(HttpServletRequest request) {
-    return org.sonatype.nexus.web.RemoteIPFinder.findIP(request);
-  }
-
   public static String findIP(Request request) {
     Form form = (Form) request.getAttributes().get("org.restlet.http.headers");
 
-    String forwardedIP = org.sonatype.nexus.web.RemoteIPFinder.getFirstForwardedIp(form.getFirstValue(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER));
+    String forwardedIP = org.sonatype.nexus.web.RemoteIPFinder.getFirstForwardedIp(
+        form.getFirstValue(FORWARD_HEADER));
 
     if (forwardedIP != null) {
       return forwardedIP;

@@ -49,12 +49,6 @@ public class NexusSecurityFilterModule
     bindNamedFilter("logout", new LogoutAuthenticationFilter());
     bindNamedFilter("perms", new FailureLoggingHttpMethodPermissionFilter());
 
-    bindTargetMappingFilter("trperms", "/service/local/repositories/(.*)/content(.*)", "/repositories/@1@2");
-    bindTargetMappingFilter("tiperms", "/service/local/repositories/(.*)/index_content(.*)", "/repositories/@1@2");
-
-    bindTargetMappingFilter("tgperms", "/service/local/repo_groups/(.*)/content(.*)", "/groups/@1@2");
-    bindTargetMappingFilter("tgiperms", "/service/local/repo_groups/(.*)/index_content(.*)", "/groups/@1@2");
-
     bindContentAuthcFilter("contentAuthcBasic", "Sonatype Nexus Repository Manager");
 
     bindTargetMappingFilter("contentTperms", "/content(.*)", "@1");

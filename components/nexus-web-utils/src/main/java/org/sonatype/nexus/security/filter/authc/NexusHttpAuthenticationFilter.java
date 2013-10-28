@@ -21,8 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
-import org.sonatype.nexus.rest.RemoteIPFinder;
-import org.sonatype.nexus.security.Constants;
+import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -38,7 +37,6 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
-import org.codehaus.plexus.PlexusContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -297,7 +295,7 @@ public class NexusHttpAuthenticationFilter
   public void postHandle(ServletRequest request, ServletResponse response)
       throws Exception
   {
-    if (request.getAttribute(Constants.REQUEST_IS_AUTHZ_REJECTED) != null) {
+    if (request.getAttribute(org.sonatype.nexus.web.Constants.ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED) != null) {
       if (request.getAttribute(ANONYMOUS_LOGIN) != null) {
         sendChallenge(request, response);
       }

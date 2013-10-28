@@ -16,6 +16,7 @@
  *
  * @class Nexus.CallbackRef
  * @namespace Nexus
+ * @deprecated
  */
 Ext.define('Nexus.CallbackRef', {
     /**
