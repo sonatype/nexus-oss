@@ -71,7 +71,7 @@ public final class FileSupport
   public static void copy(final InputStream from, final Path to, final CopyOption... options) throws IOException {
     checkNotNull(from);
     checkNotNull(to);
-    Files.createDirectories(to.getParent());
+    DirSupport.mkdir(to.getParent());
     try (final InputStream is = from) {
       Files.copy(is, to, options);
     }
@@ -139,7 +139,7 @@ public final class FileSupport
     checkNotNull(file);
     checkNotNull(charset);
     checkNotNull(payload);
-    Files.createDirectories(file.getParent());
+    DirSupport.mkdir(file.getParent());
     try (final BufferedWriter writer = Files.newBufferedWriter(file, charset)) {
       writer.write(payload);
       writer.flush();

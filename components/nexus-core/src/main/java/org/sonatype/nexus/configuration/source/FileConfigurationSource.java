@@ -38,6 +38,7 @@ import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writ
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
 import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.security.events.SecurityConfigurationChanged;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
@@ -330,7 +331,7 @@ public class FileConfigurationSource
     // Create the dir if doesn't exist, throw runtime exception on failure
     // bad bad bad
     try {
-      Files.createDirectories(file.getParentFile().toPath());
+      DirSupport.mkdir(file.getParentFile().toPath());
     }
     catch (IOException e) {
       String message =
@@ -339,7 +340,7 @@ public class FileConfigurationSource
               + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
               + "******************************************************************************";
 
-      getLogger().error(message);
+      getLogger().error(message, e);
       throw new IOException("Could not create configuration file " + file.getAbsolutePath(), e);
     }
 

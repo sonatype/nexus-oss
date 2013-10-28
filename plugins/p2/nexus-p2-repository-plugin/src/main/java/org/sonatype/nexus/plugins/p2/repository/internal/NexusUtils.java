@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,6 +33,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
+import org.sonatype.nexus.util.file.DirSupport;
 
 import org.codehaus.plexus.util.IOUtil;
 
@@ -164,8 +164,8 @@ public class NexusUtils
   {
     File tempP2Repository;
     tempP2Repository = File.createTempFile("nexus-p2-repository-plugin", "");
-    Files.delete(tempP2Repository.toPath());
-    Files.createDirectories(tempP2Repository.toPath());
+    DirSupport.delete(tempP2Repository.toPath());
+    DirSupport.mkdir(tempP2Repository.toPath());
     return tempP2Repository;
   }
 

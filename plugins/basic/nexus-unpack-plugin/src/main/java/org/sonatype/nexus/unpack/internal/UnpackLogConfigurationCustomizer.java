@@ -11,21 +11,29 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.logging;
+package org.sonatype.nexus.unpack.internal;
 
-import java.util.Set;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.log.LogConfigurationCustomizer;
+import org.sonatype.nexus.log.LoggerLevel;
 
 /**
- * Extension point for plugins/components that want to contribute loggers.
+ * Configures Unpack loggers.
  *
  * @since 2.7
  */
-public interface LoggerContributor
+@Singleton
+@Named
+public class UnpackLogConfigurationCustomizer
+    implements LogConfigurationCustomizer
 {
 
-  /**
-   * Returns contributes loggers (should not return null).
-   */
-  Set<String> getLoggers();
+  @Override
+  public void customize(final Configuration configuration) {
+    // Useful loggers (level will be calculated as effective level)
+    configuration.setLoggerLevel("org.sonatype.nexus.unpack", LoggerLevel.DEFAULT);
+  }
 
 }

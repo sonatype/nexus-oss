@@ -15,11 +15,12 @@ package org.sonatype.nexus.plugins.repository;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.sonatype.nexus.util.file.DirSupport;
 
 import com.google.common.base.Throwables;
 
@@ -49,7 +50,7 @@ final class UserNexusPluginRepository
   public UserNexusPluginRepository(final @Named("${nexus-work}/plugin-repository") File userPluginsFolder) {
     this.userPluginsFolder = checkNotNull(userPluginsFolder);
     try {
-      Files.createDirectories(userPluginsFolder.toPath());
+      DirSupport.mkdir(userPluginsFolder.toPath());
     }
     catch (IOException e) {
       Throwables.propagate(e);

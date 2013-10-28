@@ -28,8 +28,6 @@ public interface LoggingConfigurator
 
   /**
    * Returns the list of current configured loggers (never null).
-   * Collection will contain all loggers contributed by {@link LoggerContributor}s, already configured loggers and one
-   * entry for "ROOT" logger.
    */
   Collection<LoggerXO> getLoggers();
 

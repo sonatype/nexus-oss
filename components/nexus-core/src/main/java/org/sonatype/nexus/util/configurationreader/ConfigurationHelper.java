@@ -19,6 +19,10 @@ import java.util.concurrent.locks.Lock;
 import org.sonatype.configuration.upgrade.ConfigurationUpgrader;
 import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
 
+/**
+ * @deprecated unused and will be removed in future.
+ */
+@Deprecated
 @SuppressWarnings("deprecation")
 public interface ConfigurationHelper
 {

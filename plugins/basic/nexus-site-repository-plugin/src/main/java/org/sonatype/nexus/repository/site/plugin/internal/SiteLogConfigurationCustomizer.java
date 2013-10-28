@@ -11,37 +11,29 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.logging;
-
-import java.util.Set;
+package org.sonatype.nexus.repository.site.plugin.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.google.common.collect.Sets;
+import org.sonatype.nexus.log.LogConfigurationCustomizer;
+import org.sonatype.nexus.log.LoggerLevel;
 
 /**
- * Nexus Core {@link LoggerContributor}.
+ * Configures Site loggers.
  *
  * @since 2.7
  */
-@Named
 @Singleton
-public class CoreLoggerContributor
-    implements LoggerContributor
+@Named
+public class SiteLogConfigurationCustomizer
+    implements LogConfigurationCustomizer
 {
 
   @Override
-  public Set<String> getLoggers() {
-    return Sets.newHashSet(
-        "org.sonatype.nexus",
-        "org.sonatype.nexus.apachehttpclient",
-        "org.sonatype.nexus.configuration",
-        "org.sonatype.nexus.plugins",
-        "org.sonatype.nexus.proxy",
-        "org.sonatype.nexus.tasks",
-        "org.sonatype.nexus.threads"
-    );
+  public void customize(final Configuration configuration) {
+    // Useful loggers (level will be calculated as effective level)
+    configuration.setLoggerLevel("org.sonatype.nexus.repository.site.plugin", LoggerLevel.DEFAULT);
   }
 
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -11,27 +11,29 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.atlas.internal
+package org.sonatype.nexus.obr.internal;
 
-import org.sonatype.nexus.logging.LoggerContributor
-import org.sonatype.sisu.goodies.common.ComponentSupport
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import javax.inject.Named
-import javax.inject.Singleton
+import org.sonatype.nexus.log.LogConfigurationCustomizer;
+import org.sonatype.nexus.log.LoggerLevel;
 
 /**
- * Atlas {@link LoggerContributor}.
+ * Configures Obr loggers.
  *
  * @since 2.7
  */
-@Named
 @Singleton
-class LoggerContributorImpl
-extends ComponentSupport
-implements LoggerContributor
+@Named
+public class ObrLogConfigurationCustomizer
+    implements LogConfigurationCustomizer
 {
+
   @Override
-  Set<String> getLoggers() {
-    return [ 'org.sonatype.nexus.atlas' ]
+  public void customize(final Configuration configuration) {
+    // Useful loggers (level will be calculated as effective level)
+    configuration.setLoggerLevel("org.sonatype.nexus.obr", LoggerLevel.DEFAULT);
   }
+
 }

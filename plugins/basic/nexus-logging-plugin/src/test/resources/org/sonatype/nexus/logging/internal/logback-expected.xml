@@ -1,5 +1,0 @@
-
-<included>
-      <logger name="foo" level="ERROR"/>
-      <logger name="bar" level="INFO"/>
-  </included>

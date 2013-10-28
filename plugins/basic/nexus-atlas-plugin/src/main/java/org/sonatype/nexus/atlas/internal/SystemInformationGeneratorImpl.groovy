@@ -231,6 +231,13 @@ implements SystemInformationGenerator
             'version': gav.version,
             'successful': response.successful
         ]
+
+        // include dependency plugins
+        if (!response.pluginDescriptor.importedPlugins.empty) {
+          item.importedPlugins = response.pluginDescriptor.importedPlugins.collect { it.toString() }.join(',')
+        }
+
+        // include error
         if (response.throwable) {
           item.throwable = response.throwable.toString()
         }

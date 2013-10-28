@@ -1,4 +1,4 @@
-/*
+/**
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -11,27 +11,28 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.siesta.ui;
+package org.sonatype.nexus.atlas.internal
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import org.sonatype.nexus.log.LogConfigurationCustomizer
+import org.sonatype.nexus.log.LoggerLevel
+import org.sonatype.sisu.goodies.common.ComponentSupport
 
-import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+import javax.inject.Named
+import javax.inject.Singleton
 
 /**
- * @since 2.6
+ * Atlas {@link LogConfigurationCustomizer}.
+ *
+ * @since 2.7
  */
 @Named
 @Singleton
-public class SiestaUiContributor
-    implements UiContributor
+class LogConfigurationCustomizerImpl
+extends ComponentSupport
+implements LogConfigurationCustomizer
 {
-
-  public static final String ARTIFACT_ID = "nexus-siesta-plugin";
-
   @Override
-  public UiContribution contribute(final boolean debug) {
-    return new UiContributionBuilder(this, OSS_PLUGIN_GROUP, ARTIFACT_ID).build(debug);
+  void customize(LogConfigurationCustomizer.Configuration configuration) {
+    configuration.setLoggerLevel('org.sonatype.nexus.atlas', LoggerLevel.DEFAULT);
   }
 }

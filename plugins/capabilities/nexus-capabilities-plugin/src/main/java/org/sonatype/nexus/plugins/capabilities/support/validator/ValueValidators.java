@@ -66,5 +66,30 @@ public class ValueValidators
     return validatorFactory.validUrl(type, propertyKey);
   }
 
+  /**
+   * Creates a new validator that checks that a specified property (by key) is an integer value.
+   *
+   * @param type        capability type
+   * @param propertyKey key of required property
+   * @return created validator
+   */
+  public Validator isAnInteger(final CapabilityType type,
+                               final String propertyKey)
+  {
+    return validatorFactory.isAnInteger(type, propertyKey);
+  }
+
+  /**
+   * Creates a new validator that checks that a specified property (by key) is a positive integer value.
+   *
+   * @param type        capability type
+   * @param propertyKey key of required property
+   * @return created validator
+   */
+  public Validator isAPositiveInteger(final CapabilityType type,
+                                      final String propertyKey)
+  {
+    return validatorFactory.isAPositiveInteger(type, propertyKey);
+  }
 
 }

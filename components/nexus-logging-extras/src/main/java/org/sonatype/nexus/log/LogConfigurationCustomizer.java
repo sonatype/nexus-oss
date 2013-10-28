@@ -1,4 +1,4 @@
-#*
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -9,9 +9,33 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
- *#
-<included>
-  #foreach($logger in $loggers)
-    <logger name="${logger.Name}" level="${logger.Level}"/>
-  #end
-</included>
+ */
+
+package org.sonatype.nexus.log;
+
+/**
+ * Allows participation to logging configuration.
+ *
+ * @since 2.7
+ */
+public interface LogConfigurationCustomizer
+{
+
+  /**
+   * Callback allowing setting of loggers levels.
+   */
+  void customize(Configuration configuration);
+
+  interface Configuration
+  {
+    /**
+     * Sets logger level to specified value. If logger level is {@link LoggerLevel#DEFAULT} level will be calculated as
+     * effective level.
+     *
+     * @param name  logger name
+     * @param level logger level
+     */
+    void setLoggerLevel(String name, LoggerLevel level);
+  }
+
+}

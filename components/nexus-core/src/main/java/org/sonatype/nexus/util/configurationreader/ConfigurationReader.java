@@ -18,6 +18,10 @@ import java.io.Reader;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+/**
+ * @deprecated unused and will be removed in future.
+ */
+@Deprecated
 public interface ConfigurationReader<E>
 {
 
