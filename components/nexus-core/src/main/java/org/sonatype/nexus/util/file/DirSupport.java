@@ -15,6 +15,7 @@ package org.sonatype.nexus.util.file;
 
 import java.io.IOException;
 import java.nio.file.CopyOption;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -22,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileAttribute;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -116,6 +118,28 @@ public final class DirSupport
     public FileVisitResult visitFile(final Path file, final BasicFileAttributes a) throws IOException {
       Files.copy(file, to.resolve(from.relativize(file)), copyOptions);
       return FileVisitResult.CONTINUE;
+    }
+  }
+
+  // MKDIR: directory creation resilient to symlinks
+
+  /**
+   * Creates a directory. Fails only if directory creation fails, otherwise cleanly returns. If cleanly returns,
+   * it is guaranteed that passed in path is created (with all parents as needed) successfully. Unlike Java7
+   * {@link Files#createDirectories(Path, FileAttribute[])} method, this method does support paths having last
+   * path element a symlink too. In this case, it's verified that symlink points to a directory and is readable.
+   */
+  public static void mdkir(final Path dir) throws IOException {
+    try {
+      Files.createDirectories(dir);
+    }
+    catch (FileAlreadyExistsException e) {
+      // this happens when last element of path exists, but is a symlink.
+      // A simple test with Files.isDirectory should be able to  detect this
+      // case as by default, it follows symlinks.
+      if (!Files.isDirectory(dir)) {
+        throw e;
+      }
     }
   }
 
