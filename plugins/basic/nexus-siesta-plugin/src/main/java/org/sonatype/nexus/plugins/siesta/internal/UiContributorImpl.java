@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -11,27 +11,28 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.wonderland.internal
+package org.sonatype.nexus.plugins.siesta.internal;
 
-import org.sonatype.nexus.logging.LoggerContributor
-import org.sonatype.sisu.goodies.common.ComponentSupport
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import javax.inject.Named
-import javax.inject.Singleton
+import org.sonatype.nexus.plugins.siesta.SiestaPlugin;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
 
 /**
- * Wonderland {@link LoggerContributor}.
+ * Siesta {@link UiContributor}.
  *
  * @since 2.7
  */
 @Named
 @Singleton
-class LoggerContributorImpl
-extends ComponentSupport
-implements LoggerContributor
+public class UiContributorImpl
+    extends UiContributorSupport
 {
-  @Override
-  Set<String> getLoggers() {
-    return [ 'org.sonatype.nexus.wonderland' ]
+  @Inject
+  public UiContributorImpl(final SiestaPlugin owner) {
+    super(owner);
   }
 }

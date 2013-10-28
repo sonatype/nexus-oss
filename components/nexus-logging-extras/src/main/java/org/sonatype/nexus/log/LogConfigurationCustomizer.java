@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -11,27 +11,31 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.atlas.internal
-
-import org.sonatype.nexus.logging.LoggerContributor
-import org.sonatype.sisu.goodies.common.ComponentSupport
-
-import javax.inject.Named
-import javax.inject.Singleton
+package org.sonatype.nexus.log;
 
 /**
- * Atlas {@link LoggerContributor}.
+ * Allows participation to logging configuration.
  *
  * @since 2.7
  */
-@Named
-@Singleton
-class LoggerContributorImpl
-extends ComponentSupport
-implements LoggerContributor
+public interface LogConfigurationCustomizer
 {
-  @Override
-  Set<String> getLoggers() {
-    return [ 'org.sonatype.nexus.atlas' ]
+
+  /**
+   * Callback allowing setting of loggers levels.
+   */
+  void customize(Configuration configuration);
+
+  interface Configuration
+  {
+    /**
+     * Sets logger level to specified value. If logger level is {@link LoggerLevel#DEFAULT} level will be calculated as
+     * effective level.
+     *
+     * @param name  logger name
+     * @param level logger level
+     */
+    void setLoggerLevel(String name, LoggerLevel level);
   }
+
 }

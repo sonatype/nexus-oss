@@ -84,6 +84,11 @@ public interface LogManager
   /**
    * @since 2.7
    */
+  void unsetLoggerLevel(String name);
+
+  /**
+   * @since 2.7
+   */
   @Nullable
   LoggerLevel getLoggerLevel(String name);
 
