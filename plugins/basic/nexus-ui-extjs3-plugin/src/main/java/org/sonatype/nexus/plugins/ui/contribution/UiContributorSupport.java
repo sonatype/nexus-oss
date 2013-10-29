@@ -42,6 +42,16 @@ public class UiContributorSupport
       }
     }
 
+    // maybe customize
+    customize(builder);
+
     return builder.build(debug);
+  }
+
+  /**
+   * Sub-class can customize the contribution (to add conditions, etc).
+   */
+  protected void customize(final UiContributionBuilder builder) {
+    // empty
   }
 }
