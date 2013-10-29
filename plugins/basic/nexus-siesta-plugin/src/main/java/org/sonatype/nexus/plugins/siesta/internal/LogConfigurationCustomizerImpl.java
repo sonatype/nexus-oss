@@ -32,6 +32,7 @@ public class LogConfigurationCustomizerImpl
 {
   @Override
   public void customize(final Configuration configuration) {
+    configuration.setLoggerLevel("org.sonatype.sisu.siesta", DEFAULT);
     configuration.setLoggerLevel("org.sonatype.nexus.plugins.siesta", DEFAULT);
 
     // This will prevent duplicate 'Initiating Jersey application' messages, though won't omit them all... not sure why ATM.
