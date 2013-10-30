@@ -836,6 +836,7 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
               ns.settings[entry.key] = entry.value;
             });
           }
+          ns.settings.keepAlive = ns.settings.keepAlive === 'true';
           ns.loadNexusStatus();
         }
       });
