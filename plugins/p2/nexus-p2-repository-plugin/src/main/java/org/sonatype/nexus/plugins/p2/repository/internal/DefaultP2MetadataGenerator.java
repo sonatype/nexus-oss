@@ -39,6 +39,7 @@ import org.sonatype.p2.bridge.model.InstallableUnitArtifact;
 import org.sonatype.p2.bridge.model.TouchpointType;
 import org.sonatype.sisu.resource.scanner.helper.ListenerSupport;
 import org.sonatype.sisu.resource.scanner.scanners.SerialScanner;
+
 import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 
@@ -74,16 +75,18 @@ public class DefaultP2MetadataGenerator
   private final MimeSupport mimeSupport;
 
   @Inject
-  public DefaultP2MetadataGenerator(final RepositoryRegistry repositories, final MimeSupport mimeSupport,
+  public DefaultP2MetadataGenerator(final RepositoryRegistry repositories,
+                                    final MimeSupport mimeSupport,
                                     final ArtifactRepository artifactRepository,
-                                    final MetadataRepository metadataRepository, final Publisher publisher)
+                                    final MetadataRepository metadataRepository,
+                                    final Publisher publisher)
   {
     this.repositories = repositories;
     this.mimeSupport = mimeSupport;
     this.artifactRepository = artifactRepository;
     this.metadataRepository = metadataRepository;
     this.publisher = publisher;
-    configurations = new HashMap<String, P2MetadataGeneratorConfiguration>();
+    configurations = new HashMap<>();
   }
 
   @Override
@@ -140,10 +143,10 @@ public class DefaultP2MetadataGenerator
           ius = publisher.generateFeatureIUs(true /* generateCapabilities */,
               true /* generateRequirements */, file);
           artifactsUis = new ArrayList<InstallableUnit>();
-          for(InstallableUnit iu : ius) {
-              if(!iu.getId().endsWith(".feature.group")) {
-            	  artifactsUis.add(iu);
-              }
+          for (InstallableUnit iu : ius) {
+            if (!iu.getId().endsWith(".feature.group")) {
+              artifactsUis.add(iu);
+            }
           }
           break;
         default:
