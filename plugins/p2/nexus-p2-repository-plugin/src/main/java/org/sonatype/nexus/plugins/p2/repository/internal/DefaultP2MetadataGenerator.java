@@ -154,7 +154,6 @@ public class DefaultP2MetadataGenerator
       storeP2Data(artifact, ius, repository);
     }
     catch (final Exception e) {
-    	e.printStackTrace();
       logger.warn(
           String.format("Could not generate p2 metadata of [%s:%s] due to %s. Bailing out.",
               item.getRepositoryId(), item.getPath(), e.getMessage()), e);
