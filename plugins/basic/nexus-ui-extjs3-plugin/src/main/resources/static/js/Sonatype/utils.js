@@ -746,7 +746,7 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
           }
         },
         start : function() {
-          if (running === null && Sonatype.utils.keepAlive) {
+          if (running === null && Sonatype.utils.settings.keepAlive) {
             running = Ext.TaskMgr.start(config);
           }
         }};
@@ -828,13 +828,13 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
         callback: function (options, success, response) {
           var respObj;
 
+          ns.settings = {};
           if (success) {
             respObj = Ext.decode(response.responseText);
 
-            ns.keepAlive = respObj['keepAlive'];
-          }
-          else {
-            ns.keepAlive = false;
+            Ext.each(respObj, function(entry){
+              ns.settings[entry.key] = entry.value;
+            });
           }
           ns.loadNexusStatus();
         }
