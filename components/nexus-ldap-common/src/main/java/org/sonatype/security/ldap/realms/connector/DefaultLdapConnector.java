@@ -31,6 +31,7 @@ import org.sonatype.security.ldap.dao.NoSuchLdapGroupException;
 import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -152,7 +153,7 @@ public class DefaultLdapConnector
     }
   }
 
-  public SortedSet<LdapUser> searchUsers(String username)
+  public SortedSet<LdapUser> searchUsers(String username, Set<String> roleIds)
       throws LdapDAOException
   {
     LdapContext context = null;
@@ -163,6 +164,21 @@ public class DefaultLdapConnector
       // make sure the username is at least an empty string
       if (username == null) {
         username = "";
+      }
+
+      // is this a role-based search?
+      if (roleIds != null && !roleIds.isEmpty()) {
+
+        // do we have any roles to check?
+        if (!conf.isLdapGroupsAsRoles()) {
+          return new TreeSet<>();
+        }
+
+        // searchUsers is expensive with static mapping, so check roles exist in LDAP first
+        if (isStaticGroupMapping(conf) && CollectionUtils.intersection( //
+            roleIds, ldapGroupManager.getAllGroups(context, conf)).isEmpty()) {
+          return new TreeSet<>();
+        }
       }
 
       SortedSet<LdapUser> users = this.ldapUserManager.getUsers(username + "*", context, conf, -1);
