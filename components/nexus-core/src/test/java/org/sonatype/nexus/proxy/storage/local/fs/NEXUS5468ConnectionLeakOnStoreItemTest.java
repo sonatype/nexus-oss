@@ -113,8 +113,9 @@ public class NEXUS5468ConnectionLeakOnStoreItemTest
           new DefaultStorageFileItem(repository, new ResourceStoreRequest("/some/file.txt"), true, true, pcl);
 
       try {
-      testSubject.storeItem(repository, file);
-      } catch (RuntimeException e) {
+        testSubject.storeItem(repository, file);
+      }
+      catch (RuntimeException e) {
         assertThat(e.getMessage(), equalTo("Something unexpected!"));
       }
     }
