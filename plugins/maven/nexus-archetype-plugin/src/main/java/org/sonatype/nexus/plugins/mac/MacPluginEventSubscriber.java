@@ -64,8 +64,8 @@ public class MacPluginEventSubscriber
   public void on(final RepositoryRegistryEventAdd evt) {
     final Repository repository = evt.getRepository();
     // check do we need to handle it at all
-    if (isHandled(repository)) {
-      handle(repository);
+    if (isArchetypeCatalogSubject(repository)) {
+      manageArchetypeCatalog(repository);
     }
   }
 
@@ -74,12 +74,15 @@ public class MacPluginEventSubscriber
   public void on(final RepositoryConfigurationUpdatedEvent evt) {
     final Repository repository = evt.getRepository();
     // check do we need to handle it at all
-    if (isHandled(repository)) {
-      handle(repository);
+    if (isArchetypeCatalogSubject(repository)) {
+      manageArchetypeCatalog(repository);
     }
   }
 
-  private boolean isHandled(final Repository repository) {
+  /**
+   * Archetype Catalog subjects are Maven2 hosted, proxy and group repositories that are In Service.
+   */
+  private boolean isArchetypeCatalogSubject(final Repository repository) {
     return maven2ContentClass.isCompatible(repository.getRepositoryContentClass())
         && repository.getLocalStatus().shouldServiceRequest()
         && (repository.getRepositoryKind().isFacetAvailable(HostedRepository.class)
@@ -87,7 +90,10 @@ public class MacPluginEventSubscriber
         repository.getRepositoryKind().isFacetAvailable(GroupRepository.class));
   }
 
-  private void handle(final Repository repository) {
+  /**
+   * Installs or uninstall the archetype catalog (content generated) file from supported repository.
+   */
+  private void manageArchetypeCatalog(final Repository repository) {
     if (repository.isIndexable()) {
       // "install" the archetype catalog
       try {
