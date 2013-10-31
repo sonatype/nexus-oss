@@ -55,8 +55,7 @@ public class UpdateRepositoryRunnable
   @Override
   protected void doRun() {
     if (!applicationStatusSource.getSystemStatus().isNexusStarted()) {
-      getLogger().warn("Nexus stopped during background prefix file updates for {}, bailing out.",
-          mavenRepository.toString());
+      log.warn("Nexus stopped during background prefix file updates for {}, bailing out.", mavenRepository);
       return;
     }
     try {

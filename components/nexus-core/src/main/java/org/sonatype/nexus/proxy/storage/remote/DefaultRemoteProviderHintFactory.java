@@ -18,10 +18,9 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * TODO: for now, we have limited the RRS selection, but in future, this should be made dynamic!
@@ -29,13 +28,12 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class DefaultRemoteProviderHintFactory
-    implements RemoteProviderHintFactory
+  extends ComponentSupport
+  implements RemoteProviderHintFactory
 {
   public final static String DEFAULT_HTTP_PROVIDER_KEY = "nexus.default.http.provider";
 
   public final static String DEFAULT_HTTP_PROVIDER_FORCED_KEY = "nexus.default.http.providerForced";
-
-  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private Boolean httpProviderForced = null;
 
@@ -44,7 +42,7 @@ public class DefaultRemoteProviderHintFactory
       httpProviderForced = SystemPropertiesHelper.getBoolean(DEFAULT_HTTP_PROVIDER_FORCED_KEY, false);
 
       if (httpProviderForced) {
-        logger.warn("HTTP Provider forcing is in effect (system property \""
+        log.warn("HTTP Provider forcing is in effect (system property \""
             + DEFAULT_HTTP_PROVIDER_FORCED_KEY
             + "\" is set to \"true\"!), so regardless of your configuration, for HTTP RemoteRepositoryStorage the \""
             + getDefaultHttpRoleHint()
@@ -89,7 +87,7 @@ public class DefaultRemoteProviderHintFactory
       throw new IllegalArgumentException("RemoteRepositoryStorage hint cannot be null!");
     }
 
-    logger.debug("Returning supplied \"{}\" hint for remote URL {}.", remoteUrl, hint);
+    log.debug("Returning supplied \"{}\" hint for remote URL {}.", remoteUrl, hint);
 
     return hint;
   }

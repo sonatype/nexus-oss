@@ -13,9 +13,10 @@
 
 package org.sonatype.nexus.proxy.maven.routing.internal.task;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
 import com.google.common.base.Throwables;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -28,10 +29,9 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @since 2.4
  */
 public abstract class RunnableSupport
+    extends ComponentSupport
     implements Runnable
 {
-  private final Logger logger;
-
   private final ProgressListenerWrapper progressListenerWrapper;
 
   private final String name;
@@ -42,7 +42,6 @@ public abstract class RunnableSupport
 
   protected RunnableSupport(final ProgressListener progressListener, final String name) {
     checkArgument(name != null && name.trim().length() > 0);
-    this.logger = LoggerFactory.getLogger(getClass());
     this.progressListenerWrapper = new ProgressListenerWrapper(progressListener);
     this.name = name;
   }
@@ -51,8 +50,12 @@ public abstract class RunnableSupport
     return name;
   }
 
+  /**
+   * @deprecated use {@link #log} reference.
+   */
+  @Deprecated
   protected Logger getLogger() {
-    return logger;
+    return log;
   }
 
   protected ProgressListener getProgressListener() {
@@ -64,21 +67,21 @@ public abstract class RunnableSupport
     final ProgressListener oldProgressListener = ProgressListenerUtil.getCurrentProgressListener();
     try {
       ProgressListenerUtil.setCurrentProgressListener(getProgressListener());
-      getLogger().debug("{} running...", getName());
+      log.debug("{} running...", getName());
       doRun();
-      getLogger().debug("{} done...", getName());
+      log.debug("{} done...", getName());
     }
     catch (InterruptedException e) {
-      getLogger().info("{} interrupted: {}", getName(), e.getMessage());
+      log.info("{} interrupted: {}", getName(), e.getMessage());
     }
     catch (RunnableInterruptedException e) {
-      getLogger().info("{} interrupted: {}", getName(), e.getMessage());
+      log.info("{} interrupted: {}", getName(), e.getMessage());
     }
     catch (RunnableCanceledException e) {
-      getLogger().info("{} canceled: {}", getName(), e.getMessage());
+      log.info("{} canceled: {}", getName(), e.getMessage());
     }
     catch (Exception e) {
-      getLogger().warn("{} failed:", getName(), e);
+      log.warn("{} failed:", getName(), e);
       Throwables.propagate(e);
     }
     finally {
