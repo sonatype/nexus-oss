@@ -336,9 +336,7 @@ public class DefaultCapabilityReference
   {
 
     State() {
-      getLogger().debug(
-          "Capability {} ({}) state changed to {}", new Object[]{capability, id, this}
-      );
+      getLogger().debug("Capability {} ({}) state changed to {}", capability, id, this);
     }
 
     public boolean isEnabled() {
@@ -406,15 +404,14 @@ public class DefaultCapabilityReference
         capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap(newHashMap(properties));
         capability.onCreate();
         resetLastException();
-        validityHandler.bind();
-        state = new ValidState();
       }
       catch (Exception e) {
         setLastException(e);
-        state = new InvalidState("Failed to create: " + e.getMessage());
-        getLogger().error(
-            "Could not create capability {} ({})", new Object[]{capability, id, e}
-        );
+        getLogger().error("Could not create capability {} ({})", capability, id, e);
+      }
+      finally {
+        validityHandler.bind();
+        state = new DisabledState();
       }
     }
 
@@ -424,15 +421,14 @@ public class DefaultCapabilityReference
         capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap(newHashMap(properties));
         capability.onLoad();
         resetLastException();
-        validityHandler.bind();
-        state = new ValidState();
       }
       catch (Exception e) {
         setLastException(e);
-        state = new InvalidState("Failed to load: " + e.getMessage());
-        getLogger().error(
-            "Could not load capability {} ({})", new Object[]{capability, id, e}
-        );
+        getLogger().error("Could not load capability {} ({})", capability, id, e);
+      }
+      finally {
+        validityHandler.bind();
+        state = new DisabledState();
       }
     }
 
@@ -448,7 +444,7 @@ public class DefaultCapabilityReference
 
   }
 
-  private class ValidState
+  private class DisabledState
       extends State
   {
 
@@ -488,9 +484,7 @@ public class DefaultCapabilityReference
       }
       catch (Exception e) {
         setLastException(e);
-        getLogger().error(
-            "Could not update capability {} ({}).", new Object[]{capability, id, e}
-        );
+        getLogger().error("Could not update capability {} ({}).", capability, id, e);
         DefaultCapabilityReference.this.passivate();
         state.setDescription("Update failed: " + e.getMessage());
       }
@@ -510,10 +504,7 @@ public class DefaultCapabilityReference
       }
       catch (Exception e) {
         setLastException(e);
-        state = new InvalidState("Failed to remove: " + e.getMessage());
-        getLogger().error(
-            "Could not remove capability {} ({})", new Object[]{capability, id, e}
-        );
+        getLogger().error("Could not remove capability {} ({})", capability, id, e);
       }
     }
 
@@ -524,13 +515,13 @@ public class DefaultCapabilityReference
 
     @Override
     public String toString() {
-      return "VALID";
+      return "DISABLED";
     }
 
   }
 
   private class EnabledState
-      extends ValidState
+      extends DisabledState
   {
 
     private String description;
@@ -558,7 +549,7 @@ public class DefaultCapabilityReference
       getLogger().debug("Disabling capability {} ({})", capability, id);
       activationHandler.release();
       DefaultCapabilityReference.this.passivate();
-      state = new ValidState();
+      state = new DisabledState();
     }
 
     @Override
@@ -576,9 +567,7 @@ public class DefaultCapabilityReference
         }
         catch (Exception e) {
           setLastException(e);
-          getLogger().error(
-              "Could not activate capability {} ({})", new Object[]{capability, id, e}
-          );
+          getLogger().error("Could not activate capability {} ({})", capability, id, e);
           state.setDescription("Activation failed: " + e.getMessage());
         }
       }
@@ -636,9 +625,7 @@ public class DefaultCapabilityReference
       }
       catch (Exception e) {
         setLastException(e);
-        getLogger().error(
-            "Could not passivate capability {} ({})", new Object[]{capability, id, e}
-        );
+        getLogger().error("Could not passivate capability {} ({})", capability, id, e);
         state.setDescription("Passivation failed: " + e.getMessage());
       }
     }
@@ -651,28 +638,6 @@ public class DefaultCapabilityReference
     @Override
     public String toString() {
       return "ACTIVE";
-    }
-
-  }
-
-  private class InvalidState
-      extends State
-  {
-
-    private final String reason;
-
-    InvalidState(final String reason) {
-      this.reason = reason;
-    }
-
-    @Override
-    public String stateDescription() {
-      return reason;
-    }
-
-    @Override
-    public String toString() {
-      return "INVALID (" + reason + ")";
     }
 
   }
