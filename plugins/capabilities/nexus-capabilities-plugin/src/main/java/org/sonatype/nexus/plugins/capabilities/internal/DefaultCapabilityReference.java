@@ -325,11 +325,17 @@ public class DefaultCapabilityReference
   }
 
   private void resetLastException() {
-    setLastException(null);
+    setLastException(null, null);
   }
 
-  private void setLastException(final Exception e) {
+  private void setLastException(final String operation, final Exception e) {
     lastException = e;
+    if (e != null) {
+      log.error(
+          "Could not {} capability {} ({}) due to {}/{}",
+          operation, capability, id, e.getClass().getName(), e.getMessage(), log.isDebugEnabled() ? e : null
+      );
+    }
   }
 
   private class State
@@ -406,8 +412,7 @@ public class DefaultCapabilityReference
         resetLastException();
       }
       catch (Exception e) {
-        setLastException(e);
-        log.error("Could not create capability {} ({})", capability, id, e);
+        setLastException("create", e);
       }
       finally {
         validityHandler.bind();
@@ -423,8 +428,7 @@ public class DefaultCapabilityReference
         resetLastException();
       }
       catch (Exception e) {
-        setLastException(e);
-        log.error("Could not load capability {} ({})", capability, id, e);
+        setLastException("load", e);
       }
       finally {
         validityHandler.bind();
@@ -483,8 +487,7 @@ public class DefaultCapabilityReference
         );
       }
       catch (Exception e) {
-        setLastException(e);
-        log.error("Could not update capability {} ({}).", capability, id, e);
+        setLastException("update", e);
         DefaultCapabilityReference.this.passivate();
         state.setDescription("Update failed: " + e.getMessage());
       }
@@ -499,8 +502,7 @@ public class DefaultCapabilityReference
         resetLastException();
       }
       catch (Exception e) {
-        setLastException(e);
-        log.error("Could not remove capability {} ({})", capability, id, e);
+        setLastException("remove", e);
       }
       finally {
         state = new RemovedState();
@@ -568,8 +570,7 @@ public class DefaultCapabilityReference
           );
         }
         catch (Exception e) {
-          setLastException(e);
-          log.error("Could not activate capability {} ({})", capability, id, e);
+          setLastException("activate", e);
           state.setDescription("Activation failed: " + e.getMessage());
         }
       }
@@ -626,8 +627,7 @@ public class DefaultCapabilityReference
         log.debug("Passivated capability {} ({})", capability, id);
       }
       catch (Exception e) {
-        setLastException(e);
-        log.error("Could not passivate capability {} ({})", capability, id, e);
+        setLastException("passivate", e);
         state.setDescription("Passivation failed: " + e.getMessage());
       }
     }
