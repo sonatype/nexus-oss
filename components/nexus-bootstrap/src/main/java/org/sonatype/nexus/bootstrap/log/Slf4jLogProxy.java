@@ -25,7 +25,7 @@ public class Slf4jLogProxy
     extends LogProxy
 {
 
-  private Logger log = LoggerFactory.getLogger(this.getClass());
+  private Logger log = LoggerFactory.getLogger(getClass());
 
   public Slf4jLogProxy(final Logger log) {
     this.log = log;

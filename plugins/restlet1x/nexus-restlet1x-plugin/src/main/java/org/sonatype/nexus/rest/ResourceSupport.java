@@ -16,9 +16,9 @@ package org.sonatype.nexus.rest;
 import javax.ws.rs.Path;
 
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.sisu.goodies.common.Loggers;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Support for {@link PlexusResource} implementations.
@@ -29,7 +29,7 @@ public abstract class ResourceSupport
     extends AbstractNexusPlexusResource
 {
 
-  protected final Logger log = LoggerFactory.getLogger(getClass());
+  protected final Logger log = Loggers.getLogger(getClass());
 
   private String resourceUri;
 

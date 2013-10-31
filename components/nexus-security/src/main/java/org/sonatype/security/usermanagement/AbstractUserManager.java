@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -27,6 +29,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @author Brian Demers
  */
 public abstract class AbstractUserManager
+    extends ComponentSupport
     implements UserManager
 {
 

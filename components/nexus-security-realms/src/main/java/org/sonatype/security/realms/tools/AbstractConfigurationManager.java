@@ -14,21 +14,12 @@
 package org.sonatype.security.realms.tools;
 
 import org.sonatype.security.model.Configuration;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 public abstract class AbstractConfigurationManager
+    extends ComponentSupport
     implements ConfigurationManager
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
-  protected Logger getLogger() {
-    return logger;
-  }
-
-  //
-
   private volatile EnhancedConfiguration configurationCache = null;
 
   public void clearCache() {

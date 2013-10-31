@@ -30,18 +30,15 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.configuration.validator.SecurityConfigurationValidator;
 import org.sonatype.security.configuration.validator.SecurityValidationContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 @Singleton
 @Typed(SecurityConfigurationManager.class)
 @Named("default")
 public class DefaultSecurityConfigurationManager
+    extends ComponentSupport
     implements SecurityConfigurationManager
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final SecurityConfigurationSource configurationSource;
 
   private final SecurityConfigurationValidator validator;
@@ -137,10 +134,10 @@ public class DefaultSecurityConfigurationManager
       configuration = this.configurationSource.getConfiguration();
     }
     catch (IOException e) {
-      this.logger.error("IOException while retrieving configuration file", e);
+      this.log.error("IOException while retrieving configuration file", e);
     }
     catch (ConfigurationException e) {
-      this.logger.error("Invalid Configuration", e);
+      this.log.error("Invalid Configuration", e);
     }
     finally {
       lock.unlock();
@@ -163,7 +160,7 @@ public class DefaultSecurityConfigurationManager
       this.configurationSource.storeConfiguration();
     }
     catch (IOException e) {
-      this.logger.error("IOException while storing configuration file", e);
+      this.log.error("IOException while storing configuration file", e);
     }
     finally {
       lock.unlock();

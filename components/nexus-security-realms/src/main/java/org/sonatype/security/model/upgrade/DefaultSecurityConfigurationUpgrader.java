@@ -28,13 +28,12 @@ import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.UnsupportedConfigurationVersionException;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.security.model.Configuration;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default configuration updater, using versioned Modello models. It tried to detect version signature from existing
@@ -46,10 +45,9 @@ import org.slf4j.LoggerFactory;
 @Typed(SecurityConfigurationUpgrader.class)
 @Named("default")
 public class DefaultSecurityConfigurationUpgrader
+    extends ComponentSupport
     implements SecurityConfigurationUpgrader
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final Map<String, SecurityUpgrader> upgraders;
 
   private final Map<String, SecurityDataUpgrader> dataUpgraders;
@@ -101,7 +99,7 @@ public class DefaultSecurityConfigurationUpgrader
     SecurityUpgrader upgrader = upgraders.get(msg.getModelVersion());
 
     if (upgrader != null) {
-      logger.info("Upgrading old Security configuration file (version " + msg.getModelVersion() + ") from "
+      log.info("Upgrading old Security configuration file (version " + msg.getModelVersion() + ") from "
           + file.getAbsolutePath());
 
       msg.setConfiguration(upgrader.loadConfiguration(file));
@@ -126,7 +124,7 @@ public class DefaultSecurityConfigurationUpgrader
         upgrader = upgraders.get(msg.getModelVersion());
       }
 
-      logger.info("Security configuration file upgraded to current version " + msg.getModelVersion()
+      log.info("Security configuration file upgraded to current version " + msg.getModelVersion()
           + " succesfully.");
 
       return (Configuration) msg.getConfiguration();

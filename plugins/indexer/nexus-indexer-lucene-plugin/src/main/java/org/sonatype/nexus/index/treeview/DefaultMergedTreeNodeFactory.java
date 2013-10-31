@@ -25,6 +25,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.sisu.goodies.common.Loggers;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.index.ArtifactInfo;
@@ -34,7 +35,6 @@ import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeNode.Type;
 import org.apache.maven.index.treeview.TreeViewRequest;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A default implementation of merged TreeNodeFactory, that is failry simple to extend. Note: this implementation
@@ -52,7 +52,7 @@ public class DefaultMergedTreeNodeFactory
   private static final boolean CHECK_LOCAL_AVAILABILITY = SystemPropertiesHelper.getBoolean(
       CHECK_LOCAL_AVAILABILITY_KEY, false);
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = Loggers.getLogger(getClass());
 
   private final Repository repository;
 
