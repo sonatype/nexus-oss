@@ -17,92 +17,77 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
-import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plexus.appevents.Event;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * EventInspector that listens to registry events, repo addition and removal, and simply "hooks" in the generated
+ * EventSubscriber that listens to registry events, repo addition and removal, and simply "hooks" in the generated
  * Archetype catalog file to their root.
  *
  * @author cstamas
+ * @since 2.7.0
  */
 @Named
 @Singleton
-public class MacPluginEventInspector
+public class MacPluginEventSubscriber
     extends AbstractLoggingComponent
-    implements EventInspector
+    implements EventSubscriber
 {
   private static final String ARCHETYPE_PATH = "/archetype-catalog.xml";
 
   private final ContentClass maven2ContentClass;
 
   @Inject
-  public MacPluginEventInspector(final @Named("maven2") ContentClass maven2ContentClass) {
+  public MacPluginEventSubscriber(final @Named("maven2") ContentClass maven2ContentClass) {
     this.maven2ContentClass = checkNotNull(maven2ContentClass);
   }
 
-  private boolean HANDLED(final Repository repository) {
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryRegistryEventAdd evt) {
+    final Repository repository = evt.getRepository();
+    // check do we need to handle it at all
+    if (isHandled(repository)) {
+      handle(repository);
+    }
+  }
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryConfigurationUpdatedEvent evt) {
+    final Repository repository = evt.getRepository();
+    // check do we need to handle it at all
+    if (isHandled(repository)) {
+      handle(repository);
+    }
+  }
+
+  private boolean isHandled(final Repository repository) {
     return maven2ContentClass.isCompatible(repository.getRepositoryContentClass())
+        && repository.getLocalStatus().shouldServiceRequest()
         && (repository.getRepositoryKind().isFacetAvailable(HostedRepository.class)
         || repository.getRepositoryKind().isFacetAvailable(ProxyRepository.class) ||
-        repository.getRepositoryKind().isFacetAvailable(
-            GroupRepository.class));
+        repository.getRepositoryKind().isFacetAvailable(GroupRepository.class));
   }
 
-
-  public boolean accepts(Event<?> evt) {
-    if (evt instanceof RepositoryRegistryEventAdd) {
-      // only if is relevant to us
-      return HANDLED(((RepositoryRegistryEventAdd) evt).getRepository());
-    }
-    else if (evt instanceof RepositoryConfigurationUpdatedEvent) {
-      // only if is relevant to us
-      return HANDLED(((RepositoryConfigurationUpdatedEvent) evt).getRepository());
-    }
-    else if (evt instanceof RepositoryEventLocalStatusChanged) {
-      // only if put into service
-      return HANDLED(((RepositoryEventLocalStatusChanged) evt).getRepository())
-          && LocalStatus.IN_SERVICE.equals(((RepositoryEventLocalStatusChanged) evt).getNewLocalStatus());
-    }
-    else {
-      return false;
-    }
-  }
-
-  public void inspect(Event<?> evt) {
-    Repository repository = null;
-
-    if (evt instanceof RepositoryRegistryEventAdd) {
-      repository = ((RepositoryRegistryEventAdd) evt).getRepository();
-    }
-    else if (evt instanceof RepositoryConfigurationUpdatedEvent) {
-      repository = ((RepositoryConfigurationUpdatedEvent) evt).getRepository();
-    }
-    else if (evt instanceof RepositoryEventLocalStatusChanged) {
-      repository = ((RepositoryEventLocalStatusChanged) evt).getRepository();
-    }
-    else {
-      // huh?
-      return;
-    }
-
+  private void handle(final Repository repository) {
     if (repository.isIndexable()) {
       // "install" the archetype catalog
       try {
