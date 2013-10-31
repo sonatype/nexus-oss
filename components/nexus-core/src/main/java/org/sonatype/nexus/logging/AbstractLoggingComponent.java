@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.logging;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,34 +25,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * {@code LoggerFactory.getLogger(getClass() )} directly instead, since unsure about the "value" of this class.
  *
  * @author cstamas
+ * @deprecated Use {@link ComponentSupport} instead.
  */
+@Deprecated
 public abstract class AbstractLoggingComponent
+    extends ComponentSupport
 {
-
-  private final Logger logger;
-
-  /**
-   * Default constructor that creates logger for component upon instantiation.
-   */
-  protected AbstractLoggingComponent() {
-    this.logger = checkNotNull(createLogger());
-  }
-
-  /**
-   * Creates logger instance to be used with component instance. It might be overridden by subclasses to implement
-   * alternative logger naming strategy. By default, this method does the "usual" fluff: {@code
-   * LoggerFactory.getLogger(getClass())}.
-   *
-   * @return The Logger instance to be used by component for logging.
-   */
-  protected Logger createLogger() {
-    return LoggerFactory.getLogger(getClass());
-  }
-
   /**
    * Returns the Logger instance of this component. Never returns {@code null}.
+   *
+   * @deprecated Use the protected {@link #log} member directly instead.
    */
+  @Deprecated
   protected Logger getLogger() {
-    return logger;
+    return log;
   }
 }
