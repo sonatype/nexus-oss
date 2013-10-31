@@ -86,7 +86,7 @@ public class RemoteContentDiscovererImpl
       }
       catch (InvalidInputException e) {
         final String message =
-            "Remote strategy " + strategy.getId() + " detected invalid input, results discarded: "
+            "Remote strategy " + strategy.getId() + " on " + mavenProxyRepository + " detected invalid input, results discarded: "
                 + e.getMessage();
         getLogger().info(message);
         discoveryResult.recordFailure(strategy.getId(), message);
@@ -94,10 +94,10 @@ public class RemoteContentDiscovererImpl
       }
       catch (Exception e) {
         if (getLogger().isDebugEnabled()) {
-          getLogger().warn("Remote strategy {} error", strategy.getId(), e);
+          getLogger().warn("Remote strategy {} error on {}", strategy.getId(), mavenProxyRepository, e);
         }
         else {
-          getLogger().warn("Remote strategy {} error: {} / {}", strategy.getId(),
+          getLogger().warn("Remote strategy {} error on {}: {} / {}", strategy.getId(), mavenProxyRepository,
               e.getClass().getSimpleName(), e.getMessage()
           );
         }
