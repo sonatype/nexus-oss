@@ -497,14 +497,16 @@ public class DefaultCapabilityReference
         validityHandler.release();
         capability.onRemove();
         resetLastException();
-        state = new RemovedState();
-        eventBus.post(
-            new CapabilityEvent.AfterRemove(capabilityRegistry, DefaultCapabilityReference.this)
-        );
       }
       catch (Exception e) {
         setLastException(e);
         getLogger().error("Could not remove capability {} ({})", capability, id, e);
+      }
+      finally {
+        state = new RemovedState();
+        eventBus.post(
+            new CapabilityEvent.AfterRemove(capabilityRegistry, DefaultCapabilityReference.this)
+        );
       }
     }
 
