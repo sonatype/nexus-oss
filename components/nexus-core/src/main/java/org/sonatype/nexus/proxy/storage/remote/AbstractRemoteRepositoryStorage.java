@@ -103,7 +103,7 @@ public abstract class AbstractRemoteRepositoryStorage
       throw e;
     }
     catch (IOException e) {
-      throw new RemoteStorageException("Could not update context", e);
+      throw new RemoteStorageException("Could not update context of " + repository, e);
     }
   }
 
@@ -113,15 +113,13 @@ public abstract class AbstractRemoteRepositoryStorage
       throws IOException
   {
     if (ContextOperation.INITIALIZE == contextOperation) {
-      log.info(
-          String.format("Initializing transport for proxy repository %s...",
-              RepositoryStringUtils.getHumanizedNameString(repository)));
+      log.info("Initializing remote transport for proxy repository {}...",
+              RepositoryStringUtils.getHumanizedNameString(repository));
 
     }
     else if (ContextOperation.UPDATE == contextOperation) {
-      log.info(
-          String.format("Updating transport for proxy repository %s...",
-              RepositoryStringUtils.getHumanizedNameString(repository)));
+      log.info("Updating remote transport for proxy repository {}...",
+              RepositoryStringUtils.getHumanizedNameString(repository));
     }
     updateContext((ProxyRepository) repository, (RemoteStorageContext) context);
   }
