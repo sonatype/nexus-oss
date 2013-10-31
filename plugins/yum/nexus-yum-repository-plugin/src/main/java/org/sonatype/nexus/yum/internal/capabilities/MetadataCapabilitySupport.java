@@ -154,7 +154,7 @@ public abstract class MetadataCapabilitySupport<C extends MetadataCapabilityConf
         }
       }
       catch (Exception e) {
-        return super.status();
+        return null;
       }
     }
     return null;
