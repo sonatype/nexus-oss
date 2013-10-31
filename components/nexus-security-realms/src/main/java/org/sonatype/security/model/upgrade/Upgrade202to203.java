@@ -29,19 +29,17 @@ import org.sonatype.security.model.v2_0_3.CUser;
 import org.sonatype.security.model.v2_0_3.CUserRoleMapping;
 import org.sonatype.security.model.v2_0_3.Configuration;
 import org.sonatype.security.model.v2_0_3.upgrade.BasicVersionUpgrade;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
 @Typed(SecurityUpgrader.class)
 @Named("2.0.2")
 public class Upgrade202to203
+    extends ComponentSupport
     implements SecurityUpgrader
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private static String DEFAULT_SOURCE = "default";
 
   public Object loadConfiguration(File file)
@@ -82,7 +80,7 @@ public class Upgrade202to203
 
       if (DEFAULT_SOURCE.equalsIgnoreCase(roleMapping.getSource())
           && !this.hasUser(roleMapping.getUserId(), newc)) {
-        logger.info("Removing orphaned user role mapping for user: '" + roleMapping.getUserId() + "'.");
+        log.info("Removing orphaned user role mapping for user: '" + roleMapping.getUserId() + "'.");
         iter.remove();
       }
     }

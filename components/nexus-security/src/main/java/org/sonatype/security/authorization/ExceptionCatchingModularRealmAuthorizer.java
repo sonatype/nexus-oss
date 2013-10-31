@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 public class ExceptionCatchingModularRealmAuthorizer
     extends ModularRealmAuthorizer
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(ExceptionCatchingModularRealmAuthorizer.class);
 
   public ExceptionCatchingModularRealmAuthorizer(Collection<Realm> realms) {
     super(realms);

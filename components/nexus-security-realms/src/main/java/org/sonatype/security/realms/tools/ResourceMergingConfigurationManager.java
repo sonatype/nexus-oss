@@ -40,8 +40,6 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * ConfigurationManager that aggregates {@link StaticSecurityResource}s and {@link DynamicSecurityResource}s with
@@ -55,8 +53,6 @@ import org.slf4j.LoggerFactory;
 public class ResourceMergingConfigurationManager
     extends AbstractConfigurationManager
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   // This will handle all normal security.xml file loading/storing
   private final ConfigurationManager manager;
 
@@ -436,7 +432,7 @@ public class ResourceMergingConfigurationManager
       roles.addAll(userRoleMapping.getRoles());
     }
     catch (NoSuchRoleMappingException e) {
-      this.logger.debug("User: {} has no roles", user.getId());
+      this.log.debug("User: {} has no roles", user.getId());
     }
     this.updateUser(user, new HashSet<String>(roles));
   }

@@ -31,9 +31,10 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.LdapName;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -42,10 +43,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named
 public class DefaultLdapGroupDAO
+    extends ComponentSupport
     implements LdapGroupDAO
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final LdapUserDAO ldapUserManager;
 
   @Inject
@@ -106,7 +106,7 @@ public class DefaultLdapGroupDAO
 
           String filter = "(objectClass=" + configuration.getGroupObjectClass() + ")";
 
-          logger.debug(
+          log.debug(
               "Searching for groups in group DN: " + groupBaseDn + "\nUsing filter: \'" + filter + "\'");
 
           SearchControls ctls = this.getBaseSearchControls(new String[]{groupIdAttribute}, configuration
@@ -232,7 +232,7 @@ public class DefaultLdapGroupDAO
       filter += groupMemberAttribute + "=" + username + ")))";
     }
 
-    logger.debug(
+    log.debug(
         "Searching for group membership of: " + username + " in group DN: " + groupBaseDn + "\nUsing filter: \'"
             + filter + "\'");
 
@@ -262,7 +262,7 @@ public class DefaultLdapGroupDAO
       result = String.valueOf(dn.getRdn(dn.size() - 1).getValue());
     }
     catch (InvalidNameException e) {
-      logger.debug("Expected a Group DN but found: " + dnString);
+      log.debug("Expected a Group DN but found: " + dnString);
     }
     return result;
   }

@@ -74,6 +74,7 @@ import org.sonatype.nexus.util.CompositeException;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -128,8 +129,6 @@ import org.apache.maven.index.updater.IndexUpdateResult;
 import org.apache.maven.index.updater.IndexUpdater;
 import org.apache.maven.index.updater.ResourceFetcher;
 import org.apache.maven.index.util.IndexCreatorSorter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -188,6 +187,7 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class DefaultIndexerManager
+    extends ComponentSupport
     implements IndexerManager
 {
   private static final String ARTIFICIAL_EXCEPTION =
@@ -207,8 +207,6 @@ public class DefaultIndexerManager
    * Path prefix where index publishing happens
    */
   public static final String PUBLISHING_PATH_PREFIX = "/.index";
-
-  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   /**
    * Indexing is supported for this repository.
@@ -432,7 +430,7 @@ public class DefaultIndexerManager
   public void shutdown(boolean deleteFiles)
       throws IOException
   {
-    logger.info("Shutting down Nexus IndexerManager");
+    log.info("Shutting down Nexus IndexerManager");
 
     for (IndexingContext ctx : mavenIndexer.getIndexingContexts().values()) {
       mavenIndexer.removeIndexingContext(ctx, false);
@@ -494,11 +492,11 @@ public class DefaultIndexerManager
   private void addRepositoryIndexContext(final Repository repository, IndexingContext oldContext)
       throws IOException
   {
-    logger.debug("Adding indexing context for repository {}", repository.getId());
+    log.debug("Adding indexing context for repository {}", repository.getId());
 
     if (oldContext != null) {
       // this is an error, oldContext can have filesystem locks or long-running threads
-      logger.error("Old/stale indexing context {} for repository {}. Operation cancaled.", oldContext.getId(),
+      log.error("Old/stale indexing context {} for repository {}. Operation cancaled.", oldContext.getId(),
           repository.getId());
       return;
     }
@@ -530,7 +528,7 @@ public class DefaultIndexerManager
     }
     ctx.setSearchable(repository.isSearchable());
 
-    logger.debug("Added indexing context {} for repository {}", ctx.getId(), repository.getId());
+    log.debug("Added indexing context {} for repository {}", ctx.getId(), repository.getId());
   }
 
   private File getRepositoryIndexDirectory(final Repository repository) throws IOException {
@@ -551,7 +549,7 @@ public class DefaultIndexerManager
   {
     Thread otherThread = deleteThreads.putIfAbsent(repository.getId(), Thread.currentThread());
     if (otherThread != null) {
-      logger.debug("Indexing context for repository {} is being deleted by thread {}", repository.getId(),
+      log.debug("Indexing context for repository {} is being deleted by thread {}", repository.getId(),
           otherThread.getName());
       return;
     }
@@ -590,14 +588,14 @@ public class DefaultIndexerManager
       throws IOException
   {
     if (context != null) {
-      logger.debug("Removing indexing context for repository {} deleteFiles={}", repository.getId(), deleteFiles);
+      log.debug("Removing indexing context for repository {} deleteFiles={}", repository.getId(), deleteFiles);
 
       mavenIndexer.removeIndexingContext(context, deleteFiles);
 
-      logger.debug("Removed indexing context {} for repository {}", context.getId(), repository.getId());
+      log.debug("Removed indexing context {} for repository {}", context.getId(), repository.getId());
     }
     else {
-      logger.debug("Could not remove <null> indexing context for repository {}", repository.getId());
+      log.debug("Could not remove <null> indexing context for repository {}", repository.getId());
     }
   }
 
@@ -627,7 +625,7 @@ public class DefaultIndexerManager
       public void run(IndexingContext context)
           throws IOException
       {
-        logger.debug("Updating indexing context for repository {}", repository.getId());
+        log.debug("Updating indexing context for repository {}", repository.getId());
 
         File repoRoot = getRepositoryLocalStorageAsFile(repository);
 
@@ -651,11 +649,11 @@ public class DefaultIndexerManager
           }
           catch (NoSuchRepositoryException e) {
             // this can only happen if the repository was removed or changed type by another thread
-            logger.debug("Could not add indexing context for repository {}", repositoryId, e);
+            log.debug("Could not add indexing context for repository {}", repositoryId, e);
           }
         }
 
-        logger.debug("Updated indexing context for repository {}", repository.getId());
+        log.debug("Updated indexing context for repository {}", repository.getId());
       }
     });
   }
@@ -684,7 +682,7 @@ public class DefaultIndexerManager
         return baseDir;
       }
       catch (LocalStorageException e) {
-        logger.warn(String.format("Cannot determine \"%s\" (ID=%s) repository's basedir:",
+        log.warn(String.format("Cannot determine \"%s\" (ID=%s) repository's basedir:",
             repository.getName(), repository.getId()), e);
       }
     }
@@ -771,8 +769,8 @@ public class DefaultIndexerManager
           }
 
           if (ac != null) {
-            if (logger.isDebugEnabled()) {
-              logger.debug("The ArtifactContext created from file is fine, continuing.");
+            if (log.isDebugEnabled()) {
+              log.debug("The ArtifactContext created from file is fine, continuing.");
             }
 
             ArtifactInfo ai = ac.getArtifactInfo();
@@ -856,8 +854,8 @@ public class DefaultIndexerManager
     }
 
     // remove file from index
-    if (logger.isDebugEnabled()) {
-      logger.debug("Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
+    if (log.isDebugEnabled()) {
+      log.debug("Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
           + " from index (DELETE).");
     }
 
@@ -876,8 +874,8 @@ public class DefaultIndexerManager
     }
     else {
       // do NOT remove file from index
-      if (logger.isDebugEnabled()) {
-        logger.debug("NOT deleting artifact " + ac.getArtifactInfo().groupId + ":"
+      if (log.isDebugEnabled()) {
+        log.debug("NOT deleting artifact " + ac.getArtifactInfo().groupId + ":"
             + ac.getArtifactInfo().artifactId + ":" + ac.getArtifactInfo().version
             + " from index (DELETE), since it is a timestamped snapshot and more builds exists.");
       }
@@ -900,7 +898,7 @@ public class DefaultIndexerManager
   public void reindexAllRepositories(final String fromPath, final boolean fullReindex)
       throws IOException
   {
-    logger.debug("Reindexing all repositories fromPath={} fullReindex={}", fromPath, fullReindex);
+    log.debug("Reindexing all repositories fromPath={} fullReindex={}", fromPath, fullReindex);
 
     final List<Repository> reposes = repositoryRegistry.getRepositories();
     final ArrayList<IOException> exceptions = new ArrayList<IOException>();
@@ -993,7 +991,7 @@ public class DefaultIndexerManager
     ForceableReentrantLock reindexLock = getReindexLock(repository);
     if (reindexLock.tryLock()) {
       try {
-        logger.debug("Reindexing repository {} fromPath={} fullReindex={}", repository.getId(), fromPath,
+        log.debug("Reindexing repository {} fromPath={} fullReindex={}", repository.getId(), fromPath,
             fullReindex);
 
         if (!fullReindex) {
@@ -1001,13 +999,13 @@ public class DefaultIndexerManager
           try {
             Runnable runnable = new IndexUpdateRunnable(repository, fromPath, false);
             sharedSingle(repository, runnable);
-            logger.debug("Reindexed repository {}", repository.getId());
+            log.debug("Reindexed repository {}", repository.getId());
             return;
           }
           catch (IncrementalIndexUpdateException e) {
             //This exception is an indication that an incremental
             //update is not possible, and a full update is necessary
-            logger.info("Unable to incrementally update index for repository {}. Trying full index update",
+            log.info("Unable to incrementally update index for repository {}. Trying full index update",
                 repository.getId());
 
             //Let execution continue to below to try full index update
@@ -1023,14 +1021,14 @@ public class DefaultIndexerManager
         // creates a temp ctx and finally replaces the "real" with temp
         temporary(repository, runnable);
 
-        logger.debug("Reindexed repository {}", repository.getId());
+        log.debug("Reindexed repository {}", repository.getId());
       }
       finally {
         reindexLock.unlock();
       }
     }
     else {
-      logger.info(
+      log.info(
           "Repository '{}' is already in the process of being re-indexed. Skipping additional reindex requests.",
           repository.getId());
     }
@@ -1085,7 +1083,7 @@ public class DefaultIndexerManager
   public void downloadAllIndex()
       throws IOException
   {
-    logger.debug("Downloading remote indexes for all repositories");
+    log.debug("Downloading remote indexes for all repositories");
 
     final List<ProxyRepository> reposes = repositoryRegistry.getRepositoriesWithFacet(ProxyRepository.class);
     final ArrayList<IOException> exceptions = new ArrayList<IOException>();
@@ -1169,7 +1167,7 @@ public class DefaultIndexerManager
           catch (IncrementalIndexUpdateException e) {
             //This exception is an indication that an incremental
             //update is not possible, and a full update is necessary
-            logger.info("Unable to incrementally update index for repository {}. Trying full index update",
+            log.info("Unable to incrementally update index for repository {}. Trying full index update",
                 repository.getId());
 
             //Let execution continue to below to try full index update
@@ -1196,7 +1194,7 @@ public class DefaultIndexerManager
       }
     }
     else {
-      logger.info(
+      log.info(
           "Repository '%s' is already in the process of being re-indexed. Skipping additional download index requests.",
           repository.getId());
     }
@@ -1221,7 +1219,7 @@ public class DefaultIndexerManager
       return;
     }
 
-    logger.info(RepositoryStringUtils.getFormattedMessage("Trying to get remote index for repository %s",
+    log.info(RepositoryStringUtils.getFormattedMessage("Trying to get remote index for repository %s",
         repository));
 
     // this will force remote check for newer files
@@ -1304,39 +1302,39 @@ public class DefaultIndexerManager
       boolean hasRemoteIndexUpdate = result.getTimestamp() != null;
 
       if (hasRemoteIndexUpdate) {
-        logger.info(RepositoryStringUtils.getFormattedMessage(
+        log.info(RepositoryStringUtils.getFormattedMessage(
             "Remote indexes updated successfully for repository %s", repository));
       }
       else {
-        logger.info(RepositoryStringUtils.getFormattedMessage(
+        log.info(RepositoryStringUtils.getFormattedMessage(
             "Remote indexes unchanged (no update needed) for repository %s", repository));
       }
     }
     catch (FileNotFoundException e) {
       // here, FileNotFoundException literally means ResourceFetcher -- that is HTTP based -- hit a 404 on
       // remote, so we neglect this, this is not an error state actually
-      if (logger.isDebugEnabled()) {
-        logger.info(RepositoryStringUtils.getFormattedMessage(
+      if (log.isDebugEnabled()) {
+        log.info(RepositoryStringUtils.getFormattedMessage(
             "Cannot fetch remote index for repository %s as it does not publish indexes.", repository), e);
       }
       else {
-        logger.info(RepositoryStringUtils.getFormattedMessage(
+        log.info(RepositoryStringUtils.getFormattedMessage(
             "Cannot fetch remote index for repository %s as it does not publish indexes.", repository));
       }
     }
     catch (TaskInterruptedException e) {
-      logger.warn(RepositoryStringUtils.getFormattedMessage(
+      log.warn(RepositoryStringUtils.getFormattedMessage(
           "Cannot fetch remote index for repository %s, task cancelled.", repository));
     }
     catch (IncrementalIndexUpdateException e) {
       //This is an indication that an incremental index update is not possible, and a full index
       //update must be performed.
       //Just log this, and pass this exception upstream so that it can be handled appropriately
-      logger.info("Cannot incrementally update index for repository {}", repository.getId());
+      log.info("Cannot incrementally update index for repository {}", repository.getId());
       throw e;
     }
     catch (IOException e) {
-      logger.warn(RepositoryStringUtils.getFormattedMessage(
+      log.warn(RepositoryStringUtils.getFormattedMessage(
           "Cannot fetch remote index for repository %s due to IO problem.", repository), e);
       throw e;
     }
@@ -1344,7 +1342,7 @@ public class DefaultIndexerManager
       final String message =
           RepositoryStringUtils.getFormattedMessage(
               "Cannot fetch remote index for repository %s, error occurred.", repository);
-      logger.warn(message, e);
+      log.warn(message, e);
       throw new IOException(message, e);
     }
   }
@@ -1381,7 +1379,7 @@ public class DefaultIndexerManager
   public void publishAllIndex()
       throws IOException
   {
-    logger.debug("Publishing indexes for all repositories");
+    log.debug("Publishing indexes for all repositories");
 
     final List<Repository> reposes = repositoryRegistry.getRepositories();
     final ArrayList<IOException> exceptions = new ArrayList<IOException>();
@@ -1459,7 +1457,7 @@ public class DefaultIndexerManager
       }
     }
     else {
-      logger.info(
+      log.info(
           "Repository '{}' is already in the process of being re-indexed. Skipping additional publish index requests.",
           repository.getId());
     }
@@ -1468,14 +1466,14 @@ public class DefaultIndexerManager
   private void publishRepositoryIndex(final Repository repository, IndexingContext context)
       throws IOException
   {
-    logger.debug("Publishing index for repository {}", repository.getId());
+    log.debug("Publishing index for repository {}", repository.getId());
 
     File targetDir = null;
 
     try {
       TaskUtil.checkInterruption();
 
-      logger.info("Publishing index for repository " + repository.getId());
+      log.info("Publishing index for repository " + repository.getId());
 
       targetDir = new File(getTempDirectory(), "nx-index-" + Long.toHexString(System.nanoTime()));
 
@@ -1498,15 +1496,15 @@ public class DefaultIndexerManager
         }
       }
 
-      logger.debug("Published index for repository {}", repository.getId());
+      log.debug("Published index for repository {}", repository.getId());
     }
     finally {
       Exception lastException = null;
 
       if (targetDir != null) {
         try {
-          if (logger.isDebugEnabled()) {
-            logger.debug("Cleanup of temp files...");
+          if (log.isDebugEnabled()) {
+            log.debug("Cleanup of temp files...");
           }
 
           DirSupport.deleteIfExists(targetDir.toPath());
@@ -1514,7 +1512,7 @@ public class DefaultIndexerManager
         catch (IOException e) {
           lastException = e;
 
-          logger.warn("Cleanup of temp files FAILED...", e);
+          log.warn("Cleanup of temp files FAILED...", e);
         }
       }
 
@@ -1537,7 +1535,7 @@ public class DefaultIndexerManager
       // nothing serious, no index was published yet, keep it silent
     }
     catch (Exception e) {
-      logger.error("Cannot delete index items!", e);
+      log.error("Cannot delete index items!", e);
     }
   }
 
@@ -1571,7 +1569,7 @@ public class DefaultIndexerManager
       }
     }
     catch (Exception e) {
-      logger.error("Cannot store index file " + path, e);
+      log.error("Cannot store index file " + path, e);
     }
   }
 
@@ -1582,7 +1580,7 @@ public class DefaultIndexerManager
   public void optimizeAllRepositoriesIndex()
       throws IOException
   {
-    logger.debug("Optimizing indexes for all repositories");
+    log.debug("Optimizing indexes for all repositories");
 
     final List<Repository> repos = repositoryRegistry.getRepositories();
     final ArrayList<IOException> exceptions = new ArrayList<IOException>();
@@ -1652,11 +1650,11 @@ public class DefaultIndexerManager
       {
         TaskUtil.checkInterruption();
 
-        logger.debug("Optimizing index for repository {} ", repository.getId());
+        log.debug("Optimizing index for repository {} ", repository.getId());
 
         context.optimize();
 
-        logger.debug("Optimized index for repository {} ", repository.getId());
+        log.debug("Optimized index for repository {} ", repository.getId());
       }
     });
   }
@@ -2077,15 +2075,15 @@ public class DefaultIndexerManager
       return result;
     }
     catch (BooleanQuery.TooManyClauses e) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Too many clauses exception caught:", e);
+      if (log.isDebugEnabled()) {
+        log.debug("Too many clauses exception caught:", e);
       }
 
       // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
       return new FlatSearchResponse(req.getQuery(), -1, new HashSet<ArtifactInfo>());
     }
     catch (IOException e) {
-      logger.error("Got I/O exception while searching for query \"" + req.getQuery() + "\"", e);
+      log.error("Got I/O exception while searching for query \"" + req.getQuery() + "\"", e);
 
       return new FlatSearchResponse(req.getQuery(), 0, new HashSet<ArtifactInfo>());
     }
@@ -2119,8 +2117,8 @@ public class DefaultIndexerManager
     catch (BooleanQuery.TooManyClauses e) {
       lockedContexts.lock.unlock();
 
-      if (logger.isDebugEnabled()) {
-        logger.debug("Too many clauses exception caught:", e);
+      if (log.isDebugEnabled()) {
+        log.debug("Too many clauses exception caught:", e);
       }
 
       // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
@@ -2129,7 +2127,7 @@ public class DefaultIndexerManager
     catch (IOException e) {
       lockedContexts.lock.unlock();
 
-      logger.error("Got I/O exception while searching for query \"" + req.getQuery().toString() + "\"", e);
+      log.error("Got I/O exception while searching for query \"" + req.getQuery().toString() + "\"", e);
 
       return IteratorSearchResponse.empty(req.getQuery());
     }
@@ -2299,7 +2297,7 @@ public class DefaultIndexerManager
       }
     }
     else {
-      logger.warn("Could not perform index operation on repository {}", repository.getId(), new Exception(
+      log.warn("Could not perform index operation on repository {}", repository.getId(), new Exception(
           ARTIFICIAL_EXCEPTION));
     }
   }
@@ -2320,7 +2318,7 @@ public class DefaultIndexerManager
           runnable.run(ctx);
         }
         else {
-          logger.warn("Could not perform index operation on repository {}", repository.getId(),
+          log.warn("Could not perform index operation on repository {}", repository.getId(),
               new Exception(ARTIFICIAL_EXCEPTION));
         }
       }
@@ -2352,7 +2350,7 @@ public class DefaultIndexerManager
         null, // repository url
         null, // repository update url
         indexCreators, true);
-    logger.debug("Created temporary indexing context " + location + " for repository " + repository.getId());
+    log.debug("Created temporary indexing context " + location + " for repository " + repository.getId());
 
     try {
       runnable.run(temporary);
@@ -2374,7 +2372,7 @@ public class DefaultIndexerManager
             target.replace(temporary.getIndexDirectory());
           }
           else {
-            logger.warn("Could not perform index operation on repository {}", repository.getId(),
+            log.warn("Could not perform index operation on repository {}", repository.getId(),
                 new Exception());
           }
         }
@@ -2438,7 +2436,7 @@ public class DefaultIndexerManager
 
     Thread deleteThread = deleteThreads.get(repository.getId());
     if (deleteThread != null && deleteThread != Thread.currentThread()) {
-      logger.debug("Could not acquire {} lock on repository {}. The repository is being deleted by thread {}.",
+      log.debug("Could not acquire {} lock on repository {}. The repository is being deleted by thread {}.",
           lockName, repository.getId(), deleteThread.getName());
       return null;
     }
@@ -2457,14 +2455,14 @@ public class DefaultIndexerManager
       if (lock.tryLock(lockTimeoutSeconds, TimeUnit.SECONDS)) {
         return lock;
       }
-      if (logger.isDebugEnabled()) {
-        logger.warn("Could not acquire {} lock on repository {} in {} seconds. " //
+      if (log.isDebugEnabled()) {
+        log.warn("Could not acquire {} lock on repository {} in {} seconds. " //
             + "Consider increasing value of ''nexus.indexer.locktimeout'' parameter. " //
             + "The operation has been aborted.", //
             lockName, repository.getId(), lockTimeoutSeconds, new Exception(ARTIFICIAL_EXCEPTION));
       }
       else {
-        logger.warn("Could not acquire {} lock on repository {} in {} seconds. " //
+        log.warn("Could not acquire {} lock on repository {} in {} seconds. " //
             + "Consider increasing value of ''nexus.indexer.locktimeout'' parameter. " //
             + "Enable debug log to recieve more information.", //
             lockName, repository.getId(), lockTimeoutSeconds);
@@ -2472,7 +2470,7 @@ public class DefaultIndexerManager
     }
     catch (InterruptedException e) {
       // TODO consider throwing IOException instead
-      logger.debug("Interrupted {} lock request on repository {}", lockName, repository.getId(), new Exception(
+      log.debug("Interrupted {} lock request on repository {}", lockName, repository.getId(), new Exception(
           ARTIFICIAL_EXCEPTION));
     }
     return null;

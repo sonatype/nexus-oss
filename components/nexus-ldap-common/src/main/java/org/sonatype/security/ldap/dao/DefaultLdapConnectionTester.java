@@ -21,19 +21,19 @@ import javax.inject.Singleton;
 import javax.naming.NamingException;
 import javax.naming.ldap.LdapContext;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 @Named
 public class DefaultLdapConnectionTester
+    extends ComponentSupport
     implements LdapConnectionTester
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final LdapUserDAO ldapUserDao;
 
   private final LdapGroupDAO ldapGroupDAO;
@@ -89,8 +89,8 @@ public class DefaultLdapConnectionTester
           }
           catch (NoLdapUserRolesFoundException e) {
             // this is ok, the users has no roles, not a problem
-            if (logger.isDebugEnabled()) {
-              this.logger.debug("While testing for user mapping user: " + ldapUser.getUsername()
+            if (log.isDebugEnabled()) {
+              this.log.debug("While testing for user mapping user: " + ldapUser.getUsername()
                   + " had no roles.");
             }
           }

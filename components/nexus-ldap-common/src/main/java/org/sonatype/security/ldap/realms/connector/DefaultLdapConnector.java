@@ -29,16 +29,14 @@ import org.sonatype.security.ldap.dao.LdapUserDAO;
 import org.sonatype.security.ldap.dao.NoLdapUserRolesFoundException;
 import org.sonatype.security.ldap.dao.NoSuchLdapGroupException;
 import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.shiro.realm.ldap.LdapContextFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DefaultLdapConnector
+    extends ComponentSupport
     implements LdapConnector
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private LdapUserDAO ldapUserManager;
 
   private LdapGroupDAO ldapGroupManager;
@@ -49,8 +47,11 @@ public class DefaultLdapConnector
 
   private String identifier;
 
-  public DefaultLdapConnector(String identifier, LdapUserDAO ldapUserManager, LdapGroupDAO ldapGroupManager,
-                              LdapContextFactory ldapContextFactory, LdapAuthConfiguration ldapAuthConfiguration)
+  public DefaultLdapConnector(String identifier,
+                              LdapUserDAO ldapUserManager,
+                              LdapGroupDAO ldapGroupManager,
+                              LdapContextFactory ldapContextFactory,
+                              LdapAuthConfiguration ldapAuthConfiguration)
   {
     this.identifier = identifier;
     this.ldapUserManager = ldapUserManager;
@@ -111,7 +112,7 @@ public class DefaultLdapConnector
             ldapUser.setMembership(this.getGroupMembership(ldapUser.getUsername(), context, conf));
           }
           catch (NoLdapUserRolesFoundException e) {
-            this.logger.debug("No roles found for user: " + ldapUser.getUsername());
+            this.log.debug("No roles found for user: " + ldapUser.getUsername());
           }
         }
       }
@@ -142,7 +143,7 @@ public class DefaultLdapConnector
           ldapUser.setMembership(this.getGroupMembership(ldapUser.getUsername(), context, conf));
         }
         catch (NoLdapUserRolesFoundException e) {
-          this.logger.debug("No roles found for user: " + username);
+          this.log.debug("No roles found for user: " + username);
         }
       }
 
@@ -178,7 +179,7 @@ public class DefaultLdapConnector
             ldapUser.setMembership(this.getGroupMembership(ldapUser.getUsername(), context, conf));
           }
           catch (NoLdapUserRolesFoundException e) {
-            this.logger.debug("No roles found for user: " + username);
+            this.log.debug("No roles found for user: " + username);
           }
         }
       }
@@ -263,7 +264,7 @@ public class DefaultLdapConnector
       }
     }
     catch (NamingException e) {
-      this.logger.debug("Error closing connection: " + e.getMessage(), e);
+      this.log.debug("Error closing connection: " + e.getMessage(), e);
     }
   }
 }
