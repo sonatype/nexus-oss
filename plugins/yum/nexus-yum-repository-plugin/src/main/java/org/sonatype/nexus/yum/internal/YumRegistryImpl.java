@@ -163,7 +163,7 @@ public class YumRegistryImpl
       repository.storeItem(false, file);
     }
     catch (Exception e) {
-      LOG.warn("Could not store '{}'", file, e);
+      LOG.warn("Could not install yum.repo file '{}' due to {}/{}", file, e.getClass().getName(), e.getMessage());
     }
   }
 
