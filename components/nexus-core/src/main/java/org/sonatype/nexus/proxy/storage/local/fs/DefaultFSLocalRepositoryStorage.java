@@ -18,7 +18,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -48,6 +47,7 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.AbstractLocalRepositoryStorage;
+import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.util.ItemPathUtils;
@@ -71,6 +71,11 @@ public class DefaultFSLocalRepositoryStorage
 {
   public static final String PROVIDER_STRING = "file";
 
+  /**
+   * Key of the {@link File} denoting repository root directory in repository's context.
+   */
+  private static final String BASEDIR_FILE = DefaultFSLocalRepositoryStorage.class.getName() + ".baseDir";
+
   private FSPeer fsPeer;
 
   @Inject
@@ -85,10 +90,12 @@ public class DefaultFSLocalRepositoryStorage
     return fsPeer;
   }
 
+  @Override
   public String getProviderId() {
     return PROVIDER_STRING;
   }
 
+  @Override
   public void validateStorageUrl(String url)
       throws LocalStorageException
   {
@@ -99,50 +106,25 @@ public class DefaultFSLocalRepositoryStorage
     }
   }
 
+  @Override
+  protected void updateContext(final Repository repository, final LocalStorageContext context)
+      throws IOException
+  {
+    final File file = org.sonatype.nexus.util.FileUtils.getFileFromUrl(repository.getLocalUrl());
+    DirSupport.mkdir(file.toPath());
+    context.putContextObject(BASEDIR_FILE, file);
+  }
+
+
   /**
    * Gets the base dir.
    *
    * @return the base dir
    */
-  public File getBaseDir(Repository repository, ResourceStoreRequest request)
+  public File getBaseDir(final Repository repository, final ResourceStoreRequest request)
       throws LocalStorageException
   {
-    URL url;
-
-    request.pushRequestPath(RepositoryItemUid.PATH_ROOT);
-    try {
-      url = getAbsoluteUrlFromBase(repository, request);
-    }
-    finally {
-      request.popRequestPath();
-    }
-
-    File file;
-
-    try {
-      file = new File(url.toURI());
-    }
-    catch (Exception t) {
-      file = new File(url.getPath());
-    }
-
-    if (file.exists()) {
-      if (file.isFile()) {
-        throw new LocalStorageException("The \"" + repository.getName() + "\" (ID=\"" + repository.getId()
-            + "\") repository's baseDir is not a directory, path: " + file.getAbsolutePath());
-      }
-    }
-    else {
-      try {
-        DirSupport.mkdir(file.toPath());
-      }
-      catch (IOException e) {
-        throw new LocalStorageException("Could not create the baseDir directory for repository \""
-            + repository.getName() + "\" (ID=\"" + repository.getId() + "\") on path " + file.getAbsolutePath(), e);
-      }
-    }
-
-    return file;
+    return (File) getLocalStorageContext(repository).getContextObject(BASEDIR_FILE);
   }
 
   /**
@@ -153,16 +135,6 @@ public class DefaultFSLocalRepositoryStorage
   public File getFileFromBase(final Repository repository, final ResourceStoreRequest request, final File repoBase)
       throws LocalStorageException
   {
-    if (!repoBase.exists()) {
-      try {
-        DirSupport.mkdir(repoBase.toPath());
-      }
-      catch (IOException e) {
-        throw new LocalStorageException(
-            "Cannot create repoBase directory at " + repoBase.getAbsolutePath() + " for repository " + repository, e);
-      }
-    }
-
     File result = null;
 
     if (request.getRequestPath() == null || RepositoryItemUid.PATH_ROOT.equals(request.getRequestPath())) {
@@ -221,8 +193,8 @@ public class DefaultFSLocalRepositoryStorage
 
     RepositoryItemUid uid = repository.createUid(path);
 
-    AbstractStorageItem result = null;
-    if (target.exists() && target.isDirectory()) {
+    final AbstractStorageItem result;
+    if (target.isDirectory()) {
       request.setRequestPath(path);
 
       DefaultStorageCollectionItem coll =
@@ -230,19 +202,20 @@ public class DefaultFSLocalRepositoryStorage
       coll.setModified(target.lastModified());
       coll.setCreated(target.lastModified());
       result = coll;
-
     }
-    else if (target.exists() && target.isFile() && !mustBeACollection) {
+    else if (target.isFile() && !mustBeACollection) {
       request.setRequestPath(path);
 
-      FileContentLocator linkContent = new FileContentLocator(target, "text/plain");
+      // FileComtentLocator is reusable, so create it only once but with correct MIME type
+      final FileContentLocator fileContent = new FileContentLocator(target, getMimeSupport().guessMimeTypeFromPath(
+          repository.getMimeRulesSource(), target.getAbsolutePath()));
 
       try {
-        if (getLinkPersister().isLinkContent(linkContent)) {
+        if (getLinkPersister().isLinkContent(fileContent)) {
           try {
             DefaultStorageLinkItem link =
                 new DefaultStorageLinkItem(repository, request, target.canRead(), target.canWrite(),
-                    getLinkPersister().readLinkContent(linkContent));
+                    getLinkPersister().readLinkContent(fileContent));
             repository.getAttributesHandler().fetchAttributes(link);
             link.setModified(target.lastModified());
             link.setCreated(target.lastModified());
@@ -261,8 +234,7 @@ public class DefaultFSLocalRepositoryStorage
         else {
           DefaultStorageFileItem file =
               new DefaultStorageFileItem(repository, request, target.canRead(), target.canWrite(),
-                  new FileContentLocator(target, getMimeSupport().guessMimeTypeFromPath(
-                      repository.getMimeRulesSource(), target.getAbsolutePath())));
+                  fileContent);
           repository.getAttributesHandler().fetchAttributes(file);
           file.setModified(target.lastModified());
           file.setCreated(target.lastModified());
@@ -296,8 +268,7 @@ public class DefaultFSLocalRepositoryStorage
   public boolean isReachable(Repository repository, ResourceStoreRequest request)
       throws LocalStorageException
   {
-    File target = getBaseDir(repository, request);
-
+    final File target = getBaseDir(repository, request);
     return getFSPeer().isReachable(repository, target, request, target);
   }
 

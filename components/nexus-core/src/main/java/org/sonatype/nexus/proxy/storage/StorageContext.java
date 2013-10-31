@@ -55,6 +55,15 @@ public interface StorageContext
    */
   int getGeneration();
 
+  /**
+   * Increments the generation of context without making any change to the context and returns the new generation.
+   * Usable to mark context "dirty" without actually doing any change to the context itself.
+   *
+   * @return the incremented context generation.
+   * @since 2.7.0
+   */
+  int incrementGeneration();
+
   // parent
 
   /**

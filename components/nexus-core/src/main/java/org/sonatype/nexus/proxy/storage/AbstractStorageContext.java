@@ -43,6 +43,7 @@ public abstract class AbstractStorageContext
     this.changeTimestamp = System.currentTimeMillis();
   }
 
+  @Override
   public synchronized int getGeneration() {
     if (parent != null) {
       return parent.getGeneration() + generation.get();
@@ -50,6 +51,7 @@ public abstract class AbstractStorageContext
     return generation.get();
   }
 
+  @Override
   @Deprecated
   public synchronized long getLastChanged() {
     if (parent != null) {
@@ -63,15 +65,19 @@ public abstract class AbstractStorageContext
     return changeTimestamp;
   }
 
-  protected synchronized void incrementGeneration() {
+  @Override
+  public synchronized int incrementGeneration() {
     generation.incrementAndGet();
     changeTimestamp = System.currentTimeMillis();
+    return getGeneration();
   }
 
+  @Override
   public StorageContext getParentStorageContext() {
     return parent;
   }
 
+  @Override
   public void setParentStorageContext(StorageContext parent) {
     // noop
     getLogger().warn(
@@ -79,6 +85,7 @@ public abstract class AbstractStorageContext
         getClass().getName());
   }
 
+  @Override
   public Object getContextObject(String key) {
     return getContextObject(key, true);
   }
@@ -95,6 +102,7 @@ public abstract class AbstractStorageContext
     }
   }
 
+  @Override
   public synchronized void putContextObject(String key, Object value) {
     final Object previous = context.put(key, value);
 
@@ -102,6 +110,7 @@ public abstract class AbstractStorageContext
     getLogger().debug("Context entry \"{}\" updated: {} -> {}", new Object[]{key, previous, value});
   }
 
+  @Override
   public synchronized void removeContextObject(String key) {
     final Object removed = context.remove(key);
 
@@ -109,6 +118,7 @@ public abstract class AbstractStorageContext
     getLogger().debug("Context entry \"{}\" removed. Existent value: ", key, removed);
   }
 
+  @Override
   public boolean hasContextObject(String key) {
     return context.containsKey(key);
   }
