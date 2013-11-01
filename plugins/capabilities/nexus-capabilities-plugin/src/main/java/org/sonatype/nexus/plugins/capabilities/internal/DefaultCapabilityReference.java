@@ -332,8 +332,7 @@ public class DefaultCapabilityReference
     lastException = e;
     if (e != null) {
       log.error(
-          "Could not {} capability {} ({}) due to {}/{}",
-          operation, capability, id, e.getClass().getName(), e.getMessage(), e
+          "Could not {} capability {} ({})", operation, capability, id, e
       );
     }
   }
