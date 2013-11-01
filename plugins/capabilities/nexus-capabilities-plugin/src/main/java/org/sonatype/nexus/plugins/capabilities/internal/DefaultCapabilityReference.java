@@ -333,7 +333,7 @@ public class DefaultCapabilityReference
     if (e != null) {
       log.error(
           "Could not {} capability {} ({}) due to {}/{}",
-          operation, capability, id, e.getClass().getName(), e.getMessage(), log.isDebugEnabled() ? e : null
+          operation, capability, id, e.getClass().getName(), e.getMessage(), e
       );
     }
   }
