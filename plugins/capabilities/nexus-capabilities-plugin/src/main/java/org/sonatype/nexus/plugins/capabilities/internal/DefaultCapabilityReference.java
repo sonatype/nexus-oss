@@ -488,7 +488,7 @@ public class DefaultCapabilityReference
       catch (Exception e) {
         setLastException("update", e);
         DefaultCapabilityReference.this.passivate();
-        state.setDescription("Update failed: " + e.getMessage());
+        state.setDescription("Update failed: " + e);
       }
     }
 
@@ -570,7 +570,7 @@ public class DefaultCapabilityReference
         }
         catch (Exception e) {
           setLastException("activate", e);
-          state.setDescription("Activation failed: " + e.getMessage());
+          state.setDescription("Activation failed: " + e);
         }
       }
       else {
@@ -627,7 +627,7 @@ public class DefaultCapabilityReference
       }
       catch (Exception e) {
         setLastException("passivate", e);
-        state.setDescription("Passivation failed: " + e.getMessage());
+        state.setDescription("Passivation failed: " + e);
       }
     }
 
