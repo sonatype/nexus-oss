@@ -71,7 +71,7 @@ public class KenaiRealm
 {
   public static final String ROLE = "kenai";
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(KenaiRealm.class);
 
   private final KenaiRealmConfiguration kenaiRealmConfiguration;
 

@@ -40,7 +40,7 @@ public class LdapAuthorizationManager
     extends AbstractReadOnlyAuthorizationManager
 {
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(LdapAuthorizationManager.class);
 
   private final LdapManager ldapManager;
 

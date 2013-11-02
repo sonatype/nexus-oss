@@ -57,7 +57,7 @@ public class XmlAuthenticatingRealm
     extends AuthorizingRealm
     implements Realm
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(XmlAuthenticatingRealm.class);
 
   public static final String ROLE = "XmlAuthenticatingRealm";
 

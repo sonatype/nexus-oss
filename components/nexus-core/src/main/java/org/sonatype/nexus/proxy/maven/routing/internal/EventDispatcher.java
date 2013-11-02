@@ -56,7 +56,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class EventDispatcher
 {
-  private final Logger logger;
+  private static final Logger logger = LoggerFactory.getLogger(EventDispatcher.class);
 
   private final Manager manager;
 
@@ -64,7 +64,6 @@ public class EventDispatcher
    * Da constructor.
    */
   public EventDispatcher(final Manager manager) {
-    this.logger = LoggerFactory.getLogger(getClass());
     this.manager = checkNotNull(manager);
   }
 

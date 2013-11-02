@@ -32,10 +32,10 @@ import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.LdapName;
 
 import org.sonatype.security.ldap.dao.password.PasswordEncoderManager;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 
@@ -45,10 +45,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named
 public class DefaultLdapUserDAO
+    extends ComponentSupport
     implements LdapUserDAO
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final PasswordEncoderManager passwordEncoderManager;
   
   @Inject
@@ -65,7 +64,7 @@ public class DefaultLdapUserDAO
   public void removeUser(String username, LdapContext context, LdapAuthConfiguration configuration)
       throws NoSuchLdapUserException, LdapDAOException
   {
-    logger.info("Remove user: " + username);
+    log.info("Remove user: " + username);
 
     try {
       context = (LdapContext) context.lookup(StringUtils.defaultString(configuration.getUserBaseDn(), ""));
@@ -266,11 +265,11 @@ public class DefaultLdapUserDAO
     }
 
     String f = configuration.getLdapFilter();
-    logger.debug("Specific filter rule: \"" + (f != null ? f : "none") + "\"");
+    log.debug("Specific filter rule: \"" + (f != null ? f : "none") + "\"");
     String filter =
         "(&(objectClass=" + configuration.getUserObjectClass() + ")(" + configuration.getUserIdAttribute() + "="
             + (username != null ? username : "*") + ")" + (f != null && !f.isEmpty() ? "(" + f + ")" : "") + ")";
-    logger.debug("Searching for users with filter: \'" + filter + "\'");
+    log.debug("Searching for users with filter: \'" + filter + "\'");
 
     String baseDN = StringUtils.defaultString(configuration.getUserBaseDn(), "");
 
@@ -385,7 +384,7 @@ public class DefaultLdapUserDAO
   public LdapUser getUser(String username, LdapContext context, LdapAuthConfiguration configuration)
       throws NoSuchLdapUserException, LdapDAOException
   {
-    logger.debug("Searching for user: " + username);
+    log.debug("Searching for user: " + username);
 
     try {
       NamingEnumeration<SearchResult> result = searchUsers(username, context, null, configuration, 1);
@@ -458,7 +457,7 @@ public class DefaultLdapUserDAO
       result = String.valueOf(dn.getRdn(dn.size() - 1).getValue());
     }
     catch (InvalidNameException e) {
-      logger.debug("Expected a Group DN but found: " + dnString);
+      log.debug("Expected a Group DN but found: " + dnString);
     }
     return result;
   }

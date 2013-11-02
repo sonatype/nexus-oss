@@ -35,6 +35,7 @@ public class NexusXStreamFactory
     final XStream xstream = new XStream(new LookAheadXppDriver());
     xstream.setMode(XStream.NO_REFERENCES);
     xstream.autodetectAnnotations(false);
+    xstream.ignoreUnknownElements();
     return xstream;
   }
 

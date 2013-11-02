@@ -46,8 +46,6 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 import com.google.common.collect.Sets;
 import org.apache.shiro.authc.credential.PasswordService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
 @Typed(ConfigurationManager.class)
@@ -55,9 +53,6 @@ import org.slf4j.LoggerFactory;
 public class DefaultConfigurationManager
     extends AbstractConfigurationManager
 {
-
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final SecurityModelConfigurationSource configurationSource;
 
   private final SecurityConfigurationValidator validator;
@@ -285,7 +280,7 @@ public class DefaultConfigurationManager
       deleteUserRoleMapping(id, SecurityXmlUserManager.SOURCE);
     }
     catch (NoSuchRoleMappingException e) {
-      this.getLogger().debug("User role mapping for user: " + id + " source: " + SecurityXmlUserManager.SOURCE
+      log.debug("User role mapping for user: " + id + " source: " + SecurityXmlUserManager.SOURCE
           + " could not be deleted because it does not exist.");
     }
   }
@@ -388,7 +383,7 @@ public class DefaultConfigurationManager
       roles.addAll(userRoleMapping.getRoles());
     }
     catch (NoSuchRoleMappingException e) {
-      this.logger.debug("User: {} has no roles", user.getId());
+      this.log.debug("User: {} has no roles", user.getId());
     }
     this.updateUser(user, new HashSet<String>(roles));
   }
@@ -478,7 +473,7 @@ public class DefaultConfigurationManager
         }
         sb.append(" ").append(msg.toString());
       }
-      logger.warn("Security configuration has validation warnings:" + sb.toString());
+      log.warn("Security configuration has validation warnings:" + sb.toString());
     }
   }
 
@@ -557,7 +552,7 @@ public class DefaultConfigurationManager
       this.configurationSource.storeConfiguration();
     }
     catch (IOException e) {
-      getLogger().error("IOException while storing configuration file", e);
+      log.error("IOException while storing configuration file", e);
     }
   }
 
@@ -579,12 +574,12 @@ public class DefaultConfigurationManager
       return this.configurationSource.getConfiguration();
     }
     catch (IOException e) {
-      getLogger().error("IOException while retrieving configuration file", e);
+      log.error("IOException while retrieving configuration file", e);
 
       throw new IllegalStateException("Cannot load configuration!", e);
     }
     catch (ConfigurationException e) {
-      getLogger().error("Invalid Configuration", e);
+      log.error("Invalid Configuration", e);
 
       throw new IllegalStateException("Invalid configuration!", e);
     }

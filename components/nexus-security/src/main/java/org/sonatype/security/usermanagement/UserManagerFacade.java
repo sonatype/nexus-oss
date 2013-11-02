@@ -21,16 +21,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 @Singleton
 @Typed(UserManagerFacade.class)
 @Named("default")
 public class UserManagerFacade
+  extends ComponentSupport
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final Map<String, UserManager> userManagers;
 
   @Inject
@@ -86,7 +84,7 @@ public class UserManagerFacade
           }
         }
         catch (UserNotFoundException e) {
-          logger.debug("User '" + user.getUserId() + "' is not managed by the usermanager: "
+          log.debug("User '" + user.getUserId() + "' is not managed by the usermanager: "
               + tmpUserManager.getSource());
         }
       }

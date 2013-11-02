@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class StaticModelConfigurationSource
     extends AbstractSecurityModelConfigurationSource
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger log = LoggerFactory.getLogger(StaticModelConfigurationSource.class);
 
   private static final String STATIC_SECURITY_RESOURCE = "/META-INF/security/security.xml";
 
@@ -58,7 +58,7 @@ public class StaticModelConfigurationSource
       loadConfiguration(getConfigurationAsStream());
     }
     else {
-      this.logger.warn("Default static security configuration not found in classpath: "
+      this.log.warn("Default static security configuration not found in classpath: "
           + STATIC_SECURITY_RESOURCE);
     }
 

@@ -36,8 +36,6 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A user manger that returns all users that have roles defined in the security.xml file. This allows you to easily
@@ -53,8 +51,6 @@ import org.slf4j.LoggerFactory;
 public class ConfiguredUsersUserManager
     extends AbstractReadOnlyUserManager
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final SecuritySystem securitySystem;
 
   private final ConfigurationManager configuration;
@@ -85,13 +81,13 @@ public class ConfiguredUsersUserManager
         }
       }
       catch (UserNotFoundException e) {
-        this.logger.warn("User: '" + userRoleMapping.getUserId() + "' of source: '"
+        this.log.warn("User: '" + userRoleMapping.getUserId() + "' of source: '"
             + userRoleMapping.getSource() + "' could not be found.");
 
-        this.logger.debug("Most likely caused by a user role mapping that is invalid.", e);
+        this.log.debug("Most likely caused by a user role mapping that is invalid.", e);
       }
       catch (NoSuchUserManagerException e) {
-        this.logger.warn("User: '" + userRoleMapping.getUserId() + "' of source: '"
+        this.log.warn("User: '" + userRoleMapping.getUserId() + "' of source: '"
             + userRoleMapping.getSource() + "' could not be found.", e);
       }
     }

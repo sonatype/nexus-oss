@@ -45,8 +45,6 @@ import org.sonatype.security.usermanagement.UserStatus;
 
 import com.google.common.base.Throwables;
 import org.apache.shiro.authc.credential.PasswordService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A UserManager backed by the security.xml file. This UserManger supports all User CRUD operations.
@@ -61,8 +59,6 @@ public class SecurityXmlUserManager
     extends AbstractUserManager
     implements RoleMappingUserManager
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   public static final String SOURCE = "default";
 
   private final ConfigurationManager configuration;
@@ -120,7 +116,7 @@ public class SecurityXmlUserManager
     }
     catch (UserNotFoundException e) {
       // We should NEVER get here
-      this.logger.warn("Could not find user: '" + cUser.getId() + "' of source: '" + SOURCE
+      this.log.warn("Could not find user: '" + cUser.getId() + "' of source: '" + SOURCE
           + "' while looking up the users roles.", e);
     }
 
@@ -286,7 +282,7 @@ public class SecurityXmlUserManager
             }
           }
           catch (NoSuchRoleMappingException e) {
-            logger.debug("No user role mapping found for user: " + userId);
+            log.debug("No user role mapping found for user: " + userId);
           }
         }
       });
@@ -324,11 +320,11 @@ public class SecurityXmlUserManager
                   users.add(user);
                 }
                 catch (UserNotFoundException e) {
-                  logger.debug("User: '" + roleMapping.getUserId() + "' of source: '"
+                  log.debug("User: '" + roleMapping.getUserId() + "' of source: '"
                       + roleMapping.getSource() + "' could not be found.", e);
                 }
                 catch (NoSuchUserManagerException e) {
-                  logger.warn("User: '" + roleMapping.getUserId() + "' of source: '"
+                  log.warn("User: '" + roleMapping.getUserId() + "' of source: '"
                       + roleMapping.getSource() + "' could not be found.", e);
                 }
 
@@ -371,7 +367,7 @@ public class SecurityXmlUserManager
               configuration.deleteUserRoleMapping(userId, userSource);
             }
             catch (NoSuchRoleMappingException e) {
-              logger.debug("User role mapping for user: " + userId + " source: " + userSource
+              log.debug("User role mapping for user: " + userId + " source: " + userSource
                   + " could not be deleted because it does not exist.");
             }
           }
@@ -394,7 +390,7 @@ public class SecurityXmlUserManager
             }
             catch (NoSuchRoleMappingException e) {
               // update failed try create
-              logger.debug("Update of user role mapping for user: " + userId + " source: " + userSource
+              log.debug("Update of user role mapping for user: " + userId + " source: " + userSource
                   + " did not exist, creating new one.");
               configuration.createUserRoleMapping(roleMapping);
             }

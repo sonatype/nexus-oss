@@ -24,6 +24,7 @@ import java.util.List;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.sisu.goodies.common.Loggers;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
@@ -44,7 +45,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The delegating resource.
@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
 public class RestletResource
     extends Resource
 {
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
+  protected final Logger logger = Loggers.getLogger(getClass());
 
   private PlexusResource delegate;
 

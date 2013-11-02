@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 public class FirstSuccessfulModularRealmAuthenticator
     extends ModularRealmAuthenticator
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(FirstSuccessfulModularRealmAuthenticator.class);
 
   @Override
   protected AuthenticationInfo doMultiRealmAuthentication(Collection<Realm> realms, AuthenticationToken token) {

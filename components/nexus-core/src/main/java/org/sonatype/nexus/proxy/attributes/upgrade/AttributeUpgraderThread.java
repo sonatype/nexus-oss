@@ -50,7 +50,7 @@ public class AttributeUpgraderThread
 
   protected static final int RUN_SLEEP_SECONDS = 5;
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(AttributeUpgraderThread.class);
 
   private final File legacyAttributesDirectory;
 

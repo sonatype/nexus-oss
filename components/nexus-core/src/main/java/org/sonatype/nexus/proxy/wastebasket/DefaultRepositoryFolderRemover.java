@@ -21,17 +21,14 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.repository.Repository;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 @Named
 @Singleton
 public class DefaultRepositoryFolderRemover
+    extends ComponentSupport
     implements RepositoryFolderRemover
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final Map<String, RepositoryFolderCleaner> cleaners;
 
   @Inject
@@ -42,14 +39,14 @@ public class DefaultRepositoryFolderRemover
   public void deleteRepositoryFolders(final Repository repository, final boolean deleteForever)
       throws IOException
   {
-    logger.debug("Removing folders of repository \"{}\" (ID={})", repository.getName(), repository.getId());
+    log.debug("Removing folders of repository \"{}\" (ID={})", repository.getName(), repository.getId());
 
     for (RepositoryFolderCleaner cleaner : cleaners.values()) {
       try {
         cleaner.cleanRepositoryFolders(repository, deleteForever);
       }
       catch (Exception e) {
-        logger.warn("Got exception during execution of RepositoryFolderCleaner {}, continuing.",
+        log.warn("Got exception during execution of RepositoryFolderCleaner {}, continuing.",
             cleaner.getClass().getName(), e);
       }
     }

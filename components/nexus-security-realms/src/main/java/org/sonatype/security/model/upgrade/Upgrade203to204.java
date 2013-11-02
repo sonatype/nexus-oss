@@ -28,8 +28,6 @@ import org.sonatype.security.model.v2_0_4.CUser;
 import org.sonatype.security.model.v2_0_4.upgrade.BasicVersionUpgrade;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
 @Typed(SecurityUpgrader.class)
@@ -37,8 +35,6 @@ import org.slf4j.LoggerFactory;
 public class Upgrade203to204
     implements SecurityUpgrader
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private static String DEFAULT_SOURCE = "default";
 
   public Object loadConfiguration(File file)

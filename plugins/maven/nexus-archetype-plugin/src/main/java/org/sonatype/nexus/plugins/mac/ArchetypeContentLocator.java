@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 public class ArchetypeContentLocator
     extends AbstractContentLocator
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(ArchetypeContentLocator.class);
 
   private final Repository repository;
 

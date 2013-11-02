@@ -26,10 +26,9 @@ import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserNotFoundTransientException;
 import org.sonatype.security.usermanagement.UserStatus;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.shiro.subject.PrincipalCollection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Helper component to map user principals to associated information.
@@ -37,9 +36,8 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class UserPrincipalsHelper
+  extends ComponentSupport
 {
-  private final Logger log = LoggerFactory.getLogger(getClass());
-
   @Inject
   private List<UserManager> userManagers;
 

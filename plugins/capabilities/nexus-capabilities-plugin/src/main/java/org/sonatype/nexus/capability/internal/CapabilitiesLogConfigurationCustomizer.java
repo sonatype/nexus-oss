@@ -11,29 +11,30 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.security.email;
+package org.sonatype.nexus.capability.internal;
 
-import java.util.List;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.nexus.log.LogConfigurationCustomizer;
+import org.sonatype.nexus.log.LoggerLevel;
 
 /**
- * A null implementation of a SecurityEmailer.
+ * Capabilities {@link LogConfigurationCustomizer}.
+ *
+ * @since 2.7
  */
-public class NullSecurityEmailer
-    extends ComponentSupport
-    implements SecurityEmailer
+@Singleton
+@Named
+public class CapabilitiesLogConfigurationCustomizer
+    implements LogConfigurationCustomizer
 {
-  public void sendForgotUsername(String email, List<String> userIds) {
-    log.error("No SecurityEmailer, user will not be notified.");
-  }
 
-  public void sendNewUserCreated(String email, String userid, String password) {
-    log.error("No SecurityEmailer, user will not be notified.");
-  }
-
-  public void sendResetPassword(String email, String password) {
-    log.error("No SecurityEmailer, user will not be notified.");
+  @Override
+  public void customize(final Configuration configuration) {
+    // Useful loggers (level will be calculated as effective level)
+    configuration.setLoggerLevel("org.sonatype.nexus.capability", LoggerLevel.DEFAULT);
+    configuration.setLoggerLevel("org.sonatype.nexus.plugins.capabilities", LoggerLevel.DEFAULT);
   }
 
 }

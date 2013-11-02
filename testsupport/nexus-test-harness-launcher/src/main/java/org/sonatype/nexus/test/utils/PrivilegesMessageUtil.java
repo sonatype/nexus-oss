@@ -48,7 +48,7 @@ public class PrivilegesMessageUtil
 
   private MediaType mediaType;
 
-  private Logger log = LoggerFactory.getLogger(getClass());
+  private static Logger log = LoggerFactory.getLogger(PrivilegesMessageUtil.class);
 
   public PrivilegesMessageUtil(AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType) {
     super(test);
