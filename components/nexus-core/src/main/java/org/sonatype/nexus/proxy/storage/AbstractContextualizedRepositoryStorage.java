@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2.7.0
  */
-public abstract class AbstractContextualizedRepositoryStorage
+public abstract class AbstractContextualizedRepositoryStorage<C extends StorageContext>
     extends ComponentSupport
 {
   /**
@@ -58,14 +58,6 @@ public abstract class AbstractContextualizedRepositoryStorage
     repositoryContextGenerations = Maps.newConcurrentMap();
   }
 
-  /**
-   * @deprecated To support existing storage implementations, but use protected {@link #log} member directly instead.
-   */
-  @Deprecated
-  protected Logger getLogger() {
-    return log;
-  }
-
   protected static enum ContextOperation
   {
     INITIALIZE, UPDATE;
@@ -76,7 +68,7 @@ public abstract class AbstractContextualizedRepositoryStorage
    * updated if needed. See {@link #updateStorageContext(Repository, StorageContext, ContextOperation)} method, meant
    * to be implemented by storage classes to perform storage specific context WRITE operations.
    */
-  protected <C extends StorageContext> C getStorageContext(final Repository repository, final C context)
+  protected C getStorageContext(final Repository repository, final C context)
       throws IOException
   {
     checkNotNull(repository);
@@ -126,7 +118,7 @@ public abstract class AbstractContextualizedRepositoryStorage
    * @param contextOperation the operation being performed
    * @throws RemoteStorageException If context could not be updated
    */
-  protected abstract void updateStorageContext(Repository repository, StorageContext context,
+  protected abstract void updateStorageContext(Repository repository, C context,
                                                ContextOperation contextOperation)
       throws IOException;
 

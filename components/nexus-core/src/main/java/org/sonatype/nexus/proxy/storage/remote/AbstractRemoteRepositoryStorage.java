@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author cstamas
  */
 public abstract class AbstractRemoteRepositoryStorage
-    extends AbstractContextualizedRepositoryStorage
+    extends AbstractContextualizedRepositoryStorage<RemoteStorageContext>
     implements RemoteRepositoryStorage
 {
   private final MimeSupport mimeSupport;
@@ -96,8 +96,7 @@ public abstract class AbstractRemoteRepositoryStorage
       throws RemoteStorageException
   {
     try {
-      final RemoteStorageContext ctx = repository.getRemoteStorageContext();
-      return super.getStorageContext(repository, ctx);
+      return super.getStorageContext(repository, repository.getRemoteStorageContext());
     }
     catch (RemoteStorageException e) {
       throw e;
@@ -108,7 +107,7 @@ public abstract class AbstractRemoteRepositoryStorage
   }
 
   @Override
-  protected void updateStorageContext(final Repository repository, final StorageContext context,
+  protected void updateStorageContext(final Repository repository, final RemoteStorageContext context,
                                       final ContextOperation contextOperation)
       throws IOException
   {
@@ -121,7 +120,7 @@ public abstract class AbstractRemoteRepositoryStorage
       log.info("Updating remote transport for proxy repository {}...",
               RepositoryStringUtils.getHumanizedNameString(repository));
     }
-    updateContext((ProxyRepository) repository, (RemoteStorageContext) context);
+    updateContext((ProxyRepository) repository, context);
   }
 
   @Override

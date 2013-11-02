@@ -147,8 +147,8 @@ public class DefaultFSLocalRepositoryStorage
       result = new File(repoBase, request.getRequestPath());
     }
 
-    if (getLogger().isTraceEnabled()) {
-      getLogger().trace("{} --> {}", request.getRequestPath(), result.getAbsoluteFile());
+    if (log.isTraceEnabled()) {
+      log.trace("{} --> {}", request.getRequestPath(), result.getAbsoluteFile());
     }
 
     // to be foolproof, chrooting it
@@ -224,7 +224,7 @@ public class DefaultFSLocalRepositoryStorage
             repository.getAttributesHandler().touchItemLastRequested(System.currentTimeMillis(), link);
           }
           catch (NoSuchRepositoryException e) {
-            getLogger().warn("Stale link object found on UID: {}, deleting it.", uid);
+            log.warn("Stale link object found on UID: {}, deleting it.", uid);
             DirSupport.delete(target.toPath());
             throw new ItemNotFoundException(reasonFor(request, repository,
                 "Path %s not found in local storage of repository %s", request.getRequestPath(),
@@ -247,7 +247,7 @@ public class DefaultFSLocalRepositoryStorage
         // It is possible for this file to have been removed after the call to target.exists()
         // this could have been an external process
         // See: https://issues.sonatype.org/browse/NEXUS-4570
-        getLogger().debug("File '{}' removed before finished processing the directory listing", target, e);
+        log.debug("File '{}' removed before finished processing the directory listing", target, e);
         throw new ItemNotFoundException(reasonFor(request, repository,
             "Path %s not found in local storage of repository %s", request.getRequestPath(),
             RepositoryStringUtils.getHumanizedNameString(repository)), e);
@@ -430,7 +430,7 @@ public class DefaultFSLocalRepositoryStorage
             result.add(retrieveItemFromFile(repository, collMemberReq, file));
           }
           catch (ItemNotFoundException e) {
-            getLogger().debug("ItemNotFoundException while listing directory, for request: {}",
+            log.debug("ItemNotFoundException while listing directory, for request: {}",
                 collMemberReq.getRequestPath(), e);
           }
         }

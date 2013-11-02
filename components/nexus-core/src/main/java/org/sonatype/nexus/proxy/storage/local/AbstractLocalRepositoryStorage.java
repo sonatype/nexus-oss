@@ -46,7 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author cstamas
  */
 public abstract class AbstractLocalRepositoryStorage
-    extends AbstractContextualizedRepositoryStorage
+    extends AbstractContextualizedRepositoryStorage<LocalStorageContext>
     implements LocalRepositoryStorage
 {
   /**
@@ -90,8 +90,7 @@ public abstract class AbstractLocalRepositoryStorage
       throws LocalStorageException
   {
     try {
-      final LocalStorageContext ctx = repository.getLocalStorageContext();
-      return super.getStorageContext(repository, ctx);
+      return super.getStorageContext(repository, repository.getLocalStorageContext());
     }
     catch (LocalStorageException e) {
       throw e;
@@ -102,11 +101,11 @@ public abstract class AbstractLocalRepositoryStorage
   }
 
   @Override
-  protected void updateStorageContext(final Repository repository, final StorageContext context,
+  protected void updateStorageContext(final Repository repository, final LocalStorageContext context,
                                       final ContextOperation contextOperation)
       throws IOException
   {
-    updateContext(repository, (LocalStorageContext) context);
+    updateContext(repository, context);
   }
 
   /**
@@ -122,10 +121,8 @@ public abstract class AbstractLocalRepositoryStorage
 
   /**
    * Gets the absolute url from base.
-   *
-   * @param uid the uid
-   * @return the absolute url from base
    */
+  @Override
   public URL getAbsoluteUrlFromBase(Repository repository, ResourceStoreRequest request)
       throws LocalStorageException
   {
@@ -150,6 +147,7 @@ public abstract class AbstractLocalRepositoryStorage
     }
   }
 
+  @Override
   public final void deleteItem(Repository repository, ResourceStoreRequest request)
       throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
   {
@@ -158,6 +156,7 @@ public abstract class AbstractLocalRepositoryStorage
 
   // ==
 
+  @Override
   public Iterator<StorageItem> iterateItems(Repository repository, ResourceStoreIteratorRequest request)
       throws ItemNotFoundException, LocalStorageException
   {
