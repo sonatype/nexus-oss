@@ -114,7 +114,7 @@ public abstract class AbstractHttpRemoteStrategy
       final HttpResponse response = executeHttpRequest(httpClient, get);
       try {
         if (response.containsHeader("X-Artifactory-Id")) {
-          getLogger().debug("Remote server of proxy {} recognized as ARTF by response header", mavenProxyRepository);
+          log.debug("Remote server of proxy {} recognized as ARTF by response header", mavenProxyRepository);
           throw new StrategyFailedException("Server proxied by " + mavenProxyRepository
               + " proxy repository is not supported by automatic routing discovery");
         }
@@ -125,7 +125,7 @@ public abstract class AbstractHttpRemoteStrategy
             if (!addressElements.isEmpty()) {
               final String addressText = addressElements.get(0).text();
               if (addressText != null && addressText.toLowerCase(Locale.ENGLISH).startsWith("artifactory")) {
-                getLogger().debug("Remote server of proxy {} recognized as ARTF by address element in body",
+                log.debug("Remote server of proxy {} recognized as ARTF by address element in body",
                     mavenProxyRepository);
                 throw new StrategyFailedException("Server proxied by " + mavenProxyRepository
                     + " proxy repository is not supported by automatic routing discovery");

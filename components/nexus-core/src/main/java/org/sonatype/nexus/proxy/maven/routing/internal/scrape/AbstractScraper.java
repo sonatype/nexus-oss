@@ -128,7 +128,7 @@ public abstract class AbstractScraper
     final RemoteDetectionResult detectionResult = detectRemoteRepository(context, page);
     switch (detectionResult.getRemoteDetectionOutcome()) {
       case RECOGNIZED_SHOULD_BE_SCRAPED:
-        getLogger().debug("Remote repository on URL={} recognized as {}, scraping it...",
+        log.debug("Remote repository on URL={} recognized as {}, scraping it...",
             context.getRemoteRepositoryRootUrl(), detectionResult.getRemoteDetectedServer());
         try {
           final List<String> entries = diveIn(context, page);
@@ -150,7 +150,7 @@ public abstract class AbstractScraper
         }
         catch (IOException e) {
           // remote recognized, but IOEx happened during "dive": stop it and report scrape as unsuccessful
-          getLogger().debug(
+          log.debug(
               "Remote recognized as " + detectionResult.getRemoteDetectedServer() + ", but scrape failed:"
                   + e.getMessage(), e);
           context.stop("Remote recognized as " + detectionResult.getRemoteDetectedServer()
@@ -159,7 +159,7 @@ public abstract class AbstractScraper
         break;
 
       case RECOGNIZED_SHOULD_NOT_BE_SCRAPED:
-        getLogger().debug("Remote repository on URL={} recognized as {}, but not scraping it: {}",
+        log.debug("Remote repository on URL={} recognized as {}, but not scraping it: {}",
             context.getRemoteRepositoryRootUrl(), detectionResult.getRemoteDetectedServer(),
             detectionResult.getMessage());
         context.stop("Remote recognized as " + detectionResult.getRemoteDetectedServer()
@@ -168,7 +168,7 @@ public abstract class AbstractScraper
 
       default:
         // not recognized, just continue with next Scraper
-        getLogger().debug("Remote repository on URL={} not recognized as {}, skipping it.",
+        log.debug("Remote repository on URL={} not recognized as {}, skipping it.",
             context.getRemoteRepositoryRootUrl(), detectionResult.getRemoteDetectedServer());
         break;
     }
