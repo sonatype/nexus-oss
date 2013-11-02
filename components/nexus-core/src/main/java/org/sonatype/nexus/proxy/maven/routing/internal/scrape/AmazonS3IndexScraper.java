@@ -82,7 +82,7 @@ public class AmazonS3IndexScraper
       // we probably have the NoSuchKey response from S3, usually when repo root is not in bucket root
       prefix = getKeyFromNoSuchKeyResponse(initialPage);
       if (prefix == null) {
-        log.info("Unexpected {} response, cannot scrape this: {}", getTargetedServer(),
+        log.info("Unexpected S3 response from remote of {}, cannot scrape this: {}", context.getProxyRepository(),
             initialPage.getDocument().outerHtml());
         context.stop("Remote recognized as " + getTargetedServer()
             + ", but unexpected response code and response body received (see logs).");
