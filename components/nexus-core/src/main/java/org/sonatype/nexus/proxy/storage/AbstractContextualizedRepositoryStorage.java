@@ -15,15 +15,12 @@ package org.sonatype.nexus.proxy.storage;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Maps;
-import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,17 +41,11 @@ public abstract class AbstractContextualizedRepositoryStorage<C extends StorageC
       AbstractContextualizedRepositoryStorage.class.getName() + ".updated";
 
   /**
-   * Per repository locks that synchronizes context access for same repository.
-   */
-  private final ConcurrentMap<String, ReentrantLock> repositoryLocks;
-
-  /**
    * Context generations, to track changes to contexts.
    */
   private final Map<String, Integer> repositoryContextGenerations;
 
   protected AbstractContextualizedRepositoryStorage() {
-    repositoryLocks = Maps.newConcurrentMap();
     repositoryContextGenerations = Maps.newConcurrentMap();
   }
 
@@ -73,16 +64,7 @@ public abstract class AbstractContextualizedRepositoryStorage<C extends StorageC
   {
     checkNotNull(repository);
     if (context != null) {
-      ReentrantLock lock = repositoryLocks.get(repository.getId());
-      if (lock == null) {
-        final ReentrantLock newlock = new ReentrantLock();
-        lock = repositoryLocks.putIfAbsent(repository.getId(), newlock);
-        if (lock == null) {
-          lock = newlock;
-        }
-      }
-      lock.lock();
-      try {
+      synchronized (context) {
         if (!repositoryContextGenerations.containsKey(repository.getId()) ||
             !context.hasContextObject(CONTEXT_UPDATED_KEY)
             || context.getGeneration() > repositoryContextGenerations.get(repository.getId())) {
@@ -99,9 +81,6 @@ public abstract class AbstractContextualizedRepositoryStorage<C extends StorageC
           context.putContextObject(CONTEXT_UPDATED_KEY, Boolean.TRUE);
           repositoryContextGenerations.put(repository.getId(), context.getGeneration());
         }
-      }
-      finally {
-        lock.unlock();
       }
     }
     return context;
