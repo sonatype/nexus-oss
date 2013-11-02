@@ -97,9 +97,7 @@ public class RemoteContentDiscovererImpl
           log.warn("Remote strategy {} error on {}", strategy.getId(), mavenProxyRepository, e);
         }
         else {
-          log.warn("Remote strategy {} error on {}: {} / {}", strategy.getId(), mavenProxyRepository,
-              e.getClass().getSimpleName(), e.getMessage()
-          );
+          log.warn("Remote strategy {} error on {}: {}", strategy.getId(), mavenProxyRepository, e.toString());
         }
         discoveryResult.recordError(strategy.getId(), e);
         break;
