@@ -20,22 +20,15 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.util.file.DirSupport;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 public abstract class AbstractRepositoryFolderCleaner
+    extends ComponentSupport
     implements RepositoryFolderCleaner
 {
   public static final String GLOBAL_TRASH_KEY = "trash";
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private ApplicationConfiguration applicationConfiguration;
-
-  protected Logger getLogger() {
-    return logger;
-  }
 
   @Inject
   public void setApplicationConfiguration(final ApplicationConfiguration applicationConfiguration) {
@@ -60,7 +53,8 @@ public abstract class AbstractRepositoryFolderCleaner
     if (!deleteForever) {
       // move to trash
       DirSupport.moveIfExists(file.toPath(), basketFile.toPath());
-    } else {
+    }
+    else {
       DirSupport.deleteIfExists(file.toPath());
     }
   }

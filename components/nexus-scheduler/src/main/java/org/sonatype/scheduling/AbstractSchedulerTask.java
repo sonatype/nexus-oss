@@ -16,13 +16,14 @@ package org.sonatype.scheduling;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sonatype.sisu.goodies.common.Loggers;
+
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractSchedulerTask<T>
     implements SchedulerTask<T>
 {
-  protected Logger logger = LoggerFactory.getLogger(getClass());
+  protected Logger logger = Loggers.getLogger(getClass());
 
   private Map<String, String> parameters;
 

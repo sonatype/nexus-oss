@@ -68,8 +68,7 @@ NX.define('Nexus.logging.view.Panel', {
       border: false,
       cls: 'nx-logging-view-panel-description',
       html: icons.get('logging').variant('x32').img +
-          '<div>' + (!Ext.isEmpty(text) ? 'Allows ' + text + '. ' : '') +
-          'For more information see the <a href="http://links.sonatype.com/products/nexus/oss/docs" target="_blank">book pages for logging configuration</a></div>',
+          '<div>' + (!Ext.isEmpty(text) ? 'Allows ' + text + '. ' : ''),
       height: 60,
       flex: 0
     });

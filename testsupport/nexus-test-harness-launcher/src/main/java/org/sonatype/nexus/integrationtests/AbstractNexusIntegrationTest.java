@@ -47,6 +47,7 @@ import org.sonatype.nexus.test.utils.WagonDeployer;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.security.rest.model.UserResource;
+import org.sonatype.sisu.goodies.common.Loggers;
 import org.sonatype.sisu.goodies.prefs.memory.MemoryPreferencesFactory;
 
 import com.google.common.base.Throwables;
@@ -154,7 +155,7 @@ public abstract class AbstractNexusIntegrationTest
 
   protected static final String nexusLogDir;
 
-  protected Logger log = LoggerFactory.getLogger(getClass());
+  protected Logger log = Loggers.getLogger(getClass());
 
   protected static Logger staticLog = LoggerFactory.getLogger(AbstractNexusIntegrationTest.class);
 

@@ -20,6 +20,7 @@ import javax.naming.NamingException;
 
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.NoLdapUserRolesFoundException;
+import org.sonatype.sisu.goodies.common.Loggers;
 
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -33,7 +34,6 @@ import org.apache.shiro.realm.ldap.AbstractLdapRealm;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,7 +42,7 @@ public abstract class AbstractLdapAuthenticatingRealm
 {
   public static final String NAME = "LdapAuthenticatingRealm";
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = Loggers.getLogger(getClass());
 
   private final LdapManager ldapManager;
 

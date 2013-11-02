@@ -24,6 +24,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
+import org.sonatype.sisu.goodies.common.Loggers;
 import org.sonatype.sisu.velocity.Velocity;
 
 import com.noelios.restlet.application.Encoder;
@@ -39,7 +40,6 @@ import org.restlet.Router;
 import org.restlet.data.MediaType;
 import org.restlet.util.Template;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An abstract Restlet.org application, that should be extended for custom application needs. It will automatically
@@ -74,7 +74,7 @@ public abstract class PlexusRestletApplicationBridge
 
   private static final String ENABLE_ENCODER_KEY = "enable-restlet-encoder";
 
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
+  protected final Logger logger = Loggers.getLogger(getClass());
 
   private PlexusContainer plexusContainer;
 

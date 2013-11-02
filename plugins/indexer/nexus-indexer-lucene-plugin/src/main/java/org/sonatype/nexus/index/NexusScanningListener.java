@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.lucene.document.Document;
@@ -39,8 +40,6 @@ import org.apache.maven.index.ArtifactScanningListener;
 import org.apache.maven.index.ScanningResult;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.creator.MinimalArtifactInfoIndexCreator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Nexus specific ArtifactScanningListener implementation. Looks like the MI's DefaultScannerListener, but has
@@ -53,11 +52,9 @@ import org.slf4j.LoggerFactory;
  * @since 2.3
  */
 public class NexusScanningListener
+    extends ComponentSupport
     implements ArtifactScanningListener
 {
-
-  private final Logger logger;
-
   private final IndexingContext context;
 
   private final IndexSearcher contextIndexSearcher;
@@ -84,11 +81,12 @@ public class NexusScanningListener
   // timestamp in millis when scanning started
   private long scanningStarted;
 
-  public NexusScanningListener(final IndexingContext context, final IndexSearcher contextIndexSearcher,
-                               final boolean fullReindex, final boolean isProxy)
+  public NexusScanningListener(final IndexingContext context,
+                               final IndexSearcher contextIndexSearcher,
+                               final boolean fullReindex,
+                               final boolean isProxy)
       throws IOException
   {
-    this.logger = LoggerFactory.getLogger(getClass());
     this.context = context;
     this.contextIndexSearcher = contextIndexSearcher;
     this.fullReindex = fullReindex;
@@ -100,7 +98,7 @@ public class NexusScanningListener
 
   @Override
   public void scanningStarted(final IndexingContext ctx) {
-    logger.info("Scanning of repositoryID=\"{}\" started.", context.getRepositoryId());
+    log.info("Scanning of repositoryID=\"{}\" started.", context.getRepositoryId());
     scanningStarted = System.currentTimeMillis();
   }
 
@@ -179,7 +177,7 @@ public class NexusScanningListener
         result.addException(ex);
       }
     }
-    logger.info(
+    log.info(
         "Scanning of repositoryID=\"{}\" finished: scanned={}, added={}, updated={}, removed={}, scanningDuration={}",
         context.getRepositoryId(), discovered, added, updated, removed,
         DurationFormatUtils.formatDurationHMS(System.currentTimeMillis() - scanningStarted)
@@ -323,7 +321,7 @@ public class NexusScanningListener
 
     final boolean result = m1.equals(m2);
     if (!result) {
-      logger.trace("d1={}, d2={}", m1, m2);
+      log.trace("d1={}, d2={}", m1, m2);
     }
     return result;
   }

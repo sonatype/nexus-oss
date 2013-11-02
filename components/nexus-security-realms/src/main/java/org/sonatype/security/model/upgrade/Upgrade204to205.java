@@ -27,8 +27,6 @@ import org.sonatype.security.model.v2_0_4.io.xpp3.SecurityConfigurationXpp3Reade
 import org.sonatype.security.model.v2_0_5.upgrade.BasicVersionUpgrade;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
 @Typed(SecurityUpgrader.class)
@@ -36,8 +34,6 @@ import org.slf4j.LoggerFactory;
 public class Upgrade204to205
     implements SecurityUpgrader
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   public Object loadConfiguration(File file)
       throws IOException, ConfigurationIsCorruptedException
   {

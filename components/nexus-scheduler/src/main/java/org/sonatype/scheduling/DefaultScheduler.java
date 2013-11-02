@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultScheduler
     implements Scheduler
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(DefaultScheduler.class);
 
   private final TaskConfigManager taskConfig;
 

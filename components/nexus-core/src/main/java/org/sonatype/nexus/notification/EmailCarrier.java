@@ -28,21 +28,19 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named(EmailCarrier.KEY)
 @Singleton
 public class EmailCarrier
-    implements Carrier
+  extends ComponentSupport
+  implements Carrier
 {
   public static final String KEY = "email";
-
-  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final NexusEmailer nexusEmailer;
 
@@ -65,14 +63,14 @@ public class EmailCarrier
     request.getToAddresses().addAll(resolveToAddresses(target));
 
     if (request.getToAddresses().size() > 0) {
-      logger.info(
+      log.info(
           "Sending out e-mail notification to notification group \"" + target.getTargetId() + "\" (total of "
               + request.getToAddresses().size() + " recipients).");
 
       nexusEmailer.sendMail(request);
     }
     else {
-      logger.info(
+      log.info(
           "Not sending out e-mail notification to notification group \"" + target.getTargetId()
               + "\", there were no recipients (does users have e-mail accessible to Realm?).");
     }
@@ -92,8 +90,8 @@ public class EmailCarrier
 
     // resolve roles to mails
     if (target.getTargetRoles().size() > 0) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Role ID's to notify (" + target.getTargetRoles().toString() + ")");
+      if (log.isDebugEnabled()) {
+        log.debug("Role ID's to notify (" + target.getTargetRoles().toString() + ")");
       }
 
       UserSearchCriteria criteria = new UserSearchCriteria();
@@ -105,8 +103,8 @@ public class EmailCarrier
       if (users.size() > 0) {
         for (User user : users) {
           if (StringUtils.isNotBlank(user.getEmailAddress())) {
-            if (logger.isDebugEnabled()) {
-              logger.debug(
+            if (log.isDebugEnabled()) {
+              log.debug(
                   "Adding user \"" + user.getName() + "\" (" + user.getEmailAddress() + ").");
             }
 
@@ -118,8 +116,8 @@ public class EmailCarrier
 
     // resolve users to mails
     if (target.getTargetUsers().size() > 0) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("User ID's to notify (" + target.getTargetUsers().toString() + ").");
+      if (log.isDebugEnabled()) {
+        log.debug("User ID's to notify (" + target.getTargetUsers().toString() + ").");
       }
 
       for (String userId : target.getTargetUsers()) {
@@ -128,8 +126,8 @@ public class EmailCarrier
             User user = securitySystem.getUser(userId);
 
             if (StringUtils.isNotBlank(user.getEmailAddress())) {
-              if (logger.isDebugEnabled()) {
-                logger.debug(
+              if (log.isDebugEnabled()) {
+                log.debug(
                     "Adding user \"" + user.getName() + "\" (" + user.getEmailAddress() + ").");
               }
 
@@ -146,8 +144,8 @@ public class EmailCarrier
 
     // resolve externals to mails
     if (target.getExternalTargets().size() > 0) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("External emails to notify (" + target.getExternalTargets().toString() + ").");
+      if (log.isDebugEnabled()) {
+        log.debug("External emails to notify (" + target.getExternalTargets().toString() + ").");
       }
 
       for (String email : target.getExternalTargets()) {

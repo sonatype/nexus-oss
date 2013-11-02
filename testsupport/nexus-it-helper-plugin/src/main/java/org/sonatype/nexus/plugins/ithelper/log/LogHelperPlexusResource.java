@@ -88,7 +88,7 @@ public class LogHelperPlexusResource
 
     Logger logger;
     if (loggerName == null) {
-      logger = LoggerFactory.getLogger(this.getClass());
+      logger = LoggerFactory.getLogger(getClass());
     }
     else {
       logger = LoggerFactory.getLogger(loggerName);

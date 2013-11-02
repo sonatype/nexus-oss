@@ -22,9 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -34,12 +32,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named
 public class DefaultPasswordEncoderManager
+    extends ComponentSupport
     implements PasswordEncoderManager
 {
 
   private static final Pattern ENCODING_SPEC_PATTERN = Pattern.compile("\\{([a-zA-Z0-9]+)\\}(.+)");
-
-  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final String preferredEncoding;
 
@@ -79,7 +76,7 @@ public class DefaultPasswordEncoderManager
 
     PasswordEncoder encoder = getPasswordEncoder(encoding.toLowerCase());
 
-    logger.info("Verifying password with encoding: " + encoding + " (encoder: " + encoder + ").");
+    log.info("Verifying password with encoding: " + encoding + " (encoder: " + encoder + ").");
 
     if (encoder == null) {
       throw new IllegalStateException("Password encoding: " + encoding + " has no associated PasswordEncoder.");

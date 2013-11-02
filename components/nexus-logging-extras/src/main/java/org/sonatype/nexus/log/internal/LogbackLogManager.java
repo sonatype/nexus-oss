@@ -104,7 +104,7 @@ public class LogbackLogManager
 
   private static final String LOG_CONF_PROPS_RESOURCE = "/META-INF/log/" + LOG_CONF_PROPS;
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(LogbackLogManager.class);
 
   private final Injector injector;
 

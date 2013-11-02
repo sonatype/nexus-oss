@@ -24,23 +24,19 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.timeline.Timeline;
 import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineFilter;
 import org.sonatype.timeline.TimelineRecord;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @Singleton
 @Named("default")
 public class DefaultTimeline
+  extends ComponentSupport
     implements Timeline
 {
-
-  private final Logger logger;
-
   private volatile boolean started;
 
   private final DefaultTimelinePersistor persistor;
@@ -56,15 +52,10 @@ public class DefaultTimeline
    */
   @Inject
   public DefaultTimeline(@Nullable @Named("${lucene.fsdirectory.type}") final String luceneFSDirectoryType) {
-    this.logger = LoggerFactory.getLogger(getClass());
     this.started = false;
     this.persistor = new DefaultTimelinePersistor();
     this.indexer = new DefaultTimelineIndexer(luceneFSDirectoryType);
     this.timelineLock = new ReentrantReadWriteLock();
-  }
-
-  protected Logger getLogger() {
-    return logger;
   }
 
   /**
@@ -87,7 +78,7 @@ public class DefaultTimeline
   public void start(final TimelineConfiguration configuration)
       throws IOException
   {
-    getLogger().debug("Starting Timeline...");
+    log.debug("Starting Timeline...");
     timelineLock.writeLock().lock();
     try {
       if (!started) {
@@ -102,7 +93,7 @@ public class DefaultTimeline
         }
         catch (IOException e) {
           // we are starting, so repair must be tried
-          getLogger().info("Timeline index got corrupted, trying to repair it.", e);
+          log.info("Timeline index got corrupted, trying to repair it.", e);
           // stopping it cleanly
           indexer.stop();
           // deleting index files
@@ -115,7 +106,7 @@ public class DefaultTimeline
             persistor.readAllSinceDays(configuration.getRepairDaysCountRestored(), rb);
             rb.finish();
 
-            getLogger().info(
+            log.info(
                 "Timeline index is succesfully repaired, the last "
                     + configuration.getRepairDaysCountRestored() + " days were restored.");
           }
@@ -126,7 +117,7 @@ public class DefaultTimeline
           }
         }
         DefaultTimeline.this.started = true;
-        getLogger().info("Started Timeline...");
+        log.info("Started Timeline...");
       }
     }
     finally {
@@ -137,13 +128,13 @@ public class DefaultTimeline
   public void stop()
       throws IOException
   {
-    getLogger().debug("Stopping Timeline...");
+    log.debug("Stopping Timeline...");
     timelineLock.writeLock().lock();
     try {
       if (started) {
         DefaultTimeline.this.started = false;
         indexer.stop();
-        getLogger().info("Stopped Timeline...");
+        log.info("Stopped Timeline...");
       }
     }
     finally {
@@ -165,7 +156,7 @@ public class DefaultTimeline
       addToIndexer(records);
     }
     catch (IOException e) {
-      getLogger().warn("Failed to add a timeline record", e);
+      log.warn("Failed to add a timeline record", e);
     }
   }
 
@@ -192,7 +183,7 @@ public class DefaultTimeline
           catch (IOException e) {
             // we don't want to make indexer dead in here
             // FIXME: but do we want to abort the purge?
-            getLogger().warn("Failed to purge a timeline persisted records", e);
+            log.warn("Failed to purge a timeline persisted records", e);
           }
           indexer.purge(0l, System.currentTimeMillis() - (days * TimeUnit.DAYS.toMillis(days)), null, null);
           return 0;
@@ -301,14 +292,14 @@ public class DefaultTimeline
 
   protected void markIndexerDead(final Exception e) {
     if (!indexerIsDead) {
-      getLogger().warn("Timeline index got corrupted and is disabled. Repair will be tried on next boot.", e);
+      log.warn("Timeline index got corrupted and is disabled. Repair will be tried on next boot.", e);
       // we need to stop it and signal to not try any other thread
       indexerIsDead = true;
       try {
         indexer.stop();
       }
       catch (IOException ex) {
-        getLogger().warn("Timeline index can't be stopped cleanly after it's corruption.", ex);
+        log.warn("Timeline index can't be stopped cleanly after it's corruption.", ex);
       }
     }
   }

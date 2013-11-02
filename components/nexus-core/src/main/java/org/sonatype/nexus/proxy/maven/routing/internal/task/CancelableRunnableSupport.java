@@ -68,7 +68,7 @@ public abstract class CancelableRunnableSupport
   @Override
   public void run() {
     if (isCanceled()) {
-      getLogger().debug("{} canceled before running, bailing out.", getName());
+      log.debug("{} canceled before running, bailing out.", getName());
       return;
     }
     final Cancelable oldCancelable = CancelableUtil.getCurrentCancelable();

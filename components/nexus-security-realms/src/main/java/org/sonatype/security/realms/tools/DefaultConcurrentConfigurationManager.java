@@ -34,9 +34,7 @@ import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * Default implementation of the ConfigurationManager interface. Intended to
@@ -52,10 +50,9 @@ import org.slf4j.LoggerFactory;
 @Typed(ConfigurationManager.class)
 @Named("default")
 public class DefaultConcurrentConfigurationManager
+    extends ComponentSupport
     implements ConfigurationManager
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final ConfigurationManager configurationManager;
 
   private final ReentrantReadWriteLock readWriteLock;
@@ -76,7 +73,7 @@ public class DefaultConcurrentConfigurationManager
     this.readLock = this.readWriteLock.readLock();
     this.writeLock = this.readWriteLock.writeLock();
     this.lockTimeout = lockTimeout;
-    logger.debug("Lock timeout: {} seconds", lockTimeout);
+    log.debug("Lock timeout: {} seconds", lockTimeout);
   }
 
   @Override

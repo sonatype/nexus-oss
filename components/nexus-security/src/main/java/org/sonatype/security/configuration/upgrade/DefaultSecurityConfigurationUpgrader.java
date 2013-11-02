@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultSecurityConfigurationUpgrader
     implements SecurityConfigurationUpgrader
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(DefaultSecurityConfigurationUpgrader.class);
 
   private final Map<String, SecurityConfigurationVersionUpgrader> upgraders;
 
