@@ -108,7 +108,6 @@ public class ActivationConditionHandler
   ActivationConditionHandler release() {
     if (activationCondition != null) {
       eventBus.unregister(this);
-      nexusActiveCondition.release();
       activationCondition.release();
       activationCondition = null;
     }
