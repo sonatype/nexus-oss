@@ -479,14 +479,14 @@ public class DefaultCapabilityReference
         capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap(newHashMap(properties));
         capability.onUpdate();
         resetLastException();
+      }
+      catch (Exception e) {
+        setLastException("update", e);
         eventBus.post(
             new CapabilityEvent.AfterUpdate(
                 capabilityRegistry, DefaultCapabilityReference.this, properties, previousProperties
             )
         );
-      }
-      catch (Exception e) {
-        setLastException("update", e);
         DefaultCapabilityReference.this.passivate();
         state.setDescription("Update failed: " + e);
       }
