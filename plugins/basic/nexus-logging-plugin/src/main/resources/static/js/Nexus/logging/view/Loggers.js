@@ -122,6 +122,7 @@ NX.define('Nexus.logging.view.Loggers', {
           iconCls: icons.get('loggers_remove').cls,
           disabled: true
         },
+        '-',
         {
           id: 'nx-logging-button-reset-loggers',
           text: 'Reset',

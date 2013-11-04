@@ -273,7 +273,7 @@ NX.define('Nexus.logging.controller.Logging', {
 
     Ext.Msg.show({
       title: 'Reset loggers',
-      msg: 'Reset all loggers to their default levels ?',
+      msg: 'Reset loggers to their default levels?',
       buttons: Ext.Msg.OKCANCEL,
       icon: icons.get('loggers_reset').variant('x32').cls,
       fn: function (btn) {
