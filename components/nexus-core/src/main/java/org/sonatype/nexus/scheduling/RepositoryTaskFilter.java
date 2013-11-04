@@ -15,6 +15,10 @@ package org.sonatype.nexus.scheduling;
 
 import java.util.Set;
 
+/**
+ * @deprecated To be removed in future release (no replacement provided).
+ */
+@Deprecated
 public interface RepositoryTaskFilter
     extends TaskFilter
 {

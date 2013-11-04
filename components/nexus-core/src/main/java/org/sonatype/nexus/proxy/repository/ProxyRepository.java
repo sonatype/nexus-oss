@@ -59,8 +59,16 @@ public interface ProxyRepository
    */
   RemoteStatus getRemoteStatus(ResourceStoreRequest request, boolean forceCheck);
 
+  /**
+   * @deprecated To be removed in future releases.
+   */
+  @Deprecated
   Thread getRepositoryStatusCheckerThread();
 
+  /**
+   * @deprecated To be removed in future releases.
+   */
+  @Deprecated
   void setRepositoryStatusCheckerThread(Thread thread);
 
   /**

@@ -120,7 +120,10 @@ public interface Repository
 
   /**
    * Returns the task filter for this repository.
+   *
+   * @deprecated To be removed in future releases.
    */
+  @Deprecated
   RepositoryTaskFilter getRepositoryTaskFilter();
 
   /**
@@ -192,7 +195,9 @@ public interface Repository
    * Sets the not found cache.
    *
    * @param notFoundcache the new not found cache
+   * @deprecated To be removed in future releases.
    */
+  @Deprecated
   void setNotFoundCache(PathCache notFoundcache);
 
   /**
@@ -254,7 +259,10 @@ public interface Repository
 
   /**
    * Sets attribute handler used by repository.
+   *
+   * @deprecated To be removed in future releases.
    */
+  @Deprecated
   void setAttributesHandler(AttributesHandler attributesHandler);
 
   /**
@@ -502,7 +510,9 @@ public interface Repository
    * Sets the repository level AccessManager. Per repository instance may exists.
    *
    * @param accessManager the access manager
+   * @deprecated To be removed in future releases.
    */
+  @Deprecated
   void setAccessManager(AccessManager accessManager);
 
   // ==================================================
