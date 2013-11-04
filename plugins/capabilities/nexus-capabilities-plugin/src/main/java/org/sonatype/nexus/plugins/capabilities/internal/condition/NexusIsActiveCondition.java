@@ -40,13 +40,13 @@ public class NexusIsActiveCondition
 
   NexusIsActiveCondition(final EventBus eventBus) {
     super(eventBus, false);
-    bind();
+    getEventBus().register(this);
   }
 
   @Inject
   NexusIsActiveCondition(final Provider<EventBus> eventBus) {
     super(eventBus, false);
-    bind();
+    getEventBus().register(this);
   }
 
   @Subscribe
@@ -61,12 +61,12 @@ public class NexusIsActiveCondition
 
   @Override
   protected void doBind() {
-    getEventBus().register(this);
+    // do nothing
   }
 
   @Override
   protected void doRelease() {
-    getEventBus().unregister(this);
+    // do nothing
   }
 
   @Override
