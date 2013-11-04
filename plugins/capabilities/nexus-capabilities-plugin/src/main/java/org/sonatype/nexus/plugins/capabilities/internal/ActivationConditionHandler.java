@@ -15,13 +15,13 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContextAware;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.SatisfiedCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.UnsatisfiedCondition;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.0
  */
 public class ActivationConditionHandler
-    extends AbstractLoggingComponent
+    extends ComponentSupport
 {
 
   private final EventBus eventBus;
@@ -90,9 +90,9 @@ public class ActivationConditionHandler
       }
       catch (Exception e) {
         activationCondition = new UnsatisfiedCondition("Failed to determine activation condition");
-        getLogger().error(
+        log.error(
             "Could not get activation condition from capability {} ({}). Considering it as non activatable",
-            new Object[]{reference.capability(), reference.context().id(), e}
+            reference.capability(), reference.context().id(), e
         );
       }
       if (activationCondition == null) {
