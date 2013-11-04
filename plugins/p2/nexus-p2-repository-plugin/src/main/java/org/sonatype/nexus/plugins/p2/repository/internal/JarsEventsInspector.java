@@ -56,7 +56,7 @@ public class JarsEventsInspector
   @Subscribe
   @AllowConcurrentEvents
   public void onItemStored(final RepositoryItemEventStore event) {
-    if (isP2Artifact(event.getItem())) {
+    if (shouldProcessItem(event.getItem())) {
       p2MetadataGenerator.get().generateP2Metadata(event.getItem());
     }
   }
@@ -64,7 +64,7 @@ public class JarsEventsInspector
   @Subscribe
   @AllowConcurrentEvents
   public void onItemCached(final RepositoryItemEventCache event) {
-    if (isP2Artifact(event.getItem())) {
+    if (shouldProcessItem(event.getItem())) {
       p2MetadataGenerator.get().generateP2Metadata(event.getItem());
     }
   }
@@ -72,28 +72,27 @@ public class JarsEventsInspector
   @Subscribe
   @AllowConcurrentEvents
   public void onItemRemoved(final RepositoryItemEventDelete event) {
-    if (isP2Artifact(event.getItem())) {
+    if (shouldProcessItem(event.getItem())) {
       p2MetadataGenerator.get().removeP2Metadata(event.getItem());
     }
   }
 
   // TODO optimize by saving the fact that is a bundle/feature as item attribute and check that one first
-  private boolean isP2Artifact(final StorageItem item) {
-    if (item == null) {
-      return false;
+  private boolean shouldProcessItem(final StorageItem item) {
+    if (item != null && p2MetadataGenerator.get().getConfiguration(item.getRepositoryId()) != null) {
+      try {
+        final File file = retrieveFile(
+            item.getRepositoryItemUid().getRepository(), item.getPath()
+        );
+        return getP2Type(file) != null;
+      }
+      catch (final Exception e) {
+        LOG.debug(
+            "Could not determine if p2 metadata should be generated for '{}'. No metadata will be generated",
+            item.getPath(), e
+        );
+      }
     }
-    try {
-      final File file = retrieveFile(
-          item.getRepositoryItemUid().getRepository(), item.getPath()
-      );
-      return getP2Type(file) != null;
-    }
-    catch (final Exception e) {
-      LOG.debug(
-          "Could not determine if p2 metadata should be generated for '{}'. No metadata will be generated",
-          item.getPath(), e
-      );
-      return false;
-    }
+    return false;
   }
 }
