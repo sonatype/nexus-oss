@@ -16,7 +16,7 @@ package org.sonatype.nexus.proxy.storage;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import com.google.common.collect.Maps;
 
 /**
  * The abstract storage context.
@@ -24,25 +24,21 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
  * @author cstamas
  */
 public abstract class AbstractStorageContext
-    extends AbstractLoggingComponent
     implements StorageContext
 {
   private final HashMap<String, Object> context;
 
   private final StorageContext parent;
 
-  private AtomicInteger generation;
+  private final AtomicInteger generation;
 
-  @Deprecated
-  private long changeTimestamp;
-
-  protected AbstractStorageContext(StorageContext parent) {
-    this.context = new HashMap<String, Object>();
+  protected AbstractStorageContext(final StorageContext parent) {
+    this.context = Maps.newHashMap();
     this.parent = parent;
     this.generation = new AtomicInteger(0);
-    this.changeTimestamp = System.currentTimeMillis();
   }
 
+  @Override
   public synchronized int getGeneration() {
     if (parent != null) {
       return parent.getGeneration() + generation.get();
@@ -50,35 +46,18 @@ public abstract class AbstractStorageContext
     return generation.get();
   }
 
-  @Deprecated
-  public synchronized long getLastChanged() {
-    if (parent != null) {
-      final long parentChangeTimestamp = parent.getLastChanged();
-
-      if (parentChangeTimestamp > changeTimestamp) {
-        return parentChangeTimestamp;
-      }
-    }
-
-    return changeTimestamp;
-  }
-
-  protected synchronized void incrementGeneration() {
+  @Override
+  public synchronized int incrementGeneration() {
     generation.incrementAndGet();
-    changeTimestamp = System.currentTimeMillis();
+    return getGeneration();
   }
 
+  @Override
   public StorageContext getParentStorageContext() {
     return parent;
   }
 
-  public void setParentStorageContext(StorageContext parent) {
-    // noop
-    getLogger().warn(
-        "Class {} uses illegal method invocation, org.sonatype.nexus.proxy.storage.AbstractStorageContext.setParentStorageContext( StorageContext ), please update the code!",
-        getClass().getName());
-  }
-
+  @Override
   public Object getContextObject(String key) {
     return getContextObject(key, true);
   }
@@ -95,20 +74,21 @@ public abstract class AbstractStorageContext
     }
   }
 
-  public synchronized void putContextObject(String key, Object value) {
+  @Override
+  public synchronized Object putContextObject(String key, Object value) {
     final Object previous = context.put(key, value);
-
     incrementGeneration();
-    getLogger().debug("Context entry \"{}\" updated: {} -> {}", new Object[]{key, previous, value});
+    return previous;
   }
 
-  public synchronized void removeContextObject(String key) {
+  @Override
+  public synchronized Object removeContextObject(String key) {
     final Object removed = context.remove(key);
-
     incrementGeneration();
-    getLogger().debug("Context entry \"{}\" removed. Existent value: ", key, removed);
+    return removed;
   }
 
+  @Override
   public boolean hasContextObject(String key) {
     return context.containsKey(key);
   }

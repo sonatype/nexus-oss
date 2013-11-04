@@ -140,11 +140,8 @@ public abstract class AbstractHTTPRemoteRepositoryStorage
 
     if (isAmazonS3) {
       // very first request for the proxy repository (it goes remote for the 1st time)
-      getLogger().info(
-          String.format(
-              "The proxy repository %s is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of "
-                  + "your setup (baseUrl of proxy repository)!",
-              RepositoryStringUtils.getHumanizedNameString(repository)));
+      log.info("The proxy repository {} is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of "
+                  + "your setup (baseUrl of proxy repository)!",  RepositoryStringUtils.getHumanizedNameString(repository));
     }
   }
 
