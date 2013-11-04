@@ -164,15 +164,10 @@ public abstract class AbstractProxyRepository
   {
     this.poolManager = checkNotNull(poolManager);
 
+    // we have been not configured yet! So, we have no ID and stuff coming from config!
     // set here
     remoteStorageContext =
         new DefaultRemoteStorageContext(getApplicationConfiguration().getGlobalRemoteStorageContext());
-    repositoryStatusCheckerThread =
-        new RepositoryStatusCheckerThread(LoggerFactory.getLogger(getClass().getName() + "-"
-            + getId()), this);
-    repositoryStatusCheckerThread.setRunning(true);
-    repositoryStatusCheckerThread.setDaemon(true);
-    repositoryStatusCheckerThread.start();
   }
 
   @Override
@@ -188,6 +183,21 @@ public abstract class AbstractProxyRepository
     // kill our daemon thread too
     repositoryStatusCheckerThread.setRunning(false);
     repositoryStatusCheckerThread.interrupt();
+  }
+
+  @Override
+  protected void doConfigure()
+      throws ConfigurationException
+  {
+    super.doConfigure();
+    if (repositoryStatusCheckerThread == null) {
+      repositoryStatusCheckerThread =
+          new RepositoryStatusCheckerThread(LoggerFactory.getLogger(getClass().getName() + "-"
+              + getId()), this);
+      repositoryStatusCheckerThread.setRunning(true);
+      repositoryStatusCheckerThread.setDaemon(true);
+      repositoryStatusCheckerThread.start();
+    }
   }
 
   @Override

@@ -69,7 +69,7 @@ public abstract class AbstractGroupRepository
 
   @Inject
   public void populateAbstractGroupRepository(
-      RepositoryRegistry repoRegistry, RequestRepositoryMapper requestRepositoryMapper)
+      final RepositoryRegistry repoRegistry, final RequestRepositoryMapper requestRepositoryMapper)
   {
     this.repoRegistry = checkNotNull(repoRegistry);
     this.requestRepositoryMapper = requestRepositoryMapper;

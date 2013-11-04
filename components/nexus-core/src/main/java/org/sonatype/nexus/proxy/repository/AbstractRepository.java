@@ -185,8 +185,8 @@ public abstract class AbstractRepository
     this.attributesHandler = checkNotNull(attributesHandler);
     this.accessManager = checkNotNull(accessManager);
 
+    // we have been not configured yet! So, we have no ID and stuff coming from config!
     // post inject stuff
-    this.notFoundCache = cacheManager.getPathCache(getId());
     this.localStorageContext = new DefaultLocalStorageContext(getApplicationConfiguration().getGlobalLocalStorageContext());
   }
 
@@ -206,6 +206,16 @@ public abstract class AbstractRepository
 
   @Override
   protected abstract CRepositoryExternalConfigurationHolderFactory<?> getExternalConfigurationHolderFactory();
+
+  @Override
+  protected void doConfigure()
+      throws ConfigurationException
+  {
+    super.doConfigure();
+    if (notFoundCache == null) {
+      this.notFoundCache = cacheManager.getPathCache(getId());
+    }
+  }
 
   @Override
   public boolean commitChanges()
