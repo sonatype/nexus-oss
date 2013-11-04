@@ -128,8 +128,8 @@ public abstract class AbstractScraper
     final RemoteDetectionResult detectionResult = detectRemoteRepository(context, page);
     switch (detectionResult.getRemoteDetectionOutcome()) {
       case RECOGNIZED_SHOULD_BE_SCRAPED:
-        log.debug("Remote repository on URL={} recognized as {}, scraping it...",
-            context.getRemoteRepositoryRootUrl(), detectionResult.getRemoteDetectedServer());
+        log.debug("Remote repository of {} on URL={} recognized as {}, scraping it...",
+            context.getProxyRepository(), context.getRemoteRepositoryRootUrl(), detectionResult.getRemoteDetectedServer());
         try {
           final List<String> entries = diveIn(context, page);
           if (!context.isStopped()) {
@@ -151,16 +151,16 @@ public abstract class AbstractScraper
         catch (IOException e) {
           // remote recognized, but IOEx happened during "dive": stop it and report scrape as unsuccessful
           log.debug(
-              "Remote recognized as {}, but scrape failed: {}",
-                  detectionResult.getRemoteDetectedServer(), e.toString());
+              "Remote repository of {} recognized as {}, but scrape failed: {}",
+                  context.getProxyRepository(), detectionResult.getRemoteDetectedServer(), e.toString());
           context.stop("Remote recognized as " + detectionResult.getRemoteDetectedServer()
               + ", but scrape failed:" + e.getMessage());
         }
         break;
 
       case RECOGNIZED_SHOULD_NOT_BE_SCRAPED:
-        log.debug("Remote repository on URL={} recognized as {}, but not scraping it: {}",
-            context.getRemoteRepositoryRootUrl(), detectionResult.getRemoteDetectedServer(),
+        log.debug("Remote repository of {} on URL={} recognized as {}, but not scraping it: {}",
+            context.getProxyRepository(), context.getRemoteRepositoryRootUrl(), detectionResult.getRemoteDetectedServer(),
             detectionResult.getMessage());
         context.stop("Remote recognized as " + detectionResult.getRemoteDetectedServer()
             + ", but not scraping it: " + detectionResult.getMessage());
@@ -168,8 +168,8 @@ public abstract class AbstractScraper
 
       default:
         // not recognized, just continue with next Scraper
-        log.debug("Remote repository on URL={} not recognized as {}, skipping it.",
-            context.getRemoteRepositoryRootUrl(), detectionResult.getRemoteDetectedServer());
+        log.debug("Remote repository of {} on URL={} not recognized as {}, skipping it.",
+            context.getProxyRepository(), context.getRemoteRepositoryRootUrl(), detectionResult.getRemoteDetectedServer());
         break;
     }
   }

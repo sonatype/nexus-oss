@@ -92,7 +92,7 @@ public class AmazonS3IndexScraper
       initialPageUrl =
           context.getRemoteRepositoryRootUrl().substring(0,
               context.getRemoteRepositoryRootUrl().length() - prefix.length());
-      log.debug("Retrying URL {} to scrape Amazon S3 hosted repository on remote URL {}", initialPageUrl,
+      log.debug("Retrying URL {} to scrape remote of {} on URL {}", initialPageUrl, context.getProxyRepository(),
           context.getRemoteRepositoryRootUrl());
       initialPage = Page.getPageFor(context, initialPageUrl + "?prefix=" + prefix);
     }
@@ -131,7 +131,7 @@ public class AmazonS3IndexScraper
         return;
       }
 
-      log.debug("Processing S3 page response from URL {}", page.getUrl());
+      log.debug("Processing S3 page response from remote of {} got from URL {}", context.getProxyRepository(), page.getUrl());
       String markerElement = null;
       final Elements elements = page.getDocument().getElementsByTag("Contents");
       for (Element element : elements) {
