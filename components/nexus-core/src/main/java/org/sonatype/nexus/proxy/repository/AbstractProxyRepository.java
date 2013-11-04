@@ -39,6 +39,7 @@ import org.sonatype.nexus.proxy.RemoteStorageTransportException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireProxyCaches;
@@ -70,6 +71,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -177,19 +179,12 @@ public abstract class AbstractProxyRepository
             forModification);
   }
 
-  @Override
-  public void dispose() {
-    super.dispose();
-    // kill our daemon thread too
-    repositoryStatusCheckerThread.setRunning(false);
-    repositoryStatusCheckerThread.interrupt();
+  @Subscribe
+  public void on(final NexusStoppedEvent e) {
+    disposeRepositoryStatusCheckerThread();
   }
 
-  @Override
-  protected void doConfigure()
-      throws ConfigurationException
-  {
-    super.doConfigure();
+  private void createRepositoryStatusCheckerThread() {
     if (repositoryStatusCheckerThread == null) {
       repositoryStatusCheckerThread =
           new RepositoryStatusCheckerThread(LoggerFactory.getLogger(getClass().getName() + "-"
@@ -198,6 +193,28 @@ public abstract class AbstractProxyRepository
       repositoryStatusCheckerThread.setDaemon(true);
       repositoryStatusCheckerThread.start();
     }
+  }
+
+  private void disposeRepositoryStatusCheckerThread() {
+    if (repositoryStatusCheckerThread != null) {
+      repositoryStatusCheckerThread.setRunning(false);
+      repositoryStatusCheckerThread.interrupt();
+    }
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    // kill our daemon thread too
+    disposeRepositoryStatusCheckerThread();
+  }
+
+  @Override
+  protected void doConfigure()
+      throws ConfigurationException
+  {
+    super.doConfigure();
+    createRepositoryStatusCheckerThread();
   }
 
   @Override
