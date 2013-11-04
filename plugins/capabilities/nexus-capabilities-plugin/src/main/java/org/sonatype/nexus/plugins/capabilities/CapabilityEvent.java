@@ -214,4 +214,63 @@ public class CapabilityEvent
 
   }
 
+  /**
+   * Event fired when an exception occurred during a lifecycle callback method (create/load/update/activate/passivate).
+   *
+   * @since 2.7
+   */
+  public static class CallbackFailure
+      extends CapabilityEvent
+  {
+
+    private String failingAction;
+
+    private Exception failure;
+
+    public CallbackFailure(final CapabilityRegistry capabilityRegistry,
+                           final CapabilityReference reference,
+                           final String failingAction,
+                           final Exception failure)
+    {
+      super(capabilityRegistry, reference);
+      this.failingAction = checkNotNull(failingAction, "failingAction");
+      this.failure = checkNotNull(failure, "failure");
+    }
+
+    @Override
+    public String toString() {
+      return failingAction + " Failed " + super.toString();
+    }
+
+    public Exception failure() {
+      return failure;
+    }
+
+    public String failingAction() {
+      return failingAction;
+    }
+  }
+
+  /**
+   * Event fired when an capability failure has been cleared.
+   *
+   * @since 2.7
+   */
+  public static class CallbackFailureCleared
+      extends CapabilityEvent
+  {
+
+    public CallbackFailureCleared(final CapabilityRegistry capabilityRegistry,
+                                  final CapabilityReference reference)
+    {
+      super(capabilityRegistry, reference);
+    }
+
+    @Override
+    public String toString() {
+      return "Error cleared " + super.toString();
+    }
+
+  }
+
 }
