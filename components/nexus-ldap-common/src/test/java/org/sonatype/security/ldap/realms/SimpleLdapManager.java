@@ -115,10 +115,10 @@ public class SimpleLdapManager
   }
 
   @Override
-  public SortedSet<LdapUser> searchUsers(String username)
+  public SortedSet<LdapUser> searchUsers(String username, Set<String> roleIds)
       throws LdapDAOException
   {
-    return this.getLdapManagerConnector().searchUsers(username);
+    return this.getLdapManagerConnector().searchUsers(username, roleIds);
   }
 
   private LdapConnector getLdapManagerConnector()

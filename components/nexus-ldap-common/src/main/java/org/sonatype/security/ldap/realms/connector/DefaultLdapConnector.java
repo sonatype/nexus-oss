@@ -31,7 +31,9 @@ import org.sonatype.security.ldap.dao.NoSuchLdapGroupException;
 import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
+import org.codehaus.plexus.util.StringUtils;
 
 public class DefaultLdapConnector
     extends ComponentSupport
@@ -106,16 +108,13 @@ public class DefaultLdapConnector
 
       SortedSet<LdapUser> users = this.ldapUserManager.getUsers(context, conf, count);
 
-      for (LdapUser ldapUser : users) {
-        if (this.getLdapAuthConfiguration().isLdapGroupsAsRoles()) {
-          try {
-            ldapUser.setMembership(this.getGroupMembership(ldapUser.getUsername(), context, conf));
-          }
-          catch (NoLdapUserRolesFoundException e) {
-            this.log.debug("No roles found for user: " + ldapUser.getUsername());
-          }
+      // only need to update membership when using static mapping
+      if (isStaticGroupMapping(conf)) {
+        for (LdapUser ldapUser : users) {
+          updateGroupMembership(context, conf, ldapUser);
         }
       }
+
       return users;
     }
     catch (NamingException e) {
@@ -138,13 +137,9 @@ public class DefaultLdapConnector
 
       LdapUser ldapUser = this.ldapUserManager.getUser(username, context, conf);
 
-      if (this.getLdapAuthConfiguration().isLdapGroupsAsRoles()) {
-        try {
-          ldapUser.setMembership(this.getGroupMembership(ldapUser.getUsername(), context, conf));
-        }
-        catch (NoLdapUserRolesFoundException e) {
-          this.log.debug("No roles found for user: " + username);
-        }
+      // only need to update membership when using static mapping
+      if (isStaticGroupMapping(conf)) {
+        updateGroupMembership(context, conf, ldapUser);
       }
 
       return ldapUser;
@@ -158,7 +153,7 @@ public class DefaultLdapConnector
     }
   }
 
-  public SortedSet<LdapUser> searchUsers(String username)
+  public SortedSet<LdapUser> searchUsers(String username, Set<String> roleIds)
       throws LdapDAOException
   {
     LdapContext context = null;
@@ -171,18 +166,30 @@ public class DefaultLdapConnector
         username = "";
       }
 
-      SortedSet<LdapUser> users = this.ldapUserManager.getUsers(username + "*", context, conf, -1);
+      // is this a role-based search?
+      if (roleIds != null && !roleIds.isEmpty()) {
 
-      for (LdapUser ldapUser : users) {
-        if (this.getLdapAuthConfiguration().isLdapGroupsAsRoles()) {
-          try {
-            ldapUser.setMembership(this.getGroupMembership(ldapUser.getUsername(), context, conf));
-          }
-          catch (NoLdapUserRolesFoundException e) {
-            this.log.debug("No roles found for user: " + username);
-          }
+        // do we have any roles to check?
+        if (!conf.isLdapGroupsAsRoles()) {
+          return new TreeSet<>();
+        }
+
+        // searchUsers is expensive with static mapping, so check roles exist in LDAP first
+        if (isStaticGroupMapping(conf) && CollectionUtils.intersection( //
+            roleIds, ldapGroupManager.getAllGroups(context, conf)).isEmpty()) {
+          return new TreeSet<>();
         }
       }
+
+      SortedSet<LdapUser> users = this.ldapUserManager.getUsers(username + "*", context, conf, -1);
+
+      // only need to update membership when using static mapping
+      if (isStaticGroupMapping(conf)) {
+        for (LdapUser ldapUser : users) {
+          updateGroupMembership(context, conf, ldapUser);
+        }
+      }
+
       return users;
     }
     catch (NamingException e) {
@@ -191,6 +198,21 @@ public class DefaultLdapConnector
     }
     finally {
       this.closeContext(context);
+    }
+  }
+
+  private static boolean isStaticGroupMapping(LdapAuthConfiguration conf) {
+    return conf.isLdapGroupsAsRoles() && StringUtils.isEmpty(conf.getUserMemberOfAttribute());
+  }
+
+  private void updateGroupMembership(LdapContext context, LdapAuthConfiguration conf, LdapUser ldapUser)
+      throws LdapDAOException
+  {
+    try {
+      ldapUser.setMembership(this.getGroupMembership(ldapUser.getUsername(), context, conf));
+    }
+    catch (NoLdapUserRolesFoundException e) {
+      this.log.debug("No roles found for user: " + ldapUser.getUsername());
     }
   }
 

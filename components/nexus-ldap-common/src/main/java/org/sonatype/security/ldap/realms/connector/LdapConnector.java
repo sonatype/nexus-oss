@@ -42,7 +42,7 @@ public interface LdapConnector
       throws NoSuchLdapUserException,
              LdapDAOException;
 
-  public abstract SortedSet<LdapUser> searchUsers(String username)
+  public abstract SortedSet<LdapUser> searchUsers(String username, Set<String> roleIds)
       throws LdapDAOException;
 
   public abstract SortedSet<String> getAllGroups()
