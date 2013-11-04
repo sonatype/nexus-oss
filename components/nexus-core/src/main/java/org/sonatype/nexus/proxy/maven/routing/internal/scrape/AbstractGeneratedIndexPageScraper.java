@@ -121,7 +121,7 @@ public abstract class AbstractGeneratedIndexPageScraper
     }
     // cancelation
     CancelableUtil.checkInterruption();
-    getLogger().debug("Processing page response from URL {}", page.getUrl());
+    log.debug("Processing page response from URL {} for repository {}", page.getUrl(), context.getProxyRepository());
     final Elements elements = page.getDocument().getElementsByTag("a");
     final List<String> pathElements = currentNode.getPathElements();
     final String currentPath = currentNode.getPath();

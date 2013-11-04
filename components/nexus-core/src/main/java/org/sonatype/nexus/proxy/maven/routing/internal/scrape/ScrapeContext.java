@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 import org.sonatype.nexus.apachehttpclient.page.Page.RepositoryPageContext;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 import org.apache.http.client.HttpClient;
 
@@ -124,5 +125,14 @@ public class ScrapeContext extends RepositoryPageContext
    */
   public int getScrapeDepth() {
     return scrapeDepth;
+  }
+
+  /**
+   * Returns the Maven Proxy repository who's scrape context this is.
+   *
+   * @since 2.7.0
+   */
+  public MavenProxyRepository getProxyRepository() {
+    return (MavenProxyRepository) super.getProxyRepository();
   }
 }

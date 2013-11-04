@@ -227,6 +227,10 @@ public class Page
       this.proxyRepository = checkNotNull(proxyRepository);
     }
 
+    protected ProxyRepository getProxyRepository() {
+      return proxyRepository;
+    }
+
     /**
      * Equips context with repository.
      */
@@ -235,7 +239,7 @@ public class Page
         throws IOException
     {
       final HttpContext httpContext = super.createHttpContext(httpRequest);
-      httpContext.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, proxyRepository);
+      httpContext.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, getProxyRepository());
       return httpContext;
     }
   }
