@@ -47,8 +47,6 @@ public class ActivationConditionHandler
 
   private Condition activationCondition;
 
-  private Condition nexusActiveCondition;
-
   @Inject
   ActivationConditionHandler(final EventBus eventBus,
                              final Conditions conditions,
@@ -74,16 +72,23 @@ public class ActivationConditionHandler
   @AllowConcurrentEvents
   @Subscribe
   public void handle(final ConditionEvent.Unsatisfied event) {
-    if (event.getCondition() == activationCondition || event.getCondition() == nexusActiveCondition) {
+    if (event.getCondition() == activationCondition) {
       reference.passivate();
     }
   }
 
   ActivationConditionHandler bind() {
     if (activationCondition == null) {
-      nexusActiveCondition = conditions.nexus().active();
       try {
-        activationCondition = reference.capability().activationCondition();
+        Condition capabilityActivationCondition = reference.capability().activationCondition();
+        if (capabilityActivationCondition == null) {
+          capabilityActivationCondition = new SatisfiedCondition("Capability has no activation condition");
+        }
+        activationCondition = conditions.logical().and(
+            capabilityActivationCondition,
+            conditions.nexus().active(),
+            conditions.capabilities().capabilityHasNoFailures()
+        );
         if (activationCondition instanceof CapabilityContextAware) {
           ((CapabilityContextAware) activationCondition).setContext(reference.context());
         }
@@ -95,10 +100,6 @@ public class ActivationConditionHandler
             reference.capability(), reference.context().id(), e
         );
       }
-      if (activationCondition == null) {
-        activationCondition = new SatisfiedCondition("Capability has no activation condition");
-      }
-      nexusActiveCondition.bind();
       activationCondition.bind();
       eventBus.register(this);
     }

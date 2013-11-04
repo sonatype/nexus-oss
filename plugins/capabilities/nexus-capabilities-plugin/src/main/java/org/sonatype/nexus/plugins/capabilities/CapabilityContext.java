@@ -87,6 +87,13 @@ public interface CapabilityContext
   Exception failure();
 
   /**
+   * Returns name of last lifecycle callback method (create/load/update/activate/passivate) that failed.
+   *
+   * @since 2.7
+   */
+  String failingAction();
+
+  /**
    * Describe current state.
    *
    * @return state description

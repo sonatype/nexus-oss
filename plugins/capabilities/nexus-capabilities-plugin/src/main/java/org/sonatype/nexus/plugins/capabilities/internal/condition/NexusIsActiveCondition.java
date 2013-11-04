@@ -38,14 +38,16 @@ public class NexusIsActiveCondition
     implements Condition
 {
 
-  NexusIsActiveCondition(final EventBus eventBus) {
+  public NexusIsActiveCondition(final EventBus eventBus) {
     super(eventBus, false);
+    bind();
     getEventBus().register(this);
   }
 
   @Inject
-  NexusIsActiveCondition(final Provider<EventBus> eventBus) {
+  public NexusIsActiveCondition(final Provider<EventBus> eventBus) {
     super(eventBus, false);
+    bind();
     getEventBus().register(this);
   }
 
