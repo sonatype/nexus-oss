@@ -683,6 +683,26 @@ public class LogbackLogManager
   }
 
   @Override
+  public void resetLoggers() {
+    logger.debug("Reset loggers");
+
+    boolean shouldResetRoot = false;
+    for (Map.Entry<String, LoggerLevel> entry : overrides.entrySet()) {
+      if (Logger.ROOT_LOGGER_NAME.equals(entry.getKey())) {
+        shouldResetRoot = !LoggerLevel.INFO.equals(entry.getValue());
+      }
+      else {
+        getLoggerContext().getLogger(entry.getKey()).setLevel(null);
+      }
+    }
+    overrides.clear();
+    LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
+    if (shouldResetRoot) {
+      setLoggerLevel(KEY_ROOT_LEVEL, LoggerLevel.DEFAULT);
+    }
+  }
+
+  @Override
   @Nullable
   public LoggerLevel getLoggerLevel(final String name) {
     Level level = getLoggerContext().getLogger(name).getLevel();

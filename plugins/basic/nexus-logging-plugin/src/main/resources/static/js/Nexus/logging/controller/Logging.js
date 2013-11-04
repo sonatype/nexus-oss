@@ -48,6 +48,9 @@ NX.define('Nexus.logging.controller.Logging', {
       '#nx-logging-button-remove-loggers': {
         click: me.removeLogger
       },
+      '#nx-logging-button-reset-loggers': {
+        click: me.resetLoggers
+      },
       '#nx-logging-button-mark': {
         click: me.showMarkLog
       },
@@ -255,6 +258,43 @@ NX.define('Nexus.logging.controller.Logging', {
         }
       });
     }
+  },
+
+  /**
+   * Resets all loggers to their default levels.
+   *
+   * @param {Ext.Button} button reset button that triggered the action (from loggers grid toolbar)
+   * @private
+   */
+  resetLoggers: function (button) {
+    var loggersGrid = button.up('nx-logging-view-loggers'),
+        store = loggersGrid.getStore(),
+        icons = Nexus.logging.Icons;
+
+    Ext.Msg.show({
+      title: 'Reset loggers',
+      msg: 'Reset all loggers to their default levels ?',
+      buttons: Ext.Msg.OKCANCEL,
+      icon: icons.get('loggers_reset').variant('x32').cls,
+      fn: function (btn) {
+        if (btn === 'ok') {
+          Ext.Ajax.request({
+            url: Nexus.siesta.basePath + '/logging/loggers',
+            method: 'DELETE',
+            suppressStatus: true,
+            callback: function () {
+              store.load();
+            },
+            success: function () {
+              Nexus.messages.show('Logging', 'Loggers had been reset');
+            },
+            failure: function (response) {
+              Nexus.messages.show('Logging', 'Failed to reset loggers: ' + me.parseExceptionMessage(response));
+            }
+          });
+        }
+      }
+    });
   },
 
   /**

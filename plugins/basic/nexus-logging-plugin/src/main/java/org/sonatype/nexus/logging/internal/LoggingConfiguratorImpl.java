@@ -95,4 +95,15 @@ public class LoggingConfiguratorImpl
     }
   }
 
+  @Override
+  public void reset() {
+    try {
+      lock.writeLock().lock();
+      logManager.resetLoggers();
+    }
+    finally {
+      lock.writeLock().unlock();
+    }
+  }
+
 }
