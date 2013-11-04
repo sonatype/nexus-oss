@@ -39,7 +39,6 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.targets.TargetSet;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
-import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 
 /**
  * Repository interface used by Proximity. It is an extension of ResourceStore iface, allowing to make direct
@@ -119,11 +118,6 @@ public interface Repository
   ContentClass getRepositoryContentClass();
 
   /**
-   * Returns the task filter for this repository.
-   */
-  RepositoryTaskFilter getRepositoryTaskFilter();
-
-  /**
    * Gets the target set for request.
    */
   TargetSet getTargetsForRequest(ResourceStoreRequest request);
@@ -147,7 +141,7 @@ public interface Repository
    * Will return the proper Action that will occur on "write" operation: create (if nothing exists on the given path)
    * or update (if overwrite will happen since the path already exists).
    *
-   * @throws StorageException when some storage (IO) problem happens.
+   * @throws LocalStorageException when some storage (IO) problem happens.
    */
   Action getResultingActionOnWrite(ResourceStoreRequest rsr)
       throws LocalStorageException;
@@ -177,7 +171,7 @@ public interface Repository
   /**
    * Sets the not found cache time to live (in minutes).
    *
-   * @param notFoundCacheTimeToLiveSeconds the new not found cache time to live (in minutes).
+   * @param notFoundCacheTimeToLive the new not found cache time to live (in minutes).
    */
   void setNotFoundCacheTimeToLive(int notFoundCacheTimeToLive);
 
@@ -189,33 +183,10 @@ public interface Repository
   PathCache getNotFoundCache();
 
   /**
-   * Sets the not found cache.
-   *
-   * @param notFoundcache the new not found cache
-   */
-  void setNotFoundCache(PathCache notFoundcache);
-
-  /**
    * Maintains NFC.
    */
   void maintainNotFoundCache(ResourceStoreRequest request)
       throws ItemNotFoundException;
-
-  /**
-   * Adds path to NFC.
-   *
-   * @deprecated use the method with request parameter
-   */
-  @Deprecated
-  void addToNotFoundCache(String path);
-
-  /**
-   * Removes path from NFC.
-   *
-   * @deprecated use the method with request parameter
-   */
-  @Deprecated
-  void removeFromNotFoundCache(String path);
 
   /**
    * Adds path to NFC.
@@ -253,11 +224,6 @@ public interface Repository
   AttributesHandler getAttributesHandler();
 
   /**
-   * Sets attribute handler used by repository.
-   */
-  void setAttributesHandler(AttributesHandler attributesHandler);
-
-  /**
    * Returns the local URL of this repository, if any.
    *
    * @return local url of this repository, null otherwise.
@@ -270,7 +236,7 @@ public interface Repository
    * @param url the new local url
    */
   void setLocalUrl(String url)
-      throws StorageException;
+      throws LocalStorageException;
 
   /**
    * Gets local status.
@@ -286,15 +252,11 @@ public interface Repository
 
   /**
    * Returns repository specific local storage context.
-   *
-   * @return null if none
    */
   LocalStorageContext getLocalStorageContext();
 
   /**
    * Returns the local storage of the repository. Per repository instance may exists.
-   *
-   * @return localStorage or null.
    */
   LocalRepositoryStorage getLocalStorage();
 
@@ -497,13 +459,6 @@ public interface Repository
    * @return the access manager
    */
   AccessManager getAccessManager();
-
-  /**
-   * Sets the repository level AccessManager. Per repository instance may exists.
-   *
-   * @param accessManager the access manager
-   */
-  void setAccessManager(AccessManager accessManager);
 
   // ==================================================
   // Alternative (and unprotected) Content access

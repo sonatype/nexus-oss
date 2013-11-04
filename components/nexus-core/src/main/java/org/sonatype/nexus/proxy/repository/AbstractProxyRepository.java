@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -70,8 +69,10 @@ import org.sonatype.nexus.util.NumberSequence;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
@@ -106,22 +107,36 @@ public abstract class AbstractProxyRepository
    */
   private static final long AUTO_BLOCK_STATUS_MAX_RETAIN_TIME = 60L * 60L * 1000L;
 
-  // == these below are injected
+  // == injected
 
   private ThreadPoolManager poolManager;
   
-  // ==
+  // == set by this
 
   /**
    * The remote status checker thread, used in Proxies for handling autoBlocking. Not to go into Pool above, is
    * handled separately.
    */
-  private Thread repositoryStatusCheckerThread;
+  private RepositoryStatusCheckerThread repositoryStatusCheckerThread;
 
   /**
-   * if remote url changed, need special handling after save
+   * Remote storage context to store connection configs.
    */
-  private boolean remoteUrlChanged = false;
+  private RemoteStorageContext remoteStorageContext;
+
+  // == set by configurators
+
+  /**
+   * The remote storage.
+   */
+  private RemoteRepositoryStorage remoteStorage;
+
+  // == internals
+
+  /**
+   * Item content validators. Maintained by configurator, but map is final and created internally.
+   */
+  private final Map<String, ItemContentValidator> itemContentValidators = Maps.newHashMap();
 
   /**
    * The proxy remote status
@@ -134,30 +149,30 @@ public abstract class AbstractProxyRepository
   private volatile long remoteStatusUpdated = 0;
 
   /**
+   * if remote url changed, need special handling after save
+   */
+  private volatile boolean remoteUrlChanged = false;
+
+  /**
    * How much should be the last known remote status be retained.
    */
   private volatile NumberSequence remoteStatusRetainTimeSequence = new ConstantNumberSequence(
       REMOTE_STATUS_RETAIN_TIME);
 
-  /**
-   * The remote storage.
-   */
-  private RemoteRepositoryStorage remoteStorage;
-
-  /**
-   * Remote storage context to store connection configs.
-   */
-  private RemoteStorageContext remoteStorageContext;
-
-  /**
-   * Item content validators
-   */
-  private Map<String, ItemContentValidator> itemContentValidators;
-
   @Inject
   public void populateAbstractProxyRepository(ThreadPoolManager poolManager)
   {
     this.poolManager = checkNotNull(poolManager);
+
+    // set here
+    remoteStorageContext =
+        new DefaultRemoteStorageContext(getApplicationConfiguration().getGlobalRemoteStorageContext());
+    repositoryStatusCheckerThread =
+        new RepositoryStatusCheckerThread(LoggerFactory.getLogger(getClass().getName() + "-"
+            + getId()), this);
+    repositoryStatusCheckerThread.setRunning(true);
+    repositoryStatusCheckerThread.setDaemon(true);
+    repositoryStatusCheckerThread.start();
   }
 
   @Override
@@ -165,6 +180,14 @@ public abstract class AbstractProxyRepository
     return (AbstractProxyRepositoryConfiguration) getCurrentCoreConfiguration().getExternalConfiguration()
         .getConfiguration(
             forModification);
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    // kill our daemon thread too
+    repositoryStatusCheckerThread.setRunning(false);
+    repositoryStatusCheckerThread.interrupt();
   }
 
   @Override
@@ -335,34 +358,37 @@ public abstract class AbstractProxyRepository
     return processor.getFiles();
   }
 
+  @Override
   public Map<String, ItemContentValidator> getItemContentValidators() {
-    if (itemContentValidators == null) {
-      itemContentValidators = new HashMap<String, ItemContentValidator>();
-    }
-
     return itemContentValidators;
   }
 
+  @Override
   public boolean isFileTypeValidation() {
     return getExternalConfiguration(false).isFileTypeValidation();
   }
 
+  @Override
   public void setFileTypeValidation(boolean doValidate) {
     getExternalConfiguration(true).setFileTypeValidation(doValidate);
   }
 
+  @Override
   public boolean isItemAgingActive() {
     return getExternalConfiguration(false).isItemAgingActive();
   }
 
+  @Override
   public void setItemAgingActive(boolean value) {
     getExternalConfiguration(true).setItemAgingActive(value);
   }
 
+  @Override
   public boolean isAutoBlockActive() {
     return getExternalConfiguration(false).isAutoBlockActive();
   }
 
+  @Override
   public void setAutoBlockActive(boolean val) {
     // NEXUS-3516: if user disables autoblock, and repo is auto-blocked, unblock it
     if (!val && ProxyMode.BLOCKED_AUTO.equals(getProxyMode())) {
@@ -377,18 +403,12 @@ public abstract class AbstractProxyRepository
     getExternalConfiguration(true).setAutoBlockActive(val);
   }
 
-  public Thread getRepositoryStatusCheckerThread() {
-    return repositoryStatusCheckerThread;
-  }
-
-  public void setRepositoryStatusCheckerThread(Thread repositoryStatusCheckerThread) {
-    this.repositoryStatusCheckerThread = repositoryStatusCheckerThread;
-  }
-
+  @Override
   public long getCurrentRemoteStatusRetainTime() {
     return this.remoteStatusRetainTimeSequence.peek();
   }
 
+  @Override
   public long getNextRemoteStatusRetainTime() {
     // step it up, but topped
     if (this.remoteStatusRetainTimeSequence.peek() <= AUTO_BLOCK_STATUS_MAX_RETAIN_TIME) {
@@ -401,6 +421,7 @@ public abstract class AbstractProxyRepository
     }
   }
 
+  @Override
   public ProxyMode getProxyMode() {
     if (getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
       return getExternalConfiguration(false).getProxyMode();
@@ -492,6 +513,7 @@ public abstract class AbstractProxyRepository
     }
   }
 
+  @Override
   public void setProxyMode(ProxyMode proxyMode) {
     setProxyMode(proxyMode, true, null);
   }
@@ -663,14 +685,17 @@ public abstract class AbstractProxyRepository
     return null;
   }
 
+  @Override
   public RepositoryStatusCheckMode getRepositoryStatusCheckMode() {
     return getExternalConfiguration(false).getRepositoryStatusCheckMode();
   }
 
+  @Override
   public void setRepositoryStatusCheckMode(RepositoryStatusCheckMode mode) {
     getExternalConfiguration(true).setRepositoryStatusCheckMode(mode);
   }
 
+  @Override
   public String getRemoteUrl() {
     if (getCurrentConfiguration(false).getRemoteStorage() != null) {
       return getCurrentConfiguration(false).getRemoteStorage().getUrl();
@@ -680,6 +705,7 @@ public abstract class AbstractProxyRepository
     }
   }
 
+  @Override
   public void setRemoteUrl(String remoteUrl)
       throws RemoteStorageException
   {
@@ -712,6 +738,7 @@ public abstract class AbstractProxyRepository
    *
    * @return the item max age in (in minutes)
    */
+  @Override
   public int getItemMaxAge() {
     return getExternalConfiguration(false).getItemMaxAge();
   }
@@ -721,6 +748,7 @@ public abstract class AbstractProxyRepository
    *
    * @param itemMaxAge the new item max age in (in minutes).
    */
+  @Override
   public void setItemMaxAge(int itemMaxAge) {
     getExternalConfiguration(true).setItemMaxAge(itemMaxAge);
   }
@@ -734,6 +762,7 @@ public abstract class AbstractProxyRepository
    */
   private volatile boolean _remoteStatusChecking = false;
 
+  @Override
   public RemoteStatus getRemoteStatus(ResourceStoreRequest request, boolean forceCheck) {
     // if the last known status is old, simply reset it
     if (forceCheck || System.currentTimeMillis() - remoteStatusUpdated > REMOTE_STATUS_RETAIN_TIME) {
@@ -759,27 +788,27 @@ public abstract class AbstractProxyRepository
     }
   }
 
+  @Override
   public RemoteStorageContext getRemoteStorageContext() {
-    if (remoteStorageContext == null) {
-      remoteStorageContext =
-          new DefaultRemoteStorageContext(getApplicationConfiguration().getGlobalRemoteStorageContext());
-    }
-
     return remoteStorageContext;
   }
 
+  @Override
   public RemoteConnectionSettings getRemoteConnectionSettings() {
     return getRemoteStorageContext().getRemoteConnectionSettings();
   }
 
+  @Override
   public void setRemoteConnectionSettings(RemoteConnectionSettings settings) {
     getRemoteStorageContext().setRemoteConnectionSettings(settings);
   }
 
+  @Override
   public RemoteAuthenticationSettings getRemoteAuthenticationSettings() {
     return getRemoteStorageContext().getRemoteAuthenticationSettings();
   }
 
+  @Override
   public void setRemoteAuthenticationSettings(RemoteAuthenticationSettings settings) {
     getRemoteStorageContext().setRemoteAuthenticationSettings(settings);
 
@@ -802,10 +831,12 @@ public abstract class AbstractProxyRepository
     }
   }
 
+  @Override
   public RemoteRepositoryStorage getRemoteStorage() {
     return remoteStorage;
   }
 
+  @Override
   public void setRemoteStorage(RemoteRepositoryStorage remoteStorage) {
     this.remoteStorage = remoteStorage;
 
@@ -823,6 +854,7 @@ public abstract class AbstractProxyRepository
     }
   }
 
+  @Override
   public AbstractStorageItem doCacheItem(AbstractStorageItem item)
       throws LocalStorageException
   {

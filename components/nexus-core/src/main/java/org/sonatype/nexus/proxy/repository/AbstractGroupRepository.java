@@ -323,6 +323,7 @@ public abstract class AbstractGroupRepository
     }
   }
 
+  @Override
   public List<String> getMemberRepositoryIds() {
     ArrayList<String> result =
         new ArrayList<String>(getExternalConfiguration(false).getMemberRepositoryIds().size());
@@ -334,6 +335,7 @@ public abstract class AbstractGroupRepository
     return Collections.unmodifiableList(result);
   }
 
+  @Override
   public void setMemberRepositoryIds(List<String> repositories)
       throws NoSuchRepositoryException, InvalidGroupingException
   {
@@ -344,6 +346,7 @@ public abstract class AbstractGroupRepository
     }
   }
 
+  @Override
   public void addMemberRepositoryId(String repositoryId)
       throws NoSuchRepositoryException, InvalidGroupingException
   {
@@ -381,10 +384,12 @@ public abstract class AbstractGroupRepository
     }
   }
 
+  @Override
   public void removeMemberRepositoryId(String repositoryId) {
     getExternalConfiguration(true).removeMemberRepositoryId(repositoryId);
   }
 
+  @Override
   public List<Repository> getMemberRepositories() {
     ArrayList<Repository> result = new ArrayList<Repository>();
 
@@ -437,6 +442,7 @@ public abstract class AbstractGroupRepository
     }
   }
 
+  @Override
   public List<StorageItem> doRetrieveItems(ResourceStoreRequest request)
       throws GroupItemNotFoundException, StorageException
   {
