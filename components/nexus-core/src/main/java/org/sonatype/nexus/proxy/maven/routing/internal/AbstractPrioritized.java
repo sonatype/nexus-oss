@@ -13,8 +13,8 @@
 
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.maven.routing.discovery.Prioritized;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * Abstract class for {@link Prioritized} implementations.
@@ -22,7 +22,7 @@ import org.sonatype.nexus.proxy.maven.routing.discovery.Prioritized;
  * @author cstamas
  */
 public abstract class AbstractPrioritized
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements Prioritized
 {
   private final int priority;

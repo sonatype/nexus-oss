@@ -89,6 +89,11 @@ public abstract class AbstractProxyRepositoryConfigurator
 
             // set the chosen remote storage
             prepository.setRemoteStorage(configRemoteStorage);
+            // mark remote storage context dirty, if applicable
+            final RemoteStorageContext ctx = prepository.getRemoteStorageContext();
+            if (ctx != null) {
+              ctx.incrementGeneration();
+            }
           }
           else {
             // just validate

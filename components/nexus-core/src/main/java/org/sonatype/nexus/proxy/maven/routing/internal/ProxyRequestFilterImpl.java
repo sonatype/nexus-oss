@@ -21,7 +21,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
@@ -30,6 +29,7 @@ import org.sonatype.nexus.proxy.maven.routing.ProxyRequestFilter;
 import org.sonatype.nexus.proxy.maven.routing.events.PrefixFilePublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.routing.events.PrefixFileUnpublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
@@ -44,7 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class ProxyRequestFilterImpl
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements ProxyRequestFilter
 {
   private final ApplicationStatusSource applicationStatusSource;
@@ -107,7 +107,7 @@ public class ProxyRequestFilterImpl
       }
     }
     catch (IOException e) {
-      getLogger().warn("Could not build PathMatcher for {}!", mavenProxyRepository, e);
+      log.warn("Could not build PathMatcher for {}!", mavenProxyRepository, e);
       dropPathMatcherFor(mavenProxyRepository);
     }
   }

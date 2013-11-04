@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.discovery.DiscoveryResult;
 import org.sonatype.nexus.proxy.maven.routing.discovery.Prioritized.PriorityOrderingComparator;
@@ -29,6 +28,7 @@ import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteContentDiscoverer;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyFailedException;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyResult;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -41,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class RemoteContentDiscovererImpl
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements RemoteContentDiscoverer
 {
   private final List<RemoteStrategy> remoteStrategies;
@@ -68,7 +68,7 @@ public class RemoteContentDiscovererImpl
     final DiscoveryResult<MavenProxyRepository> discoveryResult =
         new DiscoveryResult<MavenProxyRepository>(mavenProxyRepository);
     for (RemoteStrategy strategy : remoteStrategies) {
-      getLogger().debug("Discovery of {} with strategy {} attempted", mavenProxyRepository, strategy.getId());
+      log.debug("Discovery of {} with strategy {} attempted", mavenProxyRepository, strategy.getId());
       try {
         final StrategyResult strategyResult = strategy.discover(mavenProxyRepository);
         if (strategyResult.isRoutingEnabled()) {
@@ -86,32 +86,30 @@ public class RemoteContentDiscovererImpl
       }
       catch (InvalidInputException e) {
         final String message =
-            "Remote strategy " + strategy.getId() + " detected invalid input, results discarded: "
+            "Remote strategy " + strategy.getId() + " on " + mavenProxyRepository + " detected invalid input, results discarded: "
                 + e.getMessage();
-        getLogger().info(message);
+        log.info(message);
         discoveryResult.recordFailure(strategy.getId(), message);
         break;
       }
       catch (Exception e) {
-        if (getLogger().isDebugEnabled()) {
-          getLogger().warn("Remote strategy {} error", strategy.getId(), e);
+        if (log.isDebugEnabled()) {
+          log.warn("Remote strategy {} error on {}", strategy.getId(), mavenProxyRepository, e);
         }
         else {
-          getLogger().warn("Remote strategy {} error: {} / {}", strategy.getId(),
-              e.getClass().getSimpleName(), e.getMessage()
-          );
+          log.warn("Remote strategy {} error on {}: {}", strategy.getId(), mavenProxyRepository, e.toString());
         }
         discoveryResult.recordError(strategy.getId(), e);
         break;
       }
 
       if (discoveryResult.isSuccessful()) {
-        getLogger().debug("Discovery of {} with strategy {} successful", mavenProxyRepository,
+        log.debug("Discovery of {} with strategy {} successful", mavenProxyRepository,
             strategy.getId());
         break;
       }
       else {
-        getLogger().debug("Discovery of {} with strategy {} unsuccessful", mavenProxyRepository,
+        log.debug("Discovery of {} with strategy {} unsuccessful", mavenProxyRepository,
             strategy.getId());
       }
     }

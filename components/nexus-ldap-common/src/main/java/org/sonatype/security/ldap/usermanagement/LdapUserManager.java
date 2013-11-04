@@ -139,7 +139,7 @@ public class LdapUserManager
     Set<User> users = new TreeSet<User>();
     if (this.isEnabled()) {
       try {
-        Set<LdapUser> ldapUsers = this.ldapManager.searchUsers(criteria.getUserId());
+        Set<LdapUser> ldapUsers = this.ldapManager.searchUsers(criteria.getUserId(), criteria.getOneOfRoleIds());
 
         for (LdapUser ldapUser : ldapUsers) {
           users.add(this.toPlexusUser(ldapUser));

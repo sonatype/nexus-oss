@@ -322,14 +322,14 @@ public class HttpClientRemoteStorage
         // If HEAD failed, attempt a GET. Some repos may not support HEAD method
         doGet = true;
 
-        getLogger().debug("HEAD method failed, will attempt GET. Exception: " + e.getMessage(), e);
+        log.debug("HEAD method failed, will attempt GET. Exception: " + e.getMessage(), e);
       }
       finally {
         // HEAD returned error, but not exception, try GET before failing
         if (!doGet && statusCode != HttpStatus.SC_OK) {
           doGet = true;
 
-          getLogger().debug("HEAD method failed, will attempt GET. Status: " + statusCode);
+          log.debug("HEAD method failed, will attempt GET. Status: " + statusCode);
         }
       }
     }
@@ -376,7 +376,7 @@ public class HttpClientRemoteStorage
             final Page page = Page.getPageFor(pageContext, nxRepoMetadataUrl.toExternalForm());
             if (page.getStatusCode() == 200) {
               // this is a Nexus with browsing disabled. say OK
-              getLogger().debug(
+              log.debug(
                   "Original GET request for URL {} failed with 404, but GET request for URL {} succeeded, we assume remote is a Nexus repository having browsing disabled.",
                   remoteUrl, nxRepoMetadataUrl);
               return true;
@@ -467,9 +467,8 @@ public class HttpClientRemoteStorage
   {
     final URI methodUri = httpRequest.getURI();
 
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug(
-          "Invoking HTTP " + httpRequest.getMethod() + " method against remote location " + methodUri);
+    if (log.isDebugEnabled()) {
+      log.debug("Invoking HTTP {} method against remote location {}", httpRequest.getMethod(), methodUri);
     }
 
     final RemoteStorageContext ctx = getRemoteStorageContext(repository);
@@ -568,11 +567,10 @@ public class HttpClientRemoteStorage
         result = DateUtils.parseDate(date.getValue()).getTime();
       }
       catch (DateParseException ex) {
-        getLogger().warn(
-            "Could not parse date '" + date + "', using system current time as item creation time.", ex);
+        log.warn("Could not parse date '{}', using system current time as item creation time.", date, ex);
       }
       catch (NullPointerException ex) {
-        getLogger().warn("Parsed date is null, using system current time as item creation time.");
+        log.warn("Parsed date is null, using system current time as item creation time.");
       }
     }
     return result;
@@ -622,7 +620,7 @@ public class HttpClientRemoteStorage
         EntityUtils.consume(httpResponse.getEntity());
       }
       catch (IOException e) {
-        getLogger().warn(e.getMessage());
+        log.warn(e.getMessage());
       }
     }
   }
