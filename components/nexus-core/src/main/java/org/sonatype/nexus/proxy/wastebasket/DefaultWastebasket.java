@@ -26,7 +26,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -38,14 +37,15 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.walker.AffirmativeStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 
 @Named
 @Singleton
 public class DefaultWastebasket
-    extends AbstractLoggingComponent
-    implements SmartWastebasket
+    extends ComponentSupport
+    implements Wastebasket
 {
   private static final String TRASH_PATH_PREFIX = "/.nexus/trash";
 
@@ -91,14 +91,17 @@ public class DefaultWastebasket
   // ==============================
   // Wastebasket iface
 
+  @Override
   public DeleteOperation getDeleteOperation() {
     return deleteOperation;
   }
 
+  @Override
   public void setDeleteOperation(final DeleteOperation deleteOperation) {
     this.deleteOperation = deleteOperation;
   }
 
+  @Override
   public Long getTotalSize() {
     Long totalSize = null;
 
@@ -113,12 +116,14 @@ public class DefaultWastebasket
     return totalSize;
   }
 
+  @Override
   public void purgeAll()
       throws IOException
   {
     purgeAll(ALL);
   }
 
+  @Override
   public void purgeAll(final long age)
       throws IOException
   {
@@ -159,16 +164,19 @@ public class DefaultWastebasket
     }
   }
 
+  @Override
   public Long getSize(final Repository repository) {
     return null;
   }
 
+  @Override
   public void purge(final Repository repository)
       throws IOException
   {
     purge(repository, ALL);
   }
 
+  @Override
   public void purge(final Repository repository, final long age)
       throws IOException
   {
@@ -222,6 +230,7 @@ public class DefaultWastebasket
     }
   }
 
+  @Override
   public boolean undelete(final LocalRepositoryStorage ls, final Repository repository,
                           final ResourceStoreRequest request)
       throws LocalStorageException
@@ -246,13 +255,6 @@ public class DefaultWastebasket
     }
 
     return false;
-  }
-
-  // ==============================
-  // SmartWastebasket iface
-
-  public void setMaximumSizeConstraint(final MaximumSizeConstraint constraint) {
-    // TODO Implement this
   }
 
   // ==
