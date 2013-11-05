@@ -15,6 +15,10 @@ package org.sonatype.nexus.proxy.wastebasket;
 
 import org.sonatype.nexus.proxy.repository.Repository;
 
+/**
+ * @deprecated To be removed in future release (no replacement provided).
+ */
+@Deprecated
 public class AbsoluteMaximumSizeConstraint
     implements MaximumSizeConstraint
 {

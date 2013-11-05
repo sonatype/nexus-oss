@@ -17,7 +17,9 @@ package org.sonatype.nexus.proxy.wastebasket;
  * A Smart Wastebasket, that is able to do some house-cleaning if some limits are reached.
  *
  * @author cstamas
+ * @deprecated To be removed in future releases (no replacement provided).
  */
+@Deprecated
 public interface SmartWastebasket
     extends Wastebasket
 {
