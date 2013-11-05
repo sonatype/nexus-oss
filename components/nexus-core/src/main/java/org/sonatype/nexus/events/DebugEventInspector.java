@@ -17,15 +17,13 @@ import java.lang.management.ManagementFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.sonatype.inject.EagerSingleton;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -35,8 +33,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A simple "debug" helper component, that dumps out events to log. Usable for debugging or problem solving, not for
- * production use. It will register itself only when enabled, otherwise it will not spend any CPU cycles being
- * dormant. It can be enabled via System property or JMX.
+ * production use! It will register itself to listen for events only when enabled, otherwise it will not spend any CPU
+ * cycles being dormant. It can be enabled via System property or JMX.
  *
  * @author cstamas
  * @since 2.1
@@ -44,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @EagerSingleton
 public class DebugEventInspector
-    extends AbstractLoggingComponent
+    extends ComponentSupport
 {
   private static final String JMX_DOMAIN = DebugEventInspector.class.getPackage().getName();
 
@@ -65,14 +63,14 @@ public class DebugEventInspector
       jmxName = ObjectName.getInstance(JMX_DOMAIN, "name", DebugEventInspector.class.getSimpleName());
       final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
       if (server.isRegistered(jmxName)) {
-        getLogger().warn("MBean already registered; replacing: {}", jmxName);
+        log.warn("MBean already registered; replacing: {}", jmxName);
         server.unregisterMBean(jmxName);
       }
       server.registerMBean(new DefaultDebugEventInspectorMBean(this), jmxName);
     }
     catch (Exception e) {
       jmxName = null;
-      getLogger().warn("Problem registering MBean for: " + getClass().getName(), e);
+      log.warn("Problem registering MBean for: " + getClass().getName(), e);
     }
     setEnabled(ENABLED_DEFAULT);
   }
@@ -98,6 +96,6 @@ public class DebugEventInspector
   @Subscribe
   @AllowConcurrentEvents
   public void accept(Event<?> evt) {
-    getLogger().info(String.valueOf(evt));
+    log.info(String.valueOf(evt));
   }
 }
