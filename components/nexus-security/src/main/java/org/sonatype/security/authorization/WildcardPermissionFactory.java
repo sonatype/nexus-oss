@@ -36,6 +36,13 @@ public class WildcardPermissionFactory
 {
   @Override
   public Permission create(final String permission) {
-    return new WildcardPermission(permission);
+    return new WildcardPermission(permission) {
+      private final int cachedHash = super.hashCode();
+
+      @Override
+      public int hashCode() {
+        return cachedHash;
+      }
+    };
   }
 }
