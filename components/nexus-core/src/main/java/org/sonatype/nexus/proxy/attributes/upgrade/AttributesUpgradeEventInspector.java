@@ -27,7 +27,9 @@ import org.sonatype.plexus.appevents.Event;
  * EventInspector that fires upgrade call to upgrader component, does it blindly.
  *
  * @since 2.0
+ * @deprecated To be removed in future releases once upgrade from Nexus 1.x line becomes unsupported.
  */
+@Deprecated
 @Singleton
 @Named("AttributesUpgradeEventInspector")
 public class AttributesUpgradeEventInspector
