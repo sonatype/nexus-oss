@@ -19,7 +19,9 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
  * The Class AbstractStorageFileItemInspector is a convenience class for implementing inspectors.
  *
  * @author cstamas
+ * @deprecated To be removed in future releases. Use {@link AbstractStorageItemInspector} instead.
  */
+@Deprecated
 public abstract class AbstractStorageFileItemInspector
     extends AbstractLoggingComponent
     implements StorageFileItemInspector
