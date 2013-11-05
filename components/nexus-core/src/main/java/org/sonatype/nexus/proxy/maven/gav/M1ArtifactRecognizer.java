@@ -15,7 +15,10 @@ package org.sonatype.nexus.proxy.maven.gav;
 
 /**
  * Utility methods for basic "detection" of artifact kind in M1 repository.
+ *
+ * @deprecated To be removed once Maven1 support is removed.
  */
+@Deprecated
 public class M1ArtifactRecognizer
 {
   /**
