@@ -17,6 +17,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
+import org.sonatype.gossip.Level;
 import org.sonatype.guice.bean.binders.SpaceModule;
 import org.sonatype.guice.bean.reflect.ClassSpace;
 import org.sonatype.guice.bean.reflect.DeferredClass;
@@ -192,7 +193,15 @@ public final class NexusAnnotatedBeanModule
         addRepositoryTypeDescriptor(role, component.hint());
       }
 
-      log.warn("Found legacy plexus component: {}", log.isDebugEnabled() ? implementation : implementation.getName());
+      // log a warning if a plexus component is found.  special handling for org.apache.maven.{index|model}
+      // ... which are required plexus components we can not effectively port to jsr-330 ATM.
+      // log these as debug to avoid warnings which users can not do anything about.
+      String implName = implementation.getName();
+      Level level = Level.WARN;
+      if (implName.startsWith("org.apache.maven.model") || implName.startsWith("org.apache.maven.index")) {
+        level = Level.DEBUG;
+      }
+      level.log(log, "Found legacy plexus component: {}", log.isDebugEnabled() ? implementation : implName);
 
       delegate.hear(component, implementation, source);
     }
