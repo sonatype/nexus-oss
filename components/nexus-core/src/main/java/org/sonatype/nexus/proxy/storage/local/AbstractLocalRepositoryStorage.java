@@ -156,6 +156,10 @@ public abstract class AbstractLocalRepositoryStorage
 
   // ==
 
+  /**
+   * @deprecated To be removed in future releases (no replacement provided).
+   */
+  @Deprecated
   @Override
   public Iterator<StorageItem> iterateItems(Repository repository, ResourceStoreIteratorRequest request)
       throws ItemNotFoundException, LocalStorageException
