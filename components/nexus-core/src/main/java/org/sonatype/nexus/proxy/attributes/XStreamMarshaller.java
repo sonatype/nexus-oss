@@ -31,7 +31,9 @@ import com.thoughtworks.xstream.converters.collections.MapConverter;
  * @author cstamas
  * @since 2.0
  * @deprecated Deprecated in favor of Jackson powered Marshaller, see {@link JacksonJSONMarshaller}.
+ * @deprecated To be removed in future releases once upgrade from Nexus 1.x line becomes unsupported.
  */
+@Deprecated
 public class XStreamMarshaller
     implements Marshaller
 {
