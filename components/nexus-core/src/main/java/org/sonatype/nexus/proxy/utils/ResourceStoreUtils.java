@@ -25,7 +25,9 @@ import org.codehaus.plexus.util.StringUtils;
  * Simple utils regarding stores.
  *
  * @author cstamas
+ * @deprecated To be removed in future releases (no replacement).
  */
+@Deprecated
 public class ResourceStoreUtils
 {
 
