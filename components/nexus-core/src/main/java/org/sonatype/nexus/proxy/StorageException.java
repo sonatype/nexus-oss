@@ -24,8 +24,10 @@ import java.io.IOException;
  * LocalStorageException and RemoteStorageException should be used to "fine tune" Nexus Core behavior.
  *
  * @author cstamas
- * @deprecated Use {@link LocalStorageException} or {@link RemoteStorageException} respectively.
+ * @deprecated Use {@link LocalStorageException} or {@link RemoteStorageException} respectively, or, catch {@link
+ *             IOException} in your code as this exception is about to be removed in future releases.
  */
+@Deprecated
 public class StorageException
     extends IOException
 {
