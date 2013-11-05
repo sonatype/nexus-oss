@@ -32,10 +32,13 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
+
+import com.google.common.base.Throwables;
 
 /**
  * The default implementation of the RolePermissionResolver which reads roles from {@link StaticSecurityResource}s to
@@ -67,10 +70,25 @@ public class XmlRolePermissionResolver
   }
 
   public Collection<Permission> resolvePermissionsInRole(final String roleString) {
+    try {
+      final Set<Permission> permissions = new LinkedHashSet<Permission>();
+      configuration.runRead(new ConfigurationManagerAction()
+      {
+        public void run() throws Exception {
+          resolvePermissionsInRole(roleString, permissions);
+        }
+      });
+      return permissions;
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  protected void resolvePermissionsInRole(final String roleString, final Collection<Permission> permissions) {
     final LinkedList<String> rolesToProcess = new LinkedList<String>();
     rolesToProcess.add(roleString); // initial role
     final Set<String> processedRoleIds = new LinkedHashSet<String>();
-    final Set<Permission> permissions = new LinkedHashSet<Permission>();
     while (!rolesToProcess.isEmpty()) {
       final String roleId = rolesToProcess.removeFirst();
       if (!processedRoleIds.contains(roleId)) {
@@ -92,7 +110,6 @@ public class XmlRolePermissionResolver
         }
       }
     }
-    return permissions;
   }
 
   protected Set<Permission> getPermissions(final String privilegeId) {
