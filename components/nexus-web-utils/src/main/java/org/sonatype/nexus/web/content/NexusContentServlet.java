@@ -234,6 +234,8 @@ public class NexusContentServlet
   protected void handleException(final HttpServletRequest request, final HttpServletResponse response,
       final ResourceStoreRequest rsr, final Exception exception) throws IOException
   {
+    logger.trace("Exception", exception);
+
     if (exception instanceof LocalStorageEOFException) {
       // in case client drops connection, this makes not much sense, as he will not
       // receive this response, but we have to end it somehow.
@@ -274,6 +276,13 @@ public class NexusContentServlet
       // Note: we must ensure response is not committed, hence, no error page is rendered
       // this attribute above will cause filter to either 403 if
       // current user is non anonymous, or 401 and challenge if user is anonymous
+    }
+    else if (exception instanceof IOException) {
+      // Do not log verbose traces for IO problems
+      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      logger.warn(exception.toString());
+      // Do not attempt to render error page
+      return;
     }
     else {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
