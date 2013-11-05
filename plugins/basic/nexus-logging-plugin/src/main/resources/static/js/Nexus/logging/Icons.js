@@ -49,6 +49,7 @@ NX.define('Nexus.logging.Icons', {
         book_add: iconConfig('book_add.png'),
         book_delete: iconConfig('book_delete.png'),
         bookmark_red: iconConfig('bookmark_red.png'),
+        arrow_undo_orange: iconConfig('arrow_undo_orange.png'),
 
         logging: '@book',
         logger: '@book',
@@ -56,6 +57,7 @@ NX.define('Nexus.logging.Icons', {
         loggers_refresh: '@arrow_refresh',
         loggers_add: '@book_add',
         loggers_remove: '@book_delete',
+        loggers_reset: '@arrow_undo_orange',
 
         log_refresh: '@arrow_refresh',
         log_download: '@download',

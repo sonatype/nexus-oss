@@ -48,4 +48,9 @@ public interface LoggingConfigurator
    */
   void remove(String name);
 
+  /**
+   * Resets all loggers to their default levels.
+   */
+  void reset();
+
 }
