@@ -37,7 +37,10 @@ public interface MetadataUpdater
 
   /**
    * Calling this method updates the GAV, GA and G metadatas accordingly. It senses whether it is a snapshot or not.
+   *
+   * @deprecated Pending removal (no replacement).
    */
+  @Deprecated
   void undeployArtifact(ArtifactStoreRequest request)
       throws IOException;
 
@@ -47,19 +50,28 @@ public interface MetadataUpdater
 
   /**
    * Calling this method <b>replaces</b> the GAV, GA and G metadatas accordingly.
+   *
+   * @deprecated Pending removal (no replacement).
    */
+  @Deprecated
   void deployArtifacts(Collection<ArtifactStoreRequest> requests)
       throws IOException;
 
   /**
    * Calling this method <b>replaces</b> the GAV, GA and G metadatas accordingly.
+   *
+   * @deprecated Pending removal (no replacement).
    */
+  @Deprecated
   void undeployArtifacts(Collection<ArtifactStoreRequest> requests)
       throws IOException;
 
   /**
    * Give me a coll, and i will createate the metadata.
+   *
+   * @deprecated Pending removal (no replacement).
    */
+  @Deprecated
   void recreateMetadata(StorageCollectionItem coll)
       throws IOException;
 }
