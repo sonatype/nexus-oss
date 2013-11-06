@@ -123,7 +123,8 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
       var
             i, errorResponse,
             serverMessage = '',
-            r = response.responseText;
+            r = response.responseText,
+            displayMessage;
 
       if (r)
       {
@@ -207,38 +208,57 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
         //
         // <retry message> (optional)
 
-        var displayMessage =
-                    // caller provided message + serverMessage
-                    // status == -1 is request timed out (?), don't show message then
-                    (message && (responseStatus != -1) ? message : '') + (
-                          // show response text if requested (and makes sense, status 400)
-                          responseStatus == 400 && showResponseText ?  ('<br /><br />' + response.responseText) :
-                          // otherwise show statusLine if not requested to hide and we have a serverMessage
-                          // (we want to always provide some kind of server message, either error msg or status line)
-                          (
-                            (options.hideErrorStatus && serverMessage ) ? '' :
-                              (
-                                (responseStatus && responseStatus != -1 ) ? // hide the "-1 status"
-                                '<br/><br/>Nexus returned an error: ERROR ' + responseStatus + ': ' + responseStatusText :
-                                '<br/><br/>There was an error communicating with the server: request timed out.'
-                              )
-                            )
-                          )
-                          // FIXME offerRestart is never used (?)
-                          + (offerRestart ? '<br /><br />Click OK to reload the console or CANCEL if you wish to retry the same action in a little while.' : '');
+        displayMessage = '';
+
+        // caller provided message + serverMessage
+        // status == -1 is request timed out (?), don't show message then
+        if (message && responseStatus != -1) {
+          displayMessage = message;
+        }
+
+        // show response text if requested (and makes sense, status 400)
+        if (responseStatus == 400 && showResponseText) {
+          if (displayMessage.length > 0) {
+            displayMessage += '<br/><br/>';
+          }
+          displayMessage += response.responseText;
+        }
+        // otherwise show statusLine if not requested to hide and we have a serverMessage
+        // (we want to always provide some kind of server message, either error msg or status line)
+        else {
+          if (!(options.hideErrorStatus && serverMessage)) {
+            if (displayMessage.length > 0) {
+              displayMessage += '<br/><br/>';
+            }
+            // hide -1 status
+            if (responseStatus && responseStatus != -1) {
+              displayMessage += 'Nexus returned an error: ERROR ' + responseStatus + ': ' + responseStatusText;
+            }
+            else {
+              displayMessage += 'There was an error communicating with the server: request timed out.';
+            }
+          }
+        }
+
+        if (offerRestart) {
+          if (displayMessage.length > 0) {
+            displayMessage += '<br/><br/>';
+          }
+          displayMessage += 'Click OK to reload the console or CANCEL if you wish to retry the same action in a little while.';
+        }
+
         Ext.MessageBox.show({
-          title : "Error",
-          msg : Ext.util.Format.htmlEncode(displayMessage),
-              buttons : offerRestart ? Ext.MessageBox.OKCANCEL : Sonatype.MessageBox.OK,
-              icon : Ext.MessageBox.ERROR,
-              animEl : 'mb3',
-              fn : function(button) {
-                if (offerRestart && button == "ok")
-                {
-                  window.location.reload();
-                }
-              }
-            });
+          title: "Error",
+          msg: displayMessage,
+          buttons: offerRestart ? Ext.MessageBox.OKCANCEL : Sonatype.MessageBox.OK,
+          icon: Ext.MessageBox.ERROR,
+          animEl: 'mb3',
+          fn: function (button) {
+            if (offerRestart && button == "ok") {
+              window.location.reload();
+            }
+          }
+        });
       }
     },
     /**
