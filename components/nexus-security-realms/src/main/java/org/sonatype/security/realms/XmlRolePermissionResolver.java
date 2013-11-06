@@ -94,6 +94,13 @@ public class XmlRolePermissionResolver
   }
 
   public Collection<Permission> resolvePermissionsInRole(final String roleString) {
+
+    // check memory-sensitive cache
+    final Collection<Permission> cachedPermissions = permissionsCache.get(roleString);
+    if (cachedPermissions != null) {
+      return cachedPermissions; // use cached results
+    }
+
     try {
       final Set<Permission> permissions = new LinkedHashSet<Permission>();
       configuration.runRead(new ConfigurationManagerAction()
@@ -116,14 +123,6 @@ public class XmlRolePermissionResolver
     while (!rolesToProcess.isEmpty()) {
       final String roleId = rolesToProcess.removeFirst();
       if (processedRoleIds.add(roleId)) {
-
-        // check memory-sensitive cache
-        final Collection<Permission> cachedPermissions = permissionsCache.get(roleId);
-        if (cachedPermissions != null) {
-          permissions.addAll(cachedPermissions);
-          continue; // use cached results
-        }
-
         try {
           final CRole role = configuration.readRole(roleId);
 
