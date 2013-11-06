@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.maven.packaging;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -24,13 +25,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
-
-import com.google.common.collect.Maps;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
 /**
  * A very simple artifact packaging mapper, that has everything for quick-start wired in this class. Also, it takes
- * into account the "${nexus-work}/conf/packaging2extension-mapping.properties" file into account if found. To override the
+ * into
+ * account the "${nexus-work}/conf/packaging2extension-mapping.properties" file into account if found. To override the
  * "defaults" in this class, simply add lines to properties file with same keys.
  *
  * @author cstamas
@@ -38,7 +38,7 @@ import com.google.common.collect.Maps;
 @Singleton
 @Named
 public class DefaultArtifactPackagingMapper
-    extends ComponentSupport
+    extends AbstractLoggingComponent
     implements ArtifactPackagingMapper
 {
   public static final String MAPPING_PROPERTIES_FILE = "packaging2extension-mapping.properties";
@@ -46,7 +46,7 @@ public class DefaultArtifactPackagingMapper
   private final static Map<String, String> defaults;
 
   static {
-    defaults = Maps.newHashMapWithExpectedSize(15);
+    defaults = new HashMap<String, String>();
     defaults.put("ejb-client", "jar");
     defaults.put("ejb", "jar");
     defaults.put("rar", "jar");
@@ -83,15 +83,15 @@ public class DefaultArtifactPackagingMapper
     if (packaging2extensionMapping == null) {
       synchronized (this) {
         if (packaging2extensionMapping == null) {
-          packaging2extensionMapping = Maps.newHashMapWithExpectedSize(defaults.size());
+          packaging2extensionMapping = new HashMap<String, String>();
 
           // merge defaults
           packaging2extensionMapping.putAll(defaults);
 
           if (propertiesFile != null && propertiesFile.exists()) {
-            log.info("Found artifact packaging mapping file {}", propertiesFile);
+            getLogger().info("Found user artifact packaging mapping file, applying it...");
 
-            final Properties userMappings = new Properties();
+            Properties userMappings = new Properties();
 
             try (final FileInputStream fis =new FileInputStream(propertiesFile)) {
               userMappings.load(fis);
@@ -102,17 +102,20 @@ public class DefaultArtifactPackagingMapper
                       userMappings.getProperty(key.toString()));
                 }
 
-                log.info("User artifact packaging mapping file contained {} mappings", userMappings.keySet().size());
+                getLogger().info(
+                    propertiesFile.getAbsolutePath()
+                        + " user artifact packaging mapping file contained "
+                        + userMappings.keySet().size() + " mappings, applied them all successfully.");
               }
             }
             catch (IOException e) {
-              log.warn(
-                  "Got IO exception during read of file: {}", propertiesFile.getAbsolutePath(), e);
+              getLogger().warn(
+                  "Got IO exception during read of file: " + propertiesFile.getAbsolutePath());
             }
           }
           else {
             // make it silent if using defaults
-            log.debug(
+            getLogger().debug(
                 "User artifact packaging mappings file not found, will work with defaults...");
           }
         }
@@ -120,6 +123,10 @@ public class DefaultArtifactPackagingMapper
     }
 
     return packaging2extensionMapping;
+  }
+
+  public void setPackaging2extensionMapping(Map<String, String> packaging2extensionMapping) {
+    this.packaging2extensionMapping = packaging2extensionMapping;
   }
 
   public Map<String, String> getDefaults() {
