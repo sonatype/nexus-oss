@@ -17,8 +17,9 @@ package org.sonatype.nexus.proxy.attributes.upgrade;
  * JMX interface for managing and monitoring Attribute Upgrade.
  *
  * @author cstamas
- * @since 2.0
+ * @deprecated To be removed in future releases once upgrade from Nexus 1.x line becomes unsupported.
  */
+@Deprecated
 public interface AttributeUpgraderMBean
 {
   /**

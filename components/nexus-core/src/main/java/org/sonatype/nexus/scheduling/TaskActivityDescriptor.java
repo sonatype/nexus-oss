@@ -17,7 +17,9 @@ package org.sonatype.nexus.scheduling;
  * A generic activity descriptor.
  *
  * @author cstamas
+ * @deprecated To be removed in future release (no replacement provided).
  */
+@Deprecated
 public interface TaskActivityDescriptor
 {
   /**

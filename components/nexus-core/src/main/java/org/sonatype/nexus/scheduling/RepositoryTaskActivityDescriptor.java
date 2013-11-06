@@ -19,7 +19,9 @@ import java.util.Set;
  * An activity descriptor for tasks that are running against one or set of Repositories.
  *
  * @author cstamas
+ * @deprecated To be removed in future release (no replacement provided).
  */
+@Deprecated
 public interface RepositoryTaskActivityDescriptor
     extends TaskActivityDescriptor
 {

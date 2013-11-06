@@ -91,14 +91,17 @@ public class DefaultWastebasket
   // ==============================
   // Wastebasket iface
 
+  @Override
   public DeleteOperation getDeleteOperation() {
     return deleteOperation;
   }
 
+  @Override
   public void setDeleteOperation(final DeleteOperation deleteOperation) {
     this.deleteOperation = deleteOperation;
   }
 
+  @Override
   public Long getTotalSize() {
     Long totalSize = null;
 
@@ -113,12 +116,14 @@ public class DefaultWastebasket
     return totalSize;
   }
 
+  @Override
   public void purgeAll()
       throws IOException
   {
     purgeAll(ALL);
   }
 
+  @Override
   public void purgeAll(final long age)
       throws IOException
   {
@@ -159,16 +164,19 @@ public class DefaultWastebasket
     }
   }
 
+  @Override
   public Long getSize(final Repository repository) {
     return null;
   }
 
+  @Override
   public void purge(final Repository repository)
       throws IOException
   {
     purge(repository, ALL);
   }
 
+  @Override
   public void purge(final Repository repository, final long age)
       throws IOException
   {
@@ -222,6 +230,7 @@ public class DefaultWastebasket
     }
   }
 
+  @Override
   public boolean undelete(final LocalRepositoryStorage ls, final Repository repository,
                           final ResourceStoreRequest request)
       throws LocalStorageException

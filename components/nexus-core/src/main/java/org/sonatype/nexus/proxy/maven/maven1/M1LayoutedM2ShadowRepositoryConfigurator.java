@@ -18,6 +18,10 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.repository.AbstractShadowRepositoryConfigurator;
 
+/**
+ * @deprecated To be removed once Maven1 support is removed.
+ */
+@Deprecated
 @Singleton
 @Named
 public class M1LayoutedM2ShadowRepositoryConfigurator

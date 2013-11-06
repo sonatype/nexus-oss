@@ -38,7 +38,9 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * A shadow repository that transforms M2 layout of master to M1 layouted shadow.
  *
  * @author cstamas
+ * @deprecated To be removed once Maven1 support is removed.
  */
+@Deprecated
 @Named(M1LayoutedM2ShadowRepository.ID)
 @Typed(ShadowRepository.class)
 @Description("Maven2 to Maven1")

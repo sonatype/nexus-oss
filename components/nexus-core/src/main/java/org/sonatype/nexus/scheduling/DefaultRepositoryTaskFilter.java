@@ -19,6 +19,10 @@ import java.util.Set;
 import org.sonatype.nexus.scheduling.RepositoryTaskActivityDescriptor.AttributesModificationOperator;
 import org.sonatype.nexus.scheduling.RepositoryTaskActivityDescriptor.ModificationOperator;
 
+/**
+ * @deprecated To be removed in future release (no replacement provided).
+ */
+@Deprecated
 public class DefaultRepositoryTaskFilter
     implements RepositoryTaskFilter
 {

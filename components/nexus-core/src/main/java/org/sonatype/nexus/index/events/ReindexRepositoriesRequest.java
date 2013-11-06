@@ -13,6 +13,9 @@
 
 package org.sonatype.nexus.index.events;
 
+/**
+ * @deprecated To be removed (no replacement).
+ */
 @Deprecated
 public class ReindexRepositoriesRequest
 {

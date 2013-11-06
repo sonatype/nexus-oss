@@ -17,8 +17,9 @@ package org.sonatype.nexus.proxy.attributes.upgrade;
  * Component responsible for "upgrading" of the legacy attributes to new attributes on upgraded systems.
  *
  * @author cstamas
- * @since 2.0
+ * @deprecated To be removed in future releases once upgrade from Nexus 1.x line becomes unsupported.
  */
+@Deprecated
 public interface AttributeUpgrader
 {
   /**

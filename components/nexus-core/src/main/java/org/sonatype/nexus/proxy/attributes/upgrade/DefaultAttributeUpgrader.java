@@ -46,7 +46,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * to not kick in on any subsequent reboot.
  *
  * @since 2.0
+ * @deprecated To be removed in future releases once upgrade from Nexus 1.x line becomes unsupported.
  */
+@Deprecated
 @Singleton
 @Named
 public class DefaultAttributeUpgrader

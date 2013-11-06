@@ -13,6 +13,10 @@
 
 package org.sonatype.nexus.proxy;
 
+/**
+ * @deprecated To be removed in future releases (no replacement provided).
+ */
+@Deprecated
 public class ResourceStoreIteratorRequest
     extends ResourceStoreRequest
 {

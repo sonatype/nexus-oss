@@ -19,6 +19,7 @@ package org.sonatype.appcontext.internal;
  * @deprecated Avoid using this junk!
  *
  * @author cstamas
+ * @deprecated To be removed in future releases (use Guava preconditions instead)
  */
 @Deprecated
 public class Preconditions

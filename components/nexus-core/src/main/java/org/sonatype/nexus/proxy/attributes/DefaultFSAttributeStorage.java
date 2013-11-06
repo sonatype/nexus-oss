@@ -39,7 +39,9 @@ import org.codehaus.plexus.util.FileUtils;
  * LocalStorage. This is the "old" default storage.
  *
  * @author cstamas
+ * @deprecated To be removed in future releases (no replacement provided).
  */
+@Deprecated
 @Typed(AttributeStorage.class)
 @Named("fs")
 @Singleton

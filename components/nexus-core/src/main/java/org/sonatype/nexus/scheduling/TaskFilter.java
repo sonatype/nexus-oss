@@ -17,7 +17,9 @@ package org.sonatype.nexus.scheduling;
  * A TaskFilter is a simple way to decide whether a task may run or may not run against some domain (ie. a Repository).
  *
  * @author cstamas
+ * @deprecated To be removed in future release (no replacement provided).
  */
+@Deprecated
 public interface TaskFilter
 {
   boolean allowsScheduledTasks();

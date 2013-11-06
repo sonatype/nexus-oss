@@ -17,7 +17,10 @@ package org.sonatype.nexus;
  * The enum of possible operation modes in which Nexus Application may reside.
  *
  * @author cstamas
+ *
+ * @deprecated To be removed (no replacement)
  */
+@Deprecated
 public enum OperationMode
 {
   /**

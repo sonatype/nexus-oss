@@ -17,6 +17,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @deprecated To be removed in future release (no replacement provided).
+ */
+@Deprecated
 public class DefaultRepositoryTaskActivityDescriptor
     implements RepositoryTaskActivityDescriptor
 {

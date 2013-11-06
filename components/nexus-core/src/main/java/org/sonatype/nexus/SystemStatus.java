@@ -208,10 +208,18 @@ public class SystemStatus
     this.state = status;
   }
 
+  /**
+   * @deprecated To be removed (no replacement)
+   */
+  @Deprecated
   public OperationMode getOperationMode() {
     return operationMode;
   }
 
+  /**
+   * @deprecated To be removed (no replacement)
+   */
+  @Deprecated
   public void setOperationMode(OperationMode operationMode) {
     this.operationMode = operationMode;
   }

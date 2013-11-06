@@ -24,7 +24,9 @@ import javax.inject.Singleton;
  *
  * @author Jason van Zyl
  * @author Tamas Cservenak
+ * @deprecated To be removed once Maven1 support is removed.
  */
+@Deprecated
 @Named("maven1")
 @Singleton
 public class M1GavCalculator
