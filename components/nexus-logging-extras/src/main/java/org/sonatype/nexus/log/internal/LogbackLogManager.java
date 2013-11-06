@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
@@ -68,7 +69,6 @@ import ch.qos.logback.core.util.StatusPrinter;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Injector;
 import org.slf4j.Logger;
@@ -112,13 +112,15 @@ public class LogbackLogManager
 
   private final List<LogConfigurationParticipant> logConfigurationParticipants;
 
+  private List<LogConfigurationCustomizer> logConfigurationCustomizers;
+
   private final NexusLoggerContextListener loggerContextListener;
 
   private final EventBus eventBus;
 
   private final Map<String, LoggerLevel> overrides;
 
-  private final Set<String> contributed;
+  private final Map<String, LoggerLevel> customisations;
 
   private ObjectName jmxName;
 
@@ -132,10 +134,11 @@ public class LogbackLogManager
     this.injector = checkNotNull(injector);
     this.applicationConfiguration = checkNotNull(applicationConfiguration);
     this.logConfigurationParticipants = checkNotNull(logConfigurationParticipants);
-    this.loggerContextListener = new NexusLoggerContextListener(logConfigurationCustomizers);
+    this.logConfigurationCustomizers = checkNotNull(logConfigurationCustomizers);
+    this.loggerContextListener = new NexusLoggerContextListener();
     this.eventBus = checkNotNull(eventBus);
     this.overrides = Maps.newHashMap();
-    this.contributed = Sets.newHashSet();
+    this.customisations = Maps.newHashMap();
     try {
       jmxName = ObjectName.getInstance(JMX_DOMAIN, "name", LogManager.class.getSimpleName());
       final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -161,6 +164,7 @@ public class LogbackLogManager
   public synchronized void configure() {
     // TODO maybe do some optimization that if participants does not change, do not reconfigure
     prepareConfigurationFiles();
+    readCustomisations();
     overrides.clear();
     File logOverridesConfigFile = getLogOverridesConfigFile();
     if (logOverridesConfigFile.exists()) {
@@ -217,9 +221,9 @@ public class LogbackLogManager
       }
     }
 
-    for (String name : contributed) {
-      if (!loggers.containsKey(name)) {
-        loggers.put(name, getLoggerEffectiveLevel(name));
+    for (Entry<String, LoggerLevel> entry : customisations.entrySet()) {
+      if (LoggerLevel.DEFAULT.equals(entry.getValue()) && !loggers.containsKey(entry.getKey())) {
+        loggers.put(entry.getKey(), getLoggerEffectiveLevel(entry.getKey()));
       }
     }
 
@@ -617,16 +621,23 @@ public class LogbackLogManager
     }
     else {
       if (LoggerLevel.DEFAULT.equals(level)) {
-        boolean customizedByUser = overrides.containsKey(name) && !contributed.contains(name);
+        boolean customizedByUser = overrides.containsKey(name) && !customisations.containsKey(name);
         unsetLoggerLevel(name);
         if (customizedByUser) {
           overrides.put(name, calculated = getLoggerEffectiveLevel(name));
+          LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
+        }
+        else {
+          LoggerLevel customizedLevel = customisations.get(name);
+          if (customizedLevel != null && !LoggerLevel.DEFAULT.equals(customizedLevel)) {
+            calculated = customizedLevel;
+          }
         }
       }
       else {
         overrides.put(name, calculated = level);
+        LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
       }
-      LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
     }
     if (calculated != null) {
       getLoggerContext().getLogger(name).setLevel(convert(calculated));
@@ -659,7 +670,8 @@ public class LogbackLogManager
     }
     overrides.clear();
     LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
-    setLoggerLevel(KEY_ROOT_LEVEL, LoggerLevel.DEFAULT);
+    setLoggerLevel(Logger.ROOT_LOGGER_NAME, LoggerLevel.DEFAULT);
+    applyCustomisations();
 
     logger.debug("Loggers reset to their default levels");
   }
@@ -711,15 +723,31 @@ public class LogbackLogManager
     }
   }
 
+  private void readCustomisations() {
+    Configuration customizerConfiguration = new Configuration()
+    {
+      @Override
+      public void setLoggerLevel(final String name, final LoggerLevel level) {
+        customisations.put(checkNotNull(name), checkNotNull(level));
+      }
+    };
+    customisations.clear();
+    for (LogConfigurationCustomizer customizer : logConfigurationCustomizers) {
+      customizer.customize(customizerConfiguration);
+    }
+  }
+
+  private void applyCustomisations() {
+    for (Entry<String, LoggerLevel> entry : customisations.entrySet()) {
+      if (!LoggerLevel.DEFAULT.equals(entry.getValue())) {
+        getLoggerContext().getLogger(entry.getKey()).setLevel(convert(entry.getValue()));
+      }
+    }
+  }
+
   private class NexusLoggerContextListener
       implements LoggerContextListener
   {
-
-    private List<LogConfigurationCustomizer> logConfigurationCustomizers;
-
-    public NexusLoggerContextListener(final List<LogConfigurationCustomizer> logConfigurationCustomizers) {
-      this.logConfigurationCustomizers = checkNotNull(logConfigurationCustomizers);
-    }
 
     @Override
     public boolean isResetResistant() {
@@ -733,22 +761,7 @@ public class LogbackLogManager
 
     @Override
     public void onReset(final LoggerContext context) {
-      Configuration customizerConfiguration = new Configuration()
-      {
-        @Override
-        public void setLoggerLevel(final String name, final LoggerLevel level) {
-          if (LoggerLevel.DEFAULT.equals(checkNotNull(level, "level"))) {
-            contributed.add(name);
-          }
-          else if (getLoggerLevel(name) == null) {
-            getLoggerContext().getLogger(name).setLevel(convert(level));
-          }
-        }
-      };
-      contributed.clear();
-      for (LogConfigurationCustomizer customizer : logConfigurationCustomizers) {
-        customizer.customize(customizerConfiguration);
-      }
+      applyCustomisations();
     }
 
     @Override
