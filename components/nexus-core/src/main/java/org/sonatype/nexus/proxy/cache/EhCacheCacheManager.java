@@ -20,7 +20,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -35,7 +34,7 @@ import com.google.common.eventbus.Subscribe;
 @Named
 @Singleton
 public class EhCacheCacheManager
-    extends ComponentSupport
+    extends AbstractLoggingComponent
     implements CacheManager
 {
   private final CacheManagerComponent cacheManagerComponent;
