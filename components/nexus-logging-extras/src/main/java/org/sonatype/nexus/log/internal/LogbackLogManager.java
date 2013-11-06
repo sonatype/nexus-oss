@@ -112,7 +112,7 @@ public class LogbackLogManager
 
   private final List<LogConfigurationParticipant> logConfigurationParticipants;
 
-  private List<LogConfigurationCustomizer> logConfigurationCustomizers;
+  private final List<LogConfigurationCustomizer> logConfigurationCustomizers;
 
   private final NexusLoggerContextListener loggerContextListener;
 
