@@ -170,7 +170,6 @@ public class LogbackLogManager
     if (logOverridesConfigFile.exists()) {
       overrides.putAll(LogbackOverrides.read(logOverridesConfigFile));
     }
-    installJulLevelChangePropagator(); // HACK: replace JUL level change propagator impl
     installNexusLoggerContextListener();
     reconfigure();
   }
@@ -640,7 +639,7 @@ public class LogbackLogManager
       }
     }
     if (calculated != null) {
-      getLoggerContext().getLogger(name).setLevel(convert(calculated));
+      setLogbackLoggerLevel(name, convert(calculated));
     }
   }
 
@@ -655,7 +654,7 @@ public class LogbackLogManager
       setLoggerLevel(name, LoggerLevel.DEFAULT);
     }
     else {
-      getLoggerContext().getLogger(name).setLevel(null);
+      setLogbackLoggerLevel(name, null);
     }
   }
 
@@ -665,7 +664,7 @@ public class LogbackLogManager
 
     for (Map.Entry<String, LoggerLevel> entry : overrides.entrySet()) {
       if (!Logger.ROOT_LOGGER_NAME.equals(entry.getKey())) {
-        getLoggerContext().getLogger(entry.getKey()).setLevel(null);
+        setLogbackLoggerLevel(entry.getKey(), null);
       }
     }
     overrides.clear();
@@ -689,6 +688,14 @@ public class LogbackLogManager
   @Override
   public LoggerLevel getLoggerEffectiveLevel(final String name) {
     return convert(getLoggerContext().getLogger(name).getEffectiveLevel());
+  }
+
+  private void setLogbackLoggerLevel(final String name, final Level level) {
+    // HACK: replace JUL level change propagator impl to avoid NPE
+    if (level == null) {
+      installJulLevelChangePropagator();
+    }
+    getLoggerContext().getLogger(name).setLevel(level);
   }
 
   /**
@@ -740,7 +747,7 @@ public class LogbackLogManager
   private void applyCustomisations() {
     for (Entry<String, LoggerLevel> entry : customisations.entrySet()) {
       if (!LoggerLevel.DEFAULT.equals(entry.getValue())) {
-        getLoggerContext().getLogger(entry.getKey()).setLevel(convert(entry.getValue()));
+        setLogbackLoggerLevel(entry.getKey(), convert(entry.getValue()));
       }
     }
   }
