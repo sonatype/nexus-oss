@@ -72,7 +72,7 @@ NX.define('Nexus.wonderland.view.AuthenticateWindow', {
 
           items: [
             {
-              xtype: 'label',
+              xtype: 'component',
               cls: 'nx-wonderland-view-authenticate-description',
               html: icons.get('lock').variant('x32').img + '<div>' + me.message +
                   '</div><br style="clear:both;"/>' // clear to get remaining form elements aligned correctly
