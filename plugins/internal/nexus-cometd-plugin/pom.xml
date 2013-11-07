@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2013 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus.plugins</groupId>
+    <artifactId>nexus-plugins-internal</artifactId>
+    <version>2.7.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>nexus-cometd-plugin</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <packaging>nexus-plugin</packaging>
+
+  <properties>
+    <pluginName>Nexus CometD Plugin</pluginName>
+    <pluginDescription>Support for use of CometD (bayeux protocol).</pluginDescription>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-ui-extjs3-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.cometd.java</groupId>
+      <artifactId>bayeux-api</artifactId>
+    </dependency>
+
+    <!--
+    FIXME: Having lots of problems with classloading with jetty classes required.
+    FIXME: Had to expose all org.eclipse.jetty classes to the webapp for this to function.
+    -->
+
+    <dependency>
+      <groupId>org.cometd.java</groupId>
+      <artifactId>cometd-java-server</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+        <!--<exclusion>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-continuation</artifactId>-->
+        <!--</exclusion>-->
+        <!--<exclusion>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-util</artifactId>-->
+        <!--</exclusion>-->
+        <!--<exclusion>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-jmx</artifactId>-->
+        <!--</exclusion>-->
+      </exclusions>
+    </dependency>
+
+    <!--
+    TODO: Adapt this annotation-based configuration to Sisu.
+    -->
+    <dependency>
+      <groupId>org.cometd.java</groupId>
+      <artifactId>cometd-java-annotations</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.cometd.java</groupId>
+      <artifactId>cometd-websocket-jetty</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+        <!--<exclusion>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-websocket</artifactId>-->
+        <!--</exclusion>-->
+        <!--<exclusion>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-io</artifactId>-->
+        <!--</exclusion>-->
+        <!--<exclusion>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-http</artifactId>-->
+        <!--</exclusion>-->
+        <exclusion>
+          <groupId>org.cometd.java</groupId>
+          <artifactId>cometd-java-client</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!--
+    FIXME: scope=provided here causes the server to fail to bootup with class def errors:
+    jvm 1    | 2013-10-26 11:33:16 WARN  [jetty-main-thread-1]  org.eclipse.jetty.util.component.AbstractLifeCycle - FAILED guiceFilter: java.lang.NoClassDefFoundError: org/eclipse/jetty/util/component/AbstractLifeCycle
+    jvm 1    | java.lang.NoClassDefFoundError: org/eclipse/jetty/util/component/AbstractLifeCycle
+
+    FIXME: When these deps are disabled (commented out), then the server boots up fine, plugin contains:
+    [INFO]  + org.cometd.java:bayeux-api:jar:2.7.0
+    [INFO]  + org.cometd.java:cometd-java-common:jar:2.7.0
+    [INFO]  + org.cometd.java:cometd-java-server:jar:2.7.0
+    [INFO]  + org.cometd.java:cometd-websocket-jetty:jar:2.7.0
+    [INFO]  + org.eclipse.jetty:jetty-continuation:jar:8.1.13.v20130916
+    [INFO]  + org.eclipse.jetty:jetty-http:jar:8.1.13.v20130916
+    [INFO]  + org.eclipse.jetty:jetty-io:jar:8.1.13.v20130916
+    [INFO]  + org.eclipse.jetty:jetty-jmx:jar:8.1.13.v20130916
+    [INFO]  + org.eclipse.jetty:jetty-util:jar:8.1.13.v20130916
+    [INFO]  + org.eclipse.jetty:jetty-websocket:jar:8.1.13.v20130916
+
+    But service request fail with class def errors:
+    jvm 1    | Caused by: java.lang.NoClassDefFoundError: org/eclipse/jetty/server/AbstractHttpConnection
+    jvm 1    | 	at org.eclipse.jetty.websocket.WebSocketFactory.upgrade(WebSocketFactory.java:235) ~[jetty-websocket-8.1.13.v20130916.jar:8.1.13.v20130916]
+    jvm 1    | 	at org.eclipse.jetty.websocket.WebSocketFactory.acceptWebSocket(WebSocketFactory.java:396) ~[jetty-websocket-8.1.13.v20130916.jar:8.1.13.v20130916]
+    jvm 1    | 	at org.cometd.websocket.server.WebSocketTransport.handle(WebSocketTransport.java:158) ~[na:na]
+    jvm 1    | 	at org.cometd.server.CometdServlet.service(CometdServlet.java:166) ~[na:na]
+    jvm 1    | 	at javax.servlet.http.HttpServlet.service(HttpServlet.java:848) ~[javax.servlet-3.0.0.v201112011016.jar:na]
+    -->
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-continuation</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-util</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-jmx</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-websocket</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-io</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-http</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-testsupport</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <configuration>
+          <sharedDependencies>
+            <sharedDependency>org.cometd.java:bayeux-api</sharedDependency>
+            <sharedDependency>org.cometd.java:cometd-java-server</sharedDependency>
+            <sharedDependency>org.cometd.java:cometd-websocket-jetty</sharedDependency>
+          </sharedDependencies>
+        </configuration>
+      </plugin>
+
+      <!--<plugin>-->
+      <!--<groupId>org.apache.maven.plugins</groupId>-->
+      <!--<artifactId>maven-dependency-plugin</artifactId>-->
+      <!--<executions>-->
+      <!--<execution>-->
+      <!--<phase>generate-resources</phase>-->
+      <!--<goals>-->
+      <!--<goal>copy</goal>-->
+      <!--</goals>-->
+      <!--<configuration>-->
+      <!--<artifactItems>-->
+      <!--<artifactItem>-->
+      <!--<groupId>org.cometd.javascript</groupId>-->
+      <!--<artifactId>cometd-javascript-common</artifactId>-->
+      <!--<type>war</type>-->
+      <!--<destFileName>cometd-javascript-common.war</destFileName>-->
+      <!--</artifactItem>-->
+      <!--</artifactItems>-->
+      <!--</configuration>-->
+      <!--</execution>-->
+      <!--</executions>-->
+      <!--</plugin>-->
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

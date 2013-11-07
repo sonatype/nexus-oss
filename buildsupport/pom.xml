@@ -30,6 +30,7 @@
 
   <modules>
     <module>bouncycastle</module>
+    <module>cometd</module>
     <module>commons</module>
     <module>goodies</module>
     <module>groovy</module>

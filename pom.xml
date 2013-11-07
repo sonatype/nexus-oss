@@ -577,6 +577,8 @@
               <exclude>**/nexus-ui-extjs3-plugin/src/main/resources/static/js/ext/ux/**</exclude>
               <exclude>**/nexus-ui-extjs3-plugin/src/main/resources/static/css/ext/ux/**</exclude>
               <exclude>**/nexus-ui-extjs3-plugin/src/main/js-lib/**</exclude>
+              <exclude>**/nexus-comet-plugin/src/main/resources/static/js/org/cometd.js</exclude>
+              <exclude>**/nexus-comet-plugin/src/main/resources/static/js/org/cometd/**</exclude>
 
               <!--
               Excludes for specific classes which have compatible, yet different licences.

@@ -28,7 +28,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <eclipse-jetty.version>8.1.11.v20130520</eclipse-jetty.version>
+    <eclipse-jetty.version>8.1.13.v20130916</eclipse-jetty.version>
   </properties>
 
   <dependencyManagement>
@@ -126,6 +126,12 @@
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-ajp</artifactId>
+        <version>${eclipse-jetty.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-websocket</artifactId>
         <version>${eclipse-jetty.version}</version>
       </dependency>
 

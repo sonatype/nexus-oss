@@ -119,6 +119,6 @@ public class MetricsModule
       }
     });
 
-    log.info("Metrics support configured");
+    log.info("Metrics support configured: {}", MOUNT_POINT);
   }
 }

@@ -32,6 +32,8 @@
     <module>nexus-groovyremote-plugin</module>
     <module>nexus-plexusplugin-plugin</module>
     <module>nexus-atlas-plugin</module>
+    <module>nexus-cometd-plugin</module>
+    <module>nexus-cometd-client</module>
     <module>nexus-wonderland-model</module>
     <module>nexus-wonderland-plugin</module>
   </modules>
