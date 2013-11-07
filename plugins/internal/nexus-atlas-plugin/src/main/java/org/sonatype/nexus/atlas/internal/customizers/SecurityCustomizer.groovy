@@ -36,8 +36,8 @@ import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.SECURITY
 @Named
 @Singleton
 class SecurityCustomizer
-extends ComponentSupport
-implements SupportBundleCustomizer
+    extends ComponentSupport
+    implements SupportBundleCustomizer
 {
   private final ApplicationConfiguration applicationConfiguration
 
@@ -65,7 +65,7 @@ implements SupportBundleCustomizer
    */
   @SuppressWarnings("UnnecessaryQualifiedReference")
   private class SecurityXmlContentSource
-  extends GeneratedContentSourceSupport
+      extends GeneratedContentSourceSupport
   {
     SecurityXmlContentSource() {
       super(SECURITY, 'work/conf/security.xml')
@@ -102,7 +102,7 @@ implements SupportBundleCustomizer
    */
   @SuppressWarnings("UnnecessaryQualifiedReference")
   private class SecurityConfigurationXmlContentSource
-  extends GeneratedContentSourceSupport
+      extends GeneratedContentSourceSupport
   {
     SecurityConfigurationXmlContentSource() {
       super(SECURITY, 'work/conf/security-configuration.xml')

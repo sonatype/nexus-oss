@@ -13,7 +13,11 @@
 
 package org.sonatype.nexus.atlas.internal.customizers
 
-import com.yammer.metrics.core.*
+import com.yammer.metrics.core.Clock
+import com.yammer.metrics.core.HealthCheckRegistry
+import com.yammer.metrics.core.MetricPredicate
+import com.yammer.metrics.core.MetricsRegistry
+import com.yammer.metrics.core.VirtualMachineMetrics
 import com.yammer.metrics.reporting.ConsoleReporter
 import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
 import org.sonatype.nexus.atlas.SupportBundle
@@ -27,7 +31,9 @@ import javax.inject.Singleton
 import static com.google.common.base.Preconditions.checkNotNull
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.HIGH
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.OPTIONAL
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.*
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.METRICS
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.SYSINFO
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.THREAD
 
 /**
  * Adds metrics (threads,metrics,healthcheck) to support bundle.
@@ -37,8 +43,8 @@ import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.*
 @Named
 @Singleton
 class MetricsCustomizer
-extends ComponentSupport
-implements SupportBundleCustomizer
+    extends ComponentSupport
+    implements SupportBundleCustomizer
 {
   private final Clock clock
 
@@ -67,6 +73,7 @@ implements SupportBundleCustomizer
       {
         this.priority = HIGH
       }
+
       @Override
       protected void generate(final File file) {
         file.withOutputStream {
@@ -80,6 +87,7 @@ implements SupportBundleCustomizer
       {
         this.priority = OPTIONAL
       }
+
       @Override
       protected void generate(final File file) {
         file.withPrintWriter { out ->
@@ -105,6 +113,7 @@ implements SupportBundleCustomizer
       {
         this.priority = OPTIONAL
       }
+
       @Override
       protected void generate(final File file) {
         file.withOutputStream {
