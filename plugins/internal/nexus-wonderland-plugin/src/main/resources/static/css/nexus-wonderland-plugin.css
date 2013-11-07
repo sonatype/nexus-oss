@@ -13,7 +13,6 @@
 
 .nx-wonderland-view-authenticate-description {
   font: normal 11px arial, tahoma, verdana, helvetica;
-  padding: 10px;
 }
 
 .nx-wonderland-view-authenticate-description img {
@@ -22,6 +21,7 @@
 }
 
 .nx-wonderland-view-authenticate-description div {
+  padding-top: 10px;
   padding-right: 10px;
 }
 

@@ -38,6 +38,7 @@ import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.codehaus.plexus.util.StringUtils;
 
@@ -61,10 +62,12 @@ public class ResourceMergingConfigurationManager
   private final List<DynamicSecurityResource> dynamicResources;
 
   @Inject
-  public ResourceMergingConfigurationManager(List<DynamicSecurityResource> dynamicResources,
+  public ResourceMergingConfigurationManager(EventBus eventBus,
+                                             List<DynamicSecurityResource> dynamicResources,
                                              @Named("legacydefault") ConfigurationManager manager,
                                              List<StaticSecurityResource> staticResources)
   {
+    super(eventBus);
     this.dynamicResources = dynamicResources;
     this.manager = manager;
     this.staticResources = staticResources;
@@ -476,7 +479,7 @@ public class ResourceMergingConfigurationManager
   // ==
 
   @Override
-  protected boolean shouldRebuildConifuguration() {
+  protected boolean shouldRebuildConfiguration() {
     for (DynamicSecurityResource resource : dynamicResources) {
       if (resource.isDirty()) {
         return true;
