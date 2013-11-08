@@ -20,8 +20,7 @@ import org.sonatype.nexus.proxy.item.ContentLocator;
 
 /**
  * A utility component for working with MIME type detection, either "without touching" (the content), that is
- * "best effort guess" based, or doing proper MIME type detection based on MIME magic database. This component
- * supersedes the {@link MimeUtil} one that is completely deprecated and should be avoided.
+ * "best effort guess" based, or doing proper MIME type detection based on MIME magic database.
  *
  * @author cstamas
  * @since 2.0
@@ -55,7 +54,9 @@ public interface MimeSupport
    *
    * @param path to guess for.
    * @return the set of applicable mime types.
+   * @deprecated Method to be removed without replacement.
    */
+  @Deprecated
   Set<String> guessMimeTypesFromPath(String path);
 
   /**

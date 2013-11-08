@@ -251,8 +251,8 @@
     </dependency>
 
     <dependency>
-      <groupId>eu.medsea.mimeutil</groupId>
-      <artifactId>mime-util</artifactId>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-core</artifactId>
     </dependency>
 
     <dependency>

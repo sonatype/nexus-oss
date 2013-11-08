@@ -22,8 +22,6 @@ import org.sonatype.nexus.mime.NexusMimeTypes;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
-import eu.medsea.mimeutil.MimeUtil2;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -117,7 +115,7 @@ public abstract class AbstractMimeMagicFileTypeValidator
 
     final Set<String> expectedMimeTypes = new HashSet<String>();
 
-    final NexusMimeTypes.NexusMimeType type = mimeTypes.getMimeTypes(MimeUtil2.getExtension(filePath));
+    final NexusMimeTypes.NexusMimeType type = mimeTypes.getMimeTypes(filePath);
     if (type != null) {
       expectedMimeTypes.addAll(type.getMimetypes());
     }
