@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.web;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.Enumeration;
 
@@ -71,8 +72,7 @@ class NexusRestletServlet
 
   @Override
   public void service(final HttpServletRequest request, final HttpServletResponse response)
-      throws ServletException,
-             IOException
+      throws ServletException, IOException
   {
     checkNotNull(request);
     checkNotNull(response);
@@ -90,6 +90,16 @@ class NexusRestletServlet
     MDC.put(getClass().getName(), uri);
     try {
       super.service(request, response);
+    }
+    catch (EOFException e) {
+      // special handling for EOF exceptions, to tersely log unless debug is enabled
+      if (log.isDebugEnabled()) {
+        log.warn(e.toString(), e);
+      }
+      else {
+        log.warn(e.toString());
+      }
+      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
     finally {
       MDC.remove(getClass().getName());
