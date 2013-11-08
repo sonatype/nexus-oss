@@ -56,6 +56,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.nexus.web.Constants;
 import org.sonatype.nexus.web.RemoteIPFinder;
+import org.sonatype.sisu.goodies.common.Throwables2;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
@@ -284,7 +285,7 @@ public class NexusContentServlet
         logger.warn(exception.toString(), exception);
       }
       else {
-        logger.warn(exception.toString());
+        logger.warn(Throwables2.explain(exception));
       }
       // Do not attempt to render error page
       return;

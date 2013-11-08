@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.plexus.rest.PlexusServerServlet;
+import org.sonatype.sisu.goodies.common.Throwables2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +98,7 @@ class NexusRestletServlet
         log.warn(e.toString(), e);
       }
       else {
-        log.warn(e.toString());
+        log.warn(Throwables2.explain(e));
       }
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
