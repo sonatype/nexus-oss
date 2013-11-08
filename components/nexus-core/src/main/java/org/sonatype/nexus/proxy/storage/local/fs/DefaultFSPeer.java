@@ -43,7 +43,6 @@ import org.sonatype.nexus.proxy.item.uid.IsItemAttributeMetacontentAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.nexus.util.CompositeException;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.util.io.StreamSupport;
@@ -53,6 +52,7 @@ import com.google.common.collect.Lists;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
+import static org.sonatype.nexus.util.CompositeException.composite;
 
 /**
  * The default FSPeer implementation, directly implementating it. There might be alternate implementations, like doing
@@ -383,7 +383,7 @@ public class DefaultFSPeer
         }
       }
       if (!success) {
-        throw new IOException("Rename operation failed", new CompositeException(exceptions));
+        throw composite(new IOException("Rename operation failed"), exceptions);
       }
     }
   }
