@@ -278,9 +278,14 @@ public class NexusContentServlet
       // current user is non anonymous, or 401 and challenge if user is anonymous
     }
     else if (exception instanceof IOException) {
-      // Do not log verbose traces for IO problems
+      // Do not log verbose traces for IO problems unless debug is enabled
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      logger.warn(exception.toString());
+      if (logger.isDebugEnabled()) {
+        logger.warn(exception.toString(), exception);
+      }
+      else {
+        logger.warn(exception.toString());
+      }
       // Do not attempt to render error page
       return;
     }

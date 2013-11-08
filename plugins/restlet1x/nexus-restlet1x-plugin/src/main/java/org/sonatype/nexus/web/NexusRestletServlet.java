@@ -92,7 +92,7 @@ class NexusRestletServlet
       super.service(request, response);
     }
     catch (EOFException e) {
-      // special handling for EOF exceptions, to tersely log unless debug is enabled
+      // special handling for EOF exceptions; tersely log unless debug is enabled
       if (log.isDebugEnabled()) {
         log.warn(e.toString(), e);
       }
