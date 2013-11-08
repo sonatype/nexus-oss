@@ -25,6 +25,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.item.ContentLocator;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -146,6 +147,17 @@ public class DefaultMimeSupport
     try (final BufferedInputStream bis = new BufferedInputStream(content.getContent())) {
       final Metadata metadata = new Metadata();
       return Collections.singleton(tika.detect(bis, metadata));
+    }
+  }
+
+  @Override
+  public String detectMimeTypesFromContent(final StorageFileItem fileItem)
+      throws IOException
+  {
+    try (final BufferedInputStream bis = new BufferedInputStream(fileItem.getInputStream())) {
+      final Metadata metadata = new Metadata();
+      metadata.set(Metadata.RESOURCE_NAME_KEY, fileItem.getName());
+      return tika.detect(bis, metadata);
     }
   }
 

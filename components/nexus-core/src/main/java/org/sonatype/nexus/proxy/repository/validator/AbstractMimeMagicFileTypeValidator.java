@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy.repository.validator;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -84,7 +85,7 @@ public abstract class AbstractMimeMagicFileTypeValidator
       return FileTypeValidity.NEUTRAL;
     }
 
-    final Set<String> magicMimeTypes = mimeSupport.detectMimeTypesFromContent(file.getContentLocator());
+    final Set<String> magicMimeTypes = Collections.singleton(mimeSupport.detectMimeTypesFromContent(file));
 
     if (getLogger().isDebugEnabled()) {
       getLogger().debug(

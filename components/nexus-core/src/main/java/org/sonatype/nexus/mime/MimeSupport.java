@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.sonatype.nexus.proxy.item.ContentLocator;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 
 /**
  * A utility component for working with MIME type detection, either "without touching" (the content), that is
@@ -67,7 +68,21 @@ public interface MimeSupport
    * @param content to perform MIME magic matching against.
    * @return all of the applicable MIME types in relevance order (best fit first).
    * @throws IOException in case of IO problems.
+   * @deprecated With file items, use {@link #detectMimeTypesFromContent(StorageFileItem)} instead.
    */
+  @Deprecated
   Set<String> detectMimeTypesFromContent(ContentLocator content)
+      throws IOException;
+
+  /**
+   * Performs a real MIME type detection by matching the "magic bytes" of a content to a known database. Is the most
+   * precise way for detection but is costly since it does IO (reads several bytes up from content to perform
+   * matching).
+   *
+   * @param fileItem to perform MIME magic matching against.
+   * @return all of the applicable MIME types in relevance order (best fit first).
+   * @throws IOException in case of IO problems.
+   */
+  String detectMimeTypesFromContent(StorageFileItem fileItem)
       throws IOException;
 }

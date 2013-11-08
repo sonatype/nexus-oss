@@ -13,11 +13,15 @@
 
 package org.sonatype.nexus.mime;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
 
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.FileContentLocator;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.After;
@@ -25,6 +29,8 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 // This test is an IT because after it runs tests keep on spitting out all sort of warnings related to magic file format")
 public class Nexus5772MimeIT
@@ -61,4 +67,41 @@ public class Nexus5772MimeIT
     assertComplete(mimeSupport, new FileContentLocator(util.resolveFile("src/test/resources/mime/file.jar"),
         "application/octet-stream"), "application/zip");
   }
+
+  @Test
+  public void assertCompleteWithFiles()
+      throws IOException
+  {
+    final MimeSupport mimeSupport = new DefaultMimeSupport();
+    {
+      final StorageFileItem fileItem = mock(StorageFileItem.class);
+      final File file = util.resolveFile("src/test/resources/mime/file.gif");
+      try (final InputStream is = new FileInputStream(file)) {
+        when(fileItem.getInputStream()).thenReturn(is);
+        when(fileItem.getName()).thenReturn(file.getName());
+        assertThat(mimeSupport.detectMimeTypesFromContent(fileItem), equalTo("image/gif"));
+      }
+    }
+    {
+      final StorageFileItem fileItem = mock(StorageFileItem.class);
+      final File file = util.resolveFile("src/test/resources/mime/file.zip");
+      try (final InputStream is = new FileInputStream(file)) {
+        when(fileItem.getInputStream()).thenReturn(is);
+        when(fileItem.getName()).thenReturn(file.getName());
+        assertThat(mimeSupport.detectMimeTypesFromContent(fileItem), equalTo("application/zip"));
+      }
+    }
+    {
+      final StorageFileItem fileItem = mock(StorageFileItem.class);
+      final File file = util.resolveFile("src/test/resources/mime/file.jar");
+      try (final InputStream is = new FileInputStream(file)) {
+        when(fileItem.getInputStream()).thenReturn(is);
+        when(fileItem.getName()).thenReturn(file.getName());
+        // NOTE: by content, this is application/zip (JAR file is a Zip file with some extra spice)
+        // But here, as we provide file, MimeSupport uses content AND filename to guess
+        assertThat(mimeSupport.detectMimeTypesFromContent(fileItem), equalTo("application/java-archive"));
+      }
+    }
+  }
+
 }
