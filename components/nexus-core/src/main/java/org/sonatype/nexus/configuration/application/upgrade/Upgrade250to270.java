@@ -30,8 +30,8 @@ import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.v2_7_0.upgrade.BasicVersionUpgrade;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.io.Closeables;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -44,7 +44,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 @Singleton
 @Named("2.5.0")
 public class Upgrade250to270
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements SingleVersionUpgrader
 {
   @Override
