@@ -26,7 +26,7 @@ import com.google.common.eventbus.Subscribe;
 /**
  * A condition that is satisfied when a capability of a specified type exists and is in an active state.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class CapabilityOfTypeActiveCondition
     extends CapabilityOfTypeExistsCondition

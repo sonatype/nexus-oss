@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * {@link Capability} related events.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class CapabilityEvent
     extends AbstractEvent<CapabilityRegistry>
@@ -49,7 +49,7 @@ public class CapabilityEvent
   /**
    * Event fired after a capability was activated.
    *
-   * @since 2.0
+   * @since capabilities 2.0
    */
   public static class AfterActivated
       extends CapabilityEvent
@@ -71,7 +71,7 @@ public class CapabilityEvent
   /**
    * Event fired before a capability is passivated.
    *
-   * @since 2.0
+   * @since capabilities 2.0
    */
   public static class BeforePassivated
       extends CapabilityEvent
@@ -93,7 +93,7 @@ public class CapabilityEvent
   /**
    * Event fired before a capability is updated.
    *
-   * @since 2.0
+   * @since capabilities 2.0
    */
   public static class BeforeUpdate
       extends CapabilityEvent
@@ -131,7 +131,7 @@ public class CapabilityEvent
   /**
    * Event fired after a capability was updated.
    *
-   * @since 2.0
+   * @since capabilities 2.0
    */
   public static class AfterUpdate
       extends CapabilityEvent
@@ -171,7 +171,7 @@ public class CapabilityEvent
    * <p/>
    * Called before {@link Capability#onCreate(java.util.Map)} / {@link Capability#onLoad(java.util.Map)} are called.
    *
-   * @since 2.0
+   * @since capabilities 2.0
    */
   public static class Created
       extends CapabilityEvent
@@ -195,7 +195,7 @@ public class CapabilityEvent
    * <p/>
    * Called after {@link Capability#onRemove()} is called.
    *
-   * @since 2.0
+   * @since capabilities 2.0
    */
   public static class AfterRemove
       extends CapabilityEvent

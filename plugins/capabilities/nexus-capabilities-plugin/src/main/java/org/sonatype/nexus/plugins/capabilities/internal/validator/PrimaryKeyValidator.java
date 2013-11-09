@@ -40,7 +40,7 @@ import static org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenc
 /**
  * A {@link Validator} that ensures that only one capability of specified type and set of properties can be created.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 public class PrimaryKeyValidator

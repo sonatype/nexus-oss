@@ -23,7 +23,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 /**
  * Capabilities filter.
  *
- * @since 2.2
+ * @since capabilities 2.2
  */
 public class Filter
 {

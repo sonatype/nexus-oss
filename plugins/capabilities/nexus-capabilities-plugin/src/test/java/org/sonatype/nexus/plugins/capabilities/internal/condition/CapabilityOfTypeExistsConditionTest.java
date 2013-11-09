@@ -40,7 +40,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 /**
  * {@link CapabilityOfTypeExistsCondition} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class CapabilityOfTypeExistsConditionTest
     extends EventBusTestSupport

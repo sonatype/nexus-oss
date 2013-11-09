@@ -32,7 +32,7 @@ import static org.mockito.Mockito.mock;
 /**
  * {@link RepositoryConditions} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class RepositoryConditionsTest
     extends TestSupport

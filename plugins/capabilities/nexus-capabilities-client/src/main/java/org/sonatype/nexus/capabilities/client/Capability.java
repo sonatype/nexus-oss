@@ -20,7 +20,7 @@ import org.sonatype.nexus.client.core.subsystem.Entity;
 /**
  * A Nexus capability.
  *
- * @since 2.2
+ * @since capabilities 2.2
  */
 public interface Capability<T extends Capability>
     extends Entity<T>
@@ -48,7 +48,7 @@ public interface Capability<T extends Capability>
 
   /**
    * @return true if capability transition between states resulted in an unhandled exception
-   * @since 2.4
+   * @since capabilities 2.4
    */
   boolean hasErrors();
 
@@ -76,7 +76,7 @@ public interface Capability<T extends Capability>
 
   /**
    * @return description of capability state
-   * @since 2.4
+   * @since capabilities 2.4
    */
   String stateDescription();
 

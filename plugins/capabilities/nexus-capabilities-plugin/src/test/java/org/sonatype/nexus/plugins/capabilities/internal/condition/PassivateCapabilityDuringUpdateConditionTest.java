@@ -35,7 +35,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabil
 /**
  * {@link PassivateCapabilityDuringUpdateCondition} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class PassivateCapabilityDuringUpdateConditionTest
     extends EventBusTestSupport

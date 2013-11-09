@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Reflection based capability implementation.
  *
- * @since 2.2
+ * @since capabilities 2.2
  */
 public class ReflectiveCapability
     implements InvocationHandler

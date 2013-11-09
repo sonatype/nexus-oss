@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Provides access to capability context.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public interface CapabilityContext
 {

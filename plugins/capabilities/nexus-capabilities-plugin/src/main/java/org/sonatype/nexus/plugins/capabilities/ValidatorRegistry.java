@@ -18,7 +18,7 @@ import java.util.Collection;
 /**
  * Registry of capability validators.
  *
- * @since 1.10
+ * @since capabilities 1.10
  */
 public interface ValidatorRegistry
 {

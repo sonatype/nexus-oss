@@ -31,7 +31,7 @@ import static org.sonatype.nexus.plugins.capabilities.Tag.categoryTag;
 import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
 
 /**
- * @since 2.4
+ * @since capabilities 2.4
  */
 @Named(CapabilityWithActivationErrorDescriptor.TYPE_ID)
 @Singleton

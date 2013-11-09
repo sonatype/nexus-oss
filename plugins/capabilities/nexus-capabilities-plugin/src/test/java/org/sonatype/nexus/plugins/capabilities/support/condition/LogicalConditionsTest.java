@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link LogicalConditions} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class LogicalConditionsTest
     extends EventBusTestSupport

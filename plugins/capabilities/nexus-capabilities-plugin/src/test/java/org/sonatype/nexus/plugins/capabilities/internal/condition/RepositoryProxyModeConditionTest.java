@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link RepositoryProxyModeCondition} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class RepositoryProxyModeConditionTest
     extends EventBusTestSupport
