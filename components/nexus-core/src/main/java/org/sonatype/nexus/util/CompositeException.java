@@ -13,32 +13,29 @@
 
 package org.sonatype.nexus.util;
 
-import java.util.Collection;
 import java.util.List;
 
-import org.sonatype.sisu.goodies.common.Internal;
+import org.sonatype.sisu.goodies.common.Throwables2;
 
 import com.google.common.collect.ImmutableList;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A composite {@link Exception} helper to attach suppressed throwables.
  *
  * @since 2.2
+ *
+ * @deprecated To be removed. Use {@link Throwables2#composite(Throwable, Throwable...)} helpers instead.
  */
-@Internal
+@Deprecated
 public class CompositeException
     extends Exception
 {
   private static final long serialVersionUID = 2L;
 
-  @Deprecated
   public CompositeException(final Throwable... causes) {
     this(null, causes);
   }
 
-  @Deprecated
   public CompositeException(final String message, final Throwable... causes) {
     super(message);
     for (Throwable cause : causes) {
@@ -46,12 +43,10 @@ public class CompositeException
     }
   }
 
-  @Deprecated
   public CompositeException(final List<? extends Throwable> causes) {
     this(null, causes);
   }
 
-  @Deprecated
   public CompositeException(final String message, final List<? extends Throwable> causes) {
     super(message);
     for (Throwable cause : causes) {
@@ -59,43 +54,7 @@ public class CompositeException
     }
   }
 
-  /**
-   * @deprecated use {@link #getSuppressed()}.
-   */
-  @Deprecated
   public List<Throwable> getCauses() {
     return ImmutableList.copyOf(getSuppressed());
-  }
-
-  //
-  // FIXME: Replace with Throwables2 impl from goodies-common once that library is based on Java7
-  //
-
-  /**
-   * Helper to composite suppressed exceptions onto given throwable and throw.
-   */
-  @Internal
-  public static <T extends Throwable> T composite(final T root, final Throwable... suppressed)
-      throws T
-  {
-    checkNotNull(suppressed);
-    for (Throwable t : suppressed) {
-      root.addSuppressed(t);
-    }
-    throw root;
-  }
-
-  /**
-   * Helper to composite suppressed exceptions onto given throwable and throw.
-   */
-  @Internal
-  public static <T extends Throwable> T composite(final T root, final Collection<? extends Throwable> suppressed)
-      throws T
-  {
-    checkNotNull(suppressed);
-    for (Throwable t : suppressed) {
-      root.addSuppressed(t);
-    }
-    throw root;
   }
 }
