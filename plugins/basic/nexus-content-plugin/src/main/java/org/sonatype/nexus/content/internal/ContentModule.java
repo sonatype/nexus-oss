@@ -15,19 +15,17 @@ package org.sonatype.nexus.content.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.Filter;
+import javax.inject.Singleton;
 
+import org.sonatype.nexus.security.filter.FilterProviderSupport;
 import org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter;
 import org.sonatype.nexus.web.MdcUserContextFilter;
 import org.sonatype.security.web.guice.SecurityWebFilter;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.security.filter.FilterProviderSupport.filterKey;
 
 /**
  * Content module.
@@ -42,10 +40,11 @@ public class ContentModule
 
   @Override
   protected void configure() {
-    // FIXME: Still not sure why this is needed, but it appears to make things work (most of the time)
+    // FIXME: Not sure why this is needed, but it appears to make things work (most of the time)
     bind(SecurityWebFilter.class);
 
-    bind(filterKey("contentAuthcBasic")).to(ContentAuthenticationFilter.class);
+    bind(filterKey("contentAuthcBasic")).to(ContentAuthenticationFilter.class).in(Singleton.class);
+
     bind(filterKey("contentTperms")).toProvider(ContentTargetMappingFilterProvider.class);
 
     install(new ServletModule()
@@ -59,25 +58,15 @@ public class ContentModule
     });
   }
 
-  private Key<Filter> filterKey(final String name) {
-    return Key.get(Filter.class, Names.named(name));
-  }
-
+  @Singleton
   static class ContentTargetMappingFilterProvider
-    implements Provider<NexusTargetMappingAuthorizationFilter>
+      extends FilterProviderSupport
   {
-    private final NexusTargetMappingAuthorizationFilter filter;
-
     @Inject
     public ContentTargetMappingFilterProvider(final NexusTargetMappingAuthorizationFilter filter) {
-      this.filter = checkNotNull(filter);
+      super(filter);
       filter.setPathPrefix(MOUNT_POINT + "(.*)");
       filter.setPathReplacement("@1");
-    }
-
-    @Override
-    public NexusTargetMappingAuthorizationFilter get() {
-      return filter;
     }
   }
 }

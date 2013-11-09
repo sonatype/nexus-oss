@@ -13,18 +13,17 @@
 
 package org.sonatype.nexus.restlet1x.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.Filter;
+import javax.inject.Singleton;
 
+import org.sonatype.nexus.security.filter.FilterProviderSupport;
 import org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Key;
-import com.google.inject.MembersInjector;
-import com.google.inject.Provider;
-import com.google.inject.Scopes;
-import com.google.inject.name.Names;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
+
+import static org.sonatype.nexus.security.filter.FilterProviderSupport.filterKey;
 
 /**
  * Restlet 1.x Guice module.
@@ -37,42 +36,60 @@ public class Restlet1xModule
 {
   @Override
   protected void configure() {
+    // FIXME: Unsure why this is needed
     requireBinding(FilterChainResolver.class);
 
-    bindTargetMappingFilter("trperms", "/service/local/repositories/(.*)/content(.*)", "/repositories/@1@2");
-    bindTargetMappingFilter("tiperms", "/service/local/repositories/(.*)/index_content(.*)", "/repositories/@1@2");
-    bindTargetMappingFilter("tgperms", "/service/local/repo_groups/(.*)/content(.*)", "/groups/@1@2");
-    bindTargetMappingFilter("tgiperms", "/service/local/repo_groups/(.*)/index_content(.*)", "/groups/@1@2");
+    bind(filterKey("trperms")).toProvider(TargetRepositoryFilterProvider.class);
+    bind(filterKey("tiperms")).toProvider(TargetRepositoryIndexFilterProvider.class);
+    bind(filterKey("tgperms")).toProvider(TargetGroupFilterProvider.class);
+    bind(filterKey("tgiperms")).toProvider(TargetGroupIndexFilterProvider.class);
   }
 
-  private void bindTargetMappingFilter(String name, String pathPrefix, String pathReplacement) {
-    NexusTargetMappingAuthorizationFilter filter = new NexusTargetMappingAuthorizationFilter();
-    filter.setPathPrefix(pathPrefix);
-    filter.setPathReplacement(pathReplacement);
-    bindNamedFilter(name, filter);
+  @Singleton
+  static class TargetRepositoryFilterProvider
+      extends FilterProviderSupport
+  {
+    @Inject
+    public TargetRepositoryFilterProvider(final NexusTargetMappingAuthorizationFilter filter) {
+      super(filter);
+      filter.setPathPrefix("/service/local/repositories/(.*)/content(.*)");
+      filter.setPathReplacement("/repositories/@1@2");
+    }
   }
 
-  private void bindNamedFilter(String name, Filter filter) {
-    Key<Filter> key = Key.get(Filter.class, Names.named(name));
-    bind(key).toProvider(defer(filter)).in(Scopes.SINGLETON);
+  @Singleton
+  static class TargetRepositoryIndexFilterProvider
+      extends FilterProviderSupport
+  {
+    @Inject
+    public TargetRepositoryIndexFilterProvider(final NexusTargetMappingAuthorizationFilter filter) {
+      super(filter);
+      filter.setPathPrefix("/service/local/repositories/(.*)/index_content(.*)");
+      filter.setPathReplacement("/repositories/@1@2");
+    }
   }
 
-  /**
-   * Guice injects bound instances eagerly, so to avoid missing dependencies causing eager failures when this module
-   * is auto-installed (such as with Sisu's classpath scanning) we defer injection of the filter as much as possible.
-   */
-  @SuppressWarnings("unchecked")
-  private Provider<Filter> defer(final Filter filter) {
-    Class<Filter> impl = (Class<Filter>) filter.getClass();
-    final MembersInjector<Filter> membersInjector = getMembersInjector(impl);
-    bind(impl); // help with any auto-wiring dependency analysis
+  @Singleton
+  static class TargetGroupFilterProvider
+      extends FilterProviderSupport
+  {
+    @Inject
+    public TargetGroupFilterProvider(final NexusTargetMappingAuthorizationFilter filter) {
+      super(filter);
+      filter.setPathPrefix("/service/local/repo_groups/(.*)/content(.*)");
+      filter.setPathReplacement("/groups/@1@2");
+    }
+  }
 
-    return new Provider<Filter>()
-    {
-      public Filter get() {
-        membersInjector.injectMembers(filter);
-        return filter;
-      }
-    };
+  @Singleton
+  static class TargetGroupIndexFilterProvider
+      extends FilterProviderSupport
+  {
+    @Inject
+    public TargetGroupIndexFilterProvider(final NexusTargetMappingAuthorizationFilter filter) {
+      super(filter);
+      filter.setPathPrefix("/service/local/repo_groups/(.*)/index_content(.*)");
+      filter.setPathReplacement("/groups/@1@2");
+    }
   }
 }
