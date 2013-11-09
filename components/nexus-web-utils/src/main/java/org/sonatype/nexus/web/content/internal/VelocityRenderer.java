@@ -33,13 +33,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.web.content.Renderer;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.velocity.Velocity;
 
 import com.google.common.base.Strings;
@@ -63,7 +63,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named
 public class VelocityRenderer
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements Renderer
 {
   private final Velocity velocity;

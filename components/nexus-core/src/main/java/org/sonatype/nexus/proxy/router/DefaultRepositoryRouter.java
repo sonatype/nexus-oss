@@ -132,7 +132,7 @@ public class DefaultRepositoryRouter
   public StorageItem dereferenceLink(StorageLinkItem link, boolean localOnly, boolean remoteOnly)
       throws AccessDeniedException, ItemNotFoundException, IllegalOperationException, StorageException
   {
-    getLogger().debug("Dereferencing link {}", link.getTarget());
+    log.debug("Dereferencing link {}", link.getTarget());
 
     ResourceStoreRequest req = new ResourceStoreRequest(link.getTarget().getPath(), localOnly, remoteOnly);
 

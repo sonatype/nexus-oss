@@ -25,7 +25,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * A very simple artifact packaging mapper, that has everything for quick-start wired in this class. Also, it takes
@@ -38,7 +38,7 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 @Singleton
 @Named
 public class DefaultArtifactPackagingMapper
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements ArtifactPackagingMapper
 {
   public static final String MAPPING_PROPERTIES_FILE = "packaging2extension-mapping.properties";
@@ -89,7 +89,7 @@ public class DefaultArtifactPackagingMapper
           packaging2extensionMapping.putAll(defaults);
 
           if (propertiesFile != null && propertiesFile.exists()) {
-            getLogger().info("Found user artifact packaging mapping file, applying it...");
+            log.info("Found user artifact packaging mapping file, applying it...");
 
             Properties userMappings = new Properties();
 
@@ -102,20 +102,20 @@ public class DefaultArtifactPackagingMapper
                       userMappings.getProperty(key.toString()));
                 }
 
-                getLogger().info(
+                log.info(
                     propertiesFile.getAbsolutePath()
                         + " user artifact packaging mapping file contained "
                         + userMappings.keySet().size() + " mappings, applied them all successfully.");
               }
             }
             catch (IOException e) {
-              getLogger().warn(
+              log.warn(
                   "Got IO exception during read of file: " + propertiesFile.getAbsolutePath());
             }
           }
           else {
             // make it silent if using defaults
-            getLogger().debug(
+            log.debug(
                 "User artifact packaging mappings file not found, will work with defaults...");
           }
         }

@@ -24,7 +24,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.AbstractConfigurable;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -35,6 +34,7 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryStatusCheckerThread;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
@@ -60,7 +60,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named
 public class DefaultRepositoryRegistry
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements RepositoryRegistry
 {
   private final EventBus eventBus;
@@ -82,7 +82,7 @@ public class DefaultRepositoryRegistry
 
     insertRepository(rtd, repository);
 
-    getLogger().info("Added repository {}", RepositoryStringUtils.getFullHumanizedNameString(repository));
+    log.info("Added repository {}", RepositoryStringUtils.getFullHumanizedNameString(repository));
   }
 
   @Override
@@ -251,7 +251,7 @@ public class DefaultRepositoryRegistry
     deleteRepository(rtd, repository, silently);
 
     if (!silently) {
-      getLogger().info("Removed repository {}", RepositoryStringUtils.getFullHumanizedNameString(repository));
+      log.info("Removed repository {}", RepositoryStringUtils.getFullHumanizedNameString(repository));
     }
   }
 

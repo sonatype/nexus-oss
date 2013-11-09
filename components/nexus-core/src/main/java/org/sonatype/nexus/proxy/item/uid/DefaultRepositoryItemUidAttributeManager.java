@@ -21,8 +21,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * This is just a quick implementation for currently only one existing attribute: is hidden. Later this should be
@@ -33,7 +33,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 @Named
 @Singleton
 public class DefaultRepositoryItemUidAttributeManager
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements RepositoryItemUidAttributeManager
 {
   private final Map<String, RepositoryItemUidAttributeSource> attributeSources;
@@ -66,8 +66,8 @@ public class DefaultRepositoryItemUidAttributeManager
       }
     }
 
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Registered {} UID Attributes coming from following sources: {}",
+    if (log.isDebugEnabled()) {
+      log.debug("Registered {} UID Attributes coming from following sources: {}",
           new Object[]{attributes.size(), sources.toString()});
     }
   }

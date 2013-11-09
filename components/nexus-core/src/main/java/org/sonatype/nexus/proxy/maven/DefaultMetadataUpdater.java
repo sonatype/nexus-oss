@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
@@ -37,6 +36,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.SetSnapshotOperation;
 import org.sonatype.nexus.proxy.maven.metadata.operations.SnapshotOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.StringOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.TimeUtil;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -47,7 +47,7 @@ import org.codehaus.plexus.util.StringUtils;
 @Named
 @Singleton
 public class DefaultMetadataUpdater
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements MetadataUpdater
 {
   private final MetadataLocator locator;

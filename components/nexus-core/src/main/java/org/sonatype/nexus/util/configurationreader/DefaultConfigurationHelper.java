@@ -34,8 +34,8 @@ import org.sonatype.configuration.upgrade.UnsupportedConfigurationVersionExcepti
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -50,7 +50,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 @Singleton
 @Named
 public class DefaultConfigurationHelper
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements ConfigurationHelper
 {
 
@@ -102,16 +102,16 @@ public class DefaultConfigurationHelper
       configuration = baseConfiguration;
     }
     catch (IOException e) {
-      getLogger().error("IOException while retrieving configuration file", e);
+      log.error("IOException while retrieving configuration file", e);
     }
     catch (XmlPullParserException e) {
-      getLogger().error("Invalid XML Configuration", e);
+      log.error("Invalid XML Configuration", e);
     }
     catch (ConfigurationIsCorruptedException e) {
-      getLogger().error("Invalid XML Configuration", e);
+      log.error("Invalid XML Configuration", e);
     }
     catch (UnsupportedConfigurationVersionException e) {
-      getLogger().error("Invalid XML Configuration", e);
+      log.error("Invalid XML Configuration", e);
     }
     finally {
       if (fr != null) {
@@ -152,7 +152,7 @@ public class DefaultConfigurationHelper
       writer.write(fw, configuration);
     }
     catch (IOException e) {
-      getLogger().error("IOException while storing configuration file", e);
+      log.error("IOException while storing configuration file", e);
     }
     finally {
       if (fw != null) {

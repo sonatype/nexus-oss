@@ -13,10 +13,10 @@
 
 package org.sonatype.nexus.plugins.capabilities.support;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkState;
  */
 @Deprecated
 public abstract class CapabilitySupport
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements Capability
 {
 

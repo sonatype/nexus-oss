@@ -141,7 +141,7 @@ public abstract class AbstractGroupRepository
       return Collections.emptyList();
     }
 
-    getLogger().info(
+    log.info(
         String.format("Evicting unused items from group repository %s from path \"%s\"",
             RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath()));
 
@@ -203,8 +203,8 @@ public abstract class AbstractGroupRepository
           }
         }
         else {
-          if (getLogger().isDebugEnabled()) {
-            getLogger().debug(
+          if (log.isDebugEnabled()) {
+            log.debug(
                 String.format(
                     "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
                     RepositoryStringUtils.getHumanizedNameString(repo),
@@ -297,8 +297,8 @@ public abstract class AbstractGroupRepository
             }
           }
           else {
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug(
+            if (log.isDebugEnabled()) {
+              log.debug(
                   String.format(
                       "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
                       RepositoryStringUtils.getHumanizedNameString(repo),
@@ -394,11 +394,11 @@ public abstract class AbstractGroupRepository
         result.add(repo);
       }
       catch (NoSuchRepositoryException e) {
-        if (getLogger().isDebugEnabled()) {
-          this.getLogger().warn("Could not find repository '{}' while iterating members", repoId, e);
+        if (log.isDebugEnabled()) {
+          this.log.warn("Could not find repository '{}' while iterating members", repoId, e);
         }
         else {
-          this.getLogger().warn("Could not find repository '{}' while iterating members", repoId);
+          this.log.warn("Could not find repository '{}' while iterating members", repoId);
         }
         // XXX throw new StorageException( e ) ;
       }
@@ -462,8 +462,8 @@ public abstract class AbstractGroupRepository
             memberThrowables.put(repository, e);
           }
           catch (RepositoryNotAvailableException e) {
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug(
+            if (log.isDebugEnabled()) {
+              log.debug(
                   RepositoryStringUtils.getFormattedMessage(
                       "Member repository %s is not available, request failed.", e.getRepository()));
             }
@@ -474,14 +474,14 @@ public abstract class AbstractGroupRepository
             throw e;
           }
           catch (IllegalOperationException e) {
-            getLogger().warn("Member repository request failed", e);
+            log.warn("Member repository request failed", e);
             // ignored, but bookkeeping happens now
             memberThrowables.put(repository, e);
           }
         }
         else {
-          if (getLogger().isDebugEnabled()) {
-            getLogger().debug(
+          if (log.isDebugEnabled()) {
+            log.debug(
                 String.format(
                     "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
                     RepositoryStringUtils.getHumanizedNameString(repository),

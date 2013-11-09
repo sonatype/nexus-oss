@@ -73,7 +73,7 @@ public abstract class AbstractApplicationConfigurationSource
     this.configuration = null;
 
     if (message != null) {
-      getLogger().debug(message, e);
+      log.debug(message, e);
     }
   }
 
@@ -121,7 +121,7 @@ public abstract class AbstractApplicationConfigurationSource
     }
 
     if (getConfiguration() != null) {
-      getLogger().info("Configuration loaded successfully.");
+      log.info("Configuration loaded successfully.");
     }
   }
 
