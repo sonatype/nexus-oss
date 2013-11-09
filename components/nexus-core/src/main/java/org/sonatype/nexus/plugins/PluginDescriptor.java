@@ -84,14 +84,6 @@ public final class PluginDescriptor
     return resolvedPlugins;
   }
 
-  public List<RepositoryTypeDescriptor> getRepositoryTypes() {
-    return repositoryTypes;
-  }
-
-  public List<StaticResource> getStaticResources() {
-    return staticResources;
-  }
-
   public String formatAsString() {
     final StringBuilder buf = new StringBuilder();
 

@@ -62,10 +62,6 @@ public final class PluginResponse
     return gav;
   }
 
-  public PluginActivationRequest getWantedGoal() {
-    return request;
-  }
-
   public PluginActivationResult getAchievedGoal() {
     return result;
   }

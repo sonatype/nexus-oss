@@ -45,14 +45,6 @@ public final class PluginActivatedEvent
   // Public methods
   // ----------------------------------------------------------------------
 
-  public PluginDescriptor getPluginDescriptor() {
-    return descriptor;
-  }
-
-  public NexusPluginManager getNexusPluginManager() {
-    return getEventSender();
-  }
-
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +

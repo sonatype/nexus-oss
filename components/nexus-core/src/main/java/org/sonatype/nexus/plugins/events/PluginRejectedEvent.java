@@ -48,16 +48,8 @@ public final class PluginRejectedEvent
   // Public methods
   // ----------------------------------------------------------------------
 
-  public GAVCoordinate getPluginCoordinates() {
-    return gav;
-  }
-
   public Throwable getReason() {
     return reason;
-  }
-
-  public NexusPluginManager getNexusPluginManager() {
-    return getEventSender();
   }
 
   @Override

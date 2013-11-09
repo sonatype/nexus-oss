@@ -14,7 +14,6 @@
 package org.sonatype.nexus.plugins;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.sonatype.plugin.metadata.GAVCoordinate;
@@ -60,10 +59,6 @@ public final class PluginManagerResponse
 
   public PluginActivationRequest getRequest() {
     return request;
-  }
-
-  public List<PluginResponse> getProcessedPluginResponses() {
-    return Collections.unmodifiableList(responses);
   }
 
   public boolean isSuccessful() {
