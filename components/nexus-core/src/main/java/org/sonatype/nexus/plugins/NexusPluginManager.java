@@ -23,7 +23,10 @@ import org.sonatype.plugins.model.PluginMetadata;
 
 /**
  * Manages Nexus plugins, including both system and user types.
+ *
+ * @deprecated Avoid usage, will be removed and/or replaced in future versions.
  */
+@Deprecated
 public interface NexusPluginManager
 {
   /**
