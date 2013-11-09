@@ -50,7 +50,7 @@ import org.sonatype.nexus.proxy.storage.local.AbstractLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
-import org.sonatype.nexus.util.ItemPathUtils;
+import org.sonatype.nexus.util.PathUtils;
 import org.sonatype.nexus.util.file.DirSupport;
 
 import com.google.common.base.Strings;
@@ -421,7 +421,7 @@ public class DefaultFSLocalRepositoryStorage
 
     if (files != null) {
       for (File file : files) {
-        String newPath = ItemPathUtils.concatPaths(request.getRequestPath(), file.getName());
+        String newPath = PathUtils.concatPaths(request.getRequestPath(), file.getName());
 
         request.pushRequestPath(newPath);
         try {
