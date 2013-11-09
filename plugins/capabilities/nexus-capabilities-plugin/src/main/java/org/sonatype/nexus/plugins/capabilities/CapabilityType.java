@@ -18,7 +18,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Type of a capability.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class CapabilityType
 {

@@ -29,7 +29,7 @@ import java.util.Map;
  * * Validators returned by {@link CapabilityDescriptor#validator(CapabilityIdentity)} method<b/>
  * * {@link Capability}, if it implements {@link Validator}
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public interface Validator
 {

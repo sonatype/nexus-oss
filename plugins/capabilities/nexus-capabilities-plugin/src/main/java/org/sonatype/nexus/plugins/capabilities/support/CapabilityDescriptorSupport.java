@@ -27,7 +27,7 @@ import org.sonatype.nexus.plugins.capabilities.Validator;
 /**
  * Support class for implementing {@link org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor}s.
  *
- * @since 2.0
+ * @since capabilities 2.0
  * @deprecated Use {@link org.sonatype.nexus.capability.support.CapabilityDescriptorSupport}
  */
 @Deprecated

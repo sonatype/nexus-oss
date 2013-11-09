@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Factory of logical {@link Condition}s.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 @Singleton
@@ -73,7 +73,7 @@ public class LogicalConditions
   /**
    * A condition that applies a logical AND between conditions.
    *
-   * @since 2.0
+   * @since capabilities 2.0
    */
   private static class ConjunctionCondition
       extends CompositeConditionSupport
@@ -143,7 +143,7 @@ public class LogicalConditions
   /**
    * A condition that applies a logical OR between conditions.
    *
-   * @since 2.0
+   * @since capabilities 2.0
    */
   private static class DisjunctionCondition
       extends CompositeConditionSupport

@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link RepositoryExistsCondition} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class RepositoryExistsConditionTest
     extends EventBusTestSupport

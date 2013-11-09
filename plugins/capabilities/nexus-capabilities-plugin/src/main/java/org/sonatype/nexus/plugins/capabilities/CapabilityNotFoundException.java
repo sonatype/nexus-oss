@@ -17,7 +17,7 @@ package org.sonatype.nexus.plugins.capabilities;
  * Exception thrown when a capability was not found (e.g. updating an inexistent capability, removing an inexistent
  * capability,...).
  *
- * @since 2.2
+ * @since capabilities 2.2
  */
 public class CapabilityNotFoundException
     extends RuntimeException

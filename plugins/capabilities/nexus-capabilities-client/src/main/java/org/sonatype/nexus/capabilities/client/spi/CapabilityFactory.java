@@ -20,7 +20,7 @@ import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 /**
  * A {@link Capability} factory that can create new ones or from an existing resource.
  *
- * @since 2.2
+ * @since capabilities 2.2
  */
 public interface CapabilityFactory<C extends Capability>
 {

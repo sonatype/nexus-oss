@@ -24,7 +24,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.validator.InversionValid
 /**
  * Factory of logical {@link Validator}s combinations.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 @Singleton

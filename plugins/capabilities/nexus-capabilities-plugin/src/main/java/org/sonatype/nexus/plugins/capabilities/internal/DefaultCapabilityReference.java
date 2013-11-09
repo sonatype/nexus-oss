@@ -37,7 +37,7 @@ import static java.util.Collections.unmodifiableMap;
 /**
  * Default {@link CapabilityReference} implementation.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class DefaultCapabilityReference
     extends ComponentSupport

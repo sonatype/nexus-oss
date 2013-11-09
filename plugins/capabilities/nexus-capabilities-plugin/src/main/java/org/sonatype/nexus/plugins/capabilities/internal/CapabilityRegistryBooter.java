@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Loads configuration when Nexus is initialized.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 @EagerSingleton
