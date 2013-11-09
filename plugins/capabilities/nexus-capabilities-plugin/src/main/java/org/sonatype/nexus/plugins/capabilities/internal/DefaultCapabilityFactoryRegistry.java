@@ -41,7 +41,7 @@ import static com.google.inject.name.Names.named;
 /**
  * Default {@link CapabilityFactoryRegistry} implementation.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 @Singleton

@@ -20,7 +20,7 @@ import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidati
 /**
  * Validates result.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public interface ValidationResult
 {
@@ -42,7 +42,7 @@ public interface ValidationResult
   /**
    * Describes a violation.
    *
-   * @since 2.0
+   * @since capabilities 2.0
    */
   interface Violation
   {

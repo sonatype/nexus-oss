@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkState;
  * A condition that is becoming unsatisfied before an capability is updated and becomes satisfied after capability was
  * updated.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class PassivateCapabilityDuringUpdateCondition
     extends ConditionSupport

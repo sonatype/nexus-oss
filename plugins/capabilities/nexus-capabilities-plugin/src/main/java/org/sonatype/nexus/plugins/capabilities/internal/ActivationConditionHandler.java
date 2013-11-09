@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Handles capability activation by reacting capability activation condition being satisfied/unsatisfied.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class ActivationConditionHandler
     extends ComponentSupport

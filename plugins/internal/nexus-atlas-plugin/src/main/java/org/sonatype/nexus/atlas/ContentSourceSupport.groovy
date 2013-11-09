@@ -27,8 +27,8 @@ import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.DEFA
  * @since 2.7
  */
 abstract class ContentSourceSupport
-extends ComponentSupport
-implements ContentSource
+    extends ComponentSupport
+    implements ContentSource
 {
   public static final String PASSWORD_TOKEN = '****'
 

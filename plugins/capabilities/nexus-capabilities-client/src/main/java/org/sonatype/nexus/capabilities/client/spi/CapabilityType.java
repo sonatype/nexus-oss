@@ -16,7 +16,7 @@ package org.sonatype.nexus.capabilities.client.spi;
 /**
  * Annotates custom capabilities that are to be reflectively implemented.
  *
- * @since 2.2
+ * @since capabilities 2.2
  */
 @javax.inject.Qualifier
 @java.lang.annotation.Documented

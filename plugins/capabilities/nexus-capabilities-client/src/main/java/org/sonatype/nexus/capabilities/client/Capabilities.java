@@ -25,7 +25,7 @@ import com.google.inject.ImplementedBy;
 /**
  * Capabilities Nexus Client Subsystem.
  *
- * @since 2.1
+ * @since capabilities 2.1
  */
 @ImplementedBy(CapabilitiesImpl.class)
 public interface Capabilities

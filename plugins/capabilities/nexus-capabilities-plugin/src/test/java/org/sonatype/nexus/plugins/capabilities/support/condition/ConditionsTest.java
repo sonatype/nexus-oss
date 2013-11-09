@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mock;
 /**
  * {@link Conditions} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class ConditionsTest
     extends TestSupport

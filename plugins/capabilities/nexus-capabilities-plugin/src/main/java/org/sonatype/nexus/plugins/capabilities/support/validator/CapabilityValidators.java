@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Factory of {@link Validator}s related to capabilities.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 @Singleton

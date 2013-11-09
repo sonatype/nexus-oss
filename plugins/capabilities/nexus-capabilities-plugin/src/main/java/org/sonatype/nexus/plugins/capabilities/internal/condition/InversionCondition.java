@@ -20,7 +20,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 /**
  * A condition that applies a logical NOT on another condition.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class InversionCondition
     extends CompositeConditionSupport

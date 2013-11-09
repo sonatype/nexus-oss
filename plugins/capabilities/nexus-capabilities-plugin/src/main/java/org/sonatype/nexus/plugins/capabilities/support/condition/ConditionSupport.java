@@ -25,7 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * {@link Condition} implementation support.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public abstract class ConditionSupport
     extends AbstractLoggingComponent

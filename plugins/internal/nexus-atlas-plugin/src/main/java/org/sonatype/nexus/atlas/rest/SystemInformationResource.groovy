@@ -38,8 +38,8 @@ import static com.google.common.base.Preconditions.checkNotNull
 @Singleton
 @Path(SystemInformationResource.RESOURCE_URI)
 class SystemInformationResource
-extends ComponentSupport
-implements Resource
+    extends ComponentSupport
+    implements Resource
 {
   static final String RESOURCE_URI = '/atlas/system-information'
 

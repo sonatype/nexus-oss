@@ -36,8 +36,8 @@ import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.SYSINFO
 @Named
 @Singleton
 class SystemInformationCustomizer
-extends ComponentSupport
-implements SupportBundleCustomizer
+    extends ComponentSupport
+    implements SupportBundleCustomizer
 {
   private final SystemInformationGenerator systemInformationGenerator
 

@@ -23,7 +23,7 @@ import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 /**
  * Capabilities {@link UiContributor}.
  *
- * @since 2.2.2
+ * @since capabilities 2.2.2
  */
 @Named
 @Singleton

@@ -71,7 +71,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 /**
  * {@link DefaultCapabilityRegistry} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class DefaultCapabilityRegistryTest
     extends TestSupport

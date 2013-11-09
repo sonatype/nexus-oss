@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.atlas.internal;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ import java.util.zip.ZipOutputStream;
  * @since 2.7
  */
 public class FlushableZipOutputStream
-  extends ZipOutputStream
+    extends ZipOutputStream
 {
   private boolean syncFlush;
 
@@ -51,11 +52,11 @@ public class FlushableZipOutputStream
   public void flush() throws IOException {
     if (syncFlush && !def.finished()) {
       int len = 0;
-      while ((len = def.deflate(buf, 0, buf.length, Deflater.SYNC_FLUSH)) > 0)
-      {
+      while ((len = def.deflate(buf, 0, buf.length, Deflater.SYNC_FLUSH)) > 0) {
         out.write(buf, 0, len);
-        if (len < buf.length)
+        if (len < buf.length) {
           break;
+        }
       }
     }
     out.flush();

@@ -24,7 +24,7 @@ import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 
 /**
- * @since 2.1
+ * @since obr 2.1
  */
 @Named
 @Singleton

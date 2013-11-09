@@ -34,7 +34,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 /**
  * {@link CapabilityConditions} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class CapabilityConditionsTest
     extends TestSupport

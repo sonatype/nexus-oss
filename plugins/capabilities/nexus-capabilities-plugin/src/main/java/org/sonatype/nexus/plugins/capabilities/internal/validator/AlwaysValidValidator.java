@@ -23,7 +23,7 @@ import org.sonatype.nexus.plugins.capabilities.Validator;
 /**
  * A {@link Validator} that is always valid.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 public class AlwaysValidValidator

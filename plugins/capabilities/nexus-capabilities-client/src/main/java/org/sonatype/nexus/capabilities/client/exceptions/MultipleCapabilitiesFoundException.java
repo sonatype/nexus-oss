@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Exception thrown when looking for a unique capability based on a filter and the filter matches more then one.
  *
- * @since 2.2
+ * @since capabilities 2.2
  */
 @SuppressWarnings("serial")
 public class MultipleCapabilitiesFoundException

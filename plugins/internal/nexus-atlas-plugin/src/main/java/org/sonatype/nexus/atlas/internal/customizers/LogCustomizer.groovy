@@ -39,8 +39,8 @@ import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.LOG
 @Named
 @Singleton
 class LogCustomizer
-extends ComponentSupport
-implements SupportBundleCustomizer
+    extends ComponentSupport
+    implements SupportBundleCustomizer
 {
   private final LogManager logManager
 
@@ -86,7 +86,8 @@ implements SupportBundleCustomizer
 
     // include installation configuration
     def installDir = applicationConfiguration.installDirectory
-    if (installDir) { // could be null
+    if (installDir) {
+      // could be null
       maybeIncludeFile new File(installDir, 'conf/logback.xml'), 'install/conf'
     }
 

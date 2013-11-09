@@ -16,7 +16,7 @@ package org.sonatype.nexus.plugins.capabilities;
 /**
  * A logical condition.
  *
- * @since 2.2
+ * @since capabilities 2.2
  */
 public interface Evaluable
 {

@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull
  * @since 2.7
  */
 class FileContentSourceSupport
-extends ContentSourceSupport
+    extends ContentSourceSupport
 {
   private final File file
 
