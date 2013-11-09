@@ -124,8 +124,7 @@ public class Upgrade250to270
       if (smtp.isSslEnabled() && smtp.isTlsEnabled()) {
         smtp.setSslEnabled(true);
         smtp.setTlsEnabled(false);
-        getLogger()
-            .warn(
+        log.warn(
                 "SMTP related configuration change happened: both SSL and TLS was set, updated to use SSL only, assuming that SMTP server port is set to a port where remote SMTP server accepts SSL connections.");
       }
     }
