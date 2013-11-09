@@ -11,16 +11,13 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.security.filter;
+package org.sonatype.nexus.content.internal;
 
 import javax.inject.Named;
 import javax.servlet.Filter;
 
-import org.sonatype.nexus.security.filter.authc.NexusApiKeyAuthenticationFilter;
-import org.sonatype.nexus.security.filter.authc.NexusAuthenticationFilter;
-import org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter;
-import org.sonatype.nexus.security.filter.authz.FailureLoggingHttpMethodPermissionFilter;
-import org.sonatype.security.web.filter.authc.LogoutAuthenticationFilter;
+import org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter;
+import org.sonatype.security.web.guice.SecurityWebFilter;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
@@ -28,37 +25,44 @@ import com.google.inject.MembersInjector;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.google.inject.name.Names;
-import org.apache.shiro.web.filter.mgt.FilterChainResolver;
+import com.google.inject.servlet.ServletModule;
 
 /**
- * Sets up Nexus's security filter configuration; this is a @Named module so it will be auto-installed by Sisu.
+ * Content module.
+ *
+ * @since 2.8
  */
 @Named
-public class NexusSecurityFilterModule
+public class ContentModule
     extends AbstractModule
 {
   @Override
   protected void configure() {
-    requireBinding(FilterChainResolver.class);
+    bind(SecurityWebFilter.class);
 
-    bindAuthcFilter("authcBasic", false, "Sonatype Nexus Repository Manager API");
-    bindAuthcFilter("authcNxBasic", true, "Sonatype Nexus Repository Manager API (specialized auth)");
+    install(new ServletModule()
+    {
+      @Override
+      protected void configureServlets() {
+        serve("/content/*").with(ContentServlet.class);
+        filter("/content/*").through(SecurityWebFilter.class);
+      }
+    });
 
-    bindNamedFilter("logout", new LogoutAuthenticationFilter());
-    bindNamedFilter("perms", new FailureLoggingHttpMethodPermissionFilter());
+    bindContentAuthcFilter("contentAuthcBasic", "Sonatype Nexus Repository Manager");
 
-    bindApiKeyFilter("authcApiKey", "Sonatype Nexus Repository Manager API (X-...-ApiKey auth)");
+    bindTargetMappingFilter("contentTperms", "/content(.*)", "@1");
   }
 
-  private void bindAuthcFilter(String name, boolean fakeAuthSchem, String applicationName) {
-    NexusSecureHttpAuthenticationFilter filter = new NexusAuthenticationFilter();
-    filter.setApplicationName(applicationName);
-    filter.setFakeAuthScheme(Boolean.toString(fakeAuthSchem));
+  private void bindTargetMappingFilter(String name, String pathPrefix, String pathReplacement) {
+    NexusTargetMappingAuthorizationFilter filter = new NexusTargetMappingAuthorizationFilter();
+    filter.setPathPrefix(pathPrefix);
+    filter.setPathReplacement(pathReplacement);
     bindNamedFilter(name, filter);
   }
 
-  private void bindApiKeyFilter(String name, String applicationName) {
-    NexusSecureHttpAuthenticationFilter filter = new NexusApiKeyAuthenticationFilter();
+  private void bindContentAuthcFilter(String name, String applicationName) {
+    ContentAuthenticationFilter filter = new ContentAuthenticationFilter();
     filter.setApplicationName(applicationName);
     bindNamedFilter(name, filter);
   }

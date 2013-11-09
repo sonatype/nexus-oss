@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.web.content.internal;
+package org.sonatype.nexus.content.internal;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -33,13 +33,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
-import org.sonatype.nexus.web.content.Renderer;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.velocity.Velocity;
 
 import com.google.common.base.Strings;
@@ -57,13 +56,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Implementation of {@link Renderer} using SISU {@link Velocity} component.
  * 
- * @since 2.7.0
- * @see Velocity
+ * @since 2.8
  */
 @Singleton
 @Named
 public class VelocityRenderer
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements Renderer
 {
   private final Velocity velocity;

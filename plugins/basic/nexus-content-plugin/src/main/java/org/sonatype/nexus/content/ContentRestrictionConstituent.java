@@ -11,19 +11,21 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.security.filter.authc;
+package org.sonatype.nexus.content;
 
 import javax.servlet.ServletRequest;
+
+import org.sonatype.nexus.content.internal.ContentAuthenticationFilter;
 
 /**
  * Allows components to configure {code}/content{code} restriction to be enabled or not.
  *
  * If one or more components has content restriction enabled, then the content authentication is restricted.
  *
- * @see NexusContentAuthenticationFilter
+ * @see ContentAuthenticationFilter
  * @since 2.1
  */
-public interface NexusContentRestrictionConstituent
+public interface ContentRestrictionConstituent
 {
   /**
    * Determine if content restriction is required for the given request.

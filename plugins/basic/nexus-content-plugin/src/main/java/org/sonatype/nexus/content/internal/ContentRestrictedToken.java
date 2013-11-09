@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.security.filter.authc;
+package org.sonatype.nexus.content.internal;
 
 import javax.servlet.ServletRequest;
 
@@ -26,10 +26,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * {@link AuthenticationToken} used when access to {code}/content{code} is restricted.
  *
- * @see NexusContentAuthenticationFilter
+ * @see ContentAuthenticationFilter
  * @since 2.1
  */
-public class NexusContentRestrictedToken
+public class ContentRestrictedToken
     implements /*RememberMeAuthenticationToken,*/ HostAuthenticationToken
 {
   private final Object principal;
@@ -42,7 +42,7 @@ public class NexusContentRestrictedToken
 
   private final ServletRequest request;
 
-  public NexusContentRestrictedToken(final UsernamePasswordToken basis, final ServletRequest request) {
+  public ContentRestrictedToken(final UsernamePasswordToken basis, final ServletRequest request) {
     checkNotNull(basis);
     this.principal = basis.getPrincipal();
     this.credentials = basis.getPassword();

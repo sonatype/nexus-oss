@@ -15,14 +15,10 @@ package org.sonatype.nexus.webapp;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.web.content.NexusContentServlet;
-import org.sonatype.security.web.guice.SecurityWebFilter;
-
 import com.google.inject.AbstractModule;
-import com.google.inject.servlet.ServletModule;
 
 /**
- * Nexus webapp module.
+ * Webapp module.
  *
  * @since 2.5
  */
@@ -32,14 +28,6 @@ public class WebappModule
 {
   @Override
   protected void configure() {
-    install(new ServletModule()
-    {
-      @Override
-      protected void configureServlets() {
-        serve("/content/*").with(NexusContentServlet.class);
-        filter("/content/*").through(SecurityWebFilter.class);
-      }
-    });
     install(new MetricsModule());
   }
 }
