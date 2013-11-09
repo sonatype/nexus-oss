@@ -96,7 +96,6 @@ public class NxApplication
     }
 
     applicationStatusSource.setState(SystemState.STOPPED);
-    applicationStatusSource.getSystemStatus().setOperationMode(OperationMode.STANDALONE);
     applicationStatusSource.getSystemStatus().setInitializedAt(new Date());
     eventBus.post(new NexusInitializedEvent(this));
   }
