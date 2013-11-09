@@ -22,6 +22,7 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
 /**
  * Describes a response from the {@link NexusPluginManager} concerning a {@link PluginActivationRequest}.
  */
+@Deprecated
 public final class PluginManagerResponse
 {
   // ----------------------------------------------------------------------

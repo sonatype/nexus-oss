@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.plugins;
 
+@Deprecated
 public enum PluginActivationRequest
 {
   ACTIVATE

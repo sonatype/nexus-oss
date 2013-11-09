@@ -21,6 +21,7 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
 /**
  * Abstract {@link NexusWritablePluginRepository} that adds support for installing/removing plugins.
  */
+@Deprecated
 abstract class AbstractFileNexusWritablePluginRepository
     extends AbstractFileNexusPluginRepository
     implements NexusWritablePluginRepository

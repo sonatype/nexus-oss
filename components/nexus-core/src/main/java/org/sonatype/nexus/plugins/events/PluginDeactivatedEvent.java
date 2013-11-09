@@ -21,6 +21,7 @@ import org.sonatype.plexus.appevents.Event;
 /**
  * This {@link Event} is triggered when a Nexus plugin is de-activated.
  */
+@Deprecated
 public final class PluginDeactivatedEvent
     extends AbstractEvent<NexusPluginManager>
 {

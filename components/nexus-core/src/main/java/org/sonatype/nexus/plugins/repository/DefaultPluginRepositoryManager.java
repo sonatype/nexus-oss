@@ -32,6 +32,7 @@ import org.sonatype.plugins.model.PluginMetadata;
  */
 @Named
 @Singleton
+@Deprecated
 final class DefaultPluginRepositoryManager
     implements PluginRepositoryManager
 {

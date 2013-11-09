@@ -21,6 +21,7 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
 /**
  * Writable {@link NexusPluginRepository} that supports installation and deletion of Nexus plugins.
  */
+@Deprecated
 public interface NexusWritablePluginRepository
     extends NexusPluginRepository
 {

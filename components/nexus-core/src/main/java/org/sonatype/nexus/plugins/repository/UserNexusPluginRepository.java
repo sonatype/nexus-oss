@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named(UserNexusPluginRepository.ID)
 @Singleton
+@Deprecated
 final class UserNexusPluginRepository
     extends AbstractFileNexusWritablePluginRepository
 {

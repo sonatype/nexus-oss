@@ -16,6 +16,7 @@ package org.sonatype.nexus.plugins.repository;
 /**
  * Aggregates zero or more {@link NexusPluginRepository} instances.
  */
+@Deprecated
 public interface PluginRepositoryManager
     extends NexusPluginRepository
 {

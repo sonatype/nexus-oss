@@ -76,6 +76,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultNexusPluginManager
     implements NexusPluginManager
 {

@@ -15,6 +15,7 @@ package org.sonatype.nexus.plugins.repository;
 
 import org.sonatype.plugin.metadata.GAVCoordinate;
 
+@Deprecated
 public final class NoSuchPluginRepositoryArtifactException
     extends Exception
 {
