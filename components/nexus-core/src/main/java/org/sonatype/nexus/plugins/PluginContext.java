@@ -21,6 +21,7 @@ import java.io.File;
  *
  * @author cstamas
  */
+@Deprecated
 public interface PluginContext
 {
   /**

@@ -18,6 +18,7 @@ import java.util.Comparator;
 /**
  * {@link Comparator} that places two {@link NexusPluginRepository} in order of priority; smallest number first.
  */
+@Deprecated
 final class NexusPluginRepositoryComparator
     implements Comparator<NexusPluginRepository>
 {
