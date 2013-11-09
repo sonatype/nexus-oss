@@ -19,6 +19,7 @@ package org.sonatype.nexus.plugins;
  *
  * @author cstamas
  */
+@Deprecated
 public interface NexusPlugin
 {
   /**
