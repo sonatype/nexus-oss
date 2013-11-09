@@ -23,7 +23,6 @@ import javax.servlet.ServletResponse;
 import org.sonatype.nexus.content.ContentRestrictionConstituent;
 import org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
@@ -38,17 +37,12 @@ import org.apache.shiro.web.filter.authc.AuthenticationFilter;
 public class ContentAuthenticationFilter
     extends NexusSecureHttpAuthenticationFilter
 {
+  private final List<ContentRestrictionConstituent> constituents;
+
   @Inject
-  @Nullable
-  private List<ContentRestrictionConstituent> constituents;
-
-  public ContentAuthenticationFilter() {
-    super();
-  }
-
-  @VisibleForTesting
-  public ContentAuthenticationFilter(final List<ContentRestrictionConstituent> constituents) {
+  public ContentAuthenticationFilter(final @Nullable List<ContentRestrictionConstituent> constituents) {
     this.constituents = constituents;
+    setApplicationName("Sonatype Nexus Repository Manager");
   }
 
   /**
@@ -56,7 +50,6 @@ public class ContentAuthenticationFilter
    * If any constituent reports a restriction then returns true.
    */
   private boolean isRestricted(final ServletRequest request) {
-    //noinspection ConstantConditions
     if (constituents != null) {
       for (ContentRestrictionConstituent constituent : constituents) {
         if (constituent.isContentRestricted(request)) {

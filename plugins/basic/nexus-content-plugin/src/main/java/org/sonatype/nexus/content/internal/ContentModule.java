@@ -13,19 +13,21 @@
 
 package org.sonatype.nexus.content.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.Filter;
 
 import org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter;
+import org.sonatype.nexus.web.MdcUserContextFilter;
 import org.sonatype.security.web.guice.SecurityWebFilter;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
-import com.google.inject.MembersInjector;
 import com.google.inject.Provider;
-import com.google.inject.Scopes;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Content module.
@@ -36,58 +38,46 @@ import com.google.inject.servlet.ServletModule;
 public class ContentModule
     extends AbstractModule
 {
+  private static final String MOUNT_POINT = "/content";
+
   @Override
   protected void configure() {
+    // FIXME: Still not sure why this is needed, but it appears to make things work (most of the time)
     bind(SecurityWebFilter.class);
+
+    bind(filterKey("contentAuthcBasic")).to(ContentAuthenticationFilter.class);
+    bind(filterKey("contentTperms")).toProvider(ContentTargetMappingFilterProvider.class);
 
     install(new ServletModule()
     {
       @Override
       protected void configureServlets() {
-        serve("/content/*").with(ContentServlet.class);
-        filter("/content/*").through(SecurityWebFilter.class);
+        serve(MOUNT_POINT + "/*").with(ContentServlet.class);
+        filter(MOUNT_POINT + "/*").through(SecurityWebFilter.class);
+        filter(MOUNT_POINT + "/*").through(MdcUserContextFilter.class);
       }
     });
-
-    bindContentAuthcFilter("contentAuthcBasic", "Sonatype Nexus Repository Manager");
-
-    bindTargetMappingFilter("contentTperms", "/content(.*)", "@1");
   }
 
-  private void bindTargetMappingFilter(String name, String pathPrefix, String pathReplacement) {
-    NexusTargetMappingAuthorizationFilter filter = new NexusTargetMappingAuthorizationFilter();
-    filter.setPathPrefix(pathPrefix);
-    filter.setPathReplacement(pathReplacement);
-    bindNamedFilter(name, filter);
+  private Key<Filter> filterKey(final String name) {
+    return Key.get(Filter.class, Names.named(name));
   }
 
-  private void bindContentAuthcFilter(String name, String applicationName) {
-    ContentAuthenticationFilter filter = new ContentAuthenticationFilter();
-    filter.setApplicationName(applicationName);
-    bindNamedFilter(name, filter);
-  }
+  static class ContentTargetMappingFilterProvider
+    implements Provider<NexusTargetMappingAuthorizationFilter>
+  {
+    private final NexusTargetMappingAuthorizationFilter filter;
 
-  private void bindNamedFilter(String name, Filter filter) {
-    Key<Filter> key = Key.get(Filter.class, Names.named(name));
-    bind(key).toProvider(defer(filter)).in(Scopes.SINGLETON);
-  }
+    @Inject
+    public ContentTargetMappingFilterProvider(final NexusTargetMappingAuthorizationFilter filter) {
+      this.filter = checkNotNull(filter);
+      filter.setPathPrefix(MOUNT_POINT + "(.*)");
+      filter.setPathReplacement("@1");
+    }
 
-  /**
-   * Guice injects bound instances eagerly, so to avoid missing dependencies causing eager failures when this module
-   * is auto-installed (such as with Sisu's classpath scanning) we defer injection of the filter as much as possible.
-   */
-  @SuppressWarnings("unchecked")
-  private Provider<Filter> defer(final Filter filter) {
-    Class<Filter> impl = (Class<Filter>) filter.getClass();
-    final MembersInjector<Filter> membersInjector = getMembersInjector(impl);
-    bind(impl); // help with any auto-wiring dependency analysis
-
-    return new Provider<Filter>()
-    {
-      public Filter get() {
-        membersInjector.injectMembers(filter);
-        return filter;
-      }
-    };
+    @Override
+    public NexusTargetMappingAuthorizationFilter get() {
+      return filter;
+    }
   }
 }
