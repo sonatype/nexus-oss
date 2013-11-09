@@ -19,7 +19,7 @@ import org.sonatype.nexus.repository.obr.client.ObrGroupRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 
 /**
- * @since 2.1
+ * @since obr 2.1
  */
 public class JerseyObrGroupRepository
     extends JerseyGroupRepository<ObrGroupRepository>
