@@ -13,35 +13,33 @@
 
 package org.sonatype.nexus.security.filter.authc;
 
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-
-import org.apache.shiro.authc.AuthenticationToken;
-
 public class NexusSecureHttpAuthenticationFilter
     extends NexusHttpAuthenticationFilter
 {
-  @Inject
-  @Nullable
-  private PasswordDecryptor passwordDecryptor;
+  // FIXME: There seems to be no implementation of PasswordDecryptor
+  // FIXME: Verify why this code exists and remove if there is no purpose
 
-  protected PasswordDecryptor getPasswordDecryptor() {
-    return passwordDecryptor;
-  }
-
-  protected String decryptPasswordIfNeeded(String password) {
-    PasswordDecryptor pd = getPasswordDecryptor();
-
-    if (pd != null && pd.isEncryptedPassword(password)) {
-      return pd.getDecryptedPassword(password);
-    }
-    else {
-      return password;
-    }
-  }
-
-  @Override
-  protected AuthenticationToken createToken(String username, String password, boolean rememberMe, String address) {
-    return super.createToken(username, decryptPasswordIfNeeded(password), rememberMe, address);
-  }
+  //@Inject
+  //@Nullable
+  //private PasswordDecryptor passwordDecryptor;
+  //
+  //protected PasswordDecryptor getPasswordDecryptor() {
+  //  return passwordDecryptor;
+  //}
+  //
+  //protected String decryptPasswordIfNeeded(String password) {
+  //  PasswordDecryptor pd = getPasswordDecryptor();
+  //
+  //  if (pd != null && pd.isEncryptedPassword(password)) {
+  //    return pd.getDecryptedPassword(password);
+  //  }
+  //  else {
+  //    return password;
+  //  }
+  //}
+  //
+  //@Override
+  //protected AuthenticationToken createToken(String username, String password, boolean rememberMe, String address) {
+  //  return super.createToken(username, decryptPasswordIfNeeded(password), rememberMe, address);
+  //}
 }
