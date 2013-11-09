@@ -51,8 +51,8 @@ import static org.sonatype.nexus.wonderland.AuthTicketService.AUTH_TICKET_HEADER
 @Singleton
 @Path(SupportZipResource.RESOURCE_URI)
 class SupportZipResource
-extends ComponentSupport
-implements Resource
+    extends ComponentSupport
+    implements Resource
 {
   static final String RESOURCE_URI = '/atlas/support-zip'
 
