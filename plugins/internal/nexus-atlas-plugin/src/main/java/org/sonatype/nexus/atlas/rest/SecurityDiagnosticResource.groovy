@@ -39,8 +39,8 @@ import static com.google.common.base.Preconditions.checkNotNull
 @Path(SecurityDiagnosticResource.RESOURCE_URI)
 @Produces(MediaType.APPLICATION_JSON)
 class SecurityDiagnosticResource
-extends ComponentSupport
-implements Resource
+    extends ComponentSupport
+    implements Resource
 {
   static final String RESOURCE_URI = '/atlas/security-diagnostic'
 

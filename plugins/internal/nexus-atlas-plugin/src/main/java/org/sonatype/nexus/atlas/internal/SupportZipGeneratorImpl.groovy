@@ -34,7 +34,12 @@ import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 
 import static com.google.common.base.Preconditions.checkNotNull
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.*
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.CONFIG
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.LOG
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.METRICS
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.SECURITY
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.SYSINFO
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.THREAD
 
 /**
  * Default {@link SupportZipGenerator}.
@@ -44,8 +49,8 @@ import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.*
 @Named
 @Singleton
 class SupportZipGeneratorImpl
-extends ComponentSupport
-implements SupportZipGenerator
+    extends ComponentSupport
+    implements SupportZipGenerator
 {
   private final List<SupportBundleCustomizer> bundleCustomizers
 
