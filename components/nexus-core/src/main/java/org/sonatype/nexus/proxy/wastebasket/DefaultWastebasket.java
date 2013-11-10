@@ -45,7 +45,7 @@ import com.google.common.annotations.VisibleForTesting;
 @Singleton
 public class DefaultWastebasket
     extends ComponentSupport
-    implements SmartWastebasket
+    implements Wastebasket
 {
   private static final String TRASH_PATH_PREFIX = "/.nexus/trash";
 
@@ -256,15 +256,6 @@ public class DefaultWastebasket
 
     return false;
   }
-
-  // ==============================
-  // SmartWastebasket iface
-
-  public void setMaximumSizeConstraint(final MaximumSizeConstraint constraint) {
-    // TODO Implement this
-  }
-
-  // ==
 
   protected String getTrashPath(final Repository repository, final String path) {
     if (path.startsWith(TRASH_PATH_PREFIX)) {
