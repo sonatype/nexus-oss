@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.plugins.lvo.strategy;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
@@ -30,17 +29,17 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.DiffMatchers;
 import org.sonatype.tests.http.server.fluent.Proxy;
 import org.sonatype.tests.http.server.fluent.Server;
 
-import org.apache.commons.io.IOUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.when;
@@ -128,8 +127,7 @@ public class AbstractRemoteDiscoveryStrategyTest
         underTest.handleRequest(server.getUrl().toString() + "/test.properties");
 
     assertThat(result.getInputStream(), notNullValue());
-    assertThat("content did not match",
-        IOUtils.contentEquals(result.getInputStream(), new ByteArrayInputStream(content.getBytes())), is(true));
+    assertThat("content did not match", IOUtil.toString(result.getInputStream()), DiffMatchers.equalTo(content));
   }
 
   @Test
@@ -149,8 +147,7 @@ public class AbstractRemoteDiscoveryStrategyTest
     result = underTest.handleRequest("http://invalid.url/test.properties");
 
     assertThat(result.getInputStream(), notNullValue());
-    assertThat("content did not match",
-        IOUtils.contentEquals(result.getInputStream(), new ByteArrayInputStream(content.getBytes())), is(true));
+    assertThat("content did not match", IOUtil.toString(result.getInputStream()), DiffMatchers.equalTo(content));
   }
 
   @Test
@@ -201,8 +198,7 @@ public class AbstractRemoteDiscoveryStrategyTest
         underTest.handleRequest(server.getUrl().toString() + "/test.properties");
 
     assertThat(result.getInputStream(), notNullValue());
-    assertThat("content did not match",
-        IOUtils.contentEquals(result.getInputStream(), new ByteArrayInputStream(content.getBytes())), is(true));
+    assertThat("content did not match", IOUtil.toString(result.getInputStream()), DiffMatchers.equalTo(content));
   }
 
   @Test
@@ -224,8 +220,7 @@ public class AbstractRemoteDiscoveryStrategyTest
     result = underTest.handleRequest("http://invalid.url/test.properties");
 
     assertThat(result.getInputStream(), notNullValue());
-    assertThat("content did not match",
-        IOUtils.contentEquals(result.getInputStream(), new ByteArrayInputStream(content.getBytes())), is(true));
+    assertThat("content did not match", IOUtil.toString(result.getInputStream()), DiffMatchers.equalTo(content));
   }
 
 }

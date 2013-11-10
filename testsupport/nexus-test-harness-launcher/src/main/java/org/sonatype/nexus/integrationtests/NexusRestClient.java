@@ -25,7 +25,6 @@ import java.net.URL;
 import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -602,10 +601,8 @@ public class NexusRestClient
   /**
    * Execute a HTTPClient method, optionally in the context of a test.
    * <p/>
-   * NOTE: Before being returned, {@link org.apache.commons.httpclient.HttpMethod#releaseConnection()} is called on
-   * the {@link org.apache.commons.httpclient.HttpMethod} instance, therefore subsequent calls to get response body
-   * as
-   * string may return nulls.
+   * NOTE: Before being returned, entity is consumed via {@link EntityUtils#consume(HttpEntity)} therefore subsequent
+   * calls to get response body as string may return nulls.
    *
    * @param method         the method to execute
    * @param useTestContext if true, execute this request in the context of a Test, false means ignore the testContext
@@ -641,7 +638,7 @@ public class NexusRestClient
       if (response.getEntity() != null) {
         // buffer it completely to be able to close connection
         entity = response.getEntity();
-        final byte[] body = IOUtils.toByteArray(entity.getContent());
+        final byte[] body = IOUtil.toByteArray(entity.getContent());
         ByteArrayEntity bae = new ByteArrayEntity(body, ContentType.get(response.getEntity()));
         bae.setChunked(entity.isChunked());
         bae.setContentEncoding(entity.getContentEncoding());

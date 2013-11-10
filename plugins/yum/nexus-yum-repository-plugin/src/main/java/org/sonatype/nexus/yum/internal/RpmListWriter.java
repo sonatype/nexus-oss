@@ -14,10 +14,9 @@
 package org.sonatype.nexus.yum.internal;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,15 +25,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.io.File.pathSeparator;
 import static java.io.File.separator;
 import static java.lang.String.format;
-import static org.apache.commons.io.IOUtils.readLines;
-import static org.apache.commons.io.IOUtils.write;
-import static org.apache.commons.io.IOUtils.writeLines;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.sonatype.nexus.yum.internal.RpmScanner.getRelativePath;
 
@@ -177,23 +174,21 @@ public class RpmListWriter
   private void writeRpmFileList(Collection<String> files, File rpmListOutputFile)
       throws IOException
   {
-    FileOutputStream outputStream = new FileOutputStream(rpmListOutputFile);
-    try {
-      writeLines(files, "\n", outputStream);
+    try (PrintWriter out = new PrintWriter(rpmListOutputFile)) {
       if (files.isEmpty()) {
         LOG.debug(
             "Write non existing package to rpm list file {} to avoid an empty packge list that would cause createrepo to scan the whole directory",
             rpmListOutputFile);
-        write(
-            ".foo/.bar.rpm/to-avoid-an-empty-rpm-list-file/that-would-cause-createrepo-to-scan-the-whole-repo.rpm",
-            outputStream);
+        out.println(
+            ".foo/.bar.rpm/to-avoid-an-empty-rpm-list-file/that-would-cause-createrepo-to-scan-the-whole-repo.rpm"
+        );
       }
       else {
+        for (String file : files) {
+          out.println(file);
+        }
         LOG.debug("Wrote {} rpm packages to rpm list file {} .", files.size(), rpmListOutputFile);
       }
-    }
-    finally {
-      outputStream.close();
     }
   }
 
@@ -201,13 +196,7 @@ public class RpmListWriter
   private List<String> readRpmFileList()
       throws IOException
   {
-    FileInputStream inputStream = new FileInputStream(rpmListFile);
-    try {
-      return readLines(inputStream);
-    }
-    finally {
-      inputStream.close();
-    }
+    return FileUtils.loadFile(rpmListFile);
   }
 
   private void rewriteList()

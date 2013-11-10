@@ -35,7 +35,7 @@ import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.YumConfigContentGenerator;
 
 import com.google.common.base.Throwables;
-import org.apache.commons.io.IOUtils;
+import org.codehaus.plexus.util.IOUtil;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.capabilities.Tag.repositoryTag;
@@ -142,7 +142,7 @@ public abstract class MetadataCapabilitySupport<C extends MetadataCapabilityConf
             return
                 "<b>Example Yum configuration file:</b><br/><br/>"
                     + "<pre>"
-                    + IOUtils.toString(in)
+                    + IOUtil.toString(in)
                     + "</pre>";
           }
         }
