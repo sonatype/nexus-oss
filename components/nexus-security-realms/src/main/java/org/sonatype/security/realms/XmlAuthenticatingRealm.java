@@ -151,7 +151,7 @@ public class XmlAuthenticatingRealm
           catch (Exception e) {
             //Update failed, rollback to previous values
             user.setPassword(currentPasswordHash);
-            logger.error("Unable to update hash for user {}", user.getId());
+            logger.error("Unable to update hash for user {}", user.getId(), e);
           }
         }
       });
