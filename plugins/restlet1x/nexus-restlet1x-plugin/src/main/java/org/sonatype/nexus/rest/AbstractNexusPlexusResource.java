@@ -151,16 +151,12 @@ public abstract class AbstractNexusPlexusResource
 
   protected boolean isRemote(Request request, String resourceStorePath) {
     // check do we need remote only access
-    boolean isRemote = request.getResourceRef().getQueryAsForm().getFirst(IS_REMOTE_PARAMETER) != null;
-
-    return isRemote;
+    return request.getResourceRef().getQueryAsForm().getFirst(IS_REMOTE_PARAMETER) != null;
   }
 
   protected boolean asExpired(Request request, String resourceStorePath) {
     // check do we need expired access
-    boolean isRemote = request.getResourceRef().getQueryAsForm().getFirst(AS_EXPIRED_PARAMETER) != null;
-
-    return isRemote;
+    return request.getResourceRef().getQueryAsForm().getFirst(AS_EXPIRED_PARAMETER) != null;
   }
 
   private Reference updateBaseRefPath(Reference reference) {
