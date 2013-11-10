@@ -32,7 +32,7 @@ public interface ArtifactViewProvider
    * Returns an object that represents a view for the storeRequest.
    *
    * @param store        The ResourceStore that was about to be "asked" for content.
-   * @param storeRequest The store request to retrieve the view for.
+   * @param request      The store request to retrieve the view for.
    * @param item         The item retrieved or null if not found. View provider must handle nulls.
    * @param req          The REST request.
    * @return An object representing the view.
