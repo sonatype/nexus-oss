@@ -56,7 +56,7 @@ import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
-import org.sonatype.nexus.util.ItemPathUtils;
+import org.sonatype.nexus.util.PathUtils;
 import org.sonatype.scheduling.TaskUtil;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -614,7 +614,7 @@ public class DefaultSnapshotRemover
     {
       // all snapshot files are deleted
       if (!deletableSnapshotsAndFiles.isEmpty() && remainingSnapshotsAndFiles.isEmpty()) {
-        collectionNodes.addAndMarkPath(ItemPathUtils.getParentPath(coll.getPath()));
+        collectionNodes.addAndMarkPath(PathUtils.getParentPath(coll.getPath()));
       }
       else {
         collectionNodes.addAndMarkPath(coll.getPath());
