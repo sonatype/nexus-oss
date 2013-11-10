@@ -23,7 +23,7 @@ import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 
-import org.apache.commons.io.FileUtils;
+import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.jetty.server.Server;
 import org.junit.After;
 import org.junit.Assert;

@@ -24,8 +24,8 @@ import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.artifact.Gav;
+import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.junit.After;
 import org.junit.Assert;
@@ -109,7 +109,7 @@ public class Nexus3638IndexProxiedMavenPluginIT
     final File nexusLog = getNexusLogFile();
 
     if (nexusLog != null) {
-      String logContent = FileUtils.readFileToString(nexusLog);
+      String logContent = FileUtils.fileRead(nexusLog);
       // NEXUS-3707
       MatcherAssert.assertThat(logContent,
           not(containsString("Rename operation failed after -1 retries in -1 ms intervals")));

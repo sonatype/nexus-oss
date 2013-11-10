@@ -25,9 +25,9 @@ import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writ
 import org.sonatype.sisu.litmus.testsupport.hamcrest.DiffMatchers;
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 
-import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
@@ -58,9 +58,9 @@ public class SiteRepositoryConfigurationModifierTest
         configuration
     );
     assertThat(
-        normalizeLineEndings(readFileToString(modified)),
+        normalizeLineEndings(FileUtils.fileRead(modified)),
         DiffMatchers.equalToOnlyDiffs(
-            normalizeLineEndings(readFileToString(util.resolveFile("target/test-classes/expected-nexus.xml"))))
+            normalizeLineEndings(FileUtils.fileRead(util.resolveFile("target/test-classes/expected-nexus.xml"))))
     );
   }
 

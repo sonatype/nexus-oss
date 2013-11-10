@@ -19,9 +19,9 @@ import java.util.Map;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.codehaus.plexus.util.FileUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;

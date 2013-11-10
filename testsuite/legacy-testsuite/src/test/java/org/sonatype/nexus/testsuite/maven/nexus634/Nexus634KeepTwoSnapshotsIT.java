@@ -19,6 +19,8 @@ import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.commons.io.FileUtils.listFiles;
+
 /**
  * Test SnapshotRemoverTask to remove old artifacts but keep updated artifacts
  *

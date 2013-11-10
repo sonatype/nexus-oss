@@ -60,6 +60,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.FileUtils;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.freecompany.redline.Builder;
@@ -75,7 +76,6 @@ import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static com.google.code.tempusfugit.temporal.Duration.seconds;
 import static com.google.code.tempusfugit.temporal.WaitFor.waitOrTimeout;
 import static java.util.Arrays.asList;
-import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.freecompany.redline.header.Architecture.NOARCH;
 import static org.freecompany.redline.header.Os.LINUX;
 import static org.freecompany.redline.header.RpmType.BINARY;
@@ -246,7 +246,7 @@ public class YumNexusTestSupport
     });
     return modules;
   }
-  
+
   @Override
   protected void setUp()
       throws Exception
@@ -329,7 +329,7 @@ public class YumNexusTestSupport
       throws IOException
   {
     final File destDir = randomDir();
-    copyDirectory(srcDir, destDir);
+    FileUtils.copyDirectory(srcDir, destDir);
     return destDir;
   }
 

@@ -40,7 +40,7 @@ import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.behaviour.Record;
 
 import junit.framework.Assert;
-import org.apache.commons.io.IOUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -137,7 +137,7 @@ public class RequestFlagsTest
     MatcherAssert.assertThat(recordedRequests.get(0), Matchers.startsWith("GET"));
     MatcherAssert.assertThat(item, Matchers.instanceOf(StorageFileItem.class));
 
-    final String content = IOUtils.toString(((StorageFileItem) item).getContentLocator().getContent());
+    final String content = IOUtil.toString(((StorageFileItem) item).getContentLocator().getContent());
     MatcherAssert.assertThat(content, Matchers.equalTo(CONTENT));
 
   }
@@ -160,7 +160,7 @@ public class RequestFlagsTest
     MatcherAssert.assertThat(recordedRequests.get(0), Matchers.startsWith("GET"));
     MatcherAssert.assertThat(item, Matchers.instanceOf(StorageFileItem.class));
 
-    final String content = IOUtils.toString(((StorageFileItem) item).getContentLocator().getContent());
+    final String content = IOUtil.toString(((StorageFileItem) item).getContentLocator().getContent());
     MatcherAssert.assertThat(content, Matchers.equalTo(CONTENT));
   }
 
@@ -184,7 +184,7 @@ public class RequestFlagsTest
     MatcherAssert.assertThat(recordedRequests.get(1), Matchers.startsWith("HEAD"));
     MatcherAssert.assertThat(item, Matchers.instanceOf(StorageFileItem.class));
 
-    final String content = IOUtils.toString(((StorageFileItem) item).getContentLocator().getContent());
+    final String content = IOUtil.toString(((StorageFileItem) item).getContentLocator().getContent());
     MatcherAssert.assertThat(content, Matchers.equalTo(CONTENT));
   }
 
@@ -211,7 +211,7 @@ public class RequestFlagsTest
     MatcherAssert.assertThat(recordedRequests.get(2), Matchers.startsWith("GET"));
     MatcherAssert.assertThat(item, Matchers.instanceOf(StorageFileItem.class));
 
-    final String content = IOUtils.toString(((StorageFileItem) item).getContentLocator().getContent());
+    final String content = IOUtil.toString(((StorageFileItem) item).getContentLocator().getContent());
     MatcherAssert.assertThat(content, Matchers.equalTo(CONTENT));
   }
 
@@ -254,7 +254,7 @@ public class RequestFlagsTest
     MatcherAssert.assertThat(recordedRequests.get(0), Matchers.startsWith("GET"));
     MatcherAssert.assertThat(item, Matchers.instanceOf(StorageFileItem.class));
 
-    final String content = IOUtils.toString(((StorageFileItem) item).getContentLocator().getContent());
+    final String content = IOUtil.toString(((StorageFileItem) item).getContentLocator().getContent());
     MatcherAssert.assertThat(content, Matchers.equalTo(CONTENT));
   }
 
@@ -278,7 +278,7 @@ public class RequestFlagsTest
     MatcherAssert.assertThat(recordedRequests.get(0), Matchers.startsWith("GET"));
     MatcherAssert.assertThat(item, Matchers.instanceOf(StorageFileItem.class));
 
-    final String content = IOUtils.toString(((StorageFileItem) item).getContentLocator().getContent());
+    final String content = IOUtil.toString(((StorageFileItem) item).getContentLocator().getContent());
     MatcherAssert.assertThat(content, Matchers.equalTo(CONTENT));
   }
 
@@ -299,7 +299,7 @@ public class RequestFlagsTest
     MatcherAssert.assertThat(recordedRequests.get(0), Matchers.startsWith("GET"));
     MatcherAssert.assertThat(item, Matchers.instanceOf(StorageFileItem.class));
 
-    final String content = IOUtils.toString(((StorageFileItem) item).getContentLocator().getContent());
+    final String content = IOUtil.toString(((StorageFileItem) item).getContentLocator().getContent());
     MatcherAssert.assertThat(content, Matchers.equalTo(CONTENT));
   }
 
@@ -325,7 +325,7 @@ public class RequestFlagsTest
     MatcherAssert.assertThat(recordedRequests.get(1), Matchers.startsWith("GET"));
     MatcherAssert.assertThat(item, Matchers.instanceOf(StorageFileItem.class));
 
-    final String content = IOUtils.toString(((StorageFileItem) item).getContentLocator().getContent());
+    final String content = IOUtil.toString(((StorageFileItem) item).getContentLocator().getContent());
     MatcherAssert.assertThat(content, Matchers.equalTo(CONTENT));
   }
 
@@ -396,7 +396,7 @@ public class RequestFlagsTest
     MatcherAssert.assertThat(recordedRequests.get(1), Matchers.startsWith("GET"));
     MatcherAssert.assertThat(item, Matchers.instanceOf(StorageFileItem.class));
 
-    final String content = IOUtils.toString(((StorageFileItem) item).getContentLocator().getContent());
+    final String content = IOUtil.toString(((StorageFileItem) item).getContentLocator().getContent());
     MatcherAssert.assertThat(content, Matchers.equalTo(CONTENT));
   }
 
@@ -420,7 +420,7 @@ public class RequestFlagsTest
     MatcherAssert.assertThat(recordedRequests.get(0), Matchers.startsWith("GET"));
     MatcherAssert.assertThat(item, Matchers.instanceOf(StorageFileItem.class));
 
-    final String content = IOUtils.toString(((StorageFileItem) item).getContentLocator().getContent());
+    final String content = IOUtil.toString(((StorageFileItem) item).getContentLocator().getContent());
     MatcherAssert.assertThat(content, Matchers.equalTo(CONTENT));
   }
 
@@ -446,7 +446,7 @@ public class RequestFlagsTest
     MatcherAssert.assertThat(recordedRequests.get(1), Matchers.startsWith("HEAD"));
     MatcherAssert.assertThat(item, Matchers.instanceOf(StorageFileItem.class));
 
-    final String content = IOUtils.toString(((StorageFileItem) item).getContentLocator().getContent());
+    final String content = IOUtil.toString(((StorageFileItem) item).getContentLocator().getContent());
     MatcherAssert.assertThat(content, Matchers.equalTo(CONTENT));
   }
 
@@ -476,7 +476,7 @@ public class RequestFlagsTest
     MatcherAssert.assertThat(recordedRequests.get(2), Matchers.startsWith("GET"));
     MatcherAssert.assertThat(item, Matchers.instanceOf(StorageFileItem.class));
 
-    final String content = IOUtils.toString(((StorageFileItem) item).getContentLocator().getContent());
+    final String content = IOUtil.toString(((StorageFileItem) item).getContentLocator().getContent());
     MatcherAssert.assertThat(content, Matchers.equalTo(CONTENT));
   }
 
@@ -503,7 +503,7 @@ public class RequestFlagsTest
     MatcherAssert.assertThat(recordedRequests.get(1), Matchers.startsWith("HEAD"));
     MatcherAssert.assertThat(item, Matchers.instanceOf(StorageFileItem.class));
 
-    final String content = IOUtils.toString(((StorageFileItem) item).getContentLocator().getContent());
+    final String content = IOUtil.toString(((StorageFileItem) item).getContentLocator().getContent());
     MatcherAssert.assertThat(content, Matchers.equalTo(CONTENT));
   }
 
@@ -534,7 +534,7 @@ public class RequestFlagsTest
     MatcherAssert.assertThat(recordedRequests.get(2), Matchers.startsWith("GET"));
     MatcherAssert.assertThat(item, Matchers.instanceOf(StorageFileItem.class));
 
-    final String content = IOUtils.toString(((StorageFileItem) item).getContentLocator().getContent());
+    final String content = IOUtil.toString(((StorageFileItem) item).getContentLocator().getContent());
     MatcherAssert.assertThat(content, Matchers.equalTo(CONTENT));
   }
 

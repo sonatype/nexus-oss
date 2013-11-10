@@ -25,8 +25,8 @@ import org.sonatype.nexus.testsuite.ldap.AbstractLdapIntegrationIT;
 import org.sonatype.nexus.testsuite.ldap.LdapConnMessageUtil;
 import org.sonatype.nexus.testsuite.ldap.LdapUserGroupMessageUtil;
 
-import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
@@ -66,7 +66,7 @@ public class NXCM2974DoNotHtmlEscapeUserPassFromRestPayloadIT
     // test for correct ldap config
     File ldapConfigFile = new File(WORK_CONF_DIR, "/ldap.xml");
     assertThat("cannot find ldap config", ldapConfigFile.exists());
-    assertThat(FileUtils.readFileToString(ldapConfigFile), containsString("more&amp;more"));
+    assertThat(FileUtils.fileRead(ldapConfigFile), containsString("more&amp;more"));
 
     connUtil.validateLdapConfig(getConnectionInfo());
 

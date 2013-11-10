@@ -38,7 +38,7 @@ import org.sonatype.p2.bridge.Publisher;
 import org.sonatype.p2.bridge.model.InstallableUnit;
 import org.sonatype.p2.bridge.model.InstallableUnitArtifact;
 
-import org.apache.commons.io.FileUtils;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

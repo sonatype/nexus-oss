@@ -15,7 +15,6 @@ package org.sonatype.nexus.testsuite.task.nexus1650;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -26,7 +25,7 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-import org.apache.commons.io.FileUtils;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,11 +39,6 @@ import static org.hamcrest.Matchers.lessThan;
 public class Nexus1650MultipleManualTaskIT
     extends AbstractNexusIntegrationTest
 {
-
-  @SuppressWarnings("unchecked")
-  public static Collection<File> listFiles(File directory, String[] extensions, boolean recursive) {
-    return FileUtils.listFiles(directory, extensions, recursive);
-  }
 
   protected File artifactFolder;
 

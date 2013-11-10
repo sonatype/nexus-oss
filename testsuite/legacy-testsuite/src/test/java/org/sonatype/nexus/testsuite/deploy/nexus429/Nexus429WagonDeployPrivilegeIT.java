@@ -23,10 +23,10 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -196,7 +196,7 @@ public class Nexus429WagonDeployPrivilegeIT
       throws IOException
   {
     File logFile = new File(verifier.getBasedir(), "log.txt");
-    String log = FileUtils.readFileToString(logFile);
+    String log = FileUtils.fileRead(logFile);
     Assert.fail(log);
   }
 

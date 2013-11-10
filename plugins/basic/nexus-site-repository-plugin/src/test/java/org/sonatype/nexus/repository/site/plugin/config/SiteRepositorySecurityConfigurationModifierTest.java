@@ -25,9 +25,9 @@ import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.DiffMatchers;
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 
-import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
@@ -58,9 +58,9 @@ public class SiteRepositorySecurityConfigurationModifierTest
         configuration
     );
     assertThat(
-        normalizeLineEndings(readFileToString(modified)),
+        normalizeLineEndings(FileUtils.fileRead(modified)),
         DiffMatchers.equalToOnlyDiffs(
-            normalizeLineEndings(readFileToString(util.resolveFile("target/test-classes/expected-security.xml"))))
+            normalizeLineEndings(FileUtils.fileRead(util.resolveFile("target/test-classes/expected-security.xml"))))
     );
   }
 

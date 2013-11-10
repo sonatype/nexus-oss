@@ -43,12 +43,12 @@ import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
-import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
@@ -106,7 +106,7 @@ public class MergeMetadataTask
               groupRepository.getId()
           );
           // delete without using group repository API as group repositories does not allow delete (read only)
-          deleteQuietly(new File(repoBaseDir, "repodata"));
+          FileUtils.forceDelete(new File(repoBaseDir, "repodata"));
         }
       }
       finally {
@@ -169,7 +169,12 @@ public class MergeMetadataTask
       });
       for (File yumTmpDir : yumTmpDirs) {
         log.debug("Deleting yum temp dir : {}", yumTmpDir);
-        deleteQuietly(yumTmpDir);
+        try {
+          FileUtils.forceDelete(yumTmpDir);
+        }
+        catch (IOException e) {
+          // do nothing
+        }
       }
     }
   }

@@ -17,9 +17,8 @@ import java.io.File;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
-
-import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
 
 /**
  * See NEXUS-4423: in short, Nexus suffers from same problem as Maven2 did: snapshots with classifiers not deployed
@@ -37,7 +36,7 @@ public class Nexus4423Maven3SnapshotMetadataIT
   {
     // copy the "repo" to it's place, we need no index etc so this is fine
     File repo = new File(nexusWorkDir, "storage/" + REPO_TEST_HARNESS_SNAPSHOT_REPO);
-    copyDirectoryToDirectory(getTestFile("org"), repo);
+    FileUtils.copyDirectory(getTestFile("org"), new File(repo, "org"));
 
     // TODO: resolve? See nexus-proxy:org.sonatype.nexus.proxy.maven.Nexus4423Maven3MetadataTest UT
     // just repeat the same but with /artifact/maven/resolve REST resource and check same asserts (version, buildTs, buildNo)
