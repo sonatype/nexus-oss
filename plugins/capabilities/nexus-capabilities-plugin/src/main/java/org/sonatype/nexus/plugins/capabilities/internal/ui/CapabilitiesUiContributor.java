@@ -13,12 +13,13 @@
 
 package org.sonatype.nexus.plugins.capabilities.internal.ui;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.CapabilitiesPlugin;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
 
 /**
  * Capabilities {@link UiContributor}.
@@ -28,19 +29,10 @@ import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 @Named
 @Singleton
 public class CapabilitiesUiContributor
-    implements UiContributor
+    extends UiContributorSupport
 {
-
-  private static final String CAPABILITIES_CSS = "static/css/capabilities.css";
-
-  @Override
-  public UiContribution contribute(final boolean debug) {
-    UiContributionBuilder builder = new UiContributionBuilder(
-        this, CapabilitiesPlugin.GROUP_ID, CapabilitiesPlugin.ARTIFACT_ID
-    );
-    if (debug) {
-      builder.withDependency("css!" + CAPABILITIES_CSS + builder.getCacheBuster(CAPABILITIES_CSS));
-    }
-    return builder.build(debug);
+  @Inject
+  public CapabilitiesUiContributor(final CapabilitiesPlugin owner) {
+    super(owner);
   }
 }
