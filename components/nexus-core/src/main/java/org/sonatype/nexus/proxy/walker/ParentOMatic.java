@@ -186,26 +186,6 @@ public class ParentOMatic
   }
 
   /**
-   * Returns the list of all path.
-   *
-   * @since 2.4
-   */
-  public List<String> getAllPaths() {
-    // doing scanning
-    final ArrayList<String> paths = new ArrayList<String>();
-    final Function<Node<Payload>, Node<Payload>> markedCollector = new Function<Node<Payload>, Node<Payload>>()
-    {
-      @Override
-      public Node<Payload> apply(Node<Payload> input) {
-        paths.add(input.getPath());
-        return null;
-      }
-    };
-    applyRecursively(ROOT, markedCollector);
-    return paths;
-  }
-
-  /**
    * Cuts down tree to given maxDepth. After this method returns, this instance guarantees that there is no path
    * deeper than passed in maxDepth (shallower than it might exists!).
    */

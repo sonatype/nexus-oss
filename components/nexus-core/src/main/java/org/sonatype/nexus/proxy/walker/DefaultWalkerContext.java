@@ -99,11 +99,6 @@ public class DefaultWalkerContext
   }
 
   @Override
-  public void setProcessors(List<WalkerProcessor> processors) {
-    this.processors = processors;
-  }
-
-  @Override
   public WalkerFilter getFilter() {
     return walkerFilter;
   }
