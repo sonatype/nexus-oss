@@ -19,10 +19,6 @@ import java.util.Date;
 public class DailySchedulerIterator
     extends AbstractCalendarBasedSchedulerIterator
 {
-  public DailySchedulerIterator(Date startingDate) {
-    super(startingDate);
-  }
-
   public DailySchedulerIterator(Date startingDate, Date endingDate) {
     super(startingDate, endingDate);
   }
