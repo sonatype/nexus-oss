@@ -21,11 +21,12 @@ import java.util.List;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
 
-import org.apache.commons.io.FileUtils;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.apache.commons.io.FileUtils.listFiles;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.sonatype.nexus.test.utils.StatusMatchers.isSuccess;
 
@@ -64,7 +65,7 @@ public class Nexus3929TimelineCorruptionIT
   protected List<File> getTimelineLuceneSegments(final File timelineLuceneIndexDirectory) {
     @SuppressWarnings("unchecked")
     final List<File> luceneFiles =
-        new ArrayList<File>(FileUtils.listFiles(timelineLuceneIndexDirectory, new String[]{
+        new ArrayList<File>(listFiles(timelineLuceneIndexDirectory, new String[]{
             "cfs", "fnm", "fdt",
             "fdx", "frm", "frq", "nrm", "prx", "tii", "tis"
         }, false));

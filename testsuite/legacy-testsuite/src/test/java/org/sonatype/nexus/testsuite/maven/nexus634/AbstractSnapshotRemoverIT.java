@@ -14,7 +14,6 @@
 package org.sonatype.nexus.testsuite.maven.nexus634;
 
 import java.io.File;
-import java.util.Collection;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
@@ -22,17 +21,12 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-import org.apache.commons.io.FileUtils;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Before;
 
 public abstract class AbstractSnapshotRemoverIT
     extends AbstractNexusIntegrationTest
 {
-
-  @SuppressWarnings("unchecked")
-  public static Collection<File> listFiles(File directory, String[] extensions, boolean recursive) {
-    return FileUtils.listFiles(directory, extensions, recursive);
-  }
 
   protected File artifactFolder;
 

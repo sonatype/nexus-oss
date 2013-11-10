@@ -49,15 +49,14 @@ import org.sonatype.sisu.goodies.common.SimpleFormat;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Throwables;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
-import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.sonatype.scheduling.TaskState.RUNNING;
@@ -331,9 +330,9 @@ public class GenerateMetadataTask
   {
     File repomd = new File(getRepoDir(), Yum.PATH_OF_REPOMD_XML);
     if (repomd.exists() && getRepoUrl() != null) {
-      String repomdStr = FileUtils.readFileToString(repomd);
+      String repomdStr = FileUtils.fileRead(repomd);
       repomdStr = repomdStr.replace(getRpmUrl(), getRepoUrl());
-      writeStringToFile(repomd, repomdStr);
+      FileUtils.fileWrite(repomd, repomdStr);
     }
   }
 

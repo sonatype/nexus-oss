@@ -22,8 +22,8 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.SearchType;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 

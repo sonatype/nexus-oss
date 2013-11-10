@@ -22,11 +22,11 @@ import org.sonatype.sisu.goodies.marshal.internal.jackson.JacksonMarshaller;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
+import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.apache.commons.io.FileUtils.readFileToString;
 
 /**
  * Utility class for loading Nexus integration tests parameters.
@@ -74,7 +74,7 @@ public abstract class ParametersLoaders
         LOGGER.info("Loading test parameters from {}", parametersFile.getAbsolutePath());
         try {
           final Object[][] parametersSets = new JacksonMarshaller().unmarshal(
-              readFileToString(checkNotNull(parametersFile)), Object[][].class
+              FileUtils.fileRead(checkNotNull(parametersFile)), Object[][].class
           );
           if (parametersSets == null) {
             return null;

@@ -24,7 +24,7 @@ import org.sonatype.sisu.litmus.testsupport.hamcrest.DiffMatchers;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.apache.commons.io.FileUtils;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Test;
 
@@ -55,7 +55,7 @@ public class LogbackOverridesTest
     LogbackOverrides.write(logbackXml, loggers);
 
     String expected = IOUtil.toString(getClass().getResourceAsStream("logback-expected.xml"));
-    String actual = FileUtils.readFileToString(logbackXml);
+    String actual = FileUtils.fileRead(logbackXml);
     assertThat(actual, DiffMatchers.equalTo(expected));
   }
 
@@ -65,7 +65,7 @@ public class LogbackOverridesTest
   @Test
   public void readLogbackXml() throws Exception {
     File logbackXml = util.createTempFile();
-    FileUtils.write(logbackXml, IOUtil.toString(getClass().getResourceAsStream("logback-expected.xml")));
+    FileUtils.fileWrite(logbackXml, IOUtil.toString(getClass().getResourceAsStream("logback-expected.xml")));
     Collection<String> actual = convertToStringList(LogbackOverrides.read(logbackXml));
     assertThat(actual, containsInAnyOrder("foo|ERROR", "bar|INFO"));
   }

@@ -18,7 +18,7 @@ import java.net.URL;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
-import org.apache.commons.io.FileUtils;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 
 import static org.sonatype.nexus.test.utils.MavenMetadataHelper.assertEquals;

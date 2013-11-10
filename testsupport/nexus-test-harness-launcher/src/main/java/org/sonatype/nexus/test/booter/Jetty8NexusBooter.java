@@ -32,15 +32,17 @@ import java.util.Properties;
 
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.apache.commons.io.FileUtils.listFiles;
 
 /**
  * The simplified Nexus booter class, that boots Nexus (the IT test subject) in completely same way as it boots in
@@ -350,7 +352,7 @@ public class Jetty8NexusBooter
         throw new FileNotFoundException("Jetty properties not found at " + jettyXml.getAbsolutePath());
       }
 
-      String jettyXmlString = FileUtils.readFileToString(jettyXml, "UTF-8");
+      String jettyXmlString = FileUtils.fileRead(jettyXml, "UTF-8");
 
       // was: we just set the value to "false", but the server.stopAtShutdown() invocation still happened,
       // triggering thread to be created in static member
@@ -370,7 +372,7 @@ public class Jetty8NexusBooter
                 "org.eclipse.jetty.server.nio.BlockingChannelConnector");
       }
 
-      FileUtils.writeStringToFile(jettyXml, jettyXmlString, "UTF-8");
+      FileUtils.fileWrite(jettyXml, "UTF-8", jettyXmlString);
     }
   }
 
@@ -434,8 +436,7 @@ public class Jetty8NexusBooter
       throws IOException
   {
     @SuppressWarnings("unchecked")
-    Collection<File> files =
-        (Collection<File>) FileUtils.listFiles(basedir, new WildcardFileFilter(wildcard), TrueFileFilter.TRUE);
+    Collection<File> files = listFiles(basedir, new WildcardFileFilter(wildcard), TrueFileFilter.TRUE);
 
     for (File file : files) {
       // only if not in /shared folder and not zeroed already
@@ -445,7 +446,7 @@ public class Jetty8NexusBooter
 
         // replace jar with dummies (to make Nexus Plugin Manager happy) and prevent it's classes to be
         // loaded from non-shared class loader
-        FileUtils.writeStringToFile(file, "");
+        FileUtils.fileWrite(file, "");
       }
     }
   }

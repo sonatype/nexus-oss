@@ -25,12 +25,13 @@ import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-import org.apache.commons.io.FileUtils;
+import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.apache.commons.io.FileUtils.listFiles;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -116,7 +117,7 @@ public class Nexus4579OptionalTrashForSnapshotsIT
 
     assertThat("artifact folder was not removed", artifactFolder.list(), nullValue());
     assertThat("removed snapshots did not go into trash", trashArtifactFolder.isDirectory(), is(true));
-    Collection<?> jars = FileUtils.listFiles(trashArtifactFolder, new String[]{"jar"}, false);
+    Collection<?> jars = listFiles(trashArtifactFolder, new String[]{"jar"}, false);
     assertThat("removed snapshots did not go into trash: " + jars, jars, hasSize(2));
   }
 
@@ -127,13 +128,13 @@ public class Nexus4579OptionalTrashForSnapshotsIT
     Matcher<Collection<? extends Object>> empty = empty();
 
     // need local variables because generics won't compile otherwise
-    Collection<? extends Object> files = FileUtils.listFiles(groupFolder, null, true);
+    Collection<? extends Object> files = listFiles(groupFolder, null, true);
     assertThat(files, not(empty));
 
     runSnapshotRemover("remove-directly", true);
 
     // need local variables because generics won't compile otherwise
-    files = FileUtils.listFiles(groupFolder, null, true);
+    files = listFiles(groupFolder, null, true);
     assertThat(files, empty);
 
     // IT is kinda wrong since fixed NEXUS-5773
@@ -147,7 +148,7 @@ public class Nexus4579OptionalTrashForSnapshotsIT
     // then it has to be empty". Needed, as FileUtils.listFiles IAEx-es when invoked with non existent
     // folder.
     if (trashArtifactFolder.isDirectory()) {
-      files = FileUtils.listFiles(trashArtifactFolder, null, true);
+      files = listFiles(trashArtifactFolder, null, true);
       assertThat("Files in trash folder", files, empty);
     }
     else {

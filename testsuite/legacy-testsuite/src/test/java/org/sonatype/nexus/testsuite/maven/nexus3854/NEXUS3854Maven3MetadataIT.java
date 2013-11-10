@@ -25,11 +25,11 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Test;
 
-import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -42,7 +42,7 @@ public class NEXUS3854Maven3MetadataIT
       throws Exception
   {
     File repo = new File(nexusWorkDir, "storage/" + REPO_TEST_HARNESS_SNAPSHOT_REPO);
-    copyDirectoryToDirectory(getTestFile("org"), repo);
+    FileUtils.copyDirectory(getTestFile("org"), new File(repo, "org"));
 
     ScheduledServicePropertyResource props = new ScheduledServicePropertyResource();
     props.setKey(RebuildMavenMetadataTaskDescriptor.REPO_OR_GROUP_FIELD_ID);
