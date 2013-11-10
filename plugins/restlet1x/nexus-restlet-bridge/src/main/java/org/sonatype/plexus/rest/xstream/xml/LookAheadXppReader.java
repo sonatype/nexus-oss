@@ -58,7 +58,7 @@ public class LookAheadXppReader
   }
 
   /**
-   * @since 1.2
+   * @since restlet-bridge 1.2
    */
   public LookAheadXppReader(Reader reader, XmlFriendlyReplacer replacer) {
     super(replacer);

@@ -63,7 +63,7 @@ public class JsonOrgHierarchicalStreamDriver
   }
 
   /**
-   * @since 1.25
+   * @since restlet-bridge 1.25
    */
   public HierarchicalStreamReader createReader(URL in) {
     try {
@@ -75,7 +75,7 @@ public class JsonOrgHierarchicalStreamDriver
   }
 
   /**
-   * @since 1.25
+   * @since restlet-bridge 1.25
    */
   public HierarchicalStreamReader createReader(File in) {
     try {

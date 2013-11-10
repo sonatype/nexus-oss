@@ -45,7 +45,7 @@ public class VelocityRepresentation
   /**
    * Constructor when Template is already assembled.
    *
-   * @since 1.21
+   * @since restlet-bridge 1.21
    */
   public VelocityRepresentation(Context context, Template template, Map<String, Object> dataModel,
                                 MediaType mediaType)
@@ -57,7 +57,7 @@ public class VelocityRepresentation
   /**
    * Constructor when template to use comes from some other classloader than the one where this class is.
    *
-   * @since 1.23
+   * @since restlet-bridge 1.23
    */
   public VelocityRepresentation(Context context, String templateName, ClassLoader cl, Map<String, Object> dataModel,
                                 MediaType mediaType)
