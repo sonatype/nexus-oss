@@ -36,7 +36,6 @@
     <module>nexus-configuration-model</module>
     <module>nexus-core</module>
     <module>nexus-ehcache</module>
-    <module>nexus-jetty8</module>
     <module>nexus-launcher</module>
     <module>nexus-ldap-common</module>
     <module>nexus-locks</module>

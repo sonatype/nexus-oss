@@ -25,17 +25,16 @@ import java.util.Properties;
 import org.sonatype.appcontext.AppContext;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.Factory;
-import org.sonatype.appcontext.publisher.AbstractStringDumpingEntryPublisher;
 import org.sonatype.appcontext.publisher.SystemPropertiesEntryPublisher;
 import org.sonatype.appcontext.source.PropertiesEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
+import org.sonatype.nexus.bootstrap.jetty.JettyServer;
 import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
 import org.sonatype.nexus.bootstrap.monitor.KeepAliveThread;
 import org.sonatype.nexus.bootstrap.monitor.commands.ExitCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.HaltCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
-import org.sonatype.sisu.jetty.Jetty8;
 
 import org.eclipse.jetty.util.resource.Resource;
 import org.slf4j.Logger;
@@ -53,7 +52,6 @@ import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_TI
  */
 public class Launcher
 {
-
   protected final Logger log;
 
   public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
@@ -68,7 +66,7 @@ public class Launcher
 
   protected static final String NEXUS_WORK = "nexus-work";
 
-  protected Jetty8 server;
+  protected JettyServer server;
 
   protected Launcher() {
     Logger log = createLogger();
@@ -83,20 +81,21 @@ public class Launcher
   }
 
   public Integer start(final String[] args) throws Exception {
-    if (args.length != 1) {
-      log.error("Missing Jetty configuration file parameter");
+    if (args.length == 0) {
+      log.error("Missing Jetty configuration parameters");
       return 1; // exit
     }
 
-    AppContext context = createAppContext();
-
-    server = new Jetty8(new File(args[0]), context);
+    // FIXME: This will go away soon
+    createAppContext();
 
     ensureTmpDirSanity();
     maybeEnableCommandMonitor();
     maybeEnableShutdownIfNotAlive();
 
-    server.startJetty();
+    server = new JettyServer(args);
+    server.start();
+
     return null; // continue running
   }
 
@@ -104,7 +103,7 @@ public class Launcher
    * We have three properties file:
    *
    * default.properties -- embedded in this jar (not user editable)
-   * this is the place to set java.io.tmp and debug options by users
+   * this is the place to set java.io.tmpdir and debug options by users
    *
    * nexus.properties -- mandatory, will be picked up into context
    * this is place to set nexus properties like workdir location etc (as today)
@@ -144,18 +143,6 @@ public class Launcher
     // Now, that will be always overridden by value got from cwd and that seems correct to me
     request.getSources().add(new StaticEntrySource(BUNDLEBASEDIR_KEY, cwd.getAbsolutePath()));
 
-    // Install a publisher which will only log as TRACE (default version will log as DEBUG or INFO or WARN)
-    request.getPublishers().add(new AbstractStringDumpingEntryPublisher()
-    {
-      @Override
-      public void publishEntries(final AppContext context) {
-        if (log.isTraceEnabled()) {
-          String dump = getDumpAsString(context);
-          log.trace("\n" + dump);
-        }
-      }
-    });
-
     // we need to publish all entries coming from loaded properties
     request.getPublishers().add(new SystemPropertiesEntryPublisher(true));
 
@@ -166,11 +153,9 @@ public class Launcher
     // Make some entries canonical
     canonicalizeEntry(context, NEXUS_WORK);
 
-    if (log.isDebugEnabled()) {
-      log.debug("Context:");
-      for (Map.Entry<String, Object> entry : context.flatten().entrySet()) {
-        log.debug("  {}='{}'", entry.getKey(), entry.getValue());
-      }
+    log.info("Bootstrap configuration:");
+    for (Map.Entry<String, Object> entry : context.flatten().entrySet()) {
+      log.info("  {}='{}'", entry.getKey(), entry.getValue());
     }
 
     return context;
@@ -317,7 +302,7 @@ public class Launcher
   }
 
   public void stop() throws Exception {
-    server.stopJetty();
+    server.stop();
   }
 
   public static void main(final String[] args) throws Exception {

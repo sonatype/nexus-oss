@@ -24,8 +24,6 @@ import org.sonatype.appcontext.AppContextEntry;
 import org.sonatype.appcontext.AppContextException;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.publisher.EntryPublisher;
-import org.sonatype.appcontext.publisher.PrintStreamEntryPublisher;
-import org.sonatype.appcontext.publisher.Slf4jLoggerEntryPublisher;
 import org.sonatype.appcontext.source.EntrySource;
 import org.sonatype.appcontext.source.EntrySourceMarker;
 import org.sonatype.appcontext.source.MapEntrySource;
@@ -64,13 +62,14 @@ public class InternalFactory
     sources.addAll(Sources.getDefaultSources(id, aliases));
 
     // be smart with publishers. go for System.out only as last resort
-    List<EntryPublisher> publishers;
-    if (isSlf4jPresentOnClasspath()) {
-      publishers = Arrays.asList(new EntryPublisher[]{new Slf4jLoggerEntryPublisher()});
-    }
-    else {
-      publishers = Arrays.asList(new EntryPublisher[]{new PrintStreamEntryPublisher()});
-    }
+    List<EntryPublisher> publishers = new ArrayList<>();
+    // HACK: fuck this noise
+    //if (isSlf4jPresentOnClasspath()) {
+    //  publishers = Arrays.asList(new EntryPublisher[]{new Slf4jLoggerEntryPublisher()});
+    //}
+    //else {
+    //  publishers = Arrays.asList(new EntryPublisher[]{new PrintStreamEntryPublisher()});
+    //}
 
     return new AppContextRequest(id, parent, sources, publishers, true, Arrays.asList(keyInclusions));
   }
