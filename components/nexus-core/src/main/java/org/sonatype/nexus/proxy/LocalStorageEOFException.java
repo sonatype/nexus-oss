@@ -24,15 +24,7 @@ package org.sonatype.nexus.proxy;
 public class LocalStorageEOFException
     extends LocalStorageException
 {
-  public LocalStorageEOFException(String msg) {
-    super(msg);
-  }
-
   public LocalStorageEOFException(String msg, Throwable cause) {
     super(msg, cause);
-  }
-
-  public LocalStorageEOFException(Throwable cause) {
-    super(cause.getMessage(), cause);
   }
 }
