@@ -19,6 +19,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Properties;
 
+// TODO Copy this to goodies-common, though has to be duplicated here
+
 /**
  * Properties-like map with appropriate generics signature.
  *
