@@ -56,6 +56,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.nexus.web.Constants;
 import org.sonatype.nexus.web.RemoteIPFinder;
+import org.sonatype.sisu.goodies.common.Throwables2;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
@@ -278,9 +279,14 @@ public class NexusContentServlet
       // current user is non anonymous, or 401 and challenge if user is anonymous
     }
     else if (exception instanceof IOException) {
-      // Do not log verbose traces for IO problems
+      // Do not log verbose traces for IO problems unless debug is enabled
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      logger.warn(exception.toString());
+      if (logger.isDebugEnabled()) {
+        logger.warn(exception.toString(), exception);
+      }
+      else {
+        logger.warn(Throwables2.explain(exception));
+      }
       // Do not attempt to render error page
       return;
     }

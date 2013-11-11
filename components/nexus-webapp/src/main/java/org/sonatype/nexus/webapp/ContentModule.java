@@ -45,7 +45,7 @@ public class ContentModule
     {
       @Override
       protected void configure() {
-        addFilterChain(MOUNT_POINT + "/**", "contentAuthcBasic,contentTperms");
+        addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,contentAuthcBasic,contentTperms");
       }
     });
   }
