@@ -79,13 +79,13 @@ public class Launcher
   }
 
   protected void maybeEnableCommandMonitor() throws IOException {
-    String commandMonitorPort = System.getProperty(COMMAND_MONITOR_PORT);
-    if (commandMonitorPort == null) {
-      commandMonitorPort = System.getenv(COMMAND_MONITOR_PORT);
+    String port = System.getProperty(COMMAND_MONITOR_PORT);
+    if (port == null) {
+      port = System.getenv(COMMAND_MONITOR_PORT);
     }
-    if (commandMonitorPort != null) {
+    if (port != null) {
       new CommandMonitorThread(
-          Integer.parseInt(commandMonitorPort),
+          Integer.parseInt(port),
           new StopApplicationCommand(new Runnable()
           {
             @Override
@@ -100,9 +100,7 @@ public class Launcher
     }
   }
 
-  protected void maybeEnableShutdownIfNotAlive()
-      throws IOException
-  {
+  protected void maybeEnableShutdownIfNotAlive() throws IOException {
     String port = System.getProperty(KEEP_ALIVE_PORT);
     if (port == null) {
       port = System.getenv(KEEP_ALIVE_PORT);
