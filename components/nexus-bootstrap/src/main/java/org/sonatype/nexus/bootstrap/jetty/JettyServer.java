@@ -12,19 +12,19 @@
  */
 package org.sonatype.nexus.bootstrap.jetty;
 
+import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.sonatype.nexus.bootstrap.PropertyMap;
+
 import org.eclipse.jetty.util.component.LifeCycle;
-import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.xml.XmlConfiguration;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 
-// NOTE: Copied and massaged from org.eclipse.jetty.xml.XmlConfiguration#main()
+// NOTE: Based on org.eclipse.jetty.xml.XmlConfiguration#main()
 
 /**
  * Jetty server.
@@ -43,15 +43,32 @@ public class JettyServer
 {
   private static final Logger log = LoggerFactory.getLogger(JettyServer.class);
 
+  private final ClassLoader classLoader;
+
+  private final Map<String,String> properties;
+
   private final String[] args;
 
   private final List<LifeCycle> components = new ArrayList<>();
 
-  public JettyServer(final String[] args) {
+  public JettyServer(final ClassLoader classLoader, final Map<String,String> properties, final String[] args) {
+    this.classLoader = checkNotNull(classLoader);
+    this.properties = checkNotNull(properties);
     this.args = checkNotNull(args);
   }
 
   public synchronized void start() throws Exception {
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(classLoader);
+    try {
+      doStart();
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(cl);
+    }
+  }
+
+  private void doStart() throws Exception {
     if (!components.isEmpty()) {
       throw new IllegalStateException("Already started");
     }
@@ -64,34 +81,31 @@ public class JettyServer
     {
       public Object run() {
         try {
-          Properties properties = new Properties();
-          properties.putAll(System.getProperties());
+          PropertyMap props = new PropertyMap();
+          props.putAll(JettyServer.this.properties);
 
           // For all arguments, load properties or parse XMLs
           XmlConfiguration last = null;
           Object[] obj = new Object[args.length];
-          for (int i = 0; i < args.length; i++) {
-            if (args[i].toLowerCase(Locale.ENGLISH).endsWith(".properties")) {
-              log.info("Loading properties: {}", args[i]);
 
-              properties.load(Resource.newResource(args[i]).getInputStream());
+          for (int i = 0; i < args.length; i++) {
+            URL url = Resource.newResource(args[i]).getURL();
+
+            if (url.getFile().toLowerCase(Locale.ENGLISH).endsWith(".properties")) {
+              log.info("Loading properties: {}", url);
+
+              props.load(url);
             }
             else {
-              log.info("Applying configuration: {}", args[i]);
+              log.info("Applying configuration: {}", url);
 
-              XmlConfiguration configuration = new XmlConfiguration(Resource.newResource(args[i]).getURL());
+              XmlConfiguration configuration = new XmlConfiguration(url);
               if (last != null) {
                 configuration.getIdMap().putAll(last.getIdMap());
               }
-
-              if (!properties.isEmpty()) {
-                Map<String, String> props = new HashMap<>();
-                for (Object key : properties.keySet()) {
-                  props.put(key.toString(), String.valueOf(properties.get(key)));
-                }
+              if (!props.isEmpty()) {
                 configuration.getProperties().putAll(props);
               }
-
               obj[i] = configuration.configure();
               last = configuration;
             }
@@ -112,28 +126,26 @@ public class JettyServer
           }
         }
         catch (Exception e) {
-          log.debug(Log.EXCEPTION, e);
           exception.set(e);
         }
         return null;
       }
     });
 
-    Throwable th = exception.get();
-    if (th != null)
-    {
-      log.error("Failed to start components", th);
+    Throwable e = exception.get();
+    if (e != null) {
+      log.error("Failed to start components", e);
 
-      if (th instanceof RuntimeException) {
-        throw (RuntimeException)th;
+      if (e instanceof RuntimeException) {
+        throw (RuntimeException)e;
       }
-      else if (th instanceof Exception) {
-        throw (Exception)th;
+      else if (e instanceof Exception) {
+        throw (Exception)e;
       }
-      else if (th instanceof Error) {
-        throw (Error)th;
+      else if (e instanceof Error) {
+        throw (Error)e;
       }
-      throw new Error(th);
+      throw new Error(e);
     }
 
     // complain if no components were started
@@ -145,6 +157,17 @@ public class JettyServer
   }
 
   public synchronized void stop() throws Exception {
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(classLoader);
+    try {
+      doStop();
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(cl);
+    }
+  }
+
+  private void doStop() throws Exception {
     if (components.isEmpty()) {
       throw new IllegalStateException("Not started");
     }

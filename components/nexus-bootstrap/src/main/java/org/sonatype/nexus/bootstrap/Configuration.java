@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -49,10 +48,10 @@ public class Configuration
 
   private static final String NEXUS_WORK = "nexus-work";
 
-  private final Map<String,String> properties;
+  private final PropertyMap properties;
 
   public Configuration() {
-    this.properties = new HashMap<>();
+    this.properties = new PropertyMap();
   }
 
   public void load() throws Exception {
@@ -93,19 +92,24 @@ public class Configuration
     // Make some entries canonical
     canonicalizeEntry(context, NEXUS_WORK);
 
-    ensureTmpDirSanity();
-
     for (Map.Entry<String, Object> entry : context.flatten().entrySet()) {
       properties.put(entry.getKey(), String.valueOf(entry.getValue()));
     }
 
-    log.info("Bootstrap configuration:");
+    ensureTmpDirSanity();
+
+    log.info("Properties:");
     for (Map.Entry<String, String> entry : properties.entrySet()) {
       log.info("  {}='{}'", entry.getKey(), entry.getValue());
     }
   }
 
   // TODO: expose, set/get, export?
+  // TODO: installDir, workDir, tmpDir helpers?
+
+  public Map<String, String> getProperties() {
+    return properties;
+  }
 
   private void canonicalizeEntry(final AppContext context, final String key) throws IOException {
     if (!context.containsKey(key)) {
@@ -170,7 +174,7 @@ public class Configuration
 
   private void ensureTmpDirSanity() throws IOException {
     // Make sure that java.io.tmpdir points to a real directory
-    String tmp = System.getProperty(JAVA_IO_TMPDIR, "tmp");
+    String tmp = properties.get(JAVA_IO_TMPDIR, System.getProperty(JAVA_IO_TMPDIR, "tmp"));
     File dir = new File(tmp).getCanonicalFile();
     log.info("Temp directory: {}", dir);
 

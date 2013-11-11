@@ -72,7 +72,7 @@ public class Launcher
     maybeEnableCommandMonitor();
     maybeEnableShutdownIfNotAlive();
 
-    server = new JettyServer(args);
+    server = new JettyServer(getClass().getClassLoader(), config.getProperties(), args);
     server.start();
 
     return null; // continue running
