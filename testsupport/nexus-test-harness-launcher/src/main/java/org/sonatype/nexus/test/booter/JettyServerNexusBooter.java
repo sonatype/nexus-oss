@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 
@@ -93,7 +94,7 @@ public class JettyServerNexusBooter
     this.bundleBasedir = bundleBasedir.getCanonicalFile();
     log.info("Bundle base directory: {}", bundleBasedir);
 
-    tamperJettyConfiguration(bundleBasedir);
+    tamperJettyConfiguration();
 
     // FIXME: Load nexus.properties, for now hard-code
     props.put("application-host", "0.0.0.0");
@@ -115,6 +116,11 @@ public class JettyServerNexusBooter
     // Disable autorouting initialization prevented
     props.put(ConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString());
 
+    log.info("Properties:");
+    for (Entry<String,String> entry : props.entrySet()) {
+      log.info("  {}='{}'", entry.getKey(), entry.getValue());
+    }
+
     // Export everything to system properties
     System.getProperties().putAll(props);
 
@@ -128,17 +134,17 @@ public class JettyServerNexusBooter
     log.info("Jetty server factory: {}", jettyServerFactory);
   }
 
-  private void tamperJettyConfiguration(final File basedir) throws IOException {
+  private void tamperJettyConfiguration() throws IOException {
+    final File file = new File(bundleBasedir, "conf/jetty.xml");
+    String xml = FileUtils.readFileToString(file, "UTF-8");
+
     // Disable the shutdown hook, since it disturbs the embedded work
     // In Jetty8, any invocation of server.stopAtShutdown(boolean) will create a thread in a class static member.
     // Hence, we simply want to make sure, that there is NO invocation happening of that method.
-    final File file = new File(basedir, "conf/jetty.xml");
-    String xml = FileUtils.readFileToString(file, "UTF-8");
-
-    // completely removing the server.stopAtShutdown() method invocation, to try to prevent thread creation at all
+    // FIXME: These can be avoided by using a <Property> configuration with default value in jetty.xml
     xml = xml.replace(
         "<Set name=\"stopAtShutdown\">true</Set>",
-        "<!-- NexusBooter: Set name=\"stopAtShutdown\">true</Set-->"
+        "<!-- <Set name=\"stopAtShutdown\">true</Set> -->"
     );
 
     // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=357318#c62
