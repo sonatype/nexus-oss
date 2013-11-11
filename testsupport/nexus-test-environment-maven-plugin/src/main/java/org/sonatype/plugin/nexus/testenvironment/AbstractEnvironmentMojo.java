@@ -47,6 +47,7 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.MapConstraints;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -77,7 +78,6 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
 
 public class AbstractEnvironmentMojo
@@ -494,21 +494,12 @@ public class AbstractEnvironmentMojo
         File outFile = new File(outputDir, name.substring(10));
         getLog().debug("Extracting " + name + " to " + outFile);
 
-        InputStream in = null;
-        FileOutputStream out = null;
-
-        try {
-          in = file.getInputStream(entry);
-          out = new FileOutputStream(outFile);
-
-          IOUtil.copy(in, out);
+        try (InputStream in = file.getInputStream(entry);
+             FileOutputStream out = new FileOutputStream(outFile)) {
+          IOUtils.copy(in, out);
         }
         catch (IOException e) {
           throw new MojoExecutionException(e.getMessage(), e);
-        }
-        finally {
-          IOUtil.close(out);
-          IOUtil.close(in);
         }
       }
     }
@@ -517,29 +508,23 @@ public class AbstractEnvironmentMojo
   private void addProjectProperties(File baseTestProperties)
       throws MojoExecutionException
   {
-    InputStream input = null;
-    OutputStream output = null;
     try {
-      input = new FileInputStream(baseTestProperties);
-
       Properties original = new Properties();
-      original.load(input);
-      IOUtil.close(input);
+
+      try (InputStream input = new FileInputStream(baseTestProperties)) {
+        original.load(input);
+      }
 
       original.putAll(this.project.getProperties());
       original.putAll(this.session.getExecutionProperties());
 
-      output = new FileOutputStream(baseTestProperties);
-
-      original.store(output, "Updated by EnvironmentMojo");
+      try (OutputStream output = new FileOutputStream(baseTestProperties)) {
+        original.store(output, "Updated by EnvironmentMojo");
+      }
     }
     catch (Exception e) {
       throw new MojoExecutionException(
           "Error adding properties '" + baseTestProperties.getAbsolutePath() + "'.", e);
-    }
-    finally {
-      IOUtil.close(input);
-      IOUtil.close(output);
     }
   }
 
@@ -661,9 +646,6 @@ public class AbstractEnvironmentMojo
   private void merge(File originalFile, File extraContentFile, String type)
       throws MojoFailureException, MojoExecutionException
   {
-    InputStream originalReader = null;
-    InputStream extraContentReader = null;
-    OutputStream originalWriter = null;
     try {
       String name = FileUtils.removeExtension(extraContentFile.getName());
       String extension = FileUtils.getExtension(extraContentFile.getName());
@@ -672,24 +654,23 @@ public class AbstractEnvironmentMojo
         File tempFile = File.createTempFile(name, extension);
         mavenFileFilter.copyFile(extraContentFile, tempFile, true, project, null, true, "UTF-8", session);
 
-        originalReader = new FileInputStream(originalFile);
-        extraContentReader = new FileInputStream(tempFile);
-
         Properties original = new Properties();
-        original.load(originalReader);
-        IOUtil.close(originalReader);
-
-        originalWriter = new FileOutputStream(originalFile);
+        try (InputStream originalReader = new FileInputStream(originalFile)) {
+          original.load(originalReader);
+        }
 
         Properties extra = new Properties();
-        extra.load(extraContentReader);
-        IOUtil.close(extraContentReader);
+        try (InputStream extraContentReader = new FileInputStream(tempFile)) {
+          extra.load(extraContentReader);
+        }
 
         for (Object key : extra.keySet()) {
           original.put(key, extra.get(key));
         }
 
-        original.store(originalWriter, "Updated by EnvironmentMojo");
+        try (OutputStream originalWriter = new FileOutputStream(originalFile)) {
+          original.store(originalWriter, "Updated by EnvironmentMojo");
+        }
       }
       else {
         throw new MojoFailureException("Invalid file type: " + type);
@@ -698,11 +679,6 @@ public class AbstractEnvironmentMojo
     catch (Exception e) {
       throw new MojoExecutionException("Error merging files: Original '" + originalFile.getAbsolutePath()
           + "', extraContent '" + extraContentFile.getAbsolutePath() + "'.", e);
-    }
-    finally {
-      IOUtil.close(originalReader);
-      IOUtil.close(extraContentReader);
-      IOUtil.close(originalWriter);
     }
   }
 

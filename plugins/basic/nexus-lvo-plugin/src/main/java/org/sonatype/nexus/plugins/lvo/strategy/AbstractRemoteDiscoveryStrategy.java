@@ -20,11 +20,11 @@ import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.codehaus.plexus.util.IOUtil;
 
 public abstract class AbstractRemoteDiscoveryStrategy
     extends AbstractDiscoveryStrategy
@@ -78,7 +78,7 @@ public abstract class AbstractRemoteDiscoveryStrategy
     }
 
     public void close() {
-      IOUtil.close(is);
+      IOUtils.closeQuietly(is);
       method.releaseConnection();
     }
   }

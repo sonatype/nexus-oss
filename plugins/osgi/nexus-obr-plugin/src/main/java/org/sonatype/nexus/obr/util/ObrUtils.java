@@ -13,10 +13,8 @@
 
 package org.sonatype.nexus.obr.util;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,7 +47,7 @@ import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.osgi.impl.bundle.obr.resource.ResourceImpl.UrlTransformer;
 import org.osgi.service.obr.Resource;
@@ -290,7 +288,7 @@ public final class ObrUtils
       writer.complete();
     }
     finally {
-      ObrUtils.close(writer);
+      IOUtils.closeQuietly(writer);
     }
   }
 
@@ -337,8 +335,8 @@ public final class ObrUtils
     }
     finally {
       // avoid file locks by closing reader first
-      ObrUtils.close(reader);
-      ObrUtils.close(writer);
+      IOUtils.closeQuietly(reader);
+      IOUtils.closeQuietly(writer);
     }
   }
 
@@ -383,20 +381,6 @@ public final class ObrUtils
     }
 
     return augmentedItems;
-  }
-
-  /**
-   * Similar to {@link IOUtil#close(InputStream)} but closes {@link Closeable} instances.
-   *
-   * @param closeable the {@link Closeable} to be closed
-   */
-  public static void close(final Closeable closeable) {
-    try {
-      closeable.close();
-    }
-    catch (final Exception e) {
-      // ignore
-    }
   }
 
   /**

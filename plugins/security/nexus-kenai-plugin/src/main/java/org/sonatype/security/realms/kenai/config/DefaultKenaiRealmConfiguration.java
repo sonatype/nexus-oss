@@ -40,7 +40,6 @@ import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -68,15 +67,13 @@ public class DefaultKenaiRealmConfiguration
   }
 
   public Configuration getConfiguration() {
-    Reader fileReader = null;
-    try {
+    try (Reader fileReader = new FileReader(this.getConfigFile())) {
       lock.lock();
 
       if (configuration != null) {
         return configuration;
       }
 
-      fileReader = new FileReader(this.getConfigFile());
       KenaiRealmConfigurationXpp3Reader reader = new KenaiRealmConfigurationXpp3Reader();
 
       configuration = reader.read(fileReader);
@@ -92,7 +89,6 @@ public class DefaultKenaiRealmConfiguration
       log.error("Invalid XML Configuration", e);
     }
     finally {
-      IOUtil.close(fileReader);
       if (configuration == null) {
         configuration = new Configuration();
       }

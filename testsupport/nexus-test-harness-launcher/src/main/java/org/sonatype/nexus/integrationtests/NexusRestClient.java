@@ -45,7 +45,6 @@ import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
-import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.restlet.Client;
@@ -556,8 +555,6 @@ public class NexusRestClient
   public File downloadFile(URL url, String targetFile)
       throws IOException
   {
-    OutputStream out = null;
-    InputStream in = null;
     File downloadedFile = new File(targetFile);
     Response response = null;
     try {
@@ -572,14 +569,12 @@ public class NexusRestClient
         downloadedFile.getParentFile().mkdirs();
       }
 
-      in = response.getEntity().getStream();
-      out = new BufferedOutputStream(new FileOutputStream(downloadedFile));
-
-      IOUtil.copy(in, out, 1024);
+      try (InputStream in = response.getEntity().getStream();
+           OutputStream out = new BufferedOutputStream(new FileOutputStream(downloadedFile))) {
+        IOUtils.copy(in, out);
+      }
     }
     finally {
-      IOUtil.close(in);
-      IOUtil.close(out);
       releaseResponse(response);
     }
     return downloadedFile;
@@ -682,13 +677,11 @@ public class NexusRestClient
     long t = System.currentTimeMillis();
 
     HttpGet get = null;
-    InputStream in = null;
     try {
       final HttpClient client = new DefaultHttpClient();
       get = new HttpGet(url.toString());
       final HttpResponse response = client.execute(get);
       MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), ResponseMatchers.isSuccessfulCode());
-      in = response.getEntity().getContent();
       byte[] b;
       if (speedLimit != -1) {
         b = new byte[speedLimit * 1024];
@@ -696,19 +689,20 @@ public class NexusRestClient
       else {
         b = new byte[1024];
       }
-      while (in.read(b) != -1) {
-        if (speedLimit != -1) {
-          try {
-            Thread.sleep(1000);
-          }
-          catch (InterruptedException e) {
-            // ignore
+      try (InputStream in = response.getEntity().getContent()) {
+        while (in.read(b) != -1) {
+          if (speedLimit != -1) {
+            try {
+              Thread.sleep(1000);
+            }
+            catch (InterruptedException e) {
+              // ignore
+            }
           }
         }
       }
     }
     finally {
-      IOUtil.close(in);
       if (get != null) {
         get.releaseConnection();
       }

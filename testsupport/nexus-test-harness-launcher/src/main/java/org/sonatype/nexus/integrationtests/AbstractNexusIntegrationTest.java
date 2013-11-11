@@ -62,7 +62,6 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.wagon.Wagon;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.After;
@@ -505,32 +504,18 @@ public abstract class AbstractNexusIntegrationTest
   protected void findReplaceInFile(File file, String findString, String replaceString)
       throws IOException
   {
-    BufferedReader bufferedFileReader = new BufferedReader(new FileReader(file));
     File tmpFile = new File(file.getAbsolutePath() + "-tmp");
 
-    FileWriter writer = null;
-
-    try {
-      writer = new FileWriter(tmpFile);
-
-      String line = null;
+    try (BufferedReader bufferedFileReader = new BufferedReader(new FileReader(file));
+         FileWriter writer = new FileWriter(tmpFile)) {
+      String line;
       while ((line = bufferedFileReader.readLine()) != null) {
         writer.write(line.replaceAll(findString, replaceString));
         writer.write("\n"); // new line
       }
-
-      // close the streams and move the file
-      IOUtil.close(bufferedFileReader);
-      IOUtil.close(writer);
-
-      file.delete();
-      tmpFile.renameTo(file);
     }
-    finally {
-      IOUtil.close(bufferedFileReader);
-      IOUtil.close(writer);
-    }
-
+    file.delete();
+    tmpFile.renameTo(file);
   }
 
   protected static void cleanWorkDir()
@@ -1006,21 +991,19 @@ public abstract class AbstractNexusIntegrationTest
             + gav.getArtifactId() + "/maven-metadata.xml";
 
     Response response = null;
-    InputStream stream = null;
     try {
       response = RequestFacade.sendMessage(new URL(url), Method.GET, null);
       if (response.getStatus().isError()) {
         return null;
       }
-      stream = response.getEntity().getStream();
-      MetadataXpp3Reader metadataReader = new MetadataXpp3Reader();
-      return metadataReader.read(stream);
+      try (InputStream stream = response.getEntity().getStream()) {
+        MetadataXpp3Reader metadataReader = new MetadataXpp3Reader();
+        return metadataReader.read(stream);
+      }
     }
     finally {
       RequestFacade.releaseResponse(response);
-      IOUtil.close(stream);
     }
-
   }
 
   protected File downloadArtifact(Gav gav, String targetDirectory)

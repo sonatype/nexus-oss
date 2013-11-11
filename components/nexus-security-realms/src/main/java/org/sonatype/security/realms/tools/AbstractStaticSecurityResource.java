@@ -22,7 +22,6 @@ import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -51,16 +50,11 @@ public abstract class AbstractStaticSecurityResource
     String resourcePath = this.getResourcePath();
 
     if (StringUtils.isNotEmpty(resourcePath)) {
-      Reader fr = null;
-      InputStream is = null;
-
       log.debug("Loading static security config from " + resourcePath);
 
-      try {
-        is = getClass().getResourceAsStream(resourcePath);
+      try (InputStream is = getClass().getResourceAsStream(resourcePath);
+           Reader fr = new InputStreamReader(is)) {
         SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-
-        fr = new InputStreamReader(is);
         return reader.read(fr);
       }
       catch (IOException e) {
@@ -68,10 +62,6 @@ public abstract class AbstractStaticSecurityResource
       }
       catch (XmlPullParserException e) {
         log.error("Invalid XML Configuration", e);
-      }
-      finally {
-        IOUtil.close(fr);
-        IOUtil.close(is);
       }
     }
 

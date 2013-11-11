@@ -22,6 +22,7 @@ import java.util.Properties;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
 import com.google.inject.Module;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -33,7 +34,6 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.DefaultContext;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
-import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -458,12 +458,9 @@ public abstract class PlexusTestCaseSupport
   protected boolean contentEquals(InputStream s1, InputStream s2)
       throws IOException
   {
-    try {
-      return IOUtil.contentEquals(s1, s2);
-    }
-    finally {
-      IOUtil.close(s1);
-      IOUtil.close(s2);
+    try (InputStream in1 = s1;
+         InputStream in2 = s2) {
+      return IOUtils.contentEquals(in1, in2);
     }
   }
 }

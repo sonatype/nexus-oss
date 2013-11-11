@@ -22,7 +22,7 @@ import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.proxy.events.EventInspector;
 
 import org.apache.commons.io.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -66,14 +66,9 @@ public class SecurityConfigurationUpgradeTest
   private void verifyUpgrade(String resource)
       throws IOException
   {
-    InputStream stream = null;
     StringWriter writer = new StringWriter();
-    try {
-      stream = getClass().getResourceAsStream(resource);
-      IOUtil.copy(stream, writer);
-    }
-    finally {
-      IOUtil.close(stream);
+    try (InputStream stream = getClass().getResourceAsStream(resource)) {
+      IOUtils.copy(stream, writer);
     }
 
     String expected = writer.toString();

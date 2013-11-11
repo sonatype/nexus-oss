@@ -49,6 +49,7 @@ import org.sonatype.nexus.proxy.repository.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.osgi.service.obr.Resource;
 
@@ -161,7 +162,7 @@ public class ObrGroupRepository
         // ignore
       }
       finally {
-        ObrUtils.close(reader);
+        IOUtils.closeQuietly(reader);
       }
     }
 
@@ -230,14 +231,14 @@ public class ObrGroupRepository
             getLogger().warn("Problem merging OBR metadata from " + f.getRepositoryItemUid(), e);
           }
           finally {
-            ObrUtils.close(reader);
+            IOUtils.closeQuietly(reader);
           }
         }
 
         writer.complete(); // the OBR is only updated once the stream is complete and closed
       }
       finally {
-        ObrUtils.close(writer);
+        IOUtils.closeQuietly(writer);
       }
 
       obrItem = ObrUtils.getCachedItem(obrUid);

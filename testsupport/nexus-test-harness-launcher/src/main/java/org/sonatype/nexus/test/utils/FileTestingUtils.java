@@ -32,8 +32,8 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -251,21 +251,11 @@ public class FileTestingUtils
         FileUtils.copyFile(sourceFile, destFile);
       }
       else {
-        FileReader reader = null;
-        FileWriter writer = null;
-        try {
-          reader = new FileReader(sourceFile);
+        try (FileReader reader = new FileReader(sourceFile);
+             FileWriter writer = new FileWriter(destFile)) {
           InterpolationFilterReader filterReader = new InterpolationFilterReader(reader, variables);
-
-          writer = new FileWriter(destFile);
-
-          IOUtil.copy(filterReader, writer);
+          IOUtils.copy(filterReader, writer);
         }
-        finally {
-          IOUtil.close(reader);
-          IOUtil.close(writer);
-        }
-
       }
     }
 

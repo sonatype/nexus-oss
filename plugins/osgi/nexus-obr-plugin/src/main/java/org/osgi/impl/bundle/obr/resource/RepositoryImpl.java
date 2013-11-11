@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -349,7 +349,7 @@ public class RepositoryImpl
       catch (MalformedURLException e) {
       }
       finally {
-        IOUtil.close(in);
+        IOUtils.closeQuietly(in);
       }
     }
   }

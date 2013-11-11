@@ -45,10 +45,10 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -133,7 +133,7 @@ public class AbstractEvictTaskIt
           File attributeFile = getAttributeFile(filePart);
           fis = new FileInputStream(attributeFile);
           StorageItem storageItem = (StorageItem) xstream.fromXML(fis);
-          IOUtil.close(fis);
+          IOUtils.closeQuietly(fis);
 
           // get old value, update it and set it, but all this is done using reflection
           // Direct method access will work, since we mangle an item that will be persisted using "old" format
@@ -153,16 +153,16 @@ public class AbstractEvictTaskIt
           // write it out in "old" format
           fos = new FileOutputStream(attributeFile);
           xstream.toXML(storageItem, fos);
-          IOUtil.close(fos);
+          IOUtils.closeQuietly(fos);
         }
 
         line = reader.readLine();
       }
     }
     finally {
-      IOUtil.close(fos);
-      IOUtil.close(fis);
-      IOUtil.close(reader);
+      IOUtils.closeQuietly(fos);
+      IOUtils.closeQuietly(fis);
+      IOUtils.closeQuietly(reader);
     }
 
     startNexus();

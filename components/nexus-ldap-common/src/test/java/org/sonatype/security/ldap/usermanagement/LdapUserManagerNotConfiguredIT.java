@@ -20,7 +20,7 @@ import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundTransientException;
 
 import junit.framework.Assert;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class LdapUserManagerNotConfiguredIT
@@ -32,10 +32,10 @@ public class LdapUserManagerNotConfiguredIT
   {
     super.setUp();
 
-    IOUtil.copy(getClass().getResourceAsStream("/test-conf/conf/security-configuration-no-ldap.xml"),
+    IOUtils.copy(getClass().getResourceAsStream("/test-conf/conf/security-configuration-no-ldap.xml"),
         new FileOutputStream(getNexusSecurityConfiguration()));
 
-    IOUtil.copy(getClass().getResourceAsStream("/test-conf/conf/security-configuration.xml"),
+    IOUtils.copy(getClass().getResourceAsStream("/test-conf/conf/security-configuration.xml"),
         new FileOutputStream(getSecurityConfiguration()));
 
     getLdapRealmConfig().delete();

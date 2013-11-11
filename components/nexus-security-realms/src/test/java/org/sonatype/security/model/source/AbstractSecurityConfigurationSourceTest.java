@@ -18,7 +18,7 @@ import java.io.InputStream;
 
 import org.sonatype.security.model.AbstractSecurityConfigTest;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 
 public abstract class AbstractSecurityConfigurationSourceTest
     extends AbstractSecurityConfigTest
@@ -41,21 +41,9 @@ public abstract class AbstractSecurityConfigurationSourceTest
     // thus changing it (but no content change!)
     copyDefaultSecurityConfigToPlace();
 
-    InputStream configStream = null;
-
-    InputStream origStream = null;
-
-    try {
-      configStream = configurationSource.getConfigurationAsStream();
-
-      origStream = getOriginatingConfigurationInputStream();
-
-      assertTrue(IOUtil.contentEquals(configStream, origStream));
-    }
-    finally {
-      IOUtil.close(origStream);
-
-      IOUtil.close(configStream);
+    try (InputStream configStream = configurationSource.getConfigurationAsStream();
+         InputStream origStream = getOriginatingConfigurationInputStream()) {
+      assertTrue(IOUtils.contentEquals(configStream, origStream));
     }
   }
 

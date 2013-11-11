@@ -26,10 +26,10 @@ import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 
@@ -111,22 +111,22 @@ public class Nexus2302DeployEncodedFileIT
     }
 
     URL url = new URL(nexusBaseUrl + "content/repositories/" + REPO_TEST_HARNESS_REPO + "/");
-    String content = IOUtil.toString(url.openStream());
+    String content = IOUtils.toString(url.openStream());
     assertThat(content, containsString(gav.getGroupId()));
 
     url = new URL(url.toString() + gav.getGroupId() + "/");
     assertThat(content, containsString(url.toString()));
-    content = IOUtil.toString(url.openStream());
+    content = IOUtils.toString(url.openStream());
     assertThat(content, containsString(gav.getArtifactId()));
 
     url = new URL(url.toString() + gav.getArtifactId() + "/");
     assertThat(content, containsString(url.toString()));
-    content = IOUtil.toString(url.openStream());
+    content = IOUtils.toString(url.openStream());
     assertThat(content, containsString(gav.getVersion()));
 
     url = new URL(url.toString() + gav.getVersion() + "/");
     assertThat(content, containsString(url.toString()));
-    content = IOUtil.toString(url.openStream());
+    content = IOUtils.toString(url.openStream());
     assertThat(content, containsString(gav.getArtifactId()));
 
     String clas = gav.getClassifier() == null ? "" : "-" + gav.getClassifier();
@@ -138,22 +138,22 @@ public class Nexus2302DeployEncodedFileIT
       throws Exception
   {
     URL url = new URL(nexusBaseUrl + "service/local/repositories/" + REPO_TEST_HARNESS_REPO + "/content/");
-    String content = IOUtil.toString(url.openStream());
+    String content = IOUtils.toString(url.openStream());
     assertThat(content, containsString(url.toString()));
     assertThat(content, containsString(gav.getGroupId()));
 
     url = new URL(url.toString() + gav.getGroupId() + "/");
-    content = IOUtil.toString(url.openStream());
+    content = IOUtils.toString(url.openStream());
     assertThat(content, containsString(url.toString()));
     assertThat(content, containsString(gav.getArtifactId()));
 
     url = new URL(url.toString() + gav.getArtifactId() + "/");
-    content = IOUtil.toString(url.openStream());
+    content = IOUtils.toString(url.openStream());
     assertThat(content, containsString(url.toString()));
     assertThat(content, containsString(gav.getVersion()));
 
     url = new URL(url.toString() + gav.getVersion() + "/");
-    content = IOUtil.toString(url.openStream());
+    content = IOUtils.toString(url.openStream());
     assertThat(content, containsString(url.toString()));
     assertThat(content, containsString(gav.getArtifactId()));
     if (gav.getClassifier() != null) {
