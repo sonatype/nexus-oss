@@ -46,5 +46,7 @@ public class NexusVelocityConfigurator
     engine.setProperty("class.resource.loader.modificationCheckInterval", "0");
     // strict mode OFF
     engine.setProperty("runtime.references.strict", "false");
+    // force templates to have inline local scope for VM definitions
+    engine.setProperty("velocimacro.permissions.allow.inline.local.scope", "true");
   }
 }
