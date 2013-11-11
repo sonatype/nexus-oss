@@ -16,7 +16,6 @@ package org.sonatype.nexus.test.booter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,25 +37,34 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
-import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
- * The simplified Nexus booter class, that boots Nexus (the IT test subject) in completely same way as it boots in
- * bundle, but in this same JVM in an isolated classloader, hence, even it will exist in same JVM, REST API is the only
- * possible "contact" with it. Naturally, Java Service Wrapper is not present, but it uses the same Jetty8 class used
- * by
- * bundle boot procedure too. Currently, nexus is started/stopped per test class.
+ * The simplified (or not) Nexus booter class, that boots Nexus (the IT test subject) in completely same way as it
+ * boots in bundle, but in this same JVM in an isolated classloader, hence, even it will exist in same JVM, REST API is
+ * the only possible "contact" with it.
+ *
+ * Naturally, Java Service Wrapper is not present, but it uses the same Jetty8 class used
+ * by bundle boot procedure too. Currently, nexus is started/stopped per test class.
+ *
  * <p>
  * There are few trickeries happening here (think ClassLoaders) that will mostly go away once we start producing clean
- * WAR instead of this "bastardized" WAR layout. There are two reasons for this class loader trickery: a) for every
- * Nexus boot, we create new Nexus isolated classloader, but we still keep one "shared" classloader as parent of it,
- * that is never recreated. For reasons, see comments in {@link #tamperJarsForSharedClasspath(File)} method. b) we are
- * emulating what is happening during bundle boot, and since Nexus -- while it is fully fledged Java Web Application --
- * there is one outstanding exception: the JARs are not in /WEB-INF/lib, but in a folder above /WEB-INF, which is
- * illegal. Hence, we, in same way as booter, add the Nexus constituent JARs to a classpath, and let Jetty8 create
+ * WAR instead of this "bastardized" WAR layout. There are two reasons for this class loader trickery:
+ *
+ * a) for every Nexus boot, we create new Nexus isolated classloader, but we still keep one "shared" classloader as
+ * parent of it, that is never recreated. For reasons, see comments in {@link #tamperJarsForSharedClasspath(File)}
+ * method.
+ *
+ * b) we are emulating what is happening during bundle boot, and since Nexus -- while it is fully fledged Java Web
+ * Application -- there is one outstanding exception: the JARs are not in /WEB-INF/lib, but in a folder above /WEB-INF,
+ * which is illegal.
+ *
+ * Hence, we, in same way as booter, add the Nexus constituent JARs to a classpath, and let Jetty8 create
  * WebAppClassloader, that will "delegate" to classes, but filtering out Jetty implementation classes on the way.
+ *
  * <p>
  * Again, once we start following conventions, this class would be simplified too! For example, the IT-realm and
  * trickery around it would become not needed at all, since Jetty8 would create WebAppClassloader anyway, lifting
@@ -67,13 +75,9 @@ import org.slf4j.LoggerFactory;
 public class Jetty8NexusBooter
     implements NexusBooter
 {
-  protected static Logger log = LoggerFactory.getLogger(Jetty8NexusBooter.class);
-
-  // ==
+  private static Logger log = LoggerFactory.getLogger(Jetty8NexusBooter.class);
 
   private static final String IT_REALM_ID = "it-realm";
-
-  // ==
 
   /**
    * The location where Nexus bundle -- the test subject -- is unpacked by nexus-test-environment-maven-plugin
@@ -96,12 +100,9 @@ public class Jetty8NexusBooter
    */
   private final ClassRealm sharedClassloader;
 
-  // ==
-
   /**
    * The IT-realm, classloader that contains the Nexus JAR constituents (and other classpath elements, as /conf
-   * folder
-   * for example). Is recreated per-start and destroyed per-stop.
+   * folder for example). Is recreated per-start and destroyed per-stop.
    */
   private ClassRealm nexusClassloader;
 
@@ -117,9 +118,7 @@ public class Jetty8NexusBooter
    * (cd-ing into it's /bin/jsw/... dir and using JSW scripts)! This is due to the fact that this booter moves some
    * JARs out of bundle to make them shared across boots.
    */
-  public Jetty8NexusBooter(final File bundleBasedir, final int port)
-      throws Exception
-  {
+  public Jetty8NexusBooter(final File bundleBasedir, final int port) throws Exception {
     this.bundleBasedir = bundleBasedir.getCanonicalFile();
     log.info("Bundle base directory: {}", bundleBasedir);
 
@@ -171,13 +170,8 @@ public class Jetty8NexusBooter
    * Starts one instance of Nexus bundle in an isolated class loader. May be invoked only once, or after
    * {@link #stopNexus()} is invoked only, otherwise will throw IllegalStateException.
    */
-  public void startNexus(final String testId)
-      throws Exception
-  {
-    if (jetty8 != null) {
-      // 2nd invocation? Stop first or puke?
-      throw new IllegalStateException("Nexus already started!");
-    }
+  public void startNexus(final String testId) throws Exception {
+    checkState(jetty8 == null, "Nexus already started");
 
     // create classloader
     nexusClassloader = buildNexusClassLoader(bundleBasedir, testId);
@@ -193,10 +187,12 @@ public class Jetty8NexusBooter
 
       log.info("Starting Nexus[{}]", testId);
 
-      jetty8 =
-          jetty8Class.getConstructor(File.class, ClassLoader.class, appContextClass, Map[].class).newInstance(
-              new File(bundleBasedir, "conf/jetty.xml"), nexusClassloader, null,
-              new Map[]{defaultContext(bundleBasedir)});
+      jetty8 = jetty8Class.getConstructor(File.class, ClassLoader.class, appContextClass, Map[].class).newInstance(
+          new File(bundleBasedir, "conf/jetty.xml"),
+          nexusClassloader,
+          /*appcontext*/null,
+          new Map[]{defaultContext(bundleBasedir)}
+      );
     }
     finally {
       Thread.currentThread().setContextClassLoader(original);
@@ -206,14 +202,13 @@ public class Jetty8NexusBooter
   }
 
   /**
-   * Stops, and cleans up the started Nexus instance. May be invoked any times, it will NOOP if not needed to do
-   * anything. Will try to ditch the used classloader. The {@link #clean()} method will be invoked on every
-   * invocation
-   * of this method, making it more plausible for JVM to recover/GC all the stuff from memory in case of any glitch.
+   * Stops, and cleans up the started Nexus instance.
+   *
+   * May be invoked any times, it will NOOP if not needed to do anything. Will try to ditch the used classloader.
+   * The {@link #clean()} method will be invoked on every invocation of this method, making it more plausible for
+   * JVM to recover/GC all the stuff from memory in case of any glitch.
    */
-  public void stopNexus()
-      throws Exception
-  {
+  public void stopNexus() throws Exception {
     try {
       log.info("Stopping Nexus");
 
@@ -250,12 +245,11 @@ public class Jetty8NexusBooter
    * Builds a ClassRealm out from contents of the {@link #sharedLibs} folder. Some JARs from bundle (/lib and some
    * plugin dependencies) are moved here to make them "shared" across executions.
    */
-  protected ClassRealm buildSharedClassLoader()
-      throws Exception
-  {
+  protected ClassRealm buildSharedClassLoader() throws Exception {
     List<URL> urls = new ArrayList<URL>();
 
     final File[] jars = sharedLibs.listFiles();
+    checkState(jars != null, "missing shared library jar files");
 
     for (File jar : jars) {
       urls.add(jar.toURI().toURL());
@@ -276,16 +270,11 @@ public class Jetty8NexusBooter
    * Builds a ClassRealm in same way as Nexus Bundle does: it adds /conf folder plus, all the JARs from the /lib
    * folder into class loader. This realm is built and thrown away per one execution, and every execution creates a
    * new one, guaranteeing that even class static members are in new/clean state. The created realm ID will be of
-   * form
-   * "it-realm" + testId for easier debug/heap dump analysis.
+   * form "it-realm" + testId for easier debug/heap dump analysis.
    */
-  protected ClassRealm buildNexusClassLoader(final File bundleBasedir, final String testId)
-      throws Exception
-  {
+  protected ClassRealm buildNexusClassLoader(final File bundleBasedir, final String testId) throws Exception {
     List<URL> urls = new ArrayList<URL>();
-
     final File libDir = new File(bundleBasedir, "lib");
-
     final File[] jars = libDir.listFiles(new FileFilter()
     {
       @Override
@@ -309,68 +298,56 @@ public class Jetty8NexusBooter
     return realm;
   }
 
+  private File requireFile(final File file) {
+    checkState(file.exists(), "Missing required file: %s", file.getAbsolutePath());
+    return file;
+  }
+
   /**
    * Modifies the Jetty's configuration files (those used by Jetty8 class, that is used in bundle but also here to
    * boot Jetty8). It sets Jetty port to the one wanted by IT, but also eliminates the appearance of Jetty's
    * "shutdown thread" that usually "pins" the it-realm classloader to memory, making it not garbage collected, and
    * making ITs OOM PermGen.
    */
-  protected void tamperJettyConfiguration(final File basedir, final int port)
-      throws IOException
-  {
-    // ==
+  protected void tamperJettyConfiguration(final File basedir, final int port) throws IOException {
     // Set the port to the one expected by IT
     {
-      final File jettyProperties = new File(basedir, "conf/nexus.properties");
+      final File file = requireFile(new File(basedir, "conf/nexus.properties"));
 
-      if (!jettyProperties.isFile()) {
-        throw new FileNotFoundException("Jetty properties not found at " + jettyProperties.getAbsolutePath());
+      Properties props = new Properties();
+      try (InputStream in = new FileInputStream(file)) {
+        props.load(in);
       }
 
-      Properties p = new Properties();
-      InputStream in = new FileInputStream(jettyProperties);
-      p.load(in);
-      IOUtil.close(in);
+      props.setProperty("application-port", String.valueOf(port));
 
-      p.setProperty("application-port", String.valueOf(port));
-
-      OutputStream out = new FileOutputStream(jettyProperties);
-      p.store(out, "NexusStatusUtil");
-      IOUtil.close(out);
+      try (OutputStream out = new FileOutputStream(file)) {
+        props.store(out, null);
+      }
     }
 
-    // ==
     // Disable the shutdown hook, since it disturbs the embedded work
     // In Jetty8, any invocation of server.stopAtShutdown(boolean) will create a thread in a class static member.
     // Hence, we simply want to make sure, that there is NO invocation happening of that method.
     {
-      final File jettyXml = new File(basedir, "conf/jetty.xml");
+      final File file = requireFile(new File(basedir, "conf/jetty.xml"));
+      String xml = FileUtils.readFileToString(file, "UTF-8");
 
-      if (!jettyXml.isFile()) {
-        throw new FileNotFoundException("Jetty properties not found at " + jettyXml.getAbsolutePath());
-      }
-
-      String jettyXmlString = FileUtils.readFileToString(jettyXml, "UTF-8");
-
-      // was: we just set the value to "false", but the server.stopAtShutdown() invocation still happened,
-      // triggering thread to be created in static member
-      // jettyXmlString =
-      // jettyXmlString.replace( "Set name=\"stopAtShutdown\">true", "Set name=\"stopAtShutdown\">false" );
-
-      // new: completely removing the server.stopAtShutdown() method invocation, to try to prevent thread
-      // creation at all
-      jettyXmlString =
-          jettyXmlString.replace("<Set name=\"stopAtShutdown\">true</Set>",
-              "<!-- NexusBooter: Set name=\"stopAtShutdown\">true</Set-->");
+      // completely removing the server.stopAtShutdown() method invocation, to try to prevent thread creation at all
+      xml = xml.replace(
+          "<Set name=\"stopAtShutdown\">true</Set>",
+          "<!-- NexusBooter: Set name=\"stopAtShutdown\">true</Set-->"
+      );
 
       // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=357318#c62
       if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-        jettyXmlString =
-            jettyXmlString.replace("org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector",
-                "org.eclipse.jetty.server.nio.BlockingChannelConnector");
+        xml = xml.replace(
+            "org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector",
+            "org.eclipse.jetty.server.nio.BlockingChannelConnector"
+        );
       }
 
-      FileUtils.writeStringToFile(jettyXml, jettyXmlString, "UTF-8");
+      FileUtils.writeStringToFile(file, xml, "UTF-8");
     }
   }
 
@@ -378,32 +355,7 @@ public class Jetty8NexusBooter
    * This method "lifts" some JARs from Nexus bundle (/lib and also plugin dependencies folders) into
    * {@link #sharedLibs} folder. For reasons per-entry, see method body comments.
    */
-  protected void tamperJarsForSharedClasspath(final File basedir)
-      throws IOException
-  {
-    // Explanation, we filter for lucene-*.jar files that are bigger than one byte, in all directories below
-    // bundleBasedir, since we
-    // have to move them into /shared newly created folder to set up IT shared classpath.
-    // But, we have to make it carefully, since we might be re-created during multi-forked ITs but the test-env
-    // plugin unzips the nexus bundle only once
-    // at the start of the build. So, we have to check and do it only once.
-    // cstamas: Lucene is no more in core, not needed to do this anymore!
-    // tamperJarsForSharedClasspath( basedir, sharedLibs, "lucene-*.jar" );
-
-    // LDAP does not unregister it? Like SISU container does not invoke Disposable.dispose() to make patch for
-    // Provider unregistration happen? NO: the cause is if someone creates HTTPS connection while BC is registered,
-    // JCEs SSLSocketFactory will get a grab on it. So, SISU is not faulty here, unregistration does happen, but
-    // the URLConnection instance may still exists. So, we are lifting the provider into "shareds", and registering
-    // it manually. LDAP's DefaultPlexusCipher obeys the registration rules, so will happily live with BC
-    // registered.
-    // WE ARE NOT REGISTERING IT ANYMORE, but is left here at "hand"
-    // Fixed with NEXUS-4443
-    // tamperJarsForSharedClasspath( basedir, sharedLibs, "bcprov-*.jar" );
-
-    // logback
-    // tamperJarsForSharedClasspath( basedir, sharedLibs, "slf4j-*.jar" );
-    // tamperJarsForSharedClasspath( basedir, sharedLibs, "logback-*.jar" );
-
+  protected void tamperJarsForSharedClasspath(final File basedir) throws IOException {
     // move jetty (actually, all that is level up in real bundle too) level up, it is isolated anyway in real bundle
     tamperJarsForSharedClasspath(basedir, sharedLibs, "jetty-*.jar");
     tamperJarsForSharedClasspath(basedir, sharedLibs, "javax.servlet-*.jar");
@@ -432,9 +384,7 @@ public class Jetty8NexusBooter
   protected void tamperJarsForSharedClasspath(final File basedir, final File sharedLibs, final String wildcard)
       throws IOException
   {
-    @SuppressWarnings("unchecked")
-    Collection<File> files =
-        (Collection<File>) FileUtils.listFiles(basedir, new WildcardFileFilter(wildcard), TrueFileFilter.TRUE);
+    Collection<File> files = FileUtils.listFiles(basedir, new WildcardFileFilter(wildcard), TrueFileFilter.TRUE);
 
     for (File file : files) {
       // only if not in /shared folder and not zeroed already
