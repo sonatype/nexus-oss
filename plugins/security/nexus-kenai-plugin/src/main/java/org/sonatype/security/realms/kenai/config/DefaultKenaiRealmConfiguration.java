@@ -67,17 +67,15 @@ public class DefaultKenaiRealmConfiguration
   }
 
   public Configuration getConfiguration() {
-    try (Reader fileReader = new FileReader(this.getConfigFile())) {
+    try {
       lock.lock();
-
       if (configuration != null) {
         return configuration;
       }
-
-      KenaiRealmConfigurationXpp3Reader reader = new KenaiRealmConfigurationXpp3Reader();
-
-      configuration = reader.read(fileReader);
-
+      try (Reader fileReader = new FileReader(this.getConfigFile())) {
+        KenaiRealmConfigurationXpp3Reader reader = new KenaiRealmConfigurationXpp3Reader();
+        configuration = reader.read(fileReader);
+      }
     }
     catch (FileNotFoundException e) {
       log.error("Kenai Realm configuration file does not exist: " + this.getConfigFile().getAbsolutePath());
@@ -92,7 +90,6 @@ public class DefaultKenaiRealmConfiguration
       if (configuration == null) {
         configuration = new Configuration();
       }
-
       lock.unlock();
     }
 
