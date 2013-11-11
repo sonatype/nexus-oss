@@ -13,22 +13,40 @@
 
 package org.sonatype.nexus.webapp;
 
-import javax.inject.Named;
+import org.sonatype.nexus.guice.FilterChainModule;
+import org.sonatype.nexus.web.content.NexusContentServlet;
+import org.sonatype.security.web.guice.SecurityWebFilter;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.servlet.ServletModule;
 
 /**
  * Nexus webapp module.
  *
- * @since 2.5
+ * @since 2.8
  */
-@Named
-public class WebappModule
+public class ContentModule
     extends AbstractModule
 {
+  private static final String MOUNT_POINT = "/content";
+
   @Override
   protected void configure() {
-    install(new MetricsModule());
-    install(new ContentModule());
+    install(new ServletModule()
+    {
+      @Override
+      protected void configureServlets() {
+        serve(MOUNT_POINT + "/*").with(NexusContentServlet.class);
+        filter(MOUNT_POINT + "/*").through(SecurityWebFilter.class);
+      }
+    });
+
+    install(new FilterChainModule()
+    {
+      @Override
+      protected void configure() {
+        addFilterChain(MOUNT_POINT + "/**", "contentAuthcBasic,contentTperms");
+      }
+    });
   }
 }
