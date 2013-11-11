@@ -44,8 +44,10 @@ import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import com.thoughtworks.xstream.XStream;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FalseFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Assert;
 import org.junit.Before;
@@ -87,7 +89,7 @@ public class AbstractEvictTaskIt
 
     this.storageWorkDir = new File(workDir, "storage");
 
-    FileUtils.copyDirectoryStructure(this.getTestResourceAsFile("storage/"), storageWorkDir);
+    FileUtils.copyDirectory(this.getTestResourceAsFile("storage/"), storageWorkDir);
     copyAttributes();
 
     // now setup all the attributes
@@ -172,7 +174,7 @@ public class AbstractEvictTaskIt
     File srcDir = getTestResourceAsFile("attributes/");
 
     // old location
-    FileUtils.copyDirectoryStructure(srcDir, new File(new File(nexusWorkDir), "proxy/attributes"));
+    FileUtils.copyDirectory(srcDir, new File(new File(nexusWorkDir), "proxy/attributes"));
 
     // new location will need path mangling, see getAttributeFile()
   }
@@ -302,9 +304,15 @@ public class AbstractEvictTaskIt
       throws IOException
   {
     SortedSet<String> result = new TreeSet<String>();
-    List<String> paths = FileUtils.getFileNames(basedir, null, null, false, true);
-    for (String path : paths) {
-      result.add(path.replaceAll(Pattern.quote("\\"), "/"));
+    Collection<File> files = FileUtils.listFiles(basedir, TrueFileFilter.TRUE, TrueFileFilter.TRUE);
+    for (File file : files) {
+      if (!file.equals(basedir)) {
+        String path = file.getPath();
+        if (path.startsWith(basedir.getAbsolutePath())) {
+          path = path.substring(basedir.getAbsolutePath().length() + 1);
+        }
+        result.add(path.replaceAll(Pattern.quote("\\"), "/"));
+      }
     }
     return result;
   }
@@ -314,9 +322,15 @@ public class AbstractEvictTaskIt
       throws IOException
   {
     SortedSet<String> result = new TreeSet<String>();
-    List<String> paths = FileUtils.getDirectoryNames(basedir, null, null, false, true);
-    for (String path : paths) {
-      result.add(path.replaceAll(Pattern.quote("\\"), "/"));
+    Collection<File> files = FileUtils.listFilesAndDirs(basedir, FalseFileFilter.FALSE, TrueFileFilter.TRUE);
+    for (File file : files) {
+      if (!file.equals(basedir)) {
+        String path = file.getPath();
+        if (path.startsWith(basedir.getAbsolutePath())) {
+          path = path.substring(basedir.getAbsolutePath().length() + 1);
+        }
+        result.add(path.replaceAll(Pattern.quote("\\"), "/"));
+      }
     }
     return result;
   }

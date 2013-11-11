@@ -53,6 +53,7 @@ import org.sonatype.sisu.goodies.prefs.memory.MemoryPreferencesFactory;
 import com.google.common.base.Throwables;
 import com.google.common.io.Closeables;
 import com.thoughtworks.xstream.XStream;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.index.artifact.Gav;
@@ -61,7 +62,6 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.wagon.Wagon;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -523,7 +523,8 @@ public abstract class AbstractNexusIntegrationTest
       IOUtil.close(bufferedFileReader);
       IOUtil.close(writer);
 
-      FileUtils.rename(tmpFile, file);
+      file.delete();
+      tmpFile.renameTo(file);
     }
     finally {
       IOUtil.close(bufferedFileReader);
@@ -981,7 +982,8 @@ public abstract class AbstractNexusIntegrationTest
       RequestFacade.releaseResponse(response);
     }
 
-    File file = FileUtils.createTempFile(gav.getArtifactId(), '.' + gav.getExtension(), parentDir);
+    parentDir.mkdirs();
+    File file = File.createTempFile(gav.getArtifactId(), '.' + gav.getExtension(), parentDir);
     RequestFacade.downloadFile(new URL(serviceURI), file.getAbsolutePath());
 
     return file;

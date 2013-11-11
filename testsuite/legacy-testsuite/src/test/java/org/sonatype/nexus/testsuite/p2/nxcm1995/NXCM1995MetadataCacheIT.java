@@ -19,7 +19,7 @@ import java.net.URL;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 

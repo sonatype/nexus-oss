@@ -32,7 +32,6 @@ import org.sonatype.nexus.util.file.DirSupport;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.io.Closeables;
-import org.codehaus.plexus.util.FileUtils;
 
 /**
  * AttributeStorage implementation that uses it's own FS storage to store attributes in separate place then
@@ -237,13 +236,7 @@ public class DefaultFSAttributeStorage
   {
     final File repoBase = new File(getWorkingDirectory(), uid.getRepository().getId());
 
-    File result = null;
-
-    String path = FileUtils.getPath(uid.getPath());
-
-    String name = FileUtils.removePath(uid.getPath());
-
-    result = new File(repoBase, path + "/" + name);
+    File result = new File(repoBase, uid.getPath());
 
     // to be foolproof
     // 2007.11.09. - Believe or not, Nexus deleted my whole USB rack! (cstamas)

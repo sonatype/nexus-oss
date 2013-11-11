@@ -24,7 +24,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class LegacyFSAttributeStorageTest
     // copying files directly, need to make sure the test is clean each time when we run the tests against multiple providers
     File sourceAttributeDirectory = getTestFile("src/test/resources/nexus4660");
     proxyAttributesDirectory = getTestFile("target/nexus4660-" + System.currentTimeMillis());
-    FileUtils.copyDirectoryStructure(sourceAttributeDirectory, proxyAttributesDirectory);
+    FileUtils.copyDirectory(sourceAttributeDirectory, proxyAttributesDirectory);
 
     ApplicationConfiguration applicationConfiguration = Mockito.mock(ApplicationConfiguration.class);
     Mockito.when(applicationConfiguration.getWorkingDirectory("proxy/attributes", false)).thenReturn(

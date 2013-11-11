@@ -24,7 +24,7 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 
 import com.thoughtworks.xstream.XStream;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -114,7 +114,7 @@ public class ClearPasswordTest
         config).contains(password));
 
     // now get the file and look for the "clear-text"
-    String configString = FileUtils.fileRead(this.getNexusConfiguration());
+    String configString = FileUtils.readFileToString(new File(this.getNexusConfiguration()));
 
     Assert.assertFalse("Clear text password found in nexus.xml:\n" + configString, configString
         .contains(password));

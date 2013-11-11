@@ -22,9 +22,8 @@ import java.util.zip.ZipFile;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.io.RawInputStreamFacade;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -87,7 +86,7 @@ public class MetadataUtils
     try {
       final InputStream is = item.getInputStream();
       try {
-        FileUtils.copyStreamToFile(new RawInputStreamFacade(is), file);
+        FileUtils.copyInputStreamToFile(is, file);
         final ZipFile z = new ZipFile(file);
         try {
           final ZipEntry ze = z.getEntry(jarPath);

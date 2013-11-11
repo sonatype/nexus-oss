@@ -21,8 +21,8 @@ import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.artifact.Gav;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.restlet.data.MediaType;

@@ -22,7 +22,7 @@ import java.util.Properties;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.inject.BeanScanning;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
 public abstract class AbstractSecurityConfigTest

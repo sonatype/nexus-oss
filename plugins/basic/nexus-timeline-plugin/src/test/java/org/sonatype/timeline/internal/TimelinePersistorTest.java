@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -150,7 +150,7 @@ public class TimelinePersistorTest
 
     File badFile = new File(persistDirectory, "bad.txt");
 
-    FileUtils.fileWrite(badFile.getAbsolutePath(), "some bad data");
+    FileUtils.write(badFile, "some bad data");
 
     AsList cb = new AsList();
     persistor.readAll(cb);

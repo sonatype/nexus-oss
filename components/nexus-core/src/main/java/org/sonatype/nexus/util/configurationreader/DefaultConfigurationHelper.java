@@ -37,7 +37,7 @@ import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.util.file.DirSupport;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;

@@ -35,8 +35,8 @@ import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 import com.google.inject.Binder;
+import org.apache.commons.io.FileUtils;
 import org.apache.shiro.realm.Realm;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 

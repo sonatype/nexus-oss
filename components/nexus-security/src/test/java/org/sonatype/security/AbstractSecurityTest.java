@@ -22,8 +22,8 @@ import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 import com.google.inject.Binder;
+import org.apache.commons.io.FileUtils;
 import org.apache.shiro.util.ThreadContext;
-import org.codehaus.plexus.util.FileUtils;
 
 public abstract class AbstractSecurityTest
     extends InjectedTestCase

@@ -28,7 +28,7 @@ import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
 import static com.google.common.base.Preconditions.checkState;

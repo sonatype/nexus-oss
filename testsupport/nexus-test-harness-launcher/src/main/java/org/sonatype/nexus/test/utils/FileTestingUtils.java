@@ -30,8 +30,9 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.slf4j.Logger;
@@ -240,7 +241,7 @@ public class FileTestingUtils
 
     String[] files = scan.getIncludedFiles();
     for (String fileName : files) {
-      String extension = FileUtils.getExtension(fileName);
+      String extension = FilenameUtils.getExtension(fileName);
       File sourceFile = new File(from, fileName);
       File destFile = new File(dest, fileName);
       destFile.getParentFile().mkdirs();

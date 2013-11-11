@@ -37,8 +37,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserStatus;
 
 import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
 import org.apache.shiro.authc.credential.PasswordService;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
 import static org.hamcrest.MatcherAssert.assertThat;
