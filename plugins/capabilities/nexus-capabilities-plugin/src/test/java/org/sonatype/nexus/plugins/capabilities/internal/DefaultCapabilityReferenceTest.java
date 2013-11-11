@@ -19,33 +19,35 @@ import java.util.Map;
 
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
-import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
-import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.NexusIsActiveCondition;
+import org.sonatype.nexus.plugins.capabilities.support.condition.CapabilityConditions;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
+import org.sonatype.nexus.plugins.capabilities.support.condition.CryptoConditions;
+import org.sonatype.nexus.plugins.capabilities.support.condition.LogicalConditions;
 import org.sonatype.nexus.plugins.capabilities.support.condition.NexusConditions;
+import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
+import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+import org.sonatype.sisu.goodies.eventbus.internal.DefaultEventBus;
+import org.sonatype.sisu.goodies.eventbus.internal.ReentrantGuavaEventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
@@ -55,7 +57,7 @@ import static org.sonatype.nexus.plugins.capabilities.internal.DefaultCapability
 /**
  * {@link DefaultCapabilityReference} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class DefaultCapabilityReferenceTest
     extends TestSupport
@@ -63,11 +65,10 @@ public class DefaultCapabilityReferenceTest
 
   static final Map<String, String> NULL_PROPERTIES = null;
 
-  @Mock
-  private Capability capability;
+  private EventBus eventBus;
 
   @Mock
-  private EventBus eventBus;
+  private Capability capability;
 
   @Mock
   private Condition activationCondition;
@@ -82,26 +83,25 @@ public class DefaultCapabilityReferenceTest
   private ValidityConditionHandlerFactory vchf;
 
   @Mock
-  private NexusIsActiveCondition nexusIsActiveCondition;
-
-  @Mock
   private CapabilityRegistry capabilityRegistry;
 
-  private ArgumentCaptor<CapabilityEvent> re;
-
-  private ArgumentCaptor<Object> ebc;
 
   private DefaultCapabilityReference underTest;
 
   @Before
   public void setUp() {
 
-    final Conditions conditions = mock(Conditions.class);
-    final NexusConditions nexusConditions = mock(NexusConditions.class);
+    eventBus = new DefaultEventBus(new ReentrantGuavaEventBus());
 
-    when(nexusIsActiveCondition.isSatisfied()).thenReturn(true);
-    when(nexusConditions.active()).thenReturn(nexusIsActiveCondition);
-    when(conditions.nexus()).thenReturn(nexusConditions);
+    final Conditions conditions = new Conditions(
+        new LogicalConditions(eventBus),
+        new CapabilityConditions(eventBus, mock(CapabilityDescriptorRegistry.class), mock(CapabilityRegistry.class)),
+        mock(RepositoryConditions.class),
+        new NexusConditions(new NexusIsActiveCondition(eventBus)),
+        mock(CryptoConditions.class)
+    );
+
+    eventBus.post(new NexusStartedEvent(this));
 
     when(activationCondition.isSatisfied()).thenReturn(true);
     when(capability.activationCondition()).thenReturn(activationCondition);
@@ -150,9 +150,6 @@ public class DefaultCapabilityReferenceTest
     );
 
     underTest.create(Collections.<String, String>emptyMap());
-
-    re = ArgumentCaptor.forClass(CapabilityEvent.class);
-    ebc = ArgumentCaptor.forClass(Object.class);
   }
 
   /**
@@ -164,7 +161,6 @@ public class DefaultCapabilityReferenceTest
     underTest.enable();
     assertThat(underTest.isEnabled(), is(true));
     verify(activationCondition).bind();
-    verify(eventBus).register(isA(ActivationConditionHandler.class));
   }
 
   /**
@@ -179,7 +175,6 @@ public class DefaultCapabilityReferenceTest
     assertThat(underTest.isEnabled(), is(false));
 
     verify(activationCondition).release();
-    verify(eventBus).unregister(isA(ActivationConditionHandler.class));
   }
 
   /**
@@ -195,9 +190,6 @@ public class DefaultCapabilityReferenceTest
     underTest.activate();
     assertThat(underTest.isActive(), is(true));
     verify(capability).onActivate();
-    verify(eventBus).post(re.capture());
-    assertThat(re.getValue(), is(instanceOf(CapabilityEvent.AfterActivated.class)));
-    assertThat(re.getValue().getReference(), is(equalTo((CapabilityReference) underTest)));
   }
 
   /**
@@ -253,12 +245,6 @@ public class DefaultCapabilityReferenceTest
     underTest.passivate();
     assertThat(underTest.isActive(), is(false));
     verify(capability).onPassivate();
-
-    verify(eventBus, times(2)).post(re.capture());
-    assertThat(re.getAllValues().get(0), is(instanceOf(CapabilityEvent.AfterActivated.class)));
-    assertThat(re.getAllValues().get(0).getReference(), is(equalTo((CapabilityReference) underTest)));
-    assertThat(re.getAllValues().get(1), is(instanceOf(CapabilityEvent.BeforePassivated.class)));
-    assertThat(re.getAllValues().get(1).getReference(), is(equalTo((CapabilityReference) underTest)));
   }
 
   /**
@@ -414,12 +400,6 @@ public class DefaultCapabilityReferenceTest
     final HashMap<String, String> previousProperties = new HashMap<String, String>();
     underTest.update(properties, previousProperties);
     verify(capability).onUpdate();
-
-    verify(eventBus, times(2)).post(re.capture());
-    assertThat(re.getAllValues().get(0), is(instanceOf(CapabilityEvent.BeforeUpdate.class)));
-    assertThat(re.getAllValues().get(0).getReference(), is(equalTo((CapabilityReference) underTest)));
-    assertThat(re.getAllValues().get(1), is(instanceOf(CapabilityEvent.AfterUpdate.class)));
-    assertThat(re.getAllValues().get(1).getReference(), is(equalTo((CapabilityReference) underTest)));
   }
 
   /**
@@ -449,7 +429,6 @@ public class DefaultCapabilityReferenceTest
     underTest.enable();
     underTest.remove();
     verify(capability).onRemove();
-    verify(eventBus, times(2)).unregister(ebc.capture());
   }
 
   @Test
@@ -509,16 +488,6 @@ public class DefaultCapabilityReferenceTest
   }
 
   /**
-   * When created it automatically listens to nexus becoming active (to be able to handle validity condition) and
-   * for validity condition.
-   */
-  @Test
-  public void listensToNexusIsActiveAndValidityConditions() {
-    verify(eventBus).register(ebc.capture());
-    assertThat(ebc.getValue(), is(instanceOf(ValidityConditionHandler.class)));
-  }
-
-  /**
    * When validity condition becomes unsatisfied, capability is automatically removed.
    *
    * @throws Exception re-thrown
@@ -527,11 +496,7 @@ public class DefaultCapabilityReferenceTest
   public void automaticallyRemoveWhenValidityConditionIsUnsatisfied()
       throws Exception
   {
-    verify(eventBus).register(ebc.capture());
-    assertThat(ebc.getValue(), is(instanceOf(ValidityConditionHandler.class)));
-
-    ((ValidityConditionHandler) ebc.getValue()).handle(new ConditionEvent.Unsatisfied(validityCondition));
-
+    eventBus.post(new ConditionEvent.Unsatisfied(validityCondition));
     verify(capabilityRegistry).remove(underTest.context().id());
   }
 
@@ -546,13 +511,7 @@ public class DefaultCapabilityReferenceTest
   {
     underTest.enable();
     underTest.activate();
-    verify(eventBus, times(2)).register(ebc.capture());
-    assertThat(ebc.getAllValues().get(0), is(instanceOf(ValidityConditionHandler.class)));
-    assertThat(ebc.getAllValues().get(1), is(instanceOf(ActivationConditionHandler.class)));
-
-    ((ActivationConditionHandler) ebc.getAllValues().get(1)).handle(
-        new ConditionEvent.Unsatisfied(nexusIsActiveCondition)
-    );
+    eventBus.post(new NexusStoppedEvent(this));
 
     verify(capability).onPassivate();
   }

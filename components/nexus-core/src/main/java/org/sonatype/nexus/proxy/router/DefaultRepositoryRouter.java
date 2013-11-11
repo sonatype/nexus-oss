@@ -54,7 +54,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.targets.TargetSet;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.nexus.util.ItemPathUtils;
+import org.sonatype.nexus.util.PathUtils;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -369,7 +369,7 @@ public class DefaultRepositoryRouter
       throws AccessDeniedException, ItemNotFoundException, IllegalOperationException, StorageException
   {
     if (isList) {
-      ((AbstractStorageItem) item).setPath(ItemPathUtils.concatPaths(route.getOriginalRequestPath(),
+      ((AbstractStorageItem) item).setPath(PathUtils.concatPaths(route.getOriginalRequestPath(),
           item.getName()));
     }
     else {
@@ -433,7 +433,7 @@ public class DefaultRepositoryRouter
                 request.getRequestPath()));
       }
 
-      result.setStrippedPrefix(ItemPathUtils.concatPaths(explodedPath[0]));
+      result.setStrippedPrefix(PathUtils.concatPaths(explodedPath[0]));
     }
 
     if (explodedPath.length >= 2) {
@@ -456,14 +456,14 @@ public class DefaultRepositoryRouter
         throw new ItemNotFoundException(reasonFor(request, e.getMessage()), e);
       }
 
-      result.setStrippedPrefix(ItemPathUtils.concatPaths(explodedPath[0], explodedPath[1]));
+      result.setStrippedPrefix(PathUtils.concatPaths(explodedPath[0], explodedPath[1]));
 
       result.setTargetedRepository(repository);
 
       String repoPath = "";
 
       for (int i = 2; i < explodedPath.length; i++) {
-        repoPath = ItemPathUtils.concatPaths(repoPath, explodedPath[i]);
+        repoPath = PathUtils.concatPaths(repoPath, explodedPath[i]);
       }
 
       if (result.getOriginalRequestPath().endsWith(RepositoryItemUid.PATH_SEPARATOR)) {
@@ -528,7 +528,7 @@ public class DefaultRepositoryRouter
         // check is there any repo registered
         if (!repositoryRegistry.getRepositoriesWithFacet(rtd.getRole()).isEmpty()) {
           ResourceStoreRequest req =
-              new ResourceStoreRequest(ItemPathUtils.concatPaths(request.getRequestPath(), rtd.getPrefix()));
+              new ResourceStoreRequest(PathUtils.concatPaths(request.getRequestPath(), rtd.getPrefix()));
 
           DefaultStorageCollectionItem repositories =
               new DefaultStorageCollectionItem(this, req, true, false);
@@ -577,12 +577,12 @@ public class DefaultRepositoryRouter
 
           if (Repository.class.equals(kind)) {
             req =
-                new ResourceStoreRequest(ItemPathUtils.concatPaths(request.getRequestPath(),
+                new ResourceStoreRequest(PathUtils.concatPaths(request.getRequestPath(),
                     repository.getId()));
           }
           else {
             req =
-                new ResourceStoreRequest(ItemPathUtils.concatPaths(request.getRequestPath(),
+                new ResourceStoreRequest(PathUtils.concatPaths(request.getRequestPath(),
                     repository.getPathPrefix()));
           }
 

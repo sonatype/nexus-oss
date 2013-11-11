@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
  * A condition that delegates to provided {@link Evaluable} for checking if the condition is satisfied.
  * {@link Evaluable#isSatisfied()} is reevaluated after each update of capability the condition is used for.
  *
- * @since 2.2
+ * @since capabilities 2.2
  */
 public class EvaluableCondition
     extends ConditionSupport

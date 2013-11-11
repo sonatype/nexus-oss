@@ -20,7 +20,7 @@ public class Nexus3860Jetty7WarCargoIT
 {
   @Override
   public File getContainerLocation() {
-    return util.resolveFile("target/containers/jetty-distribution-7.6.0.v20120127");
+    return util.resolveFile("target/containers/jetty-distribution-7.6.14.v20131031");
   }
 
   @Override

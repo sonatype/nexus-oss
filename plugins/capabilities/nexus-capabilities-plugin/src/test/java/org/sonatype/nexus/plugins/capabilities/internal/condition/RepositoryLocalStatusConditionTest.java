@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link RepositoryLocalStatusCondition} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class RepositoryLocalStatusConditionTest
     extends EventBusTestSupport

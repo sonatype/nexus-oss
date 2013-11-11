@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Factory of {@link Validator}s related to repositories.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 @Singleton
@@ -61,7 +61,7 @@ public class RepositoryValidators
    * @param type        capability type
    * @param propertyKey key of property that contains the repository id
    * @return created validator
-   * @since 2.3
+   * @since capabilities 2.3
    */
   public Validator repositoryExists(final CapabilityType type,
                                     final String propertyKey)

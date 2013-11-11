@@ -29,7 +29,7 @@ import com.google.common.eventbus.Subscribe;
 /**
  * A condition that is satisfied when nexus is active.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 @EagerSingleton
@@ -38,15 +38,17 @@ public class NexusIsActiveCondition
     implements Condition
 {
 
-  NexusIsActiveCondition(final EventBus eventBus) {
+  public NexusIsActiveCondition(final EventBus eventBus) {
     super(eventBus, false);
     bind();
+    getEventBus().register(this);
   }
 
   @Inject
-  NexusIsActiveCondition(final Provider<EventBus> eventBus) {
+  public NexusIsActiveCondition(final Provider<EventBus> eventBus) {
     super(eventBus, false);
     bind();
+    getEventBus().register(this);
   }
 
   @Subscribe
@@ -61,12 +63,12 @@ public class NexusIsActiveCondition
 
   @Override
   protected void doBind() {
-    getEventBus().register(this);
+    // do nothing
   }
 
   @Override
   protected void doRelease() {
-    getEventBus().unregister(this);
+    // do nothing
   }
 
   @Override

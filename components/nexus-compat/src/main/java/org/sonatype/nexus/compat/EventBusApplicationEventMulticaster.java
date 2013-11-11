@@ -32,7 +32,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @since 2.3
+ * @deprecated To be removed in future releases.
  */
+@Deprecated
 @Named
 @Singleton
 public class EventBusApplicationEventMulticaster

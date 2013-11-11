@@ -32,7 +32,9 @@ import org.eclipse.jetty.util.log.Logger;
  *
  * @author cstamas
  * @since 1.3
+ * @deprecated To be removed in future releases (no replacement provided).
  */
+@Deprecated
 public class JettyWatchdog
     implements Runnable
 {

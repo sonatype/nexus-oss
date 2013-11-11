@@ -22,6 +22,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.Evaluable;
+import org.sonatype.nexus.plugins.capabilities.internal.condition.CapabilityHasNoFailures;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.CapabilityOfTypeActiveCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.CapabilityOfTypeExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.EvaluableCondition;
@@ -33,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Factory of {@link Condition}s related to capabilities.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 @Singleton
@@ -96,6 +97,16 @@ public class CapabilityConditions
    */
   public Condition passivateCapabilityWhenPropertyChanged(final String... propertyNames) {
     return new PassivateCapabilityDuringUpdateCondition(eventBus, propertyNames);
+  }
+
+  /**
+   * Creates a new condition that is satisfied as long as capability has no failures.
+   *
+   * @return created condition
+   * @since 2.7
+   */
+  public Condition capabilityHasNoFailures() {
+    return new CapabilityHasNoFailures(eventBus);
   }
 
   /**

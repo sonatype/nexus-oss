@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Composite {@link Condition} implementation support.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public abstract class CompositeConditionSupport
     extends ConditionSupport

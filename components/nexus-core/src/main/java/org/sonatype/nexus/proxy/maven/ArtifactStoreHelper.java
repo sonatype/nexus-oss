@@ -422,6 +422,10 @@ public class ArtifactStoreHelper
     repository.storeItemWithChecksums(gavRequest, is, attributes);
   }
 
+  /**
+   * @deprecated Pending removal (no replacement).
+   */
+  @Deprecated
   public void deleteArtifactPom(ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
                                 boolean deleteWholeGav)
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
@@ -450,6 +454,10 @@ public class ArtifactStoreHelper
     handleDelete(gavRequest, deleteWholeGav, withChecksums, withAllSubordinates);
   }
 
+  /**
+   * @deprecated Pending removal (no replacement).
+   */
+  @Deprecated
   public void deleteArtifact(ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
                              boolean deleteWholeGav)
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
@@ -465,6 +473,10 @@ public class ArtifactStoreHelper
     handleDelete(gavRequest, deleteWholeGav, withChecksums, withAllSubordinates);
   }
 
+  /**
+   * @deprecated Pending removal (no replacement).
+   */
+  @Deprecated
   private void handleDelete(ArtifactStoreRequest gavRequest, boolean deleteWholeGav, boolean withChecksums,
                             boolean withAllSubordinates)
       throws StorageException, UnsupportedStorageOperationException, IllegalOperationException,
@@ -494,6 +506,10 @@ public class ArtifactStoreHelper
     }
   }
 
+  /**
+   * @deprecated Pending removal (no replacement).
+   */
+  @Deprecated
   public Collection<Gav> listArtifacts(ArtifactStoreRequest gavRequest) {
     // TODO: implement this
     return Collections.emptyList();

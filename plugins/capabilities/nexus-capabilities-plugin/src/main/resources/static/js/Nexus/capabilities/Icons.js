@@ -15,7 +15,7 @@
 /**
  * Container for icons used by capabilities.
  *
- * @since 2.2.2
+ * @since capabilities 2.2.2
  */
 NX.define('Nexus.capabilities.Icons', {
   extend: 'Nexus.util.IconContainer',

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.log.internal;
 
 import ch.qos.logback.classic.Level;
@@ -24,7 +25,7 @@ import ch.qos.logback.classic.jul.JULHelper;
  * @since 2.7
  */
 public class JulLevelChangePropagator
-  extends ch.qos.logback.classic.jul.LevelChangePropagator
+    extends ch.qos.logback.classic.jul.LevelChangePropagator
 {
   public JulLevelChangePropagator() {
     // nop
@@ -32,6 +33,11 @@ public class JulLevelChangePropagator
 
   public JulLevelChangePropagator(final LoggerContext context) {
     setContext(context);
+  }
+
+  @Override
+  public boolean isResetResistant() {
+    return true;
   }
 
   @Override

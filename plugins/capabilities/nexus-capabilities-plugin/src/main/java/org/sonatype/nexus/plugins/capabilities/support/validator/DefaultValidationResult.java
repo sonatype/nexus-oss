@@ -22,7 +22,7 @@ import com.google.common.collect.Sets;
 /**
  * Default {@link ValidationResult} implementation.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class DefaultValidationResult
     implements ValidationResult

@@ -44,7 +44,9 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
  *
  * @author cstamas
  * @since 1.3
+ * @deprecated To be removed in future releases (no replacement provided).
  */
+@Deprecated
 public class InstrumentedQueuedThreadPool
     extends QueuedThreadPool
 {

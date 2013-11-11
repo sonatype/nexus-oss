@@ -223,6 +223,10 @@ public class DefaultMetadataUpdater
 
   // ==
 
+  /**
+   * @deprecated Pending removal (no replacement).
+   */
+  @Deprecated
   public void deployArtifacts(Collection<ArtifactStoreRequest> requests)
       throws IOException
   {
@@ -230,6 +234,10 @@ public class DefaultMetadataUpdater
 
   }
 
+  /**
+   * @deprecated Pending removal (no replacement).
+   */
+  @Deprecated
   public void undeployArtifacts(Collection<ArtifactStoreRequest> requests)
       throws IOException
   {
@@ -237,6 +245,10 @@ public class DefaultMetadataUpdater
 
   }
 
+  /**
+   * @deprecated Pending removal (no replacement).
+   */
+  @Deprecated
   public void recreateMetadata(StorageCollectionItem coll)
       throws IOException
   {

@@ -19,7 +19,7 @@ import org.sonatype.nexus.repository.obr.client.ObrVirtualRepository;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 
 /**
- * @since 2.1
+ * @since obr 2.1
  */
 public class JerseyObrVirtualRepository
     extends JerseyVirtualRepository<ObrVirtualRepository>

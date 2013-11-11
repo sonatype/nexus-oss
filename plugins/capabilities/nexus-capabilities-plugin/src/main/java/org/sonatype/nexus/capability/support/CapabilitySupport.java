@@ -159,7 +159,6 @@ public abstract class CapabilitySupport<ConfigT>
 
   @Override
   public void onUpdate() throws Exception {
-    ensureConfigured();
     config = createConfig(context().properties());
     logLifecycle("Updating", config);
     onUpdate(config);

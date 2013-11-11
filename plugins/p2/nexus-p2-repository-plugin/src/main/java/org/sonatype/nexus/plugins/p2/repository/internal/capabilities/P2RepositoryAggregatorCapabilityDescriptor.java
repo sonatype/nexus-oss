@@ -94,7 +94,7 @@ public class P2RepositoryAggregatorCapabilityDescriptor
   /**
    * Validate on create that there is only one capability for the configured repository.
    *
-   * @since 2.3.1
+   * @since p2 2.3.1
    */
   @Override
   public Validator validator() {
@@ -104,7 +104,7 @@ public class P2RepositoryAggregatorCapabilityDescriptor
   /**
    * Validate on update that there is only one capability for the configured repository .
    *
-   * @since 2.3.1
+   * @since p2 2.3.1
    */
   @Override
   public Validator validator(final CapabilityIdentity id) {

@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link CompositeConditionSupport} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class CompositeConditionTestSupport
     extends EventBusTestSupport

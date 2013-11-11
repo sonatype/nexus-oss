@@ -15,13 +15,13 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContextAware;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.SatisfiedCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.UnsatisfiedCondition;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -33,10 +33,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Handles capability activation by reacting capability activation condition being satisfied/unsatisfied.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class ActivationConditionHandler
-    extends AbstractLoggingComponent
+    extends ComponentSupport
 {
 
   private final EventBus eventBus;
@@ -46,8 +46,6 @@ public class ActivationConditionHandler
   private final Conditions conditions;
 
   private Condition activationCondition;
-
-  private Condition nexusActiveCondition;
 
   @Inject
   ActivationConditionHandler(final EventBus eventBus,
@@ -74,31 +72,34 @@ public class ActivationConditionHandler
   @AllowConcurrentEvents
   @Subscribe
   public void handle(final ConditionEvent.Unsatisfied event) {
-    if (event.getCondition() == activationCondition || event.getCondition() == nexusActiveCondition) {
+    if (event.getCondition() == activationCondition) {
       reference.passivate();
     }
   }
 
   ActivationConditionHandler bind() {
     if (activationCondition == null) {
-      nexusActiveCondition = conditions.nexus().active();
       try {
-        activationCondition = reference.capability().activationCondition();
+        Condition capabilityActivationCondition = reference.capability().activationCondition();
+        if (capabilityActivationCondition == null) {
+          capabilityActivationCondition = new SatisfiedCondition("Capability has no activation condition");
+        }
+        activationCondition = conditions.logical().and(
+            capabilityActivationCondition,
+            conditions.nexus().active(),
+            conditions.capabilities().capabilityHasNoFailures()
+        );
         if (activationCondition instanceof CapabilityContextAware) {
           ((CapabilityContextAware) activationCondition).setContext(reference.context());
         }
       }
       catch (Exception e) {
         activationCondition = new UnsatisfiedCondition("Failed to determine activation condition");
-        getLogger().error(
+        log.error(
             "Could not get activation condition from capability {} ({}). Considering it as non activatable",
-            new Object[]{reference.capability(), reference.context().id(), e}
+            reference.capability(), reference.context().id(), e
         );
       }
-      if (activationCondition == null) {
-        activationCondition = new SatisfiedCondition("Capability has no activation condition");
-      }
-      nexusActiveCondition.bind();
       activationCondition.bind();
       eventBus.register(this);
     }
@@ -108,7 +109,6 @@ public class ActivationConditionHandler
   ActivationConditionHandler release() {
     if (activationCondition != null) {
       eventBus.unregister(this);
-      nexusActiveCondition.release();
       activationCondition.release();
       activationCondition = null;
     }

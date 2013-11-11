@@ -122,6 +122,14 @@ NX.define('Nexus.logging.view.Loggers', {
           iconCls: icons.get('loggers_remove').cls,
           disabled: true
         },
+        '-',
+        {
+          id: 'nx-logging-button-reset-loggers',
+          text: 'Reset',
+          tooltip: 'Reset loggers to their default levels',
+          iconCls: icons.get('loggers_reset').cls,
+          disabled: !sp.checkPermission('nexus:logconfig', sp.EDIT)
+        },
         '->',
         {
           xtype: 'nx-grid-filter-box',

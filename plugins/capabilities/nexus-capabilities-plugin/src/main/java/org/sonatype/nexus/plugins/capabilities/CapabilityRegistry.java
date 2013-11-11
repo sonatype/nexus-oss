@@ -101,7 +101,7 @@ public interface CapabilityRegistry
    *
    * @param id to retrieve
    * @return capability with specified id or null if not found
-   * @since 2.0
+   * @since capabilities 2.0
    */
   CapabilityReference get(CapabilityIdentity id);
 
@@ -111,7 +111,7 @@ public interface CapabilityRegistry
    *
    * @param filter capability reference filter
    * @return collection of capabilities, never null
-   * @since 2.0
+   * @since capabilities 2.0
    */
   public Collection<? extends CapabilityReference> get(Predicate<CapabilityReference> filter);
 
@@ -119,7 +119,7 @@ public interface CapabilityRegistry
    * Retrieves all capabilities from registry. If no capability exists, result will be empty.
    *
    * @return collection of capabilities, never null
-   * @since 2.0
+   * @since capabilities 2.0
    */
   Collection<? extends CapabilityReference> getAll();
 

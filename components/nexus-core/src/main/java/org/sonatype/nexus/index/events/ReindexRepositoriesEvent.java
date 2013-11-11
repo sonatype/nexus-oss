@@ -15,6 +15,9 @@ package org.sonatype.nexus.index.events;
 
 import org.sonatype.plexus.appevents.AbstractEvent;
 
+/**
+ * @deprecated To be removed (no replacement).
+ */
 @Deprecated
 public class ReindexRepositoriesEvent
     extends AbstractEvent<Object>

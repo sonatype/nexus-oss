@@ -13,10 +13,15 @@
 
 package org.sonatype.nexus.proxy.events;
 
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.slf4j.Logger;
 
+/**
+ * @deprecated Use {@link EventSubscriber} instead.
+ */
+@Deprecated
 public abstract class AbstractEventInspector
   extends ComponentSupport
   implements EventInspector

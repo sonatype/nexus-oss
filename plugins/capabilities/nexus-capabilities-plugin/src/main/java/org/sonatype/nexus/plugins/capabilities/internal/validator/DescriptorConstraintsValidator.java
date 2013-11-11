@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A {@link Validator} that ensures that constraints expressed by descriptor fields are satisfied.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 public class DescriptorConstraintsValidator

@@ -137,4 +137,16 @@ public class LoggersResource
     configurator.remove(name);
   }
 
+  /**
+   * Resets all loggers to their default levels.
+   */
+  @DELETE
+  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX_LOGGERS + "update")
+  public void reset()
+      throws Exception
+  {
+    configurator.reset();
+  }
+
+
 }

@@ -18,7 +18,7 @@ import org.sonatype.nexus.client.core.exception.NexusClientException;
 /**
  * Exception thrown when a a factory for a capability type could not be found.
  *
- * @since 2.2
+ * @since capabilities 2.2
  */
 @SuppressWarnings("serial")
 public class ReflectiveCapabilityImplementationException

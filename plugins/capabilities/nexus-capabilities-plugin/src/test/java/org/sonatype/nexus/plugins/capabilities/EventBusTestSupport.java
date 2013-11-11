@@ -37,7 +37,7 @@ import static org.mockito.Mockito.doAnswer;
 /**
  * Support for tests using event bus.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class EventBusTestSupport
     extends TestSupport

@@ -19,6 +19,7 @@ public class EmailerException
 
   private static final long serialVersionUID = -8229443120962556912L;
 
+  @Deprecated
   public EmailerException() {
     this(null);
   }

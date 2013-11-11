@@ -13,22 +13,24 @@
 
 package org.sonatype.nexus.plugins.capabilities.internal.security;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
+import org.sonatype.nexus.capability.CapabilitiesPlugin;
+import org.sonatype.nexus.plugin.support.StaticSecurityResourceSupport;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
+/**
+ * Capabilities {@link StaticSecurityResource}.
+ */
 @Named
 @Singleton
 public class CapabilitySecurityResource
-    extends AbstractStaticSecurityResource
-    implements StaticSecurityResource
+    extends StaticSecurityResourceSupport
 {
-
-  @Override
-  public String getResourcePath() {
-    return "/META-INF/org.sonatype.nexus.plugins.capability-security.xml";
+  @Inject
+  public CapabilitySecurityResource(final CapabilitiesPlugin plugin) {
+    super(plugin);
   }
-
 }
