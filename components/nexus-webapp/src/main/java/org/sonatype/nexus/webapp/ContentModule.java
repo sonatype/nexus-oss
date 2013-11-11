@@ -21,7 +21,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
 
 /**
- * Nexus webapp module.
+ * Content module.
  *
  * @since 2.8
  */
