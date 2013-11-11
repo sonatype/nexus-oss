@@ -42,11 +42,11 @@ import org.sonatype.nexus.proxy.item.uid.IsItemAttributeMetacontentAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.nexus.util.CompositeException;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.common.Throwables2;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -383,7 +383,7 @@ public class DefaultFSPeer
         }
       }
       if (!success) {
-        throw new IOException("Rename operation failed", new CompositeException(exceptions));
+        throw Throwables2.composite(new IOException("Rename operation failed"), exceptions);
       }
     }
   }
