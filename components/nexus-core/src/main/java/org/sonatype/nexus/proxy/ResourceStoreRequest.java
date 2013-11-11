@@ -406,7 +406,9 @@ public class ResourceStoreRequest
   public ResourceStoreRequest cloneAndDetach() {
     final ResourceStoreRequest result = new ResourceStoreRequest(getRequestPath());
     result.requestContext.setParentContext(null);
-    result.requestContext.putAll(requestContext.flatten());
+    for (Map.Entry<String, Object> entry : requestContext.flatten().entrySet()) {
+      result.requestContext.put(entry.getKey(), entry.getValue());
+    }
     result.pathStack.clear();
     result.processedRepositories.clear();
     result.processedRepositories.addAll(processedRepositories);

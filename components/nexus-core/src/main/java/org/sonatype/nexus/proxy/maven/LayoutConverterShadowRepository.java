@@ -432,8 +432,7 @@ public abstract class LayoutConverterShadowRepository
 
     if (shadowPaths != null && !shadowPaths.isEmpty()) {
       ResourceStoreRequest req = new ResourceStoreRequest(shadowPaths.get(0));
-
-      req.getRequestContext().putAll(item.getItemContext());
+      req.getRequestContext().setParentContext(item.getItemContext());
 
       DefaultStorageLinkItem link =
           new DefaultStorageLinkItem(this, req, true, true, item.getRepositoryItemUid());
@@ -454,12 +453,10 @@ public abstract class LayoutConverterShadowRepository
     List<String> shadowPaths = transformMaster2Shadow(item.getPath());
 
     if (shadowPaths != null && !shadowPaths.isEmpty()) {
-      ResourceStoreRequest request = new ResourceStoreRequest(shadowPaths.get(0));
-
-      request.getRequestContext().putAll(item.getItemContext());
-
+      ResourceStoreRequest req = new ResourceStoreRequest(shadowPaths.get(0));
+      req.getRequestContext().setParentContext(item.getItemContext());
       try {
-        deleteItem(false, request);
+        deleteItem(false, req);
       }
       catch (ItemNotFoundException e) {
         // NEXUS-5673: just ignore it silently, this might happen when
@@ -472,7 +469,7 @@ public abstract class LayoutConverterShadowRepository
 
       // we need to clean up empty shadow parent directories
       String parentPath =
-          request.getRequestPath().substring(0, request.getRequestPath().lastIndexOf(item.getName()));
+          req.getRequestPath().substring(0, req.getRequestPath().lastIndexOf(item.getName()));
       ResourceStoreRequest parentRequest = new ResourceStoreRequest(parentPath);
 
       while (parentRequest != null) {

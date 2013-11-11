@@ -832,8 +832,6 @@ public abstract class AbstractRepository
           DefaultStorageFileItem target =
               new DefaultStorageFileItem(this, to, true, true, ((StorageFileItem) item).getContentLocator());
 
-          target.getItemContext().putAll(item.getItemContext());
-
           storeItem(fromTask, target);
 
           // remove the "to" item from n-cache if there
@@ -1052,10 +1050,6 @@ public abstract class AbstractRepository
     maintainNotFoundCache(coll.getResourceStoreRequest());
 
     Collection<StorageItem> items = doListItems(new ResourceStoreRequest(coll));
-
-    for (StorageItem item : items) {
-      item.getItemContext().putAll(coll.getItemContext());
-    }
 
     return items;
   }

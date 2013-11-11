@@ -410,7 +410,6 @@ public class P2ProxyRepositoryImpl
       }
 
       final StorageItem item = getLocalStorage().retrieveItem(this, request);
-      item.getItemContext().putAll(request.getRequestContext());
       return item;
     }
 
