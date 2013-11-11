@@ -35,6 +35,8 @@ import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkState;
 
+// FIXME: Docs need to be cleaned up once we get something "simple" working
+
 /**
  * The simplified (or not) Nexus booter class, that boots Nexus (the IT test subject) in completely same way as it
  * boots in bundle, but in this same JVM in an isolated classloader, hence, even it will exist in same JVM, REST API is
