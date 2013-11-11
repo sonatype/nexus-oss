@@ -37,6 +37,6 @@ public class DefaultNexusSecurityUpgradeTest
     super.setUp();
 
     // copy the file to a different location because we are going to change it
-    FileUtils.copyFileToDirectory(util.resolveFile(ORG_CONFIG_FILE), getConfHomeDir());
+    FileUtils.copyFileToDirectory(util.resolveFile(ORG_CONFIG_FILE), getConfHomeDir(), false);
   }
 }

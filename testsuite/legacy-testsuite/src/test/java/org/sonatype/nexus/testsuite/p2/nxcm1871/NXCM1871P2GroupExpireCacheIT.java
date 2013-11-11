@@ -59,10 +59,10 @@ public class NXCM1871P2GroupExpireCacheIT
     assertThat(newContentXml, not(contains("com.sonatype.nexus.p2.its.feature2.feature.jar")));
     assertThat(newContentXml, contains("com.sonatype.nexus.p2.its.feature3.feature.jar"));
 
-    FileUtils.copyFileToDirectory(newContentXml, repo_nxcm1871_2);
+    FileUtils.copyFileToDirectory(newContentXml, repo_nxcm1871_2, false);
 
     final File newArtifactsXml = new File(localStorageDir, "nxcm1871-3/artifacts.xml");
-    FileUtils.copyFileToDirectory(newArtifactsXml, repo_nxcm1871_2);
+    FileUtils.copyFileToDirectory(newArtifactsXml, repo_nxcm1871_2, false);
 
     final ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
     prop.setKey("repositoryId");
