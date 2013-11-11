@@ -19,13 +19,12 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 
+import com.google.common.base.Throwables;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -78,9 +77,13 @@ public class JettyServerNexusBooter
 
   private final ClassWorld world;
 
-  private final ClassRealm bootClassLoader;
+  private final ClassRealm bootRealm;
 
-  private ClassRealm nexusClassloader;
+  private final Class<?> jettyServerClass;
+
+  private final Constructor jettyServerFactory;
+
+  private ClassRealm testRealm;
 
   private Object jettyServer;
 
@@ -116,100 +119,20 @@ public class JettyServerNexusBooter
     System.getProperties().putAll(props);
 
     world = new ClassWorld();
-    bootClassLoader = createBootClassLoader();
-  }
+    bootRealm = createBootRealm();
 
-  private ClassRealm createBootClassLoader() throws Exception {
-    File dir = new File(bundleBasedir, "lib");
-    log.info("Boot lib directory: {}", dir);
+    jettyServerClass = bootRealm.loadClass("org.sonatype.nexus.bootstrap.jetty.JettyServer");
+    log.info("Jetty server class: {}", jettyServerClass);
 
-    File[] jars = dir.listFiles(new FileFilter()
-    {
-      @Override
-      public boolean accept(File pathname) {
-        return pathname.getName().endsWith(".jar");
-      }
-    });
-
-    List<URL> urls = new ArrayList<>();
-    for (File jar : jars) {
-      urls.add(jar.toURI().toURL());
-    }
-
-    ClassRealm realm = world.newRealm("it-shared", null);
-
-    log.info("Boot ClassPath:");
-    for (URL url : urls) {
-      log.info("  {}", url);
-      realm.addURL(url);
-    }
-
-    return realm;
-  }
-
-  public void startNexus(final String testId) throws Exception {
-    checkState(jettyServer == null, "Nexus already started");
-
-    nexusClassloader = buildNexusClassLoader(testId);
-    final ClassLoader original = Thread.currentThread().getContextClassLoader();
-
-    try {
-      Thread.currentThread().setContextClassLoader(bootClassLoader);
-
-      // we have to get it from shared, as it is present here too, but by mistake it seems
-      final Class<?> jettyServer = bootClassLoader.loadClass("org.sonatype.nexus.bootstrap.jetty.JettyServer");
-
-      log.info("Starting Nexus[{}]", testId);
-
-      Constructor factory = jettyServer.getConstructor(ClassLoader.class, Map.class, String[].class);
-      this.jettyServer = factory.newInstance(
-          nexusClassloader,
-          props,
-          new String[] { new File(bundleBasedir, "conf/jetty.xml").getAbsolutePath() }
-      );
-    }
-    finally {
-      Thread.currentThread().setContextClassLoader(original);
-    }
-
-    jettyServer.getClass().getMethod("start").invoke(jettyServer);
-  }
-
-  public void stopNexus() throws Exception {
-    try {
-      log.info("Stopping Nexus");
-
-      if (jettyServer != null) {
-        jettyServer.getClass().getMethod("stop").invoke(jettyServer);
-      }
-    }
-    catch (InvocationTargetException e) {
-      if (e.getCause() instanceof IllegalStateException) {
-        // swallow it, it is Jetty8 that throws this when we stop but did not start...
-      }
-      else {
-        throw (Exception) e.getCause();
-      }
-    }
-    finally {
-      clean();
-    }
-  }
-
-  private ClassRealm buildNexusClassLoader(final String testId) throws Exception {
-    return world.newRealm(IT_REALM_ID + "-" + testId, bootClassLoader);
-  }
-
-  private File requireFile(final File file) {
-    checkState(file.exists(), "Missing required file: %s", file.getAbsolutePath());
-    return file;
+    jettyServerFactory = jettyServerClass.getConstructor(ClassLoader.class, Map.class, String[].class);
+    log.info("Jetty server factory: {}", jettyServerFactory);
   }
 
   private void tamperJettyConfiguration(final File basedir) throws IOException {
     // Disable the shutdown hook, since it disturbs the embedded work
     // In Jetty8, any invocation of server.stopAtShutdown(boolean) will create a thread in a class static member.
     // Hence, we simply want to make sure, that there is NO invocation happening of that method.
-    final File file = requireFile(new File(basedir, "conf/jetty.xml"));
+    final File file = new File(basedir, "conf/jetty.xml");
     String xml = FileUtils.readFileToString(file, "UTF-8");
 
     // completely removing the server.stopAtShutdown() method invocation, to try to prevent thread creation at all
@@ -229,24 +152,88 @@ public class JettyServerNexusBooter
     FileUtils.writeStringToFile(file, xml, "UTF-8");
   }
 
-  private void clean() {
-    if (nexusClassloader != null) {
-      try {
-        world.disposeRealm(nexusClassloader.getId());
+  private ClassRealm createBootRealm() throws Exception {
+    File dir = new File(bundleBasedir, "lib");
+    log.info("Boot lib directory: {}", dir);
+
+    File[] jars = dir.listFiles(new FileFilter()
+    {
+      @Override
+      public boolean accept(File pathname) {
+        return pathname.getName().endsWith(".jar");
       }
-      catch (NoSuchRealmException e) {
-        log.warn("Unexpected; ignoring", e);
-      }
+    });
+
+    ClassRealm realm = world.newRealm("it-boot", null);
+
+    log.info("Boot ClassPath:");
+    for (File jar : jars) {
+      URL url = jar.toURI().toURL();
+      log.info("  {}", url);
+      realm.addURL(url);
     }
 
-    // drop references
-    this.jettyServer = null;
-    this.nexusClassloader = null;
+    return realm;
+  }
 
-    // give some relief for other (like JVM internal) threads
-    Thread.yield();
+  @Override
+  public void startNexus(final String testId) throws Exception {
+    checkState(jettyServer == null, "Nexus already started");
 
-    // force GC, may help
-    System.gc();
+    testRealm = world.newRealm(IT_REALM_ID + "-" + testId, bootRealm);
+
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(bootRealm);
+
+    try {
+      log.info("Starting Nexus[{}]", testId);
+
+      jettyServer = jettyServerFactory.newInstance(
+          testRealm,
+          props,
+          new String[] { new File(bundleBasedir, "conf/jetty.xml").getAbsolutePath() }
+      );
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(cl);
+    }
+
+    jettyServerClass.getMethod("start").invoke(jettyServer);
+  }
+
+  @Override
+  public void stopNexus() throws Exception {
+    try {
+      log.info("Stopping Nexus");
+
+      if (jettyServer != null) {
+        jettyServerClass.getMethod("stop").invoke(jettyServer);
+      }
+      jettyServer = null;
+    }
+    catch (InvocationTargetException e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof IllegalStateException) {
+        log.debug("Ignoring", cause);
+      }
+      else {
+        log.error("Stop failed", cause);
+        throw Throwables.propagate(cause);
+      }
+    }
+    finally {
+      if (testRealm != null) {
+        try {
+          world.disposeRealm(testRealm.getId());
+        }
+        catch (NoSuchRealmException e) {
+          log.warn("Unexpected; ignoring", e);
+        }
+      }
+      testRealm = null;
+
+      Thread.yield();
+      System.gc();
+    }
   }
 }
