@@ -64,7 +64,9 @@ public class NexusBootstrap
   private LogManager logManager;
 
   public void contextInitialized(final ServletContextEvent event) {
-    final ServletContext context = event.getServletContext();
+    log.info("Initializing");
+
+    ServletContext context = event.getServletContext();
 
     if (context.getAttribute(PlexusConstants.PLEXUS_KEY) != null) {
       log.info("Plexus container already exists; skipping");
@@ -75,7 +77,7 @@ public class NexusBootstrap
       // Use bootstrap configuration if it exists, else load it
       Configuration config = Configuration.HOLDER.get();
       if (config == null) {
-        log.info("Loading configuration for WAR deployment");
+        log.info("Loading configuration for WAR deployment environment");
         config = new Configuration();
         config.load();
         Configuration.HOLDER.set(config);
@@ -83,7 +85,7 @@ public class NexusBootstrap
       Map<String, String> properties = config.getProperties();
 
       // lock the work directory
-      final File workDir = new File(properties.get("nexus-work")).getCanonicalFile();
+      File workDir = new File(properties.get("nexus-work")).getCanonicalFile();
       lockFile = new LockFile(new File(workDir, "nexus.lock"));
       if (!lockFile.lock()) {
         throw new IllegalStateException("Nexus work directory already is use: " + workDir);
@@ -94,7 +96,7 @@ public class NexusBootstrap
       checkState(plexusXml != null, "Missing plexus.xml");
 
       @SuppressWarnings("unchecked")
-      final ContainerConfiguration plexusConfiguration = new DefaultContainerConfiguration()
+      ContainerConfiguration plexusConfiguration = new DefaultContainerConfiguration()
           .setName(context.getServletContextName())
           .setContainerConfigurationURL(plexusXml)
           .setContext((Map) properties)
@@ -102,12 +104,13 @@ public class NexusBootstrap
           .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
           .setComponentVisibility(PlexusConstants.GLOBAL_VISIBILITY);
 
-      final List<Module> modules = Lists.newArrayList(
+      List<Module> modules = Lists.newArrayList(
           new NexusWebModule(event.getServletContext()),
           new CoreModule()
       );
 
-      final Module[] customModules = (Module[]) context.getAttribute(CUSTOM_MODULES);
+      // FIXME: What is this used for?
+      Module[] customModules = (Module[]) context.getAttribute(CUSTOM_MODULES);
       if (customModules != null) {
         modules.addAll(Arrays.asList(customModules));
       }
@@ -128,9 +131,13 @@ public class NexusBootstrap
       log.error("Failed to initialize", e);
       throw Throwables.propagate(e);
     }
+
+    log.info("Initialized");
   }
 
   public void contextDestroyed(final ServletContextEvent event) {
+    log.info("Destroying");
+
     // stop application
     if (application != null) {
       try {
@@ -139,21 +146,27 @@ public class NexusBootstrap
       catch (Exception e) {
         log.error("Failed to stop application", e);
       }
+      application = null;
     }
 
     // shutdown logging
     if (logManager != null) {
       logManager.shutdown();
+      logManager = null;
     }
 
     // cleanup the container
     if (container != null) {
       container.dispose();
+      container = null;
     }
 
     // release lock
     if (lockFile != null) {
       lockFile.release();
+      lockFile = null;
     }
+
+    log.info("Destroyed");
   }
 }
