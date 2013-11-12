@@ -28,6 +28,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,7 +41,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.web.content.Renderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-import org.sonatype.sisu.velocity.Velocity;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -50,15 +50,15 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Implementation of {@link Renderer} using SISU {@link Velocity} component.
- * 
+ * Implementation of {@link Renderer} using Apache Velocity.
+ *
  * @since 2.7.0
- * @see Velocity
  */
 @Singleton
 @Named
@@ -66,18 +66,22 @@ public class VelocityRenderer
     extends ComponentSupport
     implements Renderer
 {
-  private final Velocity velocity;
+  private final Provider<VelocityEngine> velocityEngineProvider;
+
   private final String applicationVersion;
 
   @Inject
-  public VelocityRenderer(final Velocity velocity, final ApplicationStatusSource applicationStatusSource) {
-    this.velocity = checkNotNull(velocity);
+  public VelocityRenderer(final Provider<VelocityEngine> velocityEngineProvider,
+                          final ApplicationStatusSource applicationStatusSource)
+  {
+    this.velocityEngineProvider = checkNotNull(velocityEngineProvider);
     this.applicationVersion = checkNotNull(applicationStatusSource).getSystemStatus().getVersion();
   }
 
   @Override
   public void renderCollection(final HttpServletRequest request, final HttpServletResponse response,
-      final StorageCollectionItem coll, final Collection<StorageItem> children) throws IOException
+                               final StorageCollectionItem coll, final Collection<StorageItem> children)
+      throws IOException
   {
     final Set<String> uniqueNames = Sets.newHashSetWithExpectedSize(children.size());
     final List<CollectionEntry> entries = Lists.newArrayListWithCapacity(children.size());
@@ -105,7 +109,7 @@ public class VelocityRenderer
 
   @Override
   public void renderErrorPage(final HttpServletRequest request, final HttpServletResponse response,
-      final ResourceStoreRequest rsr, final Exception exception) throws IOException
+                              final ResourceStoreRequest rsr, final Exception exception) throws IOException
   {
     final Map<String, Object> dataModel = createBaseModel(rsr);
     dataModel.put("statusCode", response.getStatus());
@@ -119,7 +123,8 @@ public class VelocityRenderer
 
   @Override
   public void renderRequestDescription(final HttpServletRequest request, final HttpServletResponse response,
-      final ResourceStoreRequest resourceStoreRequest, final StorageItem item, final Exception exception)
+                                       final ResourceStoreRequest resourceStoreRequest, final StorageItem item,
+                                       final Exception exception)
       throws IOException
   {
     final Map<String, Object> dataModel = createBaseModel(resourceStoreRequest);
@@ -178,10 +183,10 @@ public class VelocityRenderer
     Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
     try {
       if (templateName.startsWith("/")) {
-        return velocity.getEngine().getTemplate(templateName);
+        return velocityEngineProvider.get().getTemplate(templateName);
       }
       else {
-        return velocity.getEngine().getTemplate(
+        return velocityEngineProvider.get().getTemplate(
             getClass().getPackage().getName().replace(".", "/") + "/" + templateName);
       }
     }
@@ -236,7 +241,7 @@ public class VelocityRenderer
     private final String description;
 
     public CollectionEntry(final String name, final boolean collection, final String resourceUri,
-        final Date lastModified, final long size, final String description)
+                           final Date lastModified, final long size, final String description)
     {
       this.name = checkNotNull(name);
       this.collection = collection;

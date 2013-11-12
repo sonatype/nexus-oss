@@ -115,9 +115,4 @@ public class DummyWaitingNexusTask
   public String getAlertEmail() {
     return null;
   }
-
-  public TaskActivityDescriptor getTaskActivityDescriptor() {
-    return null;
-  }
-
 }

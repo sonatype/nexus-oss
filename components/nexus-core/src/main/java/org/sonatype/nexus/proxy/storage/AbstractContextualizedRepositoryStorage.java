@@ -57,30 +57,31 @@ public abstract class AbstractContextualizedRepositoryStorage<C extends StorageC
   /**
    * Method that returns StorageContext (to be used for reads only!) with a guarantee that it's properly
    * updated if needed. See {@link #updateStorageContext(Repository, StorageContext, ContextOperation)} method, meant
-   * to be implemented by storage classes to perform storage specific context WRITE operations.
+   * to be implemented by storage classes to perform storage specific context WRITE operations. Context must not be
+   * null, hence, it is the caller that should verify (or avoid) obvious bugs, like calling this method with
+   * hosted repository from a remote storage (as hosted would not have remote context).
    */
   protected C getStorageContext(final Repository repository, final C context)
       throws IOException
   {
     checkNotNull(repository);
-    if (context != null) {
-      synchronized (context) {
-        if (!repositoryContextGenerations.containsKey(repository.getId()) ||
-            !context.hasContextObject(CONTEXT_UPDATED_KEY)
-            || context.getGeneration() > repositoryContextGenerations.get(repository.getId())) {
-          final ContextOperation operation;
-          if (!repositoryContextGenerations.containsKey(repository.getId())) {
-            operation = ContextOperation.INITIALIZE;
-            log.trace("Storage {} is about to initialize context {}", getClass().getSimpleName(), context);
-          }
-          else {
-            operation = ContextOperation.UPDATE;
-            log.trace("Storage {} is about to update context {}", getClass().getSimpleName(), context);
-          }
-          updateStorageContext(repository, context, operation);
-          context.putContextObject(CONTEXT_UPDATED_KEY, Boolean.TRUE);
-          repositoryContextGenerations.put(repository.getId(), context.getGeneration());
+    checkNotNull(context);
+    synchronized (context) {
+      if (!repositoryContextGenerations.containsKey(repository.getId()) ||
+          !context.hasContextObject(CONTEXT_UPDATED_KEY)
+          || context.getGeneration() > repositoryContextGenerations.get(repository.getId())) {
+        final ContextOperation operation;
+        if (!repositoryContextGenerations.containsKey(repository.getId())) {
+          operation = ContextOperation.INITIALIZE;
+          log.trace("Storage {} is about to initialize context {}", getClass().getSimpleName(), context);
         }
+        else {
+          operation = ContextOperation.UPDATE;
+          log.trace("Storage {} is about to update context {}", getClass().getSimpleName(), context);
+        }
+        updateStorageContext(repository, context, operation);
+        context.putContextObject(CONTEXT_UPDATED_KEY, Boolean.TRUE);
+        repositoryContextGenerations.put(repository.getId(), context.getGeneration());
       }
     }
     return context;

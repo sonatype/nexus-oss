@@ -101,7 +101,7 @@ public class NexusUtils
   {
     final ResourceStoreRequest req = new ResourceStoreRequest(path);
 
-    req.getRequestContext().putAll(item.getItemContext());
+    req.getRequestContext().setParentContext(item.getItemContext());
 
     final DefaultStorageLinkItem link =
         new DefaultStorageLinkItem(repository, req, true, true, item.getRepositoryItemUid());

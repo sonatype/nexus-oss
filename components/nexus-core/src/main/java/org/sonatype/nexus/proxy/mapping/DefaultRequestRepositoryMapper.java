@@ -38,15 +38,16 @@ import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryGroupingCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.utils.ResourceStoreUtils;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
+import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -244,7 +245,7 @@ public class DefaultRequestRepositoryMapper
         StringBuilder sb =
             new StringBuilder("Request for path \"" + request.toString()
                 + "\" with the initial list of processable repositories of \""
-                + ResourceStoreUtils.getResourceStoreListAsString(resolvedRepositories)
+                + getResourceStoreListAsString(resolvedRepositories)
                 + "\" got these mappings applied:\n");
 
         for (RepositoryPathMapping mapping : appliedMappings) {
@@ -281,6 +282,24 @@ public class DefaultRequestRepositoryMapper
     }
 
     return result;
+  }
+
+  public String getResourceStoreListAsString(List<? extends ResourceStore> stores) {
+    if (stores == null) {
+      return "[]";
+    }
+    ArrayList<String> repoIdList = new ArrayList<String>(stores.size());
+
+    for (ResourceStore store : stores) {
+      if (store instanceof Repository) {
+        repoIdList.add(((Repository) store).getId());
+      }
+      else {
+        repoIdList.add(store.getClass().getName());
+      }
+    }
+
+    return StringUtils.join(repoIdList.iterator(), ", ");
   }
 
   // ==

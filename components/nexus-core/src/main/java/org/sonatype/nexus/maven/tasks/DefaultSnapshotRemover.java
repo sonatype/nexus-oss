@@ -32,6 +32,7 @@ import org.sonatype.aether.version.Version;
 import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -621,7 +622,7 @@ public class DefaultSnapshotRemover
       }
     }
 
-    public boolean releaseExistsForSnapshot(Gav snapshotGav, Map<String, Object> context) {
+    public boolean releaseExistsForSnapshot(Gav snapshotGav, RequestContext context) {
       long releaseTimestamp = -1;
 
       for (Repository repository : repositoryRegistry.getRepositories()) {
@@ -661,9 +662,8 @@ public class DefaultSnapshotRemover
 
               String path = mrepository.getGavCalculator().gavToPath(releaseGav);
 
-              ResourceStoreRequest req = new ResourceStoreRequest(path, true);
-
-              req.getRequestContext().putAll(context);
+              final ResourceStoreRequest req = new ResourceStoreRequest(path, true, false);
+              req.getRequestContext().setParentContext(context);
 
               log.debug("Checking for release counterpart in repository '{}' and path '{}'",
                   mrepository.getId(), req.toString());

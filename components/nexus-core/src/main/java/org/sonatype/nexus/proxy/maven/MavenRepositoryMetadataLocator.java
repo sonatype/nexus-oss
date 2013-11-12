@@ -17,13 +17,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -334,7 +334,7 @@ public class MavenRepositoryMetadataLocator
     return result;
   }
 
-  protected void writeMetadata(RepositoryItemUid uid, Map<String, Object> ctx, Metadata md)
+  protected void writeMetadata(RepositoryItemUid uid, RequestContext ctx, Metadata md)
       throws IllegalOperationException, UnsupportedStorageOperationException, MetadataException, IOException
   {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
