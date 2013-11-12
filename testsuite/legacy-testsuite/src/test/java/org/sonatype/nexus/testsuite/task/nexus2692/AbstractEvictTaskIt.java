@@ -45,7 +45,6 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.codehaus.plexus.util.DirectoryScanner;
@@ -94,9 +93,6 @@ public class AbstractEvictTaskIt
 
     // now setup all the attributes
     File attributesInfo = this.getTestResourceAsFile("attributes.info");
-    BufferedReader reader = null;
-    FileInputStream fis = null;
-    FileOutputStream fos = null;
 
     XStream xstream = new XStream();
     xstream.alias("file", DefaultStorageFileItem.class);
@@ -105,8 +101,7 @@ public class AbstractEvictTaskIt
 
     long timestamp = System.currentTimeMillis();
 
-    try {
-      reader = new BufferedReader(new FileReader(attributesInfo));
+    try (BufferedReader reader = new BufferedReader(new FileReader(attributesInfo))) {
 
       String line = reader.readLine();
       while (line != null) {
@@ -131,9 +126,10 @@ public class AbstractEvictTaskIt
 
           // modify the file corresponding attribute
           File attributeFile = getAttributeFile(filePart);
-          fis = new FileInputStream(attributeFile);
-          StorageItem storageItem = (StorageItem) xstream.fromXML(fis);
-          IOUtils.closeQuietly(fis);
+          StorageItem storageItem;
+          try (FileInputStream in = new FileInputStream(attributeFile)) {
+            storageItem = (StorageItem) xstream.fromXML(in);
+          }
 
           // get old value, update it and set it, but all this is done using reflection
           // Direct method access will work, since we mangle an item that will be persisted using "old" format
@@ -151,18 +147,13 @@ public class AbstractEvictTaskIt
           field.set(storageItem, variation + offset);
 
           // write it out in "old" format
-          fos = new FileOutputStream(attributeFile);
-          xstream.toXML(storageItem, fos);
-          IOUtils.closeQuietly(fos);
+          try (FileOutputStream out = new FileOutputStream(attributeFile)) {
+            xstream.toXML(storageItem, out);
+          }
         }
 
         line = reader.readLine();
       }
-    }
-    finally {
-      IOUtils.closeQuietly(fos);
-      IOUtils.closeQuietly(fis);
-      IOUtils.closeQuietly(reader);
     }
 
     startNexus();
