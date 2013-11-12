@@ -23,7 +23,7 @@ import java.util.Map;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
-import com.google.common.io.Closeables;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -56,7 +56,7 @@ public class RepoMD
       throw Throwables.propagate(e);
     }
     finally {
-      Closeables.closeQuietly(in);
+      IOUtils.closeQuietly(in);
     }
   }
 
