@@ -32,6 +32,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  * Abstract {@link NexusPluginRepository} that can parse plugin metadata.
  */
+@Deprecated
 abstract class AbstractNexusPluginRepository
     implements NexusPluginRepository
 {

@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named(SystemNexusPluginRepository.ID)
 @Singleton
+@Deprecated
 final class SystemNexusPluginRepository
     extends AbstractFileNexusPluginRepository
 {
@@ -53,7 +54,7 @@ final class SystemNexusPluginRepository
       DirSupport.mkdir(systemPluginsFolder.toPath());
     }
     catch (IOException e) {
-      Throwables.propagate(e);
+      throw Throwables.propagate(e);
     }
   }
 

@@ -66,7 +66,7 @@ public class DefaultLSAttributeStorage
    */
   public DefaultLSAttributeStorage(final Marshaller marshaller) {
     this.marshaller = Preconditions.checkNotNull(marshaller);
-    getLogger().info("Default FS AttributeStorage in place, using {} marshaller.", marshaller);
+    log.info("Default FS AttributeStorage in place, using {} marshaller.", marshaller);
   }
 
   public boolean deleteAttributes(final RepositoryItemUid uid)
@@ -77,8 +77,8 @@ public class DefaultLSAttributeStorage
     uidLock.lock(Action.delete);
 
     try {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("Deleting attributes on UID=" + uid.toString());
+      if (log.isDebugEnabled()) {
+        log.debug("Deleting attributes on UID=" + uid.toString());
       }
 
       try {
@@ -113,8 +113,8 @@ public class DefaultLSAttributeStorage
     uidLock.lock(Action.read);
 
     try {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("Loading attributes on UID=" + uid.toString());
+      if (log.isDebugEnabled()) {
+        log.debug("Loading attributes on UID=" + uid.toString());
       }
 
       return doGetAttributes(uid);
@@ -132,8 +132,8 @@ public class DefaultLSAttributeStorage
     uidLock.lock(Action.create);
 
     try {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("Storing attributes on UID=" + uid.toString());
+      if (log.isDebugEnabled()) {
+        log.debug("Storing attributes on UID=" + uid.toString());
       }
 
       try {
@@ -168,7 +168,7 @@ public class DefaultLSAttributeStorage
       }
       catch (UnsupportedStorageOperationException ex) {
         // TODO: what here? Is local storage unsuitable for storing attributes?
-        getLogger().error("Got UnsupportedStorageOperationException during store of UID=" + uid.toString(), ex);
+        log.error("Got UnsupportedStorageOperationException during store of UID=" + uid.toString(), ex);
       }
     }
     finally {
@@ -239,19 +239,19 @@ public class DefaultLSAttributeStorage
       }
     }
     catch (InvalidInputException e) {
-      if (getLogger().isDebugEnabled()) {
+      if (log.isDebugEnabled()) {
         // we log the stacktrace
-        getLogger().info("Attributes of " + uid + " are corrupt, deleting it.", e);
+        log.info("Attributes of " + uid + " are corrupt, deleting it.", e);
       }
       else {
         // just remark about this
-        getLogger().info("Attributes of " + uid + " are corrupt, deleting it.");
+        log.info("Attributes of " + uid + " are corrupt, deleting it.");
       }
 
       corrupt = true;
     }
     catch (IOException e) {
-      getLogger().warn("While reading attributes of " + uid + " we got IOException:", e);
+      log.warn("While reading attributes of " + uid + " we got IOException:", e);
 
       throw e;
     }

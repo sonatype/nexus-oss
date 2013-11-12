@@ -21,7 +21,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
 import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
@@ -29,13 +28,14 @@ import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.p2.bridge.HttpProxy;
 import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named
 @Singleton
 public class GlobalRemoteProxySettingsInspector
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements EventInspector
 {
 
@@ -82,7 +82,7 @@ public class GlobalRemoteProxySettingsInspector
       final int port = httpProxySettings.getPort();
       final Set<String> nonProxyHosts = globalRemoteProxySettings.getNonProxyHosts();
 
-      getLogger().debug(
+      log.debug(
           "Configure P2 proxy using global http proxy settings: hostname={}, port={}, username={}, nonProxyHosts={}",
           hostname, port, username, nonProxyHosts
       );
@@ -90,7 +90,7 @@ public class GlobalRemoteProxySettingsInspector
       httpProxy.setProxySettings(hostname, port, username, password, nonProxyHosts);
     }
     else {
-      getLogger().debug("No global http proxy settings. Resetting P2 proxy.");
+      log.debug("No global http proxy settings. Resetting P2 proxy.");
       httpProxy.setProxySettings(null, -1, null, null, null);
     }
   }

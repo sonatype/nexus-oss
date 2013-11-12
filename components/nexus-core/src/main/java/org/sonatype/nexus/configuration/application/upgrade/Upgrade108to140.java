@@ -48,7 +48,6 @@ import org.sonatype.nexus.configuration.model.v1_4_0.CRouting;
 import org.sonatype.nexus.configuration.model.v1_4_0.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.v1_4_0.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_4_0.CSmtpConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -61,6 +60,7 @@ import org.sonatype.security.configuration.source.PasswordHelper;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.realms.XmlAuthenticatingRealm;
 import org.sonatype.security.realms.XmlAuthorizingRealm;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -75,7 +75,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named("1.0.8")
 public class Upgrade108to140
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements SingleVersionUpgrader
 {
   private final SecurityConfigurationSource securityConfigurationSource;
@@ -267,7 +267,7 @@ public class Upgrade108to140
         securityConfig.setAnonymousPassword(passwordHelper.decrypt(oldsecurity.getAnonymousPassword()));
       }
       catch (PlexusCipherException e) {
-        getLogger().error(
+        log.error(
             "Failed to decrype anonymous password in nexus.xml, password might be encrypted in memory.", e);
       }
       securityConfig.setHashIterations(1024);
@@ -316,7 +316,7 @@ public class Upgrade108to140
         newauth.setPassword(passwordHelper.decrypt(oldauth.getPassword()));
       }
       catch (PlexusCipherException e) {
-        getLogger().error(
+        log.error(
             "Failed to decrype anonymous password in nexus.xml, password might be encrypted in memory.", e);
       }
       newauth.setNtlmHost(oldauth.getNtlmHost());
@@ -713,7 +713,7 @@ public class Upgrade108to140
     String newStr = str.replace('/', '-');
 
     if (showWarn) {
-      getLogger().warn(
+      log.warn(
           "Nexus no longer supports Repository/Group ID with slash in it.\n The ID of Repository/Group '" + str
               + "' was upgraded to '" + newStr
               + "'.\n Please move the repository contents manually if necessary.");

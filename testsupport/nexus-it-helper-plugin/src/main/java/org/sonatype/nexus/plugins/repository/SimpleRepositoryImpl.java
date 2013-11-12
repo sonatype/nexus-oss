@@ -84,7 +84,7 @@ public class SimpleRepositoryImpl
 
     getExternalConfiguration(true).setSaidHelloCount(cnt++);
 
-    getLogger().info(String.format("Saying \"Hello\" for %s time.", cnt));
+    log.info(String.format("Saying \"Hello\" for %s time.", cnt));
 
     return "hello";
   }

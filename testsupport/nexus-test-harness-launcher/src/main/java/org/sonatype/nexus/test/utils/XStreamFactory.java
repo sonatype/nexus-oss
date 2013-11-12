@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.test.utils;
 
-import org.sonatype.nexus.rest.MIndexerXStreamConfigurator;
+import org.sonatype.nexus.rest.MIndexerXStreamConfiguratorLightweight;
 import org.sonatype.nexus.rest.model.XStreamConfigurator;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
@@ -49,7 +49,7 @@ public class XStreamFactory
 
   private static void initXStream(XStream xstream) {
     XStreamConfigurator.configureXStream(xstream);
-    MIndexerXStreamConfigurator.configureXStream(xstream);
+    MIndexerXStreamConfiguratorLightweight.configureXStream(xstream);
 
     // Nexus replaces the String converter with one that escape HTML, we do NOT want that on the IT client.
     xstream.registerConverter(new StringConverter());

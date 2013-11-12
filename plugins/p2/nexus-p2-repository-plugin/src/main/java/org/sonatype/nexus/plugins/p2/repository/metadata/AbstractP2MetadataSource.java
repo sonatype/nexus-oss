@@ -27,7 +27,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
 import java.util.zip.ZipOutputStream;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2Repository;
 import org.sonatype.nexus.plugins.p2.repository.proxy.P2RuntimeExceptionMaskedAsINFException;
@@ -47,6 +46,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.IOUtil;
@@ -54,7 +54,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.MXSerializer;
 
 public abstract class AbstractP2MetadataSource<E extends P2Repository>
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements P2MetadataSource<E>
 {
 
@@ -71,7 +71,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
     Map<String, StorageItem> cached = Maps.newHashMap();
     for (Entry<String, StorageFileItem> entry : metadataItems.entrySet()) {
       setItemAttributes(entry.getValue(), context, repository);
-      getLogger().debug("Repository " + repository.getId() + ": Created metadata item " + entry.getValue().getPath());
+      log.debug("Repository " + repository.getId() + ": Created metadata item " + entry.getValue().getPath());
       cached.put(entry.getKey(), doCacheItem(entry.getValue(), repository));
     }
     return cached;
@@ -187,7 +187,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
       }
     }
     catch (ItemNotFoundException ex) {
-      getLogger().warn(
+      log.warn(
           "Nexus BUG in "
               + RepositoryStringUtils.getHumanizedNameString(repository)
               + ", ItemNotFoundException during cache! Please report this issue along with the stack trace below!",
@@ -197,7 +197,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
       result = item;
     }
     catch (UnsupportedStorageOperationException ex) {
-      getLogger().warn(
+      log.warn(
           "LocalStorage or repository " + RepositoryStringUtils.getHumanizedNameString(repository)
               + " does not handle STORE operation, not caching remote fetched item.", ex);
 
@@ -328,8 +328,8 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
       // release repo read lock we initially acquired
       repoLock.unlock();
 
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug(
+      if (log.isDebugEnabled()) {
+        log.debug(
             "Repository " + repository.getId() + ": retrieve item: " + request.getRequestPath() + ": took "
                 + (System.currentTimeMillis() - start) + " ms.");
       }
@@ -360,13 +360,13 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
   }
 
   private void deleteP2Metadata(final Repository repository) {
-    getLogger().debug("Repository " + repository.getId() + ": Deleting p2 metadata items.");
+    log.debug("Repository " + repository.getId() + ": Deleting p2 metadata items.");
     deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.ARTIFACTS_JAR));
     deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.ARTIFACTS_XML));
     deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.CONTENT_JAR));
     deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.CONTENT_XML));
     deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.PRIVATE_ROOT));
-    getLogger().debug("Repository " + repository.getId() + ": Deleted p2 metadata items.");
+    log.debug("Repository " + repository.getId() + ": Deleted p2 metadata items.");
   }
 
   private static void deleteItemSilently(final Repository repository, final ResourceStoreRequest request) {
@@ -393,7 +393,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
   {
     final Map<String, StorageFileItem> fileItems = doRetrieveArtifactsFileItems(context, repository);
     try {
-      getLogger().debug("Repository " + repository.getId() + ": Deleting p2 artifacts metadata items.");
+      log.debug("Repository " + repository.getId() + ": Deleting p2 artifacts metadata items.");
       for (StorageFileItem fileItem : fileItems.values()) {
         deleteItemSilently(repository, new ResourceStoreRequest(fileItem.getPath()));
       }
@@ -409,7 +409,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
   {
     final Map<String, StorageFileItem> fileItems = doRetrieveContentFileItems(context, repository);
     try {
-      getLogger().debug("Repository " + repository.getId() + ": Deleting p2 content metadata items.");
+      log.debug("Repository " + repository.getId() + ": Deleting p2 content metadata items.");
       for (StorageFileItem fileItem : fileItems.values()) {
         deleteItemSilently(repository, new ResourceStoreRequest(fileItem.getPath()));
       }

@@ -19,10 +19,6 @@ import java.util.Date;
 public class HourlySchedulerIterator
     extends AbstractCalendarBasedSchedulerIterator
 {
-  public HourlySchedulerIterator(Date startingDate) {
-    super(startingDate);
-  }
-
   public HourlySchedulerIterator(Date startingDate, Date endingDate) {
     super(startingDate, endingDate);
   }

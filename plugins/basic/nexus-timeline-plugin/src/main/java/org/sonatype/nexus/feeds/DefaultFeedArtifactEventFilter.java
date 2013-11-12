@@ -20,20 +20,20 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named
 @Singleton
 public class DefaultFeedArtifactEventFilter
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements FeedArtifactEventFilter
 {
   private final NexusItemAuthorizer nexusItemAuthorizer;
@@ -77,7 +77,7 @@ public class DefaultFeedArtifactEventFilter
     }
     catch (NoSuchRepositoryException e) {
       // Can't get repository for artifact, therefore we can't authorize access, therefore you don't see it
-      getLogger().debug(
+      log.debug(
           "Feed entry contained invalid repository id " + event.getNexusItemInfo().getRepositoryId(),
           e);
 

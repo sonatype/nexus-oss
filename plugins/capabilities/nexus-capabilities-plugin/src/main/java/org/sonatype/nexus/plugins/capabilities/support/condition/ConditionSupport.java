@@ -15,9 +15,9 @@ package org.sonatype.nexus.plugins.capabilities.support.condition;
 
 import javax.inject.Provider;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since capabilities 2.0
  */
 public abstract class ConditionSupport
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements Condition
 {
 

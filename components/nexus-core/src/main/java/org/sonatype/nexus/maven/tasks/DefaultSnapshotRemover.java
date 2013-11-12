@@ -30,7 +30,6 @@ import org.sonatype.aether.util.version.GenericVersionScheme;
 import org.sonatype.aether.version.InvalidVersionSpecificationException;
 import org.sonatype.aether.version.Version;
 import org.sonatype.aether.version.VersionScheme;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.RequestContext;
@@ -60,6 +59,7 @@ import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
 import org.sonatype.nexus.util.PathUtils;
 import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -74,7 +74,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class DefaultSnapshotRemover
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements SnapshotRemover
 {
 
@@ -133,17 +133,17 @@ public class DefaultSnapshotRemover
   private boolean process(SnapshotRemovalRequest request, SnapshotRemovalResult result, Repository repository) {
     // only from maven repositories, stay silent for others and simply skip
     if (!repository.getRepositoryContentClass().isCompatible(maven2ContentClass)) {
-      getLogger().debug("Skipping '" + repository.getId() + "' is not a maven 2 repository");
+      log.debug("Skipping '" + repository.getId() + "' is not a maven 2 repository");
       return false;
     }
 
     if (!repository.getLocalStatus().shouldServiceRequest()) {
-      getLogger().debug("Skipping '" + repository.getId() + "' the repository is out of service");
+      log.debug("Skipping '" + repository.getId() + "' the repository is out of service");
       return false;
     }
 
     if (repository.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
-      getLogger().debug("Skipping '" + repository.getId() + "' is a proxy repository");
+      log.debug("Skipping '" + repository.getId() + "' is a proxy repository");
       return false;
     }
 
@@ -187,8 +187,8 @@ public class DefaultSnapshotRemover
       return result;
     }
 
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug(
+    if (log.isDebugEnabled()) {
+      log.debug(
           "Collecting deletable snapshots on repository " + repository.getId() + " from storage directory "
               + repository.getLocalUrl());
     }
@@ -216,8 +216,8 @@ public class DefaultSnapshotRemover
     result.setDeletedSnapshots(snapshotRemoveProcessor.getDeletedSnapshots());
     result.setDeletedFiles(snapshotRemoveProcessor.getDeletedFiles());
 
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug(
+    if (log.isDebugEnabled()) {
+      log.debug(
           "Collected and deleted " + snapshotRemoveProcessor.getDeletedSnapshots()
               + " snapshots with alltogether " + snapshotRemoveProcessor.getDeletedFiles()
               + " files on repository " + repository.getId());
@@ -230,7 +230,7 @@ public class DefaultSnapshotRemover
       repository.expireNotFoundCaches(new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT));
 
       RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor =
-          new RecreateMavenMetadataWalkerProcessor(getLogger(), getDeleteOperation(request));
+          new RecreateMavenMetadataWalkerProcessor(log, getDeleteOperation(request));
 
       for (String path : parentOMatic.getMarkedPaths()) {
         TaskUtil.checkInterruption();
@@ -262,19 +262,19 @@ public class DefaultSnapshotRemover
 
   private void logDetails(SnapshotRemovalRequest request) {
     if (request.getRepositoryId() != null) {
-      getLogger().info("Removing old SNAPSHOT deployments from " + request.getRepositoryId() + " repository.");
+      log.info("Removing old SNAPSHOT deployments from " + request.getRepositoryId() + " repository.");
     }
     else {
-      getLogger().info("Removing old SNAPSHOT deployments from all repositories.");
+      log.info("Removing old SNAPSHOT deployments from all repositories.");
     }
 
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("With parameters: ");
-      getLogger().debug("    MinCountOfSnapshotsToKeep: " + request.getMinCountOfSnapshotsToKeep());
-      getLogger().debug("    RemoveSnapshotsOlderThanDays: " + request.getRemoveSnapshotsOlderThanDays());
-      getLogger().debug("    RemoveIfReleaseExists: " + request.isRemoveIfReleaseExists());
-      getLogger().debug("    DeleteImmediately: " + request.isDeleteImmediately());
-      getLogger().debug("    UseLastRequestedTimestamp: " + request.shouldUseLastRequestedTimestamp());
+    if (log.isDebugEnabled()) {
+      log.debug("With parameters: ");
+      log.debug("    MinCountOfSnapshotsToKeep: " + request.getMinCountOfSnapshotsToKeep());
+      log.debug("    RemoveSnapshotsOlderThanDays: " + request.getRemoveSnapshotsOlderThanDays());
+      log.debug("    RemoveIfReleaseExists: " + request.isRemoveIfReleaseExists());
+      log.debug("    DeleteImmediately: " + request.isDeleteImmediately());
+      log.debug("    UseLastRequestedTimestamp: " + request.shouldUseLastRequestedTimestamp());
     }
   }
 
@@ -365,15 +365,15 @@ public class DefaultSnapshotRemover
       }
       catch (Exception e) {
         // we always simply log the exception and continue
-        getLogger().warn("SnapshotRemover is failed to process path: '" + coll.getPath() + "'.", e);
+        log.warn("SnapshotRemover is failed to process path: '" + coll.getPath() + "'.", e);
       }
     }
 
     public void doOnCollectionExit(WalkerContext context, StorageCollectionItem coll)
         throws Exception
     {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("onCollectionExit() :: " + coll.getRepositoryItemUid().toString());
+      if (log.isDebugEnabled()) {
+        log.debug("onCollectionExit() :: " + coll.getRepositoryItemUid().toString());
       }
 
       shouldProcessCollection = coll.getPath().endsWith("SNAPSHOT");
@@ -408,7 +408,7 @@ public class DefaultSnapshotRemover
             if (!gav.isHash() && !gav.isSignature() && gav.getExtension().equals("pom")) {
               if (request.isRemoveIfReleaseExists()
                   && releaseExistsForSnapshot(gav, item.getItemContext())) {
-                getLogger().debug("Found POM and release exists, removing whole gav.");
+                log.debug("Found POM and release exists, removing whole gav.");
 
                 removeWholeGAV = true;
 
@@ -419,13 +419,13 @@ public class DefaultSnapshotRemover
 
             item.getItemContext().put(Gav.class.getName(), gav);
 
-            getLogger().debug(item.getPath());
+            log.debug(item.getPath());
 
             if (gav.getSnapshotTimeStamp() != null) {
               long itemTimestamp = gav.getSnapshotTimeStamp().longValue();
 
-              if (getLogger().isDebugEnabled()) {
-                getLogger().debug(
+              if (log.isDebugEnabled()) {
+                log.debug(
                     "itemTimestamp={} ({}), dateThreshold={} ({})",
                     itemTimestamp, itemTimestamp > 0 ? new Date(itemTimestamp) : "",
                     dateThreshold, dateThreshold > 0 ? new Date(dateThreshold) : ""
@@ -450,7 +450,7 @@ public class DefaultSnapshotRemover
             else {
               // If no timestamp on gav, then it is a non-unique snapshot
               // and should _not_ be removed
-              getLogger().debug("GAV Snapshot timestamp not available, skipping non-unique snapshot");
+              log.debug("GAV Snapshot timestamp not available, skipping non-unique snapshot");
 
               addStorageFileItemToMap(remainingSnapshotsAndFiles, gav, (StorageFileItem) item);
             }
@@ -469,15 +469,15 @@ public class DefaultSnapshotRemover
               }
             }
             catch (ItemNotFoundException e) {
-              if (getLogger().isDebugEnabled()) {
-                getLogger().debug(
+              if (log.isDebugEnabled()) {
+                log.debug(
                     "Could not delete whole GAV " + coll.getRepositoryItemUid().toString(), e);
               }
             }
           }
         }
         catch (Exception e) {
-          getLogger().warn("Could not delete whole GAV " + coll.getRepositoryItemUid().toString(), e);
+          log.warn("Could not delete whole GAV " + coll.getRepositoryItemUid().toString(), e);
         }
       }
       else {
@@ -538,13 +538,13 @@ public class DefaultSnapshotRemover
               // NEXUS-5682 Since checksum files are no longer physically represented on the file system,
               // it is expected that they will generate ItemNotFoundException. Log at trace level only for
               // diagnostic purposes.
-              if (getLogger().isTraceEnabled()) {
-                getLogger().trace("Could not delete file:", e);
+              if (log.isTraceEnabled()) {
+                log.trace("Could not delete file:", e);
               }
 
             }
             catch (Exception e) {
-              getLogger().info("Could not delete file:", e);
+              log.info("Could not delete file:", e);
             }
           }
         }
@@ -599,9 +599,9 @@ public class DefaultSnapshotRemover
           lastRequested = Math.max(lastRequested, listedItem.getLastRequested());
         }
       }
-      if (getLogger().isDebugEnabled()) {
+      if (log.isDebugEnabled()) {
         // FIXME this debug message lacks storage item context, and could be possibly better at TRACE as well
-        getLogger().debug(
+        log.debug(
             "lastRequested={} ({}), dateThreshold={} ({})",
             lastRequested, lastRequested > 0 ? new Date(lastRequested) : "",
             dateThreshold, dateThreshold > 0 ? new Date(dateThreshold) : ""
@@ -665,7 +665,7 @@ public class DefaultSnapshotRemover
               final ResourceStoreRequest req = new ResourceStoreRequest(path, true, false);
               req.getRequestContext().setParentContext(context);
 
-              getLogger().debug("Checking for release counterpart in repository '{}' and path '{}'",
+              log.debug("Checking for release counterpart in repository '{}' and path '{}'",
                   mrepository.getId(), req.toString());
 
               final StorageItem item = mrepository.retrieveItem(false, req);
@@ -679,7 +679,7 @@ public class DefaultSnapshotRemover
             }
             catch (Exception e) {
               // nothing
-              getLogger().debug("Unexpected exception!", e);
+              log.debug("Unexpected exception!", e);
             }
           }
         }

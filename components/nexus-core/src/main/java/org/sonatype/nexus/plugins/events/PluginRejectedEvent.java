@@ -21,6 +21,7 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
 /**
  * This {@link Event} is triggered when a Nexus plugin fails during activation.
  */
+@Deprecated
 public final class PluginRejectedEvent
     extends AbstractEvent<NexusPluginManager>
 {
@@ -47,16 +48,8 @@ public final class PluginRejectedEvent
   // Public methods
   // ----------------------------------------------------------------------
 
-  public GAVCoordinate getPluginCoordinates() {
-    return gav;
-  }
-
   public Throwable getReason() {
     return reason;
-  }
-
-  public NexusPluginManager getNexusPluginManager() {
-    return getEventSender();
   }
 
   @Override

@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.index;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -24,9 +23,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.ArtifactInfoFilter;
-import org.apache.maven.index.FlatSearchResponse;
 import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.SearchType;
 
@@ -50,14 +47,6 @@ public class Sha1Searcher
 
   public SearchType getDefaultSearchType() {
     return SearchType.EXACT;
-  }
-
-  public FlatSearchResponse flatSearch(Map<String, String> terms, String repositoryId, Integer from, Integer count,
-                                       Integer hitLimit)
-      throws NoSuchRepositoryException
-  {
-    // We do not support "old" style search anymore
-    return new FlatSearchResponse(null, 0, Collections.<ArtifactInfo>emptySet());
   }
 
   public IteratorSearchResponse flatIteratorSearch(Map<String, String> terms, String repositoryId, Integer from,

@@ -27,7 +27,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.ContentLocator;
@@ -43,6 +42,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.io.StreamSupport;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
@@ -60,7 +60,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class DefaultAttributesHandler
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements AttributesHandler
 {
 
@@ -139,7 +139,7 @@ public class DefaultAttributesHandler
           new DelegatingAttributeStorage(new TransitioningAttributeStorage(attributeStorage,
               legacyAttributeStorage));
 
-      getLogger().info(
+      log.info(
           "Legacy AttributeStorage directory exists here \"{}\", transitioning them on-the-fly as they are used to repository storage.",
           ((LegacyFSAttributeStorage) legacyAttributeStorage).getWorkingDirectory());
     }
@@ -397,7 +397,7 @@ public class DefaultAttributesHandler
         // as core has no more these
         // We have to have a java.io.File at any cause, as deprecated StorageFileItemInspector needs one
         // even if the ContentLocator we got is reusable
-        getLogger().warn(
+        log.warn(
             "Deprecated StorageFileItemInspector components used: {}. Change your plugin to use StorageItemInspector instead!",
             handlingFileInspectors);
 
@@ -409,7 +409,7 @@ public class DefaultAttributesHandler
             tmpFile = ((FileContentLocator) content).getFile();
           }
           else {
-            getLogger().info(
+            log.info(
                 "Doing a temporary copy of the \"{}\" item's content for expanding custom attributes. This should NOT happen, but is left in as \"fallback\"!",
                 item.getPath());
             deleteTmpFile = true;
@@ -425,7 +425,7 @@ public class DefaultAttributesHandler
               }
             }
             catch (IOException ex) {
-              getLogger().warn("Could not create file from {}", item.getRepositoryItemUid(), ex);
+              log.warn("Could not create file from {}", item.getRepositoryItemUid(), ex);
               tmpFile = null;
             }
           }
@@ -440,7 +440,7 @@ public class DefaultAttributesHandler
                 inspector.processStorageFileItem(fItem, tmpFile);
               }
               catch (Exception ex) {
-                getLogger().warn(
+                log.warn(
                     "Inspector {} throw exception during inspection of {}, continuing...", inspector.getClass(),
                     item.getRepositoryItemUid(), ex);
               }
@@ -453,7 +453,7 @@ public class DefaultAttributesHandler
               }
               catch (IOException e) {
                 tmpFile.deleteOnExit();
-                getLogger().warn("Could not delete tmp file!", e);
+                log.warn("Could not delete tmp file!", e);
               }
             }
           }
@@ -468,7 +468,7 @@ public class DefaultAttributesHandler
           inspector.processStorageItem(item);
         }
         catch (Exception ex) {
-          getLogger().warn(
+          log.warn(
               "Inspector {} throw exception during inspection of {}, continuing...", inspector.getClass(),
               item.getRepositoryItemUid(), ex);
         }

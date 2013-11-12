@@ -266,7 +266,7 @@ public abstract class AbstractProxyRepository
       }
       request.setRequestLocalOnly(true);
 
-      getLogger().debug(
+      log.debug(
           String.format("Expiring proxy cache in repository %s from path=\"%s\"",
               RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath()));
 
@@ -286,14 +286,14 @@ public abstract class AbstractProxyRepository
         }
       }
 
-      if (getLogger().isDebugEnabled()) {
+      if (log.isDebugEnabled()) {
         if (expireCacheWalkerProcessor.isCacheAltered()) {
-          getLogger().info(
+          log.info(
               String.format("Proxy cache was expired for repository %s from path=\"%s\"",
                   RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath()));
         }
         else {
-          getLogger().debug(
+          log.debug(
               String.format("Proxy cache not altered for repository %s from path=\"%s\"",
                   RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath()));
         }
@@ -360,7 +360,7 @@ public abstract class AbstractProxyRepository
   protected Collection<String> doEvictUnusedItems(ResourceStoreRequest request, final long timestamp,
                                                   EvictUnusedItemsWalkerProcessor processor, WalkerFilter filter)
   {
-    getLogger().info(
+    log.info(
         String.format("Evicting unused items from proxy repository %s from path=\"%s\"",
             RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath()));
 
@@ -419,7 +419,7 @@ public abstract class AbstractProxyRepository
   public void setAutoBlockActive(boolean val) {
     // NEXUS-3516: if user disables autoblock, and repo is auto-blocked, unblock it
     if (!val && ProxyMode.BLOCKED_AUTO.equals(getProxyMode())) {
-      getLogger().warn(
+      log.warn(
           String.format(
               "Proxy Repository %s was auto-blocked, but user disabled this feature. Unblocking repository, but this MAY cause Nexus to leak connections (if remote repository is still down)!",
               RepositoryStringUtils.getHumanizedNameString(this)));
@@ -517,8 +517,8 @@ public abstract class AbstractProxyRepository
           // NEXUS-4410: do this only when we are going BLOCKED_MANUAL -> ALLOW transition
           // In case of Auto unblocking, do not perform purge!
           if (!oldProxyMode.shouldAutoUnblock()) {
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("We have a BLOCKED_MANUAL -> ALLOW transition, purging NFC");
+            if (log.isDebugEnabled()) {
+              log.debug("We have a BLOCKED_MANUAL -> ALLOW transition, purging NFC");
             }
 
             getNotFoundCache().purge();
@@ -570,14 +570,14 @@ public abstract class AbstractProxyRepository
         if (remoteStorage instanceof AbstractHTTPRemoteRepositoryStorage
             && ((AbstractHTTPRemoteRepositoryStorage) remoteStorage).isRemotePeerAmazonS3Storage(this)
             && cause instanceof RemoteAccessDeniedException) {
-          getLogger().debug(
+          log.debug(
               "Not autoblocking repository id " + getId() + "since this is Amazon S3 proxy repo");
           return;
         }
       }
       catch (StorageException e) {
         // This shouldn't occur, since we are just checking the context
-        getLogger().debug("Unable to validate if proxy repository id " + getId() + "is Amazon S3", e);
+        log.debug("Unable to validate if proxy repository id " + getId() + "is Amazon S3", e);
       }
     }
 
@@ -614,8 +614,8 @@ public abstract class AbstractProxyRepository
       }
 
       // log the event
-      if (getLogger().isDebugEnabled()) {
-        getLogger().warn(sb.toString(), cause);
+      if (log.isDebugEnabled()) {
+        log.warn(sb.toString(), cause);
       }
       else {
         sb.append(" - Cause(s): ").append(cause.getMessage());
@@ -628,7 +628,7 @@ public abstract class AbstractProxyRepository
           c = c.getCause();
         }
 
-        getLogger().warn(sb.toString());
+        log.warn(sb.toString());
       }
     }
 
@@ -649,7 +649,7 @@ public abstract class AbstractProxyRepository
       // }
       // catch ( IOException e )
       // {
-      // getLogger().warn(
+      // log.warn(
       // "Cannot save configuration after AutoBlocking repository \"" + getName() + "\" (id=" + getId()
       // + ")", e );
       // }
@@ -670,7 +670,7 @@ public abstract class AbstractProxyRepository
 
     if (oldProxyMode.shouldAutoUnblock()) {
       // log the event
-      getLogger().warn(
+      log.warn(
           String.format(
               "Remote peer of proxy repository %s detected as healthy, un-blocking the proxy repository (it was AutoBlocked by Nexus).",
               RepositoryStringUtils.getHumanizedNameString(this)));
@@ -685,7 +685,7 @@ public abstract class AbstractProxyRepository
     // }
     // catch ( IOException e )
     // {
-    // getLogger().warn(
+    // log.warn(
     // "Cannot save configuration after AutoBlocking repository \"" + getName() + "\" (id=" + getId() + ")", e );
     // }
   }
@@ -888,8 +888,8 @@ public abstract class AbstractProxyRepository
     AbstractStorageItem result = null;
 
     try {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug(
+      if (log.isDebugEnabled()) {
+        log.debug(
             "Caching item " + item.getRepositoryItemUid().toString() + " in local storage of repository.");
       }
 
@@ -927,7 +927,7 @@ public abstract class AbstractProxyRepository
       }
     }
     catch (ItemNotFoundException ex) {
-      getLogger().warn(
+      log.warn(
           "Nexus BUG in "
               + RepositoryStringUtils.getHumanizedNameString(this)
               + ", ItemNotFoundException during cache! Please report this issue along with the stack trace below!",
@@ -937,7 +937,7 @@ public abstract class AbstractProxyRepository
       result = item;
     }
     catch (UnsupportedStorageOperationException ex) {
-      getLogger().warn(
+      log.warn(
           "LocalStorage or repository " + RepositoryStringUtils.getHumanizedNameString(this)
               + " does not handle STORE operation, not caching remote fetched item.", ex);
 
@@ -951,7 +951,7 @@ public abstract class AbstractProxyRepository
   protected StorageItem doRetrieveItem(ResourceStoreRequest request)
       throws IllegalOperationException, ItemNotFoundException, StorageException
   {
-    if (getLogger().isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       StringBuilder db = new StringBuilder(request.toString());
 
       db.append(" :: localOnly=").append(request.isRequestLocalOnly());
@@ -962,7 +962,7 @@ public abstract class AbstractProxyRepository
         db.append(", ProxyMode=" + getProxyMode().toString());
       }
 
-      getLogger().debug(db.toString());
+      log.debug(db.toString());
     }
 
     // we have to re-set locking here explicitly, since we are going to
@@ -1091,8 +1091,8 @@ public abstract class AbstractProxyRepository
           boolean shouldGetRemote = false;
 
           if (localItem != null) {
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug(
+            if (log.isDebugEnabled()) {
+              log.debug(
                   "Item " + request.toString()
                       + " is old, checking for newer file on remote then local: "
                       + new Date(localItem.getModified()));
@@ -1105,14 +1105,14 @@ public abstract class AbstractProxyRepository
               if (!shouldGetRemote) {
                 markItemRemotelyChecked(localItem);
 
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug(
+                if (log.isDebugEnabled()) {
+                  log.debug(
                       "No newer version of item " + request.toString() + " found on remote storage.");
                 }
               }
               else {
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug(
+                if (log.isDebugEnabled()) {
+                  log.debug(
                       "Newer version of item " + request.toString() + " is found on remote storage.");
                 }
               }
@@ -1149,8 +1149,8 @@ public abstract class AbstractProxyRepository
             try {
               remoteItem = doRetrieveRemoteItem(request);
 
-              if (getLogger().isDebugEnabled()) {
-                getLogger().debug("Item " + request.toString() + " found in remote storage.");
+              if (log.isDebugEnabled()) {
+                log.debug("Item " + request.toString() + " found in remote storage.");
               }
             }
             catch (StorageException ex) {
@@ -1187,8 +1187,8 @@ public abstract class AbstractProxyRepository
           }
         }
         catch (ItemNotFoundException ex) {
-          if (getLogger().isDebugEnabled()) {
-            getLogger().debug("Item " + request.toString() + " not found in remote storage.");
+          if (log.isDebugEnabled()) {
+            log.debug("Item " + request.toString() + " not found in remote storage.");
           }
 
           remoteItem = null;
@@ -1197,8 +1197,8 @@ public abstract class AbstractProxyRepository
 
       if (localItem == null && remoteItem == null) {
         // we dont have neither one, NotFoundException
-        if (getLogger().isDebugEnabled()) {
-          getLogger().debug(
+        if (log.isDebugEnabled()) {
+          log.debug(
               "Item " + request.toString()
                   + " does not exist in local or remote storage, throwing ItemNotFoundException.");
         }
@@ -1209,8 +1209,8 @@ public abstract class AbstractProxyRepository
       }
       else if (localItem != null && remoteItem == null) {
         // simple: we have local but not remote (coz we are offline or coz it is not newer)
-        if (getLogger().isDebugEnabled()) {
-          getLogger().debug(
+        if (log.isDebugEnabled()) {
+          log.debug(
               "Item " + request.toString()
                   + " does exist in local storage and is fresh, returning local one.");
         }
@@ -1228,16 +1228,16 @@ public abstract class AbstractProxyRepository
     else {
       // we cannot go remote
       if (localItem != null) {
-        if (getLogger().isDebugEnabled()) {
-          getLogger().debug(
+        if (log.isDebugEnabled()) {
+          log.debug(
               "Item " + request.toString() + " does exist locally and cannot go remote, returning local one.");
         }
 
         item = localItem;
       }
       else {
-        if (getLogger().isDebugEnabled()) {
-          getLogger().debug(
+        if (log.isDebugEnabled()) {
+          log.debug(
               "Item " + request.toString()
                   + " does not exist locally and cannot go remote, throwing ItemNotFoundException.");
         }
@@ -1253,8 +1253,8 @@ public abstract class AbstractProxyRepository
   private void sendContentValidationEvents(ResourceStoreRequest request, List<RepositoryItemValidationEvent> events,
                                            boolean isContentValid)
   {
-    if (getLogger().isDebugEnabled() && !isContentValid) {
-      getLogger().debug("Item " + request.toString() + " failed content integrity validation.");
+    if (log.isDebugEnabled() && !isContentValid) {
+      log.debug("Item " + request.toString() + " failed content integrity validation.");
     }
 
     for (RepositoryItemValidationEvent event : events) {
@@ -1287,7 +1287,7 @@ public abstract class AbstractProxyRepository
             icventry.getValue().isRemoteItemContentValid(this, req, baseUrl, item, events);
 
         if (!isValidByCurrentItemContentValidator) {
-          getLogger().info(
+          log.info(
               String.format(
                   "Proxied item %s evaluated as INVALID during content validation (validator=%s, sourceUrl=%s)",
                   item.getRepositoryItemUid().toString(), icventry.getKey(), item.getRemoteUrl()));
@@ -1296,7 +1296,7 @@ public abstract class AbstractProxyRepository
         isValid = isValid && isValidByCurrentItemContentValidator;
       }
       catch (StorageException e) {
-        getLogger().info(
+        log.info(
             String.format(
                 "Proxied item %s evaluated as INVALID during content validation (validator=%s, sourceUrl=%s)",
                 item.getRepositoryItemUid().toString(), icventry.getKey(), item.getRemoteUrl()), e);
@@ -1377,8 +1377,8 @@ public abstract class AbstractProxyRepository
           }
         }
 
-        if (getLogger().isDebugEnabled()) {
-          getLogger().debug("Using URL:" + remoteUrl + ", retryCount=" + retryCount);
+        if (log.isDebugEnabled()) {
+          log.debug("Using URL:" + remoteUrl + ", retryCount=" + retryCount);
         }
 
         // Validate the mirror URL
@@ -1433,7 +1433,7 @@ public abstract class AbstractProxyRepository
             lastException = e;
 
             // debug, print all
-            if (getLogger().isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
               logFailedUrl(remoteUrl, e);
             }
             // not debug, only print the message
@@ -1444,7 +1444,7 @@ public abstract class AbstractProxyRepository
                 t = e;
               }
 
-              getLogger().error(
+              log.error(
                   String.format(
                       "Got RemoteStorageException in proxy repository %s while retrieving remote artifact \"%s\" from URL %s, this is %s (re)try, cause: %s: %s",
                       RepositoryStringUtils.getHumanizedNameString(this), request.toString(),
@@ -1457,7 +1457,7 @@ public abstract class AbstractProxyRepository
             lastException = e;
 
             // debug, print all
-            if (getLogger().isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
               logFailedUrl(remoteUrl, e);
             }
             // not debug, only print the message
@@ -1468,7 +1468,7 @@ public abstract class AbstractProxyRepository
                 t = e;
               }
 
-              getLogger().error(
+              log.error(
                   String.format(
                       "Got LocalStorageException in proxy repository %s while caching retrieved artifact \"%s\" got from URL %s, will attempt next mirror, cause: %s: %s",
                       RepositoryStringUtils.getHumanizedNameString(this), request.toString(),
@@ -1503,7 +1503,7 @@ public abstract class AbstractProxyRepository
         // good, we want this item deleted
       }
       catch (UnsupportedStorageOperationException e) {
-        getLogger().warn("Unexpected Exception in " + RepositoryStringUtils.getHumanizedNameString(this), e);
+        log.warn("Unexpected Exception in " + RepositoryStringUtils.getHumanizedNameString(this), e);
       }
 
       if (lastException instanceof StorageException) {
@@ -1528,9 +1528,9 @@ public abstract class AbstractProxyRepository
   }
 
   private void logFailedUrl(String url, Exception e) {
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Failed URL: {}", url);
-      getLogger().debug(e.getMessage(), e);
+    if (log.isDebugEnabled()) {
+      log.debug("Failed URL: {}", url);
+      log.debug(e.getMessage(), e);
     }
   }
 
@@ -1645,8 +1645,8 @@ public abstract class AbstractProxyRepository
     boolean shouldAddToNFC = super.shouldAddToNotFoundCache(request);
     if (shouldAddToNFC) {
       shouldAddToNFC = getProxyMode() == null || getProxyMode().shouldProxy();
-      if (!shouldAddToNFC && getLogger().isDebugEnabled()) {
-        getLogger().debug(
+      if (!shouldAddToNFC && log.isDebugEnabled()) {
+        log.debug(
             String.format(
                 "Proxy repository '%s' is is not allowed to issue remote requests (%s), not adding path '%s' to NFC",
                 getId(), getProxyMode(), request.getRequestPath()));

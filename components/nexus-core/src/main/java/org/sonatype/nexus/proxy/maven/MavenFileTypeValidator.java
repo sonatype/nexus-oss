@@ -65,32 +65,32 @@ public class MavenFileTypeValidator
 
     final String filePath = file.getPath().toLowerCase();
     if (filePath.endsWith(".pom")) {
-      getLogger().debug("Checking if Maven POM {} is of the correct MIME type.", file.getRepositoryItemUid());
+      log.debug("Checking if Maven POM {} is of the correct MIME type.", file.getRepositoryItemUid());
 
       try {
         return XMLUtils.validateXmlLikeFile(file, "<project");
       }
       catch (IOException e) {
-        getLogger().warn("Cannot access content of StorageFileItem: " + file.getRepositoryItemUid(), e);
+        log.warn("Cannot access content of StorageFileItem: " + file.getRepositoryItemUid(), e);
 
         return FileTypeValidity.NEUTRAL;
       }
     }
     else if (filePath.endsWith("/maven-metadata.xml")) {
-      getLogger().debug("Checking if Maven Repository Metadata {} is of the correct MIME type.",
+      log.debug("Checking if Maven Repository Metadata {} is of the correct MIME type.",
           file.getRepositoryItemUid());
 
       try {
         return XMLUtils.validateXmlLikeFile(file, "<metadata");
       }
       catch (IOException e) {
-        getLogger().warn("Cannot access content of StorageFileItem: " + file.getRepositoryItemUid(), e);
+        log.warn("Cannot access content of StorageFileItem: " + file.getRepositoryItemUid(), e);
 
         return FileTypeValidity.NEUTRAL;
       }
     }
     else if (filePath.endsWith(".sha1") || filePath.endsWith(".md5")) {
-      getLogger().debug("Checking if Maven checksum {} is valid.", file.getRepositoryItemUid());
+      log.debug("Checking if Maven checksum {} is valid.", file.getRepositoryItemUid());
 
       try {
         final String digest = MUtils.readDigestFromFileItem(file);
@@ -105,7 +105,7 @@ public class MavenFileTypeValidator
         return FileTypeValidity.INVALID;
       }
       catch (IOException e) {
-        getLogger().warn("Cannot access content of StorageFileItem: " + file.getRepositoryItemUid(), e);
+        log.warn("Cannot access content of StorageFileItem: " + file.getRepositoryItemUid(), e);
 
         return FileTypeValidity.NEUTRAL;
       }

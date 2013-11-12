@@ -21,6 +21,7 @@ import java.io.InputStream;
  *
  * @author cstamas
  */
+@Deprecated
 public interface StaticResource
 {
   String getPath();

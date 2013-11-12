@@ -33,7 +33,6 @@ import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
 import org.sonatype.nexus.configuration.PasswordHelper;
 import org.sonatype.nexus.formfields.Encrypted;
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
@@ -52,6 +51,7 @@ import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageItem;
 import org.sonatype.plexus.components.cipher.PlexusCipherException;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -70,7 +70,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabil
 @Singleton
 @Named
 public class DefaultCapabilityRegistry
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements CapabilityRegistry
 {
 
@@ -147,7 +147,7 @@ public class DefaultCapabilityRegistry
           descriptor.version(), generatedId, type, enabled, notes, encryptedProps
       ));
 
-      getLogger().debug("Added capability '{}' of type '{}' with properties '{}'", generatedId, type, encryptedProps);
+      log.debug("Added capability '{}' of type '{}' with properties '{}'", generatedId, type, encryptedProps);
 
       final DefaultCapabilityReference reference = create(generatedId, type, descriptor);
 
@@ -189,7 +189,7 @@ public class DefaultCapabilityRegistry
           reference.descriptor().version(), id, reference.type(), enabled, notes, encryptedProps)
       );
 
-      getLogger().debug(
+      log.debug(
           "Updated capability '{}' of type '{}' with properties '{}'", id, reference.type(), encryptedProps
       );
 
@@ -220,7 +220,7 @@ public class DefaultCapabilityRegistry
       validateId(id);
 
       capabilityStorage.remove(id);
-      getLogger().debug("Removed capability with '{}'", id);
+      log.debug("Removed capability with '{}'", id);
 
       final DefaultCapabilityReference reference = references.remove(id);
       if (reference != null) {
@@ -313,7 +313,7 @@ public class DefaultCapabilityRegistry
   {
     final Collection<CapabilityStorageItem> items = capabilityStorage.getAll();
     for (final CapabilityStorageItem item : items) {
-      getLogger().debug(
+      log.debug(
           "Loading capability '{}' of type '{}' with properties '{}'",
           item.id(), item.type(), item.properties()
       );
@@ -321,7 +321,7 @@ public class DefaultCapabilityRegistry
       final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get(item.type());
 
       if (descriptor == null) {
-        getLogger().warn(
+        log.warn(
             "Capabilities persistent storage (capabilities.xml?) contains an capability of unknown type {} with"
                 + " id {}. This capability will not be loaded", item.type(), item.id()
         );
@@ -330,7 +330,7 @@ public class DefaultCapabilityRegistry
 
       Map<String, String> properties = decryptValuesIfNeeded(descriptor, item.properties());
       if (descriptor.version() != item.version()) {
-        getLogger().debug(
+        log.debug(
             "Converting capability '{}' properties from version '{}' to version '{}'",
             item.id(), item.version(), descriptor.version()
         );
@@ -339,8 +339,8 @@ public class DefaultCapabilityRegistry
           if (properties == null) {
             properties = Collections.emptyMap();
           }
-          if (getLogger().isDebugEnabled()) {
-            getLogger().debug(
+          if (log.isDebugEnabled()) {
+            log.debug(
                 "Converted capability '{}' properties '{}' (version '{}') to '{}' (version '{}')",
                 item.id(), item.properties(), item.version(),
                 encryptValuesIfNeeded(descriptor, properties), descriptor.version()
@@ -348,7 +348,7 @@ public class DefaultCapabilityRegistry
           }
         }
         catch (Exception e) {
-          getLogger().error(
+          log.error(
               "Failed converting capability '{}' properties '{}' from version '{}' to version '{}'."
                   + " Capability will not be loaded",
               item.id(), item.properties(), item.version(), descriptor.version(), e
@@ -387,7 +387,7 @@ public class DefaultCapabilityRegistry
 
     references.put(id, reference);
 
-    getLogger().debug("Created capability '{}'", capability);
+    log.debug("Created capability '{}'", capability);
 
     eventBus.post(new CapabilityEvent.Created(this, reference));
 

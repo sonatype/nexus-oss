@@ -17,9 +17,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.inject.EagerSingleton;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -40,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @EagerSingleton
 @Deprecated
 public class DefaultEventInspectorHost
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements EventInspectorHost
 {
   private final EventSubscriberHost eventSubscriberHost;
