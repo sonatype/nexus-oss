@@ -917,7 +917,7 @@ public abstract class AbstractProxyRepository
         itemLock.unlock();
       }
 
-      result.getItemContext().putAll(item.getItemContext());
+      result.getItemContext().setParentContext(item.getItemContext());
 
       if (Action.create.equals(action)) {
         eventBus().post(new RepositoryItemEventCacheCreate(this, result));
@@ -1399,8 +1399,6 @@ public abstract class AbstractProxyRepository
 
             AbstractStorageItem remoteItem =
                 getRemoteStorage().retrieveItem(this, request, remoteUrl);
-
-            remoteItem.getItemContext().putAll(request.getRequestContext());
 
             remoteItem = doCacheItem(remoteItem);
 

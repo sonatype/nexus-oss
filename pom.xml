@@ -647,6 +647,11 @@
                     <exclude>velocity:velocity-dep</exclude>
 
                     <!--
+                    SISU Velocity is banned
+                    -->
+                    <exclude>org.sonatype.sisu:sisu-velocity</exclude>
+
+                    <!--
                     Conflicts with slf4j.
                     -->
                     <exclude>commons-logging:*</exclude>

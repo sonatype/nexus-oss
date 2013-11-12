@@ -220,8 +220,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-velocity</artifactId>
+      <groupId>org.apache.velocity</groupId>
+      <artifactId>velocity</artifactId>
     </dependency>
 
     <dependency>
