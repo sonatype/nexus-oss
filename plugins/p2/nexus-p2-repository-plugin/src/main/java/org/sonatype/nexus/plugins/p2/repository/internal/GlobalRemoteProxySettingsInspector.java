@@ -22,21 +22,23 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
 import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
 import org.sonatype.nexus.events.Event;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.p2.bridge.HttpProxy;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named
 @Singleton
 public class GlobalRemoteProxySettingsInspector
-    extends AbstractLoggingComponent
-    implements EventInspector
+    extends ComponentSupport
+    implements EventSubscriber
 {
 
   private final GlobalRemoteProxySettings globalRemoteProxySettings;
@@ -51,18 +53,17 @@ public class GlobalRemoteProxySettingsInspector
     this.httpProxy = checkNotNull(httpProxy);
   }
 
-  @Override
-  public boolean accepts(final Event<?> evt) {
-    return evt instanceof GlobalRemoteProxySettingsChangedEvent
-        || evt instanceof NexusStartedEvent;
+  @Subscribe
+  public void on(final NexusStartedEvent e) {
+    inspect(e);
   }
 
-  @Override
-  public void inspect(final Event<?> evt) {
-    if (!accepts(evt)) {
-      return;
-    }
+  @Subscribe
+  public void on(final GlobalRemoteProxySettingsChangedEvent e) {
+    inspect(e);
+  }
 
+  protected void inspect(final Event<?> evt) {
     // FIXME: Sort out what to do with http/https here
     RemoteHttpProxySettings httpProxySettings = globalRemoteProxySettings.getHttpProxySettings();
 
@@ -82,7 +83,7 @@ public class GlobalRemoteProxySettingsInspector
       final int port = httpProxySettings.getPort();
       final Set<String> nonProxyHosts = globalRemoteProxySettings.getNonProxyHosts();
 
-      getLogger().debug(
+      log.debug(
           "Configure P2 proxy using global http proxy settings: hostname={}, port={}, username={}, nonProxyHosts={}",
           hostname, port, username, nonProxyHosts
       );
@@ -90,7 +91,7 @@ public class GlobalRemoteProxySettingsInspector
       httpProxy.setProxySettings(hostname, port, username, password, nonProxyHosts);
     }
     else {
-      getLogger().debug("No global http proxy settings. Resetting P2 proxy.");
+      log.debug("No global http proxy settings. Resetting P2 proxy.");
       httpProxy.setProxySettings(null, -1, null, null, null);
     }
   }

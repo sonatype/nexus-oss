@@ -13,10 +13,12 @@
 
 package org.sonatype.nexus.maven.tasks;
 
-import org.sonatype.nexus.events.Event;
-import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireNotFoundCaches;
 import org.sonatype.scheduling.TaskUtil;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Cancellation inspector that cancels the current thread, simulating user intervention about cancelling tasks.
@@ -26,7 +28,7 @@ import org.sonatype.scheduling.TaskUtil;
  * @author: cstamas
  */
 public class Nexus4588CancellationEventInspector
-    implements EventInspector
+    implements EventSubscriber
 {
 
   private boolean active;
@@ -39,13 +41,9 @@ public class Nexus4588CancellationEventInspector
     this.active = active;
   }
 
-  @Override
-  public boolean accepts(final Event<?> evt) {
-    return isActive() && evt instanceof RepositoryEventExpireNotFoundCaches;
-  }
-
-  @Override
-  public void inspect(final Event<?> evt) {
+  @Subscribe
+  @AllowConcurrentEvents
+  public void inspect(final RepositoryEventExpireNotFoundCaches evt) {
     if (isActive()) {
       TaskUtil.getCurrentProgressListener().cancel();
     }

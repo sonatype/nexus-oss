@@ -1,7 +1,7 @@
 <plexus>
 	<components>
     <component>
-      <role>org.sonatype.nexus.proxy.events.EventInspector</role>
+      <role>org.sonatype.nexus.proxy.events.EventSubscriber</role>
       <role-hint>nexus4588</role-hint>
       <implementation>org.sonatype.nexus.maven.tasks.Nexus4588CancellationEventInspector</implementation>
     </component>
