@@ -18,7 +18,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -31,6 +30,7 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -47,7 +47,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class MacPluginEventSubscriber
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements EventSubscriber
 {
   private static final String ARCHETYPE_PATH = "/archetype-catalog.xml";
@@ -104,15 +104,15 @@ public class MacPluginEventSubscriber
         repository.storeItem(false, file);
       }
       catch (RepositoryNotAvailableException e) {
-        getLogger().info("Unable to install the generated archetype catalog, repository {} is out of service",
+        log.info("Unable to install the generated archetype catalog, repository {} is out of service",
             e.getRepository().getId());
       }
       catch (Exception e) {
-        if (getLogger().isDebugEnabled()) {
-          getLogger().info("Unable to install the generated archetype catalog in repository {}:", repository, e);
+        if (log.isDebugEnabled()) {
+          log.info("Unable to install the generated archetype catalog in repository {}:", repository, e);
         }
         else {
-          getLogger().info("Unable to install the generated archetype catalog in repository {}: {}/{}", repository,
+          log.info("Unable to install the generated archetype catalog in repository {}: {}/{}", repository,
               e.getClass(), e.getMessage());
         }
       }
@@ -123,18 +123,18 @@ public class MacPluginEventSubscriber
         repository.deleteItem(false, new ResourceStoreRequest(ARCHETYPE_PATH));
       }
       catch (RepositoryNotAvailableException e) {
-        getLogger().info("Unable to uninstall the generated archetype catalog, repository {} is out of service",
+        log.info("Unable to uninstall the generated archetype catalog, repository {} is out of service",
             e.getRepository().getId());
       }
       catch (ItemNotFoundException e) {
         // neglect this, it was not present
       }
       catch (Exception e) {
-        if (getLogger().isDebugEnabled()) {
-          getLogger().info("Unable to uninstall the generated archetype catalog in repository {}:", repository, e);
+        if (log.isDebugEnabled()) {
+          log.info("Unable to uninstall the generated archetype catalog in repository {}:", repository, e);
         }
         else {
-          getLogger().info("Unable to uninstall the generated archetype catalog in repository {}: {}/{}", repository,
+          log.info("Unable to uninstall the generated archetype catalog in repository {}: {}/{}", repository,
               e.getClass(), e.getMessage());
         }
       }

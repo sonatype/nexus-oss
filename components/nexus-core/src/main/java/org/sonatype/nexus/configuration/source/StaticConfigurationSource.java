@@ -54,7 +54,7 @@ public class StaticConfigurationSource
       return result;
     }
     else {
-      getLogger().info("No edition-specific configuration found, falling back to Core default configuration.");
+      log.info("No edition-specific configuration found, falling back to Core default configuration.");
 
       return getClass().getResourceAsStream("/META-INF/nexus/default-oss-nexus.xml");
     }

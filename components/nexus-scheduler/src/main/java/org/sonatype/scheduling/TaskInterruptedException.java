@@ -32,12 +32,6 @@ public class TaskInterruptedException
     this.cancelled = cancelled;
   }
 
-  public TaskInterruptedException(String message, Throwable cause) {
-    super(message, cause);
-
-    this.cancelled = false;
-  }
-
   public TaskInterruptedException(Throwable cause) {
     super(cause);
 

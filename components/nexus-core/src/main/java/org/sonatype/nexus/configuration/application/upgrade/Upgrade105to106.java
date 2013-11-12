@@ -49,7 +49,7 @@ import org.sonatype.nexus.configuration.model.v1_0_6.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.v1_0_6.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_0_6.CSecurity;
 import org.sonatype.nexus.configuration.model.v1_0_6.CSmtpConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -61,7 +61,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 @Singleton
 @Named("1.0.5")
 public class Upgrade105to106
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements SingleVersionUpgrader
 {
   @Override

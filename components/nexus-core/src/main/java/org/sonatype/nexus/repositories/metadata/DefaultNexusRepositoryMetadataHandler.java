@@ -20,18 +20,18 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.metadata.MetadataHandlerException;
 import org.sonatype.nexus.repository.metadata.RepositoryMetadataHandler;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 @Named
 @Singleton
 public class DefaultNexusRepositoryMetadataHandler
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements NexusRepositoryMetadataHandler
 {
   private final RepositoryRegistry repositoryRegistry;

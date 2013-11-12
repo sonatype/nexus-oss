@@ -30,10 +30,6 @@ public abstract class AbstractFileWalkerProcessor
 
   /**
    * Process file item.
-   *
-   * @param store  the store
-   * @param fItem  the f item
-   * @param logger the logger
    */
   protected abstract void processFileItem(WalkerContext context, StorageFileItem fItem)
       throws Exception;

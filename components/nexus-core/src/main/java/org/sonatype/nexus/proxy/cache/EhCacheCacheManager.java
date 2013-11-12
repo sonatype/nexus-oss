@@ -17,14 +17,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.eventbus.Subscribe;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The Class EhCacheCacheManager is a thin wrapper around EhCache, just to make things going.
@@ -34,7 +34,7 @@ import com.google.common.eventbus.Subscribe;
 @Named
 @Singleton
 public class EhCacheCacheManager
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements CacheManager
 {
   private final CacheManagerComponent cacheManagerComponent;

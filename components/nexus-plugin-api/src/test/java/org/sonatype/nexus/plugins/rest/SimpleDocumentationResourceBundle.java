@@ -51,7 +51,7 @@ public class SimpleDocumentationResourceBundle
   }
 
   @Override
-  public String getUrlSnippet() {
+  public String getPathPrefix() {
     return "test";
   }
 }

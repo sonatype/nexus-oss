@@ -91,12 +91,12 @@ public class LegacyFSAttributeStorage
             + workingDirectory.getAbsolutePath());
       }
 
-      getLogger().debug(
+      log.debug(
           "Legacy Attribute storage directory does exists here \"{}\", legacy AttributeStorage will be used.",
           workingDirectory);
     }
     else {
-      getLogger().debug(
+      log.debug(
           "Legacy Attribute storage directory does not exists, was expecting it here \"{}\", legacy AttributeStorage will not be used.",
           workingDirectory);
 
@@ -127,8 +127,8 @@ public class LegacyFSAttributeStorage
     uidLock.lock(Action.delete);
 
     try {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("Deleting attributes on UID=" + uid.toString());
+      if (log.isDebugEnabled()) {
+        log.debug("Deleting attributes on UID=" + uid.toString());
       }
 
       boolean result = false;
@@ -139,7 +139,7 @@ public class LegacyFSAttributeStorage
         result = ftarget.exists() && ftarget.isFile() && ftarget.delete();
       }
       catch (IOException e) {
-        getLogger().warn("Got IOException during delete of UID=" + uid.toString(), e);
+        log.warn("Got IOException during delete of UID=" + uid.toString(), e);
       }
 
       return result;
@@ -160,8 +160,8 @@ public class LegacyFSAttributeStorage
     uidLock.lock(Action.read);
 
     try {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("Loading attributes on UID=" + uid.toString());
+      if (log.isDebugEnabled()) {
+        log.debug("Loading attributes on UID=" + uid.toString());
       }
 
       try {
@@ -176,7 +176,7 @@ public class LegacyFSAttributeStorage
         }
       }
       catch (IOException ex) {
-        getLogger().error("Got IOException during reading of UID=" + uid.toString(), ex);
+        log.error("Got IOException during reading of UID=" + uid.toString(), ex);
 
         return null;
       }
@@ -264,32 +264,32 @@ public class LegacyFSAttributeStorage
       }
       catch (NullPointerException e) {
         // see NEXUS-3911: XPP3 throws sometimes NPE on "corrupted XMLs in some specific way"
-        if (getLogger().isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
           // we log the stacktrace
-          getLogger().info("Attributes of " + uid + " are corrupt, deleting it.", e);
+          log.info("Attributes of " + uid + " are corrupt, deleting it.", e);
         }
         else {
           // just remark about this
-          getLogger().info("Attributes of " + uid + " are corrupt, deleting it.");
+          log.info("Attributes of " + uid + " are corrupt, deleting it.");
         }
 
         corrupt = true;
       }
       catch (XStreamException e) {
         // it is corrupt -- so says XStream, but see above and NEXUS-3911
-        if (getLogger().isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
           // we log the stacktrace
-          getLogger().info("Attributes of " + uid + " are corrupt, deleting it.", e);
+          log.info("Attributes of " + uid + " are corrupt, deleting it.", e);
         }
         else {
           // just remark about this
-          getLogger().info("Attributes of " + uid + " are corrupt, deleting it.");
+          log.info("Attributes of " + uid + " are corrupt, deleting it.");
         }
 
         corrupt = true;
       }
       catch (IOException e) {
-        getLogger().info("While reading attributes of " + uid + " we got IOException:", e);
+        log.info("While reading attributes of " + uid + " we got IOException:", e);
 
         throw e;
       }

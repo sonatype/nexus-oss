@@ -28,7 +28,7 @@ import org.sonatype.nexus.repository.site.plugin.SiteRepository;
  * - repository hint from "maven-site" to "site"
  * - repository target from "maven-site" to "site"
  *
- * @since 1.0
+ * @since site-repository 1.0
  */
 @Named
 @Singleton

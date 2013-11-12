@@ -334,6 +334,16 @@ public class RestletResource
     }
   }
 
+  @Override
+  public void handleOptions() {
+  	super.handleOptions();
+      try {
+      	delegate.options(getContext(), getRequest(), getResponse());
+      } catch (ResourceException re) {
+          getResponse().setStatus(re.getStatus(), re);
+      }
+  }
+  
   public void upload(Representation representation)
       throws ResourceException
   {

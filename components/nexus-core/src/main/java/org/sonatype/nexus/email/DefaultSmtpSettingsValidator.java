@@ -26,7 +26,7 @@ import org.sonatype.micromailer.MailRequest;
 import org.sonatype.micromailer.MailRequestStatus;
 import org.sonatype.micromailer.imp.DefaultMailType;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class DefaultSmtpSettingsValidator
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements SmtpSettingsValidator
 {
   private static final String NEXUS_MAIL_ID = "Nexus";
@@ -80,7 +80,7 @@ public class DefaultSmtpSettingsValidator
     MailRequestStatus status = emailer.sendSyncedMail(request);
 
     if (status.getErrorCause() != null) {
-      getLogger().error("Unable to send e-mail", status.getErrorCause());
+      log.error("Unable to send e-mail", status.getErrorCause());
       throw new EmailerException("Unable to send e-mail", status.getErrorCause());
     }
 

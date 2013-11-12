@@ -18,13 +18,13 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 @Singleton
 @Named
 public class NfcConfigurationModifier
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements ConfigurationModifier
 {
   /**
@@ -57,7 +57,7 @@ public class NfcConfigurationModifier
   }
 
   protected void doForceNfcSetting(final Configuration configuration) {
-    getLogger().info(
+    log.info(
         "Enforcing proper NFC use: every non-proxy repository present in system will have NFC deactivated (system property override present).");
 
     // conservatively shut down NFC on any non-proxy repository
@@ -69,7 +69,7 @@ public class NfcConfigurationModifier
   }
 
   protected void undoForceNfcSetting(final Configuration configuration) {
-    getLogger().info(
+    log.info(
         "Undoing NFC overrides: every repository present in system will have NFC activated (system property override present).");
 
     // just undo, set true on all repositories in system

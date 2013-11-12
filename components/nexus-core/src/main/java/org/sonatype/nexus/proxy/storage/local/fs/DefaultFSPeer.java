@@ -29,7 +29,6 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageEOFException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -43,10 +42,11 @@ import org.sonatype.nexus.proxy.item.uid.IsItemAttributeMetacontentAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.nexus.util.CompositeException;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.util.io.StreamSupport;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.common.Throwables2;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -63,7 +63,7 @@ import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 @Named
 @Singleton
 public class DefaultFSPeer
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements FSPeer
 {
 
@@ -102,8 +102,8 @@ public class DefaultFSPeer
                         final File target, final ContentLocator cl)
       throws UnsupportedStorageOperationException, LocalStorageException
   {
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Storing file to {}", target.getAbsolutePath());
+    if (log.isDebugEnabled()) {
+      log.debug("Storing file to {}", target.getAbsolutePath());
     }
 
     // create parents down to the file itself (this will make those if needed, otherwise return silently)
@@ -173,7 +173,7 @@ public class DefaultFSPeer
             Files.delete(target.toPath());
           }
           catch (IOException e1) {
-            getLogger().warn("Could not delete file: " + target.getAbsolutePath(), e);
+            log.warn("Could not delete file: " + target.getAbsolutePath(), e);
           }
         }
 
@@ -184,12 +184,12 @@ public class DefaultFSPeer
             Files.delete(hiddenTarget.toPath());
           }
           catch (IOException e1) {
-            getLogger().warn("Could not delete file: " + target.getAbsolutePath(), e);
+            log.warn("Could not delete file: " + target.getAbsolutePath(), e);
           }
         }
 
         if (!isCleanupNeeded) {
-          getLogger().warn(
+          log.warn(
               "No cleanup done for error that happened while trying to save attibutes of item {}, the backup is left as {}!",
               item.getRepositoryItemUid().toString(), hiddenTarget.getAbsolutePath());
         }
@@ -219,8 +219,8 @@ public class DefaultFSPeer
                         final ResourceStoreRequest request, final File target)
       throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
   {
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Deleting file: {}", target.getAbsolutePath());
+    if (log.isDebugEnabled()) {
+      log.debug("Deleting file: {}", target.getAbsolutePath());
     }
     try {
       if (!DirSupport.deleteIfExists(target.toPath())) {
@@ -241,8 +241,8 @@ public class DefaultFSPeer
                        final File fromTarget, final ResourceStoreRequest to, final File toTarget)
       throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
   {
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Moving file from {} to {}", fromTarget.getAbsolutePath(), toTarget.getAbsolutePath());
+    if (log.isDebugEnabled()) {
+      log.debug("Moving file from {} to {}", fromTarget.getAbsolutePath(), toTarget.getAbsolutePath());
     }
     try {
       if (!DirSupport.moveIfExists(fromTarget.toPath(), toTarget.toPath())) {
@@ -383,7 +383,7 @@ public class DefaultFSPeer
         }
       }
       if (!success) {
-        throw new IOException("Rename operation failed", new CompositeException(exceptions));
+        throw Throwables2.composite(new IOException("Rename operation failed"), exceptions);
       }
     }
   }

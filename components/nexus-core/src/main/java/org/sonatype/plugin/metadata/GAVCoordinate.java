@@ -22,6 +22,7 @@ import org.codehaus.plexus.util.StringUtils;
  * GAV coordinate fully describes the coordinates, it's "full detail". Is used as key in plugin descriptor, but also as
  * coordinates for plugin dependencies.
  */
+@Deprecated
 public final class GAVCoordinate
 {
   // ----------------------------------------------------------------------

@@ -21,6 +21,7 @@ import org.sonatype.plugins.model.PluginMetadata;
 /**
  * Represents a resolved artifact from a {@link NexusPluginRepository}.
  */
+@Deprecated
 public final class PluginRepositoryArtifact
 {
   // ----------------------------------------------------------------------

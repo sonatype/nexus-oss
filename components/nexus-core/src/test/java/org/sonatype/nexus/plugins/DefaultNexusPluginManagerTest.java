@@ -23,7 +23,6 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.repository.NexusPluginRepository;
 import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactException;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
-import org.sonatype.nexus.plugins.repository.PluginRepositoryManager;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugins.model.PluginDependency;
@@ -56,7 +55,7 @@ public class DefaultNexusPluginManagerTest
   private EventBus eventBus;
 
   @Mock
-  private PluginRepositoryManager pluginRepositoryManager;
+  private NexusPluginRepository pluginRepositoryManager;
 
   @Mock
   private NexusPluginRepository nexusPluginRepository;

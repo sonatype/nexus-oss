@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.scheduling.NexusTask;
-import org.sonatype.nexus.scheduling.TaskActivityDescriptor;
 
 public class TestNexusTask
     extends AbstractSchedulerTask<Object>
@@ -61,11 +60,6 @@ public class TestNexusTask
 
   @Override
   public String getAlertEmail() {
-    return null;
-  }
-
-  @Override
-  public TaskActivityDescriptor getTaskActivityDescriptor() {
     return null;
   }
 

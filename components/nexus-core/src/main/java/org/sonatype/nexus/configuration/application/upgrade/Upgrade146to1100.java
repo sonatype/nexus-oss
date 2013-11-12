@@ -27,8 +27,8 @@ import org.sonatype.nexus.configuration.model.v1_10_0.CErrorReporting;
 import org.sonatype.nexus.configuration.model.v1_10_0.CNotification;
 import org.sonatype.nexus.configuration.model.v1_10_0.CRepository;
 import org.sonatype.nexus.configuration.model.v1_10_0.upgrade.BasicVersionUpgrade;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfiguration;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -41,7 +41,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 @Singleton
 @Named("1.4.6")
 public class Upgrade146to1100
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements SingleVersionUpgrader
 {
   @Override

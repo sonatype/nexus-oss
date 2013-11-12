@@ -49,11 +49,6 @@ public interface WalkerContext
   List<WalkerProcessor> getProcessors();
 
   /**
-   * Sets the list of processors to use.
-   */
-  void setProcessors(List<WalkerProcessor> processors);
-
-  /**
    * Stops the walker with cause.
    */
   void stop(Throwable cause);

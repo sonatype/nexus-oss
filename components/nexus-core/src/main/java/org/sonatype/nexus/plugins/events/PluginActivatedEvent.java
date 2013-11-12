@@ -21,6 +21,7 @@ import org.sonatype.plexus.appevents.Event;
 /**
  * This {@link Event} is triggered when a Nexus plugin is successfully activated.
  */
+@Deprecated
 public final class PluginActivatedEvent
     extends AbstractEvent<NexusPluginManager>
 {
@@ -43,14 +44,6 @@ public final class PluginActivatedEvent
   // ----------------------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------------------
-
-  public PluginDescriptor getPluginDescriptor() {
-    return descriptor;
-  }
-
-  public NexusPluginManager getNexusPluginManager() {
-    return getEventSender();
-  }
 
   @Override
   public String toString() {

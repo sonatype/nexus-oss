@@ -52,11 +52,6 @@ public class DefaultThrottleInfo
   }
 
   @Override
-  public long getTotalProcessItemSpentMillis() {
-    return totalProcessItemSpentMillis;
-  }
-
-  @Override
   public long getTotalProcessItemInvocationCount() {
     return totalProcessItemInvocationCount;
   }

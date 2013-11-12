@@ -26,7 +26,7 @@ import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.model.v1_4_6.CNotificationTarget;
 import org.sonatype.nexus.configuration.model.v1_4_6.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.configuration.security.upgrade.SecurityData204Upgrade;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -38,7 +38,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 @Singleton
 @Named("1.4.5")
 public class Upgrade145to146
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements SingleVersionUpgrader
 {
   @Override
