@@ -132,7 +132,7 @@ public class EmbeddedNexusBooter
     // FIXME: These can be avoided by using a <Property> configuration with default value in jetty.xml
     xml = xml.replace(
         "<Set name=\"stopAtShutdown\">true</Set>",
-        "<!-- <Set name=\"stopAtShutdown\">true</Set> -->"
+        "<!-- Set name=\"stopAtShutdown\">true</Set -->"
     );
 
     // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=357318#c62
