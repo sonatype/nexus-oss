@@ -15,8 +15,9 @@ package org.sonatype.plexus.rest.representation;
 
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
-import org.sonatype.sisu.velocity.Velocity;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.app.VelocityEngine;
@@ -29,8 +30,7 @@ import org.restlet.ext.velocity.TemplateRepresentation;
  * Problem with Restlet {@link TemplateRepresentation} is that it creates a new instance of Velocity per creation of
  * {@link TemplateRepresentation}. This class remedies that, by overriding how {@link VelocityEngine} is obtained, as
  * Plexus Application will stuff a VelocityEngine provider into context, hence, a singleton instance of Velocity will
- * be
- * reused. See SISU {@link Velocity} that is used under the hub.
+ * be reused.
  *
  * @author cstamas
  */
@@ -99,10 +99,10 @@ public class VelocityRepresentation
   }
 
   /**
-   * {@link PlexusRestletApplicationBridge} stuffs the SISU {@link Velocity} into context, and we use the shared
+   * {@link PlexusRestletApplicationBridge} stuffs the Velocity provider into context, and we use the shared
    * instance from it, instead to recreate it over and over again.
    */
   private static VelocityEngine getEngine(final Context context) {
-    return ((Velocity) context.getAttributes().get(Velocity.class.getName())).getEngine();
+    return ((Provider<VelocityEngine>) context.getAttributes().get(VelocityEngine.class.getName())).get();
   }
 }

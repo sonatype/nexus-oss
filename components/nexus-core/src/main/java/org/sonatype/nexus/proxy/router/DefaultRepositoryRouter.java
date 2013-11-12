@@ -529,12 +529,9 @@ public class DefaultRepositoryRouter
         if (!repositoryRegistry.getRepositoriesWithFacet(rtd.getRole()).isEmpty()) {
           ResourceStoreRequest req =
               new ResourceStoreRequest(PathUtils.concatPaths(request.getRequestPath(), rtd.getPrefix()));
-
+          req.getRequestContext().setParentContext(request.getRequestContext());
           DefaultStorageCollectionItem repositories =
               new DefaultStorageCollectionItem(this, req, true, false);
-
-          repositories.getItemContext().putAll(request.getRequestContext());
-
           result.add(repositories);
         }
       }
@@ -571,10 +568,7 @@ public class DefaultRepositoryRouter
 
       for (Repository repository : repositories) {
         if (repository.isExposed() && repository.isBrowseable()) {
-          DefaultStorageCollectionItem repoItem = null;
-
           ResourceStoreRequest req = null;
-
           if (Repository.class.equals(kind)) {
             req =
                 new ResourceStoreRequest(PathUtils.concatPaths(request.getRequestPath(),
@@ -585,11 +579,8 @@ public class DefaultRepositoryRouter
                 new ResourceStoreRequest(PathUtils.concatPaths(request.getRequestPath(),
                     repository.getPathPrefix()));
           }
-
-          repoItem = new DefaultStorageCollectionItem(this, req, true, false);
-
-          repoItem.getItemContext().putAll(request.getRequestContext());
-
+          req.getRequestContext().setParentContext(request.getRequestContext());
+          DefaultStorageCollectionItem repoItem = new DefaultStorageCollectionItem(this, req, true, false);
           result.add(repoItem);
         }
       }

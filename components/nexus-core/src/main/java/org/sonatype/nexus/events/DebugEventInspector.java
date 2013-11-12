@@ -33,8 +33,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A simple "debug" helper component, that dumps out events to log. Usable for debugging or problem solving, not for
- * production use. It will register itself only when enabled, otherwise it will not spend any CPU cycles being
- * dormant. It can be enabled via System property or JMX.
+ * production use! It will register itself to listen for events only when enabled, otherwise it will not spend any CPU
+ * cycles being dormant. It can be enabled via System property or JMX.
  *
  * @author cstamas
  * @since 2.1

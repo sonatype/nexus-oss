@@ -201,7 +201,6 @@ public class HttpClientRemoteStorage
         httpItem.setRemoteUrl(remoteURL.toString());
         httpItem.setModified(makeDateFromHeader(httpResponse.getFirstHeader("last-modified")));
         httpItem.setCreated(httpItem.getModified());
-        httpItem.getItemContext().putAll(request.getRequestContext());
 
         return httpItem;
       }

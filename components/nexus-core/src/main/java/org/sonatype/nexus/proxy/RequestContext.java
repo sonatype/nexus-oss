@@ -13,16 +13,20 @@
 
 package org.sonatype.nexus.proxy;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
+import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Context map, used in {@link ResourceStoreRequest}, but also in {@link StorageItem} and related events.
@@ -30,11 +34,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @author cstamas
  */
 public class RequestContext
-    extends HashMap<String, Object>
-    implements Map<String, Object>
 {
-  private static final long serialVersionUID = 7200598686103502266L;
-
   /**
    * Context URL of the app root on the incoming connector.
    */
@@ -99,12 +99,15 @@ public class RequestContext
 
   private RequestContext parent;
 
+  private final HashMap<String, Object> delegate;
+
   public RequestContext() {
-    setParentContext(null);
+    this(null);
   }
 
   public RequestContext(RequestContext parent) {
     setParentContext(parent);
+    this.delegate = Maps.newHashMap();
   }
 
   public RequestContext getParentContext() {
@@ -129,27 +132,9 @@ public class RequestContext
     this.parent = context;
   }
 
-  public boolean containsKey(Object key) {
-    return containsKey(key, true);
-  }
-
-  public boolean containsKey(Object key, boolean fallBackToParent) {
-    boolean result = super.containsKey(key);
-
-    if (fallBackToParent && !result && getParentContext() != null && getParentContext() != this) {
-      result = getParentContext().containsKey(key);
-    }
-
-    return result;
-  }
-
-  public Object get(Object key) {
-    return get(key, true);
-  }
-
   public Object get(Object key, boolean fallBackToParent) {
     if (containsKey(key, false)) {
-      return super.get(key);
+      return delegate.get(key);
     }
     else if (fallBackToParent && getParentContext() != null && getParentContext() != this) {
       return getParentContext().get(key);
@@ -159,6 +144,34 @@ public class RequestContext
     }
   }
 
+  public boolean containsKey(Object key, boolean fallBackToParent) {
+    boolean result = delegate.containsKey(key);
+    if (fallBackToParent && !result && getParentContext() != null && getParentContext() != this) {
+      result = getParentContext().containsKey(key);
+    }
+    return result;
+  }
+
+  public Object get(Object key) {
+    return get(key, true);
+  }
+
+  public boolean containsKey(Object key) {
+    return containsKey(key, true);
+  }
+
+  public Object put(final String key, final Object value) {
+    return delegate.put(key, value);
+  }
+
+  public Object remove(final Object key) {
+    return delegate.remove(key);
+  }
+
+  /**
+   * Enforces sane state of the 3 related flag: localOnly, remoteOnly and asExpired. Only one of those
+   * might be {@code true}.
+   */
   protected void checkLocalRemoteExpiredFlags()
       throws IllegalArgumentException
   {
@@ -427,7 +440,9 @@ public class RequestContext
     }
     while (!stack.isEmpty()) {
       ctx = stack.pop();
-      result.putAll(ctx);
+      for (Map.Entry<String, Object> entry : ctx.delegate.entrySet()) {
+        result.put(entry.getKey(), entry.getValue());
+      }
     }
     return result;
   }
