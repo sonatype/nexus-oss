@@ -222,7 +222,12 @@ public class FileUtils
       }
     }
     else if (source.isFile()) {
-      org.apache.commons.io.FileUtils.forceDelete(destination);
+      try {
+        org.apache.commons.io.FileUtils.forceDelete(destination);
+      }
+      catch (FileNotFoundException e) {
+        // do nothing
+      }
       if (!source.renameTo(destination)) {
         throw new IOException("Failed to move '" + source + "' to '" + destination + "'");
       }
@@ -230,7 +235,12 @@ public class FileUtils
     else if (source.isDirectory()) {
       // the folder already exists the, so let's do a recursive move....
       if (destination.isFile()) {
-        org.apache.commons.io.FileUtils.forceDelete(destination);
+        try {
+          org.apache.commons.io.FileUtils.forceDelete(destination);
+        }
+        catch (FileNotFoundException e) {
+          // do nothing
+        }
         if (!source.renameTo(destination)) {
           throw new IOException("Failed to move '" + source + "' to '" + destination + "'");
         }
@@ -240,8 +250,12 @@ public class FileUtils
         for (String file : files) {
           move(new File(source, file), new File(destination, file));
         }
-
-        org.apache.commons.io.FileUtils.forceDelete(source);
+        try {
+          org.apache.commons.io.FileUtils.forceDelete(source);
+        }
+        catch (FileNotFoundException e) {
+          // no nothing
+        }
       }
     }
   }
