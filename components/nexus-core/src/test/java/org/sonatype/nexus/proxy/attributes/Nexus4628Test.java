@@ -76,9 +76,8 @@ public class Nexus4628Test
 
     final AttributeStorage ls = lookup(AttributeStorage.class, "ls");
     attributeStorageSpy = Mockito.spy(ls);
-    return new DefaultAttributesHandler(lookup(ApplicationConfiguration.class), attributeStorageSpy,
-        lookup(AttributeStorage.class, "legacy"), getContainer().lookupList(StorageItemInspector.class),
-        getContainer().lookupList(StorageFileItemInspector.class));
+    return new DefaultAttributesHandler(attributeStorageSpy,
+        lookup(AttributeStorage.class, "legacy"), getContainer().lookupList(StorageItemInspector.class));
   }
 
   /**
