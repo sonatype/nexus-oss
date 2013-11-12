@@ -28,6 +28,7 @@ import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -67,8 +68,8 @@ public class JerseyUtilities
   {
     if (!target.exists()) {
       final File targetDir = target.getParentFile();
-      checkState((targetDir.exists() || targetDir.mkdirs()) && targetDir.isDirectory(),
-          "Directory '%s' does not exist and could not be created", targetDir.getAbsolutePath());
+      // NOTE: can not use java.nio.Files here as this module needs to remain Java6 compatible
+      FileUtils.forceMkdir(targetDir);
     }
     else {
       checkState(target.isFile() && target.canWrite(), "File '%s' is not a file or could not be written",

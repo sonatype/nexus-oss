@@ -16,7 +16,7 @@ package org.sonatype.nexus.plugins.capabilities;
 /**
  * Registry of capability factories.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public interface CapabilityFactoryRegistry
 {

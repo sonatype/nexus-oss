@@ -17,15 +17,17 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
+import org.sonatype.nexus.plugins.capabilities.CapabilityEvent.CallbackFailure;
+import org.sonatype.nexus.plugins.capabilities.CapabilityEvent.CallbackFailureCleared;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -35,10 +37,10 @@ import static java.util.Collections.unmodifiableMap;
 /**
  * Default {@link CapabilityReference} implementation.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class DefaultCapabilityReference
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements CapabilityReference, CapabilityContext
 {
 
@@ -68,7 +70,9 @@ public class DefaultCapabilityReference
 
   private State state;
 
-  private Exception lastException;
+  private Exception failure;
+
+  private String failingAction;
 
   DefaultCapabilityReference(final CapabilityRegistry capabilityRegistry,
                              final EventBus eventBus,
@@ -187,7 +191,18 @@ public class DefaultCapabilityReference
   public Exception failure() {
     try {
       stateLock.readLock().lock();
-      return lastException;
+      return failure;
+    }
+    finally {
+      stateLock.readLock().unlock();
+    }
+  }
+
+  @Override
+  public String failingAction() {
+    try {
+      stateLock.readLock().lock();
+      return failingAction;
     }
     finally {
       stateLock.readLock().unlock();
@@ -324,21 +339,38 @@ public class DefaultCapabilityReference
     return p1.size() == p2.size() && p1.equals(p2);
   }
 
-  private void resetLastException() {
-    setLastException(null);
+  private void resetFailure() {
+    try {
+      stateLock.writeLock().lock();
+      if (failure != null) {
+        failure = null;
+        failingAction = null;
+        eventBus.post(new CallbackFailureCleared(capabilityRegistry, this));
+      }
+    }
+    finally {
+      stateLock.writeLock().unlock();
+    }
   }
 
-  private void setLastException(final Exception e) {
-    lastException = e;
+  private void setFailure(final String action, final Exception e) {
+    try {
+      stateLock.writeLock().lock();
+      failure = checkNotNull(e);
+      failingAction = checkNotNull(action);
+      log.error("Could not {} capability {} ({})", action.toLowerCase(), capability, id, e);
+      eventBus.post(new CallbackFailure(capabilityRegistry, this, action, e));
+    }
+    finally {
+      stateLock.writeLock().unlock();
+    }
   }
 
   private class State
   {
 
     State() {
-      getLogger().debug(
-          "Capability {} ({}) state changed to {}", new Object[]{capability, id, this}
-      );
+      log.debug("Capability {} ({}) state changed to {}", capability, id, this);
     }
 
     public boolean isEnabled() {
@@ -390,10 +422,6 @@ public class DefaultCapabilityReference
       return getClass().getSimpleName();
     }
 
-    void setDescription(final String description) {
-      // do nothing
-    }
-
   }
 
   private class NewState
@@ -405,16 +433,14 @@ public class DefaultCapabilityReference
       try {
         capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap(newHashMap(properties));
         capability.onCreate();
-        resetLastException();
-        validityHandler.bind();
-        state = new ValidState();
+        resetFailure();
       }
       catch (Exception e) {
-        setLastException(e);
-        state = new InvalidState("Failed to create: " + e.getMessage());
-        getLogger().error(
-            "Could not create capability {} ({})", new Object[]{capability, id, e}
-        );
+        setFailure("Create", e);
+      }
+      finally {
+        validityHandler.bind();
+        state = new DisabledState();
       }
     }
 
@@ -423,16 +449,14 @@ public class DefaultCapabilityReference
       try {
         capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap(newHashMap(properties));
         capability.onLoad();
-        resetLastException();
-        validityHandler.bind();
-        state = new ValidState();
+        resetFailure();
       }
       catch (Exception e) {
-        setLastException(e);
-        state = new InvalidState("Failed to load: " + e.getMessage());
-        getLogger().error(
-            "Could not load capability {} ({})", new Object[]{capability, id, e}
-        );
+        setFailure("Load", e);
+      }
+      finally {
+        validityHandler.bind();
+        state = new DisabledState();
       }
     }
 
@@ -448,14 +472,14 @@ public class DefaultCapabilityReference
 
   }
 
-  private class ValidState
+  private class DisabledState
       extends State
   {
 
     @Override
     public void enable() {
-      getLogger().debug("Enabling capability {} ({})", capability, id);
-      state = new EnabledState("Not yet activated");
+      log.debug("Enabling capability {} ({})", capability, id);
+      state = new EnabledState();
       activationHandler.bind();
     }
 
@@ -479,20 +503,17 @@ public class DefaultCapabilityReference
         );
         capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap(newHashMap(properties));
         capability.onUpdate();
-        resetLastException();
+        resetFailure();
+      }
+      catch (Exception e) {
+        setFailure("Update", e);
+      }
+      finally {
         eventBus.post(
             new CapabilityEvent.AfterUpdate(
                 capabilityRegistry, DefaultCapabilityReference.this, properties, previousProperties
             )
         );
-      }
-      catch (Exception e) {
-        setLastException(e);
-        getLogger().error(
-            "Could not update capability {} ({}).", new Object[]{capability, id, e}
-        );
-        DefaultCapabilityReference.this.passivate();
-        state.setDescription("Update failed: " + e.getMessage());
       }
     }
 
@@ -502,17 +523,15 @@ public class DefaultCapabilityReference
         DefaultCapabilityReference.this.disable();
         validityHandler.release();
         capability.onRemove();
-        resetLastException();
+        resetFailure();
+      }
+      catch (Exception e) {
+        setFailure("Remove", e);
+      }
+      finally {
         state = new RemovedState();
         eventBus.post(
             new CapabilityEvent.AfterRemove(capabilityRegistry, DefaultCapabilityReference.this)
-        );
-      }
-      catch (Exception e) {
-        setLastException(e);
-        state = new InvalidState("Failed to remove: " + e.getMessage());
-        getLogger().error(
-            "Could not remove capability {} ({})", new Object[]{capability, id, e}
         );
       }
     }
@@ -524,24 +543,14 @@ public class DefaultCapabilityReference
 
     @Override
     public String toString() {
-      return "VALID";
+      return "DISABLED";
     }
 
   }
 
   private class EnabledState
-      extends ValidState
+      extends DisabledState
   {
-
-    private String description;
-
-    EnabledState() {
-      this("enabled");
-    }
-
-    EnabledState(final String description) {
-      this.description = description;
-    }
 
     @Override
     public boolean isEnabled() {
@@ -555,35 +564,31 @@ public class DefaultCapabilityReference
 
     @Override
     public void disable() {
-      getLogger().debug("Disabling capability {} ({})", capability, id);
+      log.debug("Disabling capability {} ({})", capability, id);
       activationHandler.release();
       DefaultCapabilityReference.this.passivate();
-      state = new ValidState();
+      state = new DisabledState();
     }
 
     @Override
     public void activate() {
       if (activationHandler.isConditionSatisfied()) {
-        getLogger().debug("Activating capability {} ({})", capability, id);
+        log.debug("Activating capability {} ({})", capability, id);
         try {
           capability.onActivate();
-          resetLastException();
-          getLogger().debug("Activated capability {} ({})", capability, id);
+          resetFailure();
+          log.debug("Activated capability {} ({})", capability, id);
           state = new ActiveState();
           eventBus.post(
               new CapabilityEvent.AfterActivated(capabilityRegistry, DefaultCapabilityReference.this)
           );
         }
         catch (Exception e) {
-          setLastException(e);
-          getLogger().error(
-              "Could not activate capability {} ({})", new Object[]{capability, id, e}
-          );
-          state.setDescription("Activation failed: " + e.getMessage());
+          setFailure("Activate", e);
         }
       }
       else {
-        getLogger().debug("Capability {} ({}) is not yet activatable", capability, id);
+        log.debug("Capability {} ({}) is not yet activatable", capability, id);
       }
     }
 
@@ -594,7 +599,7 @@ public class DefaultCapabilityReference
 
     @Override
     public String stateDescription() {
-      return activationHandler.isConditionSatisfied() ? description : activationHandler.explainWhyNotSatisfied();
+      return activationHandler.isConditionSatisfied() ? "Enabled" : activationHandler.explainWhyNotSatisfied();
     }
 
     @Override
@@ -602,10 +607,6 @@ public class DefaultCapabilityReference
       return "ENABLED";
     }
 
-    @Override
-    void setDescription(final String description) {
-      this.description = description;
-    }
   }
 
   private class ActiveState
@@ -624,22 +625,17 @@ public class DefaultCapabilityReference
 
     @Override
     public void passivate() {
-      getLogger().debug("Passivating capability {} ({})", capability, id);
+      log.debug("Passivating capability {} ({})", capability, id);
       try {
-        state = new EnabledState("Passivated");
+        state = new EnabledState();
         eventBus.post(
             new CapabilityEvent.BeforePassivated(capabilityRegistry, DefaultCapabilityReference.this)
         );
         capability.onPassivate();
-        resetLastException();
-        getLogger().debug("Passivated capability {} ({})", capability, id);
+        log.debug("Passivated capability {} ({})", capability, id);
       }
       catch (Exception e) {
-        setLastException(e);
-        getLogger().error(
-            "Could not passivate capability {} ({})", new Object[]{capability, id, e}
-        );
-        state.setDescription("Passivation failed: " + e.getMessage());
+        setFailure("Passivate", e);
       }
     }
 
@@ -651,28 +647,6 @@ public class DefaultCapabilityReference
     @Override
     public String toString() {
       return "ACTIVE";
-    }
-
-  }
-
-  private class InvalidState
-      extends State
-  {
-
-    private final String reason;
-
-    InvalidState(final String reason) {
-      this.reason = reason;
-    }
-
-    @Override
-    public String stateDescription() {
-      return reason;
-    }
-
-    @Override
-    public String toString() {
-      return "INVALID (" + reason + ")";
     }
 
   }

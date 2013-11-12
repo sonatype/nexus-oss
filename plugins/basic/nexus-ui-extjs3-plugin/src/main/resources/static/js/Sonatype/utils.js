@@ -123,7 +123,8 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
       var
             i, errorResponse,
             serverMessage = '',
-            r = response.responseText;
+            r = response.responseText,
+            displayMessage;
 
       if (r)
       {
@@ -207,38 +208,57 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
         //
         // <retry message> (optional)
 
-        var displayMessage =
-                    // caller provided message + serverMessage
-                    // status == -1 is request timed out (?), don't show message then
-                    (message && (responseStatus != -1) ? message : '') + (
-                          // show response text if requested (and makes sense, status 400)
-                          responseStatus == 400 && showResponseText ?  ('<br /><br />' + response.responseText) :
-                          // otherwise show statusLine if not requested to hide and we have a serverMessage
-                          // (we want to always provide some kind of server message, either error msg or status line)
-                          (
-                            (options.hideErrorStatus && serverMessage ) ? '' :
-                              (
-                                (responseStatus && responseStatus != -1 ) ? // hide the "-1 status"
-                                '<br/><br/>Nexus returned an error: ERROR ' + responseStatus + ': ' + responseStatusText :
-                                '<br/><br/>There was an error communicating with the server: request timed out.'
-                              )
-                            )
-                          )
-                          // FIXME offerRestart is never used (?)
-                          + (offerRestart ? '<br /><br />Click OK to reload the console or CANCEL if you wish to retry the same action in a little while.' : '');
+        displayMessage = '';
+
+        // caller provided message + serverMessage
+        // status == -1 is request timed out (?), don't show message then
+        if (message && responseStatus != -1) {
+          displayMessage = message;
+        }
+
+        // show response text if requested (and makes sense, status 400)
+        if (responseStatus == 400 && showResponseText) {
+          if (displayMessage.length > 0) {
+            displayMessage += '<br/><br/>';
+          }
+          displayMessage += response.responseText;
+        }
+        // otherwise show statusLine if not requested to hide and we have a serverMessage
+        // (we want to always provide some kind of server message, either error msg or status line)
+        else {
+          if (!(options.hideErrorStatus && serverMessage)) {
+            if (displayMessage.length > 0) {
+              displayMessage += '<br/><br/>';
+            }
+            // hide -1 status
+            if (responseStatus && responseStatus != -1) {
+              displayMessage += 'Nexus returned an error: ERROR ' + responseStatus + ': ' + responseStatusText;
+            }
+            else {
+              displayMessage += 'There was an error communicating with the server: request timed out.';
+            }
+          }
+        }
+
+        if (offerRestart) {
+          if (displayMessage.length > 0) {
+            displayMessage += '<br/><br/>';
+          }
+          displayMessage += 'Click OK to reload the console or CANCEL if you wish to retry the same action in a little while.';
+        }
+
         Ext.MessageBox.show({
-          title : "Error",
-          msg : Ext.util.Format.htmlEncode(displayMessage),
-              buttons : offerRestart ? Ext.MessageBox.OKCANCEL : Sonatype.MessageBox.OK,
-              icon : Ext.MessageBox.ERROR,
-              animEl : 'mb3',
-              fn : function(button) {
-                if (offerRestart && button == "ok")
-                {
-                  window.location.reload();
-                }
-              }
-            });
+          title: "Error",
+          msg: displayMessage,
+          buttons: offerRestart ? Ext.MessageBox.OKCANCEL : Sonatype.MessageBox.OK,
+          icon: Ext.MessageBox.ERROR,
+          animEl: 'mb3',
+          fn: function (button) {
+            if (offerRestart && button == "ok") {
+              window.location.reload();
+            }
+          }
+        });
       }
     },
     /**
@@ -746,7 +766,7 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
           }
         },
         start : function() {
-          if (running === null) {
+          if (running === null && Sonatype.utils.settings.keepAlive) {
             running = Ext.TaskMgr.start(config);
           }
         }};
@@ -781,7 +801,7 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
               }
 
               var respObj = Ext.decode(response.responseText);
-              ns.loadNexusStatus(respObj.data.clientPermissions.loggedInUserSource);
+              ns.loadNexusSettings();
 
               Ext.namespace('Sonatype.utils').refreshTask.start();
             },
@@ -797,7 +817,7 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
               {
                 Sonatype.repoServer.RepoServer.loginForm.find('name', 'password')[0].focus(true);
               }
-              
+
               Ext.Ajax.request({
                   scope : this,
                   method : 'GET',
@@ -807,7 +827,7 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
                     Sonatype.view.justLoggedOut = true;
                   }
                 });
-              
+
             }
 
           });
@@ -817,11 +837,33 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
       return formattedAppName;
     },
 
-    loadNexusStatus : function(loggedInUserSource, versionOnly) {
-      if (!versionOnly)
-      {
-        Sonatype.user.curr = ns.cloneObj(Sonatype.user.anon);
-      }
+    /**
+     * Loads Nexus settings & status.
+     */
+    loadNexusSettings: function () {
+      Ext.Ajax.request({
+        method: 'GET',
+        suppressStatus: true,
+        url: Sonatype.config.contextPath + '/service/siesta/wonderland/settings',
+        callback: function (options, success, response) {
+          var respObj;
+
+          ns.settings = {};
+          if (success) {
+            respObj = Ext.decode(response.responseText);
+
+            Ext.each(respObj, function(entry){
+              ns.settings[entry.key] = entry.value;
+            });
+          }
+          ns.settings.keepAlive = ns.settings.keepAlive === 'true';
+          ns.loadNexusStatus();
+        }
+      });
+    },
+
+    loadNexusStatus : function() {
+      Sonatype.user.curr = ns.cloneObj(Sonatype.user.anon);
 
       Ext.Ajax.request({
             method : 'GET',
@@ -927,11 +969,11 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
       {
         token = window.location.hash.substring(1);
       }
-      
+
       Sonatype.view.historyDisabled = true;
       var eventResult = Sonatype.Events.fireEvent('historyChanged',token);
       Sonatype.view.historyDisabled = false;
-      
+
       //if event returns true, that means no event listener handled the data and stopped the process, so handle by default means
       if (token && Sonatype.user.curr.repoServer && Sonatype.user.curr.repoServer.length && eventResult)
       {
@@ -1040,210 +1082,7 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
 
     openWindow : function(url) {
       window.open(url);
-    },
-
-    generateErrorReportHandler : function(username) {
-      Ext.Ajax.request({
-            method : 'GET',
-            scope : this,
-            url : Sonatype.config.repos.urls.globalSettingsState,
-            callback : function(options, success, response) {
-              if (success)
-              {
-                var dec = Ext.decode(response.responseText);
-                var needCredentials = dec.data.errorReportingSettings == null || dec.data.errorReportingSettings.jiraUsername == null || dec.data.errorReportingSettings.jiraUsername == '';
-                ns.showProbleReport(needCredentials);
-              }
-              else
-              {
-                ns.connectionError(response, 'Error generating Problem Report');
-              }
-            }
-          });
-    },
-
-    showProbleReport : function(requestCredentials) {
-      var items = [];
-
-      var credentials = [];
-      items.push({
-            xtype : 'fieldset',
-            checkboxToggle : !requestCredentials,
-            collapsed : !requestCredentials,
-            collapsible : !requestCredentials,
-            name : 'errorReportingSettings',
-            title : requestCredentials ? 'Enter JIRA Credentials' : 'Override Default JIRA Credentials (optional)',
-            anchor : Sonatype.view.FIELDSET_OFFSET,
-            autoHeight : true,
-            layoutConfig : {
-              labelSeparator : ''
-            },
-            items : credentials
-          });
-
-      credentials.push({
-            xtype : 'panel',
-            style : 'padding-bottom: 10px',
-            html : 'In order to submit a Problem Report you must have JIRA account. Click here to <a href="http://links.sonatype.com/products/nexus/oss/issues-signup" target="_blank">Sign Up</a>.'
-          });
-      credentials.push({
-            xtype : 'textfield',
-            itemCls : 'required-field',
-            fieldLabel : 'JIRA Username',
-            helpText : Sonatype.repoServer.resources.help.server.jiraUsername,
-            name : 'jiraUsername',
-            allowBlank : !requestCredentials
-          });
-      credentials.push({
-            xtype : 'textfield',
-            itemCls : 'required-field',
-            fieldLabel : 'JIRA Password',
-            helpText : Sonatype.repoServer.resources.help.server.jiraPassword,
-            inputType : 'password',
-            name : 'jiraPassword',
-            allowBlank : !requestCredentials
-          });
-
-      var sp = Sonatype.lib.Permissions;
-      // we can't ofer to save if APR is not enabled
-      if (sp.checkPermission('nexus:settings', sp.EDIT) && !requestCredentials)
-      {
-        credentials.push({
-              xtype : 'checkbox',
-              fieldLabel : 'Save as default',
-              helpText : 'If selected will save currect Problem Report settings as default settings.',
-              name : 'saveErrorReportingSettings'
-            });
-      }
-
-      items.push({
-            xtype : 'panel',
-            style : 'padding-left: 10px; padding-bottom: 10px',
-            html : 'Enter a short title for the Problem Report, along with a more detailed description.'
-          });
-
-      items.push({
-            fieldLabel : 'Enter a short title',
-            itemCls : 'required-field',
-            name : 'title',
-            width : 250,
-            allowBlank : false
-          });
-      items.push({
-            xtype : 'textarea',
-            fieldLabel : 'Description',
-            name : 'description',
-            width : 250,
-            height : 150
-          });
-
-      items.push({
-        xtype : 'panel',
-        style : 'padding-left: 10px; padding-bottom: 10px',
-        html : 'Copies of your logs and configuration will be attached to this report to allow Sonatype to more quickly solve the problem. All passwords and emails are removed and the bundle is encrypted locally with Sonatype\'s Public key before transmitting it to Sonatype. Your data will be handled with strict confidence and will not be disclosed to any third parties.'
-      });
-
-      var w = new Ext.Window({
-            title : 'Generate Nexus Problem Report',
-            closable : true,
-            autoWidth : false,
-            width : 425,
-            autoHeight : true,
-            modal : true,
-            constrain : true,
-            resizable : false,
-            draggable : false,
-            items : [{
-                  xtype : 'form',
-                  labelWidth : 125,
-                  frame : true,
-                  defaultType : 'textfield',
-                  monitorValid : true,
-                  items : items,
-                  buttons : [{
-                        text : 'Submit',
-                        formBind : true,
-                        scope : this,
-                        handler : function() {
-                          var title = w.find('name', 'title')[0].getValue();
-                          var description = w.find('name', 'description')[0].getValue();
-                          if (requestCredentials || w.find('name', 'errorReportingSettings')[0])
-                          {
-                            var jiraUser = w.find('name', 'jiraUsername')[0].getValue();
-                            var jiraPass = w.find('name', 'jiraPassword')[0].getValue();
-                            var saveCheck = w.find('name', 'saveErrorReportingSettings')[0];
-                            var saveErrorReportingSettings;
-                            if (saveCheck)
-                            {
-                              saveErrorReportingSettings = w.find('name', 'saveErrorReportingSettings')[0].getValue();
-                            }
-                            else
-                            {
-                              saveErrorReportingSettings = false
-                            }
-                            ns.createProblemReport(w, title, description, jiraUser, jiraPass, saveErrorReportingSettings);
-                          }
-                          else
-                          {
-                            ns.createProblemReport(w, title, description);
-                          }
-                        }
-                      }, {
-                        text : 'Cancel',
-                        formBind : false,
-                        scope : this,
-                        handler : function() {
-                          w.close();
-                        }
-                      }]
-                }]
-          });
-
-      w.show();
-    },
-
-    createProblemReport : function(window, title, description, username, password, saveErrorReportingSettings) {
-      Ext.MessageBox.wait('Generating Report ...');
-      Ext.Ajax.request({
-            method : 'PUT',
-            url : Sonatype.config.servicePath + '/error_reporting',
-            // 10 minute timeout, upload may be large...
-            timeout : 600000,
-            jsonData : {
-              data : {
-                title : title,
-                description : description,
-                saveErrorReportingSettings : saveErrorReportingSettings,
-                errorReportingSettings : {
-                  jiraUsername : username,
-                  jiraPassword : password
-                }
-              }
-            },
-            cbPassThru : {
-              window : window
-            },
-            callback : function(options, success, response) {
-              var json = Ext.decode(response.responseText);
-
-              if (success)
-              {
-                options.cbPassThru.window.close();
-                Ext.MessageBox.show({
-                      title : 'Problem Report Generated',
-                      msg : 'Your Problem Report was generated <a href=' + json.data.jiraUrl + ' target="_new">here</a>.',
-                      buttons : Ext.MessageBox.OK,
-                      icon : Ext.MessageBox.INFO
-                    });
-              }
-              else
-              {
-                ns.connectionError(response, 'Error generating Problem Report');
-              }
-            }
-          });
     }
-
   });
 
   return Sonatype;

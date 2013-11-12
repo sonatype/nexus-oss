@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Factory of {@link Condition}s related to repositories.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 @Singleton

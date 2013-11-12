@@ -141,7 +141,10 @@ public interface LocalRepositoryStorage
 
   /**
    * Iterate over items.
+   * 
+   * @deprecated To be removed in future releases (no replacement provided).
    */
+  @Deprecated
   Iterator<StorageItem> iterateItems(Repository repository, ResourceStoreIteratorRequest request)
       throws ItemNotFoundException, LocalStorageException;
 }

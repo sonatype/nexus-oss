@@ -17,8 +17,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -31,8 +29,6 @@ public class RemoteIPFinderTest
 {
   @Test
   public void testResolveIP() {
-    HttpServletRequest http = Mockito.mock(HttpServletRequest.class);
-
     Request restlet = Mockito.mock(Request.class);
     Map<String, Object> attributes = Mockito.mock(Map.class);
     Form form = Mockito.mock(Form.class);
@@ -41,42 +37,6 @@ public class RemoteIPFinderTest
     Mockito.doReturn(attributes).when(restlet).getAttributes();
     Mockito.doReturn(form).when(attributes).get("org.restlet.http.headers");
     Mockito.doReturn(clientInfo).when(restlet).getClientInfo();
-
-        /*
-         * Verify that we respect the X-Forwarded-For spec and return the left-most resolvable IP:
-         */
-
-    // HTTP
-
-    Mockito.doReturn("").when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
-    Assert.assertEquals(null, RemoteIPFinder.findIP(http));
-
-    Mockito.doReturn(null).when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
-    Assert.assertEquals(null, RemoteIPFinder.findIP(http));
-
-    Mockito.doReturn("127.0.0.1").when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
-    Assert.assertEquals("127.0.0.1", RemoteIPFinder.findIP(http));
-
-    // Note that if you use a DNS provider, such as OpenDNS, or internet cafe which buckets non-resolvable host names
-    // to a landing page host, these tests will fail when the name 'missing' actually resolves to an IP
-    Mockito.doReturn("missing, 127.0.0.2, unknown, 127.0.0.1").when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
-    Assert.assertEquals("127.0.0.2", RemoteIPFinder.findIP(http));
-
-    Mockito.doReturn("127.0.0.3, 127.0.0.2, 127.0.0.1").when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
-    Assert.assertEquals("127.0.0.3", RemoteIPFinder.findIP(http));
-
-    Mockito.doReturn("localhost").when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
-    Assert.assertEquals("localhost", RemoteIPFinder.findIP(http));
-
-    Mockito.doReturn("client, proxy1, proxy2").when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
-    Mockito.doReturn(null).when(http).getRemoteAddr();
-    Assert.assertEquals(null, RemoteIPFinder.findIP(http));
-
-    Mockito.doReturn("client, proxy1, proxy2").when(http).getHeader(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
-    Mockito.doReturn("upstream").when(http).getRemoteAddr();
-    Assert.assertEquals("upstream", RemoteIPFinder.findIP(http));
-
-    // RESTLET
 
     Mockito.doReturn("").when(form).getFirstValue(org.sonatype.nexus.web.RemoteIPFinder.FORWARD_HEADER);
     Assert.assertEquals(null, RemoteIPFinder.findIP(restlet));

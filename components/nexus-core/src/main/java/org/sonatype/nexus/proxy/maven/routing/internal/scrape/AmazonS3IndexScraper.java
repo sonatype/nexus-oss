@@ -22,6 +22,7 @@ import java.util.Set;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.apachehttpclient.page.Page;
 import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableUtil;
 import org.sonatype.nexus.util.PathUtils;
 
@@ -81,7 +82,7 @@ public class AmazonS3IndexScraper
       // we probably have the NoSuchKey response from S3, usually when repo root is not in bucket root
       prefix = getKeyFromNoSuchKeyResponse(initialPage);
       if (prefix == null) {
-        getLogger().info("Unexpected {} response, cannot scrape this: {}", getTargetedServer(),
+        log.info("Unexpected S3 response from remote of {}, cannot scrape this: {}", context.getProxyRepository(),
             initialPage.getDocument().outerHtml());
         context.stop("Remote recognized as " + getTargetedServer()
             + ", but unexpected response code and response body received (see logs).");
@@ -91,7 +92,7 @@ public class AmazonS3IndexScraper
       initialPageUrl =
           context.getRemoteRepositoryRootUrl().substring(0,
               context.getRemoteRepositoryRootUrl().length() - prefix.length());
-      getLogger().debug("Retrying URL {} to scrape Amazon S3 hosted repository on remote URL {}", initialPageUrl,
+      log.debug("Retrying URL {} to scrape remote of {} on URL {}", initialPageUrl, context.getProxyRepository(),
           context.getRemoteRepositoryRootUrl());
       initialPage = Page.getPageFor(context, initialPageUrl + "?prefix=" + prefix);
     }
@@ -130,7 +131,7 @@ public class AmazonS3IndexScraper
         return;
       }
 
-      getLogger().debug("Processing S3 page response from URL {}", page.getUrl());
+      log.debug("Processing S3 page response from remote of {} got from URL {}", context.getProxyRepository(), page.getUrl());
       String markerElement = null;
       final Elements elements = page.getDocument().getElementsByTag("Contents");
       for (Element element : elements) {

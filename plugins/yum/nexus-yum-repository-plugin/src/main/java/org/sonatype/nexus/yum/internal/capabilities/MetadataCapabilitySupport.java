@@ -35,7 +35,6 @@ import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.YumConfigContentGenerator;
 
 import com.google.common.base.Throwables;
-import com.google.common.io.Closeables;
 import org.apache.commons.io.IOUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -139,22 +138,17 @@ public abstract class MetadataCapabilitySupport<C extends MetadataCapabilityConf
             new ResourceStoreRequest(YumConfigContentGenerator.configFilePath(repository.getId()), true)
         );
         if (storageItem instanceof StorageFileItem) {
-          InputStream in = null;
-          try {
-            in = ((StorageFileItem) storageItem).getInputStream();
+          try (InputStream in = ((StorageFileItem) storageItem).getInputStream()) {
             return
                 "<b>Example Yum configuration file:</b><br/><br/>"
                     + "<pre>"
                     + IOUtils.toString(in)
                     + "</pre>";
           }
-          finally {
-            Closeables.closeQuietly(in);
-          }
         }
       }
       catch (Exception e) {
-        return super.status();
+        return null;
       }
     }
     return null;

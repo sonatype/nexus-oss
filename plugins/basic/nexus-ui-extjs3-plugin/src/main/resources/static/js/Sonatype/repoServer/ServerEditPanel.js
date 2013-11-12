@@ -323,72 +323,9 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
           checkboxToggle : false,
           collapsed : false,
           collapsible : true,
-          id : formId + '_' + 'errorReportingSettings',
-          name : 'errorReportingSettings',
-          title : 'Error Reporting Settings',
-          anchor : Sonatype.view.FIELDSET_OFFSET,
-          autoHeight : true,
-          layoutConfig : {
-            labelSeparator : ''
-          },
-          listeners : {
-            'expand' : {
-              fn : this.optionalFieldsetExpandHandler,
-              scope : this
-            },
-            'collapse' : {
-              fn : this.optionalFieldsetCollapseHandler,
-              scope : this,
-              delay : 100
-            }
-          },
-
-          items : [
-            {
-              xtype : 'textfield',
-              fieldLabel : 'JIRA Username',
-              helpText : ht.jiraUsername,
-              anchor : Sonatype.view.FIELD_OFFSET,
-              name : 'errorReportingSettings.jiraUsername',
-              allowBlank : true
-            },
-            {
-              xtype : 'textfield',
-              fieldLabel : 'JIRA Password',
-              helpText : ht.jiraPassword,
-              inputType : 'password',
-              anchor : Sonatype.view.FIELD_OFFSET,
-              name : 'errorReportingSettings.jiraPassword',
-              allowBlank : true
-            },
-            {
-              xtype : 'checkbox',
-              fieldLabel : 'Report Error Automatically',
-              helpText : 'Set if Nexus should automatically report any problem found.',
-              name : 'errorReportingSettings.reportErrorsAutomatically',
-              anchor : Sonatype.view.FIELD_OFFSET,
-              allowBlank : true
-            }
-          ],
-          buttonAlign : 'left',
-          buttons : [
-            {
-              text : 'Generate Report',
-              handler : function() {
-                var jiraUsername = this.formPanel.form.findField('errorReportingSettings.jiraUsername').getValue();
-                Sonatype.utils.generateErrorReportHandler(jiraUsername);
-              },
-              scope : this
-            }
-          ]
-        },
-        {
-          xtype : 'fieldset',
-          checkboxToggle : true,
-          collapsed : true,
           id : formId + '_' + 'globalRestApiSettings',
           name : 'globalRestApiSettings',
-          title : 'Application Server Settings (optional)',
+          title : 'Application Server Settings',
           anchor : Sonatype.view.FIELDSET_OFFSET,
           autoHeight : true,
           layoutConfig : {

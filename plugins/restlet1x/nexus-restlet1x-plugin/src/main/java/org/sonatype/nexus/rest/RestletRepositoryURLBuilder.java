@@ -24,19 +24,17 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.commons.lang.StringUtils;
 import org.restlet.data.Request;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Named
 @Singleton
 public class RestletRepositoryURLBuilder
+    extends ComponentSupport
     implements RepositoryURLBuilder
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final RepositoryRegistry repositoryRegistry;
 
   private final RepositoryTypeRegistry repositoryTypeRegistry;
@@ -97,7 +95,7 @@ public class RestletRepositoryURLBuilder
 
     // if all else fails?
     if (StringUtils.isBlank(baseURL)) {
-      logger.info("Not able to build content URL of the repository {}, baseUrl not set!",
+      log.info("Not able to build content URL of the repository {}, baseUrl not set!",
           RepositoryStringUtils.getHumanizedNameString(repository));
 
       return null;

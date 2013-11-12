@@ -27,15 +27,15 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.router.RequestRoute;
+import org.sonatype.sisu.goodies.common.Loggers;
 
 import org.restlet.data.Request;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractArtifactViewProvider
     implements ArtifactViewProvider
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = Loggers.getLogger(getClass());
 
   private RepositoryRouter repositoryRouter;
 

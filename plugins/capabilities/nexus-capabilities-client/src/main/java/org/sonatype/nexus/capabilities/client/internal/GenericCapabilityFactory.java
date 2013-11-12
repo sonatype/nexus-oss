@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * type
  * specific factory is available.
  *
- * @since 2.2
+ * @since capabilities 2.2
  */
 public class GenericCapabilityFactory
     implements CapabilityFactory<Capability>

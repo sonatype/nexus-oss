@@ -33,7 +33,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumGroup;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.ListFileFactory;
@@ -46,6 +48,7 @@ import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.sisu.goodies.common.SimpleFormat;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.base.Throwables;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -159,7 +162,7 @@ public class GenerateMetadataTask
 
     LOG.debug("Generating Yum-Repository for '{}' ...", getRpmDir());
     try {
-      getRepoDir().mkdirs();
+      DirSupport.mkdir(getRepoDir().toPath());
 
       File rpmListFile = createRpmListFile();
       commandLineExecutor.exec(buildCreateRepositoryCommand(rpmListFile));
@@ -282,8 +285,9 @@ public class GenerateMetadataTask
       try {
         final Repository repository = repositoryRegistry.getRepository(getRepositoryId());
         for (GroupRepository groupRepository : repositoryRegistry.getGroupsOfRepository(repository)) {
-          if (yumRegistry.isRegistered(repository.getId())) {
-            MergeMetadataTask.createTaskFor(nexusScheduler, groupRepository);
+          Yum yum = yumRegistry.get(groupRepository.getId());
+          if (yum != null && yum instanceof YumGroup) {
+            ((YumGroup) yum).markDirty();
           }
         }
       }
@@ -383,7 +387,12 @@ public class GenerateMetadataTask
     final File cacheDir = new File(
         new File(yumRegistry.getTemporaryDirectory(), CACHE_DIR_PREFIX + getRepositoryId()), name
     );
-    cacheDir.mkdirs();
+    try {
+      DirSupport.mkdir(cacheDir.toPath());
+    }
+    catch (IOException e) {
+      Throwables.propagate(e);
+    }
     return cacheDir;
   }
 

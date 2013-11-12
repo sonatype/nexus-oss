@@ -23,7 +23,7 @@ import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
-import org.sonatype.nexus.util.ItemPathUtils;
+import org.sonatype.nexus.util.PathUtils;
 
 import com.google.common.base.Strings;
 
@@ -336,7 +336,7 @@ public abstract class AbstractStorageItem
   }
 
   public void setPath(String path) {
-    getRepositoryItemAttributes().setPath(ItemPathUtils.cleanUpTrailingSlash(path));
+    getRepositoryItemAttributes().setPath(PathUtils.cleanUpTrailingSlash(path));
   }
 
   @Override
@@ -356,7 +356,12 @@ public abstract class AbstractStorageItem
 
   @Override
   public String getParentPath() {
-    return ItemPathUtils.getParentPath(getPath());
+    return PathUtils.getParentPath(getPath());
+  }
+
+  @Override
+  public int getPathDepth() {
+    return PathUtils.getPathDepth(getPath());
   }
 
   @Override

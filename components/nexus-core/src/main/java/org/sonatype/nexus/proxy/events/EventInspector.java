@@ -14,12 +14,15 @@
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.events.Event;
+import org.sonatype.nexus.events.EventSubscriber;
 
 /**
  * A simple event inspector, a component that receives events emitted by Nexus and processes them in way they want.
  *
  * @author cstamas
+ * @deprecated Use {@link EventSubscriber} instead.
  */
+@Deprecated
 public interface EventInspector
 {
   boolean accepts(Event<?> evt);

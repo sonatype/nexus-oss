@@ -15,12 +15,31 @@ package org.sonatype.nexus.proxy.item;
 
 import org.sonatype.nexus.proxy.item.uid.Attribute;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.util.PathUtils;
 
 /**
  * Repository item UID represents a key that uniquely identifies a resource in a repository. Every Item originating
- * from
- * Nexus, that is not "virtual" is backed by UID with reference to it's originating Repository and path within that
+ * from Nexus, that is not "virtual" is backed by UID with reference to it's originating Repository and path within that
  * repository. UIDs are immutable.
+ * <p/>
+ * Note about "paths" used by this class. UID Paths are not FS file paths! They are always same on every platform, they
+ * are more "URL-like" hierarchical paths. Separator is always same (see {@link RepositoryItemUid#PATH_SEPARATOR}) and UIDs does
+ * not support notion of "relative paths". They always start with path separator and have 0 or more
+ * path elements separated by path separator. They might or might not end with a path separator, telling do you
+ * deal with a "collection" (aka "directory" or "folder") or not (represented by {@link StorageCollectionItem}).
+ * Still, actual checking for file or collection is NOT recommended using checks for UID ending with a
+ * path separator, you'd do the by retrieving item and something like {@code item intanceof StorageCollectionItem}!
+ * <p/>
+ * Few examples of UID paths:
+ * <pre>
+ *   /
+ *   /foo
+ *   /foo/bar/folder/
+ * </pre>
+ * Constructing UID instances that does not follow these requirements might lead to unexpected results!
+ * This might change in future, where the path will be validated and sanitized (and by throwing exceptions
+ * show you the location of bug in the code that tried to use invalid path for UID constructor).
+ * For path utilities, see {@link PathUtils}.
  *
  * @author cstamas
  */

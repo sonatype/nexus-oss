@@ -341,6 +341,7 @@ public class YumNexusTestSupport
                                           final String repositoryId)
   {
     final RepositoryKind kind = mock(RepositoryKind.class);
+    when(kind.isFacetAvailable(HostedRepository.class)).thenReturn(true);
     when(kind.isFacetAvailable(MavenHostedRepository.class)).thenReturn(isMavenHostedRepository);
 
     final MavenHostedRepository repository = mock(MavenHostedRepository.class);

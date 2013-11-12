@@ -22,6 +22,7 @@ import org.sonatype.nexus.proxy.access.OpenAccessManager;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.repository.AbstractRepository;
 import org.sonatype.nexus.proxy.targets.Target;
 
 import com.google.common.collect.Lists;
@@ -63,7 +64,7 @@ public class DefaultReleaseRemoverIT
       throws Exception
   {
     fillInRepo();
-    releases.setAccessManager(new OpenAccessManager());
+    ((AbstractRepository)releases).setAccessManager(new OpenAccessManager());
     ReleaseRemovalResult releaseRemovalResult =
         releaseRemover.removeReleases(new ReleaseRemovalRequest(releases.getId(), 2, ""));
     // pom + jar + sha1 for both
@@ -87,7 +88,7 @@ public class DefaultReleaseRemoverIT
       throws Exception
   {
     fillInRepo();
-    releases.setAccessManager(new OpenAccessManager());
+    ((AbstractRepository)releases).setAccessManager(new OpenAccessManager());
     targetRegistry.addRepositoryTarget(
         new Target("test", "test", new Maven2ContentClass(), Lists.newArrayList(".*/org/sonatype/.*")));
     targetRegistry.commitChanges();
@@ -102,7 +103,7 @@ public class DefaultReleaseRemoverIT
       throws Exception
   {
     fillInRepo();
-    releases.setAccessManager(new OpenAccessManager());
+    ((AbstractRepository)releases).setAccessManager(new OpenAccessManager());
     targetRegistry.addRepositoryTarget(
         new Target("test", "test", new Maven2ContentClass(), Lists.newArrayList(".*/com/sonatype/.*")));
     targetRegistry.commitChanges();
@@ -132,7 +133,7 @@ public class DefaultReleaseRemoverIT
       throws Exception
   {
     fillInRepo();
-    releases.setAccessManager(new OpenAccessManager());
+    ((AbstractRepository)releases).setAccessManager(new OpenAccessManager());
     ReleaseRemovalResult releaseRemovalResult =
         releaseRemover.removeReleases(new ReleaseRemovalRequest(releases.getId(), 2, "3"));
     // pom + jar + sha1 for both, but sources jar and associated sha1 should be left alone

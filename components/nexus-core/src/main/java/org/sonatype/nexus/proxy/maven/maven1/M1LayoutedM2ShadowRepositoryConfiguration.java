@@ -17,6 +17,10 @@ import org.sonatype.nexus.proxy.maven.LayoutConverterShadowRepositoryConfigurati
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+/**
+ * @deprecated To be removed once Maven1 support is removed.
+ */
+@Deprecated
 public class M1LayoutedM2ShadowRepositoryConfiguration
     extends LayoutConverterShadowRepositoryConfiguration
 {

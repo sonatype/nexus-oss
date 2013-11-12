@@ -35,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A {@link Validator} that ensures that capability repository property references a repository that exists.
  *
- * @since 2.3
+ * @since capabilities 2.3
  */
 @Named
 public class RepositoryExistsValidator

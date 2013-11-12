@@ -18,6 +18,10 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepositoryConfigurator;
 
+/**
+ * @deprecated To be removed once Maven1 support is removed.
+ */
+@Deprecated
 @Singleton
 @Named
 public class M1GroupRepositoryConfigurator

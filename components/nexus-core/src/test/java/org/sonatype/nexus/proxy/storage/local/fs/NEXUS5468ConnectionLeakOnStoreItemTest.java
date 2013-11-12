@@ -24,12 +24,18 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.LinkPersister;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.storage.local.DefaultLocalStorageContext;
+import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.mockito.Mockito.when;
 
 /**
  * Testing NEXUS-5468 http connection leak triggered by LocalStorageException
@@ -61,11 +67,14 @@ public class NEXUS5468ConnectionLeakOnStoreItemTest
           new DefaultFSLocalRepositoryStorage(wastebasket, linkPersister, mimeSupport, fsPeer);
 
       final Repository repository = Mockito.mock(Repository.class);
-      Mockito.when(repository.getId()).thenReturn("test");
-      Mockito.when(repository.getAttributesHandler()).thenReturn(Mockito.mock(AttributesHandler.class));
+      when(repository.getId()).thenReturn("test");
+      when(repository.getAttributesHandler()).thenReturn(Mockito.mock(AttributesHandler.class));
       // we return some URL, but does not matter which, this is only to avoid NPE
       // so execution path is "normal success" of storeItem in this case
-      Mockito.when(repository.getLocalUrl()).thenReturn(new File("target").toURI().toURL().toString());
+      final File baseUrl = new File("target");
+      when(repository.getLocalUrl()).thenReturn(baseUrl.toURI().toURL().toString());
+      final LocalStorageContext localStorageContext = new DefaultLocalStorageContext(null);
+      when(repository.getLocalStorageContext()).thenReturn(localStorageContext);
 
       final PreparedContentLocator pcl = new PreparedContentLocator(preparedStream, "text/plain", ContentLocator.UNKNOWN_LENGTH);
 
@@ -79,7 +88,7 @@ public class NEXUS5468ConnectionLeakOnStoreItemTest
     }
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void closeIsCalledOnPreparedContentLocatorIfUnexpectedExceptionIsMet()
       throws Exception
   {
@@ -89,18 +98,26 @@ public class NEXUS5468ConnectionLeakOnStoreItemTest
           new DefaultFSLocalRepositoryStorage(wastebasket, linkPersister, mimeSupport, fsPeer);
 
       final Repository repository = Mockito.mock(Repository.class);
-      Mockito.when(repository.getId()).thenReturn("test");
-      Mockito.when(repository.getAttributesHandler()).thenReturn(Mockito.mock(AttributesHandler.class));
+      when(repository.getId()).thenReturn("test");
+      when(repository.getAttributesHandler()).thenReturn(Mockito.mock(AttributesHandler.class));
       // we intentionally throw some unexpected exception here
       // so execution path here will be interrupted
-      Mockito.when(repository.getLocalUrl()).thenThrow(new RuntimeException("Something unexpected!"));
+      final LocalStorageContext localStorageContext = new DefaultLocalStorageContext(null);
+      when(repository.getLocalStorageContext()).thenReturn(localStorageContext);
+
+      when(repository.getLocalUrl()).thenThrow(new RuntimeException("Something unexpected!"));
 
       final PreparedContentLocator pcl = new PreparedContentLocator(preparedStream, "text/plain", ContentLocator.UNKNOWN_LENGTH);
 
       final DefaultStorageFileItem file =
           new DefaultStorageFileItem(repository, new ResourceStoreRequest("/some/file.txt"), true, true, pcl);
 
-      testSubject.storeItem(repository, file);
+      try {
+        testSubject.storeItem(repository, file);
+      }
+      catch (RuntimeException e) {
+        assertThat(e.getMessage(), equalTo("Something unexpected!"));
+      }
     }
     finally {
       Mockito.verify(preparedStream, Mockito.times(1)).close();

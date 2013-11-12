@@ -177,9 +177,12 @@
           </association>
           <required>true</required>
         </field>
+        <!--
+        Removed in 2.7
+        -->
         <field>
           <name>errorReporting</name>
-          <version>1.4.0+</version>
+          <version>1.4.0/2.5.0</version>
           <description>Error Reporting Parameters</description>
           <association>
             <type>CErrorReporting</type>
@@ -1248,9 +1251,12 @@
       </fields>
     </class>
 
+    <!--
+    Removed in 2.7
+    -->
     <class>
       <name>CErrorReporting</name>
-      <version>1.4.0+</version>
+      <version>1.4.0/2.5.0</version>
       <description>Configuration for automatic error reporting</description>
       <fields>
         <field>

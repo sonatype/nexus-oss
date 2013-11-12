@@ -32,10 +32,9 @@ import org.sonatype.nexus.feeds.record.NexusItemInfo;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
 import org.sonatype.nexus.timeline.NexusTimeline;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Predicate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -45,6 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class DefaultFeedRecorder
+    extends ComponentSupport
     implements FeedRecorder
 {
 
@@ -106,8 +106,6 @@ public class DefaultFeedRecorder
    */
   private static final String EVENT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSZ";
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   /**
    * The timeline for persistent events and feeds.
    */
@@ -125,7 +123,7 @@ public class DefaultFeedRecorder
     this.nexusTimeline = checkNotNull(nexusTimeline);
     this.feedArtifactEventFilter = checkNotNull(feedArtifactEventFilter);
   }
-  
+
   @Override
   public void shutdown() {
     nexusTimeline.shutdown();
@@ -142,7 +140,7 @@ public class DefaultFeedRecorder
       eventDate = getDateFormat().parse(map.get(DATE));
     }
     catch (ParseException e) {
-      logger.warn("Could not format event date!", e);
+      log.warn("Could not format event date!", e);
 
       eventDate = new Date();
     }
@@ -301,8 +299,8 @@ public class DefaultFeedRecorder
       Object value = context.get(key);
 
       if (value == null) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("The attribute with key '" + key + "' in event context is NULL!");
+        if (log.isDebugEnabled()) {
+          log.debug("The attribute with key '" + key + "' in event context is NULL!");
         }
 
         value = "";
@@ -356,7 +354,7 @@ public class DefaultFeedRecorder
 
     addToTimeline(prc);
 
-    logger.debug(prc.getMessage());
+    log.debug(prc.getMessage());
 
     return prc;
   }
@@ -366,7 +364,7 @@ public class DefaultFeedRecorder
 
     addToTimeline(prc);
 
-    logger.debug(prc.getMessage());
+    log.debug(prc.getMessage());
   }
 
   public void systemProcessCanceled(SystemProcess prc, String cancelMessage) {
@@ -374,7 +372,7 @@ public class DefaultFeedRecorder
 
     addToTimeline(prc);
 
-    logger.debug(prc.getMessage());
+    log.debug(prc.getMessage());
   }
 
   public void systemProcessBroken(SystemProcess prc, Throwable e) {
@@ -382,7 +380,7 @@ public class DefaultFeedRecorder
 
     addToTimeline(prc);
 
-    logger.debug(prc.getMessage(), e);
+    log.debug(prc.getMessage(), e);
   }
 
   protected void addToTimeline(SystemEvent se) {

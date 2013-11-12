@@ -81,7 +81,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultSecuritySystem
     implements SecuritySystem
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(DefaultSecuritySystem.class);
 
   private SecurityConfigurationManager securityConfiguration;
 
@@ -108,12 +108,15 @@ public class DefaultSecuritySystem
   private volatile boolean started;
 
   @Inject
-  public DefaultSecuritySystem(List<SecurityEmailer> securityEmailers, EventBus eventBus,
+  public DefaultSecuritySystem(List<SecurityEmailer> securityEmailers,
+                               EventBus eventBus,
                                PasswordGenerator passwordGenerator,
-                               Map<String, AuthorizationManager> authorizationManagers, Map<String, Realm> realmMap,
+                               Map<String, AuthorizationManager> authorizationManagers,
+                               Map<String, Realm> realmMap,
                                SecurityConfigurationManager securityConfiguration,
                                RealmSecurityManager securityManager,
-                               CacheManagerComponent cacheManagerComponent, UserManagerFacade userManagerFacade)
+                               CacheManagerComponent cacheManagerComponent,
+                               UserManagerFacade userManagerFacade)
   {
     this.securityEmailers = securityEmailers;
     this.eventBus = eventBus;

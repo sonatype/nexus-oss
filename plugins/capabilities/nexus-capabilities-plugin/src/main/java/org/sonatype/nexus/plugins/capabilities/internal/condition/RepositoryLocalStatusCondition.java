@@ -14,7 +14,7 @@
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
-import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
+import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A condition that is satisfied when a repository has a specified local status.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class RepositoryLocalStatusCondition
     extends RepositoryConditionSupport
@@ -57,9 +57,9 @@ public class RepositoryLocalStatusCondition
 
   @AllowConcurrentEvents
   @Subscribe
-  public void handle(final RepositoryEventLocalStatusChanged event) {
+  public void handle(final RepositoryConfigurationUpdatedEvent event) {
     if (sameRepositoryAs(event.getRepository().getId())) {
-      setSatisfied(localStatus.equals(event.getNewLocalStatus()));
+      setSatisfied(localStatus.equals(event.getRepository().getLocalStatus()));
     }
   }
 

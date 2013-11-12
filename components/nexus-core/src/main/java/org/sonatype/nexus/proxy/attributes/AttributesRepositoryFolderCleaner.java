@@ -26,7 +26,9 @@ import org.sonatype.nexus.proxy.wastebasket.AbstractRepositoryFolderCleaner;
  * TO BE REMOVED once we switch from FS based attribute storage to LS based attribute storage!
  *
  * @author cstamas
+ * @deprecated To be removed in future releases once upgrade from Nexus 1.x line becomes unsupported.
  */
+@Deprecated
 @Named("core-proxy-attributes")
 @Singleton
 public class AttributesRepositoryFolderCleaner

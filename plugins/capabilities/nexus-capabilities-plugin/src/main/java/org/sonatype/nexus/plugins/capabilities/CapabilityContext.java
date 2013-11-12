@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Provides access to capability context.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public interface CapabilityContext
 {
@@ -85,6 +85,13 @@ public interface CapabilityContext
    * @return last exception thrown during a lifecycle callback method or null if it not failed
    */
   Exception failure();
+
+  /**
+   * Returns name of last lifecycle callback method (create/load/update/activate/passivate) that failed.
+   *
+   * @since 2.7
+   */
+  String failingAction();
 
   /**
    * Describe current state.

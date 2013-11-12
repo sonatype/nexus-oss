@@ -17,11 +17,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.events.EventInspectorHost;
+import org.sonatype.nexus.events.EventSubscriberHost;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
@@ -37,11 +36,11 @@ public class EventInspectorsPlexusResource
 {
   private static final String RESOURCE_URI = "/eventInspectors/isCalmPeriod";
 
-  private final EventInspectorHost eventInspectorHost;
+  private final EventSubscriberHost eventSubscriberHost;
 
   @Inject
-  public EventInspectorsPlexusResource(final EventInspectorHost eventInspectorHost) {
-    this.eventInspectorHost = eventInspectorHost;
+  public EventInspectorsPlexusResource(final EventSubscriberHost eventSubscriberHost) {
+    this.eventSubscriberHost = eventSubscriberHost;
   }
 
   @Override
@@ -73,7 +72,7 @@ public class EventInspectorsPlexusResource
         catch (InterruptedException e) {
         }
 
-        if (eventInspectorHost.isCalmPeriod()) {
+        if (eventSubscriberHost.isCalmPeriod()) {
           response.setStatus(Status.SUCCESS_OK);
           return "Ok";
         }
@@ -83,7 +82,7 @@ public class EventInspectorsPlexusResource
       return "Still munching on them...";
     }
     else {
-      if (eventInspectorHost.isCalmPeriod()) {
+      if (eventSubscriberHost.isCalmPeriod()) {
         response.setStatus(Status.SUCCESS_OK);
         return "Ok";
       }

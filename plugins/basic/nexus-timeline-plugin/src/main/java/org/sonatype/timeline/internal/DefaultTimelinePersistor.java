@@ -36,12 +36,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
 import org.sonatype.timeline.proto.TimeLineRecordProtos;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Throwables;
 import org.codehaus.plexus.util.IOUtil;
 
 /**
@@ -82,11 +84,16 @@ public class DefaultTimelinePersistor
    * in.
    */
   protected synchronized void setConfiguration(final TimelineConfiguration configuration) {
-    this.persistDirectory = configuration.getPersistDirectory();
-    if (!this.persistDirectory.exists()) {
-      this.persistDirectory.mkdirs();
+    if (!configuration.getPersistDirectory().exists()) {
+      try {
+        DirSupport.mkdir(configuration.getPersistDirectory().toPath());
+      }
+      catch (IOException e) {
+        Throwables.propagate(e);
+      }
     }
-    this.rollingIntervalMillis = configuration.getPersistRollingIntervalMillis();
+    persistDirectory = configuration.getPersistDirectory();
+    rollingIntervalMillis = configuration.getPersistRollingIntervalMillis();
   }
 
   /**

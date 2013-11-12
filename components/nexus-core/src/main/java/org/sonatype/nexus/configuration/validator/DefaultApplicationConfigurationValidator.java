@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
-import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CMirror;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
@@ -579,29 +578,6 @@ public class DefaultApplicationConfigurationValidator
     if (StringUtils.isEmpty(settings.getSystemEmailAddress())) {
       ValidationMessage msg = new ValidationMessage("systemEmailAddress", "System Email Address is empty.");
       response.addValidationError(msg);
-    }
-
-    return response;
-  }
-
-  @Override
-  public ValidationResponse validateErrorReporting(ApplicationValidationContext ctx, CErrorReporting settings) {
-    ValidationResponse response = new ApplicationValidationResponse();
-
-    if (ctx != null) {
-      response.setContext(ctx);
-    }
-
-    if (settings.isEnabled()) {
-      if (StringUtils.isEmpty(settings.getJiraUrl())) {
-        ValidationMessage msg = new ValidationMessage("jiraUrl", "JIRA URL is empty.");
-        response.addValidationError(msg);
-      }
-
-      if (StringUtils.isEmpty(settings.getJiraProject())) {
-        ValidationMessage msg = new ValidationMessage("jiraProject", "JIRA Project is empty.");
-        response.addValidationError(msg);
-      }
     }
 
     return response;

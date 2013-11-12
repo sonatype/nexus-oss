@@ -16,7 +16,6 @@ package org.sonatype.nexus.log.internal;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -27,9 +26,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -42,27 +44,33 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.log.DefaultLogConfiguration;
 import org.sonatype.nexus.log.DefaultLogManagerMBean;
 import org.sonatype.nexus.log.LogConfiguration;
+import org.sonatype.nexus.log.LogConfigurationCustomizer;
+import org.sonatype.nexus.log.LogConfigurationCustomizer.Configuration;
 import org.sonatype.nexus.log.LogConfigurationParticipant;
 import org.sonatype.nexus.log.LogManager;
+import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
+import org.sonatype.nexus.util.file.FileSupport;
+import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.LoggerContextListener;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.util.StatusPrinter;
+import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.io.ByteStreams;
 import com.google.inject.Injector;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,26 +104,41 @@ public class LogbackLogManager
 
   private static final String LOG_CONF_PROPS_RESOURCE = "/META-INF/log/" + LOG_CONF_PROPS;
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(LogbackLogManager.class);
 
   private final Injector injector;
 
   private final ApplicationConfiguration applicationConfiguration;
 
   private final List<LogConfigurationParticipant> logConfigurationParticipants;
-  
+
+  private final List<LogConfigurationCustomizer> logConfigurationCustomizers;
+
+  private final NexusLoggerContextListener loggerContextListener;
+
   private final EventBus eventBus;
+
+  private final Map<String, LoggerLevel> overrides;
+
+  private final Map<String, LoggerLevel> customisations;
 
   private ObjectName jmxName;
 
   @Inject
-  public LogbackLogManager(final Injector injector, final ApplicationConfiguration applicationConfiguration,
-      final List<LogConfigurationParticipant> logConfigurationParticipants, final EventBus eventBus)
+  public LogbackLogManager(final Injector injector,
+                           final ApplicationConfiguration applicationConfiguration,
+                           final List<LogConfigurationParticipant> logConfigurationParticipants,
+                           final List<LogConfigurationCustomizer> logConfigurationCustomizers,
+                           final EventBus eventBus)
   {
     this.injector = checkNotNull(injector);
     this.applicationConfiguration = checkNotNull(applicationConfiguration);
     this.logConfigurationParticipants = checkNotNull(logConfigurationParticipants);
+    this.logConfigurationCustomizers = checkNotNull(logConfigurationCustomizers);
+    this.loggerContextListener = new NexusLoggerContextListener();
     this.eventBus = checkNotNull(eventBus);
+    this.overrides = Maps.newHashMap();
+    this.customisations = Maps.newHashMap();
     try {
       jmxName = ObjectName.getInstance(JMX_DOMAIN, "name", LogManager.class.getSimpleName());
       final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -127,21 +150,27 @@ public class LogbackLogManager
     }
     eventBus.register(this);
   }
-  
-  // ==
 
   @Subscribe
-  public void on(final NexusInitializedEvent evt)
-  {
+  public void on(final NexusInitializedEvent evt) {
     configure();
   }
 
-  // ==
+  private LoggerContext getLoggerContext() {
+    return (LoggerContext) LoggerFactory.getILoggerFactory();
+  }
 
   @Override
   public synchronized void configure() {
     // TODO maybe do some optimization that if participants does not change, do not reconfigure
     prepareConfigurationFiles();
+    readCustomisations();
+    overrides.clear();
+    File logOverridesConfigFile = getLogOverridesConfigFile();
+    if (logOverridesConfigFile.exists()) {
+      overrides.putAll(LogbackOverrides.read(logOverridesConfigFile));
+    }
+    installNexusLoggerContextListener();
     reconfigure();
   }
 
@@ -158,11 +187,53 @@ public class LogbackLogManager
     eventBus.unregister(this);
   }
 
+  /**
+   * @since 2.7
+   */
+  @Override
+  public File getLogConfigFile(final String name) {
+    return new File(getLogConfigDir(), name);
+  }
+
+  /**
+   * @since 2.7
+   */
+  @Override
+  public File getLogOverridesConfigFile() {
+    return getLogConfigFile("logback-overrides.xml");
+  }
+
+  /**
+   * @since 2.7
+   */
+  @Override
+  public Map<String, LoggerLevel> getLoggers() {
+    Map<String, LoggerLevel> loggers = Maps.newHashMap();
+
+    LoggerContext loggerContext = getLoggerContext();
+    for (ch.qos.logback.classic.Logger logger : loggerContext.getLoggerList()) {
+      String name = logger.getName();
+      Level level = logger.getLevel();
+      // only include loggers which explicit levels configured
+      if (level != null) {
+        loggers.put(name, convert(level));
+      }
+    }
+
+    for (Entry<String, LoggerLevel> entry : customisations.entrySet()) {
+      if (LoggerLevel.DEFAULT.equals(entry.getValue()) && !loggers.containsKey(entry.getKey())) {
+        loggers.put(entry.getKey(), getLoggerEffectiveLevel(entry.getKey()));
+      }
+    }
+
+    return loggers;
+  }
+
   @Override
   public Set<File> getLogFiles() {
     HashSet<File> files = new HashSet<File>();
 
-    LoggerContext ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
+    LoggerContext ctx = getLoggerContext();
 
     for (Logger l : ctx.getLoggerList()) {
       ch.qos.logback.classic.Logger log = (ch.qos.logback.classic.Logger) l;
@@ -310,11 +381,18 @@ public class LogbackLogManager
 
     response.setSize(log.length());
 
-    response.setFromByte(from);
+    if (count >= 0) {
+      response.setFromByte(from);
+      response.setBytesCount(count);
+    }
+    else {
+      response.setBytesCount(Math.abs(count));
+      response.setFromByte(Math.max(0, response.getSize() - response.getBytesCount()));
+    }
 
-    response.setBytesCount(count);
-
-    response.setInputStream(new LimitedInputStream(new FileInputStream(log), from, count));
+    response.setInputStream(
+        new LimitedInputStream(new FileInputStream(log), response.getFromByte(), response.getBytesCount())
+    );
 
     return response;
   }
@@ -325,22 +403,15 @@ public class LogbackLogManager
     prepareConfigurationFiles();
     String logConfigDir = getLogConfigDir();
     File logConfigPropsFile = new File(logConfigDir, LOG_CONF_PROPS);
-    InputStream in = null;
-    try {
-      in = new FileInputStream(logConfigPropsFile);
-
+    try (final InputStream in = new FileInputStream(logConfigPropsFile)) {
       Properties properties = new Properties();
       properties.load(in);
-
       return properties;
-    }
-    finally {
-      IOUtil.close(in);
     }
   }
 
   private void saveConfigurationProperties(final Properties properties)
-      throws FileNotFoundException, IOException
+      throws IOException
   {
     final File configurationFile = new File(getLogConfigDir(), LOG_CONF_PROPS);
     logger.debug("Saving configuration: {}", configurationFile);
@@ -361,7 +432,7 @@ public class LogbackLogManager
   private String getLogConfigDir() {
     String logConfigDir = System.getProperty(KEY_LOG_CONFIG_DIR);
 
-    if (StringUtils.isEmpty(logConfigDir)) {
+    if (Strings.isNullOrEmpty(logConfigDir)) {
       logConfigDir = applicationConfiguration.getConfigurationDirectory().getAbsolutePath();
 
       System.setProperty(KEY_LOG_CONFIG_DIR, logConfigDir);
@@ -377,8 +448,9 @@ public class LogbackLogManager
     if (!logConfigPropsFile.exists()) {
       try {
         URL configUrl = this.getClass().getResource(LOG_CONF_PROPS_RESOURCE);
-
-        FileUtils.copyURLToFile(configUrl, logConfigPropsFile);
+        try (final InputStream is = configUrl.openStream()) {
+          FileSupport.copy(is, logConfigPropsFile.toPath());
+        }
       }
       catch (IOException e) {
         throw new IllegalStateException("Could not create logback.properties as "
@@ -402,7 +474,7 @@ public class LogbackLogManager
                   throws IOException
               {
                 try (final InputStream in = participant.getConfiguration()) {
-                  ByteStreams.copy(in, output);
+                  StreamSupport.copy(in, output);
                 }
               }
             });
@@ -437,9 +509,16 @@ public class LogbackLogManager
             out.println("  <property file='${nexus.log-config-dir}/logback.properties'/>");
             if (logConfigurationParticipants != null) {
               for (LogConfigurationParticipant participant : logConfigurationParticipants) {
-                out.println(String.format("  <include file='${nexus.log-config-dir}/%s'/>",
-                    participant.getName()));
+                out.println(String.format(
+                    "  <include file='${nexus.log-config-dir}/%s'/>", participant.getName())
+                );
               }
+            }
+            File logOverridesConfigFile = getLogOverridesConfigFile();
+            if (logOverridesConfigFile.exists()) {
+              out.println(String.format(
+                  "  <include file='${nexus.log-config-dir}/%s'/>", logOverridesConfigFile.getName())
+              );
             }
             out.write("</configuration>");
           }
@@ -453,25 +532,27 @@ public class LogbackLogManager
 
   private void reconfigure() {
     String logConfigDir = getLogConfigDir();
+    File file = new File(logConfigDir, LOG_CONF);
+    logger.debug("Reconfiguring: {}", file);
 
-    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-
+    LoggerContext context = getLoggerContext();
     try {
       JoranConfigurator configurator = new JoranConfigurator();
-      configurator.setContext(lc);
-      lc.reset();
-      lc.getStatusManager().clear();
-      configurator.doConfigure(new File(logConfigDir, LOG_CONF));
+      configurator.setContext(context);
+      context.reset();
+      context.getStatusManager().clear();
+      configurator.doConfigure(file);
     }
-    catch (JoranException je) {
-      je.printStackTrace();
+    catch (JoranException e) {
+      e.printStackTrace();
     }
-    StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
+
+    StatusPrinter.printInCaseOfErrorsOrWarnings(context);
     injectAppenders();
   }
 
   private void injectAppenders() {
-    LoggerContext ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
+    LoggerContext ctx = getLoggerContext();
 
     for (Logger l : ctx.getLoggerList()) {
       ch.qos.logback.classic.Logger log = (ch.qos.logback.classic.Logger) l;
@@ -481,6 +562,223 @@ public class LogbackLogManager
         Appender<ILoggingEvent> ap = it.next();
         injector.injectMembers(ap);
       }
+    }
+  }
+
+  /**
+   * Convert a Logback {@link Level} into a {@link LoggerLevel}.
+   */
+  private LoggerLevel convert(final Level level) {
+    switch (level.toInt()) {
+
+      case Level.ERROR_INT:
+        return LoggerLevel.ERROR;
+
+      case Level.WARN_INT:
+        return LoggerLevel.WARN;
+
+      case Level.INFO_INT:
+        return LoggerLevel.INFO;
+
+      case Level.DEBUG_INT:
+        return LoggerLevel.DEBUG;
+
+      case Level.TRACE_INT:
+        return LoggerLevel.TRACE;
+
+      default:
+        return LoggerLevel.TRACE;
+    }
+  }
+
+  /**
+   * Convert a {@link LoggerLevel} into a Logback {@link Level}.
+   */
+  private Level convert(final LoggerLevel level) {
+    return Level.valueOf(level.name());
+  }
+
+  @Override
+  public void setLoggerLevel(final String name, final @Nullable LoggerLevel level) {
+    if (level == null) {
+      unsetLoggerLevel(name);
+      return;
+    }
+
+    logger.debug("Set logger level: {}={}", name, level);
+    LoggerLevel calculated = null;
+    if (Logger.ROOT_LOGGER_NAME.equals(name)) {
+      try {
+        calculated = LoggerLevel.DEFAULT.equals(level) ? LoggerLevel.INFO : level;
+        Properties logProperties = loadConfigurationProperties();
+        logProperties.setProperty(KEY_ROOT_LEVEL, calculated.name());
+        saveConfigurationProperties(logProperties);
+      }
+      catch (IOException e) {
+        throw Throwables.propagate(e);
+      }
+    }
+    else {
+      if (LoggerLevel.DEFAULT.equals(level)) {
+        boolean customizedByUser = overrides.containsKey(name) && !customisations.containsKey(name);
+        unsetLoggerLevel(name);
+        if (customizedByUser) {
+          overrides.put(name, calculated = getLoggerEffectiveLevel(name));
+          LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
+        }
+        else {
+          LoggerLevel customizedLevel = customisations.get(name);
+          if (customizedLevel != null && !LoggerLevel.DEFAULT.equals(customizedLevel)) {
+            calculated = customizedLevel;
+          }
+        }
+      }
+      else {
+        overrides.put(name, calculated = level);
+        LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
+      }
+    }
+    if (calculated != null) {
+      setLogbackLoggerLevel(name, convert(calculated));
+    }
+  }
+
+  @Override
+  public void unsetLoggerLevel(final String name) {
+    logger.debug("Unset logger level: {}", name);
+
+    if (overrides.remove(name) != null) {
+      LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
+    }
+    if (Logger.ROOT_LOGGER_NAME.equals(name)) {
+      setLoggerLevel(name, LoggerLevel.DEFAULT);
+    }
+    else {
+      setLogbackLoggerLevel(name, null);
+    }
+  }
+
+  @Override
+  public void resetLoggers() {
+    logger.debug("Resetting loggers");
+
+    for (Map.Entry<String, LoggerLevel> entry : overrides.entrySet()) {
+      if (!Logger.ROOT_LOGGER_NAME.equals(entry.getKey())) {
+        setLogbackLoggerLevel(entry.getKey(), null);
+      }
+    }
+    overrides.clear();
+    LogbackOverrides.write(getLogOverridesConfigFile(), overrides);
+    setLoggerLevel(Logger.ROOT_LOGGER_NAME, LoggerLevel.DEFAULT);
+    applyCustomisations();
+
+    logger.debug("Loggers reset to their default levels");
+  }
+
+  @Override
+  @Nullable
+  public LoggerLevel getLoggerLevel(final String name) {
+    Level level = getLoggerContext().getLogger(name).getLevel();
+    if (level != null) {
+      return convert(level);
+    }
+    return null;
+  }
+
+  @Override
+  public LoggerLevel getLoggerEffectiveLevel(final String name) {
+    return convert(getLoggerContext().getLogger(name).getEffectiveLevel());
+  }
+
+  private void setLogbackLoggerLevel(final String name, final Level level) {
+    // HACK: replace JUL level change propagator impl to avoid NPE
+    if (level == null) {
+      installJulLevelChangePropagator();
+    }
+    getLoggerContext().getLogger(name).setLevel(level);
+  }
+
+  /**
+   * Installs {@link NexusLoggerContextListener} if not already present in context.
+   */
+  private void installNexusLoggerContextListener() {
+    LoggerContext context = getLoggerContext();
+    if (!context.getCopyOfListenerList().contains(loggerContextListener)) {
+      context.addListener(loggerContextListener);
+      logger.debug("Nexus logger context listener installed");
+    }
+  }
+
+  /**
+   * Replace JUL level propagator with custom impl which handles NPE on level=null
+   * logback can not load this class from XML due to class-loader issues.
+   */
+  private void installJulLevelChangePropagator() {
+    LoggerContext context = getLoggerContext();
+    boolean shouldInstall = true;
+    for (LoggerContextListener listener : context.getCopyOfListenerList()) {
+      if (listener instanceof JulLevelChangePropagator) {
+        shouldInstall = false;
+      }
+      else if (listener instanceof ch.qos.logback.classic.jul.LevelChangePropagator) {
+        context.removeListener(listener);
+      }
+    }
+    if (shouldInstall) {
+      context.addListener(new JulLevelChangePropagator(context));
+      logger.debug("JUL level change propagator installed");
+    }
+  }
+
+  private void readCustomisations() {
+    Configuration customizerConfiguration = new Configuration()
+    {
+      @Override
+      public void setLoggerLevel(final String name, final LoggerLevel level) {
+        customisations.put(checkNotNull(name), checkNotNull(level));
+      }
+    };
+    customisations.clear();
+    for (LogConfigurationCustomizer customizer : logConfigurationCustomizers) {
+      customizer.customize(customizerConfiguration);
+    }
+  }
+
+  private void applyCustomisations() {
+    for (Entry<String, LoggerLevel> entry : customisations.entrySet()) {
+      if (!LoggerLevel.DEFAULT.equals(entry.getValue())) {
+        setLogbackLoggerLevel(entry.getKey(), convert(entry.getValue()));
+      }
+    }
+  }
+
+  private class NexusLoggerContextListener
+      implements LoggerContextListener
+  {
+
+    @Override
+    public boolean isResetResistant() {
+      return true;
+    }
+
+    @Override
+    public void onStart(final LoggerContext context) {
+      // do nothing
+    }
+
+    @Override
+    public void onReset(final LoggerContext context) {
+      applyCustomisations();
+    }
+
+    @Override
+    public void onStop(final LoggerContext context) {
+      // do nothing
+    }
+
+    @Override
+    public void onLevelChange(final ch.qos.logback.classic.Logger logger, final Level level) {
+      // do nothing
     }
   }
 

@@ -26,7 +26,10 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -40,7 +43,6 @@ import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.io.Closeables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +60,7 @@ public class MergeMetadataTask
     extends AbstractNexusTask<YumRepository>
 {
 
-  private static final Logger LOG = LoggerFactory.getLogger(MergeMetadataTask.class);
+  private static final Logger log = LoggerFactory.getLogger(MergeMetadataTask.class);
 
   public static final String ID = "MergeMetadataTask";
 
@@ -88,20 +90,27 @@ public class MergeMetadataTask
       deleteYumTempDirs();
 
       final File repoBaseDir = RepositoryUtils.getBaseDir(groupRepository);
-      final List<File> memberReposBaseDirs = getBaseDirsOfMemberRepositories();
-      if (memberReposBaseDirs.size() > 1) {
-        LOG.debug("Merging repository group '{}' out of {}", groupRepository.getId(), memberReposBaseDirs);
-        commandLineExecutor.exec(buildCommand(repoBaseDir, memberReposBaseDirs));
-        LOG.debug("Group repository '{}' merged", groupRepository.getId());
+      RepositoryItemUid groupRepoMdUid = groupRepository.createUid("/" + PATH_OF_REPOMD_XML);
+      try {
+        groupRepoMdUid.getLock().lock(Action.update);
+
+        final List<File> memberReposBaseDirs = getBaseDirsOfMemberRepositories();
+        if (memberReposBaseDirs.size() > 1) {
+          log.debug("Merging repository group '{}' out of {}", groupRepository.getId(), memberReposBaseDirs);
+          commandLineExecutor.exec(buildCommand(repoBaseDir, memberReposBaseDirs));
+          log.debug("Group repository '{}' merged", groupRepository.getId());
+        }
+        else {
+          log.debug(
+              "Remove group repository {} Yum metadata, because there is only one member with Yum metadata",
+              groupRepository.getId()
+          );
+          // delete without using group repository API as group repositories does not allow delete (read only)
+          deleteQuietly(new File(repoBaseDir, "repodata"));
+        }
       }
-      else {
-        final File groupRepoData = new File(repoBaseDir, "repodata");
-        LOG.debug(
-            "Remove group repository repodata, because at maximum one yum member-repository left : {}",
-            groupRepoData
-        );
-        // TODO this should be done via repo API
-        deleteQuietly(groupRepoData);
+      finally {
+        groupRepoMdUid.getLock().unlock();
       }
 
       deleteYumTempDirs();
@@ -112,34 +121,33 @@ public class MergeMetadataTask
   }
 
   private List<File> getBaseDirsOfMemberRepositories()
-      throws URISyntaxException, MalformedURLException
+      throws Exception
   {
     final List<File> baseDirs = new ArrayList<File>();
     for (final Repository memberRepository : groupRepository.getMemberRepositories()) {
+      log.trace("Looking up latest Yum metadata in {} member of {}", memberRepository.getId(), groupRepository.getId());
+      StorageItem repomdItem = null;
       try {
-        final StorageItem repomdItem = memberRepository.retrieveItem(
+        log.trace("Retrieving {}:{}", memberRepository.getId(), "/" + PATH_OF_REPOMD_XML);
+        repomdItem = memberRepository.retrieveItem(
             new ResourceStoreRequest("/" + PATH_OF_REPOMD_XML)
         );
-        if (repomdItem instanceof StorageFileItem) {
-          InputStream in = null;
-          try {
-            final RepoMD repomd = new RepoMD(in = ((StorageFileItem) repomdItem).getInputStream());
-            // do we need them all or we can skip the sqllite ?
-            for (final String location : repomd.getLocations()) {
-              memberRepository.retrieveItem(
-                  new ResourceStoreRequest("/" + location)
-              );
-            }
-          }
-          finally {
-            Closeables.closeQuietly(in);
+      }
+      catch (ItemNotFoundException ignore) {
+        // skipping as it looks like member is not an Yum repository
+      }
+      if (repomdItem != null && repomdItem instanceof StorageFileItem) {
+        try (InputStream in = ((StorageFileItem) repomdItem).getInputStream()) {
+          final RepoMD repomd = new RepoMD(in);
+          for (final String location : repomd.getLocations()) {
+            log.trace("Retrieving {}:{}", memberRepository.getId(), "/" + location);
+            memberRepository.retrieveItem(
+                new ResourceStoreRequest("/" + location)
+            );
           }
         }
         // all metadata files are available by now so lets use it
         baseDirs.add(RepositoryUtils.getBaseDir(memberRepository));
-      }
-      catch (Exception ignore) {
-        // we do not have all the necessary files in member repository to get it merged
       }
     }
     return baseDirs;
@@ -160,7 +168,7 @@ public class MergeMetadataTask
         }
       });
       for (File yumTmpDir : yumTmpDirs) {
-        LOG.debug("Deleting yum temp dir : {}", yumTmpDir);
+        log.debug("Deleting yum temp dir : {}", yumTmpDir);
         deleteQuietly(yumTmpDir);
       }
     }

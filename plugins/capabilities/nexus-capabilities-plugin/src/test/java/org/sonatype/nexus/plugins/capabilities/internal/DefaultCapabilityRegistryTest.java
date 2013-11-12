@@ -71,7 +71,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 /**
  * {@link DefaultCapabilityRegistry} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class DefaultCapabilityRegistryTest
     extends TestSupport
@@ -156,7 +156,7 @@ public class DefaultCapabilityRegistryTest
     final CapabilityReference reference = underTest.add(CAPABILITY_TYPE, true, null, null);
     assertThat(reference, is(not(nullValue())));
 
-    verify(eventBus).post(rec.capture());
+    verify(eventBus, atLeastOnce()).post(rec.capture());
     assertThat(rec.getValue(), is(instanceOf(CapabilityEvent.Created.class)));
     assertThat(rec.getValue().getReference(), is(equalTo(reference)));
   }
@@ -175,7 +175,7 @@ public class DefaultCapabilityRegistryTest
 
     assertThat(reference1, is(equalTo(reference)));
 
-    verify(eventBus, times(2)).post(rec.capture());
+    verify(eventBus, atLeastOnce()).post(rec.capture());
     assertThat(rec.getAllValues().get(0), is(instanceOf(CapabilityEvent.Created.class)));
     assertThat(rec.getAllValues().get(0).getReference(), is(equalTo(reference1)));
     assertThat(rec.getAllValues().get(1), is(instanceOf(CapabilityEvent.AfterRemove.class)));
@@ -426,7 +426,7 @@ public class DefaultCapabilityRegistryTest
 
     ArgumentCaptor<Object> ebRec = ArgumentCaptor.forClass(Object.class);
 
-    verify(eventBus, times(2)).post(ebRec.capture());
+    verify(eventBus, atLeastOnce()).post(ebRec.capture());
     assertThat(
         ((CapabilityEvent) ebRec.getAllValues().get(0)).getReference().context().properties().get("foo"), is("bar")
     );

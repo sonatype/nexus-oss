@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
@@ -244,8 +245,11 @@ public class FileSecurityConfigurationSource
   {
     // Create the dir if doesn't exist, throw runtime exception on failure
     // bad bad bad
-    if (!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
-      String message =
+    try {
+      Files.createDirectories(file.getParentFile().toPath());
+    }
+    catch (IOException e) {
+      final String message =
           "\r\n******************************************************************************\r\n"
               + "* Could not create configuration file [ "
               + file.toString()
@@ -253,7 +257,7 @@ public class FileSecurityConfigurationSource
               + "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
               + "******************************************************************************";
       getLogger().error(message);
-      throw new IOException("Could not create configuration file " + file.getAbsolutePath());
+      throw new IOException("Could not create configuration file " + file.getAbsolutePath(), e);
     }
 
     final SecurityConfiguration configuration = getConfiguration();

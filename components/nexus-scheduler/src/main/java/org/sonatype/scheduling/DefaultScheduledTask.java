@@ -28,15 +28,15 @@ import org.sonatype.scheduling.iterators.RunNowSchedulerIterator;
 import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
+import org.sonatype.sisu.goodies.common.Loggers;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 public class DefaultScheduledTask<T>
     implements ScheduledTask<T>, Callable<T>
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = Loggers.getLogger(getClass());
 
   private final String id;
 

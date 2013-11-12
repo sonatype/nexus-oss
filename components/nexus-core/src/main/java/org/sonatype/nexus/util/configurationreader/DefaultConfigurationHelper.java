@@ -35,12 +35,17 @@ import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.util.file.DirSupport;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+/**
+ * @deprecated unused and will be removed in future.
+ */
+@Deprecated
 @SuppressWarnings("deprecation")
 @Singleton
 @Named
@@ -137,11 +142,11 @@ public class DefaultConfigurationHelper
   public <E> void save(E configuration, File configurationFile, ConfigurationWritter<E> writer, Lock lock) {
     lock.lock();
 
-    configurationFile.getParentFile().mkdirs();
-
     Writer fw = null;
 
     try {
+      DirSupport.mkdir(configurationFile.getParentFile().toPath());
+
       fw = new OutputStreamWriter(new FileOutputStream(configurationFile));
 
       writer.write(fw, configuration);

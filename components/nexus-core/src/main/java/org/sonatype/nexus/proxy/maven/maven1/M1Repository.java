@@ -42,7 +42,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * policies for them.
  *
  * @author cstamas
+ * @deprecated To be removed once Maven1 support is removed.
  */
+@Deprecated
 @Named(M1Repository.ID)
 @Typed(Repository.class)
 @Description("Maven1 Repository")

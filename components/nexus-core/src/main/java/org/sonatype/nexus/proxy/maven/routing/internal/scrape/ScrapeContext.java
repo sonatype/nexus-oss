@@ -13,17 +13,12 @@
 
 package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 
-import java.io.IOException;
-
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.apachehttpclient.page.Page.RepositoryPageContext;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.protocol.BasicHttpContext;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,13 +27,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author cstamas
  */
-public class ScrapeContext
+public class ScrapeContext extends RepositoryPageContext
 {
-  private final MavenProxyRepository remoteRepository;
-
   private final String remoteRepositoryRootUrl;
-
-  private final HttpClient httpClient;
 
   private final int scrapeDepth;
 
@@ -54,9 +45,8 @@ public class ScrapeContext
   public ScrapeContext(final MavenProxyRepository remoteRepository, final HttpClient httpClient,
                        final int scrapeDepth)
   {
-    this.remoteRepository = checkNotNull(remoteRepository);
+    super(httpClient, remoteRepository);
     this.remoteRepositoryRootUrl = checkNotNull(remoteRepository.getRemoteUrl());
-    this.httpClient = checkNotNull(httpClient);
     this.scrapeDepth = checkNotNull(scrapeDepth);
     this.stopped = false;
   }
@@ -120,19 +110,6 @@ public class ScrapeContext
   // ==
 
   /**
-   * Executes a {@link HttpUriRequest} on behalf of this context.
-   *
-   * @return the {@link HttpResponse} of the request.
-   */
-  public HttpResponse executeHttpRequest(final HttpUriRequest httpRequest)
-      throws ClientProtocolException, IOException
-  {
-    final BasicHttpContext httpContext = new BasicHttpContext();
-    httpContext.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, remoteRepository);
-    return httpClient.execute(httpRequest, httpContext);
-  }
-
-  /**
    * The remote repository root URL.
    *
    * @return root url to scrape.
@@ -148,5 +125,14 @@ public class ScrapeContext
    */
   public int getScrapeDepth() {
     return scrapeDepth;
+  }
+
+  /**
+   * Returns the Maven Proxy repository who's scrape context this is.
+   *
+   * @since 2.7.0
+   */
+  public MavenProxyRepository getProxyRepository() {
+    return (MavenProxyRepository) super.getProxyRepository();
   }
 }

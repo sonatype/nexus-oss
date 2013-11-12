@@ -41,8 +41,9 @@ import org.slf4j.LoggerFactory;
  * The background thread doing the actual attribute upgrades (moving them from legacy to LS attribute storage).
  *
  * @author cstamas
- * @since 2.0
+ * @deprecated To be removed in future releases once upgrade from Nexus 1.x line becomes unsupported.
  */
+@Deprecated
 public class AttributeUpgraderThread
     extends Thread
     implements FixedRateWalkerThrottleControllerCallback
@@ -50,7 +51,7 @@ public class AttributeUpgraderThread
 
   protected static final int RUN_SLEEP_SECONDS = 5;
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(AttributeUpgraderThread.class);
 
   private final File legacyAttributesDirectory;
 

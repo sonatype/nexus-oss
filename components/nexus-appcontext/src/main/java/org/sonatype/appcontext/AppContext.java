@@ -83,7 +83,9 @@ public interface AppContext
    *
    * @return the lifecycle manager of this context.
    * @since 3.1
+   * @deprecated Unsupported.
    */
+  @Deprecated
   AppContextLifecycleManager getLifecycleManager();
 
   /**

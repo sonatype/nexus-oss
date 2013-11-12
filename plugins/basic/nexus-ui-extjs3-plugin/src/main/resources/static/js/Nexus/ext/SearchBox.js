@@ -20,6 +20,10 @@
 NX.define('Nexus.ext.SearchBox', {
   extend: 'Ext.Container',
 
+  requires: [ 'Nexus.util.Icons' ],
+
+  xtype: 'nx-search-box',
+
   /**
    * @cfg {Number} delay between keystrokes and actual filtering (defaults to 200).
    */
@@ -30,7 +34,7 @@ NX.define('Nexus.ext.SearchBox', {
    */
   initComponent: function () {
     var self = this,
-        icons = Nexus.capabilities.Icons;
+        icons = Nexus.util.Icons;
 
     self.searchField = NX.create('Ext.form.TextField', {
       enableKeyEvents: true,

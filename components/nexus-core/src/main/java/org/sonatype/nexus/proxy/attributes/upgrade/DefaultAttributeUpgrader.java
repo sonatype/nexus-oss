@@ -16,6 +16,8 @@ package org.sonatype.nexus.proxy.attributes.upgrade;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Files;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,11 +32,12 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.util.LinearNumberSequence;
 import org.sonatype.nexus.util.LowerLimitNumberSequence;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.nexus.util.file.FileSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -43,7 +46,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * to not kick in on any subsequent reboot.
  *
  * @since 2.0
+ * @deprecated To be removed in future releases once upgrade from Nexus 1.x line becomes unsupported.
  */
+@Deprecated
 @Singleton
 @Named
 public class DefaultAttributeUpgrader
@@ -305,10 +310,10 @@ public class DefaultAttributeUpgrader
   protected static boolean isUpgradeDone(final File attributesDirectory, final String repoId)
       throws IOException
   {
-    if (StringUtils.isBlank(repoId)) {
+    if (Strings.isNullOrEmpty(repoId)) {
       final File markerFile = new File(attributesDirectory, MARKER_FILENAME);
       if (markerFile.exists()) {
-        return StringUtils.equals(MARKER_TEXT, FileUtils.fileRead(markerFile));
+        return Objects.equals(MARKER_TEXT, FileSupport.readFile(markerFile.toPath()));
       }
       else {
         return false;
@@ -317,7 +322,7 @@ public class DefaultAttributeUpgrader
     else {
       final File markerFile = new File(new File(attributesDirectory, repoId), MARKER_FILENAME);
       if (markerFile.exists()) {
-        return StringUtils.equals(MARKER_TEXT, FileUtils.fileRead(markerFile));
+        return Objects.equals(MARKER_TEXT, FileSupport.readFile(markerFile.toPath()));
       }
       else {
         return false;
@@ -335,15 +340,14 @@ public class DefaultAttributeUpgrader
   protected static void markUpgradeDone(final File attributesDirectory, final String repoId)
       throws IOException
   {
-    if (StringUtils.isBlank(repoId)) {
-      FileUtils.fileWrite(new File(attributesDirectory, MARKER_FILENAME), MARKER_TEXT);
+    if (Strings.isNullOrEmpty(repoId)) {
+      FileSupport.writeFile(new File(attributesDirectory, MARKER_FILENAME).toPath(), MARKER_TEXT);
     }
     else {
       final File target = new File(new File(attributesDirectory, repoId), MARKER_FILENAME);
       // this step is needed if new repo added while upgrade not done: it will NOT have legacy attributes
       // as other reposes, that were present in old/upgraded instance
-      target.getParentFile().mkdirs();
-      FileUtils.fileWrite(target, MARKER_TEXT);
+      FileSupport.writeFile(target.toPath(), MARKER_TEXT);
     }
   }
 }

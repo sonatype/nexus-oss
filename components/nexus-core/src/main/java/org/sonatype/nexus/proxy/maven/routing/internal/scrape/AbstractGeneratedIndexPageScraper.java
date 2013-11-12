@@ -16,7 +16,8 @@ package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 import java.io.IOException;
 import java.util.List;
 
-import org.sonatype.nexus.proxy.maven.routing.internal.scrape.Page.UnexpectedPageResponse;
+import org.sonatype.nexus.apachehttpclient.page.Page;
+import org.sonatype.nexus.apachehttpclient.page.Page.UnexpectedPageResponse;
 import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableUtil;
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;
@@ -120,7 +121,7 @@ public abstract class AbstractGeneratedIndexPageScraper
     }
     // cancelation
     CancelableUtil.checkInterruption();
-    getLogger().debug("Processing page response from URL {}", page.getUrl());
+    log.debug("Processing page response from URL {} for repository {}", page.getUrl(), context.getProxyRepository());
     final Elements elements = page.getDocument().getElementsByTag("a");
     final List<String> pathElements = currentNode.getPathElements();
     final String currentPath = currentNode.getPath();

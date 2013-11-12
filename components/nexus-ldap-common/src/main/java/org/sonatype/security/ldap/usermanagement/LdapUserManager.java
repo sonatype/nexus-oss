@@ -34,9 +34,6 @@ import org.sonatype.security.usermanagement.UserNotFoundTransientException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
@@ -44,9 +41,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class LdapUserManager
     extends AbstractReadOnlyUserManager
 {
-
-  private static final Logger logger = LoggerFactory.getLogger(LdapUserManager.class);
-
   public static final String LDAP_REALM_KEY = "LdapAuthenticatingRealm";
 
   private static final String USER_SOURCE = "LDAP";
@@ -67,10 +61,10 @@ public class LdapUserManager
         return toPlexusUser(this.ldapManager.getUser(userId));
       }
       catch (NoSuchLdapUserException e) {
-        logger.debug("User: " + userId + " not found.", e);
+        log.debug("User: " + userId + " not found.", e);
       }
       catch (LdapDAOException e) {
-        logger.debug("User: " + userId + " not found, cause: " + e.getMessage(), e);
+        log.debug("User: " + userId + " not found, cause: " + e.getMessage(), e);
         throw new UserNotFoundTransientException(userId, e.getMessage(), e);
       }
     }
@@ -98,7 +92,7 @@ public class LdapUserManager
         }
       }
       catch (LdapDAOException e) {
-        logger.debug("Could not return LDAP users, LDAP Realm must not be configured.", e);
+        log.debug("Could not return LDAP users, LDAP Realm must not be configured.", e);
       }
     }
     return users;
@@ -145,14 +139,14 @@ public class LdapUserManager
     Set<User> users = new TreeSet<User>();
     if (this.isEnabled()) {
       try {
-        Set<LdapUser> ldapUsers = this.ldapManager.searchUsers(criteria.getUserId());
+        Set<LdapUser> ldapUsers = this.ldapManager.searchUsers(criteria.getUserId(), criteria.getOneOfRoleIds());
 
         for (LdapUser ldapUser : ldapUsers) {
           users.add(this.toPlexusUser(ldapUser));
         }
       }
       catch (LdapDAOException e) {
-        logger.debug("Could not return LDAP users, LDAP Realm must not be configured.", e);
+        log.debug("Could not return LDAP users, LDAP Realm must not be configured.", e);
       }
     }
 

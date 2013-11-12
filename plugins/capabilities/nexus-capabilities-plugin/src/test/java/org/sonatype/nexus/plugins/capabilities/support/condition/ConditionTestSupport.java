@@ -26,7 +26,7 @@ import static org.hamcrest.Matchers.is;
 /**
  * {@link ConditionSupport} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class ConditionTestSupport
     extends EventBusTestSupport

@@ -53,21 +53,23 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.nexus.web.Constants;
 import org.sonatype.nexus.web.RemoteIPFinder;
+import org.sonatype.sisu.goodies.common.Throwables2;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
-import com.google.common.io.ByteStreams;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.io.ByteStreams.limit;
 
 /**
  * Clean-room re-implementation of {@code /content} resource, using plain Servlet API.
@@ -233,6 +235,8 @@ public class NexusContentServlet
   protected void handleException(final HttpServletRequest request, final HttpServletResponse response,
       final ResourceStoreRequest rsr, final Exception exception) throws IOException
   {
+    logger.trace("Exception", exception);
+
     if (exception instanceof LocalStorageEOFException) {
       // in case client drops connection, this makes not much sense, as he will not
       // receive this response, but we have to end it somehow.
@@ -273,6 +277,18 @@ public class NexusContentServlet
       // Note: we must ensure response is not committed, hence, no error page is rendered
       // this attribute above will cause filter to either 403 if
       // current user is non anonymous, or 401 and challenge if user is anonymous
+    }
+    else if (exception instanceof IOException) {
+      // Do not log verbose traces for IO problems unless debug is enabled
+      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      if (logger.isDebugEnabled()) {
+        logger.warn(exception.toString(), exception);
+      }
+      else {
+        logger.warn(Throwables2.explain(exception));
+      }
+      // Do not attempt to render error page
+      return;
     }
     else {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -479,7 +495,7 @@ public class NexusContentServlet
         if (contentNeeded) {
           try (final InputStream in = file.getInputStream()) {
             in.skip(range.lowerEndpoint());
-            sendContent(ByteStreams.limit(in, bodySize), response);
+            sendContent(limit(in, bodySize), response);
           }
         }
       }
@@ -631,9 +647,6 @@ public class NexusContentServlet
   /**
    * Sends content by copying all bytes from the input stream to the output stream while setting the preferred buffer
    * size. At the end, it flushes response buffer.
-   * <p>
-   * Inspired from {@link ByteStreams#copy(InputStream, OutputStream)} (version 14.0.1) to expose configurable buffer
-   * sizes and adapted for current use case.
    */
   private void sendContent(final InputStream from, final HttpServletResponse response) throws IOException {
     int bufferSize = BUFFER_SIZE;
@@ -649,15 +662,8 @@ public class NexusContentServlet
       // user override present, tell container what buffer size we'd like
       response.setBufferSize(bufferSize);
     }
-    final byte[] buf = new byte[bufferSize];
     try (final OutputStream to = response.getOutputStream()) {
-      while (true) {
-        int r = from.read(buf);
-        if (r == -1) {
-          break;
-        }
-        to.write(buf, 0, r);
-      }
+      StreamSupport.copy(from, to, bufferSize);
     }
     response.flushBuffer();
   }

@@ -15,7 +15,7 @@
 /**
  * Container for icons used by capabilities.
  *
- * @since 2.2.2
+ * @since capabilities 2.2.2
  */
 NX.define('Nexus.capabilities.Icons', {
   extend: 'Nexus.util.IconContainer',
@@ -55,9 +55,6 @@ NX.define('Nexus.capabilities.Icons', {
         cross_grey:           'cross_grey.png',
         filter:               'filter.png',
         filter_grey:          'filter_grey.png',
-        glyph_circle_remove:  'glyph_circle_remove.png',
-        glyph_filter:         'glyph_filter.png',
-        glyph_search:         'glyph_search.png',
         warning:              'error.png',
         magnifier:            'magnifier.png',
         magnifier_grey:       'magnifier_grey.png',

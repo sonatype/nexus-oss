@@ -29,7 +29,7 @@ import com.google.inject.assistedinject.Assisted;
  * A {@link Validator} that ensures that only one capability of specified type and set of properties can be created,
  * excluding itself.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 public class PrimaryKeyExcludingSelfValidator

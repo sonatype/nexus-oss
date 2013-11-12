@@ -22,7 +22,9 @@ import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
  * The Maven1 content class.
  *
  * @author cstamas
+ * @deprecated To be removed once Maven1 support is removed.
  */
+@Deprecated
 @Named(Maven1ContentClass.ID)
 @Singleton
 public class Maven1ContentClass

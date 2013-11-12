@@ -20,12 +20,11 @@ import java.io.Reader;
 
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An abstract class that removes the boiler plate code of reading in the security configuration.
@@ -33,10 +32,9 @@ import org.slf4j.LoggerFactory;
  * @author Brian Demers
  */
 public abstract class AbstractStaticSecurityResource
+    extends ComponentSupport
     implements StaticSecurityResource
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   protected boolean dirty = false;
 
   public boolean isDirty() {
@@ -56,7 +54,7 @@ public abstract class AbstractStaticSecurityResource
       Reader fr = null;
       InputStream is = null;
 
-      this.logger.debug("Loading static security config from " + resourcePath);
+      log.debug("Loading static security config from " + resourcePath);
 
       try {
         is = getClass().getResourceAsStream(resourcePath);
@@ -66,10 +64,10 @@ public abstract class AbstractStaticSecurityResource
         return reader.read(fr);
       }
       catch (IOException e) {
-        this.logger.error("IOException while retrieving configuration file", e);
+        log.error("IOException while retrieving configuration file", e);
       }
       catch (XmlPullParserException e) {
-        this.logger.error("Invalid XML Configuration", e);
+        log.error("Invalid XML Configuration", e);
       }
       finally {
         IOUtil.close(fr);

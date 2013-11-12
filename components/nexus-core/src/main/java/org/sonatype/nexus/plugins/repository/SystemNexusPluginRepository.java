@@ -14,10 +14,17 @@
 package org.sonatype.nexus.plugins.repository;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.sonatype.nexus.util.file.DirSupport;
+
+import com.google.common.base.Throwables;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link File} backed {@link NexusPluginRepository} that supplies system plugins.
@@ -37,9 +44,20 @@ final class SystemNexusPluginRepository
   // Implementation fields
   // ----------------------------------------------------------------------
 
+  private final  File systemPluginsFolder;
+
   @Inject
-  @Named("${nexus-app}/plugin-repository")
-  private File systemPluginsFolder;
+  public SystemNexusPluginRepository(final @Named("${nexus-app}/plugin-repository") File systemPluginsFolder) {
+    this.systemPluginsFolder = checkNotNull(systemPluginsFolder);
+    try {
+      DirSupport.mkdir(systemPluginsFolder.toPath());
+    }
+    catch (IOException e) {
+      Throwables.propagate(e);
+    }
+  }
+
+
 
   // ----------------------------------------------------------------------
   // Public methods
@@ -59,9 +77,6 @@ final class SystemNexusPluginRepository
 
   @Override
   protected File getNexusPluginsDirectory() {
-    if (!systemPluginsFolder.exists()) {
-      systemPluginsFolder.mkdirs();
-    }
     return systemPluginsFolder;
   }
 }

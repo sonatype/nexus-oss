@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Logical OR between {@link Validator}s.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class DisjunctionValidator
     implements Validator

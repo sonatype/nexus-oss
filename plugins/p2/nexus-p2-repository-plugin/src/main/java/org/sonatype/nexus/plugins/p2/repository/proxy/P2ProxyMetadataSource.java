@@ -43,6 +43,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.p2.bridge.ArtifactRepository;
 import org.sonatype.p2.bridge.MetadataRepository;
 
@@ -84,8 +85,8 @@ public class P2ProxyMetadataSource
 
     try {
       final File artifactRepositoryDir = File.createTempFile("artifacts", "");
-      artifactRepositoryDir.delete();
-      artifactRepositoryDir.mkdirs();
+      DirSupport.delete(artifactRepositoryDir.toPath());
+      DirSupport.mkdir(artifactRepositoryDir.toPath());
 
       final File artifactMappingsXmlFile = File.createTempFile("p2proxy.artifact-mappings", ".xml");
       try {
@@ -169,8 +170,8 @@ public class P2ProxyMetadataSource
 
     try {
       final File metadataRepositoryDir = File.createTempFile("content", "");
-      metadataRepositoryDir.delete();
-      metadataRepositoryDir.mkdirs();
+      DirSupport.delete(metadataRepositoryDir.toPath());
+      DirSupport.mkdir(metadataRepositoryDir.toPath());
 
       try {
         String username = null;

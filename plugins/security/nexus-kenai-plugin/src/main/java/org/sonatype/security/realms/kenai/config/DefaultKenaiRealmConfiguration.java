@@ -36,22 +36,21 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
 @Named
 @Typed(KenaiRealmConfiguration.class)
 public class DefaultKenaiRealmConfiguration
+    extends ComponentSupport
     implements KenaiRealmConfiguration
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final File configurationFile;
 
   private final SecuritySystem securitySystem; // used for validation
@@ -84,13 +83,13 @@ public class DefaultKenaiRealmConfiguration
 
     }
     catch (FileNotFoundException e) {
-      logger.error("Kenai Realm configuration file does not exist: " + this.getConfigFile().getAbsolutePath());
+      log.error("Kenai Realm configuration file does not exist: " + this.getConfigFile().getAbsolutePath());
     }
     catch (IOException e) {
-      logger.error("IOException while retrieving Kenai Realm configuration file", e);
+      log.error("IOException while retrieving Kenai Realm configuration file", e);
     }
     catch (XmlPullParserException e) {
-      logger.error("Invalid XML Configuration", e);
+      log.error("Invalid XML Configuration", e);
     }
     finally {
       IOUtil.close(fileReader);
@@ -113,7 +112,7 @@ public class DefaultKenaiRealmConfiguration
 
       File configFile = this.getConfigFile();
       // make the parent dirs first
-      configFile.getParentFile().mkdirs();
+      DirSupport.mkdir(configFile.getParentFile().toPath());
 
       fileWriter = new FileWriter(configFile);
 
@@ -185,7 +184,7 @@ public class DefaultKenaiRealmConfiguration
         this.securitySystem.getAuthorizationManager("default").getRole(config.getDefaultRole());
       }
       catch (Exception e) {
-        logger.debug("Failed to find role {} during validation.", config.getDefaultRole(), e);
+        log.debug("Failed to find role {} during validation.", config.getDefaultRole(), e);
         ValidationMessage msg = new ValidationMessage("defaultRole", "Failed to find role.");
         response.addValidationError(msg);
       }

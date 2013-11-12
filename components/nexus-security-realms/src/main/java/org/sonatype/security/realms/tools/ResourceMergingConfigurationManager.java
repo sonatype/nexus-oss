@@ -38,10 +38,9 @@ import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * ConfigurationManager that aggregates {@link StaticSecurityResource}s and {@link DynamicSecurityResource}s with
@@ -55,8 +54,6 @@ import org.slf4j.LoggerFactory;
 public class ResourceMergingConfigurationManager
     extends AbstractConfigurationManager
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   // This will handle all normal security.xml file loading/storing
   private final ConfigurationManager manager;
 
@@ -65,10 +62,12 @@ public class ResourceMergingConfigurationManager
   private final List<DynamicSecurityResource> dynamicResources;
 
   @Inject
-  public ResourceMergingConfigurationManager(List<DynamicSecurityResource> dynamicResources,
+  public ResourceMergingConfigurationManager(EventBus eventBus,
+                                             List<DynamicSecurityResource> dynamicResources,
                                              @Named("legacydefault") ConfigurationManager manager,
                                              List<StaticSecurityResource> staticResources)
   {
+    super(eventBus);
     this.dynamicResources = dynamicResources;
     this.manager = manager;
     this.staticResources = staticResources;
@@ -436,7 +435,7 @@ public class ResourceMergingConfigurationManager
       roles.addAll(userRoleMapping.getRoles());
     }
     catch (NoSuchRoleMappingException e) {
-      this.logger.debug("User: {} has no roles", user.getId());
+      this.log.debug("User: {} has no roles", user.getId());
     }
     this.updateUser(user, new HashSet<String>(roles));
   }
@@ -480,7 +479,7 @@ public class ResourceMergingConfigurationManager
   // ==
 
   @Override
-  protected boolean shouldRebuildConifuguration() {
+  protected boolean shouldRebuildConfiguration() {
     for (DynamicSecurityResource resource : dynamicResources) {
       if (resource.isDirty()) {
         return true;

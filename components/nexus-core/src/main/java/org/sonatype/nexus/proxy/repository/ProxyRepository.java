@@ -59,10 +59,6 @@ public interface ProxyRepository
    */
   RemoteStatus getRemoteStatus(ResourceStoreRequest request, boolean forceCheck);
 
-  Thread getRepositoryStatusCheckerThread();
-
-  void setRepositoryStatusCheckerThread(Thread thread);
-
   /**
    * Returns the current remote status retain time. Does not change or step it's value.
    */
@@ -179,15 +175,11 @@ public interface ProxyRepository
 
   /**
    * Returns repository specific remote connection context.
-   *
-   * @return null if none
    */
   RemoteStorageContext getRemoteStorageContext();
 
   /**
    * Returns the remoteStorage of the repository. Per repository instance may exists.
-   *
-   * @return remoteStorage or null.
    */
   RemoteRepositoryStorage getRemoteStorage();
 

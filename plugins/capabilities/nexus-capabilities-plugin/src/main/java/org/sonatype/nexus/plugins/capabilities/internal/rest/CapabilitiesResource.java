@@ -267,14 +267,24 @@ public class CapabilitiesResource
     try {
       capabilityStatus.setDescription(capability.description());
     }
-    catch (Exception ignore) {
+    catch (Throwable e) {
+      log.warn(
+          "Failed to render description of capability '{}/{}' due to {}/{}",
+          reference.context().type(), reference.context().id(),
+          e.getClass().getName(), e.getMessage(), log.isDebugEnabled() ? e : null
+      );
       capabilityStatus.setDescription(null);
     }
 
     try {
       capabilityStatus.setStatus(capability.status());
     }
-    catch (Exception ignore) {
+    catch (Throwable e) {
+      log.warn(
+          "Failed to render status of capability '{}/{}' due to {}/{}",
+          reference.context().type(), reference.context().id(),
+          e.getClass().getName(), e.getMessage(), log.isDebugEnabled() ? e : null
+      );
       capabilityStatus.setStatus(null);
     }
     capabilityStatus.setStateDescription(reference.context().stateDescription());
@@ -289,10 +299,11 @@ public class CapabilitiesResource
         }
       }
     }
-    catch (Exception e) {
+    catch (Throwable e) {
       log.warn(
           "Failed to retrieve tags from capability descriptor '{}' due to {}/{}",
-          descriptor, e.getClass(), e.getMessage(), log.isDebugEnabled() ? e : null
+          reference.context().type(),
+          e.getClass().getName(), e.getMessage(), log.isDebugEnabled() ? e : null
       );
     }
     try {
@@ -303,10 +314,11 @@ public class CapabilitiesResource
         }
       }
     }
-    catch (Exception e) {
+    catch (Throwable e) {
       log.warn(
-          "Failed to retrieve tags from capability '{}' due to {}/{}",
-          descriptor, e.getClass(), e.getMessage(), log.isDebugEnabled() ? e : null
+          "Failed to retrieve tags from capability '{}/{}' due to {}/{}",
+          reference.context().type(), reference.context().id(),
+          e.getClass().getName(), e.getMessage(), log.isDebugEnabled() ? e : null
       );
     }
 

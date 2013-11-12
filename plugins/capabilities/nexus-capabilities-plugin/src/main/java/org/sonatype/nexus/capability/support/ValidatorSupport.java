@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Validators support.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public abstract class ValidatorSupport
 {

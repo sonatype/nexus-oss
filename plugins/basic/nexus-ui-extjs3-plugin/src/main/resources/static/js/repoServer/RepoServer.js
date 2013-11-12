@@ -123,7 +123,7 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
         // Left Panel
         this.nexusPanel = new Sonatype.navigation.NavigationPanel({
               id : 'st-nexus-tab',
-              title : 'nexus'
+              title : 'Nexus'
             });
 
         this.createSubComponents();
@@ -336,17 +336,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
                     title : 'Scheduled Tasks',
                     tabId : 'schedules-config',
                     tabCode : Sonatype.repoServer.SchedulesEditPanel
-                  }, {
-                    enabled : sp.checkPermission('nexus:logs', sp.READ) || sp.checkPermission('nexus:configuration', sp.READ),
-                    title : 'System Files',
-                    tabId : 'view-logs',
-                    tabCode : Sonatype.repoServer.LogsViewPanel,
-                    tabTitle : 'System Files'
-                  }, {
-                    enabled : sp.checkPermission('nexus:logconfig', sp.READ) && (sp.checkPermission('nexus:logconfig', sp.CREATE) || sp.checkPermission('nexus:logconfig', sp.DELETE) || sp.checkPermission('nexus:logconfig', sp.EDIT)),
-                    title : 'Log Configuration',
-                    tabId : 'log-config',
-                    tabCode : Sonatype.repoServer.LogEditPanel
                   }]
             });
 
@@ -371,12 +360,8 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
                     title : 'Documentation',
                     tabId : 'Documentation',
                     tabCode : Sonatype.repoServer.Documentation
-                  }, {
-                    enabled : sp.checkPermission('nexus:settings', sp.READ),
-                    title : 'Report Problem',
-                    tabId : 'error-report',
-                    handler : Sonatype.utils.generateErrorReportHandler
-                  }]
+                  }
+              ]
             });
       },
 
@@ -390,7 +375,7 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
           url : Sonatype.config.repos.urls.logout,
           callback : function(options, success, response) {
             Sonatype.view.justLoggedOut = true;
-            Sonatype.utils.loadNexusStatus();
+            Sonatype.utils.loadNexusSettings();
             window.location.hash = 'welcome';
           }
         });

@@ -18,7 +18,7 @@ import org.sonatype.nexus.events.AbstractEvent;
 /**
  * {@link CapabilityRegistry} related events.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class CapabilityRegistryEvent
     extends AbstractEvent<CapabilityRegistry>
@@ -36,7 +36,7 @@ public class CapabilityRegistryEvent
   /**
    * Event fired after capabilities were loaded loaded from persistence store.
    *
-   * @since 2.0
+   * @since capabilities 2.0
    */
   public static class AfterLoad
       extends CapabilityRegistryEvent

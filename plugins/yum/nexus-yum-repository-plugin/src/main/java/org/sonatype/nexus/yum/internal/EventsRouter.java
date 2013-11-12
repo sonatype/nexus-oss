@@ -26,22 +26,22 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumGroup;
+import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
-import org.sonatype.nexus.yum.internal.task.MergeMetadataTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -53,42 +53,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class EventsRouter
 {
 
+  private static final Logger log = LoggerFactory.getLogger(EventsRouter.class);
+
   private final Provider<RepositoryRegistry> repositoryRegistry;
 
   private final Provider<YumRegistry> yumRegistryProvider;
 
-  private final Provider<NexusScheduler> nexusScheduler;
-
-  private final Provider<SteadyLinksRequestStrategy> steadyLinksStrategy;
-
   @Inject
   public EventsRouter(final Provider<RepositoryRegistry> repositoryRegistry,
                       final Provider<YumRegistry> yumRegistryProvider,
-                      final Provider<NexusScheduler> nexusScheduler,
-                      final Provider<SteadyLinksRequestStrategy> steadyLinksStrategy,
                       final EventBus eventBus)
   {
-    this.steadyLinksStrategy = checkNotNull(steadyLinksStrategy);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.yumRegistryProvider = checkNotNull(yumRegistryProvider);
-    this.nexusScheduler = checkNotNull(nexusScheduler);
     checkNotNull(eventBus).register(this);
-  }
-
-  @AllowConcurrentEvents
-  @Subscribe
-  public void on(final RepositoryRegistryEventAdd event) {
-    event.getRepository().registerRequestStrategy(
-        SteadyLinksRequestStrategy.class.getName(), steadyLinksStrategy.get()
-    );
-  }
-
-  @AllowConcurrentEvents
-  @Subscribe
-  public void on(final RepositoryRegistryEventRemove event) {
-    event.getRepository().unregisterRequestStrategy(
-        SteadyLinksRequestStrategy.class.getName()
-    );
   }
 
   @AllowConcurrentEvents
@@ -98,7 +76,11 @@ public class EventsRouter
         && (anyOfRepositoriesHasYumRepository(event.getAddedRepositoryIds())
         || anyOfRepositoriesHasYumRepository(event.getRemovedRepositoryIds())
         || anyOfRepositoriesHasYumRepository(event.getReorderedRepositoryIds()))) {
-      MergeMetadataTask.createTaskFor(nexusScheduler.get(), event.getGroupRepository());
+
+      Yum yum = yumRegistryProvider.get().get(event.getGroupRepository().getId());
+      if (yum instanceof YumGroup) {
+        ((YumGroup) yum).markDirty();
+      }
     }
   }
 
@@ -107,9 +89,9 @@ public class EventsRouter
   public void on(final RepositoryItemEventStore eventStore) {
     if (isRpmItemEvent(eventStore)) {
       final Yum yum = yumRegistryProvider.get().get(eventStore.getRepository().getId());
-      if (yum != null) {
-        yum.markDirty(getItemVersion(eventStore.getItem()));
-        yum.addRpmAndRegenerate(eventStore.getItem().getPath());
+      if (yum != null && yum instanceof YumHosted) {
+        ((YumHosted) yum).markDirty(getItemVersion(eventStore.getItem()));
+        ((YumHosted) yum).addRpmAndRegenerate(eventStore.getItem().getPath());
       }
     }
   }
@@ -118,12 +100,12 @@ public class EventsRouter
   @Subscribe
   public void on(RepositoryItemEventDelete itemEvent) {
     final Yum yum = yumRegistryProvider.get().get(itemEvent.getRepository().getId());
-    if (yum != null) {
+    if (yum != null && yum instanceof YumHosted) {
       if (isRpmItemEvent(itemEvent)) {
-        yum.regenerateWhenPathIsRemoved(itemEvent.getItem().getPath());
+        ((YumHosted) yum).regenerateWhenPathIsRemoved(itemEvent.getItem().getPath());
       }
       else if (isCollectionItem(itemEvent)) {
-        yum.regenerateWhenDirectoryIsRemoved(itemEvent.getItem().getPath());
+        ((YumHosted) yum).regenerateWhenDirectoryIsRemoved(itemEvent.getItem().getPath());
       }
     }
   }
@@ -137,11 +119,13 @@ public class EventsRouter
   @Subscribe
   public void on(RepositoryItemEventCache itemEvent) {
     ProxyRepository repository = itemEvent.getRepository().adaptToFacet(ProxyRepository.class);
-    if (repository != null && itemEvent.getItem().getPath().toLowerCase().equals("/repodata/repomd.xml")) {
+    if (repository != null && itemEvent.getItem().getPath().toLowerCase().equals("/" + Yum.PATH_OF_REPOMD_XML)) {
+      log.debug("Yum metadata changed for {}. Looking if we should merge it...", repository.getId());
       List<GroupRepository> groups = repositoryRegistry.get().getGroupsOfRepository(repository);
       for (GroupRepository group : groups) {
-        if (yumRegistryProvider.get().isRegistered(group.getId())) {
-          MergeMetadataTask.createTaskFor(nexusScheduler.get(), group);
+        Yum yum = yumRegistryProvider.get().get(group.getId());
+        if (yum != null && yum instanceof YumGroup) {
+          ((YumGroup) yum).markDirty();
         }
       }
     }

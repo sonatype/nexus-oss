@@ -22,7 +22,6 @@ import org.sonatype.nexus.proxy.repository.AbstractRepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 

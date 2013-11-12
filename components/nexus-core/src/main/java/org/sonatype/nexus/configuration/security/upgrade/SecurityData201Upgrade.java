@@ -49,7 +49,7 @@ public class SecurityData201Upgrade
     implements SecurityDataUpgrader
 {
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(SecurityData201Upgrade.class);
 
   @Override
   public void doUpgrade(Configuration configuration)

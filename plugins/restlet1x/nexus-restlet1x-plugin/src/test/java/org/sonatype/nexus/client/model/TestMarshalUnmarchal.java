@@ -38,11 +38,6 @@ import org.sonatype.nexus.rest.model.ContentListDescribeResourceResponse;
 import org.sonatype.nexus.rest.model.ContentListDescribeResponseResource;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
-import org.sonatype.nexus.rest.model.ErrorReportRequest;
-import org.sonatype.nexus.rest.model.ErrorReportRequestDTO;
-import org.sonatype.nexus.rest.model.ErrorReportResponse;
-import org.sonatype.nexus.rest.model.ErrorReportResponseDTO;
-import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.FeedListResource;
 import org.sonatype.nexus.rest.model.FeedListResourceResponse;
 import org.sonatype.nexus.rest.model.FormFieldResource;
@@ -50,10 +45,6 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationListResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResourceResponse;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
-import org.sonatype.nexus.rest.model.LogConfigResource;
-import org.sonatype.nexus.rest.model.LogConfigResourceResponse;
-import org.sonatype.nexus.rest.model.LogsListResource;
-import org.sonatype.nexus.rest.model.LogsListResourceResponse;
 import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListRequest;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
@@ -772,13 +763,6 @@ public class TestMarshalUnmarchal
     smtpSet.setUsername("username");
     resource.setSmtpSettings(smtpSet);
 
-    ErrorReportingSettings errorSet = new ErrorReportingSettings();
-    errorSet.setJiraPassword("jiraPass");
-    errorSet.setJiraUsername("jiraUser");
-    errorSet.setUseGlobalProxy(true);
-
-    resource.setErrorReportingSettings(errorSet);
-
     resourceResponse.setData(resource);
 
     this.marshalUnmarchalThenCompare(resourceResponse);
@@ -794,31 +778,6 @@ public class TestMarshalUnmarchal
     resource.setSize(42);
 
     resourceResponse.setData(resource);
-
-    this.marshalUnmarchalThenCompare(resourceResponse, this.xstreamXML); // FIXME: Need some sort of type map, for
-    // the json reader to figure out if some
-    // fields are longs not ints.
-    this.validateXmlHasNoPackageNames(resourceResponse);
-  }
-
-  @Test
-  public void testLogsListResourceResponse() {
-    LogsListResourceResponse resourceResponse = new LogsListResourceResponse();
-
-    LogsListResource item1 = new LogsListResource();
-    item1.setMimeType("mimeType1");
-    item1.setName("name1");
-    item1.setResourceURI("resourceURI1");
-    item1.setSize(42);
-
-    LogsListResource item2 = new LogsListResource();
-    item2.setMimeType("mimeType2");
-    item2.setName("name2");
-    item2.setResourceURI("resourceURI2");
-    item2.setSize(42);
-
-    resourceResponse.addData(item1);
-    resourceResponse.addData(item2);
 
     this.marshalUnmarchalThenCompare(resourceResponse, this.xstreamXML); // FIXME: Need some sort of type map, for
     // the json reader to figure out if some
@@ -1858,22 +1817,6 @@ public class TestMarshalUnmarchal
   }
 
   @Test
-  public void testLogConfigResourceResponse() {
-    LogConfigResourceResponse response = new LogConfigResourceResponse();
-
-    LogConfigResource data = new LogConfigResource();
-    data.setFileAppenderLocation("fileappender");
-    data.setFileAppenderPattern("pattern");
-    data.setRootLoggerAppenders("rootlogger");
-    data.setRootLoggerLevel("level");
-
-    response.setData(data);
-
-    this.marshalUnmarchalThenCompare(response);
-    this.validateXmlHasNoPackageNames(response);
-  }
-
-  @Test
   public void testMirrorResourceListResponse() {
     MirrorResourceListResponse response = new MirrorResourceListResponse();
 
@@ -1948,33 +1891,6 @@ public class TestMarshalUnmarchal
     resource.setTestEmail("testemail");
     resource.setTlsEnabled(true);
     resource.setUsername("username");
-
-    request.setData(resource);
-
-    this.marshalUnmarchalThenCompare(request);
-    this.validateXmlHasNoPackageNames(request);
-  }
-
-  @Test
-  public void testErrorReportRequest() {
-    ErrorReportRequest request = new ErrorReportRequest();
-
-    ErrorReportRequestDTO resource = new ErrorReportRequestDTO();
-    resource.setDescription("description");
-    resource.setTitle("title");
-
-    request.setData(resource);
-
-    this.marshalUnmarchalThenCompare(request);
-    this.validateXmlHasNoPackageNames(request);
-  }
-
-  @Test
-  public void testErrorReportResponse() {
-    ErrorReportResponse request = new ErrorReportResponse();
-
-    ErrorReportResponseDTO resource = new ErrorReportResponseDTO();
-    resource.setJiraUrl("jiraurl");
 
     request.setData(resource);
 

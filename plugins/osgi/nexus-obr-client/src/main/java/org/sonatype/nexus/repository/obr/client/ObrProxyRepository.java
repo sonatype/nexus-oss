@@ -16,7 +16,7 @@ package org.sonatype.nexus.repository.obr.client;
 import org.sonatype.nexus.client.core.subsystem.repository.ProxyRepository;
 
 /**
- * @since 2.1
+ * @since obr 2.1
  */
 public interface ObrProxyRepository
     extends ProxyRepository<ObrProxyRepository>

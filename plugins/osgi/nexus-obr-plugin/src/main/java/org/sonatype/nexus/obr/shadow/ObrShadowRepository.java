@@ -160,12 +160,13 @@ public class ObrShadowRepository
   }
 
   @Override
-  protected StorageItem doRetrieveItem(final ResourceStoreRequest request)
+  public StorageItem retrieveItem(final boolean fromTask, final ResourceStoreRequest request)
       throws IllegalOperationException, ItemNotFoundException, StorageException
   {
     try {
       // treat expired items just like not found items
-      final StorageItem item = super.doRetrieveItem(request);
+      // NEXUS-5930: Method below, when returns, will RELEASE the read lock
+      final StorageItem item = super.retrieveItem(fromTask, request);
       if (!item.isExpired()) {
         return item;
       }
@@ -176,9 +177,9 @@ public class ObrShadowRepository
 
     // forcibly generate missing OBR metadata
     if (ObrUtils.isObrMetadataRequest(request)) {
+      // if client wanted OBR.XML, try to recreate it now that lock is RELEASED
       synchronizeWithMaster();
-
-      return super.doRetrieveItem(request);
+      return super.retrieveItem(fromTask, request);
     }
 
     // re-route request to the master repository

@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.storage.local.DefaultLocalStorageContext;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
@@ -101,6 +102,7 @@ public class DefaultFSLocalRepositoryStorageTest
     when(repository.getLocalUrl()).thenReturn(repoLocation.toURI().toURL().toString());
     AttributesHandler attributesHandler = mock(AttributesHandler.class);
     when(repository.getAttributesHandler()).thenReturn(attributesHandler);
+    when(repository.getLocalStorageContext()).thenReturn(new DefaultLocalStorageContext(null));
 
 
     DefaultFSLocalRepositoryStorage localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage(wastebasket,
@@ -132,8 +134,11 @@ public class DefaultFSLocalRepositoryStorageTest
     // Mocks
     Wastebasket wastebasket = mock(Wastebasket.class);
     Repository repository = mock(Repository.class);
+    final DefaultLocalStorageContext localStorageContext = new DefaultLocalStorageContext(null);
+    when(repository.getLocalStorageContext()).thenReturn(localStorageContext);
     FSPeer fsPeer = mock(FSPeer.class);
     MimeSupport mimeSupport = mock(MimeSupport.class);
+    when(mimeSupport.guessMimeTypeFromPath(Mockito.any(MimeRulesSource.class), Mockito.anyString())).thenReturn("text/plain");
 
     // mock file
     File mockFile = mock(File.class);

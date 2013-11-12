@@ -35,7 +35,7 @@ import com.google.common.collect.Maps;
  * - changes roles from "maven-site-*" to "site-*"
  * - changes privileges from "maven-site-*" to "site-*"
  *
- * @since 1.0
+ * @since site-repository 1.0
  */
 @Named
 @Singleton

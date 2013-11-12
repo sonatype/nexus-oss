@@ -88,8 +88,6 @@ define('Nexus/config',['extjs', 'Nexus/messagebox', 'Sonatype/init', 'Nexus/conf
           routes : servicePath + '/repo_routes',
           configs : servicePath + '/configs',
           configCurrent : servicePath + '/configs/current',
-          logs : servicePath + '/logs',
-          logConfig : servicePath + '/log/config',
           status : servicePath + '/status?perms=1',
           schedules : servicePath + '/schedules',
           scheduleRun : servicePath + '/schedule_run',

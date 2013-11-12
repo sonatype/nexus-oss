@@ -29,13 +29,13 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
@@ -74,6 +74,7 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.threads.FakeAlmightySubject;
 import org.sonatype.nexus.threads.NexusScheduledExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.SimpleFormat;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -83,6 +84,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -116,7 +118,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class ManagerImpl
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements Manager
 {
   private final EventBus eventBus;
@@ -193,7 +195,7 @@ public class ManagerImpl
             && mavenRepository.getLocalStatus().shouldServiceRequest()) {
           final FilePrefixSource prefixSource = getPrefixSourceFor(mavenRepository);
           if (prefixSource.exists()) {
-            getLogger().debug("Initializing prefix file of {}", mavenRepository);
+            log.debug("Initializing prefix file of {}", mavenRepository);
             if (prefixSource.supported()) {
               eventBus.post(new PrefixFilePublishedRepositoryEvent(mavenRepository, prefixSource));
             }
@@ -215,7 +217,7 @@ public class ManagerImpl
             // None of those is a problem, in latter case we will do what we need in next tick.
             // In former case,
             // we should not do anything anyway, we are being shut down.
-            getLogger().debug("Nexus not yet started, bailing out");
+            log.debug("Nexus not yet started, bailing out");
             return;
           }
           mayUpdateAllProxyPrefixFiles();
@@ -241,22 +243,22 @@ public class ManagerImpl
       }
     }
     catch (InterruptedException e) {
-      getLogger().debug("Could not cleanly shut down", e);
+      log.debug("Could not cleanly shut down", e);
     }
   }
 
   @Override
   public void initializePrefixFile(final MavenRepository mavenRepository) {
-    getLogger().debug("Initializing prefix file of newly added {}", mavenRepository);
+    log.debug("Initializing prefix file of newly added {}", mavenRepository);
     try {
       // spawn update, this will do whatever is needed (and handle cases like blocked, out of service etc),
       // and publish
       updatePrefixFile(mavenRepository);
-      getLogger().info("Initializing non-existing prefix file of newly added {}",
+      log.info("Initializing non-existing prefix file of newly added {}",
           RepositoryStringUtils.getHumanizedNameString(mavenRepository));
     }
     catch (Exception e) {
-      getLogger().warn("Problem during prefix file initialisation of newly added {}",
+      log.warn("Problem during prefix file initialisation of newly added {}",
           RepositoryStringUtils.getHumanizedNameString(mavenRepository), e);
       try {
         unpublish(mavenRepository);
@@ -272,7 +274,7 @@ public class ManagerImpl
    * period in hours too), and will perform prefix list update only on those proxy repositories that needs it.
    */
   protected void mayUpdateAllProxyPrefixFiles() {
-    getLogger().trace("mayUpdateAllProxyPrefixFiles started");
+    log.trace("mayUpdateAllProxyPrefixFiles started");
     for (MavenRepository mavenRepository : repositoryRegistry.getRepositoriesWithFacet(MavenRepository.class)) {
       if (isMavenRepositorySupported(mavenRepository)) {
         try {
@@ -291,11 +293,11 @@ public class ManagerImpl
         }
         catch (IllegalStateException e) {
           // just neglect it and continue, this one might be auto blocked if proxy or put out of service
-          getLogger().trace("Repository {} is not in state to be updated", mavenRepository);
+          log.trace("Repository {} is not in state to be updated", mavenRepository);
         }
         catch (Exception e) {
           // just neglect it and continue, but do log it
-          getLogger().warn("Problem during prefix file update of repository {}",
+          log.warn("Problem during prefix file update of repository {}",
               RepositoryStringUtils.getHumanizedNameString(mavenRepository), e);
         }
       }
@@ -322,33 +324,33 @@ public class ManagerImpl
           || ((System.currentTimeMillis() - discoveryStatus.getLastDiscoveryTimestamp()) >
           config.getDiscoveryInterval())) {
         if (discoveryStatus.getStatus() == DStatus.ENABLED_IN_PROGRESS) {
-          getLogger().debug("Proxy {} has never been discovered before", mavenProxyRepository);
+          log.debug("Proxy {} has never been discovered before", mavenProxyRepository);
         }
         else if (discoveryStatus.getStatus() == DStatus.ENABLED_NOT_POSSIBLE) {
-          getLogger().debug("Proxy {} discovery was not possible before", mavenProxyRepository);
+          log.debug("Proxy {} discovery was not possible before", mavenProxyRepository);
         }
         else if (discoveryStatus.getStatus() == DStatus.ERROR) {
-          getLogger().debug("Proxy {} previous discovery hit an error", mavenProxyRepository);
+          log.debug("Proxy {} previous discovery hit an error", mavenProxyRepository);
         }
         else {
-          getLogger().debug("Proxy {} needs periodic remote discovery update", mavenProxyRepository);
+          log.debug("Proxy {} needs periodic remote discovery update", mavenProxyRepository);
         }
         final boolean updateSpawned = doUpdatePrefixFileAsync(false, mavenProxyRepository);
         if (!updateSpawned) {
           // this means that either remote discovery takes too long or user might pressed Force discovery
           // on UI for moments before this call kicked in. Anyway, warn the user in logs
-          getLogger().info(
+          log.info(
               "Proxy {} periodic remote discovery skipped as there is an ongoing job updating it, consider raising the update interval for this repository",
               RepositoryStringUtils.getHumanizedNameString(mavenProxyRepository));
         }
         return updateSpawned;
       }
       else {
-        getLogger().debug("Proxy {} prefix file is up to date", mavenProxyRepository);
+        log.debug("Proxy {} prefix file is up to date", mavenProxyRepository);
       }
     }
     else {
-      getLogger().debug("Proxy {} prefix file update requested, but it's remote discovery is disabled",
+      log.debug("Proxy {} prefix file update requested, but it's remote discovery is disabled",
           mavenProxyRepository);
     }
     return false;
@@ -376,7 +378,7 @@ public class ManagerImpl
   {
     checkUpdateConditions(mavenProxyRepository);
     try {
-      getLogger().debug("Quick updating prefix file of {}", mavenProxyRepository);
+      log.debug("Quick updating prefix file of {}", mavenProxyRepository);
       constrainedExecutor.cancelRunningWithKey(mavenProxyRepository.getId());
       final PrefixSource prefixSource =
           updateProxyPrefixFile(mavenProxyRepository, Collections.singletonList(quickRemoteStrategy));
@@ -388,14 +390,14 @@ public class ManagerImpl
           (oldPrefixSource.supported()) != (prefixSource != null && prefixSource.supported());
       if (prefixSource != null && prefixSource.supported()) {
         if (stateChanged) {
-          getLogger().info("Updated and published prefix file of {}",
+          log.info("Updated and published prefix file of {}",
               RepositoryStringUtils.getHumanizedNameString(mavenProxyRepository));
         }
         publish(mavenProxyRepository, prefixSource);
       }
       else {
         if (stateChanged) {
-          getLogger().info("Unpublished prefix file of {} (and is marked for noscrape)",
+          log.info("Unpublished prefix file of {} (and is marked for noscrape)",
               RepositoryStringUtils.getHumanizedNameString(mavenProxyRepository));
         }
         unpublish(mavenProxyRepository);
@@ -461,7 +463,7 @@ public class ManagerImpl
    */
   protected boolean doUpdatePrefixFileAsync(final boolean forced, final MavenRepository mavenRepository) {
     final UpdateRepositoryRunnable updateRepositoryJob =
-        new UpdateRepositoryRunnable(new LoggingProgressListener(getLogger()), applicationStatusSource, this,
+        new UpdateRepositoryRunnable(new LoggingProgressListener(log), applicationStatusSource, this,
             mavenRepository);
     if (forced) {
       final boolean canceledPreviousJob =
@@ -469,7 +471,7 @@ public class ManagerImpl
       if (canceledPreviousJob) {
         // this is okay, as forced happens rarely, currently only when proxy repo changes remoteURL
         // (reconfiguration happens)
-        getLogger().debug("Forced prefix file update on {} canceled currently running discovery job",
+        log.debug("Forced prefix file update on {} canceled currently running discovery job",
             mavenRepository);
       }
       return canceledPreviousJob;
@@ -488,18 +490,18 @@ public class ManagerImpl
   @VisibleForTesting
   public boolean isUpdatePrefixFileJobRunning() {
     if (config.isFeatureActive() && !periodicUpdaterDidRunAtLeastOnce) {
-      getLogger().debug("Boot process not done yet, periodic updater did not yet finish!");
+      log.debug("Boot process not done yet, periodic updater did not yet finish!");
       return true;
     }
     final Statistics statistics = constrainedExecutor.getStatistics();
-    getLogger().debug("Running update jobs for {}", statistics.getCurrentlyRunningJobKeys());
+    log.debug("Running update jobs for {}", statistics.getCurrentlyRunningJobKeys());
     return !statistics.getCurrentlyRunningJobKeys().isEmpty();
   }
 
   protected void updateAndPublishPrefixFile(final MavenRepository mavenRepository)
       throws IOException
   {
-    getLogger().debug("Updating prefix file of {}", mavenRepository);
+    log.debug("Updating prefix file of {}", mavenRepository);
     try {
       final PrefixSource prefixSource;
       if (mavenRepository.getRepositoryKind().isFacetAvailable(MavenGroupRepository.class)) {
@@ -513,7 +515,7 @@ public class ManagerImpl
       }
       else {
         // we should not get here
-        getLogger().info("Repository {} unsupported by automatic routing feature",
+        log.info("Repository {} unsupported by automatic routing feature",
             RepositoryStringUtils.getFullHumanizedNameString(mavenRepository));
         return;
       }
@@ -526,14 +528,14 @@ public class ManagerImpl
 
       if (prefixSource != null && prefixSource.supported()) {
         if (stateChanged) {
-          getLogger().info("Updated and published prefix file of {}",
+          log.info("Updated and published prefix file of {}",
               RepositoryStringUtils.getHumanizedNameString(mavenRepository));
         }
         publish(mavenRepository, prefixSource);
       }
       else {
         if (stateChanged) {
-          getLogger().info("Unpublished prefix file of {} (and is marked for noscrape)",
+          log.info("Unpublished prefix file of {} (and is marked for noscrape)",
               RepositoryStringUtils.getHumanizedNameString(mavenRepository));
         }
         unpublish(mavenRepository);
@@ -541,7 +543,7 @@ public class ManagerImpl
     }
     catch (IllegalStateException e) {
       // just ack it, log it and return peacefully
-      getLogger().debug(
+      log.debug(
           "Maven repository {} not in state for prefix file update: {}", mavenRepository, e.getMessage()
       );
     }
@@ -579,7 +581,7 @@ public class ManagerImpl
             remoteContentDiscoverer.discoverRemoteContent(mavenProxyRepository, remoteStrategies);
       }
 
-      getLogger().debug("Results of {} remote discovery: {}", mavenProxyRepository,
+      log.debug("Results of {} remote discovery: {}", mavenProxyRepository,
           discoveryResult.getAllResults());
 
       if (discoveryResult.isSuccessful()) {
@@ -598,7 +600,7 @@ public class ManagerImpl
             prefixSource = mergedPrefixSource;
           }
           else {
-            getLogger().debug("{} local discovery unsuccessful", mavenProxyRepository);
+            log.debug("{} local discovery unsuccessful", mavenProxyRepository);
           }
         }
       }
@@ -622,7 +624,7 @@ public class ManagerImpl
       discoveryStatusSource.write(discoveryStatus);
     }
     else {
-      getLogger().info("{} remote discovery disabled",
+      log.info("{} remote discovery disabled",
           RepositoryStringUtils.getHumanizedNameString(mavenProxyRepository));
     }
     return prefixSource;
@@ -639,7 +641,7 @@ public class ManagerImpl
       prefixSource = discoveryResult.getPrefixSource();
     }
     else {
-      getLogger().debug("{} local discovery unsuccessful", mavenHostedRepository);
+      log.debug("{} local discovery unsuccessful", mavenHostedRepository);
     }
     return prefixSource;
   }
@@ -831,7 +833,7 @@ public class ManagerImpl
   // ==
 
   @Override
-  public boolean offerEntry(final MavenHostedRepository mavenHostedRepository, final String entry)
+  public boolean offerEntry(final MavenHostedRepository mavenHostedRepository, final StorageItem item)
       throws IOException
   {
     if (constrainedExecutor.hasRunningWithKey(mavenHostedRepository.getId())) {
@@ -847,6 +849,12 @@ public class ManagerImpl
     try {
       if (!prefixSource.supported()) {
         return false;
+      }
+      final String entry;
+      if (item.getPathDepth() == 0) {
+        entry = item.getPath();
+      } else {
+        entry = item.getParentPath();
       }
       final WritablePrefixSourceModifier wesm =
           new WritablePrefixSourceModifier(prefixSource, config.getLocalScrapeDepth());
@@ -875,7 +883,7 @@ public class ManagerImpl
   }
 
   @Override
-  public boolean revokeEntry(final MavenHostedRepository mavenHostedRepository, final String entry)
+  public boolean revokeEntry(final MavenHostedRepository mavenHostedRepository, final StorageItem item)
       throws IOException
   {
     if (constrainedExecutor.hasRunningWithKey(mavenHostedRepository.getId())) {
@@ -894,13 +902,13 @@ public class ManagerImpl
       }
       final WritablePrefixSourceModifier wesm =
           new WritablePrefixSourceModifier(prefixSource, config.getLocalScrapeDepth());
-      wesm.revokeEntry(entry);
+      wesm.revokeEntry(item.getPath());
       if (wesm.hasChanges()) {
         boolean changed = false;
         lock.lock(Action.update);
         try {
           wesm.reset();
-          wesm.revokeEntry(entry);
+          wesm.revokeEntry(item.getPath());
           changed = wesm.apply();
           if (changed) {
             publish(mavenHostedRepository, prefixSource);

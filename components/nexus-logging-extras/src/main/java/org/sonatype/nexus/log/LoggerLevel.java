@@ -21,5 +21,22 @@ package org.sonatype.nexus.log;
  */
 public enum LoggerLevel
 {
-  TRACE, DEBUG, INFO, WARN;
+  /**
+   * @since 2.7
+   */
+  OFF,
+  TRACE,
+  DEBUG,
+  INFO,
+  WARN,
+  /**
+   * @since 2.7
+   */
+  ERROR,
+  /**
+   * Level will be calculated as effective level.
+   *
+   * @since 2.7
+   */
+  DEFAULT
 }

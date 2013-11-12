@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -37,6 +36,7 @@ import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -49,7 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class LocalContentDiscovererImpl
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements LocalContentDiscoverer
 {
   private static final String ID = "local";
@@ -134,7 +134,11 @@ public class LocalContentDiscovererImpl
       // cancelation
       CancelableUtil.checkInterruption();
       if (item instanceof StorageFileItem) {
-        parentOMatic.addPath(item.getPath());
+        if (item.getPathDepth() == 0) {
+          parentOMatic.addPath(item.getPath());
+        } else {
+          parentOMatic.addPath(item.getParentPath());
+        }
       }
     }
   }

@@ -29,6 +29,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapability;
 import org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapabilityConfiguration;
@@ -50,6 +51,7 @@ import org.restlet.resource.Variant;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.restlet.data.MediaType.TEXT_PLAIN;
 import static org.restlet.data.Method.POST;
+import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
 import static org.restlet.data.Status.CLIENT_ERROR_NOT_FOUND;
 
 /**
@@ -114,7 +116,15 @@ public class AliasResource
       );
     }
 
-    final String version = yum.getVersion(alias);
+    if (!(yum instanceof YumHosted)) {
+      throw new ResourceException(
+          CLIENT_ERROR_BAD_REQUEST, "Repository " + repositoryId + " does not support versions"
+      );
+    }
+
+    YumHosted yumHosted = (YumHosted) yum;
+
+    final String version = yumHosted.getVersion(alias);
 
     if (version == null) {
       throw new ResourceException(

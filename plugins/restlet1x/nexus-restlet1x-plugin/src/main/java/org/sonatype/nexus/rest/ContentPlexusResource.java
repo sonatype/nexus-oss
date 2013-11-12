@@ -31,9 +31,13 @@ import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
+/**
+ * @deprecated This resource is not in use anymore for {@code /content}, is replaced by a dedicated Servlet.
+ */
 @Named("content")
 @Singleton
 @Typed(ManagedPlexusResource.class)
+@Deprecated
 public class ContentPlexusResource
     extends AbstractResourceStoreContentPlexusResource
     implements ManagedPlexusResource

@@ -20,12 +20,11 @@ import javax.inject.Named;
 
 import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -40,9 +39,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @EagerSingleton
 public class BCPluginEventHandler
+  extends ComponentSupport
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final boolean registered;
 
   /**
@@ -57,10 +55,10 @@ public class BCPluginEventHandler
     // register BC and nag if already installed
     registered = Security.addProvider(new BouncyCastleProvider()) != -1;
     if (registered) {
-      logger.debug("BouncyCastle security provider registered");
+      log.debug("BouncyCastle security provider registered");
     }
     else {
-      logger.warn("BouncyCastle security provider already registered; could become problematic");
+      log.warn("BouncyCastle security provider already registered; could become problematic");
     }
 
     eventBus.register(this);
@@ -76,7 +74,7 @@ public class BCPluginEventHandler
   public void onNexusStoppedEvent(final NexusStoppedEvent e) {
     if (registered) {
       Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-      logger.debug("BouncyCastle security provider unregistered");
+      log.debug("BouncyCastle security provider unregistered");
     }
   }
 }

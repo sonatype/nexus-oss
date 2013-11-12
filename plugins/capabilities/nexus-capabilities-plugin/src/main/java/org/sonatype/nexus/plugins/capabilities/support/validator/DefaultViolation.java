@@ -20,7 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Default {@link ValidationResult.Violation} implementation.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class DefaultViolation
     implements ValidationResult.Violation

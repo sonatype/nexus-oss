@@ -22,8 +22,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -70,6 +72,7 @@ import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
@@ -80,18 +83,18 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The class DefaultNexusConfiguration is responsible for config management. It actually keeps in sync Nexus internal
- * state with p ersisted user configuration. All changes incoming thru its iface is reflect/maintained in Nexus current
+ * state with persisted user configuration. All changes incoming through its iface is reflect/maintained in Nexus current
  * state and Nexus user config.
  *
  * @author cstamas
@@ -132,6 +135,8 @@ public class DefaultNexusConfiguration
   private final List<ConfigurationModifier> configurationModifiers;
   
   private final ClassLoader uberClassLoader; 
+
+  private final File installDirectory;
 
   private final File workingDirectory;
 
@@ -175,15 +180,22 @@ public class DefaultNexusConfiguration
   // ==
 
   @Inject
-  public DefaultNexusConfiguration(final CacheManager cacheManager, EventBus eventBus,
-      @Named("file") ApplicationConfigurationSource configurationSource,
-      Provider<GlobalRemoteConnectionSettings> globalRemoteConnectionSettingsProvider,
-      Provider<GlobalRemoteProxySettings> globalRemoteProxySettingsProvider, ApplicationConfigurationValidator configurationValidator,
-      ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder,
-      RepositoryTypeRegistry repositoryTypeRegistry, RepositoryRegistry repositoryRegistry,
-      List<ScheduledTaskDescriptor> scheduledTaskDescriptors, SecuritySystem securitySystem,
-      @Parameters Map<String, String> parameters, VetoFormatter vetoFormatter,
-      List<ConfigurationModifier> configurationModifiers, @Named("nexus-uber") ClassLoader uberClassLoader)
+  public DefaultNexusConfiguration(final CacheManager cacheManager,
+                                   final EventBus eventBus,
+                                   final @Named("file") ApplicationConfigurationSource configurationSource,
+                                   final Provider<GlobalRemoteConnectionSettings> globalRemoteConnectionSettingsProvider,
+                                   final Provider<GlobalRemoteProxySettings> globalRemoteProxySettingsProvider,
+                                   final ApplicationConfigurationValidator configurationValidator,
+                                   final ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder,
+                                   final RepositoryTypeRegistry repositoryTypeRegistry,
+                                   final RepositoryRegistry repositoryRegistry,
+                                   final List<ScheduledTaskDescriptor> scheduledTaskDescriptors,
+                                   final SecuritySystem securitySystem,
+                                   final @Parameters Map<String, String> parameters,
+                                   final VetoFormatter vetoFormatter,
+                                   final List<ConfigurationModifier> configurationModifiers,
+                                   final @Named("nexus-uber") ClassLoader uberClassLoader,
+                                   final @Named("${bundleBasedir}") @Nullable File installDirectory)
   {
     this.cacheManager = checkNotNull(cacheManager);
     this.eventBus = checkNotNull(eventBus);
@@ -201,6 +213,13 @@ public class DefaultNexusConfiguration
     this.uberClassLoader = checkNotNull(uberClassLoader);
     
     // init
+    if (installDirectory != null) {
+      this.installDirectory = canonicalize(installDirectory);
+    }
+    else {
+      this.installDirectory = null;
+    }
+
     try {
       final File workingDirectory = new File(parameters.get("nexus-work"));
       this.workingDirectory = canonicalize(workingDirectory);
@@ -235,14 +254,14 @@ public class DefaultNexusConfiguration
               + "]!!!! *\r\n"
               + "* Nexus cannot function properly until the process has read+write permissions to this folder *\r\n"
               + "******************************************************************************";
-      getLogger().error(message);
+      getLogger().error(message, e);
       throw Throwables.propagate(e);
     }
   }
 
   private File forceMkdir(final File directory) {
     try {
-      FileUtils.forceMkdir(directory);
+      DirSupport.mkdir(directory.toPath());
       return directory;
     }
     catch (IOException e) {
@@ -253,7 +272,7 @@ public class DefaultNexusConfiguration
               + "]!!!! *\r\n"
               + "* Nexus cannot function properly until the process has read+write permissions to this folder *\r\n"
               + "******************************************************************************";
-      getLogger().error(message);
+      getLogger().error(message, e);
       throw Throwables.propagate(e);
     }
   }
@@ -338,7 +357,7 @@ public class DefaultNexusConfiguration
     final String userId = getCurrentUserId();
 
     if (changes != null && changes.size() > 0) {
-      if (StringUtils.isBlank(userId)) {
+      if (Strings.isNullOrEmpty(userId)) {
         // should not really happen, we should always have subject (at least anon), but...
         getLogger().info("Applying Nexus Configuration due to changes in {}...", changesToString(changes));
       }
@@ -349,7 +368,7 @@ public class DefaultNexusConfiguration
       }
     }
     else {
-      if (StringUtils.isBlank(userId)) {
+      if (Strings.isNullOrEmpty(userId)) {
         // usually on boot: no changes since "all" changed, and no subject either
         getLogger().info("Applying Nexus Configuration...");
       }
@@ -475,6 +494,12 @@ public class DefaultNexusConfiguration
     return globalRemoteStorageContext;
   }
 
+  @Nullable
+  @Override
+  public File getInstallDirectory() {
+    return this.installDirectory;
+  }
+
   @Override
   public File getWorkingDirectory() {
     return workingDirectory;
@@ -540,7 +565,7 @@ public class DefaultNexusConfiguration
       throws InvalidConfigurationException
   {
     if (enabled) {
-      if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
+      if (Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password)) {
         throw new InvalidConfigurationException(
             "Anonymous access is getting enabled without valid username and/or password!");
       }
@@ -555,7 +580,7 @@ public class DefaultNexusConfiguration
       final boolean statusChanged = setAnonymousUserEnabled(username, true);
 
       // detect change
-      if (!StringUtils.equals(oldUsername, username) || !StringUtils.equals(oldPassword, password)) {
+      if (!Objects.equals(oldUsername, username) || !Objects.equals(oldPassword, password)) {
         try {
           // test authc with changed credentials
           try {
@@ -599,7 +624,7 @@ public class DefaultNexusConfiguration
       // info)
       final String existingUsername = getSecuritySystem().getAnonymousUsername();
 
-      if (!StringUtils.isBlank(existingUsername)) {
+      if (!Strings.isNullOrEmpty(existingUsername)) {
         // try to disable the "anonymous" user defined in XML realm, but ignore any problem (users might delete
         // or already disabled it, or completely removed XML realm)
         setAnonymousUserEnabled(existingUsername, false);
@@ -896,7 +921,7 @@ public class DefaultNexusConfiguration
   {
     ApplicationValidationContext ctx = getRepositoryValidationContext();
 
-    if (!create && !StringUtils.isEmpty(settings.getId())) {
+    if (!create && !Strings.isNullOrEmpty(settings.getId())) {
       // remove "itself" from the list to avoid hitting "duplicate repo" problem
       ctx.getExistingRepositoryIds().remove(settings.getId());
     }

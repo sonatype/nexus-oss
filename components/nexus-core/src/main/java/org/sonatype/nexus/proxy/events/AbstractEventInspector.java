@@ -13,15 +13,24 @@
 
 package org.sonatype.nexus.proxy.events;
 
+import org.sonatype.nexus.events.EventSubscriber;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+/**
+ * @deprecated Use {@link EventSubscriber} instead.
+ */
+@Deprecated
 public abstract class AbstractEventInspector
-    implements EventInspector
+  extends ComponentSupport
+  implements EventInspector
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
+  /**
+   * @deprecated Use {#log} reference.
+   */
+  @Deprecated
   protected Logger getLogger() {
-    return logger;
+    return log;
   }
 }

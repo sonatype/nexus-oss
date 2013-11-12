@@ -22,7 +22,7 @@ import com.google.inject.assistedinject.Assisted;
 /**
  * {@link Validator} factory.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public interface ValidatorFactory
 {
@@ -35,7 +35,7 @@ public interface ValidatorFactory
   RepositoryTypeValidator repositoryOfType(CapabilityType type, String propertyKey, Class<?> facet);
 
   /**
-   * @since 2.3
+   * @since capabilities 2.3
    */
   RepositoryExistsValidator repositoryExists(CapabilityType type, String propertyKey);
 
@@ -58,5 +58,15 @@ public interface ValidatorFactory
    * @since 2.7
    */
   UrlValidator validUrl(CapabilityType type, String propertyKey);
+
+  /**
+   * @since 2.7
+   */
+  IntegerValidator isAnInteger(CapabilityType type, String propertyKey);
+
+  /**
+   * @since 2.7
+   */
+  PositiveIntegerValidator isAPositiveInteger(CapabilityType type, String propertyKey);
 
 }

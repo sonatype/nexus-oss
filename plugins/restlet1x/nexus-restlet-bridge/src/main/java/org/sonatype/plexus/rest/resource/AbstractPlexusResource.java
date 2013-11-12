@@ -16,6 +16,8 @@ package org.sonatype.plexus.rest.resource;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sonatype.sisu.goodies.common.Loggers;
+
 import com.thoughtworks.xstream.XStream;
 import org.apache.commons.fileupload.FileItem;
 import org.restlet.Context;
@@ -27,12 +29,11 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPlexusResource
     implements PlexusResource
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = Loggers.getLogger(getClass());
 
   private boolean available = true;
 
@@ -137,6 +138,11 @@ public abstract class AbstractPlexusResource
       throws ResourceException
   {
     throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED);
+  }
+  
+  
+  public void options(Context context, Request request, Response response) throws ResourceException {
+  	// do noting by default, override to customize
   }
 
   public Object getPayloadInstance(org.restlet.data.Method method) {

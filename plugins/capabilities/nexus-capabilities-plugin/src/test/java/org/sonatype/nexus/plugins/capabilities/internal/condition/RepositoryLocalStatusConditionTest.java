@@ -15,6 +15,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
 import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
+import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
@@ -35,7 +36,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link RepositoryLocalStatusCondition} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class RepositoryLocalStatusConditionTest
     extends EventBusTestSupport
@@ -81,9 +82,9 @@ public class RepositoryLocalStatusConditionTest
     assertThat(underTest.isSatisfied(), is(true));
 
     when(repository.getLocalStatus()).thenReturn(LocalStatus.OUT_OF_SERVICE);
-    underTest.handle(new RepositoryEventLocalStatusChanged(
-        repository, LocalStatus.IN_SERVICE, LocalStatus.OUT_OF_SERVICE
-    ));
+    RepositoryConfigurationUpdatedEvent event = new RepositoryConfigurationUpdatedEvent(repository);
+    event.setLocalStatusChanged(true);
+    underTest.handle(event);
     assertThat(underTest.isSatisfied(), is(false));
 
     verifyEventBusEvents(satisfied(underTest), unsatisfied(underTest));
@@ -97,14 +98,12 @@ public class RepositoryLocalStatusConditionTest
     assertThat(underTest.isSatisfied(), is(true));
 
     when(repository.getLocalStatus()).thenReturn(LocalStatus.OUT_OF_SERVICE);
-    underTest.handle(new RepositoryEventLocalStatusChanged(
-        repository, LocalStatus.IN_SERVICE, LocalStatus.OUT_OF_SERVICE
-    ));
+    RepositoryConfigurationUpdatedEvent event = new RepositoryConfigurationUpdatedEvent(repository);
+    event.setLocalStatusChanged(true);
+    underTest.handle(event);
 
     when(repository.getLocalStatus()).thenReturn(LocalStatus.IN_SERVICE);
-    underTest.handle(new RepositoryEventLocalStatusChanged(
-        repository, LocalStatus.OUT_OF_SERVICE, LocalStatus.IN_SERVICE
-    ));
+    underTest.handle(event);
     assertThat(underTest.isSatisfied(), is(true));
 
     verifyEventBusEvents(satisfied(underTest), unsatisfied(underTest), satisfied(underTest));

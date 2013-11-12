@@ -14,15 +14,13 @@
 package org.sonatype.nexus.proxy.storage.local;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -34,8 +32,12 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.storage.AbstractContextualizedRepositoryStorage;
+import org.sonatype.nexus.proxy.storage.StorageContext;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Abstract Storage class. It have ID and defines logger. Predefines all write methods to be able to "decorate"
@@ -44,15 +46,9 @@ import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
  * @author cstamas
  */
 public abstract class AbstractLocalRepositoryStorage
-    extends AbstractLoggingComponent
+    extends AbstractContextualizedRepositoryStorage<LocalStorageContext>
     implements LocalRepositoryStorage
 {
-  /**
-   * Key used to mark a repository context as "initialized". This flag and the generation together controls how the
-   * context is about to be updated. See NEXUS-5145.
-   */
-  private static final String CONTEXT_UPDATED_KEY = AbstractLocalRepositoryStorage.class.getName() + ".updated";
-
   /**
    * The wastebasket.
    */
@@ -68,18 +64,12 @@ public abstract class AbstractLocalRepositoryStorage
    */
   private final MimeSupport mimeSupport;
 
-  /**
-   * Since storages are shared, we are tracking the last changes from each of them.
-   */
-  private final Map<String, Integer> repositoryContexts;
-
   protected AbstractLocalRepositoryStorage(final Wastebasket wastebasket, final LinkPersister linkPersister,
                                            final MimeSupport mimeSupport)
   {
-    this.wastebasket = wastebasket;
-    this.linkPersister = linkPersister;
-    this.mimeSupport = mimeSupport;
-    this.repositoryContexts = new HashMap<String, Integer>();
+    this.wastebasket = checkNotNull(wastebasket);
+    this.linkPersister = checkNotNull(linkPersister);
+    this.mimeSupport = checkNotNull(mimeSupport);
   }
 
   protected Wastebasket getWastebasket() {
@@ -96,54 +86,43 @@ public abstract class AbstractLocalRepositoryStorage
 
   // ==
 
-  /**
-   * Remote storage specific, when the remote connection settings are actually applied.
-   */
-  protected void updateContext(Repository repository, LocalStorageContext context)
+  protected LocalStorageContext getLocalStorageContext(final Repository repository)
       throws LocalStorageException
   {
-    // empty, override if needed
+    try {
+      return super.getStorageContext(repository, repository.getLocalStorageContext());
+    }
+    catch (LocalStorageException e) {
+      throw e;
+    }
+    catch (IOException e) {
+      throw new LocalStorageException("Could not update context", e);
+    }
   }
 
-  protected synchronized LocalStorageContext getLocalStorageContext(Repository repository)
-      throws LocalStorageException
+  @Override
+  protected void updateStorageContext(final Repository repository, final LocalStorageContext context,
+                                      final ContextOperation contextOperation)
+      throws IOException
   {
-    final LocalStorageContext ctx = repository.getLocalStorageContext();
-    if (ctx != null) {
-      // we have repo specific settings
-      // if repositoryContexts does not contain this context ID, or
-      // if localStorageContext does not contain CONTEXT_UPDATED_KEY, or
-      // if repositoryContext generation is less than localStorageContext generation
-      if (!repositoryContexts.containsKey(repository.getId()) || !ctx.hasContextObject(CONTEXT_UPDATED_KEY)
-          || ctx.getGeneration() > repositoryContexts.get(repository.getId())) {
-        if (getLogger().isDebugEnabled()) {
-          if (!repositoryContexts.containsKey(repository.getId())) {
-            getLogger().debug("Local context {} is about to be initialized", ctx);
-          }
-          else {
-            getLogger().debug("Local context {} has been changed. Previous generation {}",
-                new Object[]{ctx, repositoryContexts.get(repository.getId())});
-          }
-        }
+    updateContext(repository, context);
+  }
 
-        updateContext(repository, repository.getLocalStorageContext());
-        ctx.putContextObject(CONTEXT_UPDATED_KEY, Boolean.TRUE);
-        repositoryContexts.put(repository.getId(),
-            Integer.valueOf(repository.getLocalStorageContext().getGeneration()));
-      }
-    }
-    return ctx;
+  /**
+   * Local storage specific WRITE operations into context.
+   */
+  protected void updateContext(final Repository repository, final LocalStorageContext context)
+      throws IOException
+  {
+    // empty, override if needed
   }
 
   // ==
 
   /**
    * Gets the absolute url from base.
-   *
-   * @param uid the uid
-   * @return the absolute url from base
    */
-  @Deprecated
+  @Override
   public URL getAbsoluteUrlFromBase(Repository repository, ResourceStoreRequest request)
       throws LocalStorageException
   {
@@ -168,6 +147,7 @@ public abstract class AbstractLocalRepositoryStorage
     }
   }
 
+  @Override
   public final void deleteItem(Repository repository, ResourceStoreRequest request)
       throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
   {
@@ -176,6 +156,11 @@ public abstract class AbstractLocalRepositoryStorage
 
   // ==
 
+  /**
+   * @deprecated To be removed in future releases (no replacement provided).
+   */
+  @Deprecated
+  @Override
   public Iterator<StorageItem> iterateItems(Repository repository, ResourceStoreIteratorRequest request)
       throws ItemNotFoundException, LocalStorageException
   {

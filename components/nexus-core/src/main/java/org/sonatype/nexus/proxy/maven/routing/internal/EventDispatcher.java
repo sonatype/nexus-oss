@@ -24,6 +24,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventDeleteRoot;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -55,7 +56,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class EventDispatcher
 {
-  private final Logger logger;
+  private static final Logger logger = LoggerFactory.getLogger(EventDispatcher.class);
 
   private final Manager manager;
 
@@ -63,7 +64,6 @@ public class EventDispatcher
    * Da constructor.
    */
   public EventDispatcher(final Manager manager) {
-    this.logger = LoggerFactory.getLogger(getClass());
     this.manager = checkNotNull(manager);
   }
 
@@ -111,23 +111,23 @@ public class EventDispatcher
     }
   }
 
-  protected void offerPath(final MavenHostedRepository mavenHostedRepository, String path) {
+  protected void offerPath(final MavenHostedRepository mavenHostedRepository, StorageItem item) {
     try {
-      manager.offerEntry(mavenHostedRepository, path);
+      manager.offerEntry(mavenHostedRepository, item);
     }
     catch (IOException e) {
-      getLogger().warn("Problem while maintaining prefix file for hosted repository {}, offered path={}",
-          RepositoryStringUtils.getHumanizedNameString(mavenHostedRepository), path, e);
+      getLogger().warn("Problem while maintaining prefix file for hosted repository {}, offered entry={}",
+          RepositoryStringUtils.getHumanizedNameString(mavenHostedRepository), item, e);
     }
   }
 
-  protected void revokePath(final MavenHostedRepository mavenHostedRepository, String path) {
+  protected void revokePath(final MavenHostedRepository mavenHostedRepository, StorageItem item) {
     try {
-      manager.revokeEntry(mavenHostedRepository, path);
+      manager.revokeEntry(mavenHostedRepository, item);
     }
     catch (IOException e) {
-      getLogger().warn("Problem while maintaining prefix file for hosted repository {}, revoked path={}",
-          RepositoryStringUtils.getHumanizedNameString(mavenHostedRepository), path, e);
+      getLogger().warn("Problem while maintaining prefix file for hosted repository {}, revoked entry={}",
+          RepositoryStringUtils.getHumanizedNameString(mavenHostedRepository), item, e);
     }
   }
 
@@ -178,7 +178,7 @@ public class EventDispatcher
       final MavenHostedRepository mavenHostedRepository =
           evt.getRepository().adaptToFacet(MavenHostedRepository.class);
       if (mavenHostedRepository != null) {
-        offerPath(mavenHostedRepository, evt.getItem().getPath());
+        offerPath(mavenHostedRepository, evt.getItem());
       }
     }
   }
@@ -197,7 +197,7 @@ public class EventDispatcher
       final MavenHostedRepository mavenHostedRepository =
           evt.getRepository().adaptToFacet(MavenHostedRepository.class);
       if (mavenHostedRepository != null) {
-        offerPath(mavenHostedRepository, evt.getItem().getPath());
+        offerPath(mavenHostedRepository, evt.getItem());
       }
     }
   }
@@ -216,7 +216,7 @@ public class EventDispatcher
       final MavenHostedRepository mavenHostedRepository =
           evt.getRepository().adaptToFacet(MavenHostedRepository.class);
       if (mavenHostedRepository != null) {
-        revokePath(mavenHostedRepository, evt.getItem().getPath());
+        revokePath(mavenHostedRepository, evt.getItem());
       }
     }
   }

@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
+import org.sonatype.nexus.util.file.DirSupport;
 
 import org.codehaus.plexus.util.IOUtil;
 
@@ -163,8 +164,8 @@ public class NexusUtils
   {
     File tempP2Repository;
     tempP2Repository = File.createTempFile("nexus-p2-repository-plugin", "");
-    tempP2Repository.delete();
-    tempP2Repository.mkdirs();
+    DirSupport.delete(tempP2Repository.toPath());
+    DirSupport.mkdir(tempP2Repository.toPath());
     return tempP2Repository;
   }
 

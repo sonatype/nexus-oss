@@ -16,7 +16,6 @@ package org.sonatype.nexus.proxy.maven.packaging;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -25,14 +24,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import org.codehaus.plexus.util.IOUtil;
+import com.google.common.collect.Maps;
 
 /**
  * A very simple artifact packaging mapper, that has everything for quick-start wired in this class. Also, it takes
- * into
- * account the "${nexus-work}/conf/packaging2extension-mapping.properties" file into account if found. To override the
+ * into account the "${nexus-work}/conf/packaging2extension-mapping.properties" file into account if found. To override the
  * "defaults" in this class, simply add lines to properties file with same keys.
  *
  * @author cstamas
@@ -40,7 +38,7 @@ import org.codehaus.plexus.util.IOUtil;
 @Singleton
 @Named
 public class DefaultArtifactPackagingMapper
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements ArtifactPackagingMapper
 {
   public static final String MAPPING_PROPERTIES_FILE = "packaging2extension-mapping.properties";
@@ -48,7 +46,7 @@ public class DefaultArtifactPackagingMapper
   private final static Map<String, String> defaults;
 
   static {
-    defaults = new HashMap<String, String>();
+    defaults = Maps.newHashMapWithExpectedSize(15);
     defaults.put("ejb-client", "jar");
     defaults.put("ejb", "jar");
     defaults.put("rar", "jar");
@@ -85,21 +83,17 @@ public class DefaultArtifactPackagingMapper
     if (packaging2extensionMapping == null) {
       synchronized (this) {
         if (packaging2extensionMapping == null) {
-          packaging2extensionMapping = new HashMap<String, String>();
+          packaging2extensionMapping = Maps.newHashMapWithExpectedSize(defaults.size());
 
           // merge defaults
           packaging2extensionMapping.putAll(defaults);
 
           if (propertiesFile != null && propertiesFile.exists()) {
-            getLogger().info("Found user artifact packaging mapping file, applying it...");
+            log.info("Found artifact packaging mapping file {}", propertiesFile);
 
-            Properties userMappings = new Properties();
+            final Properties userMappings = new Properties();
 
-            FileInputStream fis = null;
-
-            try {
-              fis = new FileInputStream(propertiesFile);
-
+            try (final FileInputStream fis =new FileInputStream(propertiesFile)) {
               userMappings.load(fis);
 
               if (userMappings.keySet().size() > 0) {
@@ -108,24 +102,17 @@ public class DefaultArtifactPackagingMapper
                       userMappings.getProperty(key.toString()));
                 }
 
-                getLogger().info(
-                    propertiesFile.getAbsolutePath()
-                        + " user artifact packaging mapping file contained "
-                        + userMappings.keySet().size() + " mappings, applied them all successfully.");
+                log.info("User artifact packaging mapping file contained {} mappings", userMappings.keySet().size());
               }
             }
             catch (IOException e) {
-              getLogger().warn(
-                  "Got IO exception during read of file: " + propertiesFile.getAbsolutePath());
+              log.warn(
+                  "Got IO exception during read of file: {}", propertiesFile.getAbsolutePath(), e);
             }
-            finally {
-              IOUtil.close(fis);
-            }
-
           }
           else {
             // make it silent if using defaults
-            getLogger().debug(
+            log.debug(
                 "User artifact packaging mappings file not found, will work with defaults...");
           }
         }
@@ -133,10 +120,6 @@ public class DefaultArtifactPackagingMapper
     }
 
     return packaging2extensionMapping;
-  }
-
-  public void setPackaging2extensionMapping(Map<String, String> packaging2extensionMapping) {
-    this.packaging2extensionMapping = packaging2extensionMapping;
   }
 
   public Map<String, String> getDefaults() {

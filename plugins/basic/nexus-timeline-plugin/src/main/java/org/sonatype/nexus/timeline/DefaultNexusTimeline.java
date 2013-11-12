@@ -16,6 +16,7 @@ package org.sonatype.nexus.timeline;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,15 +25,14 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.timeline.Timeline;
 import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineRecord;
 
 import com.google.common.base.Predicate;
-import org.codehaus.plexus.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -46,12 +46,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class DefaultNexusTimeline
+    extends ComponentSupport
     implements NexusTimeline
 {
 
   private static final String TIMELINE_BASEDIR = "timeline";
-
-  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final Timeline timeline;
 
@@ -65,7 +64,7 @@ public class DefaultNexusTimeline
     this.applicationConfiguration = checkNotNull(applicationConfiguration);
 
     try {
-      logger.info("Initializing Nexus Timeline...");
+      log.info("Initializing Nexus Timeline...");
 
       moveLegacyTimeline();
     }
@@ -73,7 +72,7 @@ public class DefaultNexusTimeline
       throw new RuntimeException("Unable to move legacy Timeline!", e);
     }
     try {
-      logger.info("Starting Nexus Timeline...");
+      log.info("Starting Nexus Timeline...");
       updateConfiguration();
     }
     catch (IOException e) {
@@ -82,10 +81,9 @@ public class DefaultNexusTimeline
   }
 
   @Override
-  public void shutdown()
-  {
+  public void shutdown() {
     try {
-      logger.info("Stopping Nexus Timeline...");
+      log.info("Stopping Nexus Timeline...");
       timeline.stop();
     }
     catch (IOException e) {
@@ -117,16 +115,16 @@ public class DefaultNexusTimeline
       return;
     }
 
-    logger.info(
+    log.info(
         "Moving legacy timeline index from '" + legacyIndexDir.getAbsolutePath() + "' to '"
             + newIndexDir.getAbsolutePath() + "'.");
 
-    if (!newIndexDir.exists()) {
-      newIndexDir.mkdirs();
-    }
-
+    DirSupport.mkdir(newIndexDir.toPath());
     for (File legacyIndexFile : legacyIndexFiles) {
-      FileUtils.rename(legacyIndexFile, new File(newIndexDir, legacyIndexFile.getName()));
+      // legacy was just plain Lucene index (so, we move lucene files from here into a SUBDIRECTORY)
+      if (Files.isRegularFile(legacyIndexFile.toPath())) {
+        Files.move(legacyIndexFile.toPath(), new File(newIndexDir, legacyIndexFile.getName()).toPath());
+      }
     }
   }
 

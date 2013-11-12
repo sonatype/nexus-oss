@@ -95,7 +95,7 @@ public class RemotePrefixFileStrategy
   {
     StorageFileItem item;
     String path = config.getRemotePrefixFilePath();
-    getLogger().debug("Looking for remote prefix on {} at path {}", mavenProxyRepository, path);
+    log.debug("Looking for remote prefix on {} at path {}", mavenProxyRepository, path);
     // we keep exclusive lock on UID during discovery to prevent other threads grabbing this file
     // prematurely. We release the lock only when file is present locally, and is validated.
     // in that moment it's not published yet, but the content is correct and it will be
@@ -105,7 +105,7 @@ public class RemotePrefixFileStrategy
     try {
       item = retrieveFromRemoteIfExists(mavenProxyRepository, path);
       if (item != null) {
-        getLogger().debug("Remote prefix on {} at path {} found!", mavenProxyRepository, path);
+        log.debug("Remote prefix on {} at path {} found!", mavenProxyRepository, path);
         long prefixFileAgeInDays = (System.currentTimeMillis() - item.getModified()) / 86400000L;
         Result unmarshalled = new TextFilePrefixSourceMarshaller(config).read(item);
         if (!unmarshalled.supported()) {

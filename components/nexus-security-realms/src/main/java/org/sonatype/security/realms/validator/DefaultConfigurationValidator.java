@@ -34,19 +34,17 @@ import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
 @Typed(SecurityConfigurationValidator.class)
 @Named("default")
 public class DefaultConfigurationValidator
+    extends ComponentSupport
     implements SecurityConfigurationValidator
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private static String DEFAULT_SOURCE = "default";
 
   private final ConfigurationIdGenerator idGenerator;
@@ -112,32 +110,32 @@ public class DefaultConfigurationValidator
 
     // summary
     if (response.getValidationErrors().size() > 0 || response.getValidationWarnings().size() > 0) {
-      logger.error("* * * * * * * * * * * * * * * * * * * * * * * * * *");
+      log.error("* * * * * * * * * * * * * * * * * * * * * * * * * *");
 
-      logger.error("Security configuration has validation errors/warnings");
+      log.error("Security configuration has validation errors/warnings");
 
-      logger.error("* * * * * * * * * * * * * * * * * * * * * * * * * *");
+      log.error("* * * * * * * * * * * * * * * * * * * * * * * * * *");
 
       if (response.getValidationErrors().size() > 0) {
-        logger.error("The ERRORS:");
+        log.error("The ERRORS:");
 
         for (ValidationMessage msg : response.getValidationErrors()) {
-          logger.error(msg.toString());
+          log.error(msg.toString());
         }
       }
 
       if (response.getValidationWarnings().size() > 0) {
-        logger.error("The WARNINGS:");
+        log.error("The WARNINGS:");
 
         for (ValidationMessage msg : response.getValidationWarnings()) {
-          logger.error(msg.toString());
+          log.error(msg.toString());
         }
       }
 
-      logger.error("* * * * * * * * * * * * * * * * * * * * *");
+      log.error("* * * * * * * * * * * * * * * * * * * * *");
     }
     else {
-      logger.info("Security configuration validated succesfully.");
+      log.info("Security configuration validated succesfully.");
     }
 
     return response;

@@ -35,7 +35,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 import com.google.common.base.Preconditions;
-import org.codehaus.plexus.util.IOUtil;
 
 /**
  * AttributeStorage implementation that uses LocalRepositoryStorage of repositories to store attributes "along" the
@@ -202,8 +201,6 @@ public class DefaultLSAttributeStorage
   {
     Attributes result = null;
 
-    InputStream attributeStream = null;
-
     boolean corrupt = false;
 
     try {
@@ -221,9 +218,10 @@ public class DefaultLSAttributeStorage
           throw new InvalidInputException("Attribute of " + uid + " is empty!");
         }
 
-        attributeStream = attributeItem.getContentLocator().getContent();
-
-        result = marshaller.unmarshal(attributeStream);
+        try (InputStream attributeStream = attributeItem.getContentLocator().getContent())
+        {
+          result = marshaller.unmarshal(attributeStream);
+        }
 
         result.setRepositoryId(uid.getRepository().getId());
         result.setPath(uid.getPath());
@@ -259,9 +257,6 @@ public class DefaultLSAttributeStorage
     }
     catch (ItemNotFoundException e) {
       return null;
-    }
-    finally {
-      IOUtil.close(attributeStream);
     }
 
     if (corrupt) {

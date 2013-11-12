@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
+import org.sonatype.sisu.goodies.common.Loggers;
 
 import com.google.common.eventbus.Subscribe;
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -43,7 +44,6 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The Class AbstractProxyTestEnvironment.
@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractProxyTestEnvironment
     extends AbstractNexusTestEnvironment
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = Loggers.getLogger(getClass());
 
   /**
    * The config

@@ -36,19 +36,17 @@ import org.sonatype.security.ldap.realms.connector.LdapConnector;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import org.sonatype.security.ldap.realms.tools.LdapURL;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractLdapManager
+    extends ComponentSupport
     implements LdapManager
 {
-
-  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final LdapAuthenticator ldapAuthenticator;
 
@@ -60,8 +58,10 @@ public abstract class AbstractLdapManager
 
   private LdapConnector ldapConnector;
 
-  public AbstractLdapManager(final LdapAuthenticator ldapAuthenticator, final LdapUserDAO ldapUserManager,
-      final LdapGroupDAO ldapGroupManager, final LdapConfiguration ldapConfiguration)
+  public AbstractLdapManager(final LdapAuthenticator ldapAuthenticator,
+                             final LdapUserDAO ldapUserManager,
+                             final LdapGroupDAO ldapGroupManager,
+                             final LdapConfiguration ldapConfiguration)
   {
     this.ldapAuthenticator = checkNotNull(ldapAuthenticator);
     this.ldapUserManager = checkNotNull(ldapUserManager);
@@ -115,10 +115,10 @@ public abstract class AbstractLdapManager
   }
 
   @Override
-  public SortedSet<LdapUser> searchUsers(String username)
+  public SortedSet<LdapUser> searchUsers(String username, Set<String> roleIds)
       throws LdapDAOException
   {
-    return this.getLdapConnector().searchUsers(username);
+    return this.getLdapConnector().searchUsers(username, roleIds);
   }
 
   private LdapConnector getLdapConnector()
@@ -134,7 +134,7 @@ public abstract class AbstractLdapManager
     }
     return this.ldapConnector;
   }
-  
+
   protected void resetLdapConnector() {
     this.ldapConnector = null;
   }
@@ -165,7 +165,7 @@ public abstract class AbstractLdapManager
     }
     catch (MalformedURLException e) {
       // log an error, because the user could still log in and fix the config.
-      this.logger.error("LDAP Configuration is Invalid.");
+      this.log.error("LDAP Configuration is Invalid.");
       throw new LdapDAOException("Invalid LDAP URL: " + e.getMessage());
     }
 
@@ -212,9 +212,7 @@ public abstract class AbstractLdapManager
       return ldapUser;
     }
     catch (Exception e) {
-      if (this.logger.isDebugEnabled()) {
-        this.logger.debug("Failed to find user: " + userId, e);
-      }
+      this.log.debug("Failed to find user: {}", userId, e);
     }
     throw new AuthenticationException("User: " + userId + " could not be authenticated.");
   }

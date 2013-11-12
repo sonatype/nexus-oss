@@ -44,7 +44,7 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class GroovyRemoteClient
 {
-  private final Logger log = LoggerFactory.getLogger(getClass());
+  private static final Logger log = LoggerFactory.getLogger(GroovyRemoteClient.class);
 
   private final GroovyShell shell;
 

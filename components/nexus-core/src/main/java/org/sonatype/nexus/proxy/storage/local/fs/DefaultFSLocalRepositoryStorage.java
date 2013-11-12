@@ -18,7 +18,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -48,9 +47,11 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.AbstractLocalRepositoryStorage;
+import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
-import org.sonatype.nexus.util.ItemPathUtils;
+import org.sonatype.nexus.util.PathUtils;
+import org.sonatype.nexus.util.file.DirSupport;
 
 import com.google.common.base.Strings;
 import com.google.common.io.Closeables;
@@ -70,6 +71,11 @@ public class DefaultFSLocalRepositoryStorage
 {
   public static final String PROVIDER_STRING = "file";
 
+  /**
+   * Key of the {@link File} denoting repository root directory in repository's context.
+   */
+  private static final String BASEDIR_FILE = DefaultFSLocalRepositoryStorage.class.getName() + ".baseDir";
+
   private FSPeer fsPeer;
 
   @Inject
@@ -84,10 +90,12 @@ public class DefaultFSLocalRepositoryStorage
     return fsPeer;
   }
 
+  @Override
   public String getProviderId() {
     return PROVIDER_STRING;
   }
 
+  @Override
   public void validateStorageUrl(String url)
       throws LocalStorageException
   {
@@ -98,47 +106,25 @@ public class DefaultFSLocalRepositoryStorage
     }
   }
 
+  @Override
+  protected void updateContext(final Repository repository, final LocalStorageContext context)
+      throws IOException
+  {
+    final File file = org.sonatype.nexus.util.FileUtils.getFileFromUrl(repository.getLocalUrl());
+    DirSupport.mkdir(file.toPath());
+    context.putContextObject(BASEDIR_FILE, file);
+  }
+
+
   /**
    * Gets the base dir.
    *
    * @return the base dir
    */
-  public File getBaseDir(Repository repository, ResourceStoreRequest request)
+  public File getBaseDir(final Repository repository, final ResourceStoreRequest request)
       throws LocalStorageException
   {
-    URL url;
-
-    request.pushRequestPath(RepositoryItemUid.PATH_ROOT);
-    try {
-      url = getAbsoluteUrlFromBase(repository, request);
-    }
-    finally {
-      request.popRequestPath();
-    }
-
-    File file;
-
-    try {
-      file = new File(url.toURI());
-    }
-    catch (Exception t) {
-      file = new File(url.getPath());
-    }
-
-    if (file.exists()) {
-      if (file.isFile()) {
-        throw new LocalStorageException("The \"" + repository.getName() + "\" (ID=\"" + repository.getId()
-            + "\") repository's baseDir is not a directory, path: " + file.getAbsolutePath());
-      }
-    }
-    else {
-      if (!file.mkdirs()) {
-        throw new LocalStorageException("Could not create the baseDir directory for repository \""
-            + repository.getName() + "\" (ID=\"" + repository.getId() + "\") on path " + file.getAbsolutePath());
-      }
-    }
-
-    return file;
+    return (File) getLocalStorageContext(repository).getContextObject(BASEDIR_FILE);
   }
 
   /**
@@ -149,10 +135,6 @@ public class DefaultFSLocalRepositoryStorage
   public File getFileFromBase(final Repository repository, final ResourceStoreRequest request, final File repoBase)
       throws LocalStorageException
   {
-    if (!repoBase.exists()) {
-      repoBase.mkdir();
-    }
-
     File result = null;
 
     if (request.getRequestPath() == null || RepositoryItemUid.PATH_ROOT.equals(request.getRequestPath())) {
@@ -165,8 +147,8 @@ public class DefaultFSLocalRepositoryStorage
       result = new File(repoBase, request.getRequestPath());
     }
 
-    if (getLogger().isTraceEnabled()) {
-      getLogger().trace("{} --> {}", request.getRequestPath(), result.getAbsoluteFile());
+    if (log.isTraceEnabled()) {
+      log.trace("{} --> {}", request.getRequestPath(), result.getAbsoluteFile());
     }
 
     // to be foolproof, chrooting it
@@ -211,8 +193,8 @@ public class DefaultFSLocalRepositoryStorage
 
     RepositoryItemUid uid = repository.createUid(path);
 
-    AbstractStorageItem result = null;
-    if (target.exists() && target.isDirectory()) {
+    final AbstractStorageItem result;
+    if (target.isDirectory()) {
       request.setRequestPath(path);
 
       DefaultStorageCollectionItem coll =
@@ -220,19 +202,20 @@ public class DefaultFSLocalRepositoryStorage
       coll.setModified(target.lastModified());
       coll.setCreated(target.lastModified());
       result = coll;
-
     }
-    else if (target.exists() && target.isFile() && !mustBeACollection) {
+    else if (target.isFile() && !mustBeACollection) {
       request.setRequestPath(path);
 
-      FileContentLocator linkContent = new FileContentLocator(target, "text/plain");
+      // FileComtentLocator is reusable, so create it only once but with correct MIME type
+      final FileContentLocator fileContent = new FileContentLocator(target, getMimeSupport().guessMimeTypeFromPath(
+          repository.getMimeRulesSource(), target.getAbsolutePath()));
 
       try {
-        if (getLinkPersister().isLinkContent(linkContent)) {
+        if (getLinkPersister().isLinkContent(fileContent)) {
           try {
             DefaultStorageLinkItem link =
                 new DefaultStorageLinkItem(repository, request, target.canRead(), target.canWrite(),
-                    getLinkPersister().readLinkContent(linkContent));
+                    getLinkPersister().readLinkContent(fileContent));
             repository.getAttributesHandler().fetchAttributes(link);
             link.setModified(target.lastModified());
             link.setCreated(target.lastModified());
@@ -241,10 +224,8 @@ public class DefaultFSLocalRepositoryStorage
             repository.getAttributesHandler().touchItemLastRequested(System.currentTimeMillis(), link);
           }
           catch (NoSuchRepositoryException e) {
-            getLogger().warn("Stale link object found on UID: {}, deleting it.", uid);
-
-            target.delete();
-
+            log.warn("Stale link object found on UID: {}, deleting it.", uid);
+            DirSupport.delete(target.toPath());
             throw new ItemNotFoundException(reasonFor(request, repository,
                 "Path %s not found in local storage of repository %s", request.getRequestPath(),
                 RepositoryStringUtils.getHumanizedNameString(repository)), e);
@@ -253,8 +234,7 @@ public class DefaultFSLocalRepositoryStorage
         else {
           DefaultStorageFileItem file =
               new DefaultStorageFileItem(repository, request, target.canRead(), target.canWrite(),
-                  new FileContentLocator(target, getMimeSupport().guessMimeTypeFromPath(
-                      repository.getMimeRulesSource(), target.getAbsolutePath())));
+                  fileContent);
           repository.getAttributesHandler().fetchAttributes(file);
           file.setModified(target.lastModified());
           file.setCreated(target.lastModified());
@@ -267,7 +247,7 @@ public class DefaultFSLocalRepositoryStorage
         // It is possible for this file to have been removed after the call to target.exists()
         // this could have been an external process
         // See: https://issues.sonatype.org/browse/NEXUS-4570
-        getLogger().debug("File '{}' removed before finished processing the directory listing", target, e);
+        log.debug("File '{}' removed before finished processing the directory listing", target, e);
         throw new ItemNotFoundException(reasonFor(request, repository,
             "Path %s not found in local storage of repository %s", request.getRequestPath(),
             RepositoryStringUtils.getHumanizedNameString(repository)), e);
@@ -288,8 +268,7 @@ public class DefaultFSLocalRepositoryStorage
   public boolean isReachable(Repository repository, ResourceStoreRequest request)
       throws LocalStorageException
   {
-    File target = getBaseDir(repository, request);
-
+    final File target = getBaseDir(repository, request);
     return getFSPeer().isReachable(repository, target, request, target);
   }
 
@@ -442,7 +421,7 @@ public class DefaultFSLocalRepositoryStorage
 
     if (files != null) {
       for (File file : files) {
-        String newPath = ItemPathUtils.concatPaths(request.getRequestPath(), file.getName());
+        String newPath = PathUtils.concatPaths(request.getRequestPath(), file.getName());
 
         request.pushRequestPath(newPath);
         try {
@@ -451,7 +430,7 @@ public class DefaultFSLocalRepositoryStorage
             result.add(retrieveItemFromFile(repository, collMemberReq, file));
           }
           catch (ItemNotFoundException e) {
-            getLogger().debug("ItemNotFoundException while listing directory, for request: {}",
+            log.debug("ItemNotFoundException while listing directory, for request: {}",
                 collMemberReq.getRequestPath(), e);
           }
         }

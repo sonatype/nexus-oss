@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link InversionCondition} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class InversionConditionTest
     extends EventBusTestSupport

@@ -37,11 +37,6 @@ NX.define('Sonatype.repoServer.referenceData', {
       sslEnabled : "",
       tlsEnabled : ""
     },
-    errorReportingSettings : {
-      jiraUsername : "",
-      jiraPassword : "",
-      reportErrorsAutomatically : false
-    },
     globalConnectionSettings : {
       connectionTimeout : 0,
       retrievalRetryCount : 0,
@@ -353,13 +348,6 @@ NX.define('Sonatype.repoServer.referenceData', {
   contentClasses : {
     contentClass : "",
     name : ""
-  },
-
-  logConfig : {
-    rootLoggerLevel : "",
-    rootLoggerAppenders : "",
-    fileAppenderLocation : "",
-    fileAppenderPattern : ""
   },
 
   repoMirrors : [

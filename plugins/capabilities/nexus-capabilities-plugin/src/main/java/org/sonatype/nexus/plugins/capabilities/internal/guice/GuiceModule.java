@@ -25,7 +25,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 /**
  * Capabilities plugin Guice module.
  *
- * @since 1.0
+ * @since capabilities 1.0
  */
 @Named
 public class GuiceModule

@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A {@link CapabilityFactory} that implements capabilities via reflection.
  *
- * @since 2.2
+ * @since capabilities 2.2
  */
 public class ReflectiveCapabilityFactory<C extends Capability>
     implements CapabilityFactory<C>

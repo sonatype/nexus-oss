@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Central access point for built in {@link org.sonatype.nexus.plugins.capabilities.Condition}s.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 @Singleton

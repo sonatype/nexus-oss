@@ -15,13 +15,17 @@ package org.sonatype.nexus.proxy.wastebasket;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -33,16 +37,15 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.walker.AffirmativeStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
-import org.sonatype.sisu.resource.scanner.Listener;
-import org.sonatype.sisu.resource.scanner.Scanner;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 
 @Named
 @Singleton
 public class DefaultWastebasket
-    extends AbstractLoggingComponent
-    implements SmartWastebasket
+    extends ComponentSupport
+    implements Wastebasket
 {
   private static final String TRASH_PATH_PREFIX = "/.nexus/trash";
 
@@ -52,19 +55,15 @@ public class DefaultWastebasket
 
   private Walker walker;
 
-  private final Scanner scanner;
-
   private final RepositoryRegistry repositoryRegistry;
 
   @Inject
   public DefaultWastebasket(final ApplicationConfiguration applicationConfiguration,
                             final Walker walker,
-                            final @Named("serial") Scanner scanner,
                             final RepositoryRegistry repositoryRegistry)
   {
     this.applicationConfiguration = applicationConfiguration;
     this.walker = walker;
-    this.scanner = scanner;
     this.repositoryRegistry = repositoryRegistry;
   }
 
@@ -81,10 +80,6 @@ public class DefaultWastebasket
     this.walker = walker;
   }
 
-  protected Scanner getScanner() {
-    return scanner;
-  }
-
   protected RepositoryRegistry getRepositoryRegistry() {
     return repositoryRegistry;
   }
@@ -96,14 +91,17 @@ public class DefaultWastebasket
   // ==============================
   // Wastebasket iface
 
+  @Override
   public DeleteOperation getDeleteOperation() {
     return deleteOperation;
   }
 
+  @Override
   public void setDeleteOperation(final DeleteOperation deleteOperation) {
     this.deleteOperation = deleteOperation;
   }
 
+  @Override
   public Long getTotalSize() {
     Long totalSize = null;
 
@@ -118,12 +116,14 @@ public class DefaultWastebasket
     return totalSize;
   }
 
+  @Override
   public void purgeAll()
       throws IOException
   {
     purgeAll(ALL);
   }
 
+  @Override
   public void purgeAll(final long age)
       throws IOException
   {
@@ -139,44 +139,44 @@ public class DefaultWastebasket
     // check for existence, is this needed at all?
     if (basketFile.isDirectory()) {
       final long limitDate = System.currentTimeMillis() - age;
-      getScanner().scan(basketFile, new Listener()
+      Files.walkFileTree(basketFile.toPath(), new SimpleFileVisitor<Path>()
       {
         @Override
-        public void onFile(File file) {
-          if (age == ALL || file.lastModified() < limitDate) {
-            file.delete();
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+            throws IOException
+        {
+          if (age == ALL || file.toFile().lastModified() < limitDate) {
+            Files.delete(file);
           }
+          return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public void onExitDirectory(File directory) {
-          if (!basketFile.equals(directory) && directory.list().length == 0) {
-            directory.delete();
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc)
+            throws IOException
+        {
+          if (!basketFile.equals(dir.toFile()) && dir.toFile().list().length == 0) {
+            Files.delete(dir);
           }
-        }
-
-        public void onEnterDirectory(File directory) {
-        }
-
-        public void onEnd() {
-        }
-
-        public void onBegin() {
+          return FileVisitResult.CONTINUE;
         }
       });
     }
   }
 
+  @Override
   public Long getSize(final Repository repository) {
     return null;
   }
 
+  @Override
   public void purge(final Repository repository)
       throws IOException
   {
     purge(repository, ALL);
   }
 
+  @Override
   public void purge(final Repository repository, final long age)
       throws IOException
   {
@@ -230,6 +230,7 @@ public class DefaultWastebasket
     }
   }
 
+  @Override
   public boolean undelete(final LocalRepositoryStorage ls, final Repository repository,
                           final ResourceStoreRequest request)
       throws LocalStorageException
@@ -254,13 +255,6 @@ public class DefaultWastebasket
     }
 
     return false;
-  }
-
-  // ==============================
-  // SmartWastebasket iface
-
-  public void setMaximumSizeConstraint(final MaximumSizeConstraint constraint) {
-    // TODO Implement this
   }
 
   // ==

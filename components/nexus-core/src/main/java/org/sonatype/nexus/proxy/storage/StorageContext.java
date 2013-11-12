@@ -29,17 +29,6 @@ public interface StorageContext
   // change detection
 
   /**
-   * Returns the timestamp of latest change. Will propagate to parent if it is more recently changed as this (and
-   * parent is set).
-   * 
-   * @deprecated Do not use this method anymore for change detection, use {@link #getGeneration()} instead. This
-   *             method uses millisecond "resolution" and is unreliable to properly detect changes (as the change
-   *             happened within millisecond), and it resulted in loss of updates in some subsystems.
-   */
-  @Deprecated
-  long getLastChanged();
-
-  /**
    * Returns the "generation" (somewhat in ratio with count of changes) of this context, usable to detect changes
    * happened against it. Operations like {@link #putContextObject(String, Object)} and
    * {@link #removeContextObject(String)} increases this number, while other "read" operations does not. Also, even
@@ -49,11 +38,19 @@ public interface StorageContext
    * and if they differ, it would mean this context (or hierarchy, as parent is involved too) did change meanwhile.
    * 
    * @return the context generation, that grows by changes made against context (nothing guarantees next generation
-   *         is
-   *         previous increased by 1, it simply grows).
+   *         is previous increased by 1, it simply grows).
    * @since 2.1
    */
   int getGeneration();
+
+  /**
+   * Increments the generation of context without making any change to the context and returns the new generation.
+   * Usable to mark context "dirty" without actually doing any change to the context itself.
+   *
+   * @return the incremented context generation.
+   * @since 2.7.0
+   */
+  int incrementGeneration();
 
   // parent
 
@@ -61,15 +58,6 @@ public interface StorageContext
    * Returns the parent context, or null if not set.
    */
   StorageContext getParentStorageContext();
-
-  /**
-   * Sets the parent context, or nullify it. Note: as of Nexus 2.1 this method is deprecated and is made a NOOP.
-   * 
-   * @deprecated This method is NOOP, as changing parents are not possible, nor was ever properly supported, as it
-   *             interfered with "change detection".
-   */
-  @Deprecated
-  void setParentStorageContext(StorageContext parent);
 
   // modification
 
@@ -96,12 +84,12 @@ public interface StorageContext
   /**
    * Puts an object into this context, potentially overriding same keyed object from parent.
    */
-  void putContextObject(String key, Object value);
+  Object putContextObject(String key, Object value);
 
   /**
    * Removed an object from this context. Parent remains unchanged.
    */
-  void removeContextObject(String key);
+  Object removeContextObject(String key);
 
   /**
    * Returns true if this context has an object under the given key. This call does not propagate to parent.

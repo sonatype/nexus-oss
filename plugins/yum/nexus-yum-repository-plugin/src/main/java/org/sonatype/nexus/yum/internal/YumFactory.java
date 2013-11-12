@@ -15,8 +15,12 @@ package org.sonatype.nexus.yum.internal;
 
 import java.io.File;
 
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.yum.YumGroup;
+import org.sonatype.nexus.yum.YumHosted;
+import org.sonatype.nexus.yum.YumProxy;
 
 /**
  * @since yum 3.0
@@ -24,6 +28,16 @@ import org.sonatype.nexus.yum.Yum;
 public interface YumFactory
 {
 
-  Yum create(File temporaryDirectory, Repository repository);
+  YumHosted createHosted(File temporaryDirectory, HostedRepository repository);
+
+  /**
+   * @since 2.7
+   */
+  YumProxy createProxy(ProxyRepository repository);
+
+  /**
+   * @since 2.7
+   */
+  YumGroup createGroup(GroupRepository repository);
 
 }

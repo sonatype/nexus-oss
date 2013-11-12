@@ -36,22 +36,19 @@ import org.sonatype.security.ldap.realms.connector.LdapConnector;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import org.sonatype.security.ldap.realms.tools.LdapURL;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 @Named
 public class SimpleLdapManager
+    extends ComponentSupport
     implements LdapManager
 {
-
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   private final LdapAuthenticator ldapAuthenticator;
 
   private final LdapUserDAO ldapUserManager;
@@ -63,8 +60,10 @@ public class SimpleLdapManager
   private LdapConnector ldapManagerStrategy;
 
   @Inject
-  public SimpleLdapManager(LdapAuthenticator ldapAuthenticator, LdapUserDAO ldapUserManager,
-      LdapGroupDAO ldapGroupManager, LdapConfiguration ldapConfiguration)
+  public SimpleLdapManager(LdapAuthenticator ldapAuthenticator,
+                           LdapUserDAO ldapUserManager,
+                           LdapGroupDAO ldapGroupManager,
+                           LdapConfiguration ldapConfiguration)
   {
     this.ldapAuthenticator = checkNotNull(ldapAuthenticator);
     this.ldapUserManager = checkNotNull(ldapUserManager);
@@ -116,10 +115,10 @@ public class SimpleLdapManager
   }
 
   @Override
-  public SortedSet<LdapUser> searchUsers(String username)
+  public SortedSet<LdapUser> searchUsers(String username, Set<String> roleIds)
       throws LdapDAOException
   {
-    return this.getLdapManagerConnector().searchUsers(username);
+    return this.getLdapManagerConnector().searchUsers(username, roleIds);
   }
 
   private LdapConnector getLdapManagerConnector()
@@ -162,7 +161,7 @@ public class SimpleLdapManager
     }
     catch (MalformedURLException e) {
       // log an error, because the user could still log in and fix the config.
-      this.logger.error("LDAP Configuration is Invalid.");
+      this.log.error("LDAP Configuration is Invalid.");
       throw new LdapDAOException("Invalid LDAP URL: " + e.getMessage());
     }
 
@@ -202,8 +201,8 @@ public class SimpleLdapManager
       return ldapUser;
     }
     catch (Exception e) {
-      if (this.logger.isDebugEnabled()) {
-        this.logger.debug("Failed to find user: " + userId, e);
+      if (this.log.isDebugEnabled()) {
+        this.log.debug("Failed to find user: " + userId, e);
       }
     }
     throw new AuthenticationException("User: " + userId + " could not be authenticated.");

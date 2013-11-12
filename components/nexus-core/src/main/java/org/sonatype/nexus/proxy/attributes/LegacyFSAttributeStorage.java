@@ -47,7 +47,9 @@ import org.codehaus.plexus.util.FileUtils;
  *
  * @author cstamas
  * @since 2.0
+ * @deprecated To be removed in future releases once upgrade from Nexus 1.x line becomes unsupported.
  */
+@Deprecated
 @Typed(AttributeStorage.class)
 @Named("legacy")
 @Singleton

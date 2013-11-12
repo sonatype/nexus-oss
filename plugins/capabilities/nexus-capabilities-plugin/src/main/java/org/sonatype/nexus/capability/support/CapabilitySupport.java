@@ -110,7 +110,7 @@ public abstract class CapabilitySupport<ConfigT>
   }
 
   protected void ensureConfigured() {
-    checkState(config != null);
+    checkState(config != null, "Capability is not configured");
   }
 
   protected abstract ConfigT createConfig(final Map<String, String> properties) throws Exception;
@@ -159,7 +159,6 @@ public abstract class CapabilitySupport<ConfigT>
 
   @Override
   public void onUpdate() throws Exception {
-    ensureConfigured();
     config = createConfig(context().properties());
     logLifecycle("Updating", config);
     onUpdate(config);

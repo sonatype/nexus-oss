@@ -28,7 +28,9 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
  *
  * @author cstamas
  * @since 2.0
+ * @deprecated To be removed in future releases once upgrade from Nexus 1.x line becomes unsupported.
  */
+@Deprecated
 public class TransitioningAttributeStorage
     implements AttributeStorage
 {

@@ -49,7 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class DefaultRepositoryTypeRegistry
     implements RepositoryTypeRegistry
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final static Logger logger = LoggerFactory.getLogger(DefaultRepositoryTypeRegistry.class);
 
   private final Map<String, ContentClass> contentClasses;
 

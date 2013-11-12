@@ -22,6 +22,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.sonatype.nexus.apachehttpclient.page.Page;
 
 /**
  * Scraper for remote Nexus instances that will scrape only if remote is for sure recognized as Nexus instance, and URL
@@ -108,7 +109,7 @@ public class NexusScraper
       }
       catch (IOException e) {
         // hm, either not exists or whoknows, just ignore this as Nexus must have it and should return it
-        getLogger().debug("Problem during fetch of /.meta/repository-metadata.xml", e);
+        log.debug("Problem during fetch of /.meta/repository-metadata.xml from remote of {}", context.getProxyRepository(), e);
       }
     }
     // um, we were not totally positive, this might be some web server with index page similar to Nexus one
