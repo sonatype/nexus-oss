@@ -126,26 +126,12 @@ public class DefaultAttributesHandler
   @Inject
   public DefaultAttributesHandler(ApplicationConfiguration applicationConfiguration,
                                   @Named("ls") AttributeStorage attributeStorage,
-                                  @Named("legacy") AttributeStorage legacyAttributeStorage,
                                   List<StorageItemInspector> itemInspectorList,
                                   List<StorageFileItemInspector> fileItemInspectorList)
   {
     this.applicationConfiguration = checkNotNull(applicationConfiguration);
 
-    // do we need to waste CPU cycles at "transitioning" at all? Should not, ie, for new instances
-    if (legacyAttributeStorage != null
-        && ((LegacyFSAttributeStorage) legacyAttributeStorage).isLegacyAttributeStorageDiscovered()) {
-      this.attributeStorage =
-          new DelegatingAttributeStorage(new TransitioningAttributeStorage(attributeStorage,
-              legacyAttributeStorage));
-
-      getLogger().info(
-          "Legacy AttributeStorage directory exists here \"{}\", transitioning them on-the-fly as they are used to repository storage.",
-          ((LegacyFSAttributeStorage) legacyAttributeStorage).getWorkingDirectory());
-    }
-    else {
-      this.attributeStorage = new DelegatingAttributeStorage(attributeStorage);
-    }
+    this.attributeStorage = checkNotNull(attributeStorage);
     this.itemInspectorList = checkNotNull(itemInspectorList);
     this.fileItemInspectorList = checkNotNull(fileItemInspectorList);
   }
@@ -211,8 +197,8 @@ public class DefaultAttributesHandler
       // we are fixing md if we can
       ContentLocator is = null;
       if (item instanceof StorageFileItem &&
-        ((StorageFileItem) item).getContentLocator().isReusable()) {
-          is = ((StorageFileItem) item).getContentLocator();
+          ((StorageFileItem) item).getContentLocator().isReusable()) {
+        is = ((StorageFileItem) item).getContentLocator();
       }
 
       storeAttributes(item, is);
@@ -297,7 +283,8 @@ public class DefaultAttributesHandler
     if (item instanceof StorageCollectionItem) {
       // not storing attributes of directories
       return false;
-    } else if (item.isVirtual()) {
+    }
+    else if (item.isVirtual()) {
       // virtual items have no attributes (nor UID for that matter)
       return false;
     }
