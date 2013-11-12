@@ -65,16 +65,7 @@
               <useJava5>true</useJava5>
               <version>2.7.0</version>
               <packagedVersions>
-                <packagedVersion>1.4.0</packagedVersion>
-                <packagedVersion>1.4.1</packagedVersion>
-                <packagedVersion>1.4.2</packagedVersion>
-                <packagedVersion>1.4.3</packagedVersion>
-                <packagedVersion>1.4.4</packagedVersion>
-                <packagedVersion>1.4.5</packagedVersion>
-                <packagedVersion>1.4.6</packagedVersion>
-                <packagedVersion>1.10.0</packagedVersion>
                 <packagedVersion>2.0.0</packagedVersion>
-                <packagedVersion>2.2.0</packagedVersion>
                 <packagedVersion>2.2.0</packagedVersion>
                 <packagedVersion>2.5.0</packagedVersion>
               </packagedVersions>
@@ -84,31 +75,6 @@
             </configuration>
           </execution>
 
-          <execution>
-            <id>nexus-old.xml</id>
-            <goals>
-              <goal>java</goal>
-              <goal>xpp3-reader</goal>
-              <goal>xpp3-writer</goal>
-            </goals>
-            <configuration>
-              <packageWithVersion>true</packageWithVersion>
-              <version>1.0.8</version>
-              <packagedVersions>
-                <packagedVersion>1.0.0</packagedVersion>
-                <packagedVersion>1.0.1</packagedVersion>
-                <packagedVersion>1.0.2</packagedVersion>
-                <packagedVersion>1.0.3</packagedVersion>
-                <packagedVersion>1.0.4</packagedVersion>
-                <packagedVersion>1.0.5</packagedVersion>
-                <packagedVersion>1.0.6</packagedVersion>
-                <packagedVersion>1.0.7</packagedVersion>
-              </packagedVersions>
-              <models>
-                <model>src/main/mdo/nexus-old.xml</model>
-              </models>
-            </configuration>
-          </execution>
         </executions>
         <configuration>
           <packageWithVersion>false</packageWithVersion>
@@ -127,14 +93,6 @@
             <configuration>
               <version>2.7.0</version>
               <packagedVersions>
-                <packagedVersion>1.4.0</packagedVersion>
-                <packagedVersion>1.4.1</packagedVersion>
-                <packagedVersion>1.4.2</packagedVersion>
-                <packagedVersion>1.4.3</packagedVersion>
-                <packagedVersion>1.4.4</packagedVersion>
-                <packagedVersion>1.4.5</packagedVersion>
-                <packagedVersion>1.4.6</packagedVersion>
-                <packagedVersion>1.10.0</packagedVersion>
                 <packagedVersion>2.0.0</packagedVersion>
                 <packagedVersion>2.2.0</packagedVersion>
                 <packagedVersion>2.5.0</packagedVersion>

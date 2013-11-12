@@ -28,7 +28,7 @@ import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UnsupportedConfigurationVersionException;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -45,7 +45,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named
 public class DefaultApplicationConfigurationUpgrader
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements ApplicationConfigurationUpgrader
 {
   private final Map<String, SingleVersionUpgrader> upgraders;
@@ -96,9 +96,9 @@ public class DefaultApplicationConfigurationUpgrader
     SingleVersionUpgrader upgrader = upgraders.get(msg.getModelVersion());
 
     if (upgrader != null) {
-      getLogger().debug(
-          "Upgrading old Nexus configuration file (version " + msg.getModelVersion() + ") from "
-              + file.getAbsolutePath());
+      log.debug(
+          "Upgrading old Nexus configuration file (version {}) at {}", msg.getModelVersion(),
+          file.getAbsolutePath());
 
       msg.setConfiguration(upgrader.loadConfiguration(file));
 
@@ -114,8 +114,7 @@ public class DefaultApplicationConfigurationUpgrader
         upgrader = upgraders.get(msg.getModelVersion());
       }
 
-      getLogger().info(
-          "Nexus configuration file upgraded to current version " + msg.getModelVersion() + " successfully.");
+      log.info("Nexus configuration file upgraded to current version {} successfully., ", msg.getModelVersion());
 
       return (Configuration) msg.getConfiguration();
     }
