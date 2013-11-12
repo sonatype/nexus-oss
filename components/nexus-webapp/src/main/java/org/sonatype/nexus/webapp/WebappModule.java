@@ -29,6 +29,5 @@ public class WebappModule
   @Override
   protected void configure() {
     install(new MetricsModule());
-    install(new ContentModule());
   }
 }

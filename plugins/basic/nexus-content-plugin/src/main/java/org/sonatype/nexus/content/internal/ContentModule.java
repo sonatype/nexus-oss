@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.guice.FilterChainModule;
 import org.sonatype.nexus.security.filter.FilterProviderSupport;
 import org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter;
 import org.sonatype.nexus.web.MdcUserContextFilter;
@@ -54,6 +55,14 @@ public class ContentModule
         serve(MOUNT_POINT + "/*").with(ContentServlet.class);
         filter(MOUNT_POINT + "/*").through(SecurityWebFilter.class);
         filter(MOUNT_POINT + "/*").through(MdcUserContextFilter.class);
+      }
+    });
+
+    install(new FilterChainModule()
+    {
+      @Override
+      protected void configure() {
+        addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,contentAuthcBasic,contentTperms");
       }
     });
   }
