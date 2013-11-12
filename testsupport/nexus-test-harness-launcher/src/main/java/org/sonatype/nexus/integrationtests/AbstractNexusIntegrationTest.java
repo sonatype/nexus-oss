@@ -51,7 +51,6 @@ import org.sonatype.sisu.goodies.common.Loggers;
 import org.sonatype.sisu.goodies.prefs.memory.MemoryPreferencesFactory;
 
 import com.google.common.base.Throwables;
-import com.google.common.io.Closeables;
 import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -596,13 +595,9 @@ public abstract class AbstractNexusIntegrationTest
         File pom = new File(project, "pom.xml");
 
         MavenXpp3Reader reader = new MavenXpp3Reader();
-        FileInputStream fis = new FileInputStream(pom);
         Model model = null;
-        try {
+        try (FileInputStream fis = new FileInputStream(pom)) {
           model = reader.read(fis);
-        }
-        finally {
-          Closeables.closeQuietly(fis);
         }
 
         // a helpful note so you don't need to dig into the code to much.

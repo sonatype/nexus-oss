@@ -31,7 +31,6 @@ import org.sonatype.nexus.util.file.DirSupport;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.google.common.io.Closeables;
 
 /**
  * AttributeStorage implementation that uses it's own FS storage to store attributes in separate place then
@@ -190,13 +189,8 @@ public class DefaultFSAttributeStorage
         DirSupport.mkdir(target.getParentFile().toPath());
 
         if (target.getParentFile().exists() && target.getParentFile().isDirectory()) {
-          FileOutputStream fos = null;
-
-          try {
-            fos = new FileOutputStream(target);
-
+          try (FileOutputStream fos = new FileOutputStream(target)) {
             attributes.incrementGeneration();
-
             marshaller.marshal(attributes, fos);
           }
           catch (IOException ex) {
@@ -205,9 +199,6 @@ public class DefaultFSAttributeStorage
               target.delete();
             }
             throw ex;
-          }
-          finally {
-            Closeables.closeQuietly(fos);
           }
         }
         else {
@@ -269,15 +260,11 @@ public class DefaultFSAttributeStorage
     boolean corrupt = false;
 
     if (target.exists() && target.isFile()) {
-      FileInputStream fis = null;
-
-      try {
+      try (FileInputStream fis = new FileInputStream(target)) {
         if (target.length() == 0) {
           // NEXUS-4871
           throw new InvalidInputException("Attribute of " + uid + " is empty!");
         }
-
-        fis = new FileInputStream(target);
 
         result = marshaller.unmarshal(fis);
 
@@ -312,9 +299,6 @@ public class DefaultFSAttributeStorage
         getLogger().info("While reading attributes of " + uid + " we got IOException:", e);
 
         throw e;
-      }
-      finally {
-        Closeables.closeQuietly(fis);
       }
     }
 

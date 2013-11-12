@@ -32,7 +32,6 @@ import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 
-import com.google.common.io.Closeables;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 
@@ -233,11 +232,7 @@ public class LegacyFSAttributeStorage
     boolean corrupt = false;
 
     if (target.exists() && target.isFile()) {
-      FileInputStream fis = null;
-
-      try {
-        fis = new FileInputStream(target);
-
+      try (FileInputStream fis = new FileInputStream(target)) {
         result = (AbstractStorageItem) marshaller.fromXML(fis);
         result.upgrade();
 
@@ -285,9 +280,6 @@ public class LegacyFSAttributeStorage
         getLogger().info("While reading attributes of " + uid + " we got IOException:", e);
 
         throw e;
-      }
-      finally {
-        Closeables.closeQuietly(fis);
       }
     }
 

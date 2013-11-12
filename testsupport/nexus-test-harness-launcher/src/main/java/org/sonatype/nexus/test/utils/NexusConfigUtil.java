@@ -38,7 +38,6 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
 
-import com.google.common.io.Closeables;
 import com.google.common.io.Flushables;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -93,16 +92,12 @@ public class NexusConfigUtil
     final File nexusConfigFile = getNexusConfigurationFile();
     final NexusConfigurationXpp3Reader reader = new NexusConfigurationXpp3Reader();
 
-    FileInputStream in = new FileInputStream(nexusConfigFile);
-    try {
+    try (FileInputStream in = new FileInputStream(nexusConfigFile)) {
       return reader.read(in, false);
     }
     catch (XmlPullParserException e) {
       log.error(e.getMessage(), e);
       throw new RuntimeException(e);
-    }
-    finally {
-      Closeables.closeQuietly(in);
     }
   }
 
@@ -110,14 +105,10 @@ public class NexusConfigUtil
       throws IOException
   {
     // save it
-    final FileWriter fos = new FileWriter(getSecurityConfigurationFile());
     final NexusConfigurationXpp3Writer writer = new NexusConfigurationXpp3Writer();
-    try {
+    try (FileWriter fos = new FileWriter(getSecurityConfigurationFile())) {
       writer.write(fos, config);
-    }
-    finally {
       Flushables.flushQuietly(fos);
-      Closeables.closeQuietly(fos);
     }
   }
 
@@ -127,16 +118,12 @@ public class NexusConfigUtil
     final File configFile = getSecurityConfigurationFile();
     final SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
 
-    FileInputStream in = new FileInputStream(configFile);
-    try {
+    try (FileInputStream in = new FileInputStream(configFile)) {
       return reader.read(in, false);
     }
     catch (XmlPullParserException e) {
       log.error(e.getMessage(), e);
       throw new RuntimeException(e);
-    }
-    finally {
-      Closeables.closeQuietly(in);
     }
   }
 
@@ -144,14 +131,10 @@ public class NexusConfigUtil
       throws IOException
   {
     // save it
-    final FileWriter fos = new FileWriter(getSecurityConfigurationFile());
     final SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
-    try {
+    try (FileWriter fos = new FileWriter(getSecurityConfigurationFile())) {
       writer.write(fos, config);
-    }
-    finally {
       Flushables.flushQuietly(fos);
-      Closeables.closeQuietly(fos);
     }
   }
 
