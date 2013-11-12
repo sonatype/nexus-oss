@@ -79,11 +79,6 @@ public abstract class AbstractNexusTask<T>
     eventBus.post(event);
   }
 
-  // TODO: finish this thread!
-  public RepositoryTaskActivityDescriptor getTaskActivityDescriptor() {
-    return null;
-  }
-
   public boolean isExposed() {
     // override to hide it
     return true;

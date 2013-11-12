@@ -74,6 +74,4 @@ public interface NexusTask<T>
    * @return alert email
    */
   String getAlertEmail();
-
-  TaskActivityDescriptor getTaskActivityDescriptor();
 }

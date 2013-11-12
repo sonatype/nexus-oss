@@ -13,41 +13,34 @@
 
 package org.sonatype.nexus.util;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
+import org.sonatype.sisu.goodies.common.Throwables2;
+
+import com.google.common.collect.ImmutableList;
+
 /**
- * A composite {@link Exception} descendant, that is able to collect multiple causes to have them throw at the end of
- * some batch processing for example. Inspired by code from <a href=
- * "http://stackoverflow.com/questions/12481583/exception-composition-in-java-when-both-first-strategy-and-recovery-strategy-fai"
- * >Stack Overflow</a>. Note: this exception merely serves the purpose to hold multiple causes, but it not quite usable
- * to log them. As today, Nexus uses SLF4J as logging API, that might be backed by any backend out of many existing
- * (think WAR, but today logback is used) the overridden methods are not used. Hence, in case of logging
- * {@link CompositeException}, the multiple causes will not be logged, you still need to manually log them, or process
- * in any other way, if needed.
+ * A composite {@link Exception} helper to attach suppressed throwables.
  *
- * @author cstamas
  * @since 2.2
+ *
+ * @deprecated To be removed. Use {@link Throwables2#composite(Throwable, Throwable...)} helpers instead.
  */
+@Deprecated
 public class CompositeException
     extends Exception
 {
-  private static final long serialVersionUID = 1386505977462170509L;
-
-  private final List<Throwable> causes;
-
-  // ==
+  private static final long serialVersionUID = 2L;
 
   public CompositeException(final Throwable... causes) {
     this(null, causes);
   }
 
   public CompositeException(final String message, final Throwable... causes) {
-    this(message, Arrays.asList(causes));
+    super(message);
+    for (Throwable cause : causes) {
+      addSuppressed(cause);
+    }
   }
 
   public CompositeException(final List<? extends Throwable> causes) {
@@ -56,49 +49,12 @@ public class CompositeException
 
   public CompositeException(final String message, final List<? extends Throwable> causes) {
     super(message);
-    final ArrayList<Throwable> c = new ArrayList<Throwable>();
-    if (causes != null && !causes.isEmpty()) {
-      c.addAll(causes);
+    for (Throwable cause : causes) {
+      addSuppressed(cause);
     }
-    this.causes = Collections.unmodifiableList(c);
   }
 
   public List<Throwable> getCauses() {
-    return causes;
-  }
-
-  // ==
-
-  @Override
-  public void printStackTrace() {
-    if (causes.isEmpty()) {
-      super.printStackTrace();
-      return;
-    }
-    for (Throwable cause : causes) {
-      cause.printStackTrace();
-    }
-  }
-
-  @Override
-  public void printStackTrace(final PrintStream s) {
-    if (causes.isEmpty()) {
-      super.printStackTrace(s);
-      return;
-    }
-    for (Throwable cause : causes) {
-      cause.printStackTrace(s);
-    }
-  }
-
-  @Override
-  public void printStackTrace(final PrintWriter s) {
-    if (causes.isEmpty()) {
-      super.printStackTrace(s);
-      return;
-    }
-    for (Throwable cause : causes) {
-      cause.printStackTrace(s);
-    }
+    return ImmutableList.copyOf(getSuppressed());
   }
 }
