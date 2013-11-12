@@ -14,7 +14,6 @@
 package org.sonatype.nexus.atlas.internal
 
 import com.google.inject.Key
-import org.sonatype.appcontext.AppContext
 import org.sonatype.guice.bean.locators.BeanLocator
 import org.sonatype.nexus.ApplicationStatusSource
 import org.sonatype.nexus.atlas.SystemInformationGenerator
@@ -47,7 +46,8 @@ class SystemInformationGeneratorImpl
 
   private final ApplicationStatusSource applicationStatusSource
 
-  private final AppContext appContext
+  // FIXME: Replace with boot configuration properties
+  //private final AppContext appContext
 
   private final NexusPluginManager pluginManager
 
@@ -55,13 +55,13 @@ class SystemInformationGeneratorImpl
   SystemInformationGeneratorImpl(final BeanLocator beanLocator,
                                  final ApplicationConfiguration applicationConfiguration,
                                  final ApplicationStatusSource applicationStatusSource,
-                                 final AppContext appContext,
+                                 //final AppContext appContext,
                                  final NexusPluginManager pluginManager)
   {
     this.beanLocator = checkNotNull(beanLocator)
     this.applicationConfiguration = checkNotNull(applicationConfiguration)
     this.applicationStatusSource = checkNotNull(applicationStatusSource)
-    this.appContext = checkNotNull(appContext)
+    //this.appContext = checkNotNull(appContext)
     this.pluginManager = checkNotNull(pluginManager)
   }
 
@@ -73,7 +73,7 @@ class SystemInformationGeneratorImpl
     def beanLocator = this.beanLocator
     def applicationConfiguration = this.applicationConfiguration
     def systemStatus = this.applicationStatusSource.systemStatus
-    def appContext = this.appContext
+    //def appContext = this.appContext
     def pluginManager = this.pluginManager
 
     def fileref = { File file ->
@@ -254,7 +254,8 @@ class SystemInformationGeneratorImpl
         'system-filestores': reportFileStores(),
         'nexus-status': reportNexusStatus(),
         'nexus-license': reportNexusLicense(),
-        'nexus-properties': appContext.flatten().sort(),
+        // FIXME: Replace with boot configuration properties
+        //'nexus-properties': appContext.flatten().sort(),
         'nexus-configuration': reportNexusConfiguration(),
         'nexus-plugins': reportNexusPlugins()
     ]

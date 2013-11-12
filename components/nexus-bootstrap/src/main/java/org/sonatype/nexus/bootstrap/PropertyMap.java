@@ -31,7 +31,7 @@ public class PropertyMap
 {
   public void putAll(final Properties props) {
     for (Object key : props.keySet()) {
-      props.put(key.toString(), String.valueOf(props.get(key)));
+      put(key.toString(), String.valueOf(props.get(key)));
     }
   }
 

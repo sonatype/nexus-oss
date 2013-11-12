@@ -104,7 +104,6 @@
       <unpackOptions>
         <excludes>
           <exclude>META-INF/**</exclude>
-          <exclude>WEB-INF/lib/nexus-appcontext*.jar</exclude>
           <exclude>WEB-INF/lib/slf4j-api*.jar</exclude>
           <exclude>WEB-INF/lib/logback-core*.jar</exclude>
           <exclude>WEB-INF/lib/logback-classic*.jar</exclude>

@@ -35,15 +35,15 @@ public class NexusWebModule
   protected void configureShiroWeb() {
     super.configureShiroWeb();
 
-        /*
-         * -----------------------------------------------------------------------------------------------------------
-         * Expose an explicit binding to replace the old stateless and stateful "nexus" RealmSecurityManager with the
-         * default RealmSecurityManager, since we now use the "noSessionCreation" filter in Shiro 1.2 on all services
-         * except the login service.
-         * -----------------------------------------------------------------------------------------------------------
-         * The NexusWebRealmSecurityManager is still available (if necessary) under the "stateless-and-stateful" hint.
-         * -----------------------------------------------------------------------------------------------------------
-         */
+    /*
+     * -----------------------------------------------------------------------------------------------------------
+     * Expose an explicit binding to replace the old stateless and stateful "nexus" RealmSecurityManager with the
+     * default RealmSecurityManager, since we now use the "noSessionCreation" filter in Shiro 1.2 on all services
+     * except the login service.
+     * -----------------------------------------------------------------------------------------------------------
+     * The NexusWebRealmSecurityManager is still available (if necessary) under the "stateless-and-stateful" hint.
+     * -----------------------------------------------------------------------------------------------------------
+     */
 
     Named nexus = Names.named("nexus");
     bind(RealmSecurityManager.class).annotatedWith(nexus).to(RealmSecurityManager.class);

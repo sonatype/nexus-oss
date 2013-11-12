@@ -30,8 +30,6 @@ import org.eclipse.jetty.xml.XmlConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
-
 // NOTE: Based on org.eclipse.jetty.xml.XmlConfiguration#main()
 
 /**
@@ -52,9 +50,20 @@ public class JettyServer
   private final List<LifeCycle> components = new ArrayList<>();
 
   public JettyServer(final ClassLoader classLoader, final Map<String,String> properties, final String[] args) {
-    this.classLoader = checkNotNull(classLoader);
-    this.properties = checkNotNull(properties);
-    this.args = checkNotNull(args);
+    if (classLoader == null) {
+      throw new NullPointerException();
+    }
+    this.classLoader = classLoader;
+
+    if (properties == null) {
+      throw new NullPointerException();
+    }
+    this.properties = properties;
+
+    if (args == null) {
+      throw new NullPointerException();
+    }
+    this.args = args;
   }
 
   public synchronized void start() throws Exception {

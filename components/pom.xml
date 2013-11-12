@@ -29,7 +29,6 @@
 
   <modules>
     <module>base-configuration</module>
-    <module>nexus-appcontext</module>
     <module>nexus-bootstrap</module>
     <module>nexus-client-core</module>
     <module>nexus-compat</module>

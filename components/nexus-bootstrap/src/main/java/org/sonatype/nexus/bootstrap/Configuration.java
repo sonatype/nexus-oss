@@ -18,17 +18,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.sonatype.appcontext.AppContext;
-import org.sonatype.appcontext.AppContextRequest;
-import org.sonatype.appcontext.Factory;
-import org.sonatype.appcontext.publisher.SystemPropertiesEntryPublisher;
-import org.sonatype.appcontext.source.PropertiesEntrySource;
-import org.sonatype.appcontext.source.StaticEntrySource;
-
+import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
+import org.codehaus.plexus.interpolation.Interpolator;
+import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.jetty.util.resource.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,72 +51,50 @@ public class Configuration
     this.properties = new PropertyMap();
   }
 
-  public void load() throws Exception {
-    File cwd = new File(".").getCanonicalFile();
-    log.info("Current directory: {}", cwd);
-
-    // create app context request, with ID "nexus", without parent, and due to NEXUS-4520 add "plexus" alias too
-    final AppContextRequest request = Factory.getDefaultRequest("nexus", null, Arrays.asList("plexus"));
-
-    // Kill the default logging publisher that is installed
-    request.getPublishers().clear();
-
-    // NOTE: sources list is "ascending by importance", 1st elem in list is "weakest" and last elem in list is
-    // "strongest" (overrides). Factory already created us some sources, so we are just adding to that list without
-    // disturbing the order of the list (we add to list head and tail)
-
-    // Add the defaults as least important, is mandatory to be present
-    addProperties(request, "defaults", "default.properties", true);
-
-    // NOTE: These are loaded as resources, and its expected that <install>/conf is included in the classpath
-
-    // Add the nexus.properties, is mandatory to be present
-    addProperties(request, "nexus", "/nexus.properties", true);
-
-    // Add the nexus-test.properties, not mandatory to be present
-    addProperties(request, "nexus-test", "/nexus-test.properties", false);
-
-    // Ultimate source of "bundleBasedir" (hence, is added as last in sources list)
-    // Now, that will be always overridden by value got from cwd and that seems correct to me
-    request.getSources().add(new StaticEntrySource(BUNDLEBASEDIR_KEY, cwd.getAbsolutePath()));
-
-    // we need to publish all entries coming from loaded properties
-    request.getPublishers().add(new SystemPropertiesEntryPublisher(true));
-
-    // when context created, the context is built and all publisher were invoked (system props set for example)
-    AppContext context = Factory.create(request);
-
-    // Make some entries canonical
-    canonicalizeEntry(context, NEXUS_WORK);
-
-    for (Map.Entry<String, Object> entry : context.flatten().entrySet()) {
-      properties.put(entry.getKey(), String.valueOf(entry.getValue()));
-    }
-
-    ensureTmpDirSanity();
-
-    log.info("Properties:");
-    for (Map.Entry<String, String> entry : properties.entrySet()) {
-      log.info("  {}='{}'", entry.getKey(), entry.getValue());
-    }
-  }
-
   // TODO: expose, set/get, export?
+
   // TODO: installDir, workDir, tmpDir helpers?
 
   public Map<String, String> getProperties() {
     return properties;
   }
 
-  private void canonicalizeEntry(final AppContext context, final String key) throws IOException {
-    if (!context.containsKey(key)) {
-      log.warn("Unable to canonicalize missing entry: {}, key");
-      return;
+  public void load() throws Exception {
+    File cwd = new File(".").getCanonicalFile();
+    log.info("Current directory: {}", cwd);
+
+    // Add the defaults as least important, is mandatory to be present
+    addProperties("default.properties", true);
+
+    // Add the nexus.properties, is mandatory to be present
+    addProperties("/nexus.properties", true);
+
+    // Add the nexus-test.properties, not mandatory to be present
+    addProperties("/nexus-test.properties", false);
+
+    // Always force basedir
+    properties.put(BUNDLEBASEDIR_KEY, cwd.getAbsolutePath());
+
+    // Resolve all entries
+    interpolate();
+
+    // Make some entries canonical
+    canonicalizeEntry(NEXUS_WORK);
+
+    // Ensure tmp directory is sane
+    ensureTmpDirSanity();
+
+    log.info("Properties:");
+    for (Map.Entry<String, String> entry : properties.entrySet()) {
+      log.info("  {}='{}'", entry.getKey(), entry.getValue());
     }
-    String value = String.valueOf(context.get(key));
-    File file = new File(value).getCanonicalFile();
-    value = file.getAbsolutePath();
-    context.put(key, value);
+
+    // Expose as system properties
+    System.getProperties().putAll(properties);
+  }
+
+  private URL getResource(final String name) {
+    return Configuration.class.getResource(name);
   }
 
   private Properties loadProperties(final Resource resource) throws IOException {
@@ -128,21 +103,16 @@ public class Configuration
     Properties props = new Properties();
     try (InputStream input = resource.getInputStream()) {
       props.load(input);
-      if (log.isDebugEnabled()) {
-        for (Map.Entry<Object, Object> entry : props.entrySet()) {
-          log.debug("  {}='{}'", entry.getKey(), entry.getValue());
-        }
+    }
+    if (log.isDebugEnabled()) {
+      for (Map.Entry<Object, Object> entry : props.entrySet()) {
+        log.debug("  {}='{}'", entry.getKey(), entry.getValue());
       }
     }
     return props;
   }
 
-  private URL getResource(final String name) {
-    // Now that Launcher is extend-able we'll need to load resources from common package
-    return Launcher.class.getResource(name);
-  }
-
-  private Properties loadProperties(final String resource, final boolean required) throws IOException {
+  private void addProperties(final String resource, final boolean required) throws IOException {
     URL url = getResource(resource);
     if (url == null) {
       if (required) {
@@ -151,26 +121,34 @@ public class Configuration
       }
       else {
         log.debug("Missing optional resource: {}", resource);
+        return;
       }
-      return null;
     }
-    else {
-      return loadProperties(Resource.newResource(url));
+
+    Properties props = loadProperties(Resource.newResource(url));
+    properties.putAll(props);
+  }
+
+  private void interpolate() throws Exception {
+    Interpolator interpolator = new StringSearchInterpolator();
+    interpolator.addValueSource(new MapBasedValueSource(properties));
+    interpolator.addValueSource(new MapBasedValueSource(System.getProperties()));
+    interpolator.addValueSource(new EnvarBasedValueSource());
+
+    for (Entry<String,String> entry : properties.entrySet()) {
+      properties.put(entry.getKey(), interpolator.interpolate(entry.getValue()));
     }
   }
 
-  private void addProperties(final AppContextRequest request,
-                             final String name,
-                             final String resource,
-                             final boolean required)
-      throws IOException
-  {
-    Properties props = loadProperties(resource, required);
-    if (props != null) {
-      request.getSources().add(new PropertiesEntrySource(name, props));
+  private void canonicalizeEntry(final String key) throws IOException {
+    String value = properties.get(key);
+    if (value == null) {
+      log.warn("Unable to canonicalize null entry: {}", key);
+      return;
     }
+    File file = new File(value).getCanonicalFile();
+    properties.put(key, file.getAbsolutePath());
   }
-
 
   private void ensureTmpDirSanity() throws IOException {
     // Make sure that java.io.tmpdir points to a real directory
