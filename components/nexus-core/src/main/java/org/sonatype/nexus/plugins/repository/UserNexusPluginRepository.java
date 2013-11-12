@@ -26,13 +26,11 @@ import com.google.common.base.Throwables;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * {@link File} backed {@link NexusWritablePluginRepository} that supplies user plugins.
- */
 @Named(UserNexusPluginRepository.ID)
 @Singleton
+@Deprecated
 final class UserNexusPluginRepository
-    extends AbstractFileNexusWritablePluginRepository
+    extends AbstractFileNexusPluginRepository
 {
   // ----------------------------------------------------------------------
   // Constants
@@ -53,7 +51,7 @@ final class UserNexusPluginRepository
       DirSupport.mkdir(userPluginsFolder.toPath());
     }
     catch (IOException e) {
-      Throwables.propagate(e);
+      throw Throwables.propagate(e);
     }
   }
 

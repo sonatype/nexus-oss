@@ -149,4 +149,16 @@ public interface PlexusResource
    */
   Object upload(Context context, Request request, Response response, List<FileItem> files)
       throws ResourceException;
+  
+  /**
+   * Method invoked on incoming OPTIONS request.
+   * 
+   * @param context - the cross-request context
+   * @param request - the request
+   * @param response = the response
+   * @throws ResourceException
+   */
+  void options( Context context, Request request, Response response )
+      throws ResourceException;
+
 }

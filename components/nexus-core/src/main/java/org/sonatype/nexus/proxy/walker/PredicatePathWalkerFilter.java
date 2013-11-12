@@ -75,19 +75,6 @@ public class PredicatePathWalkerFilter
     }
   };
 
-  public static final PathExtractor ITEM_UID_PATH_EXTRACTOR = new PathExtractor()
-  {
-    @Override
-    public String extractItemPath(StorageItem item) {
-      return item.getRepositoryItemUid().getPath();
-    }
-
-    @Override
-    public String extractCollectionItemPath(StorageCollectionItem coll) {
-      return extractItemPath(coll);
-    }
-  };
-
   public interface PathExtractor
   {
     String extractItemPath(StorageItem item);

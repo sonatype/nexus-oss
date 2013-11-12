@@ -20,8 +20,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.PasswordHelper;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.plexus.components.cipher.PlexusCipherException;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.thoughtworks.xstream.XStream;
 import org.codehaus.plexus.util.StringUtils;
@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named
 public class DefaultConfigurationHelper
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements ConfigurationHelper
 {
   private final PasswordHelper passwordHelper;
@@ -124,7 +124,7 @@ public class DefaultConfigurationHelper
         return passwordHelper.encrypt(password);
       }
       catch (PlexusCipherException e) {
-        getLogger().error("Failed to encrypt password in nexus.xml.", e);
+        log.error("Failed to encrypt password in nexus.xml.", e);
       }
     }
     else {
@@ -132,7 +132,7 @@ public class DefaultConfigurationHelper
         return passwordHelper.decrypt(password);
       }
       catch (PlexusCipherException e) {
-        getLogger().error("Failed to decrypt password in nexus.xml.", e);
+        log.error("Failed to decrypt password in nexus.xml.", e);
       }
     }
 

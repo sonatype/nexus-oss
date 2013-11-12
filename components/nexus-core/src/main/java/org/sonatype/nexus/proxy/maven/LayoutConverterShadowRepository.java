@@ -191,8 +191,8 @@ public abstract class LayoutConverterShadowRepository
   {
     String originalPath = request.getRequestPath();
 
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("storeItemWithChecksums() :: " + request.getRequestPath());
+    if (log.isDebugEnabled()) {
+      log.debug("storeItemWithChecksums() :: " + request.getRequestPath());
     }
 
     try {
@@ -236,8 +236,8 @@ public abstract class LayoutConverterShadowRepository
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
              StorageException, AccessDeniedException
   {
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("deleteItemWithChecksums() :: " + request.getRequestPath());
+    if (log.isDebugEnabled()) {
+      log.debug("deleteItemWithChecksums() :: " + request.getRequestPath());
     }
 
     try {
@@ -285,8 +285,8 @@ public abstract class LayoutConverterShadowRepository
   public void storeItemWithChecksums(final boolean fromTask, final AbstractStorageItem item)
       throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
   {
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("storeItemWithChecksums() :: " + item.getRepositoryItemUid().toString());
+    if (log.isDebugEnabled()) {
+      log.debug("storeItemWithChecksums() :: " + item.getRepositoryItemUid().toString());
     }
 
     try {
@@ -328,8 +328,8 @@ public abstract class LayoutConverterShadowRepository
   public void deleteItemWithChecksums(final boolean fromTask, final ResourceStoreRequest request)
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
   {
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("deleteItemWithChecksums() :: " + request.toString());
+    if (log.isDebugEnabled()) {
+      log.debug("deleteItemWithChecksums() :: " + request.toString());
     }
 
     deleteItem(fromTask, request);
@@ -432,8 +432,7 @@ public abstract class LayoutConverterShadowRepository
 
     if (shadowPaths != null && !shadowPaths.isEmpty()) {
       ResourceStoreRequest req = new ResourceStoreRequest(shadowPaths.get(0));
-
-      req.getRequestContext().putAll(item.getItemContext());
+      req.getRequestContext().setParentContext(item.getItemContext());
 
       DefaultStorageLinkItem link =
           new DefaultStorageLinkItem(this, req, true, true, item.getRepositoryItemUid());
@@ -454,12 +453,10 @@ public abstract class LayoutConverterShadowRepository
     List<String> shadowPaths = transformMaster2Shadow(item.getPath());
 
     if (shadowPaths != null && !shadowPaths.isEmpty()) {
-      ResourceStoreRequest request = new ResourceStoreRequest(shadowPaths.get(0));
-
-      request.getRequestContext().putAll(item.getItemContext());
-
+      ResourceStoreRequest req = new ResourceStoreRequest(shadowPaths.get(0));
+      req.getRequestContext().setParentContext(item.getItemContext());
       try {
-        deleteItem(false, request);
+        deleteItem(false, req);
       }
       catch (ItemNotFoundException e) {
         // NEXUS-5673: just ignore it silently, this might happen when
@@ -472,7 +469,7 @@ public abstract class LayoutConverterShadowRepository
 
       // we need to clean up empty shadow parent directories
       String parentPath =
-          request.getRequestPath().substring(0, request.getRequestPath().lastIndexOf(item.getName()));
+          req.getRequestPath().substring(0, req.getRequestPath().lastIndexOf(item.getName()));
       ResourceStoreRequest parentRequest = new ResourceStoreRequest(parentPath);
 
       while (parentRequest != null) {
@@ -493,14 +490,14 @@ public abstract class LayoutConverterShadowRepository
             }
           }
           catch (AccessDeniedException e) {
-            this.getLogger().debug(
+            this.log.debug(
                 "Failed to delete shadow parent: " + this.getId() + ":" + parentItem.getPath()
                     + " Access Denied", e);
             // exit loop
             parentRequest = null;
           }
           catch (NoSuchResourceStoreException e) {
-            this.getLogger().debug(
+            this.log.debug(
                 "Failed to delete shadow parent: " + this.getId() + ":" + parentItem.getPath()
                     + " does not exist", e);
             // exit loop
@@ -508,7 +505,7 @@ public abstract class LayoutConverterShadowRepository
           }
         }
         else {
-          this.getLogger().debug("ExpectedCollectionItem, found: " + parentItem.getClass() + ", ignoring.");
+          this.log.debug("ExpectedCollectionItem, found: " + parentItem.getClass() + ", ignoring.");
         }
       }
     }

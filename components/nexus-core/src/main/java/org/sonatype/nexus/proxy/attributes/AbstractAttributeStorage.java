@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.proxy.attributes;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * Abstract superclass for AttributeStorage implementations.
@@ -22,7 +22,7 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
  * @since 2.0
  */
 public abstract class AbstractAttributeStorage
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements AttributeStorage
 {
 

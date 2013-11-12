@@ -78,7 +78,7 @@ public class P2ChecksumContentValidator
     }
     catch (final Exception e) {
       // no way to calculate
-      getLogger().debug("Unable to find artifact-mapping.xml", e);
+      log.debug("Unable to find artifact-mapping.xml", e);
       return ChecksumPolicy.IGNORE;
     }
 
@@ -103,7 +103,7 @@ public class P2ChecksumContentValidator
     try {
       final ArtifactMapping artifactMapping = p2repo.getArtifactMappings().get(baseUrl);
       if (artifactMapping == null) {
-        getLogger().debug("Unable to retrive remote has for " + item.getPath());
+        log.debug("Unable to retrive remote has for " + item.getPath());
         return null;
       }
       paths = artifactMapping.getArtifactsPath();
@@ -112,7 +112,7 @@ public class P2ChecksumContentValidator
       throw new LocalStorageException(e);
     }
     catch (final IllegalOperationException e) {
-      getLogger().error("Unable to open artifactsMapping.xml", e);
+      log.error("Unable to open artifactsMapping.xml", e);
       return null;
     }
     final String md5 = paths.get(item.getPath()).getMd5();

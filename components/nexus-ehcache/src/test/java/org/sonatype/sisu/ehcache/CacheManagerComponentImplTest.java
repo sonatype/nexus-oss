@@ -14,96 +14,59 @@
 package org.sonatype.sisu.ehcache;
 
 import java.io.File;
-import java.util.HashMap;
 
-import org.sonatype.appcontext.AppContext;
-import org.sonatype.appcontext.AppContextRequest;
-import org.sonatype.appcontext.Factory;
-import org.sonatype.appcontext.source.MapEntrySource;
-import org.sonatype.guice.bean.containers.InjectedTestCase;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import com.google.inject.Binder;
-import com.google.inject.Key;
-import org.junit.Assert;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
+/**
+ * Test for {@link CacheManagerComponentImpl}.
+ */
 public class CacheManagerComponentImplTest
-    extends InjectedTestCase
+    extends TestSupport
 {
-  private AppContext appContext;
+  private CacheManagerComponent underTest;
 
-  private CacheManagerComponent cacheManagerComponent;
+  private String originalTmpDir = System.getProperty("java.io.tmpdir");
 
-  @Override
-  public void configure(Binder binder) {
-    final HashMap<String, String> aMap = new HashMap<String, String>();
-    aMap.put("foo", "FOO");
-    aMap.put("bar", "BAR");
-    aMap.put("basedir", ".");
-    final AppContextRequest req = Factory.getDefaultRequest();
-    req.getSources().add(new MapEntrySource("aMAp", aMap));
-
-    appContext = Factory.create(req);
-
-    binder.bind(Key.get(AppContext.class)).toInstance(appContext);
+  @Before
+  public void setUp() throws Exception {
+    System.setProperty("java.io.tmpdir", util.getTmpDir().getAbsolutePath());
   }
 
-  @Override
-  protected void tearDown()
-      throws Exception
-  {
-    try {
-      if (cacheManagerComponent != null) {
-        cacheManagerComponent.shutdown();
-        cacheManagerComponent = null;
-      }
+  @After
+  public void tearDown() throws Exception {
+    if (underTest != null) {
+      underTest.shutdown();
+      underTest = null;
     }
-    finally {
-      super.tearDown();
-    }
+
+    System.setProperty("java.io.tmpdir", originalTmpDir);
   }
 
-  public void testConfigFromClasspath()
-      throws Exception
-  {
-    // look it up
-    cacheManagerComponent = (CacheManagerComponentImpl) lookup(CacheManagerComponent.class);
-
-    // check the store path, since the config from src/test/resources should be picked up
-    String storePath = cacheManagerComponent.getCacheManager().getDiskStorePath();
-
-    // it has to be absolute
-    Assert.assertTrue("Invalid path " + storePath, new File(storePath).isAbsolute());
-
-    // it has to be Interpolated
-    Assert.assertFalse("The path is not interpolated? " + storePath,
-        storePath.contains("${") || storePath.contains("}"));
-
-    // it has to point where we did set it (${basedir}/target/plexus-home/ehcache)
-    Assert.assertEquals("The store path does not point where we set it!", new File(getBasedir(),
-        "target/plexus-home/ehcache").getAbsoluteFile().getPath().toLowerCase(), storePath.toLowerCase());
+  @Test
+  public void testConfigFromClasspath() throws Exception {
+    underTest = new CacheManagerComponentImpl(null);
+    assertConfigurationValid();
   }
 
-  public void testConfigFromFile()
-      throws Exception
-  {
-    // look it up
-    final File file = new File(new File(getBasedir()), "src/test/resources/ehcache.xml");
-    // craft it manually
-    cacheManagerComponent = new CacheManagerComponentImpl(appContext, file);
-
-    // check the store path, since the config from src/test/resources should be picked up
-    String storePath = cacheManagerComponent.getCacheManager().getDiskStorePath();
-
-    // it has to be absolute
-    Assert.assertTrue("Invalid path " + storePath, new File(storePath).isAbsolute());
-
-    // it has to be Interpolated
-    Assert.assertFalse("The path is not interpolated? " + storePath,
-        storePath.contains("${") || storePath.contains("}"));
-
-    // it has to point where we did set it (${basedir}/target/plexus-home/ehcache)
-    Assert.assertEquals("The store path does not point where we set it!", new File(getBasedir(),
-        "target/plexus-home/ehcache").getAbsoluteFile().getPath().toLowerCase(), storePath.toLowerCase());
+  @Test
+  public void testConfigFromFile() throws Exception {
+    File file = util.resolveFile("src/test/resources/ehcache.xml");
+    underTest = new CacheManagerComponentImpl(file);
+    assertConfigurationValid();
   }
 
+  private void assertConfigurationValid() {
+    String path = underTest.getCacheManager().getDiskStorePath();
+    File file = new File(path);
+
+    assertThat(file.isAbsolute(), is(true));
+    assertThat(file.getAbsolutePath(), is(new File(util.getTmpDir(), "ehcache").getAbsolutePath()));
+  }
 }

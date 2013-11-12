@@ -199,7 +199,7 @@ public class DefaultTargetRegistry
   }
 
   public Set<Target> getTargetsForContentClass(ContentClass contentClass) {
-    getLogger().debug("Resolving targets for contentClass='{}'", contentClass.getId());
+    log.debug("Resolving targets for contentClass='{}'", contentClass.getId());
 
     final Set<Target> result = new HashSet<Target>();
     for (Target t : getRepositoryTargets()) {
@@ -211,7 +211,7 @@ public class DefaultTargetRegistry
   }
 
   public Set<Target> getTargetsForContentClassPath(ContentClass contentClass, String path) {
-    getLogger().debug("Resolving targets for contentClass='{}' for path='{}'", contentClass.getId(), path);
+    log.debug("Resolving targets for contentClass='{}' for path='{}'", contentClass.getId(), path);
 
     final Set<Target> result = new HashSet<Target>();
     for (Target t : getRepositoryTargets()) {
@@ -223,7 +223,7 @@ public class DefaultTargetRegistry
   }
 
   public TargetSet getTargetsForRepositoryPath(Repository repository, String path) {
-    getLogger().debug("Resolving targets for repository='{}' for path='{}'", repository.getId(), path);
+    log.debug("Resolving targets for repository='{}' for path='{}'", repository.getId(), path);
 
     final TargetSet result = new TargetSet();
     for (Target t : getRepositoryTargets()) {
@@ -235,7 +235,7 @@ public class DefaultTargetRegistry
   }
 
   public boolean hasAnyApplicableTarget(Repository repository) {
-    getLogger().debug("Looking for any targets for repository='{}'", repository.getId());
+    log.debug("Looking for any targets for repository='{}'", repository.getId());
 
     for (Target t : getRepositoryTargets()) {
       if (t.getContentClass().isCompatible(repository.getRepositoryContentClass())) {

@@ -32,14 +32,14 @@ import org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_0_8.CSecurity;
 import org.sonatype.nexus.configuration.model.v1_0_8.upgrade.BasicVersionUpgrade;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 @Singleton
 @Named("1.0.7")
 public class Upgrade107to108
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements SingleVersionUpgrader
 {
   private BasicVersionUpgrade converter = new BasicVersionUpgrade()

@@ -202,7 +202,7 @@ public abstract class AbstractMavenRepository
 
     try {
       if (!this.getLocalStorage().containsItem(this, request)) {
-        getLogger().info(
+        log.info(
             "Skip rebuilding Maven2 Metadata in repository ID='" + getId()
                 + "' because it does not contain path='" + request.getRequestPath() + "'.");
 
@@ -210,12 +210,12 @@ public abstract class AbstractMavenRepository
       }
     }
     catch (StorageException e) {
-      getLogger().warn("Skip rebuilding Maven2 Metadata in repository ID='" + getId() + "'.", e);
+      log.warn("Skip rebuilding Maven2 Metadata in repository ID='" + getId() + "'.", e);
 
       return false;
     }
 
-    getLogger().info(
+    log.info(
         "Recreating Maven2 metadata in repository ID='" + getId() + "' from path='" + request.getRequestPath()
             + "'");
 
@@ -223,7 +223,7 @@ public abstract class AbstractMavenRepository
   }
 
   protected boolean doRecreateMavenMetadata(ResourceStoreRequest request) {
-    RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor(this.getLogger());
+    RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor(log);
 
     DefaultWalkerContext ctx = new DefaultWalkerContext(this, request);
 
@@ -336,8 +336,8 @@ public abstract class AbstractMavenRepository
   public void storeItemWithChecksums(ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes)
       throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
   {
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("storeItemWithChecksums() :: " + request.getRequestPath());
+    if (log.isDebugEnabled()) {
+      log.debug("storeItemWithChecksums() :: " + request.getRequestPath());
     }
 
     getArtifactStoreHelper().storeItemWithChecksums(request, is, userAttributes);
@@ -348,8 +348,8 @@ public abstract class AbstractMavenRepository
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
              StorageException, AccessDeniedException
   {
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("deleteItemWithChecksums() :: " + request.getRequestPath());
+    if (log.isDebugEnabled()) {
+      log.debug("deleteItemWithChecksums() :: " + request.getRequestPath());
     }
 
     getArtifactStoreHelper().deleteItemWithChecksums(request);
@@ -359,8 +359,8 @@ public abstract class AbstractMavenRepository
   public void storeItemWithChecksums(boolean fromTask, AbstractStorageItem item)
       throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
   {
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("storeItemWithChecksums() :: " + item.getRepositoryItemUid().toString());
+    if (log.isDebugEnabled()) {
+      log.debug("storeItemWithChecksums() :: " + item.getRepositoryItemUid().toString());
     }
 
     getArtifactStoreHelper().storeItemWithChecksums(fromTask, item);
@@ -370,8 +370,8 @@ public abstract class AbstractMavenRepository
   public void deleteItemWithChecksums(boolean fromTask, ResourceStoreRequest request)
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
   {
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("deleteItemWithChecksums() :: " + request.toString());
+    if (log.isDebugEnabled()) {
+      log.debug("deleteItemWithChecksums() :: " + request.toString());
     }
 
     getArtifactStoreHelper().deleteItemWithChecksums(fromTask, request);
@@ -389,8 +389,8 @@ public abstract class AbstractMavenRepository
       throws IllegalOperationException, ItemNotFoundException, StorageException
   {
     if (!shouldServeByPolicies(request)) {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug(
+      if (log.isDebugEnabled()) {
+        log.debug(
             "The serving of item " + request.toString() + " is forbidden by Maven repository policy.");
       }
 
@@ -487,7 +487,7 @@ public abstract class AbstractMavenRepository
               + " is forbidden by Maven Repository policy. Because " + getId() + " is a "
               + getRepositoryPolicy().name() + " repository";
 
-      getLogger().info(msg);
+      log.info(msg);
 
       throw new UnsupportedStorageOperationException(msg);
     }
@@ -556,7 +556,7 @@ public abstract class AbstractMavenRepository
     if (shouldAddToNFC && request.getRequestContext().containsKey(Manager.ROUTING_REQUEST_REJECTED_FLAG_KEY)) {
       // TODO: should we un-flag the request?
       shouldAddToNFC = false;
-      getLogger().debug("Maven proxy repository {} autorouting rejected this request, not adding path {} to NFC.",
+      log.debug("Maven proxy repository {} autorouting rejected this request, not adding path {} to NFC.",
           RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath());
     }
     return shouldAddToNFC;
@@ -601,7 +601,7 @@ public abstract class AbstractMavenRepository
         }
       }
       catch (Exception e) {
-        getLogger().warn("Could not maintain Maven metadata '{}'", parentMetadataPath, e);
+        log.warn("Could not maintain Maven metadata '{}'", parentMetadataPath, e);
       }
     }
   }

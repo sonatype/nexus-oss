@@ -22,6 +22,7 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
 /**
  * Describes a response from a Nexus plugin concerning a {@link PluginActivationRequest}.
  */
+@Deprecated
 public final class PluginResponse
 {
   // ----------------------------------------------------------------------
@@ -59,10 +60,6 @@ public final class PluginResponse
 
   public GAVCoordinate getPluginCoordinates() {
     return gav;
-  }
-
-  public PluginActivationRequest getWantedGoal() {
-    return request;
   }
 
   public PluginActivationResult getAchievedGoal() {

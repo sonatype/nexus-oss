@@ -106,10 +106,10 @@ public class DefaultTaskConfigManager
     if (tasks != null) {
       List<CScheduledTask> tempList = new ArrayList<CScheduledTask>(tasks);
 
-      getLogger().info(tempList.size() + " task(s) to load.");
+      log.info(tempList.size() + " task(s) to load.");
 
       for (CScheduledTask task : tempList) {
-        getLogger().info("Loading task - " + task.getName());
+        log.info("Loading task - " + task.getName());
 
         try {
           SchedulerTask<?> nexusTask = createTaskInstance(task.getType());
@@ -135,7 +135,7 @@ public class DefaultTaskConfigManager
         catch (IllegalArgumentException e) {
           // this is bad, Plexus did not find the component, possibly the task.getType() contains bad class
           // name
-          getLogger().warn("Unable to initialize task " + task.getName() + ", couldn't load service class " + task.getId(),
+          log.warn("Unable to initialize task " + task.getName() + ", couldn't load service class " + task.getId(),
               e);
         }
       }
@@ -166,8 +166,8 @@ public class DefaultTaskConfigManager
         tasks.add(storeableTask);
       }
 
-      if (getLogger().isTraceEnabled()) {
-        getLogger().trace("Task with ID={} added, config {} modified.", task.getId(), storeableTask != null ? "IS"
+      if (log.isTraceEnabled()) {
+        log.trace("Task with ID={} added, config {} modified.", task.getId(), storeableTask != null ? "IS"
             : "is NOT", new Exception("This is an exception only to provide caller backtrace"));
       }
 
@@ -175,7 +175,7 @@ public class DefaultTaskConfigManager
         getApplicationConfiguration().saveConfiguration();
       }
       catch (IOException e) {
-        getLogger().warn("Could not save task changes!", e);
+        log.warn("Could not save task changes!", e);
       }
     }
   }
@@ -190,8 +190,8 @@ public class DefaultTaskConfigManager
         tasks.remove(foundTask);
       }
 
-      if (getLogger().isTraceEnabled()) {
-        getLogger().trace("Task with ID={} removed, config {} modified.", task.getId(), foundTask != null ? "IS" : "is NOT",
+      if (log.isTraceEnabled()) {
+        log.trace("Task with ID={} removed, config {} modified.", task.getId(), foundTask != null ? "IS" : "is NOT",
             new Exception("This is an exception only to provide caller backtrace"));
       }
 
@@ -199,7 +199,7 @@ public class DefaultTaskConfigManager
         getApplicationConfiguration().saveConfiguration();
       }
       catch (IOException e) {
-        getLogger().warn("Could not save task changes!", e);
+        log.warn("Could not save task changes!", e);
       }
     }
 
@@ -211,7 +211,7 @@ public class DefaultTaskConfigManager
   }
 
   private SchedulerTask<?> lookupTask(final String taskType) {
-    getLogger().debug("Looking up task for: " + taskType);
+    log.debug("Looking up task for: " + taskType);
     final Provider<SchedulerTask<?>> taskProvider = tasks.get(taskType);
     if (taskProvider == null) {
       throw new IllegalArgumentException("Could not find task of type: " + taskType);
@@ -220,7 +220,7 @@ public class DefaultTaskConfigManager
   }
 
   public <T> T createTaskInstance(final Class<T> taskType) throws IllegalArgumentException {
-    getLogger().debug("Creating task: {}", taskType);
+    log.debug("Creating task: {}", taskType);
 
     try {
       // first try a full class name lookup (modern sisu-style)
@@ -292,7 +292,7 @@ public class DefaultTaskConfigManager
           daysToRun.add(Integer.valueOf(day));
         }
         catch (NumberFormatException nfe) {
-          getLogger().error("Invalid day being added to monthly schedule - " + day + " - skipping.");
+          log.error("Invalid day being added to monthly schedule - " + day + " - skipping.");
         }
       }
 
@@ -308,7 +308,7 @@ public class DefaultTaskConfigManager
           daysToRun.add(Integer.valueOf(day));
         }
         catch (NumberFormatException nfe) {
-          getLogger().error("Invalid day being added to weekly schedule - " + day + " - skipping.");
+          log.error("Invalid day being added to weekly schedule - " + day + " - skipping.");
         }
       }
 

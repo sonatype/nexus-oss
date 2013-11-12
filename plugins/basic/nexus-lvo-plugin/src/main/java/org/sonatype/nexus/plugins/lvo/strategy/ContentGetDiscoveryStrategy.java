@@ -89,7 +89,7 @@ public class ContentGetDiscoveryStrategy
     }
     catch (Exception e) {
       // we are very rude about exceptions here ;)
-      getLogger().warn("Could not retrieve content!", e);
+      log.warn("Could not retrieve content!", e);
       return null;
     }
   }

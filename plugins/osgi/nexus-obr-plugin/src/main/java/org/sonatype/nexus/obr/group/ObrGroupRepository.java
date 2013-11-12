@@ -228,7 +228,7 @@ public class ObrGroupRepository
             }
           }
           catch (final IOException e) {
-            getLogger().warn("Problem merging OBR metadata from " + f.getRepositoryItemUid(), e);
+            log.warn("Problem merging OBR metadata from " + f.getRepositoryItemUid(), e);
           }
           finally {
             IOUtils.closeQuietly(reader);

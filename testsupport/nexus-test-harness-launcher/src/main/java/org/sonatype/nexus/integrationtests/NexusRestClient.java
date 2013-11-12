@@ -65,6 +65,7 @@ import sun.net.www.protocol.http.AuthCacheImpl;
 import sun.net.www.protocol.http.AuthCacheValue;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -571,6 +572,7 @@ public class NexusRestClient
 
       try (InputStream in = response.getEntity().getStream();
            OutputStream out = new BufferedOutputStream(new FileOutputStream(downloadedFile))) {
+        checkState(in != null, "null entity input-stream");
         IOUtils.copy(in, out);
       }
     }
@@ -582,11 +584,6 @@ public class NexusRestClient
 
   /**
    * Execute a HTTPClient method in the context of a test. make decisions how to execute.
-   * <p/>
-   * NOTE: Before being returned, {@link org.apache.commons.httpclient.HttpMethod#releaseConnection()} is called on
-   * the {@link org.apache.commons.httpclient.HttpMethod} instance, therefore subsequent calls to get response body
-   * as
-   * string may return nulls.
    */
   public HttpResponse executeHTTPClientMethod(HttpUriRequest method)
       throws IOException
@@ -596,11 +593,6 @@ public class NexusRestClient
 
   /**
    * Execute a HTTPClient method, optionally in the context of a test.
-   * <p/>
-   * NOTE: Before being returned, {@link org.apache.commons.httpclient.HttpMethod#releaseConnection()} is called on
-   * the {@link org.apache.commons.httpclient.HttpMethod} instance, therefore subsequent calls to get response body
-   * as
-   * string may return nulls.
    *
    * @param method         the method to execute
    * @param useTestContext if true, execute this request in the context of a Test, false means ignore the testContext

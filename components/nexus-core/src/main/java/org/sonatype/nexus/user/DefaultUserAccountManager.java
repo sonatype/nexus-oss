@@ -18,12 +18,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * Provides functionality to read and update basic user data.
@@ -33,7 +33,7 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 @Named
 @Singleton
 public class DefaultUserAccountManager
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements UserAccountManager
 {
   private final SecuritySystem securitySystem;

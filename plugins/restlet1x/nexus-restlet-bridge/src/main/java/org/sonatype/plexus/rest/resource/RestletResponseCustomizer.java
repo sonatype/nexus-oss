@@ -20,7 +20,7 @@ import org.restlet.resource.Representation;
  * Optional interface to be implemented by {@link Representation}s that need to customize Restlet {@link Response} as
  * for example add additional HTTP headers.
  *
- * @since 1.20
+ * @since restlet-bridge 1.20
  */
 public interface RestletResponseCustomizer
 {

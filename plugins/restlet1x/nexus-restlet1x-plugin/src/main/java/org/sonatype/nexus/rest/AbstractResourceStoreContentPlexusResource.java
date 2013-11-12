@@ -634,7 +634,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
     result.setRequestPath(request.getRequestPath());
 
-    for (Map.Entry<String, Object> entry : request.getRequestContext().entrySet()) {
+    for (Map.Entry<String, Object> entry : request.getRequestContext().flatten().entrySet()) {
       result.addRequestContext(entry.toString());
     }
 

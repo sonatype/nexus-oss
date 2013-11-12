@@ -47,7 +47,7 @@ public abstract class AbstractRemoteDiscoveryStrategy
       }
     }
     catch (IOException e) {
-      getLogger().debug("Error retrieving lvo data", e);
+      log.debug("Error retrieving lvo data", e);
     }
 
     return result;

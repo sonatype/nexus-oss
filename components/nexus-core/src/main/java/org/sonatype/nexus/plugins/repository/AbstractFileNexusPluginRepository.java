@@ -34,6 +34,7 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * Abstract {@link NexusPluginRepository} backed by a file-system.
  */
+@Deprecated
 public abstract class AbstractFileNexusPluginRepository
     extends AbstractNexusPluginRepository
 {

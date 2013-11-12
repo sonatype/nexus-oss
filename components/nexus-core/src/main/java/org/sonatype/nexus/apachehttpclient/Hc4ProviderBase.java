@@ -24,7 +24,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
@@ -33,6 +32,7 @@ import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationS
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -67,7 +67,7 @@ import org.apache.http.protocol.BasicHttpProcessor;
 @Singleton
 @Named
 public class Hc4ProviderBase
-    extends AbstractLoggingComponent
+    extends ComponentSupport
 {
 
   /**
@@ -180,7 +180,7 @@ public class Hc4ProviderBase
         final NtlmRemoteAuthenticationSettings nras = (NtlmRemoteAuthenticationSettings) ras;
         // Using NTLM auth, adding it as first in policies
         authorisationPreference.add(0, AuthPolicy.NTLM);
-        getLogger().debug("{} authentication setup for NTLM domain '{}'", authScope, nras.getNtlmDomain());
+        log.debug("{} authentication setup for NTLM domain '{}'", authScope, nras.getNtlmDomain());
         credentials = new NTCredentials(
             nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras.getNtlmDomain()
         );
@@ -188,7 +188,7 @@ public class Hc4ProviderBase
       else if (ras instanceof UsernamePasswordRemoteAuthenticationSettings) {
         final UsernamePasswordRemoteAuthenticationSettings uras =
             (UsernamePasswordRemoteAuthenticationSettings) ras;
-        getLogger().debug("{} authentication setup for remote storage with username '{}'", authScope,
+        log.debug("{} authentication setup for remote storage with username '{}'", authScope,
             uras.getUsername());
         credentials = new UsernamePasswordCredentials(uras.getUsername(), uras.getPassword());
       }
@@ -225,7 +225,7 @@ public class Hc4ProviderBase
           httpClient, remoteProxySettings.getHttpProxySettings().getProxyAuthentication(), httpProxy
       );
 
-      getLogger().debug(
+      log.debug(
           "http proxy setup with host '{}'", remoteProxySettings.getHttpProxySettings().getHostname()
       );
       proxies.put("http", httpProxy);
@@ -240,7 +240,7 @@ public class Hc4ProviderBase
         configureAuthentication(
             httpClient, remoteProxySettings.getHttpsProxySettings().getProxyAuthentication(), httpsProxy
         );
-        getLogger().debug(
+        log.debug(
             "https proxy setup with host '{}'", remoteProxySettings.getHttpsProxySettings().getHostname()
         );
         proxies.put("https", httpsProxy);
@@ -253,7 +253,7 @@ public class Hc4ProviderBase
             nonProxyHostPatterns.add(Pattern.compile(nonProxyHostRegex, Pattern.CASE_INSENSITIVE));
           }
           catch (PatternSyntaxException e) {
-            getLogger().warn("Invalid non proxy host regex: {}", nonProxyHostRegex, e);
+            log.warn("Invalid non proxy host regex: {}", nonProxyHostRegex, e);
           }
         }
       }

@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.proxy;
 
-import java.net.URL;
-
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 /**
@@ -29,14 +27,6 @@ public class RemoteAccessDeniedException
   private static final long serialVersionUID = -4719375204384900503L;
 
   private final String url;
-
-  public RemoteAccessDeniedException(ProxyRepository repository, URL url, String message) {
-    this(repository, url.toString(), message);
-  }
-
-  public RemoteAccessDeniedException(ProxyRepository repository, URL url, String message, Throwable cause) {
-    this(repository, url.toString(), message, cause);
-  }
 
   public RemoteAccessDeniedException(ProxyRepository repository, String url, String message) {
     this(repository, url, message, null);

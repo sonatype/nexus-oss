@@ -70,7 +70,7 @@ public class DefaultFSAttributeStorage
     this.applicationConfiguration = Preconditions.checkNotNull(applicationConfiguration);
     this.marshaller = Preconditions.checkNotNull(marshaller);
     this.workingDirectory = initializeWorkingDirectory();
-    getLogger().info("Default FS AttributeStorage in place, using {} marshaller.", marshaller);
+    log.info("Default FS AttributeStorage in place, using {} marshaller.", marshaller);
   }
 
   public synchronized File initializeWorkingDirectory() {
@@ -83,7 +83,7 @@ public class DefaultFSAttributeStorage
       }
     }
     else {
-      getLogger().info("Attribute storage directory does not exists, creating it here: " + workingDirectory);
+      log.info("Attribute storage directory does not exists, creating it here: " + workingDirectory);
       try {
         DirSupport.mkdir(workingDirectory.toPath());
       }
@@ -114,8 +114,8 @@ public class DefaultFSAttributeStorage
     uidLock.lock(Action.delete);
 
     try {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("Deleting attributes on UID=" + uid.toString());
+      if (log.isDebugEnabled()) {
+        log.debug("Deleting attributes on UID=" + uid.toString());
       }
 
       boolean result = false;
@@ -126,7 +126,7 @@ public class DefaultFSAttributeStorage
         result = ftarget.exists() && ftarget.isFile() && ftarget.delete();
       }
       catch (IOException e) {
-        getLogger().warn("Got IOException during delete of UID=" + uid.toString(), e);
+        log.warn("Got IOException during delete of UID=" + uid.toString(), e);
       }
 
       return result;
@@ -142,15 +142,15 @@ public class DefaultFSAttributeStorage
     uidLock.lock(Action.read);
 
     try {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("Loading attributes on UID=" + uid.toString());
+      if (log.isDebugEnabled()) {
+        log.debug("Loading attributes on UID=" + uid.toString());
       }
 
       try {
         return doGetAttributes(uid);
       }
       catch (IOException ex) {
-        getLogger().error("Got IOException during reading of UID=" + uid.toString(), ex);
+        log.error("Got IOException during reading of UID=" + uid.toString(), ex);
 
         return null;
       }
@@ -166,8 +166,8 @@ public class DefaultFSAttributeStorage
     uidLock.lock(Action.create);
 
     try {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("Storing attributes on UID=" + uid.toString());
+      if (log.isDebugEnabled()) {
+        log.debug("Storing attributes on UID=" + uid.toString());
       }
 
       try {
@@ -202,13 +202,13 @@ public class DefaultFSAttributeStorage
           }
         }
         else {
-          getLogger().error(
+          log.error(
               "Could not store attributes on UID=" + uid.toString()
                   + ", parent exists but is not a directory!");
         }
       }
       catch (IOException ex) {
-        getLogger().error("Got IOException during store of UID=" + uid.toString(), ex);
+        log.error("Got IOException during store of UID=" + uid.toString(), ex);
       }
     }
     finally {
@@ -284,19 +284,19 @@ public class DefaultFSAttributeStorage
         }
       }
       catch (InvalidInputException e) {
-        if (getLogger().isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
           // we log the stacktrace
-          getLogger().info("Attributes of " + uid + " are corrupt, deleting it.", e);
+          log.info("Attributes of " + uid + " are corrupt, deleting it.", e);
         }
         else {
           // just remark about this
-          getLogger().info("Attributes of " + uid + " are corrupt, deleting it.");
+          log.info("Attributes of " + uid + " are corrupt, deleting it.");
         }
 
         corrupt = true;
       }
       catch (IOException e) {
-        getLogger().info("While reading attributes of " + uid + " we got IOException:", e);
+        log.info("While reading attributes of " + uid + " we got IOException:", e);
 
         throw e;
       }

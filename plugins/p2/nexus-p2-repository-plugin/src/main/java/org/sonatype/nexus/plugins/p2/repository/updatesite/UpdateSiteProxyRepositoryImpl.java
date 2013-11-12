@@ -196,7 +196,7 @@ public class UpdateSiteProxyRepositoryImpl
 
     final List<SiteFeatureRef> features = site.getFeatures();
 
-    getLogger().info("Mirroring " + features.size() + " features from update site " + getName());
+    log.info("Mirroring " + features.size() + " features from update site " + getName());
 
     final Set<String> mirrored = new HashSet<String>();
 
@@ -228,7 +228,7 @@ public class UpdateSiteProxyRepositoryImpl
     });
     getWalker().walk(ctx);
 
-    getLogger().debug("Generating P2 metadata for Eclipse Update Site " + getName());
+    log.debug("Generating P2 metadata for Eclipse Update Site " + getName());
 
     final File baseDir = getLocalStorage().getBaseDir(this, root);
     final File metadataDir = new File(baseDir, ".p2");
@@ -237,7 +237,7 @@ public class UpdateSiteProxyRepositoryImpl
       FileUtils.deleteDirectory(metadataDir);
     }
     catch (final IOException e) {
-      getLogger().warn("Unexpected IOException", e);
+      log.warn("Unexpected IOException", e);
     }
 
     publisher.generateUpdateSite(baseDir, metadataDir.toURI());
@@ -249,7 +249,7 @@ public class UpdateSiteProxyRepositoryImpl
     }
     catch (final IOException e) {
       // TODO this can actually happen on Windows
-      getLogger().warn("Unexpected IOException", e);
+      log.warn("Unexpected IOException", e);
     }
 
   }
@@ -283,7 +283,7 @@ public class UpdateSiteProxyRepositoryImpl
       return;
     }
 
-    getLogger().debug("Mirroring feature " + featureRef);
+    log.debug("Mirroring feature " + featureRef);
 
     Feature feature = null;
 
@@ -302,7 +302,7 @@ public class UpdateSiteProxyRepositoryImpl
       final List<PluginRef> includedPlugins = feature.getPlugins();
       final List<FeatureRef> includedFeatures = feature.getIncludedFeatures();
 
-      getLogger().debug(
+      log.debug(
           featureRef + " includes " + includedFeatures.size() + " features and " + includedPlugins.size()
               + " plugins");
 
@@ -340,11 +340,11 @@ public class UpdateSiteProxyRepositoryImpl
         return Feature.readJar(file);
       }
 
-      getLogger().warn("Could not download feature " + featureRef + " referenced by update site " + getName());
+      log.warn("Could not download feature " + featureRef + " referenced by update site " + getName());
       return null;
     }
     catch (final Exception e) {
-      getLogger().warn("Could not download feature " + featureRef + " referenced by update site " + getName(), e);
+      log.warn("Could not download feature " + featureRef + " referenced by update site " + getName(), e);
     }
 
     return null;
@@ -366,7 +366,7 @@ public class UpdateSiteProxyRepositoryImpl
       return Feature.readJar(file);
     }
     catch (final Exception e) {
-      getLogger().warn("Could not download feature " + featureRef + " referenced by update site " + getName(), e);
+      log.warn("Could not download feature " + featureRef + " referenced by update site " + getName(), e);
     }
 
     return null;
@@ -383,22 +383,22 @@ public class UpdateSiteProxyRepositoryImpl
       return;
     }
 
-    getLogger().debug("Mirroring plugin " + pluginRef);
+    log.debug("Mirroring plugin " + pluginRef);
 
     try {
       mirrorRelativeItem(request, null, mirrored);
     }
     catch (final StorageException e) {
-      getLogger().warn("Could not download plugin " + pluginRef + " referenced by update site " + getName(), e);
+      log.warn("Could not download plugin " + pluginRef + " referenced by update site " + getName(), e);
     }
     catch (final IllegalOperationException e) {
-      getLogger().warn("Could not download plugin " + pluginRef + " referenced by update site " + getName(), e);
+      log.warn("Could not download plugin " + pluginRef + " referenced by update site " + getName(), e);
     }
     catch (final ItemNotFoundException e) {
       // if we can't find the relative url, try absolute
       if (!mirrorAbsolutePlugin(pluginRef, site, request, mirrored)) {
         // if that fails, we have problem
-        getLogger().warn("Could not download plugin " + pluginRef + " referenced by update site " + getName(),
+        log.warn("Could not download plugin " + pluginRef + " referenced by update site " + getName(),
             e);
       }
     }
@@ -418,12 +418,12 @@ public class UpdateSiteProxyRepositoryImpl
       final String absoluteUrl = archives.get(request.getRequestPath());
 
       if (absoluteUrl == null) {
-        getLogger().warn("archive url not set for plugin " + request.getRequestPath());
+        log.warn("archive url not set for plugin " + request.getRequestPath());
         return false;
       }
 
       if (!new URI(absoluteUrl).isAbsolute()) {
-        getLogger().warn(
+        log.warn(
             "archive url (" + absoluteUrl + ") is not absolute for plugin " + request.getRequestPath());
         return false;
       }
@@ -434,13 +434,13 @@ public class UpdateSiteProxyRepositoryImpl
       return true;
     }
     catch (final URISyntaxException e) {
-      getLogger().warn("archive url has illegal syntax for plugin " + request.getRequestPath(), e);
+      log.warn("archive url has illegal syntax for plugin " + request.getRequestPath(), e);
     }
     catch (final StorageException e) {
-      getLogger().warn("storage problem for plugin " + request.getRequestPath(), e);
+      log.warn("storage problem for plugin " + request.getRequestPath(), e);
     }
     catch (final ItemNotFoundException e) {
-      getLogger().warn("item not found for plugin " + request.getRequestPath(), e);
+      log.warn("item not found for plugin " + request.getRequestPath(), e);
     }
 
     return false;
@@ -553,7 +553,7 @@ public class UpdateSiteProxyRepositoryImpl
         }
       }
       catch (final URISyntaxException e) {
-        getLogger().warn("illegal url found in feature", e);
+        log.warn("illegal url found in feature", e);
         return null;
       }
     }
@@ -562,7 +562,7 @@ public class UpdateSiteProxyRepositoryImpl
       return generateResourceStoreRequest(featureRef);
     }
 
-    getLogger().warn("Could not determine referenced feature path " + featureRef.getDom());
+    log.warn("Could not determine referenced feature path " + featureRef.getDom());
     return null;
   }
 
@@ -601,7 +601,7 @@ public class UpdateSiteProxyRepositoryImpl
       getApplicationConfiguration().saveConfiguration();
     }
     catch (final Exception e) {
-      getLogger().error("Could not mirror Eclipse Update Site", e);
+      log.error("Could not mirror Eclipse Update Site", e);
     }
   }
 
@@ -648,10 +648,10 @@ public class UpdateSiteProxyRepositoryImpl
           new XmlPlexusConfiguration(Xpp3DomBuilder.build(new InputStreamReader(siteItem.getInputStream())));
 
       overwriteRemoteUrl = plexusConfig.getAttribute("url");
-      getLogger().debug("Remote update site does overwrite the remote url " + overwriteRemoteUrl);
+      log.debug("Remote update site does overwrite the remote url " + overwriteRemoteUrl);
     }
     catch (final Exception e) {
-      getLogger().debug(e.getMessage(), e);
+      log.debug(e.getMessage(), e);
       overwriteRemoteUrl = "";
     }
   }

@@ -16,7 +16,6 @@ package org.sonatype.nexus.proxy.attributes.upgrade;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.nio.file.Files;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -26,18 +25,18 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.util.LinearNumberSequence;
 import org.sonatype.nexus.util.LowerLimitNumberSequence;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.util.file.FileSupport;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -52,7 +51,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named
 public class DefaultAttributeUpgrader
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements AttributeUpgrader
 {
   private static final String JMX_DOMAIN = "org.sonatype.nexus.proxy.attributes.upgrade";
@@ -104,14 +103,14 @@ public class DefaultAttributeUpgrader
       jmxName = ObjectName.getInstance(JMX_DOMAIN, "name", AttributeUpgrader.class.getSimpleName());
       final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
       if (server.isRegistered(jmxName)) {
-        getLogger().warn("MBean already registered; replacing: {}", jmxName);
+        log.warn("MBean already registered; replacing: {}", jmxName);
         server.unregisterMBean(jmxName);
       }
       server.registerMBean(new DefaultAttributeUpgraderMBean(this), jmxName);
     }
     catch (Exception e) {
       jmxName = null;
-      getLogger().warn("Problem registering MBean for: " + getClass().getName(), e);
+      log.warn("Problem registering MBean for: " + getClass().getName(), e);
     }
     eventBus.register(this);
   }
@@ -135,7 +134,7 @@ public class DefaultAttributeUpgrader
         }
       }
       catch (final Exception e) {
-        getLogger().warn("Problem unregistering MBean for: " + getClass().getName(), e);
+        log.warn("Problem unregistering MBean for: " + getClass().getName(), e);
       }
     }
     // kill the daemon thread
@@ -170,7 +169,7 @@ public class DefaultAttributeUpgrader
     }
     catch (IOException e) {
       // return true to prevent advancing in any aspect, but the error log will make a day for sysadmin
-      getLogger().error("Unable to perform file read from legacy attributes directory: {}",
+      log.error("Unable to perform file read from legacy attributes directory: {}",
           getLegacyAttributesDirectory(), e);
       return true;
     }
@@ -258,23 +257,23 @@ public class DefaultAttributeUpgrader
     if (!isLegacyAttributesDirectoryPresent()) {
       // file not found or not a directory, stay put to not create noise in logs (new or tidied up nexus
       // instance)
-      getLogger().debug("Legacy attribute directory not present, no need for attribute upgrade.");
+      log.debug("Legacy attribute directory not present, no need for attribute upgrade.");
     }
     else {
       if (isUpgradeFinished()) {
         // nag the user to remove the directory
-        getLogger().info(
+        log.info(
             "Legacy attribute directory present, but is marked already as upgraded. Please delete, move or rename the \"{}\" directory.",
             getLegacyAttributesDirectory().getAbsolutePath());
       }
       else {
         if (force || UPGRADE) {
           if (force) {
-            getLogger().info(
+            log.info(
                 "Legacy attribute directory present, and upgrade is needed and if forced. Starting background upgrade.");
           }
           else {
-            getLogger().info(
+            log.info(
                 "Legacy attribute directory present, and upgrade is needed. Starting background upgrade.");
           }
           this.upgraderThread =
@@ -284,7 +283,7 @@ public class DefaultAttributeUpgrader
         }
         else {
           // nag the user about explicit no-upgrade switch
-          getLogger().info(
+          log.info(
               "Legacy attribute directory present, but upgrade prevented by system property. Not upgrading it.");
         }
       }

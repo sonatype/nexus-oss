@@ -13,9 +13,7 @@
 
 -->
 <ehcache>
-
-    <!-- Only ${basedir} is replaced by plexus! -->
-    <diskStore path="${basedir}/target/plexus-home/ehcache"/>
+    <diskStore path="java.io.tmpdir/ehcache"/>
     
     <!-- all created caches shares these defaults 
 

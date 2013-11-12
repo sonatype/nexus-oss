@@ -29,7 +29,6 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.util.CompositeException;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
@@ -47,6 +46,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * Test for NEXUS-5249 and related ones (see linked issues). In general, we ensure that 404 happened during remote
@@ -209,10 +210,10 @@ public class Nexus5249IndexerManagerIT
       assertThat(fetchCountingInvocationHandler, new InvocationMatcher(indexedProxyRepositories));
       // ensure we scanned all the repositories (minus the one failed, as it failed _BEFORE_ scan invocation)
       Assert.assertEquals(indexedRepositories - 1, scanInvocationCount);
-      // ensure we have composite exception
-      Assert.assertEquals(CompositeException.class, e.getCause().getClass());
-      // ensure we got back our bad exception
-      Assert.assertEquals(ex, ((CompositeException) e.getCause()).getCauses().iterator().next());
+
+      // ensure suppressed exception detail is present
+      assertThat(e.getSuppressed(), notNullValue());
+      assertThat(e.getSuppressed()[0], is((Throwable)ex));
     }
   }
 
@@ -241,10 +242,10 @@ public class Nexus5249IndexerManagerIT
       assertThat(fetchCountingInvocationHandler, new InvocationMatcher(indexedProxyRepositories));
       // ensure we scanned all the repositories (minus the one failed, as it failed _BEFORE_ scan invocation)
       Assert.assertEquals(publicGroup.getMemberRepositoryIds().size() - 1, scanInvocationCount);
-      // ensure we have composite exception
-      Assert.assertEquals(CompositeException.class, e.getCause().getClass());
-      // ensure we got back our bad exception
-      Assert.assertEquals(ex, ((CompositeException) e.getCause()).getCauses().iterator().next());
+
+      // ensure suppressed exception detail is present
+      assertThat(e.getSuppressed(), notNullValue());
+      assertThat(e.getSuppressed()[0], is((Throwable) ex));
     }
   }
 

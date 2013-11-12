@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.proxy.attributes;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * The Class AbstractStorageFileItemInspector is a convenience class for implementing inspectors.
@@ -23,7 +23,7 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
  */
 @Deprecated
 public abstract class AbstractStorageFileItemInspector
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements StorageFileItemInspector
 {
 

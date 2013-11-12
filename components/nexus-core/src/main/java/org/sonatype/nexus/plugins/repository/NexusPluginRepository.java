@@ -21,6 +21,7 @@ import org.sonatype.plugins.model.PluginMetadata;
 /**
  * Provides a simple {@link GAVCoordinate} based plugin repository.
  */
+@Deprecated
 public interface NexusPluginRepository
 {
   /**

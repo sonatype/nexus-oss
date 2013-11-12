@@ -21,10 +21,6 @@ public abstract class AbstractCalendarBasedSchedulerIterator
 {
   private final Calendar calendar;
 
-  public AbstractCalendarBasedSchedulerIterator(Date startingDate) {
-    this(startingDate, null);
-  }
-
   public AbstractCalendarBasedSchedulerIterator(Date startingDate, Date endingDate) {
     super(startingDate, endingDate);
 

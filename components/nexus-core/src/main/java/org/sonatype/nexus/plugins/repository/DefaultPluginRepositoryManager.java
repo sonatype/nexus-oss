@@ -27,13 +27,11 @@ import javax.inject.Singleton;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugins.model.PluginMetadata;
 
-/**
- * Default {@link PluginRepositoryManager} implementation.
- */
 @Named
 @Singleton
+@Deprecated
 final class DefaultPluginRepositoryManager
-    implements PluginRepositoryManager
+    implements NexusPluginRepository
 {
   // ----------------------------------------------------------------------
   // Constants
@@ -59,10 +57,6 @@ final class DefaultPluginRepositoryManager
 
   public int getPriority() {
     return -1;
-  }
-
-  public NexusPluginRepository getNexusPluginRepository(final String id) {
-    return repositoryMap.get(id);
   }
 
   public Map<GAVCoordinate, PluginMetadata> findAvailablePlugins() {

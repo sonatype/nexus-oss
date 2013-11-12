@@ -67,7 +67,7 @@ public class P2FileTypeValidator
         }
       }
       catch (final IOException e) {
-        getLogger().error("Unable to read pack200 magic bytes", e);
+        log.error("Unable to read pack200 magic bytes", e);
       }
 
       return FileTypeValidity.INVALID;

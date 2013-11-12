@@ -72,8 +72,6 @@ public class NexusApplication
 
   private final ManagedPlexusResource enterLicenseTemplateResource;
 
-  private final ManagedPlexusResource contentResource;
-
   private final ManagedPlexusResource statusPlexusResource;
 
   private final List<NexusResourceBundle> nexusResourceBundles;
@@ -90,7 +88,6 @@ public class NexusApplication
                           final Map<String, ManagedPlexusResource> managedResources,
                           final @Named("licenseTemplate") @Nullable ManagedPlexusResource licenseTemplateResource,
                           final @Named("enterLicenseTemplate") @Nullable ManagedPlexusResource enterLicenseTemplateResource,
-                          final @Named("content") ManagedPlexusResource contentResource,
                           final @Named("StatusPlexusResource") ManagedPlexusResource statusPlexusResource,
                           final List<NexusResourceBundle> nexusResourceBundles,
                           final List<NexusApplicationCustomizer> customizers,
@@ -102,7 +99,6 @@ public class NexusApplication
     this.managedResources = managedResources;
     this.licenseTemplateResource = licenseTemplateResource;
     this.enterLicenseTemplateResource = enterLicenseTemplateResource;
-    this.contentResource = contentResource;
     this.statusPlexusResource = statusPlexusResource;
     this.nexusResourceBundles = nexusResourceBundles;
     this.customizers = customizers;
@@ -114,7 +110,6 @@ public class NexusApplication
   @VisibleForTesting
   public NexusApplication() {
     this(
-        null,
         null,
         null,
         null,
@@ -242,22 +237,6 @@ public class NexusApplication
     if (DevModeResources.hasResourceLocations()) {
       attach(root, false, "/static", new DevModeResourceFinder(mimeSupport, getContext(), "/static"));
     }
-
-    // =======
-    // CONTENT
-
-    // prepare for browser diversity :)
-    BrowserSensingFilter bsf = new BrowserSensingFilter(getContext());
-
-    // mounting it
-    attach(root, false, "/content", bsf);
-
-    bsf.setNext(new NexusPlexusResourceFinder(getContext(), contentResource));
-
-    // protecting the content service manually
-    this.protectedPathManager.addProtectedResource("/content"
-        + contentResource.getResourceProtection().getPathPattern(), "noSessionCreation,"
-        + contentResource.getResourceProtection().getFilterExpression());
   }
 
   private final AntPathMatcher shiroAntPathMatcher = new AntPathMatcher();

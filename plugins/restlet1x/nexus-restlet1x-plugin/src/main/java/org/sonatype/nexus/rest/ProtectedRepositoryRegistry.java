@@ -21,17 +21,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 @Named("protected")
 @Singleton
 public class ProtectedRepositoryRegistry
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements RepositoryRegistry
 {
   private final RepositoryRegistry defaultRepositoryRegistry;
@@ -107,7 +107,7 @@ public class ProtectedRepositoryRegistry
       return (List<T>) this.filterRepositoriesList((List<Repository>) repositories);
     }
     else {
-      this.getLogger().debug(
+      this.log.debug(
           "Failed to cast Repository facet class: " + facetClass
               + " to repository, this list will not be filtered based on the users permissions.");
       return repositories;
@@ -146,7 +146,7 @@ public class ProtectedRepositoryRegistry
       this.checkAccessToRepository(((Repository) repository).getId());
     }
     else {
-      this.getLogger().debug(
+      this.log.debug(
           "Failed to cast Repository facet class: " + facetClass
               + " to repository, repository cannot be filtered based on the users permissions.");
     }
