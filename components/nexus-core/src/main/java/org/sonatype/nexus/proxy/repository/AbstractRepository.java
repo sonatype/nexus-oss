@@ -76,10 +76,8 @@ import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
-import org.sonatype.nexus.scheduling.DefaultRepositoryTaskActivityDescriptor;
-import org.sonatype.nexus.scheduling.DefaultRepositoryTaskFilter;
-import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -108,7 +106,7 @@ public abstract class AbstractRepository
     implements Repository
 {
   
-  // == these below are injected
+  // == injected
   
   private CacheManager cacheManager;
 
@@ -124,25 +122,16 @@ public abstract class AbstractRepository
 
   private Map<String, ContentGenerator> contentGenerators;
   
-  // ==
-
-  // TODO: setter on Repository iface!
   private AttributesHandler attributesHandler;
 
-  // TODO: setter on Repository iface!
   private AccessManager accessManager;
   
-  // ==
+  // == set by this
 
   /**
    * Local storage context to store storage-wide configs.
    */
   private LocalStorageContext localStorageContext;
-
-  /**
-   * The local storage.
-   */
-  private LocalRepositoryStorage localStorage;
 
   /**
    * The not found cache.
@@ -155,6 +144,13 @@ public abstract class AbstractRepository
    * @since 2.5
    */
   private final Map<String, RequestStrategy> requestStrategies = Maps.newHashMap();
+
+  // ==
+
+  /**
+   * The local storage, set by configurator.
+   */
+  private LocalRepositoryStorage localStorage;
 
   /**
    * if local url changed, need special handling after save
@@ -183,11 +179,15 @@ public abstract class AbstractRepository
     this.targetRegistry = checkNotNull(targetRegistry);
     this.repositoryItemUidFactory = checkNotNull(repositoryItemUidFactory);
     this.repositoryItemUidAttributeManager = checkNotNull(repositoryItemUidAttributeManager);
-    this.accessManager = checkNotNull(accessManager);
     this.walker = checkNotNull(walker);
     this.mimeSupport = checkNotNull(mimeSupport);
     this.contentGenerators = checkNotNull(contentGenerators);
     this.attributesHandler = checkNotNull(attributesHandler);
+    this.accessManager = checkNotNull(accessManager);
+
+    // we have been not configured yet! So, we have no ID and stuff coming from config!
+    // post inject stuff
+    this.localStorageContext = new DefaultLocalStorageContext(getApplicationConfiguration().getGlobalLocalStorageContext());
   }
 
   protected MimeSupport getMimeSupport() {
@@ -206,6 +206,16 @@ public abstract class AbstractRepository
 
   @Override
   protected abstract CRepositoryExternalConfigurationHolderFactory<?> getExternalConfigurationHolderFactory();
+
+  @Override
+  protected void doConfigure()
+      throws ConfigurationException
+  {
+    super.doConfigure();
+    if (notFoundCache == null) {
+      this.notFoundCache = cacheManager.getPathCache(getId());
+    }
+  }
 
   @Override
   public boolean commitChanges()
@@ -260,15 +270,6 @@ public abstract class AbstractRepository
 
   // ==
 
-  public RepositoryTaskFilter getRepositoryTaskFilter() {
-    // we are allowing all, and subclasses will filter as they want
-    return new DefaultRepositoryTaskFilter().setAllowsRepositoryScanning(true).setAllowsScheduledTasks(true)
-        .setAllowsUserInitiatedTasks(
-            true).setContentOperators(DefaultRepositoryTaskActivityDescriptor.ALL_CONTENT_OPERATIONS)
-        .setAttributeOperators(
-            DefaultRepositoryTaskActivityDescriptor.ALL_ATTRIBUTES_OPERATIONS);
-  }
-
   @Override
   public RequestStrategy registerRequestStrategy(final String key, final RequestStrategy strategy) {
     checkNotNull(key);
@@ -314,22 +315,9 @@ public abstract class AbstractRepository
    *
    * @return the not found cache
    */
+  @Override
   public PathCache getNotFoundCache() {
-    if (notFoundCache == null) {
-      // getting it lazily
-      notFoundCache = getCacheManager().getPathCache(getId());
-    }
-
     return notFoundCache;
-  }
-
-  /**
-   * Sets the not found cache.
-   *
-   * @param notFoundcache the new not found cache
-   */
-  public void setNotFoundCache(PathCache notFoundcache) {
-    this.notFoundCache = notFoundcache;
   }
 
   @Override
@@ -382,6 +370,7 @@ public abstract class AbstractRepository
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <F> F adaptToFacet(Class<F> t) {
     if (getRepositoryKind().isFacetAvailable(t)) {
@@ -403,10 +392,15 @@ public abstract class AbstractRepository
   // ===================================================================================
   // Repository iface
 
+  @Override
   public AccessManager getAccessManager() {
     return accessManager;
   }
 
+  /**
+   * DefaultReleaseRemoverIT
+   */
+  @VisibleForTesting
   public void setAccessManager(AccessManager accessManager) {
     this.accessManager = accessManager;
   }
@@ -513,11 +507,13 @@ public abstract class AbstractRepository
     return new NoopRepositoryMetadataManager();
   }
 
+  @Override
   public Collection<String> evictUnusedItems(ResourceStoreRequest request, final long timestamp) {
     // this is noop at hosted level
     return Collections.emptyList();
   }
 
+  @Override
   public boolean recreateAttributes(ResourceStoreRequest request, final Map<String, String> initialData) {
     if (!getLocalStatus().shouldServiceRequest()) {
       return false;
@@ -554,27 +550,22 @@ public abstract class AbstractRepository
     return true;
   }
 
+  @Override
   public AttributesHandler getAttributesHandler() {
     return attributesHandler;
   }
 
-  public void setAttributesHandler(AttributesHandler attributesHandler) {
-    this.attributesHandler = attributesHandler;
-  }
-
+  @Override
   public LocalStorageContext getLocalStorageContext() {
-    if (localStorageContext == null) {
-      localStorageContext =
-          new DefaultLocalStorageContext(getApplicationConfiguration().getGlobalLocalStorageContext());
-    }
-
     return localStorageContext;
   }
 
+  @Override
   public LocalRepositoryStorage getLocalStorage() {
     return localStorage;
   }
 
+  @Override
   public void setLocalStorage(LocalRepositoryStorage localStorage) {
     getCurrentConfiguration(true).getLocalStorage().setProvider(localStorage.getProviderId());
 
@@ -584,6 +575,7 @@ public abstract class AbstractRepository
   // ===================================================================================
   // Store iface
 
+  @Override
   public StorageItem retrieveItem(ResourceStoreRequest request)
       throws IllegalOperationException, ItemNotFoundException, StorageException, AccessDeniedException
   {
@@ -605,6 +597,7 @@ public abstract class AbstractRepository
     return item;
   }
 
+  @Override
   public void copyItem(ResourceStoreRequest from, ResourceStoreRequest to)
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
              StorageException, AccessDeniedException
@@ -615,6 +608,7 @@ public abstract class AbstractRepository
     copyItem(false, from, to);
   }
 
+  @Override
   public void moveItem(ResourceStoreRequest from, ResourceStoreRequest to)
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
              StorageException, AccessDeniedException
@@ -626,6 +620,7 @@ public abstract class AbstractRepository
     moveItem(false, from, to);
   }
 
+  @Override
   public void deleteItem(ResourceStoreRequest request)
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
              StorageException, AccessDeniedException
@@ -635,6 +630,7 @@ public abstract class AbstractRepository
     deleteItem(false, request);
   }
 
+  @Override
   public void storeItem(ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes)
       throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
   {
@@ -656,6 +652,7 @@ public abstract class AbstractRepository
     storeItem(false, fItem);
   }
 
+  @Override
   public void createCollection(ResourceStoreRequest request, Map<String, String> userAttributes)
       throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
   {
@@ -675,6 +672,7 @@ public abstract class AbstractRepository
     storeItem(false, coll);
   }
 
+  @Override
   public Collection<StorageItem> list(ResourceStoreRequest request)
       throws IllegalOperationException, ItemNotFoundException, StorageException, AccessDeniedException
   {
@@ -692,6 +690,7 @@ public abstract class AbstractRepository
     return items;
   }
 
+  @Override
   public TargetSet getTargetsForRequest(ResourceStoreRequest request) {
     if (getLogger().isDebugEnabled()) {
       getLogger().debug("getTargetsForRequest() :: " + this.getId() + ":" + request.getRequestPath());
@@ -700,6 +699,7 @@ public abstract class AbstractRepository
     return targetRegistry.getTargetsForRepositoryPath(this, request.getRequestPath());
   }
 
+  @Override
   public boolean hasAnyTargetsForRequest(ResourceStoreRequest request) {
     if (getLogger().isDebugEnabled()) {
       getLogger().debug("hasAnyTargetsForRequest() :: " + this.getId());
@@ -708,6 +708,7 @@ public abstract class AbstractRepository
     return targetRegistry.hasAnyApplicableTarget(this);
   }
 
+  @Override
   public Action getResultingActionOnWrite(final ResourceStoreRequest rsr)
       throws LocalStorageException
   {
@@ -724,6 +725,7 @@ public abstract class AbstractRepository
   // ===================================================================================
   // Repositry store-like
 
+  @Override
   public StorageItem retrieveItem(boolean fromTask, ResourceStoreRequest request)
       throws IllegalOperationException, ItemNotFoundException, StorageException
   {
@@ -800,6 +802,7 @@ public abstract class AbstractRepository
     }
   }
 
+  @Override
   public void copyItem(boolean fromTask, ResourceStoreRequest from, ResourceStoreRequest to)
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
   {
@@ -851,6 +854,7 @@ public abstract class AbstractRepository
     }
   }
 
+  @Override
   public void moveItem(boolean fromTask, ResourceStoreRequest from, ResourceStoreRequest to)
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
   {
@@ -867,6 +871,7 @@ public abstract class AbstractRepository
     deleteItem(fromTask, from);
   }
 
+  @Override
   public void deleteItem(boolean fromTask, ResourceStoreRequest request)
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
   {
@@ -953,6 +958,7 @@ public abstract class AbstractRepository
     return false;
   }
 
+  @Override
   public void storeItem(boolean fromTask, StorageItem item)
       throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
   {
@@ -1014,6 +1020,7 @@ public abstract class AbstractRepository
     }
   }
 
+  @Override
   public Collection<StorageItem> list(boolean fromTask, ResourceStoreRequest request)
       throws IllegalOperationException, ItemNotFoundException, StorageException
   {
@@ -1038,6 +1045,7 @@ public abstract class AbstractRepository
     }
   }
 
+  @Override
   public Collection<StorageItem> list(boolean fromTask, StorageCollectionItem coll)
       throws IllegalOperationException, ItemNotFoundException, StorageException
   {
@@ -1065,6 +1073,7 @@ public abstract class AbstractRepository
     return getRepositoryItemUidFactory().createUid(this, path);
   }
 
+  @Override
   public RepositoryItemUidAttributeManager getRepositoryItemUidAttributeManager() {
     return repositoryItemUidAttributeManager;
   }
@@ -1077,6 +1086,7 @@ public abstract class AbstractRepository
    *
    * @throws ItemNotFoundException the item not found exception
    */
+  @Override
   public void maintainNotFoundCache(ResourceStoreRequest request)
       throws ItemNotFoundException
   {
@@ -1103,16 +1113,6 @@ public abstract class AbstractRepository
     }
   }
 
-  @Deprecated
-  public void addToNotFoundCache(String path) {
-    addToNotFoundCache(new ResourceStoreRequest(path));
-  }
-
-  @Deprecated
-  public void removeFromNotFoundCache(String path) {
-    removeFromNotFoundCache(new ResourceStoreRequest(path));
-  }
-
   /**
    * Adds the uid to not found cache.
    */
@@ -1130,6 +1130,7 @@ public abstract class AbstractRepository
   /**
    * Removes the uid from not found cache.
    */
+  @Override
   public void removeFromNotFoundCache(ResourceStoreRequest request) {
     if (isNotFoundCacheActive()) {
       if (getLogger().isDebugEnabled()) {
@@ -1202,6 +1203,7 @@ public abstract class AbstractRepository
     }
   }
 
+  @Override
   public boolean isCompatible(Repository repository) {
     return getRepositoryContentClass().isCompatible(repository.getRepositoryContentClass());
   }
