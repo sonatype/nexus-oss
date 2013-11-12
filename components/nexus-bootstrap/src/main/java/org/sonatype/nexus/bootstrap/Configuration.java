@@ -45,6 +45,8 @@ public class Configuration
 
   private static final String NEXUS_WORK = "nexus-work";
 
+  public static final InheritableThreadLocal<Configuration> HOLDER = new InheritableThreadLocal<>();
+
   private final PropertyMap properties;
 
   public Configuration() {

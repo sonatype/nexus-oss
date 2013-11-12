@@ -98,7 +98,7 @@
           <eventListenerInfo>
             <!-- ThreadLocal hack for using the same Plexus Container as the tests are running on  -->
             <clazz>org.sonatype.security.web.testapp.HackedPlexusContainerContextListener</clazz>
-            <!--<clazz>org.sonatype.plexus.rest.PlexusContainerContextListener</clazz>-->
+            <!--<clazz>org.sonatype.plexus.rest.NexusBootstrap</clazz>-->
           </eventListenerInfo>
         </eventListenerInfos>
       </configuration>

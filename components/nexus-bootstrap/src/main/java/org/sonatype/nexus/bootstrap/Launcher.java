@@ -69,6 +69,9 @@ public class Launcher
     Configuration config = new Configuration();
     config.load();
 
+    // Expose to webapp
+    Configuration.HOLDER.set(config);
+
     maybeEnableCommandMonitor();
     maybeEnableShutdownIfNotAlive();
 
