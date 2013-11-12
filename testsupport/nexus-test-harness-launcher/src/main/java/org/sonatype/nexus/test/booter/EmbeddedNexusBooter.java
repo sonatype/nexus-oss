@@ -33,48 +33,27 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-// FIXME: Docs need to be cleaned up once we get something "simple" working
-
 /**
- * The simplified (or not) Nexus booter class, that boots Nexus (the IT test subject) in completely same way as it
- * boots in bundle, but in this same JVM in an isolated classloader, hence, even it will exist in same JVM, REST API is
- * the only possible "contact" with it.
+ * Embedded Nexus server booter.
  *
- * Naturally, Java Service Wrapper is not present, but it uses the same Jetty8 class used
- * by bundle boot procedure too. Currently, nexus is started/stopped per test class.
- *
- * <p>
- * There are few trickeries happening here (think ClassLoaders) that will mostly go away once we start producing clean
- * WAR instead of this "bastardized" WAR layout. There are two reasons for this class loader trickery:
- *
- * a) for every Nexus boot, we create new Nexus isolated classloader, but we still keep one "shared" classloader as
- * parent of it, that is never recreated. For reasons, see comments in {@link #tamperJarsForSharedClasspath(File)}
- * method.
- *
- * b) we are emulating what is happening during bundle boot, and since Nexus -- while it is fully fledged Java Web
- * Application -- there is one outstanding exception: the JARs are not in /WEB-INF/lib, but in a folder above /WEB-INF,
- * which is illegal.
- *
- * Hence, we, in same way as booter, add the Nexus constituent JARs to a classpath, and let Jetty8 create
- * WebAppClassloader, that will "delegate" to classes, but filtering out Jetty implementation classes on the way.
- *
- * <p>
- * Again, once we start following conventions, this class would be simplified too! For example, the IT-realm and
- * trickery around it would become not needed at all, since Jetty8 would create WebAppClassloader anyway, lifting
- * everything from /WEB-INF/lib directory.
- *
- * @author cstamas
+ * @since 2.8
  */
-public class JettyServerNexusBooter
+public class EmbeddedNexusBooter
     implements NexusBooter
 {
-  private static Logger log = LoggerFactory.getLogger(JettyServerNexusBooter.class);
+  private static Logger log = LoggerFactory.getLogger(EmbeddedNexusBooter.class);
 
   private static final String IT_REALM_ID = "it-realm";
 
   private final File bundleBasedir;
+
+  private final int port;
+
+  private final Map<String,String> props;
 
   private final ClassWorld world;
 
@@ -88,33 +67,16 @@ public class JettyServerNexusBooter
 
   private Object jettyServer;
 
-  private final Map<String,String> props = new HashMap<>();
+  public EmbeddedNexusBooter(final File bundleBasedir, final int port) throws Exception {
+    this.bundleBasedir = checkNotNull(bundleBasedir).getCanonicalFile();
+    log.info("Install directory: {}", bundleBasedir);
 
-  public JettyServerNexusBooter(final File bundleBasedir, final int port) throws Exception {
-    this.bundleBasedir = bundleBasedir.getCanonicalFile();
-    log.info("Bundle base directory: {}", bundleBasedir);
+    checkArgument(port > 1024);
+    this.port = port;
+    log.info("Port: {}", port);
 
-    tamperJettyConfiguration();
-
-    // FIXME: Load nexus.properties, for now hard-code
-    props.put("application-host", "0.0.0.0");
+    props = loadProperties();
     props.put("application-port", String.valueOf(port));
-
-    props.put("nexus-webapp", new File(bundleBasedir, "nexus").getAbsolutePath());
-    props.put("nexus-webapp-context-path", "/nexus");
-    props.put("runtime", new File(bundleBasedir, "nexus/WEB-INF").getAbsolutePath());
-
-    props.put("bundleBasedir", bundleBasedir.getAbsolutePath());
-    props.put("logback.configurationFile", new File(bundleBasedir, "conf/logback.xml").getAbsolutePath());
-
-    // guice finalizer
-    props.put("guice.executor.class", "NONE");
-
-    // Making MI integration in Nexus behave in-sync
-    props.put("org.sonatype.nexus.events.IndexerManagerEventInspector.async", Boolean.FALSE.toString());
-
-    // Disable autorouting initialization prevented
-    props.put(ConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString());
 
     log.info("Properties:");
     for (Entry<String,String> entry : props.entrySet()) {
@@ -124,6 +86,8 @@ public class JettyServerNexusBooter
     // Export everything to system properties
     System.getProperties().putAll(props);
 
+    tamperJettyConfiguration();
+
     world = new ClassWorld();
     bootRealm = createBootRealm();
 
@@ -132,6 +96,30 @@ public class JettyServerNexusBooter
 
     jettyServerFactory = jettyServerClass.getConstructor(ClassLoader.class, Map.class, String[].class);
     log.info("Jetty server factory: {}", jettyServerFactory);
+  }
+
+  private Map<String,String> loadProperties() {
+    Map<String,String> p = new HashMap<>();
+
+    // FIXME: Load nexus.properties, for now hard-code
+    p.put("application-host", "0.0.0.0");
+    p.put("nexus-webapp", new File(bundleBasedir, "nexus").getAbsolutePath());
+    p.put("nexus-webapp-context-path", "/nexus");
+    p.put("runtime", new File(bundleBasedir, "nexus/WEB-INF").getAbsolutePath());
+
+    p.put("bundleBasedir", bundleBasedir.getAbsolutePath());
+    p.put("logback.configurationFile", new File(bundleBasedir, "conf/logback.xml").getAbsolutePath());
+
+    // guice finalizer
+    p.put("guice.executor.class", "NONE");
+
+    // Making MI integration in Nexus behave in-sync
+    p.put("org.sonatype.nexus.events.IndexerManagerEventInspector.async", Boolean.FALSE.toString());
+
+    // Disable autorouting initialization prevented
+    p.put(ConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString());
+
+    return p;
   }
 
   private void tamperJettyConfiguration() throws IOException {

@@ -22,7 +22,7 @@ import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
-import org.sonatype.nexus.test.booter.JettyServerNexusBooter;
+import org.sonatype.nexus.test.booter.EmbeddedNexusBooter;
 import org.sonatype.nexus.test.booter.NexusBooter;
 
 import org.apache.http.HttpResponse;
@@ -44,7 +44,7 @@ public class NexusStatusUtil
       throws Exception
   {
     nexusBooter =
-        new JettyServerNexusBooter(new File(TestProperties.getAll().get("nexus.base.dir")).getAbsoluteFile(), port);
+        new EmbeddedNexusBooter(new File(TestProperties.getAll().get("nexus.base.dir")).getAbsoluteFile(), port);
   }
 
   public boolean isNexusRESTStarted()
