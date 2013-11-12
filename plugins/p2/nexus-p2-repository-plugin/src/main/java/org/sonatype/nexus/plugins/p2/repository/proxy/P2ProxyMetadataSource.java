@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ContentLocator;
@@ -77,7 +78,7 @@ public class P2ProxyMetadataSource
   }
 
   @Override
-  protected Map<String, StorageFileItem> doRetrieveArtifactsFileItems(final Map<String, Object> context,
+  protected Map<String, StorageFileItem> doRetrieveArtifactsFileItems(final RequestContext context,
                                                                       final P2ProxyRepository repository)
       throws RemoteStorageException, ItemNotFoundException
   {
@@ -162,7 +163,7 @@ public class P2ProxyMetadataSource
   }
 
   @Override
-  protected Map<String, StorageFileItem> doRetrieveContentFileItems(final Map<String, Object> context,
+  protected Map<String, StorageFileItem> doRetrieveContentFileItems(final RequestContext context,
                                                                     final P2ProxyRepository repository)
       throws RemoteStorageException, ItemNotFoundException
   {
@@ -244,7 +245,7 @@ public class P2ProxyMetadataSource
   }
 
   @Override
-  protected void setItemAttributes(final StorageFileItem item, final Map<String, Object> context,
+  protected void setItemAttributes(final StorageFileItem item, final RequestContext context,
                                    final P2ProxyRepository repository)
   {
     final String mirrorsURL = (String) context.get(CTX_MIRRORS_URL);

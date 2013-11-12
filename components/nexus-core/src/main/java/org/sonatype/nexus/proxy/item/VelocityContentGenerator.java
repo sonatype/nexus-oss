@@ -55,7 +55,7 @@ public class VelocityContentGenerator
       throws IllegalOperationException, ItemNotFoundException, LocalStorageException
   {
     final StringWriter sw = new StringWriter();
-    final VelocityContext vctx = new VelocityContext(item.getItemContext());
+    final VelocityContext vctx = new VelocityContext(item.getItemContext().flatten());
 
     try(final InputStreamReader isr = new InputStreamReader(item.getInputStream(), "UTF-8")) {
       velocityEngineProvider.get().evaluate(vctx, sw, item.getRepositoryItemUid().toString(), isr);

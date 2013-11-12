@@ -33,6 +33,7 @@ import org.sonatype.nexus.plugins.p2.repository.metadata.Content;
 import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataMergeException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -48,7 +49,7 @@ public class P2GroupMetadataSource
   private static final String ATTR_HASH_PREFIX = "original";
 
   @Override
-  protected Map<String, StorageFileItem> doRetrieveArtifactsFileItems(final Map<String, Object> context,
+  protected Map<String, StorageFileItem> doRetrieveArtifactsFileItems(final RequestContext context,
                                                                       final P2GroupRepository repository)
       throws RemoteStorageException, ItemNotFoundException
   {
@@ -75,7 +76,7 @@ public class P2GroupMetadataSource
   }
 
   @Override
-  protected Map<String, StorageFileItem> doRetrieveContentFileItems(final Map<String, Object> context,
+  protected Map<String, StorageFileItem> doRetrieveContentFileItems(final RequestContext context,
                                                                     final P2GroupRepository repository)
       throws RemoteStorageException, ItemNotFoundException
   {
@@ -101,12 +102,12 @@ public class P2GroupMetadataSource
     }
   }
 
-  private List<StorageFileItem> doRetrieveItems(final String xmlName, final Map<String, Object> context,
+  private List<StorageFileItem> doRetrieveItems(final String xmlName, final RequestContext context,
                                                 final P2GroupRepository repository)
       throws IOException, GroupItemNotFoundException
   {
     final ResourceStoreRequest request = new ResourceStoreRequest(xmlName);
-    request.getRequestContext().putAll(context);
+    request.getRequestContext().setParentContext(context);
     final List<StorageItem> items = repository.doRetrieveItems(request);
 
     final ArrayList<StorageFileItem> fileItems = new ArrayList<StorageFileItem>(items.size());
@@ -120,18 +121,16 @@ public class P2GroupMetadataSource
 
   @Override
   protected boolean isArtifactsOld(final AbstractStorageItem artifactsItem, final P2GroupRepository repository) {
-    final Map<String, Object> context = new HashMap<String, Object>();
-    return isOld(artifactsItem, P2Constants.ARTIFACTS_XML, context, repository);
+    return isOld(artifactsItem, P2Constants.ARTIFACTS_XML, artifactsItem.getItemContext(), repository);
   }
 
   @Override
   protected boolean isContentOld(final AbstractStorageItem contentItem, final P2GroupRepository repository) {
-    final Map<String, Object> context = new HashMap<String, Object>();
-    return isOld(contentItem, P2Constants.CONTENT_XML, context, repository);
+    return isOld(contentItem, P2Constants.CONTENT_XML, contentItem.getItemContext(), repository);
   }
 
   @Override
-  protected void setItemAttributes(final StorageFileItem item, final Map<String, Object> context,
+  protected void setItemAttributes(final StorageFileItem item, final RequestContext context,
                                    final P2GroupRepository repository)
   {
     if (P2Constants.ARTIFACTS_JAR.equals(item.getPath()) || P2Constants.ARTIFACTS_XML.equals(item.getPath())) {
@@ -143,7 +142,7 @@ public class P2GroupMetadataSource
   }
 
   private boolean isOld(final AbstractStorageItem artifactsItem, final String xml,
-                        final Map<String, Object> context, final P2GroupRepository repository)
+                        final RequestContext context, final P2GroupRepository repository)
   {
     final TreeMap<String, String> memberHash = getMemberHash(xml, context, repository);
     final LinkedHashMap<String, String> hash = new LinkedHashMap<String, String>();
@@ -156,7 +155,7 @@ public class P2GroupMetadataSource
     return !hash.equals(memberHash);
   }
 
-  private TreeMap<String, String> getMemberHash(final String xml, final Map<String, Object> context,
+  private TreeMap<String, String> getMemberHash(final String xml, final RequestContext context,
                                                 final P2GroupRepository repository)
   {
     final TreeMap<String, String> memberHash = new TreeMap<String, String>();
