@@ -20,7 +20,7 @@
   <display-name>Sonatype Nexus ${project.version}</display-name>
 
   <listener>
-    <listener-class>org.sonatype.nexus.webapp.NexusBootstrap</listener-class>
+    <listener-class>org.sonatype.nexus.webapp.WebappBootstrap</listener-class>
   </listener>
   
   <filter>
