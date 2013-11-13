@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.bootstrap.jetty;
 
 import java.net.URL;
@@ -20,19 +21,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.sonatype.nexus.bootstrap.PropertyMap;
 
+import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.xml.XmlConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
-
-// NOTE: Based on org.eclipse.jetty.xml.XmlConfiguration#main()
 
 /**
  * Jetty server.
@@ -45,23 +45,66 @@ public class JettyServer
 
   private final ClassLoader classLoader;
 
-  private final Map<String,String> properties;
+  private final Map<String, String> properties;
 
   private final String[] args;
 
-  private final List<LifeCycle> components = new ArrayList<>();
+  private JettyMainThread thread;
 
-  public JettyServer(final ClassLoader classLoader, final Map<String,String> properties, final String[] args) {
-    this.classLoader = checkNotNull(classLoader);
-    this.properties = checkNotNull(properties);
-    this.args = checkNotNull(args);
+  public JettyServer(final ClassLoader classLoader, final Map<String, String> properties, final String[] args) {
+    if (classLoader == null) {
+      throw new NullPointerException();
+    }
+    this.classLoader = classLoader;
+
+    if (properties == null) {
+      throw new NullPointerException();
+    }
+    this.properties = properties;
+
+    if (args == null) {
+      throw new NullPointerException();
+    }
+    this.args = args;
+  }
+
+  private Exception propagateThrowable(final Throwable e) throws Exception {
+    if (e instanceof RuntimeException) {
+      throw (RuntimeException) e;
+    }
+    else if (e instanceof Exception) {
+      throw (Exception) e;
+    }
+    else if (e instanceof Error) {
+      throw (Error) e;
+    }
+    throw new Error(e);
   }
 
   public synchronized void start() throws Exception {
     final ClassLoader cl = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(classLoader);
+
     try {
-      doStart();
+      final AtomicReference<Throwable> exception = new AtomicReference<>();
+      AccessController.doPrivileged(new PrivilegedAction<Object>()
+      {
+        public Object run() {
+          try {
+            doStart();
+          }
+          catch (Exception e) {
+            exception.set(e);
+          }
+          return null;
+        }
+      });
+
+      Throwable e = exception.get();
+      if (e != null) {
+        log.error("Start failed", e);
+        throw propagateThrowable(e);
+      }
     }
     finally {
       Thread.currentThread().setContextClassLoader(cl);
@@ -69,98 +112,81 @@ public class JettyServer
   }
 
   private void doStart() throws Exception {
-    if (!components.isEmpty()) {
+    if (thread != null) {
       throw new IllegalStateException("Already started");
     }
 
     log.info("Starting");
 
-    final AtomicReference<Throwable> exception = new AtomicReference<>();
+    List<LifeCycle> components = new ArrayList<>();
 
-    AccessController.doPrivileged(new PrivilegedAction<Object>()
-    {
-      public Object run() {
-        try {
-          PropertyMap props = new PropertyMap();
-          props.putAll(JettyServer.this.properties);
+    PropertyMap props = new PropertyMap();
+    props.putAll(JettyServer.this.properties);
 
-          // For all arguments, load properties or parse XMLs
-          XmlConfiguration last = null;
-          Object[] obj = new Object[args.length];
+    // For all arguments, load properties or parse XMLs
+    XmlConfiguration last = null;
+    for (String arg : args) {
+      URL url = Resource.newResource(arg).getURL();
 
-          for (int i = 0; i < args.length; i++) {
-            URL url = Resource.newResource(args[i]).getURL();
+      if (url.getFile().toLowerCase(Locale.ENGLISH).endsWith(".properties")) {
+        log.info("Loading properties: {}", url);
 
-            if (url.getFile().toLowerCase(Locale.ENGLISH).endsWith(".properties")) {
-              log.info("Loading properties: {}", url);
+        props.load(url);
+      }
+      else {
+        log.info("Applying configuration: {}", url);
 
-              props.load(url);
-            }
-            else {
-              log.info("Applying configuration: {}", url);
-
-              XmlConfiguration configuration = new XmlConfiguration(url);
-              if (last != null) {
-                configuration.getIdMap().putAll(last.getIdMap());
-              }
-              if (!props.isEmpty()) {
-                configuration.getProperties().putAll(props);
-              }
-              obj[i] = configuration.configure();
-              last = configuration;
-            }
-          }
-
-          // For all objects created by XmlConfigurations, start them if they are lifecycles.
-          for (int i = 0; i < args.length; i++) {
-            if (obj[i] instanceof LifeCycle) {
-              LifeCycle lc = (LifeCycle) obj[i];
-
-              log.info("Starting component: {}", lc);
-              components.add(lc);
-
-              if (!lc.isRunning()) {
-                lc.start();
-              }
-            }
-          }
+        XmlConfiguration configuration = new XmlConfiguration(url);
+        if (last != null) {
+          configuration.getIdMap().putAll(last.getIdMap());
         }
-        catch (Exception e) {
-          exception.set(e);
+        if (!props.isEmpty()) {
+          configuration.getProperties().putAll(props);
         }
-        return null;
+        Object component = configuration.configure();
+        if (component instanceof LifeCycle) {
+          components.add((LifeCycle) component);
+        }
+        last = configuration;
       }
-    });
-
-    Throwable e = exception.get();
-    if (e != null) {
-      log.error("Failed to start components", e);
-
-      if (e instanceof RuntimeException) {
-        throw (RuntimeException)e;
-      }
-      else if (e instanceof Exception) {
-        throw (Exception)e;
-      }
-      else if (e instanceof Error) {
-        throw (Error)e;
-      }
-      throw new Error(e);
     }
 
-    // complain if no components were started
+    // complain if no components configured
     if (components.isEmpty()) {
-      throw new Exception("Failed to start any components");
+      throw new Exception("Failed to configure any components");
     }
 
-    log.info("Started {} components", components.size());
+    thread = new JettyMainThread(components);
+    thread.setContextClassLoader(classLoader);
+    thread.startComponents();
+
+    log.info("Started");
   }
 
   public synchronized void stop() throws Exception {
     final ClassLoader cl = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(classLoader);
+
     try {
-      doStop();
+      final AtomicReference<Throwable> exception = new AtomicReference<>();
+      AccessController.doPrivileged(new PrivilegedAction<Object>()
+      {
+        public Object run() {
+          try {
+            doStop();
+          }
+          catch (Exception e) {
+            exception.set(e);
+          }
+          return null;
+        }
+      });
+
+      Throwable e = exception.get();
+      if (e != null) {
+        log.error("Stop failed", e);
+        throw propagateThrowable(e);
+      }
     }
     finally {
       Thread.currentThread().setContextClassLoader(cl);
@@ -168,21 +194,102 @@ public class JettyServer
   }
 
   private void doStop() throws Exception {
-    if (components.isEmpty()) {
+    if (thread == null) {
       throw new IllegalStateException("Not started");
     }
 
-    log.info("Stopping {} components", components.size());
+    log.info("Stopping");
 
-    Collections.reverse(components);
+    thread.stopComponents();
+    thread = null;
 
-    for (LifeCycle lc : components) {
-      if (!lc.isRunning()) {
-        log.info("Stopping component: {}", lc);
-        lc.stop();
+    log.info("Stopped");
+  }
+
+  /**
+   * Jetty thread used to start components, wait for the server's threads to join and stop components.
+   *
+   * Needed so that once {@link JettyServer#stop()} returns that we know that the server has actually stopped,
+   * which is required for embedding.
+   */
+  private static class JettyMainThread
+      extends Thread
+  {
+    private static final AtomicInteger INSTANCE_COUNTER = new AtomicInteger(1);
+
+    private final List<LifeCycle> components;
+
+    private final CountDownLatch started;
+
+    private final CountDownLatch stopped;
+
+    private volatile Exception exception;
+
+    public JettyMainThread(final List<LifeCycle> components) {
+      super("jetty-main-" + INSTANCE_COUNTER.getAndIncrement());
+      this.components = components;
+      this.started = new CountDownLatch(1);
+      this.stopped = new CountDownLatch(1);
+    }
+
+    @Override
+    public void run() {
+      try {
+        Server server = null;
+        try {
+          for (LifeCycle component : components) {
+            if (!component.isRunning()) {
+              log.info("Starting component: {}", component);
+              component.start();
+
+              // capture the server reference
+              if (component instanceof Server) {
+                server = (Server)component;
+              }
+            }
+          }
+        }
+        catch (Exception e) {
+          exception = e;
+        }
+        finally {
+          started.countDown();
+        }
+
+        if (server != null) {
+          log.info("Waiting");
+          server.join();
+        }
+      }
+      catch (InterruptedException e) {
+        // nothing
+      }
+      finally {
+        stopped.countDown();
       }
     }
 
-    components.clear();
+    public void startComponents() throws Exception {
+      start();
+      started.await();
+
+      if (exception != null) {
+        throw exception;
+      }
+    }
+
+    public void stopComponents() throws Exception {
+      Collections.reverse(components);
+
+      for (LifeCycle component : components) {
+        if (component.isRunning()) {
+          log.info("Stopping component: {}", component);
+          component.stop();
+        }
+      }
+
+      components.clear();
+      stopped.await();
+    }
   }
 }
