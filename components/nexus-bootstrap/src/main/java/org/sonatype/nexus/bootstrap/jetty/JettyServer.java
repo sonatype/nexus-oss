@@ -102,7 +102,6 @@ public class JettyServer
 
       Throwable e = exception.get();
       if (e != null) {
-        log.error("Start failed", e);
         throw propagateThrowable(e);
       }
     }
@@ -184,7 +183,6 @@ public class JettyServer
 
       Throwable e = exception.get();
       if (e != null) {
-        log.error("Stop failed", e);
         throw propagateThrowable(e);
       }
     }
@@ -256,8 +254,12 @@ public class JettyServer
           started.countDown();
         }
 
-        if (server != null) {
-          log.info("Waiting");
+        // complain if we did not find a server reference
+        if (server == null) {
+          log.warn("Missing server reference");
+        }
+        else {
+          log.info("Running");
           server.join();
         }
       }
@@ -265,6 +267,7 @@ public class JettyServer
         // nothing
       }
       finally {
+        log.info("Stopped");
         stopped.countDown();
       }
     }
