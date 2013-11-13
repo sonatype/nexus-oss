@@ -25,6 +25,7 @@ import org.sonatype.plugins.model.PluginMetadata;
 /**
  * Describes a Nexus plugin: its metadata, exports/imports, and what resources it contains.
  */
+@Deprecated
 public final class PluginDescriptor
 {
   // ----------------------------------------------------------------------
@@ -81,14 +82,6 @@ public final class PluginDescriptor
 
   public List<GAVCoordinate> getResolvedPlugins() {
     return resolvedPlugins;
-  }
-
-  public List<RepositoryTypeDescriptor> getRepositoryTypes() {
-    return repositoryTypes;
-  }
-
-  public List<StaticResource> getStaticResources() {
-    return staticResources;
   }
 
   public String formatAsString() {

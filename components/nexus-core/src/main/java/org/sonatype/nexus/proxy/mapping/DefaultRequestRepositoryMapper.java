@@ -158,8 +158,8 @@ public class DefaultRequestRepositoryMapper
 
     for (RepositoryPathMapping mapping : blockings) {
       if (mapping.matches(repository, request)) {
-        if (getLogger().isDebugEnabled()) {
-          getLogger().debug(
+        if (log.isDebugEnabled()) {
+          log.debug(
               "The request path [" + request.toString() + "] is blocked by rule " + mapping.toString());
         }
 
@@ -237,9 +237,9 @@ public class DefaultRequestRepositoryMapper
     request.addAppliedMappingsList(repository, appliedMappingsList);
 
     // log it if needed
-    if (getLogger().isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       if (appliedMappings.isEmpty()) {
-        getLogger().debug("No mapping exists for request path [" + request.toString() + "]");
+        log.debug("No mapping exists for request path [" + request.toString() + "]");
       }
       else {
         StringBuilder sb =
@@ -252,15 +252,15 @@ public class DefaultRequestRepositoryMapper
           sb.append(" * ").append(mapping.toString()).append("\n");
         }
 
-        getLogger().debug(sb.toString());
+        log.debug(sb.toString());
 
         if (reposIdSet.size() == 0) {
-          getLogger().debug(
+          log.debug(
               "Mapping for path [" + request.toString()
                   + "] excluded all storages from servicing the request.");
         }
         else {
-          getLogger().debug(
+          log.debug(
               "Request path for [" + request.toString() + "] is MAPPED to reposes: " + reposIdSet);
         }
       }
@@ -274,7 +274,7 @@ public class DefaultRequestRepositoryMapper
       }
     }
     catch (NoSuchRepositoryException e) {
-      getLogger().error(
+      log.error(
           "Some of the Routes contains references to non-existant repositories! Please check the following mappings: \""
               + appliedMappingsList.toString() + "\".");
 
@@ -318,8 +318,8 @@ public class DefaultRequestRepositoryMapper
     exclusions.clear();
 
     if (getCurrentConfiguration(false) == null) {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("No Routes defined, have nothing to compile.");
+      if (log.isDebugEnabled()) {
+        log.debug("No Routes defined, have nothing to compile.");
       }
 
       return;
@@ -338,7 +338,7 @@ public class DefaultRequestRepositoryMapper
         exclusions.add(convert(item));
       }
       else {
-        getLogger().warn("Unknown route type: " + item.getRouteType());
+        log.warn("Unknown route type: " + item.getRouteType());
 
         throw new IllegalArgumentException("Unknown route type: " + item.getRouteType());
       }
@@ -362,7 +362,7 @@ public class DefaultRequestRepositoryMapper
       type = MappingType.EXCLUSION;
     }
     else {
-      getLogger().warn("Unknown route type: " + item.getRouteType());
+      log.warn("Unknown route type: " + item.getRouteType());
 
       throw new IllegalArgumentException("Unknown route type: " + item.getRouteType());
     }

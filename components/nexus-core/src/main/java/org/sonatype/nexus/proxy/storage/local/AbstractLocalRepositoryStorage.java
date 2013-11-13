@@ -19,21 +19,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Iterator;
 
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
-import org.sonatype.nexus.proxy.ResourceStoreIteratorRequest;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.ChecksummingContentLocator;
 import org.sonatype.nexus.proxy.item.LinkPersister;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.AbstractContextualizedRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.StorageContext;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 
@@ -153,21 +149,6 @@ public abstract class AbstractLocalRepositoryStorage
   {
     getWastebasket().delete(this, repository, request);
   }
-
-  // ==
-
-  /**
-   * @deprecated To be removed in future releases (no replacement provided).
-   */
-  @Deprecated
-  @Override
-  public Iterator<StorageItem> iterateItems(Repository repository, ResourceStoreIteratorRequest request)
-      throws ItemNotFoundException, LocalStorageException
-  {
-    throw new UnsupportedOperationException("Iteration not supported!");
-  }
-
-  // ==
 
   protected void prepareStorageFileItemForStore(final StorageFileItem item)
       throws LocalStorageException

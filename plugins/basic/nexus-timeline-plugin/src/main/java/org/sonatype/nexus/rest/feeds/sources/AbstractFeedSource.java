@@ -17,8 +17,8 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * And abstract class for NexusArtifactEvent based feeds. This class implements all needed to create a feed,
@@ -27,7 +27,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
  * @author cstamas
  */
 public abstract class AbstractFeedSource
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements FeedSource
 {
   private ApplicationStatusSource applicationStatusSource;

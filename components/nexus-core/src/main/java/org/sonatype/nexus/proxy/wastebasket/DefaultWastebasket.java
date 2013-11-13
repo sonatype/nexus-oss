@@ -257,8 +257,6 @@ public class DefaultWastebasket
     return false;
   }
 
-  // ==
-
   protected String getTrashPath(final Repository repository, final String path) {
     if (path.startsWith(TRASH_PATH_PREFIX)) {
       return path;

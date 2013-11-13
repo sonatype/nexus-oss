@@ -96,7 +96,6 @@ public class NxApplication
     }
 
     applicationStatusSource.setState(SystemState.STOPPED);
-    applicationStatusSource.getSystemStatus().setOperationMode(OperationMode.STANDALONE);
     applicationStatusSource.getSystemStatus().setInitializedAt(new Date());
     eventBus.post(new NexusInitializedEvent(this));
   }
@@ -170,13 +169,13 @@ public class NxApplication
       applicationStatusSource.getSystemStatus().setState(SystemState.BROKEN_IO);
       applicationStatusSource.getSystemStatus().setErrorCause(e);
       log.error("Could not start Nexus, bad IO exception!", e);
-      Throwables.propagate(e);
+      throw Throwables.propagate(e);
     }
     catch (ConfigurationException e) {
       applicationStatusSource.getSystemStatus().setState(SystemState.BROKEN_CONFIGURATION);
       applicationStatusSource.getSystemStatus().setErrorCause(e);
       log.error("Could not start Nexus, user configuration exception!", e);
-      Throwables.propagate(e);
+      throw Throwables.propagate(e);
     }
   }
 

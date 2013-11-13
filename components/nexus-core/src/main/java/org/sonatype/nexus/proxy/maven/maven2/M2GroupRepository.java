@@ -231,7 +231,7 @@ public class M2GroupRepository
           existingMetadatas.add(parseMetadata(fileItem));
         }
         catch (IOException e) {
-          getLogger().warn(
+          log.warn(
               "IOException during parse of metadata UID=\"" + fileItem.getRepositoryItemUid().toString()
                   + "\", will be skipped from aggregation!", e);
 
@@ -240,7 +240,7 @@ public class M2GroupRepository
                   "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!"));
         }
         catch (MetadataException e) {
-          getLogger().warn(
+          log.warn(
               "Metadata exception during parse of metadata from UID=\""
                   + fileItem.getRepositoryItemUid().toString() + "\", will be skipped from aggregation!", e);
 
@@ -270,7 +270,7 @@ public class M2GroupRepository
             MetadataBuilder.changeMetadataIgnoringFailures(result, ops);
         if (metadataExceptions != null && !metadataExceptions.isEmpty()) {
           for (final MetadataException metadataException : metadataExceptions) {
-            getLogger().warn(
+            log.warn(
                 "Ignored exception during M2 metadata merging: " + metadataException.getMessage()
                     + " (request " + request.getRequestPath() + ")", metadataException);
           }
@@ -295,8 +295,8 @@ public class M2GroupRepository
 
       resultOutputStream.close();
 
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug(
+      if (log.isDebugEnabled()) {
+        log.debug(
             "Item for path " + request.toString() + " merged from " + Integer.toString(items.size())
                 + " found items.");
       }

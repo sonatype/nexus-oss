@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.5
  */
 public abstract class AbstractUiContributionBuilder<T>
-    extends AbstractLoggingComponent
+    extends ComponentSupport
 {
 
   protected final Object owner;
@@ -58,7 +58,7 @@ public abstract class AbstractUiContributionBuilder<T>
     InputStream input = owner.getClass().getResourceAsStream(path);
 
     if (input == null) {
-      getLogger().warn("Unable to detect version; failed to load: {}", path);
+      log.warn("Unable to detect version; failed to load: {}", path);
       return null;
     }
 
@@ -66,7 +66,7 @@ public abstract class AbstractUiContributionBuilder<T>
       props.load(input);
     }
     catch (IOException e) {
-      getLogger().warn("Failed to load POM: {}", path, e);
+      log.warn("Failed to load POM: {}", path, e);
       return null;
     }
 

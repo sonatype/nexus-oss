@@ -18,7 +18,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.ClientInfoProvider;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -37,7 +37,7 @@ import org.restlet.data.Request;
 @Named
 @Singleton
 public class RestletClientInfoProvider
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements ClientInfoProvider
 {
   @Override

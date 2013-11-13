@@ -114,8 +114,6 @@ public class StatusPlexusResource
 
     resource.setState(status.getState().toString());
 
-    resource.setOperationMode(status.getOperationMode().toString());
-
     resource.setInitializedAt(status.getInitializedAt());
 
     resource.setStartedAt(status.getStartedAt());

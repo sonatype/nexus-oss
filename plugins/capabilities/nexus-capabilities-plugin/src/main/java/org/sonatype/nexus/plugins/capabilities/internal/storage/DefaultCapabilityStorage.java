@@ -32,13 +32,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.Configuration;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Reader;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Writer;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
@@ -57,7 +57,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Singleton
 @Named
 public class DefaultCapabilityStorage
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements CapabilityStorage
 {
 
@@ -186,10 +186,10 @@ public class DefaultCapabilityStorage
       save();
     }
     catch (final IOException e) {
-      getLogger().error("IOException while retrieving configuration file", e);
+      log.error("IOException while retrieving configuration file", e);
     }
     catch (final XmlPullParserException e) {
-      getLogger().error("Invalid XML Configuration", e);
+      log.error("Invalid XML Configuration", e);
     }
     finally {
       IOUtil.close(fr);
@@ -206,7 +206,7 @@ public class DefaultCapabilityStorage
   {
     lock.lock();
 
-    getLogger().debug("Saving configuration: {}", configurationFile);
+    log.debug("Saving configuration: {}", configurationFile);
     try {
       final FileReplacer fileReplacer = new FileReplacer(configurationFile);
       // we save this file many times, don't litter backups

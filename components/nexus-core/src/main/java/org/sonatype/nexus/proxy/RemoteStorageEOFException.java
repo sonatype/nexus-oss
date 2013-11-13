@@ -35,13 +35,6 @@ public class RemoteStorageEOFException
   /**
    * Constructor.
    */
-  public RemoteStorageEOFException(final ProxyRepository repository, final String message) {
-    this(repository, message, null);
-  }
-
-  /**
-   * Constructor.
-   */
   public RemoteStorageEOFException(final ProxyRepository repository, final String message, final Throwable cause) {
     super(message, cause);
     this.repository = Preconditions.checkNotNull(repository);

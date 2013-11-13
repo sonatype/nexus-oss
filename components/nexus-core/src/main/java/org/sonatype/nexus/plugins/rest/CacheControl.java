@@ -18,6 +18,7 @@ package org.sonatype.nexus.plugins.rest;
  *
  * @since 2.7
  */
+@Deprecated
 public interface CacheControl
 {
 

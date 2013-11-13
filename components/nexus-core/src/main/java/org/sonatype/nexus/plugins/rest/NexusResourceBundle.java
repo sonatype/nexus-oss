@@ -22,6 +22,7 @@ import java.util.List;
  *
  * @author cstamas
  */
+@Deprecated
 public interface NexusResourceBundle
 {
   /**

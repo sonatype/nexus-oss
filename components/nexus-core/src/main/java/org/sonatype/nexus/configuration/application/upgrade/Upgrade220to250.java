@@ -27,7 +27,6 @@ import org.sonatype.nexus.configuration.model.v2_5_0.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.v2_5_0.CRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.v2_5_0.Configuration;
 import org.sonatype.nexus.configuration.model.v2_5_0.upgrade.BasicVersionUpgrade;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.io.Closeables;

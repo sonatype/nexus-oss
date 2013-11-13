@@ -36,8 +36,6 @@ public interface WalkerFilter
   /**
    * In case of Collections, StoreWalker will ask should it process those recursively. This is a place to "cut" the
    * tree walking if needed.
-   *
-   * @paramt context
    */
   boolean shouldProcessRecursively(WalkerContext context, StorageCollectionItem coll);
 }

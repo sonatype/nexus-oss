@@ -155,7 +155,7 @@ public class ObrShadowRepository
       ObrUtils.buildObr(obrMetadataSource, ObrUtils.createObrUid(this), getMasterRepository(), getWalker());
     }
     catch (final StorageException e) {
-      getLogger().warn("Problem rebuilding OBR metadata for repository " + getId(), e);
+      log.warn("Problem rebuilding OBR metadata for repository " + getId(), e);
     }
   }
 

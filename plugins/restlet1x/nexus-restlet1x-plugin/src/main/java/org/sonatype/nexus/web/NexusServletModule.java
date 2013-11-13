@@ -42,7 +42,6 @@ public class NexusServletModule
     serve("/*").with(NexusRestletServlet.class, nexusRestletServletInitParams());
 
     filter("/service/local/*").through(SecurityWebFilter.class);
-    filter("/content/*").through(SecurityWebFilter.class);
     filter("/*").through(MdcUserContextFilter.class);
 
         /*

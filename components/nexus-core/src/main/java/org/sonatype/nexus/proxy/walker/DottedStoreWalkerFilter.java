@@ -38,14 +38,4 @@ public class DottedStoreWalkerFilter
   protected boolean shouldProcessItem(StorageItem item) {
     return !item.getName().startsWith(".");
   }
-
-  /**
-   * Builder method.
-   *
-   * @return new DottedStoreWalkerFilter
-   */
-  public static DottedStoreWalkerFilter excludeItemsStartingWithDot() {
-    return new DottedStoreWalkerFilter();
-  }
-
 }

@@ -26,13 +26,13 @@ import org.sonatype.guice.bean.locators.BeanLocator;
 import org.sonatype.inject.BeanEntry;
 import org.sonatype.inject.EagerSingleton;
 import org.sonatype.inject.Mediator;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.threads.NexusExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -52,7 +52,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @EagerSingleton
 public class EventSubscriberHost
-    extends AbstractLoggingComponent
+    extends ComponentSupport
 {
   private final int HOST_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
       EventSubscriberHost.class.getName() + ".poolSize", 500);
@@ -87,7 +87,7 @@ public class EventSubscriberHost
       hostThreadPool.awaitTermination(5L, TimeUnit.SECONDS);
     }
     catch (InterruptedException e) {
-      getLogger().debug("Interrupted while waiting for termination", e);
+      log.debug("Interrupted while waiting for termination", e);
     }
   }
 
@@ -98,7 +98,7 @@ public class EventSubscriberHost
     else {
       eventBus.register(object);
     }
-    getLogger().trace("Registered {}", object);
+    log.trace("Registered {}", object);
   }
 
   public void unregister(final Object object) {
@@ -108,7 +108,7 @@ public class EventSubscriberHost
     else {
       eventBus.unregister(object);
     }
-    getLogger().trace("Unregistered {}", object);
+    log.trace("Unregistered {}", object);
   }
 
   /**

@@ -28,7 +28,6 @@ import org.sonatype.aether.util.version.GenericVersionScheme;
 import org.sonatype.aether.version.InvalidVersionSpecificationException;
 import org.sonatype.aether.version.Version;
 import org.sonatype.aether.version.VersionScheme;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.maven.tasks.descriptors.ReleaseRemovalTaskDescriptor;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -57,6 +56,7 @@ import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
 import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
 import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -71,7 +71,7 @@ import static org.sonatype.nexus.maven.tasks.descriptors.ReleaseRemovalTaskDescr
 @Named
 @Singleton
 public class DefaultReleaseRemover
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements ReleaseRemover
 {
 
@@ -116,7 +116,7 @@ public class DefaultReleaseRemover
       throw new IllegalArgumentException("The repository with ID=" + repository.getId() + " is not valid for "
           + ID);
     }
-    getLogger().debug("Results of {} are: {}", ReleaseRemovalTaskDescriptor.ID, result);
+    log.debug("Results of {} are: {}", ReleaseRemovalTaskDescriptor.ID, result);
     return result;
   }
 
@@ -124,34 +124,34 @@ public class DefaultReleaseRemover
                           final Repository repository, final Target repositoryTarget)
   {
     if (!repository.getRepositoryContentClass().isCompatible(maven2ContentClass)) {
-      getLogger().debug("Skipping '{}' is not a maven 2 repository", repository.getId());
+      log.debug("Skipping '{}' is not a maven 2 repository", repository.getId());
       return false;
     }
 
     if (!repository.getLocalStatus().shouldServiceRequest()) {
-      getLogger().debug("Skipping '{}' because the repository is out of service", repository.getId());
+      log.debug("Skipping '{}' because the repository is out of service", repository.getId());
       return false;
     }
 
     if (repository.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
-      getLogger().debug("Skipping '{}' because it is a proxy repository", repository.getId());
+      log.debug("Skipping '{}' because it is a proxy repository", repository.getId());
       return false;
     }
 
     if (repository.getRepositoryKind().isFacetAvailable(GroupRepository.class)) {
-      getLogger().debug("Skipping '{}' because it is a group repository", repository.getId());
+      log.debug("Skipping '{}' because it is a group repository", repository.getId());
       return false;
     }
 
     MavenRepository mavenRepository = repository.adaptToFacet(MavenRepository.class);
 
     if (mavenRepository == null) {
-      getLogger().debug("Skipping '{}' because it could not be adapted to MavenRepository", repository.getId());
+      log.debug("Skipping '{}' because it could not be adapted to MavenRepository", repository.getId());
       return false;
     }
 
     if (!RepositoryPolicy.RELEASE.equals(mavenRepository.getRepositoryPolicy())) {
-      getLogger().debug("Skipping '{}' because it is a snapshot or mixed repository", repository.getId());
+      log.debug("Skipping '{}' because it is a snapshot or mixed repository", repository.getId());
       return false;
     }
 
@@ -170,7 +170,7 @@ public class DefaultReleaseRemover
       return;
     }
 
-    getLogger().debug(
+    log.debug(
         "Collecting deletable releases on repository '" + repository.getId() + "' from storage directory "
             + repository.getLocalUrl());
 
@@ -201,11 +201,11 @@ public class DefaultReleaseRemover
   }
 
   private void logDetails(final ReleaseRemovalRequest request) {
-    getLogger().info("Removing older releases from repository: {}", request.getRepositoryId());
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("With parameters: ");
-      getLogger().debug("    NumberOfVersionsToKeep: {}", request.getNumberOfVersionsToKeep());
-      getLogger().debug("    RepositoryTarget applied: {}", request.getTargetId());
+    log.info("Removing older releases from repository: {}", request.getRepositoryId());
+    if (log.isDebugEnabled()) {
+      log.debug("With parameters: ");
+      log.debug("    NumberOfVersionsToKeep: {}", request.getNumberOfVersionsToKeep());
+      log.debug("    RepositoryTarget applied: {}", request.getTargetId());
     }
   }
 
@@ -256,7 +256,7 @@ public class DefaultReleaseRemover
       }
       catch (Exception e) {
         // we always simply log the exception and continue
-        getLogger().warn("{} failed to process path: '{}'.", ID, coll.getPath(), e);
+        log.warn("{} failed to process path: '{}'.", ID, coll.getPath(), e);
       }
     }
 
@@ -296,7 +296,7 @@ public class DefaultReleaseRemover
       if (repositoryTarget != null && !repositoryTarget.isPathContained(
           item.getRepositoryItemUid().getRepository().getRepositoryContentClass(), item
           .getPath())) {
-        getLogger().debug("Excluding file: {} from deletion due to repositoryTarget: {}.", item.getName(),
+        log.debug("Excluding file: {} from deletion due to repositoryTarget: {}.", item.getName(),
             repositoryTarget.getName());
         return;
       }
@@ -353,7 +353,7 @@ public class DefaultReleaseRemover
       for (Map.Entry<Gav, Map<Version, List<StorageFileItem>>> gavListEntry : groupArtifactToVersions.entrySet()) {
         Map<Version, List<StorageFileItem>> versions = gavListEntry.getValue();
         if (versions.size() > request.getNumberOfVersionsToKeep()) {
-          getLogger().debug("{} will delete {} versions of artifact with g={} a={}",
+          log.debug("{} will delete {} versions of artifact with g={} a={}",
               ReleaseRemovalTaskDescriptor.ID,
               versions.size() - request.getNumberOfVersionsToKeep(),
               gavListEntry.getKey().getGroupId(), gavListEntry.getKey().getArtifactId());
@@ -362,7 +362,7 @@ public class DefaultReleaseRemover
           Collections.sort(sortedVersions);
           List<Version> toDelete =
               sortedVersions.subList(0, versions.size() - request.getNumberOfVersionsToKeep());
-          getLogger().debug("Will delete these specific versions: {}", toDelete);
+          log.debug("Will delete these specific versions: {}", toDelete);
           for (Version version : toDelete) {
             for (StorageFileItem storageFileItem : versions.get(version)) {
               repository.deleteItem(createResourceStoreRequest(storageFileItem, context));

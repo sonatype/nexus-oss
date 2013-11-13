@@ -132,25 +132,6 @@ public class DigesterUtils
   // MD5
 
   /**
-   * Calculates a SHA1 digest for a string.
-   */
-  public static String getMd5Digest(String content) {
-    try {
-      InputStream fis = new ByteArrayInputStream(content.getBytes("UTF-8"));
-
-      return getDigest("MD5", fis);
-    }
-    catch (NoSuchAlgorithmException e) {
-      // will not happen
-      return null;
-    }
-    catch (UnsupportedEncodingException e) {
-      // will not happen
-      return null;
-    }
-  }
-
-  /**
    * Calculates a SHA1 digest for a stream.
    */
   public static String getMd5Digest(InputStream is) {
@@ -159,24 +140,6 @@ public class DigesterUtils
     }
     catch (NoSuchAlgorithmException e) {
       // will not happen
-      return null;
-    }
-  }
-
-  /**
-   * Calculates a SHA1 digest for a file.
-   */
-  public static String getMd5Digest(File file) {
-    try {
-      try (FileInputStream fis = new FileInputStream(file)) {
-        return getDigest("MD5", fis);
-      }
-      catch (NoSuchAlgorithmException e) {
-        // will not happen
-        return null;
-      }
-    }
-    catch (IOException e) {
       return null;
     }
   }

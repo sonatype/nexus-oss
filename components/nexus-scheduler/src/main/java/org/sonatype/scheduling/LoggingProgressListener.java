@@ -121,11 +121,6 @@ public class LoggingProgressListener
 
   // ==
 
-  @Deprecated
-  protected String nvl(final String str) {
-    return String.valueOf(str);
-  }
-
   protected String getStackedWorkunitNames() {
     Iterator<Workunit> wi = workunits.descendingIterator();
 

@@ -66,6 +66,7 @@ import sun.net.www.protocol.http.AuthCacheImpl;
 import sun.net.www.protocol.http.AuthCacheValue;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -573,6 +574,8 @@ public class NexusRestClient
       }
 
       in = response.getEntity().getStream();
+      checkState(in != null, "null entity input-stream");
+
       out = new BufferedOutputStream(new FileOutputStream(downloadedFile));
 
       IOUtil.copy(in, out, 1024);

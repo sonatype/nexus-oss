@@ -159,7 +159,7 @@ public class P2ProxyRepositoryImpl
   }
 
   protected void configureMirrors(final ResourceStoreRequest incomingRequest) {
-    getLogger().debug("Repository " + getId() + ": configureMirrors: mirrorsConfigured=" + mirrorsConfigured);
+    log.debug("Repository " + getId() + ": configureMirrors: mirrorsConfigured=" + mirrorsConfigured);
     AbstractStorageItem mirrorsItem = null;
 
     // Try to get the mirrors from local storage
@@ -183,7 +183,7 @@ public class P2ProxyRepositoryImpl
       if (mirrorsItem == null || isOld(mirrorsItem)) {
         mirrorsURLsByRepositoryURL = null;
 
-        getLogger().debug("Repository " + getId() + ": configureMirrors: getting mirrors from remote");
+        log.debug("Repository " + getId() + ": configureMirrors: getting mirrors from remote");
         final ResourceStoreRequest request = new ResourceStoreRequest(P2Constants.ARTIFACTS_XML);
         request.getRequestContext().setParentContext(incomingRequest.getRequestContext());
 
@@ -197,7 +197,7 @@ public class P2ProxyRepositoryImpl
             artifacts.getRepositoryItemAttributes().get(P2ProxyMetadataSource.ATTR_MIRRORS_URL);
         if (mirrorsURL != null) {
           // The remote repository is a SimpleArtifactRepository with mirrors configured
-          getLogger().debug(
+          log.debug(
               "Repository " + getId() + ": configureMirrors: found single mirrors URL=" + mirrorsURL);
           final StorageFileItem remoteMirrorsItem = getMirrorsItemRemote(mirrorsURL);
           final ContentLocator content =
@@ -227,14 +227,14 @@ public class P2ProxyRepositoryImpl
         }
       }
       else {
-        getLogger().debug("Repository " + getId() + ": configureMirrors: found flat list of mirrors");
+        log.debug("Repository " + getId() + ": configureMirrors: found flat list of mirrors");
         // There are no "repository" elements, so we only have a flat list of mirrors
 
         mirrorMap.clear();
 
         for (final Xpp3Dom mirrorDOM : mirrorsDom.getChildren("mirror")) {
           final String mirrorUrl = mirrorDOM.getAttribute("url");
-          getLogger().debug("Repository " + getId() + ": configureMirrors: found mirror URL=" + mirrorUrl);
+          log.debug("Repository " + getId() + ": configureMirrors: found mirror URL=" + mirrorUrl);
           if (mirrorUrl != null) {
             // TODO: validate that this is valid way to generate id
             // or if should be pulled from xml
@@ -249,8 +249,8 @@ public class P2ProxyRepositoryImpl
       mirrorsConfigured = true;
     }
     catch (final Exception e) {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().warn(
+      if (log.isDebugEnabled()) {
+        log.warn(
             "Could not retrieve list of repository mirrors. "
                 + "All downloads will come from repository canonical URL.", e);
       }
@@ -261,7 +261,7 @@ public class P2ProxyRepositoryImpl
             message += " Reason: " + e.getCause().getMessage();
           }
         }
-        getLogger().warn(
+        log.warn(
             "Could not retrieve list of repository mirrors (" + message
                 + "). All downloads will come from repository canonical URL.");
       }
@@ -302,13 +302,13 @@ public class P2ProxyRepositoryImpl
   {
     final Map<String, String> mirrorsURLsMap = getMirrorsURLsByRepositoryURL();
     if (mirrorsURLsMap == null) {
-      getLogger().debug("getMirrorsItemRemote: mirrorsURLsMap is null");
+      log.debug("getMirrorsItemRemote: mirrorsURLsMap is null");
       return null;
     }
 
     final Xpp3Dom mirrorsByRepositoryDom = new Xpp3Dom("mirrors");
     for (final String repositoryURL : mirrorsURLsMap.keySet()) {
-      getLogger().debug("getMirrorsItemRemote: repositoryURL=" + repositoryURL);
+      log.debug("getMirrorsItemRemote: repositoryURL=" + repositoryURL);
       final Xpp3Dom repositoryDom = new Xpp3Dom("repository");
       repositoryDom.setAttribute("uri", repositoryURL);
       mirrorsByRepositoryDom.addChild(repositoryDom);
@@ -321,7 +321,7 @@ public class P2ProxyRepositoryImpl
       final StorageFileItem mirrorsItem = getMirrorsItemRemote(mirrorsURL);
       final Xpp3Dom mirrorsDom = getMirrorsDom((StorageFileItem) mirrorsItem);
       for (final Xpp3Dom mirrorDOM : mirrorsDom.getChildren("mirror")) {
-        getLogger().debug("getMirrorsItemRemote: mirrorURL=" + mirrorDOM.getAttribute("url"));
+        log.debug("getMirrorsItemRemote: mirrorURL=" + mirrorDOM.getAttribute("url"));
         repositoryDom.addChild(mirrorDOM);
       }
     }
@@ -402,7 +402,7 @@ public class P2ProxyRepositoryImpl
       throws IllegalOperationException, ItemNotFoundException, StorageException
   {
     final String requestPath = request.getRequestPath();
-    getLogger().debug("Repository " + getId() + ": doRetrieveItem:" + requestPath);
+    log.debug("Repository " + getId() + ": doRetrieveItem:" + requestPath);
 
     if (P2Constants.ARTIFACT_MAPPINGS_XML.equals(requestPath)) {
       if (getLocalStorage() == null) {
@@ -565,7 +565,7 @@ public class P2ProxyRepositoryImpl
       }
     }
     catch (final StorageException | IllegalOperationException e) {
-      getLogger().warn("Could not find artifact-mapping.", e);
+      log.warn("Could not find artifact-mapping.", e);
     }
 
     for (final Mirror mirror : mirrorMap.values()) {
@@ -586,20 +586,20 @@ public class P2ProxyRepositoryImpl
     // For p2 repositories, the root URL may not be reachable,
     // so we test if we can reach one of the "standard" p2 repository metadata files.
     for (final String metadataFilePath : P2Constants.METADATA_FILE_PATHS) {
-      getLogger().debug(
+      log.debug(
           "isRemoteStorageReachable: RepositoryId=" + getId() + ": Trying to access " + metadataFilePath);
       request.setRequestPath(metadataFilePath);
       try {
         // We cannot use getRemoteStorage().isReachable() here because that forces the request path to be "/"
         if (getRemoteStorage().containsItem(this, request)) {
-          getLogger().debug(
+          log.debug(
               "isRemoteStorageReachable: RepositoryId=" + getId() + ": Successfully accessed "
                   + metadataFilePath);
           return true;
         }
       }
       catch (final RemoteStorageException e) {
-        getLogger().debug(
+        log.debug(
             "isRemoteStorageReachable: RepositoryId=" + getId() + ": Caught exception while trying to access "
                 + metadataFilePath, e);
 

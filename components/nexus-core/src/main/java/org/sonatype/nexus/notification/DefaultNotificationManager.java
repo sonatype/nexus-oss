@@ -160,11 +160,11 @@ public class DefaultNotificationManager
           carrier.notifyTarget(target, request.getMessage());
         }
         catch (NotificationException e) {
-          getLogger().warn("Could not send out notification over carrier \"{}\".", carrierKey, e);
+          log.warn("Could not send out notification over carrier \"{}\".", carrierKey, e);
         }
       }
       else {
-        getLogger().info("Notification carrier \"{}\" is unknown!", carrierKey);
+        log.info("Notification carrier \"{}\" is unknown!", carrierKey);
       }
     }
   }

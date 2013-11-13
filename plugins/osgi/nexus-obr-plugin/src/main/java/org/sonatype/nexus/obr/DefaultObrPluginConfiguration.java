@@ -27,7 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
@@ -41,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class DefaultObrPluginConfiguration
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements ObrPluginConfiguration
 {
   private static final String DEFAULT_OBR_PROPERTY_PATH = "/META-INF/nexus-obr-plugin/nexus-obr-plugin.properties";
@@ -91,7 +91,7 @@ public class DefaultObrPluginConfiguration
 
   private void writeDefaultConfiguration() {
     final File configurationFile = getConfigurationFile();
-    getLogger().debug("Saving configuration: {}", configurationFile);
+    log.debug("Saving configuration: {}", configurationFile);
     try {
       final FileReplacer fileReplacer = new FileReplacer(configurationFile);
       // we save this file many times, don't litter backups
@@ -110,7 +110,7 @@ public class DefaultObrPluginConfiguration
       });
     }
     catch (IOException e) {
-      getLogger().warn(
+      log.warn(
           "Could not write the OBR plugin configuration to path " + configurationFile.getAbsolutePath(), e);
       Throwables.propagate(e);
     }
