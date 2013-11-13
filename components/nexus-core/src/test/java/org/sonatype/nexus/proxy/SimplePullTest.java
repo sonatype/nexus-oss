@@ -50,6 +50,7 @@ import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -71,6 +72,11 @@ public class SimplePullTest
     ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
     this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder(ss);
     return jettyTestsuiteEnvironmentBuilder;
+  }
+
+  @Before
+  public void startNexus() throws Exception {
+    startNx();
   }
 
   @Test

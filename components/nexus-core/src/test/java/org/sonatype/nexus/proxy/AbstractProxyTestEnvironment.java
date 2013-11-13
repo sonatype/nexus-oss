@@ -25,7 +25,6 @@ import java.util.List;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.events.Event;
-import org.sonatype.nexus.events.EventSubscriberHost;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -65,11 +64,6 @@ public abstract class AbstractProxyTestEnvironment
    * The repository registry.
    */
   private RepositoryRegistry repositoryRegistry;
-
-  /**
-   * Event host
-   */
-  private EventSubscriberHost eventSubscriberHost;
 
   /**
    * The local repository storage.
@@ -197,9 +191,6 @@ public abstract class AbstractProxyTestEnvironment
 
     applicationConfiguration = lookup(ApplicationConfiguration.class);
 
-    eventSubscriberHost = lookup(EventSubscriberHost.class);
-    eventSubscriberHost.startup();
-
     repositoryRegistry = lookup(RepositoryRegistry.class);
 
     testEventListener = new TestItemEventListener();
@@ -237,8 +228,8 @@ public abstract class AbstractProxyTestEnvironment
   {
     try {
       getEnvironmentBuilder().stopService();
-      eventSubscriberHost.shutdown();
-    } finally {
+    }
+    finally {
       super.tearDown();
     }
   }
