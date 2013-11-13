@@ -19,6 +19,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
+import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -35,6 +36,11 @@ public class RepositoryItemUidAttributeEventInspector
   @Inject
   public RepositoryItemUidAttributeEventInspector(final RepositoryItemUidAttributeManager manager) {
     this.manager = manager;
+  }
+
+  @Subscribe
+  public void inspect(final NexusInitializedEvent evt) {
+    manager.reset();
   }
 
   @Subscribe
