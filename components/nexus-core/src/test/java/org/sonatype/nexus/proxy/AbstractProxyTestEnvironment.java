@@ -25,6 +25,7 @@ import java.util.List;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.events.Event;
+import org.sonatype.nexus.events.EventSubscriberHost;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -66,9 +67,9 @@ public abstract class AbstractProxyTestEnvironment
   private RepositoryRegistry repositoryRegistry;
 
   /**
-   * The local repository storage.
+   * Event host
    */
-  private AttributesHandler attributesHandler;
+  private EventSubscriberHost eventSubscriberHost;
 
   /**
    * The local repository storage.
@@ -196,13 +197,17 @@ public abstract class AbstractProxyTestEnvironment
 
     applicationConfiguration = lookup(ApplicationConfiguration.class);
 
+    eventSubscriberHost = lookup(EventSubscriberHost.class);
+    eventSubscriberHost.startup();
+
     repositoryRegistry = lookup(RepositoryRegistry.class);
 
     testEventListener = new TestItemEventListener();
 
     eventBus().register(testEventListener);
 
-    attributesHandler = lookup(AttributesHandler.class);
+    // "ping" it
+    lookup(AttributesHandler.class);
 
     localRepositoryStorage = lookup(LocalRepositoryStorage.class, "file");
 
@@ -230,8 +235,12 @@ public abstract class AbstractProxyTestEnvironment
   public void tearDown()
       throws Exception
   {
-    getEnvironmentBuilder().stopService();
-    super.tearDown();
+    try {
+      getEnvironmentBuilder().stopService();
+      eventSubscriberHost.shutdown();
+    } finally {
+      super.tearDown();
+    }
   }
 
   /**
