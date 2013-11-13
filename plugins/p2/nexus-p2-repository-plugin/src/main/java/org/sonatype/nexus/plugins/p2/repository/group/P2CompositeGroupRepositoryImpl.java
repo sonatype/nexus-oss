@@ -53,7 +53,7 @@ import org.sonatype.p2.bridge.CompositeRepository;
 
 import com.google.common.base.Throwables;
 import com.google.common.eventbus.Subscribe;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import static com.google.common.base.Preconditions.checkNotNull;

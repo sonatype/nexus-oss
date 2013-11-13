@@ -24,7 +24,7 @@ import org.sonatype.sisu.resource.scanner.Scanner;
 import org.sonatype.sisu.resource.scanner.helper.ListenerSupport;
 
 import com.google.common.collect.Sets;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.io.File.separator;
@@ -51,7 +51,7 @@ public class RpmScanner
     {
       @Override
       public void onFile(final File file) {
-        if ("rpm".equalsIgnoreCase(FileUtils.extension(file.getName()))
+        if ("rpm".equalsIgnoreCase(FilenameUtils.getExtension(file.getName()))
             && !getRelativePath(baseDir, file).startsWith(".")) {
           rpms.add(file);
         }

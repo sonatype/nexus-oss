@@ -43,7 +43,6 @@ import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
 import com.google.common.collect.Lists;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -161,21 +160,12 @@ public class DefaultCapabilityStorage
 
     lock.lock();
 
-    Reader fr = null;
-    FileInputStream is = null;
-
-    try {
-      final Reader r = new FileReader(configurationFile);
+    try (Reader r = new FileReader(configurationFile);
+         FileInputStream is = new FileInputStream(configurationFile);
+         Reader fr = new InputStreamReader(is)) {
 
       Xpp3DomBuilder.build(r);
-
-      is = new FileInputStream(configurationFile);
-
-      final NexusCapabilitiesConfigurationXpp3Reader reader = new NexusCapabilitiesConfigurationXpp3Reader();
-
-      fr = new InputStreamReader(is);
-
-      configuration = reader.read(fr);
+      configuration = new NexusCapabilitiesConfigurationXpp3Reader().read(fr);
     }
     catch (final FileNotFoundException e) {
       // This is ok, may not exist first time around
@@ -192,9 +182,6 @@ public class DefaultCapabilityStorage
       log.error("Invalid XML Configuration", e);
     }
     finally {
-      IOUtil.close(fr);
-      IOUtil.close(is);
-
       lock.unlock();
     }
 

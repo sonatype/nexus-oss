@@ -32,10 +32,8 @@ import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 
-import com.google.common.io.Closeables;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
-import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Legacy AttributeStorage implementation that uses it's own FS storage to store attributes, by persisting StorageItem
@@ -201,13 +199,7 @@ public class LegacyFSAttributeStorage
   {
     final File repoBase = new File(workingDirectory, uid.getRepository().getId());
 
-    File result = null;
-
-    String path = FileUtils.getPath(uid.getPath());
-
-    String name = FileUtils.removePath(uid.getPath());
-
-    result = new File(repoBase, path + "/" + name);
+    File result = new File(repoBase, uid.getPath());
 
     // to be foolproof
     // 2007.11.09. - Believe or not, Nexus deleted my whole USB rack! (cstamas)
@@ -240,11 +232,7 @@ public class LegacyFSAttributeStorage
     boolean corrupt = false;
 
     if (target.exists() && target.isFile()) {
-      FileInputStream fis = null;
-
-      try {
-        fis = new FileInputStream(target);
-
+      try (FileInputStream fis = new FileInputStream(target)) {
         result = (AbstractStorageItem) marshaller.fromXML(fis);
         result.upgrade();
 
@@ -292,9 +280,6 @@ public class LegacyFSAttributeStorage
         log.info("While reading attributes of " + uid + " we got IOException:", e);
 
         throw e;
-      }
-      finally {
-        Closeables.closeQuietly(fis);
       }
     }
 

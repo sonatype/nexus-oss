@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 public class TimelineTest
@@ -108,8 +108,8 @@ public class TimelineTest
   {
     File crashedPersistDir = new File(getBasedir(), "target/test-classes/crashed-could-not-read/persist");
     File carshedIndexDir = new File(getBasedir(), "target/test-classes/crashed-could-not-read/index");
-    FileUtils.copyDirectoryStructure(crashedPersistDir, persistDirectory);
-    FileUtils.copyDirectoryStructure(carshedIndexDir, indexDirectory);
+    FileUtils.copyDirectory(crashedPersistDir, persistDirectory);
+    FileUtils.copyDirectory(carshedIndexDir, indexDirectory);
 
     // as time passes, the timestamps in test persist files will fall out of default 30 day, so we say restore all
     timeline.start(new TimelineConfiguration(persistDirectory, indexDirectory,
@@ -139,8 +139,8 @@ public class TimelineTest
   {
     File crashedPersistDir = new File(getBasedir(), "target/test-classes/crashed-could-not-retrieve/persist");
     File carshedIndexDir = new File(getBasedir(), "target/test-classes/crashed-could-not-retrieve/index");
-    FileUtils.copyDirectoryStructure(crashedPersistDir, persistDirectory);
-    FileUtils.copyDirectoryStructure(carshedIndexDir, indexDirectory);
+    FileUtils.copyDirectory(crashedPersistDir, persistDirectory);
+    FileUtils.copyDirectory(carshedIndexDir, indexDirectory);
 
     // as time passes, the timestamps in test persist files will fall out of default 30 day, so we say restore all
     timeline.start(new TimelineConfiguration(persistDirectory, indexDirectory,
@@ -171,8 +171,8 @@ public class TimelineTest
     File persistDir = new File(getBasedir(), "target/test-classes/crashed-could-not-add/persist");
     File goodIndexDir = new File(getBasedir(), "target/test-classes/crashed-could-not-add/index-good");
     File crashedIndexDir = new File(getBasedir(), "target/test-classes/crashed-could-not-add/index-broken");
-    FileUtils.copyDirectoryStructure(persistDir, persistDirectory);
-    FileUtils.copyDirectoryStructure(goodIndexDir, indexDirectory);
+    FileUtils.copyDirectory(persistDir, persistDirectory);
+    FileUtils.copyDirectory(goodIndexDir, indexDirectory);
 
     // as time passes, the timestamps in test persist files will fall out of default 30 day, so we say restore all
     timeline.start(new TimelineConfiguration(persistDirectory, indexDirectory,
@@ -191,7 +191,7 @@ public class TimelineTest
     // pretend that when timeline is running, the index is manually changed
     timeline.stop();
     cleanDirectory(indexDirectory);
-    FileUtils.copyDirectoryStructure(crashedIndexDir, indexDirectory);
+    FileUtils.copyDirectory(crashedIndexDir, indexDirectory);
     // as time passes, the timestamps in test persist files will fall out of default 30 day, so we say restore all
     timeline.start(new TimelineConfiguration(persistDirectory, indexDirectory,
         TimelineConfiguration.DEFAULT_ROLLING_INTERVAL_MILLIS,
@@ -214,8 +214,8 @@ public class TimelineTest
     File persistDir = new File(getBasedir(), "target/test-classes/crashed-could-not-purge/persist");
     File goodIndexDir = new File(getBasedir(), "target/test-classes/crashed-could-not-purge/index-good");
     File crashedIndexDir = new File(getBasedir(), "target/test-classes/crashed-could-not-purge/index-broken");
-    FileUtils.copyDirectoryStructure(persistDir, persistDirectory);
-    FileUtils.copyDirectoryStructure(goodIndexDir, indexDirectory);
+    FileUtils.copyDirectory(persistDir, persistDirectory);
+    FileUtils.copyDirectory(goodIndexDir, indexDirectory);
 
     // as time passes, the timestamps in test persist files will fall out of default 30 day, so we say restore all
     timeline.start(new TimelineConfiguration(persistDirectory, indexDirectory,
@@ -228,7 +228,7 @@ public class TimelineTest
     // pretend that when timeline is running, the index is manually changed
     timeline.stop();
     cleanDirectory(indexDirectory);
-    FileUtils.copyDirectoryStructure(crashedIndexDir, indexDirectory);
+    FileUtils.copyDirectory(crashedIndexDir, indexDirectory);
     // as time passes, the timestamps in test persist files will fall out of default 30 day, so we say restore all
     timeline.start(new TimelineConfiguration(persistDirectory, indexDirectory,
         TimelineConfiguration.DEFAULT_ROLLING_INTERVAL_MILLIS,

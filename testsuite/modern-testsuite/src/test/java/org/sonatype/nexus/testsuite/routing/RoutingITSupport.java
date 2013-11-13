@@ -24,7 +24,6 @@ import org.sonatype.nexus.client.core.subsystem.routing.Routing;
 import org.sonatype.nexus.testsuite.NexusCoreITSupport;
 import org.sonatype.nexus.testsuite.client.RoutingTest;
 
-import com.google.common.io.Closeables;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -84,18 +83,10 @@ public abstract class RoutingITSupport
   protected InputStream getPrefixFileFrom(final String url)
       throws IOException
   {
-    InputStream entityStream = null;
-    try {
-      final HttpResponse httpResponse = executeGet(url);
-      assertThat(httpResponse.getStatusLine().getStatusCode(), equalTo(200));
-      assertThat(httpResponse.getEntity(), is(notNullValue()));
-      entityStream = httpResponse.getEntity().getContent();
-      return entityStream;
-    }
-    catch (IOException e) {
-      Closeables.closeQuietly(entityStream);
-      throw e;
-    }
+    final HttpResponse httpResponse = executeGet(url);
+    assertThat(httpResponse.getStatusLine().getStatusCode(), equalTo(200));
+    assertThat(httpResponse.getEntity(), is(notNullValue()));
+    return httpResponse.getEntity().getContent();
   }
 
   protected boolean exists(final Location location, Directive directive)

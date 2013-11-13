@@ -29,7 +29,8 @@ import org.sonatype.nexus.util.file.FileSupport;
  * Some utils that should end in plexus-utils.
  *
  * @author cstamas
- * @deprecated Do not use it, will be removed in future releases. Use {@link FileSupport} or {@link DirSupport} instead.
+ * @deprecated Do not use it, will be removed in future releases. Use {@link FileSupport} or {@link DirSupport}
+ *             instead.
  */
 @Deprecated
 public class FileUtils
@@ -221,7 +222,12 @@ public class FileUtils
       }
     }
     else if (source.isFile()) {
-      org.codehaus.plexus.util.FileUtils.forceDelete(destination);
+      try {
+        org.apache.commons.io.FileUtils.forceDelete(destination);
+      }
+      catch (FileNotFoundException e) {
+        // do nothing
+      }
       if (!source.renameTo(destination)) {
         throw new IOException("Failed to move '" + source + "' to '" + destination + "'");
       }
@@ -229,7 +235,12 @@ public class FileUtils
     else if (source.isDirectory()) {
       // the folder already exists the, so let's do a recursive move....
       if (destination.isFile()) {
-        org.codehaus.plexus.util.FileUtils.forceDelete(destination);
+        try {
+          org.apache.commons.io.FileUtils.forceDelete(destination);
+        }
+        catch (FileNotFoundException e) {
+          // do nothing
+        }
         if (!source.renameTo(destination)) {
           throw new IOException("Failed to move '" + source + "' to '" + destination + "'");
         }
@@ -239,8 +250,12 @@ public class FileUtils
         for (String file : files) {
           move(new File(source, file), new File(destination, file));
         }
-
-        org.codehaus.plexus.util.FileUtils.forceDelete(source);
+        try {
+          org.apache.commons.io.FileUtils.forceDelete(source);
+        }
+        catch (FileNotFoundException e) {
+          // no nothing
+        }
       }
     }
   }

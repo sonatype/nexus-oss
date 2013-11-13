@@ -26,7 +26,6 @@ import org.sonatype.guice.bean.containers.InjectedTest;
 import org.sonatype.nexus.test.util.StopWatch;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -89,9 +88,7 @@ public class ConfigurableInjectedTest
 
   private void load(final Properties properties, final URL url) {
     if (url != null) {
-      InputStream in = null;
-      try {
-        in = url.openStream();
+      try (InputStream in = url.openStream()) {
         if (in != null) {
           properties.load(in);
         }
@@ -99,9 +96,6 @@ public class ConfigurableInjectedTest
       }
       catch (final IOException e) {
         throw new IllegalStateException("Failed to load " + url.toExternalForm(), e);
-      }
-      finally {
-        IOUtil.close(in);
       }
     }
   }

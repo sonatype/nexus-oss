@@ -23,8 +23,8 @@ import java.util.Random;
 
 import org.sonatype.nexus.rest.model.ArtifactCoordinate;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
@@ -70,19 +70,10 @@ public class PomArtifactManager
 
     tmpPomFile.deleteOnExit();
 
-    FileOutputStream os = null;
-
-    try {
-      os = new FileOutputStream(tmpPomFile);
-
-      IOUtil.copy(is, os);
-
+    try (InputStream in = is;
+         FileOutputStream out = new FileOutputStream(tmpPomFile)) {
+      IOUtils.copy(is, out);
       state = STATE_FILE_STORED;
-    }
-    finally {
-      IOUtil.close(is);
-
-      IOUtil.close(os);
     }
   }
 
@@ -108,17 +99,9 @@ public class PomArtifactManager
       return artifactCoordinate;
     }
 
-    Reader reader = null;
-
-    try {
-      reader = ReaderFactory.newXmlReader(tmpPomFile);
-
+    try (Reader reader = ReaderFactory.newXmlReader(tmpPomFile)) {
       artifactCoordinate = parsePom(reader);
-
       state = STATE_GAV_PARSED;
-    }
-    finally {
-      IOUtil.close(reader);
     }
 
     return artifactCoordinate;

@@ -20,8 +20,8 @@ import org.sonatype.security.model.AbstractSecurityConfigTest;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 public class DefaultSecurityConfigurationUpgraderTest
     extends AbstractSecurityConfigTest
@@ -49,7 +49,7 @@ public class DefaultSecurityConfigurationUpgraderTest
 
     w.write(sw, configuration);
 
-    String shouldBe = IOUtil.toString(getClass().getResourceAsStream(path + ".result"));
+    String shouldBe = IOUtils.toString(getClass().getResourceAsStream(path + ".result"));
     shouldBe = shouldBe.replace("\r\n", "\n");
 
     assertEquals(shouldBe, sw.toString());

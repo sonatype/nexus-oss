@@ -24,7 +24,7 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -75,14 +75,9 @@ public class RemoteErrorPageWith200Test
         (DefaultStorageFileItem) remoteStorage.retrieveItem(aProxyRepository, storeRequest, this.baseUrl);
 
     // result should be HTML
-    InputStream itemInputStrem = item.getInputStream();
-
-    try {
-      String content = IOUtil.toString(itemInputStrem);
+    try (InputStream io = item.getInputStream()) {
+      String content = IOUtils.toString(io);
       Assert.assertEquals(expectedContent, content);
-    }
-    finally {
-      IOUtil.close(itemInputStrem);
     }
   }
 
