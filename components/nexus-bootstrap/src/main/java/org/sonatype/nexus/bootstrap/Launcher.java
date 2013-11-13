@@ -81,11 +81,16 @@ public class Launcher
     return null; // continue running
   }
 
-  protected void maybeEnableCommandMonitor() throws IOException {
-    String port = System.getProperty(COMMAND_MONITOR_PORT);
-    if (port == null) {
-      port = System.getenv(COMMAND_MONITOR_PORT);
+  protected String getProperty(final String name, final String defaultValue) {
+    String value = System.getProperty(name, System.getenv(name));
+    if (value == null) {
+      value = defaultValue;
     }
+    return value;
+  }
+
+  protected void maybeEnableCommandMonitor() throws IOException {
+    String port = getProperty(COMMAND_MONITOR_PORT, null);
     if (port != null) {
       new CommandMonitorThread(
           Integer.parseInt(port),
@@ -104,25 +109,11 @@ public class Launcher
   }
 
   protected void maybeEnableShutdownIfNotAlive() throws IOException {
-    String port = System.getProperty(KEEP_ALIVE_PORT);
-    if (port == null) {
-      port = System.getenv(KEEP_ALIVE_PORT);
-    }
+    String port = getProperty(KEEP_ALIVE_PORT, null);
     if (port != null) {
-      String pingInterval = System.getProperty(KEEP_ALIVE_PING_INTERVAL);
-      if (pingInterval == null) {
-        pingInterval = System.getenv(KEEP_ALIVE_PING_INTERVAL);
-        if (pingInterval == null) {
-          pingInterval = FIVE_SECONDS;
-        }
-      }
-      String timeout = System.getProperty(KEEP_ALIVE_TIMEOUT);
-      if (timeout == null) {
-        timeout = System.getenv(KEEP_ALIVE_TIMEOUT);
-        if (timeout == null) {
-          timeout = ONE_SECOND;
-        }
-      }
+      String pingInterval = getProperty(KEEP_ALIVE_PING_INTERVAL, FIVE_SECONDS);
+      String timeout = getProperty(KEEP_ALIVE_TIMEOUT, ONE_SECOND);
+
       new KeepAliveThread(
           LOCALHOST,
           Integer.parseInt(port),
