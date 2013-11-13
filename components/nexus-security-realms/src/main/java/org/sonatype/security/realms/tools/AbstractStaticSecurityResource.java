@@ -22,7 +22,6 @@ import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -56,22 +55,14 @@ public abstract class AbstractStaticSecurityResource
       checkState(url != null, "Missing static security configuration resource: %s", resourcePath);
       assert url != null;
 
-      Reader fr = null;
-      InputStream is = null;
-      try {
-        log.debug("Loading static security configuration: {}", url);
-        is = url.openStream();
+      log.debug("Loading static security configuration: {}", url);
+      try (InputStream is = url.openStream();
+           Reader fr = new InputStreamReader(is)) {
         SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-
-        fr = new InputStreamReader(is);
         return reader.read(fr);
       }
       catch (Exception e) {
         log.error("Failed to read configuration", e);
-      }
-      finally {
-        IOUtil.close(fr);
-        IOUtil.close(is);
       }
     }
 

@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.security.upgrade;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -20,8 +21,8 @@ import java.io.StringWriter;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.events.EventSubscriber;
 
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -65,20 +66,15 @@ public class SecurityConfigurationUpgradeTest
   private void verifyUpgrade(String resource)
       throws IOException
   {
-    InputStream stream = null;
     StringWriter writer = new StringWriter();
-    try {
-      stream = getClass().getResourceAsStream(resource);
-      IOUtil.copy(stream, writer);
-    }
-    finally {
-      IOUtil.close(stream);
+    try (InputStream stream = getClass().getResourceAsStream(resource)) {
+      IOUtils.copy(stream, writer);
     }
 
     String expected = writer.toString();
 
     // security should be upgraded now. lets look at the security.xml
-    String securityXML = FileUtils.fileRead(getNexusSecurityConfiguration());
+    String securityXML = FileUtils.readFileToString(new File(getNexusSecurityConfiguration()));
 
     Assert.assertEquals(expected.replace("\r", ""), securityXML.replace("\r", ""));
 

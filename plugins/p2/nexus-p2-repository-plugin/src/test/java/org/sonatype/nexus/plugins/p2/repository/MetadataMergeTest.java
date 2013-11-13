@@ -25,7 +25,6 @@ import org.sonatype.nexus.plugins.p2.repository.metadata.Content;
 import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataMergeException;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -167,12 +166,8 @@ public class MetadataMergeTest
   private Xpp3Dom loadXpp3Dom(final String filepath)
       throws IOException, XmlPullParserException
   {
-    final FileInputStream is = new FileInputStream(new File("src/test/resources", filepath));
-    try {
+    try (FileInputStream is = new FileInputStream(new File("src/test/resources", filepath))) {
       return Xpp3DomBuilder.build(new XmlStreamReader(is));
-    }
-    finally {
-      IOUtil.close(is);
     }
   }
 }

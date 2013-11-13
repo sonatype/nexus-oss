@@ -23,7 +23,7 @@ import org.sonatype.inject.BeanScanning;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
 import junit.framework.Assert;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;

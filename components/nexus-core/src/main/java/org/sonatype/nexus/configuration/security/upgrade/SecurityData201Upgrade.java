@@ -36,7 +36,6 @@ import org.sonatype.security.model.v2_0_2.CRole;
 import org.sonatype.security.model.v2_0_2.Configuration;
 import org.sonatype.security.model.v2_0_2.io.xpp3.SecurityConfigurationXpp3Reader;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,14 +136,9 @@ public class SecurityData201Upgrade
     String staticSecurityPath = "/META-INF/nexus/static-security.xml";
     Map<String, CPrivilege> privilegeMap = new HashMap<String, CPrivilege>();
 
-    Reader fr = null;
-    InputStream is = null;
-
-    try {
-      is = getClass().getResourceAsStream(staticSecurityPath);
+    try (InputStream is = getClass().getResourceAsStream(staticSecurityPath);
+         Reader fr = new InputStreamReader(is)) {
       SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-
-      fr = new InputStreamReader(is);
 
       Configuration staticConfig = reader.read(fr);
 
@@ -156,14 +150,10 @@ public class SecurityData201Upgrade
 
     }
     catch (IOException e) {
-      this.logger.error("IOException while retrieving configuration file", e);
+      logger.error("IOException while retrieving configuration file", e);
     }
     catch (org.codehaus.plexus.util.xml.pull.XmlPullParserException e) {
-      this.logger.error("Invalid XML Configuration", e);
-    }
-    finally {
-      IOUtil.close(fr);
-      IOUtil.close(is);
+      logger.error("Invalid XML Configuration", e);
     }
 
     return privilegeMap;

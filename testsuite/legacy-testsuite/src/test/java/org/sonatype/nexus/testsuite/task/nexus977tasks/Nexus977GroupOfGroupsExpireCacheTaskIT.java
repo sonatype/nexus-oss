@@ -23,8 +23,8 @@ import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.artifact.Gav;
-import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Test;

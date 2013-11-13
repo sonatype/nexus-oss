@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -66,7 +66,7 @@ public class ParentOMaticTest
       final String callerName = getCallerMethodName();
       final String actualClasspathName = getClass().getSimpleName() + "-" + callerName + ".txt";
       final InputStream actualInputStream = getClass().getResourceAsStream(actualClasspathName);
-      final String actual = IOUtil.toString(actualInputStream).replace("\r\n", "\n");
+      final String actual = IOUtils.toString(actualInputStream).replace("\r\n", "\n");
 
       assertThat(actual, Matchers.equalTo(stringBuilder.toString()));
     }

@@ -40,7 +40,8 @@ import org.sonatype.p2.bridge.model.TouchpointType;
 import org.sonatype.sisu.resource.scanner.helper.ListenerSupport;
 import org.sonatype.sisu.resource.scanner.scanners.SerialScanner;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.createTemporaryP2Repository;
@@ -200,7 +201,7 @@ public class DefaultP2MetadataGenerator
   {
     File tempP2Repository = null;
     try {
-      final String extension = FileUtils.getExtension(artifact.getRepositoryPath());
+      final String extension = FilenameUtils.getExtension(artifact.getRepositoryPath());
 
       tempP2Repository = createTemporaryP2Repository();
 

@@ -23,7 +23,6 @@ import org.sonatype.nexus.test.utils.GavUtil;
 import com.thoughtworks.xstream.XStream;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.index.artifact.Gav;
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Status;
@@ -49,14 +48,14 @@ public class Nexus1646DeployArtifactsIT
         new File(nexusWorkDir, "storage/nexus-test-harness-release-repo/nexus1646/artifact/maven-metadata.xml");
     Assert.assertTrue("Metadata file not found " + metadataFile.getAbsolutePath(), metadataFile.isFile());
 
-    FileInputStream input = new FileInputStream(metadataFile);
-    Metadata md = MetadataBuilder.read(input);
-    IOUtil.close(input);
+    try (FileInputStream input = new FileInputStream(metadataFile)) {
+      Metadata md = MetadataBuilder.read(input);
 
-    Assert.assertEquals(md.getVersioning().getLatest(), gav.getVersion());
-    Assert.assertEquals(md.getVersioning().getRelease(), gav.getVersion());
-    Assert.assertEquals(1, md.getVersioning().getVersions().size());
-    Assert.assertEquals(md.getVersioning().getVersions().get(0), gav.getVersion());
+      Assert.assertEquals(md.getVersioning().getLatest(), gav.getVersion());
+      Assert.assertEquals(md.getVersioning().getRelease(), gav.getVersion());
+      Assert.assertEquals(1, md.getVersioning().getVersions().size());
+      Assert.assertEquals(md.getVersioning().getVersions().get(0), gav.getVersion());
+    }
   }
 
   @Test
@@ -105,16 +104,16 @@ public class Nexus1646DeployArtifactsIT
             + "/org/codehaus/mojo/changelog-maven-plugin/maven-metadata.xml");
     Assert.assertTrue("Metadata file not found " + metadataFile.getAbsolutePath(), metadataFile.isFile());
 
-    FileInputStream input = new FileInputStream(metadataFile);
-    Metadata md = MetadataBuilder.read(input);
-    IOUtil.close(input);
+    try (FileInputStream input = new FileInputStream(metadataFile)) {
+      Metadata md = MetadataBuilder.read(input);
 
-    logger.info(new XStream().toXML(md));
+      logger.info(new XStream().toXML(md));
 
-    Assert.assertEquals(md.getVersioning().getLatest(), "2.0-beta-1");
-    Assert.assertEquals(md.getVersioning().getRelease(), "2.0-beta-1");
-    Assert.assertEquals(1, md.getVersioning().getVersions().size());
-    Assert.assertEquals(md.getVersioning().getVersions().get(0), "2.0-beta-1");
+      Assert.assertEquals(md.getVersioning().getLatest(), "2.0-beta-1");
+      Assert.assertEquals(md.getVersioning().getRelease(), "2.0-beta-1");
+      Assert.assertEquals(1, md.getVersioning().getVersions().size());
+      Assert.assertEquals(md.getVersioning().getVersions().get(0), "2.0-beta-1");
+    }
   }
 
 }

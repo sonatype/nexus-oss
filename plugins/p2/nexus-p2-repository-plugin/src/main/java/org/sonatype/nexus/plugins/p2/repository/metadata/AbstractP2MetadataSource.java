@@ -49,7 +49,7 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Maps;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.MXSerializer;
 
@@ -155,7 +155,7 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
          ZipOutputStream out = new ZipOutputStream(buffer);
          InputStream in = metadataXml.getInputStream()) {
       out.putNextEntry(new JarEntry(metadataXml.getName()));
-      IOUtil.copy(in, out);
+      IOUtils.copy(in, out);
     }
 
     final DefaultStorageFileItem result = new DefaultStorageFileItem(

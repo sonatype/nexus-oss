@@ -27,10 +27,10 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.targets.DefaultTargetRegistry;
 import org.sonatype.nexus.proxy.targets.TargetRegistry;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.DirectoryWalkListener;
 import org.codehaus.plexus.util.DirectoryWalker;
-import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Tests that needs some repo content and are Maven related.

@@ -22,7 +22,6 @@ import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.Test;
 
 
@@ -67,9 +66,9 @@ public class LdapConnMd5IT
   protected void copyDefaultLdapConfigToPlace()
       throws IOException
   {
-    InputStream in = getClass().getResourceAsStream("/test-conf/md5-ldap.xml");
-    this.interpolateLdapXml(in, new File(getNexusLdapConfiguration()));
-    IOUtil.close(in);
+    try (InputStream in = getClass().getResourceAsStream("/test-conf/md5-ldap.xml")) {
+      interpolateLdapXml(in, new File(getNexusLdapConfiguration()));
+    }
   }
 
 }

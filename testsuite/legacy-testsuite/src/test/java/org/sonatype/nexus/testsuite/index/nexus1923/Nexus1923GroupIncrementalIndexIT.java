@@ -15,7 +15,7 @@ package org.sonatype.nexus.testsuite.index.nexus1923;
 
 import org.sonatype.nexus.integrationtests.ITGroups.INDEX;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -48,7 +48,7 @@ public class Nexus1923GroupIncrementalIndexIT
     String reindexId = createReindexTask(GROUP_ID, GROUP_REINDEX_TASK_NAME);
 
     // deploy artifact 1 on repo 1
-    FileUtils.copyDirectoryStructure(getTestFile(FIRST_ARTIFACT), getHostedRepositoryStorageDirectory());
+    FileUtils.copyDirectory(getTestFile(FIRST_ARTIFACT), getHostedRepositoryStorageDirectory());
 
     reindexRepository(reindexId, GROUP_REINDEX_TASK_NAME);
 
@@ -74,7 +74,7 @@ public class Nexus1923GroupIncrementalIndexIT
     searchFor(HOSTED_REPO_ID, FIRST_ARTIFACT);
 
     // deploy artifact 2 on repo 2
-    FileUtils.copyDirectoryStructure(getTestFile(SECOND_ARTIFACT), getSecondHostedRepositoryStorageDirectory());
+    FileUtils.copyDirectory(getTestFile(SECOND_ARTIFACT), getSecondHostedRepositoryStorageDirectory());
 
     reindexRepository(reindexId, GROUP_REINDEX_TASK_NAME);
 
@@ -106,7 +106,7 @@ public class Nexus1923GroupIncrementalIndexIT
     searchFor(SECOND_HOSTED_REPO_ID, SECOND_ARTIFACT);
 
     // deploy artifact 3 on repo 3
-    FileUtils.copyDirectoryStructure(getTestFile(THIRD_ARTIFACT), getThirdHostedRepositoryStorageDirectory());
+    FileUtils.copyDirectory(getTestFile(THIRD_ARTIFACT), getThirdHostedRepositoryStorageDirectory());
     reindexRepository(reindexId, GROUP_REINDEX_TASK_NAME);
 
     // shouldn't changed from previous status
@@ -140,7 +140,7 @@ public class Nexus1923GroupIncrementalIndexIT
     searchFor(THIRD_HOSTED_REPO_ID, THIRD_ARTIFACT);
 
     // deploy artifact 4 on repo 1
-    FileUtils.copyDirectoryStructure(getTestFile(FOURTH_ARTIFACT), getHostedRepositoryStorageDirectory());
+    FileUtils.copyDirectory(getTestFile(FOURTH_ARTIFACT), getHostedRepositoryStorageDirectory());
     reindexRepository(reindexId, GROUP_REINDEX_TASK_NAME);
 
     // now repo 1 gets index .2

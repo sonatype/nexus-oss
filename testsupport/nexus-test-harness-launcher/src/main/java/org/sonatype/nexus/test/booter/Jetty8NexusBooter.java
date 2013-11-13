@@ -38,7 +38,6 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
-import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -328,15 +327,15 @@ public class Jetty8NexusBooter
       }
 
       Properties p = new Properties();
-      InputStream in = new FileInputStream(jettyProperties);
-      p.load(in);
-      IOUtil.close(in);
+      try (InputStream in = new FileInputStream(jettyProperties)) {
+        p.load(in);
+      }
 
       p.setProperty("application-port", String.valueOf(port));
 
-      OutputStream out = new FileOutputStream(jettyProperties);
-      p.store(out, "NexusStatusUtil");
-      IOUtil.close(out);
+      try (OutputStream out = new FileOutputStream(jettyProperties)) {
+        p.store(out, "NexusStatusUtil");
+      }
     }
 
     // ==

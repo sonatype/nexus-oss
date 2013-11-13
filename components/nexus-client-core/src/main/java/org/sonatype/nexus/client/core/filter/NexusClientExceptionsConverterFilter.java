@@ -30,7 +30,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.ClientFilter;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 
 /**
  * A filter that converts some known http error codes to specific {@link NexusClientException}:
@@ -112,9 +112,9 @@ public class NexusClientExceptionsConverterFilter
 
   private String getResponseBody(final ClientResponse response) {
     try {
-      final byte[] body = IOUtil.toByteArray(response.getEntityInputStream());
+      final byte[] body = IOUtils.toByteArray(response.getEntityInputStream());
       response.setEntityInputStream(new ByteArrayInputStream(body));
-      return IOUtil.toString(body, "UTF-8");
+      return IOUtils.toString(body, "UTF-8");
     }
     catch (IOException e) {
       throw new IllegalStateException("Jersey unexpectedly refused to rewind buffered entity.");

@@ -68,7 +68,6 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -287,13 +286,8 @@ public class P2ProxyRepositoryImpl
   private Xpp3Dom getMirrorsDom(final StorageFileItem mirrorsItem)
       throws IOException, XmlPullParserException
   {
-    final InputStream is = mirrorsItem.getInputStream();
-
-    try {
+    try (InputStream is = mirrorsItem.getInputStream()) {
       return Xpp3DomBuilder.build(new XmlStreamReader(is));
-    }
-    finally {
-      IOUtil.close(is);
     }
   }
 
@@ -328,9 +322,7 @@ public class P2ProxyRepositoryImpl
 
     final FileContentLocator fileContentLocator = new FileContentLocator("text/xml");
     try {
-      OutputStream buffer = null;
-      try {
-        buffer = fileContentLocator.getOutputStream();
+      try (OutputStream buffer = fileContentLocator.getOutputStream();) {
         final MXSerializer mx = new MXSerializer();
         mx.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  ");
         mx.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n");
@@ -339,9 +331,6 @@ public class P2ProxyRepositoryImpl
         mx.startDocument(encoding, null);
         mirrorsByRepositoryDom.writeToSerializer(null, mx);
         mx.flush();
-      }
-      finally {
-        IOUtil.close(buffer);
       }
 
       final DefaultStorageFileItem result =
@@ -364,7 +353,8 @@ public class P2ProxyRepositoryImpl
     if (mirrorsItem instanceof StorageFileItem) {
       return (StorageFileItem) mirrorsItem;
     }
-    throw new ItemNotFoundException(ItemNotFoundException.reasonFor(request, this, "URL %s does not contain valid mirrors", mirrorsURL));
+    throw new ItemNotFoundException(
+        ItemNotFoundException.reasonFor(request, this, "URL %s does not contain valid mirrors", mirrorsURL));
   }
 
   private String getBaseMirrorsURL(final URL mirrorsURL) {

@@ -39,10 +39,10 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.sisu.goodies.common.Loggers;
 
 import com.google.common.eventbus.Subscribe;
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 
 /**
@@ -318,19 +318,11 @@ public abstract class AbstractProxyTestEnvironment
   protected void saveItemToFile(StorageFileItem item, File file)
       throws IOException
   {
-    FileOutputStream fos = null;
-    InputStream is = null;
-    try {
-      is = item.getInputStream();
-      fos = new FileOutputStream(file);
-      IOUtil.copy(is, fos);
+    try (InputStream is = item.getInputStream();
+         FileOutputStream fos = new FileOutputStream(file)) {
+      IOUtils.copy(is, fos);
       fos.flush();
     }
-    finally {
-      IOUtil.close(is);
-      IOUtil.close(fos);
-    }
-
   }
 
   public PlexusContainer getPlexusContainer() {
@@ -377,27 +369,16 @@ public abstract class AbstractProxyTestEnvironment
       throws Exception
   {
     MetadataXpp3Reader metadataReader = new MetadataXpp3Reader();
-    InputStreamReader isr = null;
-    Metadata md = null;
-    try {
-      isr = new InputStreamReader(new FileInputStream(mdf));
-      md = metadataReader.read(isr);
+    try (InputStreamReader isr = new InputStreamReader(new FileInputStream(mdf))) {
+      return metadataReader.read(isr);
     }
-    finally {
-      IOUtil.close(isr);
-    }
-    return md;
   }
 
   protected String contentAsString(StorageItem item)
       throws IOException
   {
-    InputStream is = ((StorageFileItem) item).getInputStream();
-    try {
-      return IOUtil.toString(is, "UTF-8", 1024);
-    }
-    finally {
-      IOUtil.close(is);
+    try (InputStream is = ((StorageFileItem) item).getInputStream()) {
+      return IOUtils.toString(is, "UTF-8");
     }
   }
 
