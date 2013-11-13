@@ -24,7 +24,7 @@ import org.sonatype.nexus.obr.metadata.ObrResourceWriter;
 import org.sonatype.nexus.obr.metadata.ObrSite;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.osgi.service.obr.Resource;
 
@@ -146,12 +146,8 @@ public class ObrResourceWriterTest
   private String obrToString(final RepositoryItemUid uid)
       throws Exception
   {
-    final InputStream is = openObrSite(uid).openStream();
-    try {
-      return IOUtil.toString(is).replaceFirst("lastmodified='[0-9]*'", "");
-    }
-    finally {
-      IOUtil.close(is);
+    try (InputStream is = openObrSite(uid).openStream()) {
+      return IOUtils.toString(is).replaceFirst("lastmodified='[0-9]*'", "");
     }
   }
 }

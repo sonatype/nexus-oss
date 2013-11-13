@@ -20,8 +20,6 @@ import java.util.Scanner;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.validator.FileTypeValidator.FileTypeValidity;
 
-import org.codehaus.plexus.util.IOUtil;
-
 /**
  * Static helper methods to make "XML like" files probation against some patterns or expected content easier and
  * reusable.
@@ -61,9 +59,7 @@ public class XMLUtils
       throws IOException
   {
     int lineCount = 0;
-    BufferedInputStream bis = null;
-    try {
-      bis = new BufferedInputStream(file.getInputStream());
+    try (BufferedInputStream bis = new BufferedInputStream(file.getInputStream())) {
       Scanner scanner = new Scanner(bis);
       while (scanner.hasNextLine() && lineCount < linesToCheck) {
         lineCount++;
@@ -72,9 +68,6 @@ public class XMLUtils
           return FileTypeValidity.VALID;
         }
       }
-    }
-    finally {
-      IOUtil.close(bis);
     }
 
     return FileTypeValidity.INVALID;

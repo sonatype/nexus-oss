@@ -40,10 +40,8 @@ import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.io.RawInputStreamFacade;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
@@ -145,12 +143,8 @@ public class UnpackPlexusResource
               }
               final ResourceStoreRequest storeRequest =
                   getResourceStoreRequest(request, basePath + "/" + entry.getName());
-              final InputStream is = zip.getInputStream(entry);
-              try {
+              try (InputStream is = zip.getInputStream(entry)) {
                 repository.storeItem(storeRequest, is, null);
-              }
-              finally {
-                IOUtil.close(is);
               }
             }
           }
@@ -205,12 +199,8 @@ public class UnpackPlexusResource
   private void copyToFile(final FileItem source, final File target)
       throws IOException
   {
-    InputStream is = source.getInputStream();
-    try {
-      FileUtils.copyStreamToFile(new RawInputStreamFacade(is), target);
-    }
-    finally {
-      IOUtil.close(is);
+    try (InputStream is = source.getInputStream()) {
+      FileUtils.copyInputStreamToFile(is, target);
     }
   }
 

@@ -22,9 +22,7 @@ import java.util.zip.ZipFile;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.io.RawInputStreamFacade;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -71,12 +69,8 @@ public class MetadataUtils
   private static Xpp3Dom parseXmlItem(final StorageFileItem item)
       throws IOException, XmlPullParserException
   {
-    final InputStream is = item.getInputStream();
-    try {
+    try (InputStream is = item.getInputStream()) {
       return Xpp3DomBuilder.build(new XmlStreamReader(is));
-    }
-    finally {
-      IOUtil.close(is);
     }
   }
 
@@ -85,24 +79,17 @@ public class MetadataUtils
   {
     final File file = File.createTempFile("p2file", "zip");
     try {
-      final InputStream is = item.getInputStream();
-      try {
-        FileUtils.copyStreamToFile(new RawInputStreamFacade(is), file);
-        final ZipFile z = new ZipFile(file);
-        try {
+      try (InputStream is = item.getInputStream()) {
+        FileUtils.copyInputStreamToFile(is, file);
+        try (ZipFile z = new ZipFile(file)) {
           final ZipEntry ze = z.getEntry(jarPath);
           if (ze == null) {
             throw new LocalStorageException("Corrupted P2 metadata jar " + jarPath);
           }
-          final InputStream zis = z.getInputStream(ze);
-          return Xpp3DomBuilder.build(new XmlStreamReader(zis));
+          try (InputStream zis = z.getInputStream(ze)) {
+            return Xpp3DomBuilder.build(new XmlStreamReader(zis));
+          }
         }
-        finally {
-          z.close();
-        }
-      }
-      finally {
-        IOUtil.close(is);
       }
     }
     finally {

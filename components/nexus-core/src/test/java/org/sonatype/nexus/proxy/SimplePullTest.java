@@ -47,10 +47,11 @@ import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Server;
 
 import com.google.common.base.Strings;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Assert;
 import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
@@ -405,7 +406,7 @@ public class SimplePullTest
     // now put a hosted repository "inhouse-snapshot" out of service to make output nicer
     final Repository inhouseSnapshot = getRepositoryRegistry().getRepository("inhouse-snapshot");
     inhouseSnapshot.setLocalStatus(LocalStatus.OUT_OF_SERVICE);
-    ((AbstractMavenRepository)inhouseSnapshot).commitChanges();
+    ((AbstractMavenRepository) inhouseSnapshot).commitChanges();
 
     // so far, what we did: we had few reposes and a group called "test" (that had all the reposes as members).
     // now, we added test and repo1 reposes ta a newly created group, to have groups of groups.

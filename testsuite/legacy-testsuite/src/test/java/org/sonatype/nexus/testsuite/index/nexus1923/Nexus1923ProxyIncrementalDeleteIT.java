@@ -17,7 +17,7 @@ import java.io.File;
 
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,15 +41,15 @@ public class Nexus1923ProxyIncrementalDeleteIT
     //And hosted repository task
     String hostedReindexId = createHostedReindexTask();
     //index hosted repo
-    FileUtils.copyDirectoryStructure(getTestFile(FIRST_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(FIRST_ARTIFACT),
         hostedRepoStorageDirectory);
-    FileUtils.copyDirectoryStructure(getTestFile(SECOND_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(SECOND_ARTIFACT),
         hostedRepoStorageDirectory);
-    FileUtils.copyDirectoryStructure(getTestFile(THIRD_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(THIRD_ARTIFACT),
         hostedRepoStorageDirectory);
-    FileUtils.copyDirectoryStructure(getTestFile(FOURTH_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(FOURTH_ARTIFACT),
         hostedRepoStorageDirectory);
-    FileUtils.copyDirectoryStructure(getTestFile(FIFTH_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(FIFTH_ARTIFACT),
         hostedRepoStorageDirectory);
     reindexHostedRepository(hostedReindexId);
 
@@ -69,9 +69,9 @@ public class Nexus1923ProxyIncrementalDeleteIT
     //Now delete some items and put some back
     deleteAllNonHiddenContent(getHostedRepositoryStorageDirectory());
     deleteAllNonHiddenContent(getProxyRepositoryStorageDirectory());
-    FileUtils.copyDirectoryStructure(getTestFile(FIRST_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(FIRST_ARTIFACT),
         hostedRepoStorageDirectory);
-    FileUtils.copyDirectoryStructure(getTestFile(SECOND_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(SECOND_ARTIFACT),
         hostedRepoStorageDirectory);
 
     //Reindex

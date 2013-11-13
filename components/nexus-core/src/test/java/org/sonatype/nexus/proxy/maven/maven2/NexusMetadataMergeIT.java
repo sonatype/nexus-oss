@@ -31,7 +31,6 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.Test;
 
 // This is an IT just because it runs longer then 15 seconds
@@ -58,11 +57,8 @@ public class NexusMetadataMergeIT
   public Metadata parseMetadata(InputStream inputStream)
       throws IOException
   {
-    try {
-      return MetadataBuilder.read(inputStream);
-    }
-    finally {
-      IOUtil.close(inputStream);
+    try (InputStream in = inputStream) {
+      return MetadataBuilder.read(in);
     }
   }
 

@@ -19,7 +19,7 @@ import java.io.InputStream;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public abstract class AbstractApplicationConfigurationSourceTest
@@ -51,25 +51,9 @@ public abstract class AbstractApplicationConfigurationSourceTest
     // thus changing it (but no content change!)
     copyDefaultConfigToPlace();
 
-    InputStream configStream = null;
-
-    InputStream originalStream = null;
-
-    try {
-      configStream = configurationSource.getConfigurationAsStream();
-
-      originalStream = getOriginatingConfigurationInputStream();
-
-      assertTrue(IOUtil.contentEquals(configStream, originalStream));
-    }
-    finally {
-      if (configStream != null) {
-        configStream.close();
-      }
-
-      if (originalStream != null) {
-        originalStream.close();
-      }
+    try (InputStream configStream = configurationSource.getConfigurationAsStream();
+         InputStream originalStream = getOriginatingConfigurationInputStream()) {
+      assertTrue(IOUtils.contentEquals(configStream, originalStream));
     }
   }
 

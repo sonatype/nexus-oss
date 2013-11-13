@@ -20,7 +20,6 @@ import java.util.Properties;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,18 +49,13 @@ public class BuildNumberService
     }
 
     Properties props = new Properties();
-    InputStream input = null;
-    try {
-      input = url.openStream();
-      props.load(input);
 
+    try (InputStream input = url.openStream()) {
+      props.load(input);
       log.debug("Loaded properties: {}", props);
     }
     catch (Exception e) {
       log.warn("Could not determine build number", e);
-    }
-    finally {
-      IOUtils.closeQuietly(input);
     }
 
     return props.getProperty("version", "unknown-version");

@@ -39,10 +39,10 @@ import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
 import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 

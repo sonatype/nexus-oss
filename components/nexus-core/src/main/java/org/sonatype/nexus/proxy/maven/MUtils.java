@@ -23,7 +23,6 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import com.google.common.io.Closeables;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -54,13 +53,8 @@ public class MUtils
   public static String readDigestFromStream(final InputStream inputStream)
       throws IOException
   {
-    try {
-      try (final InputStreamReader isr = new InputStreamReader(inputStream, Charsets.UTF_8)) {
-        return readDigest(CharStreams.toString(isr));
-      }
-    }
-    finally {
-      Closeables.close(inputStream, true);
+    try (InputStreamReader isr = new InputStreamReader(inputStream, Charsets.UTF_8)) {
+      return readDigest(CharStreams.toString(isr));
     }
   }
 

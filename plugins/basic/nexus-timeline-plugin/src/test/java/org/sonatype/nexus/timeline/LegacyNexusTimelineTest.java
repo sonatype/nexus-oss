@@ -25,9 +25,10 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Binder;
 import com.google.inject.Module;
+import org.apache.commons.io.FileUtils;
 import org.apache.shiro.util.ThreadContext;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -79,7 +80,7 @@ public class LegacyNexusTimelineTest
   {
     final File legacyDataDir = new File(getBasedir(), "target/test-classes/timeline/legacy");
     final File legacyTimelineDir = new File(getWorkHomeDir(), "timeline");
-    FileUtils.copyDirectoryStructure(legacyDataDir, legacyTimelineDir);
+    FileUtils.copyDirectory(legacyDataDir, legacyTimelineDir);
     final NexusTimeline nexusTimeline = this.lookup(NexusTimeline.class);
     final EntryListCallback cb = new EntryListCallback();
     nexusTimeline.retrieve(0, 10, null, null, null, cb);
@@ -94,8 +95,8 @@ public class LegacyNexusTimelineTest
     final File newDataDir = new File(getBasedir(), "target/test-classes/timeline/new");
     final File legacyTimelineDir = new File(getWorkHomeDir(), "timeline");
     final File newTimelineDir = new File(getWorkHomeDir(), "timeline/index");
-    FileUtils.copyDirectoryStructure(legacyDataDir, legacyTimelineDir);
-    FileUtils.copyDirectoryStructure(newDataDir, newTimelineDir);
+    FileUtils.copyDirectory(legacyDataDir, legacyTimelineDir);
+    FileUtils.copyDirectory(newDataDir, newTimelineDir);
     final NexusTimeline nexusTimeline = this.lookup(NexusTimeline.class);
     final EntryListCallback cb = new EntryListCallback();
     nexusTimeline.retrieve(0, 10, null, null, null, cb);

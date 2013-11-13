@@ -18,7 +18,7 @@ import java.io.File;
 import org.sonatype.nexus.integrationtests.ITGroups.INDEX;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -46,7 +46,7 @@ public class Nexus1923ProxyIncrementalIndexIT
 
     TaskScheduleUtil.waitForAllTasksToStop();
 
-    FileUtils.copyDirectoryStructure(getTestFile(FIRST_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(FIRST_ARTIFACT),
         hostedRepoStorageDirectory);
 
     reindexHostedRepository(hostedReindexId);
@@ -81,7 +81,7 @@ public class Nexus1923ProxyIncrementalIndexIT
     searchForArtifactInProxyIndex(FIFTH_ARTIFACT, false);
 
     //Now add items to hosted, and reindex to create incremental chunk
-    FileUtils.copyDirectoryStructure(getTestFile(SECOND_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(SECOND_ARTIFACT),
         hostedRepoStorageDirectory);
     reindexHostedRepository(hostedReindexId);
 
@@ -111,7 +111,7 @@ public class Nexus1923ProxyIncrementalIndexIT
     searchForArtifactInProxyIndex(FIFTH_ARTIFACT, false);
 
     // Now make the hosted have 3 more index chunks
-    FileUtils.copyDirectoryStructure(getTestFile(THIRD_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(THIRD_ARTIFACT),
         hostedRepoStorageDirectory);
     reindexHostedRepository(hostedReindexId);
 
@@ -124,7 +124,7 @@ public class Nexus1923ProxyIncrementalIndexIT
     Assert.assertTrue(getHostedRepositoryIndexIncrement("3").exists());
     Assert.assertFalse(getHostedRepositoryIndexIncrement("4").exists());
 
-    FileUtils.copyDirectoryStructure(getTestFile(FOURTH_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(FOURTH_ARTIFACT),
         hostedRepoStorageDirectory);
     reindexHostedRepository(hostedReindexId);
 

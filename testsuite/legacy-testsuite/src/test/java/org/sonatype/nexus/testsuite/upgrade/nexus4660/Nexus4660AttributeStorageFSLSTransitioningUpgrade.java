@@ -19,7 +19,7 @@ import java.io.IOException;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.AfterClass;
@@ -57,7 +57,7 @@ public class Nexus4660AttributeStorageFSLSTransitioningUpgrade
   {
     super.copyTestResources();
 
-    FileUtils.copyDirectoryStructure(getTestFile("workfolder"), new File(nexusWorkDir));
+    FileUtils.copyDirectory(getTestFile("workfolder"), new File(nexusWorkDir));
 
     nexusBaseDir = new File(nexusWorkDir);
 
@@ -81,7 +81,7 @@ public class Nexus4660AttributeStorageFSLSTransitioningUpgrade
   }
 
   protected int countFiles(final File directory, final String... extensions) {
-    return FileUtils.getFilesFromExtension(directory.getAbsolutePath(), extensions).length;
+    return FileUtils.listFiles(directory, extensions, true).size();
   }
 
   protected void assertUpgradeStepsByOldNewAttributeCount(final int oldExpected, final int newExpected) {

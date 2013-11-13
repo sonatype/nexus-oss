@@ -109,7 +109,7 @@ public class FileConfigurationSourceTest
     // copy the config into place
     File nexusConfigFile = FileUtils
         .getFileFromUrl(ClassLoader.getSystemClassLoader().getResource("nexus-NEXUS-2212.xml").toString());
-    org.codehaus.plexus.util.FileUtils.copyFile(nexusConfigFile, new File(getWorkHomeDir(), "conf/nexus.xml"));
+    org.apache.commons.io.FileUtils.copyFile(nexusConfigFile, new File(getWorkHomeDir(), "conf/nexus.xml"));
 
     configurationSource = (FileConfigurationSource) getConfigurationSource();
     configurationSource.loadConfiguration();

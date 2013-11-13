@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 
 /**
@@ -90,7 +90,7 @@ public class MavenVerifierHelper
       throws IOException
   {
     final File logFile = new File(verifier.getLogFileName());
-    final String log = FileUtils.fileRead(logFile);
+    final String log = FileUtils.readFileToString(logFile);
     Assert.fail(log);
   }
 }

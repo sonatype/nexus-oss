@@ -18,7 +18,7 @@ import java.net.URL;
 
 import org.sonatype.nexus.testsuite.p2.AbstractNexusP2GeneratorIT;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

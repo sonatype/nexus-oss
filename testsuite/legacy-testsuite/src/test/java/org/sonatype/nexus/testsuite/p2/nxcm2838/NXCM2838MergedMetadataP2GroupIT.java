@@ -18,7 +18,7 @@ import java.net.URL;
 
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -48,7 +48,7 @@ public class NXCM2838MergedMetadataP2GroupIT
     );
     assertThat(artifactsXmlFile, exists());
 
-    final String artifactsXmlContent = FileUtils.fileRead(artifactsXmlFile);
+    final String artifactsXmlContent = FileUtils.readFileToString(artifactsXmlFile);
 
     // has 5 mappings
     assertThat(artifactsXmlFile, contains(
