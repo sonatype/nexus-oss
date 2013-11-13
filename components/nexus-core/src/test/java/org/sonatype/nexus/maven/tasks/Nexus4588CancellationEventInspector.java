@@ -13,6 +13,9 @@
 
 package org.sonatype.nexus.maven.tasks;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireNotFoundCaches;
 import org.sonatype.scheduling.TaskUtil;
@@ -27,6 +30,8 @@ import com.google.common.eventbus.Subscribe;
  *
  * @author: cstamas
  */
+@Singleton
+@Named("nexus4588")
 public class Nexus4588CancellationEventInspector
     implements EventSubscriber
 {

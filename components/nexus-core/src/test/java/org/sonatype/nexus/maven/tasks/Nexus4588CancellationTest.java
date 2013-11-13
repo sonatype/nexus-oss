@@ -13,12 +13,18 @@
 
 package org.sonatype.nexus.maven.tasks;
 
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.scheduling.CancellableProgressListenerWrapper;
 import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
 
+import com.google.common.collect.ObjectArrays;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import com.google.inject.name.Names;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +39,22 @@ import org.junit.Test;
 public class Nexus4588CancellationTest
     extends AbstractMavenRepoContentTests
 {
+
+  @Override
+  protected Module[] getTestCustomModules() {
+    Module[] modules = super.getTestCustomModules();
+    if (modules == null) {
+      modules = new Module[0];
+    }
+    modules = ObjectArrays.concat(modules, new Module()
+    {
+      @Override
+      public void configure(final Binder binder) {
+        binder.bind(Nexus4588CancellationEventInspector.class);
+      }
+    });
+    return modules;
+  }
 
   @Before
   public void setUpProgressListener()
