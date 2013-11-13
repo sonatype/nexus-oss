@@ -18,7 +18,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -93,11 +92,6 @@ public class WebappBootstrap
         config = new Configuration();
         config.load();
         Configuration.HOLDER.set(config);
-
-        log.info("Properties:");
-        for (Entry<String,String> entry : config.getProperties().entrySet()) {
-          log.info("  {}='{}'", entry.getKey(), entry.getValue());
-        }
       }
       Map<String, String> properties = config.getProperties();
 
