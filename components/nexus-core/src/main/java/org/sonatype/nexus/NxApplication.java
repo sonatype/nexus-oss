@@ -99,6 +99,9 @@ public class NxApplication
       }
     }
 
+    // register core and plugin contributed subscribers, start dispatching events to them
+    eventSubscriberHost.startup();
+
     applicationStatusSource.setState(SystemState.STOPPED);
     applicationStatusSource.getSystemStatus().setInitializedAt(new Date());
     eventBus.post(new NexusInitializedEvent(this));
@@ -191,6 +194,7 @@ public class NxApplication
     // kill services + notify
     nexusScheduler.shutdown();
     eventBus.post(new NexusStoppedEvent(this));
+    eventSubscriberHost.shutdown();
     nexusConfiguration.dropInternals();
     securitySystem.stop();
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPED);

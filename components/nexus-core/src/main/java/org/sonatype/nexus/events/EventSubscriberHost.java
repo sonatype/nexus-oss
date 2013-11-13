@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.events;
 
+import java.util.List;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
@@ -20,12 +21,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.guice.bean.locators.BeanLocator;
-import org.sonatype.inject.BeanEntry;
-import org.sonatype.inject.Mediator;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.threads.NexusExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
@@ -35,7 +33,6 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
-import com.google.inject.Key;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -55,13 +52,16 @@ public class EventSubscriberHost
 
   private final EventBus eventBus;
 
+  private final List<Provider<EventSubscriber>> eventSubscriberProviders;
+
   private final NexusExecutorService hostThreadPool;
 
   private final com.google.common.eventbus.AsyncEventBus asyncBus;
 
   @Inject
-  public EventSubscriberHost(final EventBus eventBus, final BeanLocator beanLocator) {
+  public EventSubscriberHost(final EventBus eventBus, final List<Provider<EventSubscriber>> eventSubscriberProviders) {
     this.eventBus = checkNotNull(eventBus);
+    this.eventSubscriberProviders = checkNotNull(eventSubscriberProviders);
 
     // direct hand-off used! Host pool will use caller thread to execute async inspectors when pool full!
     final ThreadPoolExecutor target =
@@ -70,13 +70,39 @@ public class EventSubscriberHost
     this.hostThreadPool = NexusExecutorService.forCurrentSubject(target);
     this.asyncBus = new com.google.common.eventbus.AsyncEventBus("esh-async", hostThreadPool);
 
-    beanLocator.watch(Key.get(EventSubscriber.class), new EventSubscriberMediator(), this);
     eventBus.register(this);
-    log.info("Started");
+    log.info("Initialized");
+  }
+
+  public void startup() {
+    log.info("Starting");
+    for (Provider<EventSubscriber> eventSubscriberProvider : eventSubscriberProviders) {
+      EventSubscriber es = null;
+      try {
+        es = eventSubscriberProvider.get();
+        register(es);
+      }
+      catch (Exception e) {
+        log.warn("Could not register {}", es, e);
+      }
+    }
   }
 
   public void shutdown() {
     eventBus.unregister(this);
+    log.info("Stopping");
+
+    for (Provider<EventSubscriber> eventSubscriberProvider : eventSubscriberProviders) {
+      EventSubscriber es = null;
+      try {
+        es = eventSubscriberProvider.get();
+        unregister(es);
+      }
+      catch (Exception e) {
+        log.warn("Could not unregister {}", es, e);
+      }
+    }
+
     // we need clean shutdown, wait all background event inspectors to finish to have consistent state
     hostThreadPool.shutdown();
     try {
@@ -121,36 +147,5 @@ public class EventSubscriberHost
   @AllowConcurrentEvents
   public void onEvent(final Object evt) {
     asyncBus.post(evt);
-    if (evt instanceof NexusStoppedEvent) {
-      shutdown();
-    }
-  }
-
-  // == EventSubscriber support
-
-  private static class EventSubscriberMediator
-      implements Mediator<Named, EventSubscriber, EventSubscriberHost>
-  {
-    @Override
-    public void add(final BeanEntry<Named, EventSubscriber> entry, final EventSubscriberHost watcher) throws Exception {
-      try {
-        watcher.register(entry.getValue());
-      }
-      catch (Exception e) {
-        // NEXUS-4775 Guice exception trying to resolve circular dependencies too early
-      }
-    }
-
-    @Override
-    public void remove(final BeanEntry<Named, EventSubscriber> entry, final EventSubscriberHost watcher)
-        throws Exception
-    {
-      try {
-        watcher.unregister(entry.getValue());
-      }
-      catch (Exception e) {
-        // NEXUS-4775 Guice exception trying to resolve circular dependencies too early
-      }
-    }
   }
 }
