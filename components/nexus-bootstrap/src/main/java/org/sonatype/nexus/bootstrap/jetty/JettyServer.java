@@ -152,7 +152,7 @@ public class JettyServer
 
     // complain if no components configured
     if (components.isEmpty()) {
-      throw new Exception("Failed to configure any components");
+      throw new IllegalStateException("Failed to configure any components");
     }
 
     thread = new JettyMainThread(components);
