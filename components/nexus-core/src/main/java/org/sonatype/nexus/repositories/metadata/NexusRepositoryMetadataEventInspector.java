@@ -90,6 +90,7 @@ public class NexusRepositoryMetadataEventInspector
   public void on(final RepositoryRegistryEventAdd evt) {
     inspect(evt);
   }
+
   @Subscribe
   @AllowConcurrentEvents
   public void on(final RepositoryConfigurationUpdatedEvent evt) {
