@@ -14,12 +14,13 @@
 package org.sonatype.nexus.test.booter;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -36,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.apache.commons.io.filefilter.FileFilterUtils.filter;
+import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
 
 /**
  * Embedded Nexus server booter.
@@ -49,7 +52,7 @@ public class EmbeddedNexusBooter
 
   private static final String IT_REALM_ID = "it-realm";
 
-  private final File bundleBasedir;
+  private final File installDir;
 
   private final int port;
 
@@ -67,9 +70,9 @@ public class EmbeddedNexusBooter
 
   private Object jettyServer;
 
-  public EmbeddedNexusBooter(final File bundleBasedir, final int port) throws Exception {
-    this.bundleBasedir = checkNotNull(bundleBasedir).getCanonicalFile();
-    log.info("Install directory: {}", bundleBasedir);
+  public EmbeddedNexusBooter(final File installDir, final int port) throws Exception {
+    this.installDir = checkNotNull(installDir).getCanonicalFile();
+    log.info("Install directory: {}", installDir);
 
     checkArgument(port > 1024);
     this.port = port;
@@ -103,12 +106,12 @@ public class EmbeddedNexusBooter
 
     // FIXME: Load nexus.properties, for now hard-code
     p.put("application-host", "0.0.0.0");
-    p.put("nexus-webapp", new File(bundleBasedir, "nexus").getAbsolutePath());
+    p.put("nexus-webapp", new File(installDir, "nexus").getAbsolutePath());
     p.put("nexus-webapp-context-path", "/nexus");
-    p.put("runtime", new File(bundleBasedir, "nexus/WEB-INF").getAbsolutePath());
+    p.put("runtime", new File(installDir, "nexus/WEB-INF").getAbsolutePath());
 
-    p.put("bundleBasedir", bundleBasedir.getAbsolutePath());
-    p.put("logback.configurationFile", new File(bundleBasedir, "conf/logback.xml").getAbsolutePath());
+    p.put("bundleBasedir", installDir.getAbsolutePath());
+    p.put("logback.configurationFile", new File(installDir, "conf/logback.xml").getAbsolutePath());
 
     // guice finalizer
     p.put("guice.executor.class", "NONE");
@@ -123,7 +126,7 @@ public class EmbeddedNexusBooter
   }
 
   private void tamperJettyConfiguration() throws IOException {
-    final File file = new File(bundleBasedir, "conf/jetty.xml");
+    final File file = new File(installDir, "conf/jetty.xml");
     String xml = FileUtils.readFileToString(file, "UTF-8");
 
     // Disable the shutdown hook, since it disturbs the embedded work
@@ -147,22 +150,22 @@ public class EmbeddedNexusBooter
   }
 
   private ClassRealm createBootRealm() throws Exception {
-    File dir = new File(bundleBasedir, "lib");
-    log.info("Boot lib directory: {}", dir);
+    List<URL> classpath = new ArrayList<>() ;
 
-    File[] jars = dir.listFiles(new FileFilter()
-    {
-      @Override
-      public boolean accept(File pathname) {
-        return pathname.getName().endsWith(".jar");
-      }
-    });
+    File confDir = new File(installDir, "conf");
+    log.info("Boot conf dir: {}", confDir);
+    classpath.add(confDir.toURI().toURL());
+
+    File libDir = new File(installDir, "lib");
+    log.info("Boot lib dir: {}", libDir);
+    File[] jars = filter(suffixFileFilter(".jar"), libDir.listFiles());
+    for (File jar : jars) {
+      classpath.add(jar.toURI().toURL());
+    }
 
     ClassRealm realm = world.newRealm("it-boot", null);
-
-    log.info("Boot ClassPath:");
-    for (File jar : jars) {
-      URL url = jar.toURI().toURL();
+    log.info("Boot classpath:");
+    for (URL url : classpath) {
       log.info("  {}", url);
       realm.addURL(url);
     }
@@ -185,7 +188,7 @@ public class EmbeddedNexusBooter
       jettyServer = jettyServerFactory.newInstance(
           testRealm,
           props,
-          new String[] { new File(bundleBasedir, "conf/jetty.xml").getAbsolutePath() }
+          new String[] { new File(installDir, "conf/jetty.xml").getAbsolutePath() }
       );
     }
     finally {
