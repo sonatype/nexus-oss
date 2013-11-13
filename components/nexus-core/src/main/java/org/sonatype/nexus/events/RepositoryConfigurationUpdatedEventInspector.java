@@ -42,10 +42,6 @@ public class RepositoryConfigurationUpdatedEventInspector
     this.nexusScheduler = nexusScheduler;
   }
 
-  public boolean accepts(Event<?> evt) {
-    return evt instanceof RepositoryConfigurationUpdatedEvent;
-  }
-
   @Subscribe
   @AllowConcurrentEvents
   public void inspect(final RepositoryConfigurationUpdatedEvent event) {

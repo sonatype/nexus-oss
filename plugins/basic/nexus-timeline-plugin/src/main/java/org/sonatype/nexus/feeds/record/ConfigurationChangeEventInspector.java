@@ -38,7 +38,7 @@ public class ConfigurationChangeEventInspector
 {
   @Subscribe
   @AllowConcurrentEvents
-  private void inspectForNexus(final ConfigurationChangeEvent event) {
+  public void inspectForNexus(final ConfigurationChangeEvent event) {
     if (event.getChanges().isEmpty()) {
       return;
     }
