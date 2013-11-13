@@ -20,10 +20,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.guice.bean.locators.BeanLocator;
 import org.sonatype.inject.BeanEntry;
-import org.sonatype.inject.EagerSingleton;
 import org.sonatype.inject.Mediator;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.threads.NexusExecutorService;
@@ -46,7 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.7.0
  */
 @Named
-@EagerSingleton
+@Singleton
 public class EventSubscriberHost
     extends ComponentSupport
 {
@@ -72,6 +72,7 @@ public class EventSubscriberHost
 
     beanLocator.watch(Key.get(EventSubscriber.class), new EventSubscriberMediator(), this);
     eventBus.register(this);
+    log.info("Started");
   }
 
   public void shutdown() {
