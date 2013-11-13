@@ -21,10 +21,13 @@ import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class FileUtilsTest
+    extends TestSupport
 {
   @Test
   public void testUNCPath()
@@ -54,7 +57,7 @@ public class FileUtilsTest
   public void testMove()
       throws Exception
   {
-    File root = org.codehaus.plexus.util.FileUtils.createTempFile("dir", "tmp", null);
+    File root = util.createTempDir("dir");
     File dest = new File(root, "dest");
     dest.mkdirs();
 
@@ -156,7 +159,7 @@ public class FileUtilsTest
           lock.release();
           channel.close();
 
-          org.codehaus.plexus.util.FileUtils.forceDelete(file);
+          org.apache.commons.io.FileUtils.forceDelete(file);
         }
       }
 
@@ -180,7 +183,7 @@ public class FileUtilsTest
           lock.release();
           channel.close();
 
-          org.codehaus.plexus.util.FileUtils.forceDelete(file);
+          org.apache.commons.io.FileUtils.forceDelete(file);
         }
       }
 
@@ -204,7 +207,7 @@ public class FileUtilsTest
           lock.release();
           channel.close();
 
-          org.codehaus.plexus.util.FileUtils.forceDelete(file);
+          org.apache.commons.io.FileUtils.forceDelete(file);
         }
       }
     }

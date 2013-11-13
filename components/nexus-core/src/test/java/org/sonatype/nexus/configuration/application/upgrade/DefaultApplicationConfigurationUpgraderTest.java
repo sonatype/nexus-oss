@@ -27,7 +27,7 @@ import org.sonatype.security.configuration.source.FileSecurityConfigurationSourc
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.DiffMatchers;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Test;
 
@@ -60,7 +60,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
     w.write(sw, configuration);
 
-    String shouldBe = IOUtil.toString(getClass().getResourceAsStream(path + ".result"));
+    String shouldBe = IOUtils.toString(getClass().getResourceAsStream(path + ".result"));
 
     assertThat(sw.toString(), DiffMatchers.equalToOnlyDiffs(shouldBe));
 
@@ -93,7 +93,7 @@ public class DefaultApplicationConfigurationUpgraderTest
       throws Exception
   {
 
-    String shouldBe = IOUtil.toString(getClass().getResourceAsStream(path)).replace("\r", "");
+    String shouldBe = IOUtils.toString(getClass().getResourceAsStream(path)).replace("\r", "");
 
     // we can only compare the string with no encrypted passwords, because the encryption is different every time.
     SecurityConfiguration securityConfig = this.securitySource.loadConfiguration();

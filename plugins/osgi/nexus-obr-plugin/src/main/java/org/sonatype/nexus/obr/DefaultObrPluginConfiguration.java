@@ -32,7 +32,7 @@ import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
 import com.google.common.base.Throwables;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.PropertyUtils;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -102,9 +102,8 @@ public class DefaultObrPluginConfiguration
         public void write(final BufferedOutputStream output)
             throws IOException
         {
-          try (final InputStream is =
-                   DefaultObrPluginConfiguration.class.getResourceAsStream(DEFAULT_OBR_PROPERTY_PATH)) {
-            IOUtil.copy(is, output);
+          try (InputStream is = DefaultObrPluginConfiguration.class.getResourceAsStream(DEFAULT_OBR_PROPERTY_PATH)) {
+            IOUtils.copy(is, output);
           }
         }
       });

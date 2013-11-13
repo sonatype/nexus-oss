@@ -21,7 +21,6 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -82,12 +81,8 @@ public class MavenMetadataHelper
   public static Metadata getMetadata(File metadata)
       throws Exception
   {
-    FileInputStream in = new FileInputStream(metadata);
-    try {
+    try (FileInputStream in = new FileInputStream(metadata)) {
       return MetadataBuilder.read(in);
-    }
-    finally {
-      IOUtil.close(in);
     }
   }
 }

@@ -18,10 +18,11 @@ import java.io.InputStream;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 
@@ -42,13 +43,14 @@ public class DefaultStorageFileItemTest
     }).when(repository).createUid("/a.txt");
 
     DefaultStorageFileItem file =
-        new DefaultStorageFileItem(repository, new ResourceStoreRequest("/a.txt"), true, true, new StringContentLocator("/a.txt"));
+        new DefaultStorageFileItem(repository, new ResourceStoreRequest("/a.txt"), true, true,
+            new StringContentLocator("/a.txt"));
     checkAbstractStorageItem(repository, file, false, "a.txt", "/a.txt", "/");
 
     // content
     InputStream is = file.getInputStream();
     assertEquals(true,
-        IOUtil.contentEquals(is, new ByteArrayInputStream(file.getRepositoryItemUid().getPath().getBytes())));
+        IOUtils.contentEquals(is, new ByteArrayInputStream(file.getRepositoryItemUid().getPath().getBytes())));
   }
 
   @Test
@@ -65,12 +67,13 @@ public class DefaultStorageFileItemTest
     }).when(repository).createUid("/a.txt");
 
     DefaultStorageFileItem file =
-        new DefaultStorageFileItem(repository, new ResourceStoreRequest("/a.txt"), true, true, new StringContentLocator("THIS IS CONTENT"));
+        new DefaultStorageFileItem(repository, new ResourceStoreRequest("/a.txt"), true, true,
+            new StringContentLocator("THIS IS CONTENT"));
     checkAbstractStorageItem(repository, file, false, "a.txt", "/a.txt", "/");
 
     // content
     InputStream fis = file.getInputStream();
-    assertEquals(true, IOUtil.contentEquals(fis, new ByteArrayInputStream("THIS IS CONTENT".getBytes())));
+    assertEquals(true, IOUtils.contentEquals(fis, new ByteArrayInputStream("THIS IS CONTENT".getBytes())));
   }
 
   @Test
@@ -87,14 +90,15 @@ public class DefaultStorageFileItemTest
     }).when(repository).createUid("/some/dir/hierarchy/a.txt");
 
     DefaultStorageFileItem file =
-        new DefaultStorageFileItem(repository, new ResourceStoreRequest("/some/dir/hierarchy/a.txt"), true, true, new StringContentLocator(
-            "/some/dir/hierarchy/a.txt"));
+        new DefaultStorageFileItem(repository, new ResourceStoreRequest("/some/dir/hierarchy/a.txt"), true, true,
+            new StringContentLocator(
+                "/some/dir/hierarchy/a.txt"));
     checkAbstractStorageItem(repository, file, false, "a.txt", "/some/dir/hierarchy/a.txt", "/some/dir/hierarchy");
 
     // content
     InputStream is = file.getInputStream();
     assertEquals(true,
-        IOUtil.contentEquals(is, new ByteArrayInputStream(file.getRepositoryItemUid().getPath().getBytes())));
+        IOUtils.contentEquals(is, new ByteArrayInputStream(file.getRepositoryItemUid().getPath().getBytes())));
   }
 
   @Test
@@ -111,13 +115,14 @@ public class DefaultStorageFileItemTest
     }).when(repository).createUid("/some/dir/hierarchy/a.txt");
 
     DefaultStorageFileItem file =
-        new DefaultStorageFileItem(repository, new ResourceStoreRequest("/some/dir/hierarchy/a.txt"), true, true, new StringContentLocator(
-            "THIS IS CONTENT"));
+        new DefaultStorageFileItem(repository, new ResourceStoreRequest("/some/dir/hierarchy/a.txt"), true, true,
+            new StringContentLocator(
+                "THIS IS CONTENT"));
     checkAbstractStorageItem(repository, file, false, "a.txt", "/some/dir/hierarchy/a.txt", "/some/dir/hierarchy");
 
     // content
     InputStream fis = file.getInputStream();
-    assertEquals(true, IOUtil.contentEquals(fis, new ByteArrayInputStream("THIS IS CONTENT".getBytes())));
+    assertEquals(true, IOUtils.contentEquals(fis, new ByteArrayInputStream("THIS IS CONTENT".getBytes())));
   }
 
 }

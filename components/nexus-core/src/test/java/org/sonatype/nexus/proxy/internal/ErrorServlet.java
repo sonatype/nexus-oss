@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 
 public class ErrorServlet
     extends HttpServlet
@@ -49,7 +49,7 @@ public class ErrorServlet
       resp.addHeader(headerEntry.getKey(), headerEntry.getValue());
     }
 
-    IOUtil.copy(CONTENT, resp.getOutputStream());
+    IOUtils.write(CONTENT, resp.getOutputStream());
 
   }
 

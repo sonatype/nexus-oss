@@ -14,7 +14,6 @@
 package org.sonatype.security.realms.simple;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,12 +24,12 @@ import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.realms.AbstractRealmWithSecuritySystemTest;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -62,38 +61,20 @@ public class SimpleRealmTest
   }
 
   private void copyTestConfigToPlace()
-      throws FileNotFoundException, IOException
+      throws IOException
   {
-    InputStream nexusConf = null;
-    InputStream security = null;
-    InputStream securityConf = null;
+    ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+    try (InputStream nexusConf = ccl.getResourceAsStream("nexus.xml");
+         InputStream security = ccl.getResourceAsStream("security.xml");
+         InputStream securityConf = ccl.getResourceAsStream("security-configuration.xml");
 
-    OutputStream nexusOut = null;
-    OutputStream securityOut = null;
-    OutputStream securityConfOut = null;
+         OutputStream nexusOut = new FileOutputStream(new File(confdir, "nexus.xml"));
+         OutputStream securityOut = new FileOutputStream(new File(confdir, "security.xml"));
+         OutputStream securityConfOut = new FileOutputStream(new File(confdir, "security-configuration.xml"))) {
 
-    try {
-      nexusConf = Thread.currentThread().getContextClassLoader().getResourceAsStream("nexus.xml");
-      nexusOut = new FileOutputStream(new File(confdir, "nexus.xml"));
-      IOUtil.copy(nexusConf, nexusOut);
-
-      security = Thread.currentThread().getContextClassLoader().getResourceAsStream("security.xml");
-      securityOut = new FileOutputStream(new File(confdir, "security.xml"));
-      IOUtil.copy(security, securityOut);
-
-      securityConf =
-          Thread.currentThread().getContextClassLoader().getResourceAsStream("security-configuration.xml");
-      securityConfOut = new FileOutputStream(new File(confdir, "security-configuration.xml"));
-      IOUtil.copy(securityConf, securityConfOut);
-    }
-    finally {
-      IOUtil.close(nexusConf);
-      IOUtil.close(securityConf);
-      IOUtil.close(nexusOut);
-      IOUtil.close(securityOut);
-      IOUtil.close(security);
-      IOUtil.close(securityConfOut);
-
+      IOUtils.copy(nexusConf, nexusOut);
+      IOUtils.copy(security, securityOut);
+      IOUtils.copy(securityConf, securityConfOut);
     }
   }
 

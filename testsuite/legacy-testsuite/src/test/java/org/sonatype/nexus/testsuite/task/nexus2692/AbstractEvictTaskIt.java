@@ -44,9 +44,10 @@ import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import com.thoughtworks.xstream.XStream;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FalseFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -87,14 +88,11 @@ public class AbstractEvictTaskIt
 
     this.storageWorkDir = new File(workDir, "storage");
 
-    FileUtils.copyDirectoryStructure(this.getTestResourceAsFile("storage/"), storageWorkDir);
+    FileUtils.copyDirectory(this.getTestResourceAsFile("storage/"), storageWorkDir);
     copyAttributes();
 
     // now setup all the attributes
     File attributesInfo = this.getTestResourceAsFile("attributes.info");
-    BufferedReader reader = null;
-    FileInputStream fis = null;
-    FileOutputStream fos = null;
 
     XStream xstream = new XStream();
     xstream.alias("file", DefaultStorageFileItem.class);
@@ -103,8 +101,7 @@ public class AbstractEvictTaskIt
 
     long timestamp = System.currentTimeMillis();
 
-    try {
-      reader = new BufferedReader(new FileReader(attributesInfo));
+    try (BufferedReader reader = new BufferedReader(new FileReader(attributesInfo))) {
 
       String line = reader.readLine();
       while (line != null) {
@@ -129,9 +126,10 @@ public class AbstractEvictTaskIt
 
           // modify the file corresponding attribute
           File attributeFile = getAttributeFile(filePart);
-          fis = new FileInputStream(attributeFile);
-          StorageItem storageItem = (StorageItem) xstream.fromXML(fis);
-          IOUtil.close(fis);
+          StorageItem storageItem;
+          try (FileInputStream in = new FileInputStream(attributeFile)) {
+            storageItem = (StorageItem) xstream.fromXML(in);
+          }
 
           // get old value, update it and set it, but all this is done using reflection
           // Direct method access will work, since we mangle an item that will be persisted using "old" format
@@ -149,18 +147,13 @@ public class AbstractEvictTaskIt
           field.set(storageItem, variation + offset);
 
           // write it out in "old" format
-          fos = new FileOutputStream(attributeFile);
-          xstream.toXML(storageItem, fos);
-          IOUtil.close(fos);
+          try (FileOutputStream out = new FileOutputStream(attributeFile)) {
+            xstream.toXML(storageItem, out);
+          }
         }
 
         line = reader.readLine();
       }
-    }
-    finally {
-      IOUtil.close(fos);
-      IOUtil.close(fis);
-      IOUtil.close(reader);
     }
 
     startNexus();
@@ -172,7 +165,7 @@ public class AbstractEvictTaskIt
     File srcDir = getTestResourceAsFile("attributes/");
 
     // old location
-    FileUtils.copyDirectoryStructure(srcDir, new File(new File(nexusWorkDir), "proxy/attributes"));
+    FileUtils.copyDirectory(srcDir, new File(new File(nexusWorkDir), "proxy/attributes"));
 
     // new location will need path mangling, see getAttributeFile()
   }
@@ -302,9 +295,15 @@ public class AbstractEvictTaskIt
       throws IOException
   {
     SortedSet<String> result = new TreeSet<String>();
-    List<String> paths = FileUtils.getFileNames(basedir, null, null, false, true);
-    for (String path : paths) {
-      result.add(path.replaceAll(Pattern.quote("\\"), "/"));
+    Collection<File> files = FileUtils.listFiles(basedir, TrueFileFilter.TRUE, TrueFileFilter.TRUE);
+    for (File file : files) {
+      if (!file.equals(basedir)) {
+        String path = file.getPath();
+        if (path.startsWith(basedir.getAbsolutePath())) {
+          path = path.substring(basedir.getAbsolutePath().length() + 1);
+        }
+        result.add(path.replaceAll(Pattern.quote("\\"), "/"));
+      }
     }
     return result;
   }
@@ -314,9 +313,15 @@ public class AbstractEvictTaskIt
       throws IOException
   {
     SortedSet<String> result = new TreeSet<String>();
-    List<String> paths = FileUtils.getDirectoryNames(basedir, null, null, false, true);
-    for (String path : paths) {
-      result.add(path.replaceAll(Pattern.quote("\\"), "/"));
+    Collection<File> files = FileUtils.listFilesAndDirs(basedir, FalseFileFilter.FALSE, TrueFileFilter.TRUE);
+    for (File file : files) {
+      if (!file.equals(basedir)) {
+        String path = file.getPath();
+        if (path.startsWith(basedir.getAbsolutePath())) {
+          path = path.substring(basedir.getAbsolutePath().length() + 1);
+        }
+        result.add(path.replaceAll(Pattern.quote("\\"), "/"));
+      }
     }
     return result;
   }

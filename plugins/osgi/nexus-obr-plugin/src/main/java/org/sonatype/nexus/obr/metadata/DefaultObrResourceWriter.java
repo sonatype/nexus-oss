@@ -33,7 +33,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.osgi.impl.bundle.obr.resource.ResourceImpl;
 import org.osgi.impl.bundle.obr.resource.ResourceImpl.UrlTransformer;
@@ -125,7 +125,7 @@ public class DefaultObrResourceWriter
   public void close()
       throws IOException
   {
-    IOUtil.close(pw);
+    IOUtils.closeQuietly(pw);
 
     if (!isComplete) {
       // we don't want to overwrite the current OBR with bad data

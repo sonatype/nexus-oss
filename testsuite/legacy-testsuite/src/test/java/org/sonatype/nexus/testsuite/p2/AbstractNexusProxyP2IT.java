@@ -19,8 +19,8 @@ import java.io.IOException;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.test.utils.TestProperties;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 
@@ -74,9 +74,9 @@ public abstract class AbstractNexusProxyP2IT
   protected void replaceInFile(final String filename, final String target, final String replacement)
       throws IOException
   {
-    String content = FileUtils.fileRead(filename);
+    String content = FileUtils.readFileToString(new File(filename));
     content = content.replace(target, replacement);
-    FileUtils.fileWrite(filename, content);
+    FileUtils.write(new File(filename), content);
   }
 
   @Override

@@ -30,7 +30,6 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.util.io.StreamSupport;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.Closeables;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -82,20 +81,18 @@ public class DefaultLinkPersister
   public void writeLinkContent(final StorageLinkItem link, final OutputStream os)
       throws IOException
   {
-    try {
+    try (OutputStream out = os) {
       final String linkBody = LINK_PREFIX + link.getTarget().toString();
-      StreamSupport.copy(new ByteArrayInputStream(linkBody.getBytes(LINK_CHARSET)), os);
-      os.flush();
-    }
-    finally {
-      Closeables.close(os, true);
+      StreamSupport.copy(new ByteArrayInputStream(linkBody.getBytes(LINK_CHARSET)), out);
+      out.flush();
     }
   }
 
   // ==
 
   /**
-   * Reads up first bytes (exactly as many as many makes the {@link #LINK_PREFIX_BYTES}) from ContentLocator's content. It returns byte array of
+   * Reads up first bytes (exactly as many as many makes the {@link #LINK_PREFIX_BYTES}) from ContentLocator's content.
+   * It returns byte array of
    * exact size of count, or null (ie. if file is smaller).
    *
    * @param locator the ContentLocator to read from.

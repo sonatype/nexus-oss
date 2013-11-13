@@ -64,6 +64,11 @@
       <artifactId>plexus-utils</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+
     <!-- For XML/JSON marshalling -->
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>

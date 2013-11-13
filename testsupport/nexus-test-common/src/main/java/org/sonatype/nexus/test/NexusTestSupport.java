@@ -19,12 +19,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.io.RawInputStreamFacade;
 
 /**
  * Abstract test case for nexus tests.
@@ -164,16 +163,9 @@ public abstract class NexusTestSupport
   protected void copyResource(String resource, String dest)
       throws IOException
   {
-    InputStream stream = null;
-    FileOutputStream ostream = null;
-    try {
-      stream = getClass().getResourceAsStream(resource);
-      ostream = new FileOutputStream(dest);
-      IOUtil.copy(stream, ostream);
-    }
-    finally {
-      IOUtil.close(stream);
-      IOUtil.close(ostream);
+    try (InputStream in = getClass().getResourceAsStream(resource);
+         FileOutputStream out = new FileOutputStream(dest)) {
+      IOUtils.copy(in, out);
     }
   }
 
@@ -186,7 +178,7 @@ public abstract class NexusTestSupport
   protected void copyFromClasspathToFile(String path, File output)
       throws IOException
   {
-    FileUtils.copyStreamToFile(new RawInputStreamFacade(getClass().getResourceAsStream(path)), output);
+    FileUtils.copyInputStreamToFile(getClass().getResourceAsStream(path), output);
   }
 
 }

@@ -23,8 +23,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.log.LogConfigurationParticipant;
 
-import com.google.common.io.Closeables;
-
 /**
  * TODO
  *
@@ -44,15 +42,10 @@ public class TestLogConfigurationParticipant
   @Override
   public InputStream getConfiguration() {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    PrintWriter writer = null;
-    try {
-      writer = new PrintWriter(baos);
+    try (PrintWriter writer = new PrintWriter(baos)) {
       writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
       writer.println();
       writer.println("<included/>");
-    }
-    finally {
-      Closeables.closeQuietly(writer);
     }
     return new ByteArrayInputStream(baos.toByteArray());
   }

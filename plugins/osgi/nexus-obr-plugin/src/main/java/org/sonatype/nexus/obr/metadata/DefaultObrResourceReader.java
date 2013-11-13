@@ -21,9 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sonatype.nexus.obr.util.ObrUtils;
 import org.sonatype.nexus.proxy.LocalStorageException;
 
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.osgi.service.obr.Resource;
@@ -226,7 +226,7 @@ public class DefaultObrResourceReader
 
   public void close() {
     for (final ObrParser p : visited.values()) {
-      ObrUtils.close(p);
+      IOUtils.closeQuietly(p);
     }
   }
 }
