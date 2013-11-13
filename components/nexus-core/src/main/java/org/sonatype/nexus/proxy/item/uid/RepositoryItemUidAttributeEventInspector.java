@@ -19,7 +19,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
-import org.sonatype.nexus.plugins.events.PluginDeactivatedEvent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -41,12 +40,6 @@ public class RepositoryItemUidAttributeEventInspector
   @Subscribe
   @AllowConcurrentEvents
   public void inspect(final PluginActivatedEvent evt) {
-    manager.reset();
-  }
-
-  @Subscribe
-  @AllowConcurrentEvents
-  public void inspect(final PluginDeactivatedEvent evt) {
     manager.reset();
   }
 }

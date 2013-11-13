@@ -27,6 +27,7 @@ import org.sonatype.nexus.plugins.rest.StaticResource;
 /**
  * {@link StaticResource} contributed from a Nexus plugin.
  */
+@Deprecated
 public final class PluginStaticResource
     implements StaticResource, CacheControl
 {

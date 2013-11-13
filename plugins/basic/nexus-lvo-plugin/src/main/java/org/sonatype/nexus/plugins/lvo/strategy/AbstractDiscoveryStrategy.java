@@ -13,8 +13,8 @@
 
 package org.sonatype.nexus.plugins.lvo.strategy;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * A simple helper superclass that gives you some help with getting some basic level of services available.
@@ -22,7 +22,7 @@ import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
  * @author cstamas
  */
 public abstract class AbstractDiscoveryStrategy
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements DiscoveryStrategy
 {
 }

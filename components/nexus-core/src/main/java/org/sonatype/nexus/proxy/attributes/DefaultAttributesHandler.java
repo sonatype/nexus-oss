@@ -333,7 +333,6 @@ public class DefaultAttributesHandler
    * @param content the reusable content locator
    */
   protected void expandCustomItemAttributes(final StorageItem item, final ContentLocator content) {
-    // make it handled by "plain" StorageItemInspectors too
     for (StorageItemInspector inspector : getItemInspectorList()) {
       if (inspector.isHandled(item)) {
         try {

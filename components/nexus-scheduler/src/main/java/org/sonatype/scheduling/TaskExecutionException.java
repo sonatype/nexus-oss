@@ -23,14 +23,6 @@ public class TaskExecutionException
 {
   private static final long serialVersionUID = 1364178345795897438L;
 
-  public TaskExecutionException(String message) {
-    super(message);
-  }
-
-  public TaskExecutionException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
   public TaskExecutionException(Throwable cause) {
     super(cause);
   }

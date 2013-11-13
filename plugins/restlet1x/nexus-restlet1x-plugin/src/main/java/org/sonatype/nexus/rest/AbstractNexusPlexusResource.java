@@ -21,12 +21,8 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
 import org.sonatype.nexus.templates.TemplateManager;
@@ -40,11 +36,7 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
-import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
@@ -71,8 +63,6 @@ public abstract class AbstractNexusPlexusResource
 
   private RepositoryRegistry defaultRepositoryRegistry;
 
-  private RepositoryTypeRegistry repoTypeRegistry;
-
   private ReferenceFactory referenceFactory;
 
   private TemplateManager templateManager;
@@ -92,11 +82,6 @@ public abstract class AbstractNexusPlexusResource
   @Inject
   public void setDefaultRepositoryRegistry(final @Named("default") RepositoryRegistry repositoryRegistry) {
     this.defaultRepositoryRegistry = checkNotNull(repositoryRegistry);
-  }
-
-  @Inject
-  public void setRepositoryTypeRegistry(final RepositoryTypeRegistry repoTypeRegistry) {
-    this.repoTypeRegistry = checkNotNull(repoTypeRegistry);
   }
 
   @Inject
@@ -145,15 +130,6 @@ public abstract class AbstractNexusPlexusResource
   }
 
   /**
-   * For file uploads we are using commons-fileupload integration with restlet.org. We are storing one
-   * FileItemFactory
-   * instance in context. This method simply encapsulates gettting it from Resource context.
-   */
-  protected FileItemFactory getFileItemFactory(Context context) {
-    return (FileItemFactory) context.getAttributes().get(NexusApplication.FILEITEM_FACTORY);
-  }
-
-  /**
    * Centralized, since this is the only "dependent" stuff that relies on knowledge where restlet.Application is
    * mounted (we had a /service => / move).
    */
@@ -175,16 +151,12 @@ public abstract class AbstractNexusPlexusResource
 
   protected boolean isRemote(Request request, String resourceStorePath) {
     // check do we need remote only access
-    boolean isRemote = request.getResourceRef().getQueryAsForm().getFirst(IS_REMOTE_PARAMETER) != null;
-
-    return isRemote;
+    return request.getResourceRef().getQueryAsForm().getFirst(IS_REMOTE_PARAMETER) != null;
   }
 
   protected boolean asExpired(Request request, String resourceStorePath) {
     // check do we need expired access
-    boolean isRemote = request.getResourceRef().getQueryAsForm().getFirst(AS_EXPIRED_PARAMETER) != null;
-
-    return isRemote;
+    return request.getResourceRef().getQueryAsForm().getFirst(AS_EXPIRED_PARAMETER) != null;
   }
 
   private Reference updateBaseRefPath(Reference reference) {
@@ -218,33 +190,6 @@ public abstract class AbstractNexusPlexusResource
     return ref.getTargetRef();
   }
 
-  /**
-   * Builds a reference to Repository's content root.
-   *
-   * @deprecated Use RepositoryURLBuilder component instead.
-   */
-  @Deprecated
-  protected Reference createRepositoryContentReference(Request request, String repoId) {
-    try {
-      Repository repo = repositoryRegistry.getRepository(repoId);
-
-      for (RepositoryTypeDescriptor desc : repoTypeRegistry.getRegisteredRepositoryTypeDescriptors()) {
-        if (NexusCompat.getRepositoryProviderRole(repo).equals(desc.getRole().getName())) {
-          return createReference(getContextRoot(request), "content/" + desc.getPrefix() + "/" + repoId).getTargetRef();
-        }
-      }
-
-      getLogger().error(
-          "Cannot create reference for repository with id=\"" + repo.getId() + "\" having role of "
-              + NexusCompat.getRepositoryProviderRole(repo));
-    }
-    catch (NoSuchRepositoryException e) {
-      getLogger().error("Cannot create reference for non-existant repository with id=\"" + repoId + "\"");
-    }
-
-    return null;
-  }
-
   protected Reference createRepositoryReference(Request request, String repoId) {
     return createReference(getContextRoot(request), "service/local/repositories/" + repoId).getTargetRef();
   }
@@ -265,18 +210,6 @@ public abstract class AbstractNexusPlexusResource
     return createReference(getContextRoot(request), "service/local/repo_groups/" + groupId).getTargetRef();
   }
 
-  protected Reference createRepositoryGroupReference(Request request, String groupId, String repoPath) {
-    Reference groupRootRef = createRepositoryGroupReference(request, groupId);
-
-    if (repoPath.startsWith(RepositoryItemUid.PATH_SEPARATOR)) {
-      repoPath = repoPath.substring(1);
-    }
-
-    repoPath = "content/" + repoPath;
-
-    return createReference(groupRootRef, repoPath);
-  }
-
   protected Reference createRedirectReference(Request request) {
     String uriPart =
         request.getResourceRef().getTargetRef().toString().substring(
@@ -287,16 +220,10 @@ public abstract class AbstractNexusPlexusResource
       uriPart = uriPart.substring(1);
     }
 
-    Reference result = updateBaseRefPath(new Reference(getContextRoot(request), uriPart)).getTargetRef();
-
-    return result;
+    return updateBaseRefPath(new Reference(getContextRoot(request), uriPart)).getTargetRef();
   }
 
   // ===
-
-  protected PlexusContainer getPlexusContainer(Context context) {
-    return (PlexusContainer) context.getAttributes().get(PlexusConstants.PLEXUS_KEY);
-  }
 
   protected ErrorResponse getNexusErrorResponse(String id, String msg) {
     ErrorResponse ner = new ErrorResponse();

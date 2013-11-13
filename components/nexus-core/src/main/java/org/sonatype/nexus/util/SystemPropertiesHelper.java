@@ -15,25 +15,6 @@ package org.sonatype.nexus.util;
 
 public class SystemPropertiesHelper
 {
-  public final static String[] getStringlist(final String key, final String delimiter, final String[] defaultValue) {
-    final String value = System.getProperty(key);
-
-    if (value == null || value.trim().length() == 0) {
-      return defaultValue;
-    }
-
-    try {
-      return value.split(",");
-    }
-    catch (NumberFormatException e) {
-      return defaultValue;
-    }
-  }
-
-  public final static String[] getStringlist(final String key, final String... defaultValue) {
-    return getStringlist(key, ",", defaultValue);
-  }
-
   public final static int getInteger(final String key, final int defaultValue) {
     final String value = System.getProperty(key);
 

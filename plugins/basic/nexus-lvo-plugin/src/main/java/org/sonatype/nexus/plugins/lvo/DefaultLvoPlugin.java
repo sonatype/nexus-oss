@@ -24,10 +24,10 @@ import org.sonatype.aether.util.version.GenericVersionScheme;
 import org.sonatype.aether.version.InvalidVersionSpecificationException;
 import org.sonatype.aether.version.Version;
 import org.sonatype.aether.version.VersionScheme;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.lvo.config.LvoPluginConfiguration;
 import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.StringUtils;
 
@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class DefaultLvoPlugin
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements LvoPlugin
 {
   private final LvoPluginConfiguration lvoPluginConfiguration;
@@ -66,7 +66,7 @@ public class DefaultLvoPlugin
 
       if (StringUtils.isEmpty(strategyId)) {
         // default value was 'index', not available anymore
-        getLogger().warn("Misconfigured version check key '{}': strategy ID missing.", key);
+        log.warn("Misconfigured version check key '{}': strategy ID missing.", key);
         throw new NoSuchStrategyException(info.getStrategy());
       }
 
@@ -111,7 +111,7 @@ public class DefaultLvoPlugin
         }
       }
       catch (InvalidVersionSpecificationException e) {
-        getLogger().warn("Could not parse version ({}/{}/{})",
+        log.warn("Could not parse version ({}/{}/{})",
             new String[]{key, v, response.getVersion()});
         response.setSuccessful(false);
       }

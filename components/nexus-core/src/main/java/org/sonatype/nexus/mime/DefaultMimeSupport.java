@@ -25,12 +25,12 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.mime.detectors.NexusExtensionMimeDetector;
 import org.sonatype.nexus.mime.detectors.NexusMagicMimeMimeDetector;
 import org.sonatype.nexus.mime.detectors.NexusOpendesktopMimeDetector;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
@@ -50,7 +50,7 @@ import eu.medsea.mimeutil.detector.MimeDetector;
 @Named
 @Singleton
 public class DefaultMimeSupport
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements MimeSupport
 {
   public static final String MIME_MAGIC_OPENDESKTOP_KEY = "org.sonatype.nexus.mime.DefaultMimeSupport.mimeMagicOpendesktop";

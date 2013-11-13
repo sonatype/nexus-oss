@@ -219,7 +219,7 @@ public class M2Repository
         mdFile.setContentLocator(new ByteArrayContentLocator(bos.toByteArray(), mdFile.getMimeType()));
       }
       catch (Exception e) {
-        getLogger().error("Exception during repository metadata cleansing.", e);
+        log.error("Exception during repository metadata cleansing.", e);
 
         if (backup != null) {
           // get backup and continue operation
@@ -381,11 +381,11 @@ public class M2Repository
           return result;
         }
         catch (IOException e) {
-          if (getLogger().isDebugEnabled()) {
-            getLogger().error("Error parsing metadata, serving as retrieved", e);
+          if (log.isDebugEnabled()) {
+            log.error("Error parsing metadata, serving as retrieved", e);
           }
           else {
-            getLogger().error("Error parsing metadata, serving as retrieved: " + e.getMessage());
+            log.error("Error parsing metadata, serving as retrieved: " + e.getMessage());
           }
 
           return super.doRetrieveItem(request);

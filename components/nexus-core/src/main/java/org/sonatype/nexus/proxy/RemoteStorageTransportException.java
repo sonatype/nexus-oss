@@ -36,13 +36,6 @@ public abstract class RemoteStorageTransportException
   /**
    * Constructor.
    */
-  public RemoteStorageTransportException(final ProxyRepository repository, final String message) {
-    this(repository, message, null);
-  }
-
-  /**
-   * Constructor.
-   */
   public RemoteStorageTransportException(final ProxyRepository repository, final String message,
                                          final Throwable cause)
   {

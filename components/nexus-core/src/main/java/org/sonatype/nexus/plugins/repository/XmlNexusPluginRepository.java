@@ -63,6 +63,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  */
 @Named(XmlNexusPluginRepository.ID)
 @Singleton
+@Deprecated
 class XmlNexusPluginRepository
     extends AbstractNexusPluginRepository
 {

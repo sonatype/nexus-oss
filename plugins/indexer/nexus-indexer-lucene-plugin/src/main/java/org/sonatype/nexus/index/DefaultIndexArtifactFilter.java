@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
@@ -30,6 +29,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.maven.index.ArtifactInfo;
 
@@ -41,7 +41,7 @@ import org.apache.maven.index.ArtifactInfo;
 @Named
 @Singleton
 public class DefaultIndexArtifactFilter
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements IndexArtifactFilter
 {
   private final RepositoryRegistry repositoryRegistry;
@@ -91,7 +91,7 @@ public class DefaultIndexArtifactFilter
       }
     }
     catch (NoSuchRepositoryException e) {
-      this.getLogger().warn(
+      this.log.warn(
           "Repository not found for artifact: " + artifactInfo.groupId + ":" + artifactInfo.artifactId + ":"
               + artifactInfo.version + " in repository: " + artifactInfo.repository, e);
 

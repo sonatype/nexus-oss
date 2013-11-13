@@ -46,9 +46,9 @@ import org.sonatype.nexus.guice.NexusModules.PluginModule;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
+import org.sonatype.nexus.plugins.repository.NexusPluginRepository;
 import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactException;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
-import org.sonatype.nexus.plugins.repository.PluginRepositoryManager;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
@@ -71,11 +71,9 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * Default {@link NexusPluginManager} implementation backed by a {@link PluginRepositoryManager}.
- */
 @Named
 @Singleton
+@Deprecated
 public class DefaultNexusPluginManager
     implements NexusPluginManager
 {
@@ -83,7 +81,7 @@ public class DefaultNexusPluginManager
   // Implementation fields
   // ----------------------------------------------------------------------
 
-  private final PluginRepositoryManager repositoryManager;
+  private final NexusPluginRepository repositoryManager;
 
   private final EventBus eventBus;
 
@@ -106,7 +104,7 @@ public class DefaultNexusPluginManager
   @Inject
   public DefaultNexusPluginManager(final RepositoryTypeRegistry repositoryTypeRegistry,
                                    final EventBus eventBus,
-                                   final PluginRepositoryManager repositoryManager,
+                                   final NexusPluginRepository repositoryManager,
                                    final DefaultPlexusContainer container,
                                    final MimeSupport mimeSupport,
                                    final @Parameters Map<String, String> variables,
@@ -124,14 +122,6 @@ public class DefaultNexusPluginManager
   // ----------------------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------------------
-
-  public Map<GAVCoordinate, PluginDescriptor> getActivatedPlugins() {
-    return new HashMap<GAVCoordinate, PluginDescriptor>(activePlugins);
-  }
-
-  public Map<GAVCoordinate, PluginMetadata> getInstalledPlugins() {
-    return repositoryManager.findAvailablePlugins();
-  }
 
   public Map<GAVCoordinate, PluginResponse> getPluginResponses() {
     return new HashMap<GAVCoordinate, PluginResponse>(pluginResponses);
@@ -151,35 +141,6 @@ public class DefaultNexusPluginManager
       result.add(activatePlugin(gav, true, filteredPlugins.keySet()));
     }
     return result;
-  }
-
-  public boolean isActivatedPlugin(final GAVCoordinate gav) {
-    return isActivatedPlugin(gav, true);
-  }
-
-  public PluginManagerResponse activatePlugin(final GAVCoordinate gav) {
-    // if multiple V's for GAs are found, choose the one with biggest version (and pray that plugins has sane
-    // versioning)
-    Map<GAVCoordinate, PluginMetadata> filteredPlugins =
-        filterInstalledPlugins(repositoryManager.findAvailablePlugins());
-
-    return activatePlugin(gav, true, filteredPlugins.keySet());
-  }
-
-  public PluginManagerResponse deactivatePlugin(final GAVCoordinate gav) {
-    throw new UnsupportedOperationException(); // TODO
-  }
-
-  public boolean installPluginBundle(final URL bundle)
-      throws IOException
-  {
-    throw new UnsupportedOperationException(); // TODO
-  }
-
-  public boolean uninstallPluginBundle(final GAVCoordinate gav)
-      throws IOException
-  {
-    throw new UnsupportedOperationException(); // TODO
   }
 
   // ----------------------------------------------------------------------

@@ -21,9 +21,4 @@ public class NoSuchTaskException
   public NoSuchTaskException(String id) {
     super("There is no running/active task with ID=" + id);
   }
-
-  public NoSuchTaskException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
 }

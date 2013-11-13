@@ -19,15 +19,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.validator.FileTypeValidator.FileTypeValidity;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 @Named
 @Singleton
 public class DefaultFileTypeValidatorHub
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements FileTypeValidatorHub
 {
 
@@ -47,7 +47,7 @@ public class DefaultFileTypeValidatorHub
         FileTypeValidity validity = fileTypeValidatorEntry.getValue().isExpectedFileType(file);
 
         if (FileTypeValidity.INVALID.equals(validity)) {
-          getLogger().info("File item {} evaluated as INVALID during file type validation (validator={})",
+          log.info("File item {} evaluated as INVALID during file type validation (validator={})",
               file.getRepositoryItemUid().toString(), fileTypeValidatorEntry.getKey());
           // fail fast
           return false;

@@ -25,7 +25,7 @@ import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.model.v2_2_0.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.v2_2_0.upgrade.BasicVersionUpgrade;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -38,7 +38,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 @Singleton
 @Named("2.0.0")
 public class Upgrade200to220
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements SingleVersionUpgrader
 {
   @Override

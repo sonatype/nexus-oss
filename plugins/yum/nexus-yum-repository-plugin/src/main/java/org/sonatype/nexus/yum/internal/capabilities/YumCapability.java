@@ -18,22 +18,21 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
+import org.sonatype.nexus.capability.support.CapabilitySupport;
 import org.sonatype.nexus.yum.YumRegistry;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * YUM capability.
+ *
  * @since yum 3.0
  */
 @Named(YumCapabilityDescriptor.TYPE_ID)
 public class YumCapability
-    extends CapabilitySupport
+    extends CapabilitySupport<YumCapabilityConfiguration>
 {
-
   private final YumRegistry yumRegistry;
-
-  private YumCapabilityConfiguration configuration;
 
   @Inject
   public YumCapability(final YumRegistry yumRegistry) {
@@ -41,45 +40,12 @@ public class YumCapability
   }
 
   @Override
-  public void onCreate()
-      throws Exception
-  {
-    configuration = createConfiguration(context().properties());
-  }
-
-  @Override
-  public void onLoad()
-      throws Exception
-  {
-    configuration = createConfiguration(context().properties());
-  }
-
-  @Override
-  public void onUpdate()
-      throws Exception
-  {
-    configuration = createConfiguration(context().properties());
-  }
-
-  @Override
-  public void onRemove()
-      throws Exception
-  {
-    configuration = null;
-  }
-
-  @Override
-  public void onActivate() {
-    yumRegistry.setMaxNumberOfParallelThreads(configuration.maxNumberParallelThreads());
-  }
-
-  @Override
-  public String toString() {
-    return this.getClass().getSimpleName();
-  }
-
-  YumCapabilityConfiguration createConfiguration(final Map<String, String> properties) {
+  protected YumCapabilityConfiguration createConfig(final Map<String, String> properties) throws Exception {
     return new YumCapabilityConfiguration(properties);
   }
 
+  @Override
+  protected void onActivate(final YumCapabilityConfiguration config) throws Exception {
+    yumRegistry.setMaxNumberOfParallelThreads(config.maxNumberParallelThreads());
+  }
 }

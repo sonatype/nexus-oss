@@ -140,7 +140,7 @@ public class FileConfigurationSource
     }
 
     if (!getConfigurationFile().exists()) {
-      getLogger().warn("No configuration file in place, copying the default one and continuing with it.");
+      log.warn("No configuration file in place, copying the default one and continuing with it.");
 
       // get the defaults and stick it to place
       setConfiguration(nexusDefaults.getConfiguration());
@@ -160,7 +160,7 @@ public class FileConfigurationSource
       setConfigurationUpgraded(false);
     }
     catch (ConfigurationException e) {
-      getLogger().info("Configuration file is outdated, begin upgrade");
+      log.info("Configuration file is outdated, begin upgrade");
 
       upgradeConfiguration(getConfigurationFile());
 
@@ -189,7 +189,7 @@ public class FileConfigurationSource
 
     if (vResponse.isValid()) {
       if (vResponse.isModified()) {
-        getLogger().info("Validation has modified the configuration, storing the changes.");
+        log.info("Validation has modified the configuration, storing the changes.");
 
         storeConfiguration();
       }
@@ -204,32 +204,32 @@ public class FileConfigurationSource
   protected void dumpValidationErrors(final ValidationResponse response) {
     // summary
     if (response.getValidationErrors().size() > 0 || response.getValidationWarnings().size() > 0) {
-      getLogger().error("* * * * * * * * * * * * * * * * * * * * * * * * * *");
+      log.error("* * * * * * * * * * * * * * * * * * * * * * * * * *");
 
-      getLogger().error("Nexus configuration has validation errors/warnings");
+      log.error("Nexus configuration has validation errors/warnings");
 
-      getLogger().error("* * * * * * * * * * * * * * * * * * * * * * * * * *");
+      log.error("* * * * * * * * * * * * * * * * * * * * * * * * * *");
 
       if (response.getValidationErrors().size() > 0) {
-        getLogger().error("The ERRORS:");
+        log.error("The ERRORS:");
 
         for (ValidationMessage msg : response.getValidationErrors()) {
-          getLogger().error(msg.toString());
+          log.error(msg.toString());
         }
       }
 
       if (response.getValidationWarnings().size() > 0) {
-        getLogger().error("The WARNINGS:");
+        log.error("The WARNINGS:");
 
         for (ValidationMessage msg : response.getValidationWarnings()) {
-          getLogger().error(msg.toString());
+          log.error(msg.toString());
         }
       }
 
-      getLogger().error("* * * * * * * * * * * * * * * * * * * * *");
+      log.error("* * * * * * * * * * * * * * * * * * * * *");
     }
     else {
-      getLogger().info("Nexus configuration validated successfully.");
+      log.info("Nexus configuration validated successfully.");
     }
   }
 
@@ -271,7 +271,7 @@ public class FileConfigurationSource
   protected void upgradeConfiguration(File file)
       throws IOException, ConfigurationException
   {
-    getLogger().info("Trying to upgrade the configuration file " + file.getAbsolutePath());
+    log.info("Trying to upgrade the configuration file " + file.getAbsolutePath());
 
     setConfiguration(configurationUpgrader.loadOldConfiguration(file));
 
@@ -281,7 +281,7 @@ public class FileConfigurationSource
           + file.getAbsolutePath() + " file with a valid Nexus configuration file.");
     }
 
-    getLogger().info("Creating backup from the old file and saving the upgraded configuration.");
+    log.info("Creating backup from the old file and saving the upgraded configuration.");
 
     backupConfiguration();
 
@@ -298,7 +298,7 @@ public class FileConfigurationSource
   private void loadConfiguration(File file)
       throws IOException, ConfigurationException
   {
-    getLogger().debug("Loading Nexus configuration from " + file.getAbsolutePath());
+    log.debug("Loading Nexus configuration from " + file.getAbsolutePath());
 
     FileInputStream fis = null;
     try {
@@ -340,13 +340,13 @@ public class FileConfigurationSource
               + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
               + "******************************************************************************";
 
-      getLogger().error(message, e);
+      log.error(message, e);
       throw new IOException("Could not create configuration file " + file.getAbsolutePath(), e);
     }
 
     // Clone the conf so we can encrypt the passwords
     final Configuration configuration = configHelper.encryptDecryptPasswords(getConfiguration(), true);
-    getLogger().debug("Saving configuration: {}", file);
+    log.debug("Saving configuration: {}", file);
     final FileReplacer fileReplacer = new FileReplacer(file);
     // we save this file many times, don't litter backups
     fileReplacer.setDeleteBackupFile(true);

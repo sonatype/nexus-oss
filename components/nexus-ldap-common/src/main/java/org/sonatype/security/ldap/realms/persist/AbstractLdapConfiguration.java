@@ -24,7 +24,6 @@ import java.io.Reader;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
@@ -33,6 +32,7 @@ import org.sonatype.security.ldap.realms.persist.model.Configuration;
 import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Reader;
 import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Writer;
 import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
@@ -42,7 +42,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractLdapConfiguration
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements LdapConfiguration
 {
   private final ApplicationConfiguration applicationConfiguration;
@@ -148,7 +148,7 @@ public abstract class AbstractLdapConfiguration
                 passwordHelper.decrypt(configuration.getConnectionInfo().getSystemPassword()));
           }
           catch (PlexusCipherException e) {
-            this.getLogger().error(
+            this.log.error(
                 "Failed to decrypt password, assuming the password in file: '" + configurationFile.getAbsolutePath()
                     + "' is clear text.", e);
           }
@@ -159,10 +159,10 @@ public abstract class AbstractLdapConfiguration
         configuration = this.getDefaultConfiguration();
       }
       catch (IOException e) {
-        getLogger().error("IOException while retrieving configuration file", e);
+        log.error("IOException while retrieving configuration file", e);
       }
       catch (XmlPullParserException e) {
-        getLogger().error("Invalid XML Configuration", e);
+        log.error("Invalid XML Configuration", e);
       }
     }
     finally {
@@ -189,7 +189,7 @@ public abstract class AbstractLdapConfiguration
                 +
                 "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
                 + "******************************************************************************";
-        getLogger().error(message, e);
+        log.error(message, e);
         throw new IOException("Could not create configuration file " + configurationFile.getAbsolutePath(), e);
       }
 
@@ -202,12 +202,12 @@ public abstract class AbstractLdapConfiguration
               passwordHelper.encrypt(configuration.getConnectionInfo().getSystemPassword()));
         }
         catch (PlexusCipherException e) {
-          getLogger().error("Failed to encrypt password while storing configuration file", e);
+          log.error("Failed to encrypt password while storing configuration file", e);
         }
       }
 
       // perform the "safe save"
-      getLogger().debug("Saving configuration: {}", configurationFile);
+      log.debug("Saving configuration: {}", configurationFile);
       final FileReplacer fileReplacer = new FileReplacer(configurationFile);
       fileReplacer.setDeleteBackupFile(true);
 
@@ -222,7 +222,7 @@ public abstract class AbstractLdapConfiguration
       });
     }
     catch (IOException e) {
-      getLogger().error("IOException while storing configuration file", e);
+      log.error("IOException while storing configuration file", e);
     }
     finally {
       lock.unlock();
@@ -247,13 +247,13 @@ public abstract class AbstractLdapConfiguration
       defaultConfig = reader.read(fr);
     }
     catch (IOException e) {
-      this.getLogger().error(
+      this.log.error(
           "Failed to read default LDAP Realm configuration.  This may be corrected while the application is running.",
           e);
       defaultConfig = new Configuration();
     }
     catch (XmlPullParserException e) {
-      this.getLogger().error(
+      this.log.error(
           "Failed to read default LDAP Realm configuration.  This may be corrected while the application is running.",
           e);
       defaultConfig = new Configuration();
