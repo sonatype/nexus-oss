@@ -142,7 +142,13 @@ public class SimplePullTest
     Collection<StorageItem> dir = ((StorageCollectionItem) item).list();
     // we should have listed in root only those things/dirs we pulled, se above!
     // ".nexus" is here too!
-    assertEquals(6, dir.size());
+    // Expected results:
+    // repo1:/.nexus (coll)
+    // repo1:/activemq (coll)
+    // repo1:/rome (coll)
+    // repo2:/xstream (coll)
+    // repo3:/repo3.txt (file)
+    assertEquals(5, dir.size());
 
     // SO FAR, IT's OLD Unit test, except CacheCreate events were changed (it was Cache event).
     // Now below, we add some more, to cover NXCM-3525 too:
