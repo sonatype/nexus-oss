@@ -363,32 +363,7 @@
       </patterns>
     </repositoryTarget>
   </repositoryTargets>
-  <tasks>
-    <task>
-      <id>1</id>
-      <name>EvictUnusedProxiedItemsTask</name>
-      <enabled>true</enabled>
-      <type>EvictUnusedProxiedItemsTask</type>
-      <status>SUBMITTED</status>
-      <schedule>
-        <type>manual</type>
-      </schedule>
-      <properties>
-        <property>
-          <key>.name</key>
-          <value>EvictUnusedProxiedItemsTask</value>
-        </property>
-        <property>
-          <key>evictOlderCacheItemsThen</key>
-          <value>6</value>
-        </property>
-        <property>
-          <key>repositoryId</key>
-          <value>public</value>
-        </property>
-      </properties>
-    </task>
-  </tasks>
+  <tasks/>
   <smtpConfiguration>
     <hostname>smtp-host</hostname>
     <port>25</port>

@@ -21,7 +21,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -68,11 +67,8 @@ public class AbstractEvictTaskIt
   public void setupStorageAndAttributes()
       throws Exception
   {
-    stopNexus();
-
-    File workDir = new File(AbstractNexusIntegrationTest.nexusWorkDir);
-
-    this.storageWorkDir = new File(workDir, "storage");
+    final File workDir = new File(AbstractNexusIntegrationTest.nexusWorkDir);
+    storageWorkDir = new File(workDir, "storage");
 
     FileUtils.copyDirectory(getTestResourceAsFile("storage/"), storageWorkDir);
 
@@ -127,8 +123,6 @@ public class AbstractEvictTaskIt
         line = reader.readLine();
       }
     }
-
-    startNexus();
   }
 
   protected void runTask(int days, String repoId)
