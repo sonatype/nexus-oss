@@ -13,9 +13,7 @@
 
 package org.sonatype.nexus.mime;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -36,8 +34,12 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.apache.tika.Tika;
+import org.apache.tika.config.TikaConfig;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.mime.MediaTypeRegistry;
 import org.apache.tika.mime.MimeTypes;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -55,11 +57,20 @@ public class DefaultMimeSupport
     implements MimeSupport
 {
   /**
-   * Aoache Tika instance.
+   * Nexus Mime Types.
    */
-  private final Tika tika;
-
   private final NexusMimeTypes nexusMimeTypes;
+
+  /**
+   * Aoache Tika configuraton. Will pick any service (uses Sun Service Loader Patter), so can be customized too..
+   */
+  private final TikaConfig tikaConfig;
+
+  /**
+   * "Low" level Tika detector, as {@link org.apache.tika.Tika} hides too much.
+   */
+  private final Detector detector;
+
 
   /**
    * A loading cache of extension to MIME type.
@@ -74,7 +85,8 @@ public class DefaultMimeSupport
   @VisibleForTesting
   public DefaultMimeSupport(final NexusMimeTypes nexusMimeTypes) {
     this.nexusMimeTypes = checkNotNull(nexusMimeTypes);
-    this.tika = new Tika();
+    this.tikaConfig = TikaConfig.getDefaultConfig();
+    this.detector = tikaConfig.getDetector();
 
     // create the cache
     extensionToMimeTypeCache =
@@ -89,14 +101,20 @@ public class DefaultMimeSupport
             if (mimeType != null) {
               // add Nexus matches first
               detected.addAll(mimeType.getMimetypes());
-              if (!mimeType.isOverride()) {
-                // unless no override, ask Tika too
-                detected.add(tika.detect("dummy." + key));
+              if (mimeType.isOverride()) {
+                return detected;
               }
-              return detected;
             }
-            // no nexus matches, just ask Tika
-            return Collections.singletonList(tika.detect("dummy." + key));
+            // ask Tika too
+            final Metadata metadata = new Metadata();
+            metadata.set(Metadata.RESOURCE_NAME_KEY, "dummy." + key);
+            MediaType mediaType = detector.detect(null, metadata);
+            // unravel to least specific
+            while (mediaType != null) {
+              detected.add(mediaType.getBaseType().toString());
+              mediaType = MediaTypeRegistry.getDefaultRegistry().getSupertype(mediaType);
+            }
+            return detected;
           }
         });
   }
@@ -124,6 +142,7 @@ public class DefaultMimeSupport
     }
   }
 
+  @Override
   public List<String> guessMimeTypesListFromPath(final String path) {
     final String pathExtension = getExtension(path);
     try {
@@ -140,25 +159,60 @@ public class DefaultMimeSupport
     return Sets.newHashSet(guessMimeTypesListFromPath(path));
   }
 
+  @Deprecated
   @Override
-  public Set<String> detectMimeTypesFromContent(final ContentLocator content)
-      throws IOException
-  {
-    try (final BufferedInputStream bis = new BufferedInputStream(content.getContent())) {
-      final Metadata metadata = new Metadata();
-      return Collections.singleton(tika.detect(bis, metadata));
-    }
+  public Set<String> detectMimeTypesFromContent(final ContentLocator content) throws IOException {
+    return Sets.newHashSet(detectMimeTypesListFromContent(content));
   }
 
   @Override
   public String detectMimeTypesFromContent(final StorageFileItem fileItem)
       throws IOException
   {
-    try (final BufferedInputStream bis = new BufferedInputStream(fileItem.getInputStream())) {
-      final Metadata metadata = new Metadata();
-      metadata.set(Metadata.RESOURCE_NAME_KEY, fileItem.getName());
-      return tika.detect(bis, metadata);
+    final List<String> mimeTypes = detectMimeTypesListFromContent(fileItem);
+    if (mimeTypes.isEmpty()) {
+      // what here?
+      return MimeTypes.OCTET_STREAM;
     }
+    else {
+      return mimeTypes.get(0);
+    }
+  }
+
+  @Override
+  public List<String> detectMimeTypesListFromContent(final ContentLocator content)
+      throws IOException
+  {
+    final List<String> detected = Lists.newArrayList();
+    MediaType mediaType;
+    try (final TikaInputStream tis = TikaInputStream.get(content.getContent())) {
+      mediaType = detector.detect(tis, new Metadata());
+    }
+    // unravel to least specific
+    while (mediaType != null) {
+      detected.add(mediaType.getBaseType().toString());
+      mediaType = MediaTypeRegistry.getDefaultRegistry().getSupertype(mediaType);
+    }
+    return detected;
+  }
+
+  @Override
+  public List<String> detectMimeTypesListFromContent(final StorageFileItem fileItem)
+      throws IOException
+  {
+    final List<String> detected = Lists.newArrayList();
+    final Metadata metadata = new Metadata();
+    metadata.set(Metadata.RESOURCE_NAME_KEY, fileItem.getName());
+    MediaType mediaType;
+    try (final TikaInputStream tis = TikaInputStream.get(fileItem.getInputStream())) {
+      mediaType = detector.detect(tis, metadata);
+    }
+    // unravel to least specific
+    while (mediaType != null) {
+      detected.add(mediaType.getBaseType().toString());
+      mediaType = MediaTypeRegistry.getDefaultRegistry().getSupertype(mediaType);
+    }
+    return detected;
   }
 
   // ==
