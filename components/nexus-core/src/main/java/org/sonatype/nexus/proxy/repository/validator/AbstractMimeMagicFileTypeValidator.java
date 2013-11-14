@@ -14,8 +14,8 @@
 package org.sonatype.nexus.proxy.repository.validator;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.sonatype.nexus.mime.MimeSupport;
@@ -29,7 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Helper base class for implementing {@link FileTypeValidator} components that want to verify the content's MIME magic
  * signature using {@link MimeSupport}. The main method {@link #isExpectedFileType(StorageFileItem)} has to be
  * implemented by implementor in a way it collects it's "expectations" from some source (internal state, some config,
- * whatever) and invokes the {@link #isExpectedFileTypeByDetectedMimeType(StorageFileItem, Set)} method with the file
+ * whatever) and invokes the {@link #isExpectedFileTypeByDetectedMimeType(StorageFileItem, Set, boolean)} method with
+ * the file
  * item and the set of "expectations". If the set has intersection, file is claimed valid, otherwise invalid.
  *
  * @author cstamas
@@ -71,13 +72,16 @@ public abstract class AbstractMimeMagicFileTypeValidator
    *
    * @param file              to have checked content.
    * @param expectedMimeTypes the "expectations" against detected MIME types.
+   * @param contentOnly       {@code true} to match content only, otherwise file name will be taken into account too
+   *                          (potentially resulting in misleading matches, see "empty XML file with lax=false" case!).
    * @return {@link FileTypeValidity#VALID} if detected MIME types and passed in expectations has intersection,
    *         {@link FileTypeValidity#INVALID} otherwise. {@link FileTypeValidity#NEUTRAL} if passed in expectations
    *         are {@code null} or empty.
    * @throws IOException in case of some IO problem.
    */
   protected FileTypeValidity isExpectedFileTypeByDetectedMimeType(final StorageFileItem file,
-                                                                  final Set<String> expectedMimeTypes)
+                                                                  final Set<String> expectedMimeTypes,
+                                                                  final boolean contentOnly)
       throws IOException
   {
     if (expectedMimeTypes == null || expectedMimeTypes.isEmpty()) {
@@ -85,7 +89,13 @@ public abstract class AbstractMimeMagicFileTypeValidator
       return FileTypeValidity.NEUTRAL;
     }
 
-    final Set<String> magicMimeTypes = Collections.singleton(mimeSupport.detectMimeTypesFromContent(file));
+    final List<String> magicMimeTypes;
+    if (contentOnly) {
+      magicMimeTypes = mimeSupport.detectMimeTypesListFromContent(file.getContentLocator());
+    }
+    else {
+      magicMimeTypes = mimeSupport.detectMimeTypesListFromContent(file);
+    }
 
     if (log.isDebugEnabled()) {
       log.debug(
@@ -121,11 +131,15 @@ public abstract class AbstractMimeMagicFileTypeValidator
       expectedMimeTypes.addAll(type.getMimetypes());
     }
 
+    // If we expect XML content, and XML LAX is FALSE, we have to do content only MAGIC detection!
+    boolean contentOnly = (expectedMimeTypes.contains("application/xml") || expectedMimeTypes.contains("text/xml")) &&
+        !xmlLaxValidation;
+
     try {
       // the expectedMimeTypes will be empty, see map in constructor which extensions we check at all.
       // The isExpectedFileTypeByDetectedMimeType() method will claim NEUTRAL when expectancies are empty/null
       final FileTypeValidity mimeDetectionResult = isExpectedFileTypeByDetectedMimeType(
-          file, expectedMimeTypes
+          file, expectedMimeTypes, contentOnly
       );
 
       if (FileTypeValidity.INVALID.equals(mimeDetectionResult)
