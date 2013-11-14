@@ -142,9 +142,10 @@ public class DefaultMimeSupportTest
     when(mimeType.getMimetypes()).thenReturn(Lists.newArrayList("fake/mimetype"));
 
     final List<String> mimeTypes = mimeSupport.guessMimeTypesListFromPath("foo.zip");
-    assertThat(mimeTypes, hasSize(2));
+    assertThat(mimeTypes, hasSize(3));
     assertThat(mimeTypes, hasItem("application/zip"));
     assertThat(mimeTypes, hasItem("fake/mimetype"));
+    assertThat(mimeTypes, hasItem("application/octet-stream"));
     assertThat(mimeSupport.guessMimeTypeFromPath("foo.zip"), is("fake/mimetype"));
   }
 

@@ -172,7 +172,9 @@ public class MavenFileTypeValidatorTest
   {
     doTest("something/else/library.swc", "test.tar.bz2", false);
 
-    when(mimeTypes.getMimeTypes("swc")).thenReturn(mimeType);
+    // note: The real NexusMimeTypes handles file name and is invoked like this
+    // so, to make MOCK react we use the same path as input will be
+    when(mimeTypes.getMimeTypes("something/else/library.swc")).thenReturn(mimeType);
     when(mimeType.getMimetypes()).thenReturn(Lists.newArrayList("application/x-bzip2"));
 
     doTest("something/else/library.swc", "test.tar.bz2", true);
