@@ -50,7 +50,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.shiro.subject.Subject;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.restlet.Context;
 import org.restlet.data.Form;
@@ -166,31 +165,13 @@ public abstract class AbstractArtifactPlexusResource
 
       ArtifactStoreHelper helper = mavenRepository.getArtifactStoreHelper();
 
-      InputStream pomContent = null;
+      StorageFileItem file = helper.retrieveArtifactPom(gavRequest);
 
-      InputStreamReader ir = null;
-
-      Model pom = null;
-
-      try {
-        StorageFileItem file = helper.retrieveArtifactPom(gavRequest);
-
-        pomContent = file.getInputStream();
-
+      try (InputStream pomContent = file.getInputStream();
+           InputStreamReader ir = new InputStreamReader(pomContent)) {
         MavenXpp3Reader reader = new MavenXpp3Reader();
-
-        ir = new InputStreamReader(pomContent);
-
-        pom = reader.read(ir);
+        return reader.read(ir);
       }
-      finally {
-        IOUtil.close(pomContent);
-
-        IOUtil.close(ir);
-      }
-
-      return pom;
-
     }
     catch (Exception e) {
       handleException(request, response, e);

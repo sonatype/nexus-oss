@@ -19,7 +19,7 @@ import java.net.URL;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -67,13 +67,13 @@ public class NXCM1995MetadataCacheIT
     assertThat(newContentXml, exists());
     assertThat(newContentXml, not(contains("com.adobe.flexbuilder.utils.osnative.win")));
     assertThat(newContentXml, contains("com.sonatype.nexus.p2.its.feature2.feature.jar"));
-    FileUtils.copyFileToDirectory(newContentXml, new File(reponxcm1995, "memberrepo1"));
-    FileUtils.copyFileToDirectory(newContentXml, new File(reponxcm1995, "memberrepo2"));
+    FileUtils.copyFileToDirectory(newContentXml, new File(reponxcm1995, "memberrepo1"), false);
+    FileUtils.copyFileToDirectory(newContentXml, new File(reponxcm1995, "memberrepo2"), false);
 
     final File newArtifactsXml = new File(localStorageDir, "p2repo2/artifacts.xml");
     assertThat(newArtifactsXml, exists());
-    FileUtils.copyFileToDirectory(newArtifactsXml, new File(reponxcm1995, "memberrepo1"));
-    FileUtils.copyFileToDirectory(newArtifactsXml, new File(reponxcm1995, "memberrepo2"));
+    FileUtils.copyFileToDirectory(newArtifactsXml, new File(reponxcm1995, "memberrepo1"), false);
+    FileUtils.copyFileToDirectory(newArtifactsXml, new File(reponxcm1995, "memberrepo2"), false);
 
     // metadata cache expires in ONE minute, so let's give it some time to expire
     Thread.yield();

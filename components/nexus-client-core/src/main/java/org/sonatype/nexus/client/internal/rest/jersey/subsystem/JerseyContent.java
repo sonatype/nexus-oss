@@ -27,15 +27,15 @@ import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.rest.jersey.ContextAwareUniformInterfaceException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
-import com.sun.jersey.api.client.ClientResponse.Status;
-
 import com.google.common.collect.Range;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+
 import static com.google.common.base.Preconditions.checkState;
 
 /**
@@ -157,7 +157,7 @@ public class JerseyContent
       download(location, uri, os, range);
     }
     finally {
-      IOUtil.close(os);
+      IOUtils.closeQuietly(os);
     }
   }
 
@@ -194,7 +194,7 @@ public class JerseyContent
       }
 
       try {
-        IOUtil.copy(response.getEntityInputStream(), target);
+        IOUtils.copy(response.getEntityInputStream(), target);
       }
       finally {
         response.close();

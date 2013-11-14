@@ -34,10 +34,10 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.treeview.DefaultTreeNodeFactory;
 import org.apache.maven.index.treeview.TreeNode;
-import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
@@ -195,7 +195,7 @@ public class DownloadRemoteIndexerManagerIT
       FileUtils.forceDelete(destination);
       lastMod = indexFile.lastModified();
     }
-    FileUtils.copyDirectoryStructure(source, destination);
+    FileUtils.copyDirectory(source, destination);
     long lastMod2 = indexFile.lastModified();
     assertTrue(lastMod < lastMod2);
 

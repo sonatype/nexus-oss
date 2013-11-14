@@ -35,7 +35,7 @@ import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 
@@ -63,7 +63,7 @@ public class DefaultWastebasketTest
     final File repoRoot = getRepoRoot(id);
     final File repoContent = new File("src/test/resources/" + id);
     if (repoContent.isDirectory()) {
-      FileUtils.copyDirectoryStructure(repoContent, repoRoot);
+      FileUtils.copyDirectory(repoContent, repoRoot);
     }
 
     // ading one hosted only
@@ -139,7 +139,7 @@ public class DefaultWastebasketTest
     // fill legacy trash from activeRepo trash
     basketDir.mkdirs();
     File trashContent = new File(activeRepoRoot, ".nexus/trash");
-    FileUtils.copyDirectoryStructure(trashContent, basketDir);
+    FileUtils.copyDirectory(trashContent, basketDir);
 
     M2Repository outOfServiceRepo =
         (M2Repository) this.lookup(RepositoryRegistry.class).getRepository("out-of-service-repo");

@@ -62,7 +62,6 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -443,14 +442,7 @@ public class Upgrade103to104
     // extra step, remove old tasks.xml
     // tasksFile would be null if the upgrade chain started from something older then 1.0.3
     if (tasksFile != null && tasksFile.exists()) {
-      try {
-        FileUtils.rename(tasksFile, new File(tasksFile.getParentFile(), "tasks.xml.old"));
-      }
-      catch (IOException e) {
-        // silent?
-        // after succesful upgrade, this file will not be used anymore
-        // it will remain but will be ugly (ie. a file should be deleted in safe manner)
-      }
+      tasksFile.renameTo(new File(tasksFile.getParentFile(), "tasks.xml.old"));
     }
   }
 

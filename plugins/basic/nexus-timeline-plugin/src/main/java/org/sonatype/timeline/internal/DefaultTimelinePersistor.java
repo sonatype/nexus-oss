@@ -44,7 +44,6 @@ import org.sonatype.timeline.proto.TimeLineRecordProtos;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
-import org.codehaus.plexus.util.IOUtil;
 
 /**
  * The class doing persitence of timeline records using Protobuf.
@@ -103,16 +102,11 @@ public class DefaultTimelinePersistor
       throws IOException
   {
     verify(records);
-    OutputStream out = null;
-    try {
-      out = new BufferedOutputStream(new FileOutputStream(getDataFile(), true));
+    try (OutputStream out = new BufferedOutputStream(new FileOutputStream(getDataFile(), true))) {
       for (TimelineRecord record : records) {
         toProto(record).writeDelimitedTo(out);
       }
       out.flush();
-    }
-    finally {
-      IOUtil.close(out);
     }
   }
 
@@ -241,9 +235,7 @@ public class DefaultTimelinePersistor
    */
   protected Iterator<TimelineRecord> readFile(File file) {
     final ArrayList<TimelineRecord> result = new ArrayList<TimelineRecord>();
-    InputStream in = null;
-    try {
-      in = new BufferedInputStream(new FileInputStream(file));
+    try (InputStream in = new BufferedInputStream(new FileInputStream(file))) {
       // V3 uses delimited format
       TimelineRecord rec = fromProto(TimeLineRecordProtos.TimeLineRecord.parseDelimitedFrom(in));
       while (rec != null) {
@@ -253,9 +245,6 @@ public class DefaultTimelinePersistor
     }
     catch (Exception e) {
       // just ignore it
-    }
-    finally {
-      IOUtil.close(in);
     }
 
     return result.iterator();

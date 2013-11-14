@@ -20,9 +20,9 @@ import org.sonatype.nexus.security.ldap.realms.NexusLdapAuthenticationRealm;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.realms.XmlAuthenticatingRealm;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -101,7 +101,7 @@ public class MultipleRealmsIT
   protected void copyDefaultConfigToPlace()
       throws IOException
   {
-    IOUtil.copy(getClass().getResourceAsStream("/test-conf/security-configuration-multipleRealms.xml"),
+    IOUtils.copy(getClass().getResourceAsStream("/test-conf/security-configuration-multipleRealms.xml"),
         new FileOutputStream(getSecurityConfiguration()));
   }
 

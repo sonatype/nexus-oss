@@ -30,8 +30,6 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 
-import com.google.common.io.Closeables;
-
 /**
  * @since yum 3.0
  */
@@ -70,19 +68,18 @@ public class YumConfigContentGenerator
       {
         if (content == null) {
           final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-          final PrintWriter out = new PrintWriter(baos);
 
-          out.println("[" + repository.getId() + "]");
-          out.println("name=" + repository.getName());
-          out.println("baseurl=" + repositoryURLBuilder.getExposedRepositoryContentUrl(repository, true));
-          out.println("enabled=1");
-          out.println("protect=0");
-          out.println("gpgcheck=0");
-          out.println("metadata_expire=30s");
-          out.println("autorefresh=1");
-          out.println("type=rpm-md");
-
-          Closeables.closeQuietly(out);
+          try (PrintWriter out = new PrintWriter(baos)) {
+            out.println("[" + repository.getId() + "]");
+            out.println("name=" + repository.getName());
+            out.println("baseurl=" + repositoryURLBuilder.getExposedRepositoryContentUrl(repository, true));
+            out.println("enabled=1");
+            out.println("protect=0");
+            out.println("gpgcheck=0");
+            out.println("metadata_expire=30s");
+            out.println("autorefresh=1");
+            out.println("type=rpm-md");
+          }
           content = new String(baos.toByteArray());
         }
         return new ByteArrayInputStream(content.getBytes("UTF-8"));

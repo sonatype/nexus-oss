@@ -16,14 +16,12 @@ package org.sonatype.nexus.yum.internal;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
-import com.google.common.io.Closeables;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -41,16 +39,11 @@ public class RepoMD
   }
 
   public RepoMD(final File file) {
-    BufferedInputStream in = null;
-    try {
-      in = new BufferedInputStream(new FileInputStream(file));
+    try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file))) {
       locations = parse(in);
     }
-    catch (FileNotFoundException e) {
+    catch (Exception e) {
       throw Throwables.propagate(e);
-    }
-    finally {
-      Closeables.closeQuietly(in);
     }
   }
 

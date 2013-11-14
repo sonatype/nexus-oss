@@ -48,10 +48,11 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
 import com.google.common.eventbus.Subscribe;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -139,15 +140,16 @@ public class M2RepositoryTest
     repository.setRepositoryPolicy(RepositoryPolicy.RELEASE);
     repository.getCurrentCoreConfiguration().commitChanges();
 
-    DefaultStorageFileItem item =
-        new DefaultStorageFileItem(repository, new ResourceStoreRequest(SPOOF_RELEASE), true, true, new StringContentLocator(SPOOF_RELEASE));
+    DefaultStorageFileItem item = new DefaultStorageFileItem(
+        repository, new ResourceStoreRequest(SPOOF_RELEASE), true, true, new StringContentLocator(SPOOF_RELEASE)
+    );
 
     repository.storeItem(false, item);
 
     try {
-      item =
-          new DefaultStorageFileItem(repository, new ResourceStoreRequest(SPOOF_SNAPSHOT), true, true, new StringContentLocator(
-              SPOOF_SNAPSHOT));
+      item = new DefaultStorageFileItem(
+          repository, new ResourceStoreRequest(SPOOF_SNAPSHOT), true, true, new StringContentLocator(SPOOF_SNAPSHOT)
+      );
 
       repository.storeItem(false, item);
 
@@ -164,16 +166,16 @@ public class M2RepositoryTest
     repository.setRepositoryPolicy(RepositoryPolicy.SNAPSHOT);
     repository.getCurrentCoreConfiguration().commitChanges();
 
-    item =
-        new DefaultStorageFileItem(repository, new ResourceStoreRequest(SPOOF_SNAPSHOT), true, true, new StringContentLocator(
-            SPOOF_SNAPSHOT));
+    item = new DefaultStorageFileItem(
+        repository, new ResourceStoreRequest(SPOOF_SNAPSHOT), true, true, new StringContentLocator(SPOOF_SNAPSHOT)
+    );
 
     repository.storeItem(false, item);
 
     try {
-      item =
-          new DefaultStorageFileItem(repository, new ResourceStoreRequest(SPOOF_RELEASE), true, true, new StringContentLocator(
-              SPOOF_RELEASE));
+      item = new DefaultStorageFileItem(
+          repository, new ResourceStoreRequest(SPOOF_RELEASE), true, true, new StringContentLocator(SPOOF_RELEASE)
+      );
 
       repository.storeItem(false, item);
 
@@ -505,7 +507,7 @@ public class M2RepositoryTest
     File artifactFile = new File(inhouseLocalStorageDir, itemPath);
     artifactFile.getParentFile().mkdirs();
 
-    FileUtils.fileWrite(artifactFile.getAbsolutePath(), "Some Text so the file is not empty");
+    FileUtils.write(artifactFile, "Some Text so the file is not empty");
 
     ResourceStoreRequest request = new ResourceStoreRequest(itemPath);
     request.getRequestContext().put(AccessManager.REQUEST_REMOTE_ADDRESS, "127.0.0.1");
@@ -876,10 +878,12 @@ public class M2RepositoryTest
 
     StorageItem item = repository.retrieveItem(new ResourceStoreRequest("/spoof/simple.txt"));
 
-    repository.storeItem(false, new DefaultStorageFileItem(repository, new ResourceStoreRequest(item.getPath() + ".sha1"), true, true,
-        new StringContentLocator(sha1str)));
-    repository.storeItem(false, new DefaultStorageFileItem(repository, new ResourceStoreRequest(item.getPath() + ".md5"), true, true,
-        new StringContentLocator(md5str)));
+    repository.storeItem(false, new DefaultStorageFileItem(
+        repository, new ResourceStoreRequest(item.getPath() + ".sha1"), true, true, new StringContentLocator(sha1str))
+    );
+    repository.storeItem(false, new DefaultStorageFileItem(
+        repository, new ResourceStoreRequest(item.getPath() + ".md5"), true, true, new StringContentLocator(md5str))
+    );
 
     // reread the item to refresh attributes map
     item = repository.retrieveItem(new ResourceStoreRequest("/spoof/simple.txt"));

@@ -24,11 +24,11 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Module;
+import org.apache.commons.io.FileUtils;
 import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.util.FileUtils;
 
 public abstract class AbstractSecurityRestTest
     extends PlexusTestCaseSupport
