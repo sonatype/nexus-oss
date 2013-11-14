@@ -21,7 +21,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import org.sonatype.nexus.content.ContentRestrictionConstituent;
-import org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter;
+import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -35,7 +35,7 @@ import org.apache.shiro.web.filter.authc.AuthenticationFilter;
  * @since 2.1
  */
 public class ContentAuthenticationFilter
-    extends NexusSecureHttpAuthenticationFilter
+    extends NexusHttpAuthenticationFilter
 {
   private final List<ContentRestrictionConstituent> constituents;
 
