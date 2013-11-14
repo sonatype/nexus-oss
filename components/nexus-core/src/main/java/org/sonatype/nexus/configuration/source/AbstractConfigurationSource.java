@@ -16,7 +16,7 @@ package org.sonatype.nexus.configuration.source;
 import org.sonatype.configuration.source.ConfigurationSource;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * Abstract class that encapsulates Modello model loading and saving with interpolation.
@@ -24,7 +24,7 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
  * @author cstamas
  */
 public abstract class AbstractConfigurationSource
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements ConfigurationSource<Configuration>
 {
   /**

@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.item;
 
 import org.sonatype.nexus.proxy.item.uid.Attribute;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.util.PathUtils;
 
 /**
  * Repository item UID represents a key that uniquely identifies a resource in a repository. Every Item originating
@@ -38,7 +39,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * Constructing UID instances that does not follow these requirements might lead to unexpected results!
  * This might change in future, where the path will be validated and sanitized (and by throwing exceptions
  * show you the location of bug in the code that tried to use invalid path for UID constructor).
- * For path utilities, see class {@code ItemPathUtils}.
+ * For path utilities, see {@link PathUtils}.
  *
  * @author cstamas
  */

@@ -54,6 +54,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.osgi.service.obr.Resource;
@@ -310,7 +311,7 @@ public class ObrRepository
         }
       }
       catch (final Exception e) {
-        getLogger().warn("Problem updating OBR " + getId(), e);
+        log.warn("Problem updating OBR " + getId(), e);
       }
     }
   }
@@ -353,8 +354,8 @@ public class ObrRepository
       }
       finally {
         // avoid file locks by closing reader first
-        ObrUtils.close(reader);
-        ObrUtils.close(writer);
+        IOUtils.closeQuietly(reader);
+        IOUtils.closeQuietly(writer);
       }
 
       obrItem = ObrUtils.getCachedItem(obrUid);
@@ -386,10 +387,10 @@ public class ObrRepository
       }
     }
     catch (final IOException e) {
-      getLogger().warn("Problem reading OBR metadata from repository " + getId(), e);
+      log.warn("Problem reading OBR metadata from repository " + getId(), e);
     }
     finally {
-      ObrUtils.close(reader);
+      IOUtils.closeQuietly(reader);
     }
 
     return null; // no match found!
@@ -406,18 +407,18 @@ public class ObrRepository
 
   @Override
   protected boolean isRemoteStorageReachable(final ResourceStoreRequest request) {
-    getLogger().debug("isRemoteStorageReachable: RepositoryId=" + getId() + ": Trying to access " + getObrPath());
+    log.debug("isRemoteStorageReachable: RepositoryId=" + getId() + ": Trying to access " + getObrPath());
     request.setRequestPath(getObrPath());
     try {
       // We cannot use getRemoteStorage().isReachable() here because that forces the request path to be "/"
       if (getRemoteStorage().containsItem(this, request)) {
-        getLogger().debug("isRemoteStorageReachable: RepositoryId=" + getId() + ": Successfully accessed "
+        log.debug("isRemoteStorageReachable: RepositoryId=" + getId() + ": Successfully accessed "
             + getObrPath());
         return true;
       }
     }
     catch (final Exception e) {
-      getLogger().debug("isRemoteStorageReachable: RepositoryId=" + getId()
+      log.debug("isRemoteStorageReachable: RepositoryId=" + getId()
           + ": Caught exception while trying to access " + getObrPath(), e);
     }
 

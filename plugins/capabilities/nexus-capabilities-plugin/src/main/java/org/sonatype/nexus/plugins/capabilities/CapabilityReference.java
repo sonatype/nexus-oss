@@ -16,7 +16,7 @@ package org.sonatype.nexus.plugins.capabilities;
 /**
  * Reference to a capability and its state.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public interface CapabilityReference
 {

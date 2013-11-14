@@ -13,58 +13,77 @@
 
 package org.sonatype.nexus.yum.internal.capabilities;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Tag;
 import org.sonatype.nexus.plugins.capabilities.Taggable;
 import org.sonatype.nexus.plugins.capabilities.Validator;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
+import org.sonatype.sisu.goodies.i18n.I18N;
+import org.sonatype.sisu.goodies.i18n.MessageBundle;
+
+import com.google.common.collect.Lists;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 import static org.sonatype.nexus.plugins.capabilities.Tag.categoryTag;
 import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
 
 /**
+ * {@link YumCapability} descriptor.
+ *
  * @since yum 3.0
  */
 @Singleton
 @Named(YumCapabilityDescriptor.TYPE_ID)
 public class YumCapabilityDescriptor
     extends CapabilityDescriptorSupport
-    implements CapabilityDescriptor, Taggable
+    implements Taggable
 {
-
   public static final String TYPE_ID = "yum";
 
   public static final CapabilityType TYPE = capabilityType(TYPE_ID);
 
+  private static interface Messages
+      extends MessageBundle
+  {
+    @DefaultMessage("Yum: Configuration")
+    String name();
+
+    @DefaultMessage("Max number of parallel threads")
+    String maxNumberParallelThreadsLabel();
+
+    @DefaultMessage("Maximum number of threads to be used for generating Yum repositories (default 10 threads)")
+    String maxNumberParallelThreadsHelp();
+  }
+
+  private static final Messages messages = I18N.create(Messages.class);
+
   private final Validators validators;
+
+  private final List<FormField> formFields;
 
   @Inject
   public YumCapabilityDescriptor(final Validators validators) {
-    super(
-        TYPE,
-        "Yum: Configuration",
-        "Yum plugin configuration.",
+    this.validators = validators;
+
+    this.formFields = Lists.<FormField>newArrayList(
         new NumberTextFormField(
             YumCapabilityConfiguration.MAX_NUMBER_PARALLEL_THREADS,
-            "Max number of parallel threads",
-            "Maximum number of threads to be used for generating Yum repositories"
-                + " (default 10 threads)",
+            messages.maxNumberParallelThreadsLabel(),
+            messages.maxNumberParallelThreadsHelp(),
             FormField.OPTIONAL
         ).withInitialValue(10)
     );
-    this.validators = validators;
   }
 
   @Override
@@ -82,8 +101,22 @@ public class YumCapabilityDescriptor
   }
 
   @Override
+  public CapabilityType type() {
+    return TYPE;
+  }
+
+  @Override
+  public String name() {
+    return messages.name();
+  }
+
+  @Override
+  public List<FormField> formFields() {
+    return formFields;
+  }
+
+  @Override
   public Set<Tag> getTags() {
     return tags(categoryTag("Yum"));
   }
-
 }

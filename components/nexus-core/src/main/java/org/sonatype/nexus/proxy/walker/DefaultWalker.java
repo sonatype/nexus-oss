@@ -20,7 +20,6 @@ import java.util.Collections;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -31,6 +30,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.scheduling.TaskInterruptedException;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * The Class Walker.
@@ -40,7 +40,7 @@ import org.sonatype.scheduling.TaskInterruptedException;
 @Named
 @Singleton
 public class DefaultWalker
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements Walker
 {
   public static final String WALKER_WALKED_COLLECTION_COUNT = Walker.class.getSimpleName() + ".collCount";
@@ -60,15 +60,15 @@ public class DefaultWalker
 
     // cannot walk out of service repos
     if (LocalStatus.OUT_OF_SERVICE == context.getRepository().getLocalStatus()) {
-      getLogger().info("Cannot walk, repository {} is out of service.",
+      log.info("Cannot walk, repository {} is out of service.",
           RepositoryStringUtils.getHumanizedNameString(context.getRepository()));
     }
     else {
       context.getContext().put(WALKER_WALKED_FROM_PATH, fromPath);
       context.getContext().put(WALKER_THROTTLE_INFO, new DefaultThrottleInfo());
 
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("Start walking on ResourceStore {} from path \"{}\".",
+      if (log.isDebugEnabled()) {
+        log.debug("Start walking on ResourceStore {} from path \"{}\".",
             RepositoryStringUtils.getHumanizedNameString(context.getRepository()), fromPath);
       }
 
@@ -112,14 +112,14 @@ public class DefaultWalker
         }
       }
       catch (ItemNotFoundException ex) {
-        if (getLogger().isDebugEnabled()) {
-          getLogger().debug("ItemNotFound where walking should start, bailing out.", ex);
+        if (log.isDebugEnabled()) {
+          log.debug("ItemNotFound where walking should start, bailing out.", ex);
         }
 
         context.stop(ex);
       }
       catch (Exception ex) {
-        getLogger().warn("Got exception while doing retrieve, bailing out.", ex);
+        log.warn("Got exception while doing retrieve, bailing out.", ex);
 
         context.stop(ex);
       }
@@ -133,12 +133,12 @@ public class DefaultWalker
   {
     if (context.isStopped()) {
       if (context.getStopCause() == null) {
-        if (getLogger().isDebugEnabled()) {
-          getLogger().debug("Walker was stopped programatically, not because of error.");
+        if (log.isDebugEnabled()) {
+          log.debug("Walker was stopped programatically, not because of error.");
         }
       }
       else if (context.getStopCause() instanceof TaskInterruptedException) {
-        getLogger().info(
+        log.info(
             "Canceled walking on repository {} from path \"{}\", cause: {}",
                 RepositoryStringUtils.getHumanizedNameString(context.getRepository()), fromPath,
                 context.getStopCause().getMessage());
@@ -147,13 +147,13 @@ public class DefaultWalker
         // we have a cause, report any non-ItemNotFounds with stack trace
 
         if (context.getStopCause() instanceof ItemNotFoundException) {
-          getLogger().debug(
+          log.debug(
               "Aborted walking on repository {} from path \"{}\", cause: {}",
                   RepositoryStringUtils.getHumanizedNameString(context.getRepository()),
                   fromPath, context.getStopCause().getMessage());
         }
         else {
-          getLogger().warn(
+          log.warn(
               "Aborted walking on repository {} from path \"{}\", cause: {}",
                   RepositoryStringUtils.getHumanizedNameString(context.getRepository()),
                   fromPath, context.getStopCause().getMessage(), context.getStopCause());
@@ -165,8 +165,8 @@ public class DefaultWalker
     }
     else {
       // regular finish, it was not stopped
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug(
+      if (log.isDebugEnabled()) {
+        log.debug(
             "Finished walking on ResourceStore '" + context.getRepository().getId() + "' from path '"
                 + context.getContext().get(WALKER_WALKED_FROM_PATH) + "'.");
       }
@@ -232,7 +232,7 @@ public class DefaultWalker
         }
       }
       catch (ItemNotFoundException e) {
-        getLogger().debug("ItemNotFound not found while walking it, skipping.", e);
+        log.debug("ItemNotFound not found while walking it, skipping.", e);
       }
     }
 

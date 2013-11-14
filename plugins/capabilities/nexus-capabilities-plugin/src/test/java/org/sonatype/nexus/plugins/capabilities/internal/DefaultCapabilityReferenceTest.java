@@ -57,7 +57,7 @@ import static org.sonatype.nexus.plugins.capabilities.internal.DefaultCapability
 /**
  * {@link DefaultCapabilityReference} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class DefaultCapabilityReferenceTest
     extends TestSupport

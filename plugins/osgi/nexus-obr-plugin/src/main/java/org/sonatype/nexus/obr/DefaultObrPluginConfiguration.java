@@ -27,12 +27,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
 import com.google.common.base.Throwables;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.PropertyUtils;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -41,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class DefaultObrPluginConfiguration
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements ObrPluginConfiguration
 {
   private static final String DEFAULT_OBR_PROPERTY_PATH = "/META-INF/nexus-obr-plugin/nexus-obr-plugin.properties";
@@ -91,7 +91,7 @@ public class DefaultObrPluginConfiguration
 
   private void writeDefaultConfiguration() {
     final File configurationFile = getConfigurationFile();
-    getLogger().debug("Saving configuration: {}", configurationFile);
+    log.debug("Saving configuration: {}", configurationFile);
     try {
       final FileReplacer fileReplacer = new FileReplacer(configurationFile);
       // we save this file many times, don't litter backups
@@ -102,15 +102,14 @@ public class DefaultObrPluginConfiguration
         public void write(final BufferedOutputStream output)
             throws IOException
         {
-          try (final InputStream is =
-                   DefaultObrPluginConfiguration.class.getResourceAsStream(DEFAULT_OBR_PROPERTY_PATH)) {
-            IOUtil.copy(is, output);
+          try (InputStream is = DefaultObrPluginConfiguration.class.getResourceAsStream(DEFAULT_OBR_PROPERTY_PATH)) {
+            IOUtils.copy(is, output);
           }
         }
       });
     }
     catch (IOException e) {
-      getLogger().warn(
+      log.warn(
           "Could not write the OBR plugin configuration to path " + configurationFile.getAbsolutePath(), e);
       Throwables.propagate(e);
     }

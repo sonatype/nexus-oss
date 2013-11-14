@@ -49,7 +49,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.thoughtworks.xstream.XStream;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -308,9 +308,9 @@ public class JerseyNexusClient
 
   public String getResponseBody(final ClientResponse response) {
     try {
-      final byte[] body = IOUtil.toByteArray(response.getEntityInputStream());
+      final byte[] body = IOUtils.toByteArray(response.getEntityInputStream());
       response.setEntityInputStream(new ByteArrayInputStream(body));
-      return IOUtil.toString(body, "UTF-8");
+      return IOUtils.toString(body, "UTF-8");
     }
     catch (IOException e) {
       throw new IllegalStateException("Jersey unexpectedly refused to rewind buffered entity.");

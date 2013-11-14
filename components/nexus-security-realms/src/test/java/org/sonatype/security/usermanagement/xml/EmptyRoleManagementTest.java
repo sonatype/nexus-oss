@@ -26,7 +26,7 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 
 import junit.framework.Assert;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 
 public class EmptyRoleManagementTest
     extends AbstractSecurityTestCase

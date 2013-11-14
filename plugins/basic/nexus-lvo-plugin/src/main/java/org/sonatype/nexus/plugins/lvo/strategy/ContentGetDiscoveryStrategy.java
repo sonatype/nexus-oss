@@ -33,7 +33,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 import com.google.common.base.Preconditions;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 
 /**
  * This is a "local" strategy, uses Nexus content for information fetch.
@@ -59,15 +59,11 @@ public class ContentGetDiscoveryStrategy
     final DiscoveryResponse dr = new DiscoveryResponse(request);
     final StorageFileItem response = handleRequest(request);
     if (response != null) {
-      final InputStream is = response.getInputStream();
-      try {
+      try (InputStream is = response.getInputStream()) {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        IOUtil.copy(is, bos);
+        IOUtils.copy(is, bos);
         dr.setVersion(bos.toString());
         dr.setSuccessful(true);
-      }
-      finally {
-        IOUtil.close(is);
       }
     }
 
@@ -93,7 +89,7 @@ public class ContentGetDiscoveryStrategy
     }
     catch (Exception e) {
       // we are very rude about exceptions here ;)
-      getLogger().warn("Could not retrieve content!", e);
+      log.warn("Could not retrieve content!", e);
       return null;
     }
   }

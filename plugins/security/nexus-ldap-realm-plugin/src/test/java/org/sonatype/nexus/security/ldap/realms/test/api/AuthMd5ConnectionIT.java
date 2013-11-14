@@ -21,7 +21,7 @@ import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapAuthenticationTestRequest;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Request;
@@ -165,7 +165,7 @@ public class AuthMd5ConnectionIT
   protected void copyDefaultLdapConfigToPlace()
       throws IOException
   {
-    IOUtil.copy(getClass().getResourceAsStream("/test-conf/md5-ldap.xml"), new FileOutputStream(
+    IOUtils.copy(getClass().getResourceAsStream("/test-conf/md5-ldap.xml"), new FileOutputStream(
         getNexusLdapConfiguration()));
   }
 

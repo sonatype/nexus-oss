@@ -36,7 +36,7 @@ import static org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenc
 /**
  * Support for components which need to handle capability registration upon booting.
  *
- * @since 2.2
+ * @since capabilities 2.2
  */
 public abstract class CapabilityBooterSupport
 {

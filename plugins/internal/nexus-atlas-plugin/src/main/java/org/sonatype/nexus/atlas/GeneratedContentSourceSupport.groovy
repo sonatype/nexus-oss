@@ -23,7 +23,7 @@ import java.nio.file.Files
  * @since 2.7
  */
 abstract class GeneratedContentSourceSupport
-extends ContentSourceSupport
+    extends ContentSourceSupport
 {
   private File file
 
@@ -34,7 +34,7 @@ extends ContentSourceSupport
   @Override
   void prepare() {
     assert file == null
-    file = File.createTempFile(path.replaceAll('/','-') + '-', '.tmp').canonicalFile
+    file = File.createTempFile(path.replaceAll('/', '-') + '-', '.tmp').canonicalFile
     log.trace 'Preparing: {}', file
     generate(file)
   }

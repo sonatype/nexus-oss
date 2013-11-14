@@ -33,7 +33,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * {@link SiteRepositoryConfigurationModifier} UTs.
  *
- * @since 1.0
+ * @since site-repository 1.0
  */
 public class SiteRepositoryConfigurationModifierTest
     extends InjectedTestSupport

@@ -24,8 +24,8 @@ import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.artifact.Gav;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

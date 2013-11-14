@@ -70,11 +70,11 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.nexus.util.CompositeException;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.common.Throwables2;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -928,8 +928,7 @@ public class DefaultIndexerManager
     }
 
     if (!exceptions.isEmpty()) {
-      throw new IOException("Exception(s) happened during reindexAllRepositories()", new CompositeException(
-          "Multiple exceptions happened, please see prior log messages for details.", exceptions));
+      throw Throwables2.composite(new IOException("Exception(s) happened during reindexAllRepositories()"), exceptions);
     }
   }
 
@@ -966,8 +965,7 @@ public class DefaultIndexerManager
       publishRepositoryIndex(repository);
     }
     if (!exceptions.isEmpty()) {
-      throw new IOException("Exception(s) happened during reindexAllRepositories()", new CompositeException(
-          "Multiple exceptions happened, please see prior log messages for details.", exceptions));
+      throw Throwables2.composite(new IOException("Exception(s) happened during reindexAllRepositories()"), exceptions);
     }
   }
 
@@ -1096,8 +1094,7 @@ public class DefaultIndexerManager
       }
     }
     if (!exceptions.isEmpty()) {
-      throw new IOException("Exception(s) happened during downloadAllIndex()", new CompositeException(
-          "Multiple exceptions happened, please see prior log messages for details.", exceptions));
+      throw Throwables2.composite(new IOException("Exception(s) happened during downloadAllIndex()"), exceptions);
     }
   }
 
@@ -1131,8 +1128,7 @@ public class DefaultIndexerManager
       downloadRepositoryIndex(repository.adaptToFacet(ProxyRepository.class), false);
     }
     if (!exceptions.isEmpty()) {
-      throw new IOException("Exception(s) happened during reindexAllRepositories()", new CompositeException(
-          "Multiple exceptions happened, please see prior log messages for details.", exceptions));
+      throw Throwables2.composite(new IOException("Exception(s) happened during reindexAllRepositories()"), exceptions);
     }
   }
 
@@ -1394,8 +1390,7 @@ public class DefaultIndexerManager
       }
     }
     if (!exceptions.isEmpty()) {
-      throw new IOException("Exception(s) happened during publishAllIndex()", new CompositeException(
-          "Multiple exceptions happened, please see prior log messages for details.", exceptions));
+      throw Throwables2.composite(new IOException("Exception(s) happened during publishAllIndex()"), exceptions);
     }
   }
 
@@ -1427,8 +1422,7 @@ public class DefaultIndexerManager
     TaskUtil.checkInterruption();
     publishRepositoryIndex(repository);
     if (!exceptions.isEmpty()) {
-      throw new IOException("Exception(s) happened during reindexAllRepositories()", new CompositeException(
-          "Multiple exceptions happened, please see prior log messages for details.", exceptions));
+      throw Throwables2.composite(new IOException("Exception(s) happened during reindexAllRepositories()"), exceptions);
     }
   }
 
@@ -1594,9 +1588,8 @@ public class DefaultIndexerManager
       }
     }
     if (!exceptions.isEmpty()) {
-      throw new IOException("Exception(s) happened during optimizeAllRepositoriesIndex()",
-          new CompositeException("Multiple exceptions happened, please see prior log messages for details.",
-              exceptions));
+      throw Throwables2.composite(new IOException("Exception(s) happened during optimizeAllRepositoriesIndex()"),
+          exceptions);
     }
   }
 
@@ -1628,8 +1621,7 @@ public class DefaultIndexerManager
     TaskUtil.checkInterruption();
     optimizeRepositoryIndex(repository);
     if (!exceptions.isEmpty()) {
-      throw new IOException("Exception(s) happened during reindexAllRepositories()", new CompositeException(
-          "Multiple exceptions happened, please see prior log messages for details.", exceptions));
+      throw Throwables2.composite(new IOException("Exception(s) happened during reindexAllRepositories()"), exceptions);
     }
   }
 

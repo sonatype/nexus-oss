@@ -29,15 +29,15 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.lvo.NoSuchKeyException;
 import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
 import org.sonatype.nexus.plugins.lvo.config.model.Configuration;
 import org.sonatype.nexus.plugins.lvo.config.model.io.xpp3.NexusLvoPluginConfigurationXpp3Reader;
 import org.sonatype.nexus.plugins.lvo.config.model.io.xpp3.NexusLvoPluginConfigurationXpp3Writer;
 import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -46,7 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class DefaultLvoPluginConfiguration
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements LvoPluginConfiguration
 {
   private final File configurationFile;
@@ -88,7 +88,7 @@ public class DefaultLvoPluginConfiguration
       return getConfiguration().isEnabled();
     }
     catch (ConfigurationException | IOException e) {
-      getLogger().error("Unable to read configuration", e);
+      log.error("Unable to read configuration", e);
     }
 
     return false;
@@ -138,10 +138,10 @@ public class DefaultLvoPluginConfiguration
       }
     }
     catch (IOException e) {
-      getLogger().error("IOException while retrieving configuration file", e);
+      log.error("IOException while retrieving configuration file", e);
     }
     catch (XmlPullParserException e) {
-      getLogger().error("Invalid XML Configuration", e);
+      log.error("Invalid XML Configuration", e);
     }
     finally {
       if (fr != null) {

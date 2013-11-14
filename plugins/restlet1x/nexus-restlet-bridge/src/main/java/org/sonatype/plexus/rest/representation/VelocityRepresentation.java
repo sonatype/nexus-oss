@@ -13,11 +13,11 @@
 
 package org.sonatype.plexus.rest.representation;
 
-import java.util.Collections;
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
-import org.sonatype.sisu.velocity.Velocity;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.app.VelocityEngine;
@@ -30,8 +30,7 @@ import org.restlet.ext.velocity.TemplateRepresentation;
  * Problem with Restlet {@link TemplateRepresentation} is that it creates a new instance of Velocity per creation of
  * {@link TemplateRepresentation}. This class remedies that, by overriding how {@link VelocityEngine} is obtained, as
  * Plexus Application will stuff a VelocityEngine provider into context, hence, a singleton instance of Velocity will
- * be
- * reused. See SISU {@link Velocity} that is used under the hub.
+ * be reused.
  *
  * @author cstamas
  */
@@ -46,7 +45,7 @@ public class VelocityRepresentation
   /**
    * Constructor when Template is already assembled.
    *
-   * @since 1.21
+   * @since restlet-bridge 1.21
    */
   public VelocityRepresentation(Context context, Template template, Map<String, Object> dataModel,
                                 MediaType mediaType)
@@ -58,44 +57,13 @@ public class VelocityRepresentation
   /**
    * Constructor when template to use comes from some other classloader than the one where this class is.
    *
-   * @since 1.23
+   * @since restlet-bridge 1.23
    */
   public VelocityRepresentation(Context context, String templateName, ClassLoader cl, Map<String, Object> dataModel,
                                 MediaType mediaType)
   {
     this(context, getTemplate(context, templateName, cl), dataModel, mediaType);
   }
-
-  /**
-   * Constructor when template is on core classpath (will be loaded using VelocityEngine). This constructor accepts
-   * template name (binary name), and will use current classloader to locate the template. This constructor is not
-   * quite usable in apps that maintains multiple classloaders, as there is no control exposed over classloader to be
-   * used to load up the template resource.
-   *
-   * @deprecated Use the constructor that accepts {@link Template}, as it gives you total control how to obtain the
-   *             template (ie. to use custom classloader or so).
-   */
-  public VelocityRepresentation(Context context, String templateName, Map<String, Object> dataModel,
-                                MediaType mediaType)
-  {
-    this(context, getTemplate(context, templateName, VelocityRepresentation.class.getClassLoader()), dataModel,
-        mediaType);
-  }
-
-  /**
-   * Nonsense constructor... Velocity template without data model? This constructor is not quite usable in apps that
-   * maintains multiple classloaders, as there is no control exposed over classloader to be used to load up the
-   * template resource.
-   *
-   * @deprecated Use other constructors, as this one is a bit nonsense.
-   */
-  @Deprecated
-  public VelocityRepresentation(Context context, String templateName, MediaType mediaType) {
-    this(context, getTemplate(context, templateName, VelocityRepresentation.class.getClassLoader()),
-        Collections.<String, Object>emptyMap(), mediaType);
-  }
-
-  // ==
 
   /**
    * We return our own managed velocity engine instance, to avoid Restlet create one.
@@ -131,10 +99,10 @@ public class VelocityRepresentation
   }
 
   /**
-   * {@link PlexusRestletApplicationBridge} stuffs the SISU {@link Velocity} into context, and we use the shared
+   * {@link PlexusRestletApplicationBridge} stuffs the Velocity provider into context, and we use the shared
    * instance from it, instead to recreate it over and over again.
    */
   private static VelocityEngine getEngine(final Context context) {
-    return ((Velocity) context.getAttributes().get(Velocity.class.getName())).getEngine();
+    return ((Provider<VelocityEngine>) context.getAttributes().get(VelocityEngine.class.getName())).get();
   }
 }

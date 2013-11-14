@@ -27,9 +27,8 @@ import org.sonatype.nexus.configuration.model.v2_5_0.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.v2_5_0.CRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.v2_5_0.Configuration;
 import org.sonatype.nexus.configuration.model.v2_5_0.upgrade.BasicVersionUpgrade;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.io.Closeables;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -40,21 +39,17 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 @Singleton
 @Named("2.2.0")
 public class Upgrade220to250
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements SingleVersionUpgrader
 {
   @Override
   public Object loadConfiguration(File file)
       throws IOException, ConfigurationIsCorruptedException
   {
-    FileReader fr = null;
-
     org.sonatype.nexus.configuration.model.v2_2_0.Configuration conf = null;
 
-    try {
+    try (FileReader fr = new FileReader(file)) {
       // reading without interpolation to preserve user settings as variables
-      fr = new FileReader(file);
-
       org.sonatype.nexus.configuration.model.v2_2_0.io.xpp3.NexusConfigurationXpp3Reader reader =
           new org.sonatype.nexus.configuration.model.v2_2_0.io.xpp3.NexusConfigurationXpp3Reader();
 
@@ -62,9 +57,6 @@ public class Upgrade220to250
     }
     catch (XmlPullParserException e) {
       throw new ConfigurationIsCorruptedException(file.getAbsolutePath(), e);
-    }
-    finally {
-      Closeables.closeQuietly(fr);
     }
 
     return conf;

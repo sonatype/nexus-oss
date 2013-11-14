@@ -24,8 +24,8 @@ import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
 
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -93,7 +93,7 @@ public class DefaultSecurityConfigurationUpgraderTest
     String actual = sw.toString();
     actual = actual.replace("\r\n", "\n");
 
-    String shouldBe = IOUtil.toString(getClass().getResourceAsStream(path + ".result"));
+    String shouldBe = IOUtils.toString(getClass().getResourceAsStream(path + ".result"));
     shouldBe = shouldBe.replace("\r\n", "\n");
 
     assertThat(actual, is(shouldBe));
@@ -114,17 +114,9 @@ public class DefaultSecurityConfigurationUpgraderTest
   private void copyFromStreamToFile(InputStream is, File output)
       throws IOException
   {
-    FileOutputStream fos = null;
-
-    try {
-      fos = new FileOutputStream(output);
-
-      IOUtil.copy(is, fos);
-    }
-    finally {
-      IOUtil.close(is);
-
-      IOUtil.close(fos);
+    try (InputStream in = is;
+         FileOutputStream fos = new FileOutputStream(output);) {
+      IOUtils.copy(is, fos);
     }
   }
 

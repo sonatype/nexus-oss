@@ -22,18 +22,6 @@ public class WeeklySchedulerIterator
 {
   private final Set<Integer> weekdaysToRun;
 
-  public WeeklySchedulerIterator(Date startingDate) {
-    super(startingDate);
-
-    this.weekdaysToRun = null;
-  }
-
-  public WeeklySchedulerIterator(Date startingDate, Date endingDate) {
-    super(startingDate, endingDate);
-
-    this.weekdaysToRun = null;
-  }
-
   public WeeklySchedulerIterator(Date startingDate, Date endingDate, Set<Integer> weekdaysToRun) {
     super(startingDate, endingDate);
 

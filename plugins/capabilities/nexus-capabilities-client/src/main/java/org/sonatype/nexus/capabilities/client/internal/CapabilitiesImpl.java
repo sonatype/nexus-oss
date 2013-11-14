@@ -47,7 +47,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Jersey based Capabilities Nexus Client Subsystem implementation.
  *
- * @since 2.1
+ * @since capabilities 2.1
  */
 public class CapabilitiesImpl
     implements Capabilities

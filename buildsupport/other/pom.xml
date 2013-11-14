@@ -60,7 +60,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-mailer</artifactId>
-        <version>1.7.2</version>
+        <version>1.8-SNAPSHOT</version>
         <exclusions>
           <exclusion>
             <groupId>javax.activation</groupId>
@@ -79,12 +79,6 @@
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-resource-scanner</artifactId>
         <version>1.0.1</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-velocity</artifactId>
-        <version>1.2</version>
       </dependency>
 
       <dependency>

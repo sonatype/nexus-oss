@@ -82,13 +82,6 @@ public class MarshallerTest
   // ==
 
   @Test
-  public void testXstream()
-      throws IOException
-  {
-    doTest(new XStreamMarshaller());
-  }
-
-  @Test
   public void testJacksonJSON()
       throws IOException
   {

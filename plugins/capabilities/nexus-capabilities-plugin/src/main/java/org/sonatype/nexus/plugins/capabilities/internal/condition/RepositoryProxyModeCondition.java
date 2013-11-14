@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A condition that is satisfied when a repository has a specified proxy mode.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class RepositoryProxyModeCondition
     extends RepositoryConditionSupport

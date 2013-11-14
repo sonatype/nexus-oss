@@ -15,7 +15,7 @@ package org.sonatype.nexus.configuration;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author cstamas
  */
 public abstract class AbstractConfigurable<C>
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements Configurable<C>
 {
 

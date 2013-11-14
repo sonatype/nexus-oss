@@ -30,10 +30,9 @@ import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.v2_7_0.upgrade.BasicVersionUpgrade;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.io.Closeables;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -44,21 +43,17 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 @Singleton
 @Named("2.5.0")
 public class Upgrade250to270
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements SingleVersionUpgrader
 {
   @Override
   public Object loadConfiguration(File file)
       throws IOException, ConfigurationIsCorruptedException
   {
-    FileReader fr = null;
-
     org.sonatype.nexus.configuration.model.v2_5_0.Configuration conf = null;
 
-    try {
+    try (FileReader fr = new FileReader(file)) {
       // reading without interpolation to preserve user settings as variables
-      fr = new FileReader(file);
-
       org.sonatype.nexus.configuration.model.v2_5_0.io.xpp3.NexusConfigurationXpp3Reader reader =
           new org.sonatype.nexus.configuration.model.v2_5_0.io.xpp3.NexusConfigurationXpp3Reader();
 
@@ -66,9 +61,6 @@ public class Upgrade250to270
     }
     catch (XmlPullParserException e) {
       throw new ConfigurationIsCorruptedException(file.getAbsolutePath(), e);
-    }
-    finally {
-      Closeables.closeQuietly(fr);
     }
 
     return conf;
@@ -95,7 +87,7 @@ public class Upgrade250to270
 
   /**
    * Performs upgrade for EmptyTrashTask tasks.
-   * 
+   *
    * @param conf the new model (2.7.0)
    * @see <a href="https://issues.sonatype.org/browse/NEXUS-4580">NEXUS-4580</a>
    */
@@ -114,7 +106,7 @@ public class Upgrade250to270
 
   /**
    * Performs upgrade for SMTP SSL/TLS settings
-   * 
+   *
    * @param conf the new model (2.7.0)
    * @see <a href="https://issues.sonatype.org/browse/NEXUS-4997">NEXUS-4997</a>
    */
@@ -124,8 +116,7 @@ public class Upgrade250to270
       if (smtp.isSslEnabled() && smtp.isTlsEnabled()) {
         smtp.setSslEnabled(true);
         smtp.setTlsEnabled(false);
-        getLogger()
-            .warn(
+        log.warn(
                 "SMTP related configuration change happened: both SSL and TLS was set, updated to use SSL only, assuming that SMTP server port is set to a port where remote SMTP server accepts SSL connections.");
       }
     }

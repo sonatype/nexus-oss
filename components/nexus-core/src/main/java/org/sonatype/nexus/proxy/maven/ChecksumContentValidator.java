@@ -151,7 +151,7 @@ public class ChecksumContentValidator
         response = doRetrieveMD5(proxy, request, item);
       }
       catch (ItemNotFoundException e1) {
-        getLogger().debug("Item checksums (SHA1, MD5) remotely unavailable " + uid.toString());
+        log.debug("Item checksums (SHA1, MD5) remotely unavailable " + uid.toString());
       }
       finally {
         request.popRequestPath();

@@ -28,7 +28,8 @@ import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.*
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.HIGH
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.REQUIRED
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.CONFIG
 
 /**
@@ -39,8 +40,8 @@ import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.CONFIG
 @Named
 @Singleton
 class ConfigurationCustomizer
-extends ComponentSupport
-implements SupportBundleCustomizer
+    extends ComponentSupport
+    implements SupportBundleCustomizer
 {
   private final ApplicationConfiguration applicationConfiguration
 
@@ -55,7 +56,7 @@ implements SupportBundleCustomizer
     supportBundle << new NexusXmlContentSource()
 
     // helper to include a file
-    def maybeIncludeFile = { File file, String prefix, Priority priority=null ->
+    def maybeIncludeFile = { File file, String prefix, Priority priority = null ->
       if (file.exists()) {
         log.debug 'Including file: {}', file
         supportBundle << new FileContentSourceSupport(CONFIG, "$prefix/${file.name}", file) {
@@ -86,7 +87,7 @@ implements SupportBundleCustomizer
    * Source for obfuscated nexus.xml
    */
   private class NexusXmlContentSource
-  extends GeneratedContentSourceSupport
+      extends GeneratedContentSourceSupport
   {
     NexusXmlContentSource() {
       super(CONFIG, 'work/conf/nexus.xml')

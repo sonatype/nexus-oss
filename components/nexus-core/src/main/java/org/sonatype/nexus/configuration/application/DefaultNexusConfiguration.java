@@ -53,7 +53,6 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -80,6 +79,7 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserStatus;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Function;
@@ -102,7 +102,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named
 public class DefaultNexusConfiguration
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements NexusConfiguration
 {
   /**
@@ -254,7 +254,7 @@ public class DefaultNexusConfiguration
               + "]!!!! *\r\n"
               + "* Nexus cannot function properly until the process has read+write permissions to this folder *\r\n"
               + "******************************************************************************";
-      getLogger().error(message, e);
+      log.error(message, e);
       throw Throwables.propagate(e);
     }
   }
@@ -272,7 +272,7 @@ public class DefaultNexusConfiguration
               + "]!!!! *\r\n"
               + "* Nexus cannot function properly until the process has read+write permissions to this folder *\r\n"
               + "******************************************************************************";
-      getLogger().error(message, e);
+      log.error(message, e);
       throw Throwables.propagate(e);
     }
   }
@@ -289,7 +289,7 @@ public class DefaultNexusConfiguration
       throws ConfigurationException, IOException
   {
     if (force || configurationSource.getConfiguration() == null) {
-      getLogger().info("Loading Nexus Configuration...");
+      log.info("Loading Nexus Configuration...");
 
       configurationSource.loadConfiguration();
 
@@ -324,8 +324,8 @@ public class DefaultNexusConfiguration
       eventBus.post(loadEvent);
 
       if (loadEvent.isVetoed()) {
-        getLogger().info(
-            vetoFormatter.format(new VetoFormatterRequest(loadEvent, getLogger().isDebugEnabled())));
+        log.info(
+            vetoFormatter.format(new VetoFormatterRequest(loadEvent, log.isDebugEnabled())));
 
         throw new ConfigurationException("The Nexus configuration is invalid!");
       }
@@ -359,22 +359,22 @@ public class DefaultNexusConfiguration
     if (changes != null && changes.size() > 0) {
       if (Strings.isNullOrEmpty(userId)) {
         // should not really happen, we should always have subject (at least anon), but...
-        getLogger().info("Applying Nexus Configuration due to changes in {}...", changesToString(changes));
+        log.info("Applying Nexus Configuration due to changes in {}...", changesToString(changes));
       }
       else {
         // usually what happens on config change
-        getLogger().info("Applying Nexus Configuration due to changes in {} made by {}...",
+        log.info("Applying Nexus Configuration due to changes in {} made by {}...",
             changesToString(changes), userId);
       }
     }
     else {
       if (Strings.isNullOrEmpty(userId)) {
         // usually on boot: no changes since "all" changed, and no subject either
-        getLogger().info("Applying Nexus Configuration...");
+        log.info("Applying Nexus Configuration...");
       }
       else {
         // inperfection of config framework, ie. on adding new component to config system (new repo)
-        getLogger().info("Applying Nexus Configuration made by {}...", userId);
+        log.info("Applying Nexus Configuration made by {}...", userId);
       }
     }
   }
@@ -397,13 +397,13 @@ public class DefaultNexusConfiguration
     catch (final Exception e) {
       // NEXUS-5749: Prevent interruption of configuration save (and hence, data loss) for any
       // exception thrown while gathering userId for logging purposes.
-      getLogger().warn("Could not obtain Shiro subject:", e);
+      log.warn("Could not obtain Shiro subject:", e);
     }
     return null;
   }
 
   public synchronized boolean applyConfiguration() {
-    getLogger().debug("Applying Nexus Configuration...");
+    log.debug("Applying Nexus Configuration...");
 
     ConfigurationPrepareForSaveEvent prepare = new ConfigurationPrepareForSaveEvent(this);
 
@@ -419,7 +419,7 @@ public class DefaultNexusConfiguration
       return true;
     }
     else {
-      getLogger().info(vetoFormatter.format(new VetoFormatterRequest(prepare, getLogger().isDebugEnabled())));
+      log.info(vetoFormatter.format(new VetoFormatterRequest(prepare, log.isDebugEnabled())));
 
       eventBus.post(new ConfigurationRollbackEvent(this));
 
@@ -438,7 +438,7 @@ public class DefaultNexusConfiguration
       ValidationRequest request = new ValidationRequest(configurationSource.getConfiguration());
       ValidationResponse response = configurationValidator.validateModel(request);
       if (!response.isValid()) {
-        this.getLogger().error("Saving nexus configuration caused unexpected error:\n" + response.toString());
+        this.log.error("Saving nexus configuration caused unexpected error:\n" + response.toString());
         throw new IOException("Saving nexus configuration caused unexpected error:\n" + response.toString());
       }
       // END <<<
@@ -592,14 +592,14 @@ public class DefaultNexusConfiguration
           }
           catch (UserNotFoundException e) {
             final String msg = "User \"" + username + "'\" does not exist.";
-            getLogger().warn(
+            log.warn(
                 "Nexus refused to apply configuration, the supplied anonymous information is wrong: " + msg,
                 e);
             throw new InvalidConfigurationException(msg, e);
           }
           catch (AuthenticationException e) {
             final String msg = "The password of user \"" + username + "\" is incorrect.";
-            getLogger().warn(
+            log.warn(
                 "Nexus refused to apply configuration, the supplied anonymous information is wrong: " + msg,
                 e);
             throw new InvalidConfigurationException(msg, e);
@@ -652,13 +652,13 @@ public class DefaultNexusConfiguration
     }
     catch (UserNotFoundException e) {
       // ignore, anon user maybe manually deleted from XML realm by Nexus admin, is okay (kinda expected)
-      getLogger().debug(
+      log.debug(
           "Anonymous user not found while trying to disable it (as part of disabling anonymous access)!", e);
       return false;
     }
     catch (NoSuchUserManagerException e) {
       // ignore, XML realm removed from configuration by Nexus admin, is okay (kinda expected)
-      getLogger().debug(
+      log.debug(
           "XML Realm not found while trying to disable Anonymous user (as part of disabling anonymous access)!",
           e);
       return false;
@@ -667,7 +667,7 @@ public class DefaultNexusConfiguration
       // do not ignore, and report, as this jeopardizes whole security functionality
       // we did not perform any _change_ against security sofar (we just did reading from it),
       // so it is okay to bail out at this point
-      getLogger().warn(
+      log.warn(
           "XML Realm reported invalid configuration while trying to disable Anonymous user (as part of disabling anonymous access)!",
           e);
       throw e;
@@ -837,12 +837,12 @@ public class DefaultNexusConfiguration
   @Override
   public void setDefaultRepositoryMaxInstanceCount(int count) {
     if (count < 0) {
-      getLogger().info("Default repository maximal instance limit set to UNLIMITED.");
+      log.info("Default repository maximal instance limit set to UNLIMITED.");
 
       this.defaultRepositoryMaxInstanceCountLimit = Integer.MAX_VALUE;
     }
     else {
-      getLogger().info("Default repository maximal instance limit set to " + count + ".");
+      log.info("Default repository maximal instance limit set to " + count + ".");
 
       this.defaultRepositoryMaxInstanceCountLimit = count;
     }
@@ -851,12 +851,12 @@ public class DefaultNexusConfiguration
   @Override
   public void setRepositoryMaxInstanceCount(RepositoryTypeDescriptor rtd, int count) {
     if (count < 0) {
-      getLogger().info("Repository type " + rtd.toString() + " maximal instance limit set to UNLIMITED.");
+      log.info("Repository type " + rtd.toString() + " maximal instance limit set to UNLIMITED.");
 
       getRepositoryMaxInstanceCountLimits().remove(rtd);
     }
     else {
-      getLogger().info("Repository type " + rtd.toString() + " maximal instance limit set to " + count + ".");
+      log.info("Repository type " + rtd.toString() + " maximal instance limit set to " + count + ".");
 
       getRepositoryMaxInstanceCountLimits().put(rtd, count);
     }
@@ -890,7 +890,7 @@ public class DefaultNexusConfiguration
               repositoryModel.getName(), repositoryModel.getId(), repositoryModel.getProviderRole(),
               repositoryModel.getProviderHint());
 
-      getLogger().warn(msg);
+      log.warn(msg);
 
       return;
     }
@@ -908,7 +908,7 @@ public class DefaultNexusConfiguration
               + ") cannot be created. It's repository type " + rtd.toString() + " is limited to " + maxCount
               + " instances, and it already has " + String.valueOf(rtd.getInstanceCount()) + " of them.";
 
-      getLogger().warn(msg);
+      log.warn(msg);
 
       throw new ConfigurationException(msg);
     }

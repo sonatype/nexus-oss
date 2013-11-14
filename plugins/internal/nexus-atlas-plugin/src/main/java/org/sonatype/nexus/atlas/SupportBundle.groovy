@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.atlas
 
-import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority
-import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type
-
 /**
  * Defines the content sources of a support ZIP file.
  *
@@ -27,7 +24,7 @@ class SupportBundle
    * Source of content for support bundle.
    */
   static interface ContentSource
-    extends Comparable<ContentSource>
+      extends Comparable<ContentSource>
   {
     /**
      * Support bundle content source inclusion type.

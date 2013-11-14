@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Files;
 
 import javax.ws.rs.core.Response;
 
@@ -28,14 +27,15 @@ import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.rest.jersey.ContextAwareUniformInterfaceException;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 
-import com.sun.jersey.api.client.ClientResponse.Status;
-
 import com.google.common.collect.Range;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+
 import static com.google.common.base.Preconditions.checkState;
 
 /**
@@ -143,7 +143,8 @@ public class JerseyContent
   {
     if (!target.exists()) {
       final File targetDir = target.getParentFile();
-      Files.createDirectories(targetDir.toPath());
+      // NOTE: can not use java.nio.Files here as this module needs to remain Java6 compatible
+      FileUtils.forceMkdir(targetDir);
     }
     else {
       checkState(target.isFile() && target.canWrite(), "File '%s' is not a file or could not be written",
@@ -156,7 +157,7 @@ public class JerseyContent
       download(location, uri, os, range);
     }
     finally {
-      IOUtil.close(os);
+      IOUtils.closeQuietly(os);
     }
   }
 
@@ -193,7 +194,7 @@ public class JerseyContent
       }
 
       try {
-        IOUtil.copy(response.getEntityInputStream(), target);
+        IOUtils.copy(response.getEntityInputStream(), target);
       }
       finally {
         response.close();

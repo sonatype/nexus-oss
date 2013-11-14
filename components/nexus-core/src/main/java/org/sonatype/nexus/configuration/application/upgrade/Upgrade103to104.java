@@ -56,13 +56,12 @@ import org.sonatype.nexus.configuration.model.v1_0_4.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.v1_0_4.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_0_4.CSecurity;
 import org.sonatype.nexus.configuration.model.v1_0_4.CSmtpConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -73,7 +72,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 @Singleton
 @Named("1.0.3")
 public class Upgrade103to104
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements SingleVersionUpgrader
 {
   private File tasksFile;
@@ -139,10 +138,10 @@ public class Upgrade103to104
 
         xstream.fromXML(fis, tasksConfig);
 
-        getLogger().info("tasks.xml file found and loaded...");
+        log.info("tasks.xml file found and loaded...");
       }
       catch (XStreamException e) {
-        getLogger().warn("Could not load tasks.xml, IGNORING IT!", e);
+        log.warn("Could not load tasks.xml, IGNORING IT!", e);
 
         tasksConfig = null;
       }
@@ -286,7 +285,7 @@ public class Upgrade103to104
     }
 
     if (tasksConfig != null && tasksConfig.getTasks().size() > 0) {
-      getLogger().info("Found " + tasksConfig.getTasks().size() + " tasks in tasks.xml, migrating them...");
+      log.info("Found " + tasksConfig.getTasks().size() + " tasks in tasks.xml, migrating them...");
 
       List<org.sonatype.nexus.configuration.model.v1_0_3.CScheduledTask> oldTasks = tasksConfig.getTasks();
 
@@ -443,14 +442,7 @@ public class Upgrade103to104
     // extra step, remove old tasks.xml
     // tasksFile would be null if the upgrade chain started from something older then 1.0.3
     if (tasksFile != null && tasksFile.exists()) {
-      try {
-        FileUtils.rename(tasksFile, new File(tasksFile.getParentFile(), "tasks.xml.old"));
-      }
-      catch (IOException e) {
-        // silent?
-        // after succesful upgrade, this file will not be used anymore
-        // it will remain but will be ugly (ie. a file should be deleted in safe manner)
-      }
+      tasksFile.renameTo(new File(tasksFile.getParentFile(), "tasks.xml.old"));
     }
   }
 

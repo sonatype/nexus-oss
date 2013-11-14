@@ -15,8 +15,6 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.File;
 
-import org.codehaus.plexus.util.FileUtils;
-
 /**
  * Provides general information about the Nexus Webapp.
  * <p>
@@ -72,7 +70,7 @@ public class NexusWebappLayout
    *         {@link #PATH_PLEXUS_PROPERTIES}
    */
   public File getNexusPropertiesFile() {
-    return FileUtils.resolveFile(getWebappFile(), PATH_PLEXUS_PROPERTIES);
+    return new File(getWebappFile(), PATH_PLEXUS_PROPERTIES);
   }
 
 }

@@ -13,18 +13,18 @@
 
 package org.sonatype.security.realms.tools;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URL;
 
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * An abstract class that removes the boiler plate code of reading in the security configuration.
@@ -51,27 +51,18 @@ public abstract class AbstractStaticSecurityResource
     String resourcePath = this.getResourcePath();
 
     if (StringUtils.isNotEmpty(resourcePath)) {
-      Reader fr = null;
-      InputStream is = null;
+      URL url = getClass().getResource(resourcePath);
+      checkState(url != null, "Missing static security configuration resource: %s", resourcePath);
+      assert url != null;
 
-      log.debug("Loading static security config from " + resourcePath);
-
-      try {
-        is = getClass().getResourceAsStream(resourcePath);
+      log.debug("Loading static security configuration: {}", url);
+      try (InputStream is = url.openStream();
+           Reader fr = new InputStreamReader(is)) {
         SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-
-        fr = new InputStreamReader(is);
         return reader.read(fr);
       }
-      catch (IOException e) {
-        log.error("IOException while retrieving configuration file", e);
-      }
-      catch (XmlPullParserException e) {
-        log.error("Invalid XML Configuration", e);
-      }
-      finally {
-        IOUtil.close(fr);
-        IOUtil.close(is);
+      catch (Exception e) {
+        log.error("Failed to read configuration", e);
       }
     }
 

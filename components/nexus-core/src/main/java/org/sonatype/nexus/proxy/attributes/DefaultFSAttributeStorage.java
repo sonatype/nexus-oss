@@ -31,8 +31,6 @@ import org.sonatype.nexus.util.file.DirSupport;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.google.common.io.Closeables;
-import org.codehaus.plexus.util.FileUtils;
 
 /**
  * AttributeStorage implementation that uses it's own FS storage to store attributes in separate place then
@@ -72,7 +70,7 @@ public class DefaultFSAttributeStorage
     this.applicationConfiguration = Preconditions.checkNotNull(applicationConfiguration);
     this.marshaller = Preconditions.checkNotNull(marshaller);
     this.workingDirectory = initializeWorkingDirectory();
-    getLogger().info("Default FS AttributeStorage in place, using {} marshaller.", marshaller);
+    log.info("Default FS AttributeStorage in place, using {} marshaller.", marshaller);
   }
 
   public synchronized File initializeWorkingDirectory() {
@@ -85,7 +83,7 @@ public class DefaultFSAttributeStorage
       }
     }
     else {
-      getLogger().info("Attribute storage directory does not exists, creating it here: " + workingDirectory);
+      log.info("Attribute storage directory does not exists, creating it here: " + workingDirectory);
       try {
         DirSupport.mkdir(workingDirectory.toPath());
       }
@@ -116,8 +114,8 @@ public class DefaultFSAttributeStorage
     uidLock.lock(Action.delete);
 
     try {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("Deleting attributes on UID=" + uid.toString());
+      if (log.isDebugEnabled()) {
+        log.debug("Deleting attributes on UID=" + uid.toString());
       }
 
       boolean result = false;
@@ -128,7 +126,7 @@ public class DefaultFSAttributeStorage
         result = ftarget.exists() && ftarget.isFile() && ftarget.delete();
       }
       catch (IOException e) {
-        getLogger().warn("Got IOException during delete of UID=" + uid.toString(), e);
+        log.warn("Got IOException during delete of UID=" + uid.toString(), e);
       }
 
       return result;
@@ -144,15 +142,15 @@ public class DefaultFSAttributeStorage
     uidLock.lock(Action.read);
 
     try {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("Loading attributes on UID=" + uid.toString());
+      if (log.isDebugEnabled()) {
+        log.debug("Loading attributes on UID=" + uid.toString());
       }
 
       try {
         return doGetAttributes(uid);
       }
       catch (IOException ex) {
-        getLogger().error("Got IOException during reading of UID=" + uid.toString(), ex);
+        log.error("Got IOException during reading of UID=" + uid.toString(), ex);
 
         return null;
       }
@@ -168,8 +166,8 @@ public class DefaultFSAttributeStorage
     uidLock.lock(Action.create);
 
     try {
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("Storing attributes on UID=" + uid.toString());
+      if (log.isDebugEnabled()) {
+        log.debug("Storing attributes on UID=" + uid.toString());
       }
 
       try {
@@ -191,13 +189,8 @@ public class DefaultFSAttributeStorage
         DirSupport.mkdir(target.getParentFile().toPath());
 
         if (target.getParentFile().exists() && target.getParentFile().isDirectory()) {
-          FileOutputStream fos = null;
-
-          try {
-            fos = new FileOutputStream(target);
-
+          try (FileOutputStream fos = new FileOutputStream(target)) {
             attributes.incrementGeneration();
-
             marshaller.marshal(attributes, fos);
           }
           catch (IOException ex) {
@@ -207,18 +200,15 @@ public class DefaultFSAttributeStorage
             }
             throw ex;
           }
-          finally {
-            Closeables.closeQuietly(fos);
-          }
         }
         else {
-          getLogger().error(
+          log.error(
               "Could not store attributes on UID=" + uid.toString()
                   + ", parent exists but is not a directory!");
         }
       }
       catch (IOException ex) {
-        getLogger().error("Got IOException during store of UID=" + uid.toString(), ex);
+        log.error("Got IOException during store of UID=" + uid.toString(), ex);
       }
     }
     finally {
@@ -237,13 +227,7 @@ public class DefaultFSAttributeStorage
   {
     final File repoBase = new File(getWorkingDirectory(), uid.getRepository().getId());
 
-    File result = null;
-
-    String path = FileUtils.getPath(uid.getPath());
-
-    String name = FileUtils.removePath(uid.getPath());
-
-    result = new File(repoBase, path + "/" + name);
+    File result = new File(repoBase, uid.getPath());
 
     // to be foolproof
     // 2007.11.09. - Believe or not, Nexus deleted my whole USB rack! (cstamas)
@@ -276,15 +260,11 @@ public class DefaultFSAttributeStorage
     boolean corrupt = false;
 
     if (target.exists() && target.isFile()) {
-      FileInputStream fis = null;
-
-      try {
+      try (FileInputStream fis = new FileInputStream(target)) {
         if (target.length() == 0) {
           // NEXUS-4871
           throw new InvalidInputException("Attribute of " + uid + " is empty!");
         }
-
-        fis = new FileInputStream(target);
 
         result = marshaller.unmarshal(fis);
 
@@ -304,24 +284,21 @@ public class DefaultFSAttributeStorage
         }
       }
       catch (InvalidInputException e) {
-        if (getLogger().isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
           // we log the stacktrace
-          getLogger().info("Attributes of " + uid + " are corrupt, deleting it.", e);
+          log.info("Attributes of " + uid + " are corrupt, deleting it.", e);
         }
         else {
           // just remark about this
-          getLogger().info("Attributes of " + uid + " are corrupt, deleting it.");
+          log.info("Attributes of " + uid + " are corrupt, deleting it.");
         }
 
         corrupt = true;
       }
       catch (IOException e) {
-        getLogger().info("While reading attributes of " + uid + " we got IOException:", e);
+        log.info("While reading attributes of " + uid + " we got IOException:", e);
 
         throw e;
-      }
-      finally {
-        Closeables.closeQuietly(fis);
       }
     }
 

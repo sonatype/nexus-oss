@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Logical NOT ona a {@link Validator}.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class InversionValidator
     implements Validator

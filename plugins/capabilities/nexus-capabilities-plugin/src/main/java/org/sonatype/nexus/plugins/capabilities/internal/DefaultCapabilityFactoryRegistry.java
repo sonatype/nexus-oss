@@ -22,13 +22,13 @@ import javax.inject.Singleton;
 
 import org.sonatype.guice.bean.locators.BeanLocator;
 import org.sonatype.inject.BeanEntry;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Maps;
 import com.google.inject.ConfigurationException;
@@ -41,12 +41,12 @@ import static com.google.inject.name.Names.named;
 /**
  * Default {@link CapabilityFactoryRegistry} implementation.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 @Singleton
 class DefaultCapabilityFactoryRegistry
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements CapabilityFactoryRegistry
 {
 
@@ -76,7 +76,7 @@ class DefaultCapabilityFactoryRegistry
     checkArgument(!dynamicFactories.containsKey(type), "Factory already registered for %s", type);
 
     dynamicFactories.put(type.toString(), factory);
-    getLogger().debug("Added {} -> {}", type, factory);
+    log.debug("Added {} -> {}", type, factory);
 
     return this;
   }
@@ -85,7 +85,7 @@ class DefaultCapabilityFactoryRegistry
   public CapabilityFactoryRegistry unregister(final CapabilityType type) {
     if (type != null) {
       final CapabilityFactory factory = dynamicFactories.remove(type);
-      getLogger().debug("Removed {} -> {}", type, factory);
+      log.debug("Removed {} -> {}", type, factory);
     }
 
     return this;

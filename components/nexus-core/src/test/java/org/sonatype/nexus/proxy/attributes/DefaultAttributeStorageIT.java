@@ -34,7 +34,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 
@@ -145,7 +145,7 @@ public class DefaultAttributeStorageIT
             + "/a.txt");
     // File attributeFile = new File( localStorageDirectory, ".nexus/attributes/a.txt" );
 
-    FileUtils.fileWrite(attributeFile.getAbsolutePath(), "<file");
+    FileUtils.write(attributeFile, "<file");
 
     // try to read it, we should not get NPE
     try {

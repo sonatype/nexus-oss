@@ -42,12 +42,6 @@ public interface WalkerThrottleController
   public interface ThrottleInfo
   {
     /**
-     * The total time spent in processItem() method. This time is "contained" in the {@link
-     * #getTotalTimeWalking()}.
-     */
-    long getTotalProcessItemSpentMillis();
-
-    /**
      * The total invocation count of processItem() method ("How many items were processed so far?").
      */
     long getTotalProcessItemInvocationCount();

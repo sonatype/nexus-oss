@@ -15,15 +15,15 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.util.List;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEvent;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 public abstract class AbstractChecksumContentValidator
-    extends AbstractLoggingComponent
+    extends ComponentSupport
 {
 
   public AbstractChecksumContentValidator() {
@@ -90,7 +90,7 @@ public abstract class AbstractChecksumContentValidator
     }
 
     if (!contentValid) {
-      getLogger().debug("Validation failed due: " + msg);
+      log.debug("Validation failed due: " + msg);
     }
 
     events.add(newChechsumFailureEvent(proxy, item, msg));

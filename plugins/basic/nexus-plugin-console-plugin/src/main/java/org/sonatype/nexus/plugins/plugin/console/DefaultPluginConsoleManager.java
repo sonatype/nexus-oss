@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.plugins.PluginResponse;
 import org.sonatype.nexus.plugins.plugin.console.model.DocumentationLink;
@@ -30,6 +29,7 @@ import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
 import org.sonatype.nexus.plugins.rest.NexusDocumentationBundle;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.plugin.metadata.GAVCoordinate;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class DefaultPluginConsoleManager
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements PluginConsoleManager
 {
   private final NexusPluginManager pluginManager;

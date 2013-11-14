@@ -15,13 +15,13 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContextAware;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.SatisfiedCondition;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -33,10 +33,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Handles capability automatic removing by reacting to capability validity condition being satisfied/unsatisfied.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class ValidityConditionHandler
-    extends AbstractLoggingComponent
+    extends ComponentSupport
 {
 
   private final EventBus eventBus;
@@ -87,7 +87,7 @@ public class ValidityConditionHandler
         capabilityRegistry.remove(reference.context().id());
       }
       catch (Exception e) {
-        getLogger().error("Failed to remove capability with id '{}'", reference.context().id(), e);
+        log.error("Failed to remove capability with id '{}'", reference.context().id(), e);
       }
     }
   }
@@ -125,7 +125,7 @@ public class ValidityConditionHandler
         validityCondition = new SatisfiedCondition(
             "Always satisfied (failed to determine validity condition)"
         );
-        getLogger().error(
+        log.error(
             "Could not get validation condition from capability {} ({}). Considering it as always valid",
             new Object[]{reference.capability(), reference.context().id(), e}
         );

@@ -24,21 +24,17 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.AbstractConfigurable;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventPostRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryStatusCheckerThread;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.eventbus.Subscribe;
-import org.slf4j.LoggerFactory;
+import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -60,7 +56,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named
 public class DefaultRepositoryRegistry
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements RepositoryRegistry
 {
   private final EventBus eventBus;
@@ -71,7 +67,6 @@ public class DefaultRepositoryRegistry
   public DefaultRepositoryRegistry(final EventBus eventBus, final RepositoryTypeRegistry repositoryTypeRegistry) {
     this.eventBus = checkNotNull(eventBus);
     this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
-    eventBus.register(this);
   }
 
   @Override
@@ -79,10 +74,8 @@ public class DefaultRepositoryRegistry
     final RepositoryTypeDescriptor rtd =
         repositoryTypeRegistry.getRepositoryTypeDescriptor(repository.getProviderRole(),
             repository.getProviderHint());
-
     insertRepository(rtd, repository);
-
-    getLogger().info("Added repository {}", RepositoryStringUtils.getFullHumanizedNameString(repository));
+    log.info("Added repository {}", RepositoryStringUtils.getFullHumanizedNameString(repository));
   }
 
   @Override
@@ -192,16 +185,6 @@ public class DefaultRepositoryRegistry
     return result;
   }
 
-  // Cleanup
-
-  @Subscribe
-  public void on(final NexusStoppedEvent evt) {
-    // kill the checker daemon threads
-    for (Repository repository : getRepositoriesMap().values()) {
-      killMonitorThread(repository.adaptToFacet(ProxyRepository.class));
-    }
-  }
-
   //
   // priv
   //
@@ -209,7 +192,7 @@ public class DefaultRepositoryRegistry
   /**
    * The repository registry map
    */
-  private final Map<String, Repository> _repositories = new HashMap<String, Repository>();
+  private final Map<String, Repository> _repositories = Maps.newHashMap();
 
   /**
    * The repository registry RO "view"
@@ -243,41 +226,20 @@ public class DefaultRepositoryRegistry
       throws NoSuchRepositoryException
   {
     Repository repository = getRepository(repoId);
-
     RepositoryTypeDescriptor rtd =
         repositoryTypeRegistry.getRepositoryTypeDescriptor(repository.getProviderRole(),
             repository.getProviderHint());
-
     deleteRepository(rtd, repository, silently);
 
     if (!silently) {
-      getLogger().info("Removed repository {}", RepositoryStringUtils.getFullHumanizedNameString(repository));
+      log.info("Removed repository {}", RepositoryStringUtils.getFullHumanizedNameString(repository));
     }
   }
 
   private void insertRepository(final RepositoryTypeDescriptor rtd, final Repository repository) {
     synchronized (this) {
       repositoriesMapPut(repository);
-
       rtd.instanceRegistered(this);
-
-      if (repository.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
-        final ProxyRepository proxy = repository.adaptToFacet(ProxyRepository.class);
-
-        killMonitorThread(proxy);
-
-        RepositoryStatusCheckerThread thread =
-            new RepositoryStatusCheckerThread(LoggerFactory.getLogger(getClass().getName() + "-"
-                + repository.getId()), (ProxyRepository) repository);
-
-        proxy.setRepositoryStatusCheckerThread(thread);
-
-        thread.setRunning(true);
-
-        thread.setDaemon(true);
-
-        thread.start();
-      }
     }
 
     eventBus.post(new RepositoryRegistryEventAdd(this, repository));
@@ -297,32 +259,11 @@ public class DefaultRepositoryRegistry
 
     synchronized (this) {
       rtd.instanceUnregistered(this);
-
       repositoriesMapRemove(repository.getId());
-
-      killMonitorThread(repository.adaptToFacet(ProxyRepository.class));
     }
 
     if (!silently) {
       eventBus.post(new RepositoryRegistryEventPostRemove(this, repository));
-    }
-  }
-
-  // ==
-
-  protected void killMonitorThread(final ProxyRepository proxy) {
-    if (null == proxy) {
-      return;
-    }
-
-    if (null != proxy.getRepositoryStatusCheckerThread()) {
-      RepositoryStatusCheckerThread thread =
-          (RepositoryStatusCheckerThread) proxy.getRepositoryStatusCheckerThread();
-
-      thread.setRunning(false);
-
-      // and now interrupt it to die
-      thread.interrupt();
     }
   }
 }

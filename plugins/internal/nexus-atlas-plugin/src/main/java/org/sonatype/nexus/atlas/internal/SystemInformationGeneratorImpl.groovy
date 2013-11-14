@@ -38,8 +38,8 @@ import static com.google.common.base.Preconditions.checkNotNull
 @Named
 @Singleton
 class SystemInformationGeneratorImpl
-extends ComponentSupport
-implements SystemInformationGenerator
+    extends ComponentSupport
+    implements SystemInformationGenerator
 {
   private final BeanLocator beanLocator
 

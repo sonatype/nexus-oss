@@ -46,9 +46,9 @@ import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 
 import com.google.common.primitives.Ints;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 
@@ -144,7 +144,7 @@ public class NEXUS5612DefaultFSLocalRepositoryStorageTest
       throws Exception
   {
     // prepare a repo to walk, copy some stuff under local storage
-    FileUtils.copyDirectoryStructure(getTestFile("target/test-classes/repo1"), localStorageDirectory);
+    FileUtils.copyDirectory(getTestFile("target/test-classes/repo1"), localStorageDirectory);
     // count the existing files
     final int filesInRepo =
         Ints.checkedCast(org.sonatype.nexus.util.FileUtils.fileSizesInDirectory(localStorageDirectory));

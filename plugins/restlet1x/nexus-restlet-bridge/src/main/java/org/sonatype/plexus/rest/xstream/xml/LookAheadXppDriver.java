@@ -40,7 +40,7 @@ public class LookAheadXppDriver
   }
 
   /**
-   * @since 1.2
+   * @since restlet-bridge 1.2
    */
   public LookAheadXppDriver(XmlFriendlyReplacer replacer) {
     super(replacer);

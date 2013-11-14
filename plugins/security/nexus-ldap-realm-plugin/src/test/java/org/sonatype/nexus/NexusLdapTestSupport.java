@@ -30,7 +30,7 @@ import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.junit.Assert;
 
@@ -57,9 +57,9 @@ public abstract class NexusLdapTestSupport
   protected void copyDefaultLdapConfigToPlace()
       throws IOException
   {
-    InputStream in = getClass().getResourceAsStream("/test-conf/ldap.xml");
-    this.interpolateLdapXml(in, new File(getNexusLdapConfiguration()));
-    IOUtil.close(in);
+    try (InputStream in = getClass().getResourceAsStream("/test-conf/ldap.xml")) {
+      interpolateLdapXml(in, new File(getNexusLdapConfiguration()));
+    }
   }
 
   protected void interpolateLdapXml(InputStream inputStream, File outputFile)
@@ -68,10 +68,10 @@ public abstract class NexusLdapTestSupport
     HashMap<String, String> interpolationMap = new HashMap<String, String>();
     interpolationMap.put("port", Integer.toString(this.getLdapPort()));
 
-    Reader reader = new InterpolationFilterReader(new InputStreamReader(inputStream), interpolationMap);
-    OutputStream out = new FileOutputStream(outputFile);
-    IOUtil.copy(reader, out);
-    IOUtil.close(out);
+    try (Reader reader = new InterpolationFilterReader(new InputStreamReader(inputStream), interpolationMap);
+         OutputStream out = new FileOutputStream(outputFile)) {
+      IOUtils.copy(reader, out);
+    }
   }
 
   protected int getLdapPort() {

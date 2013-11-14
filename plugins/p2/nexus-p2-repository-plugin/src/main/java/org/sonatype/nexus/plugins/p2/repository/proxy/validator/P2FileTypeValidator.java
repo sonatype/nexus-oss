@@ -27,8 +27,6 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.validator.AbstractMimeMagicFileTypeValidator;
 import org.sonatype.nexus.proxy.repository.validator.FileTypeValidator;
 
-import org.codehaus.plexus.util.IOUtil;
-
 /**
  * {@link FileTypeValidator} for P2 repositories.
  *
@@ -57,12 +55,8 @@ public class P2FileTypeValidator
     }
 
     if (file.getRepositoryItemUid().getPath().endsWith(".pack.gz")) {
-      InputStream input = null;
-
-      try {
+      try (InputStream input = file.getInputStream();) {
         final byte[] magicBytes = new byte[4];
-
-        input = file.getInputStream();
 
         if (input.read(magicBytes) > 0) {
           if (Arrays.equals(magicBytes, PACK200_MAGIC)  // real pack.gz
@@ -73,10 +67,7 @@ public class P2FileTypeValidator
         }
       }
       catch (final IOException e) {
-        getLogger().error("Unable to read pack200 magic bytes", e);
-      }
-      finally {
-        IOUtil.close(input);
+        log.error("Unable to read pack200 magic bytes", e);
       }
 
       return FileTypeValidity.INVALID;

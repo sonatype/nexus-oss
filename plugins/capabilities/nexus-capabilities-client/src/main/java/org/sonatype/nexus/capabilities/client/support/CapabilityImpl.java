@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Jersey based {@link Capability}.
  *
- * @since 2.2
+ * @since capabilities 2.2
  */
 public class CapabilityImpl<C extends Capability<C>>
     extends EntitySupport<C, CapabilityStatusXO>
@@ -108,7 +108,7 @@ public class CapabilityImpl<C extends Capability<C>>
   }
 
   /**
-   * @since 2.4
+   * @since capabilities 2.4
    */
   @Override
   public boolean hasErrors() {
@@ -147,7 +147,7 @@ public class CapabilityImpl<C extends Capability<C>>
   }
 
   /**
-   * @since 2.4
+   * @since capabilities 2.4
    */
   @Override
   public String stateDescription() {

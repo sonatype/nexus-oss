@@ -18,10 +18,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Preconditions;
 import org.apache.http.HttpRequest;
@@ -45,7 +45,7 @@ import org.apache.http.protocol.HttpContext;
 @Singleton
 @Named
 public class HttpClientManagerImpl
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements HttpClientManager
 {
   private final Hc4Provider hc4Provider;

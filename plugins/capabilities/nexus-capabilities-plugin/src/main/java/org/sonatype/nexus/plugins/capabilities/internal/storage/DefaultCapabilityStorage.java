@@ -32,18 +32,17 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.Configuration;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Reader;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Writer;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
 import com.google.common.collect.Lists;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -57,7 +56,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 @Singleton
 @Named
 public class DefaultCapabilityStorage
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements CapabilityStorage
 {
 
@@ -161,21 +160,12 @@ public class DefaultCapabilityStorage
 
     lock.lock();
 
-    Reader fr = null;
-    FileInputStream is = null;
-
-    try {
-      final Reader r = new FileReader(configurationFile);
+    try (Reader r = new FileReader(configurationFile);
+         FileInputStream is = new FileInputStream(configurationFile);
+         Reader fr = new InputStreamReader(is)) {
 
       Xpp3DomBuilder.build(r);
-
-      is = new FileInputStream(configurationFile);
-
-      final NexusCapabilitiesConfigurationXpp3Reader reader = new NexusCapabilitiesConfigurationXpp3Reader();
-
-      fr = new InputStreamReader(is);
-
-      configuration = reader.read(fr);
+      configuration = new NexusCapabilitiesConfigurationXpp3Reader().read(fr);
     }
     catch (final FileNotFoundException e) {
       // This is ok, may not exist first time around
@@ -186,15 +176,12 @@ public class DefaultCapabilityStorage
       save();
     }
     catch (final IOException e) {
-      getLogger().error("IOException while retrieving configuration file", e);
+      log.error("IOException while retrieving configuration file", e);
     }
     catch (final XmlPullParserException e) {
-      getLogger().error("Invalid XML Configuration", e);
+      log.error("Invalid XML Configuration", e);
     }
     finally {
-      IOUtil.close(fr);
-      IOUtil.close(is);
-
       lock.unlock();
     }
 
@@ -206,7 +193,7 @@ public class DefaultCapabilityStorage
   {
     lock.lock();
 
-    getLogger().debug("Saving configuration: {}", configurationFile);
+    log.debug("Saving configuration: {}", configurationFile);
     try {
       final FileReplacer fileReplacer = new FileReplacer(configurationFile);
       // we save this file many times, don't litter backups

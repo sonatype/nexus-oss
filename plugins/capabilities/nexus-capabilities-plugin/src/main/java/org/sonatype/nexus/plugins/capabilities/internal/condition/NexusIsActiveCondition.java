@@ -29,7 +29,7 @@ import com.google.common.eventbus.Subscribe;
 /**
  * A condition that is satisfied when nexus is active.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 @Named
 @EagerSingleton

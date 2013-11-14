@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.util;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -24,6 +25,7 @@ import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Simple collection of some static path related code.
@@ -39,6 +41,17 @@ import com.google.common.collect.Lists;
  */
 public class PathUtils
 {
+
+  /**
+   * @since 2.8 (moved from ItemPathUtils)
+   */
+  public static final String PATH_SEPARATOR = RepositoryItemUid.PATH_SEPARATOR;
+
+  /**
+   * @since 2.8 (moved from ItemPathUtils)
+   */
+  public static final int PATH_SEPARATOR_LENGTH = PATH_SEPARATOR.length();
+
   /**
    * Returns the "depth" (like directory depth) on the passed in path.
    *
@@ -121,6 +134,151 @@ public class PathUtils
       }
     }
     return sb.toString();
+  }
+
+  /**
+   * Simple concat method. It only watches that there is only one PATH_SEPARATOR betwen parts passed in. It DOES NOT
+   * checks that parts are fine or not.
+   *
+   * @since 2.8 (moved from ItemPathUtils)
+   */
+  public static String concatPaths(String... p) {
+    StringBuilder result = new StringBuilder();
+
+    for (String path : p) {
+      if (!StringUtils.isEmpty(path)) {
+        if (!path.startsWith(PATH_SEPARATOR)) {
+          result.append(PATH_SEPARATOR);
+        }
+
+        result.append(path.endsWith(PATH_SEPARATOR) ? path.substring(0, path.length()
+            - PATH_SEPARATOR_LENGTH) : path);
+      }
+    }
+
+    return result.toString();
+  }
+
+  /**
+   * Simple path cleanup.
+   *
+   * @since 2.8 (moved from ItemPathUtils)
+   */
+  public static String cleanUpTrailingSlash(String path) {
+    if (StringUtils.isEmpty(path)) {
+      path = PATH_SEPARATOR;
+    }
+
+    if (path.length() > 1 && path.endsWith(PATH_SEPARATOR)) {
+      path = path.substring(0, path.length() - PATH_SEPARATOR_LENGTH);
+    }
+
+    return path;
+  }
+
+  /**
+   * Calculates the parent path for a path.
+   *
+   * @since 2.8 (moved from ItemPathUtils)
+   */
+  public static String getParentPath(String path) {
+    if (PATH_SEPARATOR.equals(path)) {
+      return path;
+    }
+
+    int lastSepratorPos = path.lastIndexOf(PATH_SEPARATOR);
+
+    if (lastSepratorPos == 0) {
+      return PATH_SEPARATOR;
+    }
+    else {
+      return path.substring(0, lastSepratorPos);
+    }
+  }
+
+  /**
+   * Calculates the depth of a path, 0 being root.
+   *
+   * @since 2.8 (moved from ItemPathUtils)
+   */
+  public static int getPathDepth(String path) {
+    if (PATH_SEPARATOR.equals(path)) {
+      return 0;
+    }
+    else {
+      final String parentPath = getParentPath(path);
+      if (PATH_SEPARATOR.equals(parentPath)) {
+        return 0;
+      }
+      else {
+        return 1 + getPathDepth(parentPath);
+      }
+    }
+  }
+
+  /**
+   * Calculates the least common parent path
+   *
+   * @return null if paths is empty, else the least common parent path
+   * @since 2.8 (moved from ItemPathUtils)
+   */
+  public static String getLCPPath(final Collection<String> paths) {
+    String lcp = null;
+
+    for (String path : paths) {
+      if (lcp == null) {
+        lcp = path;
+      }
+      else {
+        lcp = getLCPPath(lcp, path);
+      }
+    }
+
+    return lcp;
+  }
+
+  /**
+   * Calculates the least common parent path
+   *
+   * @return null if any path is empty, else the least common parent path
+   * @since 2.8 (moved from ItemPathUtils)
+   */
+  public static String getLCPPath(final String pathA, final String pathB) {
+    if (StringUtils.isEmpty(pathA) || StringUtils.isEmpty(pathB)) {
+      return null;
+    }
+
+    if (pathA.equals(pathB)) {
+      return pathA;
+    }
+
+    if (pathA.startsWith(pathB)) {
+      return pathB;
+    }
+
+    if (pathB.startsWith(pathA)) {
+      return pathA;
+    }
+
+    StringBuilder lcp = new StringBuilder();
+
+    StringBuilder token = new StringBuilder();
+
+    int index = 0;
+
+    while (pathA.charAt(index) == pathB.charAt(index) && index < pathA.length() && index < pathB.length()) {
+      token.append(pathA.charAt(index));
+
+      if (pathA.charAt(index) == PATH_SEPARATOR.charAt(0)) {
+        lcp.append(token);
+
+        token.delete(0, token.length());
+      }
+
+      index++;
+    }
+
+    return lcp.toString();
   }
 
   /**

@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -29,6 +28,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.targets.TargetMatch;
 import org.sonatype.nexus.proxy.targets.TargetSet;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.shiro.subject.Subject;
 
@@ -38,7 +38,7 @@ import org.apache.shiro.subject.Subject;
 @Named
 @Singleton
 public class DefaultNexusItemAuthorizer
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements NexusItemAuthorizer
 {
   private final SecuritySystem securitySystem;
@@ -127,36 +127,36 @@ public class DefaultNexusItemAuthorizer
   }
 
   protected boolean isPermitted(final List<String> perms) {
-    boolean trace = getLogger().isTraceEnabled();
+    boolean trace = log.isTraceEnabled();
 
     Subject subject = securitySystem.getSubject();
 
     if (trace) {
-      getLogger().trace("Subject: {}", subject);
+      log.trace("Subject: {}", subject);
     }
 
     if (subject == null) {
       if (trace) {
-        getLogger().trace("Subject is not authenticated; rejecting");
+        log.trace("Subject is not authenticated; rejecting");
       }
       return false;
     }
 
     if (trace) {
-      getLogger().trace("Checking if subject '{}' has one of these permissions: {}", subject.getPrincipal(), perms);
+      log.trace("Checking if subject '{}' has one of these permissions: {}", subject.getPrincipal(), perms);
     }
     for (String perm : perms) {
       if (subject.isPermitted(perm)) {
         // TODO: we should remember/cache these decisions per-thread and not re-evaluate it always from Security
         if (trace) {
-          getLogger().trace("Subject '{}' has permission: {}; allowing", subject.getPrincipal(), perm);
+          log.trace("Subject '{}' has permission: {}; allowing", subject.getPrincipal(), perm);
         }
         return true;
       }
     }
 
     if (trace) {
-      getLogger().trace("Subject '{}' is missing required permissions; rejecting", subject.getPrincipal());
+      log.trace("Subject '{}' is missing required permissions; rejecting", subject.getPrincipal());
     }
 
     return false;

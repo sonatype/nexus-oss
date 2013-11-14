@@ -16,7 +16,7 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 /**
  * Factory of {@link ActivationConditionHandler}.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public interface ActivationConditionHandlerFactory
 {

@@ -14,8 +14,6 @@
 package org.sonatype.nexus.atlas
 
 import groovy.transform.ToString
-import org.sonatype.nexus.atlas.SupportZipGenerator.Request
-import org.sonatype.nexus.atlas.SupportZipGenerator.Result
 
 /**
  * Generates a support ZIP file.
@@ -27,7 +25,7 @@ interface SupportZipGenerator
   /**
    * Request to generate a support ZIP file.
    */
-  @ToString(includePackage=false, includeNames=true)
+  @ToString(includePackage = false, includeNames = true)
   static class Request
   {
     /**
@@ -74,7 +72,7 @@ interface SupportZipGenerator
   /**
    * Result of support ZIP generate request.
    */
-  @ToString(includePackage=false, includeNames=true)
+  @ToString(includePackage = false, includeNames = true)
   static class Result
   {
     /**

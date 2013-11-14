@@ -29,7 +29,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.IOUtil;
 import org.osgi.impl.bundle.obr.resource.BundleInfo;
 import org.osgi.service.obr.Resource;
 
@@ -78,10 +77,7 @@ public class DefaultObrMetadataSource
       return null; // ignore non-OBR resource items
     }
 
-    InputStream is = null;
-
-    try {
-      is = item.getInputStream();
+    try (InputStream is = item.getInputStream()) {
       if (is != null) {
         final RepositoryItemUid uid = item.getRepositoryItemUid();
         final BundleInfo info = new BundleInfo(null, is, "file:" + uid.getPath(), item.getLength());
@@ -92,9 +88,6 @@ public class DefaultObrMetadataSource
     }
     catch (final Exception e) {
       getLogger().warn("Unable to generate OBR metadata for item " + item.getRepositoryItemUid(), e);
-    }
-    finally {
-      IOUtil.close(is);
     }
 
     return null;

@@ -19,7 +19,7 @@ import org.sonatype.nexus.repository.obr.client.ObrProxyRepository;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 
 /**
- * @since 2.1
+ * @since obr 2.1
  */
 public class JerseyObrProxyRepository
     extends JerseyProxyRepository<ObrProxyRepository>

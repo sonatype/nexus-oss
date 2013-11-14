@@ -19,7 +19,7 @@ import org.sonatype.nexus.repository.obr.client.ObrHostedRepository;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 
 /**
- * @since 2.1
+ * @since obr 2.1
  */
 public class JerseyObrHostedRepository
     extends JerseyHostedRepository<ObrHostedRepository>

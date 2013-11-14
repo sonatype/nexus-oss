@@ -28,8 +28,8 @@ import javax.inject.Singleton
 @Named
 @Singleton
 class LogConfigurationCustomizerImpl
-extends ComponentSupport
-implements LogConfigurationCustomizer
+    extends ComponentSupport
+    implements LogConfigurationCustomizer
 {
   @Override
   void customize(LogConfigurationCustomizer.Configuration configuration) {

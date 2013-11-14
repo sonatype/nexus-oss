@@ -87,8 +87,8 @@ public abstract class AbstractMimeMagicFileTypeValidator
 
     final Set<String> magicMimeTypes = Collections.singleton(mimeSupport.detectMimeTypesFromContent(file));
 
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug(
+    if (log.isDebugEnabled()) {
+      log.debug(
           "Checking StorageFileItem {} is one of the expected mime types: {}, detected mime types are: {}",
           file.getRepositoryItemUid(), expectedMimeTypes, magicMimeTypes
       );
@@ -100,7 +100,7 @@ public abstract class AbstractMimeMagicFileTypeValidator
       }
     }
 
-    getLogger().info(
+    log.info(
         "StorageFileItem {} MIME-magic validation failed: expected MIME types: {}, detected MIME types: {}",
         file.getRepositoryItemUid(), expectedMimeTypes, magicMimeTypes
     );
@@ -139,7 +139,7 @@ public abstract class AbstractMimeMagicFileTypeValidator
       return mimeDetectionResult;
     }
     catch (IOException e) {
-      getLogger().warn(
+      log.warn(
           "Cannot detect MIME type and validate content of StorageFileItem: " + file.getRepositoryItemUid(),
           e);
 

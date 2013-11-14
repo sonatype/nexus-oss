@@ -27,7 +27,7 @@ import static org.mockito.Mockito.mock;
 /**
  * {@link NexusConditions} UTs.
  *
- * @since 2.0
+ * @since capabilities 2.0
  */
 public class NexusConditionsTest
     extends TestSupport

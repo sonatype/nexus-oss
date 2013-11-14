@@ -139,6 +139,11 @@ public abstract class AbstractPlexusResource
   {
     throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED);
   }
+  
+  
+  public void options(Context context, Request request, Response response) throws ResourceException {
+  	// do noting by default, override to customize
+  }
 
   public Object getPayloadInstance(org.restlet.data.Method method) {
     return getPayloadInstance();

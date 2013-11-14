@@ -23,6 +23,7 @@ import java.util.Set;
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
@@ -36,10 +37,10 @@ import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.sisu.velocity.Velocity;
 
 import com.google.common.collect.Lists;
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
 import org.codehaus.plexus.util.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -67,7 +68,7 @@ public class IndexTemplatePlexusResource
 
   private Map<String, NexusIndexHtmlCustomizer> bundles;
 
-  private Velocity velocity;
+  private Provider<VelocityEngine> velocityEngineProvider;
 
   private BuildNumberService buildNumberService;
 
@@ -79,7 +80,7 @@ public class IndexTemplatePlexusResource
   public IndexTemplatePlexusResource(final Map<String, NexusIndexHtmlCustomizer> bundles, final ApplicationStatusSource applicationStatusSource,
                                      final ReferenceFactory referenceFactory,
                                      final @Named("${index.template.file:-templates/index.vm}") String templateFilename,
-                                     final Velocity velocity, final BuildNumberService buildNumberService,
+                                     final Provider<VelocityEngine> velocityEngineProvider, final BuildNumberService buildNumberService,
                                      final Set<UiContributor> uiContributors)
   {
     this();
@@ -88,7 +89,7 @@ public class IndexTemplatePlexusResource
     this.applicationStatusSource = applicationStatusSource;
     this.referenceFactory = referenceFactory;
     this.templateFilename = templateFilename;
-    this.velocity = velocity;
+    this.velocityEngineProvider = velocityEngineProvider;
     this.buildNumberService = buildNumberService;
     this.rJsContributors = uiContributors;
   }
@@ -246,7 +247,7 @@ public class IndexTemplatePlexusResource
       StringWriter result = new StringWriter();
 
       try {
-        if (velocity.getEngine().evaluate(new VelocityContext(context), result, getClass().getName(), template)) {
+        if (velocityEngineProvider.get().evaluate(new VelocityContext(context), result, getClass().getName(), template)) {
           results.add(result.toString());
         }
         else {

@@ -25,7 +25,6 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
@@ -66,11 +65,10 @@ public class Nexus977MavenMetadataGroupOfGroupsIT
         downloadFile(new URL(nexusBaseUrl + "content/repositories/g4/"
             + "nexus977metadata/project/maven-metadata.xml"), "target/downloads/nexus977");
 
-    final FileInputStream in = new FileInputStream(metadataFile);
-    Metadata metadata = MetadataBuilder.read(in);
-    IOUtil.close(in);
-
-    List<String> versions = metadata.getVersioning().getVersions();
-    MatcherAssert.assertThat(versions, hasItems("1.5", "1.0.1", "1.0-SNAPSHOT", "0.8", "2.1"));
+    try (FileInputStream in = new FileInputStream(metadataFile)) {
+      Metadata metadata = MetadataBuilder.read(in);
+      List<String> versions = metadata.getVersioning().getVersions();
+      MatcherAssert.assertThat(versions, hasItems("1.5", "1.0.1", "1.0-SNAPSHOT", "0.8", "2.1"));
+    }
   }
 }

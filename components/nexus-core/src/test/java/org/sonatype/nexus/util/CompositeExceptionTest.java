@@ -14,48 +14,37 @@
 package org.sonatype.nexus.util;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.List;
 
-import org.junit.Assert;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.is;
+
 /**
- * {@link CompositeException} unit tests.
- *
- * @since 2.2
+ * Tests for {@link CompositeException}.
  */
 public class CompositeExceptionTest
+    extends TestSupport
 {
-  /**
-   * All constructors should work with {@code null}s. But the constructor exception's causes list should never be
-   * {@code null}.
-   */
-  @Test
-  public void constructorWithNull() {
-    final CompositeException c1 = new CompositeException((Throwable) null);
-    Assert.assertNotNull(c1.getCauses());
-    final CompositeException c2 = new CompositeException((String) null, (Throwable) null);
-    Assert.assertNotNull(c2.getCauses());
-    final CompositeException c3 = new CompositeException((List<Throwable>) null);
-    Assert.assertNotNull(c3.getCauses());
-    final CompositeException c4 = new CompositeException((String) null, (List<Throwable>) null);
-    Assert.assertNotNull(c4.getCauses());
-  }
-
   /**
    * Sanity check, is this class actually doing what is meant to do using vararg accepting constructor.
    */
   @Test
   public void simpleUseVarargs() {
-    final RuntimeException re = new RuntimeException("runtime");
-    final IOException io = new IOException("io");
+    final Throwable re = new RuntimeException("runtime");
+    final Throwable io = new IOException("io");
 
     final CompositeException ce = new CompositeException("composite", re, io);
 
-    Assert.assertEquals(2, ce.getCauses().size());
-    Assert.assertEquals(re, ce.getCauses().get(0));
-    Assert.assertEquals(io, ce.getCauses().get(1));
+    assertThat(ce.getSuppressed(), arrayWithSize(2));
+    assertThat(ce.getSuppressed()[0], is(re));
+    assertThat(ce.getSuppressed()[1], is(io));
   }
 
   /**
@@ -63,13 +52,38 @@ public class CompositeExceptionTest
    */
   @Test
   public void simpleUseList() {
-    final RuntimeException re = new RuntimeException("runtime");
-    final IOException io = new IOException("io");
+    final Throwable re = new RuntimeException("runtime");
+    final Throwable io = new IOException("io");
 
     final CompositeException ce = new CompositeException("composite", Arrays.asList(re, io));
 
-    Assert.assertEquals(2, ce.getCauses().size());
-    Assert.assertEquals(re, ce.getCauses().get(0));
-    Assert.assertEquals(io, ce.getCauses().get(1));
+    assertThat(ce.getSuppressed(), arrayWithSize(2));
+    assertThat(ce.getSuppressed()[0], is(re));
+    assertThat(ce.getSuppressed()[1], is(io));
+  }
+
+  @Test
+  public void multiplePrintStackTrace() {
+    StringWriter buff = new StringWriter();
+    CompositeException exception = new CompositeException("test",
+        new Exception("foo"),
+        new Exception("bar"),
+        new Exception("baz")
+    );
+    exception.printStackTrace(new PrintWriter(buff));
+
+    log("printed:");
+    log(buff);
+
+    // NOTE: There appears to be a bug in logback 1.0.13 which is not handling suppressed exceptions.
+    // NOTE: This appears to have been fixed but is not yet released.
+    log("logged:");
+    logger.info("EXCEPTION", exception);
+
+    log("nested printed:");
+    new IOException("nested", exception).printStackTrace(System.out);
+
+    log("default printed:");
+    exception.printStackTrace();
   }
 }

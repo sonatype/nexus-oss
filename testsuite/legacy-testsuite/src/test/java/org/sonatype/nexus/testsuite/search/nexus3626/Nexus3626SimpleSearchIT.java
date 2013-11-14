@@ -28,9 +28,9 @@ import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.maven.index.artifact.Gav;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -46,7 +46,7 @@ public class Nexus3626SimpleSearchIT
   {
     final File pom = getTestFile("wagon.pom");
     final File sha1 = new File(pom.getParentFile(), "wagon.pom.sha1");
-    FileUtils.fileWrite(sha1.getAbsolutePath(), FileTestingUtils.createSHA1FromFile(pom));
+    FileUtils.write(sha1, FileTestingUtils.createSHA1FromFile(pom));
 
     final String repo = getRepositoryUrl(REPO_TEST_HARNESS_REPO);
     final Gav gav = GavUtil.newGav("nexus3626", "wagon", "1.0.0", "pom");

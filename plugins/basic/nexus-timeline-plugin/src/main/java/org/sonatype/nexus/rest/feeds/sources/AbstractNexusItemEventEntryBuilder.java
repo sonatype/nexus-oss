@@ -18,13 +18,13 @@ import java.util.Date;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
@@ -36,7 +36,7 @@ import org.restlet.data.MediaType;
  * @author Juven Xu
  */
 abstract public class AbstractNexusItemEventEntryBuilder
-    extends AbstractLoggingComponent
+    extends ComponentSupport
     implements SyndEntryBuilder<NexusArtifactEvent>
 {
   private RepositoryRegistry repositoryRegistry;
@@ -204,7 +204,7 @@ abstract public class AbstractNexusItemEventEntryBuilder
       return null;
     }
     catch (NoSuchRepositoryException e) {
-      getLogger().debug(
+      log.debug(
           "Feed entry contained invalid repository id " + event.getNexusItemInfo().getRepositoryId(),
           e);
 
