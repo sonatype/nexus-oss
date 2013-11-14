@@ -21,14 +21,16 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
 import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
-import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.events.Event;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.p2.bridge.HttpProxy;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class GlobalRemoteProxySettingsInspector
     extends ComponentSupport
-    implements EventInspector
+    implements EventSubscriber
 {
 
   private final GlobalRemoteProxySettings globalRemoteProxySettings;
@@ -51,18 +53,17 @@ public class GlobalRemoteProxySettingsInspector
     this.httpProxy = checkNotNull(httpProxy);
   }
 
-  @Override
-  public boolean accepts(final Event<?> evt) {
-    return evt instanceof GlobalRemoteProxySettingsChangedEvent
-        || evt instanceof NexusStartedEvent;
+  @Subscribe
+  public void on(final NexusStartedEvent e) {
+    inspect(e);
   }
 
-  @Override
-  public void inspect(final Event<?> evt) {
-    if (!accepts(evt)) {
-      return;
-    }
+  @Subscribe
+  public void on(final GlobalRemoteProxySettingsChangedEvent e) {
+    inspect(e);
+  }
 
+  protected void inspect(final Event<?> evt) {
     // FIXME: Sort out what to do with http/https here
     RemoteHttpProxySettings httpProxySettings = globalRemoteProxySettings.getHttpProxySettings();
 

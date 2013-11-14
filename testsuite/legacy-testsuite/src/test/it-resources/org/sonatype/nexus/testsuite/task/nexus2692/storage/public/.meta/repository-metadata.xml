@@ -31,11 +31,5 @@
       <policy>release</policy>
       <url>@rootUrl@/content/repositories/central</url>
     </memberRepository>
-    <memberRepository>
-      <id>apache-snapshots</id>
-      <name>Apache Snapshots</name>
-      <policy>snapshot</policy>
-      <url>@rootUrl@/content/repositories/apache-snapshots</url>
-    </memberRepository>
   </memberRepositories>
 </repository-metadata>

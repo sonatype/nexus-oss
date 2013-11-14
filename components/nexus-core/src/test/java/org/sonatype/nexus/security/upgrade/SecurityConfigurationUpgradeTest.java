@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.events.EventSubscriber;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -45,7 +45,7 @@ public class SecurityConfigurationUpgradeTest
   public void testLoadComponent()
       throws Exception
   {
-    Assert.assertNotNull(this.lookup(EventInspector.class, "SecurityUpgradeEventInspector"));
+    Assert.assertNotNull(this.lookup(EventSubscriber.class, "SecurityUpgradeEventInspector"));
   }
 
   @Test

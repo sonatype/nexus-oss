@@ -13,8 +13,8 @@
 
 package org.sonatype.nexus.proxy.events;
 
+import org.sonatype.nexus.events.AbstractEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
  * The repository registry events superclass.

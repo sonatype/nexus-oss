@@ -20,9 +20,12 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.events.Asynchronous;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.plexus.appevents.Event;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * @author Juven Xu
@@ -31,20 +34,11 @@ import org.sonatype.plexus.appevents.Event;
 @Singleton
 public class ConfigurationChangeEventInspector
     extends AbstractFeedRecorderEventInspector
-    implements AsynchronousEventInspector
+    implements EventSubscriber, Asynchronous
 {
-
-  public boolean accepts(Event<?> evt) {
-    return (evt instanceof ConfigurationChangeEvent);
-  }
-
-  public void inspect(Event<?> evt) {
-    inspectForNexus(evt);
-  }
-
-  private void inspectForNexus(Event<?> evt) {
-    ConfigurationChangeEvent event = (ConfigurationChangeEvent) evt;
-
+  @Subscribe
+  @AllowConcurrentEvents
+  public void inspectForNexus(final ConfigurationChangeEvent event) {
     if (event.getChanges().isEmpty()) {
       return;
     }

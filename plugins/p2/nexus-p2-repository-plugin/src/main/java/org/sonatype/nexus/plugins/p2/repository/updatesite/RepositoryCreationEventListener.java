@@ -18,21 +18,23 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named
 @Singleton
 public class RepositoryCreationEventListener
-    extends AbstractEventInspector
-    implements EventInspector
+    extends ComponentSupport
+    implements EventSubscriber
 {
   private final ApplicationStatusSource applicationStatusSource;
 
@@ -46,20 +48,19 @@ public class RepositoryCreationEventListener
     this.scheduler = checkNotNull(scheduler);
   }
 
-  @Override
-  public boolean accepts(final Event<?> evt) {
-    return evt instanceof RepositoryRegistryEventAdd && applicationStatusSource.getSystemStatus().isNexusStarted();
-  }
-
-  @Override
-  public void inspect(final Event<?> evt) {
+  @Subscribe
+  @AllowConcurrentEvents
+  public void inspect(final RepositoryRegistryEventAdd evt) {
+    if (!applicationStatusSource.getSystemStatus().isNexusStarted()) {
+      return;
+    }
     final UpdateSiteProxyRepository updateSite =
         ((RepositoryRegistryEventAdd) evt).getRepository().adaptToFacet(UpdateSiteProxyRepository.class);
 
     if (updateSite != null) {
       updateSite.setExposed(false);
       final ScheduledTask<?> mirrorTask = UpdateSiteMirrorTask.submit(scheduler, updateSite, true);
-      getLogger().debug("Submitted " + mirrorTask.getName());
+      log.debug("Submitted " + mirrorTask.getName());
     }
   }
 }

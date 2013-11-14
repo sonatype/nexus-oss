@@ -17,11 +17,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Event inspector that listens for repository registry removals, and purges the {@link PathCache} belonging to given
@@ -35,7 +38,8 @@ import org.sonatype.plexus.appevents.Event;
 @Named
 @Singleton
 public class PathCacheEventInspector
-    extends AbstractEventInspector
+    extends ComponentSupport
+    implements EventSubscriber
 {
   private final CacheManager cacheManager;
 
@@ -44,20 +48,15 @@ public class PathCacheEventInspector
     this.cacheManager = cacheManager;
   }
 
-  @Override
-  public boolean accepts(final Event<?> evt) {
-    return evt instanceof RepositoryRegistryEventRemove;
-  }
-
-  @Override
-  public void inspect(final Event<?> evt) {
-    final RepositoryRegistryEventRemove removedRepositoryEvent = (RepositoryRegistryEventRemove) evt;
+  @Subscribe
+  @AllowConcurrentEvents
+  public void inspect(final RepositoryRegistryEventRemove removedRepositoryEvent) {
     final Repository removedRepository = removedRepositoryEvent.getRepository();
     final PathCache pathCache = cacheManager.getPathCache(removedRepository.getId());
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug(
-          "Purging NFC PathCache of repository "
-              + RepositoryStringUtils.getHumanizedNameString(removedRepository));
+    if (log.isDebugEnabled()) {
+      log.debug(
+          "Purging NFC PathCache of repository {}",
+          RepositoryStringUtils.getHumanizedNameString(removedRepository));
     }
     pathCache.purge();
   }

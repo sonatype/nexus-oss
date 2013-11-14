@@ -17,13 +17,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventPostRemove;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Spawns a background task to delete repository folders upon removal.
@@ -33,8 +34,8 @@ import org.sonatype.plexus.appevents.Event;
 @Named
 @Singleton
 public class DeleteRepositoryFoldersEventInspector
-    extends AbstractEventInspector
-    implements AsynchronousEventInspector
+    extends ComponentSupport
+    implements EventSubscriber, Asynchronous
 {
   private final NexusScheduler nexusScheduler;
 
@@ -43,12 +44,10 @@ public class DeleteRepositoryFoldersEventInspector
     this.nexusScheduler = nexusScheduler;
   }
 
-  public boolean accepts(Event<?> evt) {
-    return (evt instanceof RepositoryRegistryEventPostRemove);
-  }
-
-  public void inspect(Event<?> evt) {
-    Repository repository = ((RepositoryRegistryEventPostRemove) evt).getRepository();
+  @Subscribe
+  @AllowConcurrentEvents
+  public void inspect(final RepositoryRegistryEventPostRemove evt) {
+    Repository repository = evt.getRepository();
 
     try {
       // remove the storage folders for the repository
@@ -60,9 +59,7 @@ public class DeleteRepositoryFoldersEventInspector
           + repository.getId() + ").", task);
     }
     catch (Exception e) {
-      getLogger().error(
-          "Could not remove repository folders for repository \"" + repository.getName() + "\" (id="
-              + repository.getId() + ")!", e);
+      log.warn("Could not remove repository folders for repository {}", repository, e);
     }
   }
 }
