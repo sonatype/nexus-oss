@@ -23,7 +23,6 @@ import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-import com.google.common.io.Closeables;
 import org.apache.maven.index.SearchType;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
@@ -247,13 +246,9 @@ public class Nexus383SearchNGIT
     File pomFile = this.getTestFile("crossArtifact.pom");
 
     MavenXpp3Reader reader = new MavenXpp3Reader();
-    FileInputStream fis = new FileInputStream(pomFile);
     Model model = null;
-    try {
+    try (FileInputStream fis = new FileInputStream(pomFile)) {
       model = reader.read(fis, true);
-    }
-    finally {
-      Closeables.closeQuietly(fis);
     }
 
     String deployUrl = model.getDistributionManagement().getRepository().getUrl();

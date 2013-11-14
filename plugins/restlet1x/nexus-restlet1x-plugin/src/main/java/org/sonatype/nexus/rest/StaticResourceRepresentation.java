@@ -20,7 +20,7 @@ import java.util.Date;
 
 import org.sonatype.nexus.plugins.rest.StaticResource;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.restlet.data.MediaType;
 import org.restlet.resource.OutputRepresentation;
 
@@ -44,15 +44,8 @@ public class StaticResourceRepresentation
   public void write(OutputStream outputStream)
       throws IOException
   {
-    InputStream is = null;
-
-    try {
-      is = resource.getInputStream();
-
-      IOUtil.copy(is, outputStream);
-    }
-    finally {
-      IOUtil.close(is);
+    try (InputStream is = resource.getInputStream()) {
+      IOUtils.copy(is, outputStream);
     }
   }
 

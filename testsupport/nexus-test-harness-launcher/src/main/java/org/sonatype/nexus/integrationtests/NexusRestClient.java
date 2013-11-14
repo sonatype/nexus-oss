@@ -45,7 +45,6 @@ import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
-import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.restlet.Client;
@@ -557,8 +556,6 @@ public class NexusRestClient
   public File downloadFile(URL url, String targetFile)
       throws IOException
   {
-    OutputStream out = null;
-    InputStream in = null;
     File downloadedFile = new File(targetFile);
     Response response = null;
     try {
@@ -573,16 +570,13 @@ public class NexusRestClient
         downloadedFile.getParentFile().mkdirs();
       }
 
-      in = response.getEntity().getStream();
-      checkState(in != null, "null entity input-stream");
-
-      out = new BufferedOutputStream(new FileOutputStream(downloadedFile));
-
-      IOUtil.copy(in, out, 1024);
+      try (InputStream in = response.getEntity().getStream();
+           OutputStream out = new BufferedOutputStream(new FileOutputStream(downloadedFile))) {
+        checkState(in != null, "null entity input-stream");
+        IOUtils.copy(in, out);
+      }
     }
     finally {
-      IOUtil.close(in);
-      IOUtil.close(out);
       releaseResponse(response);
     }
     return downloadedFile;
@@ -590,11 +584,6 @@ public class NexusRestClient
 
   /**
    * Execute a HTTPClient method in the context of a test. make decisions how to execute.
-   * <p/>
-   * NOTE: Before being returned, {@link org.apache.commons.httpclient.HttpMethod#releaseConnection()} is called on
-   * the {@link org.apache.commons.httpclient.HttpMethod} instance, therefore subsequent calls to get response body
-   * as
-   * string may return nulls.
    */
   public HttpResponse executeHTTPClientMethod(HttpUriRequest method)
       throws IOException
@@ -604,11 +593,6 @@ public class NexusRestClient
 
   /**
    * Execute a HTTPClient method, optionally in the context of a test.
-   * <p/>
-   * NOTE: Before being returned, {@link org.apache.commons.httpclient.HttpMethod#releaseConnection()} is called on
-   * the {@link org.apache.commons.httpclient.HttpMethod} instance, therefore subsequent calls to get response body
-   * as
-   * string may return nulls.
    *
    * @param method         the method to execute
    * @param useTestContext if true, execute this request in the context of a Test, false means ignore the testContext
@@ -685,13 +669,11 @@ public class NexusRestClient
     long t = System.currentTimeMillis();
 
     HttpGet get = null;
-    InputStream in = null;
     try {
       final HttpClient client = new DefaultHttpClient();
       get = new HttpGet(url.toString());
       final HttpResponse response = client.execute(get);
       MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), ResponseMatchers.isSuccessfulCode());
-      in = response.getEntity().getContent();
       byte[] b;
       if (speedLimit != -1) {
         b = new byte[speedLimit * 1024];
@@ -699,19 +681,20 @@ public class NexusRestClient
       else {
         b = new byte[1024];
       }
-      while (in.read(b) != -1) {
-        if (speedLimit != -1) {
-          try {
-            Thread.sleep(1000);
-          }
-          catch (InterruptedException e) {
-            // ignore
+      try (InputStream in = response.getEntity().getContent()) {
+        while (in.read(b) != -1) {
+          if (speedLimit != -1) {
+            try {
+              Thread.sleep(1000);
+            }
+            catch (InterruptedException e) {
+              // ignore
+            }
           }
         }
       }
     }
     finally {
-      IOUtil.close(in);
       if (get != null) {
         get.releaseConnection();
       }

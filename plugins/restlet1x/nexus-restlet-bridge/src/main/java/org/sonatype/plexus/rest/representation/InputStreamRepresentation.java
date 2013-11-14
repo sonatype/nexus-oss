@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.restlet.data.MediaType;
 import org.restlet.resource.OutputRepresentation;
 
@@ -51,7 +51,7 @@ public class InputStreamRepresentation
       throws IOException
   {
     try {
-      IOUtil.copy(is, outputStream);
+      IOUtils.copy(is, outputStream);
     }
     finally {
       is.close();

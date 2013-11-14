@@ -26,7 +26,7 @@ import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConf
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequestDTO;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Request;
@@ -419,7 +419,7 @@ public class UserGroupConfigWithMd5IT
   protected void copyDefaultLdapConfigToPlace()
       throws IOException
   {
-    IOUtil.copy(getClass().getResourceAsStream("/test-conf/md5-ldap.xml"),
+    IOUtils.copy(getClass().getResourceAsStream("/test-conf/md5-ldap.xml"),
         new FileOutputStream(getNexusLdapConfiguration()));
   }
 

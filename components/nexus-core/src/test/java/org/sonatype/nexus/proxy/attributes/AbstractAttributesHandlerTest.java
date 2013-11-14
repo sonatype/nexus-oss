@@ -25,7 +25,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
@@ -46,7 +46,7 @@ public abstract class AbstractAttributesHandlerTest
   {
     super.setUp();
 
-    FileUtils.copyDirectoryStructure(new File(getBasedir(), "target/test-classes/repo1"), new File(
+    FileUtils.copyDirectory(new File(getBasedir(), "target/test-classes/repo1"), new File(
         getBasedir(), "target/test-reposes/repo1"));
 
     attributesHandler = createAttributesHandler();

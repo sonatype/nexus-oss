@@ -27,11 +27,10 @@ import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.templates.TemplateProvider;
-import org.sonatype.security.SecuritySystem;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

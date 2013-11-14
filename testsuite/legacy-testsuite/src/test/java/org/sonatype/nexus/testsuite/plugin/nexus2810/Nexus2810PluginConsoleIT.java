@@ -19,8 +19,8 @@ import java.util.List;
 
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class Nexus2810PluginConsoleIT
 
     File desti = new File(this.getNexusBaseDir(), RELATIVE_PLUGIN_REPOSITORY_DIR);
 
-    FileUtils.copyDirectoryStructure(source, desti);
+    FileUtils.copyDirectory(source, desti);
   }
 
   @Test

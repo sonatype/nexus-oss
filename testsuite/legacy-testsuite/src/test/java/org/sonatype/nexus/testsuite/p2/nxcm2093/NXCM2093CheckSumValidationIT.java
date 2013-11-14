@@ -23,7 +23,7 @@ import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -65,7 +65,7 @@ public class NXCM2093CheckSumValidationIT
       // Nexus prevented P2 installation, as this assertion happens in a catch block, hence P2 did not install
       // artifacts with wrong checksums.
       // Changed to check for both variations of checksum-invalid loglines.
-      final String nexusLogString = FileUtils.fileRead(getNexusLogFile());
+      final String nexusLogString = FileUtils.readFileToString(getNexusLogFile());
       final boolean passed =
           StringUtils.contains(nexusLogString,
               "Proxied item nxcm2093-bad-checksum:/plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar evaluated as INVALID")

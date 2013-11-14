@@ -37,7 +37,6 @@ import org.sonatype.sisu.filetasks.FileTaskBuilder;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.io.Closeables;
 import org.apache.tools.ant.taskdefs.condition.Os;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -273,9 +272,7 @@ public class DefaultNexusBundleConfiguration
     final Map<String, String> logLevels = getLogLevels();
     if (logLevels != null && !logLevels.isEmpty()) {
       final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      PrintWriter writer = null;
-      try {
-        writer = new PrintWriter(baos);
+      try (PrintWriter writer = new PrintWriter(baos)) {
         writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         writer.println();
         writer.println("<included>");
@@ -293,9 +290,6 @@ public class DefaultNexusBundleConfiguration
       }
       catch (UnsupportedEncodingException e) {
         throw Throwables.propagate(e);
-      }
-      finally {
-        Closeables.closeQuietly(writer);
       }
     }
 

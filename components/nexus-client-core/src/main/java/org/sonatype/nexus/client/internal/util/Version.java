@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import com.google.common.io.Closeables;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ public class Version
       LOG.error("Could not load/read version from " + path, e);
     }
     finally {
-      Closeables.closeQuietly(is);
+      IOUtils.closeQuietly(is);
     }
     return version;
   }

@@ -31,7 +31,7 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 import com.google.inject.Module;
 import junit.framework.Assert;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class LdapUserManagerIT
@@ -195,7 +195,7 @@ public class LdapUserManagerIT
   public void testOrderOfUserSearch()
       throws Exception
   {
-    IOUtil.copy(getClass().getResourceAsStream("/test-conf/conf/security-users-in-both-realms.xml"),
+    IOUtils.copy(getClass().getResourceAsStream("/test-conf/conf/security-users-in-both-realms.xml"),
         new FileOutputStream(getNexusSecurityConfiguration()));
 
     SecuritySystem securitySystem = this.getSecuritySystem();

@@ -41,11 +41,10 @@ import org.sonatype.p2.bridge.model.InstallableUnit;
 import org.sonatype.sisu.resource.scanner.helper.ListenerSupport;
 import org.sonatype.sisu.resource.scanner.scanners.SerialScanner;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.codehaus.plexus.util.FileUtils.deleteDirectory;
 import static org.sonatype.nexus.plugins.p2.repository.P2Constants.P2_REPOSITORY_ROOT_PATH;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.*;
 import static org.sonatype.nexus.plugins.p2.repository.internal.P2ArtifactsEventsInspector.isP2ArtifactsXML;
@@ -176,7 +175,7 @@ public class DefaultP2RepositoryAggregator
       }
       finally {
         p2RepoUid.getLock().unlock();
-        deleteDirectory(destinationP2Repository);
+        FileUtils.deleteDirectory(destinationP2Repository);
       }
     }
     catch (final Exception e) {
@@ -220,8 +219,8 @@ public class DefaultP2RepositoryAggregator
       }
       finally {
         p2RepoUid.getLock().unlock();
-        deleteDirectory(sourceP2Repository);
-        deleteDirectory(destinationP2Repository);
+        FileUtils.deleteDirectory(sourceP2Repository);
+        FileUtils.deleteDirectory(destinationP2Repository);
       }
     }
     catch (final Exception e) {
@@ -259,7 +258,7 @@ public class DefaultP2RepositoryAggregator
       }
       finally {
         p2RepoUid.getLock().unlock();
-        deleteDirectory(destinationP2Repository);
+        FileUtils.deleteDirectory(destinationP2Repository);
       }
     }
     catch (final Exception e) {
@@ -303,8 +302,8 @@ public class DefaultP2RepositoryAggregator
       }
       finally {
         p2RepoUid.getLock().unlock();
-        deleteDirectory(sourceP2Repository);
-        deleteDirectory(destinationP2Repository);
+        FileUtils.deleteDirectory(sourceP2Repository);
+        FileUtils.deleteDirectory(destinationP2Repository);
       }
     }
     catch (final Exception e) {
@@ -375,7 +374,7 @@ public class DefaultP2RepositoryAggregator
       finally {
         p2RepoUid.getLock().unlock();
 
-        deleteDirectory(destinationP2Repository);
+        FileUtils.deleteDirectory(destinationP2Repository);
       }
     }
     catch (final Exception e) {
@@ -415,7 +414,7 @@ public class DefaultP2RepositoryAggregator
       }
     }
     finally {
-      deleteDirectory(sourceP2Repository);
+      FileUtils.deleteDirectory(sourceP2Repository);
     }
   }
 
@@ -444,7 +443,7 @@ public class DefaultP2RepositoryAggregator
       metadataRepository.merge(sourceP2Repository.toURI(), destinationP2Repository.toURI());
     }
     finally {
-      deleteDirectory(sourceP2Repository);
+      FileUtils.deleteDirectory(sourceP2Repository);
     }
   }
 

@@ -28,7 +28,6 @@ import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.gav.GavCalculator;
 import org.sonatype.nexus.proxy.maven.gav.M2ArtifactRecognizer;
 
-import com.google.common.io.Closeables;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -278,9 +277,7 @@ abstract public class AbstractMetadataHelper
     String prefix = null;
     try {
       if (exists(jarPath)) {
-        InputStream jar = retrieveContent(jarPath);
-        ZipInputStream zip = new ZipInputStream(jar);
-        try {
+        try (ZipInputStream zip = new ZipInputStream(retrieveContent(jarPath))) {
           ZipEntry entry;
           while ((entry = zip.getNextEntry()) != null) {
             if (!entry.isDirectory() && entry.getName().equals("META-INF/maven/plugin.xml")) {
@@ -293,10 +290,6 @@ abstract public class AbstractMetadataHelper
             }
             zip.closeEntry();
           }
-        }
-        finally {
-          Closeables.close(zip, true);
-          Closeables.close(jar, true);
         }
       }
     }

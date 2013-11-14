@@ -33,7 +33,6 @@ import org.sonatype.nexus.configuration.model.v2_7_0.upgrade.BasicVersionUpgrade
 import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.io.Closeables;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -51,14 +50,10 @@ public class Upgrade250to270
   public Object loadConfiguration(File file)
       throws IOException, ConfigurationIsCorruptedException
   {
-    FileReader fr = null;
-
     org.sonatype.nexus.configuration.model.v2_5_0.Configuration conf = null;
 
-    try {
+    try (FileReader fr = new FileReader(file)) {
       // reading without interpolation to preserve user settings as variables
-      fr = new FileReader(file);
-
       org.sonatype.nexus.configuration.model.v2_5_0.io.xpp3.NexusConfigurationXpp3Reader reader =
           new org.sonatype.nexus.configuration.model.v2_5_0.io.xpp3.NexusConfigurationXpp3Reader();
 
@@ -66,9 +61,6 @@ public class Upgrade250to270
     }
     catch (XmlPullParserException e) {
       throw new ConfigurationIsCorruptedException(file.getAbsolutePath(), e);
-    }
-    finally {
-      Closeables.closeQuietly(fr);
     }
 
     return conf;

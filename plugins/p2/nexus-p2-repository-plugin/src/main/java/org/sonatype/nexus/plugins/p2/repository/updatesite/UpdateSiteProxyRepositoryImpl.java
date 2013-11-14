@@ -63,10 +63,10 @@ import org.sonatype.nexus.proxy.walker.WalkerFilter;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.p2.bridge.Publisher;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.eclipse.tycho.model.Feature;
