@@ -150,9 +150,10 @@ public class WebappBootstrap
       context.setAttribute(PlexusConstants.PLEXUS_KEY, container);
       log.debug("Container: {}", container);
 
-      // configure guice servlet
       injector = container.lookup(Injector.class);
       log.debug("Injector: {}", injector);
+
+      // configure guice servlet (add injector to servlet context)
       super.contextInitialized(event);
 
       // configure logging
@@ -200,6 +201,7 @@ public class WebappBootstrap
       logManager = null;
     }
 
+    // unset injector from context
     super.contextDestroyed(event);
 
     // cleanup the container
