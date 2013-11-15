@@ -95,6 +95,13 @@ public abstract class NexusAppTestSupport
     }
   }
 
+  /**
+   * Returns true if startNx method was invoked, if Nexus was started.
+   */
+  protected boolean isNexusStarted() {
+    return nexusStarted;
+  }
+
   // NxApplication
 
   @Override

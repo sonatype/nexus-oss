@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.notification.NotificationCheat;
 import org.sonatype.nexus.notification.NotificationManager;
 import org.sonatype.nexus.notification.NotificationRequest;
@@ -27,7 +28,6 @@ import org.sonatype.nexus.notification.NotificationTarget;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeSet;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
-import org.sonatype.plexus.appevents.Event;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

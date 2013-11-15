@@ -20,14 +20,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Event;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.TargetRegistryEventRemove;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
@@ -35,15 +35,19 @@ import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.xml.SecurityXmlAuthorizationManager;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.ConfigurationManagerAction;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 @Named
 public class SecurityCleanupEventInspector
-    extends AbstractEventInspector
+    extends ComponentSupport
+    implements EventSubscriber
 {
   private final ConfigurationManager configManager;
 
@@ -55,13 +59,19 @@ public class SecurityCleanupEventInspector
     this.security = checkNotNull(security);
   }
 
-  @Override
-  public boolean accepts(Event<?> evt) {
-    return evt instanceof RepositoryRegistryEventRemove || evt instanceof TargetRegistryEventRemove;
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryRegistryEventRemove e) {
+    inspect(e);
   }
 
-  @Override
-  public void inspect(Event<?> evt) {
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final TargetRegistryEventRemove e) {
+    inspect(e);
+  }
+
+  protected void inspect(Event<?> evt) {
     if (evt instanceof RepositoryRegistryEventRemove) {
       RepositoryRegistryEventRemove rEvt = (RepositoryRegistryEventRemove) evt;
 
@@ -73,10 +83,10 @@ public class SecurityCleanupEventInspector
         cleanupPrivileges(TargetPrivilegeGroupPropertyDescriptor.ID, repositoryId);
       }
       catch (NoSuchPrivilegeException e) {
-        getLogger().error("Unable to clean privileges attached to repository", e);
+        log.error("Unable to clean privileges attached to repository", e);
       }
       catch (NoSuchAuthorizationManagerException e) {
-        getLogger().error("Unable to clean privileges attached to repository", e);
+        log.error("Unable to clean privileges attached to repository", e);
       }
     }
     if (evt instanceof TargetRegistryEventRemove) {
@@ -88,10 +98,10 @@ public class SecurityCleanupEventInspector
         cleanupPrivileges(TargetPrivilegeRepositoryTargetPropertyDescriptor.ID, targetId);
       }
       catch (NoSuchPrivilegeException e) {
-        getLogger().error("Unable to clean privileges attached to target: " + targetId, e);
+        log.error("Unable to clean privileges attached to target: {}", targetId, e);
       }
       catch (NoSuchAuthorizationManagerException e) {
-        getLogger().error("Unable to clean privileges attached to target: " + targetId, e);
+        log.error("Unable to clean privileges attached to target: {}", targetId, e);
       }
     }
   }
@@ -106,7 +116,7 @@ public class SecurityCleanupEventInspector
     for (Privilege privilege : privileges) {
       if (!privilege.isReadOnly() && privilege.getType().equals(TargetPrivilegeDescriptor.TYPE)
           && (propertyValue.equals(privilege.getPrivilegeProperty(propertyId)))) {
-        getLogger().debug("Removing Privilege " + privilege.getName() + " because repository was removed");
+        log.debug("Removing Privilege {} because repository was removed", privilege.getName());
         security.getAuthorizationManager(SecurityXmlAuthorizationManager.SOURCE).deletePrivilege(
             privilege.getId());
         removedIds.add(privilege.getId());

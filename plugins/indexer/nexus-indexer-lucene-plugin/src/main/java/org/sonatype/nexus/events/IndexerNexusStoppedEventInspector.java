@@ -20,9 +20,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Catches Nexus shutdown event and cleanly stops the IndexManager
@@ -32,7 +33,8 @@ import org.sonatype.plexus.appevents.Event;
 @Named
 @Singleton
 public class IndexerNexusStoppedEventInspector
-    extends AbstractEventInspector
+    extends ComponentSupport
+    implements EventSubscriber
 {
   private final IndexerManager indexerManager;
 
@@ -45,16 +47,13 @@ public class IndexerNexusStoppedEventInspector
     return indexerManager;
   }
 
-  public boolean accepts(final Event<?> evt) {
-    return evt instanceof NexusStoppedEvent;
-  }
-
-  public void inspect(final Event<?> evt) {
+  @Subscribe
+  public void inspect(final NexusStoppedEvent evt) {
     try {
       indexerManager.shutdown(false);
     }
     catch (IOException e) {
-      getLogger().error("Error while stopping IndexerManager:", e);
+      log.error("Error while stopping IndexerManager:", e);
     }
   }
 }

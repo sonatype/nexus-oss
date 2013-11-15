@@ -19,8 +19,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
@@ -31,8 +29,10 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.RepairIndexTask;
 import org.sonatype.nexus.tasks.UpdateIndexTask;
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -46,8 +46,8 @@ import org.apache.commons.lang.StringUtils;
 @Named
 @Singleton
 public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
-    extends AbstractEventInspector
-    implements AsynchronousEventInspector
+    extends ComponentSupport
+    implements EventSubscriber, Asynchronous
 {
   private final RepositoryRegistry repoRegistry;
 
@@ -65,13 +65,20 @@ public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
     this.applicationStatusSource = applicationStatusSource;
   }
 
-  public boolean accepts(Event<?> evt) {
-    return ((evt instanceof RepositoryRegistryRepositoryEvent) || (evt instanceof RepositoryConfigurationUpdatedEvent))
-        && applicationStatusSource.getSystemStatus().isNexusStarted();
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryRegistryRepositoryEvent evt) {
+    inspect(evt);
   }
 
-  public void inspect(Event<?> evt) {
-    if (!accepts(evt)) {
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryConfigurationUpdatedEvent evt) {
+    inspect(evt);
+  }
+
+  protected void inspect(Event<?> evt) {
+    if (!applicationStatusSource.getSystemStatus().isNexusStarted()) {
       return;
     }
 
@@ -91,7 +98,7 @@ public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
       inspectForIndexerManager(evt, repository);
     }
     catch (NoSuchRepositoryException e) {
-      getLogger().debug("Attempted to handle repository that isn't yet in registry");
+      log.debug("Attempted to handle repository that isn't yet in registry");
     }
   }
 
@@ -144,12 +151,12 @@ public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
 
           reindexRepo(event.getRepository(), true, taskName);
 
-          getLogger().info(logMessage);
+          log.info(logMessage);
         }
       }
     }
     catch (Exception e) {
-      getLogger().error("Could not maintain indexing contexts!", e);
+      log.error("Could not maintain indexing contexts!", e);
     }
   }
 

@@ -21,12 +21,14 @@ import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthorizationEvent;
 import org.sonatype.nexus.auth.ResourceInfo;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.events.Asynchronous;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.plexus.appevents.Event;
 
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -35,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class NexusAuthorizationEventInspector
     extends AbstractFeedRecorderEventInspector
-    implements AsynchronousEventInspector
+    implements EventSubscriber, Asynchronous
 {
   private final NexusConfiguration nexusConfiguration;
 
@@ -46,48 +48,27 @@ public class NexusAuthorizationEventInspector
     this.nexusConfiguration = checkNotNull(nexusConfiguration);
   }
 
-  @Override
-  public boolean accepts(Event<?> evt) {
-    if (evt instanceof NexusAuthorizationEvent) {
-      // We accept only some NexusAuthenticationEvent, see #isRecordedEvent()
-      return isRecordedEvent((NexusAuthorizationEvent) evt);
-    }
-    else {
-      return false;
-    }
-  }
-
-  @Override
-  public void inspect(Event<?> evt) {
-    final NexusAuthorizationEvent nae = (NexusAuthorizationEvent) evt;
-
+  @Subscribe
+  @AllowConcurrentEvents
+  public void inspect(NexusAuthorizationEvent nae) {
     if (!isRecordedEvent(nae)) {
       // do nothing
       return;
     }
-
     lastNexusAuthorizationEvent = nae;
-
     final ClientInfo ai = nae.getClientInfo();
     final ResourceInfo ri = nae.getResourceInfo();
-
     final String msg =
         "Unable to authorize user [" + ai.getUserid() + "] for " + ri.getAction() + "(" + ri.getAccessProtocol()
             + " method \"" + ri.getAccessMethod() + "\") to " + ri.getAccessedUri() + " from IP Address "
             + ai.getRemoteIP() + ", user agent:\"" + ai.getUserAgent() + "\"";
+    log.debug(msg);
 
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug(msg);
-    }
-
-    AuthcAuthzEvent aae = new AuthcAuthzEvent(nae.getEventDate(), FeedRecorder.SYSTEM_AUTHZ, msg);
-
+    final AuthcAuthzEvent aae = new AuthcAuthzEvent(nae.getEventDate(), FeedRecorder.SYSTEM_AUTHZ, msg);
     final String ip = ai.getRemoteIP();
-
     if (ip != null) {
-      evt.getEventContext().put(AccessManager.REQUEST_REMOTE_ADDRESS, ip);
+      nae.getEventContext().put(AccessManager.REQUEST_REMOTE_ADDRESS, ip);
     }
-
     getFeedRecorder().addAuthcAuthzEvent(aae);
   }
 
