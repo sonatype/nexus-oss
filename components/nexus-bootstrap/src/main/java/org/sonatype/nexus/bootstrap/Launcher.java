@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.bootstrap;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -26,9 +27,6 @@ import org.sonatype.nexus.bootstrap.monitor.commands.HaltCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
 import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_PING_INTERVAL;
 import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_PORT;
@@ -41,9 +39,7 @@ import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_TI
  */
 public class Launcher
 {
-  protected final Logger log;
-
-  public static final InheritableThreadLocal<Map<String,String>> PROPERTIES = new InheritableThreadLocal<>();
+  public static final InheritableThreadLocal<Map<String, String>> PROPERTIES = new InheritableThreadLocal<>();
 
   // FIXME: Move this to CommandMonitorThread
   public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
@@ -55,28 +51,23 @@ public class Launcher
   private final JettyServer server;
 
   public Launcher(final @Nullable ClassLoader classLoader,
-                  final @Nullable Map<String,String> properties,
+                  final @Nullable Map<String, String> properties,
                   final String[] args)
       throws Exception
   {
-    Logger log = createLogger();
-    if (log == null) {
-      throw new NullPointerException();
-    }
-    this.log = log;
-
     ClassLoader cl = (classLoader == null) ? getClass().getClassLoader() : classLoader;
 
-    PropertyMap props = new PropertyMap();
+    Map<String, String> props = properties;
     if (properties == null) {
-      Configuration config = new Configuration();
-      config.load();
-      props.putAll(config.getProperties());
-    }
-    else {
-      props.putAll(properties);
+      props = new ConfigurationBuilder()
+          .defaults()
+          .set("bundleBasedir", new File(".").getCanonicalPath())
+          .properties("/nexus.properties", true)
+          .properties("/nexus-test.properties", false)
+          .build();
     }
     PROPERTIES.set(props);
+    System.getProperties().putAll(props);
 
     if (args == null) {
       throw new NullPointerException();
@@ -85,11 +76,10 @@ public class Launcher
       throw new IllegalArgumentException("Missing args");
     }
 
-    this.server = new JettyServer(cl, props, args);
-  }
+    // ensure the temporary directory is sane
+    TemporaryDirectory.get();
 
-  protected Logger createLogger() {
-    return LoggerFactory.getLogger(getClass());
+    this.server = new JettyServer(cl, props, args);
   }
 
   public void start() throws Exception {

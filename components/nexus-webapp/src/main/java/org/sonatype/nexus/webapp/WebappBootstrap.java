@@ -25,7 +25,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.sonatype.nexus.NxApplication;
-import org.sonatype.nexus.bootstrap.Configuration;
+import org.sonatype.nexus.bootstrap.ConfigurationBuilder;
 import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.guice.NexusModules.CoreModule;
 import org.sonatype.nexus.log.LogManager;
@@ -107,9 +107,18 @@ public class WebappBootstrap
       }
       else {
         log.info("Loading configuration for WAR deployment environment");
-        Configuration config = new Configuration();
-        config.load();
-        properties = config.getProperties();
+
+        // FIXME: This is what was done before, it seems completly wrong in WAR deployment since there is no bundle
+        String baseDir = System.getProperty("bundleBasedir", context.getRealPath("/WEB-INF"));
+
+        properties = new ConfigurationBuilder()
+            .defaults()
+            .set("bundleBasedir", new File(baseDir).getCanonicalPath())
+            .properties("/nexus.properties", true)
+            .properties("/nexus-test.properties", false)
+            .build();
+
+        System.getProperties().putAll(properties);
         Launcher.PROPERTIES.set(properties);
       }
 
@@ -178,7 +187,7 @@ public class WebappBootstrap
     log.info("Initialized");
   }
 
-  private void requireProperty(final Map<String,String> properties, final String name) {
+  private void requireProperty(final Map<String, String> properties, final String name) {
     if (!properties.containsKey(name)) {
       throw new IllegalStateException("Missing required property: " + name);
     }

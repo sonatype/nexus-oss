@@ -16,7 +16,6 @@ package org.sonatype.nexus.bootstrap.jsw;
 import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.bootstrap.ShutdownHelper;
 
-import org.slf4j.Logger;
 import org.tanukisoftware.wrapper.WrapperManager;
 
 import static org.tanukisoftware.wrapper.WrapperManager.WRAPPER_CTRL_LOGOFF_EVENT;
@@ -41,11 +40,6 @@ public class JswLauncher
 
     this.launcher = new Launcher(null, null, args)
     {
-      @Override
-      protected Logger createLogger() {
-        return JswLauncher.this.log;
-      }
-
       @Override
       public void commandStop() {
         WrapperManager.stopAndReturn(0);
