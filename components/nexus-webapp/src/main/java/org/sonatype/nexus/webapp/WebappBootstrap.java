@@ -189,6 +189,7 @@ public class WebappBootstrap
 
     // unset injector from context
     super.contextDestroyed(event);
+    injector = null;
 
     // cleanup the container
     if (container != null) {
