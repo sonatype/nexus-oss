@@ -89,6 +89,15 @@ public abstract class AbstractMimeMagicFileTypeValidator
       return FileTypeValidity.NEUTRAL;
     }
 
+    if (file.getContentLocator().getLength() == 0) {
+      // zero length FILE sent for CONTENT validation: FAIL
+      log.info(
+          "StorageFileItem {} MIME-magic validation failed: 0 bytes length file, no content to validate",
+          file.getRepositoryItemUid()
+      );
+      return FileTypeValidity.INVALID;
+    }
+
     final List<String> magicMimeTypes;
     if (contentOnly) {
       magicMimeTypes = mimeSupport.detectMimeTypesListFromContent(file.getContentLocator());
