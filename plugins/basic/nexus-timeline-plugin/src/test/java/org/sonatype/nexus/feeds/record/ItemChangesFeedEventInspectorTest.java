@@ -71,7 +71,7 @@ public class ItemChangesFeedEventInspectorTest
         new ItemChangesFeedEventInspector(feedRecorder, applicationStatusSource);
     final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
     when(repositoryItemUid.getBooleanAttributeValue(IsHiddenAttribute.class)).thenReturn(true);
-    underTest.inspect(evt);
+    underTest.on(evt);
 
     verifyNoMoreInteractions(feedRecorder);
   }
@@ -84,18 +84,18 @@ public class ItemChangesFeedEventInspectorTest
       final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
       when(repositoryItemUid.getBooleanAttributeValue(IsMavenRepositoryMetadataAttribute.class)).thenReturn(
           true);
-      underTest.inspect(evt);
+      underTest.on(evt);
     }
     {
       final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
       when(repositoryItemUid.getBooleanAttributeValue(IsMavenArtifactSignatureAttribute.class)).thenReturn(
           true);
-      underTest.inspect(evt);
+      underTest.on(evt);
     }
     {
       final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
       when(repositoryItemUid.getBooleanAttributeValue(IsMavenChecksumAttribute.class)).thenReturn(true);
-      underTest.inspect(evt);
+      underTest.on(evt);
     }
 
     // these events above should be filtered out by ItemChangesFeedEventInspector, feedRecordes shall be untouched
@@ -107,7 +107,7 @@ public class ItemChangesFeedEventInspectorTest
         false);
     when(repositoryItemUid.getBooleanAttributeValue(IsMavenArtifactSignatureAttribute.class)).thenReturn(false);
     when(repositoryItemUid.getBooleanAttributeValue(IsMavenChecksumAttribute.class)).thenReturn(false);
-    underTest.inspect(evt);
+    underTest.on(evt);
     // method touched only once
     verify(feedRecorder, times(1)).addNexusArtifactEvent(any(NexusArtifactEvent.class));
   }

@@ -17,11 +17,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
+import org.sonatype.nexus.events.Event;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
-import org.sonatype.plexus.appevents.Event;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -33,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named
 public class ThreadPoolManagerEventInspector
-    extends AbstractEventInspector
+    implements EventSubscriber
 {
   private final ThreadPoolManager poolManager;
 
@@ -42,28 +45,15 @@ public class ThreadPoolManagerEventInspector
     this.poolManager = checkNotNull(poolManager);
   }
 
-  @Override
-  public boolean accepts(Event<?> evt) {
-    return evt != null && evt instanceof RepositoryRegistryRepositoryEvent;
-    // return evt != null && ( evt instanceof RepositoryRegistryRepositoryEvent || evt instanceof NexusStoppedEvent );
-  }
-
-  @Override
-  public void inspect(Event<?> evt) {
-    if (!accepts(evt)) {
-      return;
-    }
-
+  @Subscribe
+  @AllowConcurrentEvents
+  public void inspect(final RepositoryRegistryRepositoryEvent evt) {
     if (evt instanceof RepositoryRegistryEventAdd) {
-      poolManager.createPool(((RepositoryRegistryEventAdd) evt).getRepository());
+      poolManager.createPool(evt.getRepository());
 
     }
     else if (evt instanceof RepositoryRegistryEventRemove) {
-      poolManager.removePool(((RepositoryRegistryEventRemove) evt).getRepository());
+      poolManager.removePool(evt.getRepository());
     }
-    // else if ( evt instanceof NexusStoppedEvent )
-    // {
-    // poolManager.shutdown();
-    // }
   }
 }

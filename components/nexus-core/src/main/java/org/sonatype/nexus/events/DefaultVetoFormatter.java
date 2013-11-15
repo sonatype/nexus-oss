@@ -27,7 +27,7 @@ import org.codehaus.plexus.util.ExceptionUtils;
 public class DefaultVetoFormatter
     implements VetoFormatter
 {
-  private static String LINE_SEPERATOR = System.getProperty("line.separator");
+  private static final String LINE_SEPERATOR = System.getProperty("line.separator");
 
   public String format(VetoFormatterRequest request) {
     StringBuilder sb = new StringBuilder();

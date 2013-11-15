@@ -18,15 +18,16 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Event inspector that maintains indexes.
@@ -36,14 +37,11 @@ import org.sonatype.plexus.appevents.Event;
 @Named
 @Singleton
 public class IndexerManagerEventInspector
-    extends AbstractEventInspector
-    implements AsynchronousEventInspector
+    extends ComponentSupport
+    implements EventSubscriber, Asynchronous
 {
   private final boolean enabled =
       SystemPropertiesHelper.getBoolean("org.sonatype.nexus.events.IndexerManagerEventInspector.enabled", true);
-
-  private final boolean async =
-      SystemPropertiesHelper.getBoolean("org.sonatype.nexus.events.IndexerManagerEventInspector.async", true);
 
   private final IndexerManager indexerManager;
 
@@ -56,21 +54,28 @@ public class IndexerManagerEventInspector
     return indexerManager;
   }
 
-  @Override
-  public boolean accepts(final Event<?> evt) {
-    // listen for STORE, CACHE, DELETE only
-    final boolean accepts = enabled
-        && (evt instanceof RepositoryItemEventStore || evt instanceof RepositoryItemEventCache ||
-        evt instanceof RepositoryItemEventDelete);
-    if (!async && accepts) {
+  // listen for STORE, CACHE, DELETE only
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryItemEventCache evt) {
+    if (enabled) {
       inspectForIndexerManager(evt);
     }
-    return accepts;
   }
 
-  @Override
-  public void inspect(final Event<?> evt) {
-    if (async) {
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryItemEventStore evt) {
+    if (enabled) {
+      inspectForIndexerManager(evt);
+    }
+  }
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryItemEventDelete evt) {
+    if (enabled) {
       inspectForIndexerManager(evt);
     }
   }
@@ -92,7 +97,7 @@ public class IndexerManagerEventInspector
       }
       catch (Exception e) // TODO be more specific
       {
-        getLogger().error("Could not maintain index for repository {}!", repository.getId(), e);
+        log.error("Could not maintain index for repository {}!", repository.getId(), e);
       }
     }
   }

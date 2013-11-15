@@ -16,11 +16,14 @@ package org.sonatype.nexus.feeds.record;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Asynchronous;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
-import org.sonatype.plexus.appevents.Event;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * @author Juven Xu
@@ -29,17 +32,12 @@ import org.sonatype.plexus.appevents.Event;
 @Singleton
 public class RepositoryEventProxyModeChangedInspector
     extends AbstractFeedRecorderEventInspector
-    implements AsynchronousEventInspector
+    implements EventSubscriber, Asynchronous
 {
 
-  public boolean accepts(Event<?> evt) {
-    if (evt instanceof RepositoryEventProxyModeChanged) {
-      return true;
-    }
-    return false;
-  }
-
-  public void inspect(Event<?> evt) {
+  @Subscribe
+  @AllowConcurrentEvents
+  public void inspect(final RepositoryEventProxyModeChanged evt) {
     RepositoryEventProxyModeChanged revt = (RepositoryEventProxyModeChanged) evt;
 
     StringBuilder sb = new StringBuilder("The proxy mode of repository '");

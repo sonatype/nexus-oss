@@ -17,9 +17,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Asynchronous;
+import org.sonatype.nexus.events.Event;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
@@ -30,7 +32,9 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.plexus.appevents.Event;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -43,7 +47,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class RepositoryRegistryRepositoryEventInspector
     extends AbstractFeedRecorderEventInspector
-    implements AsynchronousEventInspector
+    implements EventSubscriber, Asynchronous
 {
   private final RepositoryRegistry repoRegistry;
 
@@ -52,12 +56,23 @@ public class RepositoryRegistryRepositoryEventInspector
     this.repoRegistry = checkNotNull(repoRegistry);
   }
 
-  public boolean accepts(Event<?> evt) {
-    return ((evt instanceof RepositoryRegistryRepositoryEvent) || (evt instanceof RepositoryConfigurationUpdatedEvent))
-        && isNexusStarted();
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryRegistryRepositoryEvent e) {
+    inspect(e);
   }
 
-  public void inspect(Event<?> evt) {
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryConfigurationUpdatedEvent e) {
+    inspect(e);
+  }
+
+  protected void inspect(Event<?> evt) {
+    if (!isNexusStarted()) {
+      return;
+    }
+
     Repository repository = null;
 
     if (evt instanceof RepositoryRegistryRepositoryEvent) {
@@ -75,7 +90,7 @@ public class RepositoryRegistryRepositoryEventInspector
       inspectForTimeline(evt, repository);
     }
     catch (NoSuchRepositoryException e) {
-      getLogger().debug("Attempted to handle repository that isn't yet in registry");
+      log.debug("Attempted to handle repository that isn't yet in registry");
     }
   }
 

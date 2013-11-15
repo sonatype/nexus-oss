@@ -23,8 +23,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.events.Event;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -44,12 +45,16 @@ import org.sonatype.nexus.repository.metadata.RepositoryMetadataHandler;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMemberMetadata;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMirrorMetadata;
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 @Named
 @Singleton
 public class NexusRepositoryMetadataEventInspector
-    extends AbstractEventInspector
+    extends ComponentSupport
+    implements EventSubscriber
 {
   private final ContentClass maven1ContentClass;
 
@@ -75,12 +80,24 @@ public class NexusRepositoryMetadataEventInspector
     this.applicationStatusSource = applicationStatusSource;
   }
 
-  public boolean accepts(Event<?> evt) {
-    return (evt instanceof RepositoryRegistryEventAdd) || (evt instanceof RepositoryConfigurationUpdatedEvent)
-        || (evt instanceof NexusStartedEvent);
+  @Subscribe
+  public void on(final NexusStartedEvent evt) {
+    inspect(evt);
   }
 
-  public void inspect(Event<?> evt) {
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryRegistryEventAdd evt) {
+    inspect(evt);
+  }
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryConfigurationUpdatedEvent evt) {
+    inspect(evt);
+  }
+
+  protected void inspect(Event<?> evt) {
     if (evt instanceof NexusStartedEvent) {
       // on start, we batch process all of those
       for (Repository repository : repositoryRegistry.getRepositories()) {
@@ -193,13 +210,13 @@ public class NexusRepositoryMetadataEventInspector
         repository.getAttributesHandler().storeAttributes(file);
       }
       catch (MetadataHandlerException e) {
-        getLogger().info("Could not write repository metadata!", e);
+        log.info("Could not write repository metadata!", e);
       }
       catch (IOException e) {
-        getLogger().warn("IOException during write of repository metadata!", e);
+        log.warn("IOException during write of repository metadata!", e);
       }
       catch (Exception e) {
-        getLogger().info("Could not save repository metadata: ", e);
+        log.info("Could not save repository metadata: ", e);
       }
     }
   }
@@ -259,7 +276,7 @@ public class NexusRepositoryMetadataEventInspector
       return mirrors;
     }
     catch (NoSuchRepositoryException e) {
-      getLogger().debug("Repository not found, returning no mirrors");
+      log.debug("Repository not found, returning no mirrors");
     }
 
     return null;

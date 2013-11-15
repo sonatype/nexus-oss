@@ -17,18 +17,19 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.events.EventSubscriber;
+import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import org.codehaus.plexus.util.StringUtils;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 @Named
 @Singleton
 public class RepositoryItemUidAttributeEventInspector
-    extends AbstractEventInspector
-    implements EventInspector
+    extends ComponentSupport
+    implements EventSubscriber
 {
   private final RepositoryItemUidAttributeManager manager;
 
@@ -37,19 +38,14 @@ public class RepositoryItemUidAttributeEventInspector
     this.manager = manager;
   }
 
-  @Override
-  public boolean accepts(Event<?> evt) {
-    final String simpleName = evt.getClass().getName();
-
-    // TODO: nexus-proxy module does not reference plugin manager, so this is a quick'n'dirty workaround for now
-    return evt instanceof NexusInitializedEvent // for core
-        || StringUtils.equals(simpleName, "org.sonatype.nexus.plugins.events.PluginActivatedEvent") // for plugin loaded
-        || StringUtils
-        .equals(simpleName, "org.sonatype.nexus.plugins.events.PluginDeactivatedEvent"); // for plugin unloaded
+  @Subscribe
+  public void inspect(final NexusInitializedEvent evt) {
+    manager.reset();
   }
 
-  @Override
-  public void inspect(Event<?> evt) {
+  @Subscribe
+  @AllowConcurrentEvents
+  public void inspect(final PluginActivatedEvent evt) {
     manager.reset();
   }
 }

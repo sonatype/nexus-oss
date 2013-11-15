@@ -29,7 +29,7 @@ import org.apache.shiro.web.util.WebUtils;
  * {@link AuthenticatingFilter} that looks for credentials in known {@link NexusApiKey} HTTP headers.
  */
 public class NexusApiKeyAuthenticationFilter
-    extends NexusSecureHttpAuthenticationFilter
+    extends NexusHttpAuthenticationFilter
 {
   @Inject
   private Map<String, NexusApiKey> apiKeys = Collections.emptyMap();

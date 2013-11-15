@@ -17,10 +17,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Event;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.notification.NotificationManager;
 import org.sonatype.nexus.notification.NotificationRequest;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.plexus.appevents.Event;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,10 +35,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class NotificationEventInspector
-    extends AbstractEventInspector
+    implements EventSubscriber
 {
-  private static final String NOTIFICATION_ROUTE_KEY = "notificationRoute";
-
   private final NotificationEventRouter notificationEventRouter;
 
   private final NotificationManager notificationManager;
@@ -48,35 +49,15 @@ public class NotificationEventInspector
     this.notificationManager = checkNotNull(notificationManager);
   }
 
-  public boolean accepts(Event<?> evt) {
-    if (!notificationManager.isEnabled()) {
-      return false;
-    }
-
-    NotificationRequest route = notificationEventRouter.getRequestForEvent(evt);
-
-    if (route != null && !route.isEmpty()) {
-      evt.getEventContext().put(NOTIFICATION_ROUTE_KEY, route);
-
-      // yes, we have a route, we want to handle it
-      return true;
-    }
-    else {
-      // nah, no route to this one, forget it
-      return false;
-    }
-  }
-
+  @Subscribe
+  @AllowConcurrentEvents
   public void inspect(Event<?> evt) {
     if (!notificationManager.isEnabled()) {
       return;
     }
-
-    NotificationRequest request = (NotificationRequest) evt.getEventContext().get(NOTIFICATION_ROUTE_KEY);
-
-    // just a sanity check, eventInspectorHost should not call us in this case, see accepts() above
-    if (request != null && !request.isEmpty()) {
-      notificationManager.notifyTargets(request);
+    final NotificationRequest route = notificationEventRouter.getRequestForEvent(evt);
+    if (route != null && !route.isEmpty()) {
+      notificationManager.notifyTargets(route);
     }
   }
 }

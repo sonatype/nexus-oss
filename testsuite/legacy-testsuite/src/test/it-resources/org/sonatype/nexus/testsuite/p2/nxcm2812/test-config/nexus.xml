@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-2013 Sonatype, Inc.
-    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
-
-    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
-    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
-
-    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
-    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
-    Eclipse Foundation. All other trademarks are the property of their respective owners.
-
--->
 <nexusConfiguration>
-  <version>1.4.1</version>
+  <version>2.7.0</version>
   <globalConnectionSettings>
     <connectionTimeout>10000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
@@ -22,6 +8,7 @@
   </globalConnectionSettings>
   <restApi>
     <baseUrl>http://localhost:${nexus-application-port}/nexus</baseUrl>
+    <uiTimeout>60000</uiTimeout>
   </restApi>
   <httpProxy>
     <port>${nexus-proxy-port}</port>
@@ -49,7 +36,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
         <url>${proxy-repo-base-url}nxcm2812</url>
       </remoteStorage>
       <externalConfiguration>
@@ -94,7 +80,6 @@
       </patterns>
     </repositoryTarget>
   </repositoryTargets>
-  <tasks/>
   <smtpConfiguration>
     <hostname>localhost</hostname>
     <port>${email-server-port}</port>
@@ -102,10 +87,5 @@
     <password>{dlt0tjbySJMHt1DKE7jS5xp8K/4Diuuu73N0zB+4gcs=}</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
-  <errorReporting>
-    <jiraUrl>https://issues.sonatype.org</jiraUrl>
-    <jiraProject>PR</jiraProject>
-    <useGlobalProxy>true</useGlobalProxy>
-  </errorReporting>
   <notification />
 </nexusConfiguration>

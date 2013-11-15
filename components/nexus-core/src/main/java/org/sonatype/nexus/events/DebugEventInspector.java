@@ -22,7 +22,6 @@ import javax.management.ObjectName;
 
 import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

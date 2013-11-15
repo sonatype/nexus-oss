@@ -31,11 +31,6 @@
     <!-- Nexus in-reactor modules -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-compat</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration-model</artifactId>
     </dependency>
 

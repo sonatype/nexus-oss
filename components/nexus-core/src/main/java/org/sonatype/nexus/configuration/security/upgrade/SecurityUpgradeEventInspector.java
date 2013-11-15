@@ -23,17 +23,18 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.events.SecurityConfigurationChanged;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.model.upgrade.SecurityDataUpgrader;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -41,7 +42,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Named("SecurityUpgradeEventInspector")
 public class SecurityUpgradeEventInspector
-    extends AbstractEventInspector
+    extends ComponentSupport
+    implements EventSubscriber
 {
   private final EventBus eventBus;
 
@@ -71,18 +73,11 @@ public class SecurityUpgradeEventInspector
     this.upgrader = checkNotNull(upgrader);
   }
 
-  @Override
-  public boolean accepts(Event<?> evt) {
-    return (evt instanceof NexusStartedEvent);
-  }
-
-  @Override
-  public void inspect(Event<?> evt) {
+  @Subscribe
+  public void inspect(final NexusStartedEvent startedEvent) {
     final SystemStatus systemStatus = applicationStatusSource.getSystemStatus();
 
     if (systemStatus.isConfigurationUpgraded() || systemStatus.isInstanceUpgraded()) {
-      final NexusStartedEvent startedEvent = (NexusStartedEvent) evt;
-
       try {
         // re/load the config from file
         realmConfigSource.loadConfiguration();
@@ -123,15 +118,15 @@ public class SecurityUpgradeEventInspector
         }
       }
       catch (ConfigurationIsCorruptedException e) {
-        this.getLogger().error("Failed to upgrade security.xml: " + e);
+        log.error("Failed to upgrade security.xml: " + e);
         startedEvent.putVeto(this, e);
       }
       catch (ConfigurationException e) {
-        this.getLogger().error("Failed to upgrade security.xml: " + e);
+        log.error("Failed to upgrade security.xml: " + e);
         startedEvent.putVeto(this, e);
       }
       catch (IOException e) {
-        this.getLogger().error("Failed to upgrade security.xml: " + e);
+        log.error("Failed to upgrade security.xml: " + e);
         startedEvent.putVeto(this, e);
       }
     }

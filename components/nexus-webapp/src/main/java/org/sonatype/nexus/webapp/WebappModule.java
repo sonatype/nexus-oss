@@ -18,7 +18,7 @@ import javax.inject.Named;
 import com.google.inject.AbstractModule;
 
 /**
- * Nexus webapp module.
+ * Webapp module.
  *
  * @since 2.5
  */
@@ -29,6 +29,5 @@ public class WebappModule
   @Override
   protected void configure() {
     install(new MetricsModule());
-    install(new ContentModule());
   }
 }

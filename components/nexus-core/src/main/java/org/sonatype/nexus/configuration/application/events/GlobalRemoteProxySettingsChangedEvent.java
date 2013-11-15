@@ -14,7 +14,7 @@
 package org.sonatype.nexus.configuration.application.events;
 
 import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
-import org.sonatype.plexus.appevents.AbstractEvent;
+import org.sonatype.nexus.events.AbstractEvent;
 
 /**
  * Event fired when global remote Proxy settings are changed (within configuration change). The settings carried in

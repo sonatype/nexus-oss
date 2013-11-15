@@ -23,16 +23,19 @@ import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.eventbus.Subscribe;
 
 @Named
 @Singleton
 public class DefaultTargetRegistryEventInspector
-    extends AbstractEventInspector
+    extends ComponentSupport
+    implements EventSubscriber
 {
   private final RepositoryTypeRegistry repositoryTypeRegistry;
 
@@ -50,11 +53,8 @@ public class DefaultTargetRegistryEventInspector
     this.applicationConfiguration = applicationConfiguration;
   }
 
-  public boolean accepts(Event<?> evt) {
-    return (evt instanceof NexusStartedEvent);
-  }
-
-  public void inspect(Event<?> evt) {
+  @Subscribe
+  public void inspect(final NexusStartedEvent evt) {
     try {
       boolean changed = false;
 
@@ -79,7 +79,7 @@ public class DefaultTargetRegistryEventInspector
 
           targetRegistry.addRepositoryTarget(newTarget);
           changed = true;
-          getLogger().info("Adding default target for " + key + " content class");
+          log.info("Adding default target for {} content class", key);
         }
       }
 
@@ -88,10 +88,10 @@ public class DefaultTargetRegistryEventInspector
       }
     }
     catch (IOException e) {
-      getLogger().error("Unable to properly add default Repository Targets", e);
+      log.error("Unable to properly add default Repository Targets", e);
     }
     catch (ConfigurationException e) {
-      getLogger().error("Unable to properly add default Repository Targets", e);
+      log.error("Unable to properly add default Repository Targets", e);
     }
   }
 }
