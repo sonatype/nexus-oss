@@ -29,10 +29,17 @@ import static org.tanukisoftware.wrapper.WrapperManager.WRAPPER_CTRL_LOGOFF_EVEN
 public class JswLauncher
     extends WrapperListenerSupport
 {
-  private final Launcher launcher;
+  private Launcher launcher;
 
-  public JswLauncher() {
-    this.launcher = new Launcher()
+  @Override
+  protected Integer doStart(final String[] args) throws Exception {
+    if (WrapperManager.isControlledByNativeWrapper()) {
+      log.info("JVM ID: {}, JVM PID: {}, Wrapper PID: {}, User: {}",
+          WrapperManager.getJVMId(), WrapperManager.getJavaPID(), WrapperManager.getWrapperPID(),
+          WrapperManager.getUser(false).getUser());
+    }
+
+    this.launcher = new Launcher(null, null, args)
     {
       @Override
       protected Logger createLogger() {
@@ -43,19 +50,10 @@ public class JswLauncher
       public void commandStop() {
         WrapperManager.stopAndReturn(0);
       }
-
     };
-  }
 
-  @Override
-  protected Integer doStart(final String[] args) throws Exception {
-    if (WrapperManager.isControlledByNativeWrapper()) {
-      log.info("JVM ID: {}, JVM PID: {}, Wrapper PID: {}, User: {}",
-          WrapperManager.getJVMId(), WrapperManager.getJavaPID(), WrapperManager.getWrapperPID(),
-          WrapperManager.getUser(false).getUser());
-    }
-
-    return launcher.start(args);
+    launcher.start();
+    return null;
   }
 
   @Override

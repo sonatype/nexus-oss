@@ -39,13 +39,13 @@ public class Configuration
 {
   private static final Logger log = LoggerFactory.getLogger(Configuration.class);
 
+  // FIXME: Normalize keys to nexus.installDir, nexus.workDir, etc.
+
   private static final String BUNDLEBASEDIR_KEY = "bundleBasedir";
 
   private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
 
   private static final String NEXUS_WORK = "nexus-work";
-
-  public static final InheritableThreadLocal<Configuration> HOLDER = new InheritableThreadLocal<>();
 
   private final PropertyMap properties;
 

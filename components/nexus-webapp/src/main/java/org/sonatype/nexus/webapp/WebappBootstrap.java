@@ -16,6 +16,7 @@ package org.sonatype.nexus.webapp;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -25,10 +26,12 @@ import javax.servlet.ServletContextListener;
 
 import org.sonatype.nexus.NxApplication;
 import org.sonatype.nexus.bootstrap.Configuration;
+import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.guice.NexusModules.CoreModule;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.util.LockFile;
 import org.sonatype.nexus.web.NexusWebModule;
+import org.sonatype.sisu.goodies.common.OID;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -84,16 +87,38 @@ public class WebappBootstrap
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();
 
+    // HACK: Dump context attribute details
+    {
+      Enumeration<String> names = context.getAttributeNames();
+      if (names.hasMoreElements()) {
+        log.info("Context attributes:");
+        while (names.hasMoreElements()) {
+          String name = names.nextElement();
+          log.info("  {}={}", name, OID.get(context.getAttribute(name)));
+        }
+      }
+    }
+
     try {
       // Use bootstrap configuration if it exists, else load it
-      Configuration config = Configuration.HOLDER.get();
-      if (config == null) {
-        log.info("Loading configuration for WAR deployment environment");
-        config = new Configuration();
-        config.load();
-        Configuration.HOLDER.set(config);
+      Map<String, String> properties = Launcher.PROPERTIES.get();
+      if (properties != null) {
+        log.info("Using bootstrap launcher configuration");
       }
-      Map<String, String> properties = config.getProperties();
+      else {
+        log.info("Loading configuration for WAR deployment environment");
+        Configuration config = new Configuration();
+        config.load();
+        properties = config.getProperties();
+        Launcher.PROPERTIES.set(properties);
+      }
+
+      // Ensure required properties exist
+      requireProperty(properties, "bundleBasedir");
+      requireProperty(properties, "nexus-work");
+      requireProperty(properties, "nexus-app");
+      requireProperty(properties, "application-conf");
+      requireProperty(properties, "security-xml-file");
 
       // lock the work directory
       File workDir = new File(properties.get("nexus-work")).getCanonicalFile();
@@ -151,6 +176,12 @@ public class WebappBootstrap
     }
 
     log.info("Initialized");
+  }
+
+  private void requireProperty(final Map<String,String> properties, final String name) {
+    if (!properties.containsKey(name)) {
+      throw new IllegalStateException("Missing required property: " + name);
+    }
   }
 
   @Override

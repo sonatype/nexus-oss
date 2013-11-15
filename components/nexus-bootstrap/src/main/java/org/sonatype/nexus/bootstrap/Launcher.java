@@ -14,6 +14,9 @@
 package org.sonatype.nexus.bootstrap;
 
 import java.io.IOException;
+import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import org.sonatype.nexus.bootstrap.jetty.JettyServer;
 import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
@@ -40,45 +43,60 @@ public class Launcher
 {
   protected final Logger log;
 
+  public static final InheritableThreadLocal<Map<String,String>> PROPERTIES = new InheritableThreadLocal<>();
+
+  // FIXME: Move this to CommandMonitorThread
   public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
 
-  public static final String FIVE_SECONDS = "5000";
+  private static final String FIVE_SECONDS = "5000";
 
-  public static final String ONE_SECOND = "1000";
+  private static final String ONE_SECOND = "1000";
 
-  protected JettyServer server;
+  private final JettyServer server;
 
-  protected Launcher() {
+  public Launcher(final @Nullable ClassLoader classLoader,
+                  final @Nullable Map<String,String> properties,
+                  final String[] args)
+      throws Exception
+  {
     Logger log = createLogger();
     if (log == null) {
       throw new NullPointerException();
     }
     this.log = log;
+
+    ClassLoader cl = (classLoader == null) ? getClass().getClassLoader() : classLoader;
+
+    PropertyMap props = new PropertyMap();
+    if (properties == null) {
+      Configuration config = new Configuration();
+      config.load();
+      props.putAll(config.getProperties());
+    }
+    else {
+      props.putAll(properties);
+    }
+    PROPERTIES.set(props);
+
+    if (args == null) {
+      throw new NullPointerException();
+    }
+    if (args.length == 0) {
+      throw new IllegalArgumentException("Missing args");
+    }
+
+    this.server = new JettyServer(cl, props, args);
   }
 
   protected Logger createLogger() {
     return LoggerFactory.getLogger(getClass());
   }
 
-  public Integer start(final String[] args) throws Exception {
-    if (args.length == 0) {
-      log.error("Missing Jetty configuration parameters");
-      return 1; // exit
-    }
-
-    Configuration config = new Configuration();
-    config.load();
-
-    // Expose to webapp
-    Configuration.HOLDER.set(config);
-
+  public void start() throws Exception {
     maybeEnableCommandMonitor();
     maybeEnableShutdownIfNotAlive();
 
-    server = new JettyServer(getClass().getClassLoader(), config.getProperties(), args);
     server.start();
-
-    return null; // continue running
   }
 
   protected String getProperty(final String name, final String defaultValue) {
@@ -132,6 +150,6 @@ public class Launcher
   }
 
   public static void main(final String[] args) throws Exception {
-    new Launcher().start(args);
+    new Launcher(null, null, args).start();
   }
 }

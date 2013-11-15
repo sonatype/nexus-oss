@@ -54,75 +54,76 @@ public class EmbeddedNexusBooter
 
   private final File installDir;
 
-  private final int port;
-
-  private final Map<String,String> props;
+  private final Map<String,String> properties;
 
   private final ClassWorld world;
 
   private final ClassRealm bootRealm;
 
-  private final Class<?> jettyServerClass;
+  private final Class<?> launcherClass;
 
-  private final Constructor jettyServerFactory;
+  private final Constructor launcherFactory;
 
   private ClassRealm testRealm;
 
-  private Object jettyServer;
+  private Object launcher;
 
   public EmbeddedNexusBooter(final File installDir, final int port) throws Exception {
     this.installDir = checkNotNull(installDir).getCanonicalFile();
     log.info("Install directory: {}", installDir);
 
+    // HACK: This is non-standard setup by the test-enviroinment bullshit (AbstractEnvironmentMojo)
+    File workDir = new File(installDir, "../sonatype-work").getCanonicalFile();
+    log.info("Work directory: {}", workDir);
+
     checkArgument(port > 1024);
-    this.port = port;
     log.info("Port: {}", port);
 
-    props = loadProperties();
-    props.put("application-port", String.valueOf(port));
+    properties = new HashMap<>();
+    // jetty confguration
+    properties.put("application-host", "0.0.0.0");
+    properties.put("application-port", String.valueOf(port));
+    properties.put("nexus-webapp", new File(installDir, "nexus").getPath());
+    properties.put("nexus-webapp-context-path", "/nexus");
+
+    // application configuration
+    properties.put("bundleBasedir", installDir.getPath());
+    properties.put("runtime", new File(installDir, "nexus/WEB-INF").getPath());
+    properties.put("nexus-app", properties.get("runtime"));
+    properties.put("nexus-work", workDir.getPath());
+    properties.put("application-conf", new File(workDir, "conf").getPath());
+    properties.put("security-xml-file", new File(workDir, "conf/security.xml").getPath());
+
+    // force bootstrap logback configuration
+    properties.put("logback.configurationFile", new File(installDir, "conf/logback.xml").getPath());
+
+    // guice finalizer
+    properties.put("guice.executor.class", "NONE");
+
+    // Making MI integration in Nexus behave in-sync
+    properties.put("org.sonatype.nexus.events.IndexerManagerEventInspector.async", Boolean.FALSE.toString());
+
+    // Disable autorouting initialization prevented
+    properties.put(ConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString());
 
     log.info("Properties:");
-    for (Entry<String,String> entry : props.entrySet()) {
+    for (Entry<String,String> entry : properties.entrySet()) {
       log.info("  {}='{}'", entry.getKey(), entry.getValue());
     }
 
     // Export everything to system properties
-    System.getProperties().putAll(props);
+    System.getProperties().putAll(properties);
 
     tamperJettyConfiguration();
 
     world = new ClassWorld();
     bootRealm = createBootRealm();
 
-    jettyServerClass = bootRealm.loadClass("org.sonatype.nexus.bootstrap.jetty.JettyServer");
-    log.info("Jetty server class: {}", jettyServerClass);
+    launcherClass = bootRealm.loadClass("org.sonatype.nexus.bootstrap.Launcher");
+    log.info("Launcher class: {}", launcherClass);
 
-    jettyServerFactory = jettyServerClass.getConstructor(ClassLoader.class, Map.class, String[].class);
-    log.info("Jetty server factory: {}", jettyServerFactory);
-  }
-
-  private Map<String,String> loadProperties() {
-    Map<String,String> p = new HashMap<>();
-
-    // FIXME: Load nexus.properties, for now hard-code
-    p.put("application-host", "0.0.0.0");
-    p.put("nexus-webapp", new File(installDir, "nexus").getAbsolutePath());
-    p.put("nexus-webapp-context-path", "/nexus");
-    p.put("runtime", new File(installDir, "nexus/WEB-INF").getAbsolutePath());
-
-    p.put("bundleBasedir", installDir.getAbsolutePath());
-    p.put("logback.configurationFile", new File(installDir, "conf/logback.xml").getAbsolutePath());
-
-    // guice finalizer
-    p.put("guice.executor.class", "NONE");
-
-    // Making MI integration in Nexus behave in-sync
-    p.put("org.sonatype.nexus.events.IndexerManagerEventInspector.async", Boolean.FALSE.toString());
-
-    // Disable autorouting initialization prevented
-    p.put(ConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString());
-
-    return p;
+    launcherFactory = launcherClass.getConstructor(ClassLoader.class, Map.class, String[].class);
+    log.info("Launcher factory: {}", launcherFactory);
   }
 
   private void tamperJettyConfiguration() throws IOException {
@@ -175,7 +176,7 @@ public class EmbeddedNexusBooter
 
   @Override
   public void startNexus(final String testId) throws Exception {
-    checkState(jettyServer == null, "Nexus already started");
+    checkState(launcher == null, "Nexus already started");
 
     testRealm = world.newRealm(IT_REALM_ID + "-" + testId, bootRealm);
 
@@ -185,9 +186,9 @@ public class EmbeddedNexusBooter
     try {
       log.info("Starting Nexus[{}]", testId);
 
-      jettyServer = jettyServerFactory.newInstance(
+      launcher = launcherFactory.newInstance(
           testRealm,
-          props,
+          properties,
           new String[] { new File(installDir, "conf/jetty.xml").getAbsolutePath() }
       );
     }
@@ -195,7 +196,7 @@ public class EmbeddedNexusBooter
       Thread.currentThread().setContextClassLoader(cl);
     }
 
-    jettyServerClass.getMethod("start").invoke(jettyServer);
+    launcherClass.getMethod("start").invoke(launcher);
   }
 
   @Override
@@ -203,10 +204,10 @@ public class EmbeddedNexusBooter
     try {
       log.info("Stopping Nexus");
 
-      if (jettyServer != null) {
-        jettyServerClass.getMethod("stop").invoke(jettyServer);
+      if (launcher != null) {
+        launcherClass.getMethod("stop").invoke(launcher);
       }
-      jettyServer = null;
+      launcher = null;
     }
     catch (InvocationTargetException e) {
       Throwable cause = e.getCause();

@@ -206,6 +206,23 @@ public class JettyServer
     log.info("Stopped");
   }
 
+  //private static void setHandlerAttribute(final @Nullable Handler[] handlers,
+  //                                        final String name,
+  //                                        final Object value)
+  //{
+  //  if (handlers == null) {
+  //    return;
+  //  }
+  //  for (Handler handler : handlers) {
+  //    if (handler instanceof ContextHandler) {
+  //      ((ContextHandler)handler).setAttribute(name, value);
+  //    }
+  //    if (handler instanceof HandlerCollection) {
+  //      setHandlerAttribute(((HandlerCollection)handler).getHandlers(), name, value);
+  //    }
+  //  }
+  //}
+
   /**
    * Jetty thread used to start components, wait for the server's threads to join and stop components.
    *
@@ -238,14 +255,14 @@ public class JettyServer
         Server server = null;
         try {
           for (LifeCycle component : components) {
+            // capture the server reference
+            if (component instanceof Server) {
+              server = (Server)component;
+            }
+
             if (!component.isRunning()) {
               log.info("Starting component: {}", component);
               component.start();
-
-              // capture the server reference
-              if (component instanceof Server) {
-                server = (Server)component;
-              }
             }
           }
         }
