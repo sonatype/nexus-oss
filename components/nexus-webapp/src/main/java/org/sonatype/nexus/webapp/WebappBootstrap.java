@@ -26,7 +26,7 @@ import javax.servlet.ServletContextListener;
 
 import org.sonatype.nexus.NxApplication;
 import org.sonatype.nexus.bootstrap.ConfigurationBuilder;
-import org.sonatype.nexus.bootstrap.Launcher;
+import org.sonatype.nexus.bootstrap.ConfigurationHolder;
 import org.sonatype.nexus.guice.NexusModules.CoreModule;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.util.LockFile;
@@ -101,7 +101,7 @@ public class WebappBootstrap
 
     try {
       // Use bootstrap configuration if it exists, else load it
-      Map<String, String> properties = Launcher.PROPERTIES.get();
+      Map<String, String> properties = ConfigurationHolder.get();
       if (properties != null) {
         log.info("Using bootstrap launcher configuration");
       }
@@ -119,7 +119,7 @@ public class WebappBootstrap
             .build();
 
         System.getProperties().putAll(properties);
-        Launcher.PROPERTIES.set(properties);
+        ConfigurationHolder.set(properties);
       }
 
       // Ensure required properties exist

@@ -39,8 +39,6 @@ import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_TI
  */
 public class Launcher
 {
-  public static final InheritableThreadLocal<Map<String, String>> PROPERTIES = new InheritableThreadLocal<>();
-
   // FIXME: Move this to CommandMonitorThread
   public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
 
@@ -66,7 +64,7 @@ public class Launcher
           .properties("/nexus-test.properties", false)
           .build();
     }
-    PROPERTIES.set(props);
+    ConfigurationHolder.set(props);
     System.getProperties().putAll(props);
 
     if (args == null) {

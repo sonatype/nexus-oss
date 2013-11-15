@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Helper to build Nexus bootstrap configuration properties.
+ * Helper to build bootstrap configuration properties.
  *
  * @since 2.8
  */
@@ -42,8 +42,8 @@ public class ConfigurationBuilder
     if (props == null) {
       throw new NullPointerException();
     }
-    log.debug("Adding properties:");
     if (log.isDebugEnabled()) {
+      log.debug("Adding properties:");
       for (Entry<String, String> entry : props.entrySet()) {
         log.debug("  {}='{}'", entry.getKey(), entry.getValue());
       }
@@ -129,7 +129,7 @@ public class ConfigurationBuilder
     }
 
     // return copy
-    Map<String, String> props = new HashMap<>();
+    Map<String, String> props = new HashMap<>(properties.size());
     props.putAll(properties);
 
     log.info("Properties:");
