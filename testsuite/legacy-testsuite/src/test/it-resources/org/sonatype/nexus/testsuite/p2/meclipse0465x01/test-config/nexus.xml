@@ -1,75 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-2013 Sonatype, Inc.
-    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
-
-    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
-    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
-
-    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
-    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
-    Eclipse Foundation. All other trademarks are the property of their respective owners.
-
--->
 <nexusConfiguration>
-  <version>1.0.8</version>
-
-  <smtpConfiguration>
-    <host>localhost</host>
-    <port>${email-server-port}</port>
-    <sslEnabled>false</sslEnabled>
-    <tlsEnabled>false</tlsEnabled>
-    <username>smtp-username</username>
-    <password>smtp-password</password>
-    <debugMode>false</debugMode>
-    <systemEmailAddress>system@nexus.org</systemEmailAddress>
-  </smtpConfiguration>
-
-  <security>
-    <enabled>false</enabled>
-    <anonymousAccessEnabled>true</anonymousAccessEnabled>
-    <anonymousUsername>anonymous</anonymousUsername>
-    <anonymousPassword>anonymous</anonymousPassword>
-    <realms>
-      <realm>XmlAuthenticatingRealm</realm>
-      <realm>XmlAuthorizingRealm</realm>
-    </realms>
-  </security>
-
-  <globalConnectionSettings />
-
-  <restApi />
-
-  <httpProxy />
-
+  <version>2.7.0</version>
+  <globalConnectionSettings>
+    <connectionTimeout>10000</connectionTimeout>
+    <retrievalRetryCount>3</retrievalRetryCount>
+    <queryString></queryString>
+  </globalConnectionSettings>
+  <restApi>
+    <uiTimeout>60000</uiTimeout>
+  </restApi>
+  <httpProxy>
+    <port>8082</port>
+    <proxyPolicy>strict</proxyPolicy>
+  </httpProxy>
   <routing>
-    <groups />
+    <resolveLinks>true</resolveLinks>
   </routing>
-
   <repositories>
     <repository>
       <id>meclipse0465x01</id>
       <name>meclipse0465x01</name>
-      <type>p2</type>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>p2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <url>${proxy-repo-base-url}meclipse0465x01</url>
         <authentication>
-          <!-- username and password must match the settings in resources/default-config/realm.properties -->
           <username>admin</username>
           <password>admin</password>
         </authentication>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
   </repositories>
-
-  <repositoryShadows>
-  </repositoryShadows>
-
-  <repositoryGrouping>
-  </repositoryGrouping>
-
-  <repositoryTargets>
-  </repositoryTargets>
+  <repositoryGrouping />
+  <smtpConfiguration>
+    <hostname>localhost</hostname>
+    <port>${email-server-port}</port>
+    <username>smtp-username</username>
+    <password>smtp-password</password>
+    <systemEmailAddress>system@nexus.org</systemEmailAddress>
+  </smtpConfiguration>
+  <notification />
 </nexusConfiguration>

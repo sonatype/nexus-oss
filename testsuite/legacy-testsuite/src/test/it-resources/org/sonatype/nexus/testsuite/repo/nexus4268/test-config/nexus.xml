@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.4.5</version>
+  <version>2.7.0</version>
   <globalConnectionSettings>
     <connectionTimeout>20000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
@@ -200,7 +200,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -227,7 +226,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -254,7 +252,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -300,7 +297,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.ShadowRepository</providerRole>
       <providerHint>m1-m2-shadow</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>15</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -321,7 +317,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>15</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -350,7 +345,6 @@
       <providerRole>org.sonatype.nexus.plugins.repository.SimpleRepository</providerRole>
       <providerHint>default</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -448,9 +442,5 @@
     <password>{cL1Q7qtep1cHkSR5OFUDBwEpKWTixadPt15AU5ojgms=}</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
-  <errorReporting>
-    <jiraUrl>https://issues.sonatype.org</jiraUrl>
-    <jiraProject>PR</jiraProject>
-  </errorReporting>
   <notification />
 </nexusConfiguration>

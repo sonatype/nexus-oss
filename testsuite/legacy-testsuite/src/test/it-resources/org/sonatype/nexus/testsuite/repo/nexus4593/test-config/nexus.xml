@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.4.6</version>
+  <version>2.7.0</version>
   <globalConnectionSettings>
     <connectionTimeout>10000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
     <queryString></queryString>
   </globalConnectionSettings>
-
   <restApi>
     <baseUrl>http://localhost:${nexus-application-port}/nexus</baseUrl>
     <uiTimeout>60000</uiTimeout>
@@ -18,7 +17,6 @@
   <routing>
     <resolveLinks>true</resolveLinks>
   </routing>
-
   <repositories>
     <repository>
       <id>release-proxy-repo-1</id>
@@ -26,8 +24,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>false</notFoundCacheActive>
-      <notFoundCacheTTL>0</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
@@ -49,10 +45,8 @@
         <checksumPolicy>WARN</checksumPolicy>
         <repositoryPolicy>release</repositoryPolicy>
       </externalConfiguration>
-
     </repository>
   </repositories>
-
   <smtpConfiguration>
     <hostname>mail.test</hostname>
     <port>25</port>
@@ -60,5 +54,5 @@
     <password>{MsXdb4c7O3YH4wii3U+ge4xydRckZJk+KS2u8yHlQyg=}</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
-
+  <notification />
 </nexusConfiguration>

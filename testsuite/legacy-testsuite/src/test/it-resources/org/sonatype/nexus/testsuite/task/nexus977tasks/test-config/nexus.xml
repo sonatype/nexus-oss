@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.4.1</version>
+  <version>2.7.0</version>
   <globalConnectionSettings>
     <connectionTimeout>10000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
@@ -8,6 +8,7 @@
   </globalConnectionSettings>
   <restApi>
     <baseUrl>http://localhost:${nexus-application-port}/nexus</baseUrl>
+    <uiTimeout>60000</uiTimeout>
   </restApi>
   <httpProxy>
     <port>${nexus-proxy-port}</port>
@@ -23,7 +24,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -50,7 +50,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -77,7 +76,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -164,7 +162,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>15</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -188,7 +185,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>15</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -212,7 +208,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>15</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -236,7 +231,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>15</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -290,7 +284,6 @@
       </patterns>
     </repositoryTarget>
   </repositoryTargets>
-  <tasks/>
   <smtpConfiguration>
     <hostname>localhost</hostname>
     <port>${email-server-port}</port>
@@ -298,10 +291,5 @@
     <password>{dlt0tjbySJMHt1DKE7jS5xp8K/4Diuuu73N0zB+4gcs=}</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
-  <errorReporting>
-    <jiraUrl>https://issues.sonatype.org</jiraUrl>
-    <jiraProject>PR</jiraProject>
-    <useGlobalProxy>true</useGlobalProxy>
-  </errorReporting>
   <notification />
 </nexusConfiguration>

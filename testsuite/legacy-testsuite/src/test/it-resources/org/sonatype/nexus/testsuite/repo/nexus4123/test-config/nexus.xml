@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.4.2</version>
+  <version>2.7.0</version>
   <globalConnectionSettings>
     <connectionTimeout>20000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
-    <queryString/>
+    <queryString></queryString>
   </globalConnectionSettings>
   <restApi>
     <baseUrl>http://test:8200/nexus</baseUrl>
+    <uiTimeout>60000</uiTimeout>
   </restApi>
   <httpProxy>
     <enabled>true</enabled>
@@ -41,7 +42,7 @@
       <externalConfiguration>
         <repositoryPolicy>RELEASE</repositoryPolicy>
         <checksumPolicy>WARN</checksumPolicy>
-        <fileTypeValidation>false</fileTypeValidation>
+        <fileTypeValidation>true</fileTypeValidation>
         <downloadRemoteIndex>true</downloadRemoteIndex>
         <artifactMaxAge>-1</artifactMaxAge>
         <metadataMaxAge>1440</metadataMaxAge>
@@ -72,7 +73,7 @@
       <externalConfiguration>
         <repositoryPolicy>RELEASE</repositoryPolicy>
         <checksumPolicy>WARN</checksumPolicy>
-        <fileTypeValidation>false</fileTypeValidation>
+        <fileTypeValidation>true</fileTypeValidation>
         <downloadRemoteIndex>true</downloadRemoteIndex>
         <artifactMaxAge>-1</artifactMaxAge>
         <metadataMaxAge>1440</metadataMaxAge>
@@ -102,7 +103,7 @@
       <externalConfiguration>
         <repositoryPolicy>RELEASE</repositoryPolicy>
         <checksumPolicy>WARN</checksumPolicy>
-        <fileTypeValidation>false</fileTypeValidation>
+        <fileTypeValidation>true</fileTypeValidation>
         <downloadRemoteIndex>true</downloadRemoteIndex>
         <artifactMaxAge>-1</artifactMaxAge>
         <metadataMaxAge>1440</metadataMaxAge>
@@ -116,7 +117,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>15</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -160,7 +160,7 @@
       <externalConfiguration>
         <repositoryPolicy>SNAPSHOT</repositoryPolicy>
         <checksumPolicy>WARN</checksumPolicy>
-        <fileTypeValidation>false</fileTypeValidation>
+        <fileTypeValidation>true</fileTypeValidation>
         <downloadRemoteIndex>true</downloadRemoteIndex>
         <artifactMaxAge>1440</artifactMaxAge>
         <metadataMaxAge>1</metadataMaxAge>
@@ -190,7 +190,7 @@
       <externalConfiguration>
         <repositoryPolicy>RELEASE</repositoryPolicy>
         <checksumPolicy>WARN</checksumPolicy>
-        <fileTypeValidation>false</fileTypeValidation>
+        <fileTypeValidation>true</fileTypeValidation>
         <downloadRemoteIndex>true</downloadRemoteIndex>
         <artifactMaxAge>-1</artifactMaxAge>
         <metadataMaxAge>1440</metadataMaxAge>
@@ -220,7 +220,7 @@
       <externalConfiguration>
         <repositoryPolicy>RELEASE</repositoryPolicy>
         <checksumPolicy>WARN</checksumPolicy>
-        <fileTypeValidation>false</fileTypeValidation>
+        <fileTypeValidation>true</fileTypeValidation>
         <downloadRemoteIndex>true</downloadRemoteIndex>
         <artifactMaxAge>-1</artifactMaxAge>
         <metadataMaxAge>1440</metadataMaxAge>
@@ -293,11 +293,6 @@
     <password>{IBmRfTmZrZEH32kbNpfy8or7/2013RU0SbZzyv2zL34=}</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
-  <errorReporting>
-    <jiraUrl>https://issues.sonatype.org</jiraUrl>
-    <jiraProject>PR</jiraProject>
-    <useGlobalProxy>true</useGlobalProxy>
-  </errorReporting>
   <notification>
     <notificationTargets>
       <notificationTarget>
