@@ -46,17 +46,19 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-xml</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>com.yammer.metrics</groupId>
       <artifactId>metrics-jetty</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>tanukisoft</groupId>
       <artifactId>wrapper</artifactId>
-      <scope>provided</scope>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
