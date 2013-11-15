@@ -16,7 +16,6 @@ package org.sonatype.nexus.webapp;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +30,6 @@ import org.sonatype.nexus.guice.NexusModules.CoreModule;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.util.LockFile;
 import org.sonatype.nexus.web.NexusWebModule;
-import org.sonatype.sisu.goodies.common.OID;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -86,18 +84,6 @@ public class WebappBootstrap
     // FIXME: JUL handler should be handled by container or bootstrap
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();
-
-    // HACK: Dump context attribute details
-    {
-      Enumeration<String> names = context.getAttributeNames();
-      if (names.hasMoreElements()) {
-        log.info("Context attributes:");
-        while (names.hasMoreElements()) {
-          String name = names.nextElement();
-          log.info("  {}={}", name, OID.get(context.getAttribute(name)));
-        }
-      }
-    }
 
     try {
       // Use bootstrap configuration if it exists, else load it
