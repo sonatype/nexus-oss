@@ -64,8 +64,9 @@ public class Launcher
           .properties("/nexus-test.properties", false)
           .build();
     }
-    ConfigurationHolder.set(props);
+
     System.getProperties().putAll(props);
+    ConfigurationHolder.set(props);
 
     if (args == null) {
       throw new NullPointerException();
