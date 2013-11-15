@@ -18,7 +18,7 @@ import java.io.File;
 import org.sonatype.nexus.integrationtests.ITGroups.INDEX;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -48,7 +48,7 @@ public class Nexus1923HostedIncrementalIndexIT
     String reindexId = createHostedReindexTask();
 
     //Put an artifact in the storage
-    FileUtils.copyDirectoryStructure(getTestFile(FIRST_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(FIRST_ARTIFACT),
         repoStorageDirectory);
 
     //Now reindex the repo
@@ -68,7 +68,7 @@ public class Nexus1923HostedIncrementalIndexIT
     searchForArtifactInHostedIndex(FIFTH_ARTIFACT, false);
 
     //Put an artifact in the storage
-    FileUtils.copyDirectoryStructure(getTestFile(SECOND_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(SECOND_ARTIFACT),
         repoStorageDirectory);
 
     //Now reindex the repo
@@ -89,7 +89,7 @@ public class Nexus1923HostedIncrementalIndexIT
     searchForArtifactInHostedIndex(FIFTH_ARTIFACT, false);
 
     //Put an artifact in the storage
-    FileUtils.copyDirectoryStructure(getTestFile(THIRD_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(THIRD_ARTIFACT),
         repoStorageDirectory);
 
     //Now reindex the repo
@@ -111,7 +111,7 @@ public class Nexus1923HostedIncrementalIndexIT
     searchForArtifactInHostedIndex(FIFTH_ARTIFACT, false);
 
     //Put an artifact in the storage
-    FileUtils.copyDirectoryStructure(getTestFile(FOURTH_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(FOURTH_ARTIFACT),
         repoStorageDirectory);
 
     //Now reindex the repo
@@ -134,7 +134,7 @@ public class Nexus1923HostedIncrementalIndexIT
     searchForArtifactInHostedIndex(FIFTH_ARTIFACT, false);
 
     //Put an artifact in the storage
-    FileUtils.copyDirectoryStructure(getTestFile(FIFTH_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(FIFTH_ARTIFACT),
         repoStorageDirectory);
 
     //Now reindex the repo
@@ -179,9 +179,9 @@ public class Nexus1923HostedIncrementalIndexIT
 
     //Now delete some items and put some back
     deleteAllNonHiddenContent(getHostedRepositoryStorageDirectory());
-    FileUtils.copyDirectoryStructure(getTestFile(FIRST_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(FIRST_ARTIFACT),
         repoStorageDirectory);
-    FileUtils.copyDirectoryStructure(getTestFile(SECOND_ARTIFACT),
+    FileUtils.copyDirectory(getTestFile(SECOND_ARTIFACT),
         repoStorageDirectory);
 
     //Reindex

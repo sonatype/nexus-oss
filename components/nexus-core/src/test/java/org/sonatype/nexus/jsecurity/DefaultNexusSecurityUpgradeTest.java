@@ -16,7 +16,7 @@ package org.sonatype.nexus.jsecurity;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.security.SecuritySystem;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 public class DefaultNexusSecurityUpgradeTest
@@ -37,6 +37,6 @@ public class DefaultNexusSecurityUpgradeTest
     super.setUp();
 
     // copy the file to a different location because we are going to change it
-    FileUtils.copyFileToDirectory(util.resolveFile(ORG_CONFIG_FILE), getConfHomeDir());
+    FileUtils.copyFileToDirectory(util.resolveFile(ORG_CONFIG_FILE), getConfHomeDir(), false);
   }
 }

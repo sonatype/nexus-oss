@@ -16,12 +16,15 @@ package org.sonatype.nexus.feeds.record;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Asynchronous;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailed;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedChecksum;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedFileType;
-import org.sonatype.plexus.appevents.Event;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Event inspector that creates feeds about failed item validations.
@@ -32,19 +35,11 @@ import org.sonatype.plexus.appevents.Event;
 @Singleton
 public class ItemValidationFeedEventInspector
     extends AbstractFeedRecorderEventInspector
-    implements AsynchronousEventInspector
+    implements EventSubscriber, Asynchronous
 {
-  public boolean accepts(final Event<?> evt) {
-    if (evt instanceof RepositoryItemValidationEventFailed) {
-      return true;
-    }
-
-    return false;
-  }
-
-  public void inspect(final Event<?> evt) {
-    final RepositoryItemValidationEventFailed ievt = (RepositoryItemValidationEventFailed) evt;
-
+  @Subscribe
+  @AllowConcurrentEvents
+  public void inspect(final RepositoryItemValidationEventFailed ievt) {
     final NexusItemInfo ai = new NexusItemInfo();
     ai.setRepositoryId(ievt.getItem().getRepositoryId());
     ai.setPath(ievt.getItem().getPath());

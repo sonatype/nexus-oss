@@ -29,8 +29,6 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
-import org.codehaus.plexus.util.IOUtil;
-
 /**
  * This is a "local" strategy, uses Nexus content to get a Java properties file and get filtered keys from there.
  *
@@ -56,12 +54,8 @@ public class ContentGetPropertiesDiscoveryStrategy
 
     if (response != null) {
       final Properties properties = new Properties();
-      final InputStream content = response.getInputStream();
-      try {
+      try (InputStream content = response.getInputStream()) {
         properties.load(content);
-      }
-      finally {
-        IOUtil.close(content);
       }
 
       final String keyPrefix = request.getKey() + ".";

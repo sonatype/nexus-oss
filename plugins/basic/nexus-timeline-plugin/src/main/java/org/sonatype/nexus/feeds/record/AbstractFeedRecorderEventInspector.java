@@ -16,8 +16,9 @@ package org.sonatype.nexus.feeds.record;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -25,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author cstamas
  */
 public abstract class AbstractFeedRecorderEventInspector
-    extends AbstractEventInspector
+    extends ComponentSupport
 {
   private FeedRecorder feedRecorder;
 

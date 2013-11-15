@@ -35,8 +35,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.util.file.DirSupport;
 
-import org.codehaus.plexus.util.IOUtil;
-
 public class NexusUtils
 {
 
@@ -87,7 +85,8 @@ public class NexusUtils
       throws Exception
   {
     final DefaultStorageFileItem fItem =
-        new DefaultStorageFileItem(repository, request, true, true, new PreparedContentLocator(in, mimeType, ContentLocator.UNKNOWN_LENGTH));
+        new DefaultStorageFileItem(repository, request, true, true,
+            new PreparedContentLocator(in, mimeType, ContentLocator.UNKNOWN_LENGTH));
 
     if (userAttributes != null) {
       fItem.getRepositoryItemAttributes().putAll(userAttributes);
@@ -175,18 +174,13 @@ public class NexusUtils
                                        final String mimeType)
       throws Exception
   {
-    InputStream in = null;
-    try {
-      in = new FileInputStream(file);
+    try (InputStream in = new FileInputStream(file)) {
       final Map<String, String> attributes = new HashMap<String, String>();
       attributes.put(GENERATED_AT_ATTRIBUTE, new Date().toString());
 
       final ResourceStoreRequest request = new ResourceStoreRequest(path);
 
       storeItem(repository, request, in, mimeType, attributes);
-    }
-    finally {
-      IOUtil.close(in);
     }
   }
 

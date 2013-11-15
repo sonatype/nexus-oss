@@ -14,7 +14,7 @@
 package org.sonatype.nexus.configuration.application.events;
 
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
-import org.sonatype.plexus.appevents.AbstractEvent;
+import org.sonatype.nexus.events.AbstractEvent;
 
 /**
  * Event fired when global remote connection settings are changed (within configuration change). The settings carried

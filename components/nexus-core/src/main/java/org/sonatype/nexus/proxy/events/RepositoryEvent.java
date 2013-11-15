@@ -13,8 +13,8 @@
 
 package org.sonatype.nexus.proxy.events;
 
+import org.sonatype.nexus.events.AbstractEvent;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plexus.appevents.AbstractEvent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

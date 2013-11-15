@@ -37,7 +37,6 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.nexus.util.ExternalConfigUtil;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.hamcrest.Matcher;
 import org.junit.Before;
@@ -79,12 +78,8 @@ public class DefaultApplicationConfigurationValidatorTest
   {
     NexusConfigurationXpp3Reader reader = new NexusConfigurationXpp3Reader();
 
-    Reader fr = new FileReader(configFile);
-    try {
+    try (Reader fr = new FileReader(configFile)) {
       return reader.read(fr);
-    }
-    finally {
-      IOUtil.close(fr);
     }
 
   }
@@ -94,14 +89,8 @@ public class DefaultApplicationConfigurationValidatorTest
   {
     NexusConfigurationXpp3Writer writer = new NexusConfigurationXpp3Writer();
 
-    Writer fw = null;
-    try {
-      fw = new FileWriter(pathToConfig);
-
+    try (Writer fw = new FileWriter(pathToConfig)) {
       writer.write(fw, config);
-    }
-    finally {
-      IOUtil.close(fw);
     }
   }
 

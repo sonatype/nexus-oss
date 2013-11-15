@@ -54,7 +54,7 @@ import org.sonatype.nexus.util.PathUtils;
 import org.sonatype.nexus.util.file.DirSupport;
 
 import com.google.common.base.Strings;
-import com.google.common.io.Closeables;
+import org.apache.commons.io.IOUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
@@ -336,7 +336,7 @@ public class DefaultFSLocalRepositoryStorage
       // get closed irrelevant of the actual outcome. If all went right, stream was already closed,
       // and we will be "punished" by one extra (redundant) call to Closeable#close().
       if (originalContentLocator instanceof Closeable) {
-        Closeables.closeQuietly((Closeable) originalContentLocator);
+        IOUtils.closeQuietly((Closeable) originalContentLocator);
       }
     }
 

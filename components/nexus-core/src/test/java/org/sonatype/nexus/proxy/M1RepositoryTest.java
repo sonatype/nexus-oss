@@ -31,7 +31,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -133,8 +133,9 @@ public class M1RepositoryTest
     repository.storeItem(false, item);
 
     try {
-      item = new DefaultStorageFileItem(repository, new ResourceStoreRequest(SPOOF_SNAPSHOT), true, true, new StringContentLocator(
-          SPOOF_SNAPSHOT));
+      item = new DefaultStorageFileItem(
+          repository, new ResourceStoreRequest(SPOOF_SNAPSHOT), true, true, new StringContentLocator(SPOOF_SNAPSHOT)
+      );
 
       repository.storeItem(false, item);
 
@@ -151,14 +152,16 @@ public class M1RepositoryTest
     repository.setRepositoryPolicy(RepositoryPolicy.SNAPSHOT);
     repository.getCurrentCoreConfiguration().commitChanges();
 
-    item = new DefaultStorageFileItem(repository, new ResourceStoreRequest(SPOOF_SNAPSHOT), true, true, new StringContentLocator(
-        SPOOF_SNAPSHOT));
+    item = new DefaultStorageFileItem(
+        repository, new ResourceStoreRequest(SPOOF_SNAPSHOT), true, true,new StringContentLocator(SPOOF_SNAPSHOT)
+    );
 
     repository.storeItem(false, item);
 
     try {
-      item = new DefaultStorageFileItem(repository, new ResourceStoreRequest(SPOOF_RELEASE), true, true, new StringContentLocator(
-          SPOOF_RELEASE));
+      item = new DefaultStorageFileItem(
+          repository, new ResourceStoreRequest(SPOOF_RELEASE), true, true,new StringContentLocator(SPOOF_RELEASE)
+      );
 
       repository.storeItem(false, item);
 
@@ -203,7 +206,7 @@ public class M1RepositoryTest
     File artifactFile = new File(inhouseLocalStorageDir, itemPath);
     artifactFile.getParentFile().mkdirs();
 
-    FileUtils.fileWrite(artifactFile.getAbsolutePath(), "Some Text so the file is not empty");
+    FileUtils.write(artifactFile, "Some Text so the file is not empty");
 
     ResourceStoreRequest request = new ResourceStoreRequest(itemPath);
     request.getRequestContext().put(AccessManager.REQUEST_REMOTE_ADDRESS, "127.0.0.1");

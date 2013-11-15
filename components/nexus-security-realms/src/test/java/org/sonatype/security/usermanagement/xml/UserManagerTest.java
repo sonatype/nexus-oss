@@ -37,9 +37,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserStatus;
 
 import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
 import org.apache.shiro.authc.credential.PasswordService;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -318,31 +317,21 @@ public class UserManagerTest
       throws Exception
   {
     File securityXML = new File(CONFIG_DIR, "security.xml");
-    FileInputStream fis = null;
-    FileWriter fileWriter = null;
     Configuration config = null;
 
     String userId = null;
 
-    try {
-      fis = new FileInputStream(securityXML);
+    try (FileInputStream fis = new FileInputStream(securityXML)) {
       SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
       config = reader.read(fis);
+    }
 
-      IOUtil.close(fis);
-
-      fileWriter = new FileWriter(securityXML);
-
+    try (FileWriter fileWriter = new FileWriter(securityXML)) {
       config.getUsers().get(0).setEmail("testLoadConfigWithInvalidEmail");
       userId = config.getUsers().get(0).getId();
 
       SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
       writer.write(fileWriter, config);
-
-    }
-    finally {
-      IOUtil.close(fis);
-      IOUtil.close(fileWriter);
     }
 
     // FIXME: unsure about the intent of this test...

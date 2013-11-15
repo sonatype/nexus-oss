@@ -18,8 +18,8 @@ import java.lang.reflect.Method;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.feeds.SystemProcess;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.scheduling.events.NexusTaskEvent;
@@ -27,7 +27,9 @@ import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
-import org.sonatype.plexus.appevents.Event;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Event inspector that creates feeds about tasks. Note: this EventInspector is
@@ -46,17 +48,11 @@ import org.sonatype.plexus.appevents.Event;
 @Singleton
 public class NexusTaskFeedEventInspector
     extends AbstractFeedRecorderEventInspector
-    implements EventInspector
+    implements EventSubscriber
 {
-  public boolean accepts(final Event<?> evt) {
-    return evt != null && evt instanceof NexusTaskEvent;
-  }
-
-  public void inspect(final Event<?> evt) {
-    if (!accepts(evt)) {
-      return;
-    }
-
+  @Subscribe
+  @AllowConcurrentEvents
+  public void inspect(final NexusTaskEvent evt) {
     if (evt instanceof NexusTaskEventStarted<?>) {
       final String action = getActionFromTask(((NexusTaskEventStarted<?>) evt).getNexusTask());
       final String message = getMessageFromTask(((NexusTaskEventStarted<?>) evt).getNexusTask());

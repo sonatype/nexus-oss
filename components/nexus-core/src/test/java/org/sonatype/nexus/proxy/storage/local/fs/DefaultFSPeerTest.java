@@ -17,7 +17,7 @@ import java.io.File;
 
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -65,7 +65,7 @@ public class DefaultFSPeerTest
 
     // writing to hidden target is handled elsewhere, so we simulate content being written out
     final String PAYLOAD = "dummy payload";
-    FileUtils.fileWrite(hiddenTarget, PAYLOAD);
+    FileUtils.write(hiddenTarget, PAYLOAD);
 
     // handle the rename
     subject.handleRenameOperation(hiddenTarget, target);
@@ -79,7 +79,7 @@ public class DefaultFSPeerTest
     // path prefixed by OS from root, no garbage at tail
     assertThat(target.getPath(), endsWith("target/repoId/foo/1.0/foo-1.0.txt".replace("/", File.separator)));
     // content is fine too
-    assertThat(FileUtils.fileRead(target), equalTo(PAYLOAD));
+    assertThat(FileUtils.readFileToString(target), equalTo(PAYLOAD));
   }
 
   @Test
@@ -112,7 +112,7 @@ public class DefaultFSPeerTest
 
     // writing to hidden target is handled elsewhere, so we simulate content being written out
     final String PAYLOAD = "dummy payload";
-    FileUtils.fileWrite(hiddenTarget, PAYLOAD);
+    FileUtils.write(hiddenTarget, PAYLOAD);
 
     // handle the rename
     subject.handleRenameOperation(hiddenTarget, target);
@@ -126,7 +126,7 @@ public class DefaultFSPeerTest
     // path prefixed by OS from root, no garbage at tail
     assertThat(target.getPath(), endsWith("target/repoId/archetype-catalog.xml".replace("/", File.separator)));
     // content is fine too
-    assertThat(FileUtils.fileRead(target), equalTo(PAYLOAD));
+    assertThat(FileUtils.readFileToString(target), equalTo(PAYLOAD));
   }
 
 }

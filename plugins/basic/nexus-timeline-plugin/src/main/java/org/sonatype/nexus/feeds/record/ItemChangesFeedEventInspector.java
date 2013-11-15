@@ -17,20 +17,23 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.events.Asynchronous;
+import org.sonatype.nexus.events.Event;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenArtifactSignatureAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenChecksumAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenRepositoryMetadataAttribute;
-import org.sonatype.plexus.appevents.Event;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Event inspector that persists item events into Timeline.
@@ -42,7 +45,7 @@ import org.sonatype.plexus.appevents.Event;
 @Singleton
 public class ItemChangesFeedEventInspector
     extends AbstractFeedRecorderEventInspector
-    implements AsynchronousEventInspector
+    implements EventSubscriber, Asynchronous
 {
 
   public ItemChangesFeedEventInspector() {
@@ -55,12 +58,23 @@ public class ItemChangesFeedEventInspector
     super(feedRecorder, applicationStatusSource);
   }
 
-  public boolean accepts(Event<?> evt) {
-    // RETRIEVE event creates a lot of noise in events, so we are not processing those
-    return evt instanceof RepositoryItemEvent && !(evt instanceof RepositoryItemEventRetrieve);
+  // RETRIEVE event creates a lot of noise in events, so we are not processing those
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryItemEventCache evt) {
+    inspectForNexus(evt);
   }
 
-  public void inspect(Event<?> evt) {
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryItemEventStore evt) {
+    inspectForNexus(evt);
+  }
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryItemEventDelete evt) {
     inspectForNexus(evt);
   }
 

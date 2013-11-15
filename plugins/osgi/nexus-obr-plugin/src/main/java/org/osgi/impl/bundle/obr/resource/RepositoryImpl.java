@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -324,9 +323,8 @@ public class RepositoryImpl
   {
     if (!visited.contains(url)) {
       visited.add(url);
-      InputStream in = null;
       try {
-
+        InputStream in = null;
         if (url.getPath().endsWith(".zip")) {
           ZipInputStream zin = new ZipInputStream(url.openStream());
           ZipEntry entry = zin.getNextEntry();
@@ -341,15 +339,13 @@ public class RepositoryImpl
         else {
           in = url.openStream();
         }
-        Reader reader = new InputStreamReader(in);
-        XmlPullParser parser = new MXParser();
-        parser.setInput(reader);
-        parseRepository(parser);
+        try (Reader reader = new InputStreamReader(in)) {
+          XmlPullParser parser = new MXParser();
+          parser.setInput(reader);
+          parseRepository(parser);
+        }
       }
       catch (MalformedURLException e) {
-      }
-      finally {
-        IOUtil.close(in);
       }
     }
   }

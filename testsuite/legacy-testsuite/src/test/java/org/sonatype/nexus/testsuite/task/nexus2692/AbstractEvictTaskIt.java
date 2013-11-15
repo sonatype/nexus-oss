@@ -19,10 +19,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -31,160 +29,100 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
-import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.attributes.Attributes;
+import org.sonatype.nexus.proxy.attributes.JacksonJSONMarshaller;
+import org.sonatype.nexus.proxy.attributes.Marshaller;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-import com.thoughtworks.xstream.XStream;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FalseFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 
 public class AbstractEvictTaskIt
     extends AbstractNexusIntegrationTest
 {
 
-  private static final long A_DAY = 24L * 60L * 60L * 1000L;
+  /**
+   * Path, Days map. This map holds all the modified attribute paths and the int represents the "offset" (might be negative)
+   * or how many days it was shifted.
+   */
+  private Map<String, Integer> pathMap = Maps.newHashMap();
 
-  private Map<String, Double> pathMap = new HashMap<String, Double>();
-
-  private List<String> neverDeleteFiles = new ArrayList<String>();
+  private List<String> neverDeleteFiles = Lists.newArrayList();
 
   private File storageWorkDir;
-
-  @BeforeClass
-  public static void trickNexusToUseLegacyAttributes()
-      throws Exception
-  {
-    final File legacyAttributes = new File(new File(nexusWorkDir), "proxy/attributes");
-
-    // the presence of this dir will trick nexus to use "transitioning"
-    legacyAttributes.mkdirs();
-
-    // to not spawn the thread that might interfere with assertions here
-    System.setProperty("org.sonatype.nexus.proxy.attributes.upgrade.AttributesUpgradeEventInspector.upgrade",
-        Boolean.FALSE.toString());
-  }
 
   @Before
   public void setupStorageAndAttributes()
       throws Exception
   {
-    stopNexus();
+    final File workDir = new File(AbstractNexusIntegrationTest.nexusWorkDir);
+    storageWorkDir = new File(workDir, "storage");
 
-    File workDir = new File(AbstractNexusIntegrationTest.nexusWorkDir);
-
-    this.storageWorkDir = new File(workDir, "storage");
-
-    FileUtils.copyDirectoryStructure(this.getTestResourceAsFile("storage/"), storageWorkDir);
-    copyAttributes();
+    FileUtils.copyDirectory(getTestResourceAsFile("storage/"), storageWorkDir);
 
     // now setup all the attributes
-    File attributesInfo = this.getTestResourceAsFile("attributes.info");
-    BufferedReader reader = null;
-    FileInputStream fis = null;
-    FileOutputStream fos = null;
+    File attributesInfo = getTestResourceAsFile("attributes.info");
 
-    XStream xstream = new XStream();
-    xstream.alias("file", DefaultStorageFileItem.class);
-    xstream.alias("collection", DefaultStorageCollectionItem.class);
-    xstream.alias("link", DefaultStorageLinkItem.class);
+    final Marshaller marshaller = new JacksonJSONMarshaller();
 
-    long timestamp = System.currentTimeMillis();
+    final long now = System.currentTimeMillis();
 
-    try {
-      reader = new BufferedReader(new FileReader(attributesInfo));
+    try (BufferedReader reader = new BufferedReader(new FileReader(attributesInfo))) {
 
       String line = reader.readLine();
       while (line != null) {
-        String[] parts = line.split(" ");
-        String filePart = parts[0];
-        long offset = (long) (Double.parseDouble(parts[1]) * A_DAY);
+        final String[] parts = line.split(" ");
+        final String repoFilePart = parts[0];
+        final String repoId = repoFilePart.substring(0, repoFilePart.indexOf('/'));
+        final String filePart = repoFilePart.substring(repoFilePart.indexOf('/'), repoFilePart.length());
+        long offset = TimeUnit.DAYS.toMillis(Long.parseLong(parts[1]));
 
         // get the file
-        File itemFile = new File(storageWorkDir, filePart);
+        File itemFile = new File(storageWorkDir, repoFilePart);
         if (itemFile.isFile()) {
-          this.pathMap.put(filePart, Double.parseDouble(parts[1]));
+          this.pathMap.put(repoFilePart, Integer.parseInt(parts[1]));
 
                     /*
                      * groups are not checked, so the hashes are left behind, see: NEXUS-3026
                      */
-          if (filePart.startsWith("releases/") || filePart.startsWith("releases-m1/")
-              || filePart.startsWith("public/") || filePart.startsWith("snapshots/")
-              || filePart.startsWith("thirdparty/") || filePart.contains(".meta")
-              || filePart.contains(".index")) {
-            neverDeleteFiles.add(filePart);
+          if (repoFilePart.startsWith("releases/") || repoFilePart.startsWith("releases-m1/")
+              || repoFilePart.startsWith("public/") || repoFilePart.startsWith("snapshots/")
+              || repoFilePart.startsWith("thirdparty/") || repoFilePart.contains(".meta")
+              || repoFilePart.contains(".index")) {
+            neverDeleteFiles.add(repoFilePart);
           }
 
           // modify the file corresponding attribute
-          File attributeFile = getAttributeFile(filePart);
-          fis = new FileInputStream(attributeFile);
-          StorageItem storageItem = (StorageItem) xstream.fromXML(fis);
-          IOUtil.close(fis);
+          final File attributeFile = new File(new File(new File(storageWorkDir, repoId), ".nexus/attributes"), filePart);
+          Attributes attributes;
+          try (FileInputStream in = new FileInputStream(attributeFile)) {
+            attributes = marshaller.unmarshal(in);
+          }
 
-          // get old value, update it and set it, but all this is done using reflection
-          // Direct method access will work, since we mangle an item that will be persisted using "old" format
-          // Once item "upgraded", there is no backward way to downgrade it, to persist it using old format
-          final Field field = AbstractStorageItem.class.getDeclaredField("lastRequested");
-          field.setAccessible(true);
+          // set new value
+          attributes.setLastRequested(now + offset);
 
-          // get old value
-          final long itemLastRequested = (Long) field.get(storageItem);
-
-          // calculate the variation
-          long variation = (1258582311671l - itemLastRequested) + timestamp;
-
-          // and set the value with reflection, since we will again persist it using XStream in "old" format
-          field.set(storageItem, variation + offset);
-
-          // write it out in "old" format
-          fos = new FileOutputStream(attributeFile);
-          xstream.toXML(storageItem, fos);
-          IOUtil.close(fos);
+          // write it out
+          try (FileOutputStream out = new FileOutputStream(attributeFile)) {
+            marshaller.marshal(attributes, out);
+          }
         }
 
         line = reader.readLine();
       }
     }
-    finally {
-      IOUtil.close(fos);
-      IOUtil.close(fis);
-      IOUtil.close(reader);
-    }
-
-    startNexus();
-  }
-
-  protected void copyAttributes()
-      throws IOException
-  {
-    File srcDir = getTestResourceAsFile("attributes/");
-
-    // old location
-    FileUtils.copyDirectoryStructure(srcDir, new File(new File(nexusWorkDir), "proxy/attributes"));
-
-    // new location will need path mangling, see getAttributeFile()
-  }
-
-  protected File getAttributeFile(String filePart) {
-    return new File(new File(new File(nexusWorkDir), "proxy/attributes"), filePart);
-        /*
-         * This is NEW layout! String[] parts = filePart.split( "/" ); // repoId StringBuilder sb = new StringBuilder(
-         * parts[0] ); // "sneak in" the ".nexus/attributes" sb.append( "/.nexus/attributes" ); // the rest for ( int i
-         * = 1; i < parts.length; i++ ) { sb.append( "/" ).append( parts[i] ); } return new File( storageWorkDir,
-         * sb.toString() );
-         */
   }
 
   protected void runTask(int days, String repoId)
@@ -208,11 +146,9 @@ public class AbstractEvictTaskIt
 
   protected SortedSet<String> buildListOfExpectedFilesForAllRepos(int days) {
     SortedSet<String> expectedFiles = new TreeSet<String>();
-
-    expectedFiles.addAll(this.getNeverDeleteFiles());
-
-    for (Entry<String, Double> entry : this.getPathMap().entrySet()) {
-      if (entry.getValue() > (days * -1)) {
+    expectedFiles.addAll(getNeverDeleteFiles());
+    for (Entry<String, Integer> entry : pathMap.entrySet()) {
+      if (entry.getValue() > (-days)) {
         expectedFiles.add(entry.getKey());
       }
     }
@@ -224,7 +160,7 @@ public class AbstractEvictTaskIt
       String prefix = expectedFile.substring(0, expectedFile.indexOf("/")) + "-";
       String fileName = new File(expectedFile).getName();
 
-      for (String originalFile : this.getPathMap().keySet()) {
+      for (String originalFile : pathMap.keySet()) {
         if (originalFile.startsWith(prefix) && originalFile.endsWith(fileName)) {
           expectedShadows.add(originalFile);
           break;
@@ -240,7 +176,7 @@ public class AbstractEvictTaskIt
   protected SortedSet<String> buildListOfExpectedFiles(int days, List<String> otherNotChangedRepoids) {
     SortedSet<String> expectedFiles = this.buildListOfExpectedFilesForAllRepos(days);
 
-    for (String path : this.getPathMap().keySet()) {
+    for (String path : pathMap.keySet()) {
       String repoId = path.substring(0, path.indexOf("/"));
       if (otherNotChangedRepoids.contains(repoId)) {
         log.debug("found it:" + path);
@@ -302,9 +238,15 @@ public class AbstractEvictTaskIt
       throws IOException
   {
     SortedSet<String> result = new TreeSet<String>();
-    List<String> paths = FileUtils.getFileNames(basedir, null, null, false, true);
-    for (String path : paths) {
-      result.add(path.replaceAll(Pattern.quote("\\"), "/"));
+    Collection<File> files = FileUtils.listFiles(basedir, TrueFileFilter.TRUE, TrueFileFilter.TRUE);
+    for (File file : files) {
+      if (!file.equals(basedir)) {
+        String path = file.getPath();
+        if (path.startsWith(basedir.getAbsolutePath())) {
+          path = path.substring(basedir.getAbsolutePath().length() + 1);
+        }
+        result.add(path.replaceAll(Pattern.quote("\\"), "/"));
+      }
     }
     return result;
   }
@@ -314,9 +256,15 @@ public class AbstractEvictTaskIt
       throws IOException
   {
     SortedSet<String> result = new TreeSet<String>();
-    List<String> paths = FileUtils.getDirectoryNames(basedir, null, null, false, true);
-    for (String path : paths) {
-      result.add(path.replaceAll(Pattern.quote("\\"), "/"));
+    Collection<File> files = FileUtils.listFilesAndDirs(basedir, FalseFileFilter.FALSE, TrueFileFilter.TRUE);
+    for (File file : files) {
+      if (!file.equals(basedir)) {
+        String path = file.getPath();
+        if (path.startsWith(basedir.getAbsolutePath())) {
+          path = path.substring(basedir.getAbsolutePath().length() + 1);
+        }
+        result.add(path.replaceAll(Pattern.quote("\\"), "/"));
+      }
     }
     return result;
   }
@@ -325,14 +273,14 @@ public class AbstractEvictTaskIt
     return storageWorkDir;
   }
 
-  public Map<String, Double> getPathMap() {
+  public Map<String, Integer> getPathMap() {
     return pathMap;
   }
 
   public Collection<String> getNeverDeleteFiles() {
     DirectoryScanner scan = new DirectoryScanner();
     scan.setBasedir(new File(nexusWorkDir, "storage"));
-    scan.setIncludes(new String[]{"**/.index/", "**/.meta/", "*/archetype-catalog.xml"});
+    scan.setIncludes(new String[]{"**/.index/", "**/.meta/", "*/archetype-catalog.xml", "public/**", "public-snapshots/**"});
     scan.setExcludes(new String[]{"**/.nexus/", "**/.svn", "**/.svn/**"});
 
     scan.scan();

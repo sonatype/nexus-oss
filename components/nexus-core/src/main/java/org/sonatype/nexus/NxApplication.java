@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.events.EventSubscriberHost;
 import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.plugins.PluginManagerResponse;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
@@ -68,11 +69,13 @@ public class NxApplication
 
   private final RepositoryRegistry repositoryRegistry;
 
+  private final EventSubscriberHost eventSubscriberHost;
+
   @Inject
   public NxApplication(final EventBus eventBus, final NexusConfiguration nexusConfiguration,
       final NexusPluginManager nexusPluginManager, final ApplicationStatusSource applicationStatusSource,
       final SecuritySystem securitySystem, final NexusScheduler nexusScheduler,
-      final RepositoryRegistry repositoryRegistry)
+      final RepositoryRegistry repositoryRegistry, final EventSubscriberHost eventSubscriberHost)
   {
     this.eventBus = checkNotNull(eventBus);
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
@@ -81,6 +84,7 @@ public class NxApplication
     this.securitySystem = checkNotNull(securitySystem);
     this.nexusScheduler = checkNotNull(nexusScheduler);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    this.eventSubscriberHost = checkNotNull(eventSubscriberHost);
 
     logInitialized();
 
@@ -94,6 +98,9 @@ public class NxApplication
         log.warn(response.formatAsString(log.isDebugEnabled()));
       }
     }
+
+    // register core and plugin contributed subscribers, start dispatching events to them
+    eventSubscriberHost.startup();
 
     applicationStatusSource.setState(SystemState.STOPPED);
     applicationStatusSource.getSystemStatus().setInitializedAt(new Date());
@@ -187,6 +194,7 @@ public class NxApplication
     // kill services + notify
     nexusScheduler.shutdown();
     eventBus.post(new NexusStoppedEvent(this));
+    eventSubscriberHost.shutdown();
     nexusConfiguration.dropInternals();
     securitySystem.stop();
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPED);

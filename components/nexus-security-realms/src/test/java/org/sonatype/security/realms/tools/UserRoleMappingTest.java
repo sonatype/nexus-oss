@@ -23,7 +23,7 @@ import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 
 import junit.framework.Assert;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 
 public class UserRoleMappingTest
     extends AbstractSecurityTestCase

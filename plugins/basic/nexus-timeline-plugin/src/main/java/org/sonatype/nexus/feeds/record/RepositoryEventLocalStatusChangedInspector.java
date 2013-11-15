@@ -16,11 +16,14 @@ package org.sonatype.nexus.feeds.record;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Asynchronous;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.plexus.appevents.Event;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * @author Juven Xu
@@ -29,19 +32,11 @@ import org.sonatype.plexus.appevents.Event;
 @Singleton
 public class RepositoryEventLocalStatusChangedInspector
     extends AbstractFeedRecorderEventInspector
-    implements AsynchronousEventInspector
+    implements EventSubscriber, Asynchronous
 {
-
-  public boolean accepts(Event<?> evt) {
-    if (evt instanceof RepositoryEventLocalStatusChanged) {
-      return true;
-    }
-    return false;
-  }
-
-  public void inspect(Event<?> evt) {
-    RepositoryEventLocalStatusChanged revt = (RepositoryEventLocalStatusChanged) evt;
-
+  @Subscribe
+  @AllowConcurrentEvents
+  public void inspect(final RepositoryEventLocalStatusChanged revt) {
     StringBuilder sb = new StringBuilder("The repository '");
 
     sb.append(revt.getRepository().getName());
