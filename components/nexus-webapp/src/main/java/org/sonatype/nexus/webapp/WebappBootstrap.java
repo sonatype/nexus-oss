@@ -27,6 +27,7 @@ import org.sonatype.nexus.bootstrap.ConfigurationHolder;
 import org.sonatype.nexus.guice.NexusModules.CoreModule;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.util.LockFile;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.web.NexusWebModule;
 
 import com.google.common.base.Throwables;
@@ -105,6 +106,7 @@ public class WebappBootstrap
 
       // lock the work directory
       File workDir = new File(properties.get("nexus-work")).getCanonicalFile();
+      DirSupport.mkdir(workDir);
       lockFile = new LockFile(new File(workDir, "nexus.lock"));
       checkState(lockFile.lock(), "Nexus work directory already in use: %s", workDir);
 
