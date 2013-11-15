@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.4.0</version>
+  <version>2.7.0</version>
   <globalConnectionSettings>
     <connectionTimeout>10000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
     <queryString></queryString>
   </globalConnectionSettings>
-  <restApi />
+  <restApi>
+    <uiTimeout>60000</uiTimeout>
+  </restApi>
   <httpProxy>
     <enabled>true</enabled>
     <port>8082</port>
@@ -52,7 +54,6 @@
       <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>15</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
@@ -70,10 +71,7 @@
       </externalConfiguration>
     </repository>
   </repositories>
-  <repositoryGrouping>
-    <pathMappings>
-    </pathMappings>
-  </repositoryGrouping>
+  <repositoryGrouping />
   <repositoryTargets>
     <repositoryTarget>
       <id>1</id>
@@ -115,8 +113,5 @@
     <password>{oi77A/mIeOUH4naB1pVPREZQTKrcfWHQQO73aOFkU6A=}</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
-  <errorReporting>
-    <jiraUrl>https://issues.sonatype.org</jiraUrl>
-    <jiraProject>PR</jiraProject>
-  </errorReporting>
+  <notification />
 </nexusConfiguration>

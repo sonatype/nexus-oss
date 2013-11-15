@@ -1,38 +1,212 @@
-<?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
-  <version>1.0.7</version>
-
-  <security>
-    <enabled>false</enabled>
-    <anonymousAccessEnabled>true</anonymousAccessEnabled>
-    <anonymousUsername>anonymous</anonymousUsername>
-	<anonymousPassword>anonymous</anonymousPassword> 
-    <realms>
-      <realm>XmlAuthenticatingRealm</realm>
-      <realm>NexusMethodAuthorizingRealm</realm>
-      <realm>NexusTargetAuthorizingRealm</realm>
-    </realms>
-  </security>
-  <globalConnectionSettings />
-  <restApi />
-  <httpProxy><port>${nexus-proxy-port}</port><proxyPolicy>strict</proxyPolicy></httpProxy>
+<?xml version="1.0" encoding="UTF-8"?>
+<nexusConfiguration>
+  <version>2.7.0</version>
+  <globalConnectionSettings>
+    <connectionTimeout>10000</connectionTimeout>
+    <retrievalRetryCount>3</retrievalRetryCount>
+    <queryString></queryString>
+  </globalConnectionSettings>
+  <restApi>
+    <uiTimeout>60000</uiTimeout>
+  </restApi>
+  <httpProxy>
+    <port>${nexus-proxy-port}</port>
+    <proxyPolicy>strict</proxyPolicy>
+  </httpProxy>
   <routing>
-    <groups />
+    <resolveLinks>true</resolveLinks>
   </routing>
   <repositories>
     <repository>
       <id>repo1</id>
       <name>repo1</name>
-      <allowWrite>true</allowWrite>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>ALLOW_WRITE</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>repo2</id>
       <name>repo2</name>
-      <allowWrite>true</allowWrite>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>ALLOW_WRITE</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>repo3</id>
       <name>repo3</name>
-      <allowWrite>true</allowWrite>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>ALLOW_WRITE</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>exclusive-group</id>
+      <name>exclusive-group</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>repo1</memberRepository>
+          <memberRepository>repo2</memberRepository>
+          <memberRepository>repo3</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>exclusive-single</id>
+      <name>exclusive-single</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>repo1</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>inclusive-single</id>
+      <name>inclusive-single</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>repo1</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>other-group</id>
+      <name>other-group</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>repo1</memberRepository>
+          <memberRepository>repo2</memberRepository>
+          <memberRepository>repo3</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>inclusive-group</id>
+      <name>inclusive-group</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>repo2</memberRepository>
+          <memberRepository>repo1</memberRepository>
+          <memberRepository>repo3</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>blocking-group</id>
+      <name>blocking-group</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>repo1</memberRepository>
+          <memberRepository>repo2</memberRepository>
+          <memberRepository>repo3</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
     </repository>
   </repositories>
   <repositoryGrouping>
@@ -40,8 +214,10 @@
       <pathMapping>
         <id>exclusive-group</id>
         <groupId>exclusive-group</groupId>
-        <routePattern>.*exclusive.*</routePattern>
         <routeType>exclusive</routeType>
+        <routePatterns>
+          <routePattern>.*exclusive.*</routePattern>
+        </routePatterns>
         <repositories>
           <repository>repo1</repository>
         </repositories>
@@ -49,8 +225,10 @@
       <pathMapping>
         <id>exclusive-single</id>
         <groupId>exclusive-single</groupId>
-        <routePattern>.*exclusive.*</routePattern>
         <routeType>exclusive</routeType>
+        <routePatterns>
+          <routePattern>.*exclusive.*</routePattern>
+        </routePatterns>
         <repositories>
           <repository>repo1</repository>
         </repositories>
@@ -58,8 +236,10 @@
       <pathMapping>
         <id>inclusive-group</id>
         <groupId>inclusive-group</groupId>
-        <routePattern>.*inclusive.*</routePattern>
         <routeType>inclusive</routeType>
+        <routePatterns>
+          <routePattern>.*inclusive.*</routePattern>
+        </routePatterns>
         <repositories>
           <repository>repo2</repository>
         </repositories>
@@ -67,8 +247,10 @@
       <pathMapping>
         <id>inclusive-single</id>
         <groupId>inclusive-single</groupId>
-        <routePattern>.*inclusive.*</routePattern>
         <routeType>inclusive</routeType>
+        <routePatterns>
+          <routePattern>.*inclusive.*</routePattern>
+        </routePatterns>
         <repositories>
           <repository>repo1</repository>
         </repositories>
@@ -76,68 +258,19 @@
       <pathMapping>
         <id>blocking</id>
         <groupId>blocking-group</groupId>
-        <routePattern>.*blocking.*</routePattern>
         <routeType>blocking</routeType>
+        <routePatterns>
+          <routePattern>.*blocking.*</routePattern>
+        </routePatterns>
       </pathMapping>
     </pathMappings>
-    <repositoryGroups>
-      <repositoryGroup>
-        <groupId>exclusive-group</groupId>
-        <name>exclusive-group</name>
-        <repositories>
-          <repository>repo1</repository>
-          <repository>repo2</repository>
-          <repository>repo3</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>exclusive-single</groupId>
-        <name>exclusive-single</name>
-        <repositories>
-          <repository>repo1</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>inclusive-single</groupId>
-        <name>inclusive-single</name>
-        <repositories>
-          <repository>repo1</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>other-group</groupId>
-        <name>other-group</name>
-        <repositories>
-          <repository>repo1</repository>
-          <repository>repo2</repository>
-          <repository>repo3</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>inclusive-group</groupId>
-        <name>inclusive-group</name>
-        <repositories>
-          <repository>repo2</repository>
-          <repository>repo1</repository>
-          <repository>repo3</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>blocking-group</groupId>
-        <name>blocking-group</name>
-        <repositories>
-          <repository>repo1</repository>
-          <repository>repo2</repository>
-          <repository>repo3</repository>
-        </repositories>
-      </repositoryGroup>
-    </repositoryGroups>
   </repositoryGrouping>
   <smtpConfiguration>
-    <host>smtp-host</host>
+    <hostname>smtp-host</hostname>
     <port>1234</port>
     <username>smtp-username</username>
     <password>smtp-password</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
+  <notification />
 </nexusConfiguration>
