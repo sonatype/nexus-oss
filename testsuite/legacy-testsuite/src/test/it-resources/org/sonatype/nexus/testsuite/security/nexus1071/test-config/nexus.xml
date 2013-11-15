@@ -1,59 +1,168 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.0.6</version>
-  <security>
-    <enabled>true</enabled>
-    <anonymousAccessEnabled>true</anonymousAccessEnabled>
-    <realms>
-      <realm>XmlAuthenticatingRealm</realm>
-      <realm>NexusMethodAuthorizingRealm</realm>
-      <realm>NexusTargetAuthorizingRealm</realm>
-    </realms>
-  </security>
-  <globalConnectionSettings />
-  <restApi />
+  <version>2.7.0</version>
+  <globalConnectionSettings>
+    <connectionTimeout>10000</connectionTimeout>
+    <retrievalRetryCount>3</retrievalRetryCount>
+    <queryString></queryString>
+  </globalConnectionSettings>
+  <restApi>
+    <uiTimeout>60000</uiTimeout>
+  </restApi>
   <httpProxy>
     <enabled>true</enabled>
+    <port>8082</port>
+    <proxyPolicy>strict</proxyPolicy>
   </httpProxy>
   <routing>
-    <groups />
+    <resolveLinks>true</resolveLinks>
   </routing>
   <repositories>
-  	<repository>
+    <repository>
       <id>fake-central</id>
       <name>fake-central</name>
-      <allowWrite>false</allowWrite>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
       <localStorage>
-      	<url>${maven-repository}</url>
+        <provider>file</provider>
+        <url>${maven-repository}</url>
       </localStorage>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>nexus-test-harness-repo</id>
       <name>nexus-test-harness-repo</name>
-      <allowWrite>true</allowWrite>
-    </repository>    
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>ALLOW_WRITE</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
+    </repository>
     <repository>
       <id>nexus-test-harness-snapshot-repo</id>
       <name>nexus-test-harness-snapshot-repo</name>
-      <allowWrite>true</allowWrite>
-      <repositoryPolicy>snapshot</repositoryPolicy>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>ALLOW_WRITE</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>Internal</id>
       <name>Internal</name>
-      <allowWrite>true</allowWrite>
-      <checksumPolicy>ignore</checksumPolicy>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>ALLOW_WRITE</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>IGNORE</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>public</id>
+      <name>public</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>fake-central</memberRepository>
+          <memberRepository>nexus-test-harness-repo</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>public-snapshots</id>
+      <name>public-snapshots</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>nexus-test-harness-snapshot-repo</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
     </repository>
   </repositories>
-  <repositoryShadows>
-  </repositoryShadows>
   <repositoryGrouping>
     <pathMappings>
       <pathMapping>
         <id>inhouse-stuff</id>
         <groupId>*</groupId>
-        <routePattern>.*/(com|org)/somecompany/.*</routePattern>
         <routeType>inclusive</routeType>
+        <routePatterns>
+          <routePattern>.*/(com|org)/somecompany/.*</routePattern>
+        </routePatterns>
         <repositories>
           <repository>nexus-test-harness-repo</repository>
           <repository>nexus-test-harness-snapshot-repo</repository>
@@ -62,31 +171,16 @@
       <pathMapping>
         <id>apache-stuff</id>
         <groupId>*</groupId>
-        <routePattern>.*/org/some-oss/.*</routePattern>
         <routeType>exclusive</routeType>
+        <routePatterns>
+          <routePattern>.*/org/some-oss/.*</routePattern>
+        </routePatterns>
         <repositories>
           <repository>nexus-test-harness-repo</repository>
           <repository>nexus-test-harness-snapshot-repo</repository>
         </repositories>
       </pathMapping>
     </pathMappings>
-    <repositoryGroups>
-      <repositoryGroup>
-        <groupId>public</groupId>
-        <name>public</name>
-        <repositories>
-          <repository>fake-central</repository>
-          <repository>nexus-test-harness-repo</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>public-snapshots</groupId>
-        <name>public-snapshots</name>
-        <repositories>
-          <repository>nexus-test-harness-snapshot-repo</repository>
-        </repositories>
-      </repositoryGroup>      
-    </repositoryGroups>
   </repositoryGrouping>
   <repositoryTargets>
     <repositoryTarget>
@@ -123,10 +217,11 @@
     </repositoryTarget>
   </repositoryTargets>
   <smtpConfiguration>
-    <host>smtp-host</host>
+    <hostname>smtp-host</hostname>
     <port>25</port>
     <username>smtp-username</username>
     <password>smtp-password</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
+  <notification />
 </nexusConfiguration>

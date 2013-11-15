@@ -1,84 +1,242 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.0.8</version>
-  <security>
-    <enabled>true</enabled>
-    <anonymousAccessEnabled>true</anonymousAccessEnabled>
-    <anonymousPassword>{CwQ3YmFGw7IH4WFAtGPpn2IDFO/kzljLpS6sUAgyaJA=}</anonymousPassword>
-    <realms>
-      <realm>XmlAuthenticatingRealm</realm>
-      <realm>XmlAuthorizingRealm</realm>
-    </realms>
-  </security>
-  <globalConnectionSettings />
+  <version>2.7.0</version>
+  <globalConnectionSettings>
+    <connectionTimeout>10000</connectionTimeout>
+    <retrievalRetryCount>3</retrievalRetryCount>
+    <queryString></queryString>
+  </globalConnectionSettings>
   <restApi>
     <baseUrl>http://localhost:8081/nexus</baseUrl>
+    <uiTimeout>60000</uiTimeout>
   </restApi>
   <httpProxy>
     <enabled>true</enabled>
+    <port>8082</port>
+    <proxyPolicy>strict</proxyPolicy>
   </httpProxy>
   <routing>
-    <groups />
+    <resolveLinks>true</resolveLinks>
   </routing>
   <repositories>
     <repository>
       <id>central</id>
       <name>Maven Central</name>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <url>http://repo1.maven.org/maven2/</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>apache-snapshots</id>
       <name>Apache Snapshots</name>
-      <repositoryPolicy>snapshot</repositoryPolicy>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <url>http://repository.apache.org/snapshots</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>codehaus-snapshots</id>
       <name>Codehaus Snapshots</name>
-      <repositoryPolicy>snapshot</repositoryPolicy>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <url>http://snapshots.repository.codehaus.org/</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>releases</id>
       <name>Releases</name>
-      <allowWrite>true</allowWrite>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>ALLOW_WRITE</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>snapshots</id>
       <name>Snapshots</name>
-      <allowWrite>true</allowWrite>
-      <repositoryPolicy>snapshot</repositoryPolicy>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>ALLOW_WRITE</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>thirdparty</id>
       <name>3rd party</name>
-      <allowWrite>true</allowWrite>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>ALLOW_WRITE</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
-  </repositories>
-  <repositoryShadows>
-    <repositoryShadow>
+    <repository>
       <id>central-m1</id>
       <name>Central M1 shadow</name>
-      <shadowOf>central</shadowOf>
-      <type>m2-m1-shadow</type>
-    </repositoryShadow>
-  </repositoryShadows>
+      <providerRole>org.sonatype.nexus.proxy.repository.ShadowRepository</providerRole>
+      <providerHint>m2-m1-shadow</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <externalConfiguration>
+        <masterRepositoryId>central</masterRepositoryId>
+        <synchronizeAtStartup>false</synchronizeAtStartup>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>public</id>
+      <name>Public Repositories</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>releases</memberRepository>
+          <memberRepository>snapshots</memberRepository>
+          <memberRepository>thirdparty</memberRepository>
+          <memberRepository>central</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>public-snapshots</id>
+      <name>Public Snapshot Repositories</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>apache-snapshots</memberRepository>
+          <memberRepository>codehaus-snapshots</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+  </repositories>
   <repositoryGrouping>
     <pathMappings>
       <pathMapping>
         <id>inhouse-stuff</id>
         <groupId>*</groupId>
-        <routePattern>.*/(com|org)/somecompany/.*</routePattern>
         <routeType>inclusive</routeType>
+        <routePatterns>
+          <routePattern>.*/(com|org)/somecompany/.*</routePattern>
+        </routePatterns>
         <repositories>
           <repository>snapshots</repository>
           <repository>releases</repository>
@@ -87,36 +245,16 @@
       <pathMapping>
         <id>apache-stuff</id>
         <groupId>*</groupId>
-        <routePattern>.*/org/some-oss/.*</routePattern>
         <routeType>exclusive</routeType>
+        <routePatterns>
+          <routePattern>.*/org/some-oss/.*</routePattern>
+        </routePatterns>
         <repositories>
           <repository>releases</repository>
           <repository>snapshots</repository>
         </repositories>
       </pathMapping>
     </pathMappings>
-    <repositoryGroups>
-      <repositoryGroup>
-        <groupId>public</groupId>
-        <name>Public Repositories</name>
-        <type>maven2</type>
-        <repositories>
-          <repository>releases</repository>
-          <repository>snapshots</repository>
-          <repository>thirdparty</repository>
-          <repository>central</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>public-snapshots</groupId>
-        <name>Public Snapshot Repositories</name>
-        <type>maven2</type>
-        <repositories>
-          <repository>apache-snapshots</repository>
-          <repository>codehaus-snapshots</repository>
-        </repositories>
-      </repositoryGroup>
-    </repositoryGroups>
   </repositoryGrouping>
   <repositoryTargets>
     <repositoryTarget>
@@ -153,10 +291,11 @@
     </repositoryTarget>
   </repositoryTargets>
   <smtpConfiguration>
-    <host>127.0.0.5</host>
+    <hostname>127.0.0.5</hostname>
     <port>25</port>
     <username>IT-username</username>
     <password>{gXa+tOrL2/kHkPl6Fc0U8+2VvQLHNVzjZAGp5fzAprs=}</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
+  <notification />
 </nexusConfiguration>

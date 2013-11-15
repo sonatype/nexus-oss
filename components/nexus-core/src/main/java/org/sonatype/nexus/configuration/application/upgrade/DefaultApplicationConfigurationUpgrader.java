@@ -97,8 +97,8 @@ public class DefaultApplicationConfigurationUpgrader
 
     if (upgrader != null) {
       log.debug(
-          "Upgrading old Nexus configuration file (version " + msg.getModelVersion() + ") from "
-              + file.getAbsolutePath());
+          "Upgrading old Nexus configuration file (version {}) at {}", msg.getModelVersion(),
+          file.getAbsolutePath());
 
       msg.setConfiguration(upgrader.loadConfiguration(file));
 
@@ -114,8 +114,7 @@ public class DefaultApplicationConfigurationUpgrader
         upgrader = upgraders.get(msg.getModelVersion());
       }
 
-      log.info(
-          "Nexus configuration file upgraded to current version " + msg.getModelVersion() + " successfully.");
+      log.info("Nexus configuration file upgraded to current version {} successfully., ", msg.getModelVersion());
 
       return (Configuration) msg.getConfiguration();
     }
