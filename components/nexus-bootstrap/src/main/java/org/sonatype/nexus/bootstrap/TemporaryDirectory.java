@@ -28,21 +28,16 @@ public class TemporaryDirectory
 {
   public static final String PROPERTY = "java.io.tmpdir";
 
-  private static File dir;
-
   public static File get() throws IOException {
-    if (dir == null) {
-      String location = System.getProperty(PROPERTY, "tmp");
-      File dir = new File(location).getCanonicalFile();
-      mkdir(dir);
+    String location = System.getProperty(PROPERTY, "tmp");
+    File dir = new File(location).getCanonicalFile();
+    mkdir(dir);
 
-      // ensure we can create temporary files in this directory
-      Path file = Files.createTempFile("nexus-tmpdir", ".tmp");
-      Files.delete(file);
+    // ensure we can create temporary files in this directory
+    Path file = Files.createTempFile("nexus-tmpdir", ".tmp");
+    Files.delete(file);
 
-      System.setProperty(PROPERTY, dir.getPath());
-      TemporaryDirectory.dir = dir;
-    }
+    System.setProperty(PROPERTY, dir.getPath());
     return dir;
   }
 
