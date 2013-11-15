@@ -132,12 +132,6 @@ public abstract class AbstractNexusIntegrationTest
 
   public static final String LIx2 = "    ";
 
-  /**
-   * @deprecated Use nexusBaseUrl instead!
-   */
-  @Deprecated
-  public static final String baseNexusUrl;
-
   public static final String nexusWorkDir;
 
   public static final String RELATIVE_CONF_DIR = "runtime/apps/nexus/conf";
@@ -183,7 +177,6 @@ public abstract class AbstractNexusIntegrationTest
     WORK_CONF_DIR = nexusWorkDir + "/conf";
     nexusLogDir = TestProperties.getString("nexus.log.dir");
     nexusBaseUrl = TestProperties.getString("nexus.base.url");
-    baseNexusUrl = nexusBaseUrl;
 
     TestContainer.getInstance().getTestContext().setNexusUrl(nexusBaseUrl);
   }
