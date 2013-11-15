@@ -121,7 +121,12 @@ public class ConfigurationBuilder
     }
 
     interpolate();
+
+    // make some entries canonical
     canonicalize("nexus-work");
+    if (properties.containsKey(TemporaryDirectory.PROPERTY)) {
+      canonicalize(TemporaryDirectory.PROPERTY);
+    }
 
     // return copy
     Map<String, String> props = new HashMap<>();
