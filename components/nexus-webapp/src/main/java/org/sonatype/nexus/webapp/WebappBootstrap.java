@@ -15,8 +15,6 @@ package org.sonatype.nexus.webapp;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -32,9 +30,7 @@ import org.sonatype.nexus.util.LockFile;
 import org.sonatype.nexus.web.NexusWebModule;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import com.google.inject.Injector;
-import com.google.inject.Module;
 import com.google.inject.servlet.GuiceServletContextListener;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -56,8 +52,6 @@ public class WebappBootstrap
     extends GuiceServletContextListener
 {
   private static final Logger log = LoggerFactory.getLogger(WebappBootstrap.class);
-
-  private static final String CUSTOM_MODULES = "customModules";
 
   private LockFile lockFile;
 
@@ -94,7 +88,7 @@ public class WebappBootstrap
       else {
         log.info("Loading configuration for WAR deployment environment");
 
-        // FIXME: This is what was done before, it seems completly wrong in WAR deployment since there is no bundle
+        // FIXME: This is what was done before, it seems completely wrong in WAR deployment since there is no bundle
         String baseDir = System.getProperty("bundleBasedir", context.getRealPath("/WEB-INF"));
 
         properties = new ConfigurationBuilder()
@@ -134,19 +128,11 @@ public class WebappBootstrap
           .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
           .setComponentVisibility(PlexusConstants.GLOBAL_VISIBILITY);
 
-      List<Module> modules = Lists.newArrayList(
+      // create the container
+      container = new DefaultPlexusContainer(plexusConfiguration,
           new NexusWebModule(context),
           new CoreModule()
       );
-
-      // FIXME: What is this used for?
-      Module[] customModules = (Module[]) context.getAttribute(CUSTOM_MODULES);
-      if (customModules != null) {
-        modules.addAll(Arrays.asList(customModules));
-      }
-
-      // create the container
-      container = new DefaultPlexusContainer(plexusConfiguration, modules.toArray(new Module[modules.size()]));
       context.setAttribute(PlexusConstants.PLEXUS_KEY, container);
       log.debug("Container: {}", container);
 
