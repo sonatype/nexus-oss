@@ -20,12 +20,14 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.events.Asynchronous;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.plexus.appevents.Event;
 
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -34,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class NexusAuthenticationEventInspector
     extends AbstractFeedRecorderEventInspector
-    implements AsynchronousEventInspector
+    implements EventSubscriber, Asynchronous
 {
   private final NexusConfiguration nexusConfiguration;
 
@@ -45,46 +47,26 @@ public class NexusAuthenticationEventInspector
     this.nexusConfiguration = checkNotNull(nexusConfiguration);
   }
 
-  @Override
-  public boolean accepts(Event<?> evt) {
-    if (evt instanceof NexusAuthenticationEvent) {
-      // We accept only some NexusAuthenticationEvent, see #isRecordedEvent()
-      return isRecordedEvent((NexusAuthenticationEvent) evt);
-    }
-    else {
-      return false;
-    }
-  }
-
-  @Override
-  public void inspect(Event<?> evt) {
-    final NexusAuthenticationEvent nae = (NexusAuthenticationEvent) evt;
-
+  @Subscribe
+  @AllowConcurrentEvents
+  public void inspect(final NexusAuthenticationEvent nae) {
     if (!isRecordedEvent(nae)) {
       // do nothing
       return;
     }
 
     lastNexusAuthenticationEvent = nae;
-
     final ClientInfo ai = nae.getClientInfo();
-
     final String msg =
         String.format("%s user [%s] from IP address %s", (nae.isSuccessful() ? "Successfully authenticated"
             : "Unable to authenticate"), ai.getUserid(), StringUtils.defaultString(ai.getRemoteIP(), "[unknown]"));
+    log.debug(msg);
 
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug(msg);
-    }
-
-    AuthcAuthzEvent aae = new AuthcAuthzEvent(nae.getEventDate(), FeedRecorder.SYSTEM_AUTHC, msg);
-
+    final AuthcAuthzEvent aae = new AuthcAuthzEvent(nae.getEventDate(), FeedRecorder.SYSTEM_AUTHC, msg);
     final String ip = ai.getRemoteIP();
-
     if (ip != null) {
-      evt.getEventContext().put(AccessManager.REQUEST_REMOTE_ADDRESS, ip);
+      nae.getEventContext().put(AccessManager.REQUEST_REMOTE_ADDRESS, ip);
     }
-
     getFeedRecorder().addAuthcAuthzEvent(aae);
   }
 

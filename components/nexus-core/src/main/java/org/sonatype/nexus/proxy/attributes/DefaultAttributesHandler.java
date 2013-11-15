@@ -13,24 +13,16 @@
 
 package org.sonatype.nexus.proxy.attributes;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.ContentLocator;
-import org.sonatype.nexus.proxy.item.FileContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -41,11 +33,9 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -104,11 +94,6 @@ public class DefaultAttributesHandler
   private long lastRequestedResolution = LAST_REQUESTED_ATTRIBUTE_RESOLUTION;
 
   /**
-   * The application configuration.
-   */
-  private final ApplicationConfiguration applicationConfiguration;
-
-  /**
    * The attribute storage.
    */
   private final AttributeStorage attributeStorage;
@@ -118,36 +103,12 @@ public class DefaultAttributesHandler
    */
   private final List<StorageItemInspector> itemInspectorList;
 
-  /**
-   * The item inspector list.
-   */
-  private final List<StorageFileItemInspector> fileItemInspectorList;
-
   @Inject
-  public DefaultAttributesHandler(ApplicationConfiguration applicationConfiguration,
-                                  @Named("ls") AttributeStorage attributeStorage,
-                                  @Named("legacy") AttributeStorage legacyAttributeStorage,
-                                  List<StorageItemInspector> itemInspectorList,
-                                  List<StorageFileItemInspector> fileItemInspectorList)
+  public DefaultAttributesHandler(@Named("ls") AttributeStorage attributeStorage,
+                                  List<StorageItemInspector> itemInspectorList)
   {
-    this.applicationConfiguration = checkNotNull(applicationConfiguration);
-
-    // do we need to waste CPU cycles at "transitioning" at all? Should not, ie, for new instances
-    if (legacyAttributeStorage != null
-        && ((LegacyFSAttributeStorage) legacyAttributeStorage).isLegacyAttributeStorageDiscovered()) {
-      this.attributeStorage =
-          new DelegatingAttributeStorage(new TransitioningAttributeStorage(attributeStorage,
-              legacyAttributeStorage));
-
-      log.info(
-          "Legacy AttributeStorage directory exists here \"{}\", transitioning them on-the-fly as they are used to repository storage.",
-          ((LegacyFSAttributeStorage) legacyAttributeStorage).getWorkingDirectory());
-    }
-    else {
-      this.attributeStorage = new DelegatingAttributeStorage(attributeStorage);
-    }
+    this.attributeStorage = checkNotNull(attributeStorage);
     this.itemInspectorList = checkNotNull(itemInspectorList);
-    this.fileItemInspectorList = checkNotNull(fileItemInspectorList);
   }
 
   // ==
@@ -168,15 +129,6 @@ public class DefaultAttributesHandler
    */
   public List<StorageItemInspector> getItemInspectorList() {
     return itemInspectorList;
-  }
-
-  /**
-   * Gets the file item inspector list.
-   *
-   * @return the file item inspector list
-   */
-  public List<StorageFileItemInspector> getFileItemInspectorList() {
-    return fileItemInspectorList;
   }
 
   // ======================================================================
@@ -211,8 +163,8 @@ public class DefaultAttributesHandler
       // we are fixing md if we can
       ContentLocator is = null;
       if (item instanceof StorageFileItem &&
-        ((StorageFileItem) item).getContentLocator().isReusable()) {
-          is = ((StorageFileItem) item).getContentLocator();
+          ((StorageFileItem) item).getContentLocator().isReusable()) {
+        is = ((StorageFileItem) item).getContentLocator();
       }
 
       storeAttributes(item, is);
@@ -297,7 +249,8 @@ public class DefaultAttributesHandler
     if (item instanceof StorageCollectionItem) {
       // not storing attributes of directories
       return false;
-    } else if (item.isVirtual()) {
+    }
+    else if (item.isVirtual()) {
       // virtual items have no attributes (nor UID for that matter)
       return false;
     }
@@ -380,88 +333,6 @@ public class DefaultAttributesHandler
    * @param content the reusable content locator
    */
   protected void expandCustomItemAttributes(final StorageItem item, final ContentLocator content) {
-    // Step1: deprecated stuff
-    // gather deprecated inspectors willing to participate first, to save file mucking below if possible
-    if (item instanceof StorageFileItem) {
-      final StorageFileItem fItem = (StorageFileItem) item;
-
-      final ArrayList<StorageFileItemInspector> handlingFileInspectors = Lists.newArrayList();
-      for (StorageFileItemInspector inspector : getFileItemInspectorList()) {
-        if (inspector.isHandled(fItem)) {
-          handlingFileInspectors.add(inspector);
-        }
-      }
-      if (!handlingFileInspectors.isEmpty()) {
-        // everything in this if should NEVER happen, unless some
-        // 3rd party plugin uses StorageFileItemInspector for something
-        // as core has no more these
-        // We have to have a java.io.File at any cause, as deprecated StorageFileItemInspector needs one
-        // even if the ContentLocator we got is reusable
-        log.warn(
-            "Deprecated StorageFileItemInspector components used: {}. Change your plugin to use StorageItemInspector instead!",
-            handlingFileInspectors);
-
-        boolean deleteTmpFile = false;
-        File tmpFile = null;
-        if (content != null) {
-          if (content instanceof FileContentLocator) {
-            deleteTmpFile = false;
-            tmpFile = ((FileContentLocator) content).getFile();
-          }
-          else {
-            log.info(
-                "Doing a temporary copy of the \"{}\" item's content for expanding custom attributes. This should NOT happen, but is left in as \"fallback\"!",
-                item.getPath());
-            deleteTmpFile = true;
-            try {
-              tmpFile =
-                  File.createTempFile("px-" + fItem.getName(), ".tmp",
-                      applicationConfiguration.getTemporaryDirectory());
-
-              try (final InputStream in = content.getContent(); final OutputStream out = new FileOutputStream(
-                  tmpFile)) {
-                StreamSupport.copy(in, out);
-                out.flush();
-              }
-            }
-            catch (IOException ex) {
-              log.warn("Could not create file from {}", item.getRepositoryItemUid(), ex);
-              tmpFile = null;
-            }
-          }
-        }
-
-        if (tmpFile != null) {
-          try {
-            for (StorageFileItemInspector inspector : handlingFileInspectors) {
-              // isHandled already invoked way above, so handlingFileInspectors has
-              // inspectors already stated they do want to handle this item
-              try {
-                inspector.processStorageFileItem(fItem, tmpFile);
-              }
-              catch (Exception ex) {
-                log.warn(
-                    "Inspector {} throw exception during inspection of {}, continuing...", inspector.getClass(),
-                    item.getRepositoryItemUid(), ex);
-              }
-            }
-          }
-          finally {
-            if (deleteTmpFile && tmpFile != null) {
-              try {
-                Files.delete(tmpFile.toPath());
-              }
-              catch (IOException e) {
-                tmpFile.deleteOnExit();
-                log.warn("Could not delete tmp file!", e);
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // make it handled by "plain" StorageItemInspectors too
     for (StorageItemInspector inspector : getItemInspectorList()) {
       if (inspector.isHandled(item)) {
         try {

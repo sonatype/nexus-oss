@@ -13,12 +13,18 @@
 
 package org.sonatype.nexus.maven.tasks;
 
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
-import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.scheduling.CancellableProgressListenerWrapper;
 import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
 
+import com.google.common.collect.ObjectArrays;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import com.google.inject.name.Names;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +39,22 @@ import org.junit.Test;
 public class Nexus4588CancellationTest
     extends AbstractMavenRepoContentTests
 {
+
+  @Override
+  protected Module[] getTestCustomModules() {
+    Module[] modules = super.getTestCustomModules();
+    if (modules == null) {
+      modules = new Module[0];
+    }
+    modules = ObjectArrays.concat(modules, new Module()
+    {
+      @Override
+      public void configure(final Binder binder) {
+        binder.bind(Nexus4588CancellationEventInspector.class);
+      }
+    });
+    return modules;
+  }
 
   @Before
   public void setUpProgressListener()
@@ -85,7 +107,7 @@ public class Nexus4588CancellationTest
     // the molester will cancel the task once it receives cache expired event, which is sent
     // after 1st pass. This is an implementation details, so this test is actually fragile
     // against SnapshotRemover component implementation changes
-    ((Nexus4588CancellationEventInspector) lookup(EventInspector.class, "nexus4588")).setActive(true);
+    ((Nexus4588CancellationEventInspector) lookup(EventSubscriber.class, "nexus4588")).setActive(true);
 
     SnapshotRemovalResult result = lookup(SnapshotRemover.class).removeSnapshots(snapshotRemovalRequest);
   }

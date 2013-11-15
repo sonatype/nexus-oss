@@ -48,17 +48,6 @@ public class ClearPasswordTest
     this.doTestLogic();
   }
 
-  @Test
-  public void testUpgrade()
-      throws Exception
-  {
-    // copy a conf file that needs to be upgraded to the config dir
-    FileUtils.copyURLToFile(Thread.currentThread().getContextClassLoader().getResource(
-        "org/sonatype/nexus/configuration/upgrade/nexus-001-1.xml"), new File(this.getNexusConfiguration()));
-
-    this.doTestLogic();
-  }
-
   private void doTestLogic()
       throws Exception
   {

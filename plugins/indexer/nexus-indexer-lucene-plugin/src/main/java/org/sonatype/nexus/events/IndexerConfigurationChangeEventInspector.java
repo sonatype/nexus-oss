@@ -19,8 +19,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.plexus.appevents.Event;
+
+import com.google.common.eventbus.Subscribe;
 
 /**
  * @author Juven Xu
@@ -28,7 +28,7 @@ import org.sonatype.plexus.appevents.Event;
 @Named
 @Singleton
 public class IndexerConfigurationChangeEventInspector
-    extends AbstractEventInspector
+    implements EventSubscriber
 {
   private final IndexerManager indexerManager;
 
@@ -41,11 +41,8 @@ public class IndexerConfigurationChangeEventInspector
     return indexerManager;
   }
 
-  public boolean accepts(Event<?> evt) {
-    return (evt instanceof ConfigurationChangeEvent);
-  }
-
-  public void inspect(Event<?> evt) {
+  @Subscribe
+  public void inspect(final ConfigurationChangeEvent evt) {
     getIndexerManager().resetConfiguration();
   }
 }

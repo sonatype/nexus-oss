@@ -17,23 +17,26 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Event;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireNotFoundCaches;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named
 @Singleton
 public class RepositoryUpdateMirrorEventListener
-    extends AbstractEventInspector
-    implements EventInspector
+    extends ComponentSupport
+    implements EventSubscriber
 {
   private final NexusScheduler scheduler;
 
@@ -42,13 +45,19 @@ public class RepositoryUpdateMirrorEventListener
     this.scheduler = checkNotNull(scheduler);
   }
 
-  @Override
-  public boolean accepts(final Event<?> evt) {
-    return evt instanceof RepositoryConfigurationUpdatedEvent || evt instanceof RepositoryEventExpireNotFoundCaches;
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryConfigurationUpdatedEvent e) {
+    inspect(e);
   }
 
-  @Override
-  public void inspect(final Event<?> evt) {
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryEventExpireNotFoundCaches e) {
+    inspect(e);
+  }
+
+  protected void inspect(final Event<?> evt) {
     final UpdateSiteProxyRepository updateSite =
         ((RepositoryEvent) evt).getRepository().adaptToFacet(UpdateSiteProxyRepository.class);
 
@@ -56,7 +65,7 @@ public class RepositoryUpdateMirrorEventListener
         && (evt instanceof RepositoryEventExpireNotFoundCaches ||
         ((RepositoryConfigurationUpdatedEvent) evt).isRemoteUrlChanged())) {
       final ScheduledTask<?> mirrorTask = UpdateSiteMirrorTask.submit(scheduler, updateSite, false);
-      getLogger().debug("Submitted " + mirrorTask.getName());
+      log.debug("Submitted " + mirrorTask.getName());
     }
   }
 }

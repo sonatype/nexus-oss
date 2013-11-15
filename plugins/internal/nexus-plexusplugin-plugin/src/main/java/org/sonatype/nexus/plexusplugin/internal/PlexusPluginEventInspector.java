@@ -13,31 +13,28 @@
 
 package org.sonatype.nexus.plexusplugin.internal;
 
+import org.sonatype.nexus.events.Event;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.plexusplugin.PlexusPlugin;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.plexus.appevents.Event;
 
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Simple event inspector that routes all the events to {@link PlexusPlugin}.
  */
-@Component(role = EventInspector.class, hint = "plexusplugin")
+@Component(role = EventSubscriber.class, hint = "plexusplugin")
 public class PlexusPluginEventInspector
-    extends AbstractEventInspector
+    implements EventSubscriber
 {
   @Requirement
   private PlexusPlugin plexusPlugin;
 
-  @Override
-  public boolean accepts(Event<?> evt) {
-    return true;
-  }
-
-  @Override
-  public void inspect(Event<?> evt) {
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(Event<?> evt) {
     plexusPlugin.newEventReceived(evt);
   }
 }

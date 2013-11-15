@@ -18,24 +18,26 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.email.NexusPostOffice;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
-import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.events.Asynchronous;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
-import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * {@link EventInspector} that will send alert email (if necessary) in case of a failing {@link NexusTask}.
+ * {@link EventSubscriber} that will send alert email (if necessary) in case of a failing {@link NexusTask}.
  *
  * @author Alin Dreghiciu
  */
 @Singleton
 @Named
 public class NexusTaskFailureAlertEmailSender
-    extends AbstractEventInspector
-    implements AsynchronousEventInspector
+    extends ComponentSupport
+    implements EventSubscriber, Asynchronous
 {
 
   private final NexusPostOffice m_postOffice;
@@ -46,20 +48,11 @@ public class NexusTaskFailureAlertEmailSender
   }
 
   /**
-   * Accepts events of type {@link NexusTaskFailureEvent}. {@inheritDoc}
-   */
-  public boolean accepts(final Event<?> evt) {
-    return evt != null && evt instanceof NexusTaskEventStoppedFailed<?>;
-  }
-
-  /**
    * Sends alert emails if necessary. {@inheritDoc}
    */
-  public void inspect(final Event<?> evt) {
-    if (!accepts(evt)) {
-      return;
-    }
-    final NexusTaskEventStoppedFailed<?> failureEvent = (NexusTaskEventStoppedFailed<?>) evt;
+  @Subscribe
+  @AllowConcurrentEvents
+  public void inspect(final NexusTaskEventStoppedFailed<?> failureEvent) {
     final NexusTask<?> failedTask = failureEvent.getNexusTask();
     if (failedTask == null || !failedTask.shouldSendAlertEmail()) {
       return;

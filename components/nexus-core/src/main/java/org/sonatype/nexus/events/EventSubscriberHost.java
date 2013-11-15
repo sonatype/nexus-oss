@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.events;
 
-import java.util.concurrent.ConcurrentMap;
+import java.util.List;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
@@ -21,25 +21,18 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
-import org.sonatype.guice.bean.locators.BeanLocator;
-import org.sonatype.inject.BeanEntry;
-import org.sonatype.inject.EagerSingleton;
-import org.sonatype.inject.Mediator;
-import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.threads.NexusExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
-import com.google.inject.Key;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -50,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.7.0
  */
 @Named
-@EagerSingleton
+@Singleton
 public class EventSubscriberHost
     extends ComponentSupport
 {
@@ -59,13 +52,16 @@ public class EventSubscriberHost
 
   private final EventBus eventBus;
 
+  private final List<Provider<EventSubscriber>> eventSubscriberProviders;
+
   private final NexusExecutorService hostThreadPool;
 
   private final com.google.common.eventbus.AsyncEventBus asyncBus;
 
   @Inject
-  public EventSubscriberHost(final EventBus eventBus, final BeanLocator beanLocator) {
+  public EventSubscriberHost(final EventBus eventBus, final List<Provider<EventSubscriber>> eventSubscriberProviders) {
     this.eventBus = checkNotNull(eventBus);
+    this.eventSubscriberProviders = checkNotNull(eventSubscriberProviders);
 
     // direct hand-off used! Host pool will use caller thread to execute async inspectors when pool full!
     final ThreadPoolExecutor target =
@@ -74,13 +70,39 @@ public class EventSubscriberHost
     this.hostThreadPool = NexusExecutorService.forCurrentSubject(target);
     this.asyncBus = new com.google.common.eventbus.AsyncEventBus("esh-async", hostThreadPool);
 
-    beanLocator.watch(Key.get(EventSubscriber.class), new EventSubscriberMediator(), this);
-    beanLocator.watch(Key.get(EventInspector.class), new EventInspectorMediator(hostThreadPool), this);
     eventBus.register(this);
+    log.info("Initialized");
+  }
+
+  public void startup() {
+    log.info("Starting");
+    for (Provider<EventSubscriber> eventSubscriberProvider : eventSubscriberProviders) {
+      EventSubscriber es = null;
+      try {
+        es = eventSubscriberProvider.get();
+        register(es);
+      }
+      catch (Exception e) {
+        log.warn("Could not register {}", es, e);
+      }
+    }
   }
 
   public void shutdown() {
     eventBus.unregister(this);
+    log.info("Stopping");
+
+    for (Provider<EventSubscriber> eventSubscriberProvider : eventSubscriberProviders) {
+      EventSubscriber es = null;
+      try {
+        es = eventSubscriberProvider.get();
+        unregister(es);
+      }
+      catch (Exception e) {
+        log.warn("Could not unregister {}", es, e);
+      }
+    }
+
     // we need clean shutdown, wait all background event inspectors to finish to have consistent state
     hostThreadPool.shutdown();
     try {
@@ -125,139 +147,5 @@ public class EventSubscriberHost
   @AllowConcurrentEvents
   public void onEvent(final Object evt) {
     asyncBus.post(evt);
-    if (evt instanceof NexusStoppedEvent) {
-      shutdown();
-    }
-  }
-
-  // == EventSubscriber support
-
-  private static class EventSubscriberMediator
-      implements Mediator<Named, EventSubscriber, EventSubscriberHost>
-  {
-    @Override
-    public void add(final BeanEntry<Named, EventSubscriber> entry, final EventSubscriberHost watcher) throws Exception {
-      try {
-        watcher.register(entry.getValue());
-      }
-      catch (Exception e) {
-        // NEXUS-4775 Guice exception trying to resolve circular dependencies too early
-      }
-    }
-
-    @Override
-    public void remove(final BeanEntry<Named, EventSubscriber> entry, final EventSubscriberHost watcher)
-        throws Exception
-    {
-      try {
-        watcher.unregister(entry.getValue());
-      }
-      catch (Exception e) {
-        // NEXUS-4775 Guice exception trying to resolve circular dependencies too early
-      }
-    }
-  }
-
-  // == Legacy EventInspector support
-
-  private static class EventInspectorMediator
-      implements Mediator<Named, EventInspector, EventSubscriberHost>
-  {
-    private final NexusExecutorService nexusExecutorService;
-
-    private final ConcurrentMap<String, EventInspectorAdapter> eventInspectorAdapters;
-
-    public EventInspectorMediator(final NexusExecutorService nexusExecutorService) {
-      this.nexusExecutorService = checkNotNull(nexusExecutorService);
-      this.eventInspectorAdapters = Maps.newConcurrentMap();
-    }
-
-    @Override
-    public void add(final BeanEntry<Named, EventInspector> entry, final EventSubscriberHost watcher) throws Exception {
-      final EventInspectorAdapter adapter;
-      if (Asynchronous.class.isAssignableFrom(entry.getImplementationClass())) {
-        adapter = new AsynchronousEventInspectorAdapter(entry, nexusExecutorService);
-      }
-      else {
-        adapter = new EventInspectorAdapter(entry);
-      }
-      eventInspectorAdapters.put(entry.getKey().value(), adapter);
-      // Note: as none of the EI Adapter implement Asynchronous, they all will be registered with "plain" EventBus
-      watcher.register(adapter);
-    }
-
-    @Override
-    public void remove(final BeanEntry<Named, EventInspector> entry, final EventSubscriberHost watcher)
-        throws Exception
-    {
-      final EventInspectorAdapter adapter = eventInspectorAdapters.get(entry.getKey().value());
-      if (adapter != null) {
-        watcher.unregister(adapter);
-      }
-    }
-  }
-
-  private static class EventInspectorAdapter
-  {
-    private final BeanEntry<Named, EventInspector> eventInspectorEntry;
-
-    public EventInspectorAdapter(final BeanEntry<Named, EventInspector> eventInspectorEntry) {
-      this.eventInspectorEntry = checkNotNull(eventInspectorEntry);
-    }
-
-    @Subscribe
-    @AllowConcurrentEvents
-    public void on(final Event<?> event) {
-      try {
-        final EventInspector ei = eventInspectorEntry.getValue();
-        if (ei.accepts(event)) {
-          inspect(ei, event);
-        }
-      }
-      catch (Exception e) {
-        // nop, guice might NPE
-      }
-    }
-
-    protected void inspect(final EventInspector ei, final Event<?> event) {
-      ei.inspect(event);
-    }
-
-    @Override
-    public String toString() {
-      return "EIAdapter(" + eventInspectorEntry.getImplementationClass().getName() + ")";
-    }
-  }
-
-  private static class AsynchronousEventInspectorAdapter
-      extends EventInspectorAdapter
-  {
-    private final NexusExecutorService nexusExecutorService;
-
-    public AsynchronousEventInspectorAdapter(final BeanEntry<Named, EventInspector> eventInspectorEntry,
-                                             final NexusExecutorService nexusExecutorService)
-    {
-      super(eventInspectorEntry);
-      this.nexusExecutorService = checkNotNull(nexusExecutorService);
-    }
-
-    @Override
-    protected void inspect(final EventInspector ei, final Event<?> event) {
-      // TODO: Runnable creation per-event? This should be improved
-      // Still, as event inspectors are getting removed, their number should shrink not grow
-      nexusExecutorService.execute(
-          new Runnable()
-          {
-            @Override
-            public void run() {
-              ei.inspect(event);
-            }
-          });
-    }
-
-    @Override
-    public String toString() {
-      return super.toString() + " (async)";
-    }
   }
 }

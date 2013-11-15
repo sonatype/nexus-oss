@@ -27,14 +27,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link AuthenticatingFilter} that delegates token creation to {@link AuthenticationTokenFactory}s before falling
- * back to {@link NexusSecureHttpAuthenticationFilter}.
+ * back to {@link NexusHttpAuthenticationFilter}.
  *
  * e.g. {@link AuthenticationTokenFactory} that will lookup REMOTE_USER HTTP header
  *
  * @since 2.7
  */
 public class NexusAuthenticationFilter
-    extends NexusSecureHttpAuthenticationFilter
+    extends NexusHttpAuthenticationFilter
 {
 
   private List<AuthenticationTokenFactory> factories = Lists.newArrayList();
@@ -46,8 +46,8 @@ public class NexusAuthenticationFilter
 
   /**
    * Will consider an login attempt if any of the factories is able to create an authentication token.
-   * Otherwise will fallback to
-   * {@link NexusSecureHttpAuthenticationFilter#isLoginAttempt(ServletRequest, ServletResponse)}
+   *
+   * Otherwise will fallback to {@link NexusHttpAuthenticationFilter#isLoginAttempt(ServletRequest, ServletResponse)}
    */
   @Override
   protected boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
@@ -58,7 +58,7 @@ public class NexusAuthenticationFilter
   /**
    * Will cycle configured factories for an authentication token. First one that will return a non null one will win.
    * If none of them will return an authentication token will fallback to
-   * {@link NexusSecureHttpAuthenticationFilter#createToken(ServletRequest, ServletResponse)}
+   * {@link NexusHttpAuthenticationFilter#createToken(ServletRequest, ServletResponse)}
    */
   @Override
   protected AuthenticationToken createToken(ServletRequest request, ServletResponse response) {

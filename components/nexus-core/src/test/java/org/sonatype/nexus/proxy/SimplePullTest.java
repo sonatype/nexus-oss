@@ -50,6 +50,7 @@ import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -71,6 +72,11 @@ public class SimplePullTest
     ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
     this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder(ss);
     return jettyTestsuiteEnvironmentBuilder;
+  }
+
+  @Before
+  public void startNexus() throws Exception {
+    startNx();
   }
 
   @Test
@@ -142,6 +148,13 @@ public class SimplePullTest
     Collection<StorageItem> dir = ((StorageCollectionItem) item).list();
     // we should have listed in root only those things/dirs we pulled, se above!
     // ".nexus" is here too!
+    // Expected results:
+    // test:/.meta (coll)
+    // test:/.nexus (coll)
+    // repo1:/activemq (coll)
+    // repo1:/rome (coll)
+    // repo2:/xstream (coll)
+    // repo3:/repo3.txt (file)
     assertEquals(6, dir.size());
 
     // SO FAR, IT's OLD Unit test, except CacheCreate events were changed (it was Cache event).

@@ -13,8 +13,8 @@
 
 package org.sonatype.nexus.scheduling.events;
 
+import org.sonatype.nexus.events.AbstractEvent;
 import org.sonatype.nexus.scheduling.NexusTask;
-import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
  * Abstract super class for task related events.

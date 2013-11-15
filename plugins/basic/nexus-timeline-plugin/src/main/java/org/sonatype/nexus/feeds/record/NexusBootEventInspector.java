@@ -16,10 +16,13 @@ package org.sonatype.nexus.feeds.record;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.Event;
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.plexus.appevents.Event;
+
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Boot listening event inspector. This one is intentionally not async, to mark exact time stamps of Nexus important
@@ -31,14 +34,19 @@ import org.sonatype.plexus.appevents.Event;
 @Singleton
 public class NexusBootEventInspector
     extends AbstractFeedRecorderEventInspector
+    implements EventSubscriber
 {
-  @Override
-  public boolean accepts(Event<?> evt) {
-    return evt != null && (evt instanceof NexusStartedEvent || evt instanceof NexusStoppedEvent);
+  @Subscribe
+  public void on(final NexusStartedEvent e) {
+    inspect(e);
   }
 
-  @Override
-  public void inspect(Event<?> evt) {
+  @Subscribe
+  public void on(final NexusStoppedEvent e) {
+    inspect(e);
+  }
+
+  protected void inspect(Event<?> evt) {
     if (evt instanceof NexusStartedEvent) {
       getFeedRecorder().addSystemEvent(
           FeedRecorder.SYSTEM_BOOT_ACTION,

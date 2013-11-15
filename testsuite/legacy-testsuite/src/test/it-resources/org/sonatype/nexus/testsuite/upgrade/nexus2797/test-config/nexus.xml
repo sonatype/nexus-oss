@@ -1,36 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.0.8</version>
-  <security>
-    <enabled>false</enabled>
-    <realms>
-      <realm>XmlAuthenticatingRealm</realm>
-      <realm>XmlAuthorizingRealm</realm>
-    </realms>
-  </security>
-  <httpProxy />
+  <version>2.7.0</version>
+  <globalConnectionSettings />
+  <restApi>
+    <uiTimeout>60000</uiTimeout>
+  </restApi>
+  <httpProxy>
+    <port>8082</port>
+    <proxyPolicy>strict</proxyPolicy>
+  </httpProxy>
+  <routing />
   <repositories>
     <repository>
       <id>releases</id>
       <name>releases</name>
-      <allowWrite>true</allowWrite>
-      <artifactMaxAge>-1</artifactMaxAge>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>ALLOW_WRITE</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>-1</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>public</id>
+      <name>public</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>releases</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
     </repository>
   </repositories>
-  <repositoryGrouping>
-    <pathMappings>
-    </pathMappings>
-    <repositoryGroups>
-      <repositoryGroup>
-        <groupId>public</groupId>
-        <name>public</name>
-        <type>maven2</type>
-        <repositories>
-          <repository>releases</repository>
-        </repositories>
-      </repositoryGroup>
-    </repositoryGroups>
-  </repositoryGrouping>
+  <repositoryGrouping />
   <repositoryTargets>
     <repositoryTarget>
       <id>1</id>
@@ -78,6 +102,12 @@
         <type>daily</type>
         <startDate>1230777000000</startDate>
       </schedule>
+      <properties>
+        <property>
+          <key>repositoryId</key>
+          <value>all_repo</value>
+        </property>
+      </properties>
     </task>
     <task>
       <id>task2</id>
@@ -105,8 +135,8 @@
           <value>false</value>
         </property>
         <property>
-          <key>repositoryOrGroupId</key>
-          <value>repo_releases</value>
+          <key>repositoryId</key>
+          <value>releases</value>
         </property>
       </properties>
     </task>
@@ -114,7 +144,7 @@
       <id>task3</id>
       <name>task3</name>
       <enabled>true</enabled>
-      <type>ReindexTask</type>
+      <type>UpdateIndexTask</type>
       <status>SUBMITTED</status>
       <lastRun>1111111111111</lastRun>
       <nextRun>1230777000000</nextRun>
@@ -124,8 +154,8 @@
       </schedule>
       <properties>
         <property>
-          <key>repositoryOrGroupId</key>
-          <value>repo_releases</value>
+          <key>repositoryId</key>
+          <value>releases</value>
         </property>
       </properties>
     </task>
@@ -133,7 +163,7 @@
       <id>task4</id>
       <name>task4</name>
       <enabled>true</enabled>
-      <type>ReindexTask</type>
+      <type>UpdateIndexTask</type>
       <status>SUBMITTED</status>
       <nextRun>1230777000000</nextRun>
       <schedule>
@@ -142,15 +172,16 @@
       </schedule>
       <properties>
         <property>
-          <key>repositoryOrGroupId</key>
-          <value>repo_releases</value>
+          <key>repositoryId</key>
+          <value>releases</value>
         </property>
       </properties>
     </task>
   </tasks>
   <smtpConfiguration>
-    <host>localhost</host>
+    <hostname>localhost</hostname>
     <port>25</port>
     <systemEmailAddress>nexus@nexus.org</systemEmailAddress>
   </smtpConfiguration>
+  <notification />
 </nexusConfiguration>
