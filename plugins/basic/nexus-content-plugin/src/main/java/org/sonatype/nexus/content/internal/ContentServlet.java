@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.web.content;
+package org.sonatype.nexus.content.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,20 +72,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.io.ByteStreams.limit;
 
 /**
- * Clean-room re-implementation of {@code /content} resource, using plain Servlet API.
+ * Provides access to repositories contents.
  * 
- * @since 2.7.0
+ * @since 2.8
  */
 @Singleton
 @Named
-public class NexusContentServlet
+public class ContentServlet
     extends HttpServlet
 {
   /**
    * Buffer size to be used when pushing content to the {@link HttpServletResponse#getOutputStream()} stream. Default is
    * 16KB.
    */
-  private static final int BUFFER_SIZE = SystemPropertiesHelper.getInteger(NexusContentServlet.class.getName()
+  private static final int BUFFER_SIZE = SystemPropertiesHelper.getInteger(ContentServlet.class.getName()
       + ".BUFFER_SIZE", -1);
 
   /**
@@ -97,15 +97,15 @@ public class NexusContentServlet
    * the redirection to get the linked item.
    */
   private static final boolean DEREFERENCE_LINKS = SystemPropertiesHelper.getBoolean(
-      NexusContentServlet.class.getName() + ".DEREFERENCE_LINKS", true);
+      ContentServlet.class.getName() + ".DEREFERENCE_LINKS", true);
 
   /**
    * Stopwatch that is started when {@link ResourceStoreRequest} is created and stopped when request processing returns
    * from {@link RepositoryRouter}.
    */
-  private static final String STOPWATCH_KEY = NexusContentServlet.class.getName() + ".stopwatch";
+  private static final String STOPWATCH_KEY = ContentServlet.class.getName() + ".stopwatch";
 
-  private final Logger logger = LoggerFactory.getLogger(NexusContentServlet.class);
+  private final Logger logger = LoggerFactory.getLogger(ContentServlet.class);
 
   private final RepositoryRouter repositoryRouter;
   private final Renderer renderer;
@@ -113,8 +113,9 @@ public class NexusContentServlet
   private final String serverString;
 
   @Inject
-  public NexusContentServlet(final RepositoryRouter repositoryRouter, final Renderer renderer,
-      final GlobalRestApiSettings globalRestApiSettings, final ApplicationStatusSource applicationStatusSource)
+  public ContentServlet(final RepositoryRouter repositoryRouter, final Renderer renderer,
+                        final GlobalRestApiSettings globalRestApiSettings,
+                        final ApplicationStatusSource applicationStatusSource)
   {
     this.repositoryRouter = checkNotNull(repositoryRouter);
     this.renderer = checkNotNull(renderer);

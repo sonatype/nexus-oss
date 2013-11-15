@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.web.content.internal;
+package org.sonatype.nexus.content.internal;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -39,7 +39,6 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
-import org.sonatype.nexus.web.content.Renderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
@@ -58,7 +57,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Implementation of {@link Renderer} using Apache Velocity.
  *
- * @since 2.7.0
+ * @since 2.8
  */
 @Singleton
 @Named

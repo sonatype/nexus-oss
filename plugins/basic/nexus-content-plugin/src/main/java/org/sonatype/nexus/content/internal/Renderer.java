@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.web.content;
+package org.sonatype.nexus.content.internal;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -25,18 +25,27 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * Rendering component, to render error and index pages.
- * 
- * @since 2.7.0
+ *
+ * @since 2.8
  */
 public interface Renderer
 {
-  void renderCollection(final HttpServletRequest request, final HttpServletResponse response,
-      final StorageCollectionItem coll, final Collection<StorageItem> children) throws IOException;
+  void renderCollection(final HttpServletRequest request,
+                        final HttpServletResponse response,
+                        final StorageCollectionItem coll,
+                        final Collection<StorageItem> children)
+      throws IOException;
 
-  void renderErrorPage(final HttpServletRequest request, final HttpServletResponse response,
-      final ResourceStoreRequest resourceStoreRequest, final Exception exception) throws IOException;
+  void renderErrorPage(final HttpServletRequest request,
+                       final HttpServletResponse response,
+                       final ResourceStoreRequest resourceStoreRequest,
+                       final Exception exception)
+      throws IOException;
 
-  void renderRequestDescription(final HttpServletRequest request, final HttpServletResponse response,
-      final ResourceStoreRequest resourceStoreRequest, final StorageItem item, final Exception exception)
+  void renderRequestDescription(final HttpServletRequest request,
+                                final HttpServletResponse response,
+                                final ResourceStoreRequest resourceStoreRequest,
+                                final StorageItem item,
+                                final Exception exception)
       throws IOException;
 }

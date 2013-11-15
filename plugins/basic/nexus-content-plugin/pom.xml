@@ -15,34 +15,44 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>nexus-plugins</artifactId>
+    <artifactId>nexus-plugins-basic</artifactId>
     <version>2.8.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-plugins-basic</artifactId>
+  <artifactId>nexus-content-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>pom</packaging>
+  <packaging>nexus-plugin</packaging>
 
-  <modules>
-    <module>nexus-content-plugin</module>
-    <module>nexus-crypto-plugin</module>
-    <module>nexus-groovy-plugin</module>
-    <module>nexus-h2-plugin</module>
-    <module>nexus-logging-plugin</module>
-    <module>nexus-lvo-plugin</module>
-    <module>nexus-plugin-console-plugin</module>
-    <module>nexus-rrb-plugin</module>
-    <module>nexus-siesta-plugin</module>
-    <module>nexus-site-repository-client</module>
-    <module>nexus-site-repository-plugin</module>
-    <module>nexus-timeline-plugin</module>
-    <module>nexus-ui-extjs3-plugin</module>
-    <module>nexus-unpack-plugin</module>
-  </modules>
+  <properties>
+    <pluginName>Nexus Content Plugin</pluginName>
+    <pluginDescription>Provides access to repository contents.</pluginDescription>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-testsupport</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

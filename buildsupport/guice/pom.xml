@@ -28,7 +28,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <sisu-inject.version>2.5.0</sisu-inject.version>
+    <sisu-inject.version>2.5.1-SNAPSHOT</sisu-inject.version>
     <sisu-guice.version>3.1.4</sisu-guice.version>
   </properties>
 

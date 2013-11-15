@@ -10,12 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+package org.sonatype.nexus.security.filter;
 
-package org.sonatype.nexus.security.filter.authc;
+import javax.inject.Provider;
+import javax.servlet.Filter;
 
-public interface PasswordDecryptor
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Support for {@link Filter} providers.
+ *
+ * @since 2.8
+ */
+public class FilterProviderSupport
+  implements Provider<Filter>
 {
-  boolean isEncryptedPassword(String text);
+  private final Filter filter;
 
-  String getDecryptedPassword(String text);
+  public FilterProviderSupport(final Filter filter) {
+    this.filter = checkNotNull(filter);
+  }
+
+  @Override
+  public Filter get() {
+    return filter;
+  }
+
+  public static Key<Filter> filterKey(final String name) {
+    return Key.get(Filter.class, Names.named(name));
+  }
 }

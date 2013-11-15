@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.security.filter.authc;
+package org.sonatype.nexus.content.internal;
 
 import java.util.List;
 
@@ -20,7 +20,9 @@ import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import com.google.common.annotations.VisibleForTesting;
+import org.sonatype.nexus.content.ContentRestrictionConstituent;
+import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
+
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
@@ -28,24 +30,19 @@ import org.apache.shiro.web.filter.authc.AuthenticationFilter;
 /**
  * Nexus {code}/content{code} {@link AuthenticationFilter}.
  *
- * @see NexusContentRestrictionConstituent
- * @see NexusContentRestrictedToken
+ * @see ContentRestrictionConstituent
+ * @see ContentRestrictedToken
  * @since 2.1
  */
-public class NexusContentAuthenticationFilter
-    extends NexusSecureHttpAuthenticationFilter
+public class ContentAuthenticationFilter
+    extends NexusHttpAuthenticationFilter
 {
+  private final List<ContentRestrictionConstituent> constituents;
+
   @Inject
-  @Nullable
-  private List<NexusContentRestrictionConstituent> constituents;
-
-  public NexusContentAuthenticationFilter() {
-    super();
-  }
-
-  @VisibleForTesting
-  public NexusContentAuthenticationFilter(final List<NexusContentRestrictionConstituent> constituents) {
+  public ContentAuthenticationFilter(final @Nullable List<ContentRestrictionConstituent> constituents) {
     this.constituents = constituents;
+    setApplicationName("Sonatype Nexus Repository Manager");
   }
 
   /**
@@ -53,9 +50,8 @@ public class NexusContentAuthenticationFilter
    * If any constituent reports a restriction then returns true.
    */
   private boolean isRestricted(final ServletRequest request) {
-    //noinspection ConstantConditions
     if (constituents != null) {
-      for (NexusContentRestrictionConstituent constituent : constituents) {
+      for (ContentRestrictionConstituent constituent : constituents) {
         if (constituent.isContentRestricted(request)) {
           return true;
         }
@@ -73,7 +69,7 @@ public class NexusContentAuthenticationFilter
       UsernamePasswordToken basis = (UsernamePasswordToken) super.createToken(request, response);
 
       // And include more information than is normally provided to a token (ie. the request)
-      return new NexusContentRestrictedToken(basis, request);
+      return new ContentRestrictedToken(basis, request);
     }
     else {
       return super.createToken(request, response);
