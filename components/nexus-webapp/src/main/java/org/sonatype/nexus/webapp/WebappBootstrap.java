@@ -69,12 +69,6 @@ public class WebappBootstrap
 
     ServletContext context = event.getServletContext();
 
-    // FIXME: Why is this here?  for legacy test shit?
-    if (context.getAttribute(PlexusConstants.PLEXUS_KEY) != null) {
-      log.info("Plexus container already exists; skipping");
-      return;
-    }
-
     // FIXME: JUL handler should be handled by container or bootstrap
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();
