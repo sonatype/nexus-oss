@@ -41,11 +41,6 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-logging-extras</artifactId>
-    </dependency>
-
     <!--
     FIXME: Sort out what if/any of this is already included via nexus-core.
     -->
