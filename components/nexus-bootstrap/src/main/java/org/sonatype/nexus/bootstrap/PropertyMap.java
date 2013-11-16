@@ -37,7 +37,7 @@ public class PropertyMap
     super();
   }
 
-  public PropertyMap(final Map<? extends String, ? extends String> map) {
+  public PropertyMap(final Map<String, String> map) {
     super(map);
   }
 
