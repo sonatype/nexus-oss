@@ -40,11 +40,9 @@ public class NexusStatusUtil
 
   private final NexusBooter nexusBooter;
 
-  public NexusStatusUtil(final int port)
-      throws Exception
-  {
-    nexusBooter =
-        new EmbeddedNexusBooter(new File(TestProperties.getAll().get("nexus.base.dir")).getAbsoluteFile(), port);
+  public NexusStatusUtil(final int port) throws Exception {
+    File dir = new File(TestProperties.getAll().get("nexus.base.dir")).getAbsoluteFile();
+    nexusBooter = new EmbeddedNexusBooter(dir, port);
   }
 
   public boolean isNexusRESTStarted()

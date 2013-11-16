@@ -34,7 +34,7 @@ public class TestContext
   private final HashMap<String, Object> map;
 
   public TestContext() {
-    map = new HashMap<String, Object>();
+    map = new HashMap<>();
     // nexusUrl is set only once, it does not change (for now)
     nexusUrl = null;
     reset();
@@ -47,18 +47,6 @@ public class TestContext
     username = adminUsername;
     password = adminPassword;
     map.clear();
-  }
-
-  public Object getObject(final String key) {
-    return map.get(key);
-  }
-
-  public boolean getBoolean(final String key) {
-    if (map.containsKey(key)) {
-      return (Boolean) map.get(key);
-    }
-
-    return false;
   }
 
   public void put(final String key, final Object value) {

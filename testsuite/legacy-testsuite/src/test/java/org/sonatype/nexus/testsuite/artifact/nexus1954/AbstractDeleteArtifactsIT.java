@@ -37,9 +37,7 @@ public abstract class AbstractDeleteArtifactsIT
 {
 
   @BeforeClass
-  public static void clean()
-      throws Exception
-  {
+  public static void clean() throws Exception {
     cleanWorkDir();
   }
 

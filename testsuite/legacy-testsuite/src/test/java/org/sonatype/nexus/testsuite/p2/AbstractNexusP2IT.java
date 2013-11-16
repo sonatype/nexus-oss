@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.Verifier;
@@ -67,7 +68,7 @@ public abstract class AbstractNexusP2IT
 
       final Verifier verifier = new Verifier(basedir.getAbsolutePath());
 
-      verifier.setLocalRepo(new File(getBasedir(), "target/maven/fake-repo").getAbsolutePath());
+      verifier.setLocalRepo(new File(TestContainer.getBasedir(), "target/maven/fake-repo").getAbsolutePath());
 
       verifier.setSystemProperty("org.eclipse.ecf.provider.filetransfer.retrieve.readTimeout", "30000");
       verifier.setSystemProperty("p2.installIU", installIU);

@@ -44,11 +44,9 @@ public class NXCM3916SecureWebProxiedP2IT
   }
 
   @Before
-  public void startWebProxy()
-      throws Exception
-  {
+  public void startWebProxy() throws Exception {
     try {
-      webProxyServer = (ProxyServer) lookup(ProxyServer.ROLE);
+      webProxyServer = lookup(ProxyServer.class);
       webProxyServer.start();
       webProxyServer.getProxyServlet().setUseAuthentication(true);
       webProxyServer.getProxyServlet().getAuthentications().put("admin", "123");

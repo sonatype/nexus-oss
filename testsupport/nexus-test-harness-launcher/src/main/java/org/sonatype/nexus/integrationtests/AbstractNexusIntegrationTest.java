@@ -44,8 +44,9 @@ import org.sonatype.nexus.test.utils.WagonDeployer;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.security.rest.model.UserResource;
-import org.sonatype.sisu.goodies.common.Loggers;
 import org.sonatype.sisu.goodies.prefs.memory.MemoryPreferencesFactory;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
 import com.google.common.base.Throwables;
 import com.thoughtworks.xstream.XStream;
@@ -89,8 +90,8 @@ import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusC
  */
 // @RunWith(ConsoleLoggingRunner.class)
 public abstract class AbstractNexusIntegrationTest
+  extends TestSupport
 {
-
   public static final String REPO_NEXUS_TEST_HARNESS_RELEASE_GROUP = "nexus-test-harness-release-group";
 
   public static final String REPO_TEST_HARNESS_REPO = "nexus-test-harness-repo";
@@ -128,10 +129,6 @@ public abstract class AbstractNexusIntegrationTest
 
   public static final String nexusBaseUrl;
 
-  public static final String LIx1 = "  ";
-
-  public static final String LIx2 = "    ";
-
   public static final String nexusWorkDir;
 
   public static final String RELATIVE_CONF_DIR = "runtime/apps/nexus/conf";
@@ -144,7 +141,7 @@ public abstract class AbstractNexusIntegrationTest
 
   protected static final String nexusLogDir;
 
-  protected Logger log = Loggers.getLogger(getClass());
+  protected final Logger log = util.getLog();
 
   protected static Logger staticLog = LoggerFactory.getLogger(AbstractNexusIntegrationTest.class);
 
@@ -156,7 +153,7 @@ public abstract class AbstractNexusIntegrationTest
     SLF4JBridgeHandler.install();
 
     // Use in-memory preferences
-    System.setProperty("java.util.prefs.PreferencesFactory", MemoryPreferencesFactory.class.getCanonicalName());
+    System.setProperty("java.util.prefs.PreferencesFactory", MemoryPreferencesFactory.class.getName());
 
     // guice finalizer turned OFF
     System.setProperty("guice.executor.class", "NONE");
@@ -185,13 +182,10 @@ public abstract class AbstractNexusIntegrationTest
 
   private static NexusStatusUtil nexusStatusUtil;
 
-  public static NexusStatusUtil getNexusStatusUtil()
-      throws Exception
-  {
+  public static NexusStatusUtil getNexusStatusUtil() throws Exception {
     if (nexusStatusUtil == null) {
       nexusStatusUtil = new NexusStatusUtil(nexusApplicationPort);
     }
-
     return nexusStatusUtil;
   }
 
@@ -201,7 +195,6 @@ public abstract class AbstractNexusIntegrationTest
     if (nexusConfigUtil == null) {
       nexusConfigUtil = new NexusConfigUtil(this);
     }
-
     return nexusConfigUtil;
   }
 
@@ -211,7 +204,6 @@ public abstract class AbstractNexusIntegrationTest
     if (securityConfigUtil == null) {
       securityConfigUtil = new SecurityConfigUtil(this);
     }
-
     return securityConfigUtil;
   }
 
@@ -242,7 +234,6 @@ public abstract class AbstractNexusIntegrationTest
     if (searchMessageUtil == null) {
       searchMessageUtil = new SearchMessageUtil(this);
     }
-
     return searchMessageUtil;
   }
 
@@ -252,7 +243,6 @@ public abstract class AbstractNexusIntegrationTest
     if (eventInspectorsUtil == null) {
       eventInspectorsUtil = new EventInspectorsUtil(RequestFacade.getNexusRestClient());
     }
-
     return eventInspectorsUtil;
   }
 
@@ -262,7 +252,7 @@ public abstract class AbstractNexusIntegrationTest
     this("nexus-test-harness-repo");
   }
 
-  protected AbstractNexusIntegrationTest(String testRepositoryId) {
+  protected AbstractNexusIntegrationTest(final String testRepositoryId) {
     // we also need to setup a couple fields, that need to be pulled out of a bundle
     this.testRepositoryId = testRepositoryId;
     // this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
@@ -271,9 +261,9 @@ public abstract class AbstractNexusIntegrationTest
   // == Test "lifecycle" (@Before/@After...)
 
   @BeforeClass
-  public static void staticOncePerClassSetUp()
-      throws Exception
-  {
+  public static void staticOncePerClassSetUp() throws Exception {
+    staticLog.info("Static setup");
+
     startProfiler();
 
     // hacky state machine
@@ -290,11 +280,12 @@ public abstract class AbstractNexusIntegrationTest
    * possible.
    */
   @Before
-  public void oncePerClassSetUp()
-      throws Exception
-  {
+  public void oncePerClassSetUp() throws Exception {
+    log.info("Instance setup");
     synchronized (AbstractNexusIntegrationTest.class) {
       if (NEEDS_INIT) {
+        log.info("Initializing");
+
         // start per-IT plexus container
         TestContainer.getInstance().startPlexusContainer(getClass(), new SecurityModule());
 
@@ -311,7 +302,7 @@ public abstract class AbstractNexusIntegrationTest
         }
 
         // tell the console what we are doing, now that there is no output its
-        String logMessage = "Running Test: " + getTestId() + " - Class: " + this.getClass().getSimpleName();
+        String logMessage = "Running Test: " + getTestId() + " - Class: " + getClass().getSimpleName();
         staticLog.info(String.format("%1$-" + logMessage.length() + "s", " ").replaceAll(" ", "*"));
         staticLog.info(logMessage);
         staticLog.info(String.format("%1$-" + logMessage.length() + "s", " ").replaceAll(" ", "*"));
@@ -321,7 +312,7 @@ public abstract class AbstractNexusIntegrationTest
 
         copyTestResources();
 
-        this.copyConfigFiles();
+        copyConfigFiles();
 
         // start nexus
         startNexus();
@@ -347,6 +338,8 @@ public abstract class AbstractNexusIntegrationTest
   }
 
   protected void makeAnonymousAdministrator(final boolean shouldBeAdmin) throws Exception {
+    log.info("Making anonymous user administrator: {}", shouldBeAdmin);
+
     TestContainer.getInstance().invokeAsAdministrator(new Callable<Object>()
     {
       @Override
@@ -399,18 +392,18 @@ public abstract class AbstractNexusIntegrationTest
   }
 
   @After
-  public void afterTest()
-      throws Exception
-  {
+  public void afterTest() throws Exception {
+    log.info("Cleanup");
+
     // reset this for each test
     TestContainer.getInstance().reset();
     TestContainer.getInstance().getTestContext().setSecureTest(true);
   }
 
   @AfterClass
-  public static void oncePerClassTearDown()
-      throws Exception
-  {
+  public static void oncePerClassTearDown() throws Exception {
+    staticLog.info("Static cleanup");
+
     try {
       TaskScheduleUtil.waitForAllTasksToStop();
       new EventInspectorsUtil(RequestFacade.getNexusRestClient()).waitForCalmPeriod();
@@ -433,9 +426,7 @@ public abstract class AbstractNexusIntegrationTest
     System.setProperties(systemPropertiesBackup);
   }
 
-  protected void runOnce()
-      throws Exception
-  {
+  protected void runOnce() throws Exception {
     // must override to happen something
   }
 
@@ -443,15 +434,11 @@ public abstract class AbstractNexusIntegrationTest
     return new File(nexusLogDir + "/" + getTestId() + "/nexus.log");
   }
 
-  protected void beforeStartClean()
-      throws Exception
-  {
+  protected void beforeStartClean() throws Exception {
     cleanWorkDir();
   }
 
-  protected void copyTestResources()
-      throws IOException
-  {
+  protected void copyTestResources() throws IOException {
     File source = new File(TestProperties.getString("test.resources.source.folder"), getTestResource(null));
     if (!source.exists()) {
       return;
@@ -459,28 +446,30 @@ public abstract class AbstractNexusIntegrationTest
 
     File destination = new File(TestProperties.getString("test.resources.folder"), getTestResource(null));
 
+    log.info("Copying test resources {} to {}", source, destination);
+
     FileTestingUtils.interpolationDirectoryCopy(source, destination, getTestProperties());
   }
 
-  protected void copyConfigFiles()
-      throws IOException
-  {
+  protected void copyConfigFiles() throws IOException {
+    log.info("Copying config files");
+
     Map<String, String> testProperties = getTestProperties();
 
-    this.copyConfigFile("nexus.xml", testProperties, WORK_CONF_DIR);
+    copyConfigFile("nexus.xml", testProperties, WORK_CONF_DIR);
 
     // copy security config
-    this.copyConfigFile("security.xml", testProperties, WORK_CONF_DIR);
-    this.copyConfigFile("security-configuration.xml", testProperties, WORK_CONF_DIR);
+    copyConfigFile("security.xml", testProperties, WORK_CONF_DIR);
+    copyConfigFile("security-configuration.xml", testProperties, WORK_CONF_DIR);
 
-    this.copyConfigFile("logback.properties", testProperties, WORK_CONF_DIR);
-    this.copyConfigFile("logback-nexus.xml", testProperties, WORK_CONF_DIR);
+    copyConfigFile("logback.properties", testProperties, WORK_CONF_DIR);
+    copyConfigFile("logback-nexus.xml", testProperties, WORK_CONF_DIR);
   }
 
-  protected static void cleanWorkDir()
-      throws Exception
-  {
+  protected static void cleanWorkDir() throws Exception {
     final File workDir = new File(AbstractNexusIntegrationTest.nexusWorkDir);
+
+    staticLog.info("Cleaning work directory: {}", workDir);
 
     // to make sure I don't delete all my MP3's and pictures, or totally screw anyone.
     // check for 'target' and not allow any '..'
@@ -504,16 +493,13 @@ public abstract class AbstractNexusIntegrationTest
           }
         }
       }
-
     }
   }
 
   /**
    * Deploys all the provided files needed before IT actually starts.
    */
-  protected void deployArtifacts()
-      throws Exception
-  {
+  protected void deployArtifacts() throws Exception {
     // test the test directory
     File projectsDir = getTestResourceAsFile("projects");
 
@@ -525,65 +511,61 @@ public abstract class AbstractNexusIntegrationTest
    * DistributionManagement section and invoking the getWagonHintForDeployProtocol(String protocol) to get the wagon
    * hint.
    */
-  protected void deployArtifacts(final File projectsDir)
-      throws Exception
-  {
+  protected void deployArtifacts(final File projectsDir) throws Exception {
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-    log.debug("projectsDir: " + projectsDir);
+    // skip if nothing to deploy
+    if (projectsDir == null || !projectsDir.isDirectory()) {
+      return;
+    }
 
-    // if null there is nothing to deploy...
-    if (projectsDir != null && projectsDir.isDirectory()) {
+    log.info("Deploying artifacts; projects directory: {}", projectsDir);
 
-      // we have the parent dir, for each child (one level) we need to grab the pom.xml out of it and parse it,
-      // and then deploy the artifact, sounds like fun, right!
+    // we have the parent dir, for each child (one level) we need to grab the pom.xml out of it and parse it,
+    // and then deploy the artifact, sounds like fun, right!
 
-      final File[] projectFolders = projectsDir.listFiles(MavenProjectFileFilter.INSTANCE);
+    final File[] projectFolders = projectsDir.listFiles(MavenProjectFileFilter.INSTANCE);
+    if (projectFolders == null) {
+      // bail out
+      return;
+    }
 
-      if (projectFolders == null) {
-        // bail out
-        return;
+    // to achieve same ordering on different OSes
+    Arrays.sort(projectFolders);
+
+    for (File project : projectFolders) {
+      File pom = new File(project, "pom.xml");
+      assertThat(pom, FileMatchers.exists());
+      log.info("Deploying artifacts from project: {}", pom);
+
+      MavenXpp3Reader reader = new MavenXpp3Reader();
+      Model model;
+      try (FileInputStream fis = new FileInputStream(pom)) {
+        model = reader.read(fis);
       }
 
-      // to achieve same ordering on different OSes
-      Arrays.sort(projectFolders);
-
-      for (int ii = 0; ii < projectFolders.length; ii++) {
-        File project = projectFolders[ii];
-
-        // we already check if the pom.xml was in here.
-        File pom = new File(project, "pom.xml");
-
-        MavenXpp3Reader reader = new MavenXpp3Reader();
-        Model model = null;
-        try (FileInputStream fis = new FileInputStream(pom)) {
-          model = reader.read(fis);
-        }
-
-        // a helpful note so you don't need to dig into the code to much.
-        if (model.getDistributionManagement() == null
-            || model.getDistributionManagement().getRepository() == null) {
-          Assert.fail("The test artifact is either missing or has an invalid Distribution Management section.");
-        }
-
-        // get the URL to deploy
-        String deployUrl = model.getDistributionManagement().getRepository().getUrl();
-
-        // get the protocol
-        String deployUrlProtocol = deployUrl.substring(0, deployUrl.indexOf(":"));
-
-        // calculate the wagon hint
-        String wagonHint = getWagonHintForDeployProtocol(deployUrlProtocol);
-
-        deployArtifacts(project, wagonHint, deployUrl, model);
+      // a helpful note so you don't need to dig into the code to much.
+      if (model.getDistributionManagement() == null || model.getDistributionManagement().getRepository() == null) {
+        Assert.fail("The test artifact is either missing or has an invalid Distribution Management section.");
       }
+
+      // get the URL to deploy
+      String deployUrl = model.getDistributionManagement().getRepository().getUrl();
+
+      // get the protocol
+      String deployUrlProtocol = deployUrl.substring(0, deployUrl.indexOf(":"));
+
+      // calculate the wagon hint
+      String wagonHint = getWagonHintForDeployProtocol(deployUrlProtocol);
+
+      deployArtifacts(project, wagonHint, deployUrl, model);
     }
   }
 
   /**
-   * Does "protocol to wagon hint" converion: the default is just return the same, but maybe some test wants to
-   * override this.
+   * This is never overridden, remove.
    */
+  @Deprecated
   protected String getWagonHintForDeployProtocol(String deployProtocol) {
     return deployProtocol;
   }
@@ -593,11 +575,8 @@ public abstract class AbstractNexusIntegrationTest
    * deployUrl
    * with file: protocol to be deployed with file wagon would be error). Model is supplied since it is read before.
    */
-  protected void deployArtifacts(File project, String wagonHint, String deployUrl, Model model)
-      throws Exception
-  {
-    log.info("Deploying project \"" + project.getAbsolutePath() + "\" using Wagon:" + wagonHint + " to URL=\""
-        + deployUrl + "\".");
+  protected void deployArtifacts(File project, String wagonHint, String deployUrl, Model model) throws Exception {
+    log.info("Deploying project \"{}\" using Wagon:{} to URL=\"{}\".", project.getAbsolutePath(), wagonHint, deployUrl);
 
     // we already check if the pom.xml was in here.
     File pom = new File(project, "pom.xml");
@@ -614,10 +593,20 @@ public abstract class AbstractNexusIntegrationTest
 
     log.debug("wow, this is working: " + artifactFile.getName());
 
-    final Gav gav =
-        new Gav(model.getGroupId(), model.getArtifactId(), model.getVersion(), null,
-            extension, null, null, artifactFile.getName(), false, null,
-            false, null);
+    final Gav gav = new Gav(
+        model.getGroupId(),
+        model.getArtifactId(),
+        model.getVersion(),
+        null, // classifer
+        extension,
+        null, // snap #
+        null, // snap ts
+        artifactFile.getName(),
+        false, // hash
+        null,  // hash type
+        false, // sig
+        null   // sig type
+    );
 
     // the Restlet Client does not support multipart forms:
     // http://restlet.tigris.org/issues/show_bug.cgi?id=71
@@ -637,35 +626,30 @@ public abstract class AbstractNexusIntegrationTest
 
     try {
       if (artifactSha1.exists()) {
-        getDeployUtils().deployWithWagon(wagonHint, deployUrl, artifactSha1,
-            this.getRelitiveArtifactPath(gav) + ".sha1");
+        getDeployUtils().deployWithWagon(wagonHint, deployUrl, artifactSha1, getRelitiveArtifactPath(gav) + ".sha1");
       }
       if (artifactMd5.exists()) {
-        getDeployUtils().deployWithWagon(wagonHint, deployUrl, artifactMd5,
-            this.getRelitiveArtifactPath(gav) + ".md5");
+        getDeployUtils().deployWithWagon(wagonHint, deployUrl, artifactMd5, getRelitiveArtifactPath(gav) + ".md5");
       }
       if (artifactAsc.exists()) {
-        getDeployUtils().deployWithWagon(wagonHint, deployUrl, artifactAsc,
-            this.getRelitiveArtifactPath(gav) + ".asc");
+        getDeployUtils().deployWithWagon(wagonHint, deployUrl, artifactAsc, getRelitiveArtifactPath(gav) + ".asc");
       }
 
       if (artifactFile.exists()) {
-        getDeployUtils().deployWithWagon(wagonHint, deployUrl, artifactFile,
-            this.getRelitiveArtifactPath(gav));
+        getDeployUtils().deployWithWagon(wagonHint, deployUrl, artifactFile, getRelitiveArtifactPath(gav));
       }
 
       if (pomSha1.exists()) {
-        getDeployUtils().deployWithWagon(wagonHint, deployUrl, pomSha1,
-            this.getRelitivePomPath(gav) + ".sha1");
+        getDeployUtils().deployWithWagon(wagonHint, deployUrl, pomSha1, getRelitivePomPath(gav) + ".sha1");
       }
       if (pomMd5.exists()) {
-        getDeployUtils().deployWithWagon(wagonHint, deployUrl, pomMd5, this.getRelitivePomPath(gav) + ".md5");
+        getDeployUtils().deployWithWagon(wagonHint, deployUrl, pomMd5, getRelitivePomPath(gav) + ".md5");
       }
       if (pomAsc.exists()) {
-        getDeployUtils().deployWithWagon(wagonHint, deployUrl, pomAsc, this.getRelitivePomPath(gav) + ".asc");
+        getDeployUtils().deployWithWagon(wagonHint, deployUrl, pomAsc, getRelitivePomPath(gav) + ".asc");
       }
 
-      getDeployUtils().deployWithWagon(wagonHint, deployUrl, pom, this.getRelitivePomPath(gav));
+      getDeployUtils().deployWithWagon(wagonHint, deployUrl, pom, getRelitivePomPath(gav));
     }
     catch (Exception e) {
       log.error(getTestId() + " Unable to deploy " + artifactFileName, e);
@@ -673,37 +657,35 @@ public abstract class AbstractNexusIntegrationTest
     }
   }
 
-  protected void startNexus()
-      throws Exception
-  {
+  protected void startNexus() throws Exception {
+    log.info("Starting Nexus");
+
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     try {
       getNexusStatusUtil().start(getTestId());
     }
     catch (Exception e) {
+      log.error(e.toString(), e);
       e.printStackTrace();
-      staticLog.error(e.getMessage(), e);
       throw e;
     }
   }
 
-  protected static void stopNexus()
-      throws Exception
-  {
+  protected static void stopNexus() throws Exception {
+    staticLog.info("Stopping Nexus");
     getNexusStatusUtil().stop();
   }
 
-  protected void restartNexus()
-      throws Exception
-  {
+  protected void restartNexus() throws Exception {
+    log.info("Restarting Nexus");
     stopNexus();
     startNexus();
   }
 
   protected File getOverridableFile(String file) {
     // the test can override the test config.
-    File testConfigFile = this.getTestResourceAsFile("test-config/" + file);
+    File testConfigFile = getTestResourceAsFile("test-config/" + file);
 
     // if the tests doesn't have a different config then use the default.
     // we need to replace every time to make sure no one changes it.
@@ -720,8 +702,7 @@ public abstract class AbstractNexusIntegrationTest
       throws IOException
   {
     // the test can override the test config.
-    File testConfigFile = this.getOverridableFile(configFile);
-
+    File testConfigFile = getOverridableFile(configFile);
     if (testConfigFile == null) {
       return;
     }
@@ -732,7 +713,7 @@ public abstract class AbstractNexusIntegrationTest
     }
 
     File destFile = new File(parent, destShortName);
-    log.debug(LIx2 + "copying " + configFile + " to:  " + destFile);
+    log.info("Copying config file {} to: {}", configFile, destFile);
 
     FileTestingUtils.interpolationFileCopy(testConfigFile, destFile, variables);
 
@@ -740,17 +721,12 @@ public abstract class AbstractNexusIntegrationTest
 
   // Overloaded helpers
 
-  protected void copyConfigFile(String configFile, String path)
-      throws IOException
-  {
-    this.copyConfigFile(configFile, new HashMap<String, String>(), path);
+  protected void copyConfigFile(String configFile, String path) throws IOException {
+    copyConfigFile(configFile, new HashMap<String, String>(), path);
   }
 
-  protected void copyConfigFile(String configFile, Map<String, String> variables, String path)
-      throws IOException
-  {
-    this.copyConfigFile(configFile, configFile, variables, path);
-
+  protected void copyConfigFile(String configFile, Map<String, String> variables, String path) throws IOException {
+    copyConfigFile(configFile, configFile, variables, path);
   }
 
   /**
@@ -765,12 +741,12 @@ public abstract class AbstractNexusIntegrationTest
   }
 
   protected String getTestResource(String relativePath) {
-    return this.getClass().getPackage().getName().replace(".", "/")
+    return getClass().getPackage().getName().replace(".", "/")
         + (relativePath == null || "/".equals(relativePath.trim()) ? "" : "/" + relativePath);
   }
 
   protected String getTestId() {
-    String packageName = this.getClass().getPackage().getName();
+    String packageName = getClass().getPackage().getName();
     return packageName.substring(packageName.lastIndexOf('.') + 1, packageName.length());
   }
 
@@ -782,11 +758,11 @@ public abstract class AbstractNexusIntegrationTest
    * @return A file specified by the relativePath. or null if it does not exist.
    */
   protected File getTestFile(String relativePath) {
-    return this.getTestResourceAsFile("files/" + relativePath);
+    return getTestResourceAsFile("files/" + relativePath);
   }
 
   public static File getResource(String resource) {
-    staticLog.debug(LIx1 + "Looking for resource: " + resource);
+    staticLog.debug("Looking for resource: {}", resource);
     // URL classURL = Thread.currentThread().getContextClassLoader().getResource( resource );
 
     File rootDir = new File(TestProperties.getString("test.resources.folder"));
@@ -795,9 +771,6 @@ public abstract class AbstractNexusIntegrationTest
     if (!file.exists()) {
       return null;
     }
-
-    staticLog.debug(LIx2 + "found: " + file);
-
     return file;
   }
 
@@ -819,7 +792,7 @@ public abstract class AbstractNexusIntegrationTest
       controllerClazz.getMethod("captureMemorySnapshot").invoke(profiler);
     }
     catch (Exception e) {
-      fail("Profiler was active, but failed due: " + e.getMessage());
+      fail("Profiler was active, but failed: " + e);
     }
   }
 
@@ -830,69 +803,40 @@ public abstract class AbstractNexusIntegrationTest
         profiler.getClass().getMethod("captureMemorySnapshot").invoke(profiler);
       }
       catch (Exception e) {
-        fail("Profiler was active, but failed due: " + e.getMessage());
+        fail("Profiler was active, but failed: " + e);
       }
     }
   }
 
-  /**
-   * Returns the basedir.
-   *
-   * @deprecated Use {@link TestContainer#getBasedir()} instead.
-   */
-  @Deprecated
-  public static String getBasedir() {
-    return TestContainer.getBasedir();
-  }
+  // FIXME: Change signature to thorws Exception (don't let plexus api leak here)
 
-  @Deprecated
-  protected Object lookup(String role)
-      throws ComponentLookupException
-  {
+  protected <E> E lookup(Class<E> role) throws ComponentLookupException {
     return getITPlexusContainer().lookup(role);
   }
 
-  @Deprecated
-  protected Object lookup(String role, String hint)
-      throws ComponentLookupException
-  {
+  protected <E> E lookup(Class<E> role, String hint) throws ComponentLookupException {
     return getITPlexusContainer().lookup(role, hint);
   }
 
-  protected <E> E lookup(Class<E> role)
-      throws ComponentLookupException
-  {
-    return getITPlexusContainer().lookup(role);
-  }
-
-  protected <E> E lookup(Class<E> role, String hint)
-      throws ComponentLookupException
-  {
-    return getITPlexusContainer().lookup(role, hint);
-  }
-
-  protected String getRelitivePomPath(Gav gav)
-      throws FileNotFoundException
-  {
+  protected String getRelitivePomPath(Gav gav) throws FileNotFoundException {
     return GavUtil.getRelitivePomPath(gav);
   }
 
-  protected String getRelitiveArtifactPath(Gav gav)
-      throws FileNotFoundException
-  {
+  protected String getRelitiveArtifactPath(Gav gav) throws FileNotFoundException {
     return GavUtil.getRelitiveArtifactPath(gav);
   }
 
-  protected String getRelitiveArtifactPath(String groupId, String artifactId, String version, String extension,
+  protected String getRelitiveArtifactPath(String groupId,
+                                           String artifactId,
+                                           String version,
+                                           String extension,
                                            String classifier)
       throws FileNotFoundException
   {
     return GavUtil.getRelitiveArtifactPath(groupId, artifactId, version, extension, classifier);
   }
 
-  public File downloadSnapshotArtifact(String repository, Gav gav, File parentDir)
-      throws IOException
-  {
+  public File downloadSnapshotArtifact(String repository, Gav gav, File parentDir) throws IOException {
     // @see http://issues.sonatype.org/browse/NEXUS-599
     // r=<repoId> -- mandatory
     // g=<groupId> -- mandatory
@@ -911,9 +855,11 @@ public abstract class AbstractNexusIntegrationTest
     try {
       response = RequestFacade.doGetRequest(serviceURI);
 
-      assertThat(
-          response,
-          allOf(isRedirecting(), respondsWithStatusCode(307), redirectLocation(notNullValue(String.class))));
+      assertThat(response, allOf(
+          isRedirecting(),
+          respondsWithStatusCode(307),
+          redirectLocation(notNullValue(String.class)))
+      );
 
       serviceURI = response.getLocationRef().toString();
     }
@@ -931,9 +877,12 @@ public abstract class AbstractNexusIntegrationTest
   protected Metadata downloadMetadataFromRepository(Gav gav, String repoId)
       throws IOException, XmlPullParserException
   {
-    String url =
-        this.getBaseNexusUrl() + REPOSITORY_RELATIVE_URL + repoId + "/" + gav.getGroupId() + "/"
-            + gav.getArtifactId() + "/maven-metadata.xml";
+    String url = String.format("%s%s%s/%s/%s/maven-metadata.xml",
+        getBaseNexusUrl(),
+        REPOSITORY_RELATIVE_URL,
+        repoId,
+        gav.getGroupId(),
+        gav.getArtifactId());
 
     Response response = null;
     try {
@@ -951,25 +900,31 @@ public abstract class AbstractNexusIntegrationTest
     }
   }
 
-  protected File downloadArtifact(Gav gav, String targetDirectory)
-      throws IOException
-  {
-    return this.downloadArtifact(gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
-        gav.getClassifier(), targetDirectory);
+  protected File downloadArtifact(Gav gav, String targetDirectory) throws IOException {
+    return downloadArtifact(
+        gav.getGroupId(),
+        gav.getArtifactId(),
+        gav.getVersion(),
+        gav.getExtension(),
+        gav.getClassifier(),
+        targetDirectory);
   }
 
-  protected File downloadArtifact(String groupId, String artifact, String version, String type, String classifier,
+  protected File downloadArtifact(String groupId,
+                                  String artifact,
+                                  String version,
+                                  String type,
+                                  String classifier,
                                   String targetDirectory)
       throws IOException
   {
-    return this.downloadArtifact(this.getNexusTestRepoUrl(), groupId, artifact, version, type, classifier,
-        targetDirectory);
+    return downloadArtifact(getNexusTestRepoUrl(), groupId, artifact, version, type, classifier, targetDirectory);
   }
 
   protected File downloadArtifactFromRepository(String repoId, Gav gav, String targetDirectory)
       throws IOException
   {
-    return this.downloadArtifact(AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + repoId
+    return downloadArtifact(AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + repoId
         + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
         targetDirectory);
   }
@@ -977,7 +932,7 @@ public abstract class AbstractNexusIntegrationTest
   protected File downloadArtifactFromGroup(String groupId, Gav gav, String targetDirectory)
       throws IOException
   {
-    return this.downloadArtifact(AbstractNexusIntegrationTest.nexusBaseUrl + GROUP_REPOSITORY_RELATIVE_URL
+    return downloadArtifact(AbstractNexusIntegrationTest.nexusBaseUrl + GROUP_REPOSITORY_RELATIVE_URL
         + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
         gav.getClassifier(), targetDirectory);
   }
@@ -986,29 +941,23 @@ public abstract class AbstractNexusIntegrationTest
                                   String classifier, String targetDirectory)
       throws IOException
   {
-    URL url = new URL(baseUrl + this.getRelitiveArtifactPath(groupId, artifact, version, type, classifier));
+    URL url = new URL(baseUrl + getRelitiveArtifactPath(groupId, artifact, version, type, classifier));
 
     String classifierPart = (classifier != null) ? "-" + classifier : "";
-    return this.downloadFile(url, targetDirectory + "/" + artifact + "-" + version + classifierPart + "." + type);
+    return downloadFile(url, targetDirectory + "/" + artifact + "-" + version + classifierPart + "." + type);
   }
 
-  public File downloadFile(URL url, String targetFile)
-      throws IOException
-  {
-
+  public File downloadFile(URL url, String targetFile) throws IOException {
+    log.info("Downloading {} to: {}", url, targetFile);
     return RequestFacade.downloadFile(url, targetFile);
   }
 
-  protected boolean deleteFromRepository(String groupOrArtifactPath)
-      throws IOException
-  {
-    return this.deleteFromRepository(this.testRepositoryId, groupOrArtifactPath);
+  protected boolean deleteFromRepository(String groupOrArtifactPath) throws IOException {
+    return deleteFromRepository(testRepositoryId, groupOrArtifactPath);
   }
 
-  protected boolean deleteFromRepository(String repository, String groupOrArtifactPath)
-      throws IOException
-  {
-    String serviceURI = "service/local/repositories/" + repository + "/content/" + groupOrArtifactPath;
+  protected boolean deleteFromRepository(String repository, String groupOrArtifactPath) throws IOException {
+    String serviceURI = String.format("service/local/repositories/%s/content/%s", repository, groupOrArtifactPath);
 
     Status status = RequestFacade.doGetForStatus(serviceURI);
     if (status.equals(Status.CLIENT_ERROR_NOT_FOUND)) {
@@ -1016,7 +965,6 @@ public abstract class AbstractNexusIntegrationTest
       return true;
     }
 
-    // ---
     log.debug("deleting: " + serviceURI);
     status = RequestFacade.doDeleteForStatus(serviceURI, null);
     boolean deleted = status.isSuccess();
@@ -1047,7 +995,7 @@ public abstract class AbstractNexusIntegrationTest
   }
 
   public String getNexusTestRepoServiceUrl() {
-    return nexusBaseUrl + "service/local/repositories/" + testRepositoryId + "/content/";
+    return String.format("%sservice/local/repositories/%s/content/", nexusBaseUrl, testRepositoryId);
   }
 
   public String getNexusBaseDir() {
@@ -1061,7 +1009,7 @@ public abstract class AbstractNexusIntegrationTest
 
   @Deprecated
   public void setTestRepositoryId(String repoId) {
-    this.testRepositoryId = repoId;
+    testRepositoryId = repoId;
   }
 
   public String getRepositoryUrl(String repoId) {
@@ -1073,8 +1021,8 @@ public abstract class AbstractNexusIntegrationTest
   }
 
   protected boolean printKnownErrorButDoNotFail(Class<? extends AbstractNexusIntegrationTest> clazz, String... tests) {
-    StringBuilder error =
-        new StringBuilder("*********************************************************************************");
+    StringBuilder error = new StringBuilder();
+    error.append("*********************************************************************************");
     error.append("\n* This test is being skipped because its known to fail,");
     error.append("\n* It is a very minor error, and is only a problem if you start sending in ");
     error.append("\n* raw REST request to Nexus. (it is not a security problem)");
@@ -1086,7 +1034,6 @@ public abstract class AbstractNexusIntegrationTest
     error.append("\n**********************************************************************************");
 
     log.info(error.toString());
-
     return true;
   }
 
@@ -1097,8 +1044,6 @@ public abstract class AbstractNexusIntegrationTest
   public XStream getJsonXStream() {
     return XStreamFactory.getJsonXStream();
   }
-
-  // == IT Container management
 
   public PlexusContainer getITPlexusContainer() {
     return TestContainer.getInstance().getPlexusContainer();

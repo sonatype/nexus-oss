@@ -36,10 +36,8 @@ public abstract class NXCM1898P2ProxyTimeoutIT
 
   @Override
   @Before
-  public void startProxy()
-      throws Exception
-  {
-    proxyServer = (ServletServer) lookup(ServletServer.ROLE, "timeout");
+  public void startProxy() throws Exception {
+    proxyServer = lookup(ServletServer.class, "timeout");
     proxyServer.start();
   }
 

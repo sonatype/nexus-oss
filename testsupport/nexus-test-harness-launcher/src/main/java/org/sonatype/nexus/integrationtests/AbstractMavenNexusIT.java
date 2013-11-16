@@ -32,10 +32,6 @@ public class AbstractMavenNexusIT
     super(testRepositoryId);
   }
 
-  protected MavenVerifierHelper getMavenVerifierHelper() {
-    return getStaticMavenVerifierHelper();
-  }
-
   private static MavenVerifierHelper getStaticMavenVerifierHelper() {
     return mavenVerifierHelper;
   }
@@ -73,16 +69,6 @@ public class AbstractMavenNexusIT
     final MavenDeployment mavenDeployment = MavenDeployment.defaultDeployment(logname, settings, mavenProject);
     cleanRepository(mavenDeployment.getLocalRepositoryFile(), testId);
     return getStaticMavenVerifierHelper().createMavenVerifier(mavenDeployment);
-  }
-
-  /**
-   * Remove all artifacts on <code>testId</code> groupId
-   */
-  @Deprecated
-  public void cleanRepository(File mavenRepo)
-      throws IOException
-  {
-    cleanRepository(mavenRepo, getTestId());
   }
 
   /**

@@ -184,12 +184,8 @@ public class Hc4MethodCall
       }
     }
     catch (IOException ioe) {
-      this.clientHelper
-          .getLogger()
-          .log(
-              Level.WARNING,
-              "An error occurred during the communication with the remote HTTP server.",
-              ioe);
+      this.clientHelper.getLogger()
+          .log(Level.WARNING, "An error occurred during the communication with the remote HTTP server.", ioe);
     }
 
     return result;

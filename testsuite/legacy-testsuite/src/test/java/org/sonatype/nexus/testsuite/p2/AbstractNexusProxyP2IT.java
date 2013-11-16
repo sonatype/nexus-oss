@@ -65,10 +65,8 @@ public abstract class AbstractNexusProxyP2IT
     }
   }
 
-  protected ServletServer lookupProxyServer()
-      throws ComponentLookupException
-  {
-    return (ServletServer) lookup(ServletServer.ROLE);
+  protected ServletServer lookupProxyServer() throws ComponentLookupException {
+    return lookup(ServletServer.class);
   }
 
   protected void replaceInFile(final String filename, final String target, final String replacement)

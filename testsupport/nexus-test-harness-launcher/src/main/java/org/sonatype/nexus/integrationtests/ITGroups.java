@@ -19,13 +19,5 @@ public final class ITGroups
 
   public static final class INDEX {}
 
-  ;
-
   public static final class SECURITY {}
-
-  ;
-
-  public static final class CHECKIN {}
-
-  ;
 }
