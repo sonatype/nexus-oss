@@ -51,6 +51,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.eclipse.jetty.orbit</groupId>
+      <artifactId>javax.servlet</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
@@ -193,6 +198,11 @@
       <artifactId>shiro-guice</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-web</artifactId>
+    </dependency>
+
     <!-- SISU Container -->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
@@ -313,12 +323,6 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-digest</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-web</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

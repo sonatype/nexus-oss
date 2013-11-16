@@ -30,6 +30,9 @@
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
+    <!--
+    NOTE: Code from this module are used via reflection, but must not be on the classpath.
+    -->
     <!--<dependency>-->
       <!--<groupId>org.sonatype.nexus</groupId>-->
       <!--<artifactId>nexus-bootstrap</artifactId>-->
@@ -38,11 +41,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-web-utils</artifactId>
     </dependency>
 
     <dependency>
