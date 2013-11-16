@@ -46,14 +46,6 @@
       <artifactId>jcl-over-slf4j</artifactId>
     </dependency>
 
-    <!--
-    FIXME: WebappBootstrap installs JUL adapter, which it probably should not.
-    -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>log4j-over-slf4j</artifactId>
