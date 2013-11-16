@@ -54,7 +54,7 @@ public class EmbeddedNexusBooter
 
   private final File installDir;
 
-  private final Map<String,String> properties;
+  private final Map<String,String> overrides;
 
   private final ClassWorld world;
 
@@ -72,47 +72,34 @@ public class EmbeddedNexusBooter
     this.installDir = checkNotNull(installDir).getCanonicalFile();
     log.info("Install directory: {}", installDir);
 
-    // HACK: This is non-standard setup by the test-enviroinment bullshit (AbstractEnvironmentMojo)
+    // HACK: This is non-standard setup by the test-enviroinment (AbstractEnvironmentMojo)
     File workDir = new File(installDir, "../sonatype-work").getCanonicalFile();
     log.info("Work directory: {}", workDir);
 
     checkArgument(port > 1024);
     log.info("Port: {}", port);
 
-    properties = new HashMap<>();
-    // jetty confguration
-    properties.put("application-host", "0.0.0.0");
-    properties.put("application-port", String.valueOf(port));
-    properties.put("nexus-webapp", new File(installDir, "nexus").getPath());
-    properties.put("nexus-webapp-context-path", "/nexus");
-
-    // application configuration
-    properties.put("bundleBasedir", installDir.getPath());
-    properties.put("runtime", new File(installDir, "nexus/WEB-INF").getPath());
-    properties.put("nexus-app", properties.get("runtime"));
-    properties.put("nexus-work", workDir.getPath());
-    properties.put("application-conf", new File(workDir, "conf").getPath());
-    properties.put("security-xml-file", new File(workDir, "conf/security.xml").getPath());
+    overrides = new HashMap<>();
+    overrides.put("application-port", String.valueOf(port));
+    overrides.put("bundleBasedir", installDir.getPath());
+    overrides.put("nexus-work", workDir.getPath());
 
     // force bootstrap logback configuration
-    properties.put("logback.configurationFile", new File(installDir, "conf/logback.xml").getPath());
+    overrides.put("logback.configurationFile", new File(installDir, "conf/logback.xml").getPath());
 
     // guice finalizer
-    properties.put("guice.executor.class", "NONE");
+    overrides.put("guice.executor.class", "NONE");
 
     // Making MI integration in Nexus behave in-sync
-    properties.put("org.sonatype.nexus.events.IndexerManagerEventInspector.async", Boolean.FALSE.toString());
+    overrides.put("org.sonatype.nexus.events.IndexerManagerEventInspector.async", Boolean.FALSE.toString());
 
     // Disable autorouting initialization prevented
-    properties.put(ConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString());
+    overrides.put(ConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString());
 
-    log.info("Properties:");
-    for (Entry<String,String> entry : properties.entrySet()) {
+    log.info("Overrides:");
+    for (Entry<String,String> entry : overrides.entrySet()) {
       log.info("  {}='{}'", entry.getKey(), entry.getValue());
     }
-
-    // Export everything to system properties
-    System.getProperties().putAll(properties);
 
     tamperJettyConfiguration();
 
@@ -188,7 +175,7 @@ public class EmbeddedNexusBooter
 
       launcher = launcherFactory.newInstance(
           testRealm,
-          properties,
+          overrides,
           new String[] { new File(installDir, "conf/jetty.xml").getAbsolutePath() }
       );
     }
