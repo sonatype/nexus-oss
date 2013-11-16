@@ -15,15 +15,10 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.Map;
 
 import org.sonatype.nexus.integrationtests.RequestFacade;
 
-import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
@@ -37,20 +32,20 @@ public class FeedUtil
   private static final String FEED_URL_PART = "service/local/feeds/";
 
   public static SyndFeed getFeed(String feedId)
-      throws IllegalArgumentException, MalformedURLException, FeedException, IOException
+      throws IllegalArgumentException, FeedException, IOException
   {
     return getFeed(feedId, null, null, null);
   }
 
   public static SyndFeed getFeed(String feedId, int from, int count)
-      throws IllegalArgumentException, MalformedURLException, FeedException, IOException
+      throws IllegalArgumentException, FeedException, IOException
   {
     return getFeed(feedId, from, count, null);
   }
 
   public static SyndFeed getFeed(final String feedId, final Integer from, final Integer count,
                                  final Map<String, String> params)
-      throws IllegalArgumentException, MalformedURLException, FeedException, IOException
+      throws IllegalArgumentException, FeedException, IOException
   {
     final StringBuilder sb = new StringBuilder();
     sb.append("?_dc=" + System.currentTimeMillis());
@@ -74,21 +69,5 @@ public class FeedUtil
     Assert.assertTrue("Unexpected response: " + text, response.getStatus().isSuccess());
 
     return new SyndFeedInput().build(new XmlReader(new ByteArrayInputStream(text.getBytes())));
-  }
-
-  @SuppressWarnings("unchecked")
-  public static void sortSyndEntryOrderByPublishedDate(final SyndFeed feed) {
-    Collections.sort(feed.getEntries(), new Comparator<SyndEntry>()
-    {
-      public int compare(SyndEntry o1, SyndEntry o2) {
-        Date d1 = (o1).getPublishedDate();
-        Date d2 = (o2).getPublishedDate();
-        // sort desc by date
-        if (d2 != null && d1 != null) {
-          return d2.compareTo(d1);
-        }
-        return -1;
-      }
-    });
   }
 }

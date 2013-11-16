@@ -29,11 +29,6 @@ import org.restlet.data.Status;
 
 public class SettingsMessageUtil
 {
-  /**
-   * A copy from org.sonatype.nexus.rest.AbstractNexusPlexusResource to not have plugin dependency in ITs!
-   */
-  public static final String PASSWORD_PLACE_HOLDER = "|$|N|E|X|U|S|$|";
-
   private static XStream xstream;
 
   static {
@@ -70,7 +65,6 @@ public class SettingsMessageUtil
   public static Status save(final SmtpSettingsResource smtpSettings)
       throws IOException
   {
-    String serviceURI = "service/local/check_smtp_settings/";
     SmtpSettingsResourceRequest configResponse = wrapData(smtpSettings);
     XStreamRepresentation representation = new XStreamRepresentation(xstream, "", MediaType.APPLICATION_XML);
     representation.setPayload(configResponse);

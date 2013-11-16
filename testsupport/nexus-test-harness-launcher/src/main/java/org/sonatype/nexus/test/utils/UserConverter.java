@@ -18,23 +18,6 @@ import org.sonatype.security.rest.model.UserResource;
 
 public class UserConverter
 {
-
-  public static UserResource toUserResource(CUser user) {
-    UserResource resource = new UserResource();
-    resource.setEmail(user.getEmail());
-    resource.setFirstName(user.getFirstName());
-    resource.setLastName(user.getLastName());
-    resource.setStatus(user.getStatus());
-    resource.setUserId(user.getId());
-
-    //        for ( String roleId : (List<String>) user.getRoles() )
-    //        {
-    //            resource.addRole( roleId );
-    //        }
-
-    return resource;
-  }
-
   public static CUser toCUser(UserResource resource) {
     CUser user = new CUser();
 

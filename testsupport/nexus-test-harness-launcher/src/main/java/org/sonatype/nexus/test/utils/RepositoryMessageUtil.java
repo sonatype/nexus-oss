@@ -21,7 +21,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
-import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
@@ -46,9 +45,6 @@ import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 public class RepositoryMessageUtil
     extends ITUtil
 {
-
-  public static final String ALL_SERVICE_PART = RepositoriesNexusRestClient.ALL_SERVICE_PART;
-
   public static final String SERVICE_PART = RepositoriesNexusRestClient.SERVICE_PART;
 
   private static final Logger LOG = LoggerFactory.getLogger(RepositoryMessageUtil.class);
@@ -343,15 +339,6 @@ public class RepositoryMessageUtil
       throws IOException
   {
     repositoryNRC.updateStatus(repoStatus);
-  }
-
-  /**
-   * @deprecated This is half baked stuff
-   */
-  public static ContentListResourceResponse downloadRepoIndexContent(String repoId)
-      throws IOException
-  {
-    return REPOSITORY_NRC.downloadRepoIndexContent(repoId);
   }
 
   /**

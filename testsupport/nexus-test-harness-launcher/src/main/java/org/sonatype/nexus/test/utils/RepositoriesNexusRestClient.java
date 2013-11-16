@@ -17,21 +17,16 @@ import java.io.IOException;
 import java.util.List;
 
 import org.sonatype.nexus.integrationtests.NexusRestClient;
-import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
-import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
@@ -47,7 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.inError;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccess;
@@ -61,12 +55,6 @@ public class RepositoriesNexusRestClient
   public static final String ALL_SERVICE_PART = NexusRestClient.SERVICE_LOCAL + "all_repositories";
 
   public static final String SERVICE_PART = NexusRestClient.SERVICE_LOCAL + "repositories";
-
-  private static final Integer USE_DEFAULT_ARTIFACT_MAX_AGE = null;
-
-  private static final Integer USE_DEFAULT_METADATA_MAX_AGE = null;
-
-  private static final RepositoryWritePolicy USE_DEFAULT_REPOSITORY_WRITE_POLICY = null;
 
   private final NexusRestClient nexusRestClient;
 
@@ -148,23 +136,6 @@ public class RepositoriesNexusRestClient
     }
 
     return responseResource;
-  }
-
-  /**
-   * Updates remote URL for a proxy repository.
-   *
-   * @param repositoryId proxy repository id
-   * @param url          new URL
-   * @return updated repository
-   * @throws IOException if a problem occurred during update
-   */
-  public RepositoryBaseResource updateProxyRepositoryRemoteUrl(final String repositoryId, final String url)
-      throws IOException
-  {
-    final RepositoryBaseResource repository = getRepository(repositoryId);
-    assertThat(repository, instanceOf(RepositoryResource.class));
-    ((RepositoryResource) repository).getRemoteStorage().setRemoteStorageUrl(url);
-    return updateRepo(repository);
   }
 
   /**
@@ -268,7 +239,7 @@ public class RepositoriesNexusRestClient
   }
 
   private void reindex(String[] repositories, boolean incremental)
-      throws IOException, Exception
+      throws Exception
   {
     for (String repo : repositories) {
       String serviceURI;
@@ -365,10 +336,7 @@ public class RepositoriesNexusRestClient
 
     XStreamRepresentation re =
         new XStreamRepresentation(XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML);
-    ContentListResourceResponse resourceResponse =
-        (ContentListResourceResponse) re.getPayload(new ContentListResourceResponse());
-
-    return resourceResponse;
+    return (ContentListResourceResponse) re.getPayload(new ContentListResourceResponse());
   }
 
   /**
@@ -473,115 +441,6 @@ public class RepositoriesNexusRestClient
     request.setData(status);
     representation.setPayload(request);
 
-    Response response = nexusRestClient.sendMessage(serviceURI, Method.PUT, representation);
-    return response;
+    return nexusRestClient.sendMessage(serviceURI, Method.PUT, representation);
   }
-
-  public void createMavenHostedReleaseRepository(final String id)
-      throws IOException
-  {
-    createMavenHostedRepository(id, RepositoryPolicy.RELEASE);
-  }
-
-  public void createMavenHostedSnapshotRepository(final String id)
-      throws IOException
-  {
-    createMavenHostedRepository(id, RepositoryPolicy.SNAPSHOT);
-  }
-
-  public void createMavenHostedRepository(final String id, final RepositoryPolicy repositoryPolicy)
-      throws IOException
-  {
-    createMavenHostedRepository(id, repositoryPolicy, USE_DEFAULT_REPOSITORY_WRITE_POLICY);
-  }
-
-  public void createMavenHostedRepository(final String id,
-                                          final RepositoryPolicy repositoryPolicy,
-                                          final RepositoryWritePolicy repositoryWritePolicy)
-      throws IOException
-  {
-    final RepositoryResource repository = new RepositoryResource();
-
-    repository.setId(id);
-    repository.setRepoType("hosted");
-    repository.setName(id);
-    repository.setProvider("maven2");
-    repository.setFormat("maven2");
-    repository.setRepoPolicy(repositoryPolicy.name());
-    if (repositoryWritePolicy != null) {
-      repository.setWritePolicy(repositoryWritePolicy.name());
-    }
-    repository.setChecksumPolicy(ChecksumPolicy.IGNORE.name());
-    repository.setBrowseable(true);
-    repository.setIndexable(true);
-    repository.setExposed(true);
-
-    createRepository(repository);
-  }
-
-  public void createMavenProxyReleaseRepository(final String id, final String url)
-      throws IOException
-  {
-    createMavenProxyReleaseRepository(id, url, USE_DEFAULT_ARTIFACT_MAX_AGE, USE_DEFAULT_METADATA_MAX_AGE);
-  }
-
-  public void createMavenProxyReleaseRepository(final String id,
-                                                final String url,
-                                                final Integer artifactMaxAge,
-                                                final Integer metadataMaxAge)
-      throws IOException
-  {
-    createMavenProxyRepository(id, url, RepositoryPolicy.RELEASE, artifactMaxAge, metadataMaxAge);
-  }
-
-  public void createMavenProxySnapshotRepository(final String id, final String url)
-      throws IOException
-  {
-    createMavenProxySnapshotRepository(id, url, USE_DEFAULT_ARTIFACT_MAX_AGE, USE_DEFAULT_METADATA_MAX_AGE);
-  }
-
-  public void createMavenProxySnapshotRepository(final String id,
-                                                 final String url,
-                                                 final Integer artifactMaxAge,
-                                                 final Integer metadataMaxAge)
-      throws IOException
-  {
-    createMavenProxyRepository(id, url, RepositoryPolicy.SNAPSHOT, artifactMaxAge, metadataMaxAge);
-  }
-
-  public void createMavenProxyRepository(final String id,
-                                         final String url,
-                                         final RepositoryPolicy repositoryPolicy,
-                                         final Integer artifactMaxAge,
-                                         final Integer metadataMaxAge)
-      throws IOException
-  {
-    final RepositoryProxyResource repository = new RepositoryProxyResource();
-
-    repository.setId(id);
-    repository.setRepoType("proxy");
-    repository.setName(id);
-    repository.setProvider("maven2");
-    repository.setFormat("maven2");
-    repository.setRepoPolicy(repositoryPolicy.name());
-    repository.setWritePolicy(RepositoryWritePolicy.READ_ONLY.name());
-    repository.setDownloadRemoteIndexes(true);
-    repository.setChecksumPolicy(ChecksumPolicy.IGNORE.name());
-    repository.setBrowseable(true);
-    repository.setIndexable(true);
-    repository.setExposed(true);
-    if (artifactMaxAge != null) {
-      repository.setArtifactMaxAge(artifactMaxAge);
-    }
-    if (metadataMaxAge != null) {
-      repository.setMetadataMaxAge(metadataMaxAge);
-    }
-
-    RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
-    remoteStorage.setRemoteStorageUrl(url);
-    repository.setRemoteStorage(remoteStorage);
-
-    createRepository(repository);
-  }
-
 }

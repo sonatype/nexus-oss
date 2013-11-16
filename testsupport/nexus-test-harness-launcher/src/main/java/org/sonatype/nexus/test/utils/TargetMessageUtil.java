@@ -259,19 +259,6 @@ public class TargetMessageUtil
     }
   }
 
-  public static RepositoryTargetResource getByName(String name)
-      throws IOException
-  {
-    List<RepositoryTargetListResource> targets = getList();
-    for (RepositoryTargetListResource target : targets) {
-      if (name.equals(target.getName())) {
-        return get(target.getId());
-      }
-    }
-    Assert.fail("Target not found name: " + name);
-    return null;
-  }
-
   public static RepositoryTargetResource get(String targetId)
       throws IOException
   {

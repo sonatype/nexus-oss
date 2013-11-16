@@ -63,11 +63,6 @@ public class Hc4ClientHelper
     return result;
   }
 
-  public int getConnectionManagerTimeout() {
-    return Integer.parseInt(getHelpedParameters().getFirstValue(
-        "connectionManagerTimeout", "0"));
-  }
-
   public HttpClient getHttpClient() {
     return this.httpClient;
   }
@@ -87,23 +82,9 @@ public class Hc4ClientHelper
         "readTimeout", "0"));
   }
 
-  public String getRetryHandler() {
-    return getHelpedParameters().getFirstValue("retryHandler", null);
-  }
-
-  public int getStopIdleTimeout() {
-    return Integer.parseInt(getHelpedParameters().getFirstValue(
-        "stopIdleTimeout", "1000"));
-  }
-
   public boolean isFollowRedirects() {
     return Boolean.parseBoolean(getHelpedParameters().getFirstValue(
         "followRedirects", "false"));
-  }
-
-  public boolean getTcpNoDelay() {
-    return Boolean.parseBoolean(getHelpedParameters().getFirstValue(
-        "tcpNoDelay", "false"));
   }
 
   @Override

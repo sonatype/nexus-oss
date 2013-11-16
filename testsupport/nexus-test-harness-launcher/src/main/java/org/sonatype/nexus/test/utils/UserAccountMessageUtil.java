@@ -31,12 +31,6 @@ public class UserAccountMessageUtil
 {
   private static final String BASE_URL = "service/local/user_account/";
 
-  private static final String STATUS_BASE_URL = "service/local/user_account_status";
-
-  private static final String DEFAULT_ROLE_BASE_URL = "service/local/user_account_default_roles";
-
-  private static final String SIGN_UP_URL = "service/local/sign_up";
-
   private static final Logger LOGGER = LoggerFactory.getLogger(UserAccountMessageUtil.class);
 
   private static XStream xmlXstream;
