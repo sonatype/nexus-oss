@@ -163,6 +163,8 @@ public class WebappBootstrap
   public void contextDestroyed(final ServletContextEvent event) {
     log.info("Destroying");
 
+    ServletContext context = event.getServletContext();
+
     // stop application
     if (application != null) {
       try {
@@ -187,6 +189,7 @@ public class WebappBootstrap
     // cleanup the container
     if (container != null) {
       container.dispose();
+      context.removeAttribute(PlexusConstants.PLEXUS_KEY);
       container = null;
     }
 
