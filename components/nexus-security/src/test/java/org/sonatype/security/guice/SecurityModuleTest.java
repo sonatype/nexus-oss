@@ -29,6 +29,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import net.sf.ehcache.CacheManager;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
@@ -86,7 +87,7 @@ public class SecurityModuleTest
   @After
   public void stopCache() {
     if (injector != null) {
-      injector.getInstance(CacheManagerComponent.class).shutdown();
+      injector.getInstance(CacheManager.class).shutdown();
     }
   }
 

@@ -17,7 +17,10 @@ import net.sf.ehcache.CacheManager;
 
 /**
  * Provider responsible for creation, configuration and keeping a shared singleton EHCache CacheManager instance.
+ *
+ * @deprecated Inject {@link CacheManager} instead, this component exists only to shutdown and its used poorly.
  */
+@Deprecated
 public interface CacheManagerComponent
 {
   /**

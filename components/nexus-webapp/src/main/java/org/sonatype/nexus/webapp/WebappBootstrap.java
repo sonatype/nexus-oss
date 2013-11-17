@@ -41,7 +41,6 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -70,10 +69,6 @@ public class WebappBootstrap
     log.info("Initializing");
 
     ServletContext context = event.getServletContext();
-
-    // FIXME: JUL handler should be handled by container or bootstrap
-    SLF4JBridgeHandler.removeHandlersForRootLogger();
-    SLF4JBridgeHandler.install();
 
     try {
       // Use bootstrap configuration if it exists, else load it
@@ -168,6 +163,8 @@ public class WebappBootstrap
   public void contextDestroyed(final ServletContextEvent event) {
     log.info("Destroying");
 
+    ServletContext context = event.getServletContext();
+
     // stop application
     if (application != null) {
       try {
@@ -192,6 +189,7 @@ public class WebappBootstrap
     // cleanup the container
     if (container != null) {
       container.dispose();
+      context.removeAttribute(PlexusConstants.PLEXUS_KEY);
       container = null;
     }
 

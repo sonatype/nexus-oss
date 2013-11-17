@@ -19,11 +19,11 @@ import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.guice.SecurityModule;
-import org.sonatype.sisu.ehcache.CacheManagerComponent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Module;
+import net.sf.ehcache.CacheManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.ContainerConfiguration;
@@ -83,7 +83,7 @@ public abstract class AbstractSecurityRestTest
     eventBus.post(new NexusStoppedEvent(null));
     try {
       lookup(SecuritySystem.class).stop();
-      lookup(CacheManagerComponent.class).shutdown();
+      lookup(CacheManager.class).shutdown();
     }
     finally {
       super.tearDown();

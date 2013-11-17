@@ -75,7 +75,6 @@ public class CacheManagerComponentImpl
   public synchronized void shutdown() {
     if (cacheManager != null) {
       logger.info("Shutting down");
-      cacheManager.removalAll();
       cacheManager.shutdown();
       cacheManager = null;
     }

@@ -27,6 +27,8 @@ import org.sonatype.nexus.bootstrap.monitor.commands.HaltCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
 
+import org.slf4j.bridge.SLF4JBridgeHandler;
+
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
 import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_PING_INTERVAL;
 import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_PORT;
@@ -53,6 +55,10 @@ public class Launcher
                   final String[] args)
       throws Exception
   {
+    // install JUL bridge
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install();
+
     ClassLoader cl = (classLoader == null) ? getClass().getClassLoader() : classLoader;
 
     ConfigurationBuilder builder = new ConfigurationBuilder()

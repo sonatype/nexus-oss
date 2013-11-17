@@ -16,10 +16,6 @@ package org.sonatype.nexus.bootstrap;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -148,13 +144,9 @@ public class ConfigurationBuilder
     }
 
     // return copy
-    Map<String, String> props = new HashMap<>(properties.size());
-    props.putAll(properties);
-
+    PropertyMap props = new PropertyMap(properties);
     log.info("Properties:");
-    List<String> keys = new ArrayList<>(props.keySet());
-    Collections.sort(keys);
-    for (String key : keys) {
+    for (String key : props.keys()) {
       log.info("  {}='{}'", key, props.get(key));
     }
 

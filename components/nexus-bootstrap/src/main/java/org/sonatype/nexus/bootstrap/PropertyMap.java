@@ -16,7 +16,11 @@ package org.sonatype.nexus.bootstrap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 // TODO Copy this to goodies-common, though has to be duplicated here
@@ -29,6 +33,14 @@ import java.util.Properties;
 public class PropertyMap
   extends HashMap<String,String>
 {
+  public PropertyMap() {
+    super();
+  }
+
+  public PropertyMap(final Map<String, String> map) {
+    super(map);
+  }
+
   public void putAll(final Properties props) {
     for (Object key : props.keySet()) {
       put(key.toString(), String.valueOf(props.get(key)));
@@ -53,5 +65,14 @@ public class PropertyMap
     try (InputStream input = url.openStream()) {
       load(input);
     }
+  }
+
+  /**
+   * Returns list of sorted keys.
+   */
+  public List<String> keys() {
+    List<String> keys = new ArrayList<>(keySet());
+    Collections.sort(keys);
+    return Collections.unmodifiableList(keys);
   }
 }

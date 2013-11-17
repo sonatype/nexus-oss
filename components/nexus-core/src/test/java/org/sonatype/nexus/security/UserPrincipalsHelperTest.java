@@ -31,13 +31,13 @@ import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
-import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 import junit.framework.Assert;
+import net.sf.ehcache.CacheManager;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
@@ -101,7 +101,7 @@ public class UserPrincipalsHelperTest
   {
     try {
       ThreadContext.remove();
-      lookup(CacheManagerComponent.class).shutdown();
+      lookup(CacheManager.class).shutdown();
     }
     finally {
       super.tearDown();

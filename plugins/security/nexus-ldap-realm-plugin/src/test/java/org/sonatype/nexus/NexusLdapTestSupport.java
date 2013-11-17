@@ -28,8 +28,8 @@ import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
-import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
+import net.sf.ehcache.CacheManager;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.junit.Assert;
@@ -102,7 +102,7 @@ public abstract class NexusLdapTestSupport
   protected void tearDown()
       throws Exception
   {
-    lookup(CacheManagerComponent.class).shutdown();
+    lookup(CacheManager.class).shutdown();
 
     if (ldapServer != null) {
       ldapServer.stop();
