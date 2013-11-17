@@ -31,8 +31,8 @@
   <Call name="addConnector">
     <Arg>
       <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector">
-        <Set name="host">${application-host}</Set>
-        <Set name="port">${application-port}</Set>
+        <Set name="host"><Property name="application-host"/></Set>
+        <Set name="port"><Property name="application-port"/></Set>
         <Set name="forwarded">true</Set>
       </New>
     </Arg>
@@ -41,8 +41,8 @@
   <New id="NexusHandler" class="com.yammer.metrics.jetty.InstrumentedHandler">
     <Arg>
       <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
-        <Arg>${nexus-webapp}</Arg>
-        <Arg>${nexus-webapp-context-path}</Arg>
+        <Arg><Property name="nexus-webapp"/></Arg>
+        <Arg><Property name="nexus-webapp-context-path"/></Arg>
         <Set name="extractWAR">false</Set>
         <Set name="throwUnavailableOnStartupException">true</Set>
       </New>
