@@ -51,7 +51,6 @@ import org.sonatype.security.usermanagement.UserManagerFacade;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
-import org.sonatype.sisu.ehcache.CacheManagerComponent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
@@ -87,7 +86,7 @@ public class DefaultSecuritySystem
 
   private RealmSecurityManager securityManager;
 
-  private CacheManagerComponent cacheManagerComponent;
+  private CacheManager cacheManager;
 
   private UserManagerFacade userManagerFacade;
 
@@ -115,7 +114,7 @@ public class DefaultSecuritySystem
                                Map<String, Realm> realmMap,
                                SecurityConfigurationManager securityConfiguration,
                                RealmSecurityManager securityManager,
-                               CacheManagerComponent cacheManagerComponent,
+                               CacheManager cacheManager,
                                UserManagerFacade userManagerFacade)
   {
     this.securityEmailers = securityEmailers;
@@ -125,7 +124,7 @@ public class DefaultSecuritySystem
     this.realmMap = realmMap;
     this.securityConfiguration = securityConfiguration;
     this.securityManager = securityManager;
-    this.cacheManagerComponent = cacheManagerComponent;
+    this.cacheManager = cacheManager;
 
     this.eventBus.register(this);
     this.userManagerFacade = userManagerFacade;
@@ -763,22 +762,6 @@ public class DefaultSecuritySystem
     }
     // reload the config
     this.securityConfiguration.clearCache();
-
-    // if we are restarting this component the getCacheManager will be null
-    // TODO: need better lifecycle management of cache (done), make sure this works with the NEXUS tests before
-    // removing comment
-    CacheManager cacheManager = this.cacheManagerComponent.getCacheManager();
-    // if( cacheManager == null)
-    // {
-    // try
-    // {
-    // cacheManager = this.cacheManagerComponent.buildCacheManager( null );
-    // }
-    // catch ( IOException e )
-    // {
-    // throw new IllegalStateException( "Failed to restart CacheManagerComponent" );
-    // }
-    // }
 
     // setup the CacheManager ( this could be injected if we where less coupled with ehcache)
     // The plexus wrapper can interpolate the config
