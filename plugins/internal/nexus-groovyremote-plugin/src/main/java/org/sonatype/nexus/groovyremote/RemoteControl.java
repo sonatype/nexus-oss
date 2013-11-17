@@ -55,7 +55,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RemoteControl
     extends LifecycleSupport
 {
-  private static final String CPREFIX = "${groovyremote.";
+  private static final String CPREFIX = "${nexus.groovyremote.";
 
   private final BeanLocator beanLocator;
 
