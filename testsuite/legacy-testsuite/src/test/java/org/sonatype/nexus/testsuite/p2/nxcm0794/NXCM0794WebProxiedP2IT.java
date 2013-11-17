@@ -44,11 +44,9 @@ public class NXCM0794WebProxiedP2IT
   }
 
   @Before
-  public void startWebProxy()
-      throws Exception
-  {
+  public void startWebProxy() throws Exception {
     try {
-      webProxyServer = (ProxyServer) lookup(ProxyServer.ROLE);
+      webProxyServer = lookup(ProxyServer.class);
       webProxyServer.start();
     }
     catch (Exception e) {

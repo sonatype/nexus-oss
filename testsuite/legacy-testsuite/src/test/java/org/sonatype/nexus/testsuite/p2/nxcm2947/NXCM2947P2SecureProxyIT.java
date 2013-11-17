@@ -28,16 +28,12 @@ public class NXCM2947P2SecureProxyIT
   }
 
   @Override
-  protected ServletServer lookupProxyServer()
-      throws ComponentLookupException
-  {
-    return (ServletServer) lookup(ServletServer.ROLE, "secure");
+  protected ServletServer lookupProxyServer() throws ComponentLookupException {
+    return lookup(ServletServer.class, "secure");
   }
 
   @Test
-  public void test()
-      throws Exception
-  {
+  public void test() throws Exception {
     installAndVerifyP2Feature();
   }
 

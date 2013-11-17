@@ -11,26 +11,20 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.testsuite.p2;
+package org.sonatype.nexus.testsuite.misc;
 
-import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
-import org.junit.Before;
+import org.junit.Test;
 
-public abstract class AbstractNexusProxyP2SecureIT
-    extends AbstractNexusProxyP2IT
+/**
+ * Test harness sanity trials.
+ */
+public class HarnessSanityTrial
+  extends AbstractNexusIntegrationTest
 {
-
-  protected AbstractNexusProxyP2SecureIT(final String testRepositoryId) {
-    super(testRepositoryId);
+  @Test
+  public void simple() {
+    // do nothing, only here to verify the basic harness functionality
   }
-
-  @Before
-  public void startProxy() throws Exception {
-    if (proxyServer == null) {
-      proxyServer = this.lookup(ServletServer.class, "secure");
-      proxyServer.start();
-    }
-  }
-
 }

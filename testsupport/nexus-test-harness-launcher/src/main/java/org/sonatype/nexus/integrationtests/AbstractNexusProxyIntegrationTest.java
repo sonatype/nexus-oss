@@ -56,19 +56,16 @@ public abstract class AbstractNexusProxyIntegrationTest
   }
 
   @Before
-  public void startProxy()
-      throws Exception
-  {
+  public void startProxy() throws Exception {
     this.proxyServer = lookup(ServletServer.class);
     this.proxyServer.start();
   }
 
   @After
-  public void stopProxy()
-      throws Exception
-  {
+  public void stopProxy() throws Exception {
     if (this.proxyServer != null) {
       this.proxyServer.stop();
+      this.proxyServer = null;
     }
   }
 
@@ -86,9 +83,7 @@ public abstract class AbstractNexusProxyIntegrationTest
   }
 
   @Override
-  protected void copyTestResources()
-      throws IOException
-  {
+  protected void copyTestResources() throws IOException {
     super.copyTestResources();
 
     final File dest = new File(localStorageDir);
@@ -103,7 +98,5 @@ public abstract class AbstractNexusProxyIntegrationTest
     }
 
     FileTestingUtils.interpolationDirectoryCopy(source, dest, getTestProperties());
-
   }
-
 }
