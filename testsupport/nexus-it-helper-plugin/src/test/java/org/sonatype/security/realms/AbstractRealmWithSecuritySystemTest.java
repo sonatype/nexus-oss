@@ -18,9 +18,9 @@ import java.io.File;
 import org.sonatype.nexus.configuration.application.DefaultNexusConfiguration;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.guice.SecurityModule;
-import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 import com.google.inject.Module;
+import net.sf.ehcache.CacheManager;
 import org.codehaus.plexus.context.Context;
 
 /**
@@ -36,7 +36,7 @@ public abstract class AbstractRealmWithSecuritySystemTest
 {
   private SecuritySystem securitySystem;
 
-  private CacheManagerComponent cacheManagerComponent;
+  private CacheManager cacheManager;
 
   @Override
   protected void customizeContext(final Context ctx) {
@@ -57,7 +57,7 @@ public abstract class AbstractRealmWithSecuritySystemTest
     super.setUp();
 
     securitySystem = lookup(SecuritySystem.class);
-    cacheManagerComponent = lookup(CacheManagerComponent.class);
+    cacheManager = lookup(CacheManager.class);
   }
 
   protected void tearDown()
@@ -66,8 +66,8 @@ public abstract class AbstractRealmWithSecuritySystemTest
     if (securitySystem != null) {
       securitySystem.stop();
     }
-    if (cacheManagerComponent != null) {
-      cacheManagerComponent.shutdown();
+    if (cacheManager != null) {
+      cacheManager.shutdown();
     }
     super.tearDown();
   }

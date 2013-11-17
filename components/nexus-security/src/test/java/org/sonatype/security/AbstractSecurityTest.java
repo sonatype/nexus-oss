@@ -19,9 +19,9 @@ import java.util.Properties;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.inject.BeanScanning;
 import org.sonatype.security.guice.SecurityModule;
-import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 import com.google.inject.Binder;
+import net.sf.ehcache.CacheManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.shiro.util.ThreadContext;
 
@@ -62,7 +62,7 @@ public abstract class AbstractSecurityTest
   {
     try {
       getSecuritySystem().stop();
-      lookup(CacheManagerComponent.class).shutdown();
+      lookup(CacheManager.class).shutdown();
     }
     finally {
       ThreadContext.remove();

@@ -27,12 +27,12 @@ import org.sonatype.guice.bean.reflect.URLClassSpace;
 import org.sonatype.inject.BeanScanning;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.web.ProtectedPathManager;
-import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import net.sf.ehcache.CacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
@@ -114,7 +114,7 @@ public class SecurityWebModuleTest
   @After
   public void stopCache() {
     if (injector != null) {
-      injector.getInstance(CacheManagerComponent.class).shutdown();
+      injector.getInstance(CacheManager.class).shutdown();
     }
   }
 

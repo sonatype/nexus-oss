@@ -26,10 +26,10 @@ import java.util.HashMap;
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.security.guice.SecurityModule;
-import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Module;
+import net.sf.ehcache.CacheManager;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
@@ -87,7 +87,7 @@ public abstract class LdapTestSupport
   public void tearDown()
       throws Exception
   {
-    lookup(CacheManagerComponent.class).shutdown();
+    lookup(CacheManager.class).shutdown();
 
     if (ldapServer != null && ldapServer.isStarted()) {
       ldapServer.stop();
