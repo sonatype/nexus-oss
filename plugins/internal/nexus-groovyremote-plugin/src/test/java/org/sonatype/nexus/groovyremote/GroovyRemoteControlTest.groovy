@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.groovyremote
 
 import com.sun.net.httpserver.HttpServer
@@ -30,41 +31,42 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport
 class GroovyRemoteControlTest
     extends TestSupport
 {
-    private HttpServer server
+  private HttpServer server
 
-    @Before
-    void setUp() throws Exception {
-        def receiver = new Receiver()
-        def handler = new RemoteControlHttpHandler(receiver)
-        def server = HttpServer.create(new InetSocketAddress(Inet4Address.localHost, 0), 0) // force use of ipv4
-        server.createContext("/", handler)
-        server.start()
-        log("Address: $server.address")
-        this.server = server
+  @Before
+  void setUp() throws Exception {
+    def receiver = new Receiver()
+    def handler = new RemoteControlHttpHandler(receiver)
+    def server = HttpServer.create(new InetSocketAddress(Inet4Address.localHost, 0), 0)
+    // force use of ipv4
+    server.createContext("/", handler)
+    server.start()
+    log("Address: $server.address")
+    this.server = server
+  }
+
+  @After
+  void tearDown() throws Exception {
+    if (server != null) {
+      server.stop(0)
+      server = null
+    }
+  }
+
+  @Test
+  void trial() throws Exception {
+    def addr = server.getAddress()
+    String url = "http://${addr.hostName}:${addr.port}"
+    log("URL: $url")
+
+    def transport = new HttpTransport(url)
+    def remote = new RemoteControl(transport)
+
+    def value = remote.exec {
+      println "${Thread.currentThread().name} -> sup"
+      return 12345
     }
 
-    @After
-    void tearDown() throws Exception {
-        if (server != null) {
-            server.stop(0)
-            server = null
-        }
-    }
-
-    @Test
-    void trial() throws Exception {
-        def addr = server.getAddress()
-        String url = "http://${addr.hostName}:${addr.port}"
-        log("URL: $url")
-
-        def transport = new HttpTransport(url)
-        def remote = new RemoteControl(transport)
-
-        def value = remote.exec {
-            println "${Thread.currentThread().name} -> sup"
-            return 12345
-        }
-
-        log(value)
-    }
+    log(value)
+  }
 }
