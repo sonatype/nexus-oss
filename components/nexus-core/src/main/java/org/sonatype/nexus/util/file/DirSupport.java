@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.util.file;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.FileAlreadyExistsException;
@@ -141,6 +142,13 @@ public final class DirSupport
         throw e;
       }
     }
+  }
+
+  /**
+   * @since 2.8
+   */
+  public static void mkdir(final File dir) throws IOException {
+    mkdir(dir.toPath());
   }
 
   // CLEAN: remove files recursively of a directory but keeping the directory structure intact

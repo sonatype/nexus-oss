@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.test.utils;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -92,21 +91,6 @@ public class FileTestingUtils
   }
 
   /**
-   * Creates a SHA1 hash from the contents of a String.
-   *
-   * @param data the String to be digested.
-   * @return An SHA1 hash based on the contents of the String.
-   */
-  public static String createSHA1FromString(String data)
-      throws IOException
-  {
-
-    ByteArrayInputStream bais = new ByteArrayInputStream(data.getBytes());
-    return createSHA1FromStream(bais);
-
-  }
-
-  /**
    * Creates a SHA1 hash from an InputStream.
    *
    * @param in Inputstream to be digested.
@@ -180,29 +164,6 @@ public class FileTestingUtils
     catch (Exception e) {
       LOG.warn(usage, e);
     }
-
-  }
-
-  public static void fileCopy(File from, File dest)
-      throws IOException
-  {
-    // we may also need to create any parent directories
-    if (dest.getParentFile() != null && !dest.getParentFile().exists()) {
-      dest.getParentFile().mkdirs();
-    }
-
-    FileReader fileReader = new FileReader(from);
-
-    FileWriter fos = new FileWriter(dest);
-
-    int readChar = -1;
-    while ((readChar = fileReader.read()) != -1) {
-      fos.write(readChar);
-    }
-
-    // close everything
-    fileReader.close();
-    fos.close();
   }
 
   public static void interpolationFileCopy(File from, File dest, Map<String, String> variables)

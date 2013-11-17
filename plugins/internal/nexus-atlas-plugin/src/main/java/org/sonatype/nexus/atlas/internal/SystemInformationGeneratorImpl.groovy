@@ -14,8 +14,8 @@
 package org.sonatype.nexus.atlas.internal
 
 import com.google.inject.Key
-import org.sonatype.appcontext.AppContext
 import org.sonatype.guice.bean.locators.BeanLocator
+import org.sonatype.inject.Parameters
 import org.sonatype.nexus.ApplicationStatusSource
 import org.sonatype.nexus.atlas.SystemInformationGenerator
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration
@@ -47,7 +47,7 @@ class SystemInformationGeneratorImpl
 
   private final ApplicationStatusSource applicationStatusSource
 
-  private final AppContext appContext
+  private final Map<String, String> parameters;
 
   private final NexusPluginManager pluginManager
 
@@ -55,13 +55,13 @@ class SystemInformationGeneratorImpl
   SystemInformationGeneratorImpl(final BeanLocator beanLocator,
                                  final ApplicationConfiguration applicationConfiguration,
                                  final ApplicationStatusSource applicationStatusSource,
-                                 final AppContext appContext,
+                                 final @Parameters Map<String, String> parameters,
                                  final NexusPluginManager pluginManager)
   {
     this.beanLocator = checkNotNull(beanLocator)
     this.applicationConfiguration = checkNotNull(applicationConfiguration)
     this.applicationStatusSource = checkNotNull(applicationStatusSource)
-    this.appContext = checkNotNull(appContext)
+    this.parameters = checkNotNull(parameters);
     this.pluginManager = checkNotNull(pluginManager)
   }
 
@@ -73,7 +73,7 @@ class SystemInformationGeneratorImpl
     def beanLocator = this.beanLocator
     def applicationConfiguration = this.applicationConfiguration
     def systemStatus = this.applicationStatusSource.systemStatus
-    def appContext = this.appContext
+    def parameters = this.parameters
     def pluginManager = this.pluginManager
 
     def fileref = { File file ->
@@ -254,7 +254,7 @@ class SystemInformationGeneratorImpl
         'system-filestores': reportFileStores(),
         'nexus-status': reportNexusStatus(),
         'nexus-license': reportNexusLicense(),
-        'nexus-properties': appContext.flatten().sort(),
+        'nexus-properties': parameters.sort(),
         'nexus-configuration': reportNexusConfiguration(),
         'nexus-plugins': reportNexusPlugins()
     ]

@@ -16,7 +16,6 @@ package org.sonatype.nexus.test.utils;
 import java.io.IOException;
 
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 
 import org.restlet.data.Response;
 
@@ -34,20 +33,4 @@ public class RepositoryStatusMessageUtil
   {
     return REPOSITORY_NRC.putOutOfService(repoId, repoType);
   }
-
-  public static Response putInService(String repoId, String repoType)
-      throws IOException
-  {
-    return REPOSITORY_NRC.putInService(repoId, repoType);
-  }
-
-  /**
-   * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
-   */
-  public static Response changeStatus(RepositoryStatusResource status)
-      throws IOException
-  {
-    return REPOSITORY_NRC.changeStatus(status);
-  }
-
 }

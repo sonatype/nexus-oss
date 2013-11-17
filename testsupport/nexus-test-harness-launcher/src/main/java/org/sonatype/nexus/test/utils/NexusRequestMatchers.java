@@ -29,9 +29,6 @@ import org.restlet.resource.Representation;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-/**
- * Matchers for {@link NexusRequest}
- */
 public class NexusRequestMatchers
 {
 
@@ -306,11 +303,6 @@ public class NexusRequestMatchers
   @Factory
   public static <T> HasCode hasStatusCode(int expectedCode) {
     return new HasCode(expectedCode);
-  }
-
-  @Factory
-  public static <T> HasCode isNotFound() {
-    return new HasCode(404);
   }
 
   @Factory

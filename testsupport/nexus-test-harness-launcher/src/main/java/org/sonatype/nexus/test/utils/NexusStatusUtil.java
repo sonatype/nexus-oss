@@ -207,10 +207,4 @@ public class NexusStatusUtil
     }
     return false;
   }
-
-  public boolean isNexusStopped()
-      throws NexusIllegalStateException
-  {
-    return !isNexusRunning();
-  }
 }

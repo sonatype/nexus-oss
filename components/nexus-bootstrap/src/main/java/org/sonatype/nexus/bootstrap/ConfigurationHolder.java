@@ -11,29 +11,28 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.appcontext.source;
+package org.sonatype.nexus.bootstrap;
 
 import java.util.Map;
 
-import org.sonatype.appcontext.internal.Preconditions;
-
 /**
- * An EntrySource that is sourced from a {@code java.util.Map}.
+ * Holder for bootstrap configuration properties.
  *
- * @author cstamas
+ * @since 2.8
  */
-public class MapEntrySource
-    extends AbstractMapEntrySource
+public class ConfigurationHolder
 {
-  private final Map<?, ?> source;
+  private static final InheritableThreadLocal<Map<String, String>> reference = new InheritableThreadLocal<>();
 
-  public MapEntrySource(final String name, final Map<?, ?> source) {
-    super(name, "map");
-    this.source = Preconditions.checkNotNull(source);
+  public static void set(final Map<String,String> properties) {
+    reference.set(properties);
   }
 
-  @Override
-  protected Map<?, ?> getSource() {
-    return source;
+  public static Map<String,String> get() {
+    return reference.get();
+  }
+
+  public static void unset() {
+    reference.remove();
   }
 }

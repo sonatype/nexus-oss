@@ -20,23 +20,16 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationRequest;
-import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
-import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
-import org.sonatype.security.configuration.model.SecurityConfiguration;
-import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Reader;
-import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
 
 import com.google.common.io.Flushables;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -112,32 +105,6 @@ public class NexusConfigUtil
     }
   }
 
-  public SecurityConfiguration loadSecurityConfig()
-      throws IOException
-  {
-    final File configFile = getSecurityConfigurationFile();
-    final SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-
-    try (FileInputStream in = new FileInputStream(configFile)) {
-      return reader.read(in, false);
-    }
-    catch (XmlPullParserException e) {
-      log.error(e.getMessage(), e);
-      throw new RuntimeException(e);
-    }
-  }
-
-  public void saveSecurityConfig(final SecurityConfiguration config)
-      throws IOException
-  {
-    // save it
-    final SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
-    try (FileWriter fos = new FileWriter(getSecurityConfigurationFile())) {
-      writer.write(fos, config);
-      Flushables.flushQuietly(fos);
-    }
-  }
-
   @Deprecated
   public static File getNexusFile() {
     return getNexusConfigurationFile();
@@ -181,35 +148,6 @@ public class NexusConfigUtil
       }
     }
     return null;
-  }
-
-  public Xpp3Dom getRepoExternalConfiguration(String repoId)
-      throws IOException
-  {
-    List<CRepository> repos = getNexusConfig().getRepositories();
-
-    for (Iterator<CRepository> iter = repos.iterator(); iter.hasNext(); ) {
-      CRepository cRepo = iter.next();
-
-      // check id
-      if (cRepo.getId().equals(repoId)) {
-        return (Xpp3Dom) cRepo.getExternalConfiguration();
-      }
-    }
-    return null;
-  }
-
-  public void validateConfig()
-      throws Exception
-  {
-    ApplicationConfigurationValidator validator =
-        getTest().getITPlexusContainer().lookup(ApplicationConfigurationValidator.class);
-    ValidationResponse vResponse = validator.validateModel(new ValidationRequest(getNexusConfig()));
-
-    if (!vResponse.isValid()) {
-      throw new InvalidConfigurationException(vResponse);
-    }
-
   }
 
   public M2LayoutedM1ShadowRepositoryConfiguration getRepoShadow(String repoId)

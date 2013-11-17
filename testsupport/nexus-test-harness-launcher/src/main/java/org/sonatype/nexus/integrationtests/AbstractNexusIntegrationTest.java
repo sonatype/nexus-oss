@@ -13,12 +13,9 @@
 
 package org.sonatype.nexus.integrationtests;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -135,12 +132,6 @@ public abstract class AbstractNexusIntegrationTest
 
   public static final String LIx2 = "    ";
 
-  /**
-   * @deprecated Use nexusBaseUrl instead!
-   */
-  @Deprecated
-  public static final String baseNexusUrl;
-
   public static final String nexusWorkDir;
 
   public static final String RELATIVE_CONF_DIR = "runtime/apps/nexus/conf";
@@ -186,7 +177,6 @@ public abstract class AbstractNexusIntegrationTest
     WORK_CONF_DIR = nexusWorkDir + "/conf";
     nexusLogDir = TestProperties.getString("nexus.log.dir");
     nexusBaseUrl = TestProperties.getString("nexus.base.url");
-    baseNexusUrl = nexusBaseUrl;
 
     TestContainer.getInstance().getTestContext().setNexusUrl(nexusBaseUrl);
   }
@@ -479,42 +469,12 @@ public abstract class AbstractNexusIntegrationTest
 
     this.copyConfigFile("nexus.xml", testProperties, WORK_CONF_DIR);
 
-    // this is comment out for now, this has been moved into an upgrade step, that will get hit the same system
-    // property is set
-    // we might need to enable this if we have any nexus.xml with version 1.4.5 (which would NOT hit the upgrade
-    // step)
-    // now we need to filter the nexus.xml to potentially change the default http provider
-    // if( System.getProperty( RemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY ) != null)
-    // {
-    // String providerString = "<provider>" + System.getProperty(
-    // RemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY ) + "</provider>";
-    // this.findReplaceInFile( new File( WORK_CONF_DIR, "nexus.xml" ), "<provider>apacheHttpClient3x</provider>",
-    // providerString );
-    // }
-
     // copy security config
     this.copyConfigFile("security.xml", testProperties, WORK_CONF_DIR);
     this.copyConfigFile("security-configuration.xml", testProperties, WORK_CONF_DIR);
 
     this.copyConfigFile("logback.properties", testProperties, WORK_CONF_DIR);
     this.copyConfigFile("logback-nexus.xml", testProperties, WORK_CONF_DIR);
-  }
-
-  protected void findReplaceInFile(File file, String findString, String replaceString)
-      throws IOException
-  {
-    File tmpFile = new File(file.getAbsolutePath() + "-tmp");
-
-    try (BufferedReader bufferedFileReader = new BufferedReader(new FileReader(file));
-         FileWriter writer = new FileWriter(tmpFile)) {
-      String line;
-      while ((line = bufferedFileReader.readLine()) != null) {
-        writer.write(line.replaceAll(findString, replaceString));
-        writer.write("\n"); // new line
-      }
-    }
-    file.delete();
-    tmpFile.renameTo(file);
   }
 
   protected static void cleanWorkDir()
@@ -661,7 +621,6 @@ public abstract class AbstractNexusIntegrationTest
 
     // the Restlet Client does not support multipart forms:
     // http://restlet.tigris.org/issues/show_bug.cgi?id=71
-
     // int status = DeployUtils.deployUsingPomWithRest( deployUrl, repositoryId, gav, artifactFile, pom );
 
     if (!"pom".equals(model.getPackaging()) && !artifactFile.isFile()) {
@@ -972,15 +931,6 @@ public abstract class AbstractNexusIntegrationTest
   protected Metadata downloadMetadataFromRepository(Gav gav, String repoId)
       throws IOException, XmlPullParserException
   {
-    // File f =
-    // new File( nexusWorkDir, "storage/" + repoId + "/" + gav.getGroupId() + "/" + gav.getArtifactId()
-    // + "/maven-metadata.xml" );
-    //
-    // if ( !f.exists() )
-    // {
-    // throw new FileNotFoundException( "Metadata do not exist! " + f.getAbsolutePath() );
-    // }
-
     String url =
         this.getBaseNexusUrl() + REPOSITORY_RELATIVE_URL + repoId + "/" + gav.getGroupId() + "/"
             + gav.getArtifactId() + "/maven-metadata.xml";
@@ -1154,48 +1104,10 @@ public abstract class AbstractNexusIntegrationTest
     return TestContainer.getInstance().getPlexusContainer();
   }
 
-  protected void installOptionalPlugin(final String plugin)
-      throws IOException
-  {
-    File pluginDir = getOptionalPluginDirectory(plugin);
-
-    if (pluginDir != null) {
-      File target = new File(getNexusBaseDir(), "runtime/apps/nexus/plugin-repository/" + pluginDir.getName());
-      FileUtils.copyDirectory(pluginDir, target);
-    }
-  }
-
-  protected File getOptionalPluginDirectory(final String plugin) {
-    File optionalPluginDir = new File(getNexusBaseDir(), "runtime/apps/nexus/optional-plugins/");
-
-    if (optionalPluginDir.exists() && optionalPluginDir.isDirectory()) {
-      File[] files = optionalPluginDir.listFiles(new FilenameFilter()
-      {
-        public boolean accept(File dir, String name) {
-          if (name.startsWith(plugin)) {
-            return true;
-          }
-
-          return false;
-        }
-      });
-
-      if (files == null || files.length > 1) {
-        log.error("Unable to lookup plugin: " + plugin);
-        return null;
-      }
-
-      return files[0];
-    }
-
-    return null;
-  }
-
   protected Map<String, String> getTestProperties() {
     HashMap<String, String> variables = new HashMap<String, String>();
     variables.putAll(TestProperties.getAll());
     variables.put("test-id", getTestId());
     return variables;
   }
-
 }

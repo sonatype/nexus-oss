@@ -16,7 +16,6 @@ package org.sonatype.nexus.bootstrap.jsw;
 import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.bootstrap.ShutdownHelper;
 
-import org.slf4j.Logger;
 import org.tanukisoftware.wrapper.WrapperManager;
 
 import static org.tanukisoftware.wrapper.WrapperManager.WRAPPER_CTRL_LOGOFF_EVENT;
@@ -29,23 +28,7 @@ import static org.tanukisoftware.wrapper.WrapperManager.WRAPPER_CTRL_LOGOFF_EVEN
 public class JswLauncher
     extends WrapperListenerSupport
 {
-  private final Launcher launcher;
-
-  public JswLauncher() {
-    this.launcher = new Launcher()
-    {
-      @Override
-      protected Logger createLogger() {
-        return JswLauncher.this.log;
-      }
-
-      @Override
-      public void commandStop() {
-        WrapperManager.stopAndReturn(0);
-      }
-
-    };
-  }
+  private Launcher launcher;
 
   @Override
   protected Integer doStart(final String[] args) throws Exception {
@@ -55,7 +38,16 @@ public class JswLauncher
           WrapperManager.getUser(false).getUser());
     }
 
-    return launcher.start(args);
+    this.launcher = new Launcher(null, null, args)
+    {
+      @Override
+      public void commandStop() {
+        WrapperManager.stopAndReturn(0);
+      }
+    };
+
+    launcher.start();
+    return null;
   }
 
   @Override

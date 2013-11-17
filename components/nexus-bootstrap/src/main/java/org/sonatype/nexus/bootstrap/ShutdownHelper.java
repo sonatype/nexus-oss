@@ -14,7 +14,7 @@
 package org.sonatype.nexus.bootstrap;
 
 /**
- * Helper to cope with different mechanisms to shtudown.
+ * Helper to cope with different mechanisms to shutdown.
  *
  * @since 2.2
  */

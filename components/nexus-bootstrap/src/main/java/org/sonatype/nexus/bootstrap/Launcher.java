@@ -13,7 +13,11 @@
 
 package org.sonatype.nexus.bootstrap;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import org.sonatype.nexus.bootstrap.jetty.JettyServer;
 import org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread;
@@ -22,9 +26,6 @@ import org.sonatype.nexus.bootstrap.monitor.commands.ExitCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.HaltCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
 import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_PING_INTERVAL;
@@ -38,51 +39,67 @@ import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_TI
  */
 public class Launcher
 {
-  protected final Logger log;
-
+  // FIXME: Move this to CommandMonitorThread
   public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
 
-  public static final String FIVE_SECONDS = "5000";
+  private static final String FIVE_SECONDS = "5000";
 
-  public static final String ONE_SECOND = "1000";
+  private static final String ONE_SECOND = "1000";
 
-  protected JettyServer server;
+  private final JettyServer server;
 
-  protected Launcher() {
-    Logger log = createLogger();
-    if (log == null) {
+  public Launcher(final @Nullable ClassLoader classLoader,
+                  final @Nullable Map<String, String> overrides,
+                  final String[] args)
+      throws Exception
+  {
+    ClassLoader cl = (classLoader == null) ? getClass().getClassLoader() : classLoader;
+
+    ConfigurationBuilder builder = new ConfigurationBuilder()
+        .defaults()
+        .set("bundleBasedir", new File(".").getCanonicalPath())
+        .properties("/nexus.properties", true)
+        .properties("/nexus-test.properties", false)
+        .custom(new EnvironmentVariables());
+
+    if (overrides != null) {
+      builder.properties(overrides);
+    }
+
+    Map<String, String> props = builder.build();
+    System.getProperties().putAll(props);
+    ConfigurationHolder.set(props);
+
+    if (args == null) {
       throw new NullPointerException();
     }
-    this.log = log;
-  }
-
-  protected Logger createLogger() {
-    return LoggerFactory.getLogger(getClass());
-  }
-
-  public Integer start(final String[] args) throws Exception {
     if (args.length == 0) {
-      log.error("Missing Jetty configuration parameters");
-      return 1; // exit
+      throw new IllegalArgumentException("Missing args");
     }
 
-    Configuration config = new Configuration();
-    config.load();
+    // ensure the temporary directory is sane
+    TemporaryDirectory.get();
 
+    this.server = new JettyServer(cl, props, args);
+  }
+
+  public void start() throws Exception {
     maybeEnableCommandMonitor();
     maybeEnableShutdownIfNotAlive();
 
-    server = new JettyServer(getClass().getClassLoader(), config.getProperties(), args);
     server.start();
-
-    return null; // continue running
   }
 
-  protected void maybeEnableCommandMonitor() throws IOException {
-    String port = System.getProperty(COMMAND_MONITOR_PORT);
-    if (port == null) {
-      port = System.getenv(COMMAND_MONITOR_PORT);
+  private String getProperty(final String name, final String defaultValue) {
+    String value = System.getProperty(name, System.getenv(name));
+    if (value == null) {
+      value = defaultValue;
     }
+    return value;
+  }
+
+  private void maybeEnableCommandMonitor() throws IOException {
+    String port = getProperty(COMMAND_MONITOR_PORT, null);
     if (port != null) {
       new CommandMonitorThread(
           Integer.parseInt(port),
@@ -100,26 +117,12 @@ public class Launcher
     }
   }
 
-  protected void maybeEnableShutdownIfNotAlive() throws IOException {
-    String port = System.getProperty(KEEP_ALIVE_PORT);
-    if (port == null) {
-      port = System.getenv(KEEP_ALIVE_PORT);
-    }
+  private void maybeEnableShutdownIfNotAlive() throws IOException {
+    String port = getProperty(KEEP_ALIVE_PORT, null);
     if (port != null) {
-      String pingInterval = System.getProperty(KEEP_ALIVE_PING_INTERVAL);
-      if (pingInterval == null) {
-        pingInterval = System.getenv(KEEP_ALIVE_PING_INTERVAL);
-        if (pingInterval == null) {
-          pingInterval = FIVE_SECONDS;
-        }
-      }
-      String timeout = System.getProperty(KEEP_ALIVE_TIMEOUT);
-      if (timeout == null) {
-        timeout = System.getenv(KEEP_ALIVE_TIMEOUT);
-        if (timeout == null) {
-          timeout = ONE_SECOND;
-        }
-      }
+      String pingInterval = getProperty(KEEP_ALIVE_PING_INTERVAL, FIVE_SECONDS);
+      String timeout = getProperty(KEEP_ALIVE_TIMEOUT, ONE_SECOND);
+
       new KeepAliveThread(
           LOCALHOST,
           Integer.parseInt(port),
@@ -138,6 +141,6 @@ public class Launcher
   }
 
   public static void main(final String[] args) throws Exception {
-    new Launcher().start(args);
+    new Launcher(null, null, args).start();
   }
 }

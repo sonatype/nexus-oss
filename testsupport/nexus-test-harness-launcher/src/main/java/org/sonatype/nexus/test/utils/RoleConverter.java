@@ -21,29 +21,6 @@ import org.sonatype.security.rest.model.RoleResource;
 
 public class RoleConverter
 {
-
-
-  public static RoleResource toRoleResource(CRole role) {
-    //TODO: ultimately this method will take a parameter which is the nexus object
-    //and will convert to the rest object
-    RoleResource resource = new RoleResource();
-
-    resource.setDescription(role.getDescription());
-    resource.setId(role.getId());
-    resource.setName(role.getName());
-    resource.setSessionTimeout(role.getSessionTimeout());
-
-    for (String roleId : (List<String>) role.getRoles()) {
-      resource.addRole(roleId);
-    }
-
-    for (String privId : (List<String>) role.getPrivileges()) {
-      resource.addPrivilege(privId);
-    }
-
-    return resource;
-  }
-
   public static CRole toCRole(RoleResource resource) {
     CRole role = new CRole();
 
@@ -64,6 +41,4 @@ public class RoleConverter
 
     return role;
   }
-
-
 }

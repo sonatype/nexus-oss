@@ -33,22 +33,6 @@ public class EventInspectorsUtil
     this.nexusRestClient = checkNotNull(nexusRestClient);
   }
 
-  protected boolean isCalmPeriod()
-      throws IOException
-  {
-    final Status status = nexusRestClient.doGetForStatus("service/local/eventInspectors/isCalmPeriod");
-
-    if (status.isSuccess()) {
-      // only 200 Ok means calm period,
-      // otherwise 202 Accepted is returned
-      return status.getCode() == Status.SUCCESS_OK.getCode();
-    }
-    else {
-      throw new IOException("The isCalmPeriod REST resource reported an error ("
-          + status + "), bailing out!");
-    }
-  }
-
   /**
    * Hold execution until asynchronous events at nexus side stop running
    */

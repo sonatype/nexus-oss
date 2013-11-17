@@ -28,7 +28,6 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
-import org.sonatype.nexus.test.utils.NexusWebappLayout;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.testsuite.plugin.nexus2810.PluginConsoleMessageUtil;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -74,112 +73,92 @@ public abstract class AbstractCargoIT
   }
 
   @Before
-  public void setUp()
-      throws Exception
-  {
-    if (container == null) {
-      fixPlexusProperties();
-      changeStartupLoggingToDebug();
-
-      WAR war = new WAR(getWarFile().getAbsolutePath());
-      war.setContext("nexus");
-
-      File configHome = new File("target/conatiner-configs", getContainer()).getAbsoluteFile();
-
-      ConfigurationFactory configurationFactory = new DefaultConfigurationFactory();
-      LocalConfiguration configuration =
-          (LocalConfiguration) configurationFactory.createConfiguration(getContainer(), ContainerType.INSTALLED,
-              ConfigurationType.STANDALONE, configHome.getAbsolutePath());
-      configuration.addDeployable(war);
-      configuration.setProperty(ServletPropertySet.PORT, TestProperties.getString("nexus.application.port"));
-      container =
-          (InstalledLocalContainer) new DefaultContainerFactory().createContainer(getContainer(),
-              ContainerType.INSTALLED, configuration);
-      container.setHome(getContainerLocation().getAbsolutePath());
-
-      // Shut down WL feature, as these ITs are bouncing Nexus very frequently, while
-      // WL does discovery in background. For some reason, codehaus prefix file
-      // fetch on bamboo took 20s, so while WL shutdown is not fixed, disabling
-      // WL for now here.
-
-      final HashMap<String, String> sysProps = new HashMap<String, String>();
-      sysProps.put(ConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString());
-      container.setSystemProperties(sysProps);
-
-      container.setTimeout(5 * 60 * 1000);// 5 minutes
-      container.start();
+  public void setUp() throws Exception {
+    if (container != null) {
+      return;
     }
+
+    fixNexusProperties();
+    changeStartupLoggingToDebug();
+
+    WAR war = new WAR(getWarFile().getAbsolutePath());
+    war.setContext("nexus");
+
+    File configHome = new File("target/conatiner-configs", getContainer()).getAbsoluteFile();
+
+    ConfigurationFactory configurationFactory = new DefaultConfigurationFactory();
+    LocalConfiguration configuration = (LocalConfiguration) configurationFactory.createConfiguration(
+        getContainer(),
+        ContainerType.INSTALLED,
+        ConfigurationType.STANDALONE,
+        configHome.getAbsolutePath()
+    );
+    configuration.addDeployable(war);
+    configuration.setProperty(ServletPropertySet.PORT, TestProperties.getString("nexus.application.port"));
+    container = (InstalledLocalContainer) new DefaultContainerFactory().createContainer(
+        getContainer(),
+        ContainerType.INSTALLED,
+        configuration
+    );
+    container.setHome(getContainerLocation().getAbsolutePath());
+
+    // Shut down WL feature, as these ITs are bouncing Nexus very frequently, while
+    // WL does discovery in background. For some reason, codehaus prefix file
+    // fetch on bamboo took 20s, so while WL shutdown is not fixed, disabling
+    // WL for now here.
+
+    final HashMap<String, String> sysProps = new HashMap<String, String>();
+    sysProps.put(ConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString());
+    container.setSystemProperties(sysProps);
+    container.setTimeout(5 * 60 * 1000);// 5 minutes
+    container.start();
   }
 
   /**
    * To be sure we get as much logging as possible to scan for errors loading plugins or other hidden goop, set
    * startup logging to DEBUG level
    */
-  private void changeStartupLoggingToDebug()
-      throws Exception
-  {
+  private void changeStartupLoggingToDebug() throws Exception {
     // get the default logback.properties that will be deployed on 1st startup
-    File startupLogbackPropsFile = new File(getITNexusWorkDirPath() + "/conf/logback.properties");
+    File file = new File(getITNexusWorkDirPath() + "/conf/logback.properties");
     try {
-      URL configUrl = this.getClass().getResource("/META-INF/log/logback.properties");
-      FileUtils.copyURLToFile(configUrl, startupLogbackPropsFile);
+      URL configUrl = getClass().getResource("/META-INF/log/logback.properties");
+      FileUtils.copyURLToFile(configUrl, file);
     }
     catch (IOException e) {
-      throw new IllegalStateException("Could not create logback.properties as "
-          + startupLogbackPropsFile.getAbsolutePath());
+      throw new IllegalStateException("Could not create logback.properties: " + file);
     }
 
     // now load the prop file and change the root.level to DEBUG
     Properties p = new Properties();
-    FileReader r = new FileReader(startupLogbackPropsFile);
-    try {
+    try (FileReader r = new FileReader(file)) {
       p.load(r);
     }
-    finally {
-      r.close();
-    }
-    assertThat((String) p.get("root.level"), is("INFO")); // sanity
+    assertThat(p.getProperty("root.level"), is("INFO")); // sanity
 
     // reset it
     p.setProperty("root.level", "DEBUG");
 
-    Writer w = new FileWriter(startupLogbackPropsFile);
-    try {
-      p.store(w, "Startup properties that override the default root.level to DEBUG - created by "
-          + getClass().getName());
+    try (Writer w = new FileWriter(file)) {
+      p.store(w, null);
     }
     catch (IOException e) {
-      throw new IllegalStateException("Could not load logback.properties from "
-          + startupLogbackPropsFile.getAbsolutePath());
-    }
-    finally {
-
-      w.close();
+      throw new IllegalStateException("Could not load logback.properties: " + file);
     }
   }
 
   /**
    * Customize the work dir per IT by mucking with the nexus-work-dir property
    */
-  private void fixPlexusProperties()
-      throws Exception
-  {
-    File plexusProps = new File(getWarFile(), NexusWebappLayout.PATH_PLEXUS_PROPERTIES);
+  private void fixNexusProperties() throws Exception {
+    File file = new File(getWarFile(), "WEB-INF/classes/nexus.properties");
     Properties p = new Properties();
-    FileReader r = new FileReader(plexusProps);
-    try {
+    try (FileReader r = new FileReader(file)) {
       p.load(r);
     }
-    finally {
-      r.close();
-    }
     p.setProperty("nexus-work", getITNexusWorkDirPath());
-    Writer w = new FileWriter(plexusProps);
-    try {
+    try (Writer w = new FileWriter(file)) {
       p.store(w, null);
-    }
-    finally {
-      w.close();
     }
   }
 
@@ -200,21 +179,16 @@ public abstract class AbstractCargoIT
   }
 
   @Test
-  public void checkStatus()
-      throws Exception
-  {
+  public void checkStatus() throws Exception {
     // this line produces log entries that makes it look like bundle too is started but is actually not
-    assertEquals(
-        "STARTED",
+    assertEquals("STARTED",
         new NexusStatusUtil(AbstractNexusIntegrationTest.nexusApplicationPort).getNexusStatus().getData().getState());
   }
 
   protected PluginConsoleMessageUtil pluginConsoleMsgUtil = new PluginConsoleMessageUtil();
 
   @Test
-  public void checkPlugins()
-      throws Exception
-  {
+  public void checkPlugins() throws Exception {
     checkStatus();
 
     TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -228,5 +202,4 @@ public abstract class AbstractCargoIT
       assertEquals("ACTIVATED", info.getStatus());
     }
   }
-
 }

@@ -102,6 +102,7 @@ public class JettyServer
 
       Throwable e = exception.get();
       if (e != null) {
+        log.error("Start failed", e);
         throw propagateThrowable(e);
       }
     }
@@ -152,7 +153,7 @@ public class JettyServer
 
     // complain if no components configured
     if (components.isEmpty()) {
-      throw new IllegalStateException("Failed to configure any components");
+      throw new Exception("Failed to configure any components");
     }
 
     thread = new JettyMainThread(components);
@@ -183,6 +184,7 @@ public class JettyServer
 
       Throwable e = exception.get();
       if (e != null) {
+        log.error("Stop failed", e);
         throw propagateThrowable(e);
       }
     }
@@ -236,14 +238,14 @@ public class JettyServer
         Server server = null;
         try {
           for (LifeCycle component : components) {
+            // capture the server reference
+            if (component instanceof Server) {
+              server = (Server)component;
+            }
+
             if (!component.isRunning()) {
               log.info("Starting component: {}", component);
               component.start();
-
-              // capture the server reference
-              if (component instanceof Server) {
-                server = (Server)component;
-              }
             }
           }
         }
@@ -254,12 +256,8 @@ public class JettyServer
           started.countDown();
         }
 
-        // complain if we did not find a server reference
-        if (server == null) {
-          log.warn("Missing server reference");
-        }
-        else {
-          log.info("Running");
+        if (server != null) {
+          log.info("Waiting");
           server.join();
         }
       }
@@ -267,7 +265,6 @@ public class JettyServer
         // nothing
       }
       finally {
-        log.info("Stopped");
         stopped.countDown();
       }
     }

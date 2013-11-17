@@ -45,11 +45,19 @@ final class SystemNexusPluginRepository
   // Implementation fields
   // ----------------------------------------------------------------------
 
-  private final  File systemPluginsFolder;
+  private final File systemPluginsFolder;
 
   @Inject
   public SystemNexusPluginRepository(final @Named("${nexus-app}/plugin-repository") File systemPluginsFolder) {
     this.systemPluginsFolder = checkNotNull(systemPluginsFolder);
+
+    // FIXME: this should probably fail, as w/o this the server is highly non-functional
+    // FIXME: injection of @Named in this manner is not ideal, as its happy to provide a "null/plugin-repository" reference
+
+    if (!systemPluginsFolder.exists()) {
+      log.warn("Missing system plugins folder: {}", systemPluginsFolder);
+    }
+
     try {
       DirSupport.mkdir(systemPluginsFolder.toPath());
     }

@@ -19,10 +19,6 @@ public class NexusIllegalStateException
 
   private static final long serialVersionUID = -7898195673031677742L;
 
-  public NexusIllegalStateException() {
-    this(null);
-  }
-
   public NexusIllegalStateException(String message, Throwable cause) {
     super(message, cause);
   }
