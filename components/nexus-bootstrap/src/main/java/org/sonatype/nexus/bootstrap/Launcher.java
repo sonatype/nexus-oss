@@ -49,22 +49,24 @@ public class Launcher
   private final JettyServer server;
 
   public Launcher(final @Nullable ClassLoader classLoader,
-                  final @Nullable Map<String, String> properties,
+                  final @Nullable Map<String, String> overrides,
                   final String[] args)
       throws Exception
   {
     ClassLoader cl = (classLoader == null) ? getClass().getClassLoader() : classLoader;
 
-    Map<String, String> props = properties;
-    if (properties == null) {
-      props = new ConfigurationBuilder()
-          .defaults()
-          .set("bundleBasedir", new File(".").getCanonicalPath())
-          .properties("/nexus.properties", true)
-          .properties("/nexus-test.properties", false)
-          .build();
+    ConfigurationBuilder builder = new ConfigurationBuilder()
+        .defaults()
+        .set("bundleBasedir", new File(".").getCanonicalPath())
+        .properties("/nexus.properties", true)
+        .properties("/nexus-test.properties", false)
+        .custom(new EnvironmentVariables());
+
+    if (overrides != null) {
+      builder.properties(overrides);
     }
 
+    Map<String, String> props = builder.build();
     System.getProperties().putAll(props);
     ConfigurationHolder.set(props);
 
@@ -88,7 +90,7 @@ public class Launcher
     server.start();
   }
 
-  protected String getProperty(final String name, final String defaultValue) {
+  private String getProperty(final String name, final String defaultValue) {
     String value = System.getProperty(name, System.getenv(name));
     if (value == null) {
       value = defaultValue;
@@ -96,7 +98,7 @@ public class Launcher
     return value;
   }
 
-  protected void maybeEnableCommandMonitor() throws IOException {
+  private void maybeEnableCommandMonitor() throws IOException {
     String port = getProperty(COMMAND_MONITOR_PORT, null);
     if (port != null) {
       new CommandMonitorThread(
@@ -115,7 +117,7 @@ public class Launcher
     }
   }
 
-  protected void maybeEnableShutdownIfNotAlive() throws IOException {
+  private void maybeEnableShutdownIfNotAlive() throws IOException {
     String port = getProperty(KEEP_ALIVE_PORT, null);
     if (port != null) {
       String pingInterval = getProperty(KEEP_ALIVE_PING_INTERVAL, FIVE_SECONDS);

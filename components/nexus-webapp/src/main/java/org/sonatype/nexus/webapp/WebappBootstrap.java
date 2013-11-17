@@ -24,6 +24,7 @@ import javax.servlet.ServletContextListener;
 import org.sonatype.nexus.NxApplication;
 import org.sonatype.nexus.bootstrap.ConfigurationBuilder;
 import org.sonatype.nexus.bootstrap.ConfigurationHolder;
+import org.sonatype.nexus.bootstrap.EnvironmentVariables;
 import org.sonatype.nexus.guice.NexusModules.CoreModule;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.util.LockFile;
@@ -91,6 +92,7 @@ public class WebappBootstrap
             .set("bundleBasedir", new File(baseDir).getCanonicalPath())
             .properties("/nexus.properties", true)
             .properties("/nexus-test.properties", false)
+            .custom(new EnvironmentVariables())
             .build();
 
         System.getProperties().putAll(properties);

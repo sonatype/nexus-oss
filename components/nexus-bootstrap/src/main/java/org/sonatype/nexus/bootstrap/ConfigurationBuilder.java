@@ -16,7 +16,10 @@ package org.sonatype.nexus.bootstrap;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -66,9 +69,7 @@ public class ConfigurationBuilder
     return ConfigurationBuilder.class.getResource(name);
   }
 
-  public ConfigurationBuilder properties(final String resource, final boolean required)
-      throws IOException
-  {
+  public ConfigurationBuilder properties(final String resource, final boolean required) throws IOException {
     URL url = getResource(resource);
     if (url == null) {
       if (required) {
@@ -90,7 +91,25 @@ public class ConfigurationBuilder
     if (value == null) {
       throw new NullPointerException();
     }
+    log.debug("Set: {}={}", name, value);
     properties.put(name, value);
+    return this;
+  }
+
+  /**
+   * Provides customization of configuration.
+   */
+  public static interface Customizer
+  {
+    void apply(ConfigurationBuilder builder) throws Exception;
+  }
+
+  public ConfigurationBuilder custom(final Customizer customizer) throws Exception {
+    if (customizer == null) {
+      throw new NullPointerException();
+    }
+    log.debug("Customizing: {}", customizer);
+    customizer.apply(this);
     return this;
   }
 
@@ -133,8 +152,10 @@ public class ConfigurationBuilder
     props.putAll(properties);
 
     log.info("Properties:");
-    for (Map.Entry<String, String> entry : props.entrySet()) {
-      log.info("  {}='{}'", entry.getKey(), entry.getValue());
+    List<String> keys = new ArrayList<>(props.keySet());
+    Collections.sort(keys);
+    for (String key : keys) {
+      log.info("  {}='{}'", key, props.get(key));
     }
 
     return props;
