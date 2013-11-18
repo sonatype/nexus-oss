@@ -257,7 +257,7 @@ public class JettyServer
         }
 
         if (server != null) {
-          log.info("Waiting");
+          log.info("Running");
           server.join();
         }
       }
