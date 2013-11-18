@@ -244,7 +244,7 @@ public class JettyServer
             }
 
             if (!component.isRunning()) {
-              log.info("Starting component: {}", component);
+              log.info("Starting: {}", component);
               component.start();
             }
           }
@@ -283,7 +283,7 @@ public class JettyServer
 
       for (LifeCycle component : components) {
         if (component.isRunning()) {
-          log.info("Stopping component: {}", component);
+          log.info("Stopping: {}", component);
           component.stop();
         }
       }
