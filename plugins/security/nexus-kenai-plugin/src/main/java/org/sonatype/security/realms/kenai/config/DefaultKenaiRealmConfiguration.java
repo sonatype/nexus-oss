@@ -14,14 +14,12 @@
 package org.sonatype.security.realms.kenai.config;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
@@ -32,17 +30,27 @@ import com.sonatype.security.realms.kenai.config.model.Configuration;
 import com.sonatype.security.realms.kenai.config.model.io.xpp3.KenaiRealmConfigurationXpp3Reader;
 import com.sonatype.security.realms.kenai.config.model.io.xpp3.KenaiRealmConfigurationXpp3Writer;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
-import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.nexus.configuration.ModelUtils.CorruptModelException;
+import org.sonatype.nexus.configuration.ModelUtils.Versioned;
+import org.sonatype.nexus.configuration.ModelloUtils;
+import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelReader;
+import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelUpgrader;
+import org.sonatype.nexus.configuration.ModelloUtils.VersionedInFieldXmlModelloModelHelper;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+/**
+ * Kenai realm configuration, a special one, as it's configuration is "one way", is read only. Also, the model
+ * never got updated/changed (structurally) nor in version. Last change is aligning it's version with core
+ * model version, but aside of version, model is basically the same as from the first day.
+ */
 @Singleton
 @Named
 @Typed(KenaiRealmConfiguration.class)
@@ -50,99 +58,70 @@ public class DefaultKenaiRealmConfiguration
     extends ComponentSupport
     implements KenaiRealmConfiguration
 {
-  private final File configurationFile;
+  private static class KenaiRealmModelReader
+      extends ModelloModelReader<Configuration>
+      implements Versioned
+  {
+    private final VersionedInFieldXmlModelloModelHelper versionedHelper = new VersionedInFieldXmlModelloModelHelper(
+        "version");
+
+    @Override
+    public Configuration doRead(final Reader reader) throws IOException, XmlPullParserException {
+      return new KenaiRealmConfigurationXpp3Reader().read(reader);
+    }
+
+    @Override
+    public String readVersion(final InputStream input) throws IOException, CorruptModelException {
+      return versionedHelper.readVersion(input);
+    }
+  }
 
   private final SecuritySystem securitySystem; // used for validation
 
+  private final File configurationFile;
+
+  private final KenaiRealmModelReader kenaiRealmModelReader;
+
   private Configuration configuration;
 
-  private ReentrantLock lock = new ReentrantLock();
-
   @Inject
-  public DefaultKenaiRealmConfiguration(@Named("${application-conf}/kenai-realm.xml") File configurationFile,
-                                        SecuritySystem securitySystem)
+  public DefaultKenaiRealmConfiguration(final ApplicationConfiguration applicationConfiguration,
+                                        final SecuritySystem securitySystem) throws IOException
   {
-    this.configurationFile = configurationFile;
+    this.configurationFile = new File(applicationConfiguration.getConfigurationDirectory(), "kenai-realm.xml");
     this.securitySystem = securitySystem;
+    this.kenaiRealmModelReader = new KenaiRealmModelReader();
+    this.configuration = load();
   }
 
+  @Override
   public Configuration getConfiguration() {
-    try {
-      lock.lock();
-      if (configuration != null) {
-        return configuration;
-      }
-      try (Reader fileReader = new FileReader(this.getConfigFile())) {
-        KenaiRealmConfigurationXpp3Reader reader = new KenaiRealmConfigurationXpp3Reader();
-        configuration = reader.read(fileReader);
-      }
-    }
-    catch (FileNotFoundException e) {
-      log.error("Kenai Realm configuration file does not exist: " + this.getConfigFile().getAbsolutePath());
-    }
-    catch (IOException e) {
-      log.error("IOException while retrieving Kenai Realm configuration file", e);
-    }
-    catch (XmlPullParserException e) {
-      log.error("Invalid XML Configuration", e);
-    }
-    finally {
-      if (configuration == null) {
-        configuration = new Configuration();
-      }
-      lock.unlock();
-    }
-
     return configuration;
   }
 
-  public void save()
-      throws ConfigurationException
-  {
-    FileWriter fileWriter = null;
-    try {
-      lock.lock();
-
-      File configFile = this.getConfigFile();
-      // make the parent dirs first
-      DirSupport.mkdir(configFile.getParentFile().toPath());
-
-      fileWriter = new FileWriter(configFile);
-
-      KenaiRealmConfigurationXpp3Writer writer = new KenaiRealmConfigurationXpp3Writer();
-      writer.write(fileWriter, this.configuration);
+  protected Configuration load() throws IOException {
+    if (!configurationFile.exists()) {
+      return new Configuration();
     }
-    catch (IOException e) {
-      throw new ConfigurationException("Failed to save Kenai Realm configuration: " + e.getMessage(), e);
-    }
-    finally {
-      lock.unlock();
-    }
-
-  }
-
-  public void updateConfiguration(Configuration newConfig)
-      throws ConfigurationException
-  {
-    try {
-      lock.lock();
-
-      newConfig.setVersion(Configuration.MODEL_VERSION);
-
-      ValidationResponse validationResponse = this.validateConfig(newConfig);
-      if (!validationResponse.isValid()) {
-        throw new InvalidConfigurationException(validationResponse);
+    final Configuration result = ModelloUtils.load(Configuration.MODEL_VERSION, this.configurationFile,
+        kenaiRealmModelReader, new ModelloModelUpgrader("1.0.0", Configuration.MODEL_VERSION)
+    {
+      @Override
+      public void doUpgrade(final Reader reader, final Writer writer) throws IOException, XmlPullParserException {
+        // no model structure change, merely the version
+        final Configuration conf = new KenaiRealmConfigurationXpp3Reader().read(reader);
+        conf.setVersion(Configuration.MODEL_VERSION);
+        new KenaiRealmConfigurationXpp3Writer().write(writer, conf);
       }
-
-      this.configuration = newConfig;
-
-      this.save();
-
+    });
+    final ValidationResponse vr = validateConfig(result);
+    if (vr.isValid()) {
+      return result;
     }
-    finally {
-      lock.unlock();
+    else {
+      log.warn("Invalid Kenai Realm configuration, not using it ", new InvalidConfigurationException(vr));
+      return new Configuration();
     }
-
   }
 
   private ValidationResponse validateConfig(Configuration config) {
@@ -184,9 +163,5 @@ public class DefaultKenaiRealmConfiguration
     }
 
     return response;
-  }
-
-  private File getConfigFile() {
-    return configurationFile;
   }
 }
