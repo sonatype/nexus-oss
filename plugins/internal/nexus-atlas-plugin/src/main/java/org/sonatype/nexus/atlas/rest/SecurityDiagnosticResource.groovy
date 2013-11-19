@@ -15,6 +15,8 @@ package org.sonatype.nexus.atlas.rest
 
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.security.SecuritySystem
+import org.sonatype.security.authorization.NoSuchPrivilegeException
+import org.sonatype.security.authorization.NoSuchRoleException
 import org.sonatype.sisu.goodies.common.ComponentSupport
 import org.sonatype.sisu.siesta.common.Resource
 
@@ -72,14 +74,26 @@ class SecurityDiagnosticResource
 
     // add details for a privilege by id
     def explainPrivilege = { data, String id ->
-      def privilege = authzman.getPrivilege(id)
-      data[id] = mappify(privilege, ['id'] as Set)
+      try {
+        def privilege = authzman.getPrivilege(id)
+        data[id] = mappify(privilege, ['id'] as Set)
+      }
+      catch (NoSuchPrivilegeException e) {
+        log.warn("Failed to resolve privilege: $id caused by: $e")
+      }
     }
 
     // add details for a role by id (pre-defined to support recursion)
     def explainRole
     explainRole = { data, String id ->
-      def role = authzman.getRole(id)
+      def role
+      try {
+        role = authzman.getRole(id)
+      }
+      catch (NoSuchRoleException e) {
+        log.warn("Failed to resolve role: $id caused by: $e")
+        return
+      }
       data[id] = mappify(role, ['roleId', 'roles', 'privileges'] as Set)
 
       // add details for nested roles
