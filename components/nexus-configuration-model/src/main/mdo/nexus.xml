@@ -282,6 +282,12 @@
     public static final String MODEL_VERSION = "2.7.0";
 ]]></code>
         </codeSegment>
+        <codeSegment>
+          <version>2.8.0</version>
+          <code><![CDATA[
+    public static final String MODEL_VERSION = "2.8.0";
+]]></code>
+        </codeSegment>
       </codeSegments>
     </class>
 
