@@ -13,6 +13,8 @@
 
 package org.sonatype.security.ldap.realms.persist;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -35,7 +37,7 @@ public class UsersGroupAuthTestLdapConfiguration
 
   @Inject
   public UsersGroupAuthTestLdapConfiguration(final ApplicationConfiguration applicationConfiguration,
-      final ConfigurationValidator validator, final PasswordHelper passwordHelper)
+      final ConfigurationValidator validator, final PasswordHelper passwordHelper) throws IOException
   {
     super(applicationConfiguration, validator, passwordHelper);
   }

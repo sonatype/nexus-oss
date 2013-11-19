@@ -14,6 +14,7 @@
 package org.sonatype.security.ldap.realms;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.naming.NamingException;
 
@@ -48,7 +49,7 @@ public class MultipleAccessLdapConfigIT
 
   @Test
   public void testConfigure()
-      throws InvalidConfigurationException, NamingException, LdapDAOException
+      throws InvalidConfigurationException, NamingException, LdapDAOException, IOException
   {
     try {
       ldapManager.getLdapContextFactory().getSystemLdapContext();

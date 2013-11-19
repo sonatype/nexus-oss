@@ -13,18 +13,23 @@
 
 package org.sonatype.security.ldap.realms.persist;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.Writer;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.sonatype.nexus.configuration.ModelUtils.CorruptModelException;
+import org.sonatype.nexus.configuration.ModelUtils.Versioned;
+import org.sonatype.nexus.configuration.ModelloUtils;
+import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelReader;
+import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelUpgrader;
+import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelWriter;
+import org.sonatype.nexus.configuration.ModelloUtils.VersionedInFieldXmlModelloModelHelper;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import org.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
@@ -33,8 +38,6 @@ import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfiguration
 import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Writer;
 import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-import org.sonatype.sisu.goodies.common.io.FileReplacer;
-import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -45,33 +48,64 @@ public abstract class AbstractLdapConfiguration
     extends ComponentSupport
     implements LdapConfiguration
 {
+  private static class LdapModelReader
+      extends ModelloModelReader<Configuration>
+      implements Versioned
+  {
+    private final VersionedInFieldXmlModelloModelHelper versionedHelper = new VersionedInFieldXmlModelloModelHelper(
+        "version");
+
+    @Override
+    public Configuration doRead(final Reader reader) throws IOException, XmlPullParserException {
+      return new LdapConfigurationXpp3Reader().read(reader);
+    }
+
+    @Override
+    public String readVersion(final InputStream input) throws IOException, CorruptModelException {
+      return versionedHelper.readVersion(input);
+    }
+  }
+
+  private static class LdapModelWriter
+      extends ModelloModelWriter<Configuration>
+  {
+    @Override
+    public void write(final Writer writer, final Configuration model) throws IOException {
+      new LdapConfigurationXpp3Writer().write(writer, model);
+    }
+  }
+
   private final ApplicationConfiguration applicationConfiguration;
 
   private final ConfigurationValidator validator;
 
   private final PasswordHelper passwordHelper;
 
+  private final File configurationFile;
+
+  private final LdapModelReader ldapModelReader;
+
+  private final LdapModelWriter ldapModelWriter;
+
   private final ReentrantLock lock = new ReentrantLock();
 
   private Configuration configuration;
 
   public AbstractLdapConfiguration(ApplicationConfiguration applicationConfiguration, ConfigurationValidator validator,
-      PasswordHelper passwordHelper)
+                                   PasswordHelper passwordHelper) throws IOException
   {
     this.applicationConfiguration = checkNotNull(applicationConfiguration);
     this.validator = checkNotNull(validator);
     this.passwordHelper = checkNotNull(passwordHelper);
-  }
-
-  protected File getConfigurationFile() {
-    return new File(applicationConfiguration.getConfigurationDirectory(), "ldap.xml");
+    this.configurationFile = new File(applicationConfiguration.getConfigurationDirectory(), "ldap.xml");
+    this.ldapModelReader = new LdapModelReader();
+    this.ldapModelWriter = new LdapModelWriter();
+    this.configuration = load();
   }
 
   @Override
   public CConnectionInfo readConnectionInfo() {
-    CConnectionInfo connInfo = getConfiguration().getConnectionInfo();
-
-    return connInfo;
+    return getConfiguration().getConnectionInfo();
   }
 
   @Override
@@ -84,14 +118,11 @@ public abstract class AbstractLdapConfiguration
       throws InvalidConfigurationException
   {
     lock.lock();
-
     try {
-      ValidationResponse vr = validator.validateUserAndGroupAuthConfiguration(null, userAndGroupConfig);
-
+      final ValidationResponse vr = validator.validateUserAndGroupAuthConfiguration(null, userAndGroupConfig);
       if (vr.getValidationErrors().size() > 0) {
         throw new InvalidConfigurationException(vr);
       }
-
       getConfiguration().setUserAndGroupConfig(userAndGroupConfig);
     }
     finally {
@@ -104,125 +135,83 @@ public abstract class AbstractLdapConfiguration
       throws InvalidConfigurationException
   {
     lock.lock();
-
     try {
-      ValidationResponse vr = validator.validateConnectionInfo(null, connectionInfo);
-
+      final ValidationResponse vr = validator.validateConnectionInfo(null, connectionInfo);
       if (vr.getValidationErrors().size() > 0) {
         throw new InvalidConfigurationException(vr);
       }
-
       getConfiguration().setConnectionInfo(connectionInfo);
     }
     finally {
       lock.unlock();
     }
-
   }
 
-  @Override
-  public Configuration getConfiguration() {
-    lock.lock();
-    try {
-      if (configuration != null) {
-        return configuration;
-      }
-      final File configurationFile = getConfigurationFile();
-
-      try (final Reader fr = new InputStreamReader(new FileInputStream(configurationFile))) {
-        LdapConfigurationXpp3Reader reader = new LdapConfigurationXpp3Reader();
-        configuration = reader.read(fr);
-        ValidationResponse vr = validator.validateModel(new ValidationRequest(configuration));
-        if (vr.getValidationErrors().size() > 0) {
-          // TODO need to code the handling of invalid config
-          configuration = new Configuration();
-        }
-        // decrypt the password, if it fails assume the password is clear text.
-        // If the password is wrong the the LDAP Realm will not work, which is no different. If the user typed in
-        // the
-        // password wrong.
-        if (configuration.getConnectionInfo() != null
-            && StringUtils.isNotEmpty(configuration.getConnectionInfo().getSystemPassword())) {
-          try {
-            configuration.getConnectionInfo().setSystemPassword(
-                passwordHelper.decrypt(configuration.getConnectionInfo().getSystemPassword()));
-          }
-          catch (PlexusCipherException e) {
-            this.log.error(
-                "Failed to decrypt password, assuming the password in file: '" + configurationFile.getAbsolutePath()
-                    + "' is clear text.", e);
-          }
-        }
-      }
-      catch (FileNotFoundException e) {
-        // This is ok, may not exist first time around
-        configuration = this.getDefaultConfiguration();
-      }
-      catch (IOException e) {
-        log.error("IOException while retrieving configuration file", e);
-      }
-      catch (XmlPullParserException e) {
-        log.error("Invalid XML Configuration", e);
-      }
-    }
-    finally {
-      lock.unlock();
-    }
-
+  protected Configuration getConfiguration() {
     return configuration;
   }
 
-  @Override
-  public void save() {
+  protected Configuration load() throws IOException {
     lock.lock();
     try {
-      final File configurationFile = getConfigurationFile();
-      try {
-        DirSupport.mkdir(configurationFile.getParentFile().toPath());
+      Configuration configuration = ModelloUtils.load(Configuration.MODEL_VERSION, configurationFile, ldapModelReader,
+          new ModelloModelUpgrader("1.0.1", Configuration.MODEL_VERSION)
+          {
+            @Override
+            public void doUpgrade(final Reader reader, final Writer writer) throws IOException, XmlPullParserException {
+              // no model structure change, merely the version
+              final Configuration conf = new LdapConfigurationXpp3Reader().read(reader);
+              conf.setVersion(Configuration.MODEL_VERSION);
+              new LdapConfigurationXpp3Writer().write(writer, conf);
+            }
+          });
+      final ValidationResponse vr = validator.validateModel(new ValidationRequest(configuration));
+      if (vr.getValidationErrors().size() > 0) {
+        log.warn("Invalid LDAP configuration, defaulting configuration", new InvalidConfigurationException(vr));
+        configuration = getDefaultConfiguration();
       }
-      catch (IOException e) {
-        final String message =
-            "\r\n******************************************************************************\r\n"
-                + "* Could not create configuration file [ "
-                + configurationFile.toString()
-                + "]!!!! *\r\n"
-                +
-                "* Application cannot start properly until the process has read+write permissions to this folder *\r\n"
-                + "******************************************************************************";
-        log.error(message, e);
-        throw new IOException("Could not create configuration file " + configurationFile.getAbsolutePath(), e);
-      }
-
-      final Configuration configuration = this.configuration.clone();
-      // change the password to be encrypted
       if (configuration.getConnectionInfo() != null
           && StringUtils.isNotEmpty(configuration.getConnectionInfo().getSystemPassword())) {
         try {
           configuration.getConnectionInfo().setSystemPassword(
-              passwordHelper.encrypt(configuration.getConnectionInfo().getSystemPassword()));
+              passwordHelper.decrypt(configuration.getConnectionInfo().getSystemPassword()));
+        }
+        catch (PlexusCipherException e) {
+          this.log.error(
+              "Failed to decrypt password, assuming the password in file: '" + configurationFile.getAbsolutePath()
+                  + "' is clear text.", e);
+        }
+      }
+      return configuration;
+    }
+    catch (FileNotFoundException e) {
+      // This is ok, may not exist first time around
+      return getDefaultConfiguration();
+    }
+    finally {
+      lock.unlock();
+    }
+  }
+
+  @Override
+  public void save() throws IOException {
+    lock.lock();
+    try {
+      final Configuration savedConfiguration = this.configuration.clone();
+      // change the password to be encrypted
+      if (savedConfiguration.getConnectionInfo() != null
+          && StringUtils.isNotEmpty(savedConfiguration.getConnectionInfo().getSystemPassword())) {
+        try {
+          savedConfiguration.getConnectionInfo().setSystemPassword(
+              passwordHelper.encrypt(savedConfiguration.getConnectionInfo().getSystemPassword()));
         }
         catch (PlexusCipherException e) {
           log.error("Failed to encrypt password while storing configuration file", e);
         }
       }
-
       // perform the "safe save"
       log.debug("Saving configuration: {}", configurationFile);
-      final FileReplacer fileReplacer = new FileReplacer(configurationFile);
-      fileReplacer.setDeleteBackupFile(true);
-
-      fileReplacer.replace(new ContentWriter()
-      {
-        @Override
-        public void write(final BufferedOutputStream output)
-            throws IOException
-        {
-          new LdapConfigurationXpp3Writer().write(output, configuration);
-        }
-      });
-    }
-    catch (IOException e) {
-      log.error("IOException while storing configuration file", e);
+      ModelloUtils.save(savedConfiguration, configurationFile, ldapModelWriter);
     }
     finally {
       lock.unlock();

@@ -71,14 +71,19 @@
               <goal>xpp3-writer</goal>
             </goals>
             <configuration>
-              <version>1.0.1</version>
-              <packageWithVersion>false</packageWithVersion>
+              <version>2.8.0</version>
+              <packagedVersions>
+                <packagedVersion>1.0.1</packagedVersion>
+              </packagedVersions>
               <models>
                 <model>src/main/mdo/ldap.xml</model>
               </models>
             </configuration>
           </execution>
         </executions>
+        <configuration>
+          <packageWithVersion>false</packageWithVersion>
+        </configuration>
       </plugin>
     </plugins>
   </build>

@@ -13,6 +13,8 @@
 
 package org.sonatype.security.ldap.realms.persist;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -32,14 +34,14 @@ public class DefaultLdapConfiguration
 
   @Inject
   public DefaultLdapConfiguration(ApplicationConfiguration applicationConfiguration, ConfigurationValidator validator,
-      PasswordHelper passwordHelper, EventBus eventBus)
+      PasswordHelper passwordHelper, EventBus eventBus) throws IOException
   {
     super(applicationConfiguration, validator, passwordHelper);
     this.eventBus = checkNotNull(eventBus);
   }
 
   @Override
-  public void save() {
+  public void save() throws IOException {
     super.save();
     // fire clear cache event
     this.eventBus.post(new LdapClearCacheEvent(this));
