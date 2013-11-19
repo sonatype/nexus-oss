@@ -14,27 +14,28 @@
 package org.sonatype.nexus.plugins.lvo.config;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.ModelUtils.CorruptModelException;
+import org.sonatype.nexus.configuration.ModelUtils.Versioned;
+import org.sonatype.nexus.configuration.ModelloUtils;
+import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelReader;
+import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelUpgrader;
+import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelWriter;
+import org.sonatype.nexus.configuration.ModelloUtils.VersionedInFieldXmlModelloModelHelper;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.plugins.lvo.NoSuchKeyException;
 import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
 import org.sonatype.nexus.plugins.lvo.config.model.Configuration;
 import org.sonatype.nexus.plugins.lvo.config.model.io.xpp3.NexusLvoPluginConfigurationXpp3Reader;
 import org.sonatype.nexus.plugins.lvo.config.model.io.xpp3.NexusLvoPluginConfigurationXpp3Writer;
-import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.commons.io.FileUtils;
@@ -43,24 +44,62 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Configuration for LVO plugin. There is no "real" upgrade happening, as model version changed in Nexus 1.x "era", and
+ * it's version aligned with Nexus core, but the model itself is unchanged from the model used in Nexus 2.0 (was
+ * 1.0.1).
+ */
 @Named
 @Singleton
 public class DefaultLvoPluginConfiguration
     extends ComponentSupport
     implements LvoPluginConfiguration
 {
+  private static class LvoModelReader
+      extends ModelloModelReader<Configuration>
+      implements Versioned
+  {
+    private final VersionedInFieldXmlModelloModelHelper versionedHelper = new VersionedInFieldXmlModelloModelHelper(
+        "version");
+
+    @Override
+    public Configuration doRead(final Reader reader) throws IOException, XmlPullParserException {
+      return new NexusLvoPluginConfigurationXpp3Reader().read(reader);
+    }
+
+    @Override
+    public String readVersion(final InputStream input) throws IOException, CorruptModelException {
+      return versionedHelper.readVersion(input);
+    }
+  }
+
+  private static class LvoModelWriter
+      extends ModelloModelWriter<Configuration>
+  {
+    @Override
+    public void write(final Writer writer, final Configuration model) throws IOException {
+      new NexusLvoPluginConfigurationXpp3Writer().write(writer, model);
+    }
+  }
+
   private final File configurationFile;
 
+  private final LvoModelReader lvoModelReader;
+
+  private final LvoModelWriter lvoModelWriter;
+
   @Inject
-  public DefaultLvoPluginConfiguration(final @Named("${nexus-work}/conf/lvo-plugin.xml") File configurationFile) {
-    this.configurationFile = checkNotNull(configurationFile);
+  public DefaultLvoPluginConfiguration(final ApplicationConfiguration applicationConfiguration) throws IOException {
+    checkNotNull(applicationConfiguration);
+    this.configurationFile = new File(applicationConfiguration.getConfigurationDirectory(), "lvo-plugin.xml");
+    this.lvoModelReader = new LvoModelReader();
+    this.lvoModelWriter = new LvoModelWriter();
+    this.configuration = load();
   }
 
   private Configuration configuration;
 
-  private ReentrantLock lock = new ReentrantLock();
-
-  public CLvoKey getLvoKey(String key)
+  public synchronized CLvoKey getLvoKey(String key)
       throws NoSuchKeyException
   {
     if (StringUtils.isEmpty(key)) {
@@ -83,119 +122,53 @@ public class DefaultLvoPluginConfiguration
     }
   }
 
-  public boolean isEnabled() {
+  public synchronized boolean isEnabled() {
     try {
       return getConfiguration().isEnabled();
     }
-    catch (ConfigurationException | IOException e) {
+    catch (IOException e) {
       log.error("Unable to read configuration", e);
     }
 
     return false;
   }
 
-  public void enable() throws ConfigurationException, IOException {
+  public synchronized void enable() throws IOException {
     getConfiguration().setEnabled(true);
     save();
   }
 
-  public void disable() throws ConfigurationException, IOException {
+  public synchronized void disable() throws IOException {
     getConfiguration().setEnabled(false);
     save();
   }
 
-  protected Configuration getConfiguration() throws ConfigurationException, IOException {
-    if (configuration != null) {
-      return configuration;
-    }
-
-    lock.lock();
-
-    Reader fr = null;
-
-    FileInputStream is = null;
-
-    try {
-      is = new FileInputStream(configurationFile);
-
-      NexusLvoPluginConfigurationXpp3Reader reader = new NexusLvoPluginConfigurationXpp3Reader();
-
-      fr = new InputStreamReader(is);
-
-      configuration = reader.read(fr);
-    }
-    catch (FileNotFoundException e) {
-      // This is ok, may not exist first time around
-      if (!configurationFile.exists()) {
-        FileUtils.copyURLToFile(
-            getClass().getResource("/META-INF/nexus-lvo-plugin/lvo-plugin.xml"),
-            configurationFile);
-
-        return getConfiguration();
-      }
-      else {
-        throw e;
-      }
-    }
-    catch (IOException e) {
-      log.error("IOException while retrieving configuration file", e);
-    }
-    catch (XmlPullParserException e) {
-      log.error("Invalid XML Configuration", e);
-    }
-    finally {
-      if (fr != null) {
-        try {
-          fr.close();
-        }
-        catch (IOException e) {
-          // just closing if open
-        }
-      }
-
-      if (is != null) {
-        try {
-          is.close();
-        }
-        catch (IOException e) {
-          // just closing if open
-        }
-      }
-
-      lock.unlock();
-    }
-
+  protected Configuration getConfiguration() throws IOException {
     return configuration;
   }
 
-  protected void save() throws IOException {
-    lock.lock();
-
-    DirSupport.mkdir(configurationFile.getParentFile().toPath());
-
-    Writer fw = null;
-
-    try {
-      fw = new OutputStreamWriter(new FileOutputStream(configurationFile));
-
-      NexusLvoPluginConfigurationXpp3Writer writer = new NexusLvoPluginConfigurationXpp3Writer();
-
-      writer.write(fw, configuration);
+  protected synchronized Configuration load() throws IOException {
+    if (!configurationFile.exists()) {
+      // This is ok, may not exist first time around, default it
+      FileUtils.copyURLToFile(
+          getClass().getResource("/META-INF/nexus-lvo-plugin/lvo-plugin.xml"),
+          configurationFile);
     }
-    finally {
-      if (fw != null) {
-        try {
-          fw.flush();
-
-          fw.close();
-        }
-        catch (IOException e) {
-          // just closing if open
-        }
+    return ModelloUtils.load(Configuration.MODEL_VERSION, this.configurationFile,
+        lvoModelReader, new ModelloModelUpgrader("1.0.1", Configuration.MODEL_VERSION)
+    {
+      @Override
+      public void doUpgrade(final Reader reader, final Writer writer) throws IOException, XmlPullParserException {
+        // no model structure change, merely the version
+        final Configuration conf = new NexusLvoPluginConfigurationXpp3Reader().read(reader);
+        conf.setVersion(Configuration.MODEL_VERSION);
+        new NexusLvoPluginConfigurationXpp3Writer().write(writer, conf);
       }
+    });
+  }
 
-      lock.unlock();
-    }
+  protected synchronized void save() throws IOException {
+    ModelloUtils.save(configuration, configurationFile, lvoModelWriter);
   }
 
   protected void clearCache() {
