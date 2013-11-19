@@ -138,11 +138,11 @@ public class ModelloUtils
 
     private final String fieldName;
 
-    protected VersionedInFieldXmlModelloModelHelper(final String fieldName) {
+    public VersionedInFieldXmlModelloModelHelper(final String fieldName) {
       this(DEFAULT_CHARSET, fieldName);
     }
 
-    protected VersionedInFieldXmlModelloModelHelper(final Charset charset, final String fieldName) {
+    public VersionedInFieldXmlModelloModelHelper(final Charset charset, final String fieldName) {
       this.charset = checkNotNull(charset);
       this.fieldName = checkNotNull(fieldName);
     }
