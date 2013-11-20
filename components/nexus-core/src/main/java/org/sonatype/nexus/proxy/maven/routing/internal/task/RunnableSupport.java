@@ -71,7 +71,7 @@ public abstract class RunnableSupport
     }
     catch (Exception e) {
       log.warn("{} failed:", getName(), e);
-      Throwables.propagate(e);
+      throw Throwables.propagate(e);
     }
     finally {
       ProgressListenerUtil.setCurrentProgressListener(oldProgressListener);
