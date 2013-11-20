@@ -226,7 +226,9 @@ public class ModelUtilsTest
       final Xpp3Dom dom = ModelUtils.load("99", file, DOM_READER, V1_V2_UPGRADER, V2_V3_UPGRADER);
     }
     catch (IOException e) {
-      assertThat(e.getMessage(), startsWith("Could not upgrade model to version 99"));
+      assertThat(e.getMessage(), startsWith("Could not upgrade model"));
+      // TODO: assertiom against message makes test fragile, but this is what "tail" should be
+      // assertThat(e.getMessage(), endsWith("to version 99, is upgraded to 3, originally was 1, available upgraders exists for versions [2, 1]"));
     }
   }
 
