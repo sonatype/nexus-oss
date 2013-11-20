@@ -16,7 +16,6 @@ package org.sonatype.nexus.tasks.descriptors;
 import java.util.List;
 
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
 public interface ScheduledTaskDescriptor
 {
@@ -25,9 +24,6 @@ public interface ScheduledTaskDescriptor
   String getName();
 
   List<FormField> formFields();
-
-  @Deprecated
-  List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors();
 
   boolean isExposed();
 }
