@@ -450,14 +450,6 @@ public class DefaultNexusConfiguration
     }
   }
 
-  @Deprecated
-  // see above
-  protected void applyAndSaveConfiguration()
-      throws IOException
-  {
-    saveConfiguration();
-  }
-
   @Override
   @Deprecated
   public Configuration getConfigurationModel() {
@@ -1044,7 +1036,7 @@ public class DefaultNexusConfiguration
   {
     getConfigurationModel().addRemoteNexusInstance(settings);
 
-    applyAndSaveConfiguration();
+    saveConfiguration();
   }
 
   @Override
@@ -1061,7 +1053,7 @@ public class DefaultNexusConfiguration
       }
     }
 
-    applyAndSaveConfiguration();
+    saveConfiguration();
   }
 
   @Override
