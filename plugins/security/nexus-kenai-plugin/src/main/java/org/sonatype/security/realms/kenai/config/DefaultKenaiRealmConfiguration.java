@@ -65,9 +65,11 @@ public class DefaultKenaiRealmConfiguration
     private final VersionedInFieldXmlModelloModelHelper versionedHelper = new VersionedInFieldXmlModelloModelHelper(
         "version");
 
+    private final KenaiRealmConfigurationXpp3Reader modelloReader = new KenaiRealmConfigurationXpp3Reader();
+
     @Override
     public Configuration doRead(final Reader reader) throws IOException, XmlPullParserException {
-      return new KenaiRealmConfigurationXpp3Reader().read(reader);
+      return modelloReader.read(reader);
     }
 
     @Override

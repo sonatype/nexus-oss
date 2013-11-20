@@ -55,9 +55,11 @@ public abstract class AbstractLdapConfiguration
     private final VersionedInFieldXmlModelloModelHelper versionedHelper = new VersionedInFieldXmlModelloModelHelper(
         "version");
 
+    private final LdapConfigurationXpp3Reader modelloReader = new LdapConfigurationXpp3Reader();
+
     @Override
     public Configuration doRead(final Reader reader) throws IOException, XmlPullParserException {
-      return new LdapConfigurationXpp3Reader().read(reader);
+      return modelloReader.read(reader);
     }
 
     @Override
@@ -69,14 +71,14 @@ public abstract class AbstractLdapConfiguration
   private static class LdapModelWriter
       extends ModelloModelWriter<Configuration>
   {
+    private final LdapConfigurationXpp3Writer modelloWriter = new LdapConfigurationXpp3Writer();
+
     @Override
     public void write(final Writer writer, final Configuration model) throws IOException {
       model.setVersion(Configuration.MODEL_VERSION);
-      new LdapConfigurationXpp3Writer().write(writer, model);
+      modelloWriter.write(writer, model);
     }
   }
-
-  private final ApplicationConfiguration applicationConfiguration;
 
   private final ConfigurationValidator validator;
 
@@ -95,7 +97,7 @@ public abstract class AbstractLdapConfiguration
   public AbstractLdapConfiguration(ApplicationConfiguration applicationConfiguration, ConfigurationValidator validator,
                                    PasswordHelper passwordHelper) throws IOException
   {
-    this.applicationConfiguration = checkNotNull(applicationConfiguration);
+    checkNotNull(applicationConfiguration);
     this.validator = checkNotNull(validator);
     this.passwordHelper = checkNotNull(passwordHelper);
     this.configurationFile = new File(applicationConfiguration.getConfigurationDirectory(), "ldap.xml");

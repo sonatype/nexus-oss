@@ -62,9 +62,11 @@ public class DefaultLvoPluginConfiguration
     private final VersionedInFieldXmlModelloModelHelper versionedHelper = new VersionedInFieldXmlModelloModelHelper(
         "version");
 
+    private final NexusLvoPluginConfigurationXpp3Reader modelloReader = new NexusLvoPluginConfigurationXpp3Reader();
+
     @Override
     public Configuration doRead(final Reader reader) throws IOException, XmlPullParserException {
-      return new NexusLvoPluginConfigurationXpp3Reader().read(reader);
+      return modelloReader.read(reader);
     }
 
     @Override
@@ -76,10 +78,12 @@ public class DefaultLvoPluginConfiguration
   private static class LvoModelWriter
       extends ModelloModelWriter<Configuration>
   {
+    private final NexusLvoPluginConfigurationXpp3Writer modelloWriter = new NexusLvoPluginConfigurationXpp3Writer();
+
     @Override
     public void write(final Writer writer, final Configuration model) throws IOException {
       model.setVersion(Configuration.MODEL_VERSION);
-      new NexusLvoPluginConfigurationXpp3Writer().write(writer, model);
+      modelloWriter.write(writer, model);
     }
   }
 
