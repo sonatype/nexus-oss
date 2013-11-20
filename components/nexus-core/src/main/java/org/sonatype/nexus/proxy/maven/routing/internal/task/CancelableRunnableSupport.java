@@ -40,10 +40,6 @@ public abstract class CancelableRunnableSupport
 {
   private final CancelableSupport cancelableSupport;
 
-  protected CancelableRunnableSupport(final String name) {
-    this(null, name);
-  }
-
   protected CancelableRunnableSupport(final ProgressListener progressListener, final String name) {
     super(progressListener, name);
     this.cancelableSupport = new CancelableSupport();

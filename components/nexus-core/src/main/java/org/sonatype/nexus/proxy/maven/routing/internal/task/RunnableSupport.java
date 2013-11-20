@@ -36,10 +36,6 @@ public abstract class RunnableSupport
 
   private final String name;
 
-  protected RunnableSupport(final String name) {
-    this(null, name);
-  }
-
   protected RunnableSupport(final ProgressListener progressListener, final String name) {
     checkArgument(name != null && name.trim().length() > 0);
     this.progressListenerWrapper = new ProgressListenerWrapper(progressListener);
