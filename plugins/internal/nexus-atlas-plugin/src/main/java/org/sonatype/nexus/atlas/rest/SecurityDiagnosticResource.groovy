@@ -79,7 +79,7 @@ class SecurityDiagnosticResource
         data[id] = mappify(privilege, ['id'] as Set)
       }
       catch (NoSuchPrivilegeException e) {
-        log.warn("Failed to resolve privilege: $id caused by: $e")
+        data[id] = "ERROR: Failed to resolve privilege: $id caused by: $e"
       }
     }
 
@@ -91,7 +91,7 @@ class SecurityDiagnosticResource
         role = authzman.getRole(id)
       }
       catch (NoSuchRoleException e) {
-        log.warn("Failed to resolve role: $id caused by: $e")
+        data[id] = "ERROR: Failed to resolve role: $id caused by: $e"
         return
       }
       data[id] = mappify(role, ['roleId', 'roles', 'privileges'] as Set)
