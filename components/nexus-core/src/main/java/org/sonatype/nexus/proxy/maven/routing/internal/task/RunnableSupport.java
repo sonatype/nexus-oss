@@ -50,14 +50,6 @@ public abstract class RunnableSupport
     return name;
   }
 
-  /**
-   * @deprecated use {@link #log} reference.
-   */
-  @Deprecated
-  protected Logger getLogger() {
-    return log;
-  }
-
   protected ProgressListener getProgressListener() {
     return progressListenerWrapper;
   }
