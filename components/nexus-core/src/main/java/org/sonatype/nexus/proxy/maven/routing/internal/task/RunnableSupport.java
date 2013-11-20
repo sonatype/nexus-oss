@@ -63,10 +63,7 @@ public abstract class RunnableSupport
       doRun();
       log.debug("{} done...", getName());
     }
-    catch (InterruptedException e) {
-      log.info("{} interrupted: {}", getName(), e.getMessage());
-    }
-    catch (RunnableInterruptedException e) {
+    catch (InterruptedException | RunnableInterruptedException e) {
       log.info("{} interrupted: {}", getName(), e.getMessage());
     }
     catch (RunnableCanceledException e) {
