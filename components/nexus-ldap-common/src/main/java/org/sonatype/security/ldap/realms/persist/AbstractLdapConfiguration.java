@@ -28,7 +28,6 @@ import org.sonatype.nexus.configuration.ModelloUtils;
 import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelReader;
 import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelUpgrader;
 import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelWriter;
-import org.sonatype.nexus.configuration.ModelloUtils.VersionedInFieldXmlModelloModelHelper;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
@@ -39,7 +38,10 @@ import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfiguration
 import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.base.Strings;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -48,13 +50,13 @@ public abstract class AbstractLdapConfiguration
     extends ComponentSupport
     implements LdapConfiguration
 {
+  /**
+   * Model reader that carefully handles XML version field, as it does not exists always..
+   */
   private static class LdapModelReader
       extends ModelloModelReader<Configuration>
       implements Versioned
   {
-    private final VersionedInFieldXmlModelloModelHelper versionedHelper = new VersionedInFieldXmlModelloModelHelper(
-        "version");
-
     private final LdapConfigurationXpp3Reader modelloReader = new LdapConfigurationXpp3Reader();
 
     @Override
@@ -64,7 +66,29 @@ public abstract class AbstractLdapConfiguration
 
     @Override
     public String readVersion(final InputStream input) throws IOException, CorruptModelException {
-      return versionedHelper.readVersion(input);
+      // special handling for versions needed, as we might hit unversioned file
+      // older ones never got version written out
+      try (final Reader r = new InputStreamReader(input, charset)) {
+        try {
+          final Xpp3Dom dom = Xpp3DomBuilder.build(r);
+          // servers node exists, this is Pro, and is versioned, use standard ways to get it's version
+          final Xpp3Dom versionNode = dom.getChild("version");
+          if (versionNode != null) {
+            final String originalFileVersion = versionNode.getValue();
+            if (Strings.isNullOrEmpty(originalFileVersion)) {
+              throw new CorruptModelException("Passed in XML model have empty 'version' node");
+            }
+            return originalFileVersion;
+          }
+          else {
+            // unversioned, expected in OSS LDAP XML, "lie" 1.0.1
+            return "1.0.1";
+          }
+        }
+        catch (XmlPullParserException e) {
+          throw new CorruptModelException("Passed in XML model cannot be parsed", e);
+        }
+      }
     }
   }
 
