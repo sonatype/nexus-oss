@@ -289,14 +289,14 @@ public class ModelUtils
           }
           catch (CorruptModelException e) {
             final CorruptModelException ex = new CorruptModelException(String
-                .format("Model detected a corrupt during upgrade from version %s to version %s", upgrader.fromVersion(),
+                .format("Model %s detected as corrupt during upgrade from version %s to version %s", file.getAbsolutePath(), upgrader.fromVersion(),
                     upgrader.toVersion()), e);
             throw ex;
           }
           catch (IOException e) {
             final IOException ex = new IOException(String
-                .format("IO problem during upgrade from version %s to version %s", upgrader.fromVersion(),
-                    upgrader.toVersion()), e);
+                .format("IO problem during upgrade from version %s to version %s of %s", upgrader.fromVersion(),
+                    upgrader.toVersion(), file.getAbsolutePath()), e);
             throw ex;
           }
           currentFileVersion = upgrader.toVersion();
@@ -307,8 +307,8 @@ public class ModelUtils
           // upgrade failed
           throw new IOException(String
               .format(
-                  "Could not upgrade model to version %s, is upgraded to %s, originally was %s, available upgraders exists for versions %s",
-                  currentModelVersion, currentFileVersion, originalFileVersion, upgradersMap.keySet()));
+                  "Could not upgrade model %s to version %s, is upgraded to %s, originally was %s, available upgraders exists for versions %s",
+                  file.getAbsolutePath(), currentModelVersion, currentFileVersion, originalFileVersion, upgradersMap.keySet()));
         }
       }
     }
