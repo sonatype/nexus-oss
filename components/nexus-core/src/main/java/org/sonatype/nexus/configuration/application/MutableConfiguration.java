@@ -53,33 +53,6 @@ public interface MutableConfiguration
 
   String getAnonymousPassword();
 
-  /**
-   * Set anonymous access.
-   *
-   * @deprecated Use {@link #setAnonymousAccess(boolean, String, String)} instead.
-   */
-  @Deprecated
-  void setAnonymousAccessEnabled(boolean enabled)
-      throws IOException;
-
-  /**
-   * Set anonymous username.
-   *
-   * @deprecated Use {@link #setAnonymousAccess(boolean, String, String)} instead.
-   */
-  @Deprecated
-  void setAnonymousUsername(String val)
-      throws InvalidConfigurationException;
-
-  /**
-   * Set anonymous password.
-   *
-   * @deprecated Use {@link #setAnonymousAccess(boolean, String, String)} instead.
-   */
-  @Deprecated
-  void setAnonymousPassword(String val)
-      throws InvalidConfigurationException;
-
   List<String> getRealms();
 
   void setRealms(List<String> realms)
