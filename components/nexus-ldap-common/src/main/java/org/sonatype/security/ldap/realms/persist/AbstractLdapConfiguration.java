@@ -71,7 +71,6 @@ public abstract class AbstractLdapConfiguration
       try (final Reader r = new InputStreamReader(input, charset)) {
         try {
           final Xpp3Dom dom = Xpp3DomBuilder.build(r);
-          // servers node exists, this is Pro, and is versioned, use standard ways to get it's version
           final Xpp3Dom versionNode = dom.getChild("version");
           if (versionNode != null) {
             final String originalFileVersion = versionNode.getValue();
