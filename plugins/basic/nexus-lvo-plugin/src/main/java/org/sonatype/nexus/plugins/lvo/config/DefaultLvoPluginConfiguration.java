@@ -78,6 +78,7 @@ public class DefaultLvoPluginConfiguration
   {
     @Override
     public void write(final Writer writer, final Configuration model) throws IOException {
+      model.setVersion(Configuration.MODEL_VERSION);
       new NexusLvoPluginConfigurationXpp3Writer().write(writer, model);
     }
   }

@@ -71,6 +71,7 @@ public abstract class AbstractLdapConfiguration
   {
     @Override
     public void write(final Writer writer, final Configuration model) throws IOException {
+      model.setVersion(Configuration.MODEL_VERSION);
       new LdapConfigurationXpp3Writer().write(writer, model);
     }
   }
