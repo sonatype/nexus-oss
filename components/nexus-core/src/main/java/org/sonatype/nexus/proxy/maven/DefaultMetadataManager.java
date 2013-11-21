@@ -72,17 +72,6 @@ public class DefaultMetadataManager
     metadataUpdater.deployArtifact(request);
   }
 
-  /**
-   * @deprecated Pending removal (no replacement).
-   */
-  @Deprecated
-  @Override
-  public void undeployArtifact(ArtifactStoreRequest request)
-      throws IOException
-  {
-    metadataUpdater.undeployArtifact(request);
-  }
-
   @Override
   public Gav resolveArtifact(ArtifactStoreRequest gavRequest)
       throws IOException
