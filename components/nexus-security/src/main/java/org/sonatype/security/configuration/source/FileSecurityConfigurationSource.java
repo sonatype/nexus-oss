@@ -94,17 +94,6 @@ public class FileSecurityConfigurationSource
     return configurationFile;
   }
 
-  /**
-   * Sets the configuration file.
-   *
-   * @param configurationFile the new configuration file
-   * @deprecated replaced by constructor injection
-   */
-  @Deprecated
-  public void setConfigurationFile(File configurationFile) {
-    this.configurationFile = configurationFile;
-  }
-
   public SecurityConfiguration loadConfiguration()
       throws ConfigurationException, IOException
   {
