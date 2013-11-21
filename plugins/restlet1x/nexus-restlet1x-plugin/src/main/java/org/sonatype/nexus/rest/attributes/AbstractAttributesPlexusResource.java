@@ -35,9 +35,11 @@ public abstract class AbstractAttributesPlexusResource
   {
     RebuildAttributesTask task = getNexusScheduler().createTaskInstance(RebuildAttributesTask.class);
 
-    task.setRepositoryId(getRepositoryId(request));
-
-    task.setRepositoryGroupId(getRepositoryGroupId(request));
+    String repositoryId = getRepositoryId(request);
+    if (repositoryId == null) {
+      repositoryId = getRepositoryGroupId(request);
+    }
+    task.setRepositoryId(repositoryId);
 
     task.setResourceStorePath(getResourceStorePath(request));
 
