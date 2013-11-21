@@ -160,7 +160,6 @@ public class EmptyRoleTest
     user.setEmailAddress("test@foo.com");
     user.setFirstName("test");
     user.setLastName("user");
-    user.setReadOnly(false);
     user.setSource("default");
     user.setStatus(UserStatus.active);
 

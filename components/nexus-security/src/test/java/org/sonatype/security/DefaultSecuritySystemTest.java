@@ -154,7 +154,6 @@ public class DefaultSecuritySystemTest
     User user = new DefaultUser();
     user.setEmailAddress("email@foo.com");
     user.setName("testAddUser");
-    user.setReadOnly(false);
     user.setSource("MockUserManagerA");
     user.setStatus(UserStatus.active);
     user.setUserId("testAddUser");

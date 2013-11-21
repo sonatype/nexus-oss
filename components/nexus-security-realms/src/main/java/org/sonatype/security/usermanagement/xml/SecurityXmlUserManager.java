@@ -109,7 +109,6 @@ public class SecurityXmlUserManager
     user.setEmailAddress(cUser.getEmail());
     user.setSource(SOURCE);
     user.setStatus(UserStatus.valueOf(cUser.getStatus()));
-    user.setReadOnly(false);
 
     try {
       user.setRoles(this.getUsersRoles(cUser.getId(), SOURCE));

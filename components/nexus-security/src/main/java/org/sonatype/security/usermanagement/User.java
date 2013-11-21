@@ -122,10 +122,4 @@ public interface User
    */
   public void setStatus(UserStatus status);
 
-  @Deprecated
-  public boolean isReadOnly();
-
-  @Deprecated
-  public void setReadOnly(boolean readOnly);
-
 }
