@@ -66,15 +66,13 @@ public abstract class LdapTestSupport
   {
     super.setUp();
 
-    ldapServer = (LdapServer) lookup(LdapServer.ROLE);
-
-    ldapRealmConfig = new File(getConfHomeDir(), "ldap.xml");
-
     // check if we have a custom ldap.xml for this test
     String classname = this.getClass().getName();
     File sourceLdapXml =
         new File(getBasedir() + "/target/test-classes/" + classname.replace('.', '/') + "-ldap.xml");
 
+    ldapServer = (LdapServer) lookup(LdapServer.ROLE);
+    ldapRealmConfig = new File(getConfHomeDir(), "ldap.xml");
     if (sourceLdapXml.exists()) {
       this.interpolateLdapXml(sourceLdapXml, ldapRealmConfig);
     }
