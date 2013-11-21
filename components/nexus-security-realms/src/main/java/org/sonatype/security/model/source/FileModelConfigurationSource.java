@@ -52,7 +52,7 @@ public class FileModelConfigurationSource
   /**
    * The configuration file.
    */
-  private File configurationFile;
+  private final File configurationFile;
 
   /**
    * The configuration upgrader.
@@ -86,17 +86,6 @@ public class FileModelConfigurationSource
    */
   public File getConfigurationFile() {
     return configurationFile;
-  }
-
-  /**
-   * Sets the configuration file.
-   *
-   * @param configurationFile the new configuration file
-   * @deprecated replaced by constructor injection
-   */
-  @Deprecated
-  public void setConfigurationFile(File configurationFile) {
-    this.configurationFile = configurationFile;
   }
 
   public Configuration loadConfiguration()
