@@ -32,12 +32,14 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.sisu.goodies.common.Loggers;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -50,6 +52,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ModelUtils
 {
+  private static final Logger log = Loggers.getLogger(ModelUtils.class);
+
   private ModelUtils() {
     // no instance
   }
@@ -276,6 +280,7 @@ public class ModelUtils
     checkNotNull(file, "file");
     checkNotNull(reader, "reader");
     checkNotNull(upgraders, "upgraders");
+    log.info("Loading model {}", file.getAbsoluteFile(), currentModelVersion);
 
     try {
       if (reader instanceof Versioned) {
@@ -285,10 +290,11 @@ public class ModelUtils
         }
 
         if (Strings.isNullOrEmpty(originalFileVersion)) {
-          throw new CorruptModelException("Passed in model has null version");
+          throw new MissingModelVersionException("Passed in model has null version");
         }
 
         if (!Objects.equals(currentModelVersion, originalFileVersion)) {
+          log.info("Upgrading model {} from version {} to {}", file.getAbsoluteFile(), originalFileVersion, currentModelVersion);
           String currentFileVersion = originalFileVersion;
           final Map<String, ModelUpgrader> upgradersMap = Maps.newHashMapWithExpectedSize(upgraders.length);
           for (ModelUpgrader upgrader : upgraders) {
@@ -361,6 +367,7 @@ public class ModelUtils
     checkNotNull(model, "model");
     checkNotNull(file, "File");
     checkNotNull(writer, "ModelWriter");
+    log.info("Saving model {}", file.getAbsoluteFile());
     DirSupport.mkdir(file.getParentFile().toPath());
     final File backupFile = new File(file.getParentFile(), file.getName() + ".bak");
     final FileReplacer fileReplacer = new FileReplacer(file);
