@@ -76,15 +76,6 @@ public class RestletResource
   }
 
   /**
-   * @deprecated Prefer Slf4j {@link #logger} instead.
-   */
-  @Override
-  @Deprecated
-  public java.util.logging.Logger getLogger() {
-    return super.getLogger();
-  }
-
-  /**
    * For file uploads we are using commons-fileupload integration with restlet.org. We are storing one
    * FileItemFactory
    * instance in context. This method simply encapsulates gettting it from Resource context.
@@ -343,7 +334,7 @@ public class RestletResource
           getResponse().setStatus(re.getStatus(), re);
       }
   }
-  
+
   public void upload(Representation representation)
       throws ResourceException
   {
