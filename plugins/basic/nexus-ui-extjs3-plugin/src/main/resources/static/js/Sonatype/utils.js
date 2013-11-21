@@ -751,11 +751,9 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
       };
 
       // catch the case of page reload, which will leave the user logged in but not go through the login handler
-      Sonatype.Events.addListener('nexusStatus', function() {
-        if (Sonatype.user.curr && Sonatype.user.curr.isLoggedIn) {
-          ns.refreshTask.start();
-        }
-      }, this, {single: true});
+      Sonatype.Events.addListener('nexusSettings', function () {
+        ns.refreshTask.start();
+      }, this);
 
       // public API
       return {
@@ -800,10 +798,7 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
                 Sonatype.repoServer.RepoServer.loginForm.getForm().reset();
               }
 
-              var respObj = Ext.decode(response.responseText);
-              ns.loadNexusSettings();
-
-              Ext.namespace('Sonatype.utils').refreshTask.start();
+              ns.loadNexusStatus();
             },
             failure : function(response, options) {
               Ext.namespace('Sonatype.utils').refreshTask.stop();
@@ -838,7 +833,7 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
     },
 
     /**
-     * Loads Nexus settings & status.
+     * Loads Nexus settings.
      */
     loadNexusSettings: function () {
       Ext.Ajax.request({
@@ -857,7 +852,7 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
             });
           }
           ns.settings.keepAlive = ns.settings.keepAlive === 'true';
-          ns.loadNexusStatus();
+          Sonatype.Events.fireEvent('nexusSettings');
         }
       });
     },
@@ -950,6 +945,10 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
               ns.onHistoryChange(token);
               ns.updateHistory();
               Sonatype.view.justLoggedOut = false;
+
+              if (Sonatype.lib.Permissions.checkPermission('nexus:settings', Sonatype.lib.Permissions.READ)) {
+                ns.loadNexusSettings();
+              }
             }
           });
     },
