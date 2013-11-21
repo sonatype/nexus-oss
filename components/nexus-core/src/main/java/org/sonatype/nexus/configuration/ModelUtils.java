@@ -211,6 +211,17 @@ public class ModelUtils
   }
 
   /**
+   * Exception indicating that model that is {@link Versioned} lacks the version (is non existent or is empty).
+   */
+  public static class MissingModelVersionException
+      extends CorruptModelException
+  {
+    public MissingModelVersionException(final String message) {
+      super(message);
+    }
+  }
+
+  /**
    * Adapter for {@link ModelUpgrader} to be used with {@link FileReplacer}.
    */
   private static class ModelUpgraderAdapter

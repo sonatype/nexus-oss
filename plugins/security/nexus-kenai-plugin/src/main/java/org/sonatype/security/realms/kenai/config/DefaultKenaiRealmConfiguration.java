@@ -34,6 +34,7 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.ModelUtils.CorruptModelException;
+import org.sonatype.nexus.configuration.ModelUtils.MissingModelVersionException;
 import org.sonatype.nexus.configuration.ModelUtils.Versioned;
 import org.sonatype.nexus.configuration.ModelloUtils;
 import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelReader;
@@ -74,7 +75,14 @@ public class DefaultKenaiRealmConfiguration
 
     @Override
     public String readVersion(final InputStream input) throws IOException, CorruptModelException {
-      return versionedHelper.readVersion(input);
+      try {
+        return versionedHelper.readVersion(input);
+      }
+      catch (MissingModelVersionException e) {
+        // kenai models were not consistent about versioning. still, they
+        // are basically 1.0.0
+        return "1.0.0";
+      }
     }
   }
 
