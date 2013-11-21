@@ -375,7 +375,7 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
           url : Sonatype.config.repos.urls.logout,
           callback : function(options, success, response) {
             Sonatype.view.justLoggedOut = true;
-            Sonatype.utils.loadNexusSettings();
+            Sonatype.utils.loadNexusStatus();
             window.location.hash = 'welcome';
           }
         });
