@@ -25,7 +25,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import eu.medsea.mimeutil.MimeUtil2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,30 +107,13 @@ public class NexusMimeTypes
         mimetypes.addAll(additional.get(extension));
         additional.remove(extension);
       }
-      // HACK
-      // MimeUtils2 is broken so that the last listed MimeType will *usually* be chosen as the "most specific"
-      // one (depends on the impl/order of HashSet<String>.iterator() and a bug in MimeUtils2#getMostSpecificMimeType).
-      //
-      // For Nexus mimetypes, the first listed should be the "primary" mimetype, so we have to reverse the lists.
-      Collections.reverse(mimetypes);
-
       this.extensions.put(extension, new NexusMimeType(true, extension, mimetypes));
     }
 
     for (String extension : additional.keySet()) {
       final List<String> mimetypes = additional.get(extension);
-
-      // HACK
-      // MimeUtils2 is broken so that the last listed MimeType will *usually* be chosen as the "most specific"
-      // one (depends on the impl/order of HashSet<String>.iterator() and a bug in MimeUtils2#getMostSpecificMimeType).
-      //
-      // For Nexus mimetypes, the first listed should be the "primary" mimetype, so we have to reverse the lists.
-      Collections.reverse(mimetypes);
-
       this.extensions.put(extension, new NexusMimeType(false, extension, mimetypes));
     }
-
-
   }
 
   private List<String> types(final String value) {
@@ -148,9 +130,8 @@ public class NexusMimeTypes
       if (extensions.containsKey(extension)) {
         return extensions.get(extension);
       }
-      extension = MimeUtil2.getExtension(extension);
+      extension = DefaultMimeSupport.getExtension(extension);
     }
-
     return null;
   }
 
