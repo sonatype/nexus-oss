@@ -28,11 +28,4 @@ public interface StaticSecurityResource
    */
   Configuration getConfiguration();
 
-  /**
-   * Marks the Configuration dirty so it can be reloaded.
-   *
-   * @deprecated Use DynamicSecurityResource instead
-   */
-  @Deprecated
-  boolean isDirty();
 }
