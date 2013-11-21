@@ -23,6 +23,7 @@ import java.io.Writer;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.sonatype.nexus.configuration.ModelUtils.CorruptModelException;
+import org.sonatype.nexus.configuration.ModelUtils.MissingModelVersionException;
 import org.sonatype.nexus.configuration.ModelUtils.Versioned;
 import org.sonatype.nexus.configuration.ModelloUtils;
 import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelReader;
@@ -75,7 +76,7 @@ public abstract class AbstractLdapConfiguration
           if (versionNode != null) {
             final String originalFileVersion = versionNode.getValue();
             if (Strings.isNullOrEmpty(originalFileVersion)) {
-              throw new CorruptModelException("Passed in XML model have empty 'version' node");
+              throw new MissingModelVersionException("Passed in XML model have empty 'version' node");
             }
             return originalFileVersion;
           }
