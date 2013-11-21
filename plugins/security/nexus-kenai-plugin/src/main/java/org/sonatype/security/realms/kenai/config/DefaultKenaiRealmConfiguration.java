@@ -44,6 +44,7 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.base.Throwables;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -101,11 +102,18 @@ public class DefaultKenaiRealmConfiguration
     this.configurationFile = new File(applicationConfiguration.getConfigurationDirectory(), "kenai-realm.xml");
     this.securitySystem = securitySystem;
     this.kenaiRealmModelReader = new KenaiRealmModelReader();
-    this.configuration = load();
   }
 
   @Override
-  public Configuration getConfiguration() {
+  public synchronized Configuration getConfiguration() {
+    if (configuration == null) {
+      try {
+        configuration = load();
+      }
+      catch (IOException e) {
+        Throwables.propagate(e);
+      }
+    }
     return configuration;
   }
 
