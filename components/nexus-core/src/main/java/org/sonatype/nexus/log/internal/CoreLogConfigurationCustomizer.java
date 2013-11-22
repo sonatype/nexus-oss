@@ -36,7 +36,7 @@ public class CoreLogConfigurationCustomizer
     // non Nexus loggers
     configuration.setLoggerLevel("httpclient", LoggerLevel.INFO);
     configuration.setLoggerLevel("org.apache.http", LoggerLevel.INFO);
-    configuration.setLoggerLevel("org.apache.http.wire", LoggerLevel.DEFAULT);
+    configuration.setLoggerLevel("org.apache.http.wire", LoggerLevel.ERROR);
     configuration.setLoggerLevel("org.restlet", LoggerLevel.INFO);
     configuration.setLoggerLevel("org.apache.commons", LoggerLevel.WARN);
     configuration.setLoggerLevel("org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter", LoggerLevel.INFO);
