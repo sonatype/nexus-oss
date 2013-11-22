@@ -60,7 +60,7 @@ public class NexusRawTransport
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         try (final InputStream is = file.getInputStream()) {
-          StreamSupport.copy(is, os);
+          StreamSupport.copy(is, os, StreamSupport.BUFFER_SIZE);
         }
         lastReadFile = file;
         return os.toByteArray();
