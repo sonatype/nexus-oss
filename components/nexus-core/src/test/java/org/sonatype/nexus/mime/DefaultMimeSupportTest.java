@@ -13,7 +13,8 @@
 
 package org.sonatype.nexus.mime;
 
-import org.sonatype.nexus.mime.detectors.NexusExtensionMimeDetector;
+import java.util.List;
+
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Lists;
@@ -24,6 +25,7 @@ import org.mockito.Mock;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
@@ -47,10 +49,7 @@ public class DefaultMimeSupportTest
   }
 
   private void mock() {
-    final NexusExtensionMimeDetector detector =
-        (NexusExtensionMimeDetector) mimeSupport.getNonTouchingMimeUtil2()
-            .getMimeDetector(NexusExtensionMimeDetector.class.getName());
-    detector.setNexusMimeTypes(mimeTypes);
+    this.mimeSupport = new DefaultMimeSupport(mimeTypes);
   }
 
   /**
@@ -66,7 +65,7 @@ public class DefaultMimeSupportTest
     assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/maven-metadata.xml"), equalTo("application/xml"));
     assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/some.xml"), equalTo("application/xml"));
     assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/some.tar.gz"), equalTo("application/x-gzip"));
-    assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/some.tar.bz2"), equalTo("application/x-bzip"));
+    assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/some.tar.bz2"), equalTo("application/x-bzip2"));
     assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/some.zip"), equalTo("application/zip"));
     assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/some.war"), equalTo("application/java-archive"));
     assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/some.rar"), equalTo("application/java-archive"));
@@ -142,8 +141,12 @@ public class DefaultMimeSupportTest
     when(mimeType.getExtension()).thenReturn("zip");
     when(mimeType.getMimetypes()).thenReturn(Lists.newArrayList("fake/mimetype"));
 
-    assertThat(mimeSupport.guessMimeTypesFromPath("foo.zip"), hasItem("fake/mimetype"));
-    assertThat(mimeSupport.guessMimeTypeFromPath("foo.zip"), is("application/zip"));
+    final List<String> mimeTypes = mimeSupport.guessMimeTypesListFromPath("foo.zip");
+    assertThat(mimeTypes, hasSize(3));
+    assertThat(mimeTypes, hasItem("application/zip"));
+    assertThat(mimeTypes, hasItem("fake/mimetype"));
+    assertThat(mimeTypes, hasItem("application/octet-stream"));
+    assertThat(mimeSupport.guessMimeTypeFromPath("foo.zip"), is("fake/mimetype"));
   }
 
   @Test
