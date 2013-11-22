@@ -67,11 +67,6 @@ public class GroupItemNotFoundException
     return (ItemNotFoundInRepositoryReason) super.getReason();
   }
 
-  @Override
-  public GroupRepository getRepository() {
-    return (GroupRepository) getReason().getRepository();
-  }
-
   /**
    * Returns the map of reasons ({@link Throwable} instances) per Repository.
    *

@@ -47,8 +47,4 @@ public class RemoteItemNotFoundException
     return (ItemNotFoundInRepositoryReason) super.getReason();
   }
 
-  @Override
-  public ProxyRepository getRepository() {
-    return (ProxyRepository) getReason().getRepository();
-  }
 }
