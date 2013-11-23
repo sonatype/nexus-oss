@@ -68,10 +68,6 @@
 
 <p>$req.requestContext.get("org.sonatype.nexus.content.internal.ContentServlet.stopwatch")</p>
 
-<h3>Request URL</h3>
-
-<p>$req.requestAppRootUrl</p>
-
 <h3>Request Context</h3>
 
 #table($req.requestContext.flatten().entrySet())
