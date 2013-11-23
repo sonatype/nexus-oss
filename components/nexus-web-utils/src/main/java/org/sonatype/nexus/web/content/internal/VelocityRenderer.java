@@ -100,7 +100,7 @@ public class VelocityRenderer
     final Map<String, Object> dataModel = createBaseModel(coll.getResourceStoreRequest());
     dataModel.put("requestPath", coll.getPath());
     dataModel.put("listItems", entries);
-    render(getTemplate("repositoryContentHtml.vm"), dataModel, response.getOutputStream());
+    render(getTemplate("repositoryContentHtml.vm"), dataModel, response);
   }
 
   @Override
@@ -114,7 +114,7 @@ public class VelocityRenderer
     if (null != exception) {
       dataModel.put("errorStackTrace", StringEscapeUtils.escapeHtml(ExceptionUtils.getStackTrace(exception)));
     }
-    render(getTemplate("errorPageContentHtml.vm"), dataModel, response.getOutputStream());
+    render(getTemplate("errorPageContentHtml.vm"), dataModel, response);
   }
 
   @Override
@@ -126,7 +126,7 @@ public class VelocityRenderer
     dataModel.put("req", resourceStoreRequest);
     dataModel.put("item", item);
     dataModel.put("exception", exception);
-    render(getTemplate("requestDescriptionHtml.vm"), dataModel, response.getOutputStream());
+    render(getTemplate("requestDescriptionHtml.vm"), dataModel, response);
   }
 
   // ==
@@ -142,9 +142,13 @@ public class VelocityRenderer
     return dataModel;
   }
 
-  protected void render(final Template template, final Map<String, Object> dataModel, final OutputStream outputStream)
-      throws IOException
+  private void render(final Template template, final Map<String, Object> dataModel, final HttpServletResponse response)
+    throws IOException
   {
+    // ATM all templates render HTML
+    response.setContentType("text/html");
+
+    final OutputStream outputStream = response.getOutputStream();
     final Context context = new VelocityContext(dataModel);
     try {
       final Writer tmplWriter;
