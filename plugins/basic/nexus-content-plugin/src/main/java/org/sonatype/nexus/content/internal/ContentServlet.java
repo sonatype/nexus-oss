@@ -102,6 +102,8 @@ public class ContentServlet
   /**
    * Stopwatch that is started when {@link ResourceStoreRequest} is created and stopped when request processing returns
    * from {@link RepositoryRouter}.
+   *
+   * Keep in sync with describe template, which references the same value by name directly.
    */
   private static final String STOPWATCH_KEY = ContentServlet.class.getName() + ".stopwatch";
 
