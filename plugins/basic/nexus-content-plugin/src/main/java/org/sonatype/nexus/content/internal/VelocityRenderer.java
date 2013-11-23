@@ -237,7 +237,11 @@ public class VelocityRenderer
     }
   }
 
-  private static class CollectionEntry
+  /**
+   * Entry exposed to template for rendering.
+   */
+  //@TemplateAccessable
+  public static class CollectionEntry
   {
     private final String name;
 
