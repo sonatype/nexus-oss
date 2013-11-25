@@ -474,7 +474,7 @@ public class LogbackLogManager
                   throws IOException
               {
                 try (final InputStream in = participant.getConfiguration()) {
-                  StreamSupport.copy(in, output);
+                  StreamSupport.copy(in, output, StreamSupport.BUFFER_SIZE);
                 }
               }
             });

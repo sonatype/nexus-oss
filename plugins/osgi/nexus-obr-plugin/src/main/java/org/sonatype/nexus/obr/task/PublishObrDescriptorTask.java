@@ -67,9 +67,6 @@ public class PublishObrDescriptorTask
     if (getRepositoryId() != null) {
       repo = getRepositoryRegistry().getRepository(getRepositoryId());
     }
-    else if (getRepositoryGroupId() != null) {
-      repo = getRepositoryRegistry().getRepository(getRepositoryGroupId());
-    }
     else {
       throw new IllegalArgumentException("Target repository must be set.");
     }
@@ -109,9 +106,6 @@ public class PublishObrDescriptorTask
 
   @Override
   protected String getMessage() {
-    if (getRepositoryGroupId() != null) {
-      return "Publishing obr.xml for repository group " + getRepositoryGroupName();
-    }
     return "Publishing obr.xml for repository " + getRepositoryName();
   }
 

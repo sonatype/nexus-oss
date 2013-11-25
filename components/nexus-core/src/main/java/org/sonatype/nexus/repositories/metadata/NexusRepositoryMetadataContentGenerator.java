@@ -49,7 +49,7 @@ public class NexusRepositoryMetadataContentGenerator
   {
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     try (final InputStream is = item.getInputStream()) {
-      StreamSupport.copy(is, bos);
+      StreamSupport.copy(is, bos, StreamSupport.BUFFER_SIZE);
       String body = new String(bos.toByteArray(), "UTF-8");
       StringContentLocator result = null;
       if (item.getItemContext().getRequestAppRootUrl() != null) {

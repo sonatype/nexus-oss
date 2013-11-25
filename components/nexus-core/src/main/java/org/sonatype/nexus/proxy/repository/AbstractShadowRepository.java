@@ -85,22 +85,6 @@ public abstract class AbstractShadowRepository
     getExternalConfiguration(true).setSynchronizeAtStartup(val);
   }
 
-  @Deprecated
-  @Override
-  public String getMasterRepositoryId() {
-    // NEXUS-4901: this change is to lessen the logging noise, that is otherwise harmless but ugly
-    return getExternalConfiguration(false).getMasterRepositoryId();
-  }
-
-  @Deprecated
-  @Override
-  public void setMasterRepositoryId(final String repositoryId)
-      throws IncompatibleMasterRepositoryException, NoSuchRepositoryException
-  {
-    // look it up and delegate to "real" method
-    setMasterRepository(getRepositoryRegistry().getRepository(repositoryId));
-  }
-
   @Override
   public Repository getMasterRepository() {
     // return the cached instance

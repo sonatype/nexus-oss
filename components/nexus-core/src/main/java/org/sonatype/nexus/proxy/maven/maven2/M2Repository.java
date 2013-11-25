@@ -199,7 +199,7 @@ public class M2Repository
       try {
         // remote item is not reusable, and we usually cache remote stuff locally
         try (final InputStream orig = mdFile.getInputStream()) {
-          StreamSupport.copy(orig, backup1);
+          StreamSupport.copy(orig, backup1, StreamSupport.BUFFER_SIZE);
         }
         backup = new ByteArrayInputStream(backup1.toByteArray());
 

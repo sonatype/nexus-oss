@@ -78,8 +78,10 @@ public class VelocityRenderer
   }
 
   @Override
-  public void renderCollection(final HttpServletRequest request, final HttpServletResponse response,
-                               final StorageCollectionItem coll, final Collection<StorageItem> children)
+  public void renderCollection(final HttpServletRequest request,
+                               final HttpServletResponse response,
+                               final StorageCollectionItem coll,
+                               final Collection<StorageItem> children)
       throws IOException
   {
     final Set<String> uniqueNames = Sets.newHashSetWithExpectedSize(children.size());
@@ -103,12 +105,15 @@ public class VelocityRenderer
     final Map<String, Object> dataModel = createBaseModel(coll.getResourceStoreRequest());
     dataModel.put("requestPath", coll.getPath());
     dataModel.put("listItems", entries);
-    render(getTemplate("repositoryContentHtml.vm"), dataModel, response.getOutputStream());
+    render(getTemplate("repositoryContentHtml.vm"), dataModel, response);
   }
 
   @Override
-  public void renderErrorPage(final HttpServletRequest request, final HttpServletResponse response,
-                              final ResourceStoreRequest rsr, final Exception exception) throws IOException
+  public void renderErrorPage(final HttpServletRequest request,
+                              final HttpServletResponse response,
+                              final ResourceStoreRequest rsr,
+                              final Exception exception)
+      throws IOException
   {
     final Map<String, Object> dataModel = createBaseModel(rsr);
     dataModel.put("statusCode", response.getStatus());
@@ -117,12 +122,14 @@ public class VelocityRenderer
     if (null != exception) {
       dataModel.put("errorStackTrace", StringEscapeUtils.escapeHtml(ExceptionUtils.getStackTrace(exception)));
     }
-    render(getTemplate("errorPageContentHtml.vm"), dataModel, response.getOutputStream());
+    render(getTemplate("errorPageContentHtml.vm"), dataModel, response);
   }
 
   @Override
-  public void renderRequestDescription(final HttpServletRequest request, final HttpServletResponse response,
-                                       final ResourceStoreRequest resourceStoreRequest, final StorageItem item,
+  public void renderRequestDescription(final HttpServletRequest request,
+                                       final HttpServletResponse response,
+                                       final ResourceStoreRequest resourceStoreRequest,
+                                       final StorageItem item,
                                        final Exception exception)
       throws IOException
   {
@@ -130,12 +137,12 @@ public class VelocityRenderer
     dataModel.put("req", resourceStoreRequest);
     dataModel.put("item", item);
     dataModel.put("exception", exception);
-    render(getTemplate("requestDescriptionHtml.vm"), dataModel, response.getOutputStream());
+    render(getTemplate("requestDescriptionHtml.vm"), dataModel, response);
   }
 
   // ==
 
-  protected Map<String, Object> createBaseModel(final ResourceStoreRequest resourceStoreRequest) {
+  private Map<String, Object> createBaseModel(final ResourceStoreRequest resourceStoreRequest) {
     final Map<String, Object> dataModel = Maps.newHashMap();
     String nexusRoot = resourceStoreRequest.getRequestAppRootUrl();
     if (nexusRoot.endsWith("/")) {
@@ -146,9 +153,14 @@ public class VelocityRenderer
     return dataModel;
   }
 
-  protected void render(final Template template, final Map<String, Object> dataModel, final OutputStream outputStream)
+  private void render(final Template template, final Map<String, Object> dataModel, final HttpServletResponse response)
       throws IOException
   {
+    // ATM all templates render HTML
+    response.setContentType("text/html");
+
+    final OutputStream outputStream = response.getOutputStream();
+
     final Context context = new VelocityContext(dataModel);
     try {
       final Writer tmplWriter;
@@ -175,7 +187,7 @@ public class VelocityRenderer
     }
   }
 
-  protected Template getTemplate(final String templateName) {
+  private Template getTemplate(final String templateName) {
     // NOTE: Velocity's ClasspathResourceLoader goes for TCCL 1st, then would fallback to "system"
     // (in this case the classloader where Velocity is loaded) classloader
     final ClassLoader original = Thread.currentThread().getContextClassLoader();
@@ -199,7 +211,7 @@ public class VelocityRenderer
 
   // =
 
-  public static class CollectionEntryComparator
+  private static class CollectionEntryComparator
       implements Comparator<CollectionEntry>
   {
     @Override
@@ -225,6 +237,10 @@ public class VelocityRenderer
     }
   }
 
+  /**
+   * Entry exposed to template for rendering.
+   */
+  //@TemplateAccessable
   public static class CollectionEntry
   {
     private final String name;
@@ -239,8 +255,12 @@ public class VelocityRenderer
 
     private final String description;
 
-    public CollectionEntry(final String name, final boolean collection, final String resourceUri,
-                           final Date lastModified, final long size, final String description)
+    public CollectionEntry(final String name,
+                           final boolean collection,
+                           final String resourceUri,
+                           final Date lastModified,
+                           final long size,
+                           final String description)
     {
       this.name = checkNotNull(name);
       this.collection = collection;

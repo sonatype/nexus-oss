@@ -36,10 +36,6 @@ public abstract class RunnableSupport
 
   private final String name;
 
-  protected RunnableSupport(final String name) {
-    this(null, name);
-  }
-
   protected RunnableSupport(final ProgressListener progressListener, final String name) {
     checkArgument(name != null && name.trim().length() > 0);
     this.progressListenerWrapper = new ProgressListenerWrapper(progressListener);
@@ -48,14 +44,6 @@ public abstract class RunnableSupport
 
   protected String getName() {
     return name;
-  }
-
-  /**
-   * @deprecated use {@link #log} reference.
-   */
-  @Deprecated
-  protected Logger getLogger() {
-    return log;
   }
 
   protected ProgressListener getProgressListener() {
@@ -71,10 +59,7 @@ public abstract class RunnableSupport
       doRun();
       log.debug("{} done...", getName());
     }
-    catch (InterruptedException e) {
-      log.info("{} interrupted: {}", getName(), e.getMessage());
-    }
-    catch (RunnableInterruptedException e) {
+    catch (InterruptedException | RunnableInterruptedException e) {
       log.info("{} interrupted: {}", getName(), e.getMessage());
     }
     catch (RunnableCanceledException e) {
@@ -82,7 +67,7 @@ public abstract class RunnableSupport
     }
     catch (Exception e) {
       log.warn("{} failed:", getName(), e);
-      Throwables.propagate(e);
+      throw Throwables.propagate(e);
     }
     finally {
       ProgressListenerUtil.setCurrentProgressListener(oldProgressListener);

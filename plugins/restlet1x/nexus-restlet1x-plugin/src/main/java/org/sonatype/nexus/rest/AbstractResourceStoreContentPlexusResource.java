@@ -652,7 +652,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
     if (t instanceof GroupItemNotFoundException) {
       final GroupItemNotFoundException ginf = (GroupItemNotFoundException) t;
-      reasoning.setRepositoryId(ginf.getRepository().getId());
+      reasoning.setRepositoryId(ginf.getReason().getRepository().getId());
 
       for (Map.Entry<Repository, Throwable> r : ginf.getMemberReasons().entrySet()) {
         reasoning.addNotFoundReasoning(buildNotFoundReasoning(r.getKey(), r.getValue()));

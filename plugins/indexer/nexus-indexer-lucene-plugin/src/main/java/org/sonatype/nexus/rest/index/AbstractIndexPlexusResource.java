@@ -282,8 +282,11 @@ public abstract class AbstractIndexPlexusResource
       task = getNexusScheduler().createTaskInstance(UpdateIndexTask.class);
     }
 
-    task.setRepositoryId(getRepositoryId(request));
-    task.setRepositoryGroupId(getRepositoryGroupId(request));
+    String repositoryId = getRepositoryId(request);
+    if (repositoryId == null) {
+      repositoryId = getRepositoryGroupId(request);
+    }
+    task.setRepositoryId(repositoryId);
     task.setResourceStorePath(getResourceStorePath(request));
 
     handleDelete(task, request);

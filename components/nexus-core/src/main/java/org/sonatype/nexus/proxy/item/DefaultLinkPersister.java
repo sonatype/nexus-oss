@@ -67,7 +67,7 @@ public class DefaultLinkPersister
     if (locator != null) {
       try (final InputStream is = locator.getContent()) {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        StreamSupport.copy(is, baos);
+        StreamSupport.copy(is, baos, StreamSupport.BUFFER_SIZE);
         final String linkBody = new String(baos.toByteArray(), LINK_CHARSET);
         final String uidStr = linkBody.substring(LINK_PREFIX.length(), linkBody.length());
         return repositoryItemUidFactory.createUid(uidStr);
@@ -83,7 +83,7 @@ public class DefaultLinkPersister
   {
     try (OutputStream out = os) {
       final String linkBody = LINK_PREFIX + link.getTarget().toString();
-      StreamSupport.copy(new ByteArrayInputStream(linkBody.getBytes(LINK_CHARSET)), out);
+      StreamSupport.copy(new ByteArrayInputStream(linkBody.getBytes(LINK_CHARSET)), out, StreamSupport.BUFFER_SIZE);
       out.flush();
     }
   }

@@ -86,7 +86,7 @@
                         Sonatype.init();
                         Sonatype.view.init();
                         Nexus.Log.debug('Loading Nexus Status...');
-                        Sonatype.utils.loadNexusSettings();
+                        Sonatype.utils.loadNexusStatus();
                     };
 
                     Nexus.Log.debug('Loaded plugins');

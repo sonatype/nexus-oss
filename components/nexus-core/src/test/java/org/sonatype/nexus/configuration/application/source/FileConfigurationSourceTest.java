@@ -13,13 +13,10 @@
 
 package org.sonatype.nexus.configuration.application.source;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
-import org.sonatype.nexus.configuration.source.FileConfigurationSource;
-import org.sonatype.nexus.util.FileUtils;
 
 import org.junit.Test;
 
