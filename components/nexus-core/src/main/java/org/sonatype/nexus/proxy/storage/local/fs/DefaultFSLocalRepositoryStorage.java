@@ -18,9 +18,13 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -99,7 +103,7 @@ public class DefaultFSLocalRepositoryStorage
   public void validateStorageUrl(String url)
       throws LocalStorageException
   {
-    boolean result = org.sonatype.nexus.util.FileUtils.validFileUrl(url);
+    boolean result = validFileUrl(url);
 
     if (!result) {
       throw new LocalStorageException("Invalid storage URL, not a file based one: " + url);
@@ -110,7 +114,7 @@ public class DefaultFSLocalRepositoryStorage
   protected void updateContext(final Repository repository, final LocalStorageContext context)
       throws IOException
   {
-    final File file = org.sonatype.nexus.util.FileUtils.getFileFromUrl(repository.getLocalUrl());
+    final File file = getFileFromUrl(repository.getLocalUrl());
     DirSupport.mkdir(file.toPath());
     context.putContextObject(BASEDIR_FILE, file);
   }
@@ -444,6 +448,76 @@ public class DefaultFSLocalRepositoryStorage
     }
 
     return result;
+  }
+
+  private static File getFileFromUrl(String urlPath) {
+    if (validFileUrl(urlPath)) {
+      try {
+        URL url = new URL(urlPath);
+        try {
+          return new File(url.toURI());
+        }
+        catch (Exception t) {
+          return new File(url.getPath());
+        }
+      }
+      catch (MalformedURLException e) {
+        // Try just a regular file
+        return new File(urlPath);
+      }
+    }
+
+    return null;
+  }
+
+  private static boolean validFileUrl(String url) {
+    boolean result = true;
+
+    if (!validFile(new File(url))) {
+      // Failed w/ straight file, now time to try URL
+      try {
+        if (!validFile(new File(new URL(url).getFile()))) {
+          result = false;
+        }
+      }
+      catch (MalformedURLException e) {
+        result = false;
+      }
+    }
+
+    return result;
+  }
+
+  private static Set<File> roots = null;
+
+  private static boolean validFile(File file) {
+    if (roots == null) {
+      roots = new HashSet<>();
+
+      File[] listedRoots = File.listRoots();
+
+      for (int i = 0; i < listedRoots.length; i++) {
+        roots.add(listedRoots[i]);
+      }
+
+      // Allow UNC based paths on windows
+      // i.e. \\someserver\repository\central\blah
+      if (isWindows()) {
+        roots.add(new File("\\\\"));
+      }
+    }
+
+    File root = file;
+
+    while (root.getParentFile() != null) {
+      root = root.getParentFile();
+    }
+
+    return roots.contains(root);
+  }
+
+  private static boolean isWindows() {
+    return System.getProperty("os.name").contains("Windows");
   }
 
 }

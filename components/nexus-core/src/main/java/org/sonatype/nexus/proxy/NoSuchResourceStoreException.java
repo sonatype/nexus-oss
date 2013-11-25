@@ -32,23 +32,4 @@ public abstract class NoSuchResourceStoreException
     super(msg);
   }
 
-  /**
-   * Constructs a new exception with the specified detail message and cause.
-   *
-   * @param msg message
-   * @param t   the cause
-   */
-  public NoSuchResourceStoreException(final String msg, final Throwable t) {
-    super(msg, t);
-  }
-
-  /**
-   * Deprecated constructor that pre-assembles a message that does not make sense in some cases.
-   *
-   * @deprecated Use any other "usual" exception constructor instead.
-   */
-  @Deprecated
-  public NoSuchResourceStoreException(String type, String id) {
-    super("ResourceStore of type " + type + " with id='" + id + "' not found!");
-  }
 }

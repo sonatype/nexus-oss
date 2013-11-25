@@ -42,13 +42,7 @@ public abstract class AbstractShadowRepositoryConfigurator
         (AbstractShadowRepositoryConfiguration) coreConfig.getExternalConfiguration().getConfiguration(false);
 
     try {
-      // undone change made in https://github.com/sonatype/nexus/commit/64fb67dc16ef2e18300d3df3eb4f87d419b584cc
-      // original change was for NEXUS-4715
-      // undone due to NEXUS-4901
-      // ultimate fix will come with NEXUS-4909
-      // that will get rid among other thing, tricks like this one below
-      // https://github.com/sonatype/nexus/blob/master/nexus/nexus-app/src/main/java/org/sonatype/nexus/configuration/application/DefaultNexusConfiguration.java#L557
-      shadowRepository.setMasterRepositoryId(extConf.getMasterRepositoryId());
+      shadowRepository.setMasterRepository(getRepositoryRegistry().getRepository(extConf.getMasterRepositoryId()));
     }
     catch (IncompatibleMasterRepositoryException e) {
       ValidationMessage message =

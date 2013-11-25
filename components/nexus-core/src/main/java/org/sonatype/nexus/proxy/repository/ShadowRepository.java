@@ -14,7 +14,6 @@
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.plugins.RepositoryType;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**
@@ -42,23 +41,6 @@ public interface ShadowRepository
    * Sets sync at start.
    */
   void setSynchronizeAtStartup(boolean value);
-
-  /**
-   * Returns the master repository of this ShadowRepository.
-   *
-   * @deprecated Use {@link #getMasterRepository()}.getId() instead.
-   */
-  @Deprecated
-  String getMasterRepositoryId();
-
-  /**
-   * Sets the master repository of this ShadowRepository.
-   *
-   * @deprecated Use {@link #setMasterRepository(Repository)} instead.
-   */
-  @Deprecated
-  void setMasterRepositoryId(String masterRepositoryId)
-      throws NoSuchRepositoryException, IncompatibleMasterRepositoryException;
 
   /**
    * Returns the master.

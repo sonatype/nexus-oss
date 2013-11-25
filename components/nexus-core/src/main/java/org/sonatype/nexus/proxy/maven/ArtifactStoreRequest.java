@@ -24,19 +24,6 @@ public class ArtifactStoreRequest
 
   private final Gav gav;
 
-  @Deprecated
-  public ArtifactStoreRequest(MavenRepository repository, String path, boolean localOnly) {
-    super(path, localOnly);
-
-    this.mavenRepository = repository;
-
-    this.gav = mavenRepository.getGavCalculator().pathToGav(path);
-
-    if (gav == null) {
-      throw new IllegalArgumentException("The path does not represent an artifact!");
-    }
-  }
-
   public ArtifactStoreRequest(MavenRepository repository, Gav gav, boolean localOnly) {
     this(repository, gav, localOnly, false);
   }

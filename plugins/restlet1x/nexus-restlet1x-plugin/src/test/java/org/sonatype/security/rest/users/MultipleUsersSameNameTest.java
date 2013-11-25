@@ -52,7 +52,6 @@ public class MultipleUsersSameNameTest
     User jcoder = new DefaultUser();
     jcoder.setEmailAddress("jcoder@java.com");
     jcoder.setName("Joe Coder");
-    jcoder.setReadOnly(false);
     jcoder.setSource(SecurityXmlUserManager.SOURCE);
     jcoder.setStatus(UserStatus.active);
     jcoder.setUserId("jcoder");

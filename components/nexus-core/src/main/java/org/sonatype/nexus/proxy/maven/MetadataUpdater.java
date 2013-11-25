@@ -14,9 +14,6 @@
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
-import java.util.Collection;
-
-import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 
 /**
  * A metadata updater that offers simple metadata management services.
@@ -25,9 +22,6 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
  */
 public interface MetadataUpdater
 {
-  //
-  // "Single shot" methods, used from Nexus to maintain metadata on-the-fly
-  //
 
   /**
    * Calling this method updates the GAV, GA and G metadatas accordingly. It senses whether it is a snapshot or not.
@@ -35,43 +29,4 @@ public interface MetadataUpdater
   void deployArtifact(ArtifactStoreRequest request)
       throws IOException;
 
-  /**
-   * Calling this method updates the GAV, GA and G metadatas accordingly. It senses whether it is a snapshot or not.
-   *
-   * @deprecated Pending removal (no replacement).
-   */
-  @Deprecated
-  void undeployArtifact(ArtifactStoreRequest request)
-      throws IOException;
-
-  //
-  // "Multi shot" methods, used from Nexus/CLI tools to maintain metadata in batch/scanning mode
-  //
-
-  /**
-   * Calling this method <b>replaces</b> the GAV, GA and G metadatas accordingly.
-   *
-   * @deprecated Pending removal (no replacement).
-   */
-  @Deprecated
-  void deployArtifacts(Collection<ArtifactStoreRequest> requests)
-      throws IOException;
-
-  /**
-   * Calling this method <b>replaces</b> the GAV, GA and G metadatas accordingly.
-   *
-   * @deprecated Pending removal (no replacement).
-   */
-  @Deprecated
-  void undeployArtifacts(Collection<ArtifactStoreRequest> requests)
-      throws IOException;
-
-  /**
-   * Give me a coll, and i will createate the metadata.
-   *
-   * @deprecated Pending removal (no replacement).
-   */
-  @Deprecated
-  void recreateMetadata(StorageCollectionItem coll)
-      throws IOException;
 }

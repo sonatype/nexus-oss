@@ -214,16 +214,6 @@ public class ItemNotFoundException
   }
 
   /**
-   * Constructor. To be used in places where no Repository exists yet in context (like in a Router).
-   *
-   * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
-   */
-  @Deprecated
-  public ItemNotFoundException(final ResourceStoreRequest request, final Throwable cause) {
-    this(request, null, cause);
-  }
-
-  /**
    * Constructor. To be used in places whenever there IS a Repository in context.
    *
    * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
@@ -251,48 +241,10 @@ public class ItemNotFoundException
    * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
    */
   @Deprecated
-  protected ItemNotFoundException(final String message, final ResourceStoreRequest request,
-                                  final Repository repository)
-  {
-    this(message, request, repository, null);
-  }
-
-  /**
-   * Protected constructor, to be used by this class and subclass constructors.
-   *
-   * @deprecated Use constructor with {@link ItemNotFoundReason} instead.
-   */
-  @Deprecated
-  protected ItemNotFoundException(final String message, final ResourceStoreRequest request,
-                                  final Repository repository, final Throwable cause)
+  private ItemNotFoundException(final String message, final ResourceStoreRequest request,
+                                final Repository repository, final Throwable cause)
   {
     this(legacySupport(message, request, repository), cause);
   }
 
-  // ==
-
-  /**
-   * Returns the repository.
-   *
-   * @return the repository where this exception occurred or {@code null}.
-   * @deprecated Use {@link #getReason()} and inspect that instead.
-   */
-  @Deprecated
-  public Repository getRepository() {
-    if (reason instanceof ItemNotFoundInRepositoryReason) {
-      return ((ItemNotFoundInRepositoryReason) reason).getRepository();
-    }
-    return null;
-  }
-
-  /**
-   * Returns the original request, that caused this exception to be thrown.
-   *
-   * @return the request that caused this exception.
-   * @deprecated Use {@link #getReason()} and inspect that instead.
-   */
-  @Deprecated
-  public ResourceStoreRequest getRequest() {
-    return getReason().getResourceStoreRequest();
-  }
 }

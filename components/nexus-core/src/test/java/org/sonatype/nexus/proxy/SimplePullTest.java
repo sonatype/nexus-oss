@@ -599,7 +599,7 @@ public class SimplePullTest
 
     if (t instanceof GroupItemNotFoundException) {
       final GroupItemNotFoundException ginf = (GroupItemNotFoundException) t;
-      sb.append(" repo=").append(ginf.getRepository().getId());
+      sb.append(" repo=").append(ginf.getReason().getRepository().getId());
 
       for (Throwable r : ginf.getMemberReasons().values()) {
         sb.append(dumpNotFoundReasoning(r, depth + 1));

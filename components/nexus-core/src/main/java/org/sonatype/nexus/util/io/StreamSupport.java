@@ -31,25 +31,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class StreamSupport
 {
+
   private StreamSupport() {
     // no instance
   }
 
-  private static final int BUFFER_SIZE = SystemPropertiesHelper.getInteger(StreamSupport.class.getName()
-      + ".BUFFER_SIZE", 4096);
-
-  /**
-   * Shortcut method for {@link #copy(InputStream, OutputStream, int)} that uses {@link #BUFFER_SIZE}. As there is no
-   * "magic" buffer size the fits all, this method is deprecated only to draw attention to this fact, it's not
-   * deprecated to be removed.
-   *
-   * @deprecated Always specify wanted buffer size. Example sizes are 4k for smaller files, 16k for network operations
-   *             and 16k or 32k for large file sizes.
-   */
-  @Deprecated
-  public static long copy(final InputStream from, final OutputStream to) throws IOException {
-    return copy(from, to, BUFFER_SIZE);
-  }
+  public static final int BUFFER_SIZE = SystemPropertiesHelper.getInteger(
+      StreamSupport.class.getName() + ".BUFFER_SIZE", 8192
+  );
 
   /**
    * Copies provided input stream to the provided output stream, probably using buffer of provided size. The buffer

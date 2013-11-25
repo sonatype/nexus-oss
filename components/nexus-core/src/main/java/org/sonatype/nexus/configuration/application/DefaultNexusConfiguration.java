@@ -450,14 +450,6 @@ public class DefaultNexusConfiguration
     }
   }
 
-  @Deprecated
-  // see above
-  protected void applyAndSaveConfiguration()
-      throws IOException
-  {
-    saveConfiguration();
-  }
-
   @Override
   @Deprecated
   public Configuration getConfigurationModel() {
@@ -675,35 +667,13 @@ public class DefaultNexusConfiguration
   }
 
   @Override
-  @Deprecated
-  public void setAnonymousAccessEnabled(boolean enabled) {
-    getSecuritySystem().setAnonymousAccessEnabled(enabled);
-  }
-
-  @Override
   public String getAnonymousUsername() {
     return getSecuritySystem().getAnonymousUsername();
   }
 
   @Override
-  @Deprecated
-  public void setAnonymousUsername(String val)
-      throws org.sonatype.configuration.validation.InvalidConfigurationException
-  {
-    getSecuritySystem().setAnonymousUsername(val);
-  }
-
-  @Override
   public String getAnonymousPassword() {
     return getSecuritySystem().getAnonymousPassword();
-  }
-
-  @Override
-  @Deprecated
-  public void setAnonymousPassword(String val)
-      throws org.sonatype.configuration.validation.InvalidConfigurationException
-  {
-    getSecuritySystem().setAnonymousPassword(val);
   }
 
   @Override
@@ -1066,7 +1036,7 @@ public class DefaultNexusConfiguration
   {
     getConfigurationModel().addRemoteNexusInstance(settings);
 
-    applyAndSaveConfiguration();
+    saveConfiguration();
   }
 
   @Override
@@ -1083,7 +1053,7 @@ public class DefaultNexusConfiguration
       }
     }
 
-    applyAndSaveConfiguration();
+    saveConfiguration();
   }
 
   @Override

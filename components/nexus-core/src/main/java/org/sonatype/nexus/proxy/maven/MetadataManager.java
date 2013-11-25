@@ -26,15 +26,6 @@ public interface MetadataManager
       throws IOException;
 
   /**
-   * Calling this method updates the GAV, GA and G metadatas accordingly. It senses whether it is a snapshot or not.
-   *
-   * @deprecated Pending removal (no replacement).
-   */
-  @Deprecated
-  void undeployArtifact(ArtifactStoreRequest request)
-      throws IOException;
-
-  /**
    * Resolves the artifact, honoring LATEST and RELEASE as version. In case of snapshots, it will try to resolve the
    * timestamped version too, if needed.
    */

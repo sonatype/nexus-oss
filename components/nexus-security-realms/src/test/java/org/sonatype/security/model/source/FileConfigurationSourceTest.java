@@ -13,7 +13,6 @@
 
 package org.sonatype.security.model.source;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -24,12 +23,7 @@ public class FileConfigurationSourceTest
   protected SecurityModelConfigurationSource getConfigurationSource()
       throws Exception
   {
-    FileModelConfigurationSource source =
-        (FileModelConfigurationSource) lookup(SecurityModelConfigurationSource.class, "file");
-
-    source.setConfigurationFile(new File(getSecurityConfiguration()));
-
-    return source;
+    return lookup(SecurityModelConfigurationSource.class, "file");
   }
 
   protected InputStream getOriginatingConfigurationInputStream()

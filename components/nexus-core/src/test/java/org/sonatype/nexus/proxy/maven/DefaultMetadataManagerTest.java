@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.proxy.maven;
 
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.gav.GavCalculator;
 import org.sonatype.nexus.proxy.maven.gav.M2GavCalculator;
 
@@ -99,9 +100,9 @@ public class DefaultMetadataManagerTest
   public void deployHash()
       throws Exception
   {
-    ArtifactStoreRequest request =
-        new ArtifactStoreRequest(repo,
-            "/nexus4918/artifact/1.2.1-SNAPSHOT/artifact-1.2.1-20110719.134341-19.pom.sha1", true);
+    ArtifactStoreRequest request = new ArtifactStoreRequest(
+        repo, pathToGav("/nexus4918/artifact/1.2.1-SNAPSHOT/artifact-1.2.1-20110719.134341-19.pom.sha1"), true
+    );
     assertFalse(updater.doesImpactMavenMetadata(request.getGav()));
   }
 
@@ -109,8 +110,9 @@ public class DefaultMetadataManagerTest
   public void deploySignature()
       throws Exception
   {
-    ArtifactStoreRequest request =
-        new ArtifactStoreRequest(repo, "/nexus4918/artifact/1.0/artifact-1.0.pom.asc", true);
+    ArtifactStoreRequest request = new ArtifactStoreRequest(
+        repo, pathToGav("/nexus4918/artifact/1.0/artifact-1.0.pom.asc"), true
+    );
     assertFalse(updater.doesImpactMavenMetadata(request.getGav()));
   }
 
@@ -118,8 +120,9 @@ public class DefaultMetadataManagerTest
   public void deployReleaseWithClassifier()
       throws Exception
   {
-    ArtifactStoreRequest request =
-        new ArtifactStoreRequest(repo, "/nexus4918/artifact/1.0/artifact-1.0-classifier.jar", true);
+    ArtifactStoreRequest request = new ArtifactStoreRequest(
+        repo, pathToGav("/nexus4918/artifact/1.0/artifact-1.0-classifier.jar"), true
+    );
     assertFalse(updater.doesImpactMavenMetadata(request.getGav()));
   }
 
@@ -127,8 +130,9 @@ public class DefaultMetadataManagerTest
   public void deployRelease()
       throws Exception
   {
-    ArtifactStoreRequest request =
-        new ArtifactStoreRequest(repo, "/nexus4918/artifact/1.0/artifact-1.0.jar", true);
+    ArtifactStoreRequest request = new ArtifactStoreRequest(
+        repo, pathToGav("/nexus4918/artifact/1.0/artifact-1.0.jar"), true
+    );
     assertTrue(updater.doesImpactMavenMetadata(request.getGav()));
   }
 
@@ -136,8 +140,9 @@ public class DefaultMetadataManagerTest
   public void deploySnapshot()
       throws Exception
   {
-    ArtifactStoreRequest request =
-        new ArtifactStoreRequest(repo, "/nexus4918/artifact/1.1-SNAPSHOT/artifact-1.1-SNAPSHOT.jar", true);
+    ArtifactStoreRequest request = new ArtifactStoreRequest(
+        repo, pathToGav("/nexus4918/artifact/1.1-SNAPSHOT/artifact-1.1-SNAPSHOT.jar"), true
+    );
     assertTrue(updater.doesImpactMavenMetadata(request.getGav()));
   }
 
@@ -145,10 +150,14 @@ public class DefaultMetadataManagerTest
   public void deploySnapshotWithClassifier()
       throws Exception
   {
-    ArtifactStoreRequest request =
-        new ArtifactStoreRequest(repo,
-            "/nexus4918/artifact/1.2.1-SNAPSHOT/artifact-1.2.1-20110719.134341-19-classifier.jar", true);
+    ArtifactStoreRequest request = new ArtifactStoreRequest(
+        repo, pathToGav("/nexus4918/artifact/1.2.1-SNAPSHOT/artifact-1.2.1-20110719.134341-19-classifier.jar"), true
+    );
     assertTrue(updater.doesImpactMavenMetadata(request.getGav()));
+  }
+
+  private Gav pathToGav(final String path) {
+    return repo.getGavCalculator().pathToGav(path);
   }
 
 }

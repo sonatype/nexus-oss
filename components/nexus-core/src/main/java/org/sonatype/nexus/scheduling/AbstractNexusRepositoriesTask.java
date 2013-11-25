@@ -38,15 +38,6 @@ public abstract class AbstractNexusRepositoriesTask<T>
 
   private RepositoryRegistry repositoryRegistry;
 
-  @Deprecated
-  public static String getIdFromPrefixedString(String prefix, String prefixedString) {
-    if (prefixedString != null && prefixedString.startsWith(prefix)) {
-      return prefixedString.substring(prefix.length());
-    }
-
-    return null;
-  }
-
   @Inject
   public void setRepositoryRegistry(final RepositoryRegistry repositoryRegistry) {
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
@@ -74,21 +65,6 @@ public abstract class AbstractNexusRepositoriesTask<T>
     if (!StringUtils.isEmpty(repositoryId)) {
       getParameters().put(getRepositoryFieldId(), repositoryId);
     }
-  }
-
-  @Deprecated
-  public String getRepositoryGroupId() {
-    return getRepositoryId();
-  }
-
-  @Deprecated
-  public void setRepositoryGroupId(String repositoryGroupId) {
-    setRepositoryId(repositoryGroupId);
-  }
-
-  @Deprecated
-  public String getRepositoryGroupName() {
-    return getRepositoryName();
   }
 
   public String getRepositoryName() {
