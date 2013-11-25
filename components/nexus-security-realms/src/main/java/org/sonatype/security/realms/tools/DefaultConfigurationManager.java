@@ -45,6 +45,7 @@ import org.sonatype.security.realms.validator.SecurityConfigurationValidator;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.collect.Sets;
 
@@ -70,13 +71,15 @@ public class DefaultConfigurationManager
     private final PasswordService passwordService;
 
     @Inject
-    public DefaultConfigurationManager( List<SecurityConfigurationModifier> configurationModifiers,
+    public DefaultConfigurationManager( EventBus eventBus,
+                                        List<SecurityConfigurationModifier> configurationModifiers,
                                         SecurityConfigurationCleaner configCleaner,
                                         SecurityConfigurationValidator validator,
                                         @Named( "file" ) SecurityModelConfigurationSource configurationSource,
                                         List<PrivilegeDescriptor> privilegeDescriptors,
                                         PasswordService passwordService )
     {
+        super( eventBus );
         this.configurationModifiers = configurationModifiers;
         this.configCleaner = configCleaner;
         this.validator = validator;

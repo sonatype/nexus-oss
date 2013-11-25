@@ -14,7 +14,9 @@ package org.sonatype.security.realms.tools;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.security.events.AuthorizationConfigurationChanged;
 import org.sonatype.security.model.Configuration;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 public abstract class AbstractConfigurationManager
     implements ConfigurationManager
@@ -28,7 +30,14 @@ public abstract class AbstractConfigurationManager
 
     //
 
+    private final EventBus eventBus;
+
     private volatile EnhancedConfiguration configurationCache = null;
+
+    protected AbstractConfigurationManager( EventBus eventBus )
+    {
+        this.eventBus = eventBus;
+    }
 
     public void clearCache()
     {
@@ -39,18 +48,27 @@ public abstract class AbstractConfigurationManager
     {
         // Assign configuration to local variable first, as calls to clearCache can null it out at any time
         EnhancedConfiguration configuration = this.configurationCache;
-        if ( configuration == null || shouldRebuildConifuguration() )
+        if ( configuration == null || shouldRebuildConfiguration() )
         {
+            boolean rebuiltConfiguration = false;
+
             synchronized ( this )
             {
                 // double-checked locking of volatile is apparently OK with java5+
                 // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
                 configuration = this.configurationCache;
-                if ( configuration == null || shouldRebuildConifuguration() )
+                if ( configuration == null || shouldRebuildConfiguration() )
                 {
+                    rebuiltConfiguration = ( configuration != null );
                     configuration = new EnhancedConfiguration( doGetConfiguration() );
                     this.configurationCache = configuration;
                 }
+            }
+
+            if ( rebuiltConfiguration )
+            {
+                // signal rebuild (outside lock to avoid contention)
+                eventBus.post( new AuthorizationConfigurationChanged() );
             }
         }
         return configuration;
@@ -59,14 +77,14 @@ public abstract class AbstractConfigurationManager
     /**
      * Returns <code>true</code> if configuration needs to be rebuilt (by calling {@link #doGetConfiguration()}).
      */
-    protected boolean shouldRebuildConifuguration()
+    protected boolean shouldRebuildConfiguration()
     {
         return false;
     }
 
     /**
      * Builds and returns fresh new Configuration instance. Implementation is expected to reset
-     * {@link #shouldRebuildConifuguration()} flag back to <code>false</code>.
+     * {@link #shouldRebuildConfiguration()} flag back to <code>false</code>.
      */
     protected abstract Configuration doGetConfiguration();
 }
