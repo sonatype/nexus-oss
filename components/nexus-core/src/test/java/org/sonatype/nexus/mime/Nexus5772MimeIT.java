@@ -17,7 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
+import java.util.List;
 
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.FileContentLocator;
@@ -27,8 +27,9 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.junit.After;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,7 +52,7 @@ public class Nexus5772MimeIT
                                 String expectedMimeType)
       throws IOException
   {
-    final Set<String> mimeTypes = mimeSupport.detectMimeTypesFromContent(contentLocator);
+    final List<String> mimeTypes = mimeSupport.detectMimeTypesListFromContent(contentLocator);
     assertThat("Expected MIME type not returned for content:", mimeTypes, hasItem(expectedMimeType));
   }
 

@@ -15,7 +15,6 @@ package org.sonatype.nexus.mime;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
@@ -33,7 +32,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
@@ -151,18 +149,6 @@ public class DefaultMimeSupport
     catch (ExecutionException e) {
       throw Throwables.propagate(e);
     }
-  }
-
-  @Deprecated
-  @Override
-  public Set<String> guessMimeTypesFromPath(final String path) {
-    return Sets.newHashSet(guessMimeTypesListFromPath(path));
-  }
-
-  @Deprecated
-  @Override
-  public Set<String> detectMimeTypesFromContent(final ContentLocator content) throws IOException {
-    return Sets.newHashSet(detectMimeTypesListFromContent(content));
   }
 
   @Override
