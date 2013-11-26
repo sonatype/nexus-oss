@@ -22,7 +22,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.sonatype.inject.BeanEntry;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -32,6 +31,7 @@ import org.sonatype.security.usermanagement.UserManager;
 
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
+import org.eclipse.sisu.BeanEntry;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;

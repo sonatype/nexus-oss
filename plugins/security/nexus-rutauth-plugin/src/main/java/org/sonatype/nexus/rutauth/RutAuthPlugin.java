@@ -16,9 +16,9 @@ package org.sonatype.nexus.rutauth;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.plugin.PluginIdentity;
 
+import org.eclipse.sisu.EagerSingleton;
 import org.jetbrains.annotations.NonNls;
 
 /**

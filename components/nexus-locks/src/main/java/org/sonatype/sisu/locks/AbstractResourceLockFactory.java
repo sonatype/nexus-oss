@@ -19,8 +19,8 @@ import java.util.concurrent.ConcurrentMap;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.sonatype.guice.bean.reflect.Logs;
-import org.sonatype.guice.bean.reflect.Weak;
+import org.eclipse.sisu.inject.Logs;
+import org.eclipse.sisu.inject.Weak;
 
 /**
  * Abstract {@link ResourceLockFactory} implementation; associates names with {@link ResourceLock}s.

@@ -22,10 +22,10 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.sonatype.guice.bean.containers.InjectedTest;
 import org.sonatype.nexus.test.util.StopWatch;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
+import org.eclipse.sisu.launch.InjectedTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;

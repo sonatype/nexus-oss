@@ -18,11 +18,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.guice.bean.containers.InjectedTestCase;
-import org.sonatype.inject.Parameters;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
 import com.google.inject.Provides;
+import org.eclipse.sisu.Parameters;
+import org.eclipse.sisu.launch.InjectedTestCase;
 import org.junit.experimental.categories.Category;
 
 @Category(Slow.class)

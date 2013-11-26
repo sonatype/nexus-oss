@@ -22,11 +22,11 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.guice.bean.binders.ParameterKeys;
 import org.sonatype.sisu.goodies.common.Properties2;
 import org.sonatype.sisu.goodies.inject.ModuleSupport;
 
 import com.google.common.collect.Maps;
+import org.eclipse.sisu.wire.ParameterKeys;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.Nullable;
 

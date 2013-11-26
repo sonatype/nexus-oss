@@ -19,11 +19,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.sonatype.guice.bean.containers.InjectedTestCase;
-import org.sonatype.inject.BeanScanning;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.eclipse.sisu.launch.InjectedTestCase;
+import org.eclipse.sisu.space.BeanScanning;
 
 public abstract class AbstractSecurityConfigTest
     extends InjectedTestCase

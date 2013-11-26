@@ -18,12 +18,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import org.sonatype.guice.bean.containers.InjectedTestCase;
-import org.sonatype.inject.BeanScanning;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
 import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
+import org.eclipse.sisu.launch.InjectedTestCase;
+import org.eclipse.sisu.space.BeanScanning;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;

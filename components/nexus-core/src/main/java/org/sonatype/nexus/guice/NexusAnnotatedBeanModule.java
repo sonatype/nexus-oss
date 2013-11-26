@@ -13,24 +13,11 @@
 
 package org.sonatype.nexus.guice;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
 import org.sonatype.gossip.Level;
-import org.sonatype.guice.bean.binders.SpaceModule;
-import org.sonatype.guice.bean.reflect.ClassSpace;
-import org.sonatype.guice.bean.reflect.DeferredClass;
-import org.sonatype.guice.bean.scanners.ClassSpaceVisitor;
 import org.sonatype.guice.plexus.annotations.ComponentImpl;
-import org.sonatype.guice.plexus.binders.PlexusTypeBinder;
-import org.sonatype.guice.plexus.config.PlexusBeanMetadata;
-import org.sonatype.guice.plexus.config.PlexusBeanModule;
-import org.sonatype.guice.plexus.config.PlexusBeanSource;
-import org.sonatype.guice.plexus.scanners.PlexusAnnotatedMetadata;
-import org.sonatype.guice.plexus.scanners.PlexusTypeListener;
-import org.sonatype.guice.plexus.scanners.PlexusTypeVisitor;
-import org.sonatype.inject.BeanScanning;
 import org.sonatype.nexus.plugins.DefaultNexusPluginManager;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
@@ -41,6 +28,18 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.sisu.inject.DeferredClass;
+import org.eclipse.sisu.plexus.PlexusAnnotatedMetadata;
+import org.eclipse.sisu.plexus.PlexusBeanMetadata;
+import org.eclipse.sisu.plexus.PlexusBeanModule;
+import org.eclipse.sisu.plexus.PlexusBeanSource;
+import org.eclipse.sisu.plexus.PlexusTypeBinder;
+import org.eclipse.sisu.plexus.PlexusTypeListener;
+import org.eclipse.sisu.plexus.PlexusTypeVisitor;
+import org.eclipse.sisu.space.BeanScanning;
+import org.eclipse.sisu.space.ClassSpace;
+import org.eclipse.sisu.space.SpaceModule;
+import org.eclipse.sisu.space.SpaceVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +104,7 @@ public final class NexusAnnotatedBeanModule
 
   public PlexusBeanSource configure(final Binder binder) {
     if (null != space && scanning != BeanScanning.OFF) {
-      new NexusSpaceModule().configure(binder);
+      new SpaceModule(space, scanning).with(new NexusSpaceStrategy()).configure(binder);
     }
     return new NexusAnnotatedBeanSource(variables);
   }
@@ -114,15 +113,10 @@ public final class NexusAnnotatedBeanModule
   // Implementation types
   // ----------------------------------------------------------------------
 
-  private final class NexusSpaceModule
-      extends SpaceModule
+  private final class NexusSpaceStrategy
+      implements SpaceModule.Strategy
   {
-    NexusSpaceModule() {
-      super(space, scanning);
-    }
-
-    @Override
-    protected ClassSpaceVisitor visitor(final Binder binder) {
+    public SpaceVisitor visitor(final Binder binder) {
       return new PlexusTypeVisitor(new NexusTypeBinder(binder, descriptors, new PlexusTypeBinder(binder)));
     }
   }
@@ -162,7 +156,7 @@ public final class NexusAnnotatedBeanModule
      */
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void hear(final @Deprecated Annotation qualifier, final Class<?> implementation, final Object source) {
+    public void hear(final Class<?> implementation, final Object source) {
       Class role = getRepositoryRole(implementation);
       if (role != null) {
         String hint = getRepositoryHint(implementation);
@@ -173,7 +167,7 @@ public final class NexusAnnotatedBeanModule
         addRepositoryTypeDescriptor(role, hint);
       }
       else {
-        delegate.hear(qualifier, implementation, source);
+        delegate.hear(implementation, source);
       }
     }
 

@@ -27,12 +27,11 @@ import java.util.concurrent.Callable;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.sonatype.guice.bean.reflect.Logs;
-
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.core.Member;
 import com.hazelcast.core.MultiTask;
+import org.eclipse.sisu.inject.Logs;
 
 /**
  * Distributed Hazelcast {@link ResourceLockMBean} implementation.
