@@ -30,16 +30,17 @@ public class ValidHTMLJettyDefaultServlet
   /**
    * The default jetty implementation doesn't produce valid HTML, it misses the closing &lt;/A&gt; tag
    */
+  @Override
   protected void sendDirectory(HttpServletRequest request,
                                HttpServletResponse response,
                                Resource resource,
-                               boolean parent)
+                               String pathInContext)
       throws IOException
   {
 
     byte[] data = null;
     String base = URIUtil.addPaths(request.getRequestURI(), URIUtil.SLASH);
-    String dir = resource.getListHTML(base, parent);
+    String dir = resource.getListHTML(base, pathInContext.length()>1);
 
     if (dir == null) {
       response.sendError(HttpServletResponse.SC_FORBIDDEN,
