@@ -66,8 +66,6 @@ public class DefaultFeedRecorder
 
   public static final String DATE = "date";
 
-  public static final String STACK_TRACE = "strace";
-
   /**
    * Event type: repository
    */

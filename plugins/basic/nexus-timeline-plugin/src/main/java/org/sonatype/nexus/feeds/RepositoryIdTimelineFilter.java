@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.feeds;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.sonatype.nexus.timeline.Entry;
@@ -30,12 +29,6 @@ public class RepositoryIdTimelineFilter
     implements Predicate<Entry>
 {
   private final Set<String> repositoryIds;
-
-  public RepositoryIdTimelineFilter(String repositoryId) {
-    this.repositoryIds = new HashSet<String>();
-
-    this.repositoryIds.add(repositoryId);
-  }
 
   public RepositoryIdTimelineFilter(Set<String> repositoryIds) {
     this.repositoryIds = repositoryIds;
