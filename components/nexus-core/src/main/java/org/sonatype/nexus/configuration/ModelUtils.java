@@ -16,6 +16,7 @@ package org.sonatype.nexus.configuration;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,17 +26,20 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Objects;
 
 import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.sisu.goodies.common.Loggers;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -48,6 +52,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ModelUtils
 {
+  private static final Logger log = Loggers.getLogger(ModelUtils.class);
+
   private ModelUtils() {
     // no instance
   }
@@ -209,6 +215,17 @@ public class ModelUtils
   }
 
   /**
+   * Exception indicating that model that is {@link Versioned} lacks the version (is non existent or is empty).
+   */
+  public static class MissingModelVersionException
+      extends CorruptModelException
+  {
+    public MissingModelVersionException(final String message) {
+      super(message);
+    }
+  }
+
+  /**
    * Adapter for {@link ModelUpgrader} to be used with {@link FileReplacer}.
    */
   private static class ModelUpgraderAdapter
@@ -263,60 +280,76 @@ public class ModelUtils
     checkNotNull(file, "file");
     checkNotNull(reader, "reader");
     checkNotNull(upgraders, "upgraders");
+    log.info("Loading model {}", file.getAbsoluteFile(), currentModelVersion);
 
-    if (reader instanceof Versioned) {
-      final String originalFileVersion;
+    try {
+      if (reader instanceof Versioned) {
+        final String originalFileVersion;
+        try (final InputStream input = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
+          originalFileVersion = ((Versioned) reader).readVersion(input);
+        }
+
+        if (Strings.isNullOrEmpty(originalFileVersion)) {
+          throw new MissingModelVersionException("Passed in model has null version");
+        }
+
+        if (!Objects.equals(currentModelVersion, originalFileVersion)) {
+          log.info("Upgrading model {} from version {} to {}", file.getAbsoluteFile(), originalFileVersion, currentModelVersion);
+          String currentFileVersion = originalFileVersion;
+          final Map<String, ModelUpgrader> upgradersMap = Maps.newHashMapWithExpectedSize(upgraders.length);
+          for (ModelUpgrader upgrader : upgraders) {
+            upgradersMap.put(upgrader.fromVersion(), upgrader);
+          }
+          final FileReplacer fileReplacer = new FileReplacer(file);
+          fileReplacer.setDeleteBackupFile(true);
+          ModelUpgrader upgrader = upgradersMap.get(currentFileVersion);
+          // backup old version
+          Files.copy(file.toPath(), new File(file.getParentFile(), file.getName() + ".old").toPath(),
+              StandardCopyOption.REPLACE_EXISTING);
+          while (upgrader != null && !Objects.equals(currentModelVersion, currentFileVersion)) {
+            try {
+              fileReplacer.replace(new ModelUpgraderAdapter(file, upgrader));
+            }
+            catch (CorruptModelException e) {
+              final CorruptModelException ex = new CorruptModelException(String
+                  .format("Model %s detected as corrupt during upgrade from version %s to version %s",
+                      file.getAbsolutePath(), upgrader.fromVersion(),
+                      upgrader.toVersion()), e);
+              throw ex;
+            }
+            catch (IOException e) {
+              final IOException ex = new IOException(String
+                  .format("IO problem during upgrade from version %s to version %s of %s", upgrader.fromVersion(),
+                      upgrader.toVersion(), file.getAbsolutePath()), e);
+              throw ex;
+            }
+            currentFileVersion = upgrader.toVersion();
+            upgrader = upgradersMap.get(currentFileVersion);
+          }
+
+          if (!Objects.equals(currentModelVersion, currentFileVersion)) {
+            // upgrade failed
+            throw new IOException(String
+                .format(
+                    "Could not upgrade model %s to version %s, is upgraded to %s, originally was %s, available upgraders exists for versions %s",
+                    file.getAbsolutePath(), currentModelVersion, currentFileVersion, originalFileVersion,
+                    upgradersMap.keySet()));
+          }
+        }
+      }
+
       try (final InputStream input = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
-        originalFileVersion = ((Versioned) reader).readVersion(input);
-      }
-
-      if (Strings.isNullOrEmpty(originalFileVersion)) {
-        throw new CorruptModelException("Passed in model has null version");
-      }
-
-      if (!Objects.equals(currentModelVersion, originalFileVersion)) {
-        String currentFileVersion = originalFileVersion;
-        final Map<String, ModelUpgrader> upgradersMap = Maps.newHashMapWithExpectedSize(upgraders.length);
-        for (ModelUpgrader upgrader : upgraders) {
-          upgradersMap.put(upgrader.fromVersion(), upgrader);
-        }
-        final FileReplacer fileReplacer = new FileReplacer(file);
-        fileReplacer.setDeleteBackupFile(true);
-        ModelUpgrader upgrader = upgradersMap.get(currentFileVersion);
-        while (upgrader != null && !Objects.equals(currentModelVersion, currentFileVersion)) {
-          try {
-            fileReplacer.replace(new ModelUpgraderAdapter(file, upgrader));
-          }
-          catch (CorruptModelException e) {
-            final CorruptModelException ex = new CorruptModelException(String
-                .format("Model detected a corrupt during upgrade from version %s to version %s", upgrader.fromVersion(),
-                    upgrader.toVersion()), e);
-            throw ex;
-          }
-          catch (IOException e) {
-            final IOException ex = new IOException(String
-                .format("IO problem during upgrade from version %s to version %s", upgrader.fromVersion(),
-                    upgrader.toVersion()), e);
-            throw ex;
-          }
-          currentFileVersion = upgrader.toVersion();
-          upgrader = upgradersMap.get(currentFileVersion);
-        }
-
-        if (!Objects.equals(currentModelVersion, currentFileVersion)) {
-          // upgrade failed
-          throw new IOException(String
-              .format(
-                  "Could not upgrade model to version %s, is upgraded to %s, originally was %s, available upgraders exists for versions %s",
-                  currentModelVersion, currentFileVersion, originalFileVersion, upgradersMap.keySet()));
-        }
+        E model = reader.read(input);
+        // model.setVersion(currentModelVersion);
+        return model;
       }
     }
-
-    try (final InputStream input = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
-      E model = reader.read(input);
-      // model.setVersion(currentModelVersion);
-      return model;
+    catch (NoSuchFileException e) {
+      // TODO: "translate" to old FileNotFoundEx as we have existing code relying on this exception
+      // Having the new NoSuchFileEx does not buy us much, as two classes are almost identical
+      final FileNotFoundException fnf = new FileNotFoundException(e.getMessage());
+      fnf.initCause(e);
+      throw fnf;
     }
   }
 
@@ -334,6 +367,7 @@ public class ModelUtils
     checkNotNull(model, "model");
     checkNotNull(file, "File");
     checkNotNull(writer, "ModelWriter");
+    log.info("Saving model {}", file.getAbsoluteFile());
     DirSupport.mkdir(file.getParentFile().toPath());
     final File backupFile = new File(file.getParentFile(), file.getName() + ".bak");
     final FileReplacer fileReplacer = new FileReplacer(file);

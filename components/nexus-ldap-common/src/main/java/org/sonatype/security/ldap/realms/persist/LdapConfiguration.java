@@ -13,6 +13,8 @@
 
 package org.sonatype.security.ldap.realms.persist;
 
+import java.io.IOException;
+
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import org.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
@@ -22,11 +24,9 @@ public interface LdapConfiguration
 {
 
 
-  void save();
+  void save() throws IOException;
 
   void clearCache();
-
-  Configuration getConfiguration();
 
   // connection info
 

@@ -55,10 +55,8 @@ public abstract class LdapSchemaTestSupport
   public void setUp()
       throws Exception
   {
-    assertNotNull(lookup(LdapConfiguration.class));
-
     super.setUp();
-
+    assertNotNull(lookup(LdapConfiguration.class));
     this.realm = this.lookup(Realm.class, "LdapAuthenticatingRealm");
     this.ldapManager = this.lookup(LdapManager.class);
   }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><ldapConfiguration>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Sonatype Nexus (TM) Open Source Version
@@ -13,6 +13,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
+<ldapConfiguration>
+  <version>2.8.0</version>
   <userAndGroupConfig>
     
     <groupMemberFormat>${username}</groupMemberFormat>
