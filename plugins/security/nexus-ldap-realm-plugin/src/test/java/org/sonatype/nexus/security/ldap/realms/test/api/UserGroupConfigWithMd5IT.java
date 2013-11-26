@@ -13,8 +13,10 @@
 
 package org.sonatype.nexus.security.ldap.realms.test.api;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,15 @@ public class UserGroupConfigWithMd5IT
       throws Exception
   {
     return this.lookup(PlexusResource.class, "LdapUserAndGroupConfigTestPlexusResource");
+  }
+
+  @Override
+  protected void copyDefaultLdapConfigToPlace()
+      throws IOException
+  {
+    try (InputStream in = getClass().getResourceAsStream("/test-conf/md5-ldap.xml")) {
+      interpolateLdapXml(in, new File(getNexusLdapConfiguration()));
+    }
   }
 
   @Test
@@ -414,13 +425,4 @@ public class UserGroupConfigWithMd5IT
     }
 
   }
-
-  @Override
-  protected void copyDefaultLdapConfigToPlace()
-      throws IOException
-  {
-    IOUtils.copy(getClass().getResourceAsStream("/test-conf/md5-ldap.xml"),
-        new FileOutputStream(getNexusLdapConfiguration()));
-  }
-
 }

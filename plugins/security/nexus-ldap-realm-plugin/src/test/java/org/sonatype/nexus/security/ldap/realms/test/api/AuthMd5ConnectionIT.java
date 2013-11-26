@@ -13,8 +13,10 @@
 
 package org.sonatype.nexus.security.ldap.realms.test.api;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.sonatype.nexus.NexusLdapTestSupport;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
@@ -38,6 +40,15 @@ public class AuthMd5ConnectionIT
   {
     return this
         .lookup(PlexusResource.class, "LdapTestAuthenticationPlexusResource");
+  }
+
+  @Override
+  protected void copyDefaultLdapConfigToPlace()
+      throws IOException
+  {
+    try (InputStream in = getClass().getResourceAsStream("/test-conf/md5-ldap.xml")) {
+      interpolateLdapXml(in, new File(getNexusLdapConfiguration()));
+    }
   }
 
   @Test
@@ -160,13 +171,4 @@ public class AuthMd5ConnectionIT
       Assert.assertEquals(400, e.getStatus().getCode());
     }
   }
-
-  @Override
-  protected void copyDefaultLdapConfigToPlace()
-      throws IOException
-  {
-    IOUtils.copy(getClass().getResourceAsStream("/test-conf/md5-ldap.xml"), new FileOutputStream(
-        getNexusLdapConfiguration()));
-  }
-
 }

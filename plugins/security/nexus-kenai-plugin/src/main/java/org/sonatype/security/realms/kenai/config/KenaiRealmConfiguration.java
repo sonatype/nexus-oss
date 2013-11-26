@@ -15,16 +15,7 @@ package org.sonatype.security.realms.kenai.config;
 
 import com.sonatype.security.realms.kenai.config.model.Configuration;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-
 public interface KenaiRealmConfiguration
 {
   Configuration getConfiguration();
-
-  void save()
-      throws ConfigurationException;
-
-  void updateConfiguration(Configuration configuration)
-      throws InvalidConfigurationException, ConfigurationException;
 }

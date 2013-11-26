@@ -95,7 +95,7 @@
     <nexus.version>2.8.0-SNAPSHOT</nexus.version>
 
     <!-- FIXME: WTF is this for, part of the http proxy changes, used in subst in test files :-( -->
-    <nexus.configuration.version>2.7.0</nexus.configuration.version>
+    <nexus.configuration.version>2.8.0</nexus.configuration.version>
 
     <!--
     Configuration of 'nexus-plugin' packaging and bundles.

@@ -27,6 +27,7 @@ import org.sonatype.nexus.configuration.ModelUtils.CharacterModelReader;
 import org.sonatype.nexus.configuration.ModelUtils.CharacterModelUpgrader;
 import org.sonatype.nexus.configuration.ModelUtils.CharacterModelWriter;
 import org.sonatype.nexus.configuration.ModelUtils.CorruptModelException;
+import org.sonatype.nexus.configuration.ModelUtils.MissingModelVersionException;
 import org.sonatype.nexus.configuration.ModelUtils.ModelReader;
 import org.sonatype.nexus.configuration.ModelUtils.ModelUpgrader;
 import org.sonatype.nexus.configuration.ModelUtils.Versioned;
@@ -155,12 +156,12 @@ public class ModelloUtils
           if (versionNode != null) {
             final String originalFileVersion = versionNode.getValue();
             if (Strings.isNullOrEmpty(originalFileVersion)) {
-              throw new CorruptModelException("Passed in XML model have empty " + fieldName + " node");
+              throw new MissingModelVersionException("Passed in XML model have empty " + fieldName + " node");
             }
             return originalFileVersion;
           }
           else {
-            throw new CorruptModelException("Passed in XML model does not have " + fieldName + " node");
+            throw new MissingModelVersionException("Passed in XML model does not have " + fieldName + " node");
           }
         }
         catch (XmlPullParserException e) {

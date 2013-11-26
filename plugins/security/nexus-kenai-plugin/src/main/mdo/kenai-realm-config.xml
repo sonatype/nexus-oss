@@ -13,74 +13,83 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<model xsd.namespace="http://www.sonatype.org/xsd/url-realm-plugin-1.0.0"
-    xsd.targetNamespace="http://www.sonatype.org/xsd/url-realm-plugin-1.0.0">
+<model xmlns="http://modello.codehaus.org/MODELLO/1.4.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.0 http://modello.codehaus.org/xsd/modello-1.4.0.xsd"
+       xsd.namespace="http://www.sonatype.org/xsd/kenai-realm-plugin-1.0.0"
+       xsd.targetNamespace="http://www.sonatype.org/xsd/kenai-realm-plugin-1.0.0">
 
-    <id>kenairealm</id>
+  <id>kenairealm</id>
 
-    <name>KenaiRealmConfiguration</name>
+  <name>KenaiRealmConfiguration</name>
 
-    <description>
-        <![CDATA[
-        <p>URL Realm Configuration.</p>
-        ]]>
-    </description>
+  <description>
+    <![CDATA[
+    <p>URL Realm Configuration.</p>
+    ]]>
+  </description>
 
-    <defaults>
-        <default>
-            <key>package</key>
-            <value>com.sonatype.security.realms.kenai.config.model</value>
-        </default>
-    </defaults>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>com.sonatype.security.realms.kenai.config.model</value>
+    </default>
+  </defaults>
 
-    <classes>
-        <class rootElement="true" xml.tagName="kenaiRealmConfiguration">
-            <name>Configuration</name>
-            <version>1.0.0+</version>
-            <interfaces>
-              <interface>org.sonatype.configuration.Configuration</interface>
-            </interfaces>
-            <description>The root element of Kenai Realm configuration.</description>
-            <fields>
-                <field>
-                    <name>version</name>
-                    <version>1.0.0+</version>
-                    <description>The version of the persisted model.</description>
-                    <type>String</type>
-                    <required>true</required>
-                </field>
-                <field>
-                    <name>baseUrl</name>
-                    <version>1.0.0+</version>
-                    <description>The remote Kenai used for authentication.</description>
-                    <type>String</type>
-                    <required>true</required>
-                    <defaultValue>https://java.net/</defaultValue>
-                </field>
-                <field>
-                    <name>emailDomain</name>
-                    <version>1.0.0+</version>
-                    <description>The domain users belong to. Will be appended to the userId to create an email address.</description>
-                    <type>String</type>
-                    <required>true</required>
-                    <defaultValue>java.net</defaultValue>
-                </field>
-                <field>
-                    <name>defaultRole</name>
-                    <version>1.0.0+</version>
-                    <description>A role it assigned to all Kenai Realm users.</description>
-                    <type>String</type>
-                    <required>true</required>
-                </field>
-            </fields>
-            <codeSegments>
-                <codeSegment>
-                    <version>1.0.0</version>
-                    <code><![CDATA[
-    public static final String MODEL_VERSION = "1.0.0";
+  <versionDefinition>
+    <type>field</type>
+    <value>version</value>
+  </versionDefinition>
+
+  <classes>
+    <class rootElement="true" xml.tagName="kenaiRealmConfiguration">
+      <name>Configuration</name>
+      <version>2.8.0+</version>
+      <interfaces>
+        <interface>org.sonatype.configuration.Configuration</interface>
+      </interfaces>
+      <description>The root element of Kenai Realm configuration.</description>
+      <fields>
+        <field>
+          <name>version</name>
+          <version>2.8.0+</version>
+          <description>The version of the persisted model.</description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>baseUrl</name>
+          <version>2.8.0+</version>
+          <description>The remote Kenai used for authentication.</description>
+          <type>String</type>
+          <required>true</required>
+          <defaultValue>https://java.net/</defaultValue>
+        </field>
+        <field>
+          <name>emailDomain</name>
+          <version>2.8.0+</version>
+          <description>The domain users belong to. Will be appended to the userId to create an email address.
+          </description>
+          <type>String</type>
+          <required>true</required>
+          <defaultValue>java.net</defaultValue>
+        </field>
+        <field>
+          <name>defaultRole</name>
+          <version>2.8.0+</version>
+          <description>A role it assigned to all Kenai Realm users.</description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>2.8.0</version>
+          <code><![CDATA[
+    public static final String MODEL_VERSION = "2.8.0";
                 ]]></code>
-                </codeSegment>
-            </codeSegments>  
-        </class>
-    </classes>
+        </codeSegment>
+      </codeSegments>
+    </class>
+  </classes>
 </model>

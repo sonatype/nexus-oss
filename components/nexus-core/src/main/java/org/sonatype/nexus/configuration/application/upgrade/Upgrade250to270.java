@@ -25,14 +25,16 @@ import javax.inject.Singleton;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.ModelloUtils;
-import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
-import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.model.v2_7_0.CProps;
+import org.sonatype.nexus.configuration.model.v2_7_0.CScheduledTask;
+import org.sonatype.nexus.configuration.model.v2_7_0.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.model.v2_7_0.Configuration;
 import org.sonatype.nexus.configuration.model.v2_7_0.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -95,10 +97,10 @@ public class Upgrade250to270
     final List<CScheduledTask> tasks = conf.getTasks();
     for (CScheduledTask task : tasks) {
       if (EmptyTrashTaskDescriptor.ID.equals(task.getType())) {
-        final Map<String, String> taskConfig = ModelloUtils.getMapFromConfigList(task.getProperties());
+        final Map<String, String> taskConfig = getMapFromConfigList(task.getProperties());
         if (!taskConfig.containsKey(EmptyTrashTaskDescriptor.REPO_OR_GROUP_FIELD_ID)) {
           taskConfig.put(EmptyTrashTaskDescriptor.REPO_OR_GROUP_FIELD_ID, "all_repo");
-          task.setProperties(ModelloUtils.getConfigListFromMap(taskConfig));
+          task.setProperties(getConfigListFromMap(taskConfig));
         }
       }
     }
@@ -120,5 +122,32 @@ public class Upgrade250to270
             "SMTP related configuration change happened: both SSL and TLS was set, updated to use SSL only, assuming that SMTP server port is set to a port where remote SMTP server accepts SSL connections.");
       }
     }
+  }
+
+  // ==
+
+  /**
+   * {@link List} of {@link CProps} to {@link Map} converter, to ease handling of these thingies.
+   */
+  protected Map<String, String> getMapFromConfigList(List<CProps> list) {
+    final Map<String, String> result = Maps.newHashMapWithExpectedSize(list.size());
+    for (CProps props : list) {
+      result.put(props.getKey(), props.getValue());
+    }
+    return result;
+  }
+
+  /**
+   * {@link Map} to {@link List} of {@link CProps} converter, to ease handling of these thingies.
+   */
+  protected List<CProps> getConfigListFromMap(final Map<String, String> map) {
+    final List<CProps> result = Lists.newArrayListWithExpectedSize(map.size());
+    for (Map.Entry<String, String> entry : map.entrySet()) {
+      final CProps cprop = new CProps();
+      cprop.setKey(entry.getKey());
+      cprop.setValue(entry.getValue());
+      result.add(cprop);
+    }
+    return result;
   }
 }

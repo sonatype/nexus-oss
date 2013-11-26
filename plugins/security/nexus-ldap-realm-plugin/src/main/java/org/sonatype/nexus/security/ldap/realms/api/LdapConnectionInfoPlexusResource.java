@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.security.ldap.realms.api;
 
+import java.io.IOException;
+
 import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -109,6 +111,9 @@ public class LdapConnectionInfoPlexusResource
       this.getConfiguration().updateConnectionInfo(connInfo);
       // if it didn't throw an InvalidConfigurationException, we are good to go.
       this.getConfiguration().save();
+    }
+    catch (IOException e) {
+      throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
     }
     catch (InvalidConfigurationException e) {
       // this will build and thrown an exception.
