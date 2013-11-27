@@ -163,8 +163,8 @@ public class YumITSupport
       throws Exception
   {
     remoteLogger().info("Waiting for Nexus to settle down...");
-    client().getSubsystem(Events.class).waitForCalmPeriod();
     scheduler().waitForAllTasksToStop();
+    client().getSubsystem(Events.class).waitForCalmPeriod();
     remoteLogger().info("Nexus is quiet. Done waiting.");
   }
 
