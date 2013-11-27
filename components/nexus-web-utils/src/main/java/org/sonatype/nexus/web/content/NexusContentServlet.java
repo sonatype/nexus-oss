@@ -73,7 +73,7 @@ import static com.google.common.io.ByteStreams.limit;
 
 /**
  * Clean-room re-implementation of {@code /content} resource, using plain Servlet API.
- * 
+ *
  * @since 2.7.0
  */
 @Singleton
@@ -173,10 +173,13 @@ public class NexusContentServlet
     // this is HTTPS, get the cert and stuff it too for later
     if (request.isSecure()) {
       result.getRequestContext().put(AccessManager.REQUEST_CONFIDENTIAL, Boolean.TRUE);
-      final List<X509Certificate> certs = Arrays.asList((X509Certificate[]) request
-          .getAttribute("javax.servlet.request.X509Certificate"));
-      if (certs != null && !certs.isEmpty()) {
-        result.getRequestContext().put(AccessManager.REQUEST_CERTIFICATES, certs);
+      // FIXME why do we need to add client cert to the result request context?
+      final Object certArray = request.getAttribute("javax.servlet.request.X509Certificate");
+      if(certArray != null){
+        final List<X509Certificate> certs = Arrays.asList((X509Certificate[]) certArray);
+        if (!certs.isEmpty()) {
+          result.getRequestContext().put(AccessManager.REQUEST_CERTIFICATES, certs);
+        }
       }
     }
 
@@ -299,7 +302,7 @@ public class NexusContentServlet
 
   /**
    * To be added to non-content responses, like collection rendered index page of describe response is.
-   * 
+   *
    * @see <a href="https://issues.sonatype.org/browse/NEXUS-5155">NEXUS-5155</a>
    */
   protected void addNoCacheResponseHeaders(final HttpServletResponse response) {
@@ -591,7 +594,7 @@ public class NexusContentServlet
   /**
    * Parses the "Range" header of the HTTP request and builds up a list of {@link Range}. If no range header found, or
    * any problem occurred during parsing it (ie. is malformed), empty collection is returned.
-   * 
+   *
    * @return list of {@link Range}, never {@code null}.
    */
   protected List<Range<Long>> getRequestedRanges(final HttpServletRequest request, final long contentLength) {
