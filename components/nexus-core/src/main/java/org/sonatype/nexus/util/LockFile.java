@@ -22,6 +22,9 @@ import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.charset.Charset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -35,6 +38,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LockFile
 {
+  private static final Logger log = LoggerFactory.getLogger(LockFile.class);
+
   private static final byte[] DEFAULT_PAYLOAD = ManagementFactory.getRuntimeMXBean().getName().getBytes(
       Charset.forName("UTF-8"));
 
@@ -93,6 +98,7 @@ public class LockFile
       }
     }
     catch (IOException | OverlappingFileLockException e) {
+      log.warn("Failed to write lock file", e);
       // handle it as null result
       fileLock = null;
     }
