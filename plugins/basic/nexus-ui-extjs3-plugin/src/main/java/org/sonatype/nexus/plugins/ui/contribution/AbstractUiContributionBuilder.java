@@ -27,7 +27,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Base class for UI contribution builders
  *
  * @see org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder
- * @see org.sonatype.nexus.plugins.ui.contribution.IndexHtmlSnippetBuilder
  * @since 2.5
  */
 public abstract class AbstractUiContributionBuilder<T>
