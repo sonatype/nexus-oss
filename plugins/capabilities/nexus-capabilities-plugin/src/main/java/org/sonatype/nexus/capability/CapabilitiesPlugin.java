@@ -45,11 +45,6 @@ public class CapabilitiesPlugin
   public static final String ARTIFACT_ID = "nexus-" + ID_PREFIX + "-plugin";
 
   /**
-   * Prefix for @Named configuration.
-   */
-  public static final String CONFIG_PREFIX = "${" + ID_PREFIX;
-
-  /**
    * Prefix for REST resources
    */
   public static final String REST_PREFIX = "/" + ID_PREFIX;

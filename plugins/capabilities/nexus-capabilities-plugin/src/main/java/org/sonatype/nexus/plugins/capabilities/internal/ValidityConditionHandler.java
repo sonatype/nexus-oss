@@ -63,10 +63,6 @@ public class ValidityConditionHandler
     this.reference = checkNotNull(reference);
   }
 
-  boolean isConditionSatisfied() {
-    return validityCondition != null && validityCondition.isSatisfied();
-  }
-
   @AllowConcurrentEvents
   @Subscribe
   public void handle(final ConditionEvent.Satisfied event) {

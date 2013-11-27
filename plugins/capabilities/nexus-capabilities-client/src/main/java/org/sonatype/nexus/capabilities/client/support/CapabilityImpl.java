@@ -214,8 +214,6 @@ public class CapabilityImpl<C extends Capability<C>>
     return (C) this;
   }
 
-  private String xx;
-
   @Override
   public boolean equals(final Object o) {
     if (this == o) {
