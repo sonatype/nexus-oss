@@ -37,8 +37,6 @@ import org.junit.Test;
 public class ResolvingTest
     extends AbstractMavenRepoContentTests
 {
-  protected NexusAether nexusAether;
-
   protected NexusMavenBridge mavenBridge;
 
   protected RepositoryRegistry repositoryRegistry;
@@ -51,8 +49,6 @@ public class ResolvingTest
   {
     super.setUp();
 
-    nexusAether = lookup(NexusAether.class);
-
     mavenBridge = lookup(NexusMavenBridge.class);
 
     repositoryRegistry = lookup(RepositoryRegistry.class);
@@ -62,7 +58,7 @@ public class ResolvingTest
 
     for (MavenProxyRepository repo : repositoryRegistry.getRepositoriesWithFacet(MavenProxyRepository.class)) {
       repo.setRemoteUrl(server.getUrl().toExternalForm());
-      ((AbstractMavenRepository)repo).commitChanges();
+      ((AbstractMavenRepository) repo).commitChanges();
     }
   }
 
