@@ -31,6 +31,7 @@ import org.sonatype.appcontext.source.PropertiesFileEntrySource;
 import org.sonatype.appcontext.source.StaticEntrySource;
 import org.sonatype.nexus.guice.NexusModules.CoreModule;
 import org.sonatype.nexus.util.LockFile;
+import org.sonatype.nexus.util.file.DirSupport;
 
 import com.google.inject.Module;
 import org.codehaus.plexus.ContainerConfiguration;
@@ -74,6 +75,7 @@ public class PlexusContainerContextListener
             createContainerContext(context, (AppContext) context.getAttribute(AppContext.APPCONTEXT_KEY));
 
         final File nexusWorkdir = new File(String.valueOf(appContext.get("nexus-work"))).getCanonicalFile();
+        DirSupport.mkdir(nexusWorkdir.toPath());
         lockFile = new LockFile(new File(nexusWorkdir, "nexus.lock"));
         if (!lockFile.lock()) {
           throw new IllegalStateException("Nexus work directory already is use!");
