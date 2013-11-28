@@ -32,7 +32,6 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
-import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumGroup;
@@ -109,8 +108,6 @@ public class GenerateMetadataTask
 
   private final RpmScanner scanner;
 
-  private final NexusScheduler nexusScheduler;
-
   private final YumRegistry yumRegistry;
 
   private final Manager routingManager;
@@ -123,14 +120,12 @@ public class GenerateMetadataTask
                               final YumRegistry yumRegistry,
                               final RepositoryURLBuilder repositoryURLBuilder,
                               final RpmScanner scanner,
-                              final NexusScheduler nexusScheduler,
                               final Manager routingManager,
                               final CommandLineExecutor commandLineExecutor)
   {
     super(eventBus, null);
 
     this.yumRegistry = checkNotNull(yumRegistry);
-    this.nexusScheduler = checkNotNull(nexusScheduler);
     this.scanner = checkNotNull(scanner);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.repositoryURLBuilder = checkNotNull(repositoryURLBuilder);
@@ -311,7 +306,6 @@ public class GenerateMetadataTask
       throws IOException
   {
     return new RpmListWriter(
-        getRepositoryId(),
         new File(getRpmDir()),
         getAddedFiles(),
         getVersion(),
@@ -367,7 +361,7 @@ public class GenerateMetadataTask
   }
 
   @Override
-  public File getRpmListFile(String repositoryId) {
+  public File getRpmListFile() {
     return new File(createPackageDir(), getRepositoryId() + ".txt");
   }
 
@@ -397,7 +391,7 @@ public class GenerateMetadataTask
   }
 
   @Override
-  public File getRpmListFile(String repositoryId, String version) {
+  public File getRpmListFile(String version) {
     return new File(createPackageDir(), getRepositoryId() + "-" + version + ".txt");
   }
 

@@ -118,15 +118,6 @@ public class VersionedResourceTest
     resource.get(null, request, null, null);
   }
 
-  private void shouldGenerateDirectoryIndexForVersionAndRepo(final String version, final String repo)
-      throws ResourceException
-  {
-    Request request = createRequest("/", repo, version);
-    StringRepresentation representation = (StringRepresentation) resource.get(null, request, null, null);
-    Assert.assertEquals(MediaType.TEXT_HTML, representation.getMediaType());
-    Assert.assertTrue(representation.getText().contains("repodata/"));
-  }
-
   private Response createResponse(Request request) {
     return new HttpResponse(null, request);
   }

@@ -122,7 +122,6 @@ public class GenerateMetadataTaskSettingsTest
         mock(YumRegistry.class),
         mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
-        mock(NexusScheduler.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
     );
@@ -146,7 +145,6 @@ public class GenerateMetadataTaskSettingsTest
         mock(YumRegistry.class),
         repositoryURLBuilder(),
         mock(RpmScanner.class),
-        mock(NexusScheduler.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
     );
@@ -170,7 +168,6 @@ public class GenerateMetadataTaskSettingsTest
         mock(YumRegistry.class),
         mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
-        mock(NexusScheduler.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
     );
@@ -201,7 +198,6 @@ public class GenerateMetadataTaskSettingsTest
         yumRegistry,
         mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
-        mock(NexusScheduler.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
     );
@@ -254,7 +250,6 @@ public class GenerateMetadataTaskSettingsTest
         yumRegistry,
         mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
-        mock(NexusScheduler.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
     )

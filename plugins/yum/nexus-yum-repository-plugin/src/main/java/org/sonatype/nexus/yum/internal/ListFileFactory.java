@@ -21,8 +21,8 @@ import java.io.File;
 public interface ListFileFactory
 {
 
-  File getRpmListFile(String id);
+  File getRpmListFile();
 
-  File getRpmListFile(String id, String version);
+  File getRpmListFile(String version);
 
 }

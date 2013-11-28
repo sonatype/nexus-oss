@@ -38,15 +38,6 @@ public class RepoMD
     locations = parse(in);
   }
 
-  public RepoMD(final File file) {
-    try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file))) {
-      locations = parse(in);
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
-  }
-
   private static Map<String, String> parse(final InputStream in) {
     try {
       final Map<String, String> locations = Maps.newHashMap();
@@ -68,14 +59,6 @@ public class RepoMD
 
   public Collection<String> getLocations() {
     return locations.values();
-  }
-
-  public String getLocation(final String type) {
-    return locations.get(type);
-  }
-
-  public String getPrimaryLocation() {
-    return getLocation("primary");
   }
 
 }

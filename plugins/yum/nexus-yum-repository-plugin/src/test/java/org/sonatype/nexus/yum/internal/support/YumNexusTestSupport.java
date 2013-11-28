@@ -88,15 +88,9 @@ public class YumNexusTestSupport
     extends NexusAppTestSupport
 {
 
-  private static final Logger LOG = LoggerFactory.getLogger(YumNexusTestSupport.class);
-
   private String javaTmpDir;
 
   public static final String TMP_DIR_KEY = "java.io.tmpdir";
-
-  public static final String REPOMD_XML = "repomd.xml";
-
-  public static final String PRIMARY_XML = "primary.xml";
 
   protected final TestUtil util = new TestUtil(this);
 
@@ -123,10 +117,6 @@ public class YumNexusTestSupport
 
   protected File cacheDir() {
     return testIndex.getDirectory("cache");
-  }
-
-  protected File repoData() {
-    return testIndex.getDirectory();
   }
 
   protected File repositoryDir(final String repositoryId) {
@@ -157,59 +147,6 @@ public class YumNexusTestSupport
       testIndex.recordLink("surefire result", util.resolveFile(name + ".txt"));
       testIndex.recordLink("surefire output", util.resolveFile(name + "-output.txt"));
     }
-  }
-
-  public void assertThatYumMetadataAreTheSame(final File actualRepositoryDir,
-                                              final String expectedRepositoryDirName)
-      throws Exception
-  {
-    LOG.debug("Testing Repo {} ...", actualRepositoryDir);
-    final File actualRepodata = new File(actualRepositoryDir, "repodata");
-    assertThat(actualRepodata, FileMatchers.exists());
-
-    final File repoMdFile = new File(actualRepodata, REPOMD_XML);
-    final RepoMD repoMD = new RepoMD(repoMdFile);
-
-    assertSameRepomdXml(
-        repoMdFile,
-        getTemplateFile(expectedRepositoryDirName, REPOMD_XML)
-    );
-
-    assertSamePrimaryXml(
-        new File(actualRepodata.getParentFile(), repoMD.getPrimaryLocation()),
-        getTemplateFile(expectedRepositoryDirName, PRIMARY_XML)
-    );
-  }
-
-  private void assertSamePrimaryXml(final File actual, final File expected)
-      throws Exception
-  {
-    final GZIPInputStream actualIn = new GZIPInputStream(new FileInputStream(actual));
-    final Diff xmlDiff = new Diff(new FileReader(expected), new InputStreamReader(actualIn));
-    xmlDiff.overrideDifferenceListener(new TimeStampIgnoringDifferenceListener());
-    assertThat(xmlDiff.toString(), xmlDiff.similar(), is(true));
-  }
-
-  private void assertSameRepomdXml(final File actual, final File expected)
-      throws Exception
-  {
-    final Diff xmlDiff = new Diff(new FileReader(expected), new FileReader(actual));
-    xmlDiff.overrideDifferenceListener(new TimeStampIgnoringDifferenceListener());
-    xmlDiff.overrideElementQualifier(
-        new ElementNameAndAttributeQualifier("type")
-        {
-          @Override
-          protected boolean areAttributesComparable(final Element control, final Element test) {
-            return !"data".equals(control.getTagName()) || super.areAttributesComparable(control, test);
-          }
-        }
-    );
-    assertThat(xmlDiff.toString(), xmlDiff.similar(), is(true));
-  }
-
-  public File getTemplateFile(final String templateName, final String fileName) {
-    return testData.resolveFile(String.format("templates/%s/%s", templateName, fileName));
-
   }
 
   protected void waitFor(Condition condition)
