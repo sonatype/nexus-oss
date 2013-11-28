@@ -195,8 +195,8 @@ public class NexusClientFactoryImpl
         config.getProperties().put(PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION, true);
       }
       else {
-        throw new IllegalArgumentException(Template.of("AuthenticationInfo of type %s is not supported!",
-            connectionInfo.getAuthenticationInfo().getClass().getName()).toString());
+        throw new IllegalArgumentException(String.format("AuthenticationInfo of type %s is not supported!",
+            connectionInfo.getAuthenticationInfo().getClass().getName()));
       }
     }
   }
@@ -217,9 +217,9 @@ public class NexusClientFactoryImpl
             config.getProperties().put(PROPERTY_PROXY_PASSWORD, upinfo.getPassword());
           }
           else {
-            throw new IllegalArgumentException(Template.of(
+            throw new IllegalArgumentException(String.format(
                 "AuthenticationInfo of type %s is not supported!",
-                connectionInfo.getAuthenticationInfo().getClass().getName()).toString());
+                connectionInfo.getAuthenticationInfo().getClass().getName()));
           }
         }
       }

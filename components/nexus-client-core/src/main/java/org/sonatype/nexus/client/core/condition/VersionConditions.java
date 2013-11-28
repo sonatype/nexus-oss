@@ -138,7 +138,7 @@ public abstract class VersionConditions
 
     @Override
     public String explainNotSatisfied(final NexusStatus status) {
-      return Template.of("(version \"%s\" contained in \"%s\")", status.getVersion(), suitableVersions).toString();
+      return String.format("(version \"%s\" contained in \"%s\")", status.getVersion(), suitableVersions);
     }
   }
 
