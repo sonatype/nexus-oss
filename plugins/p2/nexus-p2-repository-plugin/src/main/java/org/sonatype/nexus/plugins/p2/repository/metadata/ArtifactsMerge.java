@@ -128,37 +128,6 @@ public class ArtifactsMerge
     return mappingsDom;
   }
 
-  private Xpp3Dom createMappingsDom() {
-    final Xpp3Dom mappingsDom = new Xpp3Dom("mappings");
-    Xpp3Dom ruleDom;
-
-    // <rule filter='(&amp; (classifier=osgi.bundle) (format=packed))'
-    // output='${repoUrl}/plugins/${id}_${version}.jar.pack.gz'/>
-
-    // <rule filter='(&amp; (classifier=osgi.bundle))' output='${repoUrl}/plugins/${id}_${version}.jar'/>
-    ruleDom = new Xpp3Dom("rule");
-    ruleDom.setAttribute("filter", "(& (classifier=osgi.bundle))");
-    ruleDom.setAttribute("output", "${repoUrl}/plugins/${id}_${version}.jar");
-    mappingsDom.addChild(ruleDom);
-
-    // <rule filter='(&amp; (classifier=binary))' output='${repoUrl}/binary/${id}_${version}'/>
-    ruleDom = new Xpp3Dom("rule");
-    ruleDom.setAttribute("filter", "(& (classifier=binary))");
-    ruleDom.setAttribute("output", "${repoUrl}/binary/${id}_${version}");
-    mappingsDom.addChild(ruleDom);
-
-    // <rule filter='(&amp; (classifier=org.eclipse.update.feature))'
-    // output='${repoUrl}/features/${id}_${version}.jar'/>
-    ruleDom = new Xpp3Dom("rule");
-    ruleDom.setAttribute("filter", "(& (classifier=org.eclipse.update.feature))");
-    ruleDom.setAttribute("output", "${repoUrl}/features/${id}_${version}.jar");
-    mappingsDom.addChild(ruleDom);
-
-    mappingsDom.setAttribute("size", Integer.toString(mappingsDom.getChildCount()));
-
-    return mappingsDom;
-  }
-
   private LinkedHashMap<String, String> orderMappings(final LinkedHashMap<String, String> mergedMappingsMap)
       throws P2MetadataMergeException
   {
@@ -229,32 +198,9 @@ public class ArtifactsMerge
     }
   }
 
-  private LinkedHashMap<String, String> mergeProperties(LinkedHashMap<String, String> mergedProperties,
-                                                        final AbstractMetadata repo)
-      throws P2MetadataMergeException
-  {
-    // make sure properties are the same
-    final LinkedHashMap<String, String> properties = getProperties(repo);
-    if (mergedProperties == null) {
-      mergedProperties = properties;
-    }
-    else {
-      if (!mergedProperties.equals(properties)) {
-        throw new P2MetadataMergeException("Incompatible repository properties");
-      }
-    }
-    return mergedProperties;
-  }
-
   private void setMappings(final Xpp3Dom dom, final Xpp3Dom mergedMappings) {
     AbstractMetadata.removeChild(dom, "mappings");
     dom.addChild(mergedMappings);
-  }
-
-  private LinkedHashMap<String, String> getProperties(final AbstractMetadata repo) {
-    final LinkedHashMap<String, String> properties = repo.getProperties();
-    properties.remove(P2Constants.PROP_TIMESTAMP);
-    return properties;
   }
 
   private String getArtifactKey(final Artifact artifact) {

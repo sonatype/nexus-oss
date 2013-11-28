@@ -38,7 +38,6 @@ import org.junit.Test;
 public class P2ProxyMirrorsTest
     extends NexusAppTestSupport
 {
-  protected NexusConfiguration nexusConfiguration;
 
   private P2ProxyRepository repository;
 
@@ -61,7 +60,7 @@ public class P2ProxyMirrorsTest
 
     startNx();
 
-    nexusConfiguration = lookup(NexusConfiguration.class);
+    lookup(NexusConfiguration.class);
 
     repository = (P2ProxyRepository) lookup(RepositoryRegistry.class).getRepository("p2-repo");
     repository.setChecksumPolicy(ChecksumPolicy.IGNORE);

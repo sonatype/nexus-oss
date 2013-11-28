@@ -30,6 +30,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -64,7 +65,8 @@ public class MetadataMergeTest
     Assert.assertEquals(5, merged.getMappings().size());
   }
 
-  // @Test
+  @Test
+  @Ignore
   public void incompatibleRepositoryProperties()
       throws Exception
   {

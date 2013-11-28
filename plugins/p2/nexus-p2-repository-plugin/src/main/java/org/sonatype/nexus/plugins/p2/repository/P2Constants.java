@@ -90,17 +90,8 @@ public interface P2Constants
   String PROP_TIMESTAMP = "p2.timestamp"; //$NON-NLS-1$
 
   /**
-   * Property used for interpolation of the content.xml, to filter ${baseurl} to the actual nexus base url.
-   */
-  String PROP_BASE_URL = "nexus.baseURL";
-
-  /**
    * Property key used to mark format of artifact.
    */
   String ARTIFACT_PROP_FORMAT = "format";
 
-  /**
-   * Property PROP_FORMAT value used to mark format of artifact as packed by Pack200.
-   */
-  String ARTIFACT_PROP_FORMAT_VALUE_PACKED = "packed";
 }

@@ -133,16 +133,8 @@ public class MockRemoteStorage
     return requests;
   }
 
-  public void setValidUrls(final Set<String> validUrls) {
-    this.validUrls = validUrls;
-  }
-
   public Set<String> getValidUrls() {
     return validUrls;
-  }
-
-  public void setDownUrls(final Set<String> downUrls) {
-    this.downUrls = downUrls;
   }
 
   public Set<String> getDownUrls() {

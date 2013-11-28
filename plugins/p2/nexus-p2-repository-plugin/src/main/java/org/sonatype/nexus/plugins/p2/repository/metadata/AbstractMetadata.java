@@ -47,20 +47,6 @@ public abstract class AbstractMetadata
     }
   }
 
-  public void removeProperty(final String name) {
-    final Xpp3Dom properties = dom.getChild("properties");
-
-    if (properties != null) {
-      final Xpp3Dom[] property = properties.getChildren("property");
-
-      for (int i = 0; i < property.length; i++) {
-        if (name.equals(property[i].getAttribute("name"))) {
-          properties.removeChild(i);
-        }
-      }
-    }
-  }
-
   public LinkedHashMap<String, String> getProperties() {
     final LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
 

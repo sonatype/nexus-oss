@@ -37,11 +37,6 @@ public class P2ProxyRepositoryTemplate
     super(provider, id, description, new P2ContentClass(), P2ProxyRepository.class);
   }
 
-  public P2ProxyRepositoryConfiguration getExternalConfiguration(final boolean forWrite) {
-    return (P2ProxyRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration().getConfiguration(
-        forWrite);
-  }
-
   @Override
   protected CRepositoryCoreConfiguration initCoreConfiguration() {
     final CRepository repo = new DefaultCRepository();

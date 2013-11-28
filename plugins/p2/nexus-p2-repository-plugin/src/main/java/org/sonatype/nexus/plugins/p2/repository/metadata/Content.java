@@ -57,16 +57,6 @@ public class Content
     }
   }
 
-  public void removeReferences() {
-    final Xpp3Dom[] children = dom.getChildren();
-
-    for (int i = 0; i < children.length; i++) {
-      if ("references".equals(children[i].getName())) {
-        dom.removeChild(i);
-      }
-    }
-  }
-
   public List<Unit> getUnits() {
     final Xpp3Dom unitsDom = dom.getChild("units");
 
