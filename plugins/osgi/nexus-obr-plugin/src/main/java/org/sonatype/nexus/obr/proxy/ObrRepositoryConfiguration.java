@@ -44,4 +44,7 @@ public class ObrRepositoryConfiguration
     return Integer.parseInt(getNodeValue(getRootNode(), METADATA_MAX_AGE_KEY, "1440"));
   }
 
+  public void setMetadataMaxAge(final int age) {
+    setNodeValue(getRootNode(), METADATA_MAX_AGE_KEY, String.valueOf(age));
+  }
 }

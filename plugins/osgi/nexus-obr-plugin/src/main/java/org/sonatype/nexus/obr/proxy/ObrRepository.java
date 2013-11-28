@@ -152,16 +152,20 @@ public class ObrRepository
     super.setRemoteUrl(siteAndPath[0]);
   }
 
-  private String getObrPath() {
+  public String getObrPath() {
     return getExternalConfiguration(false).getObrPath();
   }
 
-  private void setObrPath(final String obrPath) {
+  public void setObrPath(final String obrPath) {
     getExternalConfiguration(true).setObrPath(obrPath);
   }
 
-  private int getMetadataMaxAge() {
+  public int getMetadataMaxAge() {
     return getExternalConfiguration(false).getMetadataMaxAge();
+  }
+
+  public void setMetadataMaxAge(final int metadataMaxAge) {
+    getExternalConfiguration(true).setMetadataMaxAge(metadataMaxAge);
   }
 
   @Override
