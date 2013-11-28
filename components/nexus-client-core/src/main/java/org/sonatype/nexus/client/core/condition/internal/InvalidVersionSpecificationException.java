@@ -31,18 +31,13 @@ package org.sonatype.nexus.client.core.condition.internal;
  * @author Benjamin Bentmann
  */
 public class InvalidVersionSpecificationException
-    extends RuntimeException //RepositoryException
+    extends RuntimeException
 {
 
   private final String version;
 
   public InvalidVersionSpecificationException(String version, String message) {
     super(message);
-    this.version = version;
-  }
-
-  public InvalidVersionSpecificationException(String version, Throwable cause) {
-    super("Could not parse version specification " + version, cause);
     this.version = version;
   }
 

@@ -38,14 +38,6 @@ public class Template
     return String.format(format, args);
   }
 
-  public String getFormat() {
-    return format;
-  }
-
-  public Object[] getArgs() {
-    return args;
-  }
-
   @Override
   public String toString() {
     return evaluate();

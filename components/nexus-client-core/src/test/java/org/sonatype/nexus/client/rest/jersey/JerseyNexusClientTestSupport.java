@@ -25,17 +25,4 @@ public class JerseyNexusClientTestSupport
     extends TestSupport
 {
 
-  /**
-   * This method is a CHEAT! It would need to prepare and locally run a Nexus instance, but for now, RSO is used...
-   * Naturally, this makes the tests unstable too...
-   */
-  protected NexusClient createClientForLiveInstance(
-      final SubsystemFactory<?, JerseyNexusClient>... subsystemFactories)
-      throws MalformedURLException
-  {
-    final NexusClientFactory factory = new JerseyNexusClientFactory(subsystemFactories);
-    final NexusClient client = factory.createFor(BaseUrl.baseUrlFrom("https://repository.sonatype.org/"));
-    return client;
-  }
-
 }
