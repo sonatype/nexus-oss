@@ -13,12 +13,6 @@
 
 package org.sonatype.nexus.client.rest.jersey;
 
-import java.net.MalformedURLException;
-
-import org.sonatype.nexus.client.core.NexusClient;
-import org.sonatype.nexus.client.core.spi.SubsystemFactory;
-import org.sonatype.nexus.client.rest.BaseUrl;
-import org.sonatype.nexus.client.rest.NexusClientFactory;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class JerseyNexusClientTestSupport

@@ -24,7 +24,6 @@ import org.sonatype.nexus.client.core.condition.NexusStatusConditions;
 import org.sonatype.nexus.client.core.spi.SubsystemProvider;
 import org.sonatype.nexus.client.internal.rest.NexusXStreamFactory;
 import org.sonatype.nexus.client.internal.rest.XStreamXmlProvider;
-import org.sonatype.nexus.client.internal.util.Template;
 import org.sonatype.nexus.client.internal.util.Version;
 import org.sonatype.nexus.client.rest.AuthenticationInfo;
 import org.sonatype.nexus.client.rest.BaseUrl;
