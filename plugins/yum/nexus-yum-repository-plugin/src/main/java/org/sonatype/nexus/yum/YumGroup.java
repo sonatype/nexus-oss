@@ -13,17 +13,13 @@
 
 package org.sonatype.nexus.yum;
 
-import java.io.File;
-
-import org.sonatype.nexus.proxy.repository.Repository;
-
 /**
  * Provides access to Yum functionality around a Nexus group repository.
  *
  * @since 2.7
  */
 public interface YumGroup
-  extends Yum
+    extends Yum
 {
 
   void markDirty();

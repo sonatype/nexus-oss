@@ -32,14 +32,12 @@ import com.noelios.restlet.http.HttpResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

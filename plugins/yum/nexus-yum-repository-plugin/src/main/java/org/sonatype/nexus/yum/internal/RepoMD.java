@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.yum.internal;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
