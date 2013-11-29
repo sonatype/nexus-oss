@@ -13,16 +13,13 @@
 
 package org.sonatype.security.locators;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.security.authorization.Role;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
@@ -103,29 +100,6 @@ public class MockUserManagerB
     // users.add( f );
 
     return users;
-  }
-
-  public Set<Role> getUsersAdditinalRoles(String userId) {
-
-    Map<String, Set<Role>> userToRoleMap = new HashMap<String, Set<Role>>();
-
-    Set<Role> roles = new HashSet<Role>();
-
-    Role role1 = new Role();
-    role1.setSource(this.getSource());
-    role1.setName("ExtraRole1");
-    role1.setRoleId("ExtraRole1");
-
-    Role role2 = new Role();
-    role2.setSource(this.getSource());
-    role2.setName("ExtraRole2");
-    role2.setRoleId("ExtraRole2");
-
-    roles.add(role1);
-    roles.add(role2);
-    userToRoleMap.put("jcoder", roles);
-
-    return userToRoleMap.get(userId);
   }
 
   public String getAuthenticationRealmName() {

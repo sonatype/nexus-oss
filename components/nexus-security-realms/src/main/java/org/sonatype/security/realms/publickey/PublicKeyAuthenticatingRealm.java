@@ -56,11 +56,8 @@ public class PublicKeyAuthenticatingRealm
    * {@code Authorizer} to which all authorization will be delegated.
    *
    * @param publicKeyRepository public keys will be looked up from this.
-   * @param authorizer          all authorization will be delegated to this. can be for example another
-   *                            {@link org.apache.shiro.realm.Realm}.
    */
   public PublicKeyAuthenticatingRealm(PublicKeyRepository publicKeyRepository) {
-    this();
     this.publicKeyRepository = publicKeyRepository;
   }
 
@@ -87,10 +84,6 @@ public class PublicKeyAuthenticatingRealm
   public boolean supports(AuthenticationToken token) {
     // only support PublicKeyAuthenticationToken
     return PublicKeyAuthenticationToken.class.isInstance(token);
-  }
-
-  public void setPublicKeyRepository(PublicKeyRepository publicKeyRepository) {
-    this.publicKeyRepository = publicKeyRepository;
   }
 
 }
