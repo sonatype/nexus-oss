@@ -30,7 +30,7 @@
 
   <Call name="addConnector">
     <Arg>
-      <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector">
+      <New id="HTTPConnector" class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector">
         <Set name="host"><Property name="application-host"/></Set>
         <Set name="port"><Property name="application-port"/></Set>
         <Set name="forwarded">true</Set>
