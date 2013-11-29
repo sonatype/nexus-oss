@@ -46,8 +46,6 @@ public class DefaultRepositoryMetadataHandler
 
   protected final RepositoryMetadataXpp3Writer repositoryMetadataXpp3Writer = new RepositoryMetadataXpp3Writer();
 
-  protected final OrderedRepositoryMirrorsMetadataXpp3Reader orderedRepositoryMirrorsMetadataXpp3Reader = new OrderedRepositoryMirrorsMetadataXpp3Reader();
-
   @Override
   public RepositoryMetadata readRepositoryMetadata(RawTransport transport)
       throws MetadataHandlerException,
