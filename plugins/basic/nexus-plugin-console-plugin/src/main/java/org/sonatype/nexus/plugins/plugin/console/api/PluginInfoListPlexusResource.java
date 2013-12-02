@@ -122,7 +122,7 @@ public class PluginInfoListPlexusResource
     for (DocumentationLink doc : pluginInfo.getDocumentation()) {
       DocumentationLinkDTO docLink = new DocumentationLinkDTO();
       docLink.setLabel(doc.getLabel());
-      docLink.setUrl(createRootReference(request, doc.getUrl() + "/docs/index.html").getTargetRef().toString());
+      docLink.setUrl(createRootReference(request, "static/" + doc.getUrl() + "/docs/index.html").getTargetRef().toString());
       docUrls.add(docLink);
     }
     result.setDocumentation(docUrls);
