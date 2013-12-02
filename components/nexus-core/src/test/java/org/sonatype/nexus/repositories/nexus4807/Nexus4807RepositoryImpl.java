@@ -36,10 +36,6 @@ public class Nexus4807RepositoryImpl
 {
   public static final String ID = "nexus4807";
 
-  private ContentClass contentClass;
-
-  private Nexus4807RepositoryConfigurator configurator;
-
   private final RepositoryKind repositoryKind;
 
   private boolean disposeInvoked;
@@ -58,12 +54,12 @@ public class Nexus4807RepositoryImpl
 
   @Override
   public ContentClass getRepositoryContentClass() {
-    return contentClass;
+    return null;
   }
 
   @Override
   protected Configurator getConfigurator() {
-    return configurator;
+    return null;
   }
 
   @Override

@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -68,7 +67,7 @@ public class DefaultTaskConfigManager
   // TODO: Nx configuration is used here, as it's used as monitor for synchronization!!!
   @Inject
   public DefaultTaskConfigManager(final EventBus eventBus, final NexusConfiguration nexusConfiguration,
-      final Map<String, Provider<SchedulerTask<?>>> tasks)
+                                  final Map<String, Provider<SchedulerTask<?>>> tasks)
   {
     super("Scheduled Tasks", eventBus, nexusConfiguration);
     this.tasks = checkNotNull(tasks);
@@ -84,7 +83,9 @@ public class DefaultTaskConfigManager
   }
 
   @Override
-  protected CoreConfiguration<List<CScheduledTask>> wrapConfiguration(Object configuration) throws ConfigurationException {
+  protected CoreConfiguration<List<CScheduledTask>> wrapConfiguration(Object configuration)
+      throws ConfigurationException
+  {
     if (configuration instanceof ApplicationConfiguration) {
       return new CScheduledTaskCoreConfiguration((ApplicationConfiguration) configuration);
     }
@@ -236,7 +237,7 @@ public class DefaultTaskConfigManager
 
   private CScheduledTask findTask(String id, List<CScheduledTask> tasks) {
     synchronized (getApplicationConfiguration()) {
-      for (Iterator<CScheduledTask> iter = tasks.iterator(); iter.hasNext();) {
+      for (Iterator<CScheduledTask> iter = tasks.iterator(); iter.hasNext(); ) {
         CScheduledTask storedTask = iter.next();
 
         if (storedTask.getId().equals(id)) {
@@ -246,18 +247,6 @@ public class DefaultTaskConfigManager
 
       return null;
     }
-  }
-
-  private Map<String, String> translateFrom(List list) {
-    Map<String, String> map = new HashMap<String, String>();
-
-    for (Iterator iter = list.iterator(); iter.hasNext();) {
-      CProps prop = (CProps) iter.next();
-
-      map.put(prop.getKey(), prop.getValue());
-    }
-
-    return map;
   }
 
   private Schedule translateFrom(CScheduleConfig modelSchedule, Date nextRun) {
@@ -285,7 +274,7 @@ public class DefaultTaskConfigManager
     else if (CScheduleConfig.TYPE_MONTHLY.equals(modelSchedule.getType())) {
       Set<Integer> daysToRun = new HashSet<Integer>();
 
-      for (Iterator iter = modelSchedule.getDaysOfMonth().iterator(); iter.hasNext();) {
+      for (Iterator iter = modelSchedule.getDaysOfMonth().iterator(); iter.hasNext(); ) {
         String day = (String) iter.next();
 
         try {
@@ -301,7 +290,7 @@ public class DefaultTaskConfigManager
     else if (CScheduleConfig.TYPE_WEEKLY.equals(modelSchedule.getType())) {
       Set<Integer> daysToRun = new HashSet<Integer>();
 
-      for (Iterator iter = modelSchedule.getDaysOfWeek().iterator(); iter.hasNext();) {
+      for (Iterator iter = modelSchedule.getDaysOfWeek().iterator(); iter.hasNext(); ) {
         String day = (String) iter.next();
 
         try {
@@ -391,7 +380,7 @@ public class DefaultTaskConfigManager
           storeableSchedule.setEndDate(endDate.getTime());
         }
 
-        for (Iterator iter = ((MonthlySchedule) schedule).getDaysToRun().iterator(); iter.hasNext();) {
+        for (Iterator iter = ((MonthlySchedule) schedule).getDaysToRun().iterator(); iter.hasNext(); ) {
           // TODO: String.valueOf is used because currently the days to run are integers in the monthly
           // schedule
           // needs to be string
@@ -409,7 +398,7 @@ public class DefaultTaskConfigManager
           storeableSchedule.setEndDate(endDate.getTime());
         }
 
-        for (Iterator iter = ((WeeklySchedule) schedule).getDaysToRun().iterator(); iter.hasNext();) {
+        for (Iterator iter = ((WeeklySchedule) schedule).getDaysToRun().iterator(); iter.hasNext(); ) {
           // TODO: String.valueOf is used because currently the days to run are integers in the weekly
           // schedule
           // needs to be string

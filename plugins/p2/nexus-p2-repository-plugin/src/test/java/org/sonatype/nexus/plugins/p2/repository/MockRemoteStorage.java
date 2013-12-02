@@ -36,7 +36,6 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 @Named("mock")
 @Singleton
@@ -51,10 +50,8 @@ public class MockRemoteStorage
   private final List<MockRequestRecord> requests = new LinkedList<MockRequestRecord>();
 
   @Inject
-  protected MockRemoteStorage(final UserAgentBuilder userAgentBuilder,
-                              final ApplicationStatusSource applicationStatusSource, final MimeSupport mimeSupport)
-  {
-    super(userAgentBuilder, applicationStatusSource, mimeSupport);
+  protected MockRemoteStorage(final ApplicationStatusSource applicationStatusSource, final MimeSupport mimeSupport) {
+    super(applicationStatusSource, mimeSupport);
   }
 
   @Override

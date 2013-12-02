@@ -70,7 +70,7 @@ public class HttpClientRemoteStorageTest
       throws Exception
   {
     final HttpClientRemoteStorage underTest =
-        new HttpClientRemoteStorage(mock(UserAgentBuilder.class), mock(ApplicationStatusSource.class),
+        new HttpClientRemoteStorage(mock(ApplicationStatusSource.class),
             mock(MimeSupport.class), mock(QueryStringBuilder.class), mock(HttpClientManager.class));
     final ProxyRepository proxyMock = mock(ProxyRepository.class);
     when(proxyMock.getId()).thenReturn("id");
@@ -91,7 +91,7 @@ public class HttpClientRemoteStorageTest
       throws Exception
   {
     final HttpClientRemoteStorage underTest =
-        new HttpClientRemoteStorage(mock(UserAgentBuilder.class), mock(ApplicationStatusSource.class),
+        new HttpClientRemoteStorage(mock(ApplicationStatusSource.class),
             mock(MimeSupport.class), mock(QueryStringBuilder.class), mock(HttpClientManager.class));
     final ProxyRepository proxyMock = mock(ProxyRepository.class);
     when(proxyMock.getId()).thenReturn("id");
@@ -113,7 +113,7 @@ public class HttpClientRemoteStorageTest
       throws Exception
   {
     final HttpClientRemoteStorage underTest =
-        new HttpClientRemoteStorage(mock(UserAgentBuilder.class), mock(ApplicationStatusSource.class),
+        new HttpClientRemoteStorage(mock(ApplicationStatusSource.class),
             mock(MimeSupport.class), mock(QueryStringBuilder.class), mock(HttpClientManager.class));
     final ProxyRepository proxyMock = mock(ProxyRepository.class);
     when(proxyMock.getId()).thenReturn("id");
@@ -136,7 +136,7 @@ public class HttpClientRemoteStorageTest
       throws Exception
   {
     final HttpClientRemoteStorage underTest =
-        new HttpClientRemoteStorage(mock(UserAgentBuilder.class), mock(ApplicationStatusSource.class),
+        new HttpClientRemoteStorage(mock(ApplicationStatusSource.class),
             mock(MimeSupport.class), mock(QueryStringBuilder.class), mock(HttpClientManager.class))
         {
           @Override
@@ -190,7 +190,7 @@ public class HttpClientRemoteStorageTest
 
       // the RRS instance we test
       final HttpClientRemoteStorage underTest =
-          new HttpClientRemoteStorage(mock(UserAgentBuilder.class), mock(ApplicationStatusSource.class),
+          new HttpClientRemoteStorage(mock(ApplicationStatusSource.class),
               mock(MimeSupport.class), mock(QueryStringBuilder.class), new HttpClientManagerImpl(
               hc4Provider, mock(UserAgentBuilder.class)));
 

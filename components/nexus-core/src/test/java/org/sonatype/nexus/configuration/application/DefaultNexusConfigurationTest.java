@@ -34,8 +34,6 @@ public class DefaultNexusConfigurationTest
 {
   protected DefaultNexusConfiguration nexusConfiguration;
 
-  protected SecuritySystem securitySystem;
-
   protected NexusEmailer nexusEmailer;
 
   protected GlobalRemoteProxySettings globalRemoteProxySettings;
@@ -49,7 +47,7 @@ public class DefaultNexusConfigurationTest
 
     nexusConfiguration.loadConfiguration();
 
-    securitySystem = this.lookup(SecuritySystem.class);
+    lookup(SecuritySystem.class);
 
     nexusEmailer = lookup(NexusEmailer.class);
 

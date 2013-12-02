@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -152,13 +150,4 @@ public class AddPluginOperation
     }
   }
 
-  // == A HACK
-
-  public static class ArrayList2
-      extends ArrayList<Plugin>
-  {
-    public ArrayList2(Collection<? extends Plugin> c) {
-      super(c);
-    }
-  }
 }

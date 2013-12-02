@@ -67,7 +67,7 @@ public class M1Repository
 
   @Inject
   public M1Repository(final @Named(Maven1ContentClass.ID) ContentClass contentClass,
-                      final @Named("maven1") GavCalculator gavCalculator, 
+                      final @Named("maven1") GavCalculator gavCalculator,
                       final M1RepositoryConfigurator m1RepositoryConfigurator)
   {
     this.gavCalculator = checkNotNull(gavCalculator);
@@ -169,11 +169,6 @@ public class M1Repository
 
     // it is a release
     return isOld(getArtifactMaxAge(), item);
-  }
-
-  // not available on maven1 repo
-  public boolean recreateMavenMetadata(String path) {
-    return false;
   }
 
   @Override

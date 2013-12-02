@@ -47,7 +47,6 @@ import org.sonatype.nexus.configuration.ConfigurationRollbackEvent;
 import org.sonatype.nexus.configuration.ConfigurationSaveEvent;
 import org.sonatype.nexus.configuration.application.runtime.ApplicationRuntimeConfigurationBuilder;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
-import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
@@ -94,7 +93,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The class DefaultNexusConfiguration is responsible for config management. It actually keeps in sync Nexus internal
- * state with persisted user configuration. All changes incoming through its iface is reflect/maintained in Nexus current
+ * state with persisted user configuration. All changes incoming through its iface is reflect/maintained in Nexus
+ * current
  * state and Nexus user config.
  *
  * @author cstamas
@@ -133,8 +133,8 @@ public class DefaultNexusConfiguration
   private final VetoFormatter vetoFormatter;
 
   private final List<ConfigurationModifier> configurationModifiers;
-  
-  private final ClassLoader uberClassLoader; 
+
+  private final ClassLoader uberClassLoader;
 
   private final File installDirectory;
 
@@ -211,7 +211,7 @@ public class DefaultNexusConfiguration
     this.vetoFormatter = checkNotNull(vetoFormatter);
     this.configurationModifiers = checkNotNull(configurationModifiers);
     this.uberClassLoader = checkNotNull(uberClassLoader);
-    
+
     // init
     if (installDirectory != null) {
       this.installDirectory = canonicalize(installDirectory);
@@ -309,14 +309,15 @@ public class DefaultNexusConfiguration
       // this one has no parent
       globalRemoteStorageContext = new DefaultRemoteStorageContext(null);
 
-      final GlobalRemoteConnectionSettings globalRemoteConnectionSettings = globalRemoteConnectionSettingsProvider.get();
+      final GlobalRemoteConnectionSettings globalRemoteConnectionSettings = globalRemoteConnectionSettingsProvider
+          .get();
       // TODO: hack
-      ((DefaultGlobalRemoteConnectionSettings)globalRemoteConnectionSettings).configure(this);
+      ((DefaultGlobalRemoteConnectionSettings) globalRemoteConnectionSettings).configure(this);
       globalRemoteStorageContext.setRemoteConnectionSettings(globalRemoteConnectionSettings);
 
       final GlobalRemoteProxySettings globalRemoteProxySettings = globalRemoteProxySettingsProvider.get();
       // TODO: hack
-      ((DefaultGlobalRemoteProxySettings)globalRemoteProxySettings).configure(this);
+      ((DefaultGlobalRemoteProxySettings) globalRemoteProxySettings).configure(this);
       globalRemoteStorageContext.setRemoteProxySettings(globalRemoteProxySettings);
 
       ConfigurationPrepareForLoadEvent loadEvent = new ConfigurationPrepareForLoadEvent(this);
@@ -731,7 +732,8 @@ public class DefaultNexusConfiguration
   {
     try {
       // core realm will search child/plugin realms too
-      final Class<Repository> klazz = (Class<Repository>) Class.forName(repositoryModel.getProviderRole(), true, uberClassLoader);
+      final Class<Repository> klazz = (Class<Repository>) Class
+          .forName(repositoryModel.getProviderRole(), true, uberClassLoader);
       return instantiateRepository(configuration, klazz, repositoryModel.getProviderHint(), repositoryModel);
     }
     catch (Exception e) {
@@ -740,7 +742,8 @@ public class DefaultNexusConfiguration
     }
   }
 
-  protected Repository instantiateRepository(final Configuration configuration, final Class<? extends Repository> klazz, final String name, final CRepository repositoryModel)
+  protected Repository instantiateRepository(final Configuration configuration, final Class<? extends Repository> klazz,
+                                             final String name, final CRepository repositoryModel)
       throws ConfigurationException
   {
     checkRepositoryMaxInstanceCountForCreation(klazz, name, repositoryModel);
@@ -844,7 +847,8 @@ public class DefaultNexusConfiguration
     }
   }
 
-  protected void checkRepositoryMaxInstanceCountForCreation(Class<? extends Repository> klazz, String name, CRepository repositoryModel)
+  protected void checkRepositoryMaxInstanceCountForCreation(Class<? extends Repository> klazz, String name,
+                                                            CRepository repositoryModel)
       throws ConfigurationException
   {
     RepositoryTypeDescriptor rtd =
@@ -1001,60 +1005,6 @@ public class DefaultNexusConfiguration
   }
 
   // ===
-
-  @Override
-  public Collection<CRemoteNexusInstance> listRemoteNexusInstances() {
-    List<CRemoteNexusInstance> result = null;
-
-    if (getConfigurationModel().getRemoteNexusInstances() != null) {
-      result = Collections.unmodifiableList(getConfigurationModel().getRemoteNexusInstances());
-    }
-
-    return result;
-  }
-
-  @Override
-  public CRemoteNexusInstance readRemoteNexusInstance(String alias)
-      throws IOException
-  {
-    List<CRemoteNexusInstance> knownInstances = getConfigurationModel().getRemoteNexusInstances();
-
-    for (Iterator<CRemoteNexusInstance> i = knownInstances.iterator(); i.hasNext(); ) {
-      CRemoteNexusInstance nexusInstance = i.next();
-
-      if (nexusInstance.getAlias().equals(alias)) {
-        return nexusInstance;
-      }
-    }
-
-    return null;
-  }
-
-  @Override
-  public void createRemoteNexusInstance(CRemoteNexusInstance settings)
-      throws IOException
-  {
-    getConfigurationModel().addRemoteNexusInstance(settings);
-
-    saveConfiguration();
-  }
-
-  @Override
-  public void deleteRemoteNexusInstance(String alias)
-      throws IOException
-  {
-    List<CRemoteNexusInstance> knownInstances = getConfigurationModel().getRemoteNexusInstances();
-
-    for (Iterator<CRemoteNexusInstance> i = knownInstances.iterator(); i.hasNext(); ) {
-      CRemoteNexusInstance nexusInstance = i.next();
-
-      if (nexusInstance.getAlias().equals(alias)) {
-        i.remove();
-      }
-    }
-
-    saveConfiguration();
-  }
 
   @Override
   public Map<String, String> getConfigurationFiles() {

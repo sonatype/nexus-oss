@@ -35,8 +35,6 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -349,19 +347,4 @@ public class DefaultAttributesHandler
 
   // ==
 
-  /**
-   * For UT access!
-   */
-  @VisibleForTesting
-  long getLastRequestedResolution() {
-    return lastRequestedResolution;
-  }
-
-  /**
-   * For UT access!
-   */
-  @VisibleForTesting
-  void setLastRequestedResolution(long lastRequestedResolution) {
-    this.lastRequestedResolution = lastRequestedResolution;
-  }
 }

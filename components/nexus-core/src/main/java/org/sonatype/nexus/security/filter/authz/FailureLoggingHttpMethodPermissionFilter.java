@@ -26,12 +26,10 @@ import org.sonatype.nexus.auth.ResourceInfo;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.security.SecuritySystem;
-import org.sonatype.sisu.goodies.common.Loggers;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authz.HttpMethodPermissionFilter;
-import org.slf4j.Logger;
 
 /**
  * A filter that maps the action from the HTTP Verb.
@@ -41,17 +39,12 @@ import org.slf4j.Logger;
 public class FailureLoggingHttpMethodPermissionFilter
     extends HttpMethodPermissionFilter
 {
-  private final Logger logger = Loggers.getLogger(getClass());
 
   @Inject
   private SecuritySystem securitySystem;
 
   @Inject
   private EventBus eventBus;
-
-  protected Logger getLogger() {
-    return logger;
-  }
 
   @Override
   protected boolean onAccessDenied(ServletRequest request, ServletResponse response)
@@ -83,7 +76,4 @@ public class FailureLoggingHttpMethodPermissionFilter
     eventBus.post(new NexusAuthorizationEvent(this, clientInfo, resInfo, false));
   }
 
-  protected Object getAttribute(String key) {
-    return getFilterConfig().getServletContext().getAttribute(key);
-  }
 }

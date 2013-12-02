@@ -13,12 +13,9 @@
 
 package org.sonatype.nexus.proxy.repository;
 
-import javax.inject.Inject;
-
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -29,7 +26,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
@@ -40,7 +36,6 @@ import org.sonatype.nexus.proxy.walker.WalkerException;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 /**
@@ -52,23 +47,12 @@ public abstract class AbstractShadowRepository
     extends AbstractRepository
     implements ShadowRepository
 {
-  private RepositoryRegistry repositoryRegistry;
 
   /**
    * The cached instance of master Repository, to not have it look up at every {@link #getMasterRepository()}
    * invocation from registry. This instance changes as master ID in configuration changes.
    */
   private volatile Repository masterRepository;
-  
-  @Inject
-  public void populateAbstractShadowRepository(RepositoryRegistry repositoryRegistry)
-  {
-    this.repositoryRegistry = checkNotNull(repositoryRegistry);
-  }
-
-  protected RepositoryRegistry getRepositoryRegistry() {
-    return repositoryRegistry;
-  }
 
   @Override
   protected AbstractShadowRepositoryConfiguration getExternalConfiguration(boolean forModification) {

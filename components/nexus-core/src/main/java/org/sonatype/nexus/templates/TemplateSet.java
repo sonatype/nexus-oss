@@ -94,10 +94,6 @@ public class TemplateSet
     return clazz;
   }
 
-  public TemplateSet getParent() {
-    return parent;
-  }
-
   public List<Template> getTemplatesList() {
     return new ArrayList<Template>(this);
   }

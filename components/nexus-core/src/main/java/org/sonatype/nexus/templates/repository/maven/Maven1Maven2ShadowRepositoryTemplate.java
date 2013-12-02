@@ -35,11 +35,6 @@ public class Maven1Maven2ShadowRepositoryTemplate
     super(provider, id, description, new Maven2ContentClass(), MavenShadowRepository.class, null);
   }
 
-  public M2LayoutedM1ShadowRepositoryConfiguration getExternalConfiguration(boolean forWrite) {
-    return (M2LayoutedM1ShadowRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
-        .getConfiguration(forWrite);
-  }
-
   @Override
   protected CRepositoryCoreConfiguration initCoreConfiguration() {
     CRepository repo = new DefaultCRepository();

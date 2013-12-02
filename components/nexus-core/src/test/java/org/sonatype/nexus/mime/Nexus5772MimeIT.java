@@ -37,9 +37,6 @@ import static org.mockito.Mockito.when;
 public class Nexus5772MimeIT
     extends TestSupport
 {
-  public static final String CLASSIC_MAGIC_FILE_PATH = "src/test/resources/mime/mime.magic";
-
-  public static final String OPENDESKTOP_MAGIC_FILE_PATH = "src/test/resources/mime/mime.cache";
 
   @After
   public void cleanUp()

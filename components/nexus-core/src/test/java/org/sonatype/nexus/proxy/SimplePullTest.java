@@ -525,7 +525,7 @@ public class SimplePullTest
     jettyTestsuiteEnvironmentBuilder.stopService();
 
     final Server server = Server.withPort(port);
-    server.serve("/*").withBehaviours(new DropConnection(server)).start();
+    server.serve("/*").withBehaviours(new DropConnection()).start();
     try {
       final Repository repository = getRepositoryRegistry().getRepository("repo1");
       final ResourceStoreRequest request =
@@ -555,11 +555,6 @@ public class SimplePullTest
   public static class DropConnection
       implements Behaviour
   {
-    private final Server server;
-
-    public DropConnection(final Server server) {
-      this.server = server;
-    }
 
     @Override
     public boolean execute(HttpServletRequest request, HttpServletResponse response, Map<Object, Object> ctx)

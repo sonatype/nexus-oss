@@ -15,12 +15,7 @@ package org.sonatype.nexus.configuration.application.validator;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.Writer;
 
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationRequest;
@@ -29,7 +24,6 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
-import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
 import org.sonatype.nexus.configuration.validator.DefaultApplicationConfigurationValidator;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -63,16 +57,6 @@ public class DefaultApplicationConfigurationValidatorTest
     this.underTest = new DefaultApplicationConfigurationValidator();
   }
 
-  protected Configuration getConfigurationFromStream(InputStream is)
-      throws Exception
-  {
-    NexusConfigurationXpp3Reader reader = new NexusConfigurationXpp3Reader();
-
-    Reader fr = new InputStreamReader(is);
-
-    return reader.read(fr);
-  }
-
   protected Configuration loadNexusConfig(File configFile)
       throws Exception
   {
@@ -82,16 +66,6 @@ public class DefaultApplicationConfigurationValidatorTest
       return reader.read(fr);
     }
 
-  }
-
-  protected void saveConfiguration(Configuration config, String pathToConfig)
-      throws IOException
-  {
-    NexusConfigurationXpp3Writer writer = new NexusConfigurationXpp3Writer();
-
-    try (Writer fw = new FileWriter(pathToConfig)) {
-      writer.write(fw, config);
-    }
   }
 
   @Test

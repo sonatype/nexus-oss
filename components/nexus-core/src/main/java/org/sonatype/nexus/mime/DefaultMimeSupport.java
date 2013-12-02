@@ -40,8 +40,6 @@ import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MediaTypeRegistry;
 import org.apache.tika.mime.MimeTypes;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Default implementation of {@link MimeSupport} component using MimeUtil2 library and the
  * {@link NexusMimeTypes}.
@@ -54,21 +52,11 @@ public class DefaultMimeSupport
     extends ComponentSupport
     implements MimeSupport
 {
-  /**
-   * Nexus Mime Types.
-   */
-  private final NexusMimeTypes nexusMimeTypes;
-
-  /**
-   * Aoache Tika configuraton. Will pick any service (uses Sun Service Loader Patter), so can be customized too..
-   */
-  private final TikaConfig tikaConfig;
 
   /**
    * "Low" level Tika detector, as {@link org.apache.tika.Tika} hides too much.
    */
   private final Detector detector;
-
 
   /**
    * A loading cache of extension to MIME type.
@@ -82,9 +70,7 @@ public class DefaultMimeSupport
 
   @VisibleForTesting
   public DefaultMimeSupport(final NexusMimeTypes nexusMimeTypes) {
-    this.nexusMimeTypes = checkNotNull(nexusMimeTypes);
-    this.tikaConfig = TikaConfig.getDefaultConfig();
-    this.detector = tikaConfig.getDetector();
+    this.detector = TikaConfig.getDefaultConfig().getDetector();
 
     // create the cache
     extensionToMimeTypeCache =

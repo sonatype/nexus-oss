@@ -14,7 +14,6 @@
 package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 
@@ -362,23 +361,6 @@ public class GroupMetadataMergeTest
     assertEquals(3, md.getVersioning().getSnapshotVersions().size());
     assertEquals("20110122213648", md.getVersioning().getSnapshotVersions().get(0).getUpdated());
 
-  }
-
-  protected Metadata parseMetadata(File file)
-      throws Exception
-  {
-    InputStream in = null;
-
-    try {
-      in = new FileInputStream(file);
-
-      return MetadataBuilder.read(in);
-    }
-    finally {
-      if (in != null) {
-        in.close();
-      }
-    }
   }
 
   protected Metadata parseMetadata(StorageFileItem item)

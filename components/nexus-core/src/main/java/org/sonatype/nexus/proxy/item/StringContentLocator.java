@@ -27,20 +27,12 @@ public class StringContentLocator
 {
   private static final String ENCODING = "UTF-8";
 
-  private final String content;
-
   public StringContentLocator(String content) {
     this(content, null);
   }
 
   public StringContentLocator(String content, String mimeType) {
     super(toByteArray(content), StringUtils.isBlank(mimeType) ? "text/plain" : mimeType);
-
-    this.content = content;
-  }
-
-  public String getString() {
-    return content;
   }
 
   public static byte[] toByteArray(String string) {

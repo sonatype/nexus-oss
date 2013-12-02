@@ -76,13 +76,6 @@ public class Page
   }
 
   /**
-   * The HTTP request for this page.
-   */
-  public HttpUriRequest getHttpUriRequest() {
-    return httpUriRequest;
-  }
-
-  /**
    * The HTTP response for this page (response body is consumed!). To check stuff like headers.
    */
   public HttpResponse getHttpResponse() {

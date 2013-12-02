@@ -17,8 +17,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -30,8 +28,6 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
@@ -423,107 +419,6 @@ public class ArtifactStoreHelper
   }
 
   // =======================================================================================
-
-  protected void deleteAllSubordinates(ArtifactStoreRequest gavRequest)
-      throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
-  {
-    // delete all "below", meaning: classifiers of the GAV
-    // watch for subdirs
-    // delete dir if empty
-    RepositoryItemUid parentCollUid =
-        repository.createUid(gavRequest.getRequestPath().substring(0,
-            gavRequest.getRequestPath().indexOf(RepositoryItemUid.PATH_SEPARATOR)));
-
-    try {
-      gavRequest.setRequestPath(parentCollUid.getPath());
-
-      // get the parent collection
-      StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem(false, gavRequest);
-
-      // list it
-      Collection<StorageItem> items = repository.list(false, parentColl);
-
-      boolean hadSubdirectoryOrOtherFiles = false;
-
-      // and delete all except subdirs
-      for (StorageItem item : items) {
-        if (!StorageCollectionItem.class.isAssignableFrom(item.getClass())) {
-          Gav gav = repository.getGavCalculator().pathToGav(item.getPath());
-
-          if (gav != null && gavRequest.getGroupId().equals(gav.getGroupId())
-              && gavRequest.getArtifactId().equals(gav.getArtifactId())
-              && gavRequest.getVersion().equals(gav.getVersion()) && gav.getClassifier() != null) {
-            gavRequest.pushRequestPath(item.getPath());
-            try {
-              repository.deleteItem(false, gavRequest);
-            }
-            finally {
-              gavRequest.popRequestPath();
-            }
-          }
-          else if (!item.getPath().endsWith("maven-metadata.xml")) {
-            hadSubdirectoryOrOtherFiles = true;
-          }
-        }
-        else {
-          hadSubdirectoryOrOtherFiles = true;
-        }
-      }
-
-      if (!hadSubdirectoryOrOtherFiles) {
-        repository.deleteItem(false, gavRequest);
-      }
-    }
-    catch (ItemNotFoundException e) {
-      // silent
-    }
-  }
-
-  protected void deleteWholeGav(ArtifactStoreRequest gavRequest)
-      throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
-  {
-    // delete all in this directory
-    // watch for subdirs
-    // delete dir if empty
-    RepositoryItemUid parentCollUid =
-        repository.createUid(gavRequest.getRequestPath().substring(0,
-            gavRequest.getRequestPath().lastIndexOf(RepositoryItemUid.PATH_SEPARATOR)));
-
-    try {
-      gavRequest.setRequestPath(parentCollUid.getPath());
-
-      // get the parent collection
-      StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem(false, gavRequest);
-
-      // list it
-      Collection<StorageItem> items = repository.list(false, parentColl);
-
-      boolean hadSubdirectory = false;
-
-      // and delete all except subdirs
-      for (StorageItem item : items) {
-        if (!StorageCollectionItem.class.isAssignableFrom(item.getClass())) {
-          gavRequest.pushRequestPath(item.getPath());
-          try {
-            repository.deleteItem(false, gavRequest);
-          }
-          finally {
-            gavRequest.popRequestPath();
-          }
-        }
-        else if (!item.getPath().endsWith("maven-metadata.xml")) {
-          hadSubdirectory = true;
-        }
-      }
-
-      if (!hadSubdirectory) {
-        repository.deleteItem(false, gavRequest);
-      }
-    }
-    catch (ItemNotFoundException e) {
-      // silent
-    }
-  }
 
   protected void checkRequest(ArtifactStoreRequest gavRequest) {
     if (gavRequest.getGroupId() == null || gavRequest.getArtifactId() == null || gavRequest.getVersion() == null) {

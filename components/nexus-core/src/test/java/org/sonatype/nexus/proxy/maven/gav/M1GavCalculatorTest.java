@@ -13,17 +13,12 @@
 
 package org.sonatype.nexus.proxy.maven.gav;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
 import junit.framework.TestCase;
 
 public class M1GavCalculatorTest
     extends TestCase
 {
   private M1GavCalculator gavCalculator;
-
-  private SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmmss");
 
   @Override
   public void setUp()
@@ -32,17 +27,6 @@ public class M1GavCalculatorTest
     super.setUp();
 
     gavCalculator = new M1GavCalculator();
-  }
-
-  protected Long parseTimestamp(String timeStamp)
-      throws ParseException
-  {
-    if (timeStamp == null) {
-      return null;
-    }
-    else {
-      return Long.valueOf(formatter.parse(timeStamp).getTime());
-    }
   }
 
   public void testGav()

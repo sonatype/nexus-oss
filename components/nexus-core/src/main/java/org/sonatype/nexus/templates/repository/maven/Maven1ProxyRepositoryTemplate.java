@@ -37,11 +37,6 @@ public class Maven1ProxyRepositoryTemplate
     super(provider, id, description, new Maven1ContentClass(), MavenProxyRepository.class, repositoryPolicy);
   }
 
-  public M1RepositoryConfiguration getExternalConfiguration(boolean forWrite) {
-    return (M1RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
-        .getConfiguration(forWrite);
-  }
-
   @Override
   protected CRepositoryCoreConfiguration initCoreConfiguration() {
     CRepository repo = new DefaultCRepository();

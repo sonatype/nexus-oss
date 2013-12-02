@@ -17,8 +17,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.nexus.proxy.repository.Repository;
-
 /**
  * A simple helper Set implementation.
  *
@@ -63,14 +61,4 @@ public class TargetSet
     }
   }
 
-  boolean isPathContained(Repository repository, String path) {
-    for (TargetMatch targetMatch : matches) {
-      if (targetMatch.getRepository().getId().equals(repository.getId())
-          && targetMatch.getTarget().isPathContained(repository.getRepositoryContentClass(), path)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
 }

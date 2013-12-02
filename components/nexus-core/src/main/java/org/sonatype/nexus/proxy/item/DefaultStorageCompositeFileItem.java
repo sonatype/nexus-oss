@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 import com.google.common.collect.Lists;
 
@@ -32,17 +31,6 @@ public class DefaultStorageCompositeFileItem
                                          boolean canWrite, ContentLocator contentLocator, List<StorageItem> sources)
   {
     super(repository, request, canRead, canWrite, contentLocator);
-    final List<StorageItem> src = Lists.newArrayList();
-    if (sources != null) {
-      src.addAll(sources);
-    }
-    this.sources = Collections.unmodifiableList(src);
-  }
-
-  public DefaultStorageCompositeFileItem(RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
-                                         boolean canWrite, ContentLocator contentLocator, List<StorageItem> sources)
-  {
-    super(router, request, canRead, canWrite, contentLocator);
     final List<StorageItem> src = Lists.newArrayList();
     if (sources != null) {
       src.addAll(sources);

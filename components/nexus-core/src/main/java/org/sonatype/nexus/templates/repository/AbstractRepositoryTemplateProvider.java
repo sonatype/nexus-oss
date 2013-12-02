@@ -45,7 +45,7 @@ public abstract class AbstractRepositoryTemplateProvider
   private NexusConfiguration nexusConfiguration;
 
   private RemoteProviderHintFactory remoteProviderHintFactory;
-  
+
   @Inject
   public void setNexusConfiguration(final NexusConfiguration nexusConfiguration) {
     this.nexusConfiguration = checkNotNull(nexusConfiguration);
@@ -69,10 +69,6 @@ public abstract class AbstractRepositoryTemplateProvider
 
   public RemoteProviderHintFactory getRemoteProviderHintFactory() {
     return remoteProviderHintFactory;
-  }
-
-  public Class<RepositoryTemplate> getTemplateClass() {
-    return RepositoryTemplate.class;
   }
 
   public TemplateSet getTemplates(Object filter) {

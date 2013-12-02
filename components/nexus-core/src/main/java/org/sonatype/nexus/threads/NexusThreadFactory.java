@@ -56,15 +56,4 @@ public class NexusThreadFactory
     return result;
   }
 
-  public ThreadGroup getSchedulerThreadGroup() {
-    return this.schedulerThreadGroup;
-  }
-
-  public int getThreadPriority() {
-    return threadPriority;
-  }
-
-  public void setThreadPriority(int threadPriority) {
-    this.threadPriority = threadPriority;
-  }
 }
