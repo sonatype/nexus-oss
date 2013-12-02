@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.gossip.Level;
-import org.sonatype.guice.plexus.annotations.ComponentImpl;
 import org.sonatype.nexus.plugins.DefaultNexusPluginManager;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
