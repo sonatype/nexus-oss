@@ -21,13 +21,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
-import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.nexus.rest.internal.DevModeResourceFinder;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import org.sonatype.plexus.rest.RetargetableRestlet;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
@@ -74,8 +70,6 @@ public class NexusApplication
 
   private final ManagedPlexusResource statusPlexusResource;
 
-  private final List<NexusResourceBundle> nexusResourceBundles;
-
   private final List<NexusApplicationCustomizer> customizers;
 
   private final StatusService statusService;
@@ -89,7 +83,6 @@ public class NexusApplication
                           final @Named("licenseTemplate") @Nullable ManagedPlexusResource licenseTemplateResource,
                           final @Named("enterLicenseTemplate") @Nullable ManagedPlexusResource enterLicenseTemplateResource,
                           final @Named("StatusPlexusResource") ManagedPlexusResource statusPlexusResource,
-                          final List<NexusResourceBundle> nexusResourceBundles,
                           final List<NexusApplicationCustomizer> customizers,
                           final StatusService statusService,
                           final MimeSupport mimeSupport)
@@ -100,7 +93,6 @@ public class NexusApplication
     this.licenseTemplateResource = licenseTemplateResource;
     this.enterLicenseTemplateResource = enterLicenseTemplateResource;
     this.statusPlexusResource = statusPlexusResource;
-    this.nexusResourceBundles = nexusResourceBundles;
     this.customizers = customizers;
     this.statusService = statusService;
     this.mimeSupport = mimeSupport;
@@ -110,7 +102,6 @@ public class NexusApplication
   @VisibleForTesting
   public NexusApplication() {
     this(
-        null,
         null,
         null,
         null,
@@ -220,23 +211,7 @@ public class NexusApplication
     // ================
     // STATIC RESOURCES
 
-    if (nexusResourceBundles.size() > 0) {
-      for (NexusResourceBundle bundle : nexusResourceBundles) {
-        List<StaticResource> resources = bundle.getContributedResouces();
-
-        if (resources != null) {
-          for (StaticResource resource : resources) {
-            attach(root, false, resource.getPath(), new StaticResourceFinder(getContext(), resource));
-          }
-        }
-      }
-    }
-
-    // Attach to "/static" in case that dev mode is on
-    // The finder will only be called if the path under static is not found (as those are more specific)
-    if (DevModeResources.hasResourceLocations()) {
-      attach(root, false, "/static", new DevModeResourceFinder(mimeSupport, getContext(), "/static"));
-    }
+    // NEXUS-6045: Are gone from here
   }
 
   private final AntPathMatcher shiroAntPathMatcher = new AntPathMatcher();
