@@ -18,13 +18,13 @@ import java.security.Security;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.eclipse.sisu.EagerSingleton;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

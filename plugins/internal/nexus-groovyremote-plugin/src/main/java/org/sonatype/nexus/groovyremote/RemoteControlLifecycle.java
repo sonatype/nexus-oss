@@ -16,7 +16,6 @@ package org.sonatype.nexus.groovyremote;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -24,6 +23,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import org.eclipse.sisu.EagerSingleton;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

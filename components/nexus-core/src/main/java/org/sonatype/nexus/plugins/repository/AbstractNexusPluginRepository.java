@@ -21,7 +21,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.sonatype.inject.Parameters;
 import org.sonatype.plugins.model.PluginMetadata;
 import org.sonatype.plugins.model.io.xpp3.PluginModelXpp3Reader;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -29,6 +28,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.eclipse.sisu.Parameters;
 
 /**
  * Abstract {@link NexusPluginRepository} that can parse plugin metadata.

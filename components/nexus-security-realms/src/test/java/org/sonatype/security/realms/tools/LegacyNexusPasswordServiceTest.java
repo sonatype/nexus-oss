@@ -13,9 +13,8 @@
 
 package org.sonatype.security.realms.tools;
 
-import org.sonatype.guice.bean.containers.InjectedTestCase;
-
 import org.apache.shiro.authc.credential.PasswordService;
+import org.eclipse.sisu.launch.InjectedTestCase;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

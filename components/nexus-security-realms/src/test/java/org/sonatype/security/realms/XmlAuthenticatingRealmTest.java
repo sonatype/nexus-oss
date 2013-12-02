@@ -19,7 +19,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
@@ -32,6 +31,7 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.realm.Realm;
+import org.eclipse.sisu.launch.InjectedTestCase;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;

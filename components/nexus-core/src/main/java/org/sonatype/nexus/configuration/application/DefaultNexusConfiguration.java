@@ -35,7 +35,6 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
-import org.sonatype.inject.Parameters;
 import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
@@ -89,6 +88,7 @@ import com.google.common.collect.Collections2;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.eclipse.sisu.Parameters;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

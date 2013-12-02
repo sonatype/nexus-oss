@@ -22,7 +22,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.inject.Description;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -51,6 +50,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.eclipse.sisu.Description;
 import org.osgi.service.obr.Resource;
 
 import static com.google.common.base.Preconditions.checkNotNull;

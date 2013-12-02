@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.inject.Description;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
@@ -36,6 +35,7 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.sisu.Description;
 
 /**
  * A user manger that returns all users that have roles defined in the security.xml file. This allows you to easily

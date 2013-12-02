@@ -25,8 +25,6 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.sonatype.guice.bean.containers.InjectedTestCase;
-import org.sonatype.inject.BeanScanning;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.guice.SecurityModule;
@@ -38,6 +36,8 @@ import net.sf.ehcache.CacheManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.shiro.realm.Realm;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.eclipse.sisu.launch.InjectedTestCase;
+import org.eclipse.sisu.space.BeanScanning;
 
 public abstract class AbstractSecurityTestCase
     extends InjectedTestCase

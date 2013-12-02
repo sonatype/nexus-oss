@@ -13,12 +13,12 @@
 
 package org.sonatype.security.web;
 
-import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.security.SecuritySystem;
 
 import junit.framework.Assert;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.eclipse.sisu.launch.InjectedTestCase;
 
 public class DifferentThreadAuthenticationTestSkipped
     extends AbstractWebSecurityTest

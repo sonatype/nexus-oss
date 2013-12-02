@@ -20,11 +20,12 @@ import java.util.ArrayList;
 
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
-import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
+
+import org.eclipse.sisu.launch.InjectedTestCase;
 
 public class DefaultConfigurationValidatorTest
     extends InjectedTestCase

@@ -34,11 +34,6 @@ import org.sonatype.aether.util.version.GenericVersionScheme;
 import org.sonatype.aether.version.InvalidVersionSpecificationException;
 import org.sonatype.aether.version.Version;
 import org.sonatype.aether.version.VersionScheme;
-import org.sonatype.guice.bean.reflect.ClassSpace;
-import org.sonatype.guice.bean.reflect.URLClassSpace;
-import org.sonatype.guice.plexus.binders.PlexusXmlBeanModule;
-import org.sonatype.guice.plexus.config.PlexusBeanModule;
-import org.sonatype.inject.Parameters;
 import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.guice.AbstractInterceptorModule;
 import org.sonatype.nexus.guice.NexusAnnotatedBeanModule;
@@ -68,6 +63,11 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
+import org.eclipse.sisu.Parameters;
+import org.eclipse.sisu.plexus.PlexusBeanModule;
+import org.eclipse.sisu.plexus.PlexusXmlBeanModule;
+import org.eclipse.sisu.space.ClassSpace;
+import org.eclipse.sisu.space.URLClassSpace;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

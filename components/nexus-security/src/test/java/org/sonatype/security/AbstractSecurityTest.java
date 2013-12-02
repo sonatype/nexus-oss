@@ -16,14 +16,14 @@ package org.sonatype.security;
 import java.io.File;
 import java.util.Properties;
 
-import org.sonatype.guice.bean.containers.InjectedTestCase;
-import org.sonatype.inject.BeanScanning;
 import org.sonatype.security.guice.SecurityModule;
 
 import com.google.inject.Binder;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.shiro.util.ThreadContext;
+import org.eclipse.sisu.launch.InjectedTestCase;
+import org.eclipse.sisu.space.BeanScanning;
 
 public abstract class AbstractSecurityTest
     extends InjectedTestCase

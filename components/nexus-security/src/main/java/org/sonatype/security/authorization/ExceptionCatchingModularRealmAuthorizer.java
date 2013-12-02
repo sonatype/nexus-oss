@@ -16,9 +16,8 @@ package org.sonatype.security.authorization;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
-
-import org.sonatype.inject.Nullable;
 
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.Authorizer;

@@ -23,7 +23,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.inject.Description;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CRole;
@@ -45,6 +44,7 @@ import org.sonatype.security.usermanagement.UserStatus;
 
 import com.google.common.base.Throwables;
 import org.apache.shiro.authc.credential.PasswordService;
+import org.eclipse.sisu.Description;
 
 /**
  * A UserManager backed by the security.xml file. This UserManger supports all User CRUD operations.

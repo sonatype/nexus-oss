@@ -13,10 +13,10 @@
 
 package org.sonatype.security.locators.users;
 
-import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.security.authorization.Role;
 
 import junit.framework.Assert;
+import org.eclipse.sisu.launch.InjectedTestCase;
 
 public class RoleTest
     extends InjectedTestCase

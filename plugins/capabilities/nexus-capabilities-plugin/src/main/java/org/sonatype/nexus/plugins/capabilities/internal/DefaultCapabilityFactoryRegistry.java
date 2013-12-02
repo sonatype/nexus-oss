@@ -20,8 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.guice.bean.locators.BeanLocator;
-import org.sonatype.inject.BeanEntry;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
@@ -33,6 +31,8 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.collect.Maps;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Key;
+import org.eclipse.sisu.BeanEntry;
+import org.eclipse.sisu.inject.BeanLocator;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -104,7 +104,7 @@ class DefaultCapabilityFactoryRegistry
       }
       if (factory == null) {
         try {
-          final Iterable<BeanEntry<Annotation, Capability>> entries = beanLocator.locate(
+          final Iterable<? extends BeanEntry<?, Capability>> entries = beanLocator.locate(
               Key.get(Capability.class, named(type.toString()))
           );
           if (entries != null && entries.iterator().hasNext()) {

@@ -19,12 +19,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.inject.Parameters;
 import org.sonatype.nexus.testsuite.support.Filter;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
 
 import com.google.common.collect.Maps;
 import org.apache.maven.model.Model;
+import org.eclipse.sisu.Parameters;
 
 /**
  * Replaces placeholders with values out of test project pom: <br/>

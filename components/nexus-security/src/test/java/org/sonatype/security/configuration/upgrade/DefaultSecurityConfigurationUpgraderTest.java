@@ -20,12 +20,12 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Properties;
 
-import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.eclipse.sisu.launch.InjectedTestCase;
 import org.junit.Before;
 import org.junit.Test;
 
