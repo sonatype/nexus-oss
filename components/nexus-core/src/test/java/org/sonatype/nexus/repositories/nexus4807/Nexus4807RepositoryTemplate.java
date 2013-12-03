@@ -31,11 +31,6 @@ public class Nexus4807RepositoryTemplate
     super(provider, id, description, new Nexus4807ContentClass(), Nexus4807Repository.class);
   }
 
-  public AbstractRepositoryConfiguration getExternalConfiguration(boolean forWrite) {
-    return (AbstractRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
-        .getConfiguration(forWrite);
-  }
-
   @Override
   protected CRepositoryCoreConfiguration initCoreConfiguration() {
     CRepository repo = new DefaultCRepository();

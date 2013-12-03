@@ -55,7 +55,7 @@ public interface Content
 
   /**
    * Downloads a range of content from given location.
-   * 
+   *
    * @since 2.7.0
    */
   void downloadRange(Location location, File target, Range<Long> range)
@@ -63,7 +63,7 @@ public interface Content
 
   /**
    * Downloads a range of content from given location.
-   * 
+   *
    * @since 2.7.0
    */
   void downloadRange(Location location, OutputStream target, Range<Long> range)

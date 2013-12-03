@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import org.sonatype.nexus.client.core.Condition;
 import org.sonatype.nexus.client.core.NexusStatus;
 import org.sonatype.nexus.client.internal.util.Check;
-import org.sonatype.nexus.client.internal.util.Template;
 
 /**
  * Edition conditions that contains {@link Condition}s to match remote Nexus edition.
@@ -82,8 +81,7 @@ public abstract class EditionConditions
 
     @Override
     public String explainNotSatisfied(final NexusStatus status) {
-      return Template.of("(edition \"%s\" matches \"%s\")", status.getEditionShort(),
-          editionPattern).toString();
+      return String.format("(edition \"%s\" matches \"%s\")", status.getEditionShort(), editionPattern);
     }
   }
 }

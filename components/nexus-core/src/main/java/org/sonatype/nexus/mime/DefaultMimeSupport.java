@@ -15,7 +15,6 @@ package org.sonatype.nexus.mime;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
@@ -33,7 +32,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
@@ -41,8 +39,6 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MediaTypeRegistry;
 import org.apache.tika.mime.MimeTypes;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Default implementation of {@link MimeSupport} component using MimeUtil2 library and the
@@ -56,21 +52,11 @@ public class DefaultMimeSupport
     extends ComponentSupport
     implements MimeSupport
 {
-  /**
-   * Nexus Mime Types.
-   */
-  private final NexusMimeTypes nexusMimeTypes;
-
-  /**
-   * Aoache Tika configuraton. Will pick any service (uses Sun Service Loader Patter), so can be customized too..
-   */
-  private final TikaConfig tikaConfig;
 
   /**
    * "Low" level Tika detector, as {@link org.apache.tika.Tika} hides too much.
    */
   private final Detector detector;
-
 
   /**
    * A loading cache of extension to MIME type.
@@ -84,9 +70,7 @@ public class DefaultMimeSupport
 
   @VisibleForTesting
   public DefaultMimeSupport(final NexusMimeTypes nexusMimeTypes) {
-    this.nexusMimeTypes = checkNotNull(nexusMimeTypes);
-    this.tikaConfig = TikaConfig.getDefaultConfig();
-    this.detector = tikaConfig.getDetector();
+    this.detector = TikaConfig.getDefaultConfig().getDetector();
 
     // create the cache
     extensionToMimeTypeCache =
@@ -151,18 +135,6 @@ public class DefaultMimeSupport
     catch (ExecutionException e) {
       throw Throwables.propagate(e);
     }
-  }
-
-  @Deprecated
-  @Override
-  public Set<String> guessMimeTypesFromPath(final String path) {
-    return Sets.newHashSet(guessMimeTypesListFromPath(path));
-  }
-
-  @Deprecated
-  @Override
-  public Set<String> detectMimeTypesFromContent(final ContentLocator content) throws IOException {
-    return Sets.newHashSet(detectMimeTypesListFromContent(content));
   }
 
   @Override

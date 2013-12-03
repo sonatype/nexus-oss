@@ -24,7 +24,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 /**
  * This class is a base abstract class for HTTP remote storage.
@@ -36,11 +35,10 @@ public abstract class AbstractHTTPRemoteRepositoryStorage
     implements RemoteRepositoryStorage
 {
 
-  protected AbstractHTTPRemoteRepositoryStorage(final UserAgentBuilder userAgentBuilder,
-                                                final ApplicationStatusSource applicationStatusSource,
+  protected AbstractHTTPRemoteRepositoryStorage(final ApplicationStatusSource applicationStatusSource,
                                                 final MimeSupport mimeSupport)
   {
-    super(userAgentBuilder, applicationStatusSource, mimeSupport);
+    super(applicationStatusSource, mimeSupport);
   }
 
   @Override
@@ -140,8 +138,9 @@ public abstract class AbstractHTTPRemoteRepositoryStorage
 
     if (isAmazonS3) {
       // very first request for the proxy repository (it goes remote for the 1st time)
-      log.info("The proxy repository {} is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of "
-                  + "your setup (baseUrl of proxy repository)!",  RepositoryStringUtils.getHumanizedNameString(repository));
+      log.info(
+          "The proxy repository {} is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of "
+              + "your setup (baseUrl of proxy repository)!", RepositoryStringUtils.getHumanizedNameString(repository));
     }
   }
 

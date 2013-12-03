@@ -22,10 +22,4 @@ public interface ConfigurationHelper
    */
   Configuration encryptDecryptPasswords(Configuration config, boolean encrypt);
 
-  /**
-   * Returns a copy of passed in configuration with removed/sanitized sensitive information. If {@code null} is
-   * passed
-   * in, the return value is {@code null} also.
-   */
-  Configuration maskPasswords(Configuration config);
 }

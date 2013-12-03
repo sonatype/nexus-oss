@@ -23,18 +23,6 @@ import org.junit.Test;
 public class NexusAetherTest
     extends AbstractMavenRepoContentTests
 {
-  protected NexusAether nexusAether;
-
-  @Override
-  protected void setUp()
-      throws Exception
-  {
-    super.setUp();
-
-    nexusAether = lookup(NexusAether.class);
-
-    // repositoryRegistry = lookup( RepositoryRegistry.class );
-  }
 
   @Test
   public void testDependency() {
@@ -47,4 +35,5 @@ public class NexusAetherTest
     Assert.assertEquals(dep.getArtifact().getVersion(), gav.getVersion());
     Assert.assertEquals("compile", dep.getScope());
   }
+
 }

@@ -121,11 +121,6 @@ public class XmlAuthenticatingRealm
     return null;
   }
 
-  public ConfigurationManager getConfigurationManager() {
-    return configuration;
-  }
-
-
   /*
    * Re-hash user password, and persist changes
    *

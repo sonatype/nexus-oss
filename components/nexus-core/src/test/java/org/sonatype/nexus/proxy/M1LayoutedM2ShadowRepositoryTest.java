@@ -43,7 +43,7 @@ public class M1LayoutedM2ShadowRepositoryTest
     return new M2TestsuiteEnvironmentBuilder(ss);
   }
 
-  protected void addShadowReposes()
+  private void addShadowReposes()
       throws ConfigurationException, IOException, ComponentLookupException
   {
     for (ProxyRepository master : getRepositoryRegistry().getRepositoriesWithFacet(ProxyRepository.class)) {

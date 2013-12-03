@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.repository.site.plugin;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -73,12 +70,6 @@ public class DefaultSiteRepository
     }
 
     return repositoryKind;
-  }
-
-  public void deploySiteBundle(String prefix, InputStream bundle)
-      throws IOException
-  {
-    throw new UnsupportedOperationException("Deploy of the bundle is not yet implemented!");
   }
 
   @Override

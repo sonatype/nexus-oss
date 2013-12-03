@@ -14,7 +14,7 @@
 package org.sonatype.scheduling;
 
 /**
- * Runtime exception thrown in cases when thread is interrupted. Semantical meaning is almost same as
+ * Runtime exception thrown in cases when thread is interrupted. Semantically meaning is almost same as
  * {@link InterruptedException} except this one is unchecked exception.
  *
  * @author cstamas

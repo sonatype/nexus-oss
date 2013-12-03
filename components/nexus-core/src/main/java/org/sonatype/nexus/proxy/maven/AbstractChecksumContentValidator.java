@@ -19,17 +19,20 @@ import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEvent;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 public abstract class AbstractChecksumContentValidator
     extends ComponentSupport
+    implements ItemContentValidator
 {
 
   public AbstractChecksumContentValidator() {
     super();
   }
 
+  @Override
   public boolean isRemoteItemContentValid(final ProxyRepository proxy, final ResourceStoreRequest req,
                                           final String baseUrl,
                                           final AbstractStorageItem item,

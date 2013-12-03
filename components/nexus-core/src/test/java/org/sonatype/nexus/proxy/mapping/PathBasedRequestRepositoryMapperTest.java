@@ -39,10 +39,12 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.litmus.testsupport.mock.MockitoRule;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.mockito.Mock;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -264,7 +266,9 @@ public class PathBasedRequestRepositoryMapperTest
    * but
    * it is left here for reference. (added 'dont' at the start)
    */
-  public void dontTestEmptyRules()
+  @Test
+  @Ignore
+  public void testEmptyRules()
       throws Exception
   {
     HashMap<String, String[]> inclusions = new HashMap<String, String[]>();

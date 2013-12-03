@@ -20,7 +20,6 @@ public class ArtifactPath
   private String path;
 
   public ArtifactPath(final String path, final String md5) {
-    super();
     this.path = path;
     this.md5 = md5;
   }
@@ -33,11 +32,4 @@ public class ArtifactPath
     return path;
   }
 
-  public void setMd5(final String md5) {
-    this.md5 = md5;
-  }
-
-  public void setPath(final String path) {
-    this.path = path;
-  }
 }

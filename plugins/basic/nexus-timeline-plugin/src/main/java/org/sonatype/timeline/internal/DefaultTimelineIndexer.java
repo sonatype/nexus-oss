@@ -158,10 +158,6 @@ public class DefaultTimelineIndexer
     }
   }
 
-  protected int getGeneration() {
-    return generation;
-  }
-
   protected void add(final TimelineRecord record)
       throws IOException
   {

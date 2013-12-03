@@ -16,7 +16,6 @@ package org.sonatype.nexus.maven.tasks;
 import java.io.File;
 
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
@@ -31,8 +30,6 @@ public class RebuildMavenMetadataTaskTest
     extends AbstractMavenRepoContentTests
 {
   protected NexusScheduler nexusScheduler;
-
-  protected ApplicationConfiguration applicationConfiguration;
 
   protected void setUp()
       throws Exception

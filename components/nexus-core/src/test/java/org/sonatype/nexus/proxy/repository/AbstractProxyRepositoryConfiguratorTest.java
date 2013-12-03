@@ -23,7 +23,6 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.plugins.RepositoryCustomizer;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -34,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -81,10 +81,10 @@ public class AbstractProxyRepositoryConfiguratorTest
   public void setup() {
     underTest = new AbstractProxyRepositoryConfigurator() {};
     underTest.populateAbstractRepositoryConfigurator(Mockito.mock(RepositoryRegistry.class),
-        Mockito.mock(RepositoryTypeRegistry.class), Collections.<String, LocalRepositoryStorage> emptyMap(),
-        Collections.<String, RepositoryCustomizer> emptyMap());
+        Collections.<String, LocalRepositoryStorage>emptyMap(),
+        Collections.<String, RepositoryCustomizer>emptyMap());
     underTest.populateAbstractProxyRepositoryConfigurator(authInfoConverter, connSettings, providerHints,
-        Collections.<String, RemoteRepositoryStorage> emptyMap());
+        Collections.<String, RemoteRepositoryStorage>emptyMap());
 
     when(providerHints.getDefaultHttpRoleHint()).thenReturn("defaultHint");
     when(coreConfiguration.getConfiguration(true)).thenReturn(repoConfiguration);

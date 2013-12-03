@@ -154,16 +154,6 @@ public class DefaultNexusTimeline
   }
 
   @Override
-  public int purgeOlderThan(long timestamp, Set<String> types, Set<String> subTypes, Predicate<Entry> filter) {
-    if (filter != null) {
-      return timeline.purge(timestamp, types, subTypes, new PredicateTimelineFilter(filter));
-    }
-    else {
-      return timeline.purge(timestamp, types, subTypes, null);
-    }
-  }
-
-  @Override
   public void purgeOlderThan(int days) {
     timeline.purgeOlderThan(days);
   }

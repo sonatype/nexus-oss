@@ -24,7 +24,6 @@ public class ArtifactoryRemoteRepositoryParser
     extends
     HtmlRemoteRepositoryParser
 {
-  private final Logger logger = LoggerFactory.getLogger(ArtifactoryRemoteRepositoryParser.class);
 
   /**
    * Links to sub-repos contain the pattern assigned to artifactoryLinkPattern

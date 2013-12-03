@@ -28,10 +28,6 @@ public class DummyWaitingNexusRepositoriesTask
     return sleepTime;
   }
 
-  public void setSleepTime(long sleepTime) {
-    this.sleepTime = sleepTime;
-  }
-
   public Object doRun()
       throws Exception
   {

@@ -23,18 +23,10 @@ public class TestNexusTask
     implements NexusTask<Object>
 {
 
-  private int runCount = 0;
-
-  public int getRunCount() {
-    return runCount;
-  }
-
   @Override
   public Object call()
       throws Exception
   {
-    runCount++;
-
     return null;
   }
 

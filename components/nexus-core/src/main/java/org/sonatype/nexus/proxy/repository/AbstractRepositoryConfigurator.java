@@ -32,7 +32,6 @@ import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.plugins.RepositoryCustomizer;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 
@@ -45,26 +44,22 @@ public abstract class AbstractRepositoryConfigurator
 {
   private RepositoryRegistry repositoryRegistry;
 
-  private RepositoryTypeRegistry repositoryTypeRegistry;
-  
   private Map<String, LocalRepositoryStorage> localRepositoryStorages;
 
   private Map<String, RepositoryCustomizer> pluginRepositoryConfigurators;
 
   @Inject
   public void populateAbstractRepositoryConfigurator(final RepositoryRegistry repositoryRegistry,
-                                        final RepositoryTypeRegistry repositoryTypeRegistry,
-                                        final Map<String, LocalRepositoryStorage> localRepositoryStorages,
-                                        final Map<String, RepositoryCustomizer> pluginRepositoryConfigurators)
+                                                     final Map<String, LocalRepositoryStorage> localRepositoryStorages,
+                                                     final Map<String, RepositoryCustomizer> pluginRepositoryConfigurators)
   {
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
-    this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
     this.localRepositoryStorages = checkNotNull(localRepositoryStorages);
     this.pluginRepositoryConfigurators = checkNotNull(pluginRepositoryConfigurators);
   }
 
   @Override
-  public final void applyConfiguration(final Repository target, 
+  public final void applyConfiguration(final Repository target,
                                        final ApplicationConfiguration configuration,
                                        final CRepositoryCoreConfiguration config)
       throws ConfigurationException
@@ -81,7 +76,9 @@ public abstract class AbstractRepositoryConfigurator
     }
   }
 
-  public final void prepareForSave(Repository target, ApplicationConfiguration configuration, CRepositoryCoreConfiguration config) {
+  public final void prepareForSave(Repository target, ApplicationConfiguration configuration,
+                                   CRepositoryCoreConfiguration config)
+  {
     // in 1st round, i intentionally choosed to make our lives bitter, and handle plexus config manually
     // later we will see about it
     doPrepareForSave(target, configuration, config);
@@ -169,10 +166,6 @@ public abstract class AbstractRepositoryConfigurator
 
   protected RepositoryRegistry getRepositoryRegistry() {
     return repositoryRegistry;
-  }
-
-  protected RepositoryTypeRegistry getRepositoryTypeRegistry() {
-    return repositoryTypeRegistry;
   }
 
   protected LocalRepositoryStorage getLocalRepositoryStorage(String repoId, String provider)

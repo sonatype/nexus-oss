@@ -14,7 +14,6 @@
 package org.sonatype.security.realms;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -32,7 +31,6 @@ import org.sonatype.security.realms.tools.DefaultConfigurationManager;
 import org.sonatype.security.usermanagement.UserStatus;
 
 import junit.framework.Assert;
-import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.realm.Realm;
@@ -189,20 +187,4 @@ public class XmlAuthorizingRealmTest
     configurationManager.save();
   }
 
-  public static void assertImplied(Permission testPermission, Collection<Permission> assignedPermissions) {
-    for (Permission assignedPermission : assignedPermissions) {
-      if (assignedPermission.implies(testPermission)) {
-        return;
-      }
-    }
-    Assert.fail("Expected " + testPermission + " to be implied by " + assignedPermissions);
-  }
-
-  public static void assertNotImplied(Permission testPermission, Collection<Permission> assignedPermissions) {
-    for (Permission assignedPermission : assignedPermissions) {
-      if (assignedPermission.implies(testPermission)) {
-        Assert.fail("Expected " + testPermission + " not to be implied by " + assignedPermission);
-      }
-    }
-  }
 }

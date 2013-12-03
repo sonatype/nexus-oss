@@ -53,10 +53,6 @@ public class Slf4jLogChute
     this.redirectVelocityInfoToDebug = redirectVelocityInfoToDebug;
   }
 
-  public Logger getLogger() {
-    return logger;
-  }
-
   public void init(final RuntimeServices srv)
       throws Exception
   {

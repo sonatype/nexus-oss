@@ -17,19 +17,13 @@ public class ExceptionerNexusTask
     extends DummyWaitingNexusTask
 {
 
-  private String errorMessage = "Error";
-
-  public final void setErrorMessage(String errorMessage) {
-    this.errorMessage = errorMessage;
-  }
-
   @Override
   public Object call()
       throws Exception
   {
     super.call();
 
-    throw new RuntimeException(errorMessage);
+    throw new RuntimeException("Error");
   }
 
   @Override

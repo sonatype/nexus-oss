@@ -74,35 +74,6 @@ public class TimelineTest
   }
 
   @Test
-  public void testPurge()
-      throws Exception
-  {
-    timeline.start(new TimelineConfiguration(persistDirectory, indexDirectory));
-
-    String type = "type";
-    String subype = "subtype";
-    Map<String, String> data = new HashMap<String, String>();
-    data.put("k1", "v1");
-
-    timeline.add(createTimelineRecord(1000000L, type, subype, data));
-    timeline.add(createTimelineRecord(2000000L, type, subype, data));
-    timeline.add(createTimelineRecord(3000000L, type, subype, data));
-    timeline.add(createTimelineRecord(4000000L, type, subype, data));
-
-    AsList cb1 = new AsList();
-    timeline.retrieve(0, 10, null, null, null, cb1);
-    assertEquals(4, cb1.getRecords().size());
-    assertEquals(3, timeline.purge(3500000L, null, null, null));
-    AsList cb2 = new AsList();
-    timeline.retrieve(0, 10, null, null, null, cb2);
-    assertEquals(1, cb2.getRecords().size());
-    assertEquals(1, timeline.purge(System.currentTimeMillis(), null, null, null));
-    AsList cb3 = new AsList();
-    timeline.retrieve(0, 10, null, null, null, cb3);
-    assertEquals(0, cb3.getRecords().size());
-  }
-
-  @Test
   public void testRepairIndexCouldNotRead()
       throws Exception
   {
@@ -223,7 +194,7 @@ public class TimelineTest
         Integer.MAX_VALUE));
 
     // here, the "good" index really contains 6 records only
-    assertEquals(6, timeline.purge(System.currentTimeMillis(), null, null, null));
+    assertEquals(6, timeline.purgeOlderThan(0));
 
     // pretend that when timeline is running, the index is manually changed
     timeline.stop();
@@ -233,6 +204,6 @@ public class TimelineTest
     timeline.start(new TimelineConfiguration(persistDirectory, indexDirectory,
         TimelineConfiguration.DEFAULT_ROLLING_INTERVAL_MILLIS,
         Integer.MAX_VALUE));
-    assertEquals(100, timeline.purge(System.currentTimeMillis(), null, null, null));
+    assertEquals(47, timeline.purgeOlderThan(0));
   }
 }

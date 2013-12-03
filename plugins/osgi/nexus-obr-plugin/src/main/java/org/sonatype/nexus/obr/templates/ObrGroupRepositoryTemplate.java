@@ -35,11 +35,6 @@ public class ObrGroupRepositoryTemplate
     super(provider, id, description, new ObrContentClass(), ObrGroupRepository.class);
   }
 
-  public ObrGroupRepositoryConfiguration getExternalConfiguration(final boolean forWrite) {
-    return (ObrGroupRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
-        .getConfiguration(forWrite);
-  }
-
   @Override
   protected CRepositoryCoreConfiguration initCoreConfiguration() {
     final CRepository repo = new DefaultCRepository();

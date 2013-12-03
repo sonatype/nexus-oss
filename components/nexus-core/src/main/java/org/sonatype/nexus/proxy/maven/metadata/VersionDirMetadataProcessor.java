@@ -37,8 +37,6 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Process maven metadata in snapshot version directory
@@ -48,8 +46,6 @@ import org.slf4j.LoggerFactory;
 public class VersionDirMetadataProcessor
     extends AbstractMetadataProcessor
 {
-
-  private static final Logger LOG = LoggerFactory.getLogger(VersionDirMetadataProcessor.class);
 
   public VersionDirMetadataProcessor(AbstractMetadataHelper metadataHelper) {
     super(metadataHelper);

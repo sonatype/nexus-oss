@@ -40,7 +40,7 @@ public class M2LayoutedM1ShadowRepositoryTest
     return new M1TestsuiteEnvironmentBuilder(ss);
   }
 
-  protected void addShadowReposes()
+  private void addShadowReposes()
       throws ConfigurationException, IOException, ComponentLookupException
   {
     String masterId = "repo1-m1";

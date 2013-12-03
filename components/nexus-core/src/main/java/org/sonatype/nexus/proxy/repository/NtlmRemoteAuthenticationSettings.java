@@ -20,10 +20,6 @@ public class NtlmRemoteAuthenticationSettings
 
   private final String ntlmHost;
 
-  public NtlmRemoteAuthenticationSettings(String username, String password, String ntlmDomain) {
-    this(username, password, ntlmDomain, null);
-  }
-
   public NtlmRemoteAuthenticationSettings(String username, String password, String ntlmDomain, String ntlmHost) {
     super(username, password);
 

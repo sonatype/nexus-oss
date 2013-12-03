@@ -24,7 +24,6 @@ import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -37,8 +36,11 @@ import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 /**
  * AttributeStorage implementation driven by XStream.
@@ -51,8 +53,6 @@ public class DefaultAttributeStorageIT
 
   protected AttributeStorage attributeStorage;
 
-  protected RepositoryItemUidFactory repositoryItemUidFactory;
-
   protected M2Repository repository;
 
   protected File localStorageDirectory;
@@ -64,8 +64,6 @@ public class DefaultAttributeStorageIT
     super.setUp();
 
     attributeStorage = lookup(AttributeStorage.class, "ls");
-
-    repositoryItemUidFactory = lookup(RepositoryItemUidFactory.class);
 
     repository = (M2Repository) lookup(Repository.class, "maven2");
 

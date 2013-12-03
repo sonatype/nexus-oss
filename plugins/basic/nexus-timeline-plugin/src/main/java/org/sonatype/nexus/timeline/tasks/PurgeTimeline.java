@@ -44,10 +44,6 @@ public class PurgeTimeline
     return Integer.parseInt(getParameters().get(PurgeTimelineTaskDescriptor.OLDER_THAN_FIELD_ID));
   }
 
-  public void setPurgeOlderThan(int purgeOlderThan) {
-    getParameters().put(PurgeTimelineTaskDescriptor.OLDER_THAN_FIELD_ID, Integer.toString(purgeOlderThan));
-  }
-
   @Override
   protected Object doRun()
       throws Exception

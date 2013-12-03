@@ -35,11 +35,6 @@ public class ObrShadowrepositoryTemplate
     super(provider, id, description, new ObrContentClass(), ObrShadowRepository.class);
   }
 
-  public ObrShadowRepositoryConfiguration getExternalConfiguration(final boolean forWrite) {
-    return (ObrShadowRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
-        .getConfiguration(forWrite);
-  }
-
   @Override
   protected CRepositoryCoreConfiguration initCoreConfiguration() {
     final CRepository repo = new DefaultCRepository();

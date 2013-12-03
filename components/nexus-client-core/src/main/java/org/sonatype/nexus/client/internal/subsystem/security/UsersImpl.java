@@ -86,7 +86,7 @@ public class UsersImpl
 
   @Path("/service/local/users")
   public static interface UsersClient
-    extends Restlet1xClient
+      extends Restlet1xClient
   {
 
     @GET

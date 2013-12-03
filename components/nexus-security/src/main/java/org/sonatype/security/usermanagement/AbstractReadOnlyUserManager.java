@@ -13,8 +13,6 @@
 
 package org.sonatype.security.usermanagement;
 
-import java.util.Set;
-
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 
 /**
@@ -48,11 +46,6 @@ public abstract class AbstractReadOnlyUserManager
       throws UserNotFoundException
   {
     this.throwException();
-  }
-
-  public void setUsersRoles(String userId, Set<RoleIdentifier> roleIdentifiers)
-      throws UserNotFoundException, InvalidConfigurationException
-  {
   }
 
   public User updateUser(User user)

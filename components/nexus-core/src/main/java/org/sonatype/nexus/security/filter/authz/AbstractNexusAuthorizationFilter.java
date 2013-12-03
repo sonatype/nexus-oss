@@ -42,7 +42,4 @@ public class AbstractNexusAuthorizationFilter
     return pathPrefixPattern;
   }
 
-  protected Object getAttribute(String key) {
-    return this.getFilterConfig().getServletContext().getAttribute(key);
-  }
 }

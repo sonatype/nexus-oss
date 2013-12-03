@@ -50,7 +50,6 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.yammer.metrics.Metrics;
@@ -126,9 +125,9 @@ public class HttpClientRemoteStorage
    * Created items while retrieving, can be written.
    */
   private static final boolean CAN_WRITE = true;
-  
+
   private final MetricsRegistry metricsRegistry;
-  
+
   private final QueryStringBuilder queryStringBuilder;
 
   private final HttpClientManager httpClientManager;
@@ -138,11 +137,12 @@ public class HttpClientRemoteStorage
   // ----------------------------------------------------------------------
 
   @Inject
-  HttpClientRemoteStorage(final UserAgentBuilder userAgentBuilder,
-                          final ApplicationStatusSource applicationStatusSource, final MimeSupport mimeSupport,
-                          final QueryStringBuilder queryStringBuilder, final HttpClientManager httpClientManager)
+  HttpClientRemoteStorage(final ApplicationStatusSource applicationStatusSource,
+                          final MimeSupport mimeSupport,
+                          final QueryStringBuilder queryStringBuilder,
+                          final HttpClientManager httpClientManager)
   {
-    super(userAgentBuilder, applicationStatusSource, mimeSupport);
+    super(applicationStatusSource, mimeSupport);
     this.metricsRegistry = Metrics.defaultRegistry();
     this.queryStringBuilder = queryStringBuilder;
     this.httpClientManager = httpClientManager;
@@ -441,7 +441,7 @@ public class HttpClientRemoteStorage
    */
   @VisibleForTesting
   HttpResponse executeRequest(final ProxyRepository repository, final ResourceStoreRequest request,
-      final HttpUriRequest httpRequest, final String baseUrl) throws RemoteStorageException
+                              final HttpUriRequest httpRequest, final String baseUrl) throws RemoteStorageException
   {
     final Timer timer = timer(repository, httpRequest, baseUrl);
     final TimerContext timerContext = timer.time();
@@ -545,7 +545,8 @@ public class HttpClientRemoteStorage
    * @throws RemoteStorageException If an error occurred during execution of HTTP request
    */
   private HttpResponse executeRequestAndRelease(final ProxyRepository repository,
-                                                final ResourceStoreRequest request, final HttpUriRequest httpRequest, final String baseUrl)
+                                                final ResourceStoreRequest request, final HttpUriRequest httpRequest,
+                                                final String baseUrl)
       throws RemoteStorageException
   {
     final HttpResponse httpResponse = executeRequest(repository, request, httpRequest, baseUrl);

@@ -61,14 +61,11 @@ public abstract class AbstractRemoteDiscoveryStrategy
   {
     private final HttpGet method;
 
-    private final HttpResponse response;
-
     private final InputStream is;
 
     public RequestResult(HttpGet method, HttpResponse response)
         throws IOException
     {
-      this.response = Preconditions.checkNotNull(response);
       this.method = Preconditions.checkNotNull(method);
       this.is = response.getEntity().getContent();
     }

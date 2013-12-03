@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.yum.internal;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
@@ -36,15 +33,6 @@ public class RepoMD
 
   public RepoMD(final InputStream in) {
     locations = parse(in);
-  }
-
-  public RepoMD(final File file) {
-    try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file))) {
-      locations = parse(in);
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
   }
 
   private static Map<String, String> parse(final InputStream in) {
@@ -68,14 +56,6 @@ public class RepoMD
 
   public Collection<String> getLocations() {
     return locations.values();
-  }
-
-  public String getLocation(final String type) {
-    return locations.get(type);
-  }
-
-  public String getPrimaryLocation() {
-    return getLocation("primary");
   }
 
 }

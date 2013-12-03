@@ -44,10 +44,6 @@ public class LookAheadXppDriver
     super(new XmlFriendlyReplacer());
   }
 
-  public LookAheadXppDriver(XmlFriendlyReplacer replacer) {
-    super(replacer);
-  }
-
   public HierarchicalStreamReader createReader(Reader xml) {
     loadLibrary();
     return new LookAheadXppReader(xml, xmlFriendlyReplacer());

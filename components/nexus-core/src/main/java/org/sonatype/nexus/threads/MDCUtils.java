@@ -74,14 +74,6 @@ public class MDCUtils
 
   // ==
 
-  public static void markCurrentContextNonInheritable() {
-    MDC.put(CONTEXT_NON_INHERITABLE_KEY, CONTEXT_NON_INHERITABLE_KEY);
-  }
-
-  public static void unmarkCurrentContextNonInheritable() {
-    MDC.remove(CONTEXT_NON_INHERITABLE_KEY);
-  }
-
   public static Map<String, String> getCopyOfContextMap() {
     final boolean inheritable = MDC.get(CONTEXT_NON_INHERITABLE_KEY) == null;
     Map<String, String> result = null;

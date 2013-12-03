@@ -13,14 +13,11 @@
 
 package org.sonatype.security.realms;
 
-import java.util.Collection;
-
 import org.sonatype.security.AbstractSecurityTest;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authz.Permission;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.junit.Ignore;
@@ -96,20 +93,4 @@ public class SecurityAuthenticationTest
         "test:perm"));
   }
 
-  public static void assertImplied(Permission testPermission, Collection<Permission> assignedPermissions) {
-    for (Permission assignedPermission : assignedPermissions) {
-      if (assignedPermission.implies(testPermission)) {
-        return;
-      }
-    }
-    fail("Expected " + testPermission + " to be implied by " + assignedPermissions);
-  }
-
-  public static void assertNotImplied(Permission testPermission, Collection<Permission> assignedPermissions) {
-    for (Permission assignedPermission : assignedPermissions) {
-      if (assignedPermission.implies(testPermission)) {
-        fail("Expected " + testPermission + " not to be implied by " + assignedPermission);
-      }
-    }
-  }
 }

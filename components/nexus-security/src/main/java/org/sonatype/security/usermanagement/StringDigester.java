@@ -82,17 +82,4 @@ public class StringDigester
     }
   }
 
-  /**
-   * Calculates MD5 digest for a string.
-   */
-  public static String getMd5Digest(String content) {
-    try {
-      return getDigest("MD5", content);
-    }
-    catch (NoSuchAlgorithmException e) {
-      // will not happen
-      return null;
-    }
-  }
-
 }

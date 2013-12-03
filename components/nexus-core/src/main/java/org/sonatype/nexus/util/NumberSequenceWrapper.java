@@ -30,10 +30,6 @@ public abstract class NumberSequenceWrapper
     this.numberSequence = Preconditions.checkNotNull(numberSequence);
   }
 
-  protected NumberSequence getWrappedNumberSequence() {
-    return numberSequence;
-  }
-
   @Override
   public long next() {
     return numberSequence.next();

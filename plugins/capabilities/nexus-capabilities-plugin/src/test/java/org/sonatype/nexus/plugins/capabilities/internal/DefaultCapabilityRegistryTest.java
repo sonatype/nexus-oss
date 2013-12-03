@@ -61,7 +61,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -386,7 +385,9 @@ public class DefaultCapabilityRegistryTest
   {
     final CapabilityDescriptor descriptor = mock(CapabilityDescriptor.class);
     when(capabilityDescriptorRegistry.get(CAPABILITY_TYPE)).thenReturn(descriptor);
-    when(descriptor.formFields()).thenReturn(Arrays.<FormField>asList(new PasswordFormField("foo")));
+    when(descriptor.formFields()).thenReturn(Arrays.<FormField>asList(
+        new PasswordFormField("foo", "foo", "?", FormField.OPTIONAL)
+    ));
 
     Map<String, String> properties = Maps.newHashMap();
     properties.put("foo", "bar");
@@ -420,7 +421,9 @@ public class DefaultCapabilityRegistryTest
     final CapabilityDescriptor descriptor = mock(CapabilityDescriptor.class);
     when(capabilityDescriptorRegistry.get(CAPABILITY_TYPE)).thenReturn(descriptor);
     when(descriptor.version()).thenReturn(0);
-    when(descriptor.formFields()).thenReturn(Arrays.<FormField>asList(new PasswordFormField("foo")));
+    when(descriptor.formFields()).thenReturn(Arrays.<FormField>asList(
+        new PasswordFormField("foo", "foo", "?", FormField.OPTIONAL)
+    ));
 
     underTest.load();
 

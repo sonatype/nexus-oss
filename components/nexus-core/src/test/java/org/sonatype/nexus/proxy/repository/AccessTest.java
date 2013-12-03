@@ -27,7 +27,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.targets.Target;
-import org.sonatype.nexus.proxy.targets.TargetMatch;
 import org.sonatype.nexus.proxy.targets.TargetRegistry;
 import org.sonatype.nexus.security.WebSecurityUtil;
 import org.sonatype.security.SecuritySystem;
@@ -177,20 +176,6 @@ public class AccessTest
     securitySystem.logout(subject);
 
     return item;
-  }
-
-  private String targetMatchToString(TargetMatch targetMatch) {
-    StringBuilder buffer = new StringBuilder();
-
-    buffer.append("RepoId: ").append(targetMatch.getRepository().getId()).append("\n");
-    Target target = targetMatch.getTarget();
-    buffer.append("target: ").append(target.getId()).append(" - ").append(target.getName()).append("\n");
-
-    for (String pattern : target.getPatternTexts()) {
-      buffer.append("\tpattern: ").append(pattern);
-    }
-
-    return buffer.toString();
   }
 
 }

@@ -33,8 +33,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -54,8 +52,6 @@ import static org.mockito.Mockito.verify;
 public class Nxcm4861ArtifactStoreHelper_storeItemWithChecksumsTest
     extends AbstractProxyTestEnvironment
 {
-
-  private Logger log = LoggerFactory.getLogger(Nxcm4861ArtifactStoreHelper_storeItemWithChecksumsTest.class);
 
   private static final String REPO_ID = "inhouse";
 
