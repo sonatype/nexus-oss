@@ -147,17 +147,7 @@ public class NexusApplication
 
   @Override
   protected Router initializeRouter(Router root, boolean isStarted) {
-    // ========
-    // SERVICE
-
-    // service router
-    Router applicationRouter = new Router(getContext());
-
-    // attaching filter to a root on given URI
-    attach(root, false, "/", applicationRouter);
-
-    // return the swapped router
-    return applicationRouter;
+    return root;
   }
 
   @Override
