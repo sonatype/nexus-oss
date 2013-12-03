@@ -169,7 +169,7 @@ public class StaticResourcesServlet
                                                                                                     IOException
   {
     final String requestPath = request.getPathInfo();
-    logger.info("Requested resource {}", requestPath);
+    logger.debug("Requested resource {}", requestPath);
     // 0) see is index.html needed actually
     if ("".equals(requestPath) || "/".equals(requestPath)) {
       // redirect to index.html
