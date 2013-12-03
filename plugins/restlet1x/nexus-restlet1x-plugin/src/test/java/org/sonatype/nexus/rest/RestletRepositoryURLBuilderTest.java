@@ -161,7 +161,8 @@ public class RestletRepositoryURLBuilderTest
   public void testBaseUrlGlobalRequest()
       throws Exception
   {
-    String restletBaseURL = "http://from/request/";
+    // NEXUS-6045: Restlet1x request cannot come in from anywhere else than /service/local anymore
+    String restletBaseURL = "http://from/request/service/local";
 
     Mockito.doReturn(true).when(globalRestApiSettings).isEnabled();
     Mockito.doReturn(false).when(globalRestApiSettings).isForceBaseUrl();
@@ -176,7 +177,8 @@ public class RestletRepositoryURLBuilderTest
       RestletRepositoryURLBuilder urlFinder =
           new RestletRepositoryURLBuilder(repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings);
 
-      Assert.assertEquals(restletBaseURL + "content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
+      // NEXUS-6045: Restlet1x request will point to the webapp root/content
+      Assert.assertEquals("http://from/request/content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
           urlFinder.getRepositoryContentUrl(MOCK_REPO_ID));
     }
     finally {
