@@ -31,7 +31,6 @@ import org.sonatype.nexus.plugins.p2.repository.metadata.Artifacts;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Content;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
-import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -40,7 +39,6 @@ import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.FileContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -234,14 +232,6 @@ public class P2ProxyMetadataSource
     catch (IOException e) {
       throw new RemoteStorageException(e);
     }
-  }
-
-  protected StorageItem doRetrieveRemoteItem(final P2ProxyRepository repository, final String path,
-                                             final Map<String, Object> context)
-      throws ItemNotFoundException, RemoteAccessException, RemoteStorageException
-  {
-    return repository.getRemoteStorage().retrieveItem(repository, new ResourceStoreRequest(path),
-        repository.getRemoteUrl());
   }
 
   @Override

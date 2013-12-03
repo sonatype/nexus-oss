@@ -29,7 +29,6 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,8 +48,7 @@ public class DeleteRepositoryWhileDownloadingIndexIT
     protected StuckRemoteStorage()
         throws Exception
     {
-      super(lookup(UserAgentBuilder.class), lookup(ApplicationStatusSource.class),
-          lookup(MimeSupport.class));
+      super(lookup(ApplicationStatusSource.class), lookup(MimeSupport.class));
     }
 
     @Override

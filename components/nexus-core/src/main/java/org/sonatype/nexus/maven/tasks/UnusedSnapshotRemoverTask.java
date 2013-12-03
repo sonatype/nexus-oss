@@ -52,10 +52,6 @@ public class UnusedSnapshotRemoverTask
     return Integer.parseInt(checkNotNull(param, DAYS_SINCE_LAST_REQUESTED_FIELD_ID));
   }
 
-  public void setDaysSinceLastRequested(int daysSinceLastRequested) {
-    getParameters().put(DAYS_SINCE_LAST_REQUESTED_FIELD_ID, Integer.toString(daysSinceLastRequested));
-  }
-
   @Override
   public SnapshotRemovalResult doRun()
       throws Exception

@@ -28,12 +28,12 @@ public class Check
 
   public static String notBlank(final String t, final String name) {
     // check for blank
-    argument(!isBlank(t), new Template("\"%s\" is blank!", name));
+    argument(!isBlank(t), String.format("\"%s\" is blank!", name));
     return t;
   }
 
   public static <T> T notNull(final T t, final Class<?> clazz) {
-    return notNull(t, new Template("%s is null!", clazz.getSimpleName()));
+    return notNull(t, String.format("%s is null!", clazz.getSimpleName()));
   }
 
   public static <T> T notNull(final T t, final Object message) {

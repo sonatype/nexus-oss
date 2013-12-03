@@ -50,10 +50,6 @@ public class MockUserLocator
     return null;
   }
 
-  public boolean isPrimary() {
-    return false;
-  }
-
   public Set<String> listUserIds() {
     return userIds;
   }

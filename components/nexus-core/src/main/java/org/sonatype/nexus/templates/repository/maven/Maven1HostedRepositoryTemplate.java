@@ -36,11 +36,6 @@ public class Maven1HostedRepositoryTemplate
     super(provider, id, description, new Maven1ContentClass(), MavenHostedRepository.class, repositoryPolicy);
   }
 
-  public M1RepositoryConfiguration getExternalConfiguration(boolean forWrite) {
-    return (M1RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
-        .getConfiguration(forWrite);
-  }
-
   @Override
   protected CRepositoryCoreConfiguration initCoreConfiguration() {
     CRepository repo = new DefaultCRepository();

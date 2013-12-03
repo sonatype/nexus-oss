@@ -30,8 +30,6 @@ public class SystemProcess
     STARTED, FINISHED, BROKEN, CANCELED
   }
 
-  ;
-
   /**
    * When was the process started?
    */
@@ -98,32 +96,8 @@ public class SystemProcess
     }
   }
 
-  public boolean isRunning() {
-    return Status.STARTED.equals(status);
-  }
-
-  public boolean isFinished() {
-    return Status.FINISHED.equals(status);
-  }
-
-  public boolean isBroken() {
-    return Status.BROKEN.equals(status);
-  }
-
-  public Date getStarted() {
-    return started;
-  }
-
   public Date getFinished() {
     return finished;
-  }
-
-  public Throwable getErrorCause() {
-    return errorCause;
-  }
-
-  public String getFinishedMessage() {
-    return finishedMessage;
   }
 
   public String getMessage() {

@@ -17,7 +17,6 @@ import java.io.File;
 import java.util.List;
 
 import org.sonatype.security.AbstractSecurityTestCase;
-import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
@@ -41,12 +40,6 @@ public class EmptyRoleManagementTest
     String securityXml = this.getClass().getName().replaceAll("\\.", "\\/") + "-security.xml";
     FileUtils.copyURLToFile(Thread.currentThread().getContextClassLoader().getResource(securityXml),
         new File(CONFIG_DIR, "security.xml"));
-  }
-
-  public SecuritySystem getSecuritySystem()
-      throws Exception
-  {
-    return this.lookup(SecuritySystem.class);
   }
 
   public UserManager getUserManager()

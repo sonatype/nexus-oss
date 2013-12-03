@@ -60,7 +60,7 @@ public class HttpHeaderAuthenticationToken
   }
 
   public String getHeaderValue() {
-    return headerName;
+    return headerValue;
   }
 
   @Override

@@ -37,8 +37,4 @@ public class MockEmailer
     return forgotUserIds;
   }
 
-  public void setForgotUserIds(List<String> forgotUserIds) {
-    this.forgotUserIds = forgotUserIds;
-  }
-
 }

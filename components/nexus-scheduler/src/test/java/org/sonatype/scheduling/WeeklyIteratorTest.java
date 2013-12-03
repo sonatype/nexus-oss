@@ -20,6 +20,8 @@ import java.util.HashSet;
 import org.sonatype.scheduling.iterators.WeeklySchedulerIterator;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -28,6 +30,8 @@ import static org.junit.Assert.assertTrue;
 public class WeeklyIteratorTest
     extends TestSupport
 {
+
+  @Test
   public void testWeeklyIterator()
       throws Exception
   {

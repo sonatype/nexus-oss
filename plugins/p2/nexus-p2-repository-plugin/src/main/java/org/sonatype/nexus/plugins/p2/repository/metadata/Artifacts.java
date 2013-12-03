@@ -26,20 +26,6 @@ public class Artifacts
     extends AbstractMetadata
 {
 
-  public static final String[][] PACKED_MAPPING_RULES = {
-      {"(& (classifier=osgi.bundle) (format=packed))", "${repoUrl}/plugins/${id}_${version}.jar.pack.gz"},
-      //$NON-NLS-1$//$NON-NLS-2$
-      {"(& (classifier=osgi.bundle))", "${repoUrl}/plugins/${id}_${version}.jar"}, //$NON-NLS-1$//$NON-NLS-2$
-      {"(& (classifier=binary))", "${repoUrl}/binary/${id}_${version}"}, //$NON-NLS-1$ //$NON-NLS-2$
-      {"(& (classifier=org.eclipse.update.feature))", "${repoUrl}/features/${id}_${version}.jar"}
-  }; //$NON-NLS-1$//$NON-NLS-2$
-
-  public static final String[][] DEFAULT_MAPPING_RULES = {
-      {"(& (classifier=osgi.bundle))", "${repoUrl}/plugins/${id}_${version}.jar"}, //$NON-NLS-1$//$NON-NLS-2$
-      {"(& (classifier=binary))", "${repoUrl}/binary/${id}_${version}"}, //$NON-NLS-1$ //$NON-NLS-2$
-      {"(& (classifier=org.eclipse.update.feature))", "${repoUrl}/features/${id}_${version}.jar"}
-  }; //$NON-NLS-1$//$NON-NLS-2$
-
   public Artifacts(final Xpp3Dom dom) {
     super(dom);
   }
@@ -112,22 +98,6 @@ public class Artifacts
     artifactsDom.setAttribute("size", Integer.toString(artifacts.size()));
 
     dom.addChild(artifactsDom);
-  }
-
-  public void setMapping(final String[][] mappings) {
-    removeChild(dom, "mappings");
-    final Xpp3Dom mappingsDom = new Xpp3Dom("mappings");
-
-    for (final String[] rule : mappings) {
-      final Xpp3Dom ruleDom = new Xpp3Dom("rule");
-      ruleDom.setAttribute("filter", rule[0]);
-      ruleDom.setAttribute("output", rule[1]);
-
-      mappingsDom.addChild(ruleDom);
-    }
-    mappingsDom.setAttribute("size", Integer.toString(mappings.length));
-
-    dom.addChild(mappingsDom);
   }
 
   public Map<String, String> getMappings() {

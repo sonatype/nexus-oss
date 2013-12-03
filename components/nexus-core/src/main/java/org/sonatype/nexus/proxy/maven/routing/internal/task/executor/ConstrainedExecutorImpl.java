@@ -164,10 +164,6 @@ public class ConstrainedExecutorImpl
       return key;
     }
 
-    public CancelableRunnable getRunnable() {
-      return runnable;
-    }
-
     @Override
     public void run() {
       try {

@@ -34,14 +34,6 @@ public class FlushableZipOutputStream
     super(out);
   }
 
-  public FlushableZipOutputStream(final OutputStream out, final Charset charset) {
-    super(out, charset);
-  }
-
-  public boolean isSyncFlush() {
-    return syncFlush;
-  }
-
   public void setSyncFlush(final boolean syncFlush) {
     this.syncFlush = syncFlush;
   }

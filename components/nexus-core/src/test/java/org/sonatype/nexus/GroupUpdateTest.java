@@ -19,9 +19,6 @@ import java.util.List;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
-import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.templates.repository.maven.Maven1GroupRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven1HostedRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven1ProxyRepositoryTemplate;
@@ -31,9 +28,6 @@ import org.junit.Test;
 public class GroupUpdateTest
     extends NexusAppTestSupport
 {
-  RepositoryRegistry repoRegistry;
-
-  RemoteRepositoryStorage remoteRepositoryStorage;
 
   @Override
   protected void setUp()
@@ -42,9 +36,6 @@ public class GroupUpdateTest
     super.setUp();
 
     startNx();
-    repoRegistry = lookup(RepositoryRegistry.class);
-    remoteRepositoryStorage = lookup(RemoteRepositoryStorage.class,
-        lookup(RemoteProviderHintFactory.class).getDefaultHttpRoleHint());
   }
 
   @Test

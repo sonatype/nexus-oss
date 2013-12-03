@@ -20,8 +20,6 @@ import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;
 import org.sonatype.nexus.util.Node;
 import org.sonatype.nexus.util.PathUtils;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -96,11 +94,6 @@ public class PathMatcher
   }
 
   // ==
-
-  @VisibleForTesting
-  protected Node<Payload> getRoot() {
-    return root;
-  }
 
   protected Node<Payload> buildRoot(final List<String> entries, final int maxDepth) {
     // no rule B!

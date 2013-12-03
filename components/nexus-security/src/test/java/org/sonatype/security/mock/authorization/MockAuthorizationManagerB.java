@@ -38,15 +38,6 @@ public class MockAuthorizationManagerB
     return "sourceB";
   }
 
-  public Set<String> listPermissions() {
-    Set<String> permissions = new HashSet<String>();
-
-    permissions.add("from-role:read");
-    permissions.add("from-role:delete");
-
-    return permissions;
-  }
-
   public Set<Role> listRoles() {
     Set<Role> roles = new HashSet<Role>();
 

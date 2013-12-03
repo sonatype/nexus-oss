@@ -49,21 +49,6 @@ public class AtlasPlugin
   @NonNls
   public static final String ARTIFACT_ID = "nexus-" + ID_PREFIX + "-plugin";
 
-  /**
-   * Prefix for @Named configuration.
-   */
-  public static final String CONFIG_PREFIX = "${" + ID_PREFIX;
-
-  /**
-   * Prefix for REST resources
-   */
-  public static final String REST_PREFIX = "/" + ID_PREFIX;
-
-  /**
-   * Prefix for permissions.
-   */
-  public static final String PERMISSION_PREFIX = "nexus:" + ID_PREFIX + ":";
-
   @Inject
   public AtlasPlugin() throws Exception {
     super(GROUP_ID, ARTIFACT_ID);

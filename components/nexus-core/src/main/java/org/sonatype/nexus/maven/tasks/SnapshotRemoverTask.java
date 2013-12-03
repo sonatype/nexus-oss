@@ -60,10 +60,6 @@ public class SnapshotRemoverTask
     return Integer.parseInt(param);
   }
 
-  public void setMinSnapshotsToKeep(int minSnapshotsToKeep) {
-    getParameters().put(SnapshotRemovalTaskDescriptor.MIN_TO_KEEP_FIELD_ID, Integer.toString(minSnapshotsToKeep));
-  }
-
   public int getRemoveOlderThanDays() {
     String param = getParameters().get(SnapshotRemovalTaskDescriptor.KEEP_DAYS_FIELD_ID);
 
@@ -74,17 +70,8 @@ public class SnapshotRemoverTask
     return Integer.parseInt(param);
   }
 
-  public void setRemoveOlderThanDays(int removeOlderThanDays) {
-    getParameters().put(SnapshotRemovalTaskDescriptor.KEEP_DAYS_FIELD_ID, Integer.toString(removeOlderThanDays));
-  }
-
   public boolean isRemoveIfReleaseExists() {
     return Boolean.parseBoolean(getParameters().get(SnapshotRemovalTaskDescriptor.REMOVE_WHEN_RELEASED_FIELD_ID));
-  }
-
-  public void setRemoveIfReleaseExists(boolean removeIfReleaseExists) {
-    getParameters().put(SnapshotRemovalTaskDescriptor.REMOVE_WHEN_RELEASED_FIELD_ID,
-        Boolean.toString(removeIfReleaseExists));
   }
 
   public int getGraceDaysAfterRelease() {
@@ -99,10 +86,6 @@ public class SnapshotRemoverTask
 
   public boolean isDeleteImmediately() {
     return Boolean.parseBoolean(getParameters().get(SnapshotRemovalTaskDescriptor.DELETE_IMMEDIATELY));
-  }
-
-  public void setDeleteImmediately(boolean deleteImmediately) {
-    getParameters().put(SnapshotRemovalTaskDescriptor.DELETE_IMMEDIATELY, Boolean.toString(deleteImmediately));
   }
 
   @Override

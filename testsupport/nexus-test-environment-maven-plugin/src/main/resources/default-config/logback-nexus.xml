@@ -20,7 +20,7 @@
     <File>${project.build.directory}/logs/${test-id}/nexus.log</File>
     <Append>true</Append>
     <encoder>
-      <pattern>%4d{yyyy-MM-dd HH:mm:ss} %-5p [%thread] - %c - %m%n</pattern>
+      <pattern>%d{HH:mm:ss.SSS} %-5p [%thread] - %c - %m%n</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
       <maxIndex>12</maxIndex>
@@ -34,7 +34,7 @@
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <target>System.out</target>
     <encoder>
-      <pattern>NEXUS: %date{HH:mm:ss.SSS} %level [%thread%X{DC}] %logger - %msg%n</pattern>
+      <pattern>NEXUS: %d{HH:mm:ss.SSS} %level [%thread%X{DC}] %logger - %msg%n</pattern>
     </encoder>
   </appender>
 

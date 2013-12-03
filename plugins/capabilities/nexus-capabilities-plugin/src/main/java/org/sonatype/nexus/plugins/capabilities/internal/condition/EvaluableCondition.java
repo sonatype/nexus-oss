@@ -43,15 +43,6 @@ public class EvaluableCondition
   private final Evaluable evaluable;
 
   public EvaluableCondition(final EventBus eventBus,
-                            final Evaluable evaluable,
-                            final CapabilityIdentity capabilityIdentity)
-  {
-    super(eventBus, evaluable.isSatisfied());
-    this.evaluable = checkNotNull(evaluable);
-    this.capabilityIdentity = checkNotNull(capabilityIdentity);
-  }
-
-  public EvaluableCondition(final EventBus eventBus,
                             final Evaluable evaluable)
   {
     super(eventBus, false);

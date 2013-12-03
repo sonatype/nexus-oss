@@ -912,10 +912,6 @@ public class M2RepositoryTest
       return this.requestCount;
     }
 
-    public void reset() {
-      this.requestCount = 0;
-    }
-
     @Subscribe
     public void onEvent(RepositoryItemEventCache evt) {
       final RepositoryItemEventCache riec = (RepositoryItemEventCache) evt;

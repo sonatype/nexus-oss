@@ -34,7 +34,7 @@ import org.sonatype.timeline.TimelineRecord;
 @Singleton
 @Named("default")
 public class DefaultTimeline
-  extends ComponentSupport
+    extends ComponentSupport
     implements Timeline
 {
   private volatile boolean started;
@@ -161,17 +161,9 @@ public class DefaultTimeline
   }
 
   @Override
-  public int purge(long timestamp, Set<String> types, Set<String> subTypes, TimelineFilter filter) {
-    if (!started) {
-      return 0;
-    }
-    return purgeFromIndexer(timestamp, types, subTypes, filter);
-  }
-
-  @Override
-  public void purgeOlderThan(final int days) {
+  public int purgeOlderThan(final int days) {
     if (started) {
-      doShared(new Work<Integer>()
+      return doShared(new Work<Integer>()
       {
         @Override
         public Integer doIt()
@@ -185,11 +177,11 @@ public class DefaultTimeline
             // FIXME: but do we want to abort the purge?
             log.warn("Failed to purge a timeline persisted records", e);
           }
-          indexer.purge(0l, System.currentTimeMillis() - (days * TimeUnit.DAYS.toMillis(days)), null, null);
-          return 0;
+          return indexer.purge(0l, System.currentTimeMillis() - (days * TimeUnit.DAYS.toMillis(days)), null, null);
         }
       });
     }
+    return 0;
   }
 
   @Override
@@ -200,16 +192,6 @@ public class DefaultTimeline
       return;
     }
     retrieveFromIndexer(0L, System.currentTimeMillis(), fromItem, count, types, subTypes, filter, callback);
-  }
-
-  @Override
-  public void retrieve(long fromTime, long toTime, int from, int count, Set<String> types, Set<String> subTypes,
-                       TimelineFilter filter, TimelineCallback callback)
-  {
-    if (!started) {
-      return;
-    }
-    retrieveFromIndexer(fromTime, toTime, from, count, types, subTypes, filter, callback);
   }
 
   // ==
@@ -223,20 +205,6 @@ public class DefaultTimeline
       {
         indexer.addAll(records);
         return null;
-      }
-    });
-  }
-
-  protected int purgeFromIndexer(final long timestamp, final Set<String> types, final Set<String> subTypes,
-                                 final TimelineFilter filter)
-  {
-    return doShared(new Work<Integer>()
-    {
-      @Override
-      public Integer doIt()
-          throws IOException
-      {
-        return indexer.purge(0l, timestamp, types, subTypes);
       }
     });
   }

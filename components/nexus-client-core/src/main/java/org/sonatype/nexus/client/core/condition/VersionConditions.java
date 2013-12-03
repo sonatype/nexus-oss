@@ -20,7 +20,6 @@ import org.sonatype.nexus.client.core.condition.internal.InvalidVersionSpecifica
 import org.sonatype.nexus.client.core.condition.internal.Version;
 import org.sonatype.nexus.client.core.condition.internal.VersionConstraint;
 import org.sonatype.nexus.client.internal.util.Check;
-import org.sonatype.nexus.client.internal.util.Template;
 
 /**
  * {@link Condition}s that matches remote Nexus version.
@@ -138,7 +137,7 @@ public abstract class VersionConditions
 
     @Override
     public String explainNotSatisfied(final NexusStatus status) {
-      return Template.of("(version \"%s\" contained in \"%s\")", status.getVersion(), suitableVersions).toString();
+      return String.format("(version \"%s\" contained in \"%s\")", status.getVersion(), suitableVersions);
     }
   }
 

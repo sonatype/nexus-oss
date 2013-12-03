@@ -59,18 +59,6 @@ public interface NexusTimeline
                 TimelineCallback cb);
 
   /**
-   * Purges all records from timeline index that are older than timestamp, has one of the types and subtypes passed
-   * in, and is not filtered out by filter.
-   *
-   * @param timestamp the timestamp to which compared older records needs to be purged.
-   * @param types     the types you want to purge only or null if "all" (do not filter by types).
-   * @param subTypes  the subtypes you want to purge only or null if "all" (do not filter by subtypes).
-   * @param filter    filter, may be null.
-   * @return the count of purged records.
-   */
-  int purgeOlderThan(long timestamp, Set<String> types, Set<String> subTypes, Predicate<Entry> filter);
-
-  /**
    * Purges all records from timeline index and persist data that are older than {@code days} days. Here, no type,
    * subType or any other filtering is possible, this will delete records "en bloc", as filtering persist records in
    * any way is not possible (they'd need to be indexed then first).

@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.repository.site.plugin;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 
 /**
@@ -32,10 +29,4 @@ public interface SiteRepository
    */
   public static final String ID = "site";
 
-  /**
-   * Accepts a web site az ZIP file, and automatically "unzips" it honoring the dir structures in ZIP file and
-   * prefixing those with the prefix.
-   */
-  void deploySiteBundle(String prefix, InputStream bundle)
-      throws IOException;
 }

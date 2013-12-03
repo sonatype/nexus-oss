@@ -21,8 +21,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -190,16 +188,14 @@ public class LogbackLogManager
   /**
    * @since 2.7
    */
-  @Override
-  public File getLogConfigFile(final String name) {
+  private File getLogConfigFile(final String name) {
     return new File(getLogConfigDir(), name);
   }
 
   /**
    * @since 2.7
    */
-  @Override
-  public File getLogOverridesConfigFile() {
+  private File getLogOverridesConfigFile() {
     return getLogConfigFile("logback-overrides.xml");
   }
 
@@ -314,34 +310,6 @@ public class LogbackLogManager
       stream.close();
     }
     return properties;
-  }
-
-  @Override
-  public Collection<NexusStreamResponse> getApplicationLogFiles()
-      throws IOException
-  {
-    logger.debug("List log files.");
-
-    Set<File> files = getLogFiles();
-
-    ArrayList<NexusStreamResponse> result = new ArrayList<NexusStreamResponse>(files.size());
-
-    for (File file : files) {
-      NexusStreamResponse response = new NexusStreamResponse();
-
-      response.setName(file.getName());
-
-      // TODO:
-      response.setMimeType("text/plain");
-
-      response.setSize(file.length());
-
-      response.setInputStream(null);
-
-      result.add(response);
-    }
-
-    return result;
   }
 
   /**

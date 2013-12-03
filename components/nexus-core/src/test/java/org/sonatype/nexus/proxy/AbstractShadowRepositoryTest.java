@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.proxy;
 
-import java.io.IOException;
-
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -23,16 +20,12 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Assert;
 
 public abstract class AbstractShadowRepositoryTest
     extends AbstractProxyTestEnvironment
 {
   private static final long A_DAY = 24L * 60L * 60L * 1000L;
-
-  protected abstract void addShadowReposes()
-      throws ConfigurationException, IOException, ComponentLookupException;
 
   protected void testProxyLastRequestedAttribute(ShadowRepository shadowRepository, String shadowPath,
                                                  String masterPath)

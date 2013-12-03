@@ -176,8 +176,4 @@ public class DefaultLvoPluginConfiguration
     ModelloUtils.save(configuration, configurationFile, lvoModelWriter);
   }
 
-  protected void clearCache() {
-    configuration = null;
-  }
-
 }

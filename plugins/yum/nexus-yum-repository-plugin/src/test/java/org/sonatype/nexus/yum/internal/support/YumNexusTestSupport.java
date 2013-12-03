@@ -14,10 +14,7 @@
 package org.sonatype.nexus.yum.internal.support;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -25,7 +22,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
-import java.util.zip.GZIPInputStream;
 
 import javax.inject.Inject;
 
@@ -42,11 +38,9 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.yum.internal.RepoMD;
 import org.sonatype.nexus.yum.internal.task.CommandLineExecutor;
 import org.sonatype.sisu.litmus.testsupport.TestTracer;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
-import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
 import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 
@@ -60,16 +54,11 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.freecompany.redline.Builder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 
 import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static com.google.code.tempusfugit.temporal.Duration.seconds;
@@ -79,8 +68,6 @@ import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.freecompany.redline.header.Architecture.NOARCH;
 import static org.freecompany.redline.header.Os.LINUX;
 import static org.freecompany.redline.header.RpmType.BINARY;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -88,15 +75,9 @@ public class YumNexusTestSupport
     extends NexusAppTestSupport
 {
 
-  private static final Logger LOG = LoggerFactory.getLogger(YumNexusTestSupport.class);
-
   private String javaTmpDir;
 
   public static final String TMP_DIR_KEY = "java.io.tmpdir";
-
-  public static final String REPOMD_XML = "repomd.xml";
-
-  public static final String PRIMARY_XML = "primary.xml";
 
   protected final TestUtil util = new TestUtil(this);
 
@@ -123,10 +104,6 @@ public class YumNexusTestSupport
 
   protected File cacheDir() {
     return testIndex.getDirectory("cache");
-  }
-
-  protected File repoData() {
-    return testIndex.getDirectory();
   }
 
   protected File repositoryDir(final String repositoryId) {
@@ -157,59 +134,6 @@ public class YumNexusTestSupport
       testIndex.recordLink("surefire result", util.resolveFile(name + ".txt"));
       testIndex.recordLink("surefire output", util.resolveFile(name + "-output.txt"));
     }
-  }
-
-  public void assertThatYumMetadataAreTheSame(final File actualRepositoryDir,
-                                              final String expectedRepositoryDirName)
-      throws Exception
-  {
-    LOG.debug("Testing Repo {} ...", actualRepositoryDir);
-    final File actualRepodata = new File(actualRepositoryDir, "repodata");
-    assertThat(actualRepodata, FileMatchers.exists());
-
-    final File repoMdFile = new File(actualRepodata, REPOMD_XML);
-    final RepoMD repoMD = new RepoMD(repoMdFile);
-
-    assertSameRepomdXml(
-        repoMdFile,
-        getTemplateFile(expectedRepositoryDirName, REPOMD_XML)
-    );
-
-    assertSamePrimaryXml(
-        new File(actualRepodata.getParentFile(), repoMD.getPrimaryLocation()),
-        getTemplateFile(expectedRepositoryDirName, PRIMARY_XML)
-    );
-  }
-
-  private void assertSamePrimaryXml(final File actual, final File expected)
-      throws Exception
-  {
-    final GZIPInputStream actualIn = new GZIPInputStream(new FileInputStream(actual));
-    final Diff xmlDiff = new Diff(new FileReader(expected), new InputStreamReader(actualIn));
-    xmlDiff.overrideDifferenceListener(new TimeStampIgnoringDifferenceListener());
-    assertThat(xmlDiff.toString(), xmlDiff.similar(), is(true));
-  }
-
-  private void assertSameRepomdXml(final File actual, final File expected)
-      throws Exception
-  {
-    final Diff xmlDiff = new Diff(new FileReader(expected), new FileReader(actual));
-    xmlDiff.overrideDifferenceListener(new TimeStampIgnoringDifferenceListener());
-    xmlDiff.overrideElementQualifier(
-        new ElementNameAndAttributeQualifier("type")
-        {
-          @Override
-          protected boolean areAttributesComparable(final Element control, final Element test) {
-            return !"data".equals(control.getTagName()) || super.areAttributesComparable(control, test);
-          }
-        }
-    );
-    assertThat(xmlDiff.toString(), xmlDiff.similar(), is(true));
-  }
-
-  public File getTemplateFile(final String templateName, final String fileName) {
-    return testData.resolveFile(String.format("templates/%s/%s", templateName, fileName));
-
   }
 
   protected void waitFor(Condition condition)
@@ -246,7 +170,7 @@ public class YumNexusTestSupport
     });
     return modules;
   }
-  
+
   @Override
   protected void setUp()
       throws Exception

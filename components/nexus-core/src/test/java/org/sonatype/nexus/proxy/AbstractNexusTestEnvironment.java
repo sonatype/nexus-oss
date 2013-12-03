@@ -14,53 +14,27 @@
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeManager;
 
 public abstract class AbstractNexusTestEnvironment
     extends NexusAppTestSupport
 {
-  /**
-   * The cache manager.
-   */
-  private CacheManager cacheManager;
 
   private RepositoryItemUidFactory repositoryItemUidFactory;
-
-  private MimeSupport mimeSupport;
 
   protected void setUp()
       throws Exception
   {
     super.setUp();
 
-    cacheManager = lookup(CacheManager.class);
-
     repositoryItemUidFactory = lookup(RepositoryItemUidFactory.class);
-
     // rebuild cache
     lookup(RepositoryItemUidAttributeManager.class).reset();
-
-    mimeSupport = lookup(MimeSupport.class);
-  }
-
-  /**
-   * Gets the cache manager.
-   *
-   * @return the cache manager
-   */
-  protected CacheManager getCacheManager() {
-    return cacheManager;
   }
 
   protected RepositoryItemUidFactory getRepositoryItemUidFactory() {
     return repositoryItemUidFactory;
-  }
-
-  protected MimeSupport getMimeSupport() {
-    return mimeSupport;
   }
 
 }

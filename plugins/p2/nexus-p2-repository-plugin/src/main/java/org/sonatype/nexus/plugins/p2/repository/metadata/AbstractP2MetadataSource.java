@@ -359,16 +359,6 @@ public abstract class AbstractP2MetadataSource<E extends P2Repository>
     return METADATA_PATHS.contains(path);
   }
 
-  private void deleteP2Metadata(final Repository repository) {
-    log.debug("Repository " + repository.getId() + ": Deleting p2 metadata items.");
-    deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.ARTIFACTS_JAR));
-    deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.ARTIFACTS_XML));
-    deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.CONTENT_JAR));
-    deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.CONTENT_XML));
-    deleteItemSilently(repository, new ResourceStoreRequest(P2Constants.PRIVATE_ROOT));
-    log.debug("Repository " + repository.getId() + ": Deleted p2 metadata items.");
-  }
-
   private static void deleteItemSilently(final Repository repository, final ResourceStoreRequest request) {
     try {
       repository.getLocalStorage().deleteItem(repository, request);

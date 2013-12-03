@@ -47,10 +47,6 @@ public class RegexpMimeRulesSource
     rules.put(checkNotNull(pattern), checkNotNull(mimeType));
   }
 
-  public void clear() {
-    rules.clear();
-  }
-
   @Override
   public String getRuleForPath(final String path) {
     for (Map.Entry<Pattern, String> entry : rules.entrySet()) {

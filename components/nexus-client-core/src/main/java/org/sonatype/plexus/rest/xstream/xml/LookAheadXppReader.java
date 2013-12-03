@@ -59,10 +59,6 @@ public class LookAheadXppReader
 
   HashMap<String, String> lookaheadMap = new HashMap<String, String>();
 
-  public LookAheadXppReader(Reader reader) {
-    this(reader, new XmlFriendlyReplacer());
-  }
-
   /**
    * @since 1.2
    */

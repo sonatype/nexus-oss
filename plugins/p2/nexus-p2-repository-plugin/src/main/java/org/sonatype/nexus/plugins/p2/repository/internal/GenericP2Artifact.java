@@ -37,12 +37,6 @@ public class GenericP2Artifact
   private P2ArtifactType type;
 
   /**
-   * Default constructor.
-   */
-  public GenericP2Artifact() {
-  }
-
-  /**
    * Initializing constructor.
    *
    * @param id      The artifact id
@@ -63,24 +57,10 @@ public class GenericP2Artifact
   }
 
   /**
-   * @param id the id to set
-   */
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  /**
    * @return the version
    */
   public String getVersion() {
     return version;
-  }
-
-  /**
-   * @param version the version to set
-   */
-  public void setVersion(String version) {
-    this.version = version;
   }
 
   /**
@@ -90,10 +70,4 @@ public class GenericP2Artifact
     return type;
   }
 
-  /**
-   * @param type the type to set
-   */
-  public void setType(P2ArtifactType type) {
-    this.type = type;
-  }
 }

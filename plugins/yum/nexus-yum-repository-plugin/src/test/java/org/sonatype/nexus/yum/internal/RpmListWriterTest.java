@@ -30,8 +30,6 @@ public class RpmListWriterTest
     extends YumNexusTestSupport
 {
 
-  private static final String REPO_ID = "repoId";
-
   private static final String FILE_CONTENT = "another-artifact/0.0.1/another-artifact-0.0.1-1.noarch.rpm\n"
       + "conflict-artifact/2.2-1/conflict-artifact-2.2-1.noarch.rpm\n"
       + "conflict-artifact/2.2-2/conflict-artifact-2.2-2.noarch.rpm\n"
@@ -69,7 +67,6 @@ public class RpmListWriterTest
       throws Exception
   {
     final File rpmListFile = new RpmListWriter(
-        REPO_ID,
         new File(rpmsDir(), "tomcat-mysql-jdbc/5.1.15-2"),
         "/is24-tomcat-mysql-jdbc-5.1.15-2.1082.noarch.rpm",
         null,
@@ -87,7 +84,6 @@ public class RpmListWriterTest
       throws Exception
   {
     final File rpmListFile = new RpmListWriter(
-        REPO_ID,
         rpmsDir(),
         null,
         null,
@@ -114,7 +110,6 @@ public class RpmListWriterTest
       throws Exception
   {
     final File rpmListFile = new RpmListWriter(
-        REPO_ID,
         rpmsDir(),
         "conflict-artifact/2.2-1/conflict-artifact-2.2-1.noarch.rpm",
         null,
@@ -132,7 +127,6 @@ public class RpmListWriterTest
   {
     // given written list file
     final File rpmListFile = new RpmListWriter(
-        REPO_ID,
         rpmsDir(),
         NEW_RPM1 + pathSeparator + NEW_RPM2,
         null,
@@ -152,7 +146,6 @@ public class RpmListWriterTest
     final File rpmListFile = new File(testIndex.getDirectory(), "package-list.txt");
 
     new RpmListWriter(
-        testName.getMethodName(),
         rpmsDir,
         NO_ADDED_FILE,
         version,
@@ -169,12 +162,12 @@ public class RpmListWriterTest
     return new ListFileFactory()
     {
       @Override
-      public File getRpmListFile(String id) {
+      public File getRpmListFile() {
         return file;
       }
 
       @Override
-      public File getRpmListFile(String id, String version) {
+      public File getRpmListFile(String version) {
         return file;
       }
     };

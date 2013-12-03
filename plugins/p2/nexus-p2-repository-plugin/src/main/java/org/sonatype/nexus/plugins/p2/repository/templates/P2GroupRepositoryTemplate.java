@@ -44,11 +44,6 @@ public class P2GroupRepositoryTemplate
     this.providerHint = checkNotNull(providerHint);
   }
 
-  public P2GroupRepositoryConfiguration getExternalConfiguration(final boolean forWrite) {
-    return (P2GroupRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration().getConfiguration(
-        forWrite);
-  }
-
   @Override
   protected CRepositoryCoreConfiguration initCoreConfiguration() {
     final CRepository repo = new DefaultCRepository();

@@ -22,7 +22,6 @@ public class ArtifactMapping
   private String repository;
 
   public ArtifactMapping(final String repository, final Map<String, ArtifactPath> artifactsPath) {
-    super();
     this.repository = repository;
     this.artifactsPath = artifactsPath;
   }
@@ -35,11 +34,4 @@ public class ArtifactMapping
     return repository;
   }
 
-  public void setArtifactsPath(final Map<String, ArtifactPath> artifactsPath) {
-    this.artifactsPath = artifactsPath;
-  }
-
-  public void setRepository(final String repository) {
-    this.repository = repository;
-  }
 }

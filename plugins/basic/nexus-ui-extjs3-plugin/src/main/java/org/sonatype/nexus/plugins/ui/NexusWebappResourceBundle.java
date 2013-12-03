@@ -33,8 +33,6 @@ public class NexusWebappResourceBundle
 
   private final BuildNumberService buildNumberService;
 
-  private static final Logger logger = LoggerFactory.getLogger(NexusWebappResourceBundle.class);
-
   @Inject
   public NexusWebappResourceBundle(final BuildNumberService buildNumberService) {
     this.buildNumberService = buildNumberService;

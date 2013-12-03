@@ -54,8 +54,6 @@ public class RpmListWriter
 
   private final String addedFiles;
 
-  private final String repositoryId;
-
   private final File baseRpmDir;
 
   private final boolean singleRpmPerDirectory;
@@ -66,8 +64,7 @@ public class RpmListWriter
 
   private final RpmScanner scanner;
 
-  public RpmListWriter(final String repositoryId,
-                       final File baseRpmDir,
+  public RpmListWriter(final File baseRpmDir,
                        final String addedFiles,
                        final String version,
                        final boolean singleRpmPerDirectory,
@@ -75,7 +72,6 @@ public class RpmListWriter
                        final ListFileFactory fileFactory,
                        final RpmScanner scanner)
   {
-    this.repositoryId = repositoryId;
     this.baseRpmDir = baseRpmDir;
     this.addedFiles = addedFiles;
     this.version = version;
@@ -83,7 +79,7 @@ public class RpmListWriter
     this.forceFullScan = forceFullScan;
     this.fileFactory = fileFactory;
     this.scanner = scanner;
-    this.rpmListFile = fileFactory.getRpmListFile(repositoryId);
+    this.rpmListFile = fileFactory.getRpmListFile();
   }
 
   public File writeList()
@@ -120,7 +116,7 @@ public class RpmListWriter
       }
     }
 
-    File rpmVersionedListFile = fileFactory.getRpmListFile(repositoryId, version);
+    File rpmVersionedListFile = fileFactory.getRpmListFile(version);
     writeRpmFileList(filesWithRequiredVersion, rpmVersionedListFile);
     return rpmVersionedListFile;
   }

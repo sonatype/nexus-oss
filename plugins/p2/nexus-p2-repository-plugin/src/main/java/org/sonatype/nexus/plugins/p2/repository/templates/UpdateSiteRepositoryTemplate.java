@@ -37,11 +37,6 @@ public class UpdateSiteRepositoryTemplate
     super(provider, id, description, new P2ContentClass(), UpdateSiteProxyRepository.class);
   }
 
-  public UpdateSiteRepositoryConfiguration getExternalConfiguration(final boolean forWrite) {
-    return (UpdateSiteRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration().getConfiguration(
-        forWrite);
-  }
-
   @Override
   protected CRepositoryCoreConfiguration initCoreConfiguration() {
     final CRepository repo = new DefaultCRepository();

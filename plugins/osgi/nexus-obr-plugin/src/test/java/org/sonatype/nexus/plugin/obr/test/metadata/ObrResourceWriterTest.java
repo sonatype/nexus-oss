@@ -112,6 +112,7 @@ public class ObrResourceWriterTest
   }
 
   // NXCM-1360
+  @Test
   public void testRoundTrippingWithLongPackageNames()
       throws Exception
   {

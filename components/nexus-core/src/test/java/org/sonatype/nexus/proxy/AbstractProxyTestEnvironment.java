@@ -33,9 +33,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
-import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
-import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.sisu.goodies.common.Loggers;
 
 import com.google.common.eventbus.Subscribe;
@@ -66,16 +64,6 @@ public abstract class AbstractProxyTestEnvironment
   private RepositoryRegistry repositoryRegistry;
 
   /**
-   * The local repository storage.
-   */
-  private LocalRepositoryStorage localRepositoryStorage;
-
-  /**
-   * The remote repository storage.
-   */
-  private RemoteRepositoryStorage remoteRepositoryStorage;
-
-  /**
    * The hint provider for remote repository storage.
    */
   private RemoteProviderHintFactory remoteProviderHintFactory;
@@ -103,57 +91,8 @@ public abstract class AbstractProxyTestEnvironment
     return repositoryRegistry;
   }
 
-  /**
-   * Sets the repository registry.
-   *
-   * @param repositoryRegistry the new repository registry
-   */
-  public void setRepositoryRegistry(RepositoryRegistry repositoryRegistry) {
-    this.repositoryRegistry = repositoryRegistry;
-  }
-
-  /**
-   * Gets the local repository storage.
-   *
-   * @return the local repository storage
-   */
-  public LocalRepositoryStorage getLocalRepositoryStorage() {
-    return localRepositoryStorage;
-  }
-
-  /**
-   * Sets the local repository storage.
-   *
-   * @param localRepositoryStorage the new local repository storage
-   */
-  public void setLocalRepositoryStorage(LocalRepositoryStorage localRepositoryStorage) {
-    this.localRepositoryStorage = localRepositoryStorage;
-  }
-
-  /**
-   * Gets the remote repository storage.
-   *
-   * @return the remote repository storage
-   */
-  public RemoteRepositoryStorage getRemoteRepositoryStorage() {
-    return remoteRepositoryStorage;
-  }
-
-  /**
-   * Sets the remote repository storage.
-   *
-   * @param remoteRepositoryStorage the new remote repository storage
-   */
-  public void setRemoteRepositoryStorage(RemoteRepositoryStorage remoteRepositoryStorage) {
-    this.remoteRepositoryStorage = remoteRepositoryStorage;
-  }
-
   public RemoteProviderHintFactory getRemoteProviderHintFactory() {
     return remoteProviderHintFactory;
-  }
-
-  public void setRemoteProviderHintFactory(RemoteProviderHintFactory remoteProviderHintFactory) {
-    this.remoteProviderHintFactory = remoteProviderHintFactory;
   }
 
   /**
@@ -200,12 +139,7 @@ public abstract class AbstractProxyTestEnvironment
     // "ping" it
     lookup(AttributesHandler.class);
 
-    localRepositoryStorage = lookup(LocalRepositoryStorage.class, "file");
-
     remoteProviderHintFactory = lookup(RemoteProviderHintFactory.class);
-
-    remoteRepositoryStorage =
-        lookup(RemoteRepositoryStorage.class, remoteProviderHintFactory.getDefaultHttpRoleHint());
 
     rootRouter = lookup(RepositoryRouter.class);
 

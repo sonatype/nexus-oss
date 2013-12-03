@@ -38,37 +38,10 @@ public class TimeUtil
   }
 
   /**
-   * @return current UTC timestamp by yyyyMMddHHmmss mask as a long int
-   */
-  public static long getUTCTimestampAsLong() {
-    return Long.parseLong(getUTCTimestamp(new Date()));
-  }
-
-  /**
-   * @return current UTC timestamp by yyyyMMddHHmmss mask as a long int
-   */
-  public static long getUTCTimestampAsMillis() {
-    return Long.parseLong(getUTCTimestamp(new Date()));
-  }
-
-  /**
    * @return current date converted to UTC timestamp by yyyyMMddHHmmss mask
    */
   public static String getUTCTimestamp(Date date) {
     return TS_FORMAT.format(date);
-  }
-
-  /**
-   * convert timestamp to millis
-   *
-   * @param ts timestamp to convert. Presumed to be a long of form yyyyMMddHHmmss
-   * @return millis, corresponding to the supplied TS
-   * @throws ParseException is long does not follow the format
-   */
-  public static long toMillis(long ts)
-      throws ParseException
-  {
-    return toMillis("" + ts);
   }
 
   /**
@@ -106,24 +79,4 @@ public class TimeUtil
     }
   }
 
-  public static int compare(String t1, String t2)
-      throws ParseException
-  {
-    if (t1 == t2) {
-      return 0;
-    }
-
-    if (t1 == null) {
-      return -1;
-    }
-
-    if (t2 == null) {
-      return 1;
-    }
-
-    Date d1 = toDate(t1);
-    Date d2 = toDate(t2);
-
-    return d1.compareTo(d2);
-  }
 }

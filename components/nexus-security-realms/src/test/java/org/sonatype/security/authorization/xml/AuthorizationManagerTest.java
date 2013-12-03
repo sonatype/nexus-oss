@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sonatype.security.AbstractSecurityTestCase;
-import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
@@ -48,12 +47,6 @@ public class AuthorizationManagerTest
     String securityXml = this.getClass().getName().replaceAll("\\.", "\\/") + "-security.xml";
     FileUtils.copyURLToFile(Thread.currentThread().getContextClassLoader().getResource(securityXml),
         new File(CONFIG_DIR, "security.xml"));
-  }
-
-  public SecuritySystem getSecuritySystem()
-      throws Exception
-  {
-    return this.lookup(SecuritySystem.class);
   }
 
   public AuthorizationManager getAuthorizationManager()

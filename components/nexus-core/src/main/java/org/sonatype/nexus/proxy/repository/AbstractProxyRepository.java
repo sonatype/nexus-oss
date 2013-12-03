@@ -112,7 +112,7 @@ public abstract class AbstractProxyRepository
   // == injected
 
   private ThreadPoolManager poolManager;
-  
+
   // == set by this
 
   /**
@@ -162,8 +162,7 @@ public abstract class AbstractProxyRepository
       REMOTE_STATUS_RETAIN_TIME);
 
   @Inject
-  public void populateAbstractProxyRepository(ThreadPoolManager poolManager)
-  {
+  public void populateAbstractProxyRepository(ThreadPoolManager poolManager) {
     this.poolManager = checkNotNull(poolManager);
 
     // we have been not configured yet! So, we have no ID and stuff coming from config!
@@ -838,19 +837,6 @@ public abstract class AbstractProxyRepository
   @Override
   public void setRemoteAuthenticationSettings(RemoteAuthenticationSettings settings) {
     getRemoteStorageContext().setRemoteAuthenticationSettings(settings);
-
-    if (getProxyMode() != null && getProxyMode().shouldAutoUnblock()) {
-      // perm changes? retry if autoBlocked
-      setProxyMode(ProxyMode.ALLOW);
-    }
-  }
-
-  public RemoteProxySettings getRemoteProxySettings() {
-    return getRemoteStorageContext().getRemoteProxySettings();
-  }
-
-  public void setRemoteProxySettings(RemoteProxySettings settings) {
-    getRemoteStorageContext().setRemoteProxySettings(settings);
 
     if (getProxyMode() != null && getProxyMode().shouldAutoUnblock()) {
       // perm changes? retry if autoBlocked

@@ -36,11 +36,6 @@ public class Maven2HostedRepositoryTemplate
     super(provider, id, description, new Maven2ContentClass(), MavenHostedRepository.class, repositoryPolicy);
   }
 
-  public M2RepositoryConfiguration getExternalConfiguration(boolean forWrite) {
-    return (M2RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
-        .getConfiguration(forWrite);
-  }
-
   @Override
   protected CRepositoryCoreConfiguration initCoreConfiguration() {
     CRepository repo = new DefaultCRepository();

@@ -61,19 +61,6 @@ public class DefaultConfigurationHelper
     return copy;
   }
 
-  @Override
-  public Configuration maskPasswords(final Configuration config) {
-    if (null == config) {
-      return null;
-    }
-
-    final Configuration copy = clone(config);
-
-    handlePasswords(copy, false, true);
-
-    return copy;
-  }
-
   protected Configuration clone(final Configuration config) {
     // use Xstream
     return (Configuration) xstream.fromXML(xstream.toXML(config));

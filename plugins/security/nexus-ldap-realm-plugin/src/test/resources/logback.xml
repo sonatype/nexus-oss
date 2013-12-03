@@ -2,7 +2,7 @@
 <configuration>
   <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%4d{yyyy-MM-dd HH:mm:ss} %-5p [%thread] - %c - %m%n</pattern>
+      <pattern>%d{HH:mm:ss.SSS} %-5p [%thread] - %c - %m%n</pattern>
     </encoder>
   </appender>
   <root level="${test.log.level:-INFO}">

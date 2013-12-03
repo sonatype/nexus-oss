@@ -13,12 +13,10 @@
 
 package org.sonatype.nexus.yum;
 
-import java.io.File;
 import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.ScheduledTask;
 
 /**
@@ -27,7 +25,7 @@ import org.sonatype.scheduling.ScheduledTask;
  * @since 2.7
  */
 public interface YumHosted
-  extends Yum
+    extends Yum
 {
 
   static final long DEFAULT_DELETE_PROCESSING_DELAY = 10;

@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.sonatype.security.usermanagement.AbstractUserManager;
-import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
@@ -92,16 +91,6 @@ public abstract class AbstractMockUserManager
 
   protected Set<User> getUsers() {
     return users;
-  }
-
-  protected void setUsers(Set<User> users) {
-    this.users = users;
-  }
-
-  public Set<RoleIdentifier> getUsersRoles(String userId, String source)
-      throws UserNotFoundException
-  {
-    return null;
   }
 
   public void changePassword(String userId, String newPassword)

@@ -52,24 +52,12 @@ public interface Timeline
   void add(TimelineRecord... records);
 
   /**
-   * Deletes records from timeline index that are older than timestamp, and suits the filter (or null for no
-   * filtering).
-   *
-   * @param timestamp the timestamp to which compared older records should be deleted.
-   * @param types     the types to purge
-   * @param subTypes  the subTypes to purge
-   * @param filter    the filter that should be applied before deletion, or null for no filtering.
-   * @return the record count deleted from timeline.
-   */
-  int purge(long timestamp, Set<String> types, Set<String> subTypes, TimelineFilter filter);
-
-  /**
    * Deletes records from timeline index and persisted data that are older than timestamp.
    *
    * @param days how old records needs to be purged.
    * @since 2.7.0
    */
-  void purgeOlderThan(int days);
+  int purgeOlderThan(int days);
 
   /**
    * Retrieves records from timeline. The order is desceding, newest is 1st, oldest last.
@@ -84,17 +72,4 @@ public interface Timeline
   void retrieve(int fromItem, int count, Set<String> types, Set<String> subTypes, TimelineFilter filter,
                 TimelineCallback callback);
 
-  /**
-   * Retrieves records from timeline. The order is desceding, newest is 1st, oldest last.
-   *
-   * @param fromItem the number of items you want to skip (paging), 0 for none ("from beginning").
-   * @param count    the count of records you want to retrieve.
-   * @param types    the types to purge
-   * @param subTypes the subTypes to purge
-   * @param filter   the filter you want to apply, or null for no filtering.
-   * @param callback the callback to receive results, never {@code null}.
-   */
-  void retrieve(long fromTime, long toTime, int fromItem, int count, Set<String> types, Set<String> subTypes,
-                TimelineFilter filter,
-                TimelineCallback callback);
 }

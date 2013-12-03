@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +32,6 @@ import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.routing.events.PrefixFilePublishedRepositoryEvent;
-import org.sonatype.nexus.proxy.maven.routing.events.PrefixFileUnpublishedRepositoryEvent;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -76,11 +74,8 @@ public class PrefixFileUpdatePropagationGroupUpdatesTest
   {
     private final List<String> publishedIds;
 
-    private final List<String> unpublishedIds;
-
     public PrefixFileUpdateListener() {
       this.publishedIds = new ArrayList<String>();
-      this.unpublishedIds = new ArrayList<String>();
       reset();
     }
 
@@ -89,27 +84,13 @@ public class PrefixFileUpdatePropagationGroupUpdatesTest
       publishedIds.add(evt.getRepository().getId());
     }
 
-    @Subscribe
-    public void on(final PrefixFileUnpublishedRepositoryEvent evt) {
-      unpublishedIds.add(evt.getRepository().getId());
-    }
-
     public List<String> getPublished() {
       return publishedIds;
     }
 
-    public List<String> getUnpublished() {
-      return unpublishedIds;
-    }
-
     public void reset() {
       publishedIds.clear();
-      unpublishedIds.clear();
     }
-  }
-
-  protected File getStorageRoot(final String repoId) {
-    return getApplicationConfiguration().getWorkingDirectory("proxy/store/" + repoId);
   }
 
   @Override

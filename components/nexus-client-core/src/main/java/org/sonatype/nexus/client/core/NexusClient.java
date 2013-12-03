@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.client.core;
 
-import java.util.List;
-
 import org.sonatype.nexus.client.rest.ConnectionInfo;
 
 /**

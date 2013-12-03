@@ -105,9 +105,9 @@ public abstract class AbstractRepository
     extends ConfigurableRepository
     implements Repository
 {
-  
+
   // == injected
-  
+
   private CacheManager cacheManager;
 
   private TargetRegistry targetRegistry;
@@ -121,11 +121,11 @@ public abstract class AbstractRepository
   private MimeSupport mimeSupport;
 
   private Map<String, ContentGenerator> contentGenerators;
-  
+
   private AttributesHandler attributesHandler;
 
   private AccessManager accessManager;
-  
+
   // == set by this
 
   /**
@@ -187,7 +187,8 @@ public abstract class AbstractRepository
 
     // we have been not configured yet! So, we have no ID and stuff coming from config!
     // post inject stuff
-    this.localStorageContext = new DefaultLocalStorageContext(getApplicationConfiguration().getGlobalLocalStorageContext());
+    this.localStorageContext = new DefaultLocalStorageContext(
+        getApplicationConfiguration().getGlobalLocalStorageContext());
   }
 
   protected MimeSupport getMimeSupport() {
@@ -292,15 +293,6 @@ public abstract class AbstractRepository
     synchronized (requestStrategies) {
       return Maps.newHashMap(requestStrategies);
     }
-  }
-
-  /**
-   * Gets the cache manager.
-   *
-   * @return the cache manager
-   */
-  protected CacheManager getCacheManager() {
-    return cacheManager;
   }
 
   /**
@@ -643,7 +635,8 @@ public abstract class AbstractRepository
 
     DefaultStorageFileItem fItem =
         new DefaultStorageFileItem(this, request, true, true, new PreparedContentLocator(is,
-            getMimeSupport().guessMimeTypeFromPath(getMimeRulesSource(), request.getRequestPath()), ContentLocator.UNKNOWN_LENGTH));
+            getMimeSupport().guessMimeTypeFromPath(getMimeRulesSource(), request.getRequestPath()),
+            ContentLocator.UNKNOWN_LENGTH));
 
     if (userAttributes != null) {
       fItem.getRepositoryItemAttributes().putAll(userAttributes);

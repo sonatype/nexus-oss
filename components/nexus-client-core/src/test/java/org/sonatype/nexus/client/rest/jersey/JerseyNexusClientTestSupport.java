@@ -13,29 +13,10 @@
 
 package org.sonatype.nexus.client.rest.jersey;
 
-import java.net.MalformedURLException;
-
-import org.sonatype.nexus.client.core.NexusClient;
-import org.sonatype.nexus.client.core.spi.SubsystemFactory;
-import org.sonatype.nexus.client.rest.BaseUrl;
-import org.sonatype.nexus.client.rest.NexusClientFactory;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 public class JerseyNexusClientTestSupport
     extends TestSupport
 {
-
-  /**
-   * This method is a CHEAT! It would need to prepare and locally run a Nexus instance, but for now, RSO is used...
-   * Naturally, this makes the tests unstable too...
-   */
-  protected NexusClient createClientForLiveInstance(
-      final SubsystemFactory<?, JerseyNexusClient>... subsystemFactories)
-      throws MalformedURLException
-  {
-    final NexusClientFactory factory = new JerseyNexusClientFactory(subsystemFactories);
-    final NexusClient client = factory.createFor(BaseUrl.baseUrlFrom("https://repository.sonatype.org/"));
-    return client;
-  }
 
 }

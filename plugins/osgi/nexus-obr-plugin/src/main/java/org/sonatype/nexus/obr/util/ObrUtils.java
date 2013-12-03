@@ -127,16 +127,6 @@ public final class ObrUtils
     return repository.createUid(OBR_PATH);
   }
 
-  /**
-   * Splits the given URL into a site and OBR metadata path by using simple heuristics.
-   *
-   * @param url the local or remote URL
-   * @return an array containing the site and the OBR metadata path
-   */
-  public static String[] splitObrSiteAndPath(final String url) {
-    return splitObrSiteAndPath(url, true);
-  }
-
   public static String[] splitObrSiteAndPath(final String url, final boolean useDefaultIfNotSet) {
     // is this a Nexus managed OBR?
     final int i = url.lastIndexOf(OBR_PATH);

@@ -210,10 +210,6 @@ public class DefaultNexusPluginManager
     return null;
   }
 
-  protected boolean isActivatedPlugin(final GAVCoordinate gav, final boolean strict) {
-    return getActivatedPluginGav(gav, strict) != null;
-  }
-
   protected PluginManagerResponse activatePlugin(final GAVCoordinate gav, final boolean strict,
                                                  final Set<GAVCoordinate> installedPluginsFilteredByGA)
   {
@@ -401,7 +397,7 @@ public class DefaultNexusPluginManager
 
   private List<StaticResource> findStaticResources(final GAVCoordinate gav, final ClassSpace pluginSpace) {
     final List<StaticResource> staticResources = new ArrayList<StaticResource>();
-    for (Enumeration<URL> e = pluginSpace.findEntries("static/", null, true); e.hasMoreElements();) {
+    for (Enumeration<URL> e = pluginSpace.findEntries("static/", null, true); e.hasMoreElements(); ) {
       final URL url = e.nextElement();
       final String path = getPublishedPath(url);
       if (path != null) {
@@ -414,7 +410,7 @@ public class DefaultNexusPluginManager
 
   private static List<String> findExportedClassnames(final ClassSpace annSpace) {
     final List<String> exportedClassNames = new ArrayList<String>();
-    for (Enumeration<URL> e = annSpace.findEntries(null, "*.class", true); e.hasMoreElements();) {
+    for (Enumeration<URL> e = annSpace.findEntries(null, "*.class", true); e.hasMoreElements(); ) {
       String path = e.nextElement().getPath();
       int index = path.lastIndexOf("jar!/");
       if (index > 0) {
