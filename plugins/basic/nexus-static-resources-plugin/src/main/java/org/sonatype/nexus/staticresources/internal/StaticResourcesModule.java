@@ -17,6 +17,8 @@ import javax.inject.Named;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
+import org.eclipse.sisu.inject.DefaultRankingFunction;
+import org.eclipse.sisu.inject.RankingFunction;
 
 /**
  * Static resources module.
@@ -34,6 +36,12 @@ public class StaticResourcesModule
       @Override
       protected void configureServlets() {
         serve("/*").with(StaticResourcesServlet.class);
+        /*
+         * Give components contributed by this plugin a low-level ranking (same level as Nexus core) so they are ordered
+         * after components from other plugins. This makes sure all the ther non-root servlets will be invoked and this
+         * one will not "grab all" of the requests as it's mounted on root.
+         */
+        bind(RankingFunction.class).toInstance(new DefaultRankingFunction(0));
       }
     });
   }

@@ -43,13 +43,6 @@ public class NexusServletModule
 
     filter("/service/local/*").through(SecurityWebFilter.class);
     filter("/service/local/*").through(MdcUserContextFilter.class);
-
-        /*
-         * Give components contributed by this plugin a low-level ranking (same level as Nexus core) so they are ordered
-         * after components from other plugins. This makes sure the restlet1x "catch-all" filter won't kick in early and
-         * block other filters in the pipeline.
-         */
-    bind(RankingFunction.class).toInstance(new DefaultRankingFunction(0));
   }
 
   private Map<String, String> nexusRestletServletInitParams() {
