@@ -45,7 +45,8 @@ public class NexusReferenceFactory
       result = new Reference(globalRestApiSettings.getBaseUrl());
     }
     else {
-      result = request.getRootRef();
+      // TODO: NEXUS-6045 hack, Restlet app root is now "/service/local", so going up 2 levels!
+      result = request.getRootRef().getParentRef().getParentRef();
     }
 
     // fix for when restlet is at webapp root
