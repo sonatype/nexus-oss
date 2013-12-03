@@ -86,6 +86,7 @@ public class RestletRepositoryURLBuilder
     }
     // next check if this thread has a restlet request
     else if (Request.getCurrent() != null) {
+      // TODO: NEXUS-6045 hack, Restlet app root is now "/service/local", so going up 2 levels!
       baseURL = Request.getCurrent().getRootRef().getParentRef().getParentRef().toString();
     }
     // as last resort, try to use the baseURL if set

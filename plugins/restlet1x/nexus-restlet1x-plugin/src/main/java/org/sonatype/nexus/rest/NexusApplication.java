@@ -175,35 +175,6 @@ public class NexusApplication
     // SERVICE (two always connected, unrelated to isStarted)
 
     attach(getApplicationRouter(), false, statusPlexusResource);
-
-    /**
-    // ==========
-    // INDEX.HTML and WAR contents
-    // To redirect "uncaught" requests to indexTemplateResource
-    ManagedPlexusResource indexRedirectingResource = managedResources.get("IndexRedirectingPlexusResource");
-    attach(root, true, "", new NexusPlexusResourceFinder(getContext(), indexRedirectingResource));
-    attach(root, true, "/", new NexusPlexusResourceFinder(getContext(), indexRedirectingResource));
-
-    // the indexTemplateResource
-    attach(root, false, managedResources.get("indexTemplate"));
-    if (licenseTemplateResource != null) {
-      attach(root, false, licenseTemplateResource);
-    }
-    if (enterLicenseTemplateResource != null) {
-      attach(root, false, enterLicenseTemplateResource);
-    }
-
-    // publish the WAR contents
-    Directory rootDir = new NexusDirectory(getContext(), "war:///");
-    rootDir.setListingAllowed(false);
-    rootDir.setNegotiateContent(false);
-    attach(root, false, "/", rootDir);
-     **/
-
-    // ================
-    // STATIC RESOURCES
-
-    // NEXUS-6045: Are gone from here
   }
 
   private final AntPathMatcher shiroAntPathMatcher = new AntPathMatcher();
