@@ -86,7 +86,7 @@ public class RestletRepositoryURLBuilder
     }
     // next check if this thread has a restlet request
     else if (Request.getCurrent() != null) {
-      baseURL = Request.getCurrent().getRootRef().toString();
+      baseURL = Request.getCurrent().getRootRef().getParentRef().getParentRef().toString();
     }
     // as last resort, try to use the baseURL if set
     else {
