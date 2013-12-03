@@ -464,16 +464,16 @@ public class DefaultNexusPluginManager
   }
 
   private String getPublishedPath(final URL resourceURL) {
-    String path = resourceURL.toExternalForm();
+    final String path = resourceURL.toExternalForm();
     int index = path.indexOf("jar!/");
     if (index > 0) {
-      path = path.substring(index + 4);
+      return path.substring(index + 4);
     }
     index = path.indexOf("/static/");
-    if (index > -1) {
-      path = path.substring(index + 7);
+    if (index > 0) {
+      return path.substring(index);
     }
-    return path;
+    return null;
   }
 
   private void reportMissingPlugin(final PluginManagerResponse response,
