@@ -27,15 +27,13 @@ import com.google.inject.servlet.ServletModule;
 public class StaticResourcesModule
     extends AbstractModule
 {
-  private static final String MOUNT_POINT = "/static";
-
   @Override
   protected void configure() {
     install(new ServletModule()
     {
       @Override
       protected void configureServlets() {
-        serve(MOUNT_POINT + "/*").with(StaticResourcesServlet.class);
+        serve("/*").with(StaticResourcesServlet.class);
       }
     });
   }

@@ -29,7 +29,7 @@
 
   <properties>
     <pluginName>Nexus Static Resources Plugin</pluginName>
-    <pluginDescription>Publishes plugin provided static resources.</pluginDescription>
+    <pluginDescription>Publishes core and plugin provided static resources.</pluginDescription>
   </properties>
 
   <dependencies>

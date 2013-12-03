@@ -13,44 +13,18 @@
 
 package org.sonatype.nexus.staticresources;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.io.IOException;
 
-import org.sonatype.inject.EagerSingleton;
-import org.sonatype.nexus.plugin.PluginIdentity;
-
-import org.jetbrains.annotations.NonNls;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
- * Static Resources plugin.
+ * Component rendering the "/index.html" entry page. Should be provided by UI "boot" related plugin, as Nx core
+ * itself is UI agnostic.
  *
- * @since 2.8
+ * @since 2.8.0
  */
-@Named
-@EagerSingleton
-public class StaticResourcesPlugin
-    extends PluginIdentity
+public interface IndexPageRenderer
 {
-  /**
-   * Prefix for ID-like things.
-   */
-  @NonNls
-  public static final String ID_PREFIX = "static-resources";
-
-  /**
-   * Expected groupId for plugin artifact.
-   */
-  @NonNls
-  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
-
-  /**
-   * Expected artifactId for plugin artifact.
-   */
-  @NonNls
-  public static final String ARTIFACT_ID = "nexus-" + ID_PREFIX + "-plugin";
-
-  @Inject
-  public StaticResourcesPlugin() throws Exception {
-    super(GROUP_ID, ARTIFACT_ID);
-  }
+  void render(HttpServletRequest request, HttpServletResponse response, String appRootUrl) throws IOException;
 }

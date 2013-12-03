@@ -154,7 +154,7 @@ public class NexusApplication
     Router applicationRouter = new Router(getContext());
 
     // attaching filter to a root on given URI
-    attach(root, false, "/service/" + AbstractNexusPlexusResource.NEXUS_INSTANCE_LOCAL, applicationRouter);
+    attach(root, false, "/", applicationRouter);
 
     // return the swapped router
     return applicationRouter;
@@ -186,6 +186,7 @@ public class NexusApplication
 
     attach(getApplicationRouter(), false, statusPlexusResource);
 
+    /**
     // ==========
     // INDEX.HTML and WAR contents
     // To redirect "uncaught" requests to indexTemplateResource
@@ -207,6 +208,7 @@ public class NexusApplication
     rootDir.setListingAllowed(false);
     rootDir.setNegotiateContent(false);
     attach(root, false, "/", rootDir);
+     **/
 
     // ================
     // STATIC RESOURCES

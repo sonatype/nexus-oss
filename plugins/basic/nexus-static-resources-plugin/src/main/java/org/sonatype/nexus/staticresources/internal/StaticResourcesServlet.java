@@ -14,13 +14,14 @@
 package org.sonatype.nexus.staticresources.internal;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -30,14 +31,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.rest.CacheControl;
+import org.sonatype.nexus.plugins.rest.DefaultStaticResource;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
+import org.sonatype.nexus.staticresources.IndexPageRenderer;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.io.StreamSupport;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +72,10 @@ public class StaticResourcesServlet
 
   private final MimeSupport mimeSupport;
 
+  private final GlobalRestApiSettings globalRestApiSettings;
+
+  private final IndexPageRenderer indexPageRenderer;
+
   private final String serverString;
 
   private final Map<String, StaticResource> staticResources;
@@ -74,10 +83,14 @@ public class StaticResourcesServlet
   @Inject
   public StaticResourcesServlet(final List<NexusResourceBundle> nexusResourceBundles,
                                 final MimeSupport mimeSupport,
+                                final GlobalRestApiSettings globalRestApiSettings,
+                                final @Nullable IndexPageRenderer indexPageRenderer,
                                 final ApplicationStatusSource applicationStatusSource)
   {
     this.nexusResourceBundles = checkNotNull(nexusResourceBundles);
     this.mimeSupport = checkNotNull(mimeSupport);
+    this.globalRestApiSettings = checkNotNull(globalRestApiSettings);
+    this.indexPageRenderer = checkNotNull(indexPageRenderer);
     this.serverString = "Nexus/" + checkNotNull(applicationStatusSource).getSystemStatus().getVersion();
     this.staticResources = Maps.newHashMap();
     logger.debug("bufferSize={}", BUFFER_SIZE);
@@ -111,6 +124,34 @@ public class StaticResourcesServlet
     }
   }
 
+  /**
+   * Calculates the "application root" URL, as seen by client (from {@link HttpServletRequest} made by it), or, if
+   * "force base URL" configuration is set, to that URL.
+   */
+  protected String getAppRootUrl(final HttpServletRequest request) {
+    final StringBuilder result = new StringBuilder();
+    if (globalRestApiSettings.isEnabled() && globalRestApiSettings.isForceBaseUrl()
+        && !Strings.isNullOrEmpty(globalRestApiSettings.getBaseUrl())) {
+      result.append(globalRestApiSettings.getBaseUrl());
+    }
+    else {
+      String appRoot = request.getRequestURL().toString();
+      final String pathInfo = request.getPathInfo();
+      if (!Strings.isNullOrEmpty(pathInfo)) {
+        appRoot = appRoot.substring(0, appRoot.length() - pathInfo.length());
+      }
+      final String servletPath = request.getServletPath();
+      if (!Strings.isNullOrEmpty(servletPath)) {
+        appRoot = appRoot.substring(0, appRoot.length() - servletPath.length());
+      }
+      result.append(appRoot);
+    }
+    if (!result.toString().endsWith("/")) {
+      result.append("/");
+    }
+    return result.toString();
+  }
+
   // service
 
   @Override
@@ -129,47 +170,40 @@ public class StaticResourcesServlet
   {
     final String requestPath = request.getPathInfo();
     logger.info("Requested resource {}", requestPath);
-    StaticResource staticResource = null;
+    // 0) see is index.html needed actually
+    if ("".equals(requestPath) || "/".equals(requestPath)) {
+      // redirect to index.html
+      response.setStatus(HttpServletResponse.SC_FOUND);
+      response.addHeader("Location", getAppRootUrl(request) + "index.html");
+      return;
+    }
+    if ("/index.html".equals(requestPath)) {
+      doGetIndex(request, response);
+      return;
+    }
+
     // locate it
-    // first "dev" resources if enabled
+    StaticResource staticResource = null;
+    // 1) first "dev" resources if enabled (to override everything else)
     if (DevModeResources.hasResourceLocations()) {
       final File file = DevModeResources.getFileIfOnFileSystem(requestPath);
       if (file != null) {
-        // directly implementing StaticResource and not CacheControl as with dev
-        // resources WE DO NOT WANT Caching to happen at all
         logger.info("Delivering DEV resource {}", file.getAbsoluteFile());
-        staticResource = new StaticResource()
-        {
-          @Override
-          public String getPath() {
-            return requestPath;
-          }
-
-          @Override
-          public String getContentType() {
-            return mimeSupport.guessMimeTypeFromPath(file.getName());
-          }
-
-          @Override
-          public long getSize() {
-            return file.length();
-          }
-
-          @Override
-          public Long getLastModified() {
-            return file.lastModified();
-          }
-
-          @Override
-          public InputStream getInputStream() throws IOException {
-            return new FileInputStream(file);
-          }
-        };
+        staticResource = new DevModeResource(requestPath, mimeSupport.guessMimeTypeFromPath(file.getName()), file);
       }
     }
-    // second, look at "ordinary" static resources, but only if devResource did not hit anything
+    // 2) second, look at "ordinary" static resources, but only if devResource did not hit anything
     if (staticResource == null) {
       staticResource = staticResources.get(requestPath);
+    }
+
+    // 3) third, look into WAR embedded resources
+    if (staticResource == null) {
+      final URL resourceUrl = getServletContext().getResource(requestPath);
+      if (resourceUrl != null) {
+        staticResource = new DefaultStaticResource(resourceUrl, requestPath,
+            mimeSupport.guessMimeTypeFromPath(requestPath));
+      }
     }
 
     // deliver it, if we have anything
@@ -177,7 +211,19 @@ public class StaticResourcesServlet
       doGetResource(request, response, staticResource);
     }
     else {
-      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
+    }
+  }
+
+  /**
+   * Delegates to {@link IndexPageRenderer} to render index page.
+   */
+  protected void doGetIndex(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    if (indexPageRenderer != null) {
+      indexPageRenderer.render(request, response, getAppRootUrl(request));
+    }
+    else {
+      response.sendError(HttpServletResponse.SC_NOT_FOUND, "Index page renderer not found");
     }
   }
 
