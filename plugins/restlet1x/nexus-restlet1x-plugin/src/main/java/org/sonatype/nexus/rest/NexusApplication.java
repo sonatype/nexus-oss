@@ -36,7 +36,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.Subscribe;
 import com.thoughtworks.xstream.XStream;
 import org.apache.shiro.util.AntPathMatcher;
-import org.restlet.Directory;
 import org.restlet.Router;
 import org.restlet.service.StatusService;
 
