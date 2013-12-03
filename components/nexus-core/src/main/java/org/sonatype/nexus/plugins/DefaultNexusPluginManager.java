@@ -367,7 +367,7 @@ public class DefaultNexusPluginManager
     beanModules.add(new NexusAnnotatedBeanModule(annSpace, variables, repositoryTypes));
 
     // Find static resources and expose as single resource bundle
-    final List<StaticResource> staticResources = findStaticResources(pluginSpace);
+    final List<StaticResource> staticResources = findStaticResources(descriptor.getPluginCoordinates(), pluginSpace);
     final NexusResourceBundle resourceBundle = new NexusResourceBundle()
     {
       public List<StaticResource> getContributedResouces() {
@@ -399,13 +399,13 @@ public class DefaultNexusPluginManager
     descriptor.setStaticResources(staticResources);
   }
 
-  private List<StaticResource> findStaticResources(final ClassSpace pluginSpace) {
+  private List<StaticResource> findStaticResources(final GAVCoordinate gav, final ClassSpace pluginSpace) {
     final List<StaticResource> staticResources = new ArrayList<StaticResource>();
     for (Enumeration<URL> e = pluginSpace.findEntries("static/", null, true); e.hasMoreElements();) {
       final URL url = e.nextElement();
       final String path = getPublishedPath(url);
       if (path != null) {
-        staticResources.add(new PluginStaticResource(url, path,
+        staticResources.add(new PluginStaticResource(gav, url, path,
             mimeSupport.guessMimeTypeFromPath(url.getPath())));
       }
     }
