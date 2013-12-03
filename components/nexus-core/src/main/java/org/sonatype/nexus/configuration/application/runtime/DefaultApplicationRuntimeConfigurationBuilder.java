@@ -20,12 +20,12 @@ import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.guice.bean.locators.BeanLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+import org.eclipse.sisu.inject.BeanLocator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

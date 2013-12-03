@@ -20,13 +20,14 @@ import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.inject.Description;
 import org.sonatype.security.authorization.AbstractReadOnlyAuthorizationManager;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
+
+import org.eclipse.sisu.Description;
 
 /**
  * A AuthorizationManager is used if an external Realm wants to use its Group/Roles in Nexus. For example, your realm

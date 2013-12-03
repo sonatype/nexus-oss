@@ -24,9 +24,6 @@ import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 
-import org.sonatype.guice.bean.locators.BeanLocator;
-import org.sonatype.inject.BeanEntry;
-import org.sonatype.inject.Mediator;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 import org.sonatype.security.web.ProtectedPathManager;
@@ -53,6 +50,9 @@ import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
+import org.eclipse.sisu.BeanEntry;
+import org.eclipse.sisu.Mediator;
+import org.eclipse.sisu.inject.BeanLocator;
 
 /**
  * Extends ShiroWebModule to configure commonly set commponents such as SessionDAO, Authenticator, Authorizer, etc.

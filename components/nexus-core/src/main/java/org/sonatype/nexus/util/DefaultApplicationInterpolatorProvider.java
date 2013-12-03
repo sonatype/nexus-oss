@@ -19,11 +19,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.inject.Parameters;
-
 import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+import org.eclipse.sisu.Parameters;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

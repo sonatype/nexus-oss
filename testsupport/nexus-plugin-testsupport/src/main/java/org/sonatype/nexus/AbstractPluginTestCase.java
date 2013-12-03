@@ -19,13 +19,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.sonatype.guice.bean.reflect.ClassSpace;
-import org.sonatype.guice.bean.reflect.URLClassSpace;
-import org.sonatype.guice.plexus.config.PlexusBeanModule;
 import org.sonatype.nexus.guice.NexusAnnotatedBeanModule;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 
 import org.codehaus.plexus.DefaultPlexusContainer;
+import org.eclipse.sisu.plexus.PlexusBeanModule;
+import org.eclipse.sisu.space.ClassSpace;
+import org.eclipse.sisu.space.URLClassSpace;
 import org.junit.Assert;
 
 /**

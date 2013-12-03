@@ -19,11 +19,11 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.guice.bean.locators.DefaultRankingFunction;
-import org.sonatype.guice.bean.locators.RankingFunction;
 import org.sonatype.security.web.guice.SecurityWebFilter;
 
 import com.google.inject.servlet.ServletModule;
+import org.eclipse.sisu.inject.DefaultRankingFunction;
+import org.eclipse.sisu.inject.RankingFunction;
 
 /**
  * Guice module for binding nexus servlets.

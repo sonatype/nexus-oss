@@ -28,7 +28,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <sisu-inject.version>2.5.1</sisu-inject.version>
+    <eclipse-sisu.version>0.1.1</eclipse-sisu.version>
     <sisu-guice.version>3.1.4</sisu-guice.version>
   </properties>
 
@@ -38,6 +38,26 @@
         <groupId>javax.inject</groupId>
         <artifactId>javax.inject</artifactId>
         <version>1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>javax.enterprise</groupId>
+        <artifactId>cdi-api</artifactId>
+        <version>1.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.el</groupId>
+            <artifactId>el-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.jboss.ejb3</groupId>
+            <artifactId>jboss-ejb3-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.jboss.interceptor</groupId>
+            <artifactId>jboss-interceptor-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
@@ -71,25 +91,15 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-inject-bean</artifactId>
-        <version>${sisu-inject.version}</version>
-        <exclusions>
-          <!--
-          FIXME: This causes problems for module which only depend on this and not sisu-guice as well.
-          sisu-inject-bean depends on no_aop guice, strip it out so we don't get aop and no_aop variants.
-          -->
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-guice</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>org.eclipse.sisu.inject</artifactId>
+        <version>${eclipse-sisu.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-inject-plexus</artifactId>
-        <version>${sisu-inject.version}</version>
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>org.eclipse.sisu.plexus</artifactId>
+        <version>${eclipse-sisu.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

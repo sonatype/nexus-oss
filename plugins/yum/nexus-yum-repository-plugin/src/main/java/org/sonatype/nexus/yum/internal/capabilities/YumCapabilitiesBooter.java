@@ -15,10 +15,11 @@ package org.sonatype.nexus.yum.internal.capabilities;
 
 import javax.inject.Named;
 
-import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityBooterSupport;
 import org.sonatype.nexus.yum.YumRegistry;
+
+import org.eclipse.sisu.EagerSingleton;
 
 /**
  * Automatically create Yum capability.

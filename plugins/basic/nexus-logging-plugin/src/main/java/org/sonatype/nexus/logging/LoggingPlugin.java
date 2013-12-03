@@ -16,8 +16,9 @@ package org.sonatype.nexus.logging;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.plugin.PluginIdentity;
+
+import org.eclipse.sisu.EagerSingleton;
 
 /**
  * Logging plugin.
