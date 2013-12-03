@@ -15,7 +15,7 @@ package org.sonatype.security.authorization.xml;
 
 import java.util.List;
 
-import org.sonatype.guice.bean.containers.InjectedTestCase;
+import org.eclipse.sisu.launch.InjectedTestCase;
 
 public class DefaultPrivilegeInheritanceManagerTest
     extends InjectedTestCase

@@ -16,14 +16,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.management.ManagementFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-
-import org.sonatype.guice.bean.reflect.Logs;
-import org.sonatype.inject.Nullable;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.FileSystemXmlConfig;
@@ -32,6 +30,7 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ISemaphore;
 import com.hazelcast.core.InstanceDestroyedException;
+import org.eclipse.sisu.inject.Logs;
 
 /**
  * Distributed Hazelcast {@link ResourceLockFactory} implementation.

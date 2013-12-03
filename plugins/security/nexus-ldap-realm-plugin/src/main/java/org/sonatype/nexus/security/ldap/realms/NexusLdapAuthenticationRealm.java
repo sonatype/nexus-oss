@@ -17,9 +17,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.inject.Description;
 import org.sonatype.security.ldap.realms.AbstractLdapAuthenticatingRealm;
 import org.sonatype.security.ldap.realms.LdapManager;
+
+import org.eclipse.sisu.Description;
 
 @Singleton
 @Named(NexusLdapAuthenticationRealm.ROLE)

@@ -20,8 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.timeline.internal.DefaultTimeline;
+
+import org.eclipse.sisu.launch.InjectedTestCase;
 
 public abstract class AbstractTimelineTestCase
     extends InjectedTestCase

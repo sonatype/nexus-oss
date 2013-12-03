@@ -13,9 +13,11 @@
 
 package org.sonatype.nexus.atlas.internal
 
-import com.google.inject.Key
-import org.sonatype.guice.bean.locators.BeanLocator
-import org.sonatype.inject.Parameters
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+import java.nio.file.FileSystems
+
 import org.sonatype.nexus.ApplicationStatusSource
 import org.sonatype.nexus.atlas.SystemInformationGenerator
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration
@@ -23,10 +25,9 @@ import org.sonatype.nexus.plugins.NexusPluginManager
 import org.sonatype.sisu.goodies.common.ComponentSupport
 import org.sonatype.sisu.goodies.common.Iso8601Date
 
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
-import java.nio.file.FileSystems
+import com.google.inject.Key
+import org.eclipse.sisu.Parameters
+import org.eclipse.sisu.inject.BeanLocator;
 
 import static com.google.common.base.Preconditions.checkNotNull
 

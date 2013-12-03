@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.inject.Description;
+import org.eclipse.sisu.Description;
 
 @Singleton
 @Named(SimpleLdapAuthenticatingRealm.ROLE)
