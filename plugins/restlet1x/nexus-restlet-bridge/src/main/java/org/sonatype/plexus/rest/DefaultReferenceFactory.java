@@ -64,7 +64,7 @@ public class DefaultReferenceFactory
   public Reference createThisReference(Request request) {
     String uriPart =
         request.getResourceRef().getTargetRef().toString().substring(
-            request.getRootRef().getTargetRef().toString().length());
+            getContextRoot(request).getTargetRef().toString().length());
 
     // trim leading slash
     if (uriPart.startsWith("/")) {
