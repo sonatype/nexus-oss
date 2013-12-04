@@ -16,7 +16,6 @@ package org.sonatype.nexus.staticresources.internal;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.rest.CacheControl;
@@ -39,10 +37,9 @@ import org.sonatype.nexus.plugins.rest.DefaultStaticResource;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.staticresources.IndexPageRenderer;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.nexus.util.io.StreamSupport;
+import org.sonatype.nexus.staticresources.Renderer;
+import org.sonatype.nexus.staticresources.WebUtils;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,41 +56,34 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class StaticResourcesServlet
     extends HttpServlet
 {
-  /**
-   * Buffer size to be used when pushing content to the {@link HttpServletResponse#getOutputStream()} stream. Default
-   * is 8KB.
-   */
-  private static final int BUFFER_SIZE = SystemPropertiesHelper.getInteger(StaticResourcesServlet.class.getName()
-      + ".BUFFER_SIZE", -1);
-
   private final Logger logger = LoggerFactory.getLogger(StaticResourcesServlet.class);
 
   private final List<NexusResourceBundle> nexusResourceBundles;
 
   private final MimeSupport mimeSupport;
 
-  private final GlobalRestApiSettings globalRestApiSettings;
+  private final WebUtils webUtils;
+
+  private final Renderer renderer;
 
   private final IndexPageRenderer indexPageRenderer;
-
-  private final String serverString;
 
   private final Map<String, StaticResource> staticResources;
 
   @Inject
   public StaticResourcesServlet(final List<NexusResourceBundle> nexusResourceBundles,
                                 final MimeSupport mimeSupport,
-                                final GlobalRestApiSettings globalRestApiSettings,
+                                final WebUtils webUtils,
+                                final Renderer renderer,
                                 final @Nullable IndexPageRenderer indexPageRenderer,
                                 final ApplicationStatusSource applicationStatusSource)
   {
     this.nexusResourceBundles = checkNotNull(nexusResourceBundles);
     this.mimeSupport = checkNotNull(mimeSupport);
-    this.globalRestApiSettings = checkNotNull(globalRestApiSettings);
+    this.webUtils = checkNotNull(webUtils);
+    this.renderer = checkNotNull(renderer);
     this.indexPageRenderer = checkNotNull(indexPageRenderer);
-    this.serverString = "Nexus/" + checkNotNull(applicationStatusSource).getSystemStatus().getVersion();
     this.staticResources = Maps.newHashMap();
-    logger.debug("bufferSize={}", BUFFER_SIZE);
     discoverResources();
   }
 
@@ -124,41 +114,13 @@ public class StaticResourcesServlet
     }
   }
 
-  /**
-   * Calculates the "application root" URL, as seen by client (from {@link HttpServletRequest} made by it), or, if
-   * "force base URL" configuration is set, to that URL.
-   */
-  protected String getAppRootUrl(final HttpServletRequest request) {
-    final StringBuilder result = new StringBuilder();
-    if (globalRestApiSettings.isEnabled() && globalRestApiSettings.isForceBaseUrl()
-        && !Strings.isNullOrEmpty(globalRestApiSettings.getBaseUrl())) {
-      result.append(globalRestApiSettings.getBaseUrl());
-    }
-    else {
-      String appRoot = request.getRequestURL().toString();
-      final String pathInfo = request.getPathInfo();
-      if (!Strings.isNullOrEmpty(pathInfo)) {
-        appRoot = appRoot.substring(0, appRoot.length() - pathInfo.length());
-      }
-      final String servletPath = request.getServletPath();
-      if (!Strings.isNullOrEmpty(servletPath)) {
-        appRoot = appRoot.substring(0, appRoot.length() - servletPath.length());
-      }
-      result.append(appRoot);
-    }
-    if (!result.toString().endsWith("/")) {
-      result.append("/");
-    }
-    return result.toString();
-  }
-
   // service
 
   @Override
   protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
                                                                                                       IOException
   {
-    response.setHeader("Server", serverString);
+    webUtils.equipResponseWithStandardHeaders(response);
     super.service(request, response);
   }
 
@@ -173,8 +135,7 @@ public class StaticResourcesServlet
     // 0) see is index.html needed actually
     if ("".equals(requestPath) || "/".equals(requestPath)) {
       // redirect to index.html
-      response.setStatus(HttpServletResponse.SC_FOUND);
-      response.addHeader("Location", getAppRootUrl(request) + "index.html");
+      webUtils.sendTemporaryRedirect(response, webUtils.getAppRootUrl(request) + "index.html");
       return;
     }
     if ("/index.html".equals(requestPath)) {
@@ -211,7 +172,8 @@ public class StaticResourcesServlet
       doGetResource(request, response, staticResource);
     }
     else {
-      response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
+      renderer.renderErrorPage(request, response, HttpServletResponse.SC_NOT_FOUND, "Resource not found",
+          "Resource not found", null);
     }
   }
 
@@ -220,10 +182,11 @@ public class StaticResourcesServlet
    */
   protected void doGetIndex(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
     if (indexPageRenderer != null) {
-      indexPageRenderer.render(request, response, getAppRootUrl(request));
+      indexPageRenderer.render(request, response, webUtils.getAppRootUrl(request));
     }
     else {
-      response.sendError(HttpServletResponse.SC_NOT_FOUND, "Index page renderer not found");
+      renderer.renderErrorPage(request, response, HttpServletResponse.SC_NOT_FOUND, "Index page not found",
+          "Index page not found", null);
     }
   }
 
@@ -246,10 +209,7 @@ public class StaticResourcesServlet
     }
     else {
       // do not cache
-      response.setHeader("Pragma", "no-cache"); // HTTP/1.0
-      response.setHeader("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate"); // HTTP/1.1
-      response.setHeader("Cache-Control", "post-check=0, pre-check=0"); // MS IE
-      response.setHeader("Expires", "0"); // No caching on Proxies in between client and Nexus
+      webUtils.addNoCacheResponseHeaders(response);
     }
 
     // honor if-modified-since GETs
@@ -263,36 +223,11 @@ public class StaticResourcesServlet
       // NEXUS-5023 disable IE for sniffing into response content
       response.setHeader("X-Content-Type-Options", "nosniff");
       // send the content only if needed (this method will be called for HEAD requests too)
-      final boolean contentNeeded = "GET".equalsIgnoreCase(request.getMethod());
-      if (contentNeeded) {
+      if ("GET".equalsIgnoreCase(request.getMethod())) {
         try (final InputStream in = resource.getInputStream()) {
-          sendContent(in, response);
+          webUtils.sendContent(in, response);
         }
       }
     }
-  }
-
-  /**
-   * Sends content by copying all bytes from the input stream to the output stream while setting the preferred buffer
-   * size. At the end, it flushes response buffer.
-   */
-  private void sendContent(final InputStream from, final HttpServletResponse response) throws IOException {
-    int bufferSize = BUFFER_SIZE;
-    if (bufferSize < 1) {
-      // if no user override, ask container for bufferSize
-      bufferSize = response.getBufferSize();
-      if (bufferSize < 1) {
-        bufferSize = 8192;
-        response.setBufferSize(bufferSize);
-      }
-    }
-    else {
-      // user override present, tell container what buffer size we'd like
-      response.setBufferSize(bufferSize);
-    }
-    try (final OutputStream to = response.getOutputStream()) {
-      StreamSupport.copy(from, to, bufferSize);
-    }
-    response.flushBuffer();
   }
 }

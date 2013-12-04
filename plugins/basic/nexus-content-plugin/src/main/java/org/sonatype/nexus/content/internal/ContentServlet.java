@@ -15,7 +15,6 @@ package org.sonatype.nexus.content.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,8 +30,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -52,8 +49,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.staticresources.WebUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.nexus.web.Constants;
 import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.sisu.goodies.common.Throwables2;
@@ -73,7 +70,7 @@ import static com.google.common.io.ByteStreams.limit;
 
 /**
  * Provides access to repositories contents.
- * 
+ *
  * @since 2.8
  */
 @Singleton
@@ -81,13 +78,6 @@ import static com.google.common.io.ByteStreams.limit;
 public class ContentServlet
     extends HttpServlet
 {
-  /**
-   * Buffer size to be used when pushing content to the {@link HttpServletResponse#getOutputStream()} stream. Default is
-   * 16KB.
-   */
-  private static final int BUFFER_SIZE = SystemPropertiesHelper.getInteger(ContentServlet.class.getName()
-      + ".BUFFER_SIZE", -1);
-
   /**
    * A flag setting what should be done if request path retrieval gets a {@link StorageLinkItem} here. If {@code true},
    * this servlet dereference the link (using {@link RepositoryRouter#dereferenceLink(StorageLinkItem)} method), and
@@ -110,20 +100,20 @@ public class ContentServlet
   private final Logger logger = LoggerFactory.getLogger(ContentServlet.class);
 
   private final RepositoryRouter repositoryRouter;
-  private final Renderer renderer;
-  private final GlobalRestApiSettings globalRestApiSettings;
-  private final String serverString;
+
+  private final ContentRenderer contentRenderer;
+
+  private final WebUtils webUtils;
 
   @Inject
-  public ContentServlet(final RepositoryRouter repositoryRouter, final Renderer renderer,
-                        final GlobalRestApiSettings globalRestApiSettings,
-                        final ApplicationStatusSource applicationStatusSource)
+  public ContentServlet(final RepositoryRouter repositoryRouter,
+                        final ContentRenderer contentRenderer,
+                        final WebUtils webUtils)
   {
     this.repositoryRouter = checkNotNull(repositoryRouter);
-    this.renderer = checkNotNull(renderer);
-    this.globalRestApiSettings = checkNotNull(globalRestApiSettings);
-    this.serverString = "Nexus/" + checkNotNull(applicationStatusSource).getSystemStatus().getVersion();
-    logger.debug("bufferSize={}, dereferenceLinks={}", BUFFER_SIZE, DEREFERENCE_LINKS);
+    this.contentRenderer = checkNotNull(contentRenderer);
+    this.webUtils = checkNotNull(webUtils);
+    logger.debug("dereferenceLinks={}", DEREFERENCE_LINKS);
   }
 
   /**
@@ -177,7 +167,7 @@ public class ContentServlet
     if (request.isSecure()) {
       result.getRequestContext().put(AccessManager.REQUEST_CONFIDENTIAL, Boolean.TRUE);
       final Object certArray = request.getAttribute("javax.servlet.request.X509Certificate");
-      if(certArray != null){
+      if (certArray != null) {
         final List<X509Certificate> certs = Arrays.asList((X509Certificate[]) certArray);
         if (!certs.isEmpty()) {
           result.getRequestContext().put(AccessManager.REQUEST_CERTIFICATES, certs);
@@ -186,37 +176,9 @@ public class ContentServlet
     }
 
     // put the incoming URLs
-    result.setRequestAppRootUrl(getAppRootUrl(request));
+    result.setRequestAppRootUrl(webUtils.getAppRootUrl(request));
     result.setRequestUrl(request.getRequestURL().toString());
     return result;
-  }
-
-  /**
-   * Calculates the "application root" URL, as seen by client (from {@link HttpServletRequest} made by it), or, if
-   * "force base URL" configuration is set, to that URL.
-   */
-  protected String getAppRootUrl(final HttpServletRequest request) {
-    final StringBuilder result = new StringBuilder();
-    if (globalRestApiSettings.isEnabled() && globalRestApiSettings.isForceBaseUrl()
-        && !Strings.isNullOrEmpty(globalRestApiSettings.getBaseUrl())) {
-      result.append(globalRestApiSettings.getBaseUrl());
-    }
-    else {
-      String appRoot = request.getRequestURL().toString();
-      final String pathInfo = request.getPathInfo();
-      if (!Strings.isNullOrEmpty(pathInfo)) {
-        appRoot = appRoot.substring(0, appRoot.length() - pathInfo.length());
-      }
-      final String servletPath = request.getServletPath();
-      if (!Strings.isNullOrEmpty(servletPath)) {
-        appRoot = appRoot.substring(0, appRoot.length() - servletPath.length());
-      }
-      result.append(appRoot);
-    }
-    if (!result.toString().endsWith("/")) {
-      result.append("/");
-    }
-    return result.toString();
   }
 
   /**
@@ -238,43 +200,44 @@ public class ContentServlet
   }
 
   protected void handleException(final HttpServletRequest request, final HttpServletResponse response,
-      final ResourceStoreRequest rsr, final Exception exception) throws IOException
+                                 final ResourceStoreRequest rsr, final Exception exception) throws IOException
   {
     logger.trace("Exception", exception);
+    int responseCode = 500;
 
     if (exception instanceof LocalStorageEOFException) {
       // in case client drops connection, this makes not much sense, as he will not
       // receive this response, but we have to end it somehow.
       // but, in case when remote proxy peer drops connection on us regularly
       // this makes sense
-      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      responseCode = HttpServletResponse.SC_NOT_FOUND;
     }
     else if (exception instanceof IllegalArgumentException) {
-      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      responseCode = HttpServletResponse.SC_BAD_REQUEST;
     }
     else if (exception instanceof RemoteStorageTransportOverloadedException) {
-      response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+      responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE;
     }
     else if (exception instanceof RepositoryNotAvailableException) {
-      response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+      responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE;
     }
     else if (exception instanceof IllegalRequestException) {
-      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      responseCode = HttpServletResponse.SC_BAD_REQUEST;
     }
     else if (exception instanceof IllegalOperationException) {
-      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      responseCode = HttpServletResponse.SC_BAD_REQUEST;
     }
     else if (exception instanceof UnsupportedStorageOperationException) {
-      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      responseCode = HttpServletResponse.SC_BAD_REQUEST;
     }
     else if (exception instanceof NoSuchRepositoryException) {
-      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      responseCode = HttpServletResponse.SC_NOT_FOUND;
     }
     else if (exception instanceof NoSuchResourceStoreException) {
-      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      responseCode = HttpServletResponse.SC_NOT_FOUND;
     }
     else if (exception instanceof ItemNotFoundException) {
-      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      responseCode = HttpServletResponse.SC_NOT_FOUND;
     }
     else if (exception instanceof AccessDeniedException) {
       request.setAttribute(Constants.ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE);
@@ -296,32 +259,19 @@ public class ContentServlet
       return;
     }
     else {
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
       logger.warn(exception.getMessage(), exception);
     }
-    renderer.renderErrorPage(request, response, rsr, exception);
-  }
-
-  /**
-   * To be added to non-content responses, like collection rendered index page of describe response is.
-   *
-   * @see <a href="https://issues.sonatype.org/browse/NEXUS-5155">NEXUS-5155</a>
-   */
-  protected void addNoCacheResponseHeaders(final HttpServletResponse response) {
-    // NEXUS-5155 Force browsers to not cache this page
-    response.setHeader("Pragma", "no-cache"); // HTTP/1.0
-    response.setHeader("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate"); // HTTP/1.1
-    response.setHeader("Cache-Control", "post-check=0, pre-check=0"); // MS IE
-    response.setHeader("Expires", "0"); // No caching on Proxies in between client and Nexus
+    contentRenderer.renderErrorPage(request, response, responseCode, exception);
   }
 
   // service
 
   @Override
   protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
-      IOException
+                                                                                                      IOException
   {
-    response.setHeader("Server", serverString);
+    webUtils.equipResponseWithStandardHeaders(response);
     response.setHeader("Accept-Ranges", "bytes");
     super.service(request, response);
   }
@@ -330,7 +280,7 @@ public class ContentServlet
 
   @Override
   protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
-      IOException
+                                                                                                    IOException
   {
     final ResourceStoreRequest rsr = getResourceStoreRequest(request);
     try {
@@ -342,8 +292,7 @@ public class ContentServlet
             item = dereferenceLink(link);
           }
           else {
-            response.setStatus(HttpServletResponse.SC_FOUND);
-            response.addHeader("Location", getLinkTargetUrl(link));
+            webUtils.sendTemporaryRedirect(response, getLinkTargetUrl(link));
             return;
           }
         }
@@ -422,7 +371,7 @@ public class ContentServlet
    * Handles a file response, all the conditional request cases, and eventually the content serving of the file item.
    */
   protected void doGetFile(final HttpServletRequest request, final HttpServletResponse response,
-      final StorageFileItem file) throws IOException
+                           final StorageFileItem file) throws IOException
   {
     // ETag, in "shaved" form of {SHA1{e5c244520e897865709c730433f8b0c44ef271f1}} (without quotes)
     // or null if file does not have SHA1 (like Virtual) or generated items (as their SHA1 would correspond to template,
@@ -474,15 +423,13 @@ public class ContentServlet
       final boolean contentNeeded = "GET".equalsIgnoreCase(request.getMethod());
       if (ranges.isEmpty()) {
         if (contentNeeded) {
-          try (final InputStream in = file.getInputStream()) {
-            sendContent(in, response);
-          }
+          webUtils.sendContent(file.getInputStream(), response);
         }
       }
       else if (ranges.size() > 1) {
-        response.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
-        renderer.renderErrorPage(request, response, file.getResourceStoreRequest(), new UnsupportedOperationException(
-            "Multiple ranges not yet supported!"));
+        contentRenderer
+            .renderErrorPage(request, response, HttpServletResponse.SC_NOT_IMPLEMENTED,
+                new UnsupportedOperationException("Multiple ranges not yet supported!"));
       }
       else {
         final Range<Long> range = ranges.get(0);
@@ -500,7 +447,7 @@ public class ContentServlet
         if (contentNeeded) {
           try (final InputStream in = file.getInputStream()) {
             in.skip(range.lowerEndpoint());
-            sendContent(limit(in, bodySize), response);
+            webUtils.sendContent(limit(in, bodySize), response);
           }
         }
       }
@@ -512,7 +459,7 @@ public class ContentServlet
    * slash), or renders the "index page" out of collection entries.
    */
   protected void doGetCollection(final HttpServletRequest request, final HttpServletResponse response,
-      final StorageCollectionItem coll) throws Exception
+                                 final StorageCollectionItem coll) throws Exception
   {
     if (!coll.getResourceStoreRequest().getRequestUrl().endsWith("/")) {
       response.setStatus(HttpServletResponse.SC_FOUND);
@@ -526,29 +473,30 @@ public class ContentServlet
       return;
     }
     // send no cache headers, as any of these responses should not be cached, ever
-    addNoCacheResponseHeaders(response);
+    webUtils.addNoCacheResponseHeaders(response);
     // perform fairly expensive operation of fetching children from Nx
     final Collection<StorageItem> children = coll.list();
     // render the page
-    renderer.renderCollection(request, response, coll, children);
+    contentRenderer.renderCollection(request, response, coll, children);
   }
 
   /**
    * Describe response, giving out meta-information about request, found item (if any) and so on.
    */
   protected void doGetDescribe(final HttpServletRequest request, final HttpServletResponse response,
-      final ResourceStoreRequest rsr, final StorageItem item, final Exception e) throws IOException
+                               final ResourceStoreRequest rsr, final StorageItem item, final Exception e)
+      throws IOException
   {
     // send no cache headers, as any of these responses should not be cached, ever
-    addNoCacheResponseHeaders(response);
-    renderer.renderRequestDescription(request, response, rsr, item, e);
+    webUtils.addNoCacheResponseHeaders(response);
+    contentRenderer.renderRequestDescription(request, response, rsr, item, e);
   }
 
   // PUT
 
   @Override
   protected void doPut(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
-      IOException
+                                                                                                    IOException
   {
     final ResourceStoreRequest rsr = getResourceStoreRequest(request);
     try {
@@ -647,29 +595,5 @@ public class ContentServlet
    */
   protected boolean isRequestedRangeSatisfiable(final StorageFileItem file, final Range<Long> range) {
     return Range.closed(0L, file.getLength()).encloses(range);
-  }
-
-  /**
-   * Sends content by copying all bytes from the input stream to the output stream while setting the preferred buffer
-   * size. At the end, it flushes response buffer.
-   */
-  private void sendContent(final InputStream from, final HttpServletResponse response) throws IOException {
-    int bufferSize = BUFFER_SIZE;
-    if (bufferSize < 1) {
-      // if no user override, ask container for bufferSize
-      bufferSize = response.getBufferSize();
-      if (bufferSize < 1) {
-        bufferSize = 8192;
-        response.setBufferSize(bufferSize);
-      }
-    }
-    else {
-      // user override present, tell container what buffer size we'd like
-      response.setBufferSize(bufferSize);
-    }
-    try (final OutputStream to = response.getOutputStream()) {
-      StreamSupport.copy(from, to, bufferSize);
-    }
-    response.flushBuffer();
   }
 }
