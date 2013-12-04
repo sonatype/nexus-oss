@@ -152,22 +152,6 @@
         <version>2.8.0-SNAPSHOT</version>
       </dependency>
 
-      <!-- static-resources -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-static-resources-plugin</artifactId>
-        <type>nexus-plugin</type>
-        <version>2.8.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-static-resources-plugin</artifactId>
-        <type>jar</type>
-        <version>2.8.0-SNAPSHOT</version>
-      </dependency>
-
       <!-- crypto -->
 
       <dependency>

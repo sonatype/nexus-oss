@@ -49,7 +49,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.staticresources.WebUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.web.Constants;
 import org.sonatype.nexus.web.RemoteIPFinder;
@@ -101,13 +100,13 @@ public class ContentServlet
 
   private final RepositoryRouter repositoryRouter;
 
-  private final ContentRenderer contentRenderer;
+  private final VelocityRenderer contentRenderer;
 
   private final WebUtils webUtils;
 
   @Inject
   public ContentServlet(final RepositoryRouter repositoryRouter,
-                        final ContentRenderer contentRenderer,
+                        final VelocityRenderer contentRenderer,
                         final WebUtils webUtils)
   {
     this.repositoryRouter = checkNotNull(repositoryRouter);

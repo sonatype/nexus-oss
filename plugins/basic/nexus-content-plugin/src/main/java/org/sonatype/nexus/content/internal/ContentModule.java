@@ -25,6 +25,8 @@ import org.sonatype.security.web.guice.SecurityWebFilter;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
+import org.eclipse.sisu.inject.DefaultRankingFunction;
+import org.eclipse.sisu.inject.RankingFunction;
 
 import static org.sonatype.nexus.security.filter.FilterProviderSupport.filterKey;
 
@@ -37,7 +39,7 @@ import static org.sonatype.nexus.security.filter.FilterProviderSupport.filterKey
 public class ContentModule
     extends AbstractModule
 {
-  private static final String MOUNT_POINT = "/content";
+  private static final String CONTENT_MOUNT_POINT = "/content";
 
   @Override
   protected void configure() {
@@ -45,16 +47,15 @@ public class ContentModule
     bind(SecurityWebFilter.class);
 
     bind(filterKey("contentAuthcBasic")).to(ContentAuthenticationFilter.class).in(Singleton.class);
-
     bind(filterKey("contentTperms")).toProvider(ContentTargetMappingFilterProvider.class);
 
     install(new ServletModule()
     {
       @Override
       protected void configureServlets() {
-        serve(MOUNT_POINT + "/*").with(ContentServlet.class);
-        filter(MOUNT_POINT + "/*").through(SecurityWebFilter.class);
-        filter(MOUNT_POINT + "/*").through(MdcUserContextFilter.class);
+        serve(CONTENT_MOUNT_POINT + "/*").with(ContentServlet.class);
+        filter(CONTENT_MOUNT_POINT + "/*").through(SecurityWebFilter.class);
+        filter(CONTENT_MOUNT_POINT + "/*").through(MdcUserContextFilter.class);
       }
     });
 
@@ -62,9 +63,26 @@ public class ContentModule
     {
       @Override
       protected void configure() {
-        addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,contentAuthcBasic,contentTperms");
+        addFilterChain(CONTENT_MOUNT_POINT + "/**", "noSessionCreation,contentAuthcBasic,contentTperms");
       }
     });
+
+    // ROOT static resource + index
+    install(new ServletModule()
+    {
+      @Override
+      protected void configureServlets() {
+        serve("/*").with(StaticResourcesServlet.class);
+      }
+    });
+
+    /*
+     * Give components contributed by this plugin a low-level ranking (same level as Nexus core) so they are ordered
+     * after components from other plugins. This makes sure all the non-root servlets will be invoked and this
+     * one will not "grab all" of the requests as it's mounted on root. This helps plugins like Siesta and Restlet1x
+     * to properly function, not be "layered" by the servlet mounted at root above.
+     */
+    bind(RankingFunction.class).toInstance(new DefaultRankingFunction(0));
   }
 
   @Singleton
@@ -74,7 +92,7 @@ public class ContentModule
     @Inject
     public ContentTargetMappingFilterProvider(final NexusTargetMappingAuthorizationFilter filter) {
       super(filter);
-      filter.setPathPrefix(MOUNT_POINT + "(.*)");
+      filter.setPathPrefix(CONTENT_MOUNT_POINT + "(.*)");
       filter.setPathReplacement("@1");
     }
   }
