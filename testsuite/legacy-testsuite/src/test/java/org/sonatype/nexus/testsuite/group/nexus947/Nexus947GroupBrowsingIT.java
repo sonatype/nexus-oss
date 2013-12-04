@@ -60,7 +60,7 @@ public class Nexus947GroupBrowsingIT
     }
 
     // they are sorted in alpha order, so expect the jar, then the pom
-    assertThat(itemsText, contains("nexus947-3.2.1.jar", "nexus947-3.2.1.pom"));
+    assertThat(itemsText, containsInAnyOrder("nexus947-3.2.1.jar", "nexus947-3.2.1.pom"));
   }
 
   @Test
