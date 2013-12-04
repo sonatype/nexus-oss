@@ -214,7 +214,7 @@ public abstract class AbstractNexusPlexusResource
   protected Reference createRedirectReference(Request request) {
     String uriPart =
         request.getResourceRef().getTargetRef().toString().substring(
-            request.getRootRef().getTargetRef().toString().length());
+            getContextRoot(request).getTargetRef().toString().length());
 
     // trim leading slash
     if (uriPart.startsWith("/")) {
