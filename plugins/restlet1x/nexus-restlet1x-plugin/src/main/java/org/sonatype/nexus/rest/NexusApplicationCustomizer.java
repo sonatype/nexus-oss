@@ -15,6 +15,10 @@ package org.sonatype.nexus.rest;
 
 import org.sonatype.plexus.rest.RetargetableRestlet;
 
+/**
+ * @deprecated Since NEXUS-6045 this does not function anymore as before the change. Will be dropped in next release.
+ */
+@Deprecated
 public interface NexusApplicationCustomizer
 {
   void customize(NexusApplication nexusApplication, RetargetableRestlet root);
