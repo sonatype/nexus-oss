@@ -62,7 +62,7 @@ public class WebUtils
 
   /**
    * Calculates the "application root" URL, as seen by client (from {@link HttpServletRequest} made by it), or, if
-   * "force base URL" configuration is set, to that URL.
+   * "force base URL" configuration is set, to that URL. The root URL always ends with a slash ("/").
    */
   public String getAppRootUrl(final HttpServletRequest request) {
     final StringBuilder result = new StringBuilder();
