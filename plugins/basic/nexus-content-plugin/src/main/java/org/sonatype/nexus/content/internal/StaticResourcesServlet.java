@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.content.IndexPageRenderer;
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
@@ -78,7 +79,7 @@ public class StaticResourcesServlet
     this.mimeSupport = checkNotNull(mimeSupport);
     this.webUtils = checkNotNull(webUtils);
     this.renderer = checkNotNull(renderer);
-    this.indexPageRenderer = indexPageRenderer; // nullable!
+    this.indexPageRenderer = indexPageRenderer;
     this.staticResources = Maps.newHashMap();
     discoverResources();
   }
