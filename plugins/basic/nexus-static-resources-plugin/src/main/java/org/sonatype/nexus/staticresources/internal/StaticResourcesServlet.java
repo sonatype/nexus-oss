@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.content.internal;
+package org.sonatype.nexus.staticresources.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,13 +30,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.content.IndexPageRenderer;
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.rest.CacheControl;
 import org.sonatype.nexus.plugins.rest.DefaultStaticResource;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
+import org.sonatype.nexus.staticresources.IndexPageRenderer;
+import org.sonatype.nexus.staticresources.Renderer;
+import org.sonatype.nexus.staticresources.WebUtils;
 
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -62,7 +64,7 @@ public class StaticResourcesServlet
 
   private final WebUtils webUtils;
 
-  private final VelocityRenderer renderer;
+  private final Renderer renderer;
 
   private final IndexPageRenderer indexPageRenderer;
 
@@ -72,14 +74,15 @@ public class StaticResourcesServlet
   public StaticResourcesServlet(final List<NexusResourceBundle> nexusResourceBundles,
                                 final MimeSupport mimeSupport,
                                 final WebUtils webUtils,
-                                final VelocityRenderer renderer,
-                                final @Nullable IndexPageRenderer indexPageRenderer)
+                                final Renderer renderer,
+                                final @Nullable IndexPageRenderer indexPageRenderer,
+                                final ApplicationStatusSource applicationStatusSource)
   {
     this.nexusResourceBundles = checkNotNull(nexusResourceBundles);
     this.mimeSupport = checkNotNull(mimeSupport);
     this.webUtils = checkNotNull(webUtils);
     this.renderer = checkNotNull(renderer);
-    this.indexPageRenderer = indexPageRenderer;
+    this.indexPageRenderer = checkNotNull(indexPageRenderer);
     this.staticResources = Maps.newHashMap();
     discoverResources();
   }

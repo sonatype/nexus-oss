@@ -13,11 +13,7 @@
 
 package org.sonatype.nexus.content.internal;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,7 +24,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,89 +34,39 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
+import org.sonatype.nexus.staticresources.Renderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.context.Context;
-import org.apache.velocity.exception.VelocityException;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Component rendering pages using Velocity.
+ * Implementation of {@link ContentRenderer} using Apache Velocity.
  *
  * @since 2.8
  */
 @Singleton
 @Named
-public class VelocityRenderer
+public class VelocityContentRenderer
     extends ComponentSupport
+    implements ContentRenderer
 {
-  private final Provider<VelocityEngine> velocityEngineProvider;
-
-  private final WebUtils webUtils;
+  private final Renderer renderer;
 
   private final String applicationVersion;
 
   @Inject
-  public VelocityRenderer(final Provider<VelocityEngine> velocityEngineProvider,
-                          final WebUtils webUtils,
-                          final ApplicationStatusSource applicationStatusSource)
+  public VelocityContentRenderer(final Renderer renderer,
+                                 final ApplicationStatusSource applicationStatusSource)
   {
-    this.velocityEngineProvider = checkNotNull(velocityEngineProvider);
-    this.webUtils = checkNotNull(webUtils);
+    this.renderer = checkNotNull(renderer);
     this.applicationVersion = checkNotNull(applicationStatusSource).getSystemStatus().getVersion();
   }
 
-  public void renderErrorPage(final HttpServletRequest request,
-                              final HttpServletResponse response,
-                              final int responseCode,
-                              final String reasonPhrase,
-                              final String errorDescription,
-                              final Exception exception)
-      throws IOException
-  {
-    checkNotNull(request);
-    checkNotNull(response);
-    checkArgument(responseCode >= 400);
-    checkNotNull(errorDescription);
-    final Map<String, Object> dataModel = Maps.newHashMap();
-    dataModel.put("nexusRoot", webUtils.getAppRootUrl(request));
-    dataModel.put("nexusVersion", applicationVersion);
-    dataModel.put("statusCode", responseCode);
-    dataModel.put("statusName", Strings.isNullOrEmpty(reasonPhrase) ? errorDescription : reasonPhrase);
-    dataModel.put("errorDescription", StringEscapeUtils.escapeHtml(errorDescription));
-    if (null != exception) {
-      dataModel.put("errorStackTrace", StringEscapeUtils.escapeHtml(ExceptionUtils.getStackTrace(exception)));
-    }
-    if (Strings.isNullOrEmpty(reasonPhrase)) {
-      response.setStatus(responseCode);
-    }
-    else {
-      response.setStatus(responseCode, reasonPhrase);
-    }
-    render(template("/org/sonatype/nexus/content/internal/errorPageContentHtml.vm"),
-        dataModel, response);
-  }
-
-  public void renderErrorPage(final HttpServletRequest request,
-                              final HttpServletResponse response,
-                              final int responseCode,
-                              final Exception exception)
-      throws IOException
-  {
-    renderErrorPage(request, response, responseCode, null, exception.getMessage(), exception);
-  }
-
+  @Override
   public void renderCollection(final HttpServletRequest request,
                                final HttpServletResponse response,
                                final StorageCollectionItem coll,
@@ -149,11 +94,20 @@ public class VelocityRenderer
     final Map<String, Object> dataModel = createBaseModel(coll.getResourceStoreRequest());
     dataModel.put("requestPath", coll.getPath());
     dataModel.put("listItems", entries);
-    render(
-        template("/org/sonatype/nexus/content/internal/repositoryContentHtml.vm"),
-        dataModel, response);
+    renderer.render(renderer.template("/org/sonatype/nexus/content/internal/repositoryContentHtml.vm", getClass().getClassLoader()), dataModel, response);
   }
 
+  @Override
+  public void renderErrorPage(final HttpServletRequest request,
+                              final HttpServletResponse response,
+                              final int responseCode,
+                              final Exception exception)
+      throws IOException
+  {
+    renderer.renderErrorPage(request, response, responseCode, null, exception.getMessage(), exception);
+  }
+
+  @Override
   public void renderRequestDescription(final HttpServletRequest request,
                                        final HttpServletResponse response,
                                        final ResourceStoreRequest resourceStoreRequest,
@@ -165,60 +119,9 @@ public class VelocityRenderer
     dataModel.put("req", resourceStoreRequest);
     dataModel.put("item", item);
     dataModel.put("exception", exception);
-    render(template("/org/sonatype/nexus/content/internal/requestDescriptionHtml.vm"),
-        dataModel, response);
+    renderer.render(renderer.template("/org/sonatype/nexus/content/internal/requestDescriptionHtml.vm", getClass().getClassLoader()), dataModel, response);
   }
 
-  // ==
-
-  private void render(final Template template, final Map<String, Object> dataModel, final HttpServletResponse response)
-      throws IOException
-  {
-    // ATM all templates render HTML
-    response.setContentType("text/html");
-    final Context context = new VelocityContext(dataModel);
-    try (final OutputStream outputStream = response.getOutputStream()) {
-      final Writer tmplWriter;
-      // Load the template
-      if (template.getEncoding() == null) {
-        tmplWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
-      }
-      else {
-        tmplWriter = new BufferedWriter(new OutputStreamWriter(outputStream, template.getEncoding()));
-      }
-
-      // Process the template
-      template.merge(context, tmplWriter);
-      tmplWriter.flush();
-      response.flushBuffer();
-    }
-    catch (IOException e) {
-      // NEXUS-3442
-      // IOEx should be propagated as is
-      throw e;
-    }
-    catch (VelocityException e) {
-      // All other (Velocity exceptions are RuntimeExcptions!) to be wrapped, but preserve cause too
-      throw new IOException("Template processing error: " + e.getMessage(), e);
-    }
-  }
-
-  private Template template(final String templateName) {
-    // NOTE: Velocity's ClasspathResourceLoader goes for TCCL 1st, then would fallback to "system"
-    // (in this case the classloader where Velocity is loaded) classloader, so we must set TCCL
-    final ClassLoader original = Thread.currentThread().getContextClassLoader();
-    try {
-      Thread.currentThread().setContextClassLoader(VelocityRenderer.class.getClassLoader());
-      return velocityEngineProvider.get().getTemplate(templateName);
-    }
-    catch (Exception e) {
-      throw new IllegalArgumentException("Cannot get the template with name " + String.valueOf(templateName),
-          e);
-    }
-    finally {
-      Thread.currentThread().setContextClassLoader(original);
-    }
-  }
   // ==
 
   private Map<String, Object> createBaseModel(final ResourceStoreRequest resourceStoreRequest) {

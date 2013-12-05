@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.content;
+package org.sonatype.nexus.staticresources;
 
 import java.io.IOException;
 

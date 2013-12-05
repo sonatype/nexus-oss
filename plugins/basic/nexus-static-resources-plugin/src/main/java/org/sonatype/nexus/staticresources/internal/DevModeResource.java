@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.content.internal;
+package org.sonatype.nexus.staticresources.internal;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -32,11 +32,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.content.IndexPageRenderer;
 import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
 import org.sonatype.nexus.plugins.ui.BuildNumberService;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor.UiContribution;
+import org.sonatype.nexus.staticresources.IndexPageRenderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;

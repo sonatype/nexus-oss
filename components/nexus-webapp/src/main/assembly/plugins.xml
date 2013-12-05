@@ -36,6 +36,7 @@
       <unpack>true</unpack>
       <includes>
         <include>*:nexus-content-plugin</include>
+        <include>*:nexus-static-resources-plugin</include>
         <include>*:nexus-crypto-plugin</include>
         <include>*:nexus-groovy-plugin</include>
         <include>*:nexus-h2-plugin</include>
