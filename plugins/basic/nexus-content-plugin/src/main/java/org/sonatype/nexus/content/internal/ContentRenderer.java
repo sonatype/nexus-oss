@@ -42,10 +42,4 @@ public interface ContentRenderer
                                 final StorageItem item,
                                 final Exception exception)
       throws IOException;
-
-  void renderErrorPage(final HttpServletRequest request,
-                       final HttpServletResponse response,
-                       final int responseStatus,
-                       final Exception exception)
-      throws IOException;
 }

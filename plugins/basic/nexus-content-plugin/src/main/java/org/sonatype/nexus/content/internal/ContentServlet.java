@@ -49,10 +49,12 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.staticresources.WebUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.web.Constants;
+import org.sonatype.nexus.web.ErrorPageFilter;
+import org.sonatype.nexus.web.ErrorStatusServletException;
 import org.sonatype.nexus.web.RemoteIPFinder;
+import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.sisu.goodies.common.Throwables2;
 
 import com.google.common.base.Stopwatch;
@@ -199,8 +201,16 @@ public class ContentServlet
     return request.getParameterMap().containsKey(Constants.REQ_QP_IS_DESCRIBE_PARAMETER);
   }
 
-  protected void handleException(final HttpServletRequest request, final HttpServletResponse response,
-                                 final ResourceStoreRequest rsr, final Exception exception) throws IOException
+  /**
+   * This method converts various exceptions into {@link ErrorStatusServletException} preparing those to be shown
+   * by {@link ErrorPageFilter}. Still, there are some special case (see access denied handling and IO exception
+   * handling) where only a request attribute is set, signaling for security filters that a challenge is needed to
+   * elevate permissions.
+   */
+  protected void handleException(final HttpServletRequest request,
+                                 final HttpServletResponse response,
+                                 final ResourceStoreRequest rsr, final Exception exception)
+      throws ErrorStatusServletException, IOException
   {
     logger.trace("Exception", exception);
     int responseCode = 500;
@@ -241,28 +251,26 @@ public class ContentServlet
     }
     else if (exception instanceof AccessDeniedException) {
       request.setAttribute(Constants.ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE);
-      return;
       // Note: we must ensure response is not committed, hence, no error page is rendered
       // this attribute above will cause filter to either 403 if
       // current user is non anonymous, or 401 and challenge if user is anonymous
+      return;
     }
     else if (exception instanceof IOException) {
-      // Do not log verbose traces for IO problems unless debug is enabled
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      // log and rethrow IOException, as it is handled in special way, see the ErrorPageFilter
       if (logger.isDebugEnabled()) {
         logger.warn(exception.toString(), exception);
       }
       else {
         logger.warn(Throwables2.explain(exception));
       }
-      // Do not attempt to render error page
-      return;
+      throw (IOException) exception;
     }
     else {
       responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
       logger.warn(exception.getMessage(), exception);
     }
-    contentRenderer.renderErrorPage(request, response, responseCode, exception);
+    throw new ErrorStatusServletException(responseCode, null, exception.getMessage());
   }
 
   // service
@@ -371,7 +379,7 @@ public class ContentServlet
    * Handles a file response, all the conditional request cases, and eventually the content serving of the file item.
    */
   protected void doGetFile(final HttpServletRequest request, final HttpServletResponse response,
-                           final StorageFileItem file) throws IOException
+                           final StorageFileItem file) throws ServletException, IOException
   {
     // ETag, in "shaved" form of {SHA1{e5c244520e897865709c730433f8b0c44ef271f1}} (without quotes)
     // or null if file does not have SHA1 (like Virtual) or generated items (as their SHA1 would correspond to template,
@@ -427,9 +435,8 @@ public class ContentServlet
         }
       }
       else if (ranges.size() > 1) {
-        contentRenderer
-            .renderErrorPage(request, response, HttpServletResponse.SC_NOT_IMPLEMENTED,
-                new UnsupportedOperationException("Multiple ranges not yet supported!"));
+        throw new ErrorStatusServletException(HttpServletResponse.SC_NOT_IMPLEMENTED, "Not Implemented",
+            "Multiple ranges not yet supported.");
       }
       else {
         final Range<Long> range = ranges.get(0);

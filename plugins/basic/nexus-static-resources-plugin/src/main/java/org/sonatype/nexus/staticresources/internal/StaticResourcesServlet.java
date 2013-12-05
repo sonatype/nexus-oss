@@ -36,8 +36,8 @@ import org.sonatype.nexus.plugins.rest.DefaultStaticResource;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.staticresources.IndexPageRenderer;
-import org.sonatype.nexus.staticresources.Renderer;
-import org.sonatype.nexus.staticresources.WebUtils;
+import org.sonatype.nexus.web.ErrorStatusServletException;
+import org.sonatype.nexus.web.WebUtils;
 
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -63,8 +63,6 @@ public class StaticResourcesServlet
 
   private final WebUtils webUtils;
 
-  private final Renderer renderer;
-
   private final IndexPageRenderer indexPageRenderer;
 
   private final Map<String, StaticResource> staticResources;
@@ -73,13 +71,11 @@ public class StaticResourcesServlet
   public StaticResourcesServlet(final List<NexusResourceBundle> nexusResourceBundles,
                                 final MimeSupport mimeSupport,
                                 final WebUtils webUtils,
-                                final Renderer renderer,
                                 final @Nullable IndexPageRenderer indexPageRenderer)
   {
     this.nexusResourceBundles = checkNotNull(nexusResourceBundles);
     this.mimeSupport = checkNotNull(mimeSupport);
     this.webUtils = checkNotNull(webUtils);
-    this.renderer = checkNotNull(renderer);
     this.indexPageRenderer = indexPageRenderer;
     this.staticResources = Maps.newHashMap();
     discoverResources();
@@ -170,21 +166,21 @@ public class StaticResourcesServlet
       doGetResource(request, response, staticResource);
     }
     else {
-      renderer.renderErrorPage(request, response, HttpServletResponse.SC_NOT_FOUND, "Resource not found",
-          "Resource not found", null);
+      throw new ErrorStatusServletException(HttpServletResponse.SC_NOT_FOUND, "Not Found", "Resource not found");
     }
   }
 
   /**
    * Delegates to {@link IndexPageRenderer} to render index page.
    */
-  protected void doGetIndex(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+  protected void doGetIndex(final HttpServletRequest request, final HttpServletResponse response)
+      throws ServletException, IOException
+  {
     if (indexPageRenderer != null) {
       indexPageRenderer.render(request, response, webUtils.getAppRootUrl(request));
     }
     else {
-      renderer.renderErrorPage(request, response, HttpServletResponse.SC_NOT_FOUND, "Index page not found",
-          "Index page not found", null);
+      throw new ErrorStatusServletException(HttpServletResponse.SC_NOT_FOUND, "Not Found", "Index page not found");
     }
   }
 

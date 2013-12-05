@@ -34,7 +34,7 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
-import org.sonatype.nexus.staticresources.Renderer;
+import org.sonatype.nexus.web.Renderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;
@@ -95,16 +95,6 @@ public class VelocityContentRenderer
     dataModel.put("requestPath", coll.getPath());
     dataModel.put("listItems", entries);
     renderer.render(renderer.template("/org/sonatype/nexus/content/internal/repositoryContentHtml.vm", getClass().getClassLoader()), dataModel, response);
-  }
-
-  @Override
-  public void renderErrorPage(final HttpServletRequest request,
-                              final HttpServletResponse response,
-                              final int responseCode,
-                              final Exception exception)
-      throws IOException
-  {
-    renderer.renderErrorPage(request, response, responseCode, null, exception.getMessage(), exception);
   }
 
   @Override

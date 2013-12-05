@@ -14,6 +14,11 @@
 package org.sonatype.nexus.staticresources.internal;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.web.ErrorPageFilter;
+import org.sonatype.nexus.web.Renderer;
+import org.sonatype.nexus.web.internal.VelocityRenderer;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
@@ -31,11 +36,15 @@ public class StaticResourcesModule
 {
   @Override
   protected void configure() {
+    bind(VelocityRenderer.class);
+    bind(Renderer.class).to(VelocityRenderer.class).in(Singleton.class);
+
     install(new ServletModule()
     {
       @Override
       protected void configureServlets() {
         serve("/*").with(StaticResourcesServlet.class);
+        filter("/*").through(ErrorPageFilter.class);
         /*
          * Give components contributed by this plugin a low-level ranking (same level as Nexus core) so they are ordered
          * after components from other plugins. This makes sure all the ther non-root servlets will be invoked and this

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.staticresources.internal;
+package org.sonatype.nexus.web.internal;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -28,8 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.staticresources.Renderer;
-import org.sonatype.nexus.staticresources.WebUtils;
+import org.sonatype.nexus.web.Renderer;
+import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
@@ -100,7 +100,7 @@ public class VelocityRenderer
     else {
       response.setStatus(responseCode, reasonPhrase);
     }
-    render(template("/org/sonatype/nexus/staticresources/internal/errorPageContentHtml.vm", getClass().getClassLoader()), dataModel, response);
+    render(template("/org/sonatype/nexus/web/internal/errorPageContentHtml.vm", VelocityRenderer.class.getClassLoader()), dataModel, response);
   }
 
   @Override
