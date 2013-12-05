@@ -54,6 +54,15 @@ public class NexusApplication
 
   private final ProtectedPathManager protectedPathManager;
 
+  /**
+   * HACK directly injecting indexTemplate managed resource broke Nexus startup here, wasn't resolvable. It's only
+   * available in the collection later. This should be generalized for all "ManagedPlexusResource" (all resources
+   * that
+   * are bound from /,  not /service/local) but we need a little bit of order here to have resources being able to
+   * override the default UI. (e.g. licensing)
+   */
+  private final Map<String, ManagedPlexusResource> managedResources;
+
   private final ManagedPlexusResource licenseTemplateResource;
 
   private final ManagedPlexusResource enterLicenseTemplateResource;
@@ -64,28 +73,36 @@ public class NexusApplication
 
   private final StatusService statusService;
 
+  private final MimeSupport mimeSupport;
+
   @Inject
   public NexusApplication(final EventBus eventBus,
                           final ProtectedPathManager protectedPathManager,
+                          final Map<String, ManagedPlexusResource> managedResources,
                           final @Named("licenseTemplate") @Nullable ManagedPlexusResource licenseTemplateResource,
                           final @Named("enterLicenseTemplate") @Nullable ManagedPlexusResource enterLicenseTemplateResource,
                           final @Named("StatusPlexusResource") ManagedPlexusResource statusPlexusResource,
                           final List<NexusApplicationCustomizer> customizers,
-                          final StatusService statusService)
+                          final StatusService statusService,
+                          final MimeSupport mimeSupport)
   {
     this.eventBus = eventBus;
     this.protectedPathManager = protectedPathManager;
+    this.managedResources = managedResources;
     this.licenseTemplateResource = licenseTemplateResource;
     this.enterLicenseTemplateResource = enterLicenseTemplateResource;
     this.statusPlexusResource = statusPlexusResource;
     this.customizers = customizers;
     this.statusService = statusService;
+    this.mimeSupport = mimeSupport;
   }
 
   // HACK: Too many places were using new NexusApplication() ... fuck it
   @VisibleForTesting
   public NexusApplication() {
     this(
+        null,
+        null,
         null,
         null,
         null,
@@ -157,12 +174,6 @@ public class NexusApplication
     // SERVICE (two always connected, unrelated to isStarted)
 
     attach(getApplicationRouter(), false, statusPlexusResource);
-    if (licenseTemplateResource != null) {
-      attach(root, false, licenseTemplateResource);
-    }
-    if (enterLicenseTemplateResource != null) {
-      attach(root, false, enterLicenseTemplateResource);
-    }
   }
 
   private final AntPathMatcher shiroAntPathMatcher = new AntPathMatcher();
