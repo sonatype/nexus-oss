@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.rest.CacheControl;
@@ -75,14 +74,13 @@ public class StaticResourcesServlet
                                 final MimeSupport mimeSupport,
                                 final WebUtils webUtils,
                                 final Renderer renderer,
-                                final @Nullable IndexPageRenderer indexPageRenderer,
-                                final ApplicationStatusSource applicationStatusSource)
+                                final @Nullable IndexPageRenderer indexPageRenderer)
   {
     this.nexusResourceBundles = checkNotNull(nexusResourceBundles);
     this.mimeSupport = checkNotNull(mimeSupport);
     this.webUtils = checkNotNull(webUtils);
     this.renderer = checkNotNull(renderer);
-    this.indexPageRenderer = checkNotNull(indexPageRenderer);
+    this.indexPageRenderer = indexPageRenderer;
     this.staticResources = Maps.newHashMap();
     discoverResources();
   }
