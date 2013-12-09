@@ -84,13 +84,14 @@ public class StaticResourcesServlet
   }
 
   private void discoverResources() {
-    if (nexusResourceBundles.size() > 0) {
+    // log warnings if we find any overlapping resources
+    if (!nexusResourceBundles.isEmpty()) {
       for (NexusResourceBundle bundle : nexusResourceBundles) {
         final List<StaticResource> resources = bundle.getContributedResouces();
         if (resources != null) {
           for (StaticResource resource : resources) {
             final String path = resource.getPath();
-            log.debug("Serving static resource on path {} :: {}", path, resource);
+            log.trace("Serving static resource on path {} :: {}", path, resource);
             final StaticResource old = staticResources.put(path, resource);
             if (old != null) {
               log.warn("Overlapping static resources on path {}: old={}, new={}", path, old, resource);
