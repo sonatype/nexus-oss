@@ -143,7 +143,7 @@ public class StaticResourcesServlet
     if (DevModeResources.hasResourceLocations()) {
       final File file = DevModeResources.getFileIfOnFileSystem(requestPath);
       if (file != null) {
-        logger.info("Delivering DEV resource {}", file.getAbsoluteFile());
+        logger.trace("Delivering DEV resource: {}", file.getAbsoluteFile());
         staticResource = new DevModeResource(requestPath, mimeSupport.guessMimeTypeFromPath(file.getName()), file);
       }
     }
