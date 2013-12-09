@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.staticresources.internal;
+package org.sonatype.nexus.webresources.internal;
 
 import javax.inject.Named;
 
@@ -24,12 +24,12 @@ import org.eclipse.sisu.inject.DefaultRankingFunction;
 import org.eclipse.sisu.inject.RankingFunction;
 
 /**
- * Static resources module.
+ * Web resources module.
  *
  * @since 2.8
  */
 @Named
-public class StaticResourcesModule
+public class WebResourcesModule
     extends AbstractModule
 {
   @Override
@@ -40,7 +40,7 @@ public class StaticResourcesModule
     {
       @Override
       protected void configureServlets() {
-        serve("/*").with(StaticResourcesServlet.class);
+        serve("/*").with(WebResourcesServlet.class);
         filter("/*").through(ErrorPageFilter.class);
 
         // Give components contributed by this plugin a low-level ranking (same level as Nexus core) so they are ordered
