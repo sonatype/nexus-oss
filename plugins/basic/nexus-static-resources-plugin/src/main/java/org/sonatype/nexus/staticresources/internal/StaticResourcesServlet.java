@@ -91,7 +91,7 @@ public class StaticResourcesServlet
             logger.debug("Serving static resource on path {} :: {}", path, resource);
             final StaticResource old = staticResources.put(path, resource);
             if (old != null) {
-              logger.info("Overlapping static resources on path {}: old={}, new={}", path, old, resource);
+              logger.warn("Overlapping static resources on path {}: old={}, new={}", path, old, resource);
             }
           }
         }
