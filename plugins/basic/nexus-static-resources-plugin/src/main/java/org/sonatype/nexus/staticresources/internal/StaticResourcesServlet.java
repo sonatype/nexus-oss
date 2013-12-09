@@ -111,8 +111,8 @@ public class StaticResourcesServlet
   // service
 
   @Override
-  protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
-                                                                                                      IOException
+  protected void service(final HttpServletRequest request, final HttpServletResponse response)
+      throws ServletException, IOException
   {
     webUtils.equipResponseWithStandardHeaders(response);
     super.service(request, response);
@@ -121,8 +121,8 @@ public class StaticResourcesServlet
   // GET
 
   @Override
-  protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
-                                                                                                    IOException
+  protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
+      throws ServletException, IOException
   {
     final String requestPath = request.getPathInfo();
     logger.debug("Requested resource {}", requestPath);
@@ -187,7 +187,8 @@ public class StaticResourcesServlet
   /**
    * Handles a file response, all the conditional request cases, and eventually the content serving of the file item.
    */
-  protected void doGetResource(final HttpServletRequest request, final HttpServletResponse response,
+  protected void doGetResource(final HttpServletRequest request,
+                               final HttpServletResponse response,
                                final StaticResource resource) throws IOException
   {
     // content-type
