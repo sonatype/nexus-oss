@@ -60,7 +60,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-mailer</artifactId>
-        <version>1.9-SNAPSHOT</version>
+        <version>1.8</version>
         <exclusions>
           <exclusion>
             <groupId>javax.activation</groupId>
@@ -78,7 +78,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-resource-scanner</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1</version>
       </dependency>
 
       <dependency>
@@ -90,7 +90,7 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-bundle-launcher</artifactId>
-        <version>1.6-SNAPSHOT</version>
+        <version>1.6</version>
       </dependency>
 
       <dependency>
