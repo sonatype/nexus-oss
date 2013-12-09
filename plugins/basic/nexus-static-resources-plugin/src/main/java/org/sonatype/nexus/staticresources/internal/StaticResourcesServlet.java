@@ -44,6 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 /**
  * Provides access to static resources.
@@ -55,7 +56,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class StaticResourcesServlet
     extends HttpServlet
 {
-  private final Logger logger = LoggerFactory.getLogger(StaticResourcesServlet.class);
+  private static final Logger log = LoggerFactory.getLogger(StaticResourcesServlet.class);
 
   private final List<NexusResourceBundle> nexusResourceBundles;
 
@@ -81,17 +82,17 @@ public class StaticResourcesServlet
     discoverResources();
   }
 
-  protected void discoverResources() {
+  private void discoverResources() {
     if (nexusResourceBundles.size() > 0) {
       for (NexusResourceBundle bundle : nexusResourceBundles) {
         final List<StaticResource> resources = bundle.getContributedResouces();
         if (resources != null) {
           for (StaticResource resource : resources) {
             final String path = resource.getPath();
-            logger.debug("Serving static resource on path {} :: {}", path, resource);
+            log.debug("Serving static resource on path {} :: {}", path, resource);
             final StaticResource old = staticResources.put(path, resource);
             if (old != null) {
-              logger.warn("Overlapping static resources on path {}: old={}, new={}", path, old, resource);
+              log.warn("Overlapping static resources on path {}: old={}, new={}", path, old, resource);
             }
           }
         }
@@ -100,11 +101,13 @@ public class StaticResourcesServlet
 
     // log the results
     if (DevModeResources.hasResourceLocations()) {
-      logger.info("DEV mode resources ENABLED, will override mounted ones if applicable.");
+      log.info("DEV mode resources ENABLED; will override mounted ones if applicable");
     }
-    logger.info("Discovered and serving {} static resources.", staticResources.size());
-    if (logger.isDebugEnabled()) {
-      logger.debug("StaticResources {}", staticResources.keySet());
+    log.info("Discovered and serving {} static resources", staticResources.size());
+    if (log.isDebugEnabled()) {
+      for (String path : staticResources.keySet()) {
+        log.debug("  {}", path);
+      }
     }
   }
 
@@ -125,7 +128,7 @@ public class StaticResourcesServlet
       throws ServletException, IOException
   {
     final String requestPath = request.getPathInfo();
-    logger.debug("Requested resource {}", requestPath);
+    log.debug("Requested resource {}", requestPath);
     // 0) see is index.html needed actually
     if ("".equals(requestPath) || "/".equals(requestPath)) {
       // redirect to index.html
@@ -143,10 +146,11 @@ public class StaticResourcesServlet
     if (DevModeResources.hasResourceLocations()) {
       final File file = DevModeResources.getFileIfOnFileSystem(requestPath);
       if (file != null) {
-        logger.trace("Delivering DEV resource: {}", file.getAbsoluteFile());
+        log.trace("Delivering DEV resource: {}", file.getAbsoluteFile());
         staticResource = new DevModeResource(requestPath, mimeSupport.guessMimeTypeFromPath(file.getName()), file);
       }
     }
+
     // 2) second, look at "ordinary" static resources, but only if devResource did not hit anything
     if (staticResource == null) {
       staticResource = staticResources.get(requestPath);
@@ -166,37 +170,35 @@ public class StaticResourcesServlet
       doGetResource(request, response, staticResource);
     }
     else {
-      throw new ErrorStatusServletException(HttpServletResponse.SC_NOT_FOUND, "Not Found", "Resource not found");
+      throw new ErrorStatusServletException(SC_NOT_FOUND, "Not Found", "Resource not found");
     }
   }
 
   /**
    * Delegates to {@link IndexPageRenderer} to render index page.
    */
-  protected void doGetIndex(final HttpServletRequest request, final HttpServletResponse response)
+  private void doGetIndex(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException
   {
     if (indexPageRenderer != null) {
       indexPageRenderer.render(request, response, webUtils.getAppRootUrl(request));
     }
     else {
-      throw new ErrorStatusServletException(HttpServletResponse.SC_NOT_FOUND, "Not Found", "Index page not found");
+      throw new ErrorStatusServletException(SC_NOT_FOUND, "Not Found", "Index page not found");
     }
   }
 
   /**
    * Handles a file response, all the conditional request cases, and eventually the content serving of the file item.
    */
-  protected void doGetResource(final HttpServletRequest request,
-                               final HttpServletResponse response,
-                               final StaticResource resource) throws IOException
+  private void doGetResource(final HttpServletRequest request,
+                             final HttpServletResponse response,
+                             final StaticResource resource) throws IOException
   {
-    // content-type
     response.setHeader("Content-Type", resource.getContentType());
-    // last-modified
     response.setDateHeader("Last-Modified", resource.getLastModified());
-    // content-length
     response.setHeader("Content-Length", String.valueOf(resource.getSize()));
+
     // cache-control
     if (resource instanceof CacheControl && ((CacheControl) resource).shouldCache()) {
       // default cache for 30 days
