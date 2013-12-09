@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 
 /**
  * Provides access to static resources.
@@ -214,7 +215,7 @@ public class StaticResourcesServlet
     // handle conditional GETs
     if (ifModifiedSince > -1 && resource.getLastModified() <= ifModifiedSince) {
       // this is a conditional GET using time-stamp, and resource is not modified
-      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+      response.setStatus(SC_NOT_MODIFIED);
     }
     else {
       // NEXUS-5023 disable IE for sniffing into response content
