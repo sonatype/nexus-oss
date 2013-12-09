@@ -14,11 +14,9 @@
 package org.sonatype.nexus.staticresources.internal;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.sonatype.nexus.web.ErrorPageFilter;
 import org.sonatype.nexus.web.Renderer;
-import org.sonatype.nexus.web.internal.VelocityRenderer;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
@@ -36,8 +34,7 @@ public class StaticResourcesModule
 {
   @Override
   protected void configure() {
-    bind(VelocityRenderer.class);
-    bind(Renderer.class).to(VelocityRenderer.class).in(Singleton.class);
+    requireBinding(Renderer.class);
 
     install(new ServletModule()
     {

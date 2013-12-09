@@ -23,7 +23,6 @@ import org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationF
 import org.sonatype.nexus.web.ErrorPageFilter;
 import org.sonatype.nexus.web.MdcUserContextFilter;
 import org.sonatype.nexus.web.Renderer;
-import org.sonatype.nexus.web.internal.VelocityRenderer;
 import org.sonatype.security.web.guice.SecurityWebFilter;
 
 import com.google.inject.AbstractModule;
@@ -51,8 +50,7 @@ public class ContentModule
 
     bind(filterKey("contentTperms")).toProvider(ContentTargetMappingFilterProvider.class);
 
-    bind(VelocityRenderer.class);
-    bind(Renderer.class).to(VelocityRenderer.class).in(Singleton.class);
+    requireBinding(Renderer.class);
 
     install(new ServletModule()
     {
