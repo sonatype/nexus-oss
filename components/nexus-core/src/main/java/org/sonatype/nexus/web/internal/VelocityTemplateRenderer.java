@@ -85,22 +85,27 @@ public class VelocityTemplateRenderer
     checkNotNull(response);
     checkArgument(responseCode >= 400);
     checkNotNull(errorDescription);
+
     final Map<String, Object> dataModel = Maps.newHashMap();
     dataModel.put("nexusRoot", webUtils.getAppRootUrl(request));
     dataModel.put("nexusVersion", applicationVersion);
     dataModel.put("statusCode", responseCode);
     dataModel.put("statusName", Strings.isNullOrEmpty(reasonPhrase) ? errorDescription : reasonPhrase);
     dataModel.put("errorDescription", StringEscapeUtils.escapeHtml(errorDescription));
+
     if (null != exception) {
       dataModel.put("errorStackTrace", StringEscapeUtils.escapeHtml(ExceptionUtils.getStackTrace(exception)));
     }
+
     if (Strings.isNullOrEmpty(reasonPhrase)) {
       response.setStatus(responseCode);
     }
     else {
       response.setStatus(responseCode, reasonPhrase);
     }
-    render(template("/org/sonatype/nexus/web/internal/errorPageContentHtml.vm", VelocityTemplateRenderer.class.getClassLoader()), dataModel, response);
+
+    render(template("/org/sonatype/nexus/web/internal/errorPageContentHtml.vm",
+        VelocityTemplateRenderer.class.getClassLoader()), dataModel, response);
   }
 
   @Override
@@ -120,7 +125,8 @@ public class VelocityTemplateRenderer
   }
 
   @Override
-  public void render(final TemplateLocator templateLocator, final Map<String, Object> dataModel,
+  public void render(final TemplateLocator templateLocator,
+                     final Map<String, Object> dataModel,
                      final HttpServletResponse response) throws IOException
   {
     render(getVelocityTemplate(templateLocator), dataModel, response);
@@ -150,13 +156,11 @@ public class VelocityTemplateRenderer
       response.flushBuffer();
     }
     catch (IOException e) {
-      // NEXUS-3442
-      // IOEx should be propagated as is
+      // NEXUS-3442: IOEx should be propagated as is
       throw e;
     }
     catch (VelocityException e) {
-      // All other (Velocity exceptions are RuntimeExcptions!) to be wrapped, but preserve cause too
-      throw new IOException("Template processing error: " + e.getMessage(), e);
+      throw new IOException("Template processing error: " + e, e);
     }
   }
 
@@ -169,8 +173,7 @@ public class VelocityTemplateRenderer
       return velocityEngineProvider.get().getTemplate(templateLocator.name());
     }
     catch (Exception e) {
-      throw new IllegalArgumentException("Cannot get the template with name " + String.valueOf(templateLocator.name()),
-          e);
+      throw new IllegalArgumentException("Cannot get the template with name " + templateLocator.name(), e);
     }
     finally {
       Thread.currentThread().setContextClassLoader(original);
