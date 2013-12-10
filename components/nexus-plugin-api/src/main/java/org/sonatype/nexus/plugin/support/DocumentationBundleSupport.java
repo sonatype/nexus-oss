@@ -11,23 +11,23 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.rest;
+package org.sonatype.nexus.plugin.support;
 
 import org.sonatype.nexus.plugin.PluginIdentity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Support for {@link NexusDocumentationBundle} implementations.
+ * Support for {@link DocumentationBundle} implementations.
  *
  * @since 2.7
  */
-public abstract class NexusDocumentationBundleSupport
-    extends AbstractDocumentationNexusResourceBundle
+public abstract class DocumentationBundleSupport
+    extends AbstractDocumentationResourceBundle
 {
   private final PluginIdentity owner;
 
-  protected NexusDocumentationBundleSupport(final PluginIdentity plugin) {
+  protected DocumentationBundleSupport(final PluginIdentity plugin) {
     this.owner = checkNotNull(plugin);
   }
 

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.rest;
+package org.sonatype.nexus.plugin.support;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -33,18 +33,22 @@ import com.google.common.annotations.VisibleForTesting;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class AbstractDocumentationNexusResourceBundle
+/**
+ * @deprecated Replace usage with {@link DocumentationBundleSupport}.
+ */
+@Deprecated
+public abstract class AbstractDocumentationResourceBundle
     extends ComponentSupport
-    implements NexusDocumentationBundle
+    implements DocumentationBundle
 {
   private MimeSupport mimeSupport;
 
-  protected AbstractDocumentationNexusResourceBundle() {
+  protected AbstractDocumentationResourceBundle() {
     // empty
   }
 
   @VisibleForTesting
-  protected AbstractDocumentationNexusResourceBundle(final MimeSupport mimeSupport) {
+  protected AbstractDocumentationResourceBundle(final MimeSupport mimeSupport) {
     this.mimeSupport = mimeSupport;
   }
 

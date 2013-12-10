@@ -19,13 +19,13 @@ import java.util.zip.ZipFile;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
+import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
 import org.sonatype.nexus.rest.AbstractIndexerNexusPlexusResource;
 
 @Named
 @Singleton
 public class IndexerDocumentationResourceBundle
-    extends AbstractDocumentationNexusResourceBundle
+    extends AbstractDocumentationResourceBundle
 {
 
   @Override

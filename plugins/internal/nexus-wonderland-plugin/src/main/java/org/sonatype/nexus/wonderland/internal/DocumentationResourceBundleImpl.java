@@ -17,19 +17,19 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.rest.NexusDocumentationBundle;
-import org.sonatype.nexus.plugins.rest.NexusDocumentationBundleSupport;
+import org.sonatype.nexus.plugin.support.DocumentationBundle;
+import org.sonatype.nexus.plugin.support.DocumentationBundleSupport;
 import org.sonatype.nexus.wonderland.WonderlandPlugin;
 
 /**
- * Wonderland {@link NexusDocumentationBundle}.
+ * Wonderland {@link DocumentationBundle}.
  *
  * @since 2.7
  */
 @Named
 @Singleton
 public class DocumentationResourceBundleImpl
-    extends NexusDocumentationBundleSupport
+    extends DocumentationBundleSupport
 {
   @Inject
   public DocumentationResourceBundleImpl(final WonderlandPlugin plugin) {

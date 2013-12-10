@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.rest;
+package org.sonatype.nexus.plugin.support;
 
 import org.sonatype.nexus.web.WebResourceBundle;
 
@@ -21,7 +21,7 @@ import org.sonatype.nexus.web.WebResourceBundle;
  * @author velo
  * @author cstamas
  */
-public interface NexusDocumentationBundle
+public interface DocumentationBundle
     extends WebResourceBundle
 {
   /**
@@ -35,7 +35,7 @@ public interface NexusDocumentationBundle
    * Returns the "url snippet". It makes possible to do a deeper "partition" within plugin documentation URIs. Used
    * by
    * plugins that may carry multiple documentations (like core doc plugin is). Others should just use defaults
-   * (provided in {@link AbstractDocumentationNexusResourceBundle}.
+   * (provided in {@link AbstractDocumentationResourceBundle}.
    */
   String getPathPrefix();
 

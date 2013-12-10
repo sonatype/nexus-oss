@@ -18,16 +18,16 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.CapabilitiesPlugin;
-import org.sonatype.nexus.plugins.rest.NexusDocumentationBundle;
-import org.sonatype.nexus.plugins.rest.NexusDocumentationBundleSupport;
+import org.sonatype.nexus.plugin.support.DocumentationBundle;
+import org.sonatype.nexus.plugin.support.DocumentationBundleSupport;
 
 /**
- * Capabilities {@link NexusDocumentationBundle}.
+ * Capabilities {@link DocumentationBundle}.
  */
 @Named
 @Singleton
 public class CapabilityDocumentationResourceBundle
-    extends NexusDocumentationBundleSupport
+    extends DocumentationBundleSupport
 {
   @Inject
   public CapabilityDocumentationResourceBundle(final CapabilitiesPlugin plugin) {

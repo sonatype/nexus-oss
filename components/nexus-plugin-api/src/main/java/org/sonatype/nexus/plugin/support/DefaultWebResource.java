@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.rest;
+package org.sonatype.nexus.plugin.support;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,13 +29,13 @@ public class DefaultWebResource
 
   private final String path;
 
-  private volatile URLConnection urlConnection;
-
   private final String contentType;
 
   private final boolean shouldCache;
 
-  public DefaultWebResource(URL url, String path, String contentType) {
+  private volatile URLConnection urlConnection;
+
+  public DefaultWebResource(final URL url, final String path, final String contentType) {
     URL overrideUrl = DevModeResources.getResourceIfOnFileSystem(path);
     this.resourceURL = overrideUrl != null ? overrideUrl : url;
     this.path = path;
@@ -87,18 +87,14 @@ public class DefaultWebResource
     }
   }
 
-  public InputStream getInputStream()
-      throws IOException
-  {
+  public InputStream getInputStream() throws IOException {
     if (checkConnection()) {
       InputStream is = urlConnection.getInputStream();
-
       urlConnection = null;
-
       return is;
     }
     else {
-      throw new IOException("Invalid resource!");
+      throw new IOException("Invalid resource: " + resourceURL);
     }
   }
 
@@ -133,5 +129,4 @@ public class DefaultWebResource
     builder.append("]");
     return builder.toString();
   }
-
 }

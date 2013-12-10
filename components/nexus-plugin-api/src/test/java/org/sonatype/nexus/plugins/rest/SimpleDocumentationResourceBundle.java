@@ -19,9 +19,10 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.sonatype.nexus.mime.DefaultMimeSupport;
+import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
 
 public class SimpleDocumentationResourceBundle
-    extends AbstractDocumentationNexusResourceBundle
+    extends AbstractDocumentationResourceBundle
 {
   public SimpleDocumentationResourceBundle() {
     super(new DefaultMimeSupport());

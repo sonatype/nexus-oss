@@ -18,18 +18,18 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.logging.LoggingPlugin;
-import org.sonatype.nexus.plugins.rest.NexusDocumentationBundle;
-import org.sonatype.nexus.plugins.rest.NexusDocumentationBundleSupport;
+import org.sonatype.nexus.plugin.support.DocumentationBundle;
+import org.sonatype.nexus.plugin.support.DocumentationBundleSupport;
 
 /**
- * Logging plugin {@link NexusDocumentationBundle}.
+ * Logging plugin {@link DocumentationBundle}.
  *
  * @since 2.7
  */
 @Named
 @Singleton
 public class LoggingDocumentationResourceBundle
-  extends NexusDocumentationBundleSupport
+  extends DocumentationBundleSupport
 {
   @Inject
   public LoggingDocumentationResourceBundle(final LoggingPlugin plugin) {

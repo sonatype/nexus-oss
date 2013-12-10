@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.plugins.rest.DefaultWebResource;
+import org.sonatype.nexus.plugin.support.DefaultWebResource;
 import org.sonatype.nexus.web.ErrorStatusServletException;
 import org.sonatype.nexus.web.WebResource;
 import org.sonatype.nexus.web.WebResource.CacheControl;
