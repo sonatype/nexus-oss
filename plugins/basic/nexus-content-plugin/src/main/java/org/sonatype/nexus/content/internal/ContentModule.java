@@ -20,7 +20,10 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.guice.FilterChainModule;
 import org.sonatype.nexus.security.filter.FilterProviderSupport;
 import org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter;
+import org.sonatype.nexus.web.ErrorPageFilter;
 import org.sonatype.nexus.web.MdcUserContextFilter;
+import org.sonatype.nexus.web.Renderer;
+import org.sonatype.nexus.web.internal.VelocityRenderer;
 import org.sonatype.security.web.guice.SecurityWebFilter;
 
 import com.google.inject.AbstractModule;
@@ -48,11 +51,15 @@ public class ContentModule
 
     bind(filterKey("contentTperms")).toProvider(ContentTargetMappingFilterProvider.class);
 
+    bind(VelocityRenderer.class);
+    bind(Renderer.class).to(VelocityRenderer.class).in(Singleton.class);
+
     install(new ServletModule()
     {
       @Override
       protected void configureServlets() {
         serve(MOUNT_POINT + "/*").with(ContentServlet.class);
+        filter(MOUNT_POINT + "/*").through(ErrorPageFilter.class);
         filter(MOUNT_POINT + "/*").through(SecurityWebFilter.class);
         filter(MOUNT_POINT + "/*").through(MdcUserContextFilter.class);
       }

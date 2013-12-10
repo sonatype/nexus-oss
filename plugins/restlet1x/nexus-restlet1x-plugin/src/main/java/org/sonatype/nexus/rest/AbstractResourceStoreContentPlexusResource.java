@@ -504,7 +504,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
     if (StringUtils.isBlank(root.getPath()) || !root.getPath().endsWith("/")) {
       root.setPath(StringUtils.defaultString(root.getPath(), "") + "/");
     }
-    Reference requestRoot = req.getRootRef();
+    Reference requestRoot = req.getRootRef().getParentRef().getParentRef();
     if (StringUtils.isBlank(requestRoot.getPath()) || !requestRoot.getPath().endsWith("/")) {
       requestRoot.setPath(StringUtils.defaultString(requestRoot.getPath(), "") + "/");
     }

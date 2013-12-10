@@ -21,13 +21,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
-import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.nexus.rest.internal.DevModeResourceFinder;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import org.sonatype.plexus.rest.RetargetableRestlet;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
@@ -40,7 +36,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.Subscribe;
 import com.thoughtworks.xstream.XStream;
 import org.apache.shiro.util.AntPathMatcher;
-import org.restlet.Directory;
 import org.restlet.Router;
 import org.restlet.service.StatusService;
 
@@ -59,60 +54,38 @@ public class NexusApplication
 
   private final ProtectedPathManager protectedPathManager;
 
-  /**
-   * HACK directly injecting indexTemplate managed resource broke Nexus startup here, wasn't resolvable. It's only
-   * available in the collection later. This should be generalized for all "ManagedPlexusResource" (all resources
-   * that
-   * are bound from /,  not /service/local) but we need a little bit of order here to have resources being able to
-   * override the default UI. (e.g. licensing)
-   */
-  private final Map<String, ManagedPlexusResource> managedResources;
-
   private final ManagedPlexusResource licenseTemplateResource;
 
   private final ManagedPlexusResource enterLicenseTemplateResource;
 
   private final ManagedPlexusResource statusPlexusResource;
 
-  private final List<NexusResourceBundle> nexusResourceBundles;
-
   private final List<NexusApplicationCustomizer> customizers;
 
   private final StatusService statusService;
 
-  private final MimeSupport mimeSupport;
-
   @Inject
   public NexusApplication(final EventBus eventBus,
                           final ProtectedPathManager protectedPathManager,
-                          final Map<String, ManagedPlexusResource> managedResources,
                           final @Named("licenseTemplate") @Nullable ManagedPlexusResource licenseTemplateResource,
                           final @Named("enterLicenseTemplate") @Nullable ManagedPlexusResource enterLicenseTemplateResource,
                           final @Named("StatusPlexusResource") ManagedPlexusResource statusPlexusResource,
-                          final List<NexusResourceBundle> nexusResourceBundles,
                           final List<NexusApplicationCustomizer> customizers,
-                          final StatusService statusService,
-                          final MimeSupport mimeSupport)
+                          final StatusService statusService)
   {
     this.eventBus = eventBus;
     this.protectedPathManager = protectedPathManager;
-    this.managedResources = managedResources;
     this.licenseTemplateResource = licenseTemplateResource;
     this.enterLicenseTemplateResource = enterLicenseTemplateResource;
     this.statusPlexusResource = statusPlexusResource;
-    this.nexusResourceBundles = nexusResourceBundles;
     this.customizers = customizers;
     this.statusService = statusService;
-    this.mimeSupport = mimeSupport;
   }
 
   // HACK: Too many places were using new NexusApplication() ... fuck it
   @VisibleForTesting
   public NexusApplication() {
     this(
-        null,
-        null,
-        null,
         null,
         null,
         null,
@@ -156,17 +129,7 @@ public class NexusApplication
 
   @Override
   protected Router initializeRouter(Router root, boolean isStarted) {
-    // ========
-    // SERVICE
-
-    // service router
-    Router applicationRouter = new Router(getContext());
-
-    // attaching filter to a root on given URI
-    attach(root, false, "/service/" + AbstractNexusPlexusResource.NEXUS_INSTANCE_LOCAL, applicationRouter);
-
-    // return the swapped router
-    return applicationRouter;
+    return root;
   }
 
   @Override
@@ -194,48 +157,11 @@ public class NexusApplication
     // SERVICE (two always connected, unrelated to isStarted)
 
     attach(getApplicationRouter(), false, statusPlexusResource);
-
-    // ==========
-    // INDEX.HTML and WAR contents
-    // To redirect "uncaught" requests to indexTemplateResource
-    ManagedPlexusResource indexRedirectingResource = managedResources.get("IndexRedirectingPlexusResource");
-    attach(root, true, "", new NexusPlexusResourceFinder(getContext(), indexRedirectingResource));
-    attach(root, true, "/", new NexusPlexusResourceFinder(getContext(), indexRedirectingResource));
-
-    // the indexTemplateResource
-    attach(root, false, managedResources.get("indexTemplate"));
     if (licenseTemplateResource != null) {
       attach(root, false, licenseTemplateResource);
     }
     if (enterLicenseTemplateResource != null) {
       attach(root, false, enterLicenseTemplateResource);
-    }
-
-    // publish the WAR contents
-    Directory rootDir = new NexusDirectory(getContext(), "war:///");
-    rootDir.setListingAllowed(false);
-    rootDir.setNegotiateContent(false);
-    attach(root, false, "/", rootDir);
-
-    // ================
-    // STATIC RESOURCES
-
-    if (nexusResourceBundles.size() > 0) {
-      for (NexusResourceBundle bundle : nexusResourceBundles) {
-        List<StaticResource> resources = bundle.getContributedResouces();
-
-        if (resources != null) {
-          for (StaticResource resource : resources) {
-            attach(root, false, resource.getPath(), new StaticResourceFinder(getContext(), resource));
-          }
-        }
-      }
-    }
-
-    // Attach to "/static" in case that dev mode is on
-    // The finder will only be called if the path under static is not found (as those are more specific)
-    if (DevModeResources.hasResourceLocations()) {
-      attach(root, false, "/static", new DevModeResourceFinder(mimeSupport, getContext(), "/static"));
     }
   }
 

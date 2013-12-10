@@ -23,6 +23,7 @@ import java.util.jar.JarEntry;
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.plugins.rest.CacheControl;
 import org.sonatype.nexus.plugins.rest.StaticResource;
+import org.sonatype.plugin.metadata.GAVCoordinate;
 
 /**
  * {@link StaticResource} contributed from a Nexus plugin.
@@ -34,6 +35,8 @@ public final class PluginStaticResource
   // ----------------------------------------------------------------------
   // Implementation fields
   // ----------------------------------------------------------------------
+
+  private final GAVCoordinate gav;
 
   private final URL resourceURL;
 
@@ -47,8 +50,9 @@ public final class PluginStaticResource
   // Constructors
   // ----------------------------------------------------------------------
 
-  public PluginStaticResource(final URL resourceURL, final String publishedPath, final String contentType) {
+  public PluginStaticResource(final GAVCoordinate gav, final URL resourceURL, final String publishedPath, final String contentType) {
     URL overrideUrl = DevModeResources.getResourceIfOnFileSystem(publishedPath);
+    this.gav = gav;
     this.resourceURL = overrideUrl != null ? overrideUrl : resourceURL;
     this.publishedPath = publishedPath;
     this.contentType = contentType;
@@ -110,4 +114,8 @@ public final class PluginStaticResource
     return shouldCache;
   }
 
+  @Override
+  public String toString() {
+    return gav.toString() + "(" + super.toString() + ")";
+  }
 }

@@ -38,12 +38,11 @@
       <artifactId>nexus-plugin-api</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-restlet1x-plugin</artifactId>
-      <scope>provided</scope>
+      <artifactId>nexus-static-resources-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

@@ -28,18 +28,12 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  *
  * @since 2.8
  */
-public interface Renderer
+public interface ContentRenderer
 {
   void renderCollection(final HttpServletRequest request,
                         final HttpServletResponse response,
                         final StorageCollectionItem coll,
                         final Collection<StorageItem> children)
-      throws IOException;
-
-  void renderErrorPage(final HttpServletRequest request,
-                       final HttpServletResponse response,
-                       final ResourceStoreRequest resourceStoreRequest,
-                       final Exception exception)
       throws IOException;
 
   void renderRequestDescription(final HttpServletRequest request,
