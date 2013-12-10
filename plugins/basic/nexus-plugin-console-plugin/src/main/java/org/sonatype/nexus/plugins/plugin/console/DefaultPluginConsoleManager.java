@@ -27,7 +27,7 @@ import org.sonatype.nexus.plugins.PluginResponse;
 import org.sonatype.nexus.plugins.plugin.console.model.DocumentationLink;
 import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
 import org.sonatype.nexus.plugins.rest.NexusDocumentationBundle;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
+import org.sonatype.nexus.web.WebResourceBundle;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -47,19 +47,19 @@ public class DefaultPluginConsoleManager
 {
   private final NexusPluginManager pluginManager;
 
-  private final List<NexusResourceBundle> resourceBundles;
+  private final List<WebResourceBundle> resourceBundles;
 
   private final Multimap<String, NexusDocumentationBundle> docBundles;
 
   @Inject
   public DefaultPluginConsoleManager(final NexusPluginManager pluginManager,
-                                     final List<NexusResourceBundle> resourceBundles)
+                                     final List<WebResourceBundle> resourceBundles)
   {
     this.pluginManager = checkNotNull(pluginManager);
     this.resourceBundles = checkNotNull(resourceBundles);
 
     this.docBundles = LinkedHashMultimap.create();
-    for (NexusResourceBundle rb : resourceBundles) {
+    for (WebResourceBundle rb : resourceBundles) {
       if (rb instanceof NexusDocumentationBundle) {
         NexusDocumentationBundle doc = (NexusDocumentationBundle) rb;
 

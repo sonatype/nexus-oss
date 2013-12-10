@@ -31,11 +31,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.plugins.rest.CacheControl;
-import org.sonatype.nexus.plugins.rest.DefaultStaticResource;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
-import org.sonatype.nexus.plugins.rest.StaticResource;
+import org.sonatype.nexus.plugins.rest.DefaultWebResource;
 import org.sonatype.nexus.web.ErrorStatusServletException;
+import org.sonatype.nexus.web.WebResource;
+import org.sonatype.nexus.web.WebResource.CacheControl;
+import org.sonatype.nexus.web.WebResourceBundle;
 import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.nexus.webresources.IndexPageRenderer;
 
@@ -59,7 +59,7 @@ public class WebResourcesServlet
 {
   private static final Logger log = LoggerFactory.getLogger(WebResourcesServlet.class);
 
-  private final List<NexusResourceBundle> nexusResourceBundles;
+  private final List<WebResourceBundle> webResourceBundles;
 
   private final MimeSupport mimeSupport;
 
@@ -67,15 +67,15 @@ public class WebResourcesServlet
 
   private final IndexPageRenderer indexPageRenderer;
 
-  private final Map<String, StaticResource> staticResources;
+  private final Map<String, WebResource> staticResources;
 
   @Inject
-  public WebResourcesServlet(final List<NexusResourceBundle> nexusResourceBundles,
+  public WebResourcesServlet(final List<WebResourceBundle> webResourceBundles,
                              final MimeSupport mimeSupport,
                              final WebUtils webUtils,
                              final @Nullable IndexPageRenderer indexPageRenderer)
   {
-    this.nexusResourceBundles = checkNotNull(nexusResourceBundles);
+    this.webResourceBundles = checkNotNull(webResourceBundles);
     this.mimeSupport = checkNotNull(mimeSupport);
     this.webUtils = checkNotNull(webUtils);
     this.indexPageRenderer = indexPageRenderer;
@@ -85,14 +85,14 @@ public class WebResourcesServlet
 
   private void discoverResources() {
     // log warnings if we find any overlapping resources
-    if (!nexusResourceBundles.isEmpty()) {
-      for (NexusResourceBundle bundle : nexusResourceBundles) {
-        final List<StaticResource> resources = bundle.getContributedResouces();
+    if (!webResourceBundles.isEmpty()) {
+      for (WebResourceBundle bundle : webResourceBundles) {
+        final List<WebResource> resources = bundle.getResources();
         if (resources != null) {
-          for (StaticResource resource : resources) {
+          for (WebResource resource : resources) {
             final String path = resource.getPath();
             log.trace("Serving static resource on path {} :: {}", path, resource);
-            final StaticResource old = staticResources.put(path, resource);
+            final WebResource old = staticResources.put(path, resource);
             if (old != null) {
               // FIXME: for now this causes a bit of noise on startup for overlapping icons, for now reduce to DEBUG
               // FIXME: ... we need to sort out a general strategy short/long term for how to handle this issue
@@ -146,7 +146,7 @@ public class WebResourcesServlet
     }
 
     // locate it
-    StaticResource staticResource = null;
+    WebResource staticResource = null;
     // 1) first "dev" resources if enabled (to override everything else)
     if (DevModeResources.hasResourceLocations()) {
       final File file = DevModeResources.getFileIfOnFileSystem(requestPath);
@@ -165,7 +165,7 @@ public class WebResourcesServlet
     if (staticResource == null) {
       final URL resourceUrl = getServletContext().getResource(requestPath);
       if (resourceUrl != null) {
-        staticResource = new DefaultStaticResource(resourceUrl, requestPath,
+        staticResource = new DefaultWebResource(resourceUrl, requestPath,
             mimeSupport.guessMimeTypeFromPath(requestPath));
       }
     }
@@ -198,7 +198,7 @@ public class WebResourcesServlet
    */
   private void doGetResource(final HttpServletRequest request,
                              final HttpServletResponse response,
-                             final StaticResource resource) throws IOException
+                             final WebResource resource) throws IOException
   {
     response.setHeader("Content-Type", resource.getContentType());
     response.setDateHeader("Last-Modified", resource.getLastModified());

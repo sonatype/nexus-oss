@@ -19,9 +19,11 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.sonatype.nexus.internal.DevModeResources;
+import org.sonatype.nexus.web.WebResource;
+import org.sonatype.nexus.web.WebResource.CacheControl;
 
-public class DefaultStaticResource
-    implements StaticResource, CacheControl
+public class DefaultWebResource
+    implements WebResource, CacheControl
 {
   private final URL resourceURL;
 
@@ -33,7 +35,7 @@ public class DefaultStaticResource
 
   private final boolean shouldCache;
 
-  public DefaultStaticResource(URL url, String path, String contentType) {
+  public DefaultWebResource(URL url, String path, String contentType) {
     URL overrideUrl = DevModeResources.getResourceIfOnFileSystem(path);
     this.resourceURL = overrideUrl != null ? overrideUrl : url;
     this.path = path;
@@ -118,7 +120,7 @@ public class DefaultStaticResource
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    builder.append("DefaultStaticResource [");
+    builder.append("DefaultWebResource [");
     if (path != null) {
       builder.append("path=");
       builder.append(path);

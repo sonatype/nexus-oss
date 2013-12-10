@@ -11,18 +11,30 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.rest;
+package org.sonatype.nexus.web;
 
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * @deprecated pending removal
+ * ???
+ *
+ * @since 2.8
  */
-@Deprecated
-public class AbstractNexusResourceBundle
-    implements NexusResourceBundle
+public interface WebResource
 {
-  public List<StaticResource> getContributedResouces() {
-    return null;
+  String getPath();
+
+  String getContentType();
+
+  long getSize();
+
+  Long getLastModified();
+
+  InputStream getInputStream() throws IOException;
+
+  interface CacheControl
+  {
+    boolean shouldCache();
   }
 }

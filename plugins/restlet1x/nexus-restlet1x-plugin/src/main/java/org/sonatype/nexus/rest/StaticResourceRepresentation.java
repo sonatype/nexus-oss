@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
-import org.sonatype.nexus.plugins.rest.StaticResource;
+import org.sonatype.nexus.web.WebResource;
 
 import org.apache.commons.io.IOUtils;
 import org.restlet.data.MediaType;
@@ -27,9 +27,9 @@ import org.restlet.resource.OutputRepresentation;
 public class StaticResourceRepresentation
     extends OutputRepresentation
 {
-  private final StaticResource resource;
+  private final WebResource resource;
 
-  public StaticResourceRepresentation(StaticResource resource) {
+  public StaticResourceRepresentation(WebResource resource) {
     super(MediaType.valueOf(resource.getContentType()));
 
     setSize(resource.getSize());

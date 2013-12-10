@@ -44,11 +44,11 @@ import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
 import org.sonatype.nexus.plugins.repository.NexusPluginRepository;
 import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactException;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
-import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.util.AlphanumComparator;
+import org.sonatype.nexus.web.WebResource;
+import org.sonatype.nexus.web.WebResourceBundle;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugins.model.ClasspathDependency;
 import org.sonatype.plugins.model.PluginDependency;
@@ -363,10 +363,10 @@ public class DefaultNexusPluginManager
     beanModules.add(new NexusAnnotatedBeanModule(annSpace, variables, repositoryTypes));
 
     // Find static resources and expose as single resource bundle
-    final List<StaticResource> staticResources = findStaticResources(descriptor.getPluginCoordinates(), pluginSpace);
-    final NexusResourceBundle resourceBundle = new NexusResourceBundle()
+    final List<WebResource> staticResources = findStaticResources(descriptor.getPluginCoordinates(), pluginSpace);
+    final WebResourceBundle resourceBundle = new WebResourceBundle()
     {
-      public List<StaticResource> getContributedResouces() {
+      public List<WebResource> getResources() {
         return staticResources;
       }
     };
@@ -374,7 +374,7 @@ public class DefaultNexusPluginManager
     {
       @Override
       protected void configure() {
-        bind(NexusResourceBundle.class).annotatedWith(Names.named(realmId)).toInstance(resourceBundle);
+        bind(WebResourceBundle.class).annotatedWith(Names.named(realmId)).toInstance(resourceBundle);
       }
     };
 
@@ -395,13 +395,13 @@ public class DefaultNexusPluginManager
     descriptor.setStaticResources(staticResources);
   }
 
-  private List<StaticResource> findStaticResources(final GAVCoordinate gav, final ClassSpace pluginSpace) {
-    final List<StaticResource> staticResources = new ArrayList<StaticResource>();
+  private List<WebResource> findStaticResources(final GAVCoordinate gav, final ClassSpace pluginSpace) {
+    final List<WebResource> staticResources = new ArrayList<WebResource>();
     for (Enumeration<URL> e = pluginSpace.findEntries("static/", null, true); e.hasMoreElements(); ) {
       final URL url = e.nextElement();
       final String path = getPublishedPath(url);
       if (path != null) {
-        staticResources.add(new PluginStaticResource(gav, url, path,
+        staticResources.add(new PluginWebResource(gav, url, path,
             mimeSupport.guessMimeTypeFromPath(url.getPath())));
       }
     }

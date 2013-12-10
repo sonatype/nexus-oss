@@ -15,7 +15,7 @@ package org.sonatype.nexus.rest;
 
 import java.util.Collections;
 
-import org.sonatype.nexus.plugins.rest.StaticResource;
+import org.sonatype.nexus.web.WebResource;
 
 import org.restlet.Context;
 import org.restlet.data.MediaType;
@@ -29,9 +29,9 @@ import org.restlet.resource.Variant;
 public class StaticResourceResource
     extends Resource
 {
-  private final StaticResource resource;
+  private final WebResource resource;
 
-  public StaticResourceResource(Context ctx, Request req, Response rsp, StaticResource resource) {
+  public StaticResourceResource(Context ctx, Request req, Response rsp, WebResource resource) {
     super(ctx, req, rsp);
 
     setVariants(Collections.singletonList(new Variant(MediaType.valueOf(resource.getContentType()))));

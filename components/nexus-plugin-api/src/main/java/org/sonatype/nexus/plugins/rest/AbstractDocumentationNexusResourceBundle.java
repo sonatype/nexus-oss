@@ -26,6 +26,7 @@ import java.util.zip.ZipFile;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.mime.MimeSupport;
+import org.sonatype.nexus.web.WebResource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -52,8 +53,8 @@ public abstract class AbstractDocumentationNexusResourceBundle
     this.mimeSupport = checkNotNull(mimeSupport);
   }
 
-  public List<StaticResource> getContributedResouces() {
-    List<StaticResource> resources = new LinkedList<StaticResource>();
+  public List<WebResource> getResources() {
+    List<WebResource> resources = new LinkedList<WebResource>();
 
     ZipFile zip = null;
     try {
@@ -81,12 +82,12 @@ public abstract class AbstractDocumentationNexusResourceBundle
           // system-wide clashes are much harder to resolve
           String path = "/" + getPluginId() + "/" + getPathPrefix() + name;
 
-          resources.add(new DefaultStaticResource(url, path, mimeSupport.guessMimeTypeFromPath(name)));
+          resources.add(new DefaultWebResource(url, path, mimeSupport.guessMimeTypeFromPath(name)));
         }
 
         if (log.isTraceEnabled()) {
           log.trace("Discovered documentation for: {}", getPluginId());
-          for (StaticResource resource : resources) {
+          for (WebResource resource : resources) {
             log.trace("  {}", resource);
           }
         }

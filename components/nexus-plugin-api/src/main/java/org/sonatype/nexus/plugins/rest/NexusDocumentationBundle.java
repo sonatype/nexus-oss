@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.plugins.rest;
 
+import org.sonatype.nexus.web.WebResourceBundle;
+
 /**
  * A special resource bundle that holds static (preferably static HTML) documentation.
  *
@@ -20,7 +22,7 @@ package org.sonatype.nexus.plugins.rest;
  * @author cstamas
  */
 public interface NexusDocumentationBundle
-    extends NexusResourceBundle
+    extends WebResourceBundle
 {
   /**
    * Returns the plugin ID (artifactId?) of the plugin contaning this resource. This string should obey all rules

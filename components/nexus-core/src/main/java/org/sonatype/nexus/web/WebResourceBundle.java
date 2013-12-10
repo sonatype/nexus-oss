@@ -11,20 +11,16 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.rest;
+package org.sonatype.nexus.web;
+
+import java.util.List;
 
 /**
- * Implemented by {@link StaticResource} that wants to have control about the static resource being cached on client.
+ * Container for contributed {@link WebResource}.
  *
- * @since 2.7
+ * @since 2.8
  */
-@Deprecated
-public interface CacheControl
+public interface WebResourceBundle
 {
-
-  /**
-   * Return true if static resource should be cached on client.
-   */
-  boolean shouldCache();
-
+  List<WebResource> getResources();
 }
