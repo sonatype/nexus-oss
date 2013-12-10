@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.web.Renderer;
+import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -46,15 +46,15 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Implementation of {@link Renderer} using Apache Velocity.
+ * Implementation of {@link TemplateRenderer} using Apache Velocity.
  *
  * @since 2.8
  */
 @Singleton
 @Named
-public class VelocityRenderer
+public class VelocityTemplateRenderer
     extends ComponentSupport
-    implements Renderer
+    implements TemplateRenderer
 {
   private final Provider<VelocityEngine> velocityEngineProvider;
 
@@ -63,9 +63,9 @@ public class VelocityRenderer
   private final String applicationVersion;
 
   @Inject
-  public VelocityRenderer(final Provider<VelocityEngine> velocityEngineProvider,
-                          final WebUtils webUtils,
-                          final ApplicationStatusSource applicationStatusSource)
+  public VelocityTemplateRenderer(final Provider<VelocityEngine> velocityEngineProvider,
+                                  final WebUtils webUtils,
+                                  final ApplicationStatusSource applicationStatusSource)
   {
     this.velocityEngineProvider = checkNotNull(velocityEngineProvider);
     this.webUtils = checkNotNull(webUtils);
@@ -100,7 +100,7 @@ public class VelocityRenderer
     else {
       response.setStatus(responseCode, reasonPhrase);
     }
-    render(template("/org/sonatype/nexus/web/internal/errorPageContentHtml.vm", VelocityRenderer.class.getClassLoader()), dataModel, response);
+    render(template("/org/sonatype/nexus/web/internal/errorPageContentHtml.vm", VelocityTemplateRenderer.class.getClassLoader()), dataModel, response);
   }
 
   @Override

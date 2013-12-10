@@ -34,7 +34,7 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
-import org.sonatype.nexus.web.Renderer;
+import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;
@@ -54,15 +54,15 @@ public class VelocityContentRenderer
     extends ComponentSupport
     implements ContentRenderer
 {
-  private final Renderer renderer;
+  private final TemplateRenderer templateRenderer;
 
   private final String applicationVersion;
 
   @Inject
-  public VelocityContentRenderer(final Renderer renderer,
+  public VelocityContentRenderer(final TemplateRenderer templateRenderer,
                                  final ApplicationStatusSource applicationStatusSource)
   {
-    this.renderer = checkNotNull(renderer);
+    this.templateRenderer = checkNotNull(templateRenderer);
     this.applicationVersion = checkNotNull(applicationStatusSource).getSystemStatus().getVersion();
   }
 
@@ -94,7 +94,7 @@ public class VelocityContentRenderer
     final Map<String, Object> dataModel = createBaseModel(coll.getResourceStoreRequest());
     dataModel.put("requestPath", coll.getPath());
     dataModel.put("listItems", entries);
-    renderer.render(renderer.template("/org/sonatype/nexus/content/internal/repositoryContentHtml.vm", getClass().getClassLoader()), dataModel, response);
+    templateRenderer.render(templateRenderer.template("/org/sonatype/nexus/content/internal/repositoryContentHtml.vm", getClass().getClassLoader()), dataModel, response);
   }
 
   @Override
@@ -109,7 +109,7 @@ public class VelocityContentRenderer
     dataModel.put("req", resourceStoreRequest);
     dataModel.put("item", item);
     dataModel.put("exception", exception);
-    renderer.render(renderer.template("/org/sonatype/nexus/content/internal/requestDescriptionHtml.vm", getClass().getClassLoader()), dataModel, response);
+    templateRenderer.render(templateRenderer.template("/org/sonatype/nexus/content/internal/requestDescriptionHtml.vm", getClass().getClassLoader()), dataModel, response);
   }
 
   // ==

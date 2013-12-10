@@ -24,15 +24,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @since 2.8
  */
-public interface Renderer
+public interface TemplateRenderer
 {
-  public static interface TemplateLocator
-  {
-    public String name();
-
-    public ClassLoader classloader();
-  }
-
   /**
    * Renders a standard error page. Passed in responseCode must be greater or equal to 400. All the parameters
    * must be non-null except for {@code reasonPhrase} and {@code exception}. When this call returns, the
@@ -45,13 +38,20 @@ public interface Renderer
    * @param errorDescription Error description meant for human consumption, will be rendered on the error page.
    * @param exception        The exception (if any) that lead to this error condition, might be {@code null}.
    */
-  void renderErrorPage(final HttpServletRequest request,
-                       final HttpServletResponse response,
-                       final int responseCode,
-                       final String reasonPhrase,
-                       final String errorDescription,
-                       final Exception exception)
+  void renderErrorPage(HttpServletRequest request,
+                       HttpServletResponse response,
+                       int responseCode,
+                       String reasonPhrase,
+                       String errorDescription,
+                       Exception exception)
       throws IOException;
+
+  interface TemplateLocator
+  {
+    public String name();
+
+    public ClassLoader classloader();
+  }
 
   /**
    * Returns a template locator instance. The template existence in this moment is not checked, only the locator
@@ -68,6 +68,6 @@ public interface Renderer
    *
    * @throws IllegalArgumentException if the template locator does not points to an existing template.
    */
-  void render(final TemplateLocator tl, final Map<String, Object> dataModel, final HttpServletResponse response)
+  void render(TemplateLocator tl, Map<String, Object> dataModel, HttpServletResponse response)
       throws IOException, IllegalArgumentException;
 }

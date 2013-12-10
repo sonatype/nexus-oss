@@ -43,11 +43,11 @@ public class ErrorPageFilter
     extends ComponentSupport
     implements Filter
 {
-  private final Renderer renderer;
+  private final TemplateRenderer templateRenderer;
 
   @Inject
-  public ErrorPageFilter(final Renderer renderer) {
-    this.renderer = checkNotNull(renderer);
+  public ErrorPageFilter(final TemplateRenderer templateRenderer) {
+    this.templateRenderer = checkNotNull(templateRenderer);
   }
 
   @Override
@@ -71,7 +71,7 @@ public class ErrorPageFilter
     }
     catch (ErrorStatusServletException e) {
       // send for direct rendering, everything is prepared
-      renderer.renderErrorPage(
+      templateRenderer.renderErrorPage(
           request,
           response,
           e.getResponseCode(),
@@ -87,7 +87,7 @@ public class ErrorPageFilter
     catch (Exception e) {
       // runtime and servlet exceptions will end here (thrown probably by some non-nexus filter or servlet)
       log.warn("Unexpected exception", e);
-      renderer.renderErrorPage(request, response, SC_INTERNAL_SERVER_ERROR, null /*default*/, e.getMessage(), e);
+      templateRenderer.renderErrorPage(request, response, SC_INTERNAL_SERVER_ERROR, null /*default*/, e.getMessage(), e);
     }
   }
 }
