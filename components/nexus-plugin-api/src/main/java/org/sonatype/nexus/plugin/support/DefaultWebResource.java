@@ -22,6 +22,9 @@ import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.web.WebResource;
 import org.sonatype.nexus.web.WebResource.CacheControl;
 
+/**
+ * Default {@link WebResource} implementation.
+ */
 public class DefaultWebResource
     implements WebResource, CacheControl
 {
