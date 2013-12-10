@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * Servlet filter to add error page rendering.
@@ -60,28 +61,33 @@ public class ErrorPageFilter
   }
 
   @Override
-  public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
+  public void doFilter(final ServletRequest req, final ServletResponse resp, final FilterChain chain)
       throws IOException, ServletException
   {
     final HttpServletRequest request = (HttpServletRequest) req;
-    final HttpServletResponse response = (HttpServletResponse) res;
+    final HttpServletResponse response = (HttpServletResponse) resp;
     try {
       chain.doFilter(req, response);
     }
     catch (ErrorStatusServletException e) {
       // send for direct rendering, everything is prepared
-      renderer.renderErrorPage(request, response, e.getResponseCode(), e.getReasonPhrase(), e.getErrorDescription(),
-          e.getRootCause());
+      renderer.renderErrorPage(
+          request,
+          response,
+          e.getResponseCode(),
+          e.getReasonPhrase(),
+          e.getErrorDescription(),
+          e.getRootCause()
+      );
     }
     catch (IOException e) {
       // IOException handling, do not leak information nor render error page
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      response.setStatus(SC_INTERNAL_SERVER_ERROR);
     }
     catch (Exception e) {
       // runtime and servlet exceptions will end here (thrown probably by some non-nexus filter or servlet)
       log.warn("Unexpected exception", e);
-      renderer.renderErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null /*default*/,
-          e.getMessage(), e);
+      renderer.renderErrorPage(request, response, SC_INTERNAL_SERVER_ERROR, null /*default*/, e.getMessage(), e);
     }
   }
 }

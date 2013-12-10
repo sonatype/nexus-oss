@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.staticresources.internal;
+package org.sonatype.nexus.webresources.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,9 +35,9 @@ import org.sonatype.nexus.plugins.rest.CacheControl;
 import org.sonatype.nexus.plugins.rest.DefaultStaticResource;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
-import org.sonatype.nexus.staticresources.IndexPageRenderer;
 import org.sonatype.nexus.web.ErrorStatusServletException;
 import org.sonatype.nexus.web.WebUtils;
+import org.sonatype.nexus.webresources.IndexPageRenderer;
 
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -48,16 +48,16 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 
 /**
- * Provides access to static resources.
+ * Provides access to web resources.
  *
  * @since 2.8
  */
 @Singleton
 @Named
-public class StaticResourcesServlet
+public class WebResourcesServlet
     extends HttpServlet
 {
-  private static final Logger log = LoggerFactory.getLogger(StaticResourcesServlet.class);
+  private static final Logger log = LoggerFactory.getLogger(WebResourcesServlet.class);
 
   private final List<NexusResourceBundle> nexusResourceBundles;
 
@@ -70,10 +70,10 @@ public class StaticResourcesServlet
   private final Map<String, StaticResource> staticResources;
 
   @Inject
-  public StaticResourcesServlet(final List<NexusResourceBundle> nexusResourceBundles,
-                                final MimeSupport mimeSupport,
-                                final WebUtils webUtils,
-                                final @Nullable IndexPageRenderer indexPageRenderer)
+  public WebResourcesServlet(final List<NexusResourceBundle> nexusResourceBundles,
+                             final MimeSupport mimeSupport,
+                             final WebUtils webUtils,
+                             final @Nullable IndexPageRenderer indexPageRenderer)
   {
     this.nexusResourceBundles = checkNotNull(nexusResourceBundles);
     this.mimeSupport = checkNotNull(mimeSupport);
@@ -130,7 +130,8 @@ public class StaticResourcesServlet
       throws ServletException, IOException
   {
     final String requestPath = request.getPathInfo();
-    log.debug("Requested resource {}", requestPath);
+    log.debug("Requested resource: {}", requestPath);
+
     // 0) see is index.html needed actually
     if ("".equals(requestPath) || "/".equals(requestPath)) {
       // redirect to index.html

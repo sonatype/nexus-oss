@@ -36,7 +36,7 @@ import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
 import org.sonatype.nexus.plugins.ui.BuildNumberService;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor.UiContribution;
-import org.sonatype.nexus.staticresources.IndexPageRenderer;
+import org.sonatype.nexus.webresources.IndexPageRenderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;

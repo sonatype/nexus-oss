@@ -11,14 +11,12 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.staticresources.internal;
+package org.sonatype.nexus.webresources.internal;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.sonatype.nexus.web.ErrorPageFilter;
 import org.sonatype.nexus.web.Renderer;
-import org.sonatype.nexus.web.internal.VelocityRenderer;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
@@ -26,30 +24,28 @@ import org.eclipse.sisu.inject.DefaultRankingFunction;
 import org.eclipse.sisu.inject.RankingFunction;
 
 /**
- * Static resources module.
+ * Web resources module.
  *
  * @since 2.8
  */
 @Named
-public class StaticResourcesModule
+public class WebResourcesModule
     extends AbstractModule
 {
   @Override
   protected void configure() {
-    bind(VelocityRenderer.class);
-    bind(Renderer.class).to(VelocityRenderer.class).in(Singleton.class);
+    requireBinding(Renderer.class);
 
     install(new ServletModule()
     {
       @Override
       protected void configureServlets() {
-        serve("/*").with(StaticResourcesServlet.class);
+        serve("/*").with(WebResourcesServlet.class);
         filter("/*").through(ErrorPageFilter.class);
-        /*
-         * Give components contributed by this plugin a low-level ranking (same level as Nexus core) so they are ordered
-         * after components from other plugins. This makes sure all the ther non-root servlets will be invoked and this
-         * one will not "grab all" of the requests as it's mounted on root.
-         */
+
+        // Give components contributed by this plugin a low-level ranking (same level as Nexus core) so they are ordered
+        // after components from other plugins. This makes sure all the their non-root servlets will be invoked and this
+        // one will not "grab all" of the requests as it's mounted on root.
         bind(RankingFunction.class).toInstance(new DefaultRankingFunction(0));
       }
     });

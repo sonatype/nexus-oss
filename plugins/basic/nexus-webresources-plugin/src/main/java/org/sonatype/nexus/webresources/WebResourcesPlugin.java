@@ -11,31 +11,31 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.staticresources;
+package org.sonatype.nexus.webresources;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.plugin.PluginIdentity;
 
+import org.eclipse.sisu.EagerSingleton;
 import org.jetbrains.annotations.NonNls;
 
 /**
- * Static Resources plugin.
+ * Web resources plugin.
  *
  * @since 2.8
  */
 @Named
 @EagerSingleton
-public class StaticResourcesPlugin
+public class WebResourcesPlugin
     extends PluginIdentity
 {
   /**
    * Prefix for ID-like things.
    */
   @NonNls
-  public static final String ID_PREFIX = "static-resources";
+  public static final String ID_PREFIX = "webresources";
 
   /**
    * Expected groupId for plugin artifact.
@@ -50,7 +50,7 @@ public class StaticResourcesPlugin
   public static final String ARTIFACT_ID = "nexus-" + ID_PREFIX + "-plugin";
 
   @Inject
-  public StaticResourcesPlugin() throws Exception {
+  public WebResourcesPlugin() throws Exception {
     super(GROUP_ID, ARTIFACT_ID);
   }
 }

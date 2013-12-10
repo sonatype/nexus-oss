@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.staticresources;
+package org.sonatype.nexus.webresources;
 
 import java.io.IOException;
 
@@ -19,8 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Component rendering the "/index.html" entry page. Should be provided by UI "boot" related plugin, as Nx core
- * itself is UI agnostic.
+ * Component rendering the "/index.html" entry page.
  *
  * @since 2.8.0
  */

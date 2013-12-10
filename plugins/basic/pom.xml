@@ -30,7 +30,6 @@
 
   <modules>
     <module>nexus-content-plugin</module>
-    <module>nexus-static-resources-plugin</module>
     <module>nexus-crypto-plugin</module>
     <module>nexus-groovy-plugin</module>
     <module>nexus-h2-plugin</module>
@@ -44,6 +43,7 @@
     <module>nexus-timeline-plugin</module>
     <module>nexus-ui-extjs3-plugin</module>
     <module>nexus-unpack-plugin</module>
+    <module>nexus-webresources-plugin</module>
   </modules>
 
 </project>
