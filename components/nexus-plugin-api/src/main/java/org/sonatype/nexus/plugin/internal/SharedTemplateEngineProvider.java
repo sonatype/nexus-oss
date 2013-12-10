@@ -43,7 +43,7 @@ public class SharedTemplateEngineProvider
   }
 
   @Override
-  public synchronized TemplateEngine get() {
+  public TemplateEngine get() {
     return engine;
   }
 }
