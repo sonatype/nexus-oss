@@ -16,6 +16,8 @@ package org.sonatype.nexus.web;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Nullable;
+
 /**
  * A resource to be exposed via web (http/https) protocols.
  *
@@ -25,10 +27,15 @@ public interface WebResource
 {
   String getPath();
 
+  @Nullable
   String getContentType();
 
+  /**
+   * Returns the size of the content, or -1 if unknown.
+   */
   long getSize();
 
+  @Nullable
   Long getLastModified();
 
   InputStream getInputStream() throws IOException;
