@@ -73,4 +73,13 @@ public class DevModeResource
   public InputStream getInputStream() throws IOException {
     return new FileInputStream(file);
   }
+
+  @Override
+  public String toString() {
+    return "DevModeResource{" +
+        "path='" + path + '\'' +
+        ", contentType='" + contentType + '\'' +
+        ", file=" + file +
+        '}';
+  }
 }
