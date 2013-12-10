@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * ???
+ * A resource to be exposed via web (http/https) protocols.
  *
  * @since 2.8
  */

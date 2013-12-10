@@ -50,8 +50,11 @@ public final class PluginWebResource
   // Constructors
   // ----------------------------------------------------------------------
 
-  public PluginWebResource(final GAVCoordinate gav, final URL resourceURL, final String publishedPath,
-                           final String contentType) {
+  public PluginWebResource(final GAVCoordinate gav,
+                           final URL resourceURL,
+                           final String publishedPath,
+                           final String contentType)
+  {
     URL overrideUrl = DevModeResources.getResourceIfOnFileSystem(publishedPath);
     this.gav = gav;
     this.resourceURL = overrideUrl != null ? overrideUrl : resourceURL;
@@ -98,11 +101,11 @@ public final class PluginWebResource
       if (urlConn instanceof JarURLConnection) {
         final JarEntry jarEntry = ((JarURLConnection) urlConn).getJarEntry();
         if (jarEntry != null) {
-          return Long.valueOf(jarEntry.getTime());
+          return jarEntry.getTime();
         }
         // This is a jar, not an entry in a jar
       }
-      return Long.valueOf(urlConn.getLastModified());
+      return urlConn.getLastModified();
     }
     catch (final Throwable e) // NOPMD
     {
@@ -117,6 +120,9 @@ public final class PluginWebResource
 
   @Override
   public String toString() {
-    return gav.toString() + "(" + super.toString() + ")";
+    return "PluginWebResource{" +
+        "gav=" + gav +
+        ", url=" + resourceURL +
+        '}';
   }
 }

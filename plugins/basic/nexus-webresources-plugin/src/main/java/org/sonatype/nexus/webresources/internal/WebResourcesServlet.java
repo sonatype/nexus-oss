@@ -48,7 +48,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 
 /**
- * Provides access to web resources.
+ * Provides access to {@link WebResource} via configured {@link WebResourceBundle} components.
  *
  * @since 2.8
  */
