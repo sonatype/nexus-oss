@@ -59,7 +59,7 @@ public class WebResourcesServlet
 {
   private static final Logger log = LoggerFactory.getLogger(WebResourcesServlet.class);
 
-  private final List<WebResourceBundle> webResourceBundles;
+  private final List<WebResourceBundle> bundles;
 
   private final MimeSupport mimeSupport;
 
@@ -67,36 +67,36 @@ public class WebResourcesServlet
 
   private final IndexPageRenderer indexPageRenderer;
 
-  private final Map<String, WebResource> staticResources;
+  private final Map<String, WebResource> resourcePaths;
 
   @Inject
-  public WebResourcesServlet(final List<WebResourceBundle> webResourceBundles,
+  public WebResourcesServlet(final List<WebResourceBundle> bundles,
                              final MimeSupport mimeSupport,
                              final WebUtils webUtils,
                              final @Nullable IndexPageRenderer indexPageRenderer)
   {
-    this.webResourceBundles = checkNotNull(webResourceBundles);
+    this.bundles = checkNotNull(bundles);
     this.mimeSupport = checkNotNull(mimeSupport);
     this.webUtils = checkNotNull(webUtils);
     this.indexPageRenderer = indexPageRenderer;
-    this.staticResources = Maps.newHashMap();
+    this.resourcePaths = Maps.newHashMap();
     discoverResources();
   }
 
   private void discoverResources() {
     // log warnings if we find any overlapping resources
-    if (!webResourceBundles.isEmpty()) {
-      for (WebResourceBundle bundle : webResourceBundles) {
+    if (!bundles.isEmpty()) {
+      for (WebResourceBundle bundle : bundles) {
         final List<WebResource> resources = bundle.getResources();
         if (resources != null) {
           for (WebResource resource : resources) {
             final String path = resource.getPath();
-            log.trace("Serving static resource on path {} :: {}", path, resource);
-            final WebResource old = staticResources.put(path, resource);
+            log.trace("Serving resource on path {} :: {}", path, resource);
+            final WebResource old = resourcePaths.put(path, resource);
             if (old != null) {
               // FIXME: for now this causes a bit of noise on startup for overlapping icons, for now reduce to DEBUG
               // FIXME: ... we need to sort out a general strategy short/long term for how to handle this issue
-              log.debug("Overlapping static resources on path {}: old={}, new={}", path, old, resource);
+              log.debug("Overlapping resources on path {}: old={}, new={}", path, old, resource);
             }
           }
         }
@@ -107,9 +107,9 @@ public class WebResourcesServlet
     if (DevModeResources.hasResourceLocations()) {
       log.info("DEV mode resources ENABLED; will override mounted ones if applicable");
     }
-    log.info("Discovered and serving {} static resources", staticResources.size());
+    log.info("Discovered and serving {} resources", resourcePaths.size());
     if (log.isDebugEnabled()) {
-      for (String path : staticResources.keySet()) {
+      for (String path : resourcePaths.keySet()) {
         log.debug("  {}", path);
       }
     }
@@ -146,33 +146,33 @@ public class WebResourcesServlet
     }
 
     // locate it
-    WebResource staticResource = null;
+    WebResource resource = null;
     // 1) first "dev" resources if enabled (to override everything else)
     if (DevModeResources.hasResourceLocations()) {
       final File file = DevModeResources.getFileIfOnFileSystem(requestPath);
       if (file != null) {
         log.trace("Delivering DEV resource: {}", file.getAbsoluteFile());
-        staticResource = new DevModeResource(requestPath, mimeSupport.guessMimeTypeFromPath(file.getName()), file);
+        resource = new DevModeResource(requestPath, mimeSupport.guessMimeTypeFromPath(file.getName()), file);
       }
     }
 
-    // 2) second, look at "ordinary" static resources, but only if devResource did not hit anything
-    if (staticResource == null) {
-      staticResource = staticResources.get(requestPath);
+    // 2) second, look at "ordinary" resources, but only if devResource did not hit anything
+    if (resource == null) {
+      resource = resourcePaths.get(requestPath);
     }
 
     // 3) third, look into WAR embedded resources
-    if (staticResource == null) {
+    if (resource == null) {
       final URL resourceUrl = getServletContext().getResource(requestPath);
       if (resourceUrl != null) {
-        staticResource = new DefaultWebResource(resourceUrl, requestPath,
+        resource = new DefaultWebResource(resourceUrl, requestPath,
             mimeSupport.guessMimeTypeFromPath(requestPath));
       }
     }
 
     // deliver it, if we have anything
-    if (staticResource != null) {
-      doGetResource(request, response, staticResource);
+    if (resource != null) {
+      doGetResource(request, response, resource);
     }
     else {
       throw new ErrorStatusServletException(SC_NOT_FOUND, "Not Found", "Resource not found");
