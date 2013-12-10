@@ -94,7 +94,9 @@ public class WebResourcesServlet
             log.trace("Serving static resource on path {} :: {}", path, resource);
             final StaticResource old = staticResources.put(path, resource);
             if (old != null) {
-              log.warn("Overlapping static resources on path {}: old={}, new={}", path, old, resource);
+              // FIXME: for now this causes a bit of noise on startup for overlapping icons, for now reduce to DEBUG
+              // FIXME: ... we need to sort out a general strategy short/long term for how to handle this issue
+              log.debug("Overlapping static resources on path {}: old={}, new={}", path, old, resource);
             }
           }
         }
