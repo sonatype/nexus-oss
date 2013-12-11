@@ -185,7 +185,11 @@ public class NexusContentServlet
 
     // put the incoming URLs
     result.setRequestAppRootUrl(getAppRootUrl(request));
-    result.setRequestUrl(request.getRequestURL().toString());
+    final StringBuffer sb = request.getRequestURL();
+    if (request.getQueryString() != null) {
+      sb.append("?").append(request.getQueryString());
+    }
+    result.setRequestUrl(sb.toString());
     return result;
   }
 
