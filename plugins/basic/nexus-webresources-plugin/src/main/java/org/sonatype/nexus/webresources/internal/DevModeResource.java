@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.sonatype.nexus.web.WebResource;
-import org.sonatype.nexus.web.WebResource.CacheControl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -29,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.8.0
  */
 public class DevModeResource
-    implements WebResource, CacheControl
+    implements WebResource
 {
   private final String path;
 
@@ -65,7 +64,7 @@ public class DevModeResource
   }
 
   @Override
-  public Long getLastModified() {
+  public long getLastModified() {
     return file.lastModified();
   }
 

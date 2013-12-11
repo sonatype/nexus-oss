@@ -20,13 +20,12 @@ import java.net.URLConnection;
 
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.web.WebResource;
-import org.sonatype.nexus.web.WebResource.CacheControl;
 
 /**
  * Default {@link WebResource} implementation.
  */
 public class DefaultWebResource
-    implements WebResource, CacheControl
+    implements WebResource
 {
   private final URL resourceURL;
 
@@ -71,7 +70,7 @@ public class DefaultWebResource
 
   public long getSize() {
     if (checkConnection()) {
-      return urlConnection.getContentLength();
+      return urlConnection.getContentLengthLong();
     }
     else {
       return -1;
@@ -101,14 +100,14 @@ public class DefaultWebResource
     }
   }
 
-  public Long getLastModified() {
+  public long getLastModified() {
     if (!shouldCache) {
       return System.currentTimeMillis();
     }
     if (checkConnection()) {
       return urlConnection.getLastModified();
     }
-    return null;
+    return 0;
   }
 
   @Override

@@ -22,7 +22,6 @@ import java.util.jar.JarEntry;
 
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.web.WebResource;
-import org.sonatype.nexus.web.WebResource.CacheControl;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 
 /**
@@ -30,7 +29,7 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
  */
 @Deprecated
 public final class PluginWebResource
-    implements WebResource, CacheControl
+    implements WebResource
 {
   // ----------------------------------------------------------------------
   // Implementation fields
@@ -77,10 +76,9 @@ public final class PluginWebResource
 
   public long getSize() {
     try {
-      return resourceURL.openConnection().getContentLength();
+      return resourceURL.openConnection().getContentLengthLong();
     }
-    catch (final Throwable e) // NOPMD
-    {
+    catch (final Throwable e) {
       // default to unknown size
     }
     return -1;
@@ -92,7 +90,7 @@ public final class PluginWebResource
     return resourceURL.openStream();
   }
 
-  public Long getLastModified() {
+  public long getLastModified() {
     if (!shouldCache) {
       return System.currentTimeMillis();
     }
@@ -107,9 +105,8 @@ public final class PluginWebResource
       }
       return urlConn.getLastModified();
     }
-    catch (final Throwable e) // NOPMD
-    {
-      return null; // default to unknown last modified time
+    catch (final Throwable e) {
+      return 0; // default to unknown last modified time
     }
   }
 

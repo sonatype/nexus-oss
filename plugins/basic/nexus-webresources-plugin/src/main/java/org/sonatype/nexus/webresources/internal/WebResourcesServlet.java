@@ -34,7 +34,6 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugin.support.DefaultWebResource;
 import org.sonatype.nexus.web.ErrorStatusServletException;
 import org.sonatype.nexus.web.WebResource;
-import org.sonatype.nexus.web.WebResource.CacheControl;
 import org.sonatype.nexus.web.WebResourceBundle;
 import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.nexus.webresources.IndexPageRenderer;
@@ -58,6 +57,8 @@ public class WebResourcesServlet
     extends HttpServlet
 {
   private static final Logger log = LoggerFactory.getLogger(WebResourcesServlet.class);
+
+  // TODO: Add support for singleton WebResource components, for simple cases when a bundle is not needed
 
   private final List<WebResourceBundle> bundles;
 
@@ -205,7 +206,7 @@ public class WebResourcesServlet
     response.setHeader("Content-Length", String.valueOf(resource.getSize()));
 
     // cache-control
-    if (resource instanceof CacheControl && ((CacheControl) resource).shouldCache()) {
+    if (resource.shouldCache()) {
       // default cache for 30 days
       response.setHeader("Cache-Control", "max-age=2592000");
     }
