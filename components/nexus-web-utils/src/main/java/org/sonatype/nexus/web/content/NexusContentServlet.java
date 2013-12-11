@@ -546,6 +546,14 @@ public class NexusContentServlet
     renderer.renderRequestDescription(request, response, rsr, item, e);
   }
 
+  // POST
+ 
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+       throws ServletException, IOException
+  {
+    doPut(req, resp); // just do same as would on PUT
+  } 
+
   // PUT
 
   @Override
