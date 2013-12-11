@@ -325,7 +325,27 @@ public class NexusContentServlet
   {
     response.setHeader("Server", serverString);
     response.setHeader("Accept-Ranges", "bytes");
-    super.service(request, response);
+
+    final String method = request.getMethod();
+    if (method.equals("GET") || method.equals("HEAD")) {
+      doGet(request, response);
+    }
+    else if (method.equals("PUT") || method.equals("POST")) {
+      doPut(request, response);
+    }
+    else if (method.equals("DELETE")) {
+      doDelete(request, response);
+    }
+    else if (method.equals("OPTIONS")) {
+      doOptions(request, response);
+    }
+    else if (method.equals("TRACE")) {
+      doTrace(request, response);
+    }
+    else {
+      throw new ErrorStatusServletException(HttpServletResponse.SC_METHOD_NOT_ALLOWED, null,
+          "Method " + method + " not supported.");
+    }
   }
 
   // GET
@@ -545,14 +565,6 @@ public class NexusContentServlet
     addNoCacheResponseHeaders(response);
     renderer.renderRequestDescription(request, response, rsr, item, e);
   }
-
-  // POST
- 
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-       throws ServletException, IOException
-  {
-    doPut(req, resp); // just do same as would on PUT
-  } 
 
   // PUT
 
