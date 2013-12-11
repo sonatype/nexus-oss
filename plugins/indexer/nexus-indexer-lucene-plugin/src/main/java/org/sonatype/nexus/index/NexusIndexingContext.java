@@ -70,13 +70,7 @@ public class NexusIndexingContext
     // NEXUS-6156: Make SearcherManager be notified about this
     // This will release the deleted files removed after. SearcherManager is not reachable (private, no getter)
     // so this is the only way to make superclass invoke SearcherManager#maybeRefresh()
-    IndexSearcher is = null;
-    try {
-      is = acquireIndexSearcher();
-    }
-    finally {
-      releaseIndexSearcher(is);
-    }
+    releaseIndexSearcher(acquireIndexSearcher());
   }
 
   @Override
