@@ -56,7 +56,7 @@ public final class BaseUrlHolder
    */
   public static String get() {
     String url = value.get();
-    checkState(url != null, "Base URL has not be set");
+    checkState(url != null, "Base URL not set");
     return url;
   }
 
