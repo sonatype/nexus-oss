@@ -18,8 +18,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.nexus.plugins.rest.CacheControl;
-import org.sonatype.nexus.plugins.rest.StaticResource;
+import org.sonatype.nexus.web.WebResource;
+import org.sonatype.nexus.web.WebResource.CacheControl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.8.0
  */
 public class DevModeResource
-    implements StaticResource, CacheControl
+    implements WebResource, CacheControl
 {
   private final String path;
 
@@ -72,5 +72,14 @@ public class DevModeResource
   @Override
   public InputStream getInputStream() throws IOException {
     return new FileInputStream(file);
+  }
+
+  @Override
+  public String toString() {
+    return "DevModeResource{" +
+        "path='" + path + '\'' +
+        ", contentType='" + contentType + '\'' +
+        ", file=" + file +
+        '}';
   }
 }

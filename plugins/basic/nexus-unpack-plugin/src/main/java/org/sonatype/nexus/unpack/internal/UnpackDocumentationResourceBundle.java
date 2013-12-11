@@ -16,7 +16,7 @@ package org.sonatype.nexus.unpack.internal;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
+import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
 
 /**
  * Unpack plugin documentation bundle.
@@ -24,7 +24,7 @@ import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
 @Named
 @Singleton
 public class UnpackDocumentationResourceBundle
-    extends AbstractDocumentationNexusResourceBundle
+    extends AbstractDocumentationResourceBundle
 {
   @Override
   public String getPluginId() {

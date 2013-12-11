@@ -16,12 +16,12 @@ package org.sonatype.nexus.plugins.rrb;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
+import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
 
 @Named
 @Singleton
 public class RRBDocumentationResourceBundle
-    extends AbstractDocumentationNexusResourceBundle
+    extends AbstractDocumentationResourceBundle
 {
 
   @Override

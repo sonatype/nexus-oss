@@ -15,6 +15,8 @@ package org.sonatype.nexus.plugins.rest;
 
 import java.util.List;
 
+import org.sonatype.nexus.web.WebResource;
+import org.sonatype.nexus.web.WebResourceBundle;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Assert;
@@ -27,9 +29,9 @@ public class SimpleDocumentationNexusResourceBundleTest
   public void testDoc()
       throws Exception
   {
-    NexusResourceBundle docBundle = new SimpleDocumentationResourceBundle();
+    WebResourceBundle docBundle = new SimpleDocumentationResourceBundle();
 
-    List<StaticResource> resources = docBundle.getContributedResouces();
+    List<WebResource> resources = docBundle.getResources();
     Assert.assertNotNull(resources);
     Assert.assertEquals(22, resources.size());
   }

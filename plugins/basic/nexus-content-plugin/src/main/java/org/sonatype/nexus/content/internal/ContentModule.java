@@ -22,7 +22,7 @@ import org.sonatype.nexus.security.filter.FilterProviderSupport;
 import org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter;
 import org.sonatype.nexus.web.ErrorPageFilter;
 import org.sonatype.nexus.web.MdcUserContextFilter;
-import org.sonatype.nexus.web.Renderer;
+import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.security.web.guice.SecurityWebFilter;
 
 import com.google.inject.AbstractModule;
@@ -50,7 +50,7 @@ public class ContentModule
 
     bind(filterKey("contentTperms")).toProvider(ContentTargetMappingFilterProvider.class);
 
-    requireBinding(Renderer.class);
+    requireBinding(TemplateRenderer.class);
 
     install(new ServletModule()
     {

@@ -11,18 +11,16 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.rest;
+package org.sonatype.nexus.web;
 
 import java.util.List;
 
 /**
- * @deprecated pending removal
+ * Container for contributed {@link WebResource}.
+ *
+ * @since 2.8
  */
-@Deprecated
-public class AbstractNexusResourceBundle
-    implements NexusResourceBundle
+public interface WebResourceBundle
 {
-  public List<StaticResource> getContributedResouces() {
-    return null;
-  }
+  List<WebResource> getResources();
 }

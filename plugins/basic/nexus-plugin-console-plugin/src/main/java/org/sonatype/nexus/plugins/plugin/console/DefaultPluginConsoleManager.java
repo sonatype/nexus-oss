@@ -22,12 +22,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.plugin.support.DocumentationBundle;
 import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.plugins.PluginResponse;
 import org.sonatype.nexus.plugins.plugin.console.model.DocumentationLink;
 import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
-import org.sonatype.nexus.plugins.rest.NexusDocumentationBundle;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
+import org.sonatype.nexus.web.WebResourceBundle;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -47,21 +47,21 @@ public class DefaultPluginConsoleManager
 {
   private final NexusPluginManager pluginManager;
 
-  private final List<NexusResourceBundle> resourceBundles;
+  private final List<WebResourceBundle> resourceBundles;
 
-  private final Multimap<String, NexusDocumentationBundle> docBundles;
+  private final Multimap<String, DocumentationBundle> docBundles;
 
   @Inject
   public DefaultPluginConsoleManager(final NexusPluginManager pluginManager,
-                                     final List<NexusResourceBundle> resourceBundles)
+                                     final List<WebResourceBundle> resourceBundles)
   {
     this.pluginManager = checkNotNull(pluginManager);
     this.resourceBundles = checkNotNull(resourceBundles);
 
     this.docBundles = LinkedHashMultimap.create();
-    for (NexusResourceBundle rb : resourceBundles) {
-      if (rb instanceof NexusDocumentationBundle) {
-        NexusDocumentationBundle doc = (NexusDocumentationBundle) rb;
+    for (WebResourceBundle rb : resourceBundles) {
+      if (rb instanceof DocumentationBundle) {
+        DocumentationBundle doc = (DocumentationBundle) rb;
 
         docBundles.put(doc.getPluginId(), doc);
       }
@@ -97,10 +97,10 @@ public class DefaultPluginConsoleManager
           + pluginResponse.getPluginCoordinates().getArtifactId());
     }
 
-    Collection<NexusDocumentationBundle> docs =
+    Collection<DocumentationBundle> docs =
         docBundles.get(pluginResponse.getPluginCoordinates().getArtifactId());
     if (docs != null && !docs.isEmpty()) {
-      for (NexusDocumentationBundle bundle : docs) {
+      for (DocumentationBundle bundle : docs) {
         // here, we (mis)use the documentation field, to store path segments only, the REST resource will create
         // proper URLs out this these.
         DocumentationLink link = new DocumentationLink();

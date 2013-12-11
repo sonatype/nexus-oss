@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.web.Renderer;
+import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -46,15 +46,15 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Implementation of {@link Renderer} using Apache Velocity.
+ * Implementation of {@link TemplateRenderer} using Apache Velocity.
  *
  * @since 2.8
  */
 @Singleton
 @Named
-public class VelocityRenderer
+public class VelocityTemplateRenderer
     extends ComponentSupport
-    implements Renderer
+    implements TemplateRenderer
 {
   private final Provider<VelocityEngine> velocityEngineProvider;
 
@@ -63,9 +63,9 @@ public class VelocityRenderer
   private final String applicationVersion;
 
   @Inject
-  public VelocityRenderer(final Provider<VelocityEngine> velocityEngineProvider,
-                          final WebUtils webUtils,
-                          final ApplicationStatusSource applicationStatusSource)
+  public VelocityTemplateRenderer(final Provider<VelocityEngine> velocityEngineProvider,
+                                  final WebUtils webUtils,
+                                  final ApplicationStatusSource applicationStatusSource)
   {
     this.velocityEngineProvider = checkNotNull(velocityEngineProvider);
     this.webUtils = checkNotNull(webUtils);
@@ -85,22 +85,27 @@ public class VelocityRenderer
     checkNotNull(response);
     checkArgument(responseCode >= 400);
     checkNotNull(errorDescription);
+
     final Map<String, Object> dataModel = Maps.newHashMap();
     dataModel.put("nexusRoot", webUtils.getAppRootUrl(request));
     dataModel.put("nexusVersion", applicationVersion);
     dataModel.put("statusCode", responseCode);
     dataModel.put("statusName", Strings.isNullOrEmpty(reasonPhrase) ? errorDescription : reasonPhrase);
     dataModel.put("errorDescription", StringEscapeUtils.escapeHtml(errorDescription));
+
     if (null != exception) {
       dataModel.put("errorStackTrace", StringEscapeUtils.escapeHtml(ExceptionUtils.getStackTrace(exception)));
     }
+
     if (Strings.isNullOrEmpty(reasonPhrase)) {
       response.setStatus(responseCode);
     }
     else {
       response.setStatus(responseCode, reasonPhrase);
     }
-    render(template("/org/sonatype/nexus/web/internal/errorPageContentHtml.vm", VelocityRenderer.class.getClassLoader()), dataModel, response);
+
+    render(template("/org/sonatype/nexus/web/internal/errorPageContentHtml.vm",
+        VelocityTemplateRenderer.class.getClassLoader()), dataModel, response);
   }
 
   @Override
@@ -120,7 +125,8 @@ public class VelocityRenderer
   }
 
   @Override
-  public void render(final TemplateLocator templateLocator, final Map<String, Object> dataModel,
+  public void render(final TemplateLocator templateLocator,
+                     final Map<String, Object> dataModel,
                      final HttpServletResponse response) throws IOException
   {
     render(getVelocityTemplate(templateLocator), dataModel, response);
@@ -150,13 +156,11 @@ public class VelocityRenderer
       response.flushBuffer();
     }
     catch (IOException e) {
-      // NEXUS-3442
-      // IOEx should be propagated as is
+      // NEXUS-3442: IOEx should be propagated as is
       throw e;
     }
     catch (VelocityException e) {
-      // All other (Velocity exceptions are RuntimeExcptions!) to be wrapped, but preserve cause too
-      throw new IOException("Template processing error: " + e.getMessage(), e);
+      throw new IOException("Template processing error: " + e, e);
     }
   }
 
@@ -169,8 +173,7 @@ public class VelocityRenderer
       return velocityEngineProvider.get().getTemplate(templateLocator.name());
     }
     catch (Exception e) {
-      throw new IllegalArgumentException("Cannot get the template with name " + String.valueOf(templateLocator.name()),
-          e);
+      throw new IllegalArgumentException("Cannot get the template with name " + templateLocator.name(), e);
     }
     finally {
       Thread.currentThread().setContextClassLoader(original);

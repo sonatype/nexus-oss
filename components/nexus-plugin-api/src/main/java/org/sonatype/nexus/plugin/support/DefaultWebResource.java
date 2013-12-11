@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.rest;
+package org.sonatype.nexus.plugin.support;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,21 +19,26 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.sonatype.nexus.internal.DevModeResources;
+import org.sonatype.nexus.web.WebResource;
+import org.sonatype.nexus.web.WebResource.CacheControl;
 
-public class DefaultStaticResource
-    implements StaticResource, CacheControl
+/**
+ * Default {@link WebResource} implementation.
+ */
+public class DefaultWebResource
+    implements WebResource, CacheControl
 {
   private final URL resourceURL;
 
   private final String path;
 
-  private volatile URLConnection urlConnection;
-
   private final String contentType;
 
   private final boolean shouldCache;
 
-  public DefaultStaticResource(URL url, String path, String contentType) {
+  private volatile URLConnection urlConnection;
+
+  public DefaultWebResource(final URL url, final String path, final String contentType) {
     URL overrideUrl = DevModeResources.getResourceIfOnFileSystem(path);
     this.resourceURL = overrideUrl != null ? overrideUrl : url;
     this.path = path;
@@ -85,18 +90,14 @@ public class DefaultStaticResource
     }
   }
 
-  public InputStream getInputStream()
-      throws IOException
-  {
+  public InputStream getInputStream() throws IOException {
     if (checkConnection()) {
       InputStream is = urlConnection.getInputStream();
-
       urlConnection = null;
-
       return is;
     }
     else {
-      throw new IOException("Invalid resource!");
+      throw new IOException("Invalid resource: " + resourceURL);
     }
   }
 
@@ -118,7 +119,7 @@ public class DefaultStaticResource
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    builder.append("DefaultStaticResource [");
+    builder.append("DefaultWebResource [");
     if (path != null) {
       builder.append("path=");
       builder.append(path);
@@ -131,5 +132,4 @@ public class DefaultStaticResource
     builder.append("]");
     return builder.toString();
   }
-
 }

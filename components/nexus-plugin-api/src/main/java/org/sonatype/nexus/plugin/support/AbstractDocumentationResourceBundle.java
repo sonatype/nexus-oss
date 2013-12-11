@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.rest;
+package org.sonatype.nexus.plugin.support;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -26,24 +26,29 @@ import java.util.zip.ZipFile;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.mime.MimeSupport;
+import org.sonatype.nexus.web.WebResource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class AbstractDocumentationNexusResourceBundle
+/**
+ * @deprecated Replace usage with {@link DocumentationBundleSupport}.
+ */
+@Deprecated
+public abstract class AbstractDocumentationResourceBundle
     extends ComponentSupport
-    implements NexusDocumentationBundle
+    implements DocumentationBundle
 {
   private MimeSupport mimeSupport;
 
-  protected AbstractDocumentationNexusResourceBundle() {
+  protected AbstractDocumentationResourceBundle() {
     // empty
   }
 
   @VisibleForTesting
-  protected AbstractDocumentationNexusResourceBundle(final MimeSupport mimeSupport) {
+  protected AbstractDocumentationResourceBundle(final MimeSupport mimeSupport) {
     this.mimeSupport = mimeSupport;
   }
 
@@ -52,8 +57,8 @@ public abstract class AbstractDocumentationNexusResourceBundle
     this.mimeSupport = checkNotNull(mimeSupport);
   }
 
-  public List<StaticResource> getContributedResouces() {
-    List<StaticResource> resources = new LinkedList<StaticResource>();
+  public List<WebResource> getResources() {
+    List<WebResource> resources = new LinkedList<WebResource>();
 
     ZipFile zip = null;
     try {
@@ -81,12 +86,12 @@ public abstract class AbstractDocumentationNexusResourceBundle
           // system-wide clashes are much harder to resolve
           String path = "/" + getPluginId() + "/" + getPathPrefix() + name;
 
-          resources.add(new DefaultStaticResource(url, path, mimeSupport.guessMimeTypeFromPath(name)));
+          resources.add(new DefaultWebResource(url, path, mimeSupport.guessMimeTypeFromPath(name)));
         }
 
         if (log.isTraceEnabled()) {
           log.trace("Discovered documentation for: {}", getPluginId());
-          for (StaticResource resource : resources) {
+          for (WebResource resource : resources) {
             log.trace("  {}", resource);
           }
         }

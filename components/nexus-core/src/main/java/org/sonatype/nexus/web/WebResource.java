@@ -11,33 +11,37 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.rest;
+package org.sonatype.nexus.web;
 
-import org.sonatype.nexus.plugin.PluginIdentity;
+import java.io.IOException;
+import java.io.InputStream;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Nullable;
 
 /**
- * Support for {@link NexusDocumentationBundle} implementations.
+ * A resource to be exposed via web (http/https) protocols.
  *
- * @since 2.7
+ * @since 2.8
  */
-public abstract class NexusDocumentationBundleSupport
-    extends AbstractDocumentationNexusResourceBundle
+public interface WebResource
 {
-  private final PluginIdentity owner;
+  String getPath();
 
-  protected NexusDocumentationBundleSupport(final PluginIdentity plugin) {
-    this.owner = checkNotNull(plugin);
-  }
+  @Nullable
+  String getContentType();
 
-  @Override
-  public String getPluginId() {
-    return owner.getId();
-  }
+  /**
+   * Returns the size of the content, or -1 if unknown.
+   */
+  long getSize();
 
-  @Override
-  public String getDescription() {
-    return String.format("%s API", owner.getId());
+  @Nullable
+  Long getLastModified();
+
+  InputStream getInputStream() throws IOException;
+
+  interface CacheControl
+  {
+    boolean shouldCache();
   }
 }

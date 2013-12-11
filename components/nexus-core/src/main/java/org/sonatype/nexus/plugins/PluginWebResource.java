@@ -21,16 +21,16 @@ import java.net.URLConnection;
 import java.util.jar.JarEntry;
 
 import org.sonatype.nexus.internal.DevModeResources;
-import org.sonatype.nexus.plugins.rest.CacheControl;
-import org.sonatype.nexus.plugins.rest.StaticResource;
+import org.sonatype.nexus.web.WebResource;
+import org.sonatype.nexus.web.WebResource.CacheControl;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 
 /**
- * {@link StaticResource} contributed from a Nexus plugin.
+ * {@link WebResource} contributed from a Nexus plugin.
  */
 @Deprecated
-public final class PluginStaticResource
-    implements StaticResource, CacheControl
+public final class PluginWebResource
+    implements WebResource, CacheControl
 {
   // ----------------------------------------------------------------------
   // Implementation fields
@@ -50,7 +50,11 @@ public final class PluginStaticResource
   // Constructors
   // ----------------------------------------------------------------------
 
-  public PluginStaticResource(final GAVCoordinate gav, final URL resourceURL, final String publishedPath, final String contentType) {
+  public PluginWebResource(final GAVCoordinate gav,
+                           final URL resourceURL,
+                           final String publishedPath,
+                           final String contentType)
+  {
     URL overrideUrl = DevModeResources.getResourceIfOnFileSystem(publishedPath);
     this.gav = gav;
     this.resourceURL = overrideUrl != null ? overrideUrl : resourceURL;
@@ -97,11 +101,11 @@ public final class PluginStaticResource
       if (urlConn instanceof JarURLConnection) {
         final JarEntry jarEntry = ((JarURLConnection) urlConn).getJarEntry();
         if (jarEntry != null) {
-          return Long.valueOf(jarEntry.getTime());
+          return jarEntry.getTime();
         }
         // This is a jar, not an entry in a jar
       }
-      return Long.valueOf(urlConn.getLastModified());
+      return urlConn.getLastModified();
     }
     catch (final Throwable e) // NOPMD
     {
@@ -116,6 +120,9 @@ public final class PluginStaticResource
 
   @Override
   public String toString() {
-    return gav.toString() + "(" + super.toString() + ")";
+    return "PluginWebResource{" +
+        "gav=" + gav +
+        ", url=" + resourceURL +
+        '}';
   }
 }

@@ -13,14 +13,14 @@
 
 package org.sonatype.nexus.plexusplugin.rest.docs;
 
-import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
-import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
+import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
+import org.sonatype.nexus.web.WebResourceBundle;
 
 import org.codehaus.plexus.component.annotations.Component;
 
-@Component(role = NexusResourceBundle.class, hint = "PlexusPluginResourceBundle")
+@Component(role = WebResourceBundle.class, hint = "PlexusPluginResourceBundle")
 public class PlexusPluginResourceBundle
-    extends AbstractDocumentationNexusResourceBundle
+    extends AbstractDocumentationResourceBundle
 {
 
   @Override

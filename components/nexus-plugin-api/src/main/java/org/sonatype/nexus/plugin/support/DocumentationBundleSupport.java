@@ -11,20 +11,33 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.rest;
+package org.sonatype.nexus.plugin.support;
+
+import org.sonatype.nexus.plugin.PluginIdentity;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Implemented by {@link StaticResource} that wants to have control about the static resource being cached on client.
+ * Support for {@link DocumentationBundle} implementations.
  *
  * @since 2.7
  */
-@Deprecated
-public interface CacheControl
+public abstract class DocumentationBundleSupport
+    extends AbstractDocumentationResourceBundle
 {
+  private final PluginIdentity owner;
 
-  /**
-   * Return true if static resource should be cached on client.
-   */
-  boolean shouldCache();
+  protected DocumentationBundleSupport(final PluginIdentity plugin) {
+    this.owner = checkNotNull(plugin);
+  }
 
+  @Override
+  public String getPluginId() {
+    return owner.getId();
+  }
+
+  @Override
+  public String getDescription() {
+    return String.format("%s API", owner.getId());
+  }
 }
