@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugin.support.DefaultWebResource;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.ErrorStatusServletException;
 import org.sonatype.nexus.web.WebResource;
 import org.sonatype.nexus.web.WebResourceBundle;
@@ -122,8 +123,15 @@ public class WebResourcesServlet
   protected void service(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException
   {
-    webUtils.equipResponseWithStandardHeaders(response);
-    super.service(request, response);
+    // HACK: Consider adding a filter for this, so everything gets it?
+    BaseUrlHolder.set(webUtils.getAppRootUrl(request));
+    try {
+      webUtils.equipResponseWithStandardHeaders(response);
+      super.service(request, response);
+    }
+    finally {
+      BaseUrlHolder.unset();
+    }
   }
 
   // GET
