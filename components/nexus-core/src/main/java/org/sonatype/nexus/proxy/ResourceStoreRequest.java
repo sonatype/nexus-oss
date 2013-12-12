@@ -355,21 +355,6 @@ public class ResourceStoreRequest
   }
 
   /**
-   * Returns the URL of the AppRoot of the incoming request.
-   */
-  public String getRequestAppRootUrl() {
-    return getRequestContext().getRequestAppRootUrl();
-  }
-
-  /**
-   * Sets the URL of the AppRoot of the incoming request.
-   */
-  public ResourceStoreRequest setRequestAppRootUrl(String url) {
-    getRequestContext().setRequestAppRootUrl(url);
-    return this;
-  }
-
-  /**
    * Adds a list of applied mappings that happened in given repository.
    */
   public void addAppliedMappingsList(Repository repository, List<String> mappingList) {

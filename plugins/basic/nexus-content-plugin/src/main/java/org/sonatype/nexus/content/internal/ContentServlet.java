@@ -179,7 +179,6 @@ public class ContentServlet
     }
 
     // put the incoming URLs
-    result.setRequestAppRootUrl(BaseUrlHolder.get());
     final StringBuffer sb = request.getRequestURL();
     if (request.getQueryString() != null) {
       sb.append("?").append(request.getQueryString());
@@ -370,14 +369,13 @@ public class ContentServlet
   }
 
   /**
-   * Creates absolute URL (as String) of the passed link's target. To be used in "Location" header of the redirect
-   * message, for example.
+   * Creates absolute URL (as String) of the passed link's target.
+   *
+   * To be used in "Location" header of the redirect message, for example.
    */
   protected String getLinkTargetUrl(final StorageLinkItem link) {
     final RepositoryItemUid targetUid = link.getTarget();
-    // TODO: fix this chum
-    return link.getResourceStoreRequest().getRequestAppRootUrl() + "content/repositories/"
-        + targetUid.getRepository().getId() + targetUid.getPath();
+    return BaseUrlHolder.get() + "/content/repositories/" + targetUid.getRepository().getId() + targetUid.getPath();
   }
 
   /**

@@ -354,7 +354,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
     }
 
     // put the incoming URLs
-    result.setRequestAppRootUrl(getContextRoot(request).toString());
     result.setRequestUrl(request.getOriginalRef().toString());
 
     return result;
