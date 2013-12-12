@@ -36,6 +36,7 @@ import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
 import org.sonatype.nexus.plugins.ui.BuildNumberService;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor.UiContribution;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.webresources.IndexPageRenderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -85,7 +86,7 @@ public class UiExtJs3IndexPageRenderer
   }
 
   @Override
-  public void render(final HttpServletRequest request, final HttpServletResponse response, final String appRootUrl)
+  public void render(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException
   {
     log.debug("Rendering index");
@@ -94,7 +95,7 @@ public class UiExtJs3IndexPageRenderer
     templatingContext.put("serviceBase", "service/local");
     templatingContext.put("contentBase", "content");
     templatingContext.put("nexusVersion", systemStatus.getVersion());
-    templatingContext.put("nexusRoot", appRootUrl);
+    templatingContext.put("nexusRoot", BaseUrlHolder.get());
 
     // gather plugin stuff
     final Map<String, Object> topContext = Maps.newHashMap(templatingContext);
@@ -208,13 +209,11 @@ public class UiExtJs3IndexPageRenderer
       tmplWriter.flush();
     }
     catch (IOException e) {
-      // NEXUS-3442
-      // IOEx should be propagated as is
+      // NEXUS-3442: IOEx should be propagated as is
       throw e;
     }
     catch (Exception e) {
-      // All other (Velocity exceptions are RuntimeExcptions!) to be wrapped, but preserve cause too
-      throw new IOException("Template processing error: " + e.getMessage(), e);
+      throw new IOException("Template processing error: " + e, e);
     }
   }
 

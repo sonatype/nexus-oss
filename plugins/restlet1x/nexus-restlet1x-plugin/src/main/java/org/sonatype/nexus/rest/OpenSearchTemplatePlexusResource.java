@@ -22,6 +22,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
@@ -80,12 +81,8 @@ public class OpenSearchTemplatePlexusResource
     Map<String, Object> map = new HashMap<String, Object>();
 
     Reference nexusRef = getContextRoot(request);
-    String nexusRoot = nexusRef.toString();
-    if (nexusRoot.endsWith("/")) {
-      nexusRoot = nexusRoot.substring(0, nexusRoot.length() - 1);
-    }
 
-    map.put("nexusRoot", nexusRoot);
+    map.put("nexusRoot", BaseUrlHolder.get());
     map.put("nexusHost", nexusRef.getHostDomain());
 
     final VelocityRepresentation templateRepresentation =

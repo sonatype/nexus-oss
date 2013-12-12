@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -91,7 +92,7 @@ public class VelocityContentRenderer
 
     Collections.sort(entries, new CollectionEntryComparator());
 
-    final Map<String, Object> dataModel = createBaseModel(coll.getResourceStoreRequest());
+    final Map<String, Object> dataModel = createBaseModel();
     dataModel.put("requestPath", coll.getPath());
     dataModel.put("listItems", entries);
     templateRenderer.render(templateRenderer.template("/org/sonatype/nexus/content/internal/repositoryContentHtml.vm", getClass().getClassLoader()), dataModel, response);
@@ -105,7 +106,7 @@ public class VelocityContentRenderer
                                        final Exception exception)
       throws IOException
   {
-    final Map<String, Object> dataModel = createBaseModel(resourceStoreRequest);
+    final Map<String, Object> dataModel = createBaseModel();
     dataModel.put("req", resourceStoreRequest);
     dataModel.put("item", item);
     dataModel.put("exception", exception);
@@ -114,9 +115,9 @@ public class VelocityContentRenderer
 
   // ==
 
-  private Map<String, Object> createBaseModel(final ResourceStoreRequest resourceStoreRequest) {
+  private Map<String, Object> createBaseModel() {
     final Map<String, Object> dataModel = Maps.newHashMap();
-    dataModel.put("nexusRoot", resourceStoreRequest.getRequestAppRootUrl());
+    dataModel.put("nexusRoot", BaseUrlHolder.get());
     dataModel.put("nexusVersion", applicationVersion);
     return dataModel;
   }

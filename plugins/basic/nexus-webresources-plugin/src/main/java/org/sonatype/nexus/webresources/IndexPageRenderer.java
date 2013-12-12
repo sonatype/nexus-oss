@@ -25,5 +25,5 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface IndexPageRenderer
 {
-  void render(HttpServletRequest request, HttpServletResponse response, String appRootUrl) throws IOException;
+  void render(HttpServletRequest request, HttpServletResponse response) throws IOException;
 }

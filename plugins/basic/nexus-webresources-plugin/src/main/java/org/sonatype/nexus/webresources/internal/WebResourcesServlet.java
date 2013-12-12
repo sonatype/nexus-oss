@@ -139,7 +139,7 @@ public class WebResourcesServlet
     // 0) see is index.html needed actually
     if ("".equals(requestPath) || "/".equals(requestPath)) {
       // redirect to index.html
-      webUtils.sendTemporaryRedirect(response, BaseUrlHolder.get() + "index.html");
+      webUtils.sendTemporaryRedirect(response, BaseUrlHolder.get() + "/index.html");
       return;
     }
     if ("/index.html".equals(requestPath)) {
@@ -188,7 +188,7 @@ public class WebResourcesServlet
       throws ServletException, IOException
   {
     if (indexPageRenderer != null) {
-      indexPageRenderer.render(request, response, BaseUrlHolder.get());
+      indexPageRenderer.render(request, response);
     }
     else {
       throw new ErrorStatusServletException(SC_NOT_FOUND, "Not Found", "Index page not found");

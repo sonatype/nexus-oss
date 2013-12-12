@@ -20,15 +20,11 @@ import java.io.OutputStream;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.io.StreamSupport;
-
-import com.google.common.base.Strings;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -48,44 +44,11 @@ public class WebUtils
   private static final int BUFFER_SIZE = SystemPropertiesHelper
       .getInteger(WebUtils.class.getName() + ".BUFFER_SIZE", -1);
 
-  private final GlobalRestApiSettings globalRestApiSettings;
-
   private final String serverString;
 
   @Inject
-  public WebUtils(final ApplicationStatusSource applicationStatusSource,
-                  final GlobalRestApiSettings globalRestApiSettings)
-  {
+  public WebUtils(final ApplicationStatusSource applicationStatusSource) {
     this.serverString = "Nexus/" + checkNotNull(applicationStatusSource).getSystemStatus().getVersion();
-    this.globalRestApiSettings = checkNotNull(globalRestApiSettings);
-  }
-
-  /**
-   * Calculates the "application root" URL, as seen by client (from {@link HttpServletRequest} made by it), or, if
-   * "force base URL" configuration is set, to that URL. The root URL always ends with a slash ("/").
-   */
-  public String getAppRootUrl(final HttpServletRequest request) {
-    final StringBuilder result = new StringBuilder();
-    if (globalRestApiSettings.isEnabled() && globalRestApiSettings.isForceBaseUrl()
-        && !Strings.isNullOrEmpty(globalRestApiSettings.getBaseUrl())) {
-      result.append(globalRestApiSettings.getBaseUrl());
-    }
-    else {
-      String appRoot = request.getRequestURL().toString();
-      final String pathInfo = request.getPathInfo();
-      if (!Strings.isNullOrEmpty(pathInfo)) {
-        appRoot = appRoot.substring(0, appRoot.length() - pathInfo.length());
-      }
-      final String servletPath = request.getServletPath();
-      if (!Strings.isNullOrEmpty(servletPath)) {
-        appRoot = appRoot.substring(0, appRoot.length() - servletPath.length());
-      }
-      result.append(appRoot);
-    }
-    if (!result.toString().endsWith("/")) {
-      result.append("/");
-    }
-    return result.toString();
   }
 
   /**

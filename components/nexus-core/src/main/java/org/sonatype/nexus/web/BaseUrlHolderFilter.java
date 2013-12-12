@@ -26,6 +26,11 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -38,11 +43,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class BaseUrlHolderFilter
   implements Filter
 {
-  private final WebUtils utils;
+  private final GlobalRestApiSettings settings;
 
   @Inject
-  public BaseUrlHolderFilter(final WebUtils utils) {
-    this.utils = checkNotNull(utils);
+  public BaseUrlHolderFilter(final GlobalRestApiSettings settings) {
+    this.settings = checkNotNull(settings);
   }
 
   @Override
@@ -59,7 +64,7 @@ public class BaseUrlHolderFilter
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
       throws IOException, ServletException
   {
-    String baseUrl = utils.getAppRootUrl((HttpServletRequest) request);
+    String baseUrl = calculateBaseUrl((HttpServletRequest) request);
     BaseUrlHolder.set(baseUrl);
     try {
       chain.doFilter(request, response);
@@ -67,5 +72,34 @@ public class BaseUrlHolderFilter
     finally {
       BaseUrlHolder.unset();
     }
+  }
+
+  /**
+   * Calculates the "application root" URL, as seen by client (from {@link HttpServletRequest} made by it),
+   * or if "force base URL" configuration is set, to that URL.
+   */
+  @VisibleForTesting
+  String calculateBaseUrl(final HttpServletRequest request) {
+    StringBuilder buff = new StringBuilder();
+
+    if (settings.isEnabled() && settings.isForceBaseUrl() && !Strings.isNullOrEmpty(settings.getBaseUrl())) {
+      buff.append(settings.getBaseUrl());
+    }
+    else {
+      String requestUrl = request.getRequestURL().toString();
+      String pathInfo = request.getPathInfo();
+      if (!Strings.isNullOrEmpty(pathInfo)) {
+        requestUrl = requestUrl.substring(0, requestUrl.length() - pathInfo.length());
+      }
+
+      String servletPath = request.getServletPath();
+      if (!Strings.isNullOrEmpty(servletPath)) {
+        requestUrl = requestUrl.substring(0, requestUrl.length() - servletPath.length());
+      }
+
+      buff.append(requestUrl);
+    }
+
+    return buff.toString();
   }
 }
