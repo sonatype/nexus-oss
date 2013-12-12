@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugin.support.UrlWebResource;
-import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.ErrorStatusServletException;
 import org.sonatype.nexus.web.WebResource;
 import org.sonatype.nexus.web.WebResourceBundle;
@@ -146,21 +145,16 @@ public class WebResourcesServlet
       throws ServletException, IOException
   {
     final String requestPath = request.getPathInfo();
-    log.debug("Requested resource: {}", requestPath);
+    log.debug("Requested path: {}", requestPath);
 
     // 0) see is index.html needed actually
-    if ("".equals(requestPath) || "/".equals(requestPath)) {
-      // redirect to index.html
-      webUtils.sendTemporaryRedirect(response, BaseUrlHolder.get() + "/index.html");
-      return;
-    }
-    if ("/index.html".equals(requestPath)) {
+    if ("".equals(requestPath) || "/".equals(requestPath) || "/index.html".equals(requestPath)) {
       doGetIndex(request, response);
       return;
     }
 
-    // locate it
     WebResource resource = null;
+
     // 1) first "dev" resources if enabled (to override everything else)
     if (DevModeResources.hasResourceLocations()) {
       final File file = DevModeResources.getFileIfOnFileSystem(requestPath);
