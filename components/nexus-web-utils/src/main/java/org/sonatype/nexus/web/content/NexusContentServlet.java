@@ -185,7 +185,11 @@ public class NexusContentServlet
 
     // put the incoming URLs
     result.setRequestAppRootUrl(getAppRootUrl(request));
-    result.setRequestUrl(request.getRequestURL().toString());
+    final StringBuffer sb = request.getRequestURL();
+    if (request.getQueryString() != null) {
+      sb.append("?").append(request.getQueryString());
+    }
+    result.setRequestUrl(sb.toString());
     return result;
   }
 
@@ -541,6 +545,14 @@ public class NexusContentServlet
     addNoCacheResponseHeaders(response);
     renderer.renderRequestDescription(request, response, rsr, item, e);
   }
+
+  // POST
+ 
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+       throws ServletException, IOException
+  {
+    doPut(req, resp); // just do same as would on PUT
+  } 
 
   // PUT
 
