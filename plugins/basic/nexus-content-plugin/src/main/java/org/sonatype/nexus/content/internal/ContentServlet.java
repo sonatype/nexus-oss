@@ -50,6 +50,7 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.Constants;
 import org.sonatype.nexus.web.ErrorPageFilter;
 import org.sonatype.nexus.web.ErrorStatusServletException;
@@ -178,7 +179,7 @@ public class ContentServlet
     }
 
     // put the incoming URLs
-    result.setRequestAppRootUrl(webUtils.getAppRootUrl(request));
+    result.setRequestAppRootUrl(BaseUrlHolder.get());
     final StringBuffer sb = request.getRequestURL();
     if (request.getQueryString() != null) {
       sb.append("?").append(request.getQueryString());
