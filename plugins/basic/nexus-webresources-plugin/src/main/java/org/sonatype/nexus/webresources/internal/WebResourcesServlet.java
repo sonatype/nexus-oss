@@ -103,17 +103,16 @@ public class WebResourcesServlet
       addResource(resource);
     }
 
-    // make it clear we have DEV mode enabled
-    if (DevModeResources.hasResourceLocations()) {
-      log.warn("DEV mode resources is ENABLED");
-    }
-
-    // results
     log.info("Discovered {} resources", resourcePaths.size());
     if (log.isDebugEnabled()) {
       for (String path : resourcePaths.keySet()) {
         log.debug("  {}", path);
       }
+    }
+
+    // make it clear we have DEV mode enabled
+    if (DevModeResources.hasResourceLocations()) {
+      log.warn("DEV mode resources is ENABLED");
     }
   }
 
