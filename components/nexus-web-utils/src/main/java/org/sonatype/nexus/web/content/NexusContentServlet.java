@@ -320,8 +320,8 @@ public class NexusContentServlet
   // service
 
   @Override
-  protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
-      IOException
+  protected void service(final HttpServletRequest request, final HttpServletResponse response)
+      throws ServletException, IOException
   {
     response.setHeader("Server", serverString);
     response.setHeader("Accept-Ranges", "bytes");
@@ -343,8 +343,7 @@ public class NexusContentServlet
       doTrace(request, response);
     }
     else {
-      throw new ErrorStatusServletException(HttpServletResponse.SC_METHOD_NOT_ALLOWED, null,
-          "Method " + method + " not supported.");
+      response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Method " + method + " not supported.");
     }
   }
 
