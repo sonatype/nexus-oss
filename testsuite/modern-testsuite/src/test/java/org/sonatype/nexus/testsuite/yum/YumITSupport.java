@@ -25,6 +25,7 @@ import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenGroupRepos
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
 import org.sonatype.nexus.testsuite.client.Events;
+import org.sonatype.nexus.testsuite.client.RoutingTest;
 import org.sonatype.nexus.testsuite.client.Scheduler;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
@@ -165,6 +166,7 @@ public class YumITSupport
     remoteLogger().info("Waiting for Nexus to settle down...");
     scheduler().waitForAllTasksToStop();
     client().getSubsystem(Events.class).waitForCalmPeriod();
+    client().getSubsystem(RoutingTest.class).waitForAllRoutingUpdateJobToStop();
     remoteLogger().info("Nexus is quiet. Done waiting.");
   }
 
