@@ -22,13 +22,15 @@ import org.sonatype.nexus.web.WebResource;
 
 import com.google.common.base.Strings;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * Default {@link WebResource} implementation.
+ * URL-based {@link WebResource} implementation.
  */
-public class DefaultWebResource
+public class UrlWebResource
     implements WebResource
 {
-  private final URL resourceURL;
+  private final URL url;
 
   private final String path;
 
@@ -40,29 +42,31 @@ public class DefaultWebResource
 
   private final long lastModified;
 
-  public DefaultWebResource(final URL url, final String path, final String contentType) {
+  public UrlWebResource(final URL url, final String path, final String contentType) {
     this(url, path, contentType, true);
   }
 
-  public DefaultWebResource(final URL url, final String path, final String contentType, final boolean shouldCache) {
-    this.resourceURL = url;
-    this.path = path;
+  public UrlWebResource(final URL url, final String path, final String contentType, final boolean shouldCache) {
+    this.url = checkNotNull(url);
+    this.path = checkNotNull(path);
     this.shouldCache = shouldCache;
+
+    // open connection to get details about the resource
     try {
-      final URLConnection urlConnection = resourceURL.openConnection();
-      try (final InputStream is = urlConnection.getInputStream()) {
+      final URLConnection connection = this.url.openConnection();
+      try (final InputStream is = connection.getInputStream()) {
         if (Strings.isNullOrEmpty(contentType)) {
-          this.contentType = urlConnection.getContentType();
+          this.contentType = connection.getContentType();
         }
         else {
           this.contentType = contentType;
         }
-        this.size = urlConnection.getContentLengthLong();
-        this.lastModified = urlConnection.getLastModified();
+        this.size = connection.getContentLengthLong();
+        this.lastModified = connection.getLastModified();
       }
     }
     catch (IOException e) {
-      throw new IllegalArgumentException("Static resource " + url + " inaccessible", e);
+      throw new IllegalArgumentException("Resource inaccessible: " + url, e);
     }
   }
 
@@ -72,7 +76,7 @@ public class DefaultWebResource
       return path;
     }
     else {
-      return resourceURL.getPath();
+      return url.getPath();
     }
   }
 
@@ -93,7 +97,7 @@ public class DefaultWebResource
 
   @Override
   public InputStream getInputStream() throws IOException {
-    return resourceURL.openStream();
+    return url.openStream();
   }
 
   @Override
@@ -104,7 +108,7 @@ public class DefaultWebResource
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    builder.append("DefaultWebResource [");
+    builder.append("UrlWebResource [");
     if (path != null) {
       builder.append("path=");
       builder.append(path);

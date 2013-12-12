@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.plugin.support.DefaultWebResource;
+import org.sonatype.nexus.plugin.support.UrlWebResource;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.ErrorStatusServletException;
 import org.sonatype.nexus.web.WebResource;
@@ -59,9 +59,9 @@ public class WebResourcesServlet
 {
   private static final Logger log = LoggerFactory.getLogger(WebResourcesServlet.class);
 
-  // TODO: Add support for singleton WebResource components, for simple cases when a bundle is not needed
-
   private final List<WebResourceBundle> bundles;
+
+  private final List<WebResource> resources;
 
   private final MimeSupport mimeSupport;
 
@@ -73,47 +73,59 @@ public class WebResourcesServlet
 
   @Inject
   public WebResourcesServlet(final List<WebResourceBundle> bundles,
+                             List<WebResource> resources,
                              final MimeSupport mimeSupport,
                              final WebUtils webUtils,
                              final @Nullable IndexPageRenderer indexPageRenderer)
   {
     this.bundles = checkNotNull(bundles);
+    this.resources = checkNotNull(resources);
     this.mimeSupport = checkNotNull(mimeSupport);
     this.webUtils = checkNotNull(webUtils);
     this.indexPageRenderer = indexPageRenderer;
     this.resourcePaths = Maps.newHashMap();
+
     discoverResources();
   }
 
   private void discoverResources() {
-    // log warnings if we find any overlapping resources
-    if (!bundles.isEmpty()) {
-      for (WebResourceBundle bundle : bundles) {
-        final List<WebResource> resources = bundle.getResources();
-        if (resources != null) {
-          for (WebResource resource : resources) {
-            final String path = resource.getPath();
-            log.trace("Serving resource on path {} :: {}", path, resource);
-            final WebResource old = resourcePaths.put(path, resource);
-            if (old != null) {
-              // FIXME: for now this causes a bit of noise on startup for overlapping icons, for now reduce to DEBUG
-              // FIXME: ... we need to sort out a general strategy short/long term for how to handle this issue
-              log.debug("Overlapping resources on path {}: old={}, new={}", path, old, resource);
-            }
-          }
+    // register resources in bundles
+    for (WebResourceBundle bundle : bundles) {
+      List<WebResource> resources = bundle.getResources();
+      if (resources != null) {
+        for (WebResource resource : resources) {
+          addResource(resource);
         }
       }
     }
 
-    // log the results
-    if (DevModeResources.hasResourceLocations()) {
-      log.info("DEV mode resources ENABLED; will override mounted ones if applicable");
+    // register standalone resources
+    for (WebResource resource : resources) {
+      addResource(resource);
     }
-    log.info("Discovered and serving {} resources", resourcePaths.size());
+
+    // make it clear we have DEV mode enabled
+    if (DevModeResources.hasResourceLocations()) {
+      log.warn("DEV mode resources is ENABLED");
+    }
+
+    // results
+    log.info("Discovered {} resources", resourcePaths.size());
     if (log.isDebugEnabled()) {
       for (String path : resourcePaths.keySet()) {
         log.debug("  {}", path);
       }
+    }
+  }
+
+  private void addResource(final WebResource resource) {
+    String path = resource.getPath();
+    log.trace("Adding resource: {} -> {}", path, resource);
+    final WebResource old = resourcePaths.put(path, resource);
+    if (old != null) {
+      // FIXME: for now this causes a bit of noise on startup for overlapping icons, for now reduce to DEBUG
+      // FIXME: ... we need to sort out a general strategy short/long term for how to handle this issue
+      log.debug("Overlapping resources on path {}: old={}, new={}", path, old, resource);
     }
   }
 
@@ -167,8 +179,7 @@ public class WebResourcesServlet
     if (resource == null) {
       final URL resourceUrl = getServletContext().getResource(requestPath);
       if (resourceUrl != null) {
-        resource = new DefaultWebResource(resourceUrl, requestPath,
-            mimeSupport.guessMimeTypeFromPath(requestPath));
+        resource = new UrlWebResource(resourceUrl, requestPath, mimeSupport.guessMimeTypeFromPath(requestPath));
       }
     }
 

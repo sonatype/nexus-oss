@@ -19,7 +19,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugin.support.DefaultWebResource;
+import org.sonatype.nexus.plugin.support.UrlWebResource;
 import org.sonatype.nexus.web.WebResource;
 import org.sonatype.nexus.web.WebResourceBundle;
 
@@ -40,15 +40,15 @@ public class NexusWebappResourceBundle
 
     List<WebResource> result = new ArrayList<WebResource>();
 
-    result.add(new DefaultWebResource(this.getClass().getResource("/static/js/nexus-ui-extjs3-plugin-all.js"),
+    result.add(new UrlWebResource(getClass().getResource("/static/js/nexus-ui-extjs3-plugin-all.js"),
         "/js/" + prefix + "/sonatype-all.js", "text/javascript"));
-    result.add(new DefaultWebResource(this.getClass().getResource("/static/js/nx-all.js"),
+    result.add(new UrlWebResource(getClass().getResource("/static/js/nx-all.js"),
         "/js/" + prefix + "/nx-all.js", "text/javascript"));
-    result.add(new DefaultWebResource(this.getClass().getResource("/static/js/sonatype-lib.js"),
+    result.add(new UrlWebResource(getClass().getResource("/static/js/sonatype-lib.js"),
         "/js/" + prefix + "/sonatype-lib.js", "text/javascript"));
-    result.add(new DefaultWebResource(this.getClass().getResource("/static/css/nexus-ui-extjs3-plugin-all.css"),
+    result.add(new UrlWebResource(getClass().getResource("/static/css/nexus-ui-extjs3-plugin-all.css"),
         "/style/" + prefix + "/sonatype-all.css", "text/css"));
-    result.add(new DefaultWebResource(this.getClass().getResource("/static/css/nexus-ui-extjs3-plugin-all.css"),
+    result.add(new UrlWebResource(getClass().getResource("/static/css/nexus-ui-extjs3-plugin-all.css"),
         "/style/sonatype-all.css", "text/css"));
 
     return result;
