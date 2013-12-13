@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -29,11 +30,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
+import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundReason;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
+import org.sonatype.nexus.proxy.repository.GroupItemNotFoundException;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -94,7 +100,8 @@ public class VelocityContentRenderer
     final Map<String, Object> dataModel = createBaseModel(coll.getResourceStoreRequest());
     dataModel.put("requestPath", coll.getPath());
     dataModel.put("listItems", entries);
-    templateRenderer.render(templateRenderer.template("/org/sonatype/nexus/content/internal/repositoryContentHtml.vm", getClass().getClassLoader()), dataModel, response);
+    templateRenderer.render(templateRenderer.template("/org/sonatype/nexus/content/internal/repositoryContentHtml.vm",
+        getClass().getClassLoader()), dataModel, response);
   }
 
   @Override
@@ -109,7 +116,70 @@ public class VelocityContentRenderer
     dataModel.put("req", resourceStoreRequest);
     dataModel.put("item", item);
     dataModel.put("exception", exception);
-    templateRenderer.render(templateRenderer.template("/org/sonatype/nexus/content/internal/requestDescriptionHtml.vm", getClass().getClassLoader()), dataModel, response);
+    final Reasoning reasoning = buildReasoning(exception);
+    if (reasoning != null) {
+      dataModel.put("reasoning", reasoning);
+    }
+    templateRenderer.render(templateRenderer.template("/org/sonatype/nexus/content/internal/requestDescriptionHtml.vm",
+        getClass().getClassLoader()), dataModel, response);
+  }
+
+  // ==
+
+  private Reasoning buildReasoning(final Throwable ex) {
+    if (ex instanceof ItemNotFoundException &&
+        ((ItemNotFoundException) ex).getReason() instanceof ItemNotFoundInRepositoryReason) {
+      final ItemNotFoundInRepositoryReason inf = (ItemNotFoundInRepositoryReason) ((ItemNotFoundException) ex)
+          .getReason();
+      return buildReasoning(inf.getRepository().getId(), ex);
+    }
+    else {
+      return null;
+    }
+  }
+
+  private Reasoning buildReasoning(final String repositoryId, final Throwable ex) {
+    if (ex instanceof ItemNotFoundException) {
+      final ItemNotFoundException infex = (ItemNotFoundException) ex;
+      final Reasoning result = new Reasoning(repositoryId, infex.getMessage());
+      if (infex instanceof GroupItemNotFoundException) {
+        final GroupItemNotFoundException ginfex = (GroupItemNotFoundException) infex;
+        for (Entry<Repository, Throwable> memberReason : ginfex.getMemberReasons().entrySet()) {
+          result.getMembers().add(buildReasoning(memberReason.getKey().getId(), memberReason.getValue()));
+        }
+      }
+      return result;
+    }
+    else {
+      return new Reasoning(repositoryId, ex.getMessage());
+    }
+  }
+
+  public static class Reasoning
+  {
+    private final String repositoryId;
+
+    private final String reason;
+
+    private final List<Reasoning> members;
+
+    public Reasoning(final String repositoryId, final String reason) {
+      this.repositoryId = checkNotNull(repositoryId);
+      this.reason = checkNotNull(reason);
+      this.members = Lists.newArrayList();
+    }
+
+    public String getRepositoryId() {
+      return repositoryId;
+    }
+
+    public String getReason() {
+      return reason;
+    }
+
+    public List<Reasoning> getMembers() {
+      return members;
+    }
   }
 
   // ==
