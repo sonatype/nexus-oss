@@ -76,7 +76,7 @@ public class ErrorPageFilter
           response,
           e.getResponseCode(),
           e.getReasonPhrase(),
-          e.getErrorDescription(),
+          e.getMessage(),
           e.getCause()
       );
     }

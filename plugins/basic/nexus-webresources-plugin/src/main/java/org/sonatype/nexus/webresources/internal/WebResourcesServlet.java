@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
+import org.sonatype.nexus.plugin.support.FileWebResource;
 import org.sonatype.nexus.plugin.support.UrlWebResource;
 import org.sonatype.nexus.web.ErrorStatusException;
 import org.sonatype.nexus.web.WebResource;
@@ -155,12 +156,9 @@ public class WebResourcesServlet
     WebResource resource = null;
 
     // 1) first "dev" resources if enabled (to override everything else)
-    if (DevModeResources.hasResourceLocations()) {
-      final File file = DevModeResources.getFileIfOnFileSystem(requestPath);
-      if (file != null) {
-        log.trace("Delivering DEV resource: {}", file.getAbsoluteFile());
-        resource = new DevModeResource(requestPath, mimeSupport.guessMimeTypeFromPath(file.getName()), file);
-      }
+    final File file = DevModeResources.getFileIfOnFileSystem(requestPath);
+    if (file != null) {
+      resource = new FileWebResource(file, requestPath, mimeSupport.guessMimeTypeFromPath(file.getName()), false);
     }
 
     // 2) second, look at "ordinary" resources, but only if devResource did not hit anything

@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.web;
 
+import javax.servlet.ServletException;
+
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
@@ -21,7 +23,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @since 2.8
  */
 public class ErrorStatusException
-    extends RuntimeException
+    extends ServletException
 {
   private final int responseCode;
 
@@ -30,10 +32,10 @@ public class ErrorStatusException
   public ErrorStatusException(final int responseCode,
                               final String reasonPhrase,
                               final String errorMessage,
-                              final Exception rootCause)
+                              final Exception cause)
   {
-    super(errorMessage, rootCause);
-    checkArgument(responseCode >= 400);
+    super(errorMessage, cause);
+    checkArgument(responseCode >= 400, "Not an error-status code: %s", responseCode);
     this.responseCode = responseCode;
     this.reasonPhrase = reasonPhrase;
   }
@@ -48,9 +50,5 @@ public class ErrorStatusException
 
   public String getReasonPhrase() {
     return reasonPhrase;
-  }
-
-  public String getErrorDescription() {
-    return getMessage();
   }
 }

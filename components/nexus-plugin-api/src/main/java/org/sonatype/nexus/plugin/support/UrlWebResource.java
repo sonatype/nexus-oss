@@ -26,6 +26,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * URL-based {@link WebResource} implementation.
+ *
+ * @since 2.8
  */
 public class UrlWebResource
     implements WebResource
@@ -54,7 +56,7 @@ public class UrlWebResource
     // open connection to get details about the resource
     try {
       final URLConnection connection = this.url.openConnection();
-      try (final InputStream is = connection.getInputStream()) {
+      try (final InputStream ignore = connection.getInputStream()) {
         if (Strings.isNullOrEmpty(contentType)) {
           this.contentType = connection.getContentType();
         }
@@ -107,18 +109,11 @@ public class UrlWebResource
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("UrlWebResource [");
-    if (path != null) {
-      builder.append("path=");
-      builder.append(path);
-      builder.append(", ");
-    }
-    if (contentType != null) {
-      builder.append("contentType=");
-      builder.append(contentType);
-    }
-    builder.append("]");
-    return builder.toString();
+    return "UrlWebResource{" +
+        "url=" + url +
+        ", path='" + path + '\'' +
+        ", shouldCache=" + shouldCache +
+        ", contentType='" + contentType + '\'' +
+        '}';
   }
 }

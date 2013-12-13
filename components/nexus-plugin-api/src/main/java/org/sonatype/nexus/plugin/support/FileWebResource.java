@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.webresources.internal;
+package org.sonatype.nexus.plugin.support;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -24,11 +24,11 @@ import org.sonatype.nexus.web.WebResource;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Dev mode resource that is based on File.
+ * File-based {@link WebResource}.
  *
  * @since 2.8
  */
-public class DevModeResource
+public class FileWebResource
     implements WebResource
 {
   private final String path;
@@ -37,16 +37,18 @@ public class DevModeResource
 
   private final File file;
 
-  public DevModeResource(final String path, final String contentType, final File file) {
+  private final boolean cachable;
+
+  public FileWebResource(final File file, final String path, final String contentType, final boolean cachable) {
     this.file = checkNotNull(file);
     this.path = checkNotNull(path);
     this.contentType = checkNotNull(contentType);
+    this.cachable = cachable;
   }
 
   @Override
   public boolean shouldCache() {
-    // do not cache dev mode resource
-    return false;
+    return cachable;
   }
 
   @Override
@@ -76,10 +78,11 @@ public class DevModeResource
 
   @Override
   public String toString() {
-    return "DevModeResource{" +
+    return "FileWebResource{" +
         "path='" + path + '\'' +
         ", contentType='" + contentType + '\'' +
         ", file=" + file +
+        ", cachable=" + cachable +
         '}';
   }
 }
