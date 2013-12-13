@@ -71,6 +71,11 @@ public class UiExtJs3IndexPageRenderer
 
   private final Set<UiContributor> rJsContributors;
 
+  //
+  // FIXME: This can/should be replaced by a simple WebResource impl.
+  // FIXME: The only issue here is access to query-string to determine if we need to flip on debug-mode or not.
+  //
+
   @Inject
   public UiExtJs3IndexPageRenderer(final Map<String, NexusIndexHtmlCustomizer> bundles,
                                    final ApplicationStatusSource applicationStatusSource,
@@ -169,8 +174,9 @@ public class UiExtJs3IndexPageRenderer
   /**
    * Evaluates template "snippets" that will be used to construct complete template.
    */
-  private void evaluateIfNeeded(Map<String, Object> context, String template,
-                                List<String> results)
+  private void evaluateIfNeeded(final Map<String, Object> context,
+                                final String template,
+                                final List<String> results)
   {
     if (!Strings.isNullOrEmpty(template)) {
       final StringWriter result = new StringWriter();
