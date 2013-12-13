@@ -26,8 +26,21 @@ import org.sonatype.nexus.web.WebResource;
  */
 public interface WebResourceService
 {
+  /**
+   * Returns all discovered web-resource paths.
+   */
+  Collection<String> getPaths();
+
+  /**
+   * Returns all discovered web-resources.
+   */
   Collection<WebResource> getResources();
 
+  /**
+   * Get a web-resource by path.
+   *
+   * @return Web-resource for path or null if not bound.
+   */
   @Nullable
-  WebResource findResource(String path);
+  WebResource getResource(String path);
 }

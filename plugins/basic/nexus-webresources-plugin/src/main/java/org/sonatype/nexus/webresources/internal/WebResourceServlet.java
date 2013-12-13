@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.web.ErrorStatusException;
 import org.sonatype.nexus.web.WebResource;
-import org.sonatype.nexus.web.WebResourceBundle;
 import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.nexus.webresources.IndexPageRenderer;
 import org.sonatype.nexus.webresources.WebResourceService;
@@ -37,7 +36,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 
 /**
- * Provides access to {@link WebResource} via configured {@link WebResourceBundle} components.
+ * Provides access to resources via configured {@link WebResourceService}.
  *
  * @since 2.8
  */
@@ -86,7 +85,7 @@ public class WebResourceServlet
       return;
     }
 
-    WebResource resource = webResources.findResource(path);
+    WebResource resource = webResources.getResource(path);
     if (resource != null) {
       doGetResource(request, response, resource);
     }

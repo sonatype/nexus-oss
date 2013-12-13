@@ -117,12 +117,17 @@ public class WebResourceServiceImpl
   }
 
   @Override
+  public Collection<String> getPaths() {
+    return Collections.unmodifiableCollection(resourcePaths.keySet());
+  }
+
+  @Override
   public Collection<WebResource> getResources() {
     return Collections.unmodifiableCollection(resourcePaths.values());
   }
 
   @Override
-  public WebResource findResource(final String path) {
+  public WebResource getResource(final String path) {
     log.trace("Find resource: {}", path);
     WebResource resource = null;
 
