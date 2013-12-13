@@ -65,6 +65,8 @@ public class NexusModules
 
     @Override
     protected void configure() {
+      bind(ServletContext.class).toInstance(servletContext);
+
       install(new CommonModule());
 
       install(new ServletModule()

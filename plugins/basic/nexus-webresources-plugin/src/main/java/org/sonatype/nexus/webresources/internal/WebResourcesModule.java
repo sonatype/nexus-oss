@@ -14,6 +14,7 @@
 package org.sonatype.nexus.webresources.internal;
 
 import javax.inject.Named;
+import javax.servlet.ServletContext;
 
 import org.sonatype.nexus.web.TemplateRenderer;
 
@@ -33,17 +34,16 @@ public class WebResourcesModule
 {
   @Override
   protected void configure() {
+    requireBinding(ServletContext.class);
     requireBinding(TemplateRenderer.class);
 
     install(new ServletModule()
     {
       @Override
       protected void configureServlets() {
-        serve("/*").with(WebResourcesServlet.class);
+        serve("/*").with(WebResourceServlet.class);
 
-        // Give components contributed by this plugin a low-level ranking (same level as Nexus core) so they are ordered
-        // after components from other plugins. This makes sure all the their non-root servlets will be invoked and this
-        // one will not "grab all" of the requests as it's mounted on root.
+        // low binding to allow other servlets to take precedence
         bind(RankingFunction.class).toInstance(new DefaultRankingFunction(0));
       }
     });

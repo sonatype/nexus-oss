@@ -13,12 +13,8 @@
 
 package org.sonatype.nexus.webresources.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -29,19 +25,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.internal.DevModeResources;
-import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.plugin.support.FileWebResource;
-import org.sonatype.nexus.plugin.support.UrlWebResource;
 import org.sonatype.nexus.web.ErrorStatusException;
 import org.sonatype.nexus.web.WebResource;
 import org.sonatype.nexus.web.WebResourceBundle;
 import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.nexus.webresources.IndexPageRenderer;
-
-import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.webresources.WebResourceService;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -54,81 +43,26 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
  */
 @Singleton
 @Named
-public class WebResourcesServlet
+public class WebResourceServlet
     extends HttpServlet
 {
-  private static final Logger log = LoggerFactory.getLogger(WebResourcesServlet.class);
-
-  private final List<WebResourceBundle> bundles;
-
-  private final List<WebResource> resources;
-
-  private final MimeSupport mimeSupport;
+  private final WebResourceService webResources;
 
   private final WebUtils webUtils;
 
+  // FIXME: Remove this component, simplify to make this another web-resource
+
   private final IndexPageRenderer indexPageRenderer;
 
-  private final Map<String, WebResource> resourcePaths;
-
   @Inject
-  public WebResourcesServlet(final List<WebResourceBundle> bundles,
-                             List<WebResource> resources,
-                             final MimeSupport mimeSupport,
-                             final WebUtils webUtils,
-                             final @Nullable IndexPageRenderer indexPageRenderer)
+  public WebResourceServlet(final WebResourceService webResources,
+                            final WebUtils webUtils,
+                            final @Nullable IndexPageRenderer indexPageRenderer)
   {
-    this.bundles = checkNotNull(bundles);
-    this.resources = checkNotNull(resources);
-    this.mimeSupport = checkNotNull(mimeSupport);
+    this.webResources = checkNotNull(webResources);
     this.webUtils = checkNotNull(webUtils);
     this.indexPageRenderer = indexPageRenderer;
-    this.resourcePaths = Maps.newHashMap();
-
-    discoverResources();
   }
-
-  private void discoverResources() {
-    // register resources in bundles
-    for (WebResourceBundle bundle : bundles) {
-      List<WebResource> resources = bundle.getResources();
-      if (resources != null) {
-        for (WebResource resource : resources) {
-          addResource(resource);
-        }
-      }
-    }
-
-    // register standalone resources
-    for (WebResource resource : resources) {
-      addResource(resource);
-    }
-
-    log.info("Discovered {} resources", resourcePaths.size());
-    if (log.isDebugEnabled()) {
-      for (String path : resourcePaths.keySet()) {
-        log.debug("  {}", path);
-      }
-    }
-
-    // make it clear we have DEV mode enabled
-    if (DevModeResources.hasResourceLocations()) {
-      log.warn("DEV mode resources is ENABLED");
-    }
-  }
-
-  private void addResource(final WebResource resource) {
-    String path = resource.getPath();
-    log.trace("Adding resource: {} -> {}", path, resource);
-    final WebResource old = resourcePaths.put(path, resource);
-    if (old != null) {
-      // FIXME: for now this causes a bit of noise on startup for overlapping icons, for now reduce to DEBUG
-      // FIXME: ... we need to sort out a general strategy short/long term for how to handle this issue
-      log.debug("Overlapping resources on path {}: old={}, new={}", path, old, resource);
-    }
-  }
-
-  // service
 
   @Override
   protected void service(final HttpServletRequest request, final HttpServletResponse response)
@@ -144,37 +78,15 @@ public class WebResourcesServlet
   protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException
   {
-    final String requestPath = request.getPathInfo();
-    log.debug("Requested path: {}", requestPath);
+    final String path = request.getPathInfo();
 
-    // 0) see is index.html needed actually
-    if ("".equals(requestPath) || "/".equals(requestPath) || "/index.html".equals(requestPath)) {
+    // FIXME: this should be generalized and make use of WebResource impl
+    if ("".equals(path) || "/".equals(path) || "/index.html".equals(path)) {
       doGetIndex(request, response);
       return;
     }
 
-    WebResource resource = null;
-
-    // 1) first "dev" resources if enabled (to override everything else)
-    File file = DevModeResources.getFileIfOnFileSystem(requestPath);
-    if (file != null) {
-      resource = new FileWebResource(file, requestPath, mimeSupport.guessMimeTypeFromPath(file.getName()), false);
-    }
-
-    // 2) second, look at "ordinary" resources, but only if devResource did not hit anything
-    if (resource == null) {
-      resource = resourcePaths.get(requestPath);
-    }
-
-    // 3) third, look into WAR embedded resources
-    if (resource == null) {
-      URL url = getServletContext().getResource(requestPath);
-      if (url != null) {
-        resource = new UrlWebResource(url, requestPath, mimeSupport.guessMimeTypeFromPath(requestPath));
-      }
-    }
-
-    // deliver it, if we have anything
+    WebResource resource = webResources.findResource(path);
     if (resource != null) {
       doGetResource(request, response, resource);
     }
