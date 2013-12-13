@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -101,6 +103,8 @@ public class ContentServlet
 
   private final Logger logger = LoggerFactory.getLogger(ContentServlet.class);
 
+  private final NexusConfiguration nexusConfiguration;
+
   private final RepositoryRouter repositoryRouter;
 
   private final ContentRenderer contentRenderer;
@@ -108,10 +112,12 @@ public class ContentServlet
   private final WebUtils webUtils;
 
   @Inject
-  public ContentServlet(final RepositoryRouter repositoryRouter,
+  public ContentServlet(final NexusConfiguration nexusConfiguration,
+                        final RepositoryRouter repositoryRouter,
                         final ContentRenderer contentRenderer,
                         final WebUtils webUtils)
   {
+    this.nexusConfiguration = checkNotNull(nexusConfiguration);
     this.repositoryRouter = checkNotNull(repositoryRouter);
     this.contentRenderer = checkNotNull(contentRenderer);
     this.webUtils = checkNotNull(webUtils);
@@ -129,11 +135,22 @@ public class ContentServlet
     final ResourceStoreRequest result = new ResourceStoreRequest(resourceStorePath);
     result.getRequestContext().put(STOPWATCH_KEY, new Stopwatch().start());
 
-    // honor the local only and remote only
+    // stuff in the user id if we have it in request
+    final Subject subject = SecurityUtils.getSubject();
+    if (subject != null && subject.getPrincipal() != null) {
+      result.getRequestContext().put(AccessManager.REQUEST_USER, subject.getPrincipal().toString());
+    }
+    result.getRequestContext().put(AccessManager.REQUEST_AGENT, request.getHeader("user-agent"));
+
+    // honor the localOnly, remoteOnly and asExpired (but remoteOnly and asExpired only for non-anon users)
+    // as those two actually makes Nexus perform a remote request
     final Map<String, String[]> parameterMap = request.getParameterMap();
     result.setRequestLocalOnly(isLocal(request, resourceStorePath));
-    result.setRequestRemoteOnly(parameterMap.containsKey(Constants.REQ_QP_IS_REMOTE_PARAMETER));
-    result.setRequestAsExpired(parameterMap.containsKey(Constants.REQ_QP_AS_EXPIRED_PARAMETER));
+    if (!Objects.equals(nexusConfiguration.getAnonymousUsername(),
+        result.getRequestContext().get(AccessManager.REQUEST_USER))) {
+      result.setRequestRemoteOnly(parameterMap.containsKey(Constants.REQ_QP_IS_REMOTE_PARAMETER));
+      result.setRequestAsExpired(parameterMap.containsKey(Constants.REQ_QP_AS_EXPIRED_PARAMETER));
+    }
     result.setExternal(true);
 
     // honor if-modified-since
@@ -157,13 +174,6 @@ public class ContentServlet
 
     // stuff in the originating remote address
     result.getRequestContext().put(AccessManager.REQUEST_REMOTE_ADDRESS, RemoteIPFinder.findIP(request));
-
-    // stuff in the user id if we have it in request
-    final Subject subject = SecurityUtils.getSubject();
-    if (subject != null && subject.getPrincipal() != null) {
-      result.getRequestContext().put(AccessManager.REQUEST_USER, subject.getPrincipal().toString());
-    }
-    result.getRequestContext().put(AccessManager.REQUEST_AGENT, request.getHeader("user-agent"));
 
     // this is HTTPS, get the cert and stuff it too for later
     if (request.isSecure()) {
