@@ -18,6 +18,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+// FIXME: Remove this replace by bound WebResource for index.html
+
 /**
  * Component rendering the "/index.html" entry page.
  *
