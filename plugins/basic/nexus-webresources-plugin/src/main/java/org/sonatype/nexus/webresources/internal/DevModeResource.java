@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.webresources.internal;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -70,7 +71,7 @@ public class DevModeResource
 
   @Override
   public InputStream getInputStream() throws IOException {
-    return new FileInputStream(file);
+    return new BufferedInputStream(new FileInputStream(file));
   }
 
   @Override
