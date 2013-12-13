@@ -18,7 +18,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * Exception to be thrown by Servlets already prepared their error information.
  *
- * @since 2.8.0
+ * @since 2.8
  */
 public class ErrorStatusException
     extends RuntimeException

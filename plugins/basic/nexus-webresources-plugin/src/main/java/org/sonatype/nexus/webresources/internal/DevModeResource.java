@@ -25,7 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Dev mode resource that is based on File.
  *
- * @since 2.8.0
+ * @since 2.8
  */
 public class DevModeResource
     implements WebResource

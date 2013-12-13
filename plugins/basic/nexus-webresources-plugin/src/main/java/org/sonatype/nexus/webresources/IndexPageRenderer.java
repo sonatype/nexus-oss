@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Component rendering the "/index.html" entry page.
  *
- * @since 2.8.0
+ * @since 2.8
  */
 public interface IndexPageRenderer
 {

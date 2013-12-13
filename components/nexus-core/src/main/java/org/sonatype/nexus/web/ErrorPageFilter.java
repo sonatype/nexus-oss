@@ -35,7 +35,7 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 /**
  * Servlet filter to add error page rendering.
  *
- * @since 2.8.0
+ * @since 2.8
  */
 @Named
 @Singleton

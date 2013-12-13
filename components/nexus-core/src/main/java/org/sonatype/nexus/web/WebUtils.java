@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Web response related utilities, that helps in ordinary tasks with HTTP servlet responses.
  *
- * @since 2.8.0
+ * @since 2.8
  */
 @Named
 @Singleton
