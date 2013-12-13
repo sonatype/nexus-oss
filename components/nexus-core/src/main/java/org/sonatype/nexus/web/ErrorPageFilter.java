@@ -69,7 +69,7 @@ public class ErrorPageFilter
     try {
       chain.doFilter(req, response);
     }
-    catch (ErrorStatusServletException e) {
+    catch (ErrorStatusException e) {
       // send for direct rendering, everything is prepared
       templateRenderer.renderErrorPage(
           request,

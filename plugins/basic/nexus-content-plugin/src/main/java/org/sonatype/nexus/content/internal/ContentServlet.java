@@ -53,7 +53,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.Constants;
 import org.sonatype.nexus.web.ErrorPageFilter;
-import org.sonatype.nexus.web.ErrorStatusServletException;
+import org.sonatype.nexus.web.ErrorStatusException;
 import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.sisu.goodies.common.Throwables2;
@@ -206,7 +206,7 @@ public class ContentServlet
   }
 
   /**
-   * This method converts various exceptions into {@link ErrorStatusServletException} preparing those to be shown
+   * This method converts various exceptions into {@link ErrorStatusException} preparing those to be shown
    * by {@link ErrorPageFilter}. Still, there are some special case (see access denied handling and IO exception
    * handling) where only a request attribute is set, signaling for security filters that a challenge is needed to
    * elevate permissions.
@@ -215,7 +215,7 @@ public class ContentServlet
                                  final HttpServletResponse response,
                                  final ResourceStoreRequest rsr,
                                  final Exception exception)
-      throws ErrorStatusServletException, IOException
+      throws ErrorStatusException, IOException
   {
     logger.trace("Exception", exception);
     int responseCode = 500;
@@ -275,7 +275,7 @@ public class ContentServlet
       responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
       logger.warn(exception.getMessage(), exception);
     }
-    throw new ErrorStatusServletException(responseCode, null, exception.getMessage());
+    throw new ErrorStatusException(responseCode, null, exception.getMessage());
   }
 
   // service
@@ -304,7 +304,7 @@ public class ContentServlet
       doTrace(request, response);
     }
     else {
-      throw new ErrorStatusServletException(HttpServletResponse.SC_METHOD_NOT_ALLOWED, null,
+      throw new ErrorStatusException(HttpServletResponse.SC_METHOD_NOT_ALLOWED, null,
           "Method " + method + " not supported.");
     }
   }
@@ -459,7 +459,7 @@ public class ContentServlet
         }
       }
       else if (ranges.size() > 1) {
-        throw new ErrorStatusServletException(HttpServletResponse.SC_NOT_IMPLEMENTED, "Not Implemented",
+        throw new ErrorStatusException(HttpServletResponse.SC_NOT_IMPLEMENTED, "Not Implemented",
             "Multiple ranges not yet supported.");
       }
       else {

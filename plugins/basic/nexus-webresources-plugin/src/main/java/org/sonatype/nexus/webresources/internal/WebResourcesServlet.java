@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugin.support.UrlWebResource;
-import org.sonatype.nexus.web.ErrorStatusServletException;
+import org.sonatype.nexus.web.ErrorStatusException;
 import org.sonatype.nexus.web.WebResource;
 import org.sonatype.nexus.web.WebResourceBundle;
 import org.sonatype.nexus.web.WebUtils;
@@ -181,7 +181,7 @@ public class WebResourcesServlet
       doGetResource(request, response, resource);
     }
     else {
-      throw new ErrorStatusServletException(SC_NOT_FOUND, "Not Found", "Resource not found");
+      throw new ErrorStatusException(SC_NOT_FOUND, "Not Found", "Resource not found");
     }
   }
 
@@ -195,7 +195,7 @@ public class WebResourcesServlet
       indexPageRenderer.render(request, response);
     }
     else {
-      throw new ErrorStatusServletException(SC_NOT_FOUND, "Not Found", "Index page not found");
+      throw new ErrorStatusException(SC_NOT_FOUND, "Not Found", "Index page not found");
     }
   }
 

@@ -13,28 +13,24 @@
 
 package org.sonatype.nexus.web;
 
-import javax.servlet.ServletException;
-
 import static com.google.common.base.Preconditions.checkArgument;
-
-// FIXME: Unclear why this is a ServletException sub-class, much better off being a RuntimeException
 
 /**
  * Exception to be thrown by Servlets already prepared their error information.
  *
  * @since 2.8.0
  */
-public class ErrorStatusServletException
-    extends ServletException
+public class ErrorStatusException
+    extends RuntimeException
 {
   private final int responseCode;
 
   private final String reasonPhrase;
 
-  public ErrorStatusServletException(final int responseCode,
-                                     final String reasonPhrase,
-                                     final String errorMessage,
-                                     final Exception rootCause)
+  public ErrorStatusException(final int responseCode,
+                              final String reasonPhrase,
+                              final String errorMessage,
+                              final Exception rootCause)
   {
     super(errorMessage, rootCause);
     checkArgument(responseCode >= 400);
@@ -42,7 +38,7 @@ public class ErrorStatusServletException
     this.reasonPhrase = reasonPhrase;
   }
 
-  public ErrorStatusServletException(final int responseCode, final String reasonPhrase, final String errorMessage) {
+  public ErrorStatusException(final int responseCode, final String reasonPhrase, final String errorMessage) {
     this(responseCode, reasonPhrase, errorMessage, null);
   }
 
