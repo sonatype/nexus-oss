@@ -213,7 +213,8 @@ public class ContentServlet
    */
   protected void handleException(final HttpServletRequest request,
                                  final HttpServletResponse response,
-                                 final ResourceStoreRequest rsr, final Exception exception)
+                                 final ResourceStoreRequest rsr,
+                                 final Exception exception)
       throws ErrorStatusServletException, IOException
   {
     logger.trace("Exception", exception);

@@ -16,6 +16,7 @@ package org.sonatype.nexus.guice;
 import javax.servlet.ServletContext;
 
 import org.sonatype.nexus.web.BaseUrlHolderFilter;
+import org.sonatype.nexus.web.ErrorPageFilter;
 import org.sonatype.security.web.guice.SecurityWebModule;
 
 import com.google.inject.AbstractModule;
@@ -71,11 +72,10 @@ public class NexusModules
         @Override
         protected void configureServlets() {
           filter("/*").through(BaseUrlHolderFilter.class);
+          filter("/*").through(ErrorPageFilter.class);
 
-          // TODO: Can probably bind the error-page filter here too?
-
-          // our configuration needs to be first-most when calculating order
-          bind(RankingFunction.class).toInstance(new DefaultRankingFunction(Integer.MAX_VALUE));
+          // our configuration needs to be first-most when calculating order (some fudge room for edge-cases)
+          bind(RankingFunction.class).toInstance(new DefaultRankingFunction(0x70000000));
         }
       });
 

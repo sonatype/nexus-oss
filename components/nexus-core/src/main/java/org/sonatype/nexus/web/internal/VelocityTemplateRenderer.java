@@ -74,7 +74,7 @@ public class VelocityTemplateRenderer
                               final int responseCode,
                               final String reasonPhrase,
                               final String errorDescription,
-                              final Exception exception)
+                              final Throwable exception)
       throws IOException
   {
     checkNotNull(request);

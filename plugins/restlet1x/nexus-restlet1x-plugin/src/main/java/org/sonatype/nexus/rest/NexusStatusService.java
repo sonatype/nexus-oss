@@ -34,6 +34,10 @@ import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.service.StatusService;
 
+//
+// FIXME: This is duplicated error-page handling, which will go away once restlet is removed.
+//
+
 /**
  * Nexus specific status service that simply assembles an "error page" out of a Velocity template but watching to HTML
  * escape any content that might come from external (ie. query param).
