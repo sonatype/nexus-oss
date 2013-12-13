@@ -156,7 +156,7 @@ public class WebResourcesServlet
     WebResource resource = null;
 
     // 1) first "dev" resources if enabled (to override everything else)
-    final File file = DevModeResources.getFileIfOnFileSystem(requestPath);
+    File file = DevModeResources.getFileIfOnFileSystem(requestPath);
     if (file != null) {
       resource = new FileWebResource(file, requestPath, mimeSupport.guessMimeTypeFromPath(file.getName()), false);
     }
@@ -168,9 +168,9 @@ public class WebResourcesServlet
 
     // 3) third, look into WAR embedded resources
     if (resource == null) {
-      final URL resourceUrl = getServletContext().getResource(requestPath);
-      if (resourceUrl != null) {
-        resource = new UrlWebResource(resourceUrl, requestPath, mimeSupport.guessMimeTypeFromPath(requestPath));
+      URL url = getServletContext().getResource(requestPath);
+      if (url != null) {
+        resource = new UrlWebResource(url, requestPath, mimeSupport.guessMimeTypeFromPath(requestPath));
       }
     }
 
