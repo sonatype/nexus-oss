@@ -20,12 +20,9 @@ import org.sonatype.nexus.web.ErrorPageFilter;
 import org.sonatype.security.web.guice.SecurityWebModule;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
 import com.yammer.metrics.guice.InstrumentationModule;
 import org.apache.shiro.guice.aop.ShiroAopModule;
-import org.apache.shiro.mgt.RealmSecurityManager;
 import org.eclipse.sisu.inject.DefaultRankingFunction;
 import org.eclipse.sisu.inject.RankingFunction;
 
@@ -79,21 +76,7 @@ public class NexusModules
         }
       });
 
-      install(new SecurityWebModule(servletContext, true)
-      {
-        @Override
-        protected void configureShiroWeb() {
-          super.configureShiroWeb();
-
-          // Expose an explicit binding to replace the old stateless and stateful "nexus" RealmSecurityManager with the
-          // default RealmSecurityManager, since we now use the "noSessionCreation" filter in Shiro 1.2 on all services
-          // except the login service.
-          // The NexusWebRealmSecurityManager is still available (if necessary) under the "stateless-and-stateful" hint.
-          Named nexus = Names.named("nexus");
-          bind(RealmSecurityManager.class).annotatedWith(nexus).to(RealmSecurityManager.class);
-          expose(RealmSecurityManager.class).annotatedWith(nexus);
-        }
-      });
+      install(new SecurityWebModule(servletContext, true));
     }
   }
 
