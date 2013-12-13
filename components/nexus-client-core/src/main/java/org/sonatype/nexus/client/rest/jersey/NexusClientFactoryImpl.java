@@ -34,6 +34,7 @@ import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
 import org.sonatype.sisu.siesta.client.filters.RequestFilters;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
@@ -44,7 +45,15 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.conn.BasicClientConnectionManager;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.impl.conn.SchemeRegistryFactory;
 import org.apache.http.params.CoreProtocolPNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,12 +135,41 @@ public class NexusClientFactoryImpl
     applyAuthenticationIfAny(connectionInfo, config);
     applyProxyIfAny(connectionInfo, config);
 
+    // obey JSSE defined system properties
+    config.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER,
+        new BasicClientConnectionManager(SchemeRegistryFactory.createSystemDefault()));
+
     final ApacheHttpClient4 client = ApacheHttpClient4.create(config);
 
     // set UA
     client.getClientHandler().getHttpClient().getParams().setParameter(
         CoreProtocolPNames.USER_AGENT, "Nexus-Client/" + discoverClientVersion()
     );
+
+    // "weaken" HTTPS, if requested
+    final boolean insecure = connectionInfo.isSslInsecure(); // self-signed certs
+    final boolean allowAll = connectionInfo.isSslAllowAll(); // hostname check
+    if (insecure || allowAll) {
+      try {
+        final SSLSocketFactory sf;
+        if (!insecure && allowAll) {
+          sf = new SSLSocketFactory((TrustStrategy) null, new AllowAllHostnameVerifier());
+        }
+        else if (insecure && !allowAll) {
+          sf = new SSLSocketFactory(new TrustSelfSignedStrategy(),
+              SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+        }
+        else {
+          sf = new SSLSocketFactory(new TrustSelfSignedStrategy(), new AllowAllHostnameVerifier());
+        }
+        final Scheme trustSelfSignedCertHttpsScheme = new Scheme("https", 443, sf);
+        client.getClientHandler().getHttpClient().getConnectionManager().getSchemeRegistry().register(
+            trustSelfSignedCertHttpsScheme);
+      }
+      catch (Exception e) {
+        Throwables.propagate(e);
+      }
+    }
 
     // NXCM-4547 JERSEY-1293 Enforce proxy setting on httpclient
     enforceProxyUri(config, client);

@@ -31,8 +31,28 @@ public class ConnectionInfo
 
   private final Map<Protocol, ProxyInfo> proxyInfos;
 
+  /**
+   * Should SSL certificate check allow self signed ones?
+   *
+   * @since 2.8.0
+   */
+  private final boolean sslInsecure;
+
+  /**
+   * Should SSL certificate X.509 hostname matching be disabled?
+   *
+   * @since 2.8.0
+   */
+  private final boolean sslAllowAll;
+
   public ConnectionInfo(final BaseUrl baseUrl, final AuthenticationInfo authenticationInfo,
                         final Map<Protocol, ProxyInfo> proxyInfos)
+  {
+    this(baseUrl, authenticationInfo, proxyInfos, false, false);
+  }
+
+  public ConnectionInfo(final BaseUrl baseUrl, final AuthenticationInfo authenticationInfo,
+                        final Map<Protocol, ProxyInfo> proxyInfos, final boolean sslInsecure, final boolean sslAllowAll)
   {
     this.baseUrl = Check.notNull(baseUrl, "Base URL is null!");
     this.authenticationInfo = authenticationInfo;
@@ -41,6 +61,8 @@ public class ConnectionInfo
       proxies.putAll(proxyInfos);
     }
     this.proxyInfos = Collections.unmodifiableMap(proxies);
+    this.sslInsecure = sslInsecure;
+    this.sslAllowAll = sslAllowAll;
   }
 
   public BaseUrl getBaseUrl() {
@@ -54,6 +76,20 @@ public class ConnectionInfo
   public Map<Protocol, ProxyInfo> getProxyInfos() {
     return proxyInfos;
   }
+
+  /**
+   * Returns {@code true} if SSL certification check is relaxed (allows self signed certificates).
+   *
+   * @since 2.8.0
+   */
+  public boolean isSslInsecure() { return sslInsecure; }
+
+  /**
+   * Returns {@code true} if SSL certificate X.509 hostname check is relaxed (no match will be performed).
+   *
+   * @since 2.8.0
+   */
+  public boolean isSslAllowAll() { return sslAllowAll; }
 
   // ==
 
