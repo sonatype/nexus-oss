@@ -14,7 +14,6 @@
 package org.sonatype.nexus.webresources.internal;
 
 import javax.inject.Named;
-import javax.servlet.ServletContext;
 
 import org.sonatype.nexus.web.TemplateRenderer;
 
@@ -34,7 +33,6 @@ public class WebResourcesModule
 {
   @Override
   protected void configure() {
-    requireBinding(ServletContext.class);
     requireBinding(TemplateRenderer.class);
 
     install(new ServletModule()
