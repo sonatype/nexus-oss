@@ -128,7 +128,6 @@ public class WebResourceServiceImpl
 
   @Override
   public WebResource getResource(final String path) {
-    log.trace("Find resource: {}", path);
     WebResource resource = null;
 
     // 1) first "dev" resources if enabled (to override everything else)

@@ -29,6 +29,9 @@ import org.sonatype.nexus.web.WebResource;
 import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.nexus.webresources.WebResourceService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
@@ -43,6 +46,8 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 public class WebResourceServlet
     extends HttpServlet
 {
+  private static final Logger log = LoggerFactory.getLogger(WebResourceServlet.class);
+
   private final WebResourceService webResources;
 
   private final WebUtils webUtils;
@@ -78,7 +83,7 @@ public class WebResourceServlet
 
     WebResource resource = webResources.getResource(path);
     if (resource != null) {
-      serveResource(request, response, resource);
+      serveResource(resource, request, response);
     }
     else {
       throw new ErrorStatusException(SC_NOT_FOUND, "Not Found", "Resource not found");
@@ -88,11 +93,13 @@ public class WebResourceServlet
   /**
    * Handles a file response, all the conditional request cases, and eventually the content serving of the file item.
    */
-  private void serveResource(final HttpServletRequest request,
-                             final HttpServletResponse response,
-                             final WebResource resource)
+  private void serveResource(final WebResource resource,
+                             final HttpServletRequest request,
+                             final HttpServletResponse response)
       throws IOException
   {
+    log.trace("Serving resource: {}", resource);
+
     response.setHeader("Content-Type", resource.getContentType());
     response.setDateHeader("Last-Modified", resource.getLastModified());
     response.setHeader("Content-Length", String.valueOf(resource.getSize()));
