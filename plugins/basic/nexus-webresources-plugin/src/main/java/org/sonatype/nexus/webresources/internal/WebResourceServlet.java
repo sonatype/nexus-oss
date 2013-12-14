@@ -93,7 +93,7 @@ public class WebResourceServlet
     response.setHeader("Content-Length", String.valueOf(resource.getSize()));
 
     // cache-control
-    if (resource.shouldCache()) {
+    if (resource.isCacheable()) {
       // default cache for 30 days
       response.setHeader("Cache-Control", "max-age=2592000");
     }

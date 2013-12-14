@@ -90,7 +90,7 @@ public class IndexWebResource
 
   @Override
   public long getSize() {
-    return -1;
+    return UNKNOWN_SIZE;
   }
 
   @Override
@@ -99,7 +99,7 @@ public class IndexWebResource
   }
 
   @Override
-  public boolean shouldCache() {
+  public boolean isCacheable() {
     return false;
   }
 

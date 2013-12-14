@@ -26,6 +26,10 @@ import javax.annotation.Nullable;
  */
 public interface WebResource
 {
+  long UNKNOWN_SIZE = -1L;
+
+  long UNKNOWN_LAST_MODIFIED = 0L;
+
   /**
    * The path where the resource is mounted under the servlet-context.
    */
@@ -38,14 +42,14 @@ public interface WebResource
   String getContentType();
 
   /**
-   * The size of the content, or -1 if unknown.
+   * The size of the content, or {@link #UNKNOWN_SIZE} if unknown.
    *
    * @see URLConnection#getContentLengthLong()
    */
   long getSize();
 
   /**
-   * The last modified time, or 0 if unknown.
+   * The last modified time, or {@link #UNKNOWN_LAST_MODIFIED} if unknown.
    *
    * @see URLConnection#getLastModified()
    */
@@ -54,7 +58,7 @@ public interface WebResource
   /**
    * True if the resource should be cached.
    */
-  boolean shouldCache();
+  boolean isCacheable();
 
   /**
    * Resource content stream.
