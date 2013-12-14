@@ -15,6 +15,7 @@ package org.sonatype.nexus.web;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLConnection;
 
 import javax.annotation.Nullable;
 
@@ -25,23 +26,38 @@ import javax.annotation.Nullable;
  */
 public interface WebResource
 {
+  /**
+   * The path where the resource is mounted under the servlet-context.
+   */
   String getPath();
 
+  /**
+   * The content-type of the resource, or null if unknown.
+   */
   @Nullable
   String getContentType();
 
   /**
-   * Returns the size of the content, or -1 if unknown.
+   * The size of the content, or -1 if unknown.
+   *
+   * @see URLConnection#getContentLengthLong()
    */
   long getSize();
 
-  @Nullable
-  Long getLastModified();
+  /**
+   * The last modified time, or 0 if unknown.
+   *
+   * @see URLConnection#getLastModified()
+   */
+  long getLastModified();
 
+  /**
+   * True if the resource should be cached.
+   */
+  boolean shouldCache();
+
+  /**
+   * Resource content stream.
+   */
   InputStream getInputStream() throws IOException;
-
-  interface CacheControl
-  {
-    boolean shouldCache();
-  }
 }

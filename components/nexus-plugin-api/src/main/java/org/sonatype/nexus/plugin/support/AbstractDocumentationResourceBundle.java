@@ -86,7 +86,7 @@ public abstract class AbstractDocumentationResourceBundle
           // system-wide clashes are much harder to resolve
           String path = "/" + getPluginId() + "/" + getPathPrefix() + name;
 
-          resources.add(new DefaultWebResource(url, path, mimeSupport.guessMimeTypeFromPath(name)));
+          resources.add(new UrlWebResource(url, path, mimeSupport.guessMimeTypeFromPath(name)));
         }
 
         if (log.isTraceEnabled()) {

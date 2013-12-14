@@ -31,7 +31,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  * Upgrades configuration model from version 2.7.0 to 2.8.0.
  *
- * @since 2.8.0
+ * @since 2.8
  */
 @Singleton
 @Named("2.7.0")

@@ -20,9 +20,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.jar.JarEntry;
 
-import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.web.WebResource;
-import org.sonatype.nexus.web.WebResource.CacheControl;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 
 /**
@@ -30,7 +28,7 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
  */
 @Deprecated
 public final class PluginWebResource
-    implements WebResource, CacheControl
+    implements WebResource
 {
   // ----------------------------------------------------------------------
   // Implementation fields
@@ -42,9 +40,13 @@ public final class PluginWebResource
 
   private final String publishedPath;
 
+  private final boolean shouldCache;
+
   private final String contentType;
 
-  private final boolean shouldCache;
+  private final long size;
+
+  private final long lastModified;
 
   // ----------------------------------------------------------------------
   // Constructors
@@ -55,12 +57,30 @@ public final class PluginWebResource
                            final String publishedPath,
                            final String contentType)
   {
-    URL overrideUrl = DevModeResources.getResourceIfOnFileSystem(publishedPath);
+    this(gav, resourceURL, publishedPath, contentType, true);
+  }
+
+  public PluginWebResource(final GAVCoordinate gav,
+                           final URL resourceURL,
+                           final String publishedPath,
+                           final String contentType,
+                           final boolean shouldCache)
+  {
     this.gav = gav;
-    this.resourceURL = overrideUrl != null ? overrideUrl : resourceURL;
+    this.resourceURL = resourceURL;
     this.publishedPath = publishedPath;
     this.contentType = contentType;
-    this.shouldCache = overrideUrl == null;
+    this.shouldCache = shouldCache;
+    try {
+      final URLConnection urlConnection = resourceURL.openConnection();
+      try (final InputStream is = urlConnection.getInputStream()) {
+        this.size = urlConnection.getContentLengthLong();
+        this.lastModified = urlConnection.getLastModified();
+      }
+    }
+    catch (IOException e) {
+      throw new IllegalArgumentException("Plugin resource " + resourceURL + " inaccessible", e);
+    }
   }
 
   // ----------------------------------------------------------------------
@@ -76,46 +96,22 @@ public final class PluginWebResource
   }
 
   public long getSize() {
-    try {
-      return resourceURL.openConnection().getContentLength();
-    }
-    catch (final Throwable e) // NOPMD
-    {
-      // default to unknown size
-    }
-    return -1;
+    return size;
+  }
+
+  public long getLastModified() {
+    return lastModified;
+  }
+
+  @Override
+  public boolean shouldCache() {
+    return shouldCache;
   }
 
   public InputStream getInputStream()
       throws IOException
   {
     return resourceURL.openStream();
-  }
-
-  public Long getLastModified() {
-    if (!shouldCache) {
-      return System.currentTimeMillis();
-    }
-    try {
-      final URLConnection urlConn = resourceURL.openConnection();
-      if (urlConn instanceof JarURLConnection) {
-        final JarEntry jarEntry = ((JarURLConnection) urlConn).getJarEntry();
-        if (jarEntry != null) {
-          return jarEntry.getTime();
-        }
-        // This is a jar, not an entry in a jar
-      }
-      return urlConn.getLastModified();
-    }
-    catch (final Throwable e) // NOPMD
-    {
-      return null; // default to unknown last modified time
-    }
-  }
-
-  @Override
-  public boolean shouldCache() {
-    return shouldCache;
   }
 
   @Override

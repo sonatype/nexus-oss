@@ -30,6 +30,7 @@ import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.rest.model.NexusAuthenticationClientPermissions;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.security.rest.authentication.AbstractUIPermissionCalculatingPlexusResource;
@@ -153,7 +154,7 @@ public class StatusPlexusResource
       resource.setClientPermissions(getClientPermissions(request));
     }
 
-    resource.setBaseUrl(getContextRoot(request).toString());
+    resource.setBaseUrl(BaseUrlHolder.get());
 
     resource.setLicenseInstalled(status.isLicenseInstalled());
 

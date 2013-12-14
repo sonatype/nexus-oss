@@ -47,9 +47,6 @@ public abstract class AbstractNexusPlexusResource
     extends AbstractPlexusResource
     implements PlexusResource
 {
-  @Deprecated
-  public static final String NEXUS_INSTANCE_LOCAL = "local";
-
   public static final String PASSWORD_PLACE_HOLDER = "|$|N|E|X|U|S|$|";
 
   public static final String IS_LOCAL_PARAMETER = Constants.REQ_QP_IS_LOCAL_PARAMETER;

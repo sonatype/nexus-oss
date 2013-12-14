@@ -13,9 +13,20 @@
 
 package org.sonatype.nexus.guice;
 
+import javax.servlet.ServletContext;
+
+import org.sonatype.nexus.web.BaseUrlHolderFilter;
+import org.sonatype.nexus.web.ErrorPageFilter;
+import org.sonatype.security.web.guice.SecurityWebModule;
+
 import com.google.inject.AbstractModule;
+import com.google.inject.servlet.ServletModule;
 import com.yammer.metrics.guice.InstrumentationModule;
 import org.apache.shiro.guice.aop.ShiroAopModule;
+import org.eclipse.sisu.inject.DefaultRankingFunction;
+import org.eclipse.sisu.inject.RankingFunction;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Nexus guice modules.
@@ -43,9 +54,29 @@ public class NexusModules
   public static class CoreModule
       extends AbstractModule
   {
+    private final ServletContext servletContext;
+
+    public CoreModule(final ServletContext servletContext) {
+      this.servletContext = checkNotNull(servletContext);
+    }
+
     @Override
     protected void configure() {
       install(new CommonModule());
+
+      install(new ServletModule()
+      {
+        @Override
+        protected void configureServlets() {
+          filter("/*").through(BaseUrlHolderFilter.class);
+          filter("/*").through(ErrorPageFilter.class);
+
+          // our configuration needs to be first-most when calculating order (some fudge room for edge-cases)
+          bind(RankingFunction.class).toInstance(new DefaultRankingFunction(0x70000000));
+        }
+      });
+
+      install(new SecurityWebModule(servletContext, true));
     }
   }
 

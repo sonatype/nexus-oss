@@ -11,15 +11,36 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.rest;
+package org.sonatype.nexus.webresources;
 
-import org.sonatype.plexus.rest.RetargetableRestlet;
+import java.util.Collection;
+
+import javax.annotation.Nullable;
+
+import org.sonatype.nexus.web.WebResource;
 
 /**
- * @deprecated Unused class, since NEXUS-6045 this does not function anymore as before. Will be dropped in next release.
+ * Provides access to {@link WebResource} instances.
+ *
+ * @since 2.8
  */
-@Deprecated
-public interface NexusApplicationCustomizer
+public interface WebResourceService
 {
-  void customize(NexusApplication nexusApplication, RetargetableRestlet root);
+  /**
+   * Returns all discovered web-resource paths.
+   */
+  Collection<String> getPaths();
+
+  /**
+   * Returns all discovered web-resources.
+   */
+  Collection<WebResource> getResources();
+
+  /**
+   * Get a web-resource by path.
+   *
+   * @return Web-resource for path or null if not bound.
+   */
+  @Nullable
+  WebResource getResource(String path);
 }

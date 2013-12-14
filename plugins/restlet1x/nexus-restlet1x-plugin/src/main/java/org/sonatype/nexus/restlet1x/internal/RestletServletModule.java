@@ -11,35 +11,30 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.web;
+package org.sonatype.nexus.restlet1x.internal;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
+import org.sonatype.nexus.web.MdcUserContextFilter;
+import org.sonatype.nexus.web.NexusGuiceFilter;
 import org.sonatype.security.web.guice.SecurityWebFilter;
 
 import com.google.inject.servlet.ServletModule;
-import org.eclipse.sisu.inject.DefaultRankingFunction;
-import org.eclipse.sisu.inject.RankingFunction;
 
 /**
  * Guice module for binding nexus servlets.
  *
  * @author adreghiciu
  */
-@Named
-@Singleton
-public class NexusServletModule
+class RestletServletModule
     extends ServletModule
 {
   @Override
   protected void configureServlets() {
     requestStaticInjection(NexusGuiceFilter.class);
 
-    serve("/service/local/*").with(NexusRestletServlet.class, nexusRestletServletInitParams());
+    serve("/service/local/*").with(RestletServlet.class, nexusRestletServletInitParams());
 
     filter("/service/local/*").through(SecurityWebFilter.class);
     filter("/service/local/*").through(MdcUserContextFilter.class);

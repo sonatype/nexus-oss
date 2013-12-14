@@ -15,12 +15,12 @@
   <title>Description of request processing of $req.requestPath</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-  <link rel="icon" type="image/png" href="${nexusRoot}favicon.png">
+  <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
   <!--[if IE]>
-  <link rel="SHORTCUT ICON" href="${nexusRoot}favicon.ico"/>
+  <link rel="SHORTCUT ICON" href="$nexusRoot/favicon.ico"/>
   <![endif]-->
 
-  <link rel="stylesheet" href="${nexusRoot}static/css/Sonatype-content.css?${nexusVersion}"
+  <link rel="stylesheet" href="$nexusRoot/static/css/Sonatype-content.css?${nexusVersion}"
         type="text/css" media="screen"
         title="no title" charset="utf-8">
 
