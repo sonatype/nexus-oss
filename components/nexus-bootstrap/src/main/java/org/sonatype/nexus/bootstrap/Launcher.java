@@ -58,8 +58,6 @@ public class Launcher
                   final String[] args)
       throws Exception
   {
-    MDC.put("userId", "<system>");
-
     // install JUL bridge
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();
@@ -173,6 +171,7 @@ public class Launcher
   }
 
   public static void main(final String[] args) throws Exception {
+    MDC.put("userId", "<system>");
     new Launcher(null, null, args).start();
   }
 }
