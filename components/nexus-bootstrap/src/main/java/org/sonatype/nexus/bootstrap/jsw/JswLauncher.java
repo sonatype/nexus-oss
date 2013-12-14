@@ -19,6 +19,7 @@ import org.sonatype.nexus.bootstrap.ShutdownHelper;
 import org.slf4j.MDC;
 import org.tanukisoftware.wrapper.WrapperManager;
 
+import static org.sonatype.nexus.bootstrap.Launcher.SYSTEM_USERID;
 import static org.tanukisoftware.wrapper.WrapperManager.WRAPPER_CTRL_LOGOFF_EVENT;
 
 /**
@@ -70,7 +71,7 @@ public class JswLauncher
   }
 
   public static void main(final String[] args) throws Exception {
-    MDC.put("userId", "<system>");
+    MDC.put("userId", SYSTEM_USERID);
     ShutdownHelper.setDelegate(new JswShutdownDelegate());
     WrapperManager.start(new JswLauncher(), args);
   }

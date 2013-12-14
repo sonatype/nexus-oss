@@ -43,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class FakeAlmightySubject
     implements Subject
 {
-  public static final String TASK_USERID = "Task-User";
+  public static final String TASK_USERID = "*TASK";
 
   public static final Subject TASK_SUBJECT = forUserId(TASK_USERID);
 

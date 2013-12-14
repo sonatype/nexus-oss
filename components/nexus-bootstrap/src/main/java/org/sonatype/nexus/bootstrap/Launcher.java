@@ -47,6 +47,8 @@ public class Launcher
   // FIXME: Move this to CommandMonitorThread
   public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
 
+  public static final String SYSTEM_USERID = "*SYSTEM";
+
   private static final String FIVE_SECONDS = "5000";
 
   private static final String ONE_SECOND = "1000";
@@ -171,7 +173,7 @@ public class Launcher
   }
 
   public static void main(final String[] args) throws Exception {
-    MDC.put("userId", "<system>");
+    MDC.put("userId", SYSTEM_USERID);
     new Launcher(null, null, args).start();
   }
 }
