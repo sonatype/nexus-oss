@@ -28,6 +28,7 @@ import org.sonatype.nexus.web.ErrorStatusException;
 import org.sonatype.nexus.web.WebResource;
 import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.nexus.webresources.WebResourceService;
+import org.sonatype.sisu.goodies.common.Time;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,12 +53,17 @@ public class WebResourceServlet
 
   private final WebUtils webUtils;
 
+  private final long maxAgeSeconds;
+
   @Inject
   public WebResourceServlet(final WebResourceService webResources,
-                            final WebUtils webUtils)
+                            final WebUtils webUtils,
+                            final @Named("${nexus.webresources.maxAge:-30days}") Time maxAge)
   {
     this.webResources = checkNotNull(webResources);
     this.webUtils = checkNotNull(webUtils);
+    this.maxAgeSeconds = checkNotNull(maxAge.toSeconds());
+    log.info("Max-age: {} ({} seconds)", maxAge, maxAgeSeconds);
   }
 
   @Override
@@ -72,12 +78,11 @@ public class WebResourceServlet
     }
 
     WebResource resource = webResources.getResource(path);
-    if (resource != null) {
-      serveResource(resource, request, response);
-    }
-    else {
+    if (resource == null) {
       throw new ErrorStatusException(SC_NOT_FOUND, "Not Found", "Resource not found");
     }
+
+    serveResource(resource, request, response);
   }
 
   private void serveResource(final WebResource resource,
@@ -92,18 +97,16 @@ public class WebResourceServlet
     response.setDateHeader("Last-Modified", resource.getLastModified());
     response.setHeader("Content-Length", String.valueOf(resource.getSize()));
 
-    // cache-control
+    // set max-age if cacheable
     if (resource.isCacheable()) {
-      // default cache for 30 days
-      response.setHeader("Cache-Control", "max-age=2592000");
+      response.setHeader("Cache-Control", "max-age=" + maxAgeSeconds);
     }
     else {
-      // do not cache
       webUtils.addNoCacheResponseHeaders(response);
     }
 
     // honor if-modified-since GETs
-    final long ifModifiedSince = request.getDateHeader("if-modified-since");
+    long ifModifiedSince = request.getDateHeader("if-modified-since");
     // handle conditional GETs
     if (ifModifiedSince > -1 && resource.getLastModified() <= ifModifiedSince) {
       // this is a conditional GET using time-stamp, and resource is not modified
@@ -114,7 +117,7 @@ public class WebResourceServlet
       response.setHeader("X-Content-Type-Options", "nosniff");
       // send the content only if needed (this method will be called for HEAD requests too)
       if ("GET".equalsIgnoreCase(request.getMethod())) {
-        try (final InputStream in = resource.getInputStream()) {
+        try (InputStream in = resource.getInputStream()) {
           webUtils.sendContent(in, response);
         }
       }
