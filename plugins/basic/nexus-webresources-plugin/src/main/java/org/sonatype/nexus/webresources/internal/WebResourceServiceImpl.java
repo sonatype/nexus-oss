@@ -23,6 +23,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.ServletContext;
 
@@ -55,7 +56,7 @@ public class WebResourceServiceImpl
 
   private final List<WebResource> resources;
 
-  private final ServletContext servletContext;
+  private final Provider<ServletContext> servletContextProvider;
 
   private final MimeSupport mimeSupport;
 
@@ -64,12 +65,12 @@ public class WebResourceServiceImpl
   @Inject
   public WebResourceServiceImpl(final List<WebResourceBundle> bundles,
                                 final List<WebResource> resources,
-                                final ServletContext servletContext,
+                                final Provider<ServletContext> servletContextProvider,
                                 final MimeSupport mimeSupport)
   {
     this.bundles = checkNotNull(bundles);
     this.resources = checkNotNull(resources);
-    this.servletContext = checkNotNull(servletContext);
+    this.servletContextProvider = checkNotNull(servletContextProvider);
     this.mimeSupport = checkNotNull(mimeSupport);
     this.resourcePaths = Maps.newHashMap();
 
@@ -128,26 +129,33 @@ public class WebResourceServiceImpl
 
   @Override
   public WebResource getResource(final String path) {
+    log.trace("Looking up resource: {}", path);
+
     WebResource resource = null;
 
     // 1) first "dev" resources if enabled (to override everything else)
     File file = DevModeResources.getFileIfOnFileSystem(path);
     if (file != null) {
       resource = new FileWebResource(file, path, mimeSupport.guessMimeTypeFromPath(file.getName()), false);
+      log.trace("Found dev-mode resource: {}", resource);
     }
 
     // 2) second, look at "ordinary" resources, but only if devResource did not hit anything
     if (resource == null) {
       resource = resourcePaths.get(path);
+      if (resource != null) {
+        log.trace("Found bound resource: {}", resource);
+      }
     }
 
     // 3) third, look into WAR embedded resources
     if (resource == null) {
       URL url;
       try {
-        url = servletContext.getResource(path);
+        url = servletContextProvider.get().getResource(path);
         if (url != null) {
           resource = new UrlWebResource(url, path, mimeSupport.guessMimeTypeFromPath(path));
+          log.trace("Found servlet-context resource: {}", resource);
         }
       }
       catch (MalformedURLException e) {
