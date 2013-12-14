@@ -23,7 +23,7 @@ import org.sonatype.nexus.plugin.support.UrlWebResource;
 import org.sonatype.nexus.web.WebResource;
 import org.sonatype.nexus.web.WebResourceBundle;
 
-// FIXME: Sort out why, if at all, component is needed
+// FIXME: Sort out why, if at all, component is needed.  Apparently only used to "rename" some resources.
 
 @Named
 public class WebResourceBundleImpl
