@@ -36,7 +36,7 @@ public class UrlWebResource
 
   private final String path;
 
-  private final boolean shouldCache;
+  private final boolean cacheable;
 
   private final String contentType;
 
@@ -48,10 +48,10 @@ public class UrlWebResource
     this(url, path, contentType, true);
   }
 
-  public UrlWebResource(final URL url, final String path, final String contentType, final boolean shouldCache) {
+  public UrlWebResource(final URL url, final String path, final String contentType, final boolean cacheable) {
     this.url = checkNotNull(url);
     this.path = checkNotNull(path);
-    this.shouldCache = shouldCache;
+    this.cacheable = cacheable;
 
     // open connection to get details about the resource
     try {
@@ -103,8 +103,8 @@ public class UrlWebResource
   }
 
   @Override
-  public boolean shouldCache() {
-    return shouldCache;
+  public boolean isCacheable() {
+    return cacheable;
   }
 
   @Override
@@ -112,7 +112,7 @@ public class UrlWebResource
     return "UrlWebResource{" +
         "url=" + url +
         ", path='" + path + '\'' +
-        ", shouldCache=" + shouldCache +
+        ", isCacheable=" + cacheable +
         ", contentType='" + contentType + '\'' +
         '}';
   }

@@ -47,7 +47,7 @@ public class FileWebResource
   }
 
   @Override
-  public boolean shouldCache() {
+  public boolean isCacheable() {
     return cachable;
   }
 

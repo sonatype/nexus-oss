@@ -15,10 +15,8 @@ package org.sonatype.nexus.plugins;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.jar.JarEntry;
 
 import org.sonatype.nexus.web.WebResource;
 import org.sonatype.plugin.metadata.GAVCoordinate;
@@ -40,7 +38,7 @@ public final class PluginWebResource
 
   private final String publishedPath;
 
-  private final boolean shouldCache;
+  private final boolean cacheable;
 
   private final String contentType;
 
@@ -64,13 +62,13 @@ public final class PluginWebResource
                            final URL resourceURL,
                            final String publishedPath,
                            final String contentType,
-                           final boolean shouldCache)
+                           final boolean cacheable)
   {
     this.gav = gav;
     this.resourceURL = resourceURL;
     this.publishedPath = publishedPath;
     this.contentType = contentType;
-    this.shouldCache = shouldCache;
+    this.cacheable = cacheable;
     try {
       final URLConnection urlConnection = resourceURL.openConnection();
       try (final InputStream is = urlConnection.getInputStream()) {
@@ -104,8 +102,8 @@ public final class PluginWebResource
   }
 
   @Override
-  public boolean shouldCache() {
-    return shouldCache;
+  public boolean isCacheable() {
+    return cacheable;
   }
 
   public InputStream getInputStream()
