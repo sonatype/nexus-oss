@@ -16,7 +16,6 @@ package org.sonatype.nexus.webresources.internal;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -28,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.nexus.web.ErrorStatusException;
 import org.sonatype.nexus.web.WebResource;
 import org.sonatype.nexus.web.WebUtils;
-import org.sonatype.nexus.webresources.IndexPageRenderer;
 import org.sonatype.nexus.webresources.WebResourceService;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -49,18 +47,12 @@ public class WebResourceServlet
 
   private final WebUtils webUtils;
 
-  // FIXME: Remove this component, simplify to make this another web-resource
-
-  private final IndexPageRenderer indexPageRenderer;
-
   @Inject
   public WebResourceServlet(final WebResourceService webResources,
-                            final WebUtils webUtils,
-                            final @Nullable IndexPageRenderer indexPageRenderer)
+                            final WebUtils webUtils)
   {
     this.webResources = checkNotNull(webResources);
     this.webUtils = checkNotNull(webUtils);
-    this.indexPageRenderer = indexPageRenderer;
   }
 
   @Override
@@ -77,17 +69,16 @@ public class WebResourceServlet
   protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException
   {
-    final String path = request.getPathInfo();
+    String path = request.getPathInfo();
 
-    // FIXME: this should be generalized and make use of WebResource impl
-    if ("".equals(path) || "/".equals(path) || "/index.html".equals(path)) {
-      doGetIndex(request, response);
-      return;
+    // default-page handling
+    if ("".equals(path) || "/".equals(path)) {
+      path = "/index.html";
     }
 
     WebResource resource = webResources.getResource(path);
     if (resource != null) {
-      doGetResource(request, response, resource);
+      serveResource(request, response, resource);
     }
     else {
       throw new ErrorStatusException(SC_NOT_FOUND, "Not Found", "Resource not found");
@@ -95,25 +86,12 @@ public class WebResourceServlet
   }
 
   /**
-   * Delegates to {@link IndexPageRenderer} to render index page.
-   */
-  private void doGetIndex(final HttpServletRequest request, final HttpServletResponse response)
-      throws ServletException, IOException
-  {
-    if (indexPageRenderer != null) {
-      indexPageRenderer.render(request, response);
-    }
-    else {
-      throw new ErrorStatusException(SC_NOT_FOUND, "Not Found", "Index page not found");
-    }
-  }
-
-  /**
    * Handles a file response, all the conditional request cases, and eventually the content serving of the file item.
    */
-  private void doGetResource(final HttpServletRequest request,
+  private void serveResource(final HttpServletRequest request,
                              final HttpServletResponse response,
-                             final WebResource resource) throws IOException
+                             final WebResource resource)
+      throws IOException
   {
     response.setHeader("Content-Type", resource.getContentType());
     response.setDateHeader("Last-Modified", resource.getLastModified());
