@@ -29,6 +29,7 @@ import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
@@ -57,6 +58,8 @@ public class Launcher
                   final String[] args)
       throws Exception
   {
+    MDC.put("userId", "<system>");
+
     // install JUL bridge
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();
