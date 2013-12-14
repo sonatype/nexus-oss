@@ -61,16 +61,6 @@ public class WebResourceServlet
   }
 
   @Override
-  protected void service(final HttpServletRequest request, final HttpServletResponse response)
-      throws ServletException, IOException
-  {
-    webUtils.equipResponseWithStandardHeaders(response);
-    super.service(request, response);
-  }
-
-  // GET
-
-  @Override
   protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException
   {
@@ -90,9 +80,6 @@ public class WebResourceServlet
     }
   }
 
-  /**
-   * Handles a file response, all the conditional request cases, and eventually the content serving of the file item.
-   */
   private void serveResource(final WebResource resource,
                              final HttpServletRequest request,
                              final HttpServletResponse response)
@@ -100,6 +87,7 @@ public class WebResourceServlet
   {
     log.trace("Serving resource: {}", resource);
 
+    webUtils.equipResponseWithStandardHeaders(response);
     response.setHeader("Content-Type", resource.getContentType());
     response.setDateHeader("Last-Modified", resource.getLastModified());
     response.setHeader("Content-Length", String.valueOf(resource.getSize()));
