@@ -11,27 +11,46 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.rrb.ui;
+package org.sonatype.nexus.plugins.ui;
 
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+import org.sonatype.nexus.plugin.PluginIdentity;
+
+import org.eclipse.sisu.EagerSingleton;
+import org.jetbrains.annotations.NonNls;
 
 /**
- * @since 2.6
+ * Extsj-3 plugin.
+ *
+ * @since 2.8
  */
 @Named
-@Singleton
-public class RrbUiCustomizer
-    implements UiContributor
+@EagerSingleton
+public class Extjs3Plugin
+    extends PluginIdentity
 {
+  /**
+   * Prefix for ID-like things.
+   */
+  @NonNls
+  public static final String ID_PREFIX = "ui-extjs3";
 
-  public static final String ARTIFACT_ID = "nexus-rrb-plugin";
+  /**
+   * Expected groupId for plugin artifact.
+   */
+  @NonNls
+  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
 
-  @Override
-  public UiContribution contribute(final boolean debug) {
-    return new UiContributionBuilder(this, OSS_PLUGIN_GROUP, ARTIFACT_ID).build(debug);
+  /**
+   * Expected artifactId for plugin artifact.
+   */
+  @NonNls
+  public static final String ARTIFACT_ID = "nexus-" + ID_PREFIX + "-plugin";
+
+  @Inject
+  public Extjs3Plugin() throws Exception {
+    super(GROUP_ID, ARTIFACT_ID);
   }
 }

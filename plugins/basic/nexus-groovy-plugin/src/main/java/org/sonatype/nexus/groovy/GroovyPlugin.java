@@ -11,25 +11,46 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.security.ldap.realms.ui;
+package org.sonatype.nexus.groovy;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
-import org.sonatype.nexus.security.ldap.realms.LdapPlugin;
+import org.sonatype.nexus.plugin.PluginIdentity;
+
+import org.eclipse.sisu.EagerSingleton;
+import org.jetbrains.annotations.NonNls;
 
 /**
- * @since 2.6
+ * Groovy plugin.
+ *
+ * @since 2.8
  */
 @Named
-@Singleton
-public class LdapRealmUiContributor
-    extends UiContributorSupport
+@EagerSingleton
+public class GroovyPlugin
+    extends PluginIdentity
 {
+  /**
+   * Prefix for ID-like things.
+   */
+  @NonNls
+  public static final String ID_PREFIX = "groovy";
+
+  /**
+   * Expected groupId for plugin artifact.
+   */
+  @NonNls
+  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
+
+  /**
+   * Expected artifactId for plugin artifact.
+   */
+  @NonNls
+  public static final String ARTIFACT_ID = "nexus-" + ID_PREFIX + "-plugin";
+
   @Inject
-  public LdapRealmUiContributor(final LdapPlugin owner) {
-    super(owner);
+  public GroovyPlugin() throws Exception {
+    super(GROUP_ID, ARTIFACT_ID);
   }
 }

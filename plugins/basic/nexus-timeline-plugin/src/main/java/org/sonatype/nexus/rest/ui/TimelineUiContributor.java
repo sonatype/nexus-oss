@@ -13,11 +13,12 @@
 
 package org.sonatype.nexus.rest.ui;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
+import org.sonatype.nexus.timeline.TimelinePlugin;
 
 /**
  * UI contribution for the timeline plugin.
@@ -27,15 +28,10 @@ import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 @Named
 @Singleton
 public class TimelineUiContributor
-    implements UiContributor
+    extends UiContributorSupport
 {
-
-  public static final String ARTIFACT_ID = "nexus-timeline-plugin";
-
-  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
-
-  @Override
-  public UiContribution contribute(final boolean debug) {
-    return new UiContributionBuilder(this, GROUP_ID, ARTIFACT_ID).build(debug);
+  @Inject
+  public TimelineUiContributor(final TimelinePlugin owner) {
+    super(owner);
   }
 }
