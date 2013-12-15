@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
 /**
  *
  */
-public class DefaultLvoPluginTest
+public class DefaultLvoServiceTest
     extends TestSupport
 {
   @Mock
@@ -51,12 +51,12 @@ public class DefaultLvoPluginTest
 
   private final Map<String, DiscoveryStrategy> strategies = Maps.newHashMap();
 
-  private DefaultLvoPlugin underTest;
+  private DefaultLvoService underTest;
 
   @Before
   public void setUp() {
     when(cfg.isEnabled()).thenReturn(true);
-    underTest = new DefaultLvoPlugin(cfg, strategies);
+    underTest = new DefaultLvoService(cfg, strategies);
   }
 
   @Test
