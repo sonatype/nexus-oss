@@ -41,9 +41,6 @@ public class ContentModule
 
   @Override
   protected void configure() {
-    // FIXME: Not sure why this is needed, but it appears to make things work (most of the time)
-    bind(SecurityWebFilter.class);
-
     bind(filterKey("contentAuthcBasic")).to(ContentAuthenticationFilter.class).in(Singleton.class);
 
     bind(filterKey("contentTperms")).toProvider(ContentTargetMappingFilterProvider.class);

@@ -17,6 +17,8 @@ import javax.servlet.ServletContext;
 
 import org.sonatype.nexus.web.BaseUrlHolderFilter;
 import org.sonatype.nexus.web.ErrorPageFilter;
+import org.sonatype.nexus.web.TemplateRenderer;
+import org.sonatype.security.web.guice.SecurityWebFilter;
 import org.sonatype.security.web.guice.SecurityWebModule;
 
 import com.google.inject.AbstractModule;
@@ -93,6 +95,11 @@ public class NexusModules
     @Override
     protected void configure() {
       install(new CommonModule());
+
+      // handle some edge-cases for commonly used servlet-based components which need a bit more configuration
+      // so that sisu/guice can find the correct bindings inside of plugins
+      bind(SecurityWebFilter.class);
+      requireBinding(TemplateRenderer.class);
     }
   }
 }
