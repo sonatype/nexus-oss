@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
-import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundReason;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -156,6 +155,10 @@ public class VelocityContentRenderer
     }
   }
 
+  /**
+   * This class is public only for Velocity access only, as it's used in "describe" page template to render
+   * "reasoning", see methods above {@link #buildReasoning(Throwable)} and {@link #buildReasoning(String, Throwable)}.
+   */
   public static class Reasoning
   {
     private final String repositoryId;

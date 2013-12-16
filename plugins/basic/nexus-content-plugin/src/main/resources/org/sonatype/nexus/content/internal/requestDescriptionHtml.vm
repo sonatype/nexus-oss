@@ -138,7 +138,6 @@
 
 #if($reasoning)
   <h2>Exception reasoning</h2>
-  <h3>Message</h3>
   <p>#renderReasoning($reasoning)</p>
 #end
 
