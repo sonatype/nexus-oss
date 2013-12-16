@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
+import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundReason;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -127,32 +128,24 @@ public class VelocityContentRenderer
   // ==
 
   private Reasoning buildReasoning(final Throwable ex) {
-    if (ex instanceof ItemNotFoundException &&
-        ((ItemNotFoundException) ex).getReason() instanceof ItemNotFoundInRepositoryReason) {
-      final ItemNotFoundInRepositoryReason inf = (ItemNotFoundInRepositoryReason) ((ItemNotFoundException) ex)
-          .getReason();
-      return buildReasoning(inf.getRepository().getId(), ex);
+    if (ex instanceof ItemNotFoundException) {
+      final ItemNotFoundReason reason = ((ItemNotFoundException) ex).getReason();
+      if (reason instanceof ItemNotFoundInRepositoryReason) {
+        return buildReasoning(((ItemNotFoundInRepositoryReason) reason).getRepository().getId(), ex);
+      }
     }
-    else {
-      return null;
-    }
+    return null;
   }
 
   private Reasoning buildReasoning(final String repositoryId, final Throwable ex) {
-    if (ex instanceof ItemNotFoundException) {
-      final ItemNotFoundException infex = (ItemNotFoundException) ex;
-      final Reasoning result = new Reasoning(repositoryId, infex.getMessage());
-      if (infex instanceof GroupItemNotFoundException) {
-        final GroupItemNotFoundException ginfex = (GroupItemNotFoundException) infex;
-        for (Entry<Repository, Throwable> memberReason : ginfex.getMemberReasons().entrySet()) {
-          result.getMembers().add(buildReasoning(memberReason.getKey().getId(), memberReason.getValue()));
-        }
+    final Reasoning result = new Reasoning(repositoryId, ex.getMessage());
+    if (ex instanceof GroupItemNotFoundException) {
+      final GroupItemNotFoundException ginfex = (GroupItemNotFoundException) ex;
+      for (Entry<Repository, Throwable> memberReason : ginfex.getMemberReasons().entrySet()) {
+        result.getMembers().add(buildReasoning(memberReason.getKey().getId(), memberReason.getValue()));
       }
-      return result;
     }
-    else {
-      return new Reasoning(repositoryId, ex.getMessage());
-    }
+    return result;
   }
 
   /**
