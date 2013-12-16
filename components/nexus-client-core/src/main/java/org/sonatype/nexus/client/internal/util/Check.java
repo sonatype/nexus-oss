@@ -30,7 +30,7 @@ public class Check
 
   @Deprecated
   public static boolean isBlank(final String t) {
-    return Strings.isNullOrEmpty(t);
+    return t == null || t.trim().isEmpty();
   }
 
   @Deprecated
