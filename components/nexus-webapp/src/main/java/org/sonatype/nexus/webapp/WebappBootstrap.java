@@ -29,7 +29,6 @@ import org.sonatype.nexus.guice.NexusModules.CoreModule;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.util.LockFile;
 import org.sonatype.nexus.util.file.DirSupport;
-import org.sonatype.nexus.web.NexusWebModule;
 
 import com.google.common.base.Throwables;
 import com.google.inject.Injector;
@@ -122,10 +121,7 @@ public class WebappBootstrap
           .setComponentVisibility(PlexusConstants.GLOBAL_VISIBILITY);
 
       // create the container
-      container = new DefaultPlexusContainer(plexusConfiguration,
-          new NexusWebModule(context),
-          new CoreModule()
-      );
+      container = new DefaultPlexusContainer(plexusConfiguration, new CoreModule(context));
       context.setAttribute(PlexusConstants.PLEXUS_KEY, container);
       log.debug("Container: {}", container);
 

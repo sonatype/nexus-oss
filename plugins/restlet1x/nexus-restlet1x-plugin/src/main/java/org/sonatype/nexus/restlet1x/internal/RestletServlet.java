@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.web;
+package org.sonatype.nexus.restlet1x.internal;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -34,33 +34,31 @@ import org.slf4j.MDC;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * An {@link PlexusServerServlet} that has an hardcoded name of "nexus" as required by plexus init param lookup. Guice
- * servlet extension does not allow servlet name setup while binding.
+ * An {@link PlexusServerServlet} that has an hardcoded name of "nexus" as required by plexus init param lookup.
+ *
+ * Guice servlet extension does not allow servlet name setup while binding.
  *
  * @author adreghiciu
  */
 @Singleton
-class NexusRestletServlet
+class RestletServlet
     extends PlexusServerServlet
 {
-
   private static final long serialVersionUID = -840934203229475592L;
 
-  private static final Logger log = LoggerFactory.getLogger(NexusRestletServlet.class);
+  private static final Logger log = LoggerFactory.getLogger(RestletServlet.class);
 
   /**
    * Original servlet context delegate.
    */
   private DelegatingServletConfig servletConfig;
 
-  NexusRestletServlet() {
+  RestletServlet() {
     servletConfig = new DelegatingServletConfig();
   }
 
   @Override
-  public void init()
-      throws ServletException
-  {
+  public void init() throws ServletException {
     final ClassLoader original = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
     try {
@@ -118,23 +116,21 @@ class NexusRestletServlet
   private class DelegatingServletConfig
       implements ServletConfig
   {
-
     public String getServletName() {
       return "nexus";
     }
 
     public ServletContext getServletContext() {
-      return NexusRestletServlet.super.getServletConfig().getServletContext();
+      return RestletServlet.super.getServletConfig().getServletContext();
     }
 
     public String getInitParameter(String name) {
-      return NexusRestletServlet.super.getServletConfig().getInitParameter(name);
+      return RestletServlet.super.getServletConfig().getInitParameter(name);
     }
 
     @SuppressWarnings("rawtypes")
     public Enumeration getInitParameterNames() {
-      return NexusRestletServlet.super.getServletConfig().getInitParameterNames();
+      return RestletServlet.super.getServletConfig().getInitParameterNames();
     }
   }
-
 }

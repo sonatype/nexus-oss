@@ -36,6 +36,8 @@ public class Restlet1xModule
 {
   @Override
   protected void configure() {
+    install(new RestletServletModule());
+
     // FIXME: Unsure why this is needed
     requireBinding(FilterChainResolver.class);
 

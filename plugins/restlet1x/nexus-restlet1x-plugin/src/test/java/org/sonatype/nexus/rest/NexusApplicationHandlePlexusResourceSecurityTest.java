@@ -41,9 +41,6 @@ public class NexusApplicationHandlePlexusResourceSecurityTest
         null,
         mockProtectedPathManager,
         null,
-        null,
-        null,
-        null,
         null
     );
   }

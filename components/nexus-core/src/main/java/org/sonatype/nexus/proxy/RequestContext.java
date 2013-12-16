@@ -13,11 +13,9 @@
 
 package org.sonatype.nexus.proxy;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -26,7 +24,6 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Context map, used in {@link ResourceStoreRequest}, but also in {@link StorageItem} and related events.
@@ -35,11 +32,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class RequestContext
 {
-  /**
-   * Context URL of the app root on the incoming connector.
-   */
-  public static final String CTX_REQUEST_APP_ROOT_URL = "request.appRootUrl";
-
   /**
    * Context URL of the original resource requested on the incoming connector.
    */
@@ -403,25 +395,6 @@ public class RequestContext
    */
   public void setRequestIsExternal(boolean external) {
     put(CTX_REQUEST_IS_EXTERNAL, external);
-  }
-
-  /**
-   * Returns the URL of the AppRoot of the incoming request.
-   */
-  public String getRequestAppRootUrl() {
-    return (String) get(CTX_REQUEST_APP_ROOT_URL);
-  }
-
-  /**
-   * Sets the URL of the AppRoot of the incoming request.
-   */
-  public void setRequestAppRootUrl(String url) {
-    if (!StringUtils.isBlank(url)) {
-      put(CTX_REQUEST_APP_ROOT_URL, url);
-    }
-    else {
-      remove(CTX_REQUEST_APP_ROOT_URL);
-    }
   }
 
   // ==

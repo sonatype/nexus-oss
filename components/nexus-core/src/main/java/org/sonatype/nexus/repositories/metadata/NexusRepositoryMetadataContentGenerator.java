@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.util.io.StreamSupport;
+import org.sonatype.nexus.web.BaseUrlHolder;
 
 @Named(NexusRepositoryMetadataContentGenerator.ID)
 @Singleton
@@ -52,13 +53,8 @@ public class NexusRepositoryMetadataContentGenerator
       StreamSupport.copy(is, bos, StreamSupport.BUFFER_SIZE);
       String body = new String(bos.toByteArray(), "UTF-8");
       StringContentLocator result = null;
-      if (item.getItemContext().getRequestAppRootUrl() != null) {
-        String appRootUrl = item.getItemContext().getRequestAppRootUrl();
-        // trim last slash NEXUS-1736
-        if (appRootUrl.endsWith("/")) {
-          appRootUrl = appRootUrl.substring(0, appRootUrl.length() - 1);
-        }
-        result = new StringContentLocator(body.replace("@rootUrl@", appRootUrl));
+      if (BaseUrlHolder.isSet()) {
+        result = new StringContentLocator(body.replace("@rootUrl@", BaseUrlHolder.get()));
       }
       else {
         result = new StringContentLocator(body.replace("@rootUrl@", ""));

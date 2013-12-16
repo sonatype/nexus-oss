@@ -242,10 +242,6 @@ public abstract class AbstractSecurityPlexusResource
     return roleResource;
   }
 
-  protected Reference getContextRoot(Request request) {
-    return this.referenceFactory.getContextRoot(request);
-  }
-
   protected Reference createChildReference(Request request, String childPath) {
     return this.referenceFactory.createChildReference(request, childPath);
   }
