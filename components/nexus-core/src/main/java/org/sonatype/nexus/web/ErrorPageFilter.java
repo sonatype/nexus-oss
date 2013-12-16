@@ -35,7 +35,7 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 /**
  * Servlet filter to add error page rendering.
  *
- * @since 2.8.0
+ * @since 2.8
  */
 @Named
 @Singleton
@@ -69,15 +69,15 @@ public class ErrorPageFilter
     try {
       chain.doFilter(req, response);
     }
-    catch (ErrorStatusServletException e) {
+    catch (ErrorStatusException e) {
       // send for direct rendering, everything is prepared
       templateRenderer.renderErrorPage(
           request,
           response,
           e.getResponseCode(),
           e.getReasonPhrase(),
-          e.getErrorDescription(),
-          e.getRootCause()
+          e.getMessage(),
+          e.getCause()
       );
     }
     catch (IOException e) {

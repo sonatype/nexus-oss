@@ -62,6 +62,7 @@ import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.rest.model.NotFoundReasoning;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.Constants;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.security.SecuritySystem;
@@ -353,7 +354,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
     }
 
     // put the incoming URLs
-    result.setRequestAppRootUrl(getContextRoot(request).toString());
     result.setRequestUrl(request.getOriginalRef().toString());
 
     return result;
@@ -541,17 +541,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
       HashMap<String, Object> dataModel = new HashMap<String, Object>();
 
       dataModel.put("listItems", sortContentListResource(((ContentListResourceResponse) payload).getData()));
-
       dataModel.put("request", req);
-
       dataModel.put("nexusVersion", applicationStatusSource.getSystemStatus().getVersion());
-
-      // getContentRoot(req) always returns Reference with "/" as last character
-      String nexusRoot = getContextRoot(req).toString();
-      if (nexusRoot.endsWith("/")) {
-        nexusRoot = nexusRoot.substring(0, nexusRoot.length() - 1);
-      }
-      dataModel.put("nexusRoot", nexusRoot);
+      dataModel.put("nexusRoot", BaseUrlHolder.get());
 
       final VelocityRepresentation representation =
           new VelocityRepresentation(context, "/templates/repositoryContentHtml.vm",

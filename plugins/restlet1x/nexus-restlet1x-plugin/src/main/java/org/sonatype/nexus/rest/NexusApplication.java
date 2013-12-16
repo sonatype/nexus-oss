@@ -13,15 +13,10 @@
 
 package org.sonatype.nexus.rest;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
@@ -40,10 +35,7 @@ import org.restlet.Router;
 import org.restlet.service.StatusService;
 
 /**
- * Nexus REST Application. This will ultimately replace the two applications we have now, and provide us plugin UI
- * extension capability.
- *
- * @author cstamas
+ * Legacy restlet application support.
  */
 @Named("nexus")
 @Singleton
@@ -54,31 +46,19 @@ public class NexusApplication
 
   private final ProtectedPathManager protectedPathManager;
 
-  private final ManagedPlexusResource licenseTemplateResource;
-
-  private final ManagedPlexusResource enterLicenseTemplateResource;
-
   private final ManagedPlexusResource statusPlexusResource;
-
-  private final List<NexusApplicationCustomizer> customizers;
 
   private final StatusService statusService;
 
   @Inject
   public NexusApplication(final EventBus eventBus,
                           final ProtectedPathManager protectedPathManager,
-                          final @Named("licenseTemplate") @Nullable ManagedPlexusResource licenseTemplateResource,
-                          final @Named("enterLicenseTemplate") @Nullable ManagedPlexusResource enterLicenseTemplateResource,
                           final @Named("StatusPlexusResource") ManagedPlexusResource statusPlexusResource,
-                          final List<NexusApplicationCustomizer> customizers,
                           final StatusService statusService)
   {
     this.eventBus = eventBus;
     this.protectedPathManager = protectedPathManager;
-    this.licenseTemplateResource = licenseTemplateResource;
-    this.enterLicenseTemplateResource = enterLicenseTemplateResource;
     this.statusPlexusResource = statusPlexusResource;
-    this.customizers = customizers;
     this.statusService = statusService;
   }
 
@@ -86,9 +66,6 @@ public class NexusApplication
   @VisibleForTesting
   public NexusApplication() {
     this(
-        null,
-        null,
-        null,
         null,
         null,
         null,
@@ -119,9 +96,6 @@ public class NexusApplication
     eventBus.register(this);
   }
 
-  /**
-   * Configuring xstream with our aliases.
-   */
   @Override
   public XStream doConfigureXstream(XStream xstream) {
     return org.sonatype.nexus.rest.model.XStreamConfigurator.configureXStream(xstream);
@@ -133,36 +107,14 @@ public class NexusApplication
   }
 
   @Override
-  protected void afterCreateRoot(RetargetableRestlet root) {
-    // customizers
-    for (NexusApplicationCustomizer customizer : customizers) {
-      customizer.customize(this, root);
-    }
-  }
-
-  /**
-   * "Decorating" the root with our resources.
-   *
-   * @TODO Move this to PlexusResources, except Status (see isStarted usage below!)
-   */
-  @Override
   protected void doCreateRoot(Router root, boolean isStarted) {
     if (!isStarted) {
       return;
     }
 
-    // set our StatusService
     setStatusService(statusService);
 
-    // SERVICE (two always connected, unrelated to isStarted)
-
     attach(getApplicationRouter(), false, statusPlexusResource);
-    if (licenseTemplateResource != null) {
-      attach(root, false, licenseTemplateResource);
-    }
-    if (enterLicenseTemplateResource != null) {
-      attach(root, false, enterLicenseTemplateResource);
-    }
   }
 
   private final AntPathMatcher shiroAntPathMatcher = new AntPathMatcher();
@@ -170,7 +122,6 @@ public class NexusApplication
   @Override
   protected void handlePlexusResourceSecurity(PlexusResource resource) {
     PathProtectionDescriptor descriptor = resource.getResourceProtection();
-
     if (descriptor == null) {
       return;
     }

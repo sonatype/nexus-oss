@@ -15,6 +15,8 @@ package org.sonatype.nexus.plugins.ui.contribution;
 
 import java.util.List;
 
+import org.sonatype.nexus.plugin.PluginIdentity;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -24,8 +26,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public interface UiContributor
 {
+  /**
+   * @deprecated Plugins should create {@link PluginIdentity} components to capture GAV details.
+   */
+  @Deprecated
   String OSS_PLUGIN_GROUP = "org.sonatype.nexus.plugins";
 
+  /**
+   * @deprecated Plugins should create {@link PluginIdentity} components to capture GAV details.
+   */
+  @Deprecated
   String PRO_PLUGIN_GROUP = "com.sonatype.nexus.plugins";
 
   /**

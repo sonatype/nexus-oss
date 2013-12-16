@@ -26,7 +26,7 @@ import org.apache.velocity.runtime.RuntimeConstants;
 /**
  * Nexus preconfigured ans shared Velocity provider.
  *
- * @since 2.8.0
+ * @since 2.8
  */
 @Named
 @Singleton

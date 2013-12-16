@@ -20,25 +20,27 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * Exception to be thrown by Servlets already prepared their error information.
  *
- * @since 2.8.0
+ * @since 2.8
  */
-public class ErrorStatusServletException
+public class ErrorStatusException
     extends ServletException
 {
   private final int responseCode;
 
   private final String reasonPhrase;
 
-  public ErrorStatusServletException(final int responseCode, final String reasonPhrase, final String errorMessage,
-                                     final Exception rootCause)
+  public ErrorStatusException(final int responseCode,
+                              final String reasonPhrase,
+                              final String errorMessage,
+                              final Exception cause)
   {
-    super(errorMessage, rootCause);
-    checkArgument(responseCode >= 400);
+    super(errorMessage, cause);
+    checkArgument(responseCode >= 400, "Not an error-status code: %s", responseCode);
     this.responseCode = responseCode;
     this.reasonPhrase = reasonPhrase;
   }
 
-  public ErrorStatusServletException(final int responseCode, final String reasonPhrase, final String errorMessage) {
+  public ErrorStatusException(final int responseCode, final String reasonPhrase, final String errorMessage) {
     this(responseCode, reasonPhrase, errorMessage, null);
   }
 
@@ -48,14 +50,5 @@ public class ErrorStatusServletException
 
   public String getReasonPhrase() {
     return reasonPhrase;
-  }
-
-  public String getErrorDescription() {
-    return getMessage();
-  }
-
-  @Override
-  public Exception getRootCause() {
-    return (Exception) super.getRootCause();
   }
 }

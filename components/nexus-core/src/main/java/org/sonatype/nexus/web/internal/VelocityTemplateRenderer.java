@@ -28,8 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.TemplateRenderer;
-import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
@@ -58,17 +58,13 @@ public class VelocityTemplateRenderer
 {
   private final Provider<VelocityEngine> velocityEngineProvider;
 
-  private final WebUtils webUtils;
-
   private final String applicationVersion;
 
   @Inject
   public VelocityTemplateRenderer(final Provider<VelocityEngine> velocityEngineProvider,
-                                  final WebUtils webUtils,
                                   final ApplicationStatusSource applicationStatusSource)
   {
     this.velocityEngineProvider = checkNotNull(velocityEngineProvider);
-    this.webUtils = checkNotNull(webUtils);
     this.applicationVersion = checkNotNull(applicationStatusSource).getSystemStatus().getVersion();
   }
 
@@ -78,7 +74,7 @@ public class VelocityTemplateRenderer
                               final int responseCode,
                               final String reasonPhrase,
                               final String errorDescription,
-                              final Exception exception)
+                              final Throwable exception)
       throws IOException
   {
     checkNotNull(request);
@@ -87,7 +83,7 @@ public class VelocityTemplateRenderer
     checkNotNull(errorDescription);
 
     final Map<String, Object> dataModel = Maps.newHashMap();
-    dataModel.put("nexusRoot", webUtils.getAppRootUrl(request));
+    dataModel.put("nexusRoot", BaseUrlHolder.get());
     dataModel.put("nexusVersion", applicationVersion);
     dataModel.put("statusCode", responseCode);
     dataModel.put("statusName", Strings.isNullOrEmpty(reasonPhrase) ? errorDescription : reasonPhrase);
