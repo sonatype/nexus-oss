@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.ui;
+package org.sonatype.nexus.plugins.ui.internal;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -20,19 +20,17 @@ import java.util.Properties;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * Exposes build number/version as filtered by build.
  */
 @Named
 @Singleton
-public class BuildNumberService
+class BuildNumberService
+  extends ComponentSupport
 {
   private static final String RESOURCE_NAME = "version.properties";
-
-  private static final Logger log = LoggerFactory.getLogger(BuildNumberService.class);
 
   private final String buildNumber;
 
@@ -49,7 +47,6 @@ public class BuildNumberService
     }
 
     Properties props = new Properties();
-
     try (InputStream input = url.openStream()) {
       props.load(input);
       log.debug("Loaded properties: {}", props);
@@ -64,5 +61,4 @@ public class BuildNumberService
   public String getBuildNumber() {
     return buildNumber;
   }
-
 }

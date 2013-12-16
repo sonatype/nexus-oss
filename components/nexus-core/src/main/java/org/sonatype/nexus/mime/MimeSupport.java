@@ -56,7 +56,7 @@ public interface MimeSupport
    *
    * @param path to guess for.
    * @return the list of applicable mime types.
-   * @since 2.8.0
+   * @since 2.8
    */
   List<String> guessMimeTypesListFromPath(final String path);
 
@@ -82,7 +82,7 @@ public interface MimeSupport
    * @param content to perform MIME magic matching against.
    * @return all of the applicable MIME types in relevance order (best fit first).
    * @throws IOException in case of IO problems.
-   * @since 2.8.0
+   * @since 2.8
    */
   List<String> detectMimeTypesListFromContent(ContentLocator content)
       throws IOException;
@@ -102,7 +102,7 @@ public interface MimeSupport
    * @param fileItem to perform MIME magic matching against.
    * @return all of the applicable MIME types in relevance order (best fit first).
    * @throws IOException in case of IO problems.
-   * @since 2.8.0
+   * @since 2.8
    */
   List<String> detectMimeTypesListFromContent(StorageFileItem fileItem)
       throws IOException;

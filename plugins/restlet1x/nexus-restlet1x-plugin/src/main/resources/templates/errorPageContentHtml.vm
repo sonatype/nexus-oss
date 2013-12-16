@@ -15,19 +15,19 @@
     <title>$statusCode - $statusName</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-    <link rel="icon" type="image/png" href="$nexusRoot/favicon.png"><!-- Major Browsers -->
-    <!--[if IE]><link rel="SHORTCUT ICON" href="$nexusRoot/favicon.ico"/><![endif]--><!-- Internet Explorer-->
+    ##
+    ## FIXME: This is duplicated error-page handling, which will go away once restlet is removed.
+    ##
+
+    <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
+    <!--[if IE]>
+    <link rel="SHORTCUT ICON" href="$nexusRoot/favicon.ico"/>
+    <![endif]-->
 
     <link rel="stylesheet" href="$nexusRoot/static/css/Sonatype-content.css?$nexusVersion" type="text/css" media="screen" title="no title" charset="utf-8">
   </head>
   <body>
     <h1>$statusCode - $statusName</h1>
     <p>$errorDescription</p>
-    #*
-    #if ($errorStackTrace)
-    <p>
-    <pre>$errorStackTrace</pre>
-    #end
-    *#
   </body>
 </html>

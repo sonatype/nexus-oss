@@ -13,6 +13,8 @@
 
 package org.sonatype.plexus.rest;
 
+import org.sonatype.nexus.web.BaseUrlHolder;
+
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 
@@ -21,6 +23,11 @@ public interface ReferenceFactory
 
   Reference createChildReference(Request request, String childPath);
 
+  /**
+   * @deprecated Use {@link BaseUrlHolder#get()} instead to reference to base URL.
+   *             Trying to normalize this so we can cleanup how baseUrl handling is done generally.
+   */
+  @Deprecated
   Reference getContextRoot(Request request);
 
   Reference createReference(Reference base, String relPart);

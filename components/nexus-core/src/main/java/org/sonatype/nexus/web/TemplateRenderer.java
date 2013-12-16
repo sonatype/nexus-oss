@@ -43,7 +43,7 @@ public interface TemplateRenderer
                        int responseCode,
                        String reasonPhrase,
                        String errorDescription,
-                       Exception exception)
+                       Throwable exception)
       throws IOException;
 
   interface TemplateLocator

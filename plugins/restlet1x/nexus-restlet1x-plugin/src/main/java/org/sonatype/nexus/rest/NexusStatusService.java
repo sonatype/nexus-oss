@@ -21,7 +21,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.plexus.rest.ReferenceFactory;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -34,6 +34,10 @@ import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.service.StatusService;
 
+//
+// FIXME: This is duplicated error-page handling, which will go away once restlet is removed.
+//
+
 /**
  * Nexus specific status service that simply assembles an "error page" out of a Velocity template but watching to HTML
  * escape any content that might come from external (ie. query param).
@@ -45,15 +49,11 @@ import org.restlet.service.StatusService;
 public class NexusStatusService
     extends StatusService
 {
-  private final ReferenceFactory referenceFactory;
-
   private final ApplicationStatusSource applicationStatusSource;
 
   @Inject
-  public NexusStatusService(final ReferenceFactory referenceFactory,
-                            final ApplicationStatusSource applicationStatusSource)
+  public NexusStatusService(final ApplicationStatusSource applicationStatusSource)
   {
-    this.referenceFactory = referenceFactory;
     this.applicationStatusSource = applicationStatusSource;
   }
 
@@ -63,12 +63,7 @@ public class NexusStatusService
     final SystemStatus systemStatus = applicationStatusSource.getSystemStatus();
     dataModel.put("request", request);
     dataModel.put("nexusVersion", systemStatus.getVersion());
-    // getContentRoot(req) always returns Reference with "/" as last character
-    String nexusRoot = referenceFactory.getContextRoot(request).toString();
-    if (nexusRoot.endsWith("/")) {
-      nexusRoot = nexusRoot.substring(0, nexusRoot.length() - 1);
-    }
-    dataModel.put("nexusRoot", nexusRoot);
+    dataModel.put("nexusRoot", BaseUrlHolder.get());
 
     dataModel.put("statusCode", status.getCode());
     dataModel.put("statusName", status.getName());

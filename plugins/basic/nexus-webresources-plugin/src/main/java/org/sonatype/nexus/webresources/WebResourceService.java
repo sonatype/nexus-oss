@@ -13,17 +13,34 @@
 
 package org.sonatype.nexus.webresources;
 
-import java.io.IOException;
+import java.util.Collection;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.annotation.Nullable;
+
+import org.sonatype.nexus.web.WebResource;
 
 /**
- * Component rendering the "/index.html" entry page.
+ * Provides access to {@link WebResource} instances.
  *
- * @since 2.8.0
+ * @since 2.8
  */
-public interface IndexPageRenderer
+public interface WebResourceService
 {
-  void render(HttpServletRequest request, HttpServletResponse response, String appRootUrl) throws IOException;
+  /**
+   * Returns all discovered web-resource paths.
+   */
+  Collection<String> getPaths();
+
+  /**
+   * Returns all discovered web-resources.
+   */
+  Collection<WebResource> getResources();
+
+  /**
+   * Get a web-resource by path.
+   *
+   * @return Web-resource for path or null if not bound.
+   */
+  @Nullable
+  WebResource getResource(String path);
 }

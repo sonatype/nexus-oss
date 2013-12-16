@@ -10,16 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+package org.sonatype.nexus.webresources.internal;
 
-package org.sonatype.nexus.rest;
+import javax.inject.Named;
 
-import org.sonatype.plexus.rest.RetargetableRestlet;
+import org.sonatype.sisu.goodies.common.Time;
+
+import com.google.inject.spi.TypeConverter;
 
 /**
- * @deprecated Unused class, since NEXUS-6045 this does not function anymore as before. Will be dropped in next release.
+ * Guice {@link TypeConverter} for {@link Time} instances.
+ *
+ * @since 2.8
  */
-@Deprecated
-public interface NexusApplicationCustomizer
+@Named
+public class TimeTypeConverter
+    extends org.sonatype.sisu.goodies.inject.converter.TimeTypeConverter
 {
-  void customize(NexusApplication nexusApplication, RetargetableRestlet root);
+  // HACK: Work-around for type-converters not getting picked up by the container
 }
