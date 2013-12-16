@@ -53,6 +53,7 @@ import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 import org.sonatype.nexus.web.Constants;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
@@ -592,7 +593,8 @@ public class HttpClientRemoteStorage
   {
     final RemoteStorageContext ctx = getRemoteStorageContext(repository);
 
-    final StringBuilder queryStringBld = new StringBuilder(queryStringBuilder.getQueryString(ctx, repository));
+    final String qsbQuery = queryStringBuilder.getQueryString(ctx, repository);
+    final StringBuilder queryStringBld = Strings.isNullOrEmpty(qsbQuery) ? new StringBuilder() : new StringBuilder(qsbQuery);
     if (request.isRequestAsExpired()) {
       if (StringUtils.isNotBlank(queryStringBld.toString())) {
         queryStringBld.append('&');
