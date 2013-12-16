@@ -81,9 +81,6 @@ public class MetricsModule
     final JsonFactory jsonFactory = new JsonFactory(new ObjectMapper());
     bind(JsonFactory.class).toInstance(jsonFactory);
 
-    // FIXME: Sort out if we need to do this.  Its noted in SiestaModule, may be needed here too :-(
-    //bind(SecurityWebFilter.class);
-
     install(new ServletModule()
     {
       @Override
