@@ -27,6 +27,7 @@ import org.eclipse.sisu.inject.DefaultRankingFunction;
 import org.eclipse.sisu.inject.RankingFunction;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.inject.name.Names.named;
 
 /**
  * Nexus guice modules.
@@ -62,6 +63,9 @@ public class NexusModules
 
     @Override
     protected void configure() {
+      // HACK: Re-bind servlet-context instance with a name to avoid backwards-compat warnings from guice-servlet
+      bind(ServletContext.class).annotatedWith(named("nexus")).toInstance(servletContext);
+
       install(new CommonModule());
 
       install(new ServletModule()

@@ -65,7 +65,7 @@ public class WebResourceServiceImpl
   @Inject
   public WebResourceServiceImpl(final List<WebResourceBundle> bundles,
                                 final List<WebResource> resources,
-                                final Provider<ServletContext> servletContextProvider,
+                                final @Named("nexus") Provider<ServletContext> servletContextProvider,
                                 final MimeSupport mimeSupport)
   {
     this.bundles = checkNotNull(bundles);
