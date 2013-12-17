@@ -59,7 +59,7 @@ public class MetricsModule
 
   @Override
   protected void configure() {
-    // NOTE: AdminServletModule (metrics-guice intgegration) generates invalid links, so wire up servlets ourselves
+    // NOTE: AdminServletModule (metrics-guice integration) generates invalid links, so wire up servlets ourselves
 
     final Clock clock = Clock.defaultClock();
     bind(Clock.class).toInstance(clock);
