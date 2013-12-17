@@ -52,10 +52,10 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.Constants;
-import org.sonatype.nexus.web.ErrorPageFilter;
 import org.sonatype.nexus.web.ErrorStatusException;
 import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.nexus.web.WebUtils;
+import org.sonatype.nexus.web.internal.ErrorPageFilter;
 import org.sonatype.sisu.goodies.common.Throwables2;
 
 import com.google.common.base.Stopwatch;

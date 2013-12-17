@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.web;
+package org.sonatype.nexus.web.internal;
 
 import java.io.IOException;
 
@@ -27,6 +27,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
+import org.sonatype.nexus.web.BaseUrlHolder;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;

@@ -14,7 +14,7 @@
 package org.sonatype.nexus.webapp;
 
 import org.sonatype.nexus.guice.FilterChainModule;
-import org.sonatype.security.web.guice.SecurityWebFilter;
+import org.sonatype.nexus.web.internal.SecurityFilter;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -103,7 +103,7 @@ public class MetricsModule
         filter("/*").through(new DefaultWebappMetricsFilter());
 
         // configure security
-        filter(MOUNT_POINT + "/*").through(SecurityWebFilter.class);
+        filter(MOUNT_POINT + "/*").through(SecurityFilter.class);
       }
     });
 

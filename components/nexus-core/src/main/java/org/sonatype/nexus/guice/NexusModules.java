@@ -15,9 +15,9 @@ package org.sonatype.nexus.guice;
 
 import javax.servlet.ServletContext;
 
-import org.sonatype.nexus.web.BaseUrlHolderFilter;
-import org.sonatype.nexus.web.ErrorPageFilter;
 import org.sonatype.nexus.web.TemplateRenderer;
+import org.sonatype.nexus.web.internal.BaseUrlHolderFilter;
+import org.sonatype.nexus.web.internal.ErrorPageFilter;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.web.guice.SecurityWebModule;
 
