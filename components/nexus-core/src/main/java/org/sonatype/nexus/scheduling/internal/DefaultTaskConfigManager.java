@@ -57,8 +57,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The default implementation of the Task Configuration manager. Will handle writing to and loading from the tasks
- * within nexus.xml file.
+ * The default implementation of the Task Configuration manager.
  */
 @Singleton
 @Named
