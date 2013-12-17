@@ -11,25 +11,25 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.security.ldap.realms.ui;
+package org.sonatype.nexus.plugins.rrb.ui;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.plugins.rrb.RrbPlugin;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
-import org.sonatype.nexus.security.ldap.realms.LdapPlugin;
 
 /**
  * @since 2.6
  */
 @Named
 @Singleton
-public class LdapRealmUiContributor
+public class RrbUiContributor
     extends UiContributorSupport
 {
   @Inject
-  public LdapRealmUiContributor(final LdapPlugin owner) {
+  public RrbUiContributor(final RrbPlugin owner) {
     super(owner);
   }
 }

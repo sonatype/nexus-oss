@@ -13,38 +13,49 @@
 
 package org.sonatype.nexus.plugins.lvo;
 
-import java.io.IOException;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.plugin.PluginIdentity;
+
+import org.eclipse.sisu.EagerSingleton;
+import org.jetbrains.annotations.NonNls;
 
 /**
- * The LVO Plugin interface.
+ * LVO plugin.
  *
- * @author cstamas
+ * @since 2.7
  */
-public interface LvoPlugin
+@Named
+@EagerSingleton
+public class LvoPlugin
+    extends PluginIdentity
 {
   /**
-   * Returns the latest V (V from GAV) that fits the properties specified by key.
-   *
-   * @return the V, null if key exists but we are unable to calculate LV.
+   * Prefix for ID-like things.
    */
-  DiscoveryResponse getLatestVersionForKey(String key)
-      throws NoSuchKeyException,
-             NoSuchStrategyException,
-             NoSuchRepositoryException,
-             IOException;
+  @NonNls
+  public static final String ID_PREFIX = "lvo";
 
   /**
-   * Queries for the latest V (V from GAV) that fits the properties specified by key. If the passed in v is equal of
-   * the latest v, returns null.
-   *
-   * @param v current version associated with key.
-   * @return the V if newer found, null if key exists but we are unable to calculate LV or no newer version exists.
+   * Expected groupId for plugin artifact.
    */
-  DiscoveryResponse queryLatestVersionForKey(String key, String v)
-      throws NoSuchKeyException,
-             NoSuchStrategyException,
-             NoSuchRepositoryException,
-             IOException;
+  @NonNls
+  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
+
+  /**
+   * Expected artifactId for plugin artifact.
+   */
+  @NonNls
+  public static final String ARTIFACT_ID = "nexus-" + ID_PREFIX + "-plugin";
+
+  /**
+   * Prefix for REST resources
+   */
+  public static final String REST_PREFIX = "/" + ID_PREFIX;
+
+  @Inject
+  public LvoPlugin() throws Exception {
+    super(GROUP_ID, ARTIFACT_ID);
+  }
 }

@@ -35,9 +35,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named
 @Singleton
-public class DefaultLvoPlugin
+public class DefaultLvoService
     extends ComponentSupport
-    implements LvoPlugin
+    implements LvoService
 {
   private final LvoPluginConfiguration lvoPluginConfiguration;
 
@@ -46,8 +46,8 @@ public class DefaultLvoPlugin
   private final VersionScheme versionScheme = new GenericVersionScheme();
 
   @Inject
-  public DefaultLvoPlugin(final LvoPluginConfiguration lvoPluginConfiguration,
-                          final Map<String, DiscoveryStrategy> strategies)
+  public DefaultLvoService(final LvoPluginConfiguration lvoPluginConfiguration,
+                           final Map<String, DiscoveryStrategy> strategies)
   {
     this.lvoPluginConfiguration = checkNotNull(lvoPluginConfiguration);
     this.strategies = checkNotNull(strategies);

@@ -20,7 +20,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
-import org.sonatype.nexus.plugins.lvo.LvoPlugin;
+import org.sonatype.nexus.plugins.lvo.LvoService;
 import org.sonatype.nexus.plugins.lvo.NoSuchKeyException;
 import org.sonatype.nexus.plugins.lvo.NoSuchStrategyException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -42,11 +42,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class LvoPlexusResource
     extends AbstractPlexusResource
 {
-  private final LvoPlugin lvoPlugin;
+  private final LvoService lvoService;
 
   @Inject
-  public LvoPlexusResource(final LvoPlugin lvoPlugin) {
-    this.lvoPlugin = checkNotNull(lvoPlugin);
+  public LvoPlexusResource(final LvoService lvoService) {
+    this.lvoService = checkNotNull(lvoService);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class LvoPlexusResource
     String key = (String) request.getAttributes().get("key");
 
     try {
-      DiscoveryResponse dr = lvoPlugin.getLatestVersionForKey(key);
+      DiscoveryResponse dr = lvoService.getLatestVersionForKey(key);
 
       if (dr.isSuccessful()) {
         return dr;
