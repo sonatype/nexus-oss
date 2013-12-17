@@ -149,12 +149,11 @@ public class ContentServlet
 
     // honor the localOnly, remoteOnly and asExpired (but remoteOnly and asExpired only for non-anon users)
     // as those two actually makes Nexus perform a remote request
-    final Map<String, String[]> parameterMap = request.getParameterMap();
     result.setRequestLocalOnly(isLocal(request, resourceStorePath));
     if (!Objects.equals(nexusConfiguration.getAnonymousUsername(),
         result.getRequestContext().get(AccessManager.REQUEST_USER))) {
-      result.setRequestRemoteOnly(parameterMap.containsKey(Constants.REQ_QP_IS_REMOTE_PARAMETER));
-      result.setRequestAsExpired(parameterMap.containsKey(Constants.REQ_QP_AS_EXPIRED_PARAMETER));
+      result.setRequestRemoteOnly(Constants.REQ_QP_FORCE_REMOTE_VALUE.equals(request.getParameter(Constants.REQ_QP_FORCE_PARAMETER)));
+      result.setRequestAsExpired(Constants.REQ_QP_FORCE_EXPIRED_VALUE.equals(request.getParameter(Constants.REQ_QP_FORCE_PARAMETER)));
     }
     result.setExternal(true);
 
@@ -207,7 +206,7 @@ public class ContentServlet
    */
   protected boolean isLocal(final HttpServletRequest request, final String resourceStorePath) {
     // check do we need local only access
-    boolean isLocal = request.getParameterMap().containsKey(Constants.REQ_QP_IS_LOCAL_PARAMETER);
+    boolean isLocal = Constants.REQ_QP_FORCE_LOCAL_VALUE.equals(request.getParameter(Constants.REQ_QP_FORCE_PARAMETER));
     if (!Strings.isNullOrEmpty(resourceStorePath)) {
       // overriding isLocal is we know it will be a collection
       isLocal = isLocal || resourceStorePath.endsWith(RepositoryItemUid.PATH_SEPARATOR);
@@ -216,7 +215,7 @@ public class ContentServlet
   }
 
   protected boolean isDescribeRequest(final HttpServletRequest request) {
-    return request.getParameterMap().containsKey(Constants.REQ_QP_IS_DESCRIBE_PARAMETER);
+    return request.getParameterMap().containsKey(Constants.REQ_QP_DESCRIBE_PARAMETER);
   }
 
   /**

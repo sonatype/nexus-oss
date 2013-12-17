@@ -599,7 +599,7 @@ public class HttpClientRemoteStorage
       if (StringUtils.isNotBlank(queryStringBld.toString())) {
         queryStringBld.append('&');
       }
-      queryStringBld.append(Constants.REQ_QP_AS_EXPIRED_PARAMETER);
+      queryStringBld.append(Constants.REQ_QP_FORCE_PARAMETER).append("=").append(Constants.REQ_QP_FORCE_EXPIRED_VALUE);
     }
 
     final String queryString = queryStringBld.toString();
