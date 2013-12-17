@@ -13,6 +13,9 @@
 
 package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -20,6 +23,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
@@ -29,10 +33,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.RedirectStrategy;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.impl.client.RequestWrapper;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
 
@@ -99,13 +101,30 @@ public class HttpClientManagerImpl
   }
 
   /**
-   * Returns {@link RedirectStrategy} needed for given repository instance. For now, it is "do not redirect to index
-   * pages (collections), but accept any other redirects". Usually, users will set up wrongly repositories to HTTP
-   * URLs while the server is actually hosted at HTTPS (typical setup for Nexus, like RSO is). This is user
-   * configuration error, as every out-bound request will bounce back as redirect. In general, Nexus always followed
-   * redirects, but the example for before is just a typical example where redirects are actually bad.
+   * Returns {@link RedirectStrategy} used by proxy repository instances. For now, it is "do not follow redirect to
+   * index pages (collections), but accept and follow any other redirects" strategy. If index page redirect is detected
+   * (by naive checking the URL for trailing slash), redirection mechanism of HC4 is stopped, and hence, the response
+   * will return with redirect response code (301, 302 or 307). These responses are handled within {@link
+   * HttpClientRemoteStorage} and is handled by throwing a {@link RemoteItemNotFoundException}. Main goal of this
+   * {@link RedirectStrategy} is to save the subsequent (the one following the redirect) request once we learn
+   * it would lead us to index page, as we don't need index pages (hence, we do not fetch it only to throw it away).
+   * <p/>
+   * Usual problems are misconfiguration, where a repository published over HTTPS is configured with HTTP (ie.
+   * admin mistyped the URL). Seemingly all work, but that is a source of performance issue, as every outgoing
+   * Nexus request will "bounce", as usually HTTP port will redirect Nexus to HTTPS port, and then the artifact
+   * will be fetched. Remedy for these scenarios is to edit the proxy repository configuration and update the
+   * URL to proper protocol.
+   * <p/>
+   * Still, this code is very naive way to detect index page redirects, and is used only in Nexuses released prior
+   * 2.8 release.
+   * <p/>
+   * This code <strong>assumes</strong> that remote repository is set up by best practices and common conventions,
+   * hence, index page redirect means that target URL ends with slash. For more about this topic, read the
+   * "To slash or not to slash" Google blog entry.
    *
-   * @return the strategy to use.
+   * @return the strategy to use with HC4 to follow redirects.
+   * @see <a href="http://googlewebmastercentral.blogspot.hu/2010/04/to-slash-or-not-to-slash.html">To slash or not to
+   * slash</a>
    */
   protected RedirectStrategy getProxyRepositoryRedirectStrategy(final ProxyRepository proxyRepository,
                                                                 final RemoteStorageContext ctx)
@@ -120,12 +139,20 @@ public class HttpClientManagerImpl
       {
         if (super.isRedirected(request, response, context)) {
           if (response.getFirstHeader("location") != null) {
-            final String sourceUri = getPreviousRequestUri(request);
-            final String targetUri = response.getFirstHeader("location").getValue();
-
+            final String targetUriHeader = response.getFirstHeader("location").getValue();
             // is this an index page redirect?
-            if (targetUri.equals(sourceUri + "/")) {
-              return false;
+            try {
+              // create URI to access path, as location might have query parameters
+              final URI targetUri = new URI(targetUriHeader);
+              if (targetUri.getPath().endsWith("/")) {
+                return false; // this is index page, break the redirect following and make HC4 return the redirecting response
+              }
+            }
+            catch (URISyntaxException e) {
+              // fallback to "naive" string checking
+              if (targetUriHeader.endsWith("/")) {
+                return false; // this is index page, break the redirect following and make HC4 return the redirecting response
+              }
             }
           }
           return true;
@@ -134,18 +161,5 @@ public class HttpClientManagerImpl
       }
     };
     return doNotRedirectToIndexPagesStrategy;
-  }
-
-  // ==
-
-  private String getPreviousRequestUri(final HttpRequest request) {
-    // hacky way of retrieving
-    if (request instanceof RequestWrapper) {
-      return getPreviousRequestUri(((RequestWrapper) request).getOriginal());
-    }
-    if (request instanceof HttpUriRequest) {
-      return ((HttpUriRequest) request).getURI().toString();
-    }
-    return null;
   }
 }
