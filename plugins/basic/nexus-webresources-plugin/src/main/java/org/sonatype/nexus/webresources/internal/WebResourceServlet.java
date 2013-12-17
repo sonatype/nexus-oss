@@ -92,16 +92,21 @@ public class WebResourceServlet
                              final HttpServletResponse response)
       throws IOException
   {
+
+
     log.trace("Serving resource: {}", resource);
 
     // support resources which need to be prepared before serving
     if (resource instanceof Prepareable) {
       resource = ((Prepareable) resource).prepare();
-      checkState(response != null, "Prepared resource is null");
+      checkState(resource != null, "Prepared resource is null");
     }
+    assert resource != null;
 
     webUtils.equipResponseWithStandardHeaders(response);
-    response.setHeader("Content-Type", resource.getContentType());
+    if (resource.getContentType() != null) {
+      response.setHeader("Content-Type", resource.getContentType());
+    }
     response.setDateHeader("Last-Modified", resource.getLastModified());
     response.setHeader("Content-Length", String.valueOf(resource.getSize()));
 
