@@ -2,9 +2,9 @@
   <components>
     <component>
       <role>org.sonatype.scheduling.SchedulerTask</role>
-      <role-hint>org.sonatype.scheduling.TestNexusTask</role-hint>
+      <role-hint>org.sonatype.nexus.scheduling.internal.TestNexusTask</role-hint>
       <instantiation-strategy>per-lookup</instantiation-strategy>
-      <implementation>org.sonatype.scheduling.TestNexusTask</implementation>
+      <implementation>org.sonatype.nexus.scheduling.internal.TestNexusTask</implementation>
     </component>
   </components>
 </plexus>
