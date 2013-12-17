@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.scheduling;
+package org.sonatype.nexus.scheduling.internal;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,6 +27,12 @@ import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
+import org.sonatype.scheduling.DefaultScheduledTask;
+import org.sonatype.scheduling.DefaultScheduler;
+import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.Scheduler;
+import org.sonatype.scheduling.TaskConfigManager;
+import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
@@ -34,6 +40,7 @@ import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.After;
 import org.junit.Test;
 
@@ -198,7 +205,7 @@ public class DefaultTaskConfigManagerTest
       // loadConfig();
 
       assertThat(getTaskConfiguration().size(), equalTo(1));
-      assertThat(TaskState.valueOf(((CScheduledTask) getTaskConfiguration().get(0)).getStatus()),
+      MatcherAssert.assertThat(TaskState.valueOf(((CScheduledTask) getTaskConfiguration().get(0)).getStatus()),
           equalTo(TaskState.SUBMITTED));
       assertThat(((CScheduledTask) getTaskConfiguration().get(0)).getName(), equalTo(TASK_NAME));
 
