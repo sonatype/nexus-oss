@@ -31,7 +31,6 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.DefaultContext;
 import org.codehaus.plexus.logging.Logger;
@@ -67,18 +66,11 @@ public abstract class PlexusTestCaseSupport
     System.setProperty("user.dir", util.getBaseDir().getAbsolutePath());
   }
 
-  public static final String BASE_DIR_KEY = "basedir";
-
   private PlexusContainer container;
-
-  private static String basedir;
 
   private Properties sysPropsBackup;
 
-  protected void setUp()
-      throws Exception
-  {
-    basedir = getBasedir();
+  protected void setUp() throws Exception {
     sysPropsBackup = System.getProperties();
   }
 
@@ -154,21 +146,22 @@ public abstract class PlexusTestCaseSupport
   }
 
   /**
-   * Allow custom test case implementations do augment the default container configuration before executing tests.
+   * @deprecated Avoid usage of Plexus apis.
    */
+  @Deprecated
   protected void customizeContainerConfiguration(final ContainerConfiguration containerConfiguration) {
+    // empty
   }
 
+  /**
+   * @deprecated Avoid usage of Plexus apis.
+   */
+  @Deprecated
   protected void customizeContext(final Context context) {
+    // empty
   }
 
-  protected PlexusConfiguration customizeComponentConfiguration() {
-    return null;
-  }
-
-  protected void tearDown()
-      throws Exception
-  {
+  protected void tearDown() throws Exception {
     try {
       if (container != null) {
         container.dispose();
@@ -181,6 +174,10 @@ public abstract class PlexusTestCaseSupport
     }
   }
 
+  /**
+   * @deprecated Avoid usage of Plexus apis.
+   */
+  @Deprecated
   protected PlexusContainer getContainer() {
     if (container == null) {
       setupContainer();
@@ -189,28 +186,34 @@ public abstract class PlexusTestCaseSupport
     return container;
   }
 
-  protected InputStream getConfiguration()
-      throws Exception
-  {
+  /**
+   * @deprecated Avoid usage of Plexus apis (this is used to access plexus xml configuration files).
+   */
+  @Deprecated
+  protected InputStream getConfiguration() throws Exception {
     return getConfiguration(null);
   }
 
-  protected InputStream getConfiguration(final String subname)
-      throws Exception
-  {
+  /**
+   * @deprecated Avoid usage of Plexus apis (this is used to access plexus xml configuration files).
+   */
+  @Deprecated
+  protected InputStream getConfiguration(final String subname) throws Exception {
     return getResourceAsStream(getConfigurationName(subname));
   }
 
+  /**
+   * @deprecated Avoid usage of Plexus apis (this is used to access plexus xml configuration files).
+   */
+  @Deprecated
   protected String getCustomConfigurationName() {
     return null;
   }
 
   /**
-   * Allow the retrieval of a container configuration that is based on the name of the test class being run. So if
-   * you
-   * have a test class called org.foo.FunTest, then this will produce a resource name of org/foo/FunTest.xml which
-   * would be used to configure the Plexus container before running your test.
+   * @deprecated Avoid usage of Plexus apis (this is used to access plexus xml configuration files).
    */
+  @Deprecated
   protected String getConfigurationName(final String subname) {
     return getClass().getName().replace('.', '/') + ".xml";
   }
@@ -227,33 +230,33 @@ public abstract class PlexusTestCaseSupport
   // Container access
   // ----------------------------------------------------------------------
 
-  protected Object lookup(final String componentKey)
-      throws Exception
-  {
+  /**
+   * @deprecated Avoid usage of Plexus apis (string role/hint lookup is plexus specific).
+   */
+  protected Object lookup(final String componentKey) throws Exception {
     return getContainer().lookup(componentKey);
   }
 
-  protected Object lookup(final String role, final String roleHint)
-      throws Exception
-  {
+  /**
+   * @deprecated Avoid usage of Plexus apis (string role/hint lookup is plexus specific).
+   */
+  @Deprecated
+  protected Object lookup(final String role, final String roleHint) throws Exception {
     return getContainer().lookup(role, roleHint);
   }
 
-  protected <T> T lookup(final Class<T> componentClass)
-      throws Exception
-  {
+  protected <T> T lookup(final Class<T> componentClass) throws Exception {
     return getContainer().lookup(componentClass);
   }
 
-  protected <T> T lookup(final Class<T> componentClass, final String roleHint)
-      throws Exception
-  {
+  protected <T> T lookup(final Class<T> componentClass, final String roleHint) throws Exception {
     return getContainer().lookup(componentClass, roleHint);
   }
 
-  protected void release(final Object component)
-      throws Exception
-  {
+  /**
+   * @deprecated Avoid usage of Plexus apis.
+   */
+  protected void release(final Object component) throws Exception {
     getContainer().release(component);
   }
 
@@ -275,42 +278,14 @@ public abstract class PlexusTestCaseSupport
     return new File(basedirFile, path);
   }
 
-  public String getTestPath(final String path) {
-    return getTestFile(path).getAbsolutePath();
-  }
-
-  public String getTestPath(final String basedir, final String path) {
-    return getTestFile(basedir, path).getAbsolutePath();
-  }
-
   public String getBasedir() {
     return util.getBaseDir().getAbsolutePath();
   }
 
-  public String getTestConfiguration() {
-    return getTestConfiguration(getClass());
-  }
-
-  public static String getTestConfiguration(final Class<?> clazz) {
-    final String s = clazz.getName().replace('.', '/');
-
-    return s.substring(0, s.indexOf("$")) + ".xml";
-  }
-
   /**
-   * Get a configured {@link LoggerManager}
-   * <p>
-   * The LoggerManager returned has its threshold influenced by the system property {@code 'test.log.level'}. The
-   * values of DEBUG, INFO, WARN, ERROR will set the threshold of the LoggerManager to the corresponding value.
-   *
-   * https://issues.sonatype.org/browse/NXCM-3230
-   *
-   * @return LoggerManager with threshold influenced by system property
-   * @throws ComponentLookupException if LoggerManager cannot be looked up
+   * @deprecated Avoid usage of Plexus apis.
    */
-  protected LoggerManager getLoggerManager()
-      throws ComponentLookupException
-  {
+  protected LoggerManager getLoggerManager() throws ComponentLookupException {
     LoggerManager loggerManager = getContainer().lookup(LoggerManager.class);
     // system property helps configure logger - see NXCM-3230
     String testLogLevel = System.getProperty("test.log.level");
@@ -337,9 +312,7 @@ public abstract class PlexusTestCaseSupport
    * Helper to call old JUnit 3x style {@link #setUp()}
    */
   @Before
-  final public void setUpJunit()
-      throws Exception
-  {
+  final public void setUpJunit() throws Exception {
     setUp();
   }
 
@@ -347,23 +320,15 @@ public abstract class PlexusTestCaseSupport
    * Helper to call old JUnit 3x style {@link #tearDown()}
    */
   @After
-  final public void tearDownJunit()
-      throws Exception
-  {
+  final public void tearDownJunit() throws Exception {
     tearDown();
   }
 
-  /**
-   * @deprecated Use {@link org.hamcrest.Assert#fail()} directly instead.
-   */
   @Deprecated
   protected void fail() {
     Assert.fail();
   }
 
-  /**
-   * @deprecated Use {@link org.hamcrest.Assert#fail(java.lang.String)} directly instead.
-   */
   @Deprecated
   protected void fail(String message) {
     Assert.fail(message);
@@ -452,18 +417,14 @@ public abstract class PlexusTestCaseSupport
     MatcherAssert.assertThat(actual, Matchers.equalTo(expected));
   }
 
-  protected boolean contentEquals(File f1, File f2)
-      throws IOException
-  {
+  protected boolean contentEquals(File f1, File f2) throws IOException {
     return contentEquals(new FileInputStream(f1), new FileInputStream(f2));
   }
 
   /**
    * Both s1 and s2 will be closed.
    */
-  protected boolean contentEquals(InputStream s1, InputStream s2)
-      throws IOException
-  {
+  protected boolean contentEquals(InputStream s1, InputStream s2) throws IOException {
     try (InputStream in1 = s1;
          InputStream in2 = s2) {
       return IOUtils.contentEquals(in1, in2);
