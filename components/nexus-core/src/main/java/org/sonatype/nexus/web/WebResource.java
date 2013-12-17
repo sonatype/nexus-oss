@@ -38,7 +38,7 @@ public interface WebResource
   String getPath();
 
   /**
-   * The content-type of the resource, or null if unknown.
+   * The content-type of the resource, or {@code null} or {@link #UNKNOWN_CONTENT_TYPE} if unknown.
    */
   @Nullable
   String getContentType();
