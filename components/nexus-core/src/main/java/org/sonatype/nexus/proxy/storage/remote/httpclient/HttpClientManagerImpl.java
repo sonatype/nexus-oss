@@ -101,13 +101,16 @@ public class HttpClientManagerImpl
   }
 
   /**
-   * Returns {@link RedirectStrategy} used by proxy repository instances. For now, it is "do not follow redirect to
-   * index pages (collections), but accept and follow any other redirects" strategy. If index page redirect is detected
-   * (by naive checking the URL for trailing slash), redirection mechanism of HC4 is stopped, and hence, the response
-   * will return with redirect response code (301, 302 or 307). These responses are handled within {@link
-   * HttpClientRemoteStorage} and is handled by throwing a {@link RemoteItemNotFoundException}. Main goal of this
-   * {@link RedirectStrategy} is to save the subsequent (the one following the redirect) request once we learn
-   * it would lead us to index page, as we don't need index pages (hence, we do not fetch it only to throw it away).
+   * Returns {@link RedirectStrategy} used by proxy repository instances. This special strategy will kick in only
+   * if Nexus performs content retrieval. In every other case (non-GET method or GET method used in remote
+   * availability check) this strategy defaults to {@link DefaultRedirectStrategy} behavior.
+   * <p/>For now, if used, it is "do not follow redirect to index pages (collections), but accept and follow any
+   * other redirects" strategy. If index page redirect is detected (by naive checking the URL path for trailing slash),
+   * redirection mechanism of HC4 is stopped, and hence, the response will return with redirect response code
+   * (301, 302 or 307). These responses are handled within {@link HttpClientRemoteStorage} and is handled by
+   * throwing a {@link RemoteItemNotFoundException}. Main goal of this {@link RedirectStrategy} is to save the
+   * subsequent (the one following the redirect) request once we learn it would lead us to index page, as we
+   * don't need index pages (hence, we do not fetch it only to throw it away).
    * <p/>
    * Usual problems are misconfiguration, where a repository published over HTTPS is configured with HTTP (ie.
    * admin mistyped the URL). Seemingly all work, but that is a source of performance issue, as every outgoing
@@ -138,20 +141,25 @@ public class HttpClientManagerImpl
           throws ProtocolException
       {
         if (super.isRedirected(request, response, context)) {
-          if (response.getFirstHeader("location") != null) {
-            final String targetUriHeader = response.getFirstHeader("location").getValue();
-            // is this an index page redirect?
-            try {
-              // create URI to access path, as location might have query parameters
-              final URI targetUri = new URI(targetUriHeader);
-              if (targetUri.getPath().endsWith("/")) {
-                return false; // this is index page, break the redirect following and make HC4 return the redirecting response
+          // this logic below should trigger only for content fetches made by RRS retrieveItem
+          // hence, we do this ONLY if the HttpRequest is "marked" as such request
+          if (request.getParams().isParameterTrue(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY)) {
+            if (response.getFirstHeader("location") != null) {
+              final String targetUriString = response.getFirstHeader("location").getValue();
+              // is this an index page redirect?
+              try {
+                // create URI to access path, as location might have query parameters
+                final URI targetUri = new URI(targetUriString);
+                // on schema change
+                if (targetUri.getPath().endsWith("/")) {
+                  return false; // this is index page, break the redirect following and make HC4 return the redirecting response
+                }
               }
-            }
-            catch (URISyntaxException e) {
-              // fallback to "naive" string checking
-              if (targetUriHeader.endsWith("/")) {
-                return false; // this is index page, break the redirect following and make HC4 return the redirecting response
+              catch (URISyntaxException e) {
+                // fallback to "naive" string checking
+                if (targetUriString.endsWith("/")) {
+                  return false; // this is index page, break the redirect following and make HC4 return the redirecting response
+                }
               }
             }
           }
