@@ -31,6 +31,7 @@ import org.sonatype.scheduling.DefaultScheduledTask;
 import org.sonatype.scheduling.DefaultScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.Scheduler;
+import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.TaskConfigManager;
 import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.schedules.CronSchedule;
@@ -40,6 +41,9 @@ import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
+import com.google.inject.name.Names;
 import org.hamcrest.MatcherAssert;
 import org.junit.After;
 import org.junit.Test;
@@ -95,6 +99,19 @@ public class DefaultTaskConfigManagerTest
   private static final String TASK_NAME = "test";
 
   private static final String CRON_EXPRESSION = "0 0/5 14,18,3-9,2 ? JAN,MAR,SEP MON-FRI 2002-2010";
+
+  @Override
+  protected void customizeModules(final List<Module> modules) {
+    modules.add(new AbstractModule()
+    {
+      @Override
+      protected void configure() {
+        bind(SchedulerTask.class)
+            .annotatedWith(Names.named(TestNexusTask.class.getName()))
+            .to(TestNexusTask.class);
+      }
+    });
+  }
 
   @Override
   public void setUp()
