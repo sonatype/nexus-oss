@@ -17,10 +17,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Module;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.ContainerConfiguration;
@@ -124,14 +126,14 @@ public abstract class PlexusTestCaseSupport
     customizeContainerConfiguration(containerConfiguration);
 
     try {
-      final Module[] modules = getTestCustomModules();
+      List<Module> modules = Lists.newLinkedList();
+      Module[] customModules = getTestCustomModules();
+      if (customModules != null) {
+        modules.addAll(Lists.newArrayList(customModules));
+      }
+      customizeModules(modules);
 
-      if (modules == null || modules.length == 0) {
-        container = new DefaultPlexusContainer(containerConfiguration);
-      }
-      else {
-        container = new DefaultPlexusContainer(containerConfiguration, modules);
-      }
+      container = new DefaultPlexusContainer(containerConfiguration, modules.toArray(new Module[modules.size()]));
     }
     catch (final PlexusContainerException e) {
       e.printStackTrace();
@@ -140,11 +142,15 @@ public abstract class PlexusTestCaseSupport
   }
 
   /**
-   * Adds the ability to register custom modules with Plexus Shim. Just override this method and it will be invoked
-   * frok {@link #setupContainer()}.
+   * @deprecated Use {@link #customizeModules(List)} instead.
    */
+  @Deprecated
   protected Module[] getTestCustomModules() {
     return null;
+  }
+
+  protected void customizeModules(final List<Module> modules) {
+    // empty
   }
 
   /**
