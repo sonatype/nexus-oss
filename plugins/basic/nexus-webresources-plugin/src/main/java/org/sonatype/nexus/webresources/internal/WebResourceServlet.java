@@ -92,8 +92,6 @@ public class WebResourceServlet
                              final HttpServletResponse response)
       throws IOException
   {
-
-
     log.trace("Serving resource: {}", resource);
 
     // support resources which need to be prepared before serving
@@ -107,7 +105,7 @@ public class WebResourceServlet
 
     String contentType = resource.getContentType();
     if (contentType == null) {
-      contentType = "application/octet-stream";
+      contentType = WebResource.UNKNOWN_CONTENT_TYPE;
     }
     response.setHeader("Content-Type", contentType);
     response.setDateHeader("Last-Modified", resource.getLastModified());

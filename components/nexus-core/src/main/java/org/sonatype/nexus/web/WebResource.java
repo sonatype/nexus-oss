@@ -30,6 +30,8 @@ public interface WebResource
 
   long UNKNOWN_LAST_MODIFIED = 0L;
 
+  String UNKNOWN_CONTENT_TYPE = "application/octet-stream";
+
   /**
    * The path where the resource is mounted under the servlet-context.
    */
