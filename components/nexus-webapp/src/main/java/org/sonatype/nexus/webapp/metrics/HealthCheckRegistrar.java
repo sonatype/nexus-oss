@@ -16,7 +16,6 @@ import java.lang.annotation.Annotation;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -24,8 +23,11 @@ import com.google.inject.Key;
 import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.core.HealthCheckRegistry;
 import org.eclipse.sisu.BeanEntry;
+import org.eclipse.sisu.EagerSingleton;
 import org.eclipse.sisu.Mediator;
 import org.eclipse.sisu.inject.BeanLocator;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Helper to manage {@link HealthCheck} registrations via Sisu component mediation.
@@ -33,7 +35,7 @@ import org.eclipse.sisu.inject.BeanLocator;
  * @since 2.8
  */
 @Named
-@Singleton
+@EagerSingleton
 public class HealthCheckRegistrar
     extends ComponentSupport
 {
@@ -41,6 +43,8 @@ public class HealthCheckRegistrar
   public HealthCheckRegistrar(final BeanLocator beanLocator,
                               final HealthCheckRegistry registry)
   {
+    checkNotNull(beanLocator);
+    checkNotNull(registry);
     beanLocator.watch(Key.get(HealthCheck.class), new HealthCheckMediator(), registry);
   }
 
