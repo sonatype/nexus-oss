@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 
@@ -96,6 +97,7 @@ public class WebResourceServlet
     // support resources which need to be prepared before serving
     if (resource instanceof Prepareable) {
       resource = ((Prepareable) resource).prepare();
+      checkState(response != null, "Prepared resource is null");
     }
 
     webUtils.equipResponseWithStandardHeaders(response);
