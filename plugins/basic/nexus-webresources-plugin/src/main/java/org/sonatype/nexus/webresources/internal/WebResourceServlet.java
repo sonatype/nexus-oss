@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.web.ErrorStatusException;
 import org.sonatype.nexus.web.WebResource;
+import org.sonatype.nexus.web.WebResource.Prepareable;
 import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.nexus.webresources.WebResourceService;
 import org.sonatype.sisu.goodies.common.Time;
@@ -85,12 +86,17 @@ public class WebResourceServlet
     serveResource(resource, request, response);
   }
 
-  private void serveResource(final WebResource resource,
+  private void serveResource(WebResource resource,
                              final HttpServletRequest request,
                              final HttpServletResponse response)
       throws IOException
   {
     log.trace("Serving resource: {}", resource);
+
+    // support resources which need to be prepared before serving
+    if (resource instanceof Prepareable) {
+      resource = ((Prepareable) resource).prepare();
+    }
 
     webUtils.equipResponseWithStandardHeaders(response);
     response.setHeader("Content-Type", resource.getContentType());

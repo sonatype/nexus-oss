@@ -64,4 +64,12 @@ public interface WebResource
    * Resource content stream.
    */
   InputStream getInputStream() throws IOException;
+
+  /**
+   * Allows web-resources to prepare for handling requests.
+   */
+  interface Prepareable
+  {
+    WebResource prepare() throws IOException;
+  }
 }
