@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.webapp;
+package org.sonatype.nexus.webapp.metrics;
 
 import org.sonatype.nexus.guice.FilterChainModule;
 import org.sonatype.nexus.web.internal.SecurityFilter;
@@ -30,7 +30,6 @@ import com.yammer.metrics.reporting.HealthCheckServlet;
 import com.yammer.metrics.reporting.MetricsServlet;
 import com.yammer.metrics.reporting.PingServlet;
 import com.yammer.metrics.reporting.ThreadDumpServlet;
-import com.yammer.metrics.util.DeadlockHealthCheck;
 import com.yammer.metrics.web.DefaultWebappMetricsFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,10 +69,6 @@ public class MetricsModule
 
     final HealthCheckRegistry healthCheckRegistry = HealthChecks.defaultRegistry();
     bind(HealthCheckRegistry.class).toInstance(healthCheckRegistry);
-
-    // TODO: Consider making a component which can mediate (via sisu) adding/removing healthcheck components to/from the registry
-    // TODO: For now new instances must be explicitly registered, like this one:
-    healthCheckRegistry.register(new DeadlockHealthCheck(virtualMachineMetrics));
 
     final MetricsRegistry metricsRegistry = Metrics.defaultRegistry();
     bind(MetricsRegistry.class).toInstance(metricsRegistry);
