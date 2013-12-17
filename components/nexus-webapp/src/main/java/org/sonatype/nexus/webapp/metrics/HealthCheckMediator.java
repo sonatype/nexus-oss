@@ -32,16 +32,12 @@ public class HealthCheckMediator
     extends ComponentSupport
     implements Mediator<Named, HealthCheck, HealthCheckRegistry>
 {
-  public void add(final BeanEntry<Named, HealthCheck> entry, final HealthCheckRegistry registry)
-      throws Exception
-  {
+  public void add(final BeanEntry<Named, HealthCheck> entry, final HealthCheckRegistry registry) throws Exception {
     log.debug("Registering: {}", entry);
     registry.register(entry.getValue());
   }
 
-  public void remove(final BeanEntry<Named, HealthCheck> entry, final HealthCheckRegistry registry)
-      throws Exception
-  {
+  public void remove(final BeanEntry<Named, HealthCheck> entry, final HealthCheckRegistry registry) throws Exception {
     log.debug("Un-registering: {}", entry);
     registry.unregister(entry.getValue());
   }
