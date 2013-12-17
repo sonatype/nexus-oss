@@ -23,7 +23,7 @@ import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.Mediator;
 
 /**
- * Helper to manage {@link HealthCheck} registrations via Sisu component mediation.
+ * Manages {@link HealthCheck} registrations via Sisu component mediation.
  *
  * @since 2.8
  */
