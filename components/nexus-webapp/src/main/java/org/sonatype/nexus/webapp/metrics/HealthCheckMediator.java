@@ -10,24 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.webapp.metrics;
 
-import java.lang.annotation.Annotation;
-
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.inject.Key;
 import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.core.HealthCheckRegistry;
 import org.eclipse.sisu.BeanEntry;
-import org.eclipse.sisu.EagerSingleton;
 import org.eclipse.sisu.Mediator;
-import org.eclipse.sisu.inject.BeanLocator;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Helper to manage {@link HealthCheck} registrations via Sisu component mediation.
@@ -35,34 +28,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.8
  */
 @Named
-@EagerSingleton
-public class HealthCheckRegistrar
+public class HealthCheckMediator
     extends ComponentSupport
+    implements Mediator<Named, HealthCheck, HealthCheckRegistry>
 {
-  @Inject
-  public HealthCheckRegistrar(final BeanLocator beanLocator,
-                              final HealthCheckRegistry registry)
+  public void add(final BeanEntry<Named, HealthCheck> entry, final HealthCheckRegistry registry)
+      throws Exception
   {
-    checkNotNull(beanLocator);
-    checkNotNull(registry);
-    beanLocator.watch(Key.get(HealthCheck.class), new HealthCheckMediator(), registry);
+    log.debug("Registering: {}", entry);
+    registry.register(entry.getValue());
   }
 
-  private class HealthCheckMediator
-      implements Mediator<Annotation, HealthCheck, HealthCheckRegistry>
+  public void remove(final BeanEntry<Named, HealthCheck> entry, final HealthCheckRegistry registry)
+      throws Exception
   {
-    public void add(final BeanEntry<Annotation, HealthCheck> entry, final HealthCheckRegistry registry)
-        throws Exception
-    {
-      log.debug("Registering: {}", entry);
-      registry.register(entry.getValue());
-    }
-
-    public void remove(final BeanEntry<Annotation, HealthCheck> entry, final HealthCheckRegistry registry)
-        throws Exception
-    {
-      log.debug("Un-registering: {}", entry);
-      registry.unregister(entry.getValue());
-    }
+    log.debug("Un-registering: {}", entry);
+    registry.unregister(entry.getValue());
   }
 }
+
