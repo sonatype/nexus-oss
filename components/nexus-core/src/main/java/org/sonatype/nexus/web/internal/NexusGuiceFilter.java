@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.web;
+package org.sonatype.nexus.web.internal;
 
 import java.io.IOException;
 import java.util.Collections;
