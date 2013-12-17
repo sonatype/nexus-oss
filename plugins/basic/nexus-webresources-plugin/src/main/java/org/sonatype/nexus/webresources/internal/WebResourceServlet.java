@@ -104,9 +104,12 @@ public class WebResourceServlet
     assert resource != null;
 
     webUtils.equipResponseWithStandardHeaders(response);
-    if (resource.getContentType() != null) {
-      response.setHeader("Content-Type", resource.getContentType());
+
+    String contentType = resource.getContentType();
+    if (contentType == null) {
+      contentType = "application/octet-stream";
     }
+    response.setHeader("Content-Type", contentType);
     response.setDateHeader("Last-Modified", resource.getLastModified());
     response.setHeader("Content-Length", String.valueOf(resource.getSize()));
 
