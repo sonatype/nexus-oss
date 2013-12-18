@@ -14,7 +14,6 @@
 package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,6 +27,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 import com.google.common.base.Preconditions;
+import org.apache.http.Header;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolException;
@@ -144,23 +144,18 @@ public class HttpClientManagerImpl
           // this logic below should trigger only for content fetches made by RRS retrieveItem
           // hence, we do this ONLY if the HttpRequest is "marked" as such request
           if (request.getParams().isParameterTrue(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY)) {
-            if (response.getFirstHeader("location") != null) {
-              final String targetUriString = response.getFirstHeader("location").getValue();
-              // is this an index page redirect?
-              try {
-                // create URI to access path, as location might have query parameters
-                final URI targetUri = new URI(targetUriString);
-                // on schema change
-                if (targetUri.getPath().endsWith("/")) {
-                  return false; // this is index page, break the redirect following and make HC4 return the redirecting response
-                }
-              }
-              catch (URISyntaxException e) {
-                // fallback to "naive" string checking
-                if (targetUriString.endsWith("/")) {
-                  return false; // this is index page, break the redirect following and make HC4 return the redirecting response
-                }
-              }
+            // code below comes from DefaultRedirectStrategy, as method super.getLocationURI cannot be used
+            // since it modifies context state, and would result in false circular reference detection
+            final Header locationHeader = response.getFirstHeader("location");
+            if (locationHeader == null) {
+              // got a redirect response, but no location header
+              throw new ProtocolException(
+                  "Received redirect response " + response.getStatusLine()
+                      + " from proxy " + proxyRepository + " but no location present");
+            }
+            final URI uri = createLocationURI(locationHeader.getValue());
+            if (uri.getPath().endsWith("/")) {
+              return false; // this is index page, break the redirect following and make HC4 return the redirecting response
             }
           }
           return true;
