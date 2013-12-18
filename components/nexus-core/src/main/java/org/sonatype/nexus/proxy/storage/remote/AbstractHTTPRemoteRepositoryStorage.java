@@ -145,6 +145,18 @@ public abstract class AbstractHTTPRemoteRepositoryStorage
   }
 
   /**
+   * Returns {@code true} if remote peer for passed in proxy repository is detected as a Nexus instance. To more closely
+   * inspect the remote instance (ie. to get it's version) you should use Nexus Client instead. This method should be
+   * implemented by any RRS implementation doing some inspection of known places to figure out is remote a Nexus or
+   * not. Still, the implementation should not pose any expectation about <strong>baseURL</strong> of remote Nexus
+   * or try to "calculate" it from remote URL of the passed in proxy repository. It should try "well known locations"
+   * within the repository root (as it's possible that baseURL of Nexus is not published, only the content resource).
+   *
+   * @since 2.8.0
+   */
+  protected abstract boolean isRemoteNexus(final ProxyRepository repository) throws RemoteStorageException;
+
+  /**
    * Initially, this method is here only to share the code for "availability check" and for "contains" check.
    * Unfortunately, the "availability" check cannot be done at RemoteStorage level, since it is completely repository
    * layout unaware and is able to tell only about the existence of remote server and that the URI on it exists. This

@@ -29,10 +29,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.RedirectStrategy;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.impl.client.RequestWrapper;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
 
@@ -99,53 +97,24 @@ public class HttpClientManagerImpl
   }
 
   /**
-   * Returns {@link RedirectStrategy} needed for given repository instance. For now, it is "do not redirect to index
-   * pages (collections), but accept any other redirects". Usually, users will set up wrongly repositories to HTTP
-   * URLs while the server is actually hosted at HTTPS (typical setup for Nexus, like RSO is). This is user
-   * configuration error, as every out-bound request will bounce back as redirect. In general, Nexus always followed
-   * redirects, but the example for before is just a typical example where redirects are actually bad.
+   * Returns {@link RedirectStrategy} used by proxy repository instances. It as actually preventing HC4 to follow
+   * any redirect, as since Nexus 2.8 redirects are handled "manually" in {@link HttpClientRemoteStorage} code.
    *
-   * @return the strategy to use.
+   * @return the strategy to use with HC4 to follow redirects (basically disabling redirection following of HC4).
    */
   protected RedirectStrategy getProxyRepositoryRedirectStrategy(final ProxyRepository proxyRepository,
                                                                 final RemoteStorageContext ctx)
   {
     // Prevent redirection to index pages
-    final RedirectStrategy doNotRedirectToIndexPagesStrategy = new DefaultRedirectStrategy()
+    return new DefaultRedirectStrategy()
     {
       @Override
       public boolean isRedirected(final HttpRequest request, final HttpResponse response,
                                   final HttpContext context)
           throws ProtocolException
       {
-        if (super.isRedirected(request, response, context)) {
-          if (response.getFirstHeader("location") != null) {
-            final String sourceUri = getPreviousRequestUri(request);
-            final String targetUri = response.getFirstHeader("location").getValue();
-
-            // is this an index page redirect?
-            if (targetUri.equals(sourceUri + "/")) {
-              return false;
-            }
-          }
-          return true;
-        }
         return false;
       }
     };
-    return doNotRedirectToIndexPagesStrategy;
-  }
-
-  // ==
-
-  private String getPreviousRequestUri(final HttpRequest request) {
-    // hacky way of retrieving
-    if (request instanceof RequestWrapper) {
-      return getPreviousRequestUri(((RequestWrapper) request).getOriginal());
-    }
-    if (request instanceof HttpUriRequest) {
-      return ((HttpUriRequest) request).getURI().toString();
-    }
-    return null;
   }
 }
