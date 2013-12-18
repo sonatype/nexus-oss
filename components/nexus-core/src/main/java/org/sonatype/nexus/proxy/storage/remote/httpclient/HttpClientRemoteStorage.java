@@ -620,7 +620,7 @@ public class HttpClientRemoteStorage
         EntityUtils.consume(httpResponse.getEntity());
       }
       catch (IOException e) {
-        log.warn(e.getMessage());
+        log.warn("Failed to consume entity: " + e); // terse
       }
     }
   }
