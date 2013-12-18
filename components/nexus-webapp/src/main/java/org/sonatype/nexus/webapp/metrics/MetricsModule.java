@@ -11,10 +11,10 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.webapp;
+package org.sonatype.nexus.webapp.metrics;
 
 import org.sonatype.nexus.guice.FilterChainModule;
-import org.sonatype.security.web.guice.SecurityWebFilter;
+import org.sonatype.nexus.web.internal.SecurityFilter;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +30,6 @@ import com.yammer.metrics.reporting.HealthCheckServlet;
 import com.yammer.metrics.reporting.MetricsServlet;
 import com.yammer.metrics.reporting.PingServlet;
 import com.yammer.metrics.reporting.ThreadDumpServlet;
-import com.yammer.metrics.util.DeadlockHealthCheck;
 import com.yammer.metrics.web.DefaultWebappMetricsFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +59,7 @@ public class MetricsModule
 
   @Override
   protected void configure() {
-    // NOTE: AdminServletModule (metrics-guice intgegration) generates invalid links, so wire up servlets ourselves
+    // NOTE: AdminServletModule (metrics-guice integration) generates invalid links, so wire up servlets ourselves
 
     final Clock clock = Clock.defaultClock();
     bind(Clock.class).toInstance(clock);
@@ -71,18 +70,11 @@ public class MetricsModule
     final HealthCheckRegistry healthCheckRegistry = HealthChecks.defaultRegistry();
     bind(HealthCheckRegistry.class).toInstance(healthCheckRegistry);
 
-    // TODO: Consider making a component which can mediate (via sisu) adding/removing healthcheck components to/from the registry
-    // TODO: For now new instances must be explicitly registered, like this one:
-    healthCheckRegistry.register(new DeadlockHealthCheck(virtualMachineMetrics));
-
     final MetricsRegistry metricsRegistry = Metrics.defaultRegistry();
     bind(MetricsRegistry.class).toInstance(metricsRegistry);
 
     final JsonFactory jsonFactory = new JsonFactory(new ObjectMapper());
     bind(JsonFactory.class).toInstance(jsonFactory);
-
-    // FIXME: Sort out if we need to do this.  Its noted in SiestaModule, may be needed here too :-(
-    //bind(SecurityWebFilter.class);
 
     install(new ServletModule()
     {
@@ -106,7 +98,7 @@ public class MetricsModule
         filter("/*").through(new DefaultWebappMetricsFilter());
 
         // configure security
-        filter(MOUNT_POINT + "/*").through(SecurityWebFilter.class);
+        filter(MOUNT_POINT + "/*").through(SecurityFilter.class);
       }
     });
 

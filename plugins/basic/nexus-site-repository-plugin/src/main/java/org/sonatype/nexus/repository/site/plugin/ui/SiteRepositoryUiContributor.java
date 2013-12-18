@@ -13,11 +13,12 @@
 
 package org.sonatype.nexus.repository.site.plugin.ui;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
+import org.sonatype.nexus.repository.site.plugin.SiteRepositoryPlugin;
 
 /**
  * @since 2.6
@@ -25,15 +26,10 @@ import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 @Named
 @Singleton
 public class SiteRepositoryUiContributor
-    implements UiContributor
+    extends UiContributorSupport
 {
-
-  private static final String ARTIFACT_ID = "nexus-site-repository-plugin";
-
-  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
-
-  @Override
-  public UiContribution contribute(final boolean debug) {
-    return new UiContributionBuilder(this, GROUP_ID, ARTIFACT_ID).build(debug);
+  @Inject
+  public SiteRepositoryUiContributor(final SiteRepositoryPlugin owner) {
+    super(owner);
   }
 }

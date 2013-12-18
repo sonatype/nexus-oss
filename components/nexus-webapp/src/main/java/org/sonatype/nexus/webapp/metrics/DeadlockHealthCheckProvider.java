@@ -10,26 +10,38 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
-package org.sonatype.nexus.security.ldap.realms.ui;
+package org.sonatype.nexus.webapp.metrics;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
-import org.sonatype.nexus.security.ldap.realms.LdapPlugin;
+import com.yammer.metrics.core.HealthCheck;
+import com.yammer.metrics.core.VirtualMachineMetrics;
+import com.yammer.metrics.util.DeadlockHealthCheck;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * @since 2.6
+ * {@link DeadlockHealthCheck} provider.
+ *
+ * @since 2.8
  */
 @Named
 @Singleton
-public class LdapRealmUiContributor
-    extends UiContributorSupport
+public class DeadlockHealthCheckProvider
+  implements Provider<HealthCheck>
 {
+  private final VirtualMachineMetrics metrics;
+
   @Inject
-  public LdapRealmUiContributor(final LdapPlugin owner) {
-    super(owner);
+  public DeadlockHealthCheckProvider(final VirtualMachineMetrics metrics) {
+    this.metrics = checkNotNull(metrics);
+  }
+
+  @Override
+  public HealthCheck get() {
+    return new DeadlockHealthCheck(metrics);
   }
 }

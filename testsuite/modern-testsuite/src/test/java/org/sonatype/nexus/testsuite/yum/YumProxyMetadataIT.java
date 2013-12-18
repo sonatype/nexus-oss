@@ -18,6 +18,7 @@ import org.sonatype.nexus.client.core.subsystem.repository.Repository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
 import org.sonatype.nexus.client.core.subsystem.routing.Routing;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
@@ -38,6 +39,7 @@ public class YumProxyMetadataIT
     super(nexusBundleCoordinates);
   }
 
+  @Ignore // NEXUS-6184
   @Test
   public void cleanUp() throws Exception {
     final Repository hosted = createYumEnabledRepository(repositoryIdForTest());

@@ -27,12 +27,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Injected {@link ShiroFilter}.
+ *
+ * @deprecated To be removed, replaced by nexus-core SecurityFilter.
  */
 @Singleton
+@Deprecated
 public class SecurityWebFilter
     extends AbstractShiroFilter
 {
-
   @Inject
   protected SecurityWebFilter(SecuritySystem securitySystem, FilterChainResolver filterChainResolver) {
     this.setSecurityManager((WebSecurityManager) checkNotNull(securitySystem.getSecurityManager(), "securityManager"));

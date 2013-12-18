@@ -11,12 +11,14 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.scheduling;
+package org.sonatype.nexus.scheduling.internal;
 
 import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.scheduling.AbstractSchedulerTask;
+import org.sonatype.scheduling.ScheduledTask;
 
 public class TestNexusTask
     extends AbstractSchedulerTask<Object>

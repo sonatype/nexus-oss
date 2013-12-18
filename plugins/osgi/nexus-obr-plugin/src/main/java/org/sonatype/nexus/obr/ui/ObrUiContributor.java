@@ -13,11 +13,12 @@
 
 package org.sonatype.nexus.obr.ui;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+import org.sonatype.nexus.obr.ObrPlugin;
+import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
 
 /**
  * @since 2.6
@@ -25,13 +26,10 @@ import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 @Named
 @Singleton
 public class ObrUiContributor
-    implements UiContributor
+    extends UiContributorSupport
 {
-
-  public static final String ARTIFACT_ID = "nexus-obr-plugin";
-
-  @Override
-  public UiContribution contribute(final boolean debug) {
-    return new UiContributionBuilder(this, OSS_PLUGIN_GROUP, ARTIFACT_ID).build(debug);
+  @Inject
+  public ObrUiContributor(final ObrPlugin owner) {
+    super(owner);
   }
 }

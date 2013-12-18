@@ -15,6 +15,8 @@ package org.sonatype.nexus.webapp;
 
 import javax.inject.Named;
 
+import org.sonatype.nexus.webapp.metrics.MetricsModule;
+
 import com.google.inject.AbstractModule;
 
 /**

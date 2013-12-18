@@ -278,7 +278,7 @@ public class DefaultScheduledTask<T>
     }
   }
 
-  protected void setLastRun(Date lastRun) {
+  public void setLastRun(Date lastRun) {
     this.lastRun = new Date(lastRun.getTime() + 20);
   }
 

@@ -15,18 +15,22 @@ package org.sonatype.nexus.guice;
 
 import javax.servlet.ServletContext;
 
-import org.sonatype.nexus.web.BaseUrlHolderFilter;
-import org.sonatype.nexus.web.ErrorPageFilter;
+import org.sonatype.nexus.web.TemplateRenderer;
+import org.sonatype.nexus.web.internal.BaseUrlHolderFilter;
+import org.sonatype.nexus.web.internal.ErrorPageFilter;
+import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.web.guice.SecurityWebModule;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
 import com.yammer.metrics.guice.InstrumentationModule;
 import org.apache.shiro.guice.aop.ShiroAopModule;
+import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.eclipse.sisu.inject.DefaultRankingFunction;
 import org.eclipse.sisu.inject.RankingFunction;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.inject.name.Names.named;
 
 /**
  * Nexus guice modules.
@@ -62,6 +66,9 @@ public class NexusModules
 
     @Override
     protected void configure() {
+      // HACK: Re-bind servlet-context instance with a name to avoid backwards-compat warnings from guice-servlet
+      bind(ServletContext.class).annotatedWith(named("nexus")).toInstance(servletContext);
+
       install(new CommonModule());
 
       install(new ServletModule()
@@ -89,6 +96,12 @@ public class NexusModules
     @Override
     protected void configure() {
       install(new CommonModule());
+
+      // handle some edge-cases for commonly used servlet-based components which need a bit more configuration
+      // so that sisu/guice can find the correct bindings inside of plugins
+      requireBinding(SecuritySystem.class);
+      requireBinding(FilterChainResolver.class);
+      requireBinding(TemplateRenderer.class);
     }
   }
 }

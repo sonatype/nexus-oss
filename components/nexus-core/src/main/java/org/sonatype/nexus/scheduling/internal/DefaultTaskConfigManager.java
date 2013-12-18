@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.scheduling;
+package org.sonatype.nexus.scheduling.internal;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -38,6 +38,11 @@ import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CScheduledTaskCoreConfiguration;
 import org.sonatype.nexus.scheduling.TaskUtils;
+import org.sonatype.scheduling.DefaultScheduledTask;
+import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.Scheduler;
+import org.sonatype.scheduling.SchedulerTask;
+import org.sonatype.scheduling.TaskConfigManager;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.HourlySchedule;
@@ -52,8 +57,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The default implementation of the Task Configuration manager. Will handle writing to and loading from the tasks
- * within nexus.xml file.
+ * The default implementation of the Task Configuration manager.
  */
 @Singleton
 @Named

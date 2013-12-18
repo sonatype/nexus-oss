@@ -37,7 +37,7 @@ public class MDCUtils
 
   public static final String USER_ID_KEY = "userId";
 
-  public static final String UNKNOWN_USER_ID = "<unknown-user>";
+  public static final String UNKNOWN_USER_ID = "*UNKNOWN";
 
   public static void setMDCUserIdIfNeeded() {
     final String userId = MDC.get(USER_ID_KEY);

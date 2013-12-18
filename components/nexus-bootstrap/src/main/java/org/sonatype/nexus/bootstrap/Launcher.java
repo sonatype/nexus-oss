@@ -29,6 +29,7 @@ import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
@@ -45,6 +46,8 @@ public class Launcher
 {
   // FIXME: Move this to CommandMonitorThread
   public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
+
+  public static final String SYSTEM_USERID = "*SYSTEM";
 
   private static final String FIVE_SECONDS = "5000";
 
@@ -170,6 +173,7 @@ public class Launcher
   }
 
   public static void main(final String[] args) throws Exception {
+    MDC.put("userId", SYSTEM_USERID);
     new Launcher(null, null, args).start();
   }
 }
