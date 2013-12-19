@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -41,6 +40,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RemoteStorageTransportOverloadedException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.ContentLocator;
@@ -87,6 +87,34 @@ import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 public class ContentServlet
     extends HttpServlet
 {
+  /**
+   * HTTP query parameter to mark request as "describe" request.
+   */
+  private static final String REQ_QP_DESCRIBE_PARAMETER = "describe";
+
+  /**
+   * HTTP query parameter to mark request as "describe" request.
+   */
+  private static final String REQ_QP_FORCE_PARAMETER = "force";
+
+  /**
+   * HTTP query parameter value for {@link #REQ_QP_FORCE_PARAMETER} to force local content. See {@link
+   * RequestContext#isRequestLocalOnly()}.
+   */
+  private static final String REQ_QP_FORCE_LOCAL_VALUE = "local";
+
+  /**
+   * HTTP query parameter value for {@link #REQ_QP_FORCE_PARAMETER} to force remote content. See {@link
+   * RequestContext#isRequestRemoteOnly()}.
+   */
+  private static final String REQ_QP_FORCE_REMOTE_VALUE = "remote";
+
+  /**
+   * HTTP query parameter value for {@link #REQ_QP_FORCE_PARAMETER} to force expiration of content. See {@link
+   * RequestContext#isRequestAsExpired()}.
+   */
+  private static final String REQ_QP_FORCE_EXPIRED_VALUE = "expired";
+
   /**
    * A flag setting what should be done if request path retrieval gets a {@link StorageLinkItem} here. If {@code true},
    * this servlet dereference the link (using {@link RepositoryRouter#dereferenceLink(StorageLinkItem)} method), and
@@ -152,8 +180,8 @@ public class ContentServlet
     result.setRequestLocalOnly(isLocal(request, resourceStorePath));
     if (!Objects.equals(nexusConfiguration.getAnonymousUsername(),
         result.getRequestContext().get(AccessManager.REQUEST_USER))) {
-      result.setRequestRemoteOnly(Constants.REQ_QP_FORCE_REMOTE_VALUE.equals(request.getParameter(Constants.REQ_QP_FORCE_PARAMETER)));
-      result.setRequestAsExpired(Constants.REQ_QP_FORCE_EXPIRED_VALUE.equals(request.getParameter(Constants.REQ_QP_FORCE_PARAMETER)));
+      result.setRequestRemoteOnly(REQ_QP_FORCE_REMOTE_VALUE.equals(request.getParameter(REQ_QP_FORCE_PARAMETER)));
+      result.setRequestAsExpired(REQ_QP_FORCE_EXPIRED_VALUE.equals(request.getParameter(REQ_QP_FORCE_PARAMETER)));
     }
     result.setExternal(true);
 
@@ -206,7 +234,7 @@ public class ContentServlet
    */
   protected boolean isLocal(final HttpServletRequest request, final String resourceStorePath) {
     // check do we need local only access
-    boolean isLocal = Constants.REQ_QP_FORCE_LOCAL_VALUE.equals(request.getParameter(Constants.REQ_QP_FORCE_PARAMETER));
+    boolean isLocal = REQ_QP_FORCE_LOCAL_VALUE.equals(request.getParameter(REQ_QP_FORCE_PARAMETER));
     if (!Strings.isNullOrEmpty(resourceStorePath)) {
       // overriding isLocal is we know it will be a collection
       isLocal = isLocal || resourceStorePath.endsWith(RepositoryItemUid.PATH_SEPARATOR);
@@ -215,7 +243,7 @@ public class ContentServlet
   }
 
   protected boolean isDescribeRequest(final HttpServletRequest request) {
-    return request.getParameterMap().containsKey(Constants.REQ_QP_DESCRIBE_PARAMETER);
+    return request.getParameterMap().containsKey(REQ_QP_DESCRIBE_PARAMETER);
   }
 
   /**

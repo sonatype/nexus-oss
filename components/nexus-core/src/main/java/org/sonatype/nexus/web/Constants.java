@@ -37,32 +37,4 @@ public interface Constants
    * @since 2.7.0
    */
   String ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED = "request.is.authz.rejected";
-
-  /**
-   * HTTP query parameter to mark request as "describe" request.
-   */
-  String REQ_QP_DESCRIBE_PARAMETER = "describe";
-
-  /**
-   * HTTP query parameter to mark request as "describe" request.
-   */
-  String REQ_QP_FORCE_PARAMETER = "force";
-
-  /**
-   * HTTP query parameter value for {@link #REQ_QP_FORCE_PARAMETER} to force local content. See {@link
-   * RequestContext#isRequestLocalOnly()}.
-   */
-  String REQ_QP_FORCE_LOCAL_VALUE = "local";
-
-  /**
-   * HTTP query parameter value for {@link #REQ_QP_FORCE_PARAMETER} to force remote content. See {@link
-   * RequestContext#isRequestRemoteOnly()}.
-   */
-  String REQ_QP_FORCE_REMOTE_VALUE = "remote";
-
-  /**
-   * HTTP query parameter value for {@link #REQ_QP_FORCE_PARAMETER} to force expiration of content. See {@link
-   * RequestContext#isRequestAsExpired()}.
-   */
-  String REQ_QP_FORCE_EXPIRED_VALUE = "expired";
 }
