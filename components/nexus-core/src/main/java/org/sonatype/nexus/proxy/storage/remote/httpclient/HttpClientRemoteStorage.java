@@ -91,7 +91,7 @@ public class HttpClientRemoteStorage
     implements RemoteRepositoryStorage
 {
 
-  private static final Logger outboundRequestLog = LoggerFactory.getLogger("remote.storage.outbound");
+  static final Logger outboundRequestLog = LoggerFactory.getLogger("remote.storage.outbound");
 
   // ----------------------------------------------------------------------
   // Constants
