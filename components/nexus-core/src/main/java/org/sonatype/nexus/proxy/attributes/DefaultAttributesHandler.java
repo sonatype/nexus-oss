@@ -154,7 +154,7 @@ public class DefaultAttributesHandler
 
     final Attributes attributes = getAttributeStorage().getAttributes(item.getRepositoryItemUid());
 
-    if (attributes != null) {
+    if (attributes != null && attributes.getModified() == item.getModified()) {
       item.getRepositoryItemAttributes().overlayAttributes(attributes);
     }
     else {
