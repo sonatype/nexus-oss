@@ -24,27 +24,27 @@ import com.google.common.collect.Range;
  */
 public interface Content
 {
-  enum Directive
+  enum ForceDirective
   {
-    LOCAL_ONLY, REMOTE_ONLY, GROUP_ONLY, AS_EXPIRED;
+    LOCAL, REMOTE, EXPIRED;
   }
 
   boolean exists(Location location)
       throws IOException;
 
-  boolean existsWith(Location location, Directive directive)
+  boolean existsWith(Location location, ForceDirective directive)
       throws IOException;
 
   void download(Location location, File target)
       throws IOException;
 
-  void downloadWith(Location location, Directive directive, File target)
+  void downloadWith(Location location, ForceDirective directive, File target)
       throws IOException;
 
   /**
    * @since 2.4
    */
-  void downloadWith(Location location, Directive directive, OutputStream target)
+  void downloadWith(Location location, ForceDirective directive, OutputStream target)
       throws IOException;
 
   void upload(Location location, File target)
