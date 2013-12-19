@@ -55,11 +55,11 @@ import org.eclipse.sisu.Mediator;
 import org.eclipse.sisu.inject.BeanLocator;
 
 /**
- * Extends ShiroWebModule to configure commonly set commponents such as SessionDAO, Authenticator, Authorizer, etc.
+ * Extends ShiroWebModule to configure commonly set components such as SessionDAO, Authenticator, Authorizer, etc.
  * <p>
  * When {@link #useFilterChainManager} is {@code true} the {@link #addFilterChain} method has no affect; instead all
  * named filters bound in this application are injected into the {@link FilterChainManager} so they can be added to
- * filter chains programatically.
+ * filter chains programmatically.
  *
  * @since 2.6.1
  */
@@ -96,7 +96,7 @@ public class SecurityWebModule
 
   @Override
   protected void bindWebSecurityManager(AnnotatedBindingBuilder<? super WebSecurityManager> bind) {
-    // prefer the default constructor; we'll set the realms programatically
+    // prefer the default constructor; we'll set the realms programmatically
     bind(DefaultWebSecurityManager.class).toConstructor(ctor(DefaultWebSecurityManager.class)).asEagerSingleton();
 
     // bind RealmSecurityManager and WebSecurityManager to _same_ component

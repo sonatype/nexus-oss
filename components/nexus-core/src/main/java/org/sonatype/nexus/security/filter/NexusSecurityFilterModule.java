@@ -36,16 +36,13 @@ public class NexusSecurityFilterModule
 {
   @Override
   protected void configure() {
-    // FIXME: Unsure why this is needed
     requireBinding(FilterChainResolver.class);
 
     bind(filterKey("authcBasic")).toProvider(AuthcBasicFilterProvider.class);
-    bind(filterKey("authcNxBasic")).toProvider(AuthcNxBasicFilterProvider.class);
+    bind(filterKey("authcApiKey")).toProvider(AuthcApiKeyFilterProvider.class);
 
     bind(filterKey("logout")).to(LogoutAuthenticationFilter.class).in(Singleton.class);
     bind(filterKey("perms")).to(FailureLoggingHttpMethodPermissionFilter.class).in(Singleton.class);
-
-    bind(filterKey("authcApiKey")).toProvider(AuthcApiKeyFilterProvider.class);
   }
 
   @Singleton
@@ -55,23 +52,10 @@ public class NexusSecurityFilterModule
     @Inject
     AuthcBasicFilterProvider(final NexusAuthenticationFilter filter) {
       super(filter);
-      filter.setApplicationName("Sonatype Nexus Repository Manager API");
-      filter.setFakeAuthScheme(Boolean.toString(false));
-    }
-  }
+      filter.setApplicationName("Sonatype Nexus");
 
-  /**
-   * Special filter used by login resource so that browser BASIC auth dialogs will not be shown.
-   */
-  @Singleton
-  static class AuthcNxBasicFilterProvider
-      extends FilterProviderSupport
-  {
-    @Inject
-    AuthcNxBasicFilterProvider(final NexusAuthenticationFilter filter) {
-      super(filter);
-      filter.setApplicationName("Sonatype Nexus Repository Manager API (specialized auth)");
-      filter.setFakeAuthScheme(Boolean.toString(true));
+      // change the authc scheme to avoid browser prompt for login details
+      filter.setAuthcScheme("NoPrompt_Basic");
     }
   }
 
@@ -82,7 +66,7 @@ public class NexusSecurityFilterModule
     @Inject
     AuthcApiKeyFilterProvider(final NexusApiKeyAuthenticationFilter filter) {
       super(filter);
-      filter.setApplicationName("Sonatype Nexus Repository Manager API (X-...-ApiKey auth)");
+      filter.setApplicationName("Sonatype Nexus (X-...-ApiKey auth)");
     }
   }
 }
