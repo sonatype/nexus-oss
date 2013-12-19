@@ -28,6 +28,15 @@
 
   <dependencies>
 
+	<!-- 
+	  J.Godau added this to be able to run tests for 
+	  NEXUS-6185 Timestamped M2 Snapshots should be consumable over M1 shadow
+	-->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>base-configuration</artifactId>
+    </dependency>
+
     <!-- Nexus in-reactor modules -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

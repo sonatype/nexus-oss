@@ -392,37 +392,85 @@ public abstract class LayoutConverterShadowRepository
     return Collections.singletonList(sb.toString());
   }
 
-  /**
-   * Transforms a full artifact path from M2 layout to M1 layout.
-   */
-  protected List<String> transformM2toM1(final String path, final List<String> extraFolders) {
-    final Gav gav = getM2GavCalculator().pathToGav(path);
+	/**
+	 * Transforms a full artifact path from M2 layout to M1 layout.
+	 */
+	protected List<String> transformM2toM1(final String path,
+			final List<String> extraFolders) {
+		final Gav gav = getM2GavCalculator().pathToGav(path);
 
-    // Unsupported path
-    if (gav == null) {
-      return null;
-    }
-    final List<String> exts = Lists.newArrayList();
-    exts.add(gav.getExtension() + "s");
-    if (extraFolders != null && !extraFolders.isEmpty()) {
-      exts.addAll(extraFolders);
-    }
-    final List<String> result = Lists.newArrayListWithCapacity(exts.size());
-    for (String ext : exts) {
-      // m1 repo is layouted as:
-      // g.i.d
-      // poms/jars/java-sources/licenses
-      // files
-      StringBuilder sb = new StringBuilder(RepositoryItemUid.PATH_ROOT);
-      sb.append(gav.getGroupId());
-      sb.append(RepositoryItemUid.PATH_SEPARATOR);
-      sb.append(ext);
-      sb.append(RepositoryItemUid.PATH_SEPARATOR);
-      sb.append(gav.getName());
-      result.add(sb.toString());
-    }
-    return result;
-  }
+		// Unsupported path
+		if (gav == null) {
+			return null;
+		}
+
+		final List<String> exts = Lists.newArrayList();
+		exts.add(gav.getExtension() + "s");
+		if ((extraFolders != null) && !extraFolders.isEmpty()) {
+			exts.addAll(extraFolders);
+		}
+		final List<String> result = Lists.newArrayListWithCapacity(exts.size());
+		for (final String ext : exts) {
+			// m1 repo is layouted as:
+			// g.i.d
+			// poms/jars/java-sources/licenses
+			// files
+			final StringBuilder sb = new StringBuilder(
+					RepositoryItemUid.PATH_ROOT);
+			sb.append(gav.getGroupId());
+			sb.append(RepositoryItemUid.PATH_SEPARATOR);
+			sb.append(ext);
+			sb.append(RepositoryItemUid.PATH_SEPARATOR);
+
+			// https://issues.sonatype.org/browse/NEXUS-6185
+			// Patch by J. Mertins and J. Godau of Schuetze Consulting AG,
+			// Berlin, DE
+
+			// only if it's a snapshot
+			if (Gav.isSnapshot(gav.getVersion())) {
+				// we're dealing with files like
+				// artifact-1.2-20131207.174838-3.jar
+				// artifact-1.2-20131207.174838-3.jar.md5
+				// artifact-1.2-20131207.174838-3.jar.sha1
+				// artifact-1.2-20131207.174838-3.jar.asc
+				// artifact-1.2-20131207.174838-3.pom
+				// etc...
+				//
+				// artifact-1.2-SNAPSHOT
+				sb.append(gav.getArtifactId()).append("-")
+						.append(gav.getBaseVersion());
+
+				if (!StringUtils.isEmpty(gav.getClassifier())) {
+					// if it's an ejb-client or similar then append the
+					// classifer
+					// artifact-1.2-SNAPSHOT-client
+					sb.append("-").append(gav.getClassifier());
+				}
+
+				// artifact-1.2-SNAPSHOT.pom|jar|war|ear|js|...
+				sb.append(".").append(gav.getExtension());
+
+				if (gav.isHash()) {
+					// artifact-1.2-SNAPSHOT.jar.md5|sha1
+					sb.append(".").append(gav.getHashType());
+				}
+
+				if (gav.isSignature()) {
+					// artifact-1.2-SNAPSHOT.jar.asc
+					sb.append(".").append(gav.getSignatureType());
+				}
+
+			} else {
+
+				// if it's not a SNAPSHOT, then assume everything was already
+				// correct
+				sb.append(gav.getName());
+			}
+
+			result.add(sb.toString());
+		}
+		return result;
+	}
 
   @Override
   protected StorageLinkItem createLink(final StorageItem item)
