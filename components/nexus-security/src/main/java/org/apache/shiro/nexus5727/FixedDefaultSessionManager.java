@@ -45,7 +45,7 @@ public class FixedDefaultSessionManager
 
   @Override
   protected synchronized void enableSessionValidation() {
-    log.info("Global Session Timeout: {}", getGlobalSessionTimeout());
+    log.info("Global session timeout: {} ms", getGlobalSessionTimeout());
     final SessionValidationScheduler scheduler = getSessionValidationScheduler();
     if (scheduler == null) {
       super.enableSessionValidation();
