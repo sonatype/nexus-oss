@@ -19,6 +19,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.security.filter.authc.NexusApiKeyAuthenticationFilter;
 import org.sonatype.nexus.security.filter.authc.NexusAuthenticationFilter;
+import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 import org.sonatype.nexus.security.filter.authz.FailureLoggingHttpMethodPermissionFilter;
 import org.sonatype.security.web.filter.authc.LogoutAuthenticationFilter;
 
@@ -55,7 +56,7 @@ public class NexusSecurityFilterModule
       filter.setApplicationName("Sonatype Nexus");
 
       // change the authc scheme to avoid browser prompt for login details
-      filter.setAuthcScheme("NoPrompt_Basic");
+      filter.setAuthcScheme(NexusHttpAuthenticationFilter.NO_PROMPT_BASIC);
     }
   }
 

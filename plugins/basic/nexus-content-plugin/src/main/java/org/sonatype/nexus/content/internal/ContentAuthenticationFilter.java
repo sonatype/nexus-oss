@@ -42,7 +42,10 @@ public class ContentAuthenticationFilter
   @Inject
   public ContentAuthenticationFilter(final @Nullable List<ContentRestrictionConstituent> constituents) {
     this.constituents = constituents;
-    setApplicationName("Sonatype Nexus Repository Manager");
+    setApplicationName("Sonatype Nexus");
+
+    // change the authc scheme to avoid browser prompt for login details
+    setAuthcScheme(NexusHttpAuthenticationFilter.NO_PROMPT_BASIC);
   }
 
   /**

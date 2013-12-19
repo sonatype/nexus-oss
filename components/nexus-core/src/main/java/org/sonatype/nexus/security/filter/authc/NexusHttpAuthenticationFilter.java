@@ -47,7 +47,13 @@ public class NexusHttpAuthenticationFilter
 
   public static final String AUTH_REALM_KEY = "auth.realm";
 
+  /**
+   * @deprecated use {@link #NO_PROMPT_BASIC} instead.
+   */
+  @Deprecated
   public static final String FAKE_AUTH_SCHEME = "NxBASIC";
+
+  public static final String NO_PROMPT_BASIC = "NoPrompt_Basic";
 
   public static final String ANONYMOUS_LOGIN = "nexus.anonymous";
 
