@@ -50,7 +50,6 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
-import org.sonatype.nexus.web.Constants;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
@@ -604,7 +603,8 @@ public class HttpClientRemoteStorage
       if (StringUtils.isNotBlank(queryStringBld.toString())) {
         queryStringBld.append('&');
       }
-      queryStringBld.append(Constants.REQ_QP_FORCE_PARAMETER).append("=").append(Constants.REQ_QP_FORCE_EXPIRED_VALUE);
+      // TODO: this constant is actually in nexus-content-plugin
+      queryStringBld.append("force=expired");
     }
 
     final String queryString = queryStringBld.toString();
