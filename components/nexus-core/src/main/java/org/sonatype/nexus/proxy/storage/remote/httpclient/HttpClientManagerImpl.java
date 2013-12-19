@@ -104,9 +104,9 @@ public class HttpClientManagerImpl
    * Returns {@link RedirectStrategy} used by proxy repository instances. This special strategy will kick in only
    * if Nexus performs content retrieval. In every other case (non-GET method or GET method used in remote
    * availability check) this strategy defaults to {@link DefaultRedirectStrategy} behavior.
-   * <p/>For now, if used, it is "do not follow redirect to index pages (collections), but accept and follow any
-   * other redirects" strategy. If index page redirect is detected (by naive checking the URL path for trailing slash),
-   * redirection mechanism of HC4 is stopped, and hence, the response will return with redirect response code
+   * <p/>In case of content retrieval, the "do not follow redirect to index pages (collections), but accept and follow
+   * any other redirects" strategy kicks in. If index page redirect is detected (by checking the URL path for trailing
+   * slash), redirection mechanism of HC4 is stopped, and hence, the response will return with redirect response code
    * (301, 302 or 307). These responses are handled within {@link HttpClientRemoteStorage} and is handled by
    * throwing a {@link RemoteItemNotFoundException}. Main goal of this {@link RedirectStrategy} is to save the
    * subsequent (the one following the redirect) request once we learn it would lead us to index page, as we
@@ -117,9 +117,6 @@ public class HttpClientManagerImpl
    * Nexus request will "bounce", as usually HTTP port will redirect Nexus to HTTPS port, and then the artifact
    * will be fetched. Remedy for these scenarios is to edit the proxy repository configuration and update the
    * URL to proper protocol.
-   * <p/>
-   * Still, this code is very naive way to detect index page redirects, and is used only in Nexuses released prior
-   * 2.8 release.
    * <p/>
    * This code <strong>assumes</strong> that remote repository is set up by best practices and common conventions,
    * hence, index page redirect means that target URL ends with slash. For more about this topic, read the
