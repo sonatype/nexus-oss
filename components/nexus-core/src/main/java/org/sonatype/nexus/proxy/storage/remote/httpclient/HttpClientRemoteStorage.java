@@ -91,7 +91,7 @@ public class HttpClientRemoteStorage
     implements RemoteRepositoryStorage
 {
 
-  private static final Logger outboundRequestLog = LoggerFactory.getLogger("remote.storage.outbound");
+  static final Logger outboundRequestLog = LoggerFactory.getLogger("remote.storage.outbound");
 
   // ----------------------------------------------------------------------
   // Constants
@@ -158,6 +158,16 @@ public class HttpClientRemoteStorage
     return PROVIDER_STRING;
   }
 
+  /**
+   * Key used in HttpGet method parameters in {@link #retrieveItem(ProxyRepository, ResourceStoreRequest, String)} method
+   * that this request is about content retrieval, hence, the special redirection strategy set up in
+   * {@link HttpClientManagerImpl#getProxyRepositoryRedirectStrategy(ProxyRepository, RemoteStorageContext)} should
+   * be applied. See that method for more.
+   *
+   * @since 2.7.0
+   */
+  public static final String CONTENT_RETRIEVAL_MARKER_KEY = HttpClientRemoteStorage.class.getName() + "#retrieveItem";
+
   @Override
   public AbstractStorageItem retrieveItem(final ProxyRepository repository, final ResourceStoreRequest request,
                                           final String baseUrl)
@@ -178,6 +188,7 @@ public class HttpClientRemoteStorage
     }
 
     final HttpGet method = new HttpGet(url);
+    method.getParams().setBooleanParameter(CONTENT_RETRIEVAL_MARKER_KEY, true);
 
     final HttpResponse httpResponse = executeRequest(repository, request, method, baseUrl);
 
