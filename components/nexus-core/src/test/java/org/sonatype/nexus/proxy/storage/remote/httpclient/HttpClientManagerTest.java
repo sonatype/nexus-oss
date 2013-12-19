@@ -113,11 +113,13 @@ public class HttpClientManagerTest
 
     // no location header
     request = new HttpGet("http://localhost/dir/fileA");
+    request.getParams().setBooleanParameter(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY, true);
     when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_OK);
     assertThat(underTest.isRedirected(request, response, httpContext), is(false));
 
     // redirect to file
     request = new HttpGet("http://localhost/dir/fileA");
+    request.getParams().setBooleanParameter(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY, true);
     when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_MOVED_TEMPORARILY);
     when(response.getFirstHeader("location")).thenReturn(
         new BasicHeader("location", "http://localhost/dir/fileB"));
@@ -125,6 +127,7 @@ public class HttpClientManagerTest
 
     // redirect to dir
     request = new HttpGet("http://localhost/dir");
+    request.getParams().setBooleanParameter(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY, true);
     when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_MOVED_TEMPORARILY);
     when(response.getFirstHeader("location")).thenReturn(new BasicHeader("location", "http://localhost/dir/"));
     assertThat(underTest.isRedirected(request, response, httpContext), is(false));
