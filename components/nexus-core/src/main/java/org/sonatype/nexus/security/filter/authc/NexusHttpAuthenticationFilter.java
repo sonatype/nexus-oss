@@ -59,8 +59,6 @@ public class NexusHttpAuthenticationFilter
 
   private final Logger logger = Loggers.getLogger(getClass());
 
-  private boolean fakeAuthScheme;
-
   @Inject
   private SecuritySystem securitySystem;
 
@@ -73,27 +71,6 @@ public class NexusHttpAuthenticationFilter
 
   protected Logger getLogger() {
     return logger;
-  }
-
-  // TODO: this should be boolean, but see
-  // http://issues.jsecurity.org/browse/JSEC-119
-  public String isFakeAuthScheme() {
-    return Boolean.toString(fakeAuthScheme);
-  }
-
-  // TODO: this should be boolean, but see
-  // http://issues.jsecurity.org/browse/JSEC-119
-  public void setFakeAuthScheme(String fakeAuthSchemeStr) {
-    this.fakeAuthScheme = Boolean.parseBoolean(fakeAuthSchemeStr);
-
-    if (fakeAuthScheme) {
-      setAuthcScheme(FAKE_AUTH_SCHEME);
-      setAuthzScheme(FAKE_AUTH_SCHEME);
-    }
-    else {
-      setAuthcScheme(HttpServletRequest.BASIC_AUTH);
-      setAuthzScheme(HttpServletRequest.BASIC_AUTH);
-    }
   }
 
   @Override
