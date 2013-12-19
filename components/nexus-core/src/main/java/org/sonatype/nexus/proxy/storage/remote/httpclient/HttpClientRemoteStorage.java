@@ -53,6 +53,7 @@ import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Stopwatch;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
@@ -457,13 +458,17 @@ public class HttpClientRemoteStorage
   {
     final Timer timer = timer(repository, httpRequest, baseUrl);
     final TimerContext timerContext = timer.time();
+    Stopwatch stopwatch = null;
+    if (outboundRequestLog.isDebugEnabled()) {
+      stopwatch = new Stopwatch().start();
+    }
     try {
       return doExecuteRequest(repository, request, httpRequest);
     }
     finally {
       timerContext.stop();
-      if (outboundRequestLog.isDebugEnabled()) {
-        outboundRequestLog.debug("[{}] {} {}", repository.getId(), httpRequest.getMethod(), httpRequest.getURI());
+      if (stopwatch != null) {
+        outboundRequestLog.debug("[{}] {} {} - {}", repository.getId(), httpRequest.getMethod(), httpRequest.getURI(), stopwatch);
       }
     }
   }
