@@ -13,8 +13,13 @@
 
 package org.apache.shiro.nexus5727;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.shiro.session.mgt.SessionValidationScheduler;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fixed {@link DefaultWebSessionManager} for issue SHIRO-443. This subclass is put into package of Shiro to have
@@ -29,8 +34,18 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 public class FixedDefaultWebSessionManager
     extends DefaultWebSessionManager
 {
+  private static final Logger log = LoggerFactory.getLogger(FixedDefaultWebSessionManager.class);
+
+  @Inject
+  public void configureProperties(
+      final @Named("${shiro.globalSessionTimeout:-" + DEFAULT_GLOBAL_SESSION_TIMEOUT+  "}") long globalSessionTimeout)
+  {
+    setGlobalSessionTimeout(globalSessionTimeout);
+  }
+
   @Override
   protected synchronized void enableSessionValidation() {
+    log.info("Global Session Timeout: {}", getGlobalSessionTimeout());
     final SessionValidationScheduler scheduler = getSessionValidationScheduler();
     if (scheduler == null) {
       super.enableSessionValidation();
