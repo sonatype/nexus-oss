@@ -780,7 +780,7 @@ public abstract class AbstractNexusIntegrationTest
   private static void startProfiler() {
     Class<?> controllerClazz;
     try {
-      controllerClazz = Class.forName("com.yourkit.api.Controller");
+      controllerClazz = AbstractNexusIntegrationTest.class.getClassLoader().loadClass("com.yourkit.api.Controller");
     }
     catch (Exception e) {
       staticLog.info("Profiler not present");

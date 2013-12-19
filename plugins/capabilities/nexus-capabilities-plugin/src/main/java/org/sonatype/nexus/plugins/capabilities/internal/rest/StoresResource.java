@@ -213,7 +213,7 @@ public class StoresResource
       for (String facet : facets) {
         if (StringUtils.isNotEmpty(facet) && !facet.startsWith("!")) {
           try {
-            final Class<?> facetClass = Class.forName(facet);
+            final Class<?> facetClass = getClass().getClassLoader().loadClass(facet);
             predicates.add(new Predicate<Repository>()
             {
               @Override
@@ -244,7 +244,7 @@ public class StoresResource
         if (StringUtils.isNotEmpty(facet) && facet.startsWith("!")) {
           String actualFacet = facet.substring(1);
           try {
-            final Class<?> facetClass = Class.forName(actualFacet);
+            final Class<?> facetClass = getClass().getClassLoader().loadClass(actualFacet);
             predicates.add(new Predicate<Repository>()
             {
               @Override

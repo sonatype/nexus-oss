@@ -224,10 +224,10 @@ public class DefaultSecuritySystem
         realms.add(this.realmMap.get(realmId));
       }
       else {
-        this.logger.debug("Failed to look up realm as a component, trying a Class.forName()");
+        this.logger.debug("Failed to look up realm as a component, trying reflection");
         // If that fails, will simply use reflection to load
         try {
-          realms.add((Realm) Class.forName(realmId).newInstance());
+          realms.add((Realm) getClass().getClassLoader().loadClass(realmId).newInstance());
         }
         catch (Exception e) {
           this.logger.error("Unable to lookup security realms", e);

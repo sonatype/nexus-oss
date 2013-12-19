@@ -58,7 +58,7 @@ public class LookAheadXppDriver
   private void loadLibrary() {
     if (!xppLibraryPresent) {
       try {
-        Class.forName("org.xmlpull.mxp1.MXParser");
+        getClass().getClassLoader().loadClass("org.xmlpull.mxp1.MXParser");
       }
       catch (ClassNotFoundException e) {
         throw new IllegalArgumentException("XPP3 pull parser library not present. Specify another driver." +
