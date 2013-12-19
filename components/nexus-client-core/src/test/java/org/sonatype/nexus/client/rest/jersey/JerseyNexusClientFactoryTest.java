@@ -16,6 +16,7 @@ package org.sonatype.nexus.client.rest.jersey;
 import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.rest.BaseUrl;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
+import org.sonatype.nexus.client.rest.ConnectionInfo.ValidationLevel;
 import org.sonatype.nexus.client.rest.ProxyInfo;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -66,6 +67,8 @@ public class JerseyNexusClientFactoryTest
   public void testProxySettings() {
     when(connection.getProxyInfos()).thenReturn(ImmutableMap.of(HTTP, proxyInfo));
     when(connection.getBaseUrl()).thenReturn(new BaseUrl(HTTP, "otherhost", 8080, "path"));
+    when(connection.getSslCertificateValidation()).thenReturn(ValidationLevel.STRICT);
+    when(connection.getSslCertificateHostnameValidation()).thenReturn(ValidationLevel.LAX);
 
     when(proxyInfo.getProxyHost()).thenReturn("somehost");
     when(proxyInfo.getProxyPort()).thenReturn(8888);
