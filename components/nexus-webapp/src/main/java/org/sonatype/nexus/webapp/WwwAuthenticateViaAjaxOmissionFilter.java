@@ -28,6 +28,8 @@ import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Strips out {@code WWW-Authenticate} response headers if requested via Ajax.
  *
@@ -57,6 +59,15 @@ public class WwwAuthenticateViaAjaxOmissionFilter
     // empty
   }
 
+  @VisibleForTesting
+  boolean isOmit(final String headerName, final HttpServletRequest request) {
+    if (WWW_AUTHENTICATE.equalsIgnoreCase(headerName)) {
+      String value = request.getHeader(X_REQUESTED_WITH);
+      return value != null && value.equalsIgnoreCase(XML_HTTP_REQUEST);
+    }
+    return false;
+  }
+
   @Override
   public void doFilter(final ServletRequest request, ServletResponse response, final FilterChain chain)
       throws IOException, ServletException
@@ -66,17 +77,9 @@ public class WwwAuthenticateViaAjaxOmissionFilter
 
       response = new HttpServletResponseWrapper((HttpServletResponse) response)
       {
-        private boolean isOmit(final String name) {
-          if (WWW_AUTHENTICATE.equalsIgnoreCase(name)) {
-            String value = httpRequest.getHeader(X_REQUESTED_WITH);
-            return value != null && value.equalsIgnoreCase(XML_HTTP_REQUEST);
-          }
-          return false;
-        }
-
         @Override
         public void setHeader(final String name, final String value) {
-          if (isOmit(name)) {
+          if (isOmit(name, httpRequest)) {
             log.trace("Omitting header: {}={}", name, value);
           }
           else {
@@ -86,7 +89,7 @@ public class WwwAuthenticateViaAjaxOmissionFilter
 
         @Override
         public void addHeader(final String name, final String value) {
-          if (isOmit(name)) {
+          if (isOmit(name, httpRequest)) {
             log.trace("Omitting header: {}={}", name, value);
           }
           else {
