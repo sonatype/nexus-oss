@@ -36,6 +36,9 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import eu.bitwalker.useragentutils.UserAgent;
 
+// NOTE: This violates the specification for 401 responses, which say WWW-Authenticate *must* be set.
+// NOTE: But I'm not sure it matters for browsers here, as we clearly want to shunt the default behavior on 401.
+
 /**
  * Strips out {@code WWW-Authenticate} response headers if requested via a browser (as detected by parsing User-Agent).
  *
