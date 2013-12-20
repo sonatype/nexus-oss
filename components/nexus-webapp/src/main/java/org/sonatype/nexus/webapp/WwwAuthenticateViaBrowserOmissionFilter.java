@@ -10,10 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.webapp;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.Filter;
@@ -29,18 +32,21 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import eu.bitwalker.useragentutils.UserAgent;
 
 /**
- * Strips out {@code WWW-Authenticate} response headers if requested via Ajax.
+ * Strips out {@code WWW-Authenticate} response headers if requested via a browser (as detected by parsing User-Agent).
  *
- * This will prevent browser BASIC authentication dialogs for Ajax requests.
+ * This will prevent browser BASIC authentication dialogs for all browser requests.
  * Needs to be bound very early in the filter pipeline to be effective.
  *
  * @since 2.8
  */
 @Named
 @Singleton
-public class WwwAuthenticateViaAjaxOmissionFilter
+public class WwwAuthenticateViaBrowserOmissionFilter
     extends ComponentSupport
     implements Filter
 {
@@ -48,10 +54,12 @@ public class WwwAuthenticateViaAjaxOmissionFilter
   static final String WWW_AUTHENTICATE = "WWW-Authenticate";
 
   @VisibleForTesting
-  static final String X_REQUESTED_WITH = "X-Requested-With";
+  static final String USER_AGENT = "User-Agent";
 
-  @VisibleForTesting
-  static final String XML_HTTP_REQUEST = "XMLHttpRequest";
+  private final Cache<String, UserAgent> cache = CacheBuilder.newBuilder()
+      .maximumSize(100)
+      .expireAfterWrite(2, TimeUnit.HOURS)
+      .build();
 
   @Override
   public void init(final FilterConfig config) throws ServletException {
@@ -63,19 +71,36 @@ public class WwwAuthenticateViaAjaxOmissionFilter
     // empty
   }
 
-  //
-  // TODO: sort out if we need to generally not send this header for all browser requests,
-  // TODO: which means we'll have to parse the request's user-agent to determine if we omit
-  // TODO: ... vs simply checking the X-Requested-With header value
-  //
-
   @VisibleForTesting
-  boolean isOmit(final String headerName, final HttpServletRequest request) {
+  boolean shouldOmit(final String headerName, final HttpServletRequest request) {
     if (WWW_AUTHENTICATE.equalsIgnoreCase(headerName)) {
-      String value = request.getHeader(X_REQUESTED_WITH);
-      return value != null && value.equalsIgnoreCase(XML_HTTP_REQUEST);
+      UserAgent userAgent = parseUserAgent(request.getHeader(USER_AGENT));
+      if (userAgent != null) {
+        // omit for browsers
+        switch (userAgent.getBrowser().getBrowserType()) {
+          case WEB_BROWSER:
+          case MOBILE_BROWSER:
+          case TEXT_BROWSER:
+            return true;
+        }
+      }
     }
+
     return false;
+  }
+
+  @Nullable
+  private UserAgent parseUserAgent(final String headerValue) {
+    if (headerValue == null) {
+      return null;
+    }
+
+    UserAgent userAgent = cache.getIfPresent(headerValue);
+    if (userAgent == null) {
+      userAgent = UserAgent.parseUserAgentString(headerValue);
+      cache.put(headerValue, userAgent);
+    }
+    return userAgent;
   }
 
   @Override
@@ -89,7 +114,7 @@ public class WwwAuthenticateViaAjaxOmissionFilter
       {
         @Override
         public void setHeader(final String name, final String value) {
-          if (isOmit(name, httpRequest)) {
+          if (shouldOmit(name, httpRequest)) {
             log.trace("Omitting header: {}={}", name, value);
           }
           else {
@@ -99,7 +124,7 @@ public class WwwAuthenticateViaAjaxOmissionFilter
 
         @Override
         public void addHeader(final String name, final String value) {
-          if (isOmit(name, httpRequest)) {
+          if (shouldOmit(name, httpRequest)) {
             log.trace("Omitting header: {}={}", name, value);
           }
           else {

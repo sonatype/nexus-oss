@@ -38,7 +38,7 @@ public class WebappModule
       protected void configureServlets() {
         serve("/content/*").with(NexusContentServlet.class);
         filter("/content/*").through(SecurityWebFilter.class);
-        filter("/*").through(WwwAuthenticateViaAjaxOmissionFilter.class);
+        filter("/*").through(WwwAuthenticateViaBrowserOmissionFilter.class);
       }
     });
 
