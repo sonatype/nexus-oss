@@ -38,6 +38,8 @@ import eu.bitwalker.useragentutils.UserAgent;
 
 // NOTE: This violates the specification for 401 responses, which say WWW-Authenticate *must* be set.
 // NOTE: But I'm not sure it matters for browsers here, as we clearly want to shunt the default behavior on 401.
+// NOTE: If we want to be compliant, we many want to instead of _omitting_ the header, set a custom header with
+// NOTE: a _non-basic_ scheme instead.
 
 /**
  * Strips out {@code WWW-Authenticate} response headers if requested via a browser (as detected by parsing User-Agent).
