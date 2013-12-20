@@ -1382,7 +1382,7 @@ public abstract class AbstractProxyRepository
           lastException = e;
 
           // make it logged, this is RuntimeEx
-          logFailedUrl(true, remoteUrl, e);
+          log.info("Failed URL validation: {}", remoteUrl, e);
 
           continue all_urls; // retry with next url
         }
@@ -1477,8 +1477,8 @@ public abstract class AbstractProxyRepository
           catch (RuntimeException e) {
             lastException = e;
 
-            // Runtime's should be logged
-            logFailedUrl(true, remoteUrl, e);
+            // make it logged, this is RuntimeEx
+            log.info("Failed URL retrieve/cache: {}", remoteUrl, e);
 
             continue all_urls; // retry with next url
           }
@@ -1523,13 +1523,8 @@ public abstract class AbstractProxyRepository
   }
 
   private void logFailedUrl(String url, Exception e) {
-    logFailedUrl(log.isDebugEnabled(), url, e);
-  }
-
-  private void logFailedUrl(boolean shouldLog, String url, Exception e) {
-    if (shouldLog) {
-      log.debug("Failed URL: {}", url);
-      log.debug(e.getMessage(), e);
+    if (log.isDebugEnabled()) {
+      log.debug("Failed URL: {}", url, e);
     }
   }
 
