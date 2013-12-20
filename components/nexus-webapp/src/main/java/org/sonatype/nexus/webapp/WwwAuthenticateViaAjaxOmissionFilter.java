@@ -53,7 +53,7 @@ public class WwwAuthenticateViaAjaxOmissionFilter
   static final String XML_HTTP_REQUEST = "XMLHttpRequest";
 
   @Override
-  public void init(final FilterConfig filterConfig) throws ServletException {
+  public void init(final FilterConfig config) throws ServletException {
     // empty
   }
 
