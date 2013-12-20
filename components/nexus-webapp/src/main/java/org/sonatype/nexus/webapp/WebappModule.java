@@ -35,7 +35,7 @@ public class WebappModule
     {
       @Override
       protected void configureServlets() {
-        filter("/*").through(WwwAuthenticateViaAjaxOmissionFilter.class);
+        filter("/*").through(WwwAuthenticateViaBrowserOmissionFilter.class);
       }
     });
 

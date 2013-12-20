@@ -91,6 +91,11 @@
       <artifactId>nexus-oss-edition</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>bitwalker</groupId>
+      <artifactId>UserAgentUtils</artifactId>
+    </dependency>
+
     <!--
     HACK: Using nexus.version since DM not in scope.
     -->
