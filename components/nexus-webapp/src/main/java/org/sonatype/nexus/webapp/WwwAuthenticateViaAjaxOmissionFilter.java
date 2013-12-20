@@ -59,6 +59,12 @@ public class WwwAuthenticateViaAjaxOmissionFilter
     // empty
   }
 
+  //
+  // TODO: sort out if we need to generally not send this header for all browser requests,
+  // TODO: which means we'll have to parse the request's user-agent to determine if we omit
+  // TODO: ... vs simply checking the X-Requested-With header value
+  //
+
   @VisibleForTesting
   boolean isOmit(final String headerName, final HttpServletRequest request) {
     if (WWW_AUTHENTICATE.equalsIgnoreCase(headerName)) {
