@@ -13,7 +13,10 @@
 /*global define*/
 define('Nexus/configuration/Ajax', ['extjs'], function(Ext) {
   Ext.Ajax.defaultHeaders = {
-    'accept' : 'application/json,application/vnd.siesta-error-v1+json,application/vnd.siesta-validation-errors-v1+json'
+    'accept' : 'application/json,application/vnd.siesta-error-v1+json,application/vnd.siesta-validation-errors-v1+json',
+
+    // ensure that we send X-Requested-With so that server can omit WWW-Authenticate headers in responses
+    'X-Requested-With': 'XMLHttpRequest'
   };
 
   Ext.Ajax.on('requestexception', function(connection, response) {
