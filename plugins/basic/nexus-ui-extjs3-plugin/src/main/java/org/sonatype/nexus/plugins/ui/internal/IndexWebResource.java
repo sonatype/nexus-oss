@@ -32,7 +32,9 @@ import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor.UiContribution;
 import org.sonatype.nexus.web.BaseUrlHolder;
+import org.sonatype.nexus.web.DelegatingWebResource;
 import org.sonatype.nexus.web.WebResource;
+import org.sonatype.nexus.web.WebResource.Prepareable;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 
@@ -51,7 +53,7 @@ import static com.google.common.base.Preconditions.checkState;
 @Singleton
 public class IndexWebResource
   extends ComponentSupport
-  implements WebResource
+  implements WebResource, Prepareable
 {
   private final Provider<HttpServletRequest> requestProvider;
 
@@ -89,11 +91,6 @@ public class IndexWebResource
   }
 
   @Override
-  public long getSize() {
-    return UNKNOWN_SIZE;
-  }
-
-  @Override
   public long getLastModified() {
     return System.currentTimeMillis();
   }
@@ -104,11 +101,16 @@ public class IndexWebResource
   }
 
   @Override
-  public InputStream getInputStream() throws IOException {
-    return renderTemplate("index.vm");
+  public long getSize() {
+    throw new UnsupportedOperationException("Preparation required");
   }
 
-  private InputStream renderTemplate(final String templateName) throws IOException {
+  @Override
+  public InputStream getInputStream() throws IOException {
+    throw new UnsupportedOperationException("Preparation required");
+  }
+
+  private byte[] renderTemplate(final String templateName) throws IOException {
     SystemStatus systemStatus = applicationStatusSource.getSystemStatus();
 
     Map<String, Object> params = Maps.newHashMap();
@@ -138,11 +140,29 @@ public class IndexWebResource
     log.debug("Rendering template: {}", template);
     String content = templateEngine.render(this, template, params);
 
-    return new ByteArrayInputStream(content.getBytes());
+    return content.getBytes();
   }
 
   private boolean isDebugMode() {
     String query = requestProvider.get().getQueryString();
     return query != null && query.contains("debug");
+  }
+
+  @Override
+  public WebResource prepare() throws IOException {
+    return new DelegatingWebResource(this)
+    {
+      private final byte[] content = renderTemplate("index.vm");
+
+      @Override
+      public long getSize() {
+        return content.length;
+      }
+
+      @Override
+      public InputStream getInputStream() throws IOException {
+        return new ByteArrayInputStream(content);
+      }
+    };
   }
 }
