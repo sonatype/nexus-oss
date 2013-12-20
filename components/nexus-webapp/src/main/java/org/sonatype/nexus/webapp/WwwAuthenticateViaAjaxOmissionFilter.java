@@ -34,6 +34,7 @@ import com.google.common.annotations.VisibleForTesting;
  * Strips out {@code WWW-Authenticate} response headers if requested via Ajax.
  *
  * This will prevent browser BASIC authentication dialogs for Ajax requests.
+ * Needs to be bound very early in the filter pipeline to be effective.
  *
  * @since 2.8
  */
