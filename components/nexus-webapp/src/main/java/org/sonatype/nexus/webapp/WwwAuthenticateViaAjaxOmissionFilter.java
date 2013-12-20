@@ -43,11 +43,14 @@ public class WwwAuthenticateViaAjaxOmissionFilter
     extends ComponentSupport
     implements Filter
 {
-  private static final String WWW_AUTHENTICATE = "WWW-Authenticate";
+  @VisibleForTesting
+  static final String WWW_AUTHENTICATE = "WWW-Authenticate";
 
-  private static final String X_REQUESTED_WITH = "X-Requested-With";
+  @VisibleForTesting
+  static final String X_REQUESTED_WITH = "X-Requested-With";
 
-  private static final String XML_HTTP_REQUEST = "XMLHttpRequest";
+  @VisibleForTesting
+  static final String XML_HTTP_REQUEST = "XMLHttpRequest";
 
   @Override
   public void init(final FilterConfig filterConfig) throws ServletException {
