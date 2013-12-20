@@ -42,12 +42,9 @@ import org.restlet.resource.Variant;
 public class NexusLoginPlexusResource
     extends AbstractLoginPlexusResource
 {
-
   @Override
   public PathProtectionDescriptor getResourceProtection() {
-    // this is the ONLY resource using authcNxBasic, as the UI can't receive 401 errors from teh server
-    // as the browser login pops up, which is no good in this case
-    return new PathProtectionDescriptor(getResourceUri(), "authcNxBasic,perms[nexus:authentication]");
+    return new PathProtectionDescriptor(getResourceUri(), "authcBasic,perms[nexus:authentication]");
   }
 
   /**

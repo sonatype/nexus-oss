@@ -62,15 +62,9 @@ public class NexusApplication
     this.statusService = statusService;
   }
 
-  // HACK: Too many places were using new NexusApplication() ... fuck it
   @VisibleForTesting
   public NexusApplication() {
-    this(
-        null,
-        null,
-        null,
-        null
-    );
+    this(null, null, null, null);
   }
 
   @Subscribe
@@ -135,11 +129,6 @@ public class NexusApplication
     }
 
     String filterExpression = descriptor.getFilterExpression();
-    if (filterExpression != null && !filterExpression.contains("authcNxBasic")) {
-      // don't create session unless the user logs in from the UI
-      filterExpression = "noSessionCreation," + filterExpression;
-    }
-
     this.protectedPathManager.addProtectedResource("/service/local" + descriptor.getPathPattern(), filterExpression);
   }
 
