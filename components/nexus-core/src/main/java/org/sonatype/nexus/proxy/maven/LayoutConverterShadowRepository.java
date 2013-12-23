@@ -395,30 +395,55 @@ public abstract class LayoutConverterShadowRepository
   /**
    * Transforms a full artifact path from M2 layout to M1 layout.
    */
-  protected List<String> transformM2toM1(final String path, final List<String> extraFolders) {
+  protected List<String> transformM2toM1(final String path,
+                                         final List<String> extraFolders)
+  {
     final Gav gav = getM2GavCalculator().pathToGav(path);
 
     // Unsupported path
     if (gav == null) {
       return null;
     }
+
     final List<String> exts = Lists.newArrayList();
     exts.add(gav.getExtension() + "s");
-    if (extraFolders != null && !extraFolders.isEmpty()) {
+    if ((extraFolders != null) && !extraFolders.isEmpty()) {
       exts.addAll(extraFolders);
     }
     final List<String> result = Lists.newArrayListWithCapacity(exts.size());
-    for (String ext : exts) {
+    for (final String ext : exts) {
       // m1 repo is layouted as:
       // g.i.d
       // poms/jars/java-sources/licenses
       // files
-      StringBuilder sb = new StringBuilder(RepositoryItemUid.PATH_ROOT);
+      final StringBuilder sb = new StringBuilder(RepositoryItemUid.PATH_ROOT);
       sb.append(gav.getGroupId());
       sb.append(RepositoryItemUid.PATH_SEPARATOR);
       sb.append(ext);
       sb.append(RepositoryItemUid.PATH_SEPARATOR);
-      sb.append(gav.getName());
+
+      // NEXUS-6185: Fix for M2 timestamped snapshots
+      if (gav.isSnapshot()) {
+        // we're dealing with files like
+        // artifact-1.2-20131207.174838-3.jar
+        // goal is
+        // artifact-1.2-SNAPSHOT
+        sb.append(gav.getArtifactId()).append("-").append(gav.getBaseVersion());
+
+        if (!StringUtils.isEmpty(gav.getClassifier())) {
+          sb.append("-").append(gav.getClassifier());
+        }
+        sb.append(".").append(gav.getExtension());
+        if (gav.isHash()) {
+          sb.append(".").append(gav.getHashType());
+        }
+        if (gav.isSignature()) {
+          sb.append(".").append(gav.getSignatureType());
+        }
+      }
+      else {
+        sb.append(gav.getName());
+      }
       result.add(sb.toString());
     }
     return result;
