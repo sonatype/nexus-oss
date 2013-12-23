@@ -1382,7 +1382,7 @@ public abstract class AbstractProxyRepository
           lastException = e;
 
           // make it logged, this is RuntimeEx
-          log.info("Failed URL validation: {}", remoteUrl, e);
+          log.warn("Failed URL validation: {}", remoteUrl, e);
 
           continue all_urls; // retry with next url
         }
@@ -1478,7 +1478,7 @@ public abstract class AbstractProxyRepository
             lastException = e;
 
             // make it logged, this is RuntimeEx
-            log.info("Failed URL retrieve/cache: {}", remoteUrl, e);
+            log.warn("Failed URL retrieve/cache: {}", remoteUrl, e);
 
             continue all_urls; // retry with next url
           }
