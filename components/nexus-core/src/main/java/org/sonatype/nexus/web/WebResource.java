@@ -30,13 +30,15 @@ public interface WebResource
 
   long UNKNOWN_LAST_MODIFIED = 0L;
 
+  String UNKNOWN_CONTENT_TYPE = "application/octet-stream";
+
   /**
    * The path where the resource is mounted under the servlet-context.
    */
   String getPath();
 
   /**
-   * The content-type of the resource, or null if unknown.
+   * The content-type of the resource, or {@code null} or {@link #UNKNOWN_CONTENT_TYPE} if unknown.
    */
   @Nullable
   String getContentType();
@@ -64,4 +66,12 @@ public interface WebResource
    * Resource content stream.
    */
   InputStream getInputStream() throws IOException;
+
+  /**
+   * Allows web-resources to prepare for handling requests.
+   */
+  interface Prepareable
+  {
+    WebResource prepare() throws IOException;
+  }
 }

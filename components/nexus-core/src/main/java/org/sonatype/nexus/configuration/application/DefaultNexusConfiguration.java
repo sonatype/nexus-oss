@@ -732,8 +732,7 @@ public class DefaultNexusConfiguration
   {
     try {
       // core realm will search child/plugin realms too
-      final Class<Repository> klazz = (Class<Repository>) Class
-          .forName(repositoryModel.getProviderRole(), true, uberClassLoader);
+      final Class<Repository> klazz = (Class<Repository>) uberClassLoader.loadClass(repositoryModel.getProviderRole());
       return instantiateRepository(configuration, klazz, repositoryModel.getProviderHint(), repositoryModel);
     }
     catch (Exception e) {

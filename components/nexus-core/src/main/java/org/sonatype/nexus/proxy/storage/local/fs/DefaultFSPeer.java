@@ -117,7 +117,7 @@ public class DefaultFSPeer
       // In case of error cleaning up only what needed
       // No locking needed, AbstractRepository took care of that
       try (final InputStream is = cl.getContent(); final OutputStream os = new BufferedOutputStream(
-          new FileOutputStream(hiddenTarget))) {
+          new FileOutputStream(hiddenTarget), getCopyStreamBufferSize())) {
         StreamSupport.copy(is, os, getCopyStreamBufferSize());
         os.flush();
       }
@@ -339,7 +339,7 @@ public class DefaultFSPeer
   private static final String FILE_COPY_STREAM_BUFFER_SIZE_KEY = "upload.stream.bufferSize";
 
   private static final int FILE_COPY_STREAM_BUFFER_SIZE = SystemPropertiesHelper
-      .getInteger(FILE_COPY_STREAM_BUFFER_SIZE_KEY, 4096);
+      .getInteger(FILE_COPY_STREAM_BUFFER_SIZE_KEY, 8192); // align with Java default bufSize (BufferedOutputStream)
 
   protected int getCopyStreamBufferSize() {
     return FILE_COPY_STREAM_BUFFER_SIZE;

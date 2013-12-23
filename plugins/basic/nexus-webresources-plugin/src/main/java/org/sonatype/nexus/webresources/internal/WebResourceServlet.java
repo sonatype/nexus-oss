@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.web.ErrorStatusException;
 import org.sonatype.nexus.web.WebResource;
+import org.sonatype.nexus.web.WebResource.Prepareable;
 import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.nexus.webresources.WebResourceService;
 import org.sonatype.sisu.goodies.common.Time;
@@ -34,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 
@@ -85,15 +87,27 @@ public class WebResourceServlet
     serveResource(resource, request, response);
   }
 
-  private void serveResource(final WebResource resource,
+  private void serveResource(WebResource resource,
                              final HttpServletRequest request,
                              final HttpServletResponse response)
       throws IOException
   {
     log.trace("Serving resource: {}", resource);
 
+    // support resources which need to be prepared before serving
+    if (resource instanceof Prepareable) {
+      resource = ((Prepareable) resource).prepare();
+      checkState(resource != null, "Prepared resource is null");
+    }
+    assert resource != null;
+
     webUtils.equipResponseWithStandardHeaders(response);
-    response.setHeader("Content-Type", resource.getContentType());
+
+    String contentType = resource.getContentType();
+    if (contentType == null) {
+      contentType = WebResource.UNKNOWN_CONTENT_TYPE;
+    }
+    response.setHeader("Content-Type", contentType);
     response.setDateHeader("Last-Modified", resource.getLastModified());
     response.setHeader("Content-Length", String.valueOf(resource.getSize()));
 

@@ -62,7 +62,7 @@ public class AuthorizationExceptionMapper
 
       builder
           .status(Response.Status.UNAUTHORIZED)
-          .header(AUTHENTICATE_HEADER, scheme + " realm=\"" + realm + "");
+          .header(AUTHENTICATE_HEADER, String.format("%s realm=\"%s\"", scheme, realm));
     }
     return builder.build();
   }
