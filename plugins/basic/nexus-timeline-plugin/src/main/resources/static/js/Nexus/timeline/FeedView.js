@@ -74,7 +74,7 @@ NX.define('Nexus.timeline.FeedView', {
       tbar : [
         {
           text : 'Refresh',
-          icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+          icon : Sonatype.config.resourcePath + '/static/images/icons/arrow_refresh.png',
           cls : 'x-btn-text-icon',
           handler : function() {
             self.feedsDataStore.reload();
@@ -83,7 +83,7 @@ NX.define('Nexus.timeline.FeedView', {
         },
         {
           text : 'Subscribe',
-          icon : Sonatype.config.resourcePath + '/images/icons/feed.png',
+          icon : Sonatype.config.resourcePath + '/static/images/icons/feed.png',
           cls : 'x-btn-text-icon',
           handler : function() {
             if (self.feedsGridPanel.getSelectionModel().hasSelection()) {
