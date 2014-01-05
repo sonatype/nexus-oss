@@ -41,7 +41,7 @@ public class MDCUtils
 
   public static void setMDCUserIdIfNeeded() {
     final String userId = MDC.get(USER_ID_KEY);
-    if (Strings.isNullOrEmpty(userId)) {
+    if (Strings.isNullOrEmpty(userId) || UNKNOWN_USER_ID.equals(userId)) {
       setMDCUserId();
     }
   }
