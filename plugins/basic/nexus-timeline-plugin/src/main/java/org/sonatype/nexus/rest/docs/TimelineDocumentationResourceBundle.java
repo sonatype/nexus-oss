@@ -13,25 +13,20 @@
 
 package org.sonatype.nexus.rest.docs;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
+import org.sonatype.nexus.plugin.support.DocumentationBundleSupport;
+import org.sonatype.nexus.timeline.TimelinePlugin;
 
 @Named
 @Singleton
 public class TimelineDocumentationResourceBundle
-    extends AbstractDocumentationResourceBundle
+    extends DocumentationBundleSupport
 {
-
-  @Override
-  public String getPluginId() {
-    return "nexus-timeline-plugin";
+  @Inject
+  public TimelineDocumentationResourceBundle(final TimelinePlugin plugin) {
+    super(plugin);
   }
-
-  @Override
-  public String getDescription() {
-    return "Timeline Plugin API";
-  }
-
 }

@@ -13,25 +13,20 @@
 
 package org.sonatype.nexus.plugins.plugin.console.ui;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
+import org.sonatype.nexus.plugin.support.DocumentationBundleSupport;
+import org.sonatype.nexus.plugins.plugin.console.PluginConsolePlugin;
 
 @Named
 @Singleton
 public class PluginConsoleDocumentationResourceBundle
-    extends AbstractDocumentationResourceBundle
+    extends DocumentationBundleSupport
 {
-
-  @Override
-  public String getPluginId() {
-    return "nexus-plugin-console-plugin";
+  @Inject
+  public PluginConsoleDocumentationResourceBundle(final PluginConsolePlugin plugin) {
+    super(plugin);
   }
-
-  @Override
-  public String getDescription() {
-    return "Plugin Console Plugin API";
-  }
-
 }

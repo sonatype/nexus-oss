@@ -13,10 +13,12 @@
 
 package org.sonatype.nexus.unpack.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
+import org.sonatype.nexus.plugin.support.DocumentationBundleSupport;
+import org.sonatype.nexus.unpack.UnpackPlugin;
 
 /**
  * Unpack plugin documentation bundle.
@@ -24,15 +26,10 @@ import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
 @Named
 @Singleton
 public class UnpackDocumentationResourceBundle
-    extends AbstractDocumentationResourceBundle
+    extends DocumentationBundleSupport
 {
-  @Override
-  public String getPluginId() {
-    return "nexus-unpack-plugin";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Unpack Plugin API";
+  @Inject
+  public UnpackDocumentationResourceBundle(final UnpackPlugin plugin) {
+    super(plugin);
   }
 }
