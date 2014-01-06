@@ -39,7 +39,7 @@ public class UserIdMdcHelper
 
   public static boolean isSet() {
     String userId = MDC.get(KEY);
-    return !Strings.isNullOrEmpty(userId) || UNKNOWN.equals(userId);
+    return !(Strings.isNullOrEmpty(userId) || UNKNOWN.equals(userId));
   }
 
   public static void setIfNeeded() {
