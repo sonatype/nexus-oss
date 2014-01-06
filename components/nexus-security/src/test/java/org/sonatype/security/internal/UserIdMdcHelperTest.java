@@ -14,6 +14,7 @@ package org.sonatype.security.internal;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.junit.After;
@@ -27,6 +28,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.sonatype.security.internal.UserIdMdcHelper.KEY;
+import static org.sonatype.security.internal.UserIdMdcHelper.UNKNOWN;
 
 /**
  * Tests for {@link UserIdMdcHelper}.
@@ -34,16 +36,20 @@ import static org.sonatype.security.internal.UserIdMdcHelper.KEY;
 public class UserIdMdcHelperTest
   extends TestSupport
 {
-  @Before
-  public void setUp() throws Exception {
+  private void reset() {
     MDC.remove(KEY);
     ThreadContext.unbindSubject();
+    ThreadContext.unbindSecurityManager();
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    reset();
   }
 
   @After
   public void tearDown() throws Exception {
-    MDC.remove(KEY);
-    ThreadContext.unbindSubject();
+    reset();
   }
 
   private Subject subject(final Object principal) {
@@ -59,12 +65,12 @@ public class UserIdMdcHelperTest
 
   @Test
   public void userId_nullSubject() {
-    assertThat(UserIdMdcHelper.userId(null), is(UserIdMdcHelper.UNKNOWN));
+    assertThat(UserIdMdcHelper.userId(null), is(UNKNOWN));
   }
 
   @Test
   public void userId_nullPrincipal() {
-    assertThat(UserIdMdcHelper.userId(subject(null)), is(UserIdMdcHelper.UNKNOWN));
+    assertThat(UserIdMdcHelper.userId(subject(null)), is(UNKNOWN));
   }
 
   @Test
@@ -88,7 +94,7 @@ public class UserIdMdcHelperTest
 
   @Test
   public void isSet_withUnknown() {
-    MDC.put(KEY, UserIdMdcHelper.UNKNOWN);
+    MDC.put(KEY, UNKNOWN);
     assertThat(UserIdMdcHelper.isSet(), is(false));
   }
 
@@ -113,6 +119,16 @@ public class UserIdMdcHelperTest
 
     assertThat(UserIdMdcHelper.isSet(), is(true));
     assertThat(MDC.get(KEY), is("test"));
+  }
+
+  @Test
+  public void set_notSet_withoutSubject() {
+    ThreadContext.bind(mock(SecurityManager.class));
+
+    UserIdMdcHelper.set();
+
+    assertThat(UserIdMdcHelper.isSet(), is(false));
+    assertThat(MDC.get(KEY), is(UNKNOWN));
   }
 
   @Test
