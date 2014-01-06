@@ -15,6 +15,7 @@ package org.sonatype.security.internal;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,11 +37,34 @@ public class UserIdMdcHelperTest
   @Before
   public void setUp() throws Exception {
     MDC.remove(KEY);
+    ThreadContext.unbindSubject();
   }
 
   @After
   public void tearDown() throws Exception {
     MDC.remove(KEY);
+    ThreadContext.unbindSubject();
+  }
+
+  private Subject subject(final Object principal) {
+    Subject subject = mock(Subject.class);
+    when(subject.getPrincipal()).thenReturn(principal);
+    return subject;
+  }
+
+  @Test
+  public void userId_subject() {
+    assertThat(UserIdMdcHelper.userId(subject("test")), is("test"));
+  }
+
+  @Test
+  public void userId_nullSubject() {
+    assertThat(UserIdMdcHelper.userId(null), is(UserIdMdcHelper.UNKNOWN));
+  }
+
+  @Test
+  public void userId_nullPrincipal() {
+    assertThat(UserIdMdcHelper.userId(subject(null)), is(UserIdMdcHelper.UNKNOWN));
   }
 
   @Test
@@ -69,39 +93,59 @@ public class UserIdMdcHelperTest
   }
 
   @Test(expected = NullPointerException.class)
-  public void set_null() {
+  public void set_withNull() {
     UserIdMdcHelper.set(null);
   }
 
   @Test
-  public void set_subject() {
-    Subject subject = mock(Subject.class);
-    when(subject.getPrincipal()).thenReturn("test");
-
-    UserIdMdcHelper.set(subject);
+  public void set_withSubject() {
+    UserIdMdcHelper.set(subject("test"));
 
     assertThat(UserIdMdcHelper.isSet(), is(true));
     assertThat(MDC.get(KEY), is("test"));
   }
 
   @Test
-  public void userId_subject() {
-    Subject subject = mock(Subject.class);
-    when(subject.getPrincipal()).thenReturn("test");
+  public void set_notSet() {
+    ThreadContext.bind(subject("test"));
 
-    assertThat(UserIdMdcHelper.userId(subject), is("test"));
+    UserIdMdcHelper.set();
+
+    assertThat(UserIdMdcHelper.isSet(), is(true));
+    assertThat(MDC.get(KEY), is("test"));
   }
 
   @Test
-  public void userId_nullSubject() {
-    assertThat(UserIdMdcHelper.userId(null), is(UserIdMdcHelper.UNKNOWN));
+  public void set_alreadySet() {
+    MDC.put(KEY, "foo");
+
+    ThreadContext.bind(subject("test"));
+
+    UserIdMdcHelper.set();
+
+    assertThat(UserIdMdcHelper.isSet(), is(true));
+    assertThat(MDC.get(KEY), is("test"));
   }
 
   @Test
-  public void userId_nullPrincipal() {
-    Subject subject = mock(Subject.class);
-    when(subject.getPrincipal()).thenReturn(null);
+  public void setIfNeeded_notSet() {
+    ThreadContext.bind(subject("test"));
 
-    assertThat(UserIdMdcHelper.userId(subject), is(UserIdMdcHelper.UNKNOWN));
+    UserIdMdcHelper.setIfNeeded();
+
+    assertThat(UserIdMdcHelper.isSet(), is(true));
+    assertThat(MDC.get(KEY), is("test"));
+  }
+
+  @Test
+  public void setIfNeeded_alreadySet() {
+    MDC.put(KEY, "foo");
+
+    ThreadContext.bind(subject("test"));
+
+    UserIdMdcHelper.setIfNeeded();
+
+    assertThat(UserIdMdcHelper.isSet(), is(true));
+    assertThat(MDC.get(KEY), is("foo"));
   }
 }
