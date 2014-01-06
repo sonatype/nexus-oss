@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
-import org.sonatype.nexus.threads.MDCUtils;
 import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.common.Loggers;
@@ -273,7 +272,6 @@ public class NexusHttpAuthenticationFilter
     else {
       userId = token.getPrincipal().toString();
     }
-    MDCUtils.setMDCUserId();
     postAuthcEvent(request, userId, getUserAgent(request), true);
     return true;
   }

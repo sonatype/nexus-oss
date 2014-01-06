@@ -15,12 +15,9 @@ package org.sonatype.nexus.threads;
 
 import java.util.Map;
 
-import com.google.common.base.Strings;
+import org.sonatype.security.internal.UserIdMdcHelper;
+
 import com.google.common.collect.Maps;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 /**
@@ -31,53 +28,13 @@ import org.slf4j.MDC;
  */
 public class MDCUtils
 {
-  private static final Logger log = LoggerFactory.getLogger(MDCUtils.class);
-
   public static final String CONTEXT_NON_INHERITABLE_KEY = "non-inheritable";
-
-  public static final String USER_ID_KEY = "userId";
-
-  public static final String UNKNOWN_USER_ID = "*UNKNOWN";
-
-  public static void setMDCUserIdIfNeeded() {
-    final String userId = MDC.get(USER_ID_KEY);
-    if (Strings.isNullOrEmpty(userId) || UNKNOWN_USER_ID.equals(userId)) {
-      setMDCUserId();
-    }
-  }
-
-  public static void setMDCUserId() {
-    MDC.put(USER_ID_KEY, getCurrentUserId());
-  }
-
-  public static void unsetMDCUserId() {
-    MDC.remove(USER_ID_KEY);
-  }
-
-  public static String getCurrentUserId() {
-    String userId = UNKNOWN_USER_ID;
-    try {
-      final Subject subject = SecurityUtils.getSubject();
-      if (subject != null) {
-        final Object principal = subject.getPrincipal();
-        if (principal != null) {
-          userId = principal.toString();
-        }
-      }
-    }
-    catch (Exception e) {
-      log.warn("Unable to determine current user; ignoring", e);
-    }
-    log.trace("Current userId: {}", userId);
-    return userId;
-  }
-
-  // ==
 
   public static Map<String, String> getCopyOfContextMap() {
     final boolean inheritable = MDC.get(CONTEXT_NON_INHERITABLE_KEY) == null;
     Map<String, String> result = null;
     if (inheritable) {
+      //noinspection unchecked
       result = MDC.getCopyOfContextMap();
     }
     if (result == null) {
@@ -90,11 +47,11 @@ public class MDCUtils
   public static void setContextMap(Map<String, String> context) {
     if (context != null) {
       MDC.setContextMap(context);
-      setMDCUserIdIfNeeded();
+      UserIdMdcHelper.setIfNeeded();
     }
     else {
       MDC.clear();
-      setMDCUserId();
+      UserIdMdcHelper.set();
     }
   }
 }
