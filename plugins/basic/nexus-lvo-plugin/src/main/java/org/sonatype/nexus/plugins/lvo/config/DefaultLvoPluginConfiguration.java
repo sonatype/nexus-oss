@@ -71,7 +71,15 @@ public class DefaultLvoPluginConfiguration
 
     @Override
     public String readVersion(final InputStream input) throws IOException, CorruptModelException {
-      return versionedHelper.readVersion(input);
+      // NEXUS-6099: Treat "1.0.0" XML as "1.0.1" as those are backward compatible
+      // But it seems we still have instances with mismanaged LVO XML versions out there
+      final String version = versionedHelper.readVersion(input);
+      if ("1.0.0".equals(version)) {
+        return "1.0.1";
+      }
+      else {
+        return version;
+      }
     }
   }
 

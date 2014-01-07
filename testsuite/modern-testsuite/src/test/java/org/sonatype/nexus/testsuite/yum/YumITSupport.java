@@ -13,7 +13,9 @@
 
 package org.sonatype.nexus.testsuite.yum;
 
+import java.lang.ProcessBuilder.Redirect;
 import java.util.Collection;
+import java.util.List;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.capabilities.client.Capabilities;
@@ -35,9 +37,12 @@ import org.sonatype.nexus.yum.client.capabilities.GenerateMetadataCapability;
 import org.sonatype.nexus.yum.client.capabilities.MergeMetadataCapability;
 import org.sonatype.nexus.yum.client.capabilities.ProxyMetadataCapability;
 
+import com.google.common.collect.Lists;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.runners.Parameterized;
 
+import static org.junit.Assume.assumeTrue;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
@@ -76,6 +81,25 @@ public class YumITSupport
                 "org.sonatype.nexus.plugins", "nexus-yum-repository-plugin"
             )
         );
+  }
+
+  @BeforeClass
+  public static void ignoreIfCreateRepoNotPresent() {
+    List<String> command = Lists.newArrayList();
+    command.add("createrepo");
+    command.add("--version");
+
+    ProcessBuilder processBuilder = new ProcessBuilder(command);
+    processBuilder.redirectErrorStream(true);
+    processBuilder.redirectOutput(Redirect.INHERIT);
+
+    try {
+      int exitCode = processBuilder.start().waitFor();
+      assumeTrue("createrepo is present", exitCode == 0);
+    }
+    catch (Exception e) {
+      assumeTrue("createrepo is present", false);
+    }
   }
 
   @Before

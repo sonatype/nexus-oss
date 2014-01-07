@@ -18,6 +18,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.webapp.metrics.MetricsModule;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.servlet.ServletModule;
 
 /**
  * Webapp module.
@@ -30,6 +31,14 @@ public class WebappModule
 {
   @Override
   protected void configure() {
+    install(new ServletModule()
+    {
+      @Override
+      protected void configureServlets() {
+        filter("/*").through(WwwAuthenticateViaBrowserOmissionFilter.class);
+      }
+    });
+
     install(new MetricsModule());
   }
 }

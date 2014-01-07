@@ -91,6 +91,11 @@
       <artifactId>nexus-oss-edition</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>bitwalker</groupId>
+      <artifactId>UserAgentUtils</artifactId>
+    </dependency>
+
     <!--
     HACK: Using nexus.version since DM not in scope.
     -->
@@ -273,6 +278,12 @@
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

@@ -134,6 +134,12 @@
         <artifactId>hazelcast</artifactId>
         <version>1.9.4.4</version>
       </dependency>
+
+      <dependency>
+        <groupId>bitwalker</groupId>
+        <artifactId>UserAgentUtils</artifactId>
+        <version>1.12</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

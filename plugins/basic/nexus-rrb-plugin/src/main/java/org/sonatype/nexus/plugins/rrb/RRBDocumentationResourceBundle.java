@@ -13,25 +13,19 @@
 
 package org.sonatype.nexus.plugins.rrb;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
+import org.sonatype.nexus.plugin.support.DocumentationBundleSupport;
 
 @Named
 @Singleton
 public class RRBDocumentationResourceBundle
-    extends AbstractDocumentationResourceBundle
+    extends DocumentationBundleSupport
 {
-
-  @Override
-  public String getPluginId() {
-    return "nexus-rrb-plugin";
+  @Inject
+  public RRBDocumentationResourceBundle(final RrbPlugin plugin) {
+    super(plugin);
   }
-
-  @Override
-  public String getDescription() {
-    return "RRB Plugin API";
-  }
-
 }

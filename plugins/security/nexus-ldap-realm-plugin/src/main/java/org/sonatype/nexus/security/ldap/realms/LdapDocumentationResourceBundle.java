@@ -13,25 +13,19 @@
 
 package org.sonatype.nexus.security.ldap.realms;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
+import org.sonatype.nexus.plugin.support.DocumentationBundleSupport;
 
 @Named
 @Singleton
 public class LdapDocumentationResourceBundle
-    extends AbstractDocumentationResourceBundle
+    extends DocumentationBundleSupport
 {
-
-  @Override
-  public String getPluginId() {
-    return "nexus-ldap-realm-plugin";
+  @Inject
+  public LdapDocumentationResourceBundle(final LdapPlugin plugin) {
+    super(plugin);
   }
-
-  @Override
-  public String getDescription() {
-    return "OSS LDAP Realm API";
-  }
-
 }

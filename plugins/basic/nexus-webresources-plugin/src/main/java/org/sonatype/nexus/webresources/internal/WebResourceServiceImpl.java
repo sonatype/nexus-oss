@@ -37,6 +37,7 @@ import org.sonatype.nexus.webresources.WebResourceService;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -95,7 +96,9 @@ public class WebResourceServiceImpl
 
     log.info("Discovered {} resources", resourcePaths.size());
     if (log.isDebugEnabled()) {
-      for (String path : resourcePaths.keySet()) {
+      List<String> paths = Lists.newArrayList(resourcePaths.keySet());
+      Collections.sort(paths);
+      for (String path : paths) {
         log.debug("  {}", path);
       }
     }
