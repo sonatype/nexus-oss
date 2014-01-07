@@ -47,7 +47,7 @@ import eu.bitwalker.useragentutils.UserAgent;
  * This will prevent browser BASIC authentication dialogs for all browser requests.
  * Needs to be bound very early in the filter pipeline to be effective.
  *
- * @since 2.8
+ * @since 2.7
  */
 @Named
 @Singleton
