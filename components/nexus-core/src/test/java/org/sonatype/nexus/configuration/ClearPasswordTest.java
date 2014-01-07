@@ -25,6 +25,7 @@ import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 
 import com.thoughtworks.xstream.XStream;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -110,8 +111,10 @@ public class ClearPasswordTest
     // save it
     source.storeConfiguration();
 
-    Assert.assertTrue("Configuration is corroupt, passwords are encrypted (in memory). ", new XStream().toXML(
-        config).contains(password));
+    XStream xs = new XStream();
+    xs.processAnnotations(new Class[] { Xpp3Dom.class });
+    Assert.assertTrue("Configuration is corroupt, passwords are encrypted (in memory). ",
+        xs.toXML(config).contains(password));
 
     // now get the file and look for the "clear-text"
     String configString = FileUtils.fileRead(this.getNexusConfiguration());

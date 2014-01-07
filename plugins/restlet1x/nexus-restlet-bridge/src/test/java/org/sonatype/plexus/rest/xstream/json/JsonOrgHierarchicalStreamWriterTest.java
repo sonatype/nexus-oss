@@ -31,6 +31,12 @@ public class JsonOrgHierarchicalStreamWriterTest
     this.xstream = new XStream(new JsonOrgHierarchicalStreamDriver());
 
     this.xstream.registerConverter(new PrimitiveKeyedMapConverter(xstream.getMapper()));
+
+    this.xstream.processAnnotations(new Class[] {
+        OneValued.class,
+        CombinedValued.class,
+        ThreeValued.class
+    });
   }
 
   protected void setUp()
