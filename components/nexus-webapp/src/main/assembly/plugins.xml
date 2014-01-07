@@ -55,6 +55,7 @@
         <include>*:nexus-capabilities-plugin</include>
         <include>*:nexus-atlas-plugin</include>
         <include>*:nexus-wonderland-plugin</include>
+        <include>*:nexus-extdirect-plugin</include>
       </includes>
     </dependencySet>
   </dependencySets>

@@ -28,6 +28,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>nexus-extdirect-plugin</module>
     <module>nexus-groovyremote-client</module>
     <module>nexus-groovyremote-plugin</module>
     <module>nexus-plexusplugin-plugin</module>

@@ -37,17 +37,24 @@ NX.define('Nexus.logging.store.Logger', {
     Ext.apply(me, {
       storeId: 'nx-logging-store-logger',
       autoDestroy: true,
-      restful: true,
+      //restful: true,
 
       sortInfo: { field: 'name', direction: 'ASC' },
 
-      proxy: NX.create('Ext.data.HttpProxy', {
-        url: Nexus.siesta.basePath + '/logging/loggers'
+      proxy: NX.create('Ext.data.DirectProxy', {
+        paramsAsHash: false,
+        api: {
+          read: NX.direct.logging.Loggers.read,
+          create: NX.direct.logging.Loggers.update,
+          update: NX.direct.logging.Loggers.update,
+          destroy: NX.direct.logging.Loggers.destroy
+        }
       }),
 
       reader: NX.create('Ext.data.JsonReader', {
-        root: '',
+        root: 'data',
         idProperty: 'name',
+        successProperty: 'success',
         fields: [
           'name',
           'level'
@@ -63,13 +70,6 @@ NX.define('Nexus.logging.store.Logger', {
     });
 
     me.constructor.superclass.constructor.call(me);
-
-    Ext.apply(me.reader, {
-      // HACK: without this create will fail as it will look for a successProperty in response
-      getSuccess: function (obj) {
-        return Ext.isDefined(obj);
-      }
-    });
   }
 
 });

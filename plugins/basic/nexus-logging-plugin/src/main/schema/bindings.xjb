@@ -38,4 +38,14 @@
         </schemaBindings>
     </bindings>
 
+    <bindings schemaLocation="model-ux.xsd" node="/xsd:schema">
+        <schemaBindings>
+            <package name="org.sonatype.nexus.logging.ux.model"/>
+            <nameXmlTransform>
+                <elementName suffix="UX"/>
+                <typeName suffix="UX"/>
+            </nameXmlTransform>
+        </schemaBindings>
+     </bindings>
+
 </bindings>

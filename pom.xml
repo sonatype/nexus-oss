@@ -558,6 +558,8 @@
               Excludes for specific classes which have compatible, yet different licences.
               -->
               <exclude>**/nexus-ldap-common/**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
+              <exclude>**/nexus-extdirect-plugin/**/com/director/core/DirectConfiguration.java</exclude>
+              <exclude>**/nexus-extdirect-plugin/**/com/director/core/AbstractProvider.java</exclude>
             </excludes>
           </configuration>
         </plugin>
