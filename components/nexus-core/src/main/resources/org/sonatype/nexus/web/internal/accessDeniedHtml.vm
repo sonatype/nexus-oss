@@ -1,4 +1,4 @@
-/*
+#*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -9,36 +9,23 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
- */
+ *#
+<html>
+  <head>
+    <title>Access Denied</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-package org.sonatype.nexus.webapp;
+    <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
+    <!--[if IE]>
+    <link rel="SHORTCUT ICON" href="$nexusRoot/favicon.ico"/>
+    <![endif]-->
 
-import javax.inject.Named;
-
-import org.sonatype.nexus.web.content.NexusContentServlet;
-import org.sonatype.security.web.guice.SecurityWebFilter;
-
-import com.google.inject.AbstractModule;
-
-/**
- * Nexus webapp module.
- *
- * @since 2.5
- */
-@Named
-public class WebappModule
-    extends AbstractModule
-{
-  @Override
-  protected void configure() {
-    install(new ServletModule()
-    {
-      @Override
-      protected void configureServlets() {
-        serve("/content/*").with(NexusContentServlet.class);
-        filter("/content/*").through(SecurityWebFilter.class);
-      }
-    });
-    install(new MetricsModule());
-  }
-}
+    <link rel="stylesheet" href="$nexusRoot/static/css/Sonatype-content.css?${nexusVersion}" type="text/css" media="screen" title="no title" charset="utf-8">
+  </head>
+  <body>
+    <h1>Access Denied</h1>
+    <p>
+      Please <a href="$nexusRoot">login</a> before attempting further requests.
+    </p>
+  </body>
+</html>
