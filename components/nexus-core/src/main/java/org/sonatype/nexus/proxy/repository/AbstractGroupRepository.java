@@ -45,6 +45,7 @@ import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -180,7 +181,7 @@ public abstract class AbstractGroupRepository
 
     final boolean isRequestGroupLocalOnly =
         request.isRequestGroupLocalOnly() || uid.getBooleanAttributeValue(IsGroupLocalOnlyAttribute.class);
-    final HashMap<Repository, Throwable> memberThrowables = new HashMap<Repository, Throwable>();
+    final HashMap<Repository, Throwable> memberThrowables = Maps.newLinkedHashMap();
 
     if (!isRequestGroupLocalOnly) {
       for (Repository repo : getMemberRepositories()) {
@@ -258,7 +259,7 @@ public abstract class AbstractGroupRepository
       request.getRequestContext().put(AccessManager.REQUEST_AUTHORIZED, Boolean.TRUE);
     }
 
-    final HashMap<Repository, Throwable> memberThrowables = new HashMap<Repository, Throwable>();
+    final HashMap<Repository, Throwable> memberThrowables = Maps.newLinkedHashMap();
 
     try {
       RepositoryItemUid uid = createUid(request.getRequestPath());
@@ -447,7 +448,7 @@ public abstract class AbstractGroupRepository
     final boolean isRequestGroupLocalOnly =
         request.isRequestGroupLocalOnly() || uid.getBooleanAttributeValue(IsGroupLocalOnlyAttribute.class);
 
-    final HashMap<Repository, Throwable> memberThrowables = new HashMap<Repository, Throwable>();
+    final HashMap<Repository, Throwable> memberThrowables = Maps.newLinkedHashMap();
 
     if (!isRequestGroupLocalOnly) {
       for (Repository repository : getRequestRepositories(request)) {
