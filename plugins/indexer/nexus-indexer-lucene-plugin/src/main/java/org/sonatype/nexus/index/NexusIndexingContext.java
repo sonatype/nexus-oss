@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.TieredMergePolicy;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.maven.index.context.DefaultIndexingContext;
 import org.apache.maven.index.context.ExistingLuceneIndexMismatchException;
@@ -61,6 +62,15 @@ public class NexusIndexingContext
     writerConfig.setMergePolicy(mergePolicy);
 
     return writerConfig;
+  }
+
+  @Override
+  public void optimize() throws IOException {
+    super.optimize();
+    // NEXUS-6156: Make SearcherManager be notified about this
+    // This will release the deleted files removed after. SearcherManager is not reachable (private, no getter)
+    // so this is the only way to make superclass invoke SearcherManager#maybeRefresh()
+    releaseIndexSearcher(acquireIndexSearcher());
   }
 
   @Override
