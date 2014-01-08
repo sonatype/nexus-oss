@@ -53,7 +53,6 @@ import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
-import com.google.common.base.Strings;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
