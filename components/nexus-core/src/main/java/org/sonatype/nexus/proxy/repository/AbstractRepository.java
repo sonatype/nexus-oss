@@ -1079,7 +1079,7 @@ public abstract class AbstractRepository
   {
     // NEXUS-6177: skip NFC if request is "asExpired"
     // On outcome, if remotely found, will invalidate NFC by caching it
-    if (isNotFoundCacheActive() || !request.isRequestAsExpired()) {
+    if (isNotFoundCacheActive() && !request.isRequestAsExpired()) {
       if (getNotFoundCache().contains(request.getRequestPath())) {
         if (getNotFoundCache().isExpired(request.getRequestPath())) {
           if (log.isDebugEnabled()) {
