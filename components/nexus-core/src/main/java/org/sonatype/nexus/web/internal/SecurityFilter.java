@@ -23,8 +23,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.sonatype.nexus.threads.MDCUtils;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.internal.UserIdMdcHelper;
 
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.mgt.WebSecurityManager;
@@ -69,12 +69,12 @@ public class SecurityFilter
                               final FilterChain origChain)
       throws IOException, ServletException
   {
-    MDCUtils.setMDCUserId();
+    UserIdMdcHelper.set();
     try {
       super.executeChain(request, response, origChain);
     }
     finally {
-      MDCUtils.unsetMDCUserId();
+      UserIdMdcHelper.unset();
     }
   }
 }

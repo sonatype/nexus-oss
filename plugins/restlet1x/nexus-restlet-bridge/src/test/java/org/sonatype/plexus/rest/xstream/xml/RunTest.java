@@ -59,6 +59,7 @@ public class RunTest
     xstream.alias("top", TopLevelObject.class);
     xstream.registerConverter(new TopLevelObjectConverter(xstream.getMapper(), xstream.getReflectionProvider()));
     xstream.registerConverter(new BaseDataObjectConverter(xstream.getMapper(), xstream.getReflectionProvider()));
+    xstream.processAnnotations(new Class[] { DataObject1.class, DataObject2.class });
 
     // xstream.aliasAttribute( "type", "class" );
     // xstream.alias( "type-one", DataObject1.class );
@@ -105,6 +106,7 @@ public class RunTest
     xstream.alias("top", TopLevelObject.class);
     xstream.registerConverter(new TopLevelObjectConverter(xstream.getMapper(), xstream.getReflectionProvider()));
     xstream.registerConverter(new BaseDataObjectConverter(xstream.getMapper(), xstream.getReflectionProvider()));
+    xstream.processAnnotations(new Class[] { DataObject1.class });
 
     // xstream.aliasAttribute( "type", "class" );
     // xstream.alias( "type-one", DataObject1.class );
@@ -125,8 +127,6 @@ public class RunTest
     String xml2 = xstream.toXML(result);
 
     Assert.assertEquals("Expected xml strings to be equal", xml1, xml2);
-
-
   }
 
 }
