@@ -607,18 +607,7 @@ public class HttpClientRemoteStorage
       throws RemoteStorageException
   {
     final RemoteStorageContext ctx = getRemoteStorageContext(repository);
-
-    final String qsbQuery = queryStringBuilder.getQueryString(ctx, repository);
-    final StringBuilder queryStringBld = Strings.isNullOrEmpty(qsbQuery) ? new StringBuilder() : new StringBuilder(qsbQuery);
-    if (request.isRequestAsExpired()) {
-      if (StringUtils.isNotBlank(queryStringBld.toString())) {
-        queryStringBld.append('&');
-      }
-      // TODO: this constant is actually in nexus-content-plugin
-      queryStringBld.append("force=expired");
-    }
-
-    final String queryString = queryStringBld.toString();
+    final String queryString = queryStringBuilder.getQueryString(ctx, repository);
     if (StringUtils.isNotBlank(queryString)) {
       try {
         if (StringUtils.isBlank(url.getQuery())) {
