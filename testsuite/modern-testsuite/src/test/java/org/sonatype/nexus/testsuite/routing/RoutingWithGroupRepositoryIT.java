@@ -16,14 +16,14 @@ package org.sonatype.nexus.testsuite.routing;
 import java.io.IOException;
 
 import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
-import org.sonatype.nexus.client.core.subsystem.content.Content.Directive;
+import org.sonatype.nexus.client.core.subsystem.content.Content.ForceDirective;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.core.subsystem.routing.DiscoveryConfiguration;
 
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Testing automatic routing publishing on group repositories.
@@ -50,13 +50,13 @@ public class RoutingWithGroupRepositoryIT
   protected boolean exists(final Location location)
       throws IOException
   {
-    return exists(location, Directive.GROUP_ONLY);
+    return exists(location, ForceDirective.LOCAL);
   }
 
   protected boolean noscrape(final Location location)
       throws IOException
   {
-    return noscrape(location, Directive.GROUP_ONLY);
+    return noscrape(location, ForceDirective.LOCAL);
   }
 
   @Test

@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
-import org.sonatype.nexus.client.core.subsystem.content.Content.Directive;
+import org.sonatype.nexus.client.core.subsystem.content.Content.ForceDirective;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.client.core.subsystem.routing.Routing;
 import org.sonatype.nexus.testsuite.NexusCoreITSupport;
@@ -29,10 +29,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Support class for Automatic Routing Core feature (NEXUS-5472), aka "proxy404".
@@ -89,13 +87,13 @@ public abstract class RoutingITSupport
     return httpResponse.getEntity().getContent();
   }
 
-  protected boolean exists(final Location location, Directive directive)
+  protected boolean exists(final Location location, ForceDirective directive)
       throws IOException
   {
     return content().existsWith(location, directive);
   }
 
-  protected boolean noscrape(final Location location, Directive directive)
+  protected boolean noscrape(final Location location, ForceDirective directive)
       throws IOException
   {
     ByteArrayOutputStream buf = new ByteArrayOutputStream();

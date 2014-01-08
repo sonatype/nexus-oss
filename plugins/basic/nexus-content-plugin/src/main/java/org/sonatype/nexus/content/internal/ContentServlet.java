@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -39,6 +40,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RemoteStorageTransportOverloadedException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.ContentLocator;
@@ -86,6 +88,34 @@ public class ContentServlet
     extends HttpServlet
 {
   /**
+   * HTTP query parameter to mark request as "describe" request.
+   */
+  private static final String REQ_QP_DESCRIBE_PARAMETER = "describe";
+
+  /**
+   * HTTP query parameter to mark request as "describe" request.
+   */
+  private static final String REQ_QP_FORCE_PARAMETER = "force";
+
+  /**
+   * HTTP query parameter value for {@link #REQ_QP_FORCE_PARAMETER} to force local content. See {@link
+   * RequestContext#isRequestLocalOnly()}.
+   */
+  private static final String REQ_QP_FORCE_LOCAL_VALUE = "local";
+
+  /**
+   * HTTP query parameter value for {@link #REQ_QP_FORCE_PARAMETER} to force remote content. See {@link
+   * RequestContext#isRequestRemoteOnly()}.
+   */
+  private static final String REQ_QP_FORCE_REMOTE_VALUE = "remote";
+
+  /**
+   * HTTP query parameter value for {@link #REQ_QP_FORCE_PARAMETER} to force expiration of content. See {@link
+   * RequestContext#isRequestAsExpired()}.
+   */
+  private static final String REQ_QP_FORCE_EXPIRED_VALUE = "expired";
+
+  /**
    * A flag setting what should be done if request path retrieval gets a {@link StorageLinkItem} here. If {@code true},
    * this servlet dereference the link (using {@link RepositoryRouter#dereferenceLink(StorageLinkItem)} method), and
    * send proper content to client (ie. client will be "unaware" it actually stepped on link, and content it gets is
@@ -106,6 +136,8 @@ public class ContentServlet
 
   private final Logger logger = LoggerFactory.getLogger(ContentServlet.class);
 
+  private final NexusConfiguration nexusConfiguration;
+
   private final RepositoryRouter repositoryRouter;
 
   private final ContentRenderer contentRenderer;
@@ -113,10 +145,12 @@ public class ContentServlet
   private final WebUtils webUtils;
 
   @Inject
-  public ContentServlet(final RepositoryRouter repositoryRouter,
+  public ContentServlet(final NexusConfiguration nexusConfiguration,
+                        final RepositoryRouter repositoryRouter,
                         final ContentRenderer contentRenderer,
                         final WebUtils webUtils)
   {
+    this.nexusConfiguration = checkNotNull(nexusConfiguration);
     this.repositoryRouter = checkNotNull(repositoryRouter);
     this.contentRenderer = checkNotNull(contentRenderer);
     this.webUtils = checkNotNull(webUtils);
@@ -134,11 +168,21 @@ public class ContentServlet
     final ResourceStoreRequest result = new ResourceStoreRequest(resourceStorePath);
     result.getRequestContext().put(STOPWATCH_KEY, new Stopwatch().start());
 
-    // honor the local only and remote only
-    final Map<String, String[]> parameterMap = request.getParameterMap();
+    // stuff in the user id if we have it in request
+    final Subject subject = SecurityUtils.getSubject();
+    if (subject != null && subject.getPrincipal() != null) {
+      result.getRequestContext().put(AccessManager.REQUEST_USER, subject.getPrincipal().toString());
+    }
+    result.getRequestContext().put(AccessManager.REQUEST_AGENT, request.getHeader("user-agent"));
+
+    // honor the localOnly, remoteOnly and asExpired (but remoteOnly and asExpired only for non-anon users)
+    // as those two actually makes Nexus perform a remote request
     result.setRequestLocalOnly(isLocal(request, resourceStorePath));
-    result.setRequestRemoteOnly(parameterMap.containsKey(Constants.REQ_QP_IS_REMOTE_PARAMETER));
-    result.setRequestAsExpired(parameterMap.containsKey(Constants.REQ_QP_AS_EXPIRED_PARAMETER));
+    if (!Objects.equals(nexusConfiguration.getAnonymousUsername(),
+        result.getRequestContext().get(AccessManager.REQUEST_USER))) {
+      result.setRequestRemoteOnly(REQ_QP_FORCE_REMOTE_VALUE.equals(request.getParameter(REQ_QP_FORCE_PARAMETER)));
+      result.setRequestAsExpired(REQ_QP_FORCE_EXPIRED_VALUE.equals(request.getParameter(REQ_QP_FORCE_PARAMETER)));
+    }
     result.setExternal(true);
 
     // honor if-modified-since
@@ -162,13 +206,6 @@ public class ContentServlet
 
     // stuff in the originating remote address
     result.getRequestContext().put(AccessManager.REQUEST_REMOTE_ADDRESS, RemoteIPFinder.findIP(request));
-
-    // stuff in the user id if we have it in request
-    final Subject subject = SecurityUtils.getSubject();
-    if (subject != null && subject.getPrincipal() != null) {
-      result.getRequestContext().put(AccessManager.REQUEST_USER, subject.getPrincipal().toString());
-    }
-    result.getRequestContext().put(AccessManager.REQUEST_AGENT, request.getHeader("user-agent"));
 
     // this is HTTPS, get the cert and stuff it too for later
     if (request.isSecure()) {
@@ -197,7 +234,7 @@ public class ContentServlet
    */
   protected boolean isLocal(final HttpServletRequest request, final String resourceStorePath) {
     // check do we need local only access
-    boolean isLocal = request.getParameterMap().containsKey(Constants.REQ_QP_IS_LOCAL_PARAMETER);
+    boolean isLocal = REQ_QP_FORCE_LOCAL_VALUE.equals(request.getParameter(REQ_QP_FORCE_PARAMETER));
     if (!Strings.isNullOrEmpty(resourceStorePath)) {
       // overriding isLocal is we know it will be a collection
       isLocal = isLocal || resourceStorePath.endsWith(RepositoryItemUid.PATH_SEPARATOR);
@@ -206,7 +243,7 @@ public class ContentServlet
   }
 
   protected boolean isDescribeRequest(final HttpServletRequest request) {
-    return request.getParameterMap().containsKey(Constants.REQ_QP_IS_DESCRIBE_PARAMETER);
+    return request.getParameterMap().containsKey(REQ_QP_DESCRIBE_PARAMETER);
   }
 
   /**

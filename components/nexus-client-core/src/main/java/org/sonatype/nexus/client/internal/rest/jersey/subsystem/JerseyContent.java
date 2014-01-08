@@ -52,21 +52,18 @@ public class JerseyContent
     super(nexusClient);
   }
 
-  protected String toUri(final Location location, final Directive directive) {
+  protected String toUri(final Location location, final ForceDirective directive) {
     String uri = CONTENT_PREFIX + location.toContentPath();
     if (directive != null) {
       switch (directive) {
-        case LOCAL_ONLY:
-          uri += "?isLocal";
+        case LOCAL:
+          uri += "?force=local";
           break;
-        case REMOTE_ONLY:
-          uri += "?isRemote";
+        case REMOTE:
+          uri += "?force=remote";
           break;
-        case GROUP_ONLY:
-          uri += "?asGroupOnly";
-          break;
-        case AS_EXPIRED:
-          uri += "?asExpired";
+        case EXPIRED:
+          uri += "?force=expired";
           break;
         default:
           break;
@@ -81,7 +78,7 @@ public class JerseyContent
   }
 
   @Override
-  public boolean existsWith(final Location location, final Directive directive) {
+  public boolean existsWith(final Location location, final ForceDirective directive) {
     return exists(location, toUri(location, directive));
   }
 
@@ -129,12 +126,12 @@ public class JerseyContent
   }
 
   @Override
-  public void downloadWith(final Location location, final Directive directive, final File target) throws IOException {
+  public void downloadWith(final Location location, final ForceDirective directive, final File target) throws IOException {
     download(location, toUri(location, directive), target, null);
   }
 
   @Override
-  public void downloadWith(Location location, Directive directive, OutputStream target) throws IOException {
+  public void downloadWith(Location location, ForceDirective directive, OutputStream target) throws IOException {
     download(location, toUri(location, directive), target, null);
   }
 
