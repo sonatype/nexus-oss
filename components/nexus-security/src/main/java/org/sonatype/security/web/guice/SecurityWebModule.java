@@ -39,6 +39,7 @@ import org.apache.shiro.authz.Authorizer;
 import org.apache.shiro.config.ConfigurationException;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.nexus.NexusWebSecurityManager;
 import org.apache.shiro.nexus5727.FixedDefaultWebSessionManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
@@ -48,7 +49,6 @@ import org.apache.shiro.web.filter.mgt.DefaultFilterChainManager;
 import org.apache.shiro.web.filter.mgt.FilterChainManager;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
-import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.Mediator;
@@ -96,12 +96,11 @@ public class SecurityWebModule
 
   @Override
   protected void bindWebSecurityManager(AnnotatedBindingBuilder<? super WebSecurityManager> bind) {
-    // prefer the default constructor; we'll set the realms programatically
-    bind(DefaultWebSecurityManager.class).toConstructor(ctor(DefaultWebSecurityManager.class)).asEagerSingleton();
+    bind(NexusWebSecurityManager.class).asEagerSingleton();
 
     // bind RealmSecurityManager and WebSecurityManager to _same_ component
-    bind(RealmSecurityManager.class).to(DefaultWebSecurityManager.class);
-    bind.to(DefaultWebSecurityManager.class);
+    bind(RealmSecurityManager.class).to(NexusWebSecurityManager.class);
+    bind.to(NexusWebSecurityManager.class);
 
     // bindings used by external modules
     expose(RealmSecurityManager.class);
