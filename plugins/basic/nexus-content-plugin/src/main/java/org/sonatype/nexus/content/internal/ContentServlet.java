@@ -71,10 +71,17 @@ import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.io.ByteStreams.limit;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static javax.servlet.http.HttpServletResponse.SC_PARTIAL_CONTENT;
+import static javax.servlet.http.HttpServletResponse.SC_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-import static javax.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED;
+import static javax.servlet.http.HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_IMPLEMENTED;
 import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 
 /**
@@ -483,12 +490,12 @@ public class ContentServlet
     if (!file.isContentGenerated() && file.getResourceStoreRequest().getIfModifiedSince() != 0
         && file.getModified() <= file.getResourceStoreRequest().getIfModifiedSince()) {
       // this is a conditional GET using time-stamp
-      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+      response.setStatus(SC_NOT_MODIFIED);
     }
     else if (!file.isContentGenerated() && file.getResourceStoreRequest().getIfNoneMatch() != null && etag != null
         && file.getResourceStoreRequest().getIfNoneMatch().equals(etag)) {
       // this is a conditional GET using ETag
-      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+      response.setStatus(SC_NOT_MODIFIED);
     }
     else {
       // NEXUS-5023 disable IE for sniffing into response content
@@ -505,19 +512,19 @@ public class ContentServlet
         }
       }
       else if (ranges.size() > 1) {
-        throw new ErrorStatusException(HttpServletResponse.SC_NOT_IMPLEMENTED, "Not Implemented",
+        throw new ErrorStatusException(SC_NOT_IMPLEMENTED, "Not Implemented",
             "Multiple ranges not yet supported.");
       }
       else {
         final Range<Long> range = ranges.get(0);
         if (!isRequestedRangeSatisfiable(file, range)) {
-          response.setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+          response.setStatus(SC_REQUESTED_RANGE_NOT_SATISFIABLE);
           response.setHeader("Content-Length", "0");
           response.setHeader("Content-Range", "bytes */" + file.getLength());
           return;
         }
         final long bodySize = range.upperEndpoint() - range.lowerEndpoint();
-        response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        response.setStatus(SC_PARTIAL_CONTENT);
         response.setHeader("Content-Length", String.valueOf(bodySize));
         response.setHeader("Content-Range",
             range.lowerEndpoint() + "-" + range.upperEndpoint() + "/" + file.getLength());
@@ -541,7 +548,7 @@ public class ContentServlet
       throws Exception
   {
     if (!coll.getResourceStoreRequest().getRequestUrl().endsWith("/")) {
-      response.setStatus(HttpServletResponse.SC_FOUND);
+      response.setStatus(SC_FOUND);
       response.addHeader("Location", coll.getResourceStoreRequest().getRequestUrl() + "/");
       return;
     }
@@ -584,7 +591,7 @@ public class ContentServlet
     try {
       repositoryRouter.storeItem(rsr, request.getInputStream(), null);
       ((Stopwatch) rsr.getRequestContext().get(STOPWATCH_KEY)).stop();
-      response.setStatus(HttpServletResponse.SC_CREATED);
+      response.setStatus(SC_CREATED);
     }
     catch (Exception e) {
       ((Stopwatch) rsr.getRequestContext().get(STOPWATCH_KEY)).stop();
@@ -601,7 +608,7 @@ public class ContentServlet
     final ResourceStoreRequest rsr = getResourceStoreRequest(request);
     try {
       repositoryRouter.deleteItem(rsr);
-      response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+      response.setStatus(SC_NO_CONTENT);
       ((Stopwatch) rsr.getRequestContext().get(STOPWATCH_KEY)).stop();
     }
     catch (Exception e) {
