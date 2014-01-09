@@ -15,6 +15,8 @@ package org.sonatype.nexus.webapp;
 
 import javax.inject.Named;
 
+import org.sonatype.guice.bean.locators.DefaultRankingFunction;
+import org.sonatype.guice.bean.locators.RankingFunction;
 import org.sonatype.nexus.web.content.NexusContentServlet;
 import org.sonatype.security.web.guice.SecurityWebFilter;
 
@@ -36,10 +38,20 @@ public class WebappModule
     {
       @Override
       protected void configureServlets() {
+        filter("/*").through(WwwAuthenticateViaBrowserOmissionFilter.class);
+        bind(RankingFunction.class).toInstance(new DefaultRankingFunction(100000));
+      }
+    });
+
+    install(new ServletModule()
+    {
+      @Override
+      protected void configureServlets() {
         serve("/content/*").with(NexusContentServlet.class);
         filter("/content/*").through(SecurityWebFilter.class);
       }
     });
+
     install(new MetricsModule());
   }
 }
