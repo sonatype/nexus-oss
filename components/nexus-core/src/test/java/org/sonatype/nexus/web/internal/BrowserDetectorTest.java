@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.webapp;
+package org.sonatype.nexus.web.internal;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,55 +23,56 @@ import org.mockito.Mock;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.webapp.WwwAuthenticateViaBrowserOmissionFilter.USER_AGENT;
-import static org.sonatype.nexus.webapp.WwwAuthenticateViaBrowserOmissionFilter.WWW_AUTHENTICATE;
 
 /**
- * Tests for {@link WwwAuthenticateViaBrowserOmissionFilter}.
+ * Tests for {@link BrowserDetector}.
  */
-public class WwwAuthenticateViaBrowserOmissionFilterTest
+public class BrowserDetectorTest
   extends TestSupport
 {
-  private WwwAuthenticateViaBrowserOmissionFilter underTest;
+  private BrowserDetector underTest;
 
   @Mock
   private HttpServletRequest request;
 
   @Before
   public void setUp() throws Exception {
-    underTest = new WwwAuthenticateViaBrowserOmissionFilter();
+    underTest = new BrowserDetector(false);
   }
 
   private void whenUserAgent(final String userAgent) {
-    when(request.getHeader(USER_AGENT)).thenReturn(userAgent);
+    when(request.getHeader(BrowserDetector.USER_AGENT)).thenReturn(userAgent);
   }
 
   @Test
-  public void omit_chrome() {
+  public void chrome() {
     whenUserAgent("User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_0) " +
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36");
-    assertThat(underTest.shouldOmit(WWW_AUTHENTICATE, request), is(true));
+    assertThat(underTest.isBrowserInitiated(request), is(true));
   }
 
   @Test
-  public void omit_firefox() {
+  public void chrome_whenDisabled() {
+    underTest = new BrowserDetector(true);
+    whenUserAgent("User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_0) " +
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36");
+    assertThat(underTest.isBrowserInitiated(request), is(false));
+  }
+
+  @Test
+  public void firefox() {
     whenUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:25.0) Gecko/20100101 Firefox/25.0");
-    assertThat(underTest.shouldOmit(WWW_AUTHENTICATE, request), is(true));
+    assertThat(underTest.isBrowserInitiated(request), is(true));
   }
 
   @Test
-  public void notOmit_notWwwAuthenticate() {
-    assertThat(underTest.shouldOmit("not-" + WWW_AUTHENTICATE, request), is(false));
-  }
-
-  @Test
-  public void notOmit_httpclient() {
+  public void httpclient() {
     whenUserAgent("Apache-HttpClient/release (java 1.5)");
-    assertThat(underTest.shouldOmit(WWW_AUTHENTICATE, request), is(false));
+    assertThat(underTest.isBrowserInitiated(request), is(false));
   }
 
   @Test
-  public void notOmit_missingUserAgent() {
-    assertThat(underTest.shouldOmit(WWW_AUTHENTICATE, request), is(false));
+  public void missingUserAgent() {
+    assertThat(underTest.isBrowserInitiated(request), is(false));
   }
 }
