@@ -24,8 +24,6 @@
   <link rel="SHORTCUT ICON" href="favicon.ico"/>
   <![endif]-->
 
-  <link rel="search" type="application/opensearchdescription+xml"
-        href="$serviceBase/opensearch" title="Nexus"/>
   <link rel="stylesheet" href="static/ext-3.4.1.1/resources/css/ext-all.css"
         type="text/css" media="screen" charset="utf-8"/>
   <link rel="stylesheet" href="static/ext-3.4.1.1/resources/css/xtheme-gray.css"
