@@ -19,6 +19,7 @@ import org.sonatype.nexus.web.content.NexusContentServlet;
 import org.sonatype.security.web.guice.SecurityWebFilter;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.servlet.ServletModule;
 
 /**
  * Nexus webapp module.

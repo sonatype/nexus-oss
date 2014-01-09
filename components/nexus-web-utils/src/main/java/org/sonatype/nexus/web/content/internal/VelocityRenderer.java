@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -68,11 +69,16 @@ public class VelocityRenderer
 {
   private final Velocity velocity;
   private final String applicationVersion;
+  private final GlobalRestApiSettings globalRestApiSettings;
 
   @Inject
-  public VelocityRenderer(final Velocity velocity, final ApplicationStatusSource applicationStatusSource) {
+  public VelocityRenderer(final Velocity velocity,
+                          final ApplicationStatusSource applicationStatusSource,
+                          final GlobalRestApiSettings globalRestApiSettings)
+  {
     this.velocity = checkNotNull(velocity);
     this.applicationVersion = checkNotNull(applicationStatusSource).getSystemStatus().getVersion();
+    this.globalRestApiSettings = checkNotNull(globalRestApiSettings);
   }
 
   @Override
@@ -175,6 +181,41 @@ public class VelocityRenderer
     }
   }
 
+  public void render(final String templateName, final Map<String, Object> dataModel, final HttpServletResponse response)
+      throws IOException
+  {
+    Template template = getTemplate(templateName);
+
+    // ATM all templates render HTML
+    response.setContentType("text/html");
+
+    final OutputStream outputStream = response.getOutputStream();
+    final Context context = new VelocityContext(dataModel);
+    try {
+      final Writer tmplWriter;
+      // Load the template
+      if (template.getEncoding() == null) {
+        tmplWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+      }
+      else {
+        tmplWriter = new BufferedWriter(new OutputStreamWriter(outputStream, template.getEncoding()));
+      }
+
+      // Process the template
+      template.merge(context, tmplWriter);
+      tmplWriter.flush();
+    }
+    catch (IOException e) {
+      // NEXUS-3442
+      // IOEx should be propagated as is
+      throw e;
+    }
+    catch (Exception e) {
+      // All other (Velocity exceptions are RuntimeExcptions!) to be wrapped, but preserve cause too
+      throw new IOException("Template processing error: " + e.getMessage(), e);
+    }
+  }
+
   protected Template getTemplate(final String templateName) {
     // NOTE: Velocity's ClasspathResourceLoader goes for TCCL 1st, then would fallback to "system"
     // (in this case the classloader where Velocity is loaded) classloader
@@ -195,6 +236,35 @@ public class VelocityRenderer
     finally {
       Thread.currentThread().setContextClassLoader(original);
     }
+  }
+
+  public String getAppRootUrl(final HttpServletRequest request) {
+    checkNotNull(request);
+
+    final StringBuilder result = new StringBuilder();
+    if (globalRestApiSettings.isEnabled() && globalRestApiSettings.isForceBaseUrl()
+        && !Strings.isNullOrEmpty(globalRestApiSettings.getBaseUrl())) {
+      result.append(globalRestApiSettings.getBaseUrl());
+    }
+    else {
+      String appRoot = request.getRequestURL().toString();
+      final String pathInfo = request.getPathInfo();
+      if (!Strings.isNullOrEmpty(pathInfo)) {
+        appRoot = appRoot.substring(0, appRoot.length() - pathInfo.length());
+      }
+      final String servletPath = request.getServletPath();
+      if (!Strings.isNullOrEmpty(servletPath)) {
+        appRoot = appRoot.substring(0, appRoot.length() - servletPath.length());
+      }
+      result.append(appRoot);
+    }
+
+    String url = result.toString();
+    // strip off trailing "/", note this is done so that script/template can easily $baseUrl/foo
+    if (url.endsWith("/")) {
+      url = url.substring(0, url.length() - 1);
+    }
+    return url;
   }
 
   // =

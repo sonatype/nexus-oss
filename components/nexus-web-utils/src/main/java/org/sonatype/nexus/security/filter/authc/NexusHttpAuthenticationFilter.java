@@ -25,10 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
-import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.RemoteIPFinder;
-import org.sonatype.nexus.web.TemplateRenderer;
-import org.sonatype.nexus.web.TemplateRenderer.TemplateLocator;
+import org.sonatype.nexus.web.content.Renderer;
 import org.sonatype.nexus.web.internal.BrowserDetector;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.common.Loggers;
@@ -74,7 +72,7 @@ public class NexusHttpAuthenticationFilter
   private EventBus eventBus;
 
   @Inject
-  private TemplateRenderer templateRenderer;
+  private Renderer templateRenderer;
 
   @Inject
   private ApplicationStatusSource applicationStatusSource;
@@ -176,21 +174,18 @@ public class NexusHttpAuthenticationFilter
   @Override
   protected boolean sendChallenge(final ServletRequest request, final ServletResponse response) {
     if (browserDetector.isBrowserInitiated(request)) {
+      HttpServletRequest httpRequest = WebUtils.toHttp(request);
       HttpServletResponse httpResponse = WebUtils.toHttp(response);
       httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       // omit WWW-Authenticate we do NOT want to have browser prompt
 
       Map<String,Object> params = ImmutableMap.of(
           "nexusVersion", applicationStatusSource.getSystemStatus().getVersion(),
-          "nexusRoot", (Object)BaseUrlHolder.get()
-      );
-      TemplateLocator template = templateRenderer.template(
-          "/org/sonatype/nexus/web/internal/accessDeniedHtml.vm",
-          NexusHttpAuthenticationFilter.class.getClassLoader()
+          "nexusRoot", (Object)templateRenderer.getAppRootUrl(httpRequest)
       );
 
       try {
-        templateRenderer.render(template, params, httpResponse);
+        templateRenderer.render("/org/sonatype/nexus/web/internal/accessDeniedHtml.vm", params, httpResponse);
       }
       catch (IOException e) {
         throw Throwables.propagate(e);
