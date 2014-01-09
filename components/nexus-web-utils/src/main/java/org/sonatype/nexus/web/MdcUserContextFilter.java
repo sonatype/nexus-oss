@@ -24,7 +24,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.sonatype.nexus.threads.MDCUtils;
 import org.sonatype.security.internal.UserIdMdcHelper;
 
 // NOTE: This would be better integrated as part of the org.sonatype.security.web.guice.SecurityWebFilter ?
@@ -53,7 +52,7 @@ public class MdcUserContextFilter
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
       throws IOException, ServletException
   {
-    UserIdMdcHelper.setIfNeeded();
+    UserIdMdcHelper.set();
     try {
       chain.doFilter(request, response);
     }
