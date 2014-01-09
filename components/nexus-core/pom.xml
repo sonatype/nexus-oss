@@ -310,6 +310,11 @@
       <artifactId>goodies-i18n</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>bitwalker</groupId>
+      <artifactId>UserAgentUtils</artifactId>
+    </dependency>
+
     <!-- Testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

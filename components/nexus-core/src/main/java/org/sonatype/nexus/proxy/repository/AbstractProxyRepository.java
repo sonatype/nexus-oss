@@ -1371,10 +1371,18 @@ public abstract class AbstractProxyRepository
         try {
           getRemoteStorage().validateStorageUrl(remoteUrl);
         }
-        catch (Exception e) {
+        catch (RemoteStorageException e) {
           lastException = e;
 
           logFailedUrl(remoteUrl, e);
+
+          continue all_urls; // retry with next url
+        }
+        catch (Exception e) {
+          lastException = e;
+
+          // make it logged, this is RuntimeEx
+          log.warn("Failed URL validation: {}", remoteUrl, e);
 
           continue all_urls; // retry with next url
         }
@@ -1469,7 +1477,8 @@ public abstract class AbstractProxyRepository
           catch (RuntimeException e) {
             lastException = e;
 
-            logFailedUrl(remoteUrl, e);
+            // make it logged, this is RuntimeEx
+            log.warn("Failed URL retrieve/cache: {}", remoteUrl, e);
 
             continue all_urls; // retry with next url
           }
@@ -1515,8 +1524,7 @@ public abstract class AbstractProxyRepository
 
   private void logFailedUrl(String url, Exception e) {
     if (log.isDebugEnabled()) {
-      log.debug("Failed URL: {}", url);
-      log.debug(e.getMessage(), e);
+      log.debug("Failed URL: {}", url, e);
     }
   }
 

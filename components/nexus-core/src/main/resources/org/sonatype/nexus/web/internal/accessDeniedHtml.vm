@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 #*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2013 Sonatype, Inc.
@@ -11,12 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  *#
+<html>
+  <head>
+    <title>Access Denied</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"  xmlns:moz="http://www.mozilla.org/2006/browser/search/">
-  <ShortName>Nexus ($nexusHost)</ShortName>
-  <Description>Maven artifact search with Sonatype Nexus.</Description>
-  <Contact>nexus@sonatype.com</Contact>
-  <Image height="16" width="16" type="image/x-icon">$nexusRoot/favicon.ico</Image>
-  <Url type="text/html" template="$nexusRoot/index.html#nexus-search;{searchTerms}"/>
-  <moz:SearchForm>$nexusRoot</moz:SearchForm>
-</OpenSearchDescription>
+    <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
+    <!--[if IE]>
+    <link rel="SHORTCUT ICON" href="$nexusRoot/favicon.ico"/>
+    <![endif]-->
+
+    <link rel="stylesheet" href="$nexusRoot/static/css/Sonatype-content.css?${nexusVersion}" type="text/css" media="screen" title="no title" charset="utf-8">
+  </head>
+  <body>
+    <h1>Access Denied</h1>
+    <p>
+      Please <a href="$nexusRoot">login</a> before attempting further requests.
+    </p>
+  </body>
+</html>

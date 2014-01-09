@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.web;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +23,7 @@ import org.apache.shiro.subject.Subject;
 
 /**
  * Common HTTP attribute and parameter keys, used to communicate between filters and servlets and similar.
- * 
+ *
  * @since 2.7.0
  */
 public interface Constants
@@ -32,28 +33,8 @@ public interface Constants
    * {@link RepositoryRouter} throwing {@link AccessDeniedException} for example) due to lack of authorization of
    * current Shiro {@link Subject}. To mark this state, request attribute should contain {@link Boolean#TRUE} mapped
    * with this key.
-   * 
+   *
    * @since 2.7.0
    */
   String ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED = "request.is.authz.rejected";
-
-  /**
-   * HTTP query parameter to mark request as "describe" request.
-   */
-  String REQ_QP_IS_DESCRIBE_PARAMETER = "describe";
-
-  /**
-   * HTTP query parameter to mark request as "local" request, see {@link RequestContext#isRequestLocalOnly()}.
-   */
-  String REQ_QP_IS_LOCAL_PARAMETER = "isLocal";
-
-  /**
-   * HTTP query parameter to mark request as "remote" request, see {@link RequestContext#isRequestRemoteOnly()}.
-   */
-  String REQ_QP_IS_REMOTE_PARAMETER = "isRemote";
-
-  /**
-   * HTTP query parameter to mark request as "expired" request, see {@link RequestContext#isRequestAsExpired()}.
-   */
-  String REQ_QP_AS_EXPIRED_PARAMETER = "asExpired";
 }

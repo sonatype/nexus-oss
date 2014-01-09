@@ -134,7 +134,7 @@ public class IndexWebResource
     params.put("rJsContributions", contributions);
     params.put("buildQualifier", buildNumberService.getBuildNumber());
 
-    URL template = getClass().getResource("index.vm");
+    URL template = getClass().getResource(templateName);
     checkState(template != null, "Missing template: %s", templateName);
 
     log.debug("Rendering template: {}", template);
