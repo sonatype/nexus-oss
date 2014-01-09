@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.security.filter.authc;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -325,10 +327,9 @@ public class NexusHttpAuthenticationFilter
   /**
    * set http 403 forbidden header for the response
    */
-  protected void sendForbidden(ServletRequest request, ServletResponse response) {
+  protected void sendForbidden(ServletRequest request, ServletResponse response) throws IOException {
     HttpServletResponse httpResponse = WebUtils.toHttp(response);
-
-    httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+    httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
   }
 
   // Will retrieve authz header. if missing from header, will try
