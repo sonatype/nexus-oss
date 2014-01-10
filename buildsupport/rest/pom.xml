@@ -68,7 +68,7 @@
       <dependency>
         <groupId>org.sonatype.nexus.xstream</groupId>
         <artifactId>xstream</artifactId>
-        <version>1.4.6-SONATYPE-SNAPSHOT</version>
+        <version>1.4.6-SONATYPE-02</version>
       </dependency>
 
       <dependency>
