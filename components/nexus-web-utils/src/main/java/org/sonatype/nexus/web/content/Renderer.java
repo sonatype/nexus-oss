@@ -15,6 +15,7 @@ package org.sonatype.nexus.web.content;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +31,17 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  */
 public interface Renderer
 {
+  /**
+   * @since 2.7.1
+   */
+  void render(String templateName, Map<String, Object> dataModel, HttpServletResponse response)
+      throws IOException;
+
+  /**
+   * @since 2.7.1
+   */
+  String getAppRootUrl(HttpServletRequest request);
+
   void renderCollection(final HttpServletRequest request, final HttpServletResponse response,
       final StorageCollectionItem coll, final Collection<StorageItem> children) throws IOException;
 

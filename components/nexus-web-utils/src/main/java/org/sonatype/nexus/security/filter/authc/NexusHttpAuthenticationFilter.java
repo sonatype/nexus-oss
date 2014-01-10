@@ -13,19 +13,27 @@
 
 package org.sonatype.nexus.security.filter.authc;
 
+import java.io.IOException;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.web.RemoteIPFinder;
+import org.sonatype.nexus.web.content.Renderer;
+import org.sonatype.nexus.web.internal.BrowserDetector;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.common.Loggers;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -55,11 +63,22 @@ public class NexusHttpAuthenticationFilter
 
   private boolean fakeAuthScheme;
 
+  // FIXME: Evil field injection should be replaced!
+
   @Inject
   private SecuritySystem securitySystem;
 
   @Inject
   private EventBus eventBus;
+
+  @Inject
+  private Renderer templateRenderer;
+
+  @Inject
+  private ApplicationStatusSource applicationStatusSource;
+
+  @Inject
+  private BrowserDetector browserDetector;
 
   protected SecuritySystem getSecuritySystem() {
     return securitySystem;
@@ -147,6 +166,36 @@ public class NexusHttpAuthenticationFilter
     }
 
     return loggedIn;
+  }
+
+  /**
+   * If request comes from a web-browser render an error page, else perform default challenge.
+   */
+  @Override
+  protected boolean sendChallenge(final ServletRequest request, final ServletResponse response) {
+    if (browserDetector.isBrowserInitiated(request)) {
+      HttpServletRequest httpRequest = WebUtils.toHttp(request);
+      HttpServletResponse httpResponse = WebUtils.toHttp(response);
+      httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      // omit WWW-Authenticate we do NOT want to have browser prompt
+
+      Map<String,Object> params = ImmutableMap.of(
+          "nexusVersion", applicationStatusSource.getSystemStatus().getVersion(),
+          "nexusRoot", (Object)templateRenderer.getAppRootUrl(httpRequest)
+      );
+
+      try {
+        templateRenderer.render("/org/sonatype/nexus/web/internal/accessDeniedHtml.vm", params, httpResponse);
+      }
+      catch (IOException e) {
+        throw Throwables.propagate(e);
+      }
+
+      return false;
+    }
+    else {
+      return super.sendChallenge(request, response);
+    }
   }
 
   @Override
