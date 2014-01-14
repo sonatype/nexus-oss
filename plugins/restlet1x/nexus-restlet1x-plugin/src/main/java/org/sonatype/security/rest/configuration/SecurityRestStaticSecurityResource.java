@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.security.configuration;
+package org.sonatype.security.rest.configuration;
 
 import javax.enterprise.inject.Typed;
 import javax.inject.Named;
