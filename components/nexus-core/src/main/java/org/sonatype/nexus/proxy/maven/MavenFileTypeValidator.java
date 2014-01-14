@@ -51,7 +51,7 @@ public class MavenFileTypeValidator
    *
    * @since 2.8.0
    */
-  private static final Pattern SITE_XML_FILENAME_PATTERN = Pattern.compile("^/(.*)-site(_([a-z][a-z])(_([a-z][a-z]))?)?.xml$");
+  private static final Pattern SITE_XML_FILENAME_PATTERN = Pattern.compile("^(.*)-site(_([a-z][a-z])(_([a-z][a-z]))?)?.xml$");
 
   @Inject
   public MavenFileTypeValidator(final MimeSupport mimeSupport) {
