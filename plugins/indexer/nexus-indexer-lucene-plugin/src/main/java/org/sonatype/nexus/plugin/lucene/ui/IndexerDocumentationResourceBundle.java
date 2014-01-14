@@ -20,7 +20,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
-import org.sonatype.nexus.rest.AbstractIndexerNexusPlexusResource;
+import org.sonatype.nexus.rest.index.AbstractIndexerNexusPlexusResource;
 
 @Named
 @Singleton

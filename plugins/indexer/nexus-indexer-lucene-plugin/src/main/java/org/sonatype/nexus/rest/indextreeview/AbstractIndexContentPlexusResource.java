@@ -22,8 +22,8 @@ import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.rest.AbstractIndexerNexusPlexusResource;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
+import org.sonatype.nexus.rest.index.AbstractIndexerNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 import com.thoughtworks.xstream.XStream;

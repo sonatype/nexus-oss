@@ -25,7 +25,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.rest.AbstractIndexerNexusPlexusResource;
+import org.sonatype.nexus.rest.index.AbstractIndexerNexusPlexusResource;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 

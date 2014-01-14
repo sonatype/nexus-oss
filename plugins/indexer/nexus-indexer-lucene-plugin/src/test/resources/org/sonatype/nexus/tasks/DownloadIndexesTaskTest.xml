@@ -1,8 +1,0 @@
-<plexus>
-  <components>
-    <component>
-      <role>org.sonatype.nexus.index.IndexerManager</role>
-      <implementation>org.sonatype.nexus.tasks.MockedIndexerManager</implementation>
-    </component>
-  </components>
-</plexus>
