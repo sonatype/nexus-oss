@@ -167,6 +167,23 @@ public class MavenFileTypeValidatorTest
   }
 
   @Test
+  public void testSiteXmlNEXUS6213()
+      throws Exception
+  {
+    // neg tests
+    doTest("something/else/file-site.xml", "nexus-6213-fubar-1.0.xml", false);
+    doTest("something/else/file-site_hu.xml", "nexus-6213-fubar-1.0.xml", false);
+    doTest("something/else/file-site_hu_HU.xml", "nexus-6213-fubar-1.0.xml", false);
+    doTest("something/else/file-site_123.xml", "nexus-6213-fubar-1.0.xml", true); // is not site XML
+
+    // positive tests
+    doTest("something/else/file-site.xml", "nexus-6213-maven-3.0.5-site.xml", true);
+    doTest("something/else/file-site_hu.xml", "nexus-6213-maven-3.0.5-site.xml", true);
+    doTest("something/else/file-site_hu_HU.xml", "nexus-6213-maven-3.0.5-site.xml", true);
+    doTest("something/else/file-site_123.xml", "nexus-6213-maven-3.0.5-site.xml", true);
+  }
+
+  @Test
   public void overrideRules()
       throws Exception
   {
