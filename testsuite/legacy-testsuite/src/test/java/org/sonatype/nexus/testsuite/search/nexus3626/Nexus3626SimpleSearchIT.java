@@ -16,12 +16,12 @@ package org.sonatype.nexus.testsuite.search.nexus3626;
 import java.io.File;
 import java.io.IOException;
 
+import org.sonatype.nexus.index.tasks.UpdateIndexTask;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.ITGroups.INDEX;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
-import org.sonatype.nexus.tasks.UpdateIndexTask;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenDeployer;

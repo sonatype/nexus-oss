@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.test.utils;
 
-import org.sonatype.nexus.rest.MIndexerXStreamConfiguratorLightweight;
+import org.sonatype.nexus.rest.index.MIndexerXStreamConfiguratorLightweight;
 import org.sonatype.nexus.rest.model.XStreamConfigurator;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;

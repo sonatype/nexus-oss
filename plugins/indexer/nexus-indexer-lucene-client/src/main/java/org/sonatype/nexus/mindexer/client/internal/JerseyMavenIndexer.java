@@ -24,7 +24,7 @@ import org.sonatype.nexus.mindexer.client.SearchRequest;
 import org.sonatype.nexus.mindexer.client.SearchResponse;
 import org.sonatype.nexus.mindexer.client.SearchResponseArtifact;
 import org.sonatype.nexus.mindexer.client.SearchResponseRepository;
-import org.sonatype.nexus.rest.MIndexerXStreamConfiguratorLightweight;
+import org.sonatype.nexus.rest.index.MIndexerXStreamConfiguratorLightweight;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;
 import org.sonatype.nexus.rest.model.NexusNGArtifactHit;
 import org.sonatype.nexus.rest.model.NexusNGArtifactLink;

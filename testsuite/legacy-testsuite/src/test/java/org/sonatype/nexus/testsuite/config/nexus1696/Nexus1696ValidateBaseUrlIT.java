@@ -16,6 +16,7 @@ package org.sonatype.nexus.testsuite.config.nexus1696;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sonatype.nexus.index.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
@@ -30,7 +31,6 @@ import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.ContentListMessageUtil;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;

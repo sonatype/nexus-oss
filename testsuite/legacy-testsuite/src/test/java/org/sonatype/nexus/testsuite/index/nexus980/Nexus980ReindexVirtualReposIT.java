@@ -15,12 +15,12 @@ package org.sonatype.nexus.testsuite.index.nexus980;
 
 import java.io.IOException;
 
+import org.sonatype.nexus.index.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.ITGroups.INDEX;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import org.junit.Assert;

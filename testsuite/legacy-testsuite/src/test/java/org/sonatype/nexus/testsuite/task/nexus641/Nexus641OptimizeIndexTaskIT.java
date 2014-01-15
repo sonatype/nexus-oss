@@ -15,9 +15,9 @@ package org.sonatype.nexus.testsuite.task.nexus641;
 
 import java.io.IOException;
 
+import org.sonatype.nexus.index.tasks.descriptors.OptimizeIndexTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.OptimizeIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import org.junit.Test;
