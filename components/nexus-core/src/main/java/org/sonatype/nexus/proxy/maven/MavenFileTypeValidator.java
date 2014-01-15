@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -41,10 +42,16 @@ public class MavenFileTypeValidator
 {
   public static final String XML_DETECTION_LAX_KEY = MavenFileTypeValidator.class.getName() + ".relaxedXmlValidation";
 
-  private static final boolean XML_DETECTION_LAX_DEFAULT = true;
+  private static final boolean XML_DETECTION_LAX = SystemPropertiesHelper.getBoolean(XML_DETECTION_LAX_KEY, true);
 
-  private static final boolean XML_DETECTION_LAX = SystemPropertiesHelper.getBoolean(XML_DETECTION_LAX_KEY,
-      XML_DETECTION_LAX_DEFAULT);
+  /**
+   * Regexp pattern for Maven Site plugin descriptor (when deployed). In this case, the classifier of the deployed
+   * descriptor is "site" and might be followed by underscore and some l10n value ("site_hu.xml" or "site_cn_TW.xml").
+   * Extension is ".xml".
+   *
+   * @since 2.8.0
+   */
+  private static final Pattern SITE_XML_FILENAME_PATTERN = Pattern.compile("^(.*)-site(_([a-z][a-z])(_([a-z][a-z]))?)?.xml$");
 
   @Inject
   public MavenFileTypeValidator(final MimeSupport mimeSupport) {
@@ -59,39 +66,51 @@ public class MavenFileTypeValidator
   @Override
   public FileTypeValidity isExpectedFileType(final StorageFileItem file) {
     // only check content from maven repositories
-    if (file.getRepositoryItemUid().getRepository().adaptToFacet(MavenRepository.class) == null) {
+    final MavenRepository mavenRepository = file.getRepositoryItemUid().getRepository().adaptToFacet(MavenRepository.class);
+    if (mavenRepository == null) {
       return FileTypeValidity.NEUTRAL;
     }
 
     final String filePath = file.getPath().toLowerCase();
     if (filePath.endsWith(".pom")) {
+      // POM
       log.debug("Checking if Maven POM {} is of the correct MIME type.", file.getRepositoryItemUid());
-
       try {
         return XMLUtils.validateXmlLikeFile(file, "<project");
       }
       catch (IOException e) {
-        log.warn("Cannot access content of StorageFileItem: " + file.getRepositoryItemUid(), e);
-
+        log.warn("Cannot access content of StorageFileItem: {}", file.getRepositoryItemUid(), e);
+        return FileTypeValidity.NEUTRAL;
+      }
+    }
+    else if (SITE_XML_FILENAME_PATTERN.matcher(filePath).matches()) {
+      // site descriptor
+      log.debug("Checking if Maven Site Descriptor {} is of the correct MIME type.",
+          file.getRepositoryItemUid());
+      try {
+        return XMLUtils.validateXmlLikeFile(file, "<project");
+      }
+      catch (IOException e) {
+        log.warn("Cannot access content of StorageFileItem: {}", file.getRepositoryItemUid(), e);
         return FileTypeValidity.NEUTRAL;
       }
     }
     else if (filePath.endsWith("/maven-metadata.xml")) {
+      // maven-metadata.xml
       log.debug("Checking if Maven Repository Metadata {} is of the correct MIME type.",
           file.getRepositoryItemUid());
-
       try {
         return XMLUtils.validateXmlLikeFile(file, "<metadata");
       }
       catch (IOException e) {
-        log.warn("Cannot access content of StorageFileItem: " + file.getRepositoryItemUid(), e);
-
+        log.warn("Cannot access content of StorageFileItem: {}", file.getRepositoryItemUid(), e);
         return FileTypeValidity.NEUTRAL;
       }
     }
     else if (filePath.endsWith(".sha1") || filePath.endsWith(".md5")) {
-      log.debug("Checking if Maven checksum {} is valid.", file.getRepositoryItemUid());
-
+      // hashes
+      log.debug("Checking if Maven Repository Metadata Hash {} is of the correct MIME type.",
+          file.getRepositoryItemUid());
       try {
         final String digest = MUtils.readDigestFromFileItem(file);
         if (MUtils.isDigest(digest)) {
@@ -105,15 +124,13 @@ public class MavenFileTypeValidator
         return FileTypeValidity.INVALID;
       }
       catch (IOException e) {
-        log.warn("Cannot access content of StorageFileItem: " + file.getRepositoryItemUid(), e);
-
+        log.warn("Cannot access content of StorageFileItem: {}", file.getRepositoryItemUid(), e);
         return FileTypeValidity.NEUTRAL;
       }
+    }
 
-    }
-    else {
-      return super.isExpectedFileType(file);
-    }
+    // for cases not handled above, use the "generic" MIME based one
+    return super.isExpectedFileType(file);
   }
 
   @Override
