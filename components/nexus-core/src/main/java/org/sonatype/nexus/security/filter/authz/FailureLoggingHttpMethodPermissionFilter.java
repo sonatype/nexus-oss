@@ -54,10 +54,6 @@ public class FailureLoggingHttpMethodPermissionFilter
 
     request.setAttribute(org.sonatype.nexus.web.Constants.ATTR_KEY_REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE);
 
-    // NOTE: not calling super which is odd here due to NX anonymous user muck which has to be handled
-    // NOTE: specially and adds lots of complication, consider removing the need for this in the future
-    //return super.onAccessDenied(request, response);
-
     return false;
   }
 
