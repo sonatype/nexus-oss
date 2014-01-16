@@ -13,9 +13,9 @@
 
 package org.sonatype.nexus.testsuite.task.nexus977tasks;
 
+import org.sonatype.nexus.index.tasks.descriptors.DownloadIndexesTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.DownloadIndexesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import org.junit.Assert;

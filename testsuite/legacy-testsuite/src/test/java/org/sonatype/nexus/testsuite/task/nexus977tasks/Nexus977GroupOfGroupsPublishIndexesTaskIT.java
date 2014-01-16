@@ -15,10 +15,10 @@ package org.sonatype.nexus.testsuite.task.nexus977tasks;
 
 import java.io.File;
 
+import org.sonatype.nexus.index.tasks.descriptors.DownloadIndexesTaskDescriptor;
+import org.sonatype.nexus.index.tasks.descriptors.PublishIndexesTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.DownloadIndexesTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.PublishIndexesTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 

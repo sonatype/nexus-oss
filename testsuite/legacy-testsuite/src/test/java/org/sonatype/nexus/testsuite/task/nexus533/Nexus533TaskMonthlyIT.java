@@ -17,9 +17,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.sonatype.nexus.index.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 
 import org.apache.commons.lang.time.DateUtils;
 

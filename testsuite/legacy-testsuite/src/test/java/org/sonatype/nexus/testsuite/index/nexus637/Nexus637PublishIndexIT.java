@@ -16,9 +16,9 @@ package org.sonatype.nexus.testsuite.index.nexus637;
 import java.io.File;
 import java.util.Arrays;
 
+import org.sonatype.nexus.index.tasks.descriptors.PublishIndexesTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.PublishIndexesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import org.junit.Assert;

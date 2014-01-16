@@ -17,12 +17,12 @@ import java.io.File;
 import java.util.List;
 
 import org.sonatype.jettytestsuite.ControlledServer;
+import org.sonatype.nexus.index.tasks.UpdateIndexTask;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNodeDTO;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.tasks.UpdateIndexTask;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
