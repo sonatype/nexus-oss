@@ -52,9 +52,10 @@ public interface Hc4Provider
    * configuration changes, the client needs reconfiguration too, hence if you keep a reference to the created
    * client, you might end up with stale and non-working client (for example, global HTTP Proxy got changed between
    * your invocation of this method and when you want to perform HTTP request. Your instance would still try to talk to
-   * HTTP proxy set in time when you created the instance). For simplicity sake, HttpClient instance returned by
-   * this method <em>does not support Keep-Alive</em> (persistent HTTP connections). If you need a client that
-   * reuse connections, use method {@link #createHttpClient(boolean)} instead.
+   * HTTP proxy set in time when you created the instance). For resource optimization's sake, HttpClient instance
+   * returned by this method  <em>does not support Keep-Alive</em> (unless configuration needs it).
+   * If you need explicit control over connection reuse, or must have one a client
+   * that reuse connections at any cause, use method {@link #createHttpClient(boolean)} instead.
    *
    * @return HttpClient4x pre-configured instance, that uses global {@link RemoteStorageContext} to be configured
    * (see {@link ApplicationConfiguration#getGlobalRemoteStorageContext()}).
