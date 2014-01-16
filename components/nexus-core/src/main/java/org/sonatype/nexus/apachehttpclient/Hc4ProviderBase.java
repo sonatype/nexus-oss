@@ -159,6 +159,36 @@ public class Hc4ProviderBase
 
   // ==
 
+  /**
+   * Returns {@code true} if passed in {@link RemoteStorageContext} contains some configuration element that
+   * does require connection reuse (typically remote NTLM authentication or proxy with NTLM authentication set).
+   *
+   * @param context the remote storage context to test for need of reused connections.
+   * @return {@code true} if connection reuse is required according to remote storage context.
+   * @since 2.8.0
+   */
+  protected boolean reuseConnectionsNeeded(final RemoteStorageContext context) {
+    // return true if any of the auth is NTLM based, as NTLM must have keep-alive to work
+    if (context != null) {
+      if (context.getRemoteAuthenticationSettings() instanceof NtlmRemoteAuthenticationSettings) {
+        return true;
+      }
+      if (context.getRemoteProxySettings() != null) {
+        if (context.getRemoteProxySettings().getHttpProxySettings() != null &&
+            context.getRemoteProxySettings().getHttpProxySettings()
+                .getProxyAuthentication() instanceof NtlmRemoteAuthenticationSettings) {
+          return true;
+        }
+        if (context.getRemoteProxySettings().getHttpsProxySettings() != null &&
+            context.getRemoteProxySettings().getHttpsProxySettings()
+                .getProxyAuthentication() instanceof NtlmRemoteAuthenticationSettings) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   protected void configureAuthentication(final DefaultHttpClient httpClient,
                                          final RemoteAuthenticationSettings ras,
                                          final HttpHost proxyHost)

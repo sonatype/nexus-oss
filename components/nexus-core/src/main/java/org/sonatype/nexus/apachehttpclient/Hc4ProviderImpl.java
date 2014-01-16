@@ -236,7 +236,13 @@ public class Hc4ProviderImpl
     // components using the "shared" httpClient should not produce hiw rate of requests
     // anyway, as they usually happen per user interactions (GPG gets keys are staging repo is closed, if not cached
     // yet, LVO gets info when UI's main window is loaded into user's browser, etc
-    return createHttpClient(false);
+    // ==
+    // NEXUS-6220: This story above is mainly true and is basically "resource optimization", as
+    // this method is used by various "side services" (typically LVO etc), where single request is made
+    // with huge pauses in between. Still, connection reuse is needed in some rare cases,
+    // like when you have NTLM proxy in between Nexus and the Internet. So, let ask HC4 provider,
+    // does it "think" we still need connection reuse or not.
+    return createHttpClient(reuseConnectionsNeeded(applicationConfiguration.getGlobalRemoteStorageContext()));
   }
 
   @Override
