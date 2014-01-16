@@ -18,6 +18,7 @@ import javax.servlet.ServletContext;
 import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.nexus.web.internal.BaseUrlHolderFilter;
 import org.sonatype.nexus.web.internal.ErrorPageFilter;
+import org.sonatype.nexus.web.internal.ErrorPageServlet;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.web.guice.SecurityWebModule;
 
@@ -77,6 +78,7 @@ public class NexusModules
         protected void configureServlets() {
           filter("/*").through(BaseUrlHolderFilter.class);
           filter("/*").through(ErrorPageFilter.class);
+          serve("/error.html").with(ErrorPageServlet.class);
 
           // our configuration needs to be first-most when calculating order (some fudge room for edge-cases)
           bind(RankingFunction.class).toInstance(new DefaultRankingFunction(0x70000000));
