@@ -379,10 +379,9 @@ public class NexusHttpAuthenticationFilter
   /**
    * set http 403 forbidden header for the response
    */
-  protected void sendForbidden(ServletRequest request, ServletResponse response) {
+  protected void sendForbidden(ServletRequest request, ServletResponse response) throws IOException {
     HttpServletResponse httpResponse = WebUtils.toHttp(response);
-
-    httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+    httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
   }
 
   // Will retrieve authz header. if missing from header, will try
