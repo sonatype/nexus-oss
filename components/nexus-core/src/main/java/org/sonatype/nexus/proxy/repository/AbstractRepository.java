@@ -451,10 +451,6 @@ public abstract class AbstractRepository
   }
 
   protected boolean doExpireNotFoundCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
-    if (!getLocalStatus().shouldServiceRequest()) {
-      return false;
-    }
-
     if (StringUtils.isBlank(request.getRequestPath())) {
       request.setRequestPath(RepositoryItemUid.PATH_ROOT);
     }

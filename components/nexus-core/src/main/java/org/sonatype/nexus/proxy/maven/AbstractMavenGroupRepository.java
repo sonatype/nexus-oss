@@ -101,7 +101,7 @@ public abstract class AbstractMavenGroupRepository
   }
 
   @Override
-  public boolean recreateMavenMetadata(ResourceStoreRequest request) {
+  public boolean recreateMavenMetadata(final ResourceStoreRequest request) {
     if (!shouldServiceOperation(request, "recreateMavenMetadata")) {
       return false;
     }
