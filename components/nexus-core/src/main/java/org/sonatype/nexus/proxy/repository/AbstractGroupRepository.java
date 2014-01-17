@@ -131,7 +131,7 @@ public abstract class AbstractGroupRepository
   protected boolean doExpireCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
     final List<Repository> members = getMemberRepositories();
     for (Repository member : members) {
-      member.expireCaches(request);
+      member.expireCaches(request, filter);
     }
     return super.doExpireCaches(request, filter);
   }
