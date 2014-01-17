@@ -44,6 +44,7 @@ import org.sonatype.nexus.proxy.item.uid.IsGroupLocalOnlyAttribute;
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.proxy.walker.WalkerFilter;
 
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
@@ -127,35 +128,23 @@ public abstract class AbstractGroupRepository
   }
 
   @Override
-  public void expireCaches(ResourceStoreRequest request) {
+  protected boolean doExpireCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
     final List<Repository> members = getMemberRepositories();
     for (Repository member : members) {
       member.expireCaches(request);
     }
-
-    super.expireCaches(request);
+    return super.doExpireCaches(request, filter);
   }
 
   @Override
-  public Collection<String> evictUnusedItems(ResourceStoreRequest request, final long timestamp) {
-    if (!getLocalStatus().shouldServiceRequest()) {
-      return Collections.emptyList();
-    }
-
-    log.info(
-        String.format("Evicting unused items from group repository %s from path \"%s\"",
-            RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath()));
-
+  protected Collection<String> doEvictUnusedItems(final ResourceStoreRequest request, final long timestamp) {
     HashSet<String> result = new HashSet<String>();
-
     // here, we just iterate over members and call evict
     final List<Repository> members = getMemberRepositories();
     for (Repository repository : members) {
       result.addAll(repository.evictUnusedItems(request, timestamp));
     }
-
     eventBus().post(new RepositoryEventEvictUnusedItems(this));
-
     return result;
   }
 

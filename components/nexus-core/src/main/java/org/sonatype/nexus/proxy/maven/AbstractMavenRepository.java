@@ -16,7 +16,6 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -26,6 +25,7 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
@@ -167,32 +167,26 @@ public abstract class AbstractMavenRepository
   }
 
   @Override
-  public Collection<String> evictUnusedItems(ResourceStoreRequest request, final long timestamp) {
-    if (!getLocalStatus().shouldServiceRequest()) {
-      return Collections.emptyList();
-    }
-
+  protected Collection<String> doEvictUnusedItems(final ResourceStoreRequest request, final long timestamp) {
     if (getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
       Collection<String> result =
           doEvictUnusedItems(request, timestamp, new EvictUnusedMavenItemsWalkerProcessor(timestamp),
               new EvictUnusedMavenItemsWalkerFilter());
-
       eventBus().post(new RepositoryEventEvictUnusedItems(this));
-
       return result;
     }
     else {
-      return super.evictUnusedItems(request, timestamp);
+      return super.doEvictUnusedItems(request, timestamp);
     }
   }
 
   @Override
-  public boolean recreateMavenMetadata(ResourceStoreRequest request) {
-    if (!getLocalStatus().shouldServiceRequest()) {
+  public boolean recreateMavenMetadata(final ResourceStoreRequest request) {
+    if (!shouldServiceOperation(request, "recreateMavenMetadata")) {
       return false;
     }
-
     if (!getRepositoryKind().isFacetAvailable(HostedRepository.class)) {
+      log.debug("Not performing recreateMavenMetadata, {} is not hosted.", this);
       return false;
     }
 
@@ -201,34 +195,25 @@ public abstract class AbstractMavenRepository
     }
 
     try {
-      if (!this.getLocalStorage().containsItem(this, request)) {
+      if (!getLocalStorage().containsItem(this, request)) {
         log.info(
-            "Skip rebuilding Maven2 Metadata in repository ID='" + getId()
-                + "' because it does not contain path='" + request.getRequestPath() + "'.");
-
+            "Skip rebuilding Maven2 Metadata in repository ID={} because it does not contain path='{}'.", getId(),
+            request.getRequestPath());
         return false;
       }
     }
-    catch (StorageException e) {
-      log.warn("Skip rebuilding Maven2 Metadata in repository ID='" + getId() + "'.", e);
-
+    catch (LocalStorageException e) {
+      log.warn("Skip rebuilding Maven2 Metadata in repository ID={}", getId(), e);
       return false;
     }
-
-    log.info(
-        "Recreating Maven2 metadata in repository ID='" + getId() + "' from path='" + request.getRequestPath()
-            + "'");
-
     return doRecreateMavenMetadata(request);
   }
 
-  protected boolean doRecreateMavenMetadata(ResourceStoreRequest request) {
-    RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor(log);
-
-    DefaultWalkerContext ctx = new DefaultWalkerContext(this, request);
-
+  protected boolean doRecreateMavenMetadata(final ResourceStoreRequest request) {
+    log.info("Recreating Maven2 metadata in repository ID={} from path='{}'", getId(), request.getRequestPath());
+    final RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor(log);
+    final DefaultWalkerContext ctx = new DefaultWalkerContext(this, request);
     ctx.getProcessors().add(wp);
-
     try {
       getWalker().walk(ctx);
     }
@@ -239,9 +224,7 @@ public abstract class AbstractMavenRepository
         throw e;
       }
     }
-
     eventBus().post(new RepositoryEventRecreateMavenMetadata(this));
-
     return !ctx.isStopped();
   }
 

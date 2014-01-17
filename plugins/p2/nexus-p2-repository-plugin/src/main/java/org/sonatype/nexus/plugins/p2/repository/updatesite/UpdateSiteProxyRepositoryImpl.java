@@ -700,9 +700,9 @@ public class UpdateSiteProxyRepositoryImpl
   }
 
   @Override
-  public void expireCaches(final ResourceStoreRequest request) {
-    super.expireCaches(request);
-
+  protected boolean doExpireCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
+    final boolean result = super.doExpireCaches(request, filter);
     overwriteRemoteUrl = null;
+    return result;
   }
 }
