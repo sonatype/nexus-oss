@@ -197,20 +197,20 @@ public abstract class AbstractMavenRepository
     try {
       if (!getLocalStorage().containsItem(this, request)) {
         log.info(
-            "Skip rebuilding Maven2 Metadata in repository ID={} because it does not contain path='{}'.", getId(),
+            "Skip rebuilding Maven2 Metadata in repository {} because it does not contain path='{}'.", this,
             request.getRequestPath());
         return false;
       }
     }
     catch (LocalStorageException e) {
-      log.warn("Skip rebuilding Maven2 Metadata in repository ID={}", getId(), e);
+      log.warn("Skip rebuilding Maven2 Metadata in repository {}", this, e);
       return false;
     }
     return doRecreateMavenMetadata(request);
   }
 
   protected boolean doRecreateMavenMetadata(final ResourceStoreRequest request) {
-    log.info("Recreating Maven2 metadata in repository ID={} from path='{}'", getId(), request.getRequestPath());
+    log.info("Recreating Maven2 metadata in hosted repository {} from path='{}'", this, request.getRequestPath());
     final RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor(log);
     final DefaultWalkerContext ctx = new DefaultWalkerContext(this, request);
     ctx.getProcessors().add(wp);
