@@ -455,7 +455,7 @@ public class RemoteContentDiscovererImplTest
         assertThat(status.getDiscoveryStatus().getLastDiscoveryStrategy(),
             equalTo(RemotePrefixFileStrategy.ID));
         // message is "Connection to XXX refused"
-        assertThat(status.getDiscoveryStatus().getLastDiscoveryMessage(), containsString("Connection"));
+        assertThat(status.getDiscoveryStatus().getLastDiscoveryMessage(), containsString("Connection to"));
         assertThat(status.getDiscoveryStatus().getLastDiscoveryMessage(), containsString("refused"));
       }
     }
