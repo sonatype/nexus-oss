@@ -57,7 +57,6 @@ public class ErrorPageServlet
   @Override
   protected void service(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException {
-    webUtils.equipResponseWithStandardHeaders(response);
     webUtils.addNoCacheResponseHeaders(response);
 
     Integer errorCode = (Integer) request.getAttribute("javax.servlet.error.status_code");

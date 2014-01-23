@@ -69,14 +69,6 @@ public class WebResourceServlet
   }
 
   @Override
-  protected void service(final HttpServletRequest request, final HttpServletResponse response)
-      throws ServletException, IOException
-  {
-    webUtils.equipResponseWithStandardHeaders(response); // be consistent for any HTTP verb
-    super.service(request, response);
-  }
-
-  @Override
   protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException
   {

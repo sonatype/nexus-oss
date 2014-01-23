@@ -330,7 +330,6 @@ public class ContentServlet
   protected void service(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException
   {
-    webUtils.equipResponseWithStandardHeaders(response);
     response.setHeader("Accept-Ranges", "bytes");
 
     final String method = request.getMethod();
