@@ -59,12 +59,20 @@ public class ErrorPageServlet
       throws ServletException, IOException {
     webUtils.equipResponseWithStandardHeaders(response);
     webUtils.addNoCacheResponseHeaders(response);
+
+    Integer errorCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+    String errorMessage = (String)request.getAttribute("javax.servlet.error.message");
+    if (errorCode == null) {
+      // this happens if someone "browses" to error page
+      errorCode = 404;
+      errorMessage = "Not found";
+    }
     templateRenderer.renderErrorPage(
         request,
         response,
-        (Integer)request.getAttribute("javax.servlet.error.status_code"),
+        errorCode,
         null, // default reason phrase will be used
-        (String)request.getAttribute("javax.servlet.error.message"),
+        errorMessage,
         (Throwable)request.getAttribute("javax.servlet.error.exception")
     );
   }
