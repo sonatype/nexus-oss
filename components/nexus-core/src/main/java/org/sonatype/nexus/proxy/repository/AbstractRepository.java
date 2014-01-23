@@ -397,45 +397,63 @@ public abstract class AbstractRepository
     this.accessManager = accessManager;
   }
 
+  /**
+   * Returns {@code true} if action should be performed against this repository. Should guard against repeated
+   * processing, like in "cascade" case when a group does action against it's members.
+   */
+  protected boolean shouldServiceOperation(final ResourceStoreRequest request, final String action) {
+    if (!getLocalStatus().shouldServiceRequest()) {
+      log.debug("Not performing {}, {} is not in service.", action, this);
+      return false;
+    }
+    if (request.getProcessedRepositories().contains(getId())) {
+      log.debug("Not performing {}, {} was already processed in this request.", action, this);
+      return false;
+    }
+    request.addProcessedRepository(getId());
+    return true;
+  }
+
   @Override
-  public void expireCaches(final ResourceStoreRequest request) {
+  public final void expireCaches(final ResourceStoreRequest request) {
     expireCaches(request, null);
   }
 
   @Override
-  public boolean expireCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
-    if (!getLocalStatus().shouldServiceRequest()) {
+  public final boolean expireCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
+    if (!shouldServiceOperation(request, "expireCaches")) {
       return false;
     }
+    log.info("Expiring caches in repository {} from path='{}'", this, request.getRequestPath());
+    return doExpireCaches(request, filter);
+  }
 
+  protected boolean doExpireCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
     // at this level (we are not proxy) expireCaches() actually boils down to "expire NFC" only
     // we are NOT crawling local storage content to flip the isExpired flags to true on a hosted
     // repo, since those attributes in case of hosted (or any other non-proxy) repositories does not have any
     // meaning
-
-    // 2nd, remove the items from NFC
-    return expireNotFoundCaches(request, filter);
+    return doExpireNotFoundCaches(request, filter);
   }
 
   @Override
-  public void expireNotFoundCaches(final ResourceStoreRequest request) {
+  public final void expireNotFoundCaches(final ResourceStoreRequest request) {
     expireNotFoundCaches(request, null);
   }
 
   @Override
-  public boolean expireNotFoundCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
-    if (!getLocalStatus().shouldServiceRequest()) {
+  public final boolean expireNotFoundCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
+    if (!shouldServiceOperation(request, "expireNotFoundCaches")) {
       return false;
     }
+    log.info("Expiring NFC caches in repository {} from path='{}'", this, request.getRequestPath());
+    return doExpireNotFoundCaches(request, filter);
+  }
 
+  protected boolean doExpireNotFoundCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
     if (StringUtils.isBlank(request.getRequestPath())) {
       request.setRequestPath(RepositoryItemUid.PATH_ROOT);
     }
-
-    log.debug(
-        String.format("Clearing NFC cache in repository %s from path=\"%s\"",
-            RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath()));
-
     boolean cacheAltered = false;
     // remove the items from NFC
     if (filter == null) {
@@ -476,14 +494,10 @@ public abstract class AbstractRepository
 
     if (log.isDebugEnabled()) {
       if (cacheAltered) {
-        log.info(
-            String.format("NFC for repository %s from path=\"%s\" was cleared.",
-                RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath()));
+        log.info("NFC for repository {} from path='{}' was cleared.", this, request.getRequestPath());
       }
       else {
-        log.debug(
-            String.format("Clear NFC for repository %s from path=\"%s\" did not alter cache.",
-                RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath()));
+        log.debug("Clear NFC for repository {} from path='{}' did not alter cache.", this, request.getRequestPath());
       }
     }
 
@@ -500,31 +514,33 @@ public abstract class AbstractRepository
   }
 
   @Override
-  public Collection<String> evictUnusedItems(ResourceStoreRequest request, final long timestamp) {
+  public final Collection<String> evictUnusedItems(final ResourceStoreRequest request, final long timestamp) {
+    if (!shouldServiceOperation(request, "evictUnusedItems")) {
+      return Collections.emptyList();
+    }
+    log.info("Evicting unused items in repository {}, from path='{}'", this, request.getRequestPath());
+    return doEvictUnusedItems(request, timestamp);
+  }
+
+  protected Collection<String> doEvictUnusedItems(final ResourceStoreRequest request, final long timestamp) {
     // this is noop at hosted level
     return Collections.emptyList();
   }
 
+  // TODO: this is strictly Nexus internal thing, not exposed in any way, nothing should override this
+  // Also, AttributeStorage should never be "rebuilt", thats := data loss
   @Override
-  public boolean recreateAttributes(ResourceStoreRequest request, final Map<String, String> initialData) {
-    if (!getLocalStatus().shouldServiceRequest()) {
+  public final boolean recreateAttributes(final ResourceStoreRequest request, final Map<String, String> initialData) {
+    if (!shouldServiceOperation(request, "recreateAttributes")) {
       return false;
     }
-
     if (StringUtils.isEmpty(request.getRequestPath())) {
       request.setRequestPath(RepositoryItemUid.PATH_ROOT);
     }
-
-    log.info(
-        String.format("Rebuilding item attributes in repository %s from path=\"%s\"",
-            RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath()));
-
-    RecreateAttributesWalker walkerProcessor = new RecreateAttributesWalker(this, initialData);
-
-    DefaultWalkerContext ctx = new DefaultWalkerContext(this, request);
-
+    log.info("Rebuilding item attributes in repository {} from path='{}'", this, request.getRequestPath());
+    final RecreateAttributesWalker walkerProcessor = new RecreateAttributesWalker(this, initialData);
+    final DefaultWalkerContext ctx = new DefaultWalkerContext(this, request);
     ctx.getProcessors().add(walkerProcessor);
-
     // let it loose
     try {
       getWalker().walk(ctx);
@@ -536,9 +552,7 @@ public abstract class AbstractRepository
         throw e;
       }
     }
-
     eventBus().post(new RepositoryEventRecreateAttributes(this));
-
     return true;
   }
 
