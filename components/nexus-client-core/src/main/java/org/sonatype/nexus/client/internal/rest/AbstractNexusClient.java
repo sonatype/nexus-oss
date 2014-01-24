@@ -71,7 +71,7 @@ public abstract class AbstractNexusClient
   }
 
   @Override
-  public void close() {
+  public synchronized void close() {
     subsystemInstanceCache.clear();
   }
 

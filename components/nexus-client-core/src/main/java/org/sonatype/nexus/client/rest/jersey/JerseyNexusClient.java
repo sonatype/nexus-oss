@@ -162,7 +162,7 @@ public class JerseyNexusClient
   }
 
   @Override
-  public void close() {
+  public synchronized void close() {
     try {
       if (client != null) {
         client.destroy();
