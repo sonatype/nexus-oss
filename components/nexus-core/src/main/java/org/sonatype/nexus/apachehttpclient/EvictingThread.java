@@ -17,8 +17,11 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Preconditions;
 import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Low priority daemon thread responsible to evict connection manager pooled connections/
@@ -31,24 +34,24 @@ class EvictingThread
 {
   private static final Logger LOGGER = LoggerFactory.getLogger(EvictingThread.class);
 
-  private final ClientConnectionManager clientConnectionManager;
+  private final HttpClientConnectionManager httpClientConnectionManager;
 
   private final long idleTimeMillis;
 
   private final long delay;
 
-  EvictingThread(final ClientConnectionManager clientConnectionManager, final long idleTimeMillis, final long delay) {
+  EvictingThread(final HttpClientConnectionManager httpClientConnectionManager, final long idleTimeMillis, final long delay) {
     super("HC4x-EvictingThread");
     Preconditions.checkArgument(idleTimeMillis > -1, "Keep alive period in milliseconds cannot be negative");
-    this.clientConnectionManager = Preconditions.checkNotNull(clientConnectionManager);
+    this.httpClientConnectionManager = checkNotNull(httpClientConnectionManager);
     this.idleTimeMillis = idleTimeMillis;
     this.delay = delay;
     setDaemon(true);
     setPriority(MIN_PRIORITY);
   }
 
-  EvictingThread(final ClientConnectionManager clientConnectionManager, final long idleTimeMillis) {
-    this(clientConnectionManager, idleTimeMillis, 5000);
+  EvictingThread(final HttpClientConnectionManager httpClientConnectionManager, final long idleTimeMillis) {
+    this(httpClientConnectionManager, idleTimeMillis, 5000);
   }
 
   @Override
@@ -59,13 +62,13 @@ class EvictingThread
         synchronized (this) {
           wait(delay);
           try {
-            clientConnectionManager.closeExpiredConnections();
+            httpClientConnectionManager.closeExpiredConnections();
           }
           catch (final Exception e) {
             LOGGER.warn("Failed to close expired connections", e);
           }
           try {
-            clientConnectionManager.closeIdleConnections(idleTimeMillis, TimeUnit.MILLISECONDS);
+            httpClientConnectionManager.closeIdleConnections(idleTimeMillis, TimeUnit.MILLISECONDS);
           }
           catch (final Exception e) {
             LOGGER.warn("Failed to close expired connections", e);

@@ -17,9 +17,16 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.config.ConnectionConfig;
+import org.apache.http.config.ConnectionConfig.Builder;
+import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HttpContext;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Component for creating pre-configured Apache HttpClient4x instances in Nexus.
@@ -93,4 +100,58 @@ public interface Hc4Provider
    * @return HttpClient4x pre-configured instance, that uses passed {@link RemoteStorageContext} to be configured.
    */
   HttpClient createHttpClient(RemoteStorageContext context);
+
+  // ==
+
+  static class Zigote
+  {
+    private final HttpClientBuilder httpClientBuilder;
+
+    private final ConnectionConfig.Builder connectionConfigBuilder;
+
+    private final SocketConfig.Builder socketConfigBuilder;
+
+    private final RequestConfig.Builder requestConfigBuilder;
+
+    Zigote() {
+      this(HttpClientBuilder.create(), ConnectionConfig.copy(ConnectionConfig.DEFAULT),
+          SocketConfig.copy(SocketConfig.DEFAULT), RequestConfig.copy(RequestConfig.DEFAULT));
+    }
+
+    Zigote(final HttpClientBuilder httpClientBuilder, final Builder connectionConfigBuilder,
+           final SocketConfig.Builder socketConfigBuilder, final RequestConfig.Builder requestConfigBuilder)
+    {
+      this.httpClientBuilder = checkNotNull(httpClientBuilder);
+      this.connectionConfigBuilder = checkNotNull(connectionConfigBuilder);
+      this.socketConfigBuilder = checkNotNull(socketConfigBuilder);
+      this.requestConfigBuilder = checkNotNull(requestConfigBuilder);
+    }
+
+    public HttpClientBuilder getHttpClientBuilder() {
+      return httpClientBuilder;
+    }
+
+    public Builder getConnectionConfigBuilder() {
+      return connectionConfigBuilder;
+    }
+
+    public SocketConfig.Builder getSocketConfigBuilder() {
+      return socketConfigBuilder;
+    }
+
+    public RequestConfig.Builder getRequestConfigBuilder() {
+      return requestConfigBuilder;
+    }
+
+    public HttpClient build() {
+      httpClientBuilder.setDefaultConnectionConfig(connectionConfigBuilder.build());
+      httpClientBuilder.setDefaultSocketConfig(socketConfigBuilder.build());
+      httpClientBuilder.setDefaultRequestConfig(requestConfigBuilder.build());
+      return httpClientBuilder.build();
+    }
+  }
+
+  Zigote prepareHttpClient();
+
+  Zigote prepareHttpClient(RemoteStorageContext context);
 }

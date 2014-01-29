@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 import javax.management.StandardMBean;
 
 import com.google.common.base.Preconditions;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 /**
  * Default {@link PoolingClientConnectionManagerMBean} implementation.
@@ -30,9 +30,9 @@ class PoolingClientConnectionManagerMBeanImpl
     implements PoolingClientConnectionManagerMBean
 {
 
-  private final PoolingClientConnectionManager connMgr;
+  private final PoolingHttpClientConnectionManager connMgr;
 
-  PoolingClientConnectionManagerMBeanImpl(final PoolingClientConnectionManager connMgr) {
+  PoolingClientConnectionManagerMBeanImpl(final PoolingHttpClientConnectionManager connMgr) {
     super(PoolingClientConnectionManagerMBean.class, false);
 
     this.connMgr = Preconditions.checkNotNull(connMgr);

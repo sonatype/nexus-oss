@@ -20,13 +20,10 @@ import java.util.regex.Pattern;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
-import org.apache.http.conn.params.ConnRouteParams;
+import org.apache.http.conn.SchemePortResolver;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.routing.HttpRoutePlanner;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.impl.client.ClientParamsStack;
-import org.apache.http.impl.conn.DefaultHttpRoutePlanner;
-import org.apache.http.params.HttpParams;
+import org.apache.http.impl.conn.DefaultRoutePlanner;
 import org.apache.http.protocol.HttpContext;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -38,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.6
  */
 class NexusHttpRoutePlanner
-    extends DefaultHttpRoutePlanner
+    extends DefaultRoutePlanner
 {
 
   // ----------------------------------------------------------------------
@@ -63,10 +60,10 @@ class NexusHttpRoutePlanner
    * @since 2.5
    */
   NexusHttpRoutePlanner(final Map<String, HttpHost> proxies,
-                        final SchemeRegistry schemeRegistry,
-                        final Set<Pattern> nonProxyHostPatterns)
+                        final Set<Pattern> nonProxyHostPatterns,
+                        final SchemePortResolver schemePortResolver)
   {
-    super(schemeRegistry);
+    super(schemePortResolver);
     this.proxies = checkNotNull(proxies);
     this.nonProxyHostPatterns = checkNotNull(nonProxyHostPatterns);
   }
@@ -78,33 +75,24 @@ class NexusHttpRoutePlanner
   public HttpRoute determineRoute(final HttpHost target, final HttpRequest request, final HttpContext context)
       throws HttpException
   {
-    final HttpHost proxy = proxies.get(target.getSchemeName());
-
-    if (proxy != null) {
-      if (request.getParams() instanceof ClientParamsStack) {
-        request.setParams(
-            new NonProxyHostParamsStack(
-                (ClientParamsStack) request.getParams(),
-                noProxyFor(target.getHostName()) ? null : proxy
-            )
-        );
-      }
-      else {
-        request.setParams(
-            new NonProxyHostParamsStack(
-                request.getParams(),
-                noProxyFor(target.getHostName()) ? null : proxy
-            )
-        );
-      }
-    }
-
     return super.determineRoute(target, request, context);
   }
 
   // ----------------------------------------------------------------------
   // Implementation methods
   // ----------------------------------------------------------------------
+
+  @Override
+  protected HttpHost determineProxy(
+      final HttpHost target,
+      final HttpRequest request,
+      final HttpContext context) throws HttpException
+  {
+    if (noProxyFor(target.getHostName())) {
+      return null;
+    }
+    return proxies.get(target.getSchemeName());
+  }
 
   private boolean noProxyFor(final String hostName) {
     for (final Pattern nonProxyHostPattern : nonProxyHostPatterns) {
@@ -113,39 +101,5 @@ class NexusHttpRoutePlanner
       }
     }
     return false;
-  }
-
-  private static class NonProxyHostParamsStack
-      extends ClientParamsStack
-  {
-
-    private final HttpHost proxy;
-
-    /**
-     * @param stack the parameter stack to delegate to
-     * @param proxy proxy to be returned on {@code #getParameter(ConnRouteParams.DEFAULT_PROXY)}
-     */
-    public NonProxyHostParamsStack(final ClientParamsStack stack, final HttpHost proxy) {
-      super(stack.getApplicationParams(), stack.getClientParams(), stack.getRequestParams(),
-          stack.getOverrideParams());
-      this.proxy = proxy;
-    }
-
-    /**
-     * @param params the parameters instance to delegate to
-     * @param @param proxy proxy to be returned on {@code #getParameter(ConnRouteParams.DEFAULT_PROXY)}
-     */
-    public NonProxyHostParamsStack(final HttpParams params, final HttpHost proxy) {
-      super(null, null, params, null);
-      this.proxy = proxy;
-    }
-
-    @Override
-    public Object getParameter(final String name) {
-      if (ConnRouteParams.DEFAULT_PROXY.equals(name)) {
-        return proxy;
-      }
-      return super.getParameter(name);
-    }
   }
 }

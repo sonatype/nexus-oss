@@ -13,30 +13,16 @@
 
 package org.sonatype.nexus.apachehttpclient;
 
-import org.apache.http.HttpHost;
-import org.apache.http.conn.ClientConnectionOperator;
-import org.apache.http.params.HttpParams;
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.protocol.HttpContext;
 
 /**
- * A strategy for {@link ClientConnectionOperator} selection based on http host, http context and http parameters.
- * <p/>
- * If selector does not return an operator, other eventual selectors will be used. If none of them returns an operator,
- * a default operator will be used.
+ * Selects SSLContext to be used for given HTTP context.
  *
- * @since 2.4
+ * @since 2.8
  */
-public interface ClientConnectionOperatorSelector
+public interface SSLContextSelector
 {
-
-  /**
-   * Selects an operator based on http host, http context and http parameters.
-   *
-   * @param host    http host (not null)
-   * @param context http context (not null)
-   * @param params  http parameters (not null)
-   * @return an operator or null if selector cannot determine one based on provided parameters
-   */
-  ClientConnectionOperator get(HttpHost host, HttpContext context, HttpParams params);
-
+  SSLContext select(HttpContext context);
 }

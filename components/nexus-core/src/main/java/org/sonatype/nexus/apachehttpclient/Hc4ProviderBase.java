@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.apachehttpclient.Hc4Provider.Zigote;
 import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
@@ -34,29 +35,30 @@ import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.http.HttpHost;
-import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.auth.params.AuthPNames;
-import org.apache.http.client.params.AuthPolicy;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.client.params.CookiePolicy;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.AuthSchemes;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.protocol.ResponseContentEncoding;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.config.ConnectionConfig;
+import org.apache.http.config.ConnectionConfig.Builder;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
-import org.apache.http.params.SyncBasicHttpParams;
-import org.apache.http.protocol.BasicHttpProcessor;
+import org.apache.http.impl.conn.DefaultSchemePortResolver;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Support class for implementation of {@link Hc4Provider}.
@@ -91,42 +93,43 @@ public class Hc4ProviderBase
    */
   @Inject
   public Hc4ProviderBase(final UserAgentBuilder userAgentBuilder) {
-    this.userAgentBuilder = Preconditions.checkNotNull(userAgentBuilder);
+    this.userAgentBuilder = checkNotNull(userAgentBuilder);
   }
 
   // configuration
 
   // ==
 
-  public DefaultHttpClient createHttpClient(final RemoteStorageContext context,
-                                            final ClientConnectionManager clientConnectionManager)
+  protected Zigote prepareHttpClient(final RemoteStorageContext context,
+                                     final HttpClientConnectionManager httpClientConnectionManager)
   {
-    final DefaultHttpClient httpClient = new DefaultHttpClientImpl(
-        clientConnectionManager, createHttpParams(context)
-    );
-    configureAuthentication(httpClient, context.getRemoteAuthenticationSettings(), null);
-    configureProxy(httpClient, context.getRemoteProxySettings());
+    final Zigote zigote = new Zigote();
+    zigote.getHttpClientBuilder().setConnectionManager(httpClientConnectionManager);
+    zigote.getHttpClientBuilder().addInterceptorFirst(new ResponseContentEncoding());
+    applyConfig(zigote, context);
+    applyAuthenticationConfig(zigote, context.getRemoteAuthenticationSettings(), null);
+    applyProxyConfig(zigote, context.getRemoteProxySettings());
     // obey the given retries count and apply it to client.
     final int retries =
         context.getRemoteConnectionSettings() != null
             ? context.getRemoteConnectionSettings().getRetrievalRetryCount()
             : 0;
-    httpClient.setHttpRequestRetryHandler(new StandardHttpRequestRetryHandler(retries, false));
-    httpClient.setKeepAliveStrategy(new NexusConnectionKeepAliveStrategy(getKeepAliveMaxDuration()));
-    return httpClient;
+    zigote.getHttpClientBuilder().setRetryHandler(new StandardHttpRequestRetryHandler(retries, false));
+    zigote.getHttpClientBuilder().setKeepAliveStrategy(new NexusConnectionKeepAliveStrategy(getKeepAliveMaxDuration()));
+    return zigote;
   }
 
-  protected HttpParams createHttpParams(final RemoteStorageContext context) {
-    HttpParams params = new SyncBasicHttpParams();
-    params.setParameter(HttpProtocolParams.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
-    params.setBooleanParameter(HttpProtocolParams.USE_EXPECT_CONTINUE, false);
-    params.setBooleanParameter(HttpConnectionParams.STALE_CONNECTION_CHECK, false);
-    params.setIntParameter(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024);
-    params.setIntParameter(HttpConnectionParams.CONNECTION_TIMEOUT, getConnectionTimeout(context));
-    params.setIntParameter(HttpConnectionParams.SO_TIMEOUT, getSoTimeout(context));
-    params.setParameter(HttpProtocolParams.USER_AGENT, userAgentBuilder.formatUserAgentString(context));
-    params.setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.IGNORE_COOKIES);
-    return params;
+  protected void applyConfig(final Zigote zigote, final RemoteStorageContext context) {
+    zigote.getSocketConfigBuilder().setSoTimeout(getSoTimeout(context));
+
+    zigote.getConnectionConfigBuilder().setBufferSize(8 * 1024);
+
+    zigote.getRequestConfigBuilder().setCookieSpec(CookieSpecs.IGNORE_COOKIES);
+    zigote.getRequestConfigBuilder().setExpectContinueEnabled(false);
+    zigote.getRequestConfigBuilder().setStaleConnectionCheckEnabled(false);
+    zigote.getRequestConfigBuilder().setConnectTimeout(getConnectionTimeout(context));
+
+    zigote.getHttpClientBuilder().setUserAgent(userAgentBuilder.formatUserAgentString(context));
   }
 
   /**
@@ -189,9 +192,9 @@ public class Hc4ProviderBase
     return false;
   }
 
-  protected void configureAuthentication(final DefaultHttpClient httpClient,
-                                         final RemoteAuthenticationSettings ras,
-                                         final HttpHost proxyHost)
+  protected void applyAuthenticationConfig(final Zigote zigote,
+                                           final RemoteAuthenticationSettings ras,
+                                           final HttpHost proxyHost)
   {
     if (ras != null) {
       String authScope = "target";
@@ -199,9 +202,9 @@ public class Hc4ProviderBase
         authScope = proxyHost.toHostString() + " proxy";
       }
 
-      List<String> authorisationPreference = Lists.newArrayListWithExpectedSize(3);
-      authorisationPreference.add(AuthPolicy.DIGEST);
-      authorisationPreference.add(AuthPolicy.BASIC);
+      final List<String> authorisationPreference = Lists.newArrayListWithExpectedSize(3);
+      authorisationPreference.add(AuthSchemes.DIGEST);
+      authorisationPreference.add(AuthSchemes.BASIC);
       Credentials credentials = null;
       if (ras instanceof ClientSSLRemoteAuthenticationSettings) {
         throw new IllegalArgumentException("SSL client authentication not yet supported!");
@@ -209,7 +212,7 @@ public class Hc4ProviderBase
       else if (ras instanceof NtlmRemoteAuthenticationSettings) {
         final NtlmRemoteAuthenticationSettings nras = (NtlmRemoteAuthenticationSettings) ras;
         // Using NTLM auth, adding it as first in policies
-        authorisationPreference.add(0, AuthPolicy.NTLM);
+        authorisationPreference.add(0, AuthSchemes.NTLM);
         log.debug("{} authentication setup for NTLM domain '{}'", authScope, nras.getNtlmDomain());
         credentials = new NTCredentials(
             nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras.getNtlmDomain()
@@ -224,14 +227,16 @@ public class Hc4ProviderBase
       }
 
       if (credentials != null) {
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         if (proxyHost != null) {
-          httpClient.getCredentialsProvider().setCredentials(new AuthScope(proxyHost), credentials);
-          httpClient.getParams().setParameter(AuthPNames.PROXY_AUTH_PREF, authorisationPreference);
+          credentialsProvider.setCredentials(new AuthScope(proxyHost), credentials);
+          zigote.getRequestConfigBuilder().setProxyPreferredAuthSchemes(authorisationPreference);
         }
         else {
-          httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
-          httpClient.getParams().setParameter(AuthPNames.TARGET_AUTH_PREF, authorisationPreference);
+          credentialsProvider.setCredentials(AuthScope.ANY, credentials);
+          zigote.getRequestConfigBuilder().setTargetPreferredAuthSchemes(authorisationPreference);
         }
+        zigote.getHttpClientBuilder().setDefaultCredentialsProvider(credentialsProvider);
       }
     }
   }
@@ -239,8 +244,8 @@ public class Hc4ProviderBase
   /**
    * @since 2.6
    */
-  protected void configureProxy(final DefaultHttpClient httpClient,
-                                final RemoteProxySettings remoteProxySettings)
+  protected void applyProxyConfig(final Zigote zigote,
+                                  final RemoteProxySettings remoteProxySettings)
   {
     if (remoteProxySettings != null
         && remoteProxySettings.getHttpProxySettings() != null
@@ -251,8 +256,8 @@ public class Hc4ProviderBase
           remoteProxySettings.getHttpProxySettings().getHostname(),
           remoteProxySettings.getHttpProxySettings().getPort()
       );
-      configureAuthentication(
-          httpClient, remoteProxySettings.getHttpProxySettings().getProxyAuthentication(), httpProxy
+      applyAuthenticationConfig(
+          zigote, remoteProxySettings.getHttpProxySettings().getProxyAuthentication(), httpProxy
       );
 
       log.debug(
@@ -267,8 +272,8 @@ public class Hc4ProviderBase
             remoteProxySettings.getHttpsProxySettings().getHostname(),
             remoteProxySettings.getHttpsProxySettings().getPort()
         );
-        configureAuthentication(
-            httpClient, remoteProxySettings.getHttpsProxySettings().getProxyAuthentication(), httpsProxy
+        applyAuthenticationConfig(
+            zigote, remoteProxySettings.getHttpsProxySettings().getProxyAuthentication(), httpsProxy
         );
         log.debug(
             "https proxy setup with host '{}'", remoteProxySettings.getHttpsProxySettings().getHostname()
@@ -288,30 +293,11 @@ public class Hc4ProviderBase
         }
       }
 
-      httpClient.setRoutePlanner(
+      zigote.getHttpClientBuilder().setRoutePlanner(
           new NexusHttpRoutePlanner(
-              proxies, httpClient.getConnectionManager().getSchemeRegistry(), nonProxyHostPatterns
+              proxies, nonProxyHostPatterns, DefaultSchemePortResolver.INSTANCE
           )
       );
     }
   }
-
-  /**
-   * Sub-classed here to customize the http processor and to keep a sane logger name.
-   */
-  private static class DefaultHttpClientImpl
-      extends InstrumentedHttpClient
-  {
-    private DefaultHttpClientImpl(final ClientConnectionManager conman, final HttpParams params) {
-      super(conman, params);
-    }
-
-    @Override
-    protected BasicHttpProcessor createHttpProcessor() {
-      final BasicHttpProcessor result = super.createHttpProcessor();
-      result.addResponseInterceptor(new ResponseContentEncoding());
-      return result;
-    }
-  }
-
 }

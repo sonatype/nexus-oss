@@ -14,7 +14,6 @@
 package org.sonatype.security.realms.kenai;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.inject.Typed;
@@ -23,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider.Zigote;
 import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
 
 import com.google.common.collect.Lists;
@@ -32,13 +32,13 @@ import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.auth.params.AuthPNames;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.utils.HttpClientUtils;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationException;
@@ -163,17 +163,19 @@ public class KenaiRealm
 
   private HttpClient getHttpClient(final UsernamePasswordToken usernamePasswordToken) {
     // risky, but we must blindly assume it is
-    final DefaultHttpClient client = (DefaultHttpClient) hc4Provider.createHttpClient();
+    final Zigote zigote = hc4Provider.prepareHttpClient();
     if (usernamePasswordToken != null) {
-      final List<String> authorisationPreference = new ArrayList<String>(2);
-      authorisationPreference.add(AuthPolicy.DIGEST);
-      authorisationPreference.add(AuthPolicy.BASIC);
+      final List<String> authorisationPreference = Lists.newArrayListWithExpectedSize(2);
+      authorisationPreference.add(AuthSchemes.DIGEST);
+      authorisationPreference.add(AuthSchemes.BASIC);
       final Credentials credentials =
           new UsernamePasswordCredentials(usernamePasswordToken.getUsername(),
               String.valueOf(usernamePasswordToken.getPassword()));
-      client.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
-      client.getParams().setParameter(AuthPNames.TARGET_AUTH_PREF, authorisationPreference);
+      final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+      credentialsProvider.setCredentials(AuthScope.ANY, credentials);
+      zigote.getHttpClientBuilder().setDefaultCredentialsProvider(credentialsProvider);
+      zigote.getRequestConfigBuilder().setTargetPreferredAuthSchemes(authorisationPreference);
     }
-    return client;
+    return zigote.build();
   }
 }
