@@ -20,10 +20,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.sonatype.nexus.apachehttpclient.Hc4Provider.Zigote;
 import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
@@ -44,17 +40,11 @@ import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.protocol.ResponseContentEncoding;
-import org.apache.http.config.ConnectionConfig;
-import org.apache.http.config.ConnectionConfig.Builder;
-import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.impl.conn.DefaultSchemePortResolver;
 
@@ -66,8 +56,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author cstamas
  * @since 2.2
  */
-@Singleton
-@Named
 public class Hc4ProviderBase
     extends ComponentSupport
 {
@@ -91,7 +79,6 @@ public class Hc4ProviderBase
   /**
    * @param userAgentBuilder UA builder component, must not be {@code null}.
    */
-  @Inject
   public Hc4ProviderBase(final UserAgentBuilder userAgentBuilder) {
     this.userAgentBuilder = checkNotNull(userAgentBuilder);
   }

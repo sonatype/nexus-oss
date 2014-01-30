@@ -282,9 +282,9 @@ public class Hc4ProviderImpl
   {
     final Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
         .register("http", PlainConnectionSocketFactory.getSocketFactory())
-        .register("https", new SSLConnectionSocketFactory(new NexusSSLSocketFactorySelector(
-            (javax.net.ssl.SSLSocketFactory) javax.net.ssl.SSLSocketFactory.getDefault(), selectors), null, null,
-            SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER)).build();
+        .register("https", new NexusSSLConnectionSocketFactory(
+            (javax.net.ssl.SSLSocketFactory) javax.net.ssl.SSLSocketFactory.getDefault(),
+            SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER, selectors)).build();
 
     final ManagedClientConnectionManager connManager = new ManagedClientConnectionManager(registry);
     final int maxConnectionCount = getConnectionPoolMaxSize();
