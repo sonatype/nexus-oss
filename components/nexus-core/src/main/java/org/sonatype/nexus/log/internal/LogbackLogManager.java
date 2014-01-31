@@ -510,6 +510,7 @@ public class LogbackLogManager
       configurator.setContext(context);
       context.reset();
       context.getStatusManager().clear();
+      installNonResetResistantListeners();
       configurator.doConfigure(file);
     }
     catch (JoranException e) {
@@ -518,8 +519,31 @@ public class LogbackLogManager
 
     StatusPrinter.printInCaseOfErrorsOrWarnings(context);
     injectAppenders();
+  }
+
+  /**
+   * Invoked after {@link LoggerContext#reset()} by logger manager, to reinstall all listeners that are non
+   * reset resistant.
+   *
+   * @since 2.8
+   */
+  private void installNonResetResistantListeners() {
     installLevelChangePropagator();
   }
+
+  /**
+   * Installs {@link LevelChangePropagator} in context.
+
+   * @since 2.8
+   */
+  private void installLevelChangePropagator() {
+    LoggerContext context = getLoggerContext();
+    final LevelChangePropagator levelChangePropagator = new LevelChangePropagator();
+    levelChangePropagator.setResetJUL(true);
+    levelChangePropagator.setContext(context);
+    context.addListener(levelChangePropagator);
+  }
+
 
   private void injectAppenders() {
     LoggerContext ctx = getLoggerContext();
@@ -662,19 +686,6 @@ public class LogbackLogManager
 
   private void setLogbackLoggerLevel(final String name, final Level level) {
     getLoggerContext().getLogger(name).setLevel(level);
-  }
-
-  /**
-   * Installs {@link LevelChangePropagator} in context. Note that {@link LevelChangePropagator}
-   * is not "reset resistant", so this listener should be re-installed every time when {@link LoggerContext#reset()}
-   * is invoked!
-   */
-  private void installLevelChangePropagator() {
-    LoggerContext context = getLoggerContext();
-    final LevelChangePropagator levelChangePropagator = new LevelChangePropagator();
-    levelChangePropagator.setResetJUL(true);
-    levelChangePropagator.setContext(context);
-    context.addListener(levelChangePropagator);
   }
 
   /**
