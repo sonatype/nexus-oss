@@ -115,6 +115,7 @@ public class Hc4ProviderBase
     zigote.getRequestConfigBuilder().setExpectContinueEnabled(false);
     zigote.getRequestConfigBuilder().setStaleConnectionCheckEnabled(false);
     zigote.getRequestConfigBuilder().setConnectTimeout(getConnectionTimeout(context));
+    zigote.getRequestConfigBuilder().setSocketTimeout(getSoTimeout(context));
 
     zigote.getHttpClientBuilder().setUserAgent(userAgentBuilder.formatUserAgentString(context));
   }
