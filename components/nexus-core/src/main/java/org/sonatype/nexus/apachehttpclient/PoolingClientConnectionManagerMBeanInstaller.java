@@ -21,14 +21,13 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.http.client.HttpClient;
-import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * An wrapper {@link Hc4Provider} that automatically registers / unregisters JMX MBeans for each created
- * {@link HttpClient}s and {@link HttpClientConnectionManager}.
+ * {@link HttpClient}s and {@link PoolingHttpClientConnectionManager}.
  *
  * @since 2.2
  */

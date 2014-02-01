@@ -16,7 +16,6 @@ package org.sonatype.nexus.apachehttpclient;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Preconditions;
-import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

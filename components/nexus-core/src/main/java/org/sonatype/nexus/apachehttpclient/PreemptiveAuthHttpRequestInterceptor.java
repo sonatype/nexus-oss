@@ -28,9 +28,9 @@ import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.protocol.HttpContext;
 
 /**
- * A {@link HttpRequestInterceptor} that forces HC4 to auth preemptively against target host. Use with caution, as
- * this might provide leak of sensitive information! Usually, this shoulb be used to access trusted but protected
- * HTTP services (ie. internal services, within same firewall area, "in house").
+ * A {@link HttpRequestInterceptor} that forces HC4 to auth preemptively, without accepting challenge, against target
+ * host. Use with caution, as this might provide leak of sensitive information! Usually, this should be used to access
+ * trusted but protected HTTP services (ie. internal services, within same firewall area, "in house").
  *
  * @since 2.8
  */

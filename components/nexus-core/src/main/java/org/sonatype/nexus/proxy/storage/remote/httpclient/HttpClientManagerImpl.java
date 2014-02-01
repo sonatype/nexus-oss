@@ -22,7 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
-import org.sonatype.nexus.apachehttpclient.Hc4Provider.Zigote;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider.Zygote;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -38,7 +38,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.impl.client.RequestWrapper;
 import org.apache.http.protocol.HttpContext;
 
 /**
@@ -73,9 +72,9 @@ public class HttpClientManagerImpl
   public HttpClient create(final ProxyRepository proxyRepository, final RemoteStorageContext ctx) {
     Preconditions.checkNotNull(proxyRepository);
     Preconditions.checkNotNull(ctx);
-    final Zigote zigote = hc4Provider.prepareHttpClient(ctx);
-    configure(proxyRepository, ctx, zigote);
-    return zigote.build();
+    final Zygote zygote = hc4Provider.prepareHttpClient(ctx);
+    configure(proxyRepository, ctx, zygote);
+    return zygote.build();
   }
 
   @Override
@@ -90,13 +89,13 @@ public class HttpClientManagerImpl
    * appropriate redirect strategy only.
    */
   protected void configure(final ProxyRepository proxyRepository, final RemoteStorageContext ctx,
-                           final Zigote zigote)
+                           final Zygote zygote)
   {
     // set UA, as Proxy reposes have different than the "generic" one set by Hc4Provider
-    zigote.getHttpClientBuilder().setUserAgent(userAgentBuilder.formatRemoteRepositoryStorageUserAgentString(proxyRepository, ctx));
+    zygote.getHttpClientBuilder().setUserAgent(userAgentBuilder.formatRemoteRepositoryStorageUserAgentString(proxyRepository, ctx));
 
     // set proxy redirect strategy
-    zigote.getHttpClientBuilder().setRedirectStrategy(getProxyRepositoryRedirectStrategy(proxyRepository, ctx));
+    zygote.getHttpClientBuilder().setRedirectStrategy(getProxyRepositoryRedirectStrategy(proxyRepository, ctx));
   }
 
   /**
@@ -181,18 +180,5 @@ public class HttpClientManagerImpl
       }
     };
     return doNotRedirectToIndexPagesStrategy;
-  }
-
-  /**
-   * Returns "source" URI in case of redirected HttpRequest.
-   */
-  private URI getPreviousRequestUri(final HttpRequest request) {
-    if (request instanceof RequestWrapper) {
-      return getPreviousRequestUri(((RequestWrapper) request).getOriginal());
-    }
-    if (request instanceof HttpUriRequest) {
-      return ((HttpUriRequest) request).getURI();
-    }
-    return null;
   }
 }

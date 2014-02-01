@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider.Zigote;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider.Zygote;
 import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
@@ -87,37 +87,37 @@ public class Hc4ProviderBase
 
   // ==
 
-  protected Zigote prepareHttpClient(final RemoteStorageContext context,
+  protected Zygote prepareHttpClient(final RemoteStorageContext context,
                                      final HttpClientConnectionManager httpClientConnectionManager)
   {
-    final Zigote zigote = new Zigote();
-    zigote.getHttpClientBuilder().setConnectionManager(httpClientConnectionManager);
-    zigote.getHttpClientBuilder().addInterceptorFirst(new ResponseContentEncoding());
-    applyConfig(zigote, context);
-    applyAuthenticationConfig(zigote, context.getRemoteAuthenticationSettings(), null);
-    applyProxyConfig(zigote, context.getRemoteProxySettings());
+    final Zygote zygote = new Zygote();
+    zygote.getHttpClientBuilder().setConnectionManager(httpClientConnectionManager);
+    zygote.getHttpClientBuilder().addInterceptorFirst(new ResponseContentEncoding());
+    applyConfig(zygote, context);
+    applyAuthenticationConfig(zygote, context.getRemoteAuthenticationSettings(), null);
+    applyProxyConfig(zygote, context.getRemoteProxySettings());
     // obey the given retries count and apply it to client.
     final int retries =
         context.getRemoteConnectionSettings() != null
             ? context.getRemoteConnectionSettings().getRetrievalRetryCount()
             : 0;
-    zigote.getHttpClientBuilder().setRetryHandler(new StandardHttpRequestRetryHandler(retries, false));
-    zigote.getHttpClientBuilder().setKeepAliveStrategy(new NexusConnectionKeepAliveStrategy(getKeepAliveMaxDuration()));
-    return zigote;
+    zygote.getHttpClientBuilder().setRetryHandler(new StandardHttpRequestRetryHandler(retries, false));
+    zygote.getHttpClientBuilder().setKeepAliveStrategy(new NexusConnectionKeepAliveStrategy(getKeepAliveMaxDuration()));
+    return zygote;
   }
 
-  protected void applyConfig(final Zigote zigote, final RemoteStorageContext context) {
-    zigote.getSocketConfigBuilder().setSoTimeout(getSoTimeout(context));
+  protected void applyConfig(final Zygote zygote, final RemoteStorageContext context) {
+    zygote.getSocketConfigBuilder().setSoTimeout(getSoTimeout(context));
 
-    zigote.getConnectionConfigBuilder().setBufferSize(8 * 1024);
+    zygote.getConnectionConfigBuilder().setBufferSize(8 * 1024);
 
-    zigote.getRequestConfigBuilder().setCookieSpec(CookieSpecs.IGNORE_COOKIES);
-    zigote.getRequestConfigBuilder().setExpectContinueEnabled(false);
-    zigote.getRequestConfigBuilder().setStaleConnectionCheckEnabled(false);
-    zigote.getRequestConfigBuilder().setConnectTimeout(getConnectionTimeout(context));
-    zigote.getRequestConfigBuilder().setSocketTimeout(getSoTimeout(context));
+    zygote.getRequestConfigBuilder().setCookieSpec(CookieSpecs.IGNORE_COOKIES);
+    zygote.getRequestConfigBuilder().setExpectContinueEnabled(false);
+    zygote.getRequestConfigBuilder().setStaleConnectionCheckEnabled(false);
+    zygote.getRequestConfigBuilder().setConnectTimeout(getConnectionTimeout(context));
+    zygote.getRequestConfigBuilder().setSocketTimeout(getSoTimeout(context));
 
-    zigote.getHttpClientBuilder().setUserAgent(userAgentBuilder.formatUserAgentString(context));
+    zygote.getHttpClientBuilder().setUserAgent(userAgentBuilder.formatUserAgentString(context));
   }
 
   /**
@@ -180,7 +180,7 @@ public class Hc4ProviderBase
     return false;
   }
 
-  protected void applyAuthenticationConfig(final Zigote zigote,
+  protected void applyAuthenticationConfig(final Zygote zygote,
                                            final RemoteAuthenticationSettings ras,
                                            final HttpHost proxyHost)
   {
@@ -218,13 +218,13 @@ public class Hc4ProviderBase
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         if (proxyHost != null) {
           credentialsProvider.setCredentials(new AuthScope(proxyHost), credentials);
-          zigote.getRequestConfigBuilder().setProxyPreferredAuthSchemes(authorisationPreference);
+          zygote.getRequestConfigBuilder().setProxyPreferredAuthSchemes(authorisationPreference);
         }
         else {
           credentialsProvider.setCredentials(AuthScope.ANY, credentials);
-          zigote.getRequestConfigBuilder().setTargetPreferredAuthSchemes(authorisationPreference);
+          zygote.getRequestConfigBuilder().setTargetPreferredAuthSchemes(authorisationPreference);
         }
-        zigote.getHttpClientBuilder().setDefaultCredentialsProvider(credentialsProvider);
+        zygote.getHttpClientBuilder().setDefaultCredentialsProvider(credentialsProvider);
       }
     }
   }
@@ -232,7 +232,7 @@ public class Hc4ProviderBase
   /**
    * @since 2.6
    */
-  protected void applyProxyConfig(final Zigote zigote,
+  protected void applyProxyConfig(final Zygote zygote,
                                   final RemoteProxySettings remoteProxySettings)
   {
     if (remoteProxySettings != null
@@ -245,7 +245,7 @@ public class Hc4ProviderBase
           remoteProxySettings.getHttpProxySettings().getPort()
       );
       applyAuthenticationConfig(
-          zigote, remoteProxySettings.getHttpProxySettings().getProxyAuthentication(), httpProxy
+          zygote, remoteProxySettings.getHttpProxySettings().getProxyAuthentication(), httpProxy
       );
 
       log.debug(
@@ -261,7 +261,7 @@ public class Hc4ProviderBase
             remoteProxySettings.getHttpsProxySettings().getPort()
         );
         applyAuthenticationConfig(
-            zigote, remoteProxySettings.getHttpsProxySettings().getProxyAuthentication(), httpsProxy
+            zygote, remoteProxySettings.getHttpsProxySettings().getProxyAuthentication(), httpsProxy
         );
         log.debug(
             "https proxy setup with host '{}'", remoteProxySettings.getHttpsProxySettings().getHostname()
@@ -281,7 +281,7 @@ public class Hc4ProviderBase
         }
       }
 
-      zigote.getHttpClientBuilder().setRoutePlanner(
+      zygote.getHttpClientBuilder().setRoutePlanner(
           new NexusHttpRoutePlanner(
               proxies, nonProxyHostPatterns, DefaultSchemePortResolver.INSTANCE
           )

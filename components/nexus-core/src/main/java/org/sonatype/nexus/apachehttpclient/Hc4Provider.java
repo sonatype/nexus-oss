@@ -103,7 +103,14 @@ public interface Hc4Provider
 
   // ==
 
-  static class Zigote
+  /**
+   * Zygote carries not-yet built HttpClient parts and configuration, enabling to have it passed around to apply
+   * configuration changes on it before client is built. After having built {@link HttpClient}, the instance
+   * is immutable and does not expose getters either for various members like pool etc.
+   *
+   * @since 2.8
+   */
+  public static class Zygote
   {
     private final HttpClientBuilder httpClientBuilder;
 
@@ -113,12 +120,12 @@ public interface Hc4Provider
 
     private final RequestConfig.Builder requestConfigBuilder;
 
-    Zigote() {
+    Zygote() {
       this(HttpClientBuilder.create(), ConnectionConfig.copy(ConnectionConfig.DEFAULT),
           SocketConfig.copy(SocketConfig.DEFAULT), RequestConfig.copy(RequestConfig.DEFAULT));
     }
 
-    Zigote(final HttpClientBuilder httpClientBuilder, final Builder connectionConfigBuilder,
+    Zygote(final HttpClientBuilder httpClientBuilder, final Builder connectionConfigBuilder,
            final SocketConfig.Builder socketConfigBuilder, final RequestConfig.Builder requestConfigBuilder)
     {
       this.httpClientBuilder = checkNotNull(httpClientBuilder);
@@ -143,6 +150,12 @@ public interface Hc4Provider
       return requestConfigBuilder;
     }
 
+    /**
+     * Builds the {@link HttpClient} from current state of this zygote. Once client is built and returned, it is
+     * immutable and thread safe (unless explicitly configured with non-thread safe client connection manager.
+     * This instance might be re-used, as the configuration state is unused, and client once built with this method
+     * is detached from configurations being present here.
+     */
     public HttpClient build() {
       httpClientBuilder.setDefaultConnectionConfig(connectionConfigBuilder.build());
       httpClientBuilder.setDefaultSocketConfig(socketConfigBuilder.build());
@@ -151,7 +164,8 @@ public interface Hc4Provider
     }
   }
 
-  Zigote prepareHttpClient();
-
-  Zigote prepareHttpClient(RemoteStorageContext context);
+  /**
+   * Prepares but does not build a Zygote, allowing extra configuration to be applied to it by caller.
+   */
+  Zygote prepareHttpClient(RemoteStorageContext context);
 }
