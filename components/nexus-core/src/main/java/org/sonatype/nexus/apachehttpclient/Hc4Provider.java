@@ -105,8 +105,10 @@ public interface Hc4Provider
 
   /**
    * Zygote carries not-yet built HttpClient parts and configuration, enabling to have it passed around to apply
-   * configuration changes on it before client is built. After having built {@link HttpClient}, the instance
-   * is immutable and does not expose getters either for various members like pool etc.
+   * configuration changes on it before client is finally built. After having built {@link HttpClient}, the returned
+   * instance is immutable and does not expose getters either for various members like pool etc. Still, this instance
+   * of Zygote might be reused to create multiple clients, but in that case care must be take to apply reusable
+   * parts (ie. if connection manager is applied, it has to be reusable too).
    *
    * @since 2.8
    */
@@ -152,9 +154,9 @@ public interface Hc4Provider
 
     /**
      * Builds the {@link HttpClient} from current state of this zygote. Once client is built and returned, it is
-     * immutable and thread safe (unless explicitly configured with non-thread safe client connection manager.
-     * This instance might be re-used, as the configuration state is unused, and client once built with this method
-     * is detached from configurations being present here.
+     * immutable and thread safe (unless explicitly configured with non-thread safe client connection manager).
+     * This instance might be re-used to create multiple clients, as the configuration state once client is built, is
+     * detached from configurations being present here.
      */
     public HttpClient build() {
       httpClientBuilder.setDefaultConnectionConfig(connectionConfigBuilder.build());
