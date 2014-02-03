@@ -57,6 +57,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.classic.jul.LevelChangePropagator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggerContextListener;
 import ch.qos.logback.core.Appender;
@@ -168,7 +169,7 @@ public class LogbackLogManager
     if (logOverridesConfigFile.exists()) {
       overrides.putAll(LogbackOverrides.read(logOverridesConfigFile));
     }
-    installNexusLoggerContextListener();
+    mayInstallNexusLoggerContextListener();
     reconfigure();
   }
 
@@ -509,6 +510,7 @@ public class LogbackLogManager
       configurator.setContext(context);
       context.reset();
       context.getStatusManager().clear();
+      installNonResetResistantListeners();
       configurator.doConfigure(file);
     }
     catch (JoranException e) {
@@ -518,6 +520,30 @@ public class LogbackLogManager
     StatusPrinter.printInCaseOfErrorsOrWarnings(context);
     injectAppenders();
   }
+
+  /**
+   * Invoked after {@link LoggerContext#reset()} by logger manager, to reinstall all listeners that are non
+   * reset resistant.
+   *
+   * @since 2.8
+   */
+  private void installNonResetResistantListeners() {
+    installLevelChangePropagator();
+  }
+
+  /**
+   * Installs {@link LevelChangePropagator} in context.
+
+   * @since 2.8
+   */
+  private void installLevelChangePropagator() {
+    LoggerContext context = getLoggerContext();
+    final LevelChangePropagator levelChangePropagator = new LevelChangePropagator();
+    levelChangePropagator.setResetJUL(true);
+    levelChangePropagator.setContext(context);
+    context.addListener(levelChangePropagator);
+  }
+
 
   private void injectAppenders() {
     LoggerContext ctx = getLoggerContext();
@@ -659,42 +685,17 @@ public class LogbackLogManager
   }
 
   private void setLogbackLoggerLevel(final String name, final Level level) {
-    // HACK: replace JUL level change propagator impl to avoid NPE
-    if (level == null) {
-      installJulLevelChangePropagator();
-    }
     getLoggerContext().getLogger(name).setLevel(level);
   }
 
   /**
    * Installs {@link NexusLoggerContextListener} if not already present in context.
    */
-  private void installNexusLoggerContextListener() {
+  private void mayInstallNexusLoggerContextListener() {
     LoggerContext context = getLoggerContext();
     if (!context.getCopyOfListenerList().contains(loggerContextListener)) {
       context.addListener(loggerContextListener);
       logger.debug("Nexus logger context listener installed");
-    }
-  }
-
-  /**
-   * Replace JUL level propagator with custom impl which handles NPE on level=null
-   * logback can not load this class from XML due to class-loader issues.
-   */
-  private void installJulLevelChangePropagator() {
-    LoggerContext context = getLoggerContext();
-    boolean shouldInstall = true;
-    for (LoggerContextListener listener : context.getCopyOfListenerList()) {
-      if (listener instanceof JulLevelChangePropagator) {
-        shouldInstall = false;
-      }
-      else if (listener instanceof ch.qos.logback.classic.jul.LevelChangePropagator) {
-        context.removeListener(listener);
-      }
-    }
-    if (shouldInstall) {
-      context.addListener(new JulLevelChangePropagator(context));
-      logger.debug("JUL level change propagator installed");
     }
   }
 
