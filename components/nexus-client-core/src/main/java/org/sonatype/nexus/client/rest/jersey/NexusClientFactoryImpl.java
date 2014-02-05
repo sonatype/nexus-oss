@@ -31,7 +31,6 @@ import org.sonatype.nexus.client.internal.util.Version;
 import org.sonatype.nexus.client.rest.AuthenticationInfo;
 import org.sonatype.nexus.client.rest.BaseUrl;
 import org.sonatype.nexus.client.rest.ConnectionInfo;
-import org.sonatype.nexus.client.rest.ConnectionInfo.ValidationLevel;
 import org.sonatype.nexus.client.rest.NexusClientFactory;
 import org.sonatype.nexus.client.rest.ProxyInfo;
 import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
@@ -58,7 +57,7 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.conn.BasicClientConnectionManager;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.impl.conn.SchemeRegistryFactory;
 import org.apache.http.params.CoreProtocolPNames;
 import org.slf4j.Logger;
@@ -143,7 +142,7 @@ public class NexusClientFactoryImpl
 
     // obey JSSE defined system properties
     config.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER,
-        new BasicClientConnectionManager(SchemeRegistryFactory.createSystemDefault()));
+        new PoolingClientConnectionManager(SchemeRegistryFactory.createSystemDefault()));
 
     final ApacheHttpClient4 client = ApacheHttpClient4.create(config);
 
