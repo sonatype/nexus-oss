@@ -65,7 +65,7 @@ public class LookAheadXppDriver
       catch (ClassNotFoundException e) {
         throw new IllegalArgumentException(
             "XPP3 pull parser library not present. Specify another driver."
-                + " For example: new XStream(new DomDriver())"
+                + " For example: new XStream(new DomDriver())", e
         );
       }
       xppLibraryPresent = true;
