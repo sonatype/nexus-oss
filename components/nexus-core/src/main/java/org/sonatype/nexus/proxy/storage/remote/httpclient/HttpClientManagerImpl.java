@@ -22,7 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
-import org.sonatype.nexus.apachehttpclient.Hc4Provider.Zygote;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider.Builder;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -72,9 +72,9 @@ public class HttpClientManagerImpl
   public HttpClient create(final ProxyRepository proxyRepository, final RemoteStorageContext ctx) {
     Preconditions.checkNotNull(proxyRepository);
     Preconditions.checkNotNull(ctx);
-    final Zygote zygote = hc4Provider.prepareHttpClient(ctx);
-    configure(proxyRepository, ctx, zygote);
-    return zygote.build();
+    final Builder builder = hc4Provider.prepareHttpClient(ctx);
+    configure(proxyRepository, ctx, builder);
+    return builder.build();
   }
 
   @Override
@@ -89,13 +89,13 @@ public class HttpClientManagerImpl
    * appropriate redirect strategy only.
    */
   protected void configure(final ProxyRepository proxyRepository, final RemoteStorageContext ctx,
-                           final Zygote zygote)
+                           final Builder builder)
   {
     // set UA, as Proxy reposes have different than the "generic" one set by Hc4Provider
-    zygote.getHttpClientBuilder().setUserAgent(userAgentBuilder.formatRemoteRepositoryStorageUserAgentString(proxyRepository, ctx));
+    builder.getHttpClientBuilder().setUserAgent(userAgentBuilder.formatRemoteRepositoryStorageUserAgentString(proxyRepository, ctx));
 
     // set proxy redirect strategy
-    zygote.getHttpClientBuilder().setRedirectStrategy(getProxyRepositoryRedirectStrategy(proxyRepository, ctx));
+    builder.getHttpClientBuilder().setRedirectStrategy(getProxyRepositoryRedirectStrategy(proxyRepository, ctx));
   }
 
   /**

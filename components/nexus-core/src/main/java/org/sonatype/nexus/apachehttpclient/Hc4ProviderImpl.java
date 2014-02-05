@@ -246,11 +246,11 @@ public class Hc4ProviderImpl
 
   @Override
   public HttpClient createHttpClient(final boolean reuseConnections) {
-    final Zygote zygote = prepareHttpClient(applicationConfiguration.getGlobalRemoteStorageContext());
+    final Builder builder = prepareHttpClient(applicationConfiguration.getGlobalRemoteStorageContext());
     if (!reuseConnections) {
-      zygote.getHttpClientBuilder().setConnectionReuseStrategy(new NoConnectionReuseStrategy());
+      builder.getHttpClientBuilder().setConnectionReuseStrategy(new NoConnectionReuseStrategy());
     }
-    return zygote.build();
+    return builder.build();
   }
 
   @Override
@@ -259,16 +259,16 @@ public class Hc4ProviderImpl
   }
 
   @Override
-  public Zygote prepareHttpClient(final RemoteStorageContext context) {
+  public Builder prepareHttpClient(final RemoteStorageContext context) {
     return prepareHttpClient(context, sharedConnectionManager);
   }
 
   // ==
 
   @Override
-  protected void applyConfig(final Zygote zygote, final RemoteStorageContext context) {
-    super.applyConfig(zygote, context);
-    zygote.getRequestConfigBuilder().setConnectionRequestTimeout(Ints.checkedCast(getConnectionPoolTimeout()));
+  protected void applyConfig(final Builder builder, final RemoteStorageContext context) {
+    super.applyConfig(builder, context);
+    builder.getRequestConfigBuilder().setConnectionRequestTimeout(Ints.checkedCast(getConnectionPoolTimeout()));
   }
 
   protected ManagedClientConnectionManager createClientConnectionManager(

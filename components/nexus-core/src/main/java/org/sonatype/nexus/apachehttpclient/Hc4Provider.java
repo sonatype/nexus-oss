@@ -20,9 +20,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.config.ConnectionConfig;
-import org.apache.http.config.ConnectionConfig.Builder;
 import org.apache.http.config.SocketConfig;
-import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HttpContext;
 
@@ -93,7 +92,7 @@ public interface Hc4Provider
    * "factory"-like features of this provider. In short: it wants to have pre-configured instance adjusted to passed
    * in {@link RemoteStorageContext}, namely with authentication and HTTP proxy configuration set. So far, that
    * subsystem is Nexus Proxy repositories. The created {@link HttpClient} will use the shared
-   * {@link ClientConnectionManager} managed by this component, so instances created with this method must not be
+   * {@link HttpClientConnectionManager} managed by this component, so instances created with this method must not be
    * managed or shutdown!
    *
    * @param context to source connection parameters from.
@@ -104,15 +103,15 @@ public interface Hc4Provider
   // ==
 
   /**
-   * Zygote carries not-yet built HttpClient parts and configuration, enabling to have it passed around to apply
+   * Builder carries not-yet built HttpClient parts and configuration, enabling to have it passed around to apply
    * configuration changes on it before client is finally built. After having built {@link HttpClient}, the returned
    * instance is immutable and does not expose getters either for various members like pool etc. Still, this instance
-   * of Zygote might be reused to create multiple clients, but in that case care must be take to apply reusable
+   * of Builder might be reused to create multiple clients, but in that case care must be take to apply reusable
    * parts (ie. if connection manager is applied, it has to be reusable too).
    *
    * @since 2.8
    */
-  public static class Zygote
+  public static class Builder
   {
     private final HttpClientBuilder httpClientBuilder;
 
@@ -122,13 +121,13 @@ public interface Hc4Provider
 
     private final RequestConfig.Builder requestConfigBuilder;
 
-    Zygote() {
+    Builder() {
       this(HttpClientBuilder.create(), ConnectionConfig.copy(ConnectionConfig.DEFAULT),
           SocketConfig.copy(SocketConfig.DEFAULT), RequestConfig.copy(RequestConfig.DEFAULT));
     }
 
-    Zygote(final HttpClientBuilder httpClientBuilder, final Builder connectionConfigBuilder,
-           final SocketConfig.Builder socketConfigBuilder, final RequestConfig.Builder requestConfigBuilder)
+    Builder(final HttpClientBuilder httpClientBuilder, final ConnectionConfig.Builder connectionConfigBuilder,
+            final SocketConfig.Builder socketConfigBuilder, final RequestConfig.Builder requestConfigBuilder)
     {
       this.httpClientBuilder = checkNotNull(httpClientBuilder);
       this.connectionConfigBuilder = checkNotNull(connectionConfigBuilder);
@@ -140,7 +139,7 @@ public interface Hc4Provider
       return httpClientBuilder;
     }
 
-    public Builder getConnectionConfigBuilder() {
+    public ConnectionConfig.Builder getConnectionConfigBuilder() {
       return connectionConfigBuilder;
     }
 
@@ -153,10 +152,10 @@ public interface Hc4Provider
     }
 
     /**
-     * Builds the {@link HttpClient} from current state of this zygote. Once client is built and returned, it is
+     * Builds the {@link HttpClient} from current state of this builder. Once client is built and returned, it is
      * immutable and thread safe (unless explicitly configured with non-thread safe client connection manager).
      * This instance might be re-used to create multiple clients, as the configuration state once client is built, is
-     * detached from configurations being present here.
+     * detached from it.
      */
     public HttpClient build() {
       httpClientBuilder.setDefaultConnectionConfig(connectionConfigBuilder.build());
@@ -167,7 +166,7 @@ public interface Hc4Provider
   }
 
   /**
-   * Prepares but does not build a Zygote, allowing extra configuration to be applied to it by caller.
+   * Prepares but does not build a Builder, allowing extra configuration to be applied to it by caller.
    */
-  Zygote prepareHttpClient(RemoteStorageContext context);
+  Builder prepareHttpClient(RemoteStorageContext context);
 }
