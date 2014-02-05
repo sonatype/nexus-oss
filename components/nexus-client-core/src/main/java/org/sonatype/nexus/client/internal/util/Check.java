@@ -13,46 +13,49 @@
 
 package org.sonatype.nexus.client.internal.util;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Simple internal utility class to perform checks of arguments. Inspired by Google's {@code Preconditions}.
  *
  * @since 2.1
+ * @deprecated Use Google Guava {@link Preconditions} instead.
  */
 public class Check
 {
 
+  @Deprecated
   public static boolean isBlank(final String t) {
-    // check for null
     return t == null || t.trim().isEmpty();
   }
 
+  @Deprecated
   public static String notBlank(final String t, final String name) {
-    // check for blank
-    argument(!isBlank(t), new Template("\"%s\" is blank!", name));
-    return t;
+    return argument(!isBlank(t), t, String.format("\"%s\" is blank!", name));
   }
 
+  @Deprecated
   public static <T> T notNull(final T t, final Class<?> clazz) {
     return notNull(t, new Template("%s is null!", clazz.getSimpleName()));
   }
 
+  @Deprecated
   public static <T> T notNull(final T t, final Object message) {
-    if (null == t) {
-      throw new NullPointerException(String.valueOf(message));
-    }
-
-    return t;
+    return checkNotNull(t, message);
   }
 
+  @Deprecated
   public static void argument(boolean condition, final Object message) {
     argument(condition, null, message);
   }
 
+  @Deprecated
   public static <T> T argument(boolean condition, final T t, final Object message) {
-    if (!condition) {
-      throw new IllegalArgumentException(String.valueOf(message));
-    }
-
+    checkArgument(condition, message);
     return t;
   }
 }
