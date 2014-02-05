@@ -197,16 +197,20 @@ public abstract class AbstractProxyRepository
   }
 
   @Override
-  public void expireProxyCaches(final ResourceStoreRequest request) {
+  public final void expireProxyCaches(final ResourceStoreRequest request) {
     expireProxyCaches(request, null);
   }
 
   @Override
-  public boolean expireProxyCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
-    if (!getLocalStatus().shouldServiceRequest()) {
+  public final boolean expireProxyCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
+    if (!shouldServiceOperation(request, "expireProxyCaches")) {
       return false;
     }
+    log.info("Expiring proxy caches in repository {} from path='{}'", this, request.getRequestPath());
+    return doExpireProxyCaches(request, filter);
+  }
 
+  protected boolean doExpireProxyCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
     // do this only if we ARE a proxy
     // crawl the local storage (which is in this case proxy cache)
     // and flip the isExpired attribute bits to true
@@ -215,16 +219,10 @@ public abstract class AbstractProxyRepository
         request.setRequestPath(RepositoryItemUid.PATH_ROOT);
       }
       request.setRequestLocalOnly(true);
-
-      getLogger().debug(
-          String.format("Expiring proxy cache in repository %s from path=\"%s\"",
-              RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath()));
-
       // 1st, expire all the files below path
       final DefaultWalkerContext ctx = new DefaultWalkerContext(this, request, filter);
       final ExpireCacheWalker expireCacheWalkerProcessor = new ExpireCacheWalker(this);
       ctx.getProcessors().add(expireCacheWalkerProcessor);
-
       try {
         getWalker().walk(ctx);
       }
@@ -238,14 +236,10 @@ public abstract class AbstractProxyRepository
 
       if (getLogger().isDebugEnabled()) {
         if (expireCacheWalkerProcessor.isCacheAltered()) {
-          getLogger().info(
-              String.format("Proxy cache was expired for repository %s from path=\"%s\"",
-                  RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath()));
+          log.info("Proxy cache was expired for repository {} from path='{}'", this, request.getRequestPath());
         }
         else {
-          getLogger().debug(
-              String.format("Proxy cache not altered for repository %s from path=\"%s\"",
-                  RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath()));
+          log.debug("Proxy cache not altered for repository {} from path='{}'", this, request.getRequestPath());
         }
       }
 
@@ -261,65 +255,35 @@ public abstract class AbstractProxyRepository
     }
   }
 
-  @Override
-  public void expireCaches(final ResourceStoreRequest request) {
-    if (!getLocalStatus().shouldServiceRequest()) {
-      return;
-    }
-
+  protected boolean doExpireCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
     // expire proxy cache
-    expireProxyCaches(request);
+    boolean v1 = doExpireProxyCaches(request, filter);
     // do the stuff we inherited
-    super.expireCaches(request);
-  }
-
-  @Override
-  public boolean expireCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
-    if (!getLocalStatus().shouldServiceRequest()) {
-      return false;
-    }
-
-    // expire proxy cache
-    boolean v1 = expireProxyCaches(request, filter);
-    // do the stuff we inherited
-    boolean v2 = super.expireCaches(request, filter);
-
+    boolean v2 = super.doExpireCaches(request, filter);
+    // return v1 OR v2
     return v1 || v2;
   }
 
   @Override
-  public Collection<String> evictUnusedItems(ResourceStoreRequest request, final long timestamp) {
-    if (!getLocalStatus().shouldServiceRequest()) {
-      return Collections.emptyList();
-    }
-
+  protected Collection<String> doEvictUnusedItems(final ResourceStoreRequest request, final long timestamp) {
     if (getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
       Collection<String> result =
           doEvictUnusedItems(request, timestamp, new EvictUnusedItemsWalkerProcessor(timestamp),
               new EvictUnusedItemsWalkerFilter());
-
       eventBus().post(new RepositoryEventEvictUnusedItems(this));
-
       return result;
     }
     else {
-      return super.evictUnusedItems(request, timestamp);
+      return super.doEvictUnusedItems(request, timestamp);
     }
   }
 
   protected Collection<String> doEvictUnusedItems(ResourceStoreRequest request, final long timestamp,
                                                   EvictUnusedItemsWalkerProcessor processor, WalkerFilter filter)
   {
-    getLogger().info(
-        String.format("Evicting unused items from proxy repository %s from path=\"%s\"",
-            RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath()));
-
     request.setRequestLocalOnly(true);
-
     DefaultWalkerContext ctx = new DefaultWalkerContext(this, request, filter);
-
     ctx.getProcessors().add(processor);
-
     // and let it loose
     try {
       getWalker().walk(ctx);
