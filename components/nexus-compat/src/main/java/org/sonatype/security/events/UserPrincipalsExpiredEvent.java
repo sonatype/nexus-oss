@@ -18,7 +18,7 @@ import org.sonatype.plexus.appevents.AbstractEvent;
 /**
  * An event fired when a user is removed from the system, so cached principals can be expired.
  *
- * @since 2.8
+ * @since 2.7.2
  * @deprecated use {@link AuthorizationConfigurationChanged} event via an EventBus handler
  */
 @Deprecated

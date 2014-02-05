@@ -27,7 +27,7 @@ public class ConnectionInfo
   /**
    * Tri-state enum used in various validation scenarios.
    *
-   * @since 2.8.0
+   * @since 2.7.2
    */
   public static enum ValidationLevel
   {
@@ -62,7 +62,7 @@ public class ConnectionInfo
    * </ul>
    * Warning: values other than {@link ValidationLevel#STRICT} are meant for development use only!
    *
-   * @since 2.8.0
+   * @since 2.7.2
    */
   private final ValidationLevel sslCertificateValidation;
 
@@ -78,7 +78,7 @@ public class ConnectionInfo
    * </ul>
    * Warning: value {@link ValidationLevel#NONE} is meant for development use only!
    *
-   * @since 2.8.0
+   * @since 2.7.2
    */
   private final ValidationLevel sslCertificateHostnameValidation;
 
@@ -119,14 +119,14 @@ public class ConnectionInfo
   /**
    * Returns {@link ValidationLevel} of SSL certification checking made against HTTPS connections.
    *
-   * @since 2.8.0
+   * @since 2.7.2
    */
   public ValidationLevel getSslCertificateValidation() { return sslCertificateValidation; }
 
   /**
    * Returns {@link ValidationLevel} of SSL certificate X.509 hostname checking made against HTTPS connections.c
    *
-   * @since 2.8.0
+   * @since 2.7.2
    */
   public ValidationLevel getSslCertificateHostnameValidation() { return sslCertificateHostnameValidation; }
 
