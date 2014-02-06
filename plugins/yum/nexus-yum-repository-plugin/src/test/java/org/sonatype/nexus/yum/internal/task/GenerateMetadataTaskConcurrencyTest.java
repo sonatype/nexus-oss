@@ -24,8 +24,10 @@ import java.util.concurrent.TimeoutException;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -45,6 +47,7 @@ import com.google.code.tempusfugit.temporal.Condition;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +75,9 @@ public class GenerateMetadataTaskConcurrencyTest
 
   @Inject
   private NexusScheduler nexusScheduler;
+
+  @Inject
+  private RepositoryRegistry repositoryRegistry;
 
   @Inject
   private YumRegistry yumRegistry;
@@ -119,8 +125,12 @@ public class GenerateMetadataTaskConcurrencyTest
     when(repository.adaptToFacet(MavenRepository.class)).thenReturn(repository);
     when(repository.adaptToFacet(MavenHostedRepository.class)).thenReturn(repository);
     final RepositoryItemUid uid = mock(RepositoryItemUid.class);
+    when(uid.getLock()).thenReturn(mock(RepositoryItemUidLock.class));
     when(repository.createUid(anyString())).thenReturn(uid);
+    when(repository.getRepositoryContentClass()).thenReturn(new Maven2ContentClass());
+    when(repository.isExposed()).thenReturn(true);
     final RepositoryKind repositoryKind = mock(RepositoryKind.class);
+    Mockito.<Class<?>>when(repositoryKind.getMainFacet()).thenReturn(MavenHostedRepository.class);
     when(repositoryKind.isFacetAvailable(HostedRepository.class)).thenReturn(true);
     when(repositoryKind.isFacetAvailable(MavenRepository.class)).thenReturn(true);
     when(repositoryKind.isFacetAvailable(MavenHostedRepository.class)).thenReturn(true);
@@ -134,6 +144,7 @@ public class GenerateMetadataTaskConcurrencyTest
     for (int index = 0; index < MAX_PARALLEL_SCHEDULER_THREADS; index++) {
       futures.add(nexusScheduler.submit("WaitTask", nexusScheduler.createTaskInstance(WaitTask.class)));
     }
+    repositoryRegistry.addRepository(repository);
     final YumHosted yum = (YumHosted) yumRegistry.register(repository);
 
     // when
