@@ -23,7 +23,7 @@ import org.apache.shiro.authz.Permission;
  * permission in Shiro: the {@link WildcardPermissionFactory}.
  *
  * @author cstamas
- * @since 2.8
+ * @since sonatype-security 2.8
  */
 public interface PermissionFactory
 {
