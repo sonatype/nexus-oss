@@ -101,19 +101,16 @@ public abstract class AbstractMavenGroupRepository
   }
 
   @Override
-  public boolean recreateMavenMetadata(ResourceStoreRequest request) {
-    if (!getLocalStatus().shouldServiceRequest()) {
+  public boolean recreateMavenMetadata(final ResourceStoreRequest request) {
+    if (!shouldServiceOperation(request, "recreateMavenMetadata")) {
       return false;
     }
-
     boolean result = false;
-
     for (Repository repository : getMemberRepositories()) {
       if (repository.getRepositoryKind().isFacetAvailable(MavenRepository.class)) {
         result |= ((MavenRepository) repository).recreateMavenMetadata(request);
       }
     }
-
     return result;
   }
 
