@@ -48,18 +48,39 @@ public interface Hc4Provider
   /**
    * Returns a new pre-configured instance of Apache HttpClient4x. This call will assemble a new instance of client
    * per every invocation. Created instances should be kept only during request execution, and should not be kept for
-   * reuse over longer timespan. Rather keep reference to this component and re-create client when needed. On Nexus
+   * reuse over longer time span. Rather keep reference to this component and re-create client when needed. On Nexus
    * configuration changes, the client needs reconfiguration too, hence if you keep a reference to the created
-   * client,
-   * you might end up with stale and non-working client (for example, global HTTP Proxy got changed between your
-   * invocation of this method and when you want to perform HTTP request. Your instance would still try to talk to
-   * HTTP proxy set in time when you created the instance).
+   * client, you might end up with stale and non-working client (for example, global HTTP Proxy got changed between
+   * your invocation of this method and when you want to perform HTTP request. Your instance would still try to talk to
+   * HTTP proxy set in time when you created the instance). For resource optimization's sake, HttpClient instance
+   * returned by this method  <em>does not support Keep-Alive</em> (unless configuration needs it).
+   * If you need explicit control over connection reuse, or must have one a client
+   * that reuse connections at any cause, use method {@link #createHttpClient(boolean)} instead.
    *
    * @return HttpClient4x pre-configured instance, that uses global {@link RemoteStorageContext} to be configured
-   *         (see
-   *         {@link ApplicationConfiguration#getGlobalRemoteStorageContext()}).
+   * (see {@link ApplicationConfiguration#getGlobalRemoteStorageContext()}).
    */
   HttpClient createHttpClient();
+
+  /**
+   * Returns a new pre-configured instance of Apache HttpClient4x. This call will assemble a new instance of client
+   * per every invocation. Created instances should be kept only during request execution, and should not be kept for
+   * reuse over longer time span. Rather keep reference to this component and re-create client when needed. On Nexus
+   * configuration changes, the client needs reconfiguration too, hence if you keep a reference to the created
+   * client, you might end up with stale and non-working client (for example, global HTTP Proxy got changed between
+   * your invocation of this method and when you want to perform HTTP request. Your instance would still try to talk to
+   * HTTP proxy set in time when you created the instance). The instance returned by this method will support
+   * connection reuse if asked to. Keep in mind, that stale connection detection is not reliable (without traffic)
+   * and that Nexus uses shared connection pool, so even getting connection manager from the returned
+   * instance and shutting it down will not help (nor should be attempted!).
+   *
+   * @param reuseConnections if {@code true} the returned HTTP client will reuse connections (and hence, support
+   *                         HTTP features as Keep Alive, etc).
+   * @return HttpClient4x pre-configured instance, that uses global {@link RemoteStorageContext} to be configured
+   * (see {@link ApplicationConfiguration#getGlobalRemoteStorageContext()}).
+   * @since 2.7.2
+   */
+  HttpClient createHttpClient(boolean reuseConnections);
 
   /**
    * Advanced. Primarily to be used by subsystem that wants full control over the HTTP Client, it only uses the

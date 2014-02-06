@@ -24,15 +24,73 @@ import org.sonatype.nexus.client.internal.util.Check;
  */
 public class ConnectionInfo
 {
+  /**
+   * Tri-state enum used in various validation scenarios.
+   *
+   * @since 2.7.2
+   */
+  public static enum ValidationLevel
+  {
+    NONE, LAX, STRICT;
+  }
 
+  /**
+   * The Nexus baseUrl.
+   */
   private final BaseUrl baseUrl;
 
+  /**
+   * Authentication information to use for connection.
+   */
   private final AuthenticationInfo authenticationInfo;
 
+  /**
+   * Proxy information to use for connection, per-{@link Protocol} (different proxies are possible for HTTP and HTTPS).
+   */
   private final Map<Protocol, ProxyInfo> proxyInfos;
+
+  /**
+   * Validation level of SSL certificate validation be performed for HTTPS connections? The {@link
+   * ValidationLevel#STRICT} is the default, and will validate the HTTPS connection certificate against JVM known CAs
+   * (thus, not allowing self signed certificates unless the CA for it is imported). The {@link ValidationLevel#LAX}
+   * will allow self signed certificates too (those having CA chain of length 1), and {@link ValidationLevel#NONE} will
+   * completely neglect the certificate material. The levels in short:
+   * <ul>
+   * <li>{@link ValidationLevel#STRICT} - (default) will perform certificate validation.</li>
+   * <li>{@link ValidationLevel#LAX} - performs certificate validation allowing self signed certificates too.</li>
+   * <li>{@link ValidationLevel#NONE} - neglects completely the certificate material.</li>
+   * </ul>
+   * Warning: values other than {@link ValidationLevel#STRICT} are meant for development use only!
+   *
+   * @since 2.7.2
+   */
+  private final ValidationLevel sslCertificateValidation;
+
+  /**
+   * Validation level of SSL certificate X.509 hostname matching. The {@link ValidationLevel#LAX} is the default,
+   * and allows "browser like" behaviour, where sub-domain wildcards matches all sub-domains (any depth).
+   * <ul>
+   * <li>{@link ValidationLevel#STRICT} - will perform strict hostname validation, wildcard in X.509 hostname is
+   * matched only one level deep.</li>
+   * <li>{@link ValidationLevel#LAX} - (default) performs relaxed hostname validation (similar to like made by
+   * browsers), where wildcard in X.509 hostname matches all sub-domains.</li>
+   * <li>{@link ValidationLevel#NONE} - neglects completely the X.509 hostname.</li>
+   * </ul>
+   * Warning: value {@link ValidationLevel#NONE} is meant for development use only!
+   *
+   * @since 2.7.2
+   */
+  private final ValidationLevel sslCertificateHostnameValidation;
 
   public ConnectionInfo(final BaseUrl baseUrl, final AuthenticationInfo authenticationInfo,
                         final Map<Protocol, ProxyInfo> proxyInfos)
+  {
+    this(baseUrl, authenticationInfo, proxyInfos, ValidationLevel.STRICT, ValidationLevel.LAX);
+  }
+
+  public ConnectionInfo(final BaseUrl baseUrl, final AuthenticationInfo authenticationInfo,
+                        final Map<Protocol, ProxyInfo> proxyInfos, final ValidationLevel sslCertificateValidation,
+                        final ValidationLevel sslCertificateHostnameValidation)
   {
     this.baseUrl = Check.notNull(baseUrl, "Base URL is null!");
     this.authenticationInfo = authenticationInfo;
@@ -41,6 +99,9 @@ public class ConnectionInfo
       proxies.putAll(proxyInfos);
     }
     this.proxyInfos = Collections.unmodifiableMap(proxies);
+    this.sslCertificateValidation = Check.notNull(sslCertificateValidation, "sslCertificateValidation is null!");
+    this.sslCertificateHostnameValidation = Check
+        .notNull(sslCertificateHostnameValidation, "sslCertificateHostnameValidation is null");
   }
 
   public BaseUrl getBaseUrl() {
@@ -55,6 +116,20 @@ public class ConnectionInfo
     return proxyInfos;
   }
 
+  /**
+   * Returns {@link ValidationLevel} of SSL certification checking made against HTTPS connections.
+   *
+   * @since 2.7.2
+   */
+  public ValidationLevel getSslCertificateValidation() { return sslCertificateValidation; }
+
+  /**
+   * Returns {@link ValidationLevel} of SSL certificate X.509 hostname checking made against HTTPS connections.c
+   *
+   * @since 2.7.2
+   */
+  public ValidationLevel getSslCertificateHostnameValidation() { return sslCertificateHostnameValidation; }
+
   // ==
 
   @Override
@@ -67,6 +142,8 @@ public class ConnectionInfo
     if (!getProxyInfos().isEmpty()) {
       sb.append(",proxy=").append(getProxyInfos());
     }
+    sb.append(",sslCertificateValidation=").append(getSslCertificateValidation());
+    sb.append(",sslCertificateHostnameValidation=").append(getSslCertificateHostnameValidation());
     sb.append(")");
     return sb.toString();
   }

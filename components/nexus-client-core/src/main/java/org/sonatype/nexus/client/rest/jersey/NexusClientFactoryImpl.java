@@ -14,6 +14,8 @@
 package org.sonatype.nexus.client.rest.jersey;
 
 import java.net.URI;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -35,6 +37,7 @@ import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
 import org.sonatype.sisu.siesta.client.filters.RequestFilters;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
@@ -45,7 +48,17 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+import org.apache.http.conn.ssl.BrowserCompatHostnameVerifier;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.StrictHostnameVerifier;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.impl.conn.SchemeRegistryFactory;
 import org.apache.http.params.CoreProtocolPNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,12 +140,56 @@ public class NexusClientFactoryImpl
     applyAuthenticationIfAny(connectionInfo, config);
     applyProxyIfAny(connectionInfo, config);
 
+    // obey JSSE defined system properties
+    config.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER,
+        new PoolingClientConnectionManager(SchemeRegistryFactory.createSystemDefault()));
+
     final ApacheHttpClient4 client = ApacheHttpClient4.create(config);
 
     // set UA
     client.getClientHandler().getHttpClient().getParams().setParameter(
         CoreProtocolPNames.USER_AGENT, "Nexus-Client/" + discoverClientVersion()
     );
+
+    // "tweak" HTTPS scheme as requested
+    final TrustStrategy trustStrategy;
+    switch (connectionInfo.getSslCertificateValidation()) {
+      case NONE:
+        trustStrategy = new TrustStrategy()
+        {
+          @Override
+          public boolean isTrusted(final X509Certificate[] chain, final String authType) throws CertificateException {
+            return true;
+          }
+        };
+        break;
+      case LAX:
+        trustStrategy = new TrustSelfSignedStrategy();
+        break;
+      default:
+        trustStrategy = null;
+    }
+
+    final X509HostnameVerifier hostnameVerifier;
+    switch (connectionInfo.getSslCertificateHostnameValidation()) {
+      case NONE:
+        hostnameVerifier = new AllowAllHostnameVerifier();
+        break;
+      case STRICT:
+        hostnameVerifier = new StrictHostnameVerifier();
+        break;
+      default:
+        hostnameVerifier = new BrowserCompatHostnameVerifier();
+    }
+
+    try {
+      final SSLSocketFactory ssf = new SSLSocketFactory(trustStrategy, hostnameVerifier);
+      final Scheme tweakedHttpsScheme = new Scheme("https", 443, ssf);
+      client.getClientHandler().getHttpClient().getConnectionManager().getSchemeRegistry().register(tweakedHttpsScheme);
+    }
+    catch (Exception e) {
+      Throwables.propagate(e);
+    }
 
     // NXCM-4547 JERSEY-1293 Enforce proxy setting on httpclient
     enforceProxyUri(config, client);

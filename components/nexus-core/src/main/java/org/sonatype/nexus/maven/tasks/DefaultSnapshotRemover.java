@@ -593,7 +593,8 @@ public class DefaultSnapshotRemover
       final Collection<StorageItem> items = repository.list(false, coll);
       for (final StorageItem listedItem : items) {
         final Gav listedItemGav = repository.getGavCalculator().pathToGav(listedItem.getPath());
-        if (gav.getSnapshotBuildNumber().equals(listedItemGav.getSnapshotBuildNumber())
+        // NEXUS-6230: returned GAV might be null, if file does not obey layout or is metadata
+        if (listedItemGav != null && gav.getSnapshotBuildNumber().equals(listedItemGav.getSnapshotBuildNumber())
             && gav.getSnapshotTimeStamp().equals(listedItemGav.getSnapshotTimeStamp())) {
           lastRequested = Math.max(lastRequested, listedItem.getLastRequested());
         }
