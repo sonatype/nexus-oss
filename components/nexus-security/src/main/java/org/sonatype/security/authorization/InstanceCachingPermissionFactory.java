@@ -31,7 +31,7 @@ import org.apache.shiro.authz.Permission;
  * mapped permissions are still constants.
  *
  * @author cstamas
- * @since 2.7.2
+ * @since 2.8
  */
 @Named("caching")
 @Singleton

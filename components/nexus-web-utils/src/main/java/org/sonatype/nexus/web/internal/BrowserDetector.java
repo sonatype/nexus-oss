@@ -34,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Helper to detect if a servlet-request is initiated from a web-browser.
  *
- * @since 2.7.2
+ * @since 2.8
  */
 @Named
 @Singleton

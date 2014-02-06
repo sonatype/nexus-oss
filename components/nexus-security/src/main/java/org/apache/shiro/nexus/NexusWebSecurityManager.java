@@ -24,7 +24,7 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 /**
  * Nexus customized {@link WebSecurityManager}.
  *
- * @since 2.7.2
+ * @since 2.8
  */
 public class NexusWebSecurityManager
     extends DefaultWebSecurityManager
