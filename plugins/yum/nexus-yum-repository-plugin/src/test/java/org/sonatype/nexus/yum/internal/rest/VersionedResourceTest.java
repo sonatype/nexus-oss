@@ -18,6 +18,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -39,6 +40,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.ResourceException;
 
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -144,6 +146,8 @@ public class VersionedResourceTest
     when(repository.adaptToFacet(HostedRepository.class)).thenReturn(repository);
     when(repository.adaptToFacet(MavenRepository.class)).thenReturn(repository);
     when(repository.adaptToFacet(MavenHostedRepository.class)).thenReturn(repository);
+    final RepositoryItemUid uid = mock(RepositoryItemUid.class);
+    when(repository.createUid(anyString())).thenReturn(uid);
 
     final RepositoryKind repositoryKind = mock(RepositoryKind.class);
     when(repository.getRepositoryKind()).thenReturn(repositoryKind);

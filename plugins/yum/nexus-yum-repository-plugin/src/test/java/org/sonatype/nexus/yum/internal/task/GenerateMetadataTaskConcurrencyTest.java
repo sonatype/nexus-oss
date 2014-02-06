@@ -23,6 +23,7 @@ import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
@@ -50,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import static java.io.File.pathSeparator;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.ID;
@@ -116,6 +118,8 @@ public class GenerateMetadataTaskConcurrencyTest
     when(repository.adaptToFacet(HostedRepository.class)).thenReturn(repository);
     when(repository.adaptToFacet(MavenRepository.class)).thenReturn(repository);
     when(repository.adaptToFacet(MavenHostedRepository.class)).thenReturn(repository);
+    final RepositoryItemUid uid = mock(RepositoryItemUid.class);
+    when(repository.createUid(anyString())).thenReturn(uid);
     final RepositoryKind repositoryKind = mock(RepositoryKind.class);
     when(repositoryKind.isFacetAvailable(HostedRepository.class)).thenReturn(true);
     when(repositoryKind.isFacetAvailable(MavenRepository.class)).thenReturn(true);
