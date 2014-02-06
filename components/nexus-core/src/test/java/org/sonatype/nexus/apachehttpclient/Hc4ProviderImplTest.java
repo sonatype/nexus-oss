@@ -13,9 +13,16 @@
 
 package org.sonatype.nexus.apachehttpclient;
 
+import java.net.URL;
+import java.util.Set;
+
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
+import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
+import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
+import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -34,6 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class Hc4ProviderImplTest
@@ -151,6 +159,46 @@ public class Hc4ProviderImplTest
     finally {
       testSubject.shutdown();
       unsetParameters();
+    }
+  }
+
+  @Test
+  public void NEXUS6220_connectionReuse() {
+    testSubject = new Hc4ProviderImpl(applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller, null);
+
+    // nothing NTLM related present
+    {
+      final DefaultRemoteStorageContext drsc = new DefaultRemoteStorageContext(null);
+      Assert.assertFalse("No auth-proxy set", testSubject.reuseConnectionsNeeded(drsc));
+    }
+
+    // remote auth is NTLM
+    {
+      final DefaultRemoteStorageContext drsc = new DefaultRemoteStorageContext(null);
+      drsc.setRemoteAuthenticationSettings(new NtlmRemoteAuthenticationSettings("a", "b", "c", "d"));
+      Assert.assertTrue("NTLM target auth-proxy set", testSubject.reuseConnectionsNeeded(drsc));
+    }
+
+    // HTTP proxy is NTLM
+    {
+      final RemoteHttpProxySettings http = new DefaultRemoteHttpProxySettings();
+      http.setProxyAuthentication(new NtlmRemoteAuthenticationSettings("a", "b", "c", "d"));
+      final RemoteHttpProxySettings https = new DefaultRemoteHttpProxySettings();
+      when(remoteProxySettings.getHttpProxySettings()).thenReturn(http);
+      when(remoteProxySettings.getHttpsProxySettings()).thenReturn(https);
+      Assert
+          .assertTrue("NTLM HTTP proxy auth-proxy set", testSubject.reuseConnectionsNeeded(applicationConfiguration.getGlobalRemoteStorageContext()));
+    }
+
+    // HTTPS proxy is NTLM
+    {
+      final RemoteHttpProxySettings http = new DefaultRemoteHttpProxySettings();
+      final RemoteHttpProxySettings https = new DefaultRemoteHttpProxySettings();
+      https.setProxyAuthentication(new NtlmRemoteAuthenticationSettings("a", "b", "c", "d"));
+      when(remoteProxySettings.getHttpProxySettings()).thenReturn(http);
+      when(remoteProxySettings.getHttpsProxySettings()).thenReturn(https);
+      Assert
+          .assertTrue("NTLM HTTPS proxy auth-proxy set", testSubject.reuseConnectionsNeeded(applicationConfiguration.getGlobalRemoteStorageContext()));
     }
   }
 
