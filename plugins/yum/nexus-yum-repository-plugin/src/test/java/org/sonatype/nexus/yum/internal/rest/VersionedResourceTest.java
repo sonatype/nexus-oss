@@ -18,8 +18,12 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
@@ -33,6 +37,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.MediaType;
+import org.mockito.Mockito;
 import org.restlet.data.Method;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -41,6 +46,7 @@ import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -60,11 +66,16 @@ public class VersionedResourceTest
   @Inject
   private YumRegistry yumRegistry;
 
+  @Inject
+  private RepositoryRegistry repositoryRegistry;
+
   @Before
   public void registerRepository()
       throws Exception
   {
-    final YumHosted yum = (YumHosted) yumRegistry.register(createRepository(TESTREPO));
+    final MavenHostedRepository repository = createRepository(TESTREPO);
+    repositoryRegistry.addRepository(repository);
+    final YumHosted yum = (YumHosted) yumRegistry.register(repository);
     yum.addAlias(ALIAS, VERSION);
     waitFor(new Condition()
     {
@@ -155,9 +166,15 @@ public class VersionedResourceTest
     when(repository.adaptToFacet(HostedRepository.class)).thenReturn(repository);
     when(repository.adaptToFacet(MavenRepository.class)).thenReturn(repository);
     when(repository.adaptToFacet(MavenHostedRepository.class)).thenReturn(repository);
+    final RepositoryItemUid uid = mock(RepositoryItemUid.class);
+    when(uid.getLock()).thenReturn(mock(RepositoryItemUidLock.class));
+    when(repository.createUid(anyString())).thenReturn(uid);
+    when(repository.getRepositoryContentClass()).thenReturn(new Maven2ContentClass());
+    when(repository.isExposed()).thenReturn(true);
 
     final RepositoryKind repositoryKind = mock(RepositoryKind.class);
     when(repository.getRepositoryKind()).thenReturn(repositoryKind);
+    Mockito.<Class<?>>when(repositoryKind.getMainFacet()).thenReturn(MavenHostedRepository.class);
     when(repositoryKind.isFacetAvailable(HostedRepository.class)).thenReturn(true);
     when(repositoryKind.isFacetAvailable(MavenRepository.class)).thenReturn(true);
     when(repositoryKind.isFacetAvailable(MavenHostedRepository.class)).thenReturn(true);
