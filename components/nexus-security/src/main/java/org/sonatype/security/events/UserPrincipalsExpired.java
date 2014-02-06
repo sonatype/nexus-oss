@@ -16,7 +16,7 @@ package org.sonatype.security.events;
 /**
  * An event fired when a user is removed from the system, so cached principals can be expired.
  *
- * @since 2.8
+ * @since sonatype-security 2.8
  */
 public class UserPrincipalsExpired
 {

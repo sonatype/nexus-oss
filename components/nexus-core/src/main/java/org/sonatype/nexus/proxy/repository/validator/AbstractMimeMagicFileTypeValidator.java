@@ -42,10 +42,8 @@ public abstract class AbstractMimeMagicFileTypeValidator
 
   public static final String XML_DETECTION_LAX_KEY = FileTypeValidator.class.getName() + ".relaxedXmlValidation";
 
-  private static final boolean XML_DETECTION_LAX_DEFAULT = true;
-
   private static final boolean XML_DETECTION_LAX = SystemPropertiesHelper.getBoolean(
-      XML_DETECTION_LAX_KEY, XML_DETECTION_LAX_DEFAULT
+      XML_DETECTION_LAX_KEY, true
   );
 
   private final MimeSupport mimeSupport;
@@ -134,6 +132,8 @@ public abstract class AbstractMimeMagicFileTypeValidator
           && filePath.endsWith(".xml")) {
         // we go LAX way, if MIME detection says INVALID (does for XMLs missing preamble too)
         // we just stay put saying we are "neutral" on this question
+        getLogger().info("StorageFileItem {} detected as INVALID XML file but relaxed XML validation is in effect.",
+            file.getRepositoryItemUid());
         return FileTypeValidity.NEUTRAL;
       }
 

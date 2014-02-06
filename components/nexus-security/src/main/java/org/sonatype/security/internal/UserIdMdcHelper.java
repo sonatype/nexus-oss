@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Helper to set the {@code userId} MDC attribute.
  *
- * @since 2.8
+ * @since 2.7.2
  */
 public class UserIdMdcHelper
 {
