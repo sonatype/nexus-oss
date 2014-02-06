@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
+import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
 
 public class EvictUnusedItemsWalkerProcessor
     extends AbstractFileWalkerProcessor
@@ -106,7 +107,9 @@ public class EvictUnusedItemsWalkerProcessor
   protected void doDelete(WalkerContext ctx, StorageFileItem item)
       throws StorageException, UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException
   {
-    getRepository(ctx).deleteItem(false, new ResourceStoreRequest(item));
+    final ResourceStoreRequest rsr = new ResourceStoreRequest(item);
+    rsr.getRequestContext().put(DeleteOperation.DELETE_OPERATION_CTX_KEY,DeleteOperation.DELETE_PERMANENTLY);
+    getRepository(ctx).deleteItem(false, rsr);
   }
 
   @Override
@@ -116,7 +119,9 @@ public class EvictUnusedItemsWalkerProcessor
     // expiring now empty directories
     try {
       if (getRepository(ctx).list(false, coll).size() == 0) {
-        getRepository(ctx).deleteItem(false, new ResourceStoreRequest(coll));
+        final ResourceStoreRequest rsr = new ResourceStoreRequest(coll);
+        rsr.getRequestContext().put(DeleteOperation.DELETE_OPERATION_CTX_KEY,DeleteOperation.DELETE_PERMANENTLY);
+        getRepository(ctx).deleteItem(false, rsr);
       }
     }
     catch (RepositoryNotAvailableException e) {

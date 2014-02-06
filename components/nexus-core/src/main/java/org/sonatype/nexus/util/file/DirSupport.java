@@ -97,12 +97,9 @@ public final class DirSupport
 
     private final Path to;
 
-    private final CopyOption[] copyOptions;
-
-    public CopyVisitor(final Path from, final Path to, final CopyOption... copyOptions) {
+    public CopyVisitor(final Path from, final Path to) {
       this.from = from;
       this.to = to;
-      this.copyOptions = copyOptions;
     }
 
     @Override
@@ -116,7 +113,7 @@ public final class DirSupport
 
     @Override
     public FileVisitResult visitFile(final Path file, final BasicFileAttributes a) throws IOException {
-      Files.copy(file, to.resolve(from.relativize(file)), copyOptions);
+      Files.copy(file, to.resolve(from.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
       return FileVisitResult.CONTINUE;
     }
   }
@@ -280,56 +277,31 @@ public final class DirSupport
   // COPY: recursive copy of whole directory tree
 
   /**
-   * Invokes {@link #copy(Path, Path, CopyOption...)} using "default" options that are:
-   * <pre>
-   *   {@link StandardCopyOption#REPLACE_EXISTING}
-   * </pre>
+   * Copies path "from" to path "to". This method accepts both existing regular files and existing directories. If
+   * "from" is a directory, a recursive copy happens of the whole subtree with "from" directory as root. Caller may
+   * alter behaviour of Copy operation using copy options, as seen on {@link Files#copy(Path, Path, CopyOption...)}.
    */
   public static void copy(final Path from, final Path to) throws IOException {
-    copy(from, to, StandardCopyOption.REPLACE_EXISTING);
+    validateDirectoryOrFile(from);
+    checkNotNull(to);
+    if (Files.isDirectory(from)) {
+      Files.walkFileTree(from, DEFAULT_FILE_VISIT_OPTIONS, Integer.MAX_VALUE,
+          new CopyVisitor(from, to));
+    }
+    else {
+      mkdir(to.getParent());
+      Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
+    }
   }
 
   /**
-   * Invokes {@link #copy(Path, Path)} if passed in "from" path exists and returns {@code true}. If "from" path
-   * does not exists, {@code false} is returned.
+   * Invokes {@link #copy(Path, Path)} if passed in "from" path exists and returns {@code true}. If
+   * "from" path does not exists, {@code false} is returned.
    */
   public static boolean copyIfExists(final Path from, final Path to) throws IOException {
     checkNotNull(from);
     if (Files.exists(from)) {
       copy(from, to);
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-
-  /**
-   * Copies path "from" to path "to". This method accepts both existing regular files and existing directories. If
-   * "from" is a directory, a recursive copy happens of the whole subtree with "from" directory as root. Caller may
-   * alter behaviour of Copy operation using copy options, as seen on {@link Files#copy(Path, Path, CopyOption...)}.
-   */
-  public static void copy(final Path from, final Path to, final CopyOption... options) throws IOException {
-    validateDirectoryOrFile(from);
-    checkNotNull(to);
-    if (Files.isDirectory(from)) {
-      Files.walkFileTree(from, DEFAULT_FILE_VISIT_OPTIONS, Integer.MAX_VALUE,
-          new CopyVisitor(from, to, options));
-    }
-    else {
-      mkdir(to.getParent());
-      Files.copy(from, to, options);
-    }
-  }
-
-  /**
-   * Invokes {@link #copy(Path, Path, CopyOption...)} if passed in "from" path exists and returns {@code true}. If
-   * "from" path does not exists, {@code false} is returned.
-   */
-  public static boolean copyIfExists(final Path from, final Path to, final CopyOption... options) throws IOException {
-    checkNotNull(from);
-    if (Files.exists(from)) {
-      copy(from, to, options);
       return true;
     }
     else {
@@ -344,7 +316,7 @@ public final class DirSupport
    * existing Paths that might denote a regular file or a directory.
    */
   public static void move(final Path from, final Path to) throws IOException {
-    copy(from, to, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+    copy(from, to);
     delete(from);
   }
 
