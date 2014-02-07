@@ -39,7 +39,11 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundReason;
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.attributes.Attributes;
+import org.sonatype.nexus.proxy.attributes.AttributesFilter;
+import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -76,15 +80,18 @@ public class VelocityRenderer
   private final Velocity velocity;
   private final String applicationVersion;
   private final GlobalRestApiSettings globalRestApiSettings;
+  private final List<AttributesFilter> attributesFilters;
 
   @Inject
   public VelocityRenderer(final Velocity velocity,
                           final ApplicationStatusSource applicationStatusSource,
-                          final GlobalRestApiSettings globalRestApiSettings)
+                          final GlobalRestApiSettings globalRestApiSettings,
+                          final List<AttributesFilter> attributesFilters)
   {
     this.velocity = checkNotNull(velocity);
     this.applicationVersion = checkNotNull(applicationStatusSource).getSystemStatus().getVersion();
     this.globalRestApiSettings = checkNotNull(globalRestApiSettings);
+    this.attributesFilters = checkNotNull(attributesFilters);
   }
 
   @Override
@@ -137,6 +144,8 @@ public class VelocityRenderer
     final Map<String, Object> dataModel = createBaseModel(resourceStoreRequest);
     dataModel.put("req", resourceStoreRequest);
     dataModel.put("item", item);
+    dataModel.put("itemContext", filterItemContext(item.getItemContext()).flatten());
+    dataModel.put("itemAttributes", filterItemAttributes(item.getRepositoryItemAttributes()).asMap());
     dataModel.put("exception", exception);
     final Reasoning reasoning = buildReasoning(exception);
     if (reasoning != null) {
@@ -146,6 +155,21 @@ public class VelocityRenderer
   }
 
   // ==
+
+  private RequestContext filterItemContext(final RequestContext itemContext) {
+    final RequestContext filtered = new RequestContext();
+    filtered.putAll(itemContext);
+    return filtered;
+  }
+
+  private Attributes filterItemAttributes(final Attributes itemAttributes) {
+    final DefaultAttributes filtered = new DefaultAttributes();
+    filtered.overlayAttributes(itemAttributes);
+    for (AttributesFilter filter : attributesFilters) {
+      filter.filterAttributes(filtered);
+    }
+    return filtered;
+  }
 
   private Reasoning buildReasoning(final Throwable ex) {
     if (ex instanceof ItemNotFoundException) {
