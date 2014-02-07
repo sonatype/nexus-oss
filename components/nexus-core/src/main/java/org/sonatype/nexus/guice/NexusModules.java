@@ -16,12 +16,15 @@ package org.sonatype.nexus.guice;
 import javax.servlet.ServletContext;
 
 import org.sonatype.nexus.web.TemplateRenderer;
+import org.sonatype.nexus.web.WebResourceBundle;
 import org.sonatype.nexus.web.internal.BaseUrlHolderFilter;
 import org.sonatype.nexus.web.internal.CommonHeadersFilter;
 import org.sonatype.nexus.web.internal.ErrorPageFilter;
 import org.sonatype.nexus.web.internal.ErrorPageServlet;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.web.guice.SecurityWebModule;
+
+import com.google.inject.name.Names;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
@@ -107,6 +110,9 @@ public class NexusModules
       requireBinding(SecuritySystem.class);
       requireBinding(FilterChainResolver.class);
       requireBinding(TemplateRenderer.class);
+
+      // eagerly initialize list of static web resources as soon as plugin starts (rather than on first request)
+      bind(WebResourceBundle.class).annotatedWith(Names.named("static")).to(StaticWebResourceBundle.class).asEagerSingleton();
     }
   }
 }
