@@ -24,6 +24,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -59,6 +61,7 @@ import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 import static org.sonatype.scheduling.TaskState.SLEEPING;
 import static org.sonatype.scheduling.TaskState.SUBMITTED;
@@ -155,40 +158,47 @@ public class GenerateMetadataTask
 
     setDefaults();
 
-    LOG.debug("Generating Yum-Repository for '{}' ...", getRpmDir());
-    try {
-      DirSupport.mkdir(getRepoDir().toPath());
-
-      File rpmListFile = createRpmListFile();
-      commandLineExecutor.exec(buildCreateRepositoryCommand(rpmListFile));
-
-      if (isUseAbsoluteUrls() && StringUtils.isNotBlank(getRpmUrl())) {
-        replaceUrlInRepomdXml();
-      }
-
-    }
-    catch (IOException e) {
-      LOG.warn("Yum metadata generation failed", e);
-      throw new IOException("Yum metadata generation failed", e);
-    }
-    // TODO dubious
-    Thread.sleep(100);
-
     final Repository repository = findRepository();
-    if (repository != null) {
-      final MavenRepository mavenRepository = repository.adaptToFacet(MavenRepository.class);
-      if (mavenRepository != null) {
-        try {
-          routingManager.forceUpdatePrefixFile(mavenRepository);
+    final RepositoryItemUid mdUid = repository.createUid("/" + PATH_OF_REPOMD_XML);
+    try {
+      mdUid.getLock().lock(Action.update);
+
+      LOG.debug("Generating Yum-Repository for '{}' ...", getRpmDir());
+      try {
+        DirSupport.mkdir(getRepoDir().toPath());
+
+        File rpmListFile = createRpmListFile();
+        commandLineExecutor.exec(buildCreateRepositoryCommand(rpmListFile));
+
+        if (isUseAbsoluteUrls() && StringUtils.isNotBlank(getRpmUrl())) {
+          replaceUrlInRepomdXml();
         }
-        catch (Exception e) {
-          logger.warn("Could not update Whitelist for repository '{}'", mavenRepository, e);
+
+      }
+      catch (IOException e) {
+        LOG.warn("Yum metadata generation failed", e);
+        throw new IOException("Yum metadata generation failed", e);
+      }
+      // TODO dubious
+      Thread.sleep(100);
+
+      if (repository != null) {
+        final MavenRepository mavenRepository = repository.adaptToFacet(MavenRepository.class);
+        if (mavenRepository != null) {
+          try {
+            routingManager.forceUpdatePrefixFile(mavenRepository);
+          }
+          catch (Exception e) {
+            logger.warn("Could not update Whitelist for repository '{}'", mavenRepository, e);
+          }
         }
       }
-    }
 
-    regenerateMetadataForGroups();
-    return new YumRepositoryImpl(getRepoDir(), repositoryId, getVersion());
+      regenerateMetadataForGroups();
+      return new YumRepositoryImpl(getRepoDir(), repositoryId, getVersion());
+    } finally {
+      mdUid.getLock().unlock();
+    }
   }
 
   protected void setDefaults()
