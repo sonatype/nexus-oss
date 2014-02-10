@@ -35,6 +35,7 @@ import org.sonatype.nexus.configuration.application.DefaultGlobalRestApiSettings
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
@@ -81,6 +82,7 @@ import static org.freecompany.redline.header.Os.LINUX;
 import static org.freecompany.redline.header.RpmType.BINARY;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -349,6 +351,9 @@ public class YumNexusTestSupport
     when(repository.getId()).thenReturn(repositoryId);
     when(repository.getProviderRole()).thenReturn(Repository.class.getName());
     when(repository.getProviderHint()).thenReturn("maven2");
+    final RepositoryItemUid uid = mock(RepositoryItemUid.class);
+    when(uid.getLock()).thenReturn(mock(RepositoryItemUidLock.class));
+    when(repository.createUid(anyString())).thenReturn(uid);
 
     if (isMavenHostedRepository) {
       when(repository.adaptToFacet(HostedRepository.class)).thenReturn(repository);
