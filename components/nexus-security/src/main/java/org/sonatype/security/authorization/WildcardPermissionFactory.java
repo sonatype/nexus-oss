@@ -26,7 +26,7 @@ import org.apache.shiro.authz.permission.WildcardPermission;
  * {@link WildcardPermission} is the default permission implementation used all over Security.
  *
  * @author cstamas
- * @since 2.8
+ * @since sonatype-security 2.8
  */
 @Named("wildcard")
 @Singleton

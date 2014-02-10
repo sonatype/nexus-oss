@@ -84,6 +84,7 @@ public interface Hc4Provider
    *                         HTTP features as Keep Alive, etc).
    * @return HttpClient4x pre-configured instance, that uses global {@link RemoteStorageContext} to be configured
    * (see {@link ApplicationConfiguration#getGlobalRemoteStorageContext()}).
+   * @since 2.7.2
    */
   HttpClient createHttpClient(boolean reuseConnections);
 

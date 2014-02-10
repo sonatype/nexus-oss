@@ -156,7 +156,7 @@ public class Hc4ProviderBase
    *
    * @param context the remote storage context to test for need of reused connections.
    * @return {@code true} if connection reuse is required according to remote storage context.
-   * @since 2.8.0
+   * @since 2.7.2
    */
   protected boolean reuseConnectionsNeeded(final RemoteStorageContext context) {
     // return true if any of the auth is NTLM based, as NTLM must have keep-alive to work

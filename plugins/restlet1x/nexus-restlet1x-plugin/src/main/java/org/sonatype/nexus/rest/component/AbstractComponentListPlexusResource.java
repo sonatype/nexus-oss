@@ -13,18 +13,17 @@
 
 package org.sonatype.nexus.rest.component;
 
-import java.util.Map;
-
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.PlexusComponentListResource;
 import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
 
+import com.google.inject.Key;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.eclipse.sisu.BeanEntry;
+import org.eclipse.sisu.inject.BeanLocator;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -37,11 +36,14 @@ public abstract class AbstractComponentListPlexusResource
 {
   public static final String ROLE_ID = "role";
 
-  private PlexusContainer container;
+  private BeanLocator beanLocator;
+
+  private ClassLoader uberClassLoader;
 
   @Inject
-  public void setContainer(final PlexusContainer container) {
-    this.container = container;
+  public void setContainer(BeanLocator beanLocator, @Named("nexus-uber") ClassLoader uberClassLoader) {
+    this.beanLocator = beanLocator;
+    this.uberClassLoader = uberClassLoader;
   }
 
   @Override
@@ -53,43 +55,38 @@ public abstract class AbstractComponentListPlexusResource
     return request.getAttributes().get(ROLE_ID).toString();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Object get(Context context, Request request, Response response, Variant variant)
-      throws ResourceException
-  {
+  public Object get(Context context, Request request, Response response, Variant variant) throws ResourceException {
     PlexusComponentListResourceResponse result = new PlexusComponentListResourceResponse();
 
     // get role from request
     String role = getRole(request);
 
     try {
-      Map<String, Object> components = container.lookupMap(role);
+      Key<?> roleKey = Key.get(uberClassLoader.loadClass(role), Named.class);
+      Iterable<? extends BeanEntry<Named, ?>> components = beanLocator.locate(roleKey);
 
-      if (components == null || components.isEmpty()) {
+      if (!components.iterator().hasNext()) {
         throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND);
       }
 
-      for (String hint : components.keySet()) {
-        ComponentDescriptor componentDescriptor = container.getComponentDescriptor(role, hint);
-
+      for (BeanEntry<Named, ?> entry : components) {
         PlexusComponentListResource resource = new PlexusComponentListResource();
 
-        resource.setRoleHint(componentDescriptor.getRoleHint());
-        resource.setDescription((StringUtils.isNotEmpty(componentDescriptor.getDescription()))
-            ? componentDescriptor.getDescription()
-            : componentDescriptor.getRoleHint());
+        String hint = entry.getKey().value();
+        String description = entry.getDescription();
+
+        resource.setRoleHint(hint);
+        resource.setDescription(StringUtils.isNotEmpty(description) ? description : hint);
 
         // add it to the collection
         result.addData(resource);
       }
-
     }
-    catch (ComponentLookupException e) {
+    catch (ClassNotFoundException | LinkageError e) {
       if (this.getLogger().isDebugEnabled()) {
-        getLogger().debug("Unable to look up plexus component with role '" + "1" + "'.", e);
+        getLogger().debug("Unable to look up plexus component with role '" + role + "'.", e);
       }
-
       throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND);
     }
 
