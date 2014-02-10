@@ -537,7 +537,7 @@ public abstract class AbstractMavenRepository
   protected boolean shouldAddToNotFoundCache(final ResourceStoreRequest request) {
     boolean shouldAddToNFC = super.shouldAddToNotFoundCache(request);
     if (shouldAddToNFC && request.getRequestContext().containsKey(Manager.ROUTING_REQUEST_REJECTED_FLAG_KEY)) {
-      // TODO: should we un-flag the request?
+      request.getRequestContext().remove(Manager.ROUTING_REQUEST_REJECTED_FLAG_KEY);
       shouldAddToNFC = false;
       log.debug("Maven proxy repository {} autorouting rejected this request, not adding path {} to NFC.",
           RepositoryStringUtils.getHumanizedNameString(this), request.getRequestPath());
