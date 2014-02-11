@@ -165,7 +165,7 @@ public class VelocityRenderer
     if (remoteUrl != null && remoteUrl.startsWith("https://secure.central.sonatype.com/")) {
       int qpIdx = remoteUrl.indexOf("?");
       if (qpIdx > -1) {
-        filtered.setRemoteUrl(remoteUrl.substring(0, qpIdx));
+        filtered.setRemoteUrl(remoteUrl.substring(0, qpIdx) + "?truncated");
       }
     }
     return filtered;
