@@ -33,7 +33,10 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundReason;
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.attributes.Attributes;
+import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -116,6 +119,8 @@ public class VelocityContentRenderer
     final Map<String, Object> dataModel = createBaseModel();
     dataModel.put("req", resourceStoreRequest);
     dataModel.put("item", item);
+    dataModel.put("itemContext", filterItemContext(item.getItemContext()).flatten());
+    dataModel.put("itemAttributes", filterItemAttributes(item.getRepositoryItemAttributes()).asMap());
     dataModel.put("exception", exception);
     final Reasoning reasoning = buildReasoning(exception);
     if (reasoning != null) {
@@ -126,6 +131,25 @@ public class VelocityContentRenderer
   }
 
   // ==
+
+  private RequestContext filterItemContext(final RequestContext itemContext) {
+    final RequestContext filtered = new RequestContext();
+    filtered.setParentContext(itemContext);
+    return filtered;
+  }
+
+  private Attributes filterItemAttributes(final Attributes itemAttributes) {
+    final DefaultAttributes filtered = new DefaultAttributes();
+    filtered.overlayAttributes(itemAttributes);
+    final String remoteUrl = filtered.get("storageItem-remoteUrl");
+    if (remoteUrl != null && remoteUrl.startsWith("https://secure.central.sonatype.com/")) {
+      int qpIdx = remoteUrl.indexOf("?");
+      if (qpIdx > -1) {
+        filtered.setRemoteUrl(remoteUrl.substring(0, qpIdx));
+      }
+    }
+    return filtered;
+  }
 
   private Reasoning buildReasoning(final Throwable ex) {
     if (ex instanceof ItemNotFoundException) {
