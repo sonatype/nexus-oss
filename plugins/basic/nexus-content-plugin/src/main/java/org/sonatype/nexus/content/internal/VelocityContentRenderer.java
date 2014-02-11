@@ -142,6 +142,8 @@ public class VelocityContentRenderer
     final DefaultAttributes filtered = new DefaultAttributes();
     filtered.overlayAttributes(itemAttributes);
     final String remoteUrl = filtered.get("storageItem-remoteUrl");
+    
+    // strip params from secure central remote urls
     if (remoteUrl != null && remoteUrl.startsWith("https://secure.central.sonatype.com/")) {
       int qpIdx = remoteUrl.indexOf("?");
       if (qpIdx > -1) {
