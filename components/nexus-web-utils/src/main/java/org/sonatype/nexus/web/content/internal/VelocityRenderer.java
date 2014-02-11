@@ -93,13 +93,13 @@ public class VelocityRenderer
   {
     final Set<String> uniqueNames = Sets.newHashSetWithExpectedSize(children.size());
     final List<CollectionEntry> entries = Lists.newArrayListWithCapacity(children.size());
-    final String collUri = request.getRequestURI();
+    final String collUrl = request.getRequestURL().toString();
     for (StorageItem child : children) {
       if (child.isVirtual() || !child.getRepositoryItemUid().getBooleanAttributeValue(IsHiddenAttribute.class)) {
         if (!uniqueNames.contains(child.getName())) {
           final boolean isCollection = child instanceof StorageCollectionItem;
           final String name = isCollection ? child.getName() + "/" : child.getName();
-          final CollectionEntry entry = new CollectionEntry(name, isCollection,  collUri + name,
+          final CollectionEntry entry = new CollectionEntry(name, isCollection,  collUrl + name,
               new Date(child.getModified()), StorageFileItem.class.isAssignableFrom(child
               .getClass()) ? ((StorageFileItem) child).getLength() : -1, "");
           entries.add(entry);
