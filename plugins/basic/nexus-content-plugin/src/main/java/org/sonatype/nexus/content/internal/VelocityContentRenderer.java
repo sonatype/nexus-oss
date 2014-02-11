@@ -122,8 +122,10 @@ public class VelocityContentRenderer
     final Map<String, Object> dataModel = createBaseModel();
     dataModel.put("req", resourceStoreRequest);
     dataModel.put("item", item);
-    dataModel.put("itemContext", filterItemContext(item.getItemContext()).flatten());
-    dataModel.put("itemAttributes", filterItemAttributes(item.getRepositoryItemAttributes()).asMap());
+    if (item != null) {
+      dataModel.put("itemContext", filterItemContext(item.getItemContext()).flatten());
+      dataModel.put("itemAttributes", filterItemAttributes(item.getRepositoryItemAttributes()).asMap());
+    }
     dataModel.put("exception", exception);
     final Reasoning reasoning = buildReasoning(exception);
     if (reasoning != null) {
