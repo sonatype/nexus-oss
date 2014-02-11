@@ -121,11 +121,11 @@
 
   <h3>Retrieved Item Context</h3>
 
-  #table($item.itemContext.flatten().entrySet())
+  #table($itemContext.entrySet())
 
   <h3>Retrieved Item Attributes</h3>
 
-  #table($item.repositoryItemAttributes.asMap().entrySet())
+  #table($itemAttributes.entrySet())
 #end
 
 #if($exception)
