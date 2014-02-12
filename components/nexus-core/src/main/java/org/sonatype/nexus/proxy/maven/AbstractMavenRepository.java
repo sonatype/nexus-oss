@@ -477,6 +477,16 @@ public abstract class AbstractMavenRepository
   }
 
   @Override
+  public AbstractStorageItem doCacheItem(AbstractStorageItem item)
+      throws LocalStorageException
+  {
+    final AbstractStorageItem result = super.doCacheItem(item);
+    result.getRepositoryItemAttributes().remove(ATTR_REMOTE_SHA1);
+    result.getRepositoryItemAttributes().remove(ATTR_REMOTE_MD5);
+    return result;
+  }
+
+  @Override
   public boolean isCompatible(Repository repository) {
     if (super.isCompatible(repository) && MavenRepository.class.isAssignableFrom(repository.getClass())
         && getRepositoryPolicy().equals(((MavenRepository) repository).getRepositoryPolicy())) {
