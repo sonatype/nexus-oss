@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.targets.TargetMatch;
 import org.sonatype.nexus.proxy.targets.TargetSet;
@@ -59,8 +60,20 @@ public class DefaultNexusItemAuthorizer
     if (matched != null && authorizePath(matched, action)) {
       return true;
     }
-    // if this repository is contained in any group, we need to check those targets too
-    return authorizePath(getGroupsTargetSet(repository, request), action);
+    // if we are here, we need to check cascading permissions, where this repository is contained in group
+    return authorizePathCascade(repository, request, action);
+  }
+
+  private boolean authorizePathCascade(final Repository repository, final ResourceStoreRequest request,
+                                       final Action action)
+  {
+    final List<GroupRepository> groups = repoRegistry.getGroupsOfRepository(repository);
+    for (GroupRepository group : groups) {
+      if (authorizePath(group, request, action)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public boolean authorizePermission(final String permission) {
