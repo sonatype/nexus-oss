@@ -206,7 +206,7 @@ public abstract class AbstractProxyRepository
     if (!shouldServiceOperation(request, "expireProxyCaches")) {
       return false;
     }
-    log.info("Expiring proxy caches in repository {} from path='{}'", this, request.getRequestPath());
+    log.debug("Expiring proxy caches in repository {} from path='{}'", this, request.getRequestPath());
     return doExpireProxyCaches(request, filter);
   }
 
