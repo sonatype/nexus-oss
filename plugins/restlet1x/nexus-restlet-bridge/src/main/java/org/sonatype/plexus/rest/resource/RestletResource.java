@@ -395,18 +395,22 @@ public class RestletResource
       this.representation = representation;
     }
 
+    @Override
     public String getContentType() {
       return representation.getMediaType().getName();
     }
 
+    @Override
     public String getName() {
       return name;
     }
 
+    @Override
     public String getFieldName() {
       return getName();
     }
 
+    @Override
     public InputStream getInputStream()
         throws IOException
     {
@@ -475,6 +479,7 @@ public class RestletResource
     {
     }
 
+    @Override
     public FileItemHeaders getHeaders() {
       return null;
     }
