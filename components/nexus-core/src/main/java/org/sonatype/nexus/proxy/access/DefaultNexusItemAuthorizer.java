@@ -54,13 +54,13 @@ public class DefaultNexusItemAuthorizer
   }
 
   public boolean authorizePath(final Repository repository, final ResourceStoreRequest request, final Action action) {
-    TargetSet matched = repository.getTargetsForRequest(request);
-    if (matched == null) {
-      matched = new TargetSet();
+    // check repo only first, if there is directly assigned matching target permission, we're good
+    final TargetSet matched = repository.getTargetsForRequest(request);
+    if (matched != null && authorizePath(matched, action)) {
+      return true;
     }
-    // if this repository is contained in any group, we need to get those targets, and tweak the TargetMatch
-    matched.addTargetSet(this.getGroupsTargetSet(repository, request));
-    return authorizePath(matched, action);
+    // if this repository is contained in any group, we need to check those targets too
+    return authorizePath(getGroupsTargetSet(repository, request), action);
   }
 
   public boolean authorizePermission(final String permission) {
