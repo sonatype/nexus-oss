@@ -50,7 +50,7 @@
         <groupId>org.sonatype.sisu.inject</groupId>
         <artifactId>guice-servlet</artifactId>
         <!-- Patched version for NEXUS-6279 -->
-        <version>3.1.10<</version>
+        <version>3.1.10</version>
       </dependency>
 
       <dependency>
