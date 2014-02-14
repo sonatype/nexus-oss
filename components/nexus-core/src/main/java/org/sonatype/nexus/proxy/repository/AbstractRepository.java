@@ -438,7 +438,7 @@ public abstract class AbstractRepository
     if (!shouldServiceOperation(request, "expireCaches")) {
       return false;
     }
-    log.info("Expiring caches in repository {} from path='{}'", this, request.getRequestPath());
+    log.debug("Expiring caches in repository {} from path='{}'", this, request.getRequestPath());
     return doExpireCaches(request, filter);
   }
 
@@ -460,7 +460,7 @@ public abstract class AbstractRepository
     if (!shouldServiceOperation(request, "expireNotFoundCaches")) {
       return false;
     }
-    log.info("Expiring NFC caches in repository {} from path='{}'", this, request.getRequestPath());
+    log.debug("Expiring NFC caches in repository {} from path='{}'", this, request.getRequestPath());
     return doExpireNotFoundCaches(request, filter);
   }
 
@@ -532,7 +532,7 @@ public abstract class AbstractRepository
     if (!shouldServiceOperation(request, "evictUnusedItems")) {
       return Collections.emptyList();
     }
-    log.info("Evicting unused items in repository {}, from path='{}'", this, request.getRequestPath());
+    log.debug("Evicting unused items in repository {}, from path='{}'", this, request.getRequestPath());
     return doEvictUnusedItems(request, timestamp);
   }
 
