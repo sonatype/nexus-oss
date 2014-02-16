@@ -30,8 +30,11 @@ import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.plugins.PluginManagerResponse;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.NexusStateChangeEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
+import org.sonatype.nexus.proxy.events.VetoFormatter;
+import org.sonatype.nexus.proxy.events.VetoFormatterRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
@@ -71,11 +74,13 @@ public class NxApplication
 
   private final EventSubscriberHost eventSubscriberHost;
 
+  private final VetoFormatter vetoFormatter;
+
   @Inject
   public NxApplication(final EventBus eventBus, final NexusConfiguration nexusConfiguration,
       final NexusPluginManager nexusPluginManager, final ApplicationStatusSource applicationStatusSource,
       final SecuritySystem securitySystem, final NexusScheduler nexusScheduler,
-      final RepositoryRegistry repositoryRegistry, final EventSubscriberHost eventSubscriberHost)
+      final RepositoryRegistry repositoryRegistry, final EventSubscriberHost eventSubscriberHost, final VetoFormatter vetoFormatter)
   {
     this.eventBus = checkNotNull(eventBus);
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
@@ -85,6 +90,7 @@ public class NxApplication
     this.nexusScheduler = checkNotNull(nexusScheduler);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.eventSubscriberHost = checkNotNull(eventSubscriberHost);
+    this.vetoFormatter = checkNotNull(vetoFormatter);
 
     logInitialized();
 
@@ -104,7 +110,16 @@ public class NxApplication
 
     applicationStatusSource.setState(SystemState.STOPPED);
     applicationStatusSource.getSystemStatus().setInitializedAt(new Date());
-    eventBus.post(new NexusInitializedEvent(this));
+    fireNexusStateChangeEventAndListenForVetos(new NexusInitializedEvent(this));
+  }
+
+  private void fireNexusStateChangeEventAndListenForVetos(final NexusStateChangeEvent evt) {
+    checkNotNull(evt);
+    eventBus.post(evt);
+    if (evt.isVetoed()) {
+      log.warn(vetoFormatter.format(new VetoFormatterRequest(evt, true)));
+      throw new IllegalStateException("Nexus state change prevented, bailing out. Check logs for more details.");
+    }
   }
 
   @VisibleForTesting
@@ -170,7 +185,7 @@ public class NxApplication
         log.info("Nexus Work Directory : {}", workDirPath);
         log.info("Started {}", getNexusNameForLogs());
       }
-      eventBus.post(new NexusStartedEvent(this));
+      fireNexusStateChangeEventAndListenForVetos(new NexusStartedEvent(this));
     }
     catch (IOException e) {
       applicationStatusSource.getSystemStatus().setState(SystemState.BROKEN_IO);
