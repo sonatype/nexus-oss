@@ -133,8 +133,6 @@ public class NexusClientFactoryImpl
     config.getSingletons().add(new XStreamXmlProvider(xstream, APPLICATION_XML_UTF8_TYPE));
     // set _real_ URL for baseUrl, and not a redirection (typically http instead of https)
     config.getProperties().put(PROPERTY_FOLLOW_REDIRECTS, Boolean.FALSE);
-    // Not needed anymore, Jackson2.x will autoregister itself just fine
-    // config.getFeatures().put(FEATURE_POJO_MAPPING, Boolean.TRUE);
 
     applyAuthenticationIfAny(connectionInfo, config);
     applyProxyIfAny(connectionInfo, config);
