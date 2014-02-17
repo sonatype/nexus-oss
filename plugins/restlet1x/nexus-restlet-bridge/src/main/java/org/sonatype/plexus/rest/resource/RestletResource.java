@@ -30,6 +30,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileItemHeaders;
 import org.apache.commons.fileupload.FileUploadException;
 import org.restlet.Context;
 import org.restlet.data.CharacterSet;
@@ -394,18 +395,22 @@ public class RestletResource
       this.representation = representation;
     }
 
+    @Override
     public String getContentType() {
       return representation.getMediaType().getName();
     }
 
+    @Override
     public String getName() {
       return name;
     }
 
+    @Override
     public String getFieldName() {
       return getName();
     }
 
+    @Override
     public InputStream getInputStream()
         throws IOException
     {
@@ -414,15 +419,18 @@ public class RestletResource
 
     // == ignored methods
 
+    @Override
     public void delete() {
       // TODO Auto-generated method stub
     }
 
+    @Override
     public byte[] get() {
       // TODO Auto-generated method stub
       return null;
     }
 
+    @Override
     public OutputStream getOutputStream()
         throws IOException
     {
@@ -430,39 +438,56 @@ public class RestletResource
       return null;
     }
 
+    @Override
     public long getSize() {
       return 0;
     }
 
+    @Override
     public String getString() {
       return null;
     }
 
+    @Override
     public String getString(String encoding)
         throws UnsupportedEncodingException
     {
       return null;
     }
 
+    @Override
     public boolean isFormField() {
       return false;
     }
 
+    @Override
     public boolean isInMemory() {
       return false;
     }
 
+    @Override
     public void setFieldName(String name) {
     }
 
+    @Override
     public void setFormField(boolean state) {
     }
 
+    @Override
     public void write(File file)
         throws Exception
     {
     }
 
+    @Override
+    public FileItemHeaders getHeaders() {
+      return null;
+    }
+
+    @Override
+    public void setHeaders(final FileItemHeaders headers) {
+
+    }
   }
 
 }
