@@ -73,7 +73,7 @@
       <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
-        <version>1.8</version>
+        <version>1.9-SNAPSHOT</version>
         <exclusions>
           <exclusion>
             <groupId>com.thoughtworks.xstream</groupId>
