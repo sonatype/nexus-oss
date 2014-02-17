@@ -63,7 +63,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.sun.jersey.api.client.config.ClientConfig.PROPERTY_FOLLOW_REDIRECTS;
-import static com.sun.jersey.api.json.JSONConfiguration.FEATURE_POJO_MAPPING;
 import static com.sun.jersey.client.apache4.config.ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER;
 import static com.sun.jersey.client.apache4.config.ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION;
 import static com.sun.jersey.client.apache4.config.ApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD;
@@ -134,7 +133,8 @@ public class NexusClientFactoryImpl
     config.getSingletons().add(new XStreamXmlProvider(xstream, APPLICATION_XML_UTF8_TYPE));
     // set _real_ URL for baseUrl, and not a redirection (typically http instead of https)
     config.getProperties().put(PROPERTY_FOLLOW_REDIRECTS, Boolean.FALSE);
-    config.getFeatures().put(FEATURE_POJO_MAPPING, Boolean.TRUE);
+    // Not needed anymore, Jackson2.x will autoregister itself just fine
+    // config.getFeatures().put(FEATURE_POJO_MAPPING, Boolean.TRUE);
 
     applyAuthenticationIfAny(connectionInfo, config);
     applyProxyIfAny(connectionInfo, config);
