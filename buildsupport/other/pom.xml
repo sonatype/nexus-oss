@@ -27,10 +27,6 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
-  <properties>
-    <jackson.version>1.9.10</jackson.version>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -42,7 +38,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>14.0.1</version>
+        <version>16.0.1</version>
       </dependency>
 
       <dependency>
@@ -85,12 +81,6 @@
         <groupId>org.apache.velocity</groupId>
         <artifactId>velocity</artifactId>
         <version>1.7</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-bundle-launcher</artifactId>
-        <version>1.6</version>
       </dependency>
 
       <dependency>
