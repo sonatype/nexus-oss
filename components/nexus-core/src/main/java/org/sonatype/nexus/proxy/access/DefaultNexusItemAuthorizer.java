@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.targets.TargetMatch;
 import org.sonatype.nexus.proxy.targets.TargetSet;
@@ -54,13 +55,25 @@ public class DefaultNexusItemAuthorizer
   }
 
   public boolean authorizePath(final Repository repository, final ResourceStoreRequest request, final Action action) {
-    TargetSet matched = repository.getTargetsForRequest(request);
-    if (matched == null) {
-      matched = new TargetSet();
+    // check repo only first, if there is directly assigned matching target permission, we're good
+    final TargetSet matched = repository.getTargetsForRequest(request);
+    if (matched != null && authorizePath(matched, action)) {
+      return true;
     }
-    // if this repository is contained in any group, we need to get those targets, and tweak the TargetMatch
-    matched.addTargetSet(this.getGroupsTargetSet(repository, request));
-    return authorizePath(matched, action);
+    // if we are here, we need to check cascading permissions, where this repository is contained in group
+    return authorizePathCascade(repository, request, action);
+  }
+
+  private boolean authorizePathCascade(final Repository repository, final ResourceStoreRequest request,
+                                       final Action action)
+  {
+    final List<GroupRepository> groups = repoRegistry.getGroupsOfRepository(repository);
+    for (GroupRepository group : groups) {
+      if (authorizePath(group, request, action)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public boolean authorizePermission(final String permission) {
