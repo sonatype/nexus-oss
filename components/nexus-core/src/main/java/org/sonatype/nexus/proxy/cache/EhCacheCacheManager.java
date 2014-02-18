@@ -46,7 +46,7 @@ public class EhCacheCacheManager
     this.cacheManager = checkNotNull(cacheManager);
   }
 
-  public PathCache getPathCache(String cache) {
+  public synchronized PathCache getPathCache(String cache) {
     if (!cacheManager.cacheExists(SINGLE_PATH_CACHE_NAME)) {
       cacheManager.addCache(SINGLE_PATH_CACHE_NAME);
     }
