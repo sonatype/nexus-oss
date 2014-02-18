@@ -36,34 +36,28 @@ import org.sonatype.aether.version.Version;
 import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.guice.AbstractInterceptorModule;
-import org.sonatype.nexus.guice.NexusAnnotatedBeanModule;
 import org.sonatype.nexus.guice.NexusModules.PluginModule;
-import org.sonatype.nexus.mime.MimeSupport;
+import org.sonatype.nexus.guice.NexusTypeBinder;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
 import org.sonatype.nexus.plugins.repository.NexusPluginRepository;
 import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactException;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.util.AlphanumComparator;
-import org.sonatype.nexus.web.WebResource;
-import org.sonatype.nexus.web.WebResourceBundle;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugins.model.ClasspathDependency;
 import org.sonatype.plugins.model.PluginDependency;
 import org.sonatype.plugins.model.PluginMetadata;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Module;
-import com.google.inject.name.Names;
 import com.yammer.metrics.annotation.Timed;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.eclipse.sisu.Parameters;
+import org.eclipse.sisu.plexus.PlexusAnnotatedBeanModule;
 import org.eclipse.sisu.plexus.PlexusBeanModule;
 import org.eclipse.sisu.plexus.PlexusXmlBeanModule;
 import org.eclipse.sisu.space.ClassSpace;
@@ -85,10 +79,6 @@ public class DefaultNexusPluginManager
 
   private final EventBus eventBus;
 
-  private final RepositoryTypeRegistry repositoryTypeRegistry;
-
-  private final MimeSupport mimeSupport;
-
   private final DefaultPlexusContainer container;
 
   private final Map<String, String> variables;
@@ -102,19 +92,15 @@ public class DefaultNexusPluginManager
   private final VersionScheme versionParser = new GenericVersionScheme();
 
   @Inject
-  public DefaultNexusPluginManager(final RepositoryTypeRegistry repositoryTypeRegistry,
-                                   final EventBus eventBus,
+  public DefaultNexusPluginManager(final EventBus eventBus,
                                    final NexusPluginRepository repositoryManager,
                                    final DefaultPlexusContainer container,
-                                   final MimeSupport mimeSupport,
                                    final @Parameters Map<String, String> variables,
                                    final List<AbstractInterceptorModule> interceptorModules)
   {
-    this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
     this.eventBus = checkNotNull(eventBus);
     this.repositoryManager = checkNotNull(repositoryManager);
     this.container = checkNotNull(container);
-    this.mimeSupport = checkNotNull(mimeSupport);
     this.variables = checkNotNull(variables);
     this.interceptorModules = checkNotNull(interceptorModules);
   }
@@ -359,53 +345,16 @@ public class DefaultNexusPluginManager
 
     // Scan for annotated components
     final ClassSpace annSpace = new URLClassSpace(pluginRealm, scanList.toArray(new URL[scanList.size()]));
-    final List<RepositoryTypeDescriptor> repositoryTypes = new ArrayList<RepositoryTypeDescriptor>();
-    beanModules.add(new NexusAnnotatedBeanModule(annSpace, variables, repositoryTypes));
-
-    // Find static resources and expose as single resource bundle
-    final List<WebResource> staticResources = findStaticResources(descriptor.getPluginCoordinates(), pluginSpace);
-    final WebResourceBundle resourceBundle = new WebResourceBundle()
-    {
-      public List<WebResource> getResources() {
-        return staticResources;
-      }
-    };
-    final Module resourceModule = new AbstractModule()
-    {
-      @Override
-      protected void configure() {
-        bind(WebResourceBundle.class).annotatedWith(Names.named(realmId)).toInstance(resourceBundle);
-      }
-    };
+    beanModules.add(new PlexusAnnotatedBeanModule(annSpace, variables).with(NexusTypeBinder.STRATEGY));
 
     // Assemble plugin components and resources
     final List<Module> modules = new ArrayList<Module>();
-    modules.add(resourceModule);
     modules.add(new PluginModule());
     modules.addAll(interceptorModules);
 
     container.addPlexusInjector(beanModules, modules.toArray(new Module[modules.size()]));
 
-    for (final RepositoryTypeDescriptor r : repositoryTypes) {
-      repositoryTypeRegistry.registerRepositoryTypeDescriptors(r);
-    }
-
     descriptor.setExportedClassnames(findExportedClassnames(annSpace));
-    descriptor.setRepositoryTypes(repositoryTypes);
-    descriptor.setStaticResources(staticResources);
-  }
-
-  private List<WebResource> findStaticResources(final GAVCoordinate gav, final ClassSpace pluginSpace) {
-    final List<WebResource> staticResources = new ArrayList<WebResource>();
-    for (Enumeration<URL> e = pluginSpace.findEntries("static/", null, true); e.hasMoreElements(); ) {
-      final URL url = e.nextElement();
-      final String path = getPublishedPath(url);
-      if (path != null) {
-        staticResources.add(new PluginWebResource(gav, url, path,
-            mimeSupport.guessMimeTypeFromPath(url.getPath())));
-      }
-    }
-    return staticResources;
   }
 
   private static List<String> findExportedClassnames(final ClassSpace annSpace) {
@@ -457,19 +406,6 @@ public class DefaultNexusPluginManager
     catch (IOException e) {
       return false;
     }
-  }
-
-  private String getPublishedPath(final URL resourceURL) {
-    final String path = resourceURL.toExternalForm();
-    int index = path.indexOf("jar!/");
-    if (index > 0) {
-      return path.substring(index + 4);
-    }
-    index = path.indexOf("/static/");
-    if (index > 0) {
-      return path.substring(index);
-    }
-    return null;
   }
 
   private void reportMissingPlugin(final PluginManagerResponse response,
