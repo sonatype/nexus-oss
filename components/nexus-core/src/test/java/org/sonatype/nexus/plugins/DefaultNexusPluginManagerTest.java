@@ -28,7 +28,7 @@ import org.sonatype.plugins.model.PluginMetadata;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.codehaus.plexus.DefaultPlexusContainer;
+import org.eclipse.sisu.inject.MutableBeanLocator;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -55,13 +55,16 @@ public class DefaultNexusPluginManagerTest
   @Mock
   private NexusPluginRepository nexusPluginRepository;
 
+  @Mock
+  private MutableBeanLocator locator;
+
   @Test
   public void pluginDependenciesAreActivatedByGA()
       throws Exception
   {
     final DefaultNexusPluginManager underTest = new DefaultNexusPluginManager(
-        eventBus, pluginRepositoryManager,
-        new DefaultPlexusContainer(), new HashMap<String, String>(),
+        eventBus, pluginRepositoryManager, locator,
+        new HashMap<String, String>(),
         Collections.<AbstractInterceptorModule>emptyList()
     )
     {
