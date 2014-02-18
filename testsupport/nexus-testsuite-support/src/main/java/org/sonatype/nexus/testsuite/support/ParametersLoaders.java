@@ -18,7 +18,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.sonatype.sisu.goodies.marshal.internal.jackson.JacksonMarshaller;
+import org.sonatype.sisu.goodies.marshal.internal.jackson2.JacksonMarshaller;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;

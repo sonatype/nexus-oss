@@ -97,6 +97,11 @@
       <artifactId>siesta-client</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.sisu.siesta</groupId>
+      <artifactId>siesta-jackson</artifactId>
+    </dependency>
+
     <!-- For Jersey client: complete HC4 stack + logger -->
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
