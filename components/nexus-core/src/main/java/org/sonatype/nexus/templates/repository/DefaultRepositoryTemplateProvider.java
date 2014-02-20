@@ -48,7 +48,9 @@ public class DefaultRepositoryTemplateProvider
 
   private static final String DEFAULT_PROXY_SNAPSHOT = "default_proxy_snapshot";
 
-  private static final String DEFAULT_VIRTUAL = "default_virtual";
+  private static final String DEFAULT_VIRTUAL_M2_M1 = "default_virtual_m2_m1";
+
+  private static final String DEFAULT_VIRTUAL_M1_M2 = "default_virtual_m1_m2";
 
   private static final String DEFAULT_GROUP = "default_group";
 
@@ -69,11 +71,11 @@ public class DefaultRepositoryTemplateProvider
       templates.add(new Maven2ProxyRepositoryTemplate(this, DEFAULT_PROXY_SNAPSHOT,
           "Maven2 (proxy, snapshot)", RepositoryPolicy.SNAPSHOT));
 
-      templates.add(new Maven1Maven2ShadowRepositoryTemplate(this, DEFAULT_VIRTUAL,
-          "Maven1-to-Maven2 (vitual)"));
+      templates.add(new Maven1Maven2ShadowRepositoryTemplate(this, DEFAULT_VIRTUAL_M1_M2,
+          "Maven1 to Maven2 (virtual)"));
 
-      templates.add(new Maven2Maven1ShadowRepositoryTemplate(this, DEFAULT_VIRTUAL,
-          "Maven2-to-Maven1 (virtual)"));
+      templates.add(new Maven2Maven1ShadowRepositoryTemplate(this, DEFAULT_VIRTUAL_M2_M1,
+          "Maven2 to Maven1 (virtual)"));
 
       templates.add(new Maven1HostedRepositoryTemplate(this, "maven1_hosted_release",
           "Maven1 (hosted, release)", RepositoryPolicy.RELEASE));
