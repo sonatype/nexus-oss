@@ -28,18 +28,23 @@ public interface NexusItemAuthorizer
 
   /**
    * Authorizes TargetSet.
+   *
+   * @deprecated Use {@link #authorizePath(Repository, ResourceStoreRequest, Action)} method instead.
    */
+  @Deprecated
   public boolean authorizePath(TargetSet matched, Action action);
 
   /**
    * Returns groups for target set.
+   *
+   * @deprecated Use {@link #authorizePath(Repository, ResourceStoreRequest, Action)} method instead.
    */
+  @Deprecated
   public TargetSet getGroupsTargetSet(Repository repository, ResourceStoreRequest request);
 
   /**
-   * Authorizes a repository level path against an action. Use when you have a repositoy path, ie. filtering of
-   * search
-   * results or feeds.
+   * Authorizes a repository level path against an action. Use when you have a repository path, ie. filtering of
+   * search results or feeds with links to repository.
    */
   boolean authorizePath(Repository repository, ResourceStoreRequest request, Action action);
 
@@ -50,7 +55,7 @@ public interface NexusItemAuthorizer
 
 
   /**
-   * Used to authorize a simple permission string
+   * Used to authorize a simple permission string.
    */
   boolean authorizePermission(String permission);
 
