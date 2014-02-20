@@ -14,7 +14,6 @@
 package org.sonatype.nexus.webapp;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -31,13 +30,20 @@ import org.sonatype.nexus.util.LockFile;
 import org.sonatype.nexus.util.file.DirSupport;
 
 import com.google.common.base.Throwables;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.context.Context;
+import org.eclipse.sisu.plexus.PlexusSpaceModule;
+import org.eclipse.sisu.space.BeanScanning;
+import org.eclipse.sisu.space.ClassSpace;
+import org.eclipse.sisu.space.URLClassSpace;
+import org.eclipse.sisu.wire.WireModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,27 +112,24 @@ public class WebappBootstrap
       lockFile = new LockFile(new File(workDir, "nexus.lock"));
       checkState(lockFile.lock(), "Nexus work directory already in use: %s", workDir);
 
-      // setup plexus configuration
-      URL plexusXml = getClass().getResource("/plexus.xml");
-      checkState(plexusXml != null, "Missing plexus.xml");
-      log.debug("Plexus XML: {}", plexusXml);
+      final ClassWorld world = new ClassWorld("nexus", Thread.currentThread().getContextClassLoader());
+      final ClassRealm realm = world.getRealm("nexus");
 
-      @SuppressWarnings("unchecked")
-      ContainerConfiguration plexusConfiguration = new DefaultContainerConfiguration()
-          .setName(context.getServletContextName())
-          .setContainerConfigurationURL(plexusXml)
-          .setContext((Map) properties)
-          .setAutoWiring(true)
-          .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
-          .setComponentVisibility(PlexusConstants.GLOBAL_VISIBILITY);
-
-      // create the container
-      container = new DefaultPlexusContainer(plexusConfiguration, new CoreModule(context));
-      context.setAttribute(PlexusConstants.PLEXUS_KEY, container);
-      log.debug("Container: {}", container);
-
-      injector = container.lookup(Injector.class);
+      // create the injector
+      ClassSpace space = new URLClassSpace(realm);
+      injector = Guice.createInjector(new WireModule(new AbstractModule()
+      {
+        @Override
+        protected void configure() {
+          bind(ClassRealm.class).toInstance(realm); // TEMP: won't be required in next step
+        }
+      }, new CoreModule(context, properties), new PlexusSpaceModule(space, BeanScanning.INDEX)));
       log.debug("Injector: {}", injector);
+      
+      container = injector.getInstance(PlexusContainer.class);
+      context.setAttribute(PlexusConstants.PLEXUS_KEY, container);
+      injector.getInstance(Context.class).put(PlexusConstants.PLEXUS_KEY, container);
+      log.debug("Container: {}", container);
 
       // configure guice servlet (add injector to servlet context)
       super.contextInitialized(event);
@@ -149,7 +152,7 @@ public class WebappBootstrap
     log.info("Initialized");
   }
 
-  private void requireProperty(final Map<String, String> properties, final String name) {
+  private static void requireProperty(final Map<String, String> properties, final String name) {
     if (!properties.containsKey(name)) {
       throw new IllegalStateException("Missing required property: " + name);
     }
