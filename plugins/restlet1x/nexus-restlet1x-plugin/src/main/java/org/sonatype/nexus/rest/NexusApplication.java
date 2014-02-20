@@ -234,6 +234,10 @@ public class NexusApplication
         this.protectedPathManager.addProtectedResource( "/content"
             + contentResource.getResourceProtection().getPathPattern(), "noSessionCreation,"
             + contentResource.getResourceProtection().getFilterExpression() );
+
+        // protecting service resources with "wall" permission
+        this.protectedPathManager.addProtectedResource("/service/local/**",
+            "noSessionCreation,authcBasic,perms[nexus:permToCatchAllUnprotecteds]");
     }
     
     private final AntPathMatcher shiroAntPathMatcher = new AntPathMatcher();
