@@ -43,7 +43,7 @@ public class StaticWebResourceBundle
       final URL url = e.nextElement();
       final String path = getPublishedPath(url);
       if (path != null) {
-        staticResources.add(new StaticWebResource(url, path, mimeSupport.guessMimeTypeFromPath(url.getPath())));
+        staticResources.add(new StaticWebResource(url, path, mimeSupport.guessMimeTypeFromPath(path)));
       }
     }
   }
