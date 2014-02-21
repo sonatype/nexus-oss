@@ -17,9 +17,15 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.config.ConnectionConfig;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HttpContext;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Component for creating pre-configured Apache HttpClient4x instances in Nexus.
@@ -87,11 +93,81 @@ public interface Hc4Provider
    * "factory"-like features of this provider. In short: it wants to have pre-configured instance adjusted to passed
    * in {@link RemoteStorageContext}, namely with authentication and HTTP proxy configuration set. So far, that
    * subsystem is Nexus Proxy repositories. The created {@link HttpClient} will use the shared
-   * {@link ClientConnectionManager} managed by this component, so instances created with this method must not be
+   * {@link HttpClientConnectionManager} managed by this component, so instances created with this method must not be
    * managed or shutdown!
    *
    * @param context to source connection parameters from.
    * @return HttpClient4x pre-configured instance, that uses passed {@link RemoteStorageContext} to be configured.
    */
   HttpClient createHttpClient(RemoteStorageContext context);
+
+  // ==
+
+  /**
+   * Builder carries not-yet built HttpClient parts and configuration, enabling to have it passed around to apply
+   * configuration changes on it before client is finally built. After having built {@link HttpClient}, the returned
+   * instance is immutable and does not expose getters either for various members like pool etc. Still, this instance
+   * of Builder might be reused to create multiple clients, but in that case care must be take to apply reusable
+   * parts (ie. if connection manager is applied, it has to be reusable too).
+   *
+   * @since 2.8
+   */
+  public static class Builder
+  {
+    private final HttpClientBuilder httpClientBuilder;
+
+    private final ConnectionConfig.Builder connectionConfigBuilder;
+
+    private final SocketConfig.Builder socketConfigBuilder;
+
+    private final RequestConfig.Builder requestConfigBuilder;
+
+    Builder() {
+      this(HttpClientBuilder.create(), ConnectionConfig.copy(ConnectionConfig.DEFAULT),
+          SocketConfig.copy(SocketConfig.DEFAULT), RequestConfig.copy(RequestConfig.DEFAULT));
+    }
+
+    Builder(final HttpClientBuilder httpClientBuilder, final ConnectionConfig.Builder connectionConfigBuilder,
+            final SocketConfig.Builder socketConfigBuilder, final RequestConfig.Builder requestConfigBuilder)
+    {
+      this.httpClientBuilder = checkNotNull(httpClientBuilder);
+      this.connectionConfigBuilder = checkNotNull(connectionConfigBuilder);
+      this.socketConfigBuilder = checkNotNull(socketConfigBuilder);
+      this.requestConfigBuilder = checkNotNull(requestConfigBuilder);
+    }
+
+    public HttpClientBuilder getHttpClientBuilder() {
+      return httpClientBuilder;
+    }
+
+    public ConnectionConfig.Builder getConnectionConfigBuilder() {
+      return connectionConfigBuilder;
+    }
+
+    public SocketConfig.Builder getSocketConfigBuilder() {
+      return socketConfigBuilder;
+    }
+
+    public RequestConfig.Builder getRequestConfigBuilder() {
+      return requestConfigBuilder;
+    }
+
+    /**
+     * Builds the {@link HttpClient} from current state of this builder. Once client is built and returned, it is
+     * immutable and thread safe (unless explicitly configured with non-thread safe client connection manager).
+     * This instance might be re-used to create multiple clients, as the configuration state once client is built, is
+     * detached from it.
+     */
+    public HttpClient build() {
+      httpClientBuilder.setDefaultConnectionConfig(connectionConfigBuilder.build());
+      httpClientBuilder.setDefaultSocketConfig(socketConfigBuilder.build());
+      httpClientBuilder.setDefaultRequestConfig(requestConfigBuilder.build());
+      return httpClientBuilder.build();
+    }
+  }
+
+  /**
+   * Prepares but does not build a Builder, allowing extra configuration to be applied to it by caller.
+   */
+  Builder prepareHttpClient(RemoteStorageContext context);
 }

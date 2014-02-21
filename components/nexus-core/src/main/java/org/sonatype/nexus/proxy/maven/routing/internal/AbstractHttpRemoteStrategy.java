@@ -46,8 +46,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class AbstractHttpRemoteStrategy
     extends AbstractRemoteStrategy
 {
-  private static final String MAVEN_PROXY_KEY = AbstractHttpRemoteStrategy.class.getName() + ".mavenProxyRepository";
-
   private final HttpClientManager httpClientManager;
 
   protected AbstractHttpRemoteStrategy(final int priority, final String id, final HttpClientManager httpClientManager) {
@@ -70,21 +68,7 @@ public abstract class AbstractHttpRemoteStrategy
   protected HttpClient createHttpClientFor(final MavenProxyRepository mavenProxyRepository) {
     final HttpClient client = httpClientManager.create(mavenProxyRepository,
         mavenProxyRepository.getRemoteStorageContext());
-    client.getParams().setParameter(MAVEN_PROXY_KEY, mavenProxyRepository);
     return client;
-  }
-
-  /**
-   * Executes a {@link HttpUriRequest}.
-   */
-  protected HttpResponse executeHttpRequest(final HttpClient httpClient, final HttpUriRequest httpRequest)
-      throws ClientProtocolException, IOException
-  {
-    final MavenProxyRepository mavenProxyRepository = (MavenProxyRepository) httpClient.getParams().getParameter(
-        MAVEN_PROXY_KEY);
-    final BasicHttpContext httpContext = new BasicHttpContext();
-    httpContext.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, mavenProxyRepository);
-    return httpClient.execute(httpRequest, httpContext);
   }
 
   /**
@@ -111,7 +95,10 @@ public abstract class AbstractHttpRemoteStrategy
       // NEXUS-5849: Artifactory will happily serve Central prefixes, effectively shading all the other artifacts from
       // it's group
       final HttpGet get = new HttpGet(remoteUrl);
-      final HttpResponse response = executeHttpRequest(httpClient, get);
+      final BasicHttpContext httpContext = new BasicHttpContext();
+      httpContext.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, mavenProxyRepository);
+      final HttpResponse response  = httpClient.execute(get, httpContext);
+
       try {
         if (response.containsHeader("X-Artifactory-Id")) {
           log.debug("Remote server of proxy {} recognized as ARTF by response header", mavenProxyRepository);

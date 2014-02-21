@@ -14,7 +14,6 @@
 package org.sonatype.security.realms.kenai;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.inject.Typed;
@@ -29,16 +28,10 @@ import com.google.common.collect.Lists;
 import org.apache.http.Consts;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.utils.HttpClientUtils;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationException;
@@ -117,7 +110,7 @@ public class KenaiRealm
   }
 
   private boolean authenticateViaUrl(final UsernamePasswordToken usernamePasswordToken) {
-    final HttpClient client = getHttpClient(null);
+    final HttpClient client = hc4Provider.createHttpClient();
 
     try {
       final String url = kenaiRealmConfiguration.getConfiguration().getBaseUrl() + "api/login/authenticate.json";
@@ -157,23 +150,5 @@ public class KenaiRealm
     final SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
     authorizationInfo.addRole(kenaiRealmConfiguration.getConfiguration().getDefaultRole());
     return authorizationInfo;
-  }
-
-  // ==
-
-  private HttpClient getHttpClient(final UsernamePasswordToken usernamePasswordToken) {
-    // risky, but we must blindly assume it is
-    final DefaultHttpClient client = (DefaultHttpClient) hc4Provider.createHttpClient();
-    if (usernamePasswordToken != null) {
-      final List<String> authorisationPreference = new ArrayList<String>(2);
-      authorisationPreference.add(AuthPolicy.DIGEST);
-      authorisationPreference.add(AuthPolicy.BASIC);
-      final Credentials credentials =
-          new UsernamePasswordCredentials(usernamePasswordToken.getUsername(),
-              String.valueOf(usernamePasswordToken.getPassword()));
-      client.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
-      client.getParams().setParameter(AuthPNames.TARGET_AUTH_PREF, authorisationPreference);
-    }
-    return client;
   }
 }

@@ -34,9 +34,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -77,9 +79,6 @@ public class HttpClientManagerTest
   private HttpResponse response;
 
   @Mock
-  private HttpContext httpContext;
-
-  @Mock
   private StatusLine statusLine;
 
   private HttpGet request;
@@ -110,16 +109,19 @@ public class HttpClientManagerTest
   {
     final RedirectStrategy underTest =
         httpClientManager.getProxyRepositoryRedirectStrategy(proxyRepository, globalRemoteStorageContext);
+    HttpContext httpContext;
 
     // no location header
     request = new HttpGet("http://localhost/dir/fileA");
-    request.getParams().setBooleanParameter(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY, true);
+    httpContext = new BasicHttpContext();
+    httpContext.setAttribute(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
     when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_OK);
     assertThat(underTest.isRedirected(request, response, httpContext), is(false));
 
     // redirect to file
     request = new HttpGet("http://localhost/dir/fileA");
-    request.getParams().setBooleanParameter(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY, true);
+    httpContext = new BasicHttpContext();
+    httpContext.setAttribute(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
     when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_MOVED_TEMPORARILY);
     when(response.getFirstHeader("location")).thenReturn(
         new BasicHeader("location", "http://localhost/dir/fileB"));
@@ -127,7 +129,8 @@ public class HttpClientManagerTest
 
     // redirect to dir
     request = new HttpGet("http://localhost/dir");
-    request.getParams().setBooleanParameter(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY, true);
+    httpContext = new BasicHttpContext();
+    httpContext.setAttribute(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
     when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_MOVED_TEMPORARILY);
     when(response.getFirstHeader("location")).thenReturn(new BasicHeader("location", "http://localhost/dir/"));
     assertThat(underTest.isRedirected(request, response, httpContext), is(false));
@@ -145,16 +148,17 @@ public class HttpClientManagerTest
     when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_MOVED_TEMPORARILY);
     when(response.getFirstHeader("location")).thenReturn(
         new BasicHeader("location", "http://hostB/dir"));
-    assertThat(underTest.isRedirected(request, response, httpContext), is(true));
+    assertThat(underTest.isRedirected(request, response, new BasicHttpContext()), is(true));
 
     // cross redirect to dir (failed coz NEXUS-5744)
     request = new HttpGet("http://hostA/dir/");
     when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_MOVED_TEMPORARILY);
     when(response.getFirstHeader("location")).thenReturn(new BasicHeader("location", "http://hostB/dir/"));
-    assertThat(underTest.isRedirected(request, response, httpContext), is(true));
+    assertThat(underTest.isRedirected(request, response, new BasicHttpContext()), is(true));
   }
 
   @Test
+  @Ignore("Hc4Provider does not deliver DefaultHttpClient deprecated instances anymore")
   public void doNotHandleRetries() {
     final DefaultHttpClient client =
         (DefaultHttpClient) new HttpClientManagerImpl(hc4Provider, userAgentBuilder).create(proxyRepository,

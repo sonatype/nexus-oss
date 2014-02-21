@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.apachehttpclient.Hc4Provider.Builder;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -36,10 +37,7 @@ import org.apache.http.ProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.impl.client.RequestWrapper;
-import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
 
 /**
@@ -74,12 +72,9 @@ public class HttpClientManagerImpl
   public HttpClient create(final ProxyRepository proxyRepository, final RemoteStorageContext ctx) {
     Preconditions.checkNotNull(proxyRepository);
     Preconditions.checkNotNull(ctx);
-    final DefaultHttpClient httpClient = (DefaultHttpClient) hc4Provider.createHttpClient(ctx);
-    // RRS/Proxy repositories handle retries manually, so kill the retry handler set by Hc4Provider
-    // TODO: NEXUS-5368 This is disabled on purpose for now (same in HttpClientManagerTest!)
-    // httpClient.setHttpRequestRetryHandler( new StandardHttpRequestRetryHandler( 0, false ) );
-    configure(proxyRepository, ctx, httpClient);
-    return httpClient;
+    final Builder builder = hc4Provider.prepareHttpClient(ctx);
+    configure(proxyRepository, ctx, builder);
+    return builder.build();
   }
 
   @Override
@@ -94,14 +89,13 @@ public class HttpClientManagerImpl
    * appropriate redirect strategy only.
    */
   protected void configure(final ProxyRepository proxyRepository, final RemoteStorageContext ctx,
-                           final DefaultHttpClient httpClient)
+                           final Builder builder)
   {
-    // set UA
-    httpClient.getParams().setParameter(HttpProtocolParams.USER_AGENT,
-        userAgentBuilder.formatRemoteRepositoryStorageUserAgentString(proxyRepository, ctx));
+    // set UA, as Proxy reposes have different than the "generic" one set by Hc4Provider
+    builder.getHttpClientBuilder().setUserAgent(userAgentBuilder.formatRemoteRepositoryStorageUserAgentString(proxyRepository, ctx));
 
-    // set redirect strategy
-    httpClient.setRedirectStrategy(getProxyRepositoryRedirectStrategy(proxyRepository, ctx));
+    // set proxy redirect strategy
+    builder.getHttpClientBuilder().setRedirectStrategy(getProxyRepositoryRedirectStrategy(proxyRepository, ctx));
   }
 
   /**
@@ -151,7 +145,7 @@ public class HttpClientManagerImpl
                 "Received redirect response " + response.getStatusLine()
                     + " from proxy " + proxyRepository + " but no location present");
           }
-          final URI sourceUri = getPreviousRequestUri(request);
+          final URI sourceUri = ((HttpUriRequest)request).getURI();
           final URI targetUri = createLocationURI(locationHeader.getValue());
           // nag about redirection peculiarities, in any case
           if (!Objects.equals(sourceUri.getScheme().toLowerCase(Locale.US), targetUri.getScheme().toLowerCase(
@@ -172,7 +166,7 @@ public class HttpClientManagerImpl
           }
           // this logic below should trigger only for content fetches made by RRS retrieveItem
           // hence, we do this ONLY if the HttpRequest is "marked" as such request
-          if (request.getParams().isParameterTrue(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY)) {
+          if (Boolean.TRUE == context.getAttribute(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY)) {
             if (targetUri.getPath().endsWith("/")) {
               HttpClientRemoteStorage.outboundRequestLog.debug("Not following redirection to index {} -> {}", sourceUri,
                   targetUri);
@@ -186,18 +180,5 @@ public class HttpClientManagerImpl
       }
     };
     return doNotRedirectToIndexPagesStrategy;
-  }
-
-  /**
-   * Returns "source" URI in case of redirected HttpRequest.
-   */
-  private URI getPreviousRequestUri(final HttpRequest request) {
-    if (request instanceof RequestWrapper) {
-      return getPreviousRequestUri(((RequestWrapper) request).getOriginal());
-    }
-    if (request instanceof HttpUriRequest) {
-      return ((HttpUriRequest) request).getURI();
-    }
-    return null;
   }
 }

@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.junit.Test;
 
 import static org.mockito.Mockito.atLeast;
@@ -44,7 +44,7 @@ public class EvictingThreadTest
   public void connectionEvictedIn5Seconds()
       throws Exception
   {
-    final ClientConnectionManager clientConnectionManager = mock(ClientConnectionManager.class);
+    final HttpClientConnectionManager clientConnectionManager = mock(HttpClientConnectionManager.class);
 
     final EvictingThread underTest = new EvictingThread(clientConnectionManager, 1000, 100);
     underTest.start();
@@ -66,7 +66,7 @@ public class EvictingThreadTest
   public void evictionContinuesWhenConnectionManagerFails()
       throws Exception
   {
-    final ClientConnectionManager clientConnectionManager = mock(ClientConnectionManager.class);
+    final HttpClientConnectionManager clientConnectionManager = mock(HttpClientConnectionManager.class);
     doThrow(new RuntimeException("closeExpiredConnections")).when(clientConnectionManager)
         .closeExpiredConnections();
     doThrow(new RuntimeException("closeIdleConnections")).when(clientConnectionManager)
