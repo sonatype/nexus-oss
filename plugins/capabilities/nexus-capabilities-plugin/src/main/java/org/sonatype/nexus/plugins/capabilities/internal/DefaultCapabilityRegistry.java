@@ -29,7 +29,6 @@ import javax.inject.Singleton;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
-import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
 import org.sonatype.nexus.configuration.PasswordHelper;
 import org.sonatype.nexus.formfields.Encrypted;
 import org.sonatype.nexus.formfields.FormField;
@@ -62,7 +61,7 @@ import com.google.common.collect.Maps;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableCollection;
-import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
+import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
 /**
  * Default {@link CapabilityRegistry} implementation.
@@ -75,8 +74,6 @@ public class DefaultCapabilityRegistry
 {
 
   private final CapabilityStorage capabilityStorage;
-
-  private final ConfigurationIdGenerator idGenerator;
 
   private final Provider<ValidatorRegistry> validatorRegistryProvider;
 
@@ -98,7 +95,6 @@ public class DefaultCapabilityRegistry
 
   @Inject
   DefaultCapabilityRegistry(final CapabilityStorage capabilityStorage,
-                            final ConfigurationIdGenerator idGenerator,
                             final Provider<ValidatorRegistry> validatorRegistryProvider,
                             final CapabilityFactoryRegistry capabilityFactoryRegistry,
                             final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
@@ -108,7 +104,6 @@ public class DefaultCapabilityRegistry
                             final PasswordHelper passwordHelper)
   {
     this.capabilityStorage = checkNotNull(capabilityStorage);
-    this.idGenerator = checkNotNull(idGenerator);
     this.validatorRegistryProvider = checkNotNull(validatorRegistryProvider);
     this.capabilityFactoryRegistry = checkNotNull(capabilityFactoryRegistry);
     this.capabilityDescriptorRegistry = checkNotNull(capabilityDescriptorRegistry);
@@ -139,12 +134,10 @@ public class DefaultCapabilityRegistry
 
       final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get(type);
 
-      final CapabilityIdentity generatedId = capabilityIdentity(idGenerator.generateId());
-
       final Map<String, String> encryptedProps = encryptValuesIfNeeded(descriptor, props);
 
-      capabilityStorage.add(new CapabilityStorageItem(
-          descriptor.version(), generatedId, type, enabled, notes, encryptedProps
+      final CapabilityIdentity generatedId = capabilityStorage.add(new CapabilityStorageItem(
+          descriptor.version(), type.toString(), enabled, notes, encryptedProps
       ));
 
       log.debug("Added capability '{}' of type '{}' with properties '{}'", generatedId, type, encryptedProps);
@@ -185,8 +178,8 @@ public class DefaultCapabilityRegistry
 
       final Map<String, String> encryptedProps = encryptValuesIfNeeded(reference.descriptor(), props);
 
-      capabilityStorage.update(new CapabilityStorageItem(
-          reference.descriptor().version(), id, reference.type(), enabled, notes, encryptedProps)
+      capabilityStorage.update(id, new CapabilityStorageItem(
+          reference.descriptor().version(), reference.type().toString(), enabled, notes, encryptedProps)
       );
 
       log.debug(
@@ -311,38 +304,41 @@ public class DefaultCapabilityRegistry
   public void load()
       throws IOException
   {
-    final Collection<CapabilityStorageItem> items = capabilityStorage.getAll();
-    for (final CapabilityStorageItem item : items) {
+    final Map<CapabilityIdentity, CapabilityStorageItem> items = capabilityStorage.getAll();
+    for (final Map.Entry<CapabilityIdentity, CapabilityStorageItem> entry : items.entrySet()) {
+      CapabilityIdentity id = entry.getKey();
+      CapabilityStorageItem item = entry.getValue();
+
       log.debug(
           "Loading capability '{}' of type '{}' with properties '{}'",
-          item.id(), item.type(), item.properties()
+          id, item.getType(), item.getProperties()
       );
 
-      final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get(item.type());
+      final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get(capabilityType(item.getType()));
 
       if (descriptor == null) {
         log.warn(
             "Capabilities persistent storage (capabilities.xml?) contains an capability of unknown type {} with"
-                + " id {}. This capability will not be loaded", item.type(), item.id()
+                + " id {}. This capability will not be loaded", item.getType(), id
         );
         continue;
       }
 
-      Map<String, String> properties = decryptValuesIfNeeded(descriptor, item.properties());
-      if (descriptor.version() != item.version()) {
+      Map<String, String> properties = decryptValuesIfNeeded(descriptor, item.getProperties());
+      if (descriptor.version() != item.getVersion()) {
         log.debug(
             "Converting capability '{}' properties from version '{}' to version '{}'",
-            item.id(), item.version(), descriptor.version()
+            id, item.getVersion(), descriptor.version()
         );
         try {
-          properties = descriptor.convert(properties, item.version());
+          properties = descriptor.convert(properties, item.getVersion());
           if (properties == null) {
             properties = Collections.emptyMap();
           }
           if (log.isDebugEnabled()) {
             log.debug(
                 "Converted capability '{}' properties '{}' (version '{}') to '{}' (version '{}')",
-                item.id(), item.properties(), item.version(),
+                id, item.getProperties(), item.getVersion(),
                 encryptValuesIfNeeded(descriptor, properties), descriptor.version()
             );
           }
@@ -351,18 +347,18 @@ public class DefaultCapabilityRegistry
           log.error(
               "Failed converting capability '{}' properties '{}' from version '{}' to version '{}'."
                   + " Capability will not be loaded",
-              item.id(), item.properties(), item.version(), descriptor.version(), e
+              id, item.getProperties(), item.getVersion(), descriptor.version(), e
           );
           continue;
         }
-        capabilityStorage.update(new CapabilityStorageItem(
-            descriptor.version(), item.id(), item.type(), item.isEnabled(), item.notes(), properties)
+        capabilityStorage.update(id, new CapabilityStorageItem(
+            descriptor.version(), item.getType(), item.isEnabled(), item.getNotes(), properties)
         );
       }
 
-      final DefaultCapabilityReference reference = create(item.id(), item.type(), descriptor);
+      final DefaultCapabilityReference reference = create(id, capabilityType(item.getType()), descriptor);
 
-      reference.setNotes(item.notes());
+      reference.setNotes(item.getNotes());
       reference.load(properties);
       if (item.isEnabled()) {
         reference.enable();

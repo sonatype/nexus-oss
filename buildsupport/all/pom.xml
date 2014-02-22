@@ -41,6 +41,14 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
+        <artifactId>nexus-buildsupport-db</artifactId>
+        <type>pom</type>
+        <version>2.8.0-SNAPSHOT</version>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.buildsupport</groupId>
         <artifactId>nexus-buildsupport-httpclient</artifactId>
         <type>pom</type>
         <version>2.8.0-SNAPSHOT</version>
