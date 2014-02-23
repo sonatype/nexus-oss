@@ -115,6 +115,10 @@ public class NexusApplication
     setStatusService(statusService);
 
     attach(getApplicationRouter(), false, statusPlexusResource);
+
+    // protecting service resources with "wall" permission
+    this.protectedPathManager.addProtectedResource("/service/local/**",
+        "noSessionCreation,authcBasic,perms[nexus:permToCatchAllUnprotecteds]");
   }
 
   private final AntPathMatcher shiroAntPathMatcher = new AntPathMatcher();

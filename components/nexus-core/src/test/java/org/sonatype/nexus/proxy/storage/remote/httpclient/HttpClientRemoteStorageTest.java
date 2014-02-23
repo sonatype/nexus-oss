@@ -141,7 +141,7 @@ public class HttpClientRemoteStorageTest
         {
           @Override
           HttpResponse executeRequest(final ProxyRepository repository, final ResourceStoreRequest request,
-                                      final HttpUriRequest httpRequest, final String baseUrl)
+                                      final HttpUriRequest httpRequest, final String baseUrl, final boolean contentRelated)
               throws RemoteStorageException
           {
             final HttpResponse httpResponse = mock(HttpResponse.class);

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins;
+package org.sonatype.nexus.guice;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,20 +19,16 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.sonatype.nexus.web.WebResource;
-import org.sonatype.plugin.metadata.GAVCoordinate;
 
 /**
  * {@link WebResource} contributed from a Nexus plugin.
  */
-@Deprecated
-public final class PluginWebResource
+class StaticWebResource
     implements WebResource
 {
   // ----------------------------------------------------------------------
   // Implementation fields
   // ----------------------------------------------------------------------
-
-  private final GAVCoordinate gav;
 
   private final URL resourceURL;
 
@@ -50,21 +46,13 @@ public final class PluginWebResource
   // Constructors
   // ----------------------------------------------------------------------
 
-  public PluginWebResource(final GAVCoordinate gav,
-                           final URL resourceURL,
-                           final String publishedPath,
-                           final String contentType)
-  {
-    this(gav, resourceURL, publishedPath, contentType, true);
+  public StaticWebResource(final URL resourceURL, final String publishedPath, final String contentType) {
+    this(resourceURL, publishedPath, contentType, true);
   }
 
-  public PluginWebResource(final GAVCoordinate gav,
-                           final URL resourceURL,
-                           final String publishedPath,
-                           final String contentType,
-                           final boolean cacheable)
+  public StaticWebResource(final URL resourceURL, final String publishedPath, final String contentType,
+      final boolean cacheable)
   {
-    this.gav = gav;
     this.resourceURL = resourceURL;
     this.publishedPath = publishedPath;
     this.contentType = contentType;
@@ -77,7 +65,7 @@ public final class PluginWebResource
       }
     }
     catch (IOException e) {
-      throw new IllegalArgumentException("Plugin resource " + resourceURL + " inaccessible", e);
+      throw new IllegalArgumentException("Static resource " + resourceURL + " inaccessible", e);
     }
   }
 
@@ -101,22 +89,16 @@ public final class PluginWebResource
     return lastModified;
   }
 
-  @Override
   public boolean isCacheable() {
     return cacheable;
   }
 
-  public InputStream getInputStream()
-      throws IOException
-  {
+  public InputStream getInputStream() throws IOException {
     return resourceURL.openStream();
   }
 
   @Override
   public String toString() {
-    return "PluginWebResource{" +
-        "gav=" + gav +
-        ", url=" + resourceURL +
-        '}';
+    return "StaticWebResource{url=" + resourceURL + '}';
   }
 }

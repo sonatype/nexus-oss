@@ -30,17 +30,16 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.Subscribe;
-import com.yammer.metrics.httpclient.InstrumentedClientConnManager;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.conn.ClientConnectionOperator;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
+import com.google.common.primitives.Ints;
+import org.apache.http.client.HttpClient;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.NoConnectionReuseStrategy;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.apache.http.params.HttpParams;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 /**
  * Default implementation of {@link Hc4Provider}.
@@ -134,13 +133,13 @@ public class Hc4ProviderImpl
    * @param userAgentBuilder         UA builder component, must not be {@code null}.
    * @param eventBus                 the event bus, must not be {@code null}.
    * @param jmxInstaller             installer to expose pool information over JMX, must not be {@code null}.
-   * @param selectors                list of {@link ClientConnectionOperatorSelector}, might be {@code null}.
+   * @param selectors                list of {@link SSLContextSelector}, might be {@code null}.
    */
   @Inject
   public Hc4ProviderImpl(final ApplicationConfiguration applicationConfiguration,
                          final UserAgentBuilder userAgentBuilder, final EventBus eventBus,
                          final PoolingClientConnectionManagerMBeanInstaller jmxInstaller,
-                         final List<ClientConnectionOperatorSelector> selectors)
+                         final List<SSLContextSelector> selectors)
   {
     super(userAgentBuilder);
     this.applicationConfiguration = Preconditions.checkNotNull(applicationConfiguration);
@@ -230,7 +229,7 @@ public class Hc4ProviderImpl
   // == Hc4Provider API
 
   @Override
-  public DefaultHttpClient createHttpClient() {
+  public HttpClient createHttpClient() {
     // connection manager will cap the max count of connections, but with this below
     // we get rid of pooling. Pooling is used in Proxy repositories only, as all other
     // components using the "shared" httpClient should not produce hiw rate of requests
@@ -246,44 +245,43 @@ public class Hc4ProviderImpl
   }
 
   @Override
-  public DefaultHttpClient createHttpClient(final boolean reuseConnections) {
-    final DefaultHttpClient result = createHttpClient(applicationConfiguration.getGlobalRemoteStorageContext());
+  public HttpClient createHttpClient(final boolean reuseConnections) {
+    final Builder builder = prepareHttpClient(applicationConfiguration.getGlobalRemoteStorageContext());
     if (!reuseConnections) {
-      result.setReuseStrategy(new NoConnectionReuseStrategy());
+      builder.getHttpClientBuilder().setConnectionReuseStrategy(new NoConnectionReuseStrategy());
     }
-    return result;
+    return builder.build();
   }
 
   @Override
-  public DefaultHttpClient createHttpClient(final RemoteStorageContext context) {
-    return createHttpClient(context, sharedConnectionManager);
+  public HttpClient createHttpClient(final RemoteStorageContext context) {
+    return prepareHttpClient(context).build();
+  }
+
+  @Override
+  public Builder prepareHttpClient(final RemoteStorageContext context) {
+    return prepareHttpClient(context, sharedConnectionManager);
   }
 
   // ==
 
   @Override
-  protected HttpParams createHttpParams(final RemoteStorageContext context) {
-    final HttpParams params = super.createHttpParams(context);
-    params.setLongParameter(ClientPNames.CONN_MANAGER_TIMEOUT, getConnectionPoolTimeout());
-    return params;
+  protected void applyConfig(final Builder builder, final RemoteStorageContext context) {
+    super.applyConfig(builder, context);
+    builder.getRequestConfigBuilder().setConnectionRequestTimeout(Ints.checkedCast(getConnectionPoolTimeout()));
   }
 
   protected ManagedClientConnectionManager createClientConnectionManager(
-      final List<ClientConnectionOperatorSelector> selectors)
+      final List<SSLContextSelector> selectors)
       throws IllegalStateException
   {
-    final SchemeRegistry schemeRegistry = new SchemeRegistry();
-    schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
-    schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory.getSystemSocketFactory()));
+    final Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
+        .register("http", PlainConnectionSocketFactory.getSocketFactory())
+        .register("https", new NexusSSLConnectionSocketFactory(
+            (javax.net.ssl.SSLSocketFactory) javax.net.ssl.SSLSocketFactory.getDefault(),
+            SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER, selectors)).build();
 
-    final ManagedClientConnectionManager connManager = new ManagedClientConnectionManager(schemeRegistry)
-    {
-      @Override
-      protected ClientConnectionOperator createConnectionOperator(final SchemeRegistry defaultSchemeRegistry) {
-        return new Hc4ClientConnectionOperator(defaultSchemeRegistry, selectors);
-      }
-    };
-
+    final ManagedClientConnectionManager connManager = new ManagedClientConnectionManager(registry);
     final int maxConnectionCount = getConnectionPoolMaxSize();
     final int perRouteConnectionCount = Math.min(getConnectionPoolSize(), maxConnectionCount);
 
@@ -294,10 +292,10 @@ public class Hc4ProviderImpl
   }
 
   private class ManagedClientConnectionManager
-      extends InstrumentedClientConnManager
+      extends PoolingHttpClientConnectionManager
   {
 
-    public ManagedClientConnectionManager(final SchemeRegistry schemeRegistry) {
+    public ManagedClientConnectionManager(final Registry<ConnectionSocketFactory> schemeRegistry) {
       super(schemeRegistry);
     }
 

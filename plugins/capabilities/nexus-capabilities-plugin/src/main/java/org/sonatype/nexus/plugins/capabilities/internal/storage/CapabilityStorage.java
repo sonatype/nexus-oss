@@ -14,11 +14,12 @@
 package org.sonatype.nexus.plugins.capabilities.internal.storage;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.Map;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
-public interface CapabilityStorage
+public interface CapabilityStorage extends Lifecycle
 {
 
   /**
@@ -27,7 +28,7 @@ public interface CapabilityStorage
    * @param item to be added
    * @throws IOException IOException If any problem encountered while read/store of capabilities storage
    */
-  public void add(CapabilityStorageItem item)
+  public CapabilityIdentity add(CapabilityStorageItem item)
       throws IOException;
 
   /**
@@ -37,7 +38,7 @@ public interface CapabilityStorage
    * @return false if capability to be updated does not exist in storage, true otherwise
    * @throws IOException If any problem encountered while read/store of capabilities storage
    */
-  public boolean update(CapabilityStorageItem item)
+  public boolean update(CapabilityIdentity id, CapabilityStorageItem item)
       throws IOException;
 
   /**
@@ -56,7 +57,7 @@ public interface CapabilityStorage
    * @return capabilities (never null)
    * @throws IOException If any problem encountered while read/store of capabilities storage
    */
-  public Collection<CapabilityStorageItem> getAll()
+  public Map<CapabilityIdentity, CapabilityStorageItem> getAll()
       throws IOException;
 
 }

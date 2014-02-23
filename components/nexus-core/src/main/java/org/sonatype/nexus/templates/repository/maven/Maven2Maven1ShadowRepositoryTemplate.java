@@ -19,7 +19,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHo
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.maven.MavenShadowRepository;
 import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepositoryConfiguration;
-import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
@@ -32,7 +32,7 @@ public class Maven2Maven1ShadowRepositoryTemplate
   public Maven2Maven1ShadowRepositoryTemplate(DefaultRepositoryTemplateProvider provider, String id,
                                               String description)
   {
-    super(provider, id, description, new Maven2ContentClass(), MavenShadowRepository.class, null);
+    super(provider, id, description, new Maven1ContentClass(), MavenShadowRepository.class, null);
   }
 
   public M1LayoutedM2ShadowRepositoryConfiguration getExternalConfiguration(boolean forWrite) {

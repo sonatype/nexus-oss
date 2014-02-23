@@ -21,13 +21,13 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.http.client.HttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * An wrapper {@link Hc4Provider} that automatically registers / unregisters JMX MBeans for each created
- * {@link HttpClient}s and {@link PoolingClientConnectionManager}.
+ * {@link HttpClient}s and {@link PoolingHttpClientConnectionManager}.
  *
  * @since 2.2
  */
@@ -45,11 +45,11 @@ public class PoolingClientConnectionManagerMBeanInstaller
   /**
    * Registers the connection manager to JMX.
    */
-  public synchronized void register(final PoolingClientConnectionManager connectionManager) {
+  public synchronized void register(final PoolingHttpClientConnectionManager connectionManager) {
     if (jmxName == null) {
       try {
         jmxName =
-            ObjectName.getInstance(JMX_DOMAIN, "name", PoolingClientConnectionManager.class.getSimpleName());
+            ObjectName.getInstance(JMX_DOMAIN, "name", PoolingHttpClientConnectionManager.class.getSimpleName());
 
         final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         server.registerMBean(new PoolingClientConnectionManagerMBeanImpl(connectionManager), jmxName);

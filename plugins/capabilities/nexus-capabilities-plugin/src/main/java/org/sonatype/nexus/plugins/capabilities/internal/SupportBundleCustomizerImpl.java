@@ -10,19 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.capabilities.internal;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.atlas.FileContentSourceSupport;
+import org.sonatype.nexus.atlas.GeneratedContentSourceSupport;
 import org.sonatype.nexus.atlas.SupportBundle;
 import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type;
 import org.sonatype.nexus.atlas.SupportBundleCustomizer;
-import org.sonatype.nexus.plugins.capabilities.internal.storage.DefaultCapabilityStorage;
+import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Writer;
+import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageConverter;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -38,11 +43,11 @@ public class SupportBundleCustomizerImpl
     extends ComponentSupport
     implements SupportBundleCustomizer
 {
-  private final DefaultCapabilityStorage capabilityStorage;
+  private final CapabilityStorageConverter converter;
 
   @Inject
-  public SupportBundleCustomizerImpl(final DefaultCapabilityStorage capabilityStorage) {
-    this.capabilityStorage = checkNotNull(capabilityStorage);
+  public SupportBundleCustomizerImpl(final CapabilityStorageConverter converter) {
+    this.converter = checkNotNull(converter);
   }
 
   /**
@@ -50,14 +55,17 @@ public class SupportBundleCustomizerImpl
    */
   @Override
   public void customize(final SupportBundle supportBundle) {
-    File file = capabilityStorage.getConfigurationFile();
-    if (!file.exists()) {
-      log.debug("skipping non-existent file: {}", file);
-    }
-
-    // capabilities.xml
-    supportBundle.add(
-        new FileContentSourceSupport(Type.CONFIG, "work/conf/" + file.getName(), file)
-    );
+    // TODO : replace bellow with direct export from for Kazuki/H2 store
+    // for now we generate an capabilities.xml out of kazuki
+    supportBundle.add(new GeneratedContentSourceSupport(Type.CONFIG, "work/conf/capabilities.xml")
+    {
+      @Override
+      protected void generate(final File file) throws Exception {
+        try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
+          new NexusCapabilitiesConfigurationXpp3Writer().write(out, converter.convertFromKazuki());
+        }
+      }
+    });
   }
+
 }

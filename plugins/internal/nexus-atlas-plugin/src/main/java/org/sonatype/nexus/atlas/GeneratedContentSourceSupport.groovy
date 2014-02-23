@@ -39,7 +39,7 @@ abstract class GeneratedContentSourceSupport
     generate(file)
   }
 
-  protected abstract void generate(File file)
+  protected abstract void generate(File file) throws Exception
 
   @Override
   long getSize() {

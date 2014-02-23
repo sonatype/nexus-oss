@@ -38,6 +38,7 @@ import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.params.HttpConnectionParams;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -77,6 +78,7 @@ public class Hc4ProviderImplTest
   }
 
   @Test
+  @Ignore("DefaultHttpClient is not in use anymore")
   public void sharedInstanceConfigurationTest() {
     setParameters();
     try {
@@ -118,6 +120,7 @@ public class Hc4ProviderImplTest
   }
 
   @Test
+  @Ignore("DefaultHttpClient is not in use anymore")
   public void createdInstanceConfigurationTest() {
     setParameters();
     try {

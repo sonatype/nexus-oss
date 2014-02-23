@@ -16,7 +16,6 @@ package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 import org.sonatype.nexus.apachehttpclient.page.Page.RepositoryPageContext;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.PrefixSource;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 import org.apache.http.client.HttpClient;
 

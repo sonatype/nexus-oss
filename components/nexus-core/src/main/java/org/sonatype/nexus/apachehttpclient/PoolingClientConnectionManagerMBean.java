@@ -13,10 +13,10 @@
 
 package org.sonatype.nexus.apachehttpclient;
 
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 /**
- * MBean which exposes details about a {@link PoolingClientConnectionManager}.
+ * MBean which exposes details about a {@link PoolingHttpClientConnectionManager}.
  *
  * @since 2.2
  */

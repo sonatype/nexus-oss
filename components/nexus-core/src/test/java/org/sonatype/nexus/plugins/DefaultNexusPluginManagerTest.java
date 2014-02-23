@@ -19,18 +19,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.sonatype.nexus.guice.AbstractInterceptorModule;
-import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.repository.NexusPluginRepository;
 import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactException;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugins.model.PluginDependency;
 import org.sonatype.plugins.model.PluginMetadata;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.codehaus.plexus.DefaultPlexusContainer;
+import org.eclipse.sisu.inject.MutableBeanLocator;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -49,9 +47,6 @@ public class DefaultNexusPluginManagerTest
 {
 
   @Mock
-  private RepositoryTypeRegistry repositoryTypeRegistry;
-
-  @Mock
   private EventBus eventBus;
 
   @Mock
@@ -61,15 +56,15 @@ public class DefaultNexusPluginManagerTest
   private NexusPluginRepository nexusPluginRepository;
 
   @Mock
-  private MimeSupport mimeSupport;
+  private MutableBeanLocator locator;
 
   @Test
   public void pluginDependenciesAreActivatedByGA()
       throws Exception
   {
     final DefaultNexusPluginManager underTest = new DefaultNexusPluginManager(
-        repositoryTypeRegistry, eventBus, pluginRepositoryManager,
-        new DefaultPlexusContainer(), mimeSupport, new HashMap<String, String>(),
+        eventBus, pluginRepositoryManager, locator,
+        new HashMap<String, String>(),
         Collections.<AbstractInterceptorModule>emptyList()
     )
     {

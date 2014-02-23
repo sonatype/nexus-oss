@@ -188,9 +188,8 @@ public class HttpClientRemoteStorage
     }
 
     final HttpGet method = new HttpGet(url);
-    method.getParams().setBooleanParameter(CONTENT_RETRIEVAL_MARKER_KEY, true);
 
-    final HttpResponse httpResponse = executeRequest(repository, request, method, baseUrl);
+    final HttpResponse httpResponse = executeRequest(repository, request, method, baseUrl, true);
 
     if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
       InputStream is;
@@ -454,7 +453,7 @@ public class HttpClientRemoteStorage
    */
   @VisibleForTesting
   HttpResponse executeRequest(final ProxyRepository repository, final ResourceStoreRequest request,
-                              final HttpUriRequest httpRequest, final String baseUrl) throws RemoteStorageException
+                              final HttpUriRequest httpRequest, final String baseUrl, final boolean contentRequest) throws RemoteStorageException
   {
     final Timer timer = timer(repository, httpRequest, baseUrl);
     final TimerContext timerContext = timer.time();
@@ -463,7 +462,7 @@ public class HttpClientRemoteStorage
       stopwatch = new Stopwatch().start();
     }
     try {
-      return doExecuteRequest(repository, request, httpRequest);
+      return doExecuteRequest(repository, request, httpRequest, contentRequest);
     }
     finally {
       timerContext.stop();
@@ -478,7 +477,7 @@ public class HttpClientRemoteStorage
   }
 
   private HttpResponse doExecuteRequest(final ProxyRepository repository, final ResourceStoreRequest request,
-                                        final HttpUriRequest httpRequest)
+                                        final HttpUriRequest httpRequest, final boolean contentRequest)
       throws RemoteStorageException
   {
     final URI methodUri = httpRequest.getURI();
@@ -500,6 +499,9 @@ public class HttpClientRemoteStorage
     try {
       final BasicHttpContext httpContext = new BasicHttpContext();
       httpContext.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, repository);
+      if (contentRequest) {
+        httpContext.setAttribute(CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
+      }
 
       httpResponse = httpClient.execute(httpRequest, httpContext);
       final int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -566,7 +568,7 @@ public class HttpClientRemoteStorage
                                                 final String baseUrl)
       throws RemoteStorageException
   {
-    final HttpResponse httpResponse = executeRequest(repository, request, httpRequest, baseUrl);
+    final HttpResponse httpResponse = executeRequest(repository, request, httpRequest, baseUrl, false);
     release(httpResponse);
     return httpResponse;
   }
