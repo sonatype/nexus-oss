@@ -98,6 +98,8 @@ public class AnalyticsModule
     return builder.build();
   }
 
+  // FIXME: Use helper component or redefine using ApplicationDirectories
+
   private static class JdbiConfigurationProvider
       implements Provider<JdbiDataSourceConfiguration>
   {
