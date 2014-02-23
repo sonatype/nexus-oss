@@ -66,7 +66,7 @@ public class ApplicationDirectoriesImpl
     log.debug("Work dir: {}", this.workDir);
 
     this.tempDir = resolve(tempDir, true);
-    log.debug("Tmp dir: {}", this.tempDir);
+    log.debug("Temp dir: {}", this.tempDir);
   }
 
   @Nullable
