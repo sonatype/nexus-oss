@@ -100,7 +100,7 @@ public class ApplicationDirectoriesImpl
   private File resolve(File dir, final boolean create) {
     checkNotNull(dir);
 
-    log.debug("Resolving directory: {}; create={}", dir, create);
+    log.debug("Resolving directory: {}; create: {}", dir, create);
 
     try {
       dir = dir.getCanonicalFile();
