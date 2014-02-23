@@ -1,4 +1,4 @@
-/*
+/**
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -10,19 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global define*/
-define('ext/ux',
-      ['extjs',
-       'ext/ux/browsebutton',
-       'ext/ux/gridvalidator',
-       'ext/ux/lovcombo',
-       'ext/ux/multiselecttree',
-        'ext/ux/TabCloseMenu',
-        'ext/ux/statusbar',
-        'ext/ux/CheckColumn',
-        'ext/ux/RowExpander'
-      ],
-      function(Ext) {
-        Ext.namespace('Ext.ux');
-        return Ext;
-      });
+
+package org.sonatype.nexus.analytics.internal
+
+import org.sonatype.nexus.log.LogConfigurationCustomizer
+import org.sonatype.nexus.log.LoggerLevel
+import org.sonatype.sisu.goodies.common.ComponentSupport
+
+import javax.inject.Named
+import javax.inject.Singleton
+
+/**
+ * Analytics {@link LogConfigurationCustomizer}.
+ *
+ * @since 2.8
+ */
+@Named
+@Singleton
+class LogConfigurationCustomizerImpl
+    extends ComponentSupport
+    implements LogConfigurationCustomizer
+{
+  @Override
+  void customize(LogConfigurationCustomizer.Configuration configuration) {
+    configuration.setLoggerLevel('org.sonatype.nexus.analytics', LoggerLevel.DEFAULT);
+  }
+}

@@ -33,6 +33,7 @@
     <module>nexus-kazuki-plugin</module>
     <module>nexus-plexusplugin-plugin</module>
     <module>nexus-atlas-plugin</module>
+    <module>nexus-analytics-plugin</module>
     <module>nexus-wonderland-model</module>
     <module>nexus-wonderland-plugin</module>
   </modules>

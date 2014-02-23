@@ -55,6 +55,7 @@
         <include>*:nexus-ui-extjs3-plugin</include>
         <include>*:nexus-capabilities-plugin</include>
         <include>*:nexus-atlas-plugin</include>
+        <include>*:nexus-analytics-plugin</include>
         <include>*:nexus-wonderland-plugin</include>
       </includes>
     </dependencySet>

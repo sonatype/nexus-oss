@@ -13,7 +13,11 @@
 /*global define*/
 define('Nexus/configuration/Ajax', ['extjs'], function(Ext) {
   Ext.Ajax.defaultHeaders = {
-    'accept' : 'application/json,application/vnd.siesta-error-v1+json,application/vnd.siesta-validation-errors-v1+json'
+    'accept' : 'application/json,application/vnd.siesta-error-v1+json,application/vnd.siesta-validation-errors-v1+json',
+
+    // HACK: Setting request header to allow analytics to tell if the request came from the UI or not
+    // HACK: This has some issues, will only catch ajax requests, etc... but may be fine for now
+    'X-Nexus-UI': 'true'
   };
 
   Ext.Ajax.on('requestexception', function(connection, response) {

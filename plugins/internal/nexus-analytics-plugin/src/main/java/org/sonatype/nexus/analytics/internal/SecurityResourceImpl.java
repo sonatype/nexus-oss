@@ -10,19 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global define*/
-define('ext/ux',
-      ['extjs',
-       'ext/ux/browsebutton',
-       'ext/ux/gridvalidator',
-       'ext/ux/lovcombo',
-       'ext/ux/multiselecttree',
-        'ext/ux/TabCloseMenu',
-        'ext/ux/statusbar',
-        'ext/ux/CheckColumn',
-        'ext/ux/RowExpander'
-      ],
-      function(Ext) {
-        Ext.namespace('Ext.ux');
-        return Ext;
-      });
+
+package org.sonatype.nexus.analytics.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.analytics.AnalyticsPlugin;
+import org.sonatype.nexus.plugin.support.StaticSecurityResourceSupport;
+import org.sonatype.security.realms.tools.StaticSecurityResource;
+
+/**
+ * Analytics {@link StaticSecurityResource}.
+ *
+ * @since 2.8
+ */
+@Named
+@Singleton
+public class SecurityResourceImpl
+    extends StaticSecurityResourceSupport
+{
+  @Inject
+  public SecurityResourceImpl(final AnalyticsPlugin plugin) {
+    super(plugin);
+  }
+}

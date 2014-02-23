@@ -1,4 +1,4 @@
-/*
+/**
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2013 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -10,19 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global define*/
-define('ext/ux',
-      ['extjs',
-       'ext/ux/browsebutton',
-       'ext/ux/gridvalidator',
-       'ext/ux/lovcombo',
-       'ext/ux/multiselecttree',
-        'ext/ux/TabCloseMenu',
-        'ext/ux/statusbar',
-        'ext/ux/CheckColumn',
-        'ext/ux/RowExpander'
-      ],
-      function(Ext) {
-        Ext.namespace('Ext.ux');
-        return Ext;
-      });
+def url = new URL("http://localhost:8081/nexus/service/local/status")
+def times = 1_000_000
+
+def start = new Date()
+for (int i in 0..times) {
+  url.text
+}
+def stop = new Date()
+def e = stop.time - start.time
+println "elasped $e ms"

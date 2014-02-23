@@ -10,19 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global define*/
-define('ext/ux',
-      ['extjs',
-       'ext/ux/browsebutton',
-       'ext/ux/gridvalidator',
-       'ext/ux/lovcombo',
-       'ext/ux/multiselecttree',
-        'ext/ux/TabCloseMenu',
-        'ext/ux/statusbar',
-        'ext/ux/CheckColumn',
-        'ext/ux/RowExpander'
-      ],
-      function(Ext) {
-        Ext.namespace('Ext.ux');
-        return Ext;
-      });
+package org.sonatype.nexus.analytics.internal;
+
+import java.util.Map;
+
+import org.sonatype.nexus.capability.support.CapabilityConfigurationSupport;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * {@link AutoSubmitCapability} configuration.
+ *
+ * @since 2.8
+ */
+public class AutoSubmitCapabilityConfiguration
+  extends CapabilityConfigurationSupport
+{
+  public AutoSubmitCapabilityConfiguration(final Map<String, String> properties) {
+    checkNotNull(properties);
+  }
+}
