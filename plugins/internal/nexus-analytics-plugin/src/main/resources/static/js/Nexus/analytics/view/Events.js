@@ -178,7 +178,7 @@ NX.define('Nexus.analytics.view.Events', {
           id: 'nx-analytics-view-events-button-export',
           text: 'Export',
           tooltip: 'Export and download event data',
-          iconCls: icons.get('export').cls
+          iconCls: icons.get('_export').cls
         },
         '-',
         {
