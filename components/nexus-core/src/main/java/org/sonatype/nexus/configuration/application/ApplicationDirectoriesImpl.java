@@ -51,7 +51,7 @@ public class ApplicationDirectoriesImpl
   @Inject
   public ApplicationDirectoriesImpl(final @Named("${bundleBasedir}") @Nullable File installDir,
                                     final @Named("${nexus-work}") File workDir,
-                                    final @Named("${java.io.tmpdir") File tempDir)
+                                    final @Named("${java.io.tmpdir}") File tempDir)
   {
     if (installDir != null) {
       this.installDir = resolve(installDir, false);
