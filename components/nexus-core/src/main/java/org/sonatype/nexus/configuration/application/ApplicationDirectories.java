@@ -25,7 +25,9 @@ import javax.annotation.Nullable;
 public interface ApplicationDirectories
 {
   /**
-   * Installation directory.  This may be null in WAR-based deployments.
+   * Installation directory.
+   *
+   * Null for WAR-based deployments.
    */
   @Nullable
   File getInstallDirectory();
@@ -40,7 +42,16 @@ public interface ApplicationDirectories
    */
   File getWorkDirectory();
 
+  /**
+   * Work sub-directory.
+   *
+   * @param path   Sub-directory path.
+   * @param create True to create the directory if it does not exist.
+   */
   File getWorkDirectory(String path, boolean create);
 
+  /**
+   * Work sub-directory.
+   */
   File getWorkDirectory(String path);
 }
