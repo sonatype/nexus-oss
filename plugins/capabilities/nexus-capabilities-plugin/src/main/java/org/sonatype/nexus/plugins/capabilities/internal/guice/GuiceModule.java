@@ -14,18 +14,15 @@
 package org.sonatype.nexus.plugins.capabilities.internal.guice;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.plugins.capabilities.internal.ActivationConditionHandlerFactory;
 import org.sonatype.nexus.plugins.capabilities.internal.ValidityConditionHandlerFactory;
 import org.sonatype.nexus.plugins.capabilities.internal.validator.ValidatorFactory;
-import org.sonatype.nexus.util.file.DirSupport;
 
-import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
@@ -36,10 +33,8 @@ import io.kazuki.v0.store.jdbi.JdbiDataSourceConfiguration;
 import io.kazuki.v0.store.keyvalue.KeyValueStoreConfiguration;
 import io.kazuki.v0.store.lifecycle.LifecycleModule;
 import io.kazuki.v0.store.sequence.SequenceServiceConfiguration;
-import org.eclipse.sisu.Parameters;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.plugins.capabilities.internal.storage.DefaultCapabilityStorage.CAPABILITY_SCHEMA;
 
 /**
@@ -94,19 +89,17 @@ public class GuiceModule
     return builder.build();
   }
 
+
+  // TODO: Extract helper for jdbi config, as the location for databases will be normalized
+
   private static class JdbiConfigurationProvider
       implements Provider<JdbiDataSourceConfiguration>
   {
-    private final File workdir;
-
-    // HACK: Using custom directory resolution, as ApplicationConfiguration depends on way too much
+    private final ApplicationDirectories directories;
 
     @Inject
-    public JdbiConfigurationProvider(final @Parameters Map<String, String> parameters) {
-      checkNotNull(parameters);
-      String location = parameters.get("nexus-work");
-      checkState(location != null, "Missing nexus-work parameter");
-      this.workdir = new File(location);
+    public JdbiConfigurationProvider(final ApplicationDirectories directories) {
+      this.directories = checkNotNull(directories);
     }
 
     @Override
@@ -115,16 +108,9 @@ public class GuiceModule
 
       builder.withJdbcDriver("org.h2.Driver");
 
-      File basedir = new File(workdir, "db");
-      try {
-        DirSupport.mkdir(basedir.toPath());
-        basedir = basedir.getCanonicalFile();
-      }
-      catch (IOException e) {
-        throw Throwables.propagate(e);
-      }
-      File dir = new File(basedir, "capabilities/capabilities");
-      builder.withJdbcUrl("jdbc:h2:" + dir.getAbsolutePath());
+      File dir = directories.getWorkDirectory("db/capabilities");
+      File file = new File(dir, dir.getName());
+      builder.withJdbcUrl("jdbc:h2:" + file.getAbsolutePath());
 
       builder.withJdbcUser("root");
       builder.withJdbcPassword("not_really_used");

@@ -58,6 +58,8 @@ public abstract class NexusTestSupport
 
   private File nexusappHomeDir = null;
 
+  private File tempDir = null;
+
   @Override
   protected void customizeContext(Context ctx) {
     super.customizeContext(ctx);
@@ -70,6 +72,7 @@ public abstract class NexusTestSupport
     confHomeDir = new File(workHomeDir, "conf");
     runtimeHomeDir = new File(plexusHomeDir, "runtime");
     nexusappHomeDir = new File(plexusHomeDir, "nexus-app");
+    tempDir = new File(workHomeDir, "tmp");
 
     ctx.put(WORK_CONFIGURATION_KEY, workHomeDir.getAbsolutePath());
     ctx.put(APPS_CONFIGURATION_KEY, appsHomeDir.getAbsolutePath());
@@ -77,6 +80,7 @@ public abstract class NexusTestSupport
     ctx.put(SECURITY_XML_FILE, getNexusSecurityConfiguration());
     ctx.put(RUNTIME_CONFIGURATION_KEY, runtimeHomeDir.getAbsolutePath());
     ctx.put(NEXUS_APP_CONFIGURATION_KEY, nexusappHomeDir.getAbsolutePath());
+    ctx.put("java.io.tmpdir", tempDir.getAbsolutePath());
   }
 
   @Override
@@ -101,6 +105,7 @@ public abstract class NexusTestSupport
     confHomeDir.mkdirs();
     runtimeHomeDir.mkdirs();
     nexusappHomeDir.mkdirs();
+    tempDir.mkdirs();
   }
 
   @Override

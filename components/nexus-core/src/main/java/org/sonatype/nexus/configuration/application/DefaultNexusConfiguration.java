@@ -69,7 +69,6 @@ import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
-import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
@@ -82,12 +81,10 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.eclipse.sisu.Parameters;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -136,9 +133,7 @@ public class DefaultNexusConfiguration
 
   private final ClassLoader uberClassLoader;
 
-  private final File installDirectory;
-
-  private final File workingDirectory;
+  private final ApplicationDirectories applicationDirectories;
 
   // ===
 
@@ -156,11 +151,6 @@ public class DefaultNexusConfiguration
    * The config dir
    */
   private File configurationDirectory;
-
-  /**
-   * The temp dir
-   */
-  private File temporaryDirectory;
 
   /**
    * Names of the conf files
@@ -191,11 +181,10 @@ public class DefaultNexusConfiguration
                                    final RepositoryRegistry repositoryRegistry,
                                    final List<ScheduledTaskDescriptor> scheduledTaskDescriptors,
                                    final SecuritySystem securitySystem,
-                                   final @Parameters Map<String, String> parameters,
                                    final VetoFormatter vetoFormatter,
                                    final List<ConfigurationModifier> configurationModifiers,
                                    final @Named("nexus-uber") ClassLoader uberClassLoader,
-                                   final @Named("${bundleBasedir}") @Nullable File installDirectory)
+                                   final ApplicationDirectories applicationDirectories)
   {
     this.cacheManager = checkNotNull(cacheManager);
     this.eventBus = checkNotNull(eventBus);
@@ -211,70 +200,9 @@ public class DefaultNexusConfiguration
     this.vetoFormatter = checkNotNull(vetoFormatter);
     this.configurationModifiers = checkNotNull(configurationModifiers);
     this.uberClassLoader = checkNotNull(uberClassLoader);
+    this.applicationDirectories = checkNotNull(applicationDirectories);
 
-    // init
-    if (installDirectory != null) {
-      this.installDirectory = canonicalize(installDirectory);
-    }
-    else {
-      this.installDirectory = null;
-    }
-
-    try {
-      final File workingDirectory = new File(parameters.get("nexus-work"));
-      this.workingDirectory = canonicalize(workingDirectory);
-      if (!workingDirectory.isDirectory()) {
-        forceMkdir(workingDirectory);
-      }
-
-      this.temporaryDirectory = canonicalize(new File(System.getProperty("java.io.tmpdir")));
-      if (!temporaryDirectory.isDirectory()) {
-        forceMkdir(temporaryDirectory);
-      }
-
-      this.configurationDirectory = canonicalize(new File(getWorkingDirectory(), "conf"));
-      if (!configurationDirectory.isDirectory()) {
-        forceMkdir(configurationDirectory);
-      }
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
-  }
-
-  private File canonicalize(final File file) {
-    try {
-      return file.getCanonicalFile();
-    }
-    catch (IOException e) {
-      final String message =
-          "\r\n******************************************************************************\r\n"
-              + "* Could not canonicalize file [ "
-              + file
-              + "]!!!! *\r\n"
-              + "* Nexus cannot function properly until the process has read+write permissions to this folder *\r\n"
-              + "******************************************************************************";
-      log.error(message, e);
-      throw Throwables.propagate(e);
-    }
-  }
-
-  private File forceMkdir(final File directory) {
-    try {
-      DirSupport.mkdir(directory.toPath());
-      return directory;
-    }
-    catch (IOException e) {
-      final String message =
-          "\r\n******************************************************************************\r\n"
-              + "* Could not create directory [ "
-              + directory
-              + "]!!!! *\r\n"
-              + "* Nexus cannot function properly until the process has read+write permissions to this folder *\r\n"
-              + "******************************************************************************";
-      log.error(message, e);
-      throw Throwables.propagate(e);
-    }
+    this.configurationDirectory = applicationDirectories.getWorkDirectory("conf");
   }
 
   @Override
@@ -489,32 +417,33 @@ public class DefaultNexusConfiguration
 
   @Nullable
   @Override
+  @Deprecated
   public File getInstallDirectory() {
-    return this.installDirectory;
+    return applicationDirectories.getInstallDirectory();
   }
 
   @Override
+  @Deprecated
   public File getWorkingDirectory() {
-    return workingDirectory;
+    return applicationDirectories.getWorkDirectory();
   }
 
   @Override
+  @Deprecated
   public File getWorkingDirectory(String key) {
-    return getWorkingDirectory(key, true);
+    return applicationDirectories.getWorkDirectory(key);
   }
 
   @Override
+  @Deprecated
   public File getWorkingDirectory(final String key, final boolean createIfNeeded) {
-    final File keyedDirectory = new File(getWorkingDirectory(), key);
-    if (createIfNeeded) {
-      forceMkdir(keyedDirectory);
-    }
-    return canonicalize(keyedDirectory);
+    return applicationDirectories.getWorkDirectory(key, createIfNeeded);
   }
 
   @Override
+  @Deprecated
   public File getTemporaryDirectory() {
-    return temporaryDirectory;
+    return applicationDirectories.getTemporaryDirectory();
   }
 
   @Override

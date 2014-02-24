@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.analytics.EventStore;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.web.internal.SecurityFilter;
 
 import com.google.inject.AbstractModule;
@@ -32,6 +32,8 @@ import io.kazuki.v0.store.jdbi.JdbiDataSourceConfiguration;
 import io.kazuki.v0.store.keyvalue.KeyValueStoreConfiguration;
 import io.kazuki.v0.store.lifecycle.LifecycleModule;
 import io.kazuki.v0.store.sequence.SequenceServiceConfiguration;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Analytics guice module.
@@ -98,16 +100,14 @@ public class AnalyticsModule
     return builder.build();
   }
 
-  // FIXME: Use helper component or redefine using ApplicationDirectories
-
   private static class JdbiConfigurationProvider
       implements Provider<JdbiDataSourceConfiguration>
   {
-    private final ApplicationConfiguration config;
+    private final ApplicationDirectories directories;
 
     @Inject
-    public JdbiConfigurationProvider(final ApplicationConfiguration config) {
-      this.config = config;
+    public JdbiConfigurationProvider(final ApplicationDirectories directories) {
+      this.directories = checkNotNull(directories);
     }
 
     @Override
@@ -116,9 +116,9 @@ public class AnalyticsModule
 
       builder.withJdbcDriver("org.h2.Driver");
 
-      File basedir = config.getWorkingDirectory("db");
-      File dir = new File(basedir, "analytics/analytics");
-      builder.withJdbcUrl("jdbc:h2:" + dir.getAbsolutePath());
+      File dir = directories.getWorkDirectory("db/analytics");
+      File file = new File(dir, dir.getName());
+      builder.withJdbcUrl("jdbc:h2:" + file.getAbsolutePath());
 
       builder.withJdbcUser("root");
       builder.withJdbcPassword("not_really_used");
