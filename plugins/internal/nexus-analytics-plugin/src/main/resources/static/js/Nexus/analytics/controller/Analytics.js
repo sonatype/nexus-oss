@@ -216,7 +216,7 @@ NX.define('Nexus.analytics.controller.Analytics', {
       title: 'Export events',
       msg: 'Export and download analytics event data?<br/>No data will be sent to Sonatype.',
       buttons: Ext.Msg.OKCANCEL,
-      icon: icons.get('export').variant('x32').cls,
+      icon: icons.get('_export').variant('x32').cls,
       fn: function (btn) {
         if (btn === 'ok') {
           Ext.Ajax.request({
