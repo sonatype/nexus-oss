@@ -38,7 +38,7 @@
       <dependency>
         <groupId>io.kazuki</groupId>
         <artifactId>kazuki-db</artifactId>
-        <version>0.0.22</version>
+        <version>0.0.23</version>
       </dependency>
 
       <dependency>
