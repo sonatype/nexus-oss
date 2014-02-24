@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
@@ -619,19 +620,14 @@ public class DefaultRepositoryRouter
 
   }
 
-  public boolean authorizePath(ResourceStoreRequest request, Action action) {
-    TargetSet matched = this.getTargetsForRequest(request);
-
+  @Override
+  public boolean authorizePath(final ResourceStoreRequest request, final Action action) {
     try {
-      RequestRoute route = this.getRequestRouteForRequest(request);
-
-      if (route.getTargetedRepository() != null) {
-        // if this repository is contained in any group, we need to get those targets, and tweak the TargetMatch
+      final RequestRoute route = getRequestRouteForRequest(request);
+      if (route.isRepositoryHit()) {
         request.pushRequestPath(route.getRepositoryPath());
         try {
-          matched.addTargetSet(
-              this.itemAuthorizer.getGroupsTargetSet(route.getTargetedRepository(), request)
-          );
+          return itemAuthorizer.authorizePath(route.getTargetedRepository(), request, action);
         }
         finally {
           request.popRequestPath();
@@ -639,16 +635,9 @@ public class DefaultRepositoryRouter
       }
     }
     catch (ItemNotFoundException e) {
-      // ignore it, do nothing
-
-      // cstamas says: above is untrue. It means that user should get 404, but there is no
-      // proper solution to do it from this method! The culprit is that "view privilege" piggybacks
-      // on the getRequestRouteForRequest() method that is not meant for this, it does it's job
-      // well for routing....
-      // So, we still have a bug here (NXCM-3600), and I am leaving it intact, since repo-level
-      // security will catch any non authorized ones as well.
+      // ignore this
     }
-
-    return this.itemAuthorizer.authorizePath(matched, action);
+    // we did not hit any repository, so we are on virtual paths, allow access
+    return true;
   }
 }
