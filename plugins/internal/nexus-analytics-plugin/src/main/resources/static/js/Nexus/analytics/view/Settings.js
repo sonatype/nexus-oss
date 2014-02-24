@@ -23,10 +23,6 @@ NX.define('Nexus.analytics.view.Settings', {
     'Nexus.LogAwareMixin'
   ],
 
-  requires: [
-    'Nexus.analytics.Icons'
-  ],
-
   xtype: 'nx-analytics-view-settings',
   title: 'Settings',
   id: 'nx-analytics-view-settings',
@@ -39,8 +35,7 @@ NX.define('Nexus.analytics.view.Settings', {
    * @override
    */
   initComponent: function () {
-    var me = this,
-        icons = Nexus.analytics.Icons;
+    var me = this;
 
     Ext.apply(me, {
       items: [
@@ -50,6 +45,7 @@ NX.define('Nexus.analytics.view.Settings', {
           style: {
             padding: '10px'
           },
+
           defaults: {
             hideLabel: true,
             inputValue: 'true' // use 'true' instead of 'on'

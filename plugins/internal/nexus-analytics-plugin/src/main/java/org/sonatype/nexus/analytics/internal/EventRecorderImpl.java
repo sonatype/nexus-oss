@@ -45,7 +45,7 @@ public class EventRecorderImpl
 
   public void setEnabled(final boolean enabled) {
     this.enabled = enabled;
-    log.info("Enabled: {}", enabled);
+    log.debug("Enabled: {}", enabled);
   }
 
   @Override
