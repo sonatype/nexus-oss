@@ -81,7 +81,7 @@ public class RestRequestCollector
           .set("method", httpRequest.getMethod())
           .set("path", getPath(httpRequest))
           .set("ui", ui);
-      startTime = System.currentTimeMillis();
+      startTime = System.nanoTime();
     }
 
     try {
@@ -90,7 +90,7 @@ public class RestRequestCollector
     finally {
       if (builder != null) {
         builder.set("status", httpResponse.getStatus());
-        builder.set("duration", System.currentTimeMillis() - startTime);
+        builder.set("duration", System.nanoTime() - startTime);
         recorder.record(builder.build());
       }
     }
