@@ -51,7 +51,7 @@ public class ApplicationDirectoriesImpl
   @Inject
   public ApplicationDirectoriesImpl(final @Named("${bundleBasedir}") @Nullable File installDir,
                                     final @Named("${nexus-work}") File workDir,
-                                    final @Named("${java.io.tmpdir}") File tempDir)
+                                    final @Named("${java.io.tmpdir}") @Nullable File tempDir)
   {
     if (installDir != null) {
       this.installDir = resolve(installDir, false);
@@ -65,7 +65,13 @@ public class ApplicationDirectoriesImpl
     this.workDir = resolve(workDir, true);
     log.debug("Work dir: {}", this.workDir);
 
-    this.tempDir = resolve(tempDir, true);
+    if (tempDir != null) {
+      this.tempDir = resolve(tempDir, true);
+    }
+    else {
+      // edge-case for injected-tests which do not have java.io.tmpdir set
+      this.tempDir = resolve(new File(workDir, "tmp"), true);
+    }
     log.debug("Temp dir: {}", this.tempDir);
   }
 
