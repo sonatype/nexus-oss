@@ -13,13 +13,8 @@
 
 package org.sonatype.nexus.plugins.capabilities.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import io.kazuki.v0.store.lifecycle.Lifecycle;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.eclipse.sisu.EagerSingleton;
 
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageConverter;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.DefaultCapabilityStorage;
@@ -29,6 +24,9 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Provider;
+import org.eclipse.sisu.EagerSingleton;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Loads configuration when Nexus is initialized.
@@ -40,8 +38,8 @@ import com.google.inject.Provider;
 public class CapabilityRegistryBooter
 {
   private final Provider<DefaultCapabilityRegistry> capabilityRegistry;
+
   private final DefaultCapabilityStorage capabilityStorage;
-  private final Lifecycle lifecycle;
 
   private final CapabilityStorageConverter storageConverter;
 
@@ -49,12 +47,10 @@ public class CapabilityRegistryBooter
   public CapabilityRegistryBooter(final Provider<DefaultCapabilityRegistry> capabilityRegistry,
                                   final DefaultCapabilityStorage capabilityStorage,
                                   final EventBus eventBus,
-                                  final @Named("nexuscapability") Lifecycle lifecycle,
                                   final CapabilityStorageConverter storageConverter)
   {
     this.capabilityRegistry = capabilityRegistry;
     this.capabilityStorage = checkNotNull(capabilityStorage);
-    this.lifecycle = lifecycle;
     this.storageConverter = checkNotNull(storageConverter);
     checkNotNull(eventBus).register(this);
   }
@@ -62,8 +58,6 @@ public class CapabilityRegistryBooter
   @Subscribe
   public void handle(final NexusInitializedEvent event) {
     try {
-      lifecycle.init();
-      lifecycle.start();
       capabilityStorage.start();
       storageConverter.convertToKazukiIfNecessary();
       capabilityRegistry.get().load();
@@ -77,8 +71,6 @@ public class CapabilityRegistryBooter
   public void handle(final NexusStoppingEvent event) {
     try {
       capabilityStorage.stop();
-      lifecycle.shutdown();
-      lifecycle.stop();
     }
     catch (final Exception e) {
       throw new RuntimeException("Could not shutdown", e);

@@ -32,6 +32,7 @@ import io.kazuki.v0.store.Key;
 import io.kazuki.v0.store.keyvalue.KeyValueIterable;
 import io.kazuki.v0.store.keyvalue.KeyValuePair;
 import io.kazuki.v0.store.keyvalue.KeyValueStore;
+import io.kazuki.v0.store.lifecycle.Lifecycle;
 import io.kazuki.v0.store.schema.SchemaStore;
 import io.kazuki.v0.store.schema.TypeValidation;
 
@@ -48,20 +49,27 @@ public class DefaultCapabilityStorage
 {
   public static final String CAPABILITY_SCHEMA = "capability";
 
+  private final Lifecycle lifecycle;
+
   private final KeyValueStore keyValueStore;
 
   private final SchemaStore schemaStore;
 
   @Inject
-  public DefaultCapabilityStorage(final @Named("nexuscapability") KeyValueStore keyValueStore,
+  public DefaultCapabilityStorage(final @Named("nexuscapability") Lifecycle lifecycle,
+                                  final @Named("nexuscapability") KeyValueStore keyValueStore,
                                   final @Named("nexuscapability") SchemaStore schemaStore)
   {
+    this.lifecycle = checkNotNull(lifecycle);
     this.keyValueStore = checkNotNull(keyValueStore);
     this.schemaStore = checkNotNull(schemaStore);
   }
 
   @Override
   protected void doStart() throws Exception {
+    lifecycle.init();
+    lifecycle.start();
+
     if (schemaStore.retrieveSchema(CAPABILITY_SCHEMA) == null) {
       Schema schema = new Schema(Collections.<Attribute>emptyList());
 
@@ -69,6 +77,12 @@ public class DefaultCapabilityStorage
 
       schemaStore.createSchema(CAPABILITY_SCHEMA, schema);
     }
+  }
+
+  @Override
+  protected void doStop() throws Exception {
+    lifecycle.stop();
+    lifecycle.shutdown();
   }
 
   @Override
