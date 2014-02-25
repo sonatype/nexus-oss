@@ -34,7 +34,7 @@ extends SiestaClient
   SettingsXO get()
 
   @PUT
-  void set(SettingsXO settings);
+  void set(SettingsXO settings)
 
   @ToString(includePackage = false, includeNames = true)
   static class SettingsXO

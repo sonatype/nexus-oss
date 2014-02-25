@@ -42,8 +42,8 @@ extends AnalyticsITSupport
   void whenCollectingIsEnabledEventsAreCollected() {
 
     configureAnalytics(true, false)
-    EventsXO before = allEvents
-    EventsXO after = allEvents
+    EventsXO before = getAllEvents()
+    EventsXO after = getAllEvents()
 
     assertThat after.count, is(greaterThan(before.count))
     assertThat pathsOf(after), hasItem('GET|/service/siesta/analytics/events')
@@ -58,8 +58,8 @@ extends AnalyticsITSupport
     configureAnalytics(false, false)
 
     thrown.expect UniformInterfaceException.class
-    thrown.expectMessage 'Not started';
-    allEvents
+    thrown.expectMessage 'Not started'
+    getAllEvents()
   }
 
   /**
@@ -70,8 +70,8 @@ extends AnalyticsITSupport
 
     configureAnalytics(true, false)
     // access events a couple of times, which in turn will generate events
-    allEvents
-    allEvents
+    getAllEvents()
+    getAllEvents()
 
     ExportXO export = events.export()
 
