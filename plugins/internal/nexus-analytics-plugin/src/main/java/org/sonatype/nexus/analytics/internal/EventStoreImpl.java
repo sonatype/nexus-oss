@@ -80,8 +80,8 @@ public class EventStoreImpl
 
   @Override
   protected void doStop() throws Exception {
-    lifecycle.shutdown();
     lifecycle.stop();
+    lifecycle.shutdown();
   }
 
   public JournalStore getJournalStore() {
