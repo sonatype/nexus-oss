@@ -10,18 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.analytics
 
 import com.sun.jersey.api.client.UniformInterfaceException
 import org.junit.Test
-import org.sonatype.nexus.client.core.subsystem.content.Location
 import org.sonatype.nexus.testsuite.analytics.client.Events.EventsXO
 import org.sonatype.nexus.testsuite.analytics.client.Events.ExportXO
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.*
-import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation
 
 /**
  * Analytics related ITs.
@@ -31,12 +30,6 @@ import static org.sonatype.nexus.client.core.subsystem.content.Location.reposito
 class AnalyticsIT
 extends AnalyticsITSupport
 {
-
-  private static final String AOP_POM = 'aopalliance/aopalliance/1.0/aopalliance-1.0.pom'
-
-  private static final String AOP_CONTENT_PATH = 'content/repositories/releases' + AOP_POM
-
-  private static final Location AOP_POM_LOCATION = repositoryLocation('releases', AOP_POM)
 
   AnalyticsIT(String nexusBundleCoordinates) {
     super(nexusBundleCoordinates)
