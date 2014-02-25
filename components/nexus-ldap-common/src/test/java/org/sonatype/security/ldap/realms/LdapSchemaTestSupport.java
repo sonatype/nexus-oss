@@ -116,16 +116,9 @@ public abstract class LdapSchemaTestSupport
       throws Exception
   {
 
-    UsernamePasswordToken upToken = new UsernamePasswordToken("brianf", "brianf123");
-
-    AuthenticationInfo ai = realm.getAuthenticationInfo(upToken);
-
-    assertNull(ai.getCredentials());
-
-    // String password = new String( (char[]) ai.getCredentials() );
-    //
-    // // password is plain text
-    // assertEquals( "brianf123", password );
+    final UsernamePasswordToken upToken = new UsernamePasswordToken("brianf", "brianf123");
+    final AuthenticationInfo ai = realm.getAuthenticationInfo(upToken);
+    assertEquals("brianf123".toCharArray(), ai.getCredentials());
   }
 
   @Test

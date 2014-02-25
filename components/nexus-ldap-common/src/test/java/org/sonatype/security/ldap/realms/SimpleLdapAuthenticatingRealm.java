@@ -17,6 +17,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+
 import org.eclipse.sisu.Description;
 
 @Singleton
@@ -29,8 +31,8 @@ public class SimpleLdapAuthenticatingRealm
   public static final String ROLE = "LdapAuthenticatingRealm";
 
   @Inject
-  public SimpleLdapAuthenticatingRealm(final LdapManager ldapManager) {
-    super(ldapManager);
+  public SimpleLdapAuthenticatingRealm(final EventBus eventBus, final LdapManager ldapManager) {
+    super(eventBus, ldapManager);
   }
 
   @Override
