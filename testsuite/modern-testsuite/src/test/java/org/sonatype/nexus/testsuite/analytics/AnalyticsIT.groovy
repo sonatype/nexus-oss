@@ -90,20 +90,4 @@ extends AnalyticsITSupport
     // TODO open zip and check content?
   }
 
-  /**
-   * Verifies that events events about upload/download via '/content/*' are recorded.
-   */
-  //@Test TODO no events for accessing /content/* ?
-  void uploadAndDownloadAreCollected() {
-
-    configureAnalytics(true, false)
-
-    content().upload(AOP_POM_LOCATION, testData().resolveFile("artifacts/" + AOP_POM))
-    content().download(AOP_POM_LOCATION, new File(testIndex().getDirectory("downloads"), "aopalliance-1.0.pom"))
-
-    EventsXO events = allEvents
-
-    assertThat pathsOf(events), hasItems('PUT|' + AOP_CONTENT_PATH, 'GET|' + AOP_CONTENT_PATH)
-  }
-
 }
