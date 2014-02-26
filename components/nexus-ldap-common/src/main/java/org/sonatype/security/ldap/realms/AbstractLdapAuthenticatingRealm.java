@@ -22,6 +22,8 @@ import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.NoLdapUserRolesFoundException;
 import org.sonatype.sisu.goodies.common.Loggers;
 
+import com.google.common.base.Strings;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
@@ -59,6 +61,11 @@ public abstract class AbstractLdapAuthenticatingRealm
     UsernamePasswordToken upToken = (UsernamePasswordToken) token;
     String username = upToken.getUsername();
     String pass = String.valueOf(upToken.getPassword());
+
+    // Verify non-empty password
+    if (Strings.isNullOrEmpty(pass)) {
+      throw new AuthenticationException("Password must not be empty");
+    }
 
     try {
       this.ldapManager.authenticateUser(username, pass);
