@@ -23,6 +23,7 @@ NX.define('Nexus.analytics.controller.Analytics', {
   requires: [
     'Nexus.siesta',
     'Nexus.analytics.Icons',
+    'Nexus.analytics.view.EventsZipCreated',
     'Nexus.analytics.view.Panel',
     'Nexus.util.DownloadHelper'
   ],
@@ -51,6 +52,9 @@ NX.define('Nexus.analytics.controller.Analytics', {
       },
       '#nx-analytics-view-events-button-submit': {
         click: me.submitEvents
+      },
+      '#nx-analytics-button-eventszip-download': {
+        'authenticated': me.downloadEventsZip
       }
     });
 
@@ -223,9 +227,12 @@ NX.define('Nexus.analytics.controller.Analytics', {
             url: Nexus.siesta.basePath + '/analytics/events/export',
             method: 'POST',
             suppressStatus: true,
-            success: function () {
-              me.showMessage('Event data has been exported');
-              // FIXME: hook up to allow user to download after auth
+            success: function(response) {
+              var obj = Ext.decode(response.responseText),
+                  win = NX.create('Nexus.analytics.view.EventsZipCreated');
+
+              win.setValues(obj);
+              win.show();
             },
             failure: function (response) {
               me.showMessage('Failed to export event data: ' + me.parseExceptionMessage(response));
@@ -266,5 +273,26 @@ NX.define('Nexus.analytics.controller.Analytics', {
         }
       }
     });
+  },
+
+  /**
+   * Download events ZIP file.
+   *
+   * @private
+   */
+  downloadEventsZip: function(button, authTicket) {
+    var win = button.up('nx-analytics-view-eventszip-created'),
+        fileName = win.getValues().name;
+
+    // encode ticket for query-parameter
+    authTicket = Sonatype.utils.base64.encode(authTicket);
+
+    if (Nexus.util.DownloadHelper.downloadUrl(
+        Nexus.siesta.basePath + '/atlas/support-zip/' + fileName + '?t=' + authTicket))
+    {
+      // if download was initiated close the window
+      win.close();
+    }
   }
+
 });

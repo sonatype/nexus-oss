@@ -49,6 +49,7 @@ NX.define('Nexus.analytics.Icons', {
         download: iconConfig('download.png'),
         external: iconConfig('external.png'),
         transmit: iconConfig('transmit.png'),
+        file_extension_zip: iconConfig('file_extension_zip.png'),
 
         refresh: '@arrow_refresh',
         analytics: '@action_log',
@@ -56,7 +57,8 @@ NX.define('Nexus.analytics.Icons', {
         _export: '@download', // avoid invalid property id
         submit: '@external',
 
-        type_REST: '@transmit'
+        type_REST: '@transmit',
+        zip: '@file_extension_zip'
       }
     });
   },
