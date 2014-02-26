@@ -208,7 +208,7 @@ public class EventExporterImpl
     Files.move(file.toPath(), target.toPath());
 
     log.info("Exported {} partitions, {} events to: {}, took: {}", partitionCount, eventCount, target, watch);
-    return file;
+    return target;
   }
 
   private void writeHeader(final JsonFactory jsonFactory, final ZipOutputStream output) throws Exception {
