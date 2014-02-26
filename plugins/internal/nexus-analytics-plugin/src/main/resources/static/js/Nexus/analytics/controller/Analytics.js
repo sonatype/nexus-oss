@@ -214,7 +214,9 @@ NX.define('Nexus.analytics.controller.Analytics', {
    */
   exportEvents: function(button) {
     var me = this,
-        icons = Nexus.analytics.Icons;
+        icons = Nexus.analytics.Icons,
+        viewport = button.up('viewport'),
+        mask = NX.create('Ext.LoadMask', viewport.getEl(), { msg: 'Exporting events ZIP file...' });
 
     Ext.Msg.show({
       title: 'Export events',
@@ -223,10 +225,17 @@ NX.define('Nexus.analytics.controller.Analytics', {
       icon: icons.get('_export').variant('x32').cls,
       fn: function (btn) {
         if (btn === 'ok') {
+          mask.show();
+
           Ext.Ajax.request({
             url: Nexus.siesta.basePath + '/analytics/events/export',
             method: 'POST',
             suppressStatus: true,
+
+            scope: me,
+            callback: function() {
+              mask.hide()
+            },
             success: function(response) {
               var obj = Ext.decode(response.responseText),
                   win = NX.create('Nexus.analytics.view.EventsZipCreated');

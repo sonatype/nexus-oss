@@ -27,7 +27,7 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
     'Nexus.atlas.Icons'
   ],
 
-  fileType: 'Support Zip',
+  fileType: 'Support ZIP',
   downloadButtonId: 'nx-atlas-button-supportzip-download',
 
   /**

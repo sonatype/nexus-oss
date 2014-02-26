@@ -25,7 +25,7 @@ NX.define('Nexus.analytics.view.EventsZipCreated', {
     'Nexus.analytics.Icons'
   ],
 
-  fileType: 'Events Zip',
+  fileType: 'Events ZIP',
   downloadButtonId: 'nx-analytics-button-eventszip-download',
 
   /**
