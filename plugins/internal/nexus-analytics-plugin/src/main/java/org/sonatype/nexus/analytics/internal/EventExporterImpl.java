@@ -17,6 +17,9 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
@@ -33,7 +36,7 @@ import org.sonatype.nexus.analytics.EventData;
 import org.sonatype.nexus.analytics.EventExporter;
 import org.sonatype.nexus.analytics.EventHeader;
 import org.sonatype.nexus.analytics.EventStore;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -67,14 +70,14 @@ public class EventExporterImpl
 
   private final Anonymizer anonymizer;
 
-  private final File supportDir;
+  private final File exportDir;
 
   private final String product;
 
   private final ReentrantLock exportLock = new ReentrantLock();
 
   @Inject
-  public EventExporterImpl(final ApplicationConfiguration applicationConfiguration,
+  public EventExporterImpl(final ApplicationDirectories applicationDirectories,
                            final ApplicationStatusSource applicationStatusSource,
                            final EventStoreImpl eventStore,
                            final Anonymizer anonymizer)
@@ -82,11 +85,11 @@ public class EventExporterImpl
     this.eventStore = checkNotNull(eventStore);
     this.anonymizer = checkNotNull(anonymizer);
 
-    this.supportDir = applicationConfiguration.getWorkingDirectory("support");
-    log.info("Support directory: {}", supportDir);
+    this.exportDir = applicationDirectories.getWorkDirectory("support"); // FIXME: Sort out common place for these things?
+    log.info("Export directory: {}", exportDir);
 
     SystemStatus status = applicationStatusSource.getSystemStatus();
-    this.product = String.format("nexus-%s/%s", status.getEditionShort(), status.getVersion());
+    this.product = String.format("nexus/%s/%s", status.getEditionShort(), status.getVersion());
     log.info("Product: {}", product);
   }
 
@@ -149,7 +152,6 @@ public class EventExporterImpl
     // Close the current partition, so that any new events are separate from those that exist already
     journal.closeActivePartition();
 
-    // TODO: Sort out max for each zip file
     File file = File.createTempFile("analytics-", ".zip");
     log.debug("Exporting to: {}", file);
 
@@ -185,7 +187,8 @@ public class EventExporterImpl
           generator.writeStartArray();
 
           try (KeyValueIterable<KeyValuePair<EventData>> iter = journal.entriesRelative(
-              EventStore.SCHEMA_NAME, EventData.class, 0L, partition.getSize())) {
+              EventStore.SCHEMA_NAME, EventData.class, 0L, partition.getSize()))
+          {
             for (KeyValuePair<EventData> entry : iter) {
               generator.writeObject(anonymizerHelper.anonymize(entry.getValue()));
               eventCount++;
@@ -204,11 +207,20 @@ public class EventExporterImpl
     }
 
     // Move completed export file into place
-    File target = new File(supportDir, file.getName()); // TODO: analytics-{yyyyMMdd-HHmmss}.zip for target
+    File target = new File(exportDir, uniquePrefix() + ".zip");
     Files.move(file.toPath(), target.toPath());
 
     log.info("Exported {} partitions, {} events to: {}, took: {}", partitionCount, eventCount, target, watch);
     return target;
+  }
+
+  private static final AtomicLong counter = new AtomicLong();
+
+  /**
+   * Generate a unique file prefix.
+   */
+  private String uniquePrefix() {
+    return "analytics-" + new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date()) + "-" + counter.incrementAndGet();
   }
 
   private void writeHeader(final JsonFactory jsonFactory, final ZipOutputStream output) throws Exception {

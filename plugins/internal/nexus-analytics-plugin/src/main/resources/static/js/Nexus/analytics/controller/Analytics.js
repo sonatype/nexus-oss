@@ -216,7 +216,7 @@ NX.define('Nexus.analytics.controller.Analytics', {
     var me = this,
         icons = Nexus.analytics.Icons,
         viewport = button.up('viewport'),
-        mask = NX.create('Ext.LoadMask', viewport.getEl(), { msg: 'Exporting events ZIP file...' });
+        mask = NX.create('Ext.LoadMask', viewport.getEl(), { msg: 'Exporting event data...' });
 
     Ext.Msg.show({
       title: 'Export events',
@@ -296,6 +296,7 @@ NX.define('Nexus.analytics.controller.Analytics', {
     // encode ticket for query-parameter
     authTicket = Sonatype.utils.base64.encode(authTicket);
 
+    // FIXME: Expose download stuff in wonderland to avoid direct dep on atlas plugin
     if (Nexus.util.DownloadHelper.downloadUrl(
         Nexus.siesta.basePath + '/atlas/support-zip/' + fileName + '?t=' + authTicket))
     {
