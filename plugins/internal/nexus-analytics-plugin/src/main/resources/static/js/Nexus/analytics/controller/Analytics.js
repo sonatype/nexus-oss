@@ -23,6 +23,7 @@ NX.define('Nexus.analytics.controller.Analytics', {
   requires: [
     'Nexus.siesta',
     'Nexus.analytics.Icons',
+    'Nexus.analytics.view.EventsZipCreated',
     'Nexus.analytics.view.Panel',
     'Nexus.util.DownloadHelper'
   ],
@@ -51,6 +52,9 @@ NX.define('Nexus.analytics.controller.Analytics', {
       },
       '#nx-analytics-view-events-button-submit': {
         click: me.submitEvents
+      },
+      '#nx-analytics-button-eventszip-download': {
+        'authenticated': me.downloadEventsZip
       }
     });
 
@@ -210,7 +214,9 @@ NX.define('Nexus.analytics.controller.Analytics', {
    */
   exportEvents: function(button) {
     var me = this,
-        icons = Nexus.analytics.Icons;
+        icons = Nexus.analytics.Icons,
+        viewport = button.up('viewport'),
+        mask = NX.create('Ext.LoadMask', viewport.getEl(), { msg: 'Exporting event data...' });
 
     Ext.Msg.show({
       title: 'Export events',
@@ -219,13 +225,23 @@ NX.define('Nexus.analytics.controller.Analytics', {
       icon: icons.get('_export').variant('x32').cls,
       fn: function (btn) {
         if (btn === 'ok') {
+          mask.show();
+
           Ext.Ajax.request({
             url: Nexus.siesta.basePath + '/analytics/events/export',
             method: 'POST',
             suppressStatus: true,
-            success: function () {
-              me.showMessage('Event data has been exported');
-              // FIXME: hook up to allow user to download after auth
+
+            scope: me,
+            callback: function() {
+              mask.hide()
+            },
+            success: function(response) {
+              var obj = Ext.decode(response.responseText),
+                  win = NX.create('Nexus.analytics.view.EventsZipCreated');
+
+              win.setValues(obj);
+              win.show();
             },
             failure: function (response) {
               me.showMessage('Failed to export event data: ' + me.parseExceptionMessage(response));
@@ -266,5 +282,27 @@ NX.define('Nexus.analytics.controller.Analytics', {
         }
       }
     });
+  },
+
+  /**
+   * Download events ZIP file.
+   *
+   * @private
+   */
+  downloadEventsZip: function(button, authTicket) {
+    var win = button.up('nx-analytics-view-eventszip-created'),
+        fileName = win.getValues().name;
+
+    // encode ticket for query-parameter
+    authTicket = Sonatype.utils.base64.encode(authTicket);
+
+    // FIXME: Expose download stuff in wonderland to avoid direct dep on atlas plugin
+    if (Nexus.util.DownloadHelper.downloadUrl(
+        Nexus.siesta.basePath + '/atlas/support-zip/' + fileName + '?t=' + authTicket))
+    {
+      // if download was initiated close the window
+      win.close();
+    }
   }
+
 });

@@ -28,3 +28,29 @@
 .nx-wonderland-view-authenticate .x-form-item-label {
   font: bold 11px arial, tahoma, verdana, helvetica;
 }
+
+.nx-wonderland-view-file-created-description {
+  padding: 10px;
+}
+
+.nx-wonderland-view-file-created-description img {
+  float: left;
+  padding-right: 10px;
+}
+
+.nx-wonderland-view-file-created-description div {
+  vertical-align: middle;
+}
+
+.nx-wonderland-view-file-created .x-window-ml div {
+  background-color: white;
+}
+
+.nx-wonderland-view-file-created .x-form {
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+.nx-wonderland-view-file-created .x-form-item-label {
+  font: bold 11px arial, tahoma, verdana, helvetica;
+}
