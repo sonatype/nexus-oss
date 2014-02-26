@@ -52,14 +52,18 @@ public class CollectionCapability
 
   private final AnonymizerImpl anonymizer;
 
+  private final EventHeaderFactory headerFactory;
+
   @Inject
   public CollectionCapability(final EventStoreImpl store,
                               final EventRecorderImpl recorder,
-                              final AnonymizerImpl anonymizer)
+                              final AnonymizerImpl anonymizer,
+                              final EventHeaderFactory headerFactory)
   {
     this.store = checkNotNull(store);
     this.recorder = checkNotNull(recorder);
     this.anonymizer = checkNotNull(anonymizer);
+    this.headerFactory = checkNotNull(headerFactory);
   }
 
   @Override
@@ -76,6 +80,7 @@ public class CollectionCapability
   protected void onActivate(final CollectionCapabilityConfiguration config) throws Exception {
     store.start();
     anonymizer.setSalt(config.getSaltBytes());
+    headerFactory.setNode(config.getHostId());
     recorder.setEnabled(true);
     log.info("Collection enabled");
   }

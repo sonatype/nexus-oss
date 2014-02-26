@@ -44,8 +44,8 @@ public class CollectionCapabilityConfiguration
     this.salt = properties.get(SALT);
   }
 
-  public static String getHostId() {
-    return HOST_ID;
+  public String getHostId() {
+    return hostId;
   }
 
   public String getSalt() {
