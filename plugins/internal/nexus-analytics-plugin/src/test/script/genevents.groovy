@@ -10,21 +10,41 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
+def workers = 10
+def pool = Executors.newFixedThreadPool(workers)
 def url = new URL('http://localhost:8081/nexus/service/local/status')
-def times = 1_000_000
+def times = 100_000
+def tick = 1000
+def counter = new AtomicInteger()
 
-def start = new Date()
-for (int i in 1..times) {
-  url.text
-  if (i % 10000 == 0) {
-    print '.'
-  }
-  if (i % 100000 == 0) {
-    println " $i"
+def task = {
+  for (int i in 1..times) {
+    url.text
+    def count = counter.incrementAndGet()
+    if (count % tick == 0) {
+      print '.'
+    }
   }
 }
 
+def start = new Date()
+
+(1..workers).each {
+  pool.submit(task)
+  println "queued task: #$it"
+}
+
+println 'waiting for tasks'
+pool.shutdown()
+pool.awaitTermination(1, TimeUnit.HOURS)
+
+println ''
+println 'tasks completed'
+
 def stop = new Date()
 def e = stop.time - start.time
-println "elasped $e ms"
+println "executed task $counter times; elasped $e ms"
