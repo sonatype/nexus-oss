@@ -53,10 +53,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <!--
-    NOTE: This is bringing in jackson2
-    -->
-
     <dependency>
       <groupId>io.kazuki</groupId>
       <artifactId>kazuki-db</artifactId>
