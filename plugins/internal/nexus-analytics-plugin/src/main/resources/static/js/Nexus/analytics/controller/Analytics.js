@@ -298,7 +298,7 @@ NX.define('Nexus.analytics.controller.Analytics', {
 
     // FIXME: Expose download stuff in wonderland to avoid direct dep on atlas plugin
     if (Nexus.util.DownloadHelper.downloadUrl(
-        Nexus.siesta.basePath + '/atlas/support-zip/' + fileName + '?t=' + authTicket))
+        Nexus.siesta.basePath + '/wonderland/download/' + fileName + '?t=' + authTicket))
     {
       // if download was initiated close the window
       win.close();
