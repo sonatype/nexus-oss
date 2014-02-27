@@ -33,8 +33,8 @@ import java.util.concurrent.atomic.AtomicLong
 @Named
 @Singleton
 class DownloadServiceImpl
-    extends ComponentSupport
-    implements DownloadService
+extends ComponentSupport
+implements DownloadService
 {
 
   /**
@@ -70,6 +70,7 @@ class DownloadServiceImpl
 
   @Override
   File get(String fileName, String authTicket) {
+    log.info 'Download: {}', fileName
 
     if (!authTickets.redeemTicket(authTicket)) {
       throw new IllegalAccessException('Invalid authentication ticket')
@@ -81,6 +82,7 @@ class DownloadServiceImpl
     assert file.parentFile == downloadDir
 
     if (!file.exists() && file.isFile()) {
+      log.warn 'File {} not found in download directory (or is not a file)', file
       return null
     }
     return file
