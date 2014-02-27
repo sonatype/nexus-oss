@@ -76,6 +76,10 @@ class DownloadServiceImpl
     }
 
     def file = new File(downloadDir, fileName)
+
+    // ensure we do not leak references outside of the downloads directory, only direct children can be served
+    assert file.parentFile == downloadDir
+
     if (!file.exists() && file.isFile()) {
       return null
     }
@@ -85,6 +89,8 @@ class DownloadServiceImpl
   @Override
   File move(File source, String name) {
     def target = new File(downloadDir, name)
+    // ensure we only create files in downloads directory
+    assert target.parentFile == downloadDir
     Files.move(source.toPath(), target.toPath())
     log.debug 'Moved {} to {}', source, target
     return target

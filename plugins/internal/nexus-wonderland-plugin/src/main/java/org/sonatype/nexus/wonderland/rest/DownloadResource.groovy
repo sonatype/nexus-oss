@@ -84,9 +84,6 @@ class DownloadResource
     try {
       def file = downloadService.get(fileName, authTicket)
 
-      // ensure we do not leak references outside of the downloads directory, only direct children can be served
-      assert file.parentFile == downloadService.directory
-
       if (!file.exists()) {
         return Response.status(NOT_FOUND).build()
       }
