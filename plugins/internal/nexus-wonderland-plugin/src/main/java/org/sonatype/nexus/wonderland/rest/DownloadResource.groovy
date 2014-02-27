@@ -65,7 +65,7 @@ class DownloadResource
   @GET
   @Path('{fileName}')
   @Produces('application/zip')
-  @RequiresPermissions('nexus:atlas')
+  @RequiresPermissions('nexus:wonderland')
   Response downloadZip(final @PathParam('fileName') String fileName,
                        final @Nullable @QueryParam('t') String authTicketParam, // Base64
                        final @Nullable @HeaderParam(AUTH_TICKET_HEADER) String authTicketHeader)
