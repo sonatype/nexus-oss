@@ -25,8 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.analytics.Anonymizer;
 import org.sonatype.nexus.analytics.EventData;
 import org.sonatype.nexus.analytics.EventExporter;
@@ -66,25 +64,22 @@ public class EventExporterImpl
 
   private final Anonymizer anonymizer;
 
-  private final DownloadService downloadService;
+  private final EventHeaderFactory headerFactory;
 
-  private final String product;
+  private final DownloadService downloadService;
 
   private final ReentrantLock exportLock = new ReentrantLock();
 
   @Inject
   public EventExporterImpl(final DownloadService downloadService,
-                           final ApplicationStatusSource applicationStatusSource,
                            final EventStoreImpl eventStore,
+                           final EventHeaderFactory headerFactory,
                            final Anonymizer anonymizer)
   {
     this.downloadService = checkNotNull(downloadService);
     this.eventStore = checkNotNull(eventStore);
     this.anonymizer = checkNotNull(anonymizer);
-
-    SystemStatus status = applicationStatusSource.getSystemStatus();
-    this.product = String.format("nexus/%s/%s", status.getEditionShort(), status.getVersion());
-    log.info("Product: {}", product);
+    this.headerFactory = checkNotNull(headerFactory);
   }
 
   /**
@@ -208,10 +203,7 @@ public class EventExporterImpl
   }
 
   private void writeHeader(final JsonFactory jsonFactory, final ZipOutputStream output) throws Exception {
-    EventHeader header = new EventHeader();
-    header.setFormat("zip-bundle/1");
-    header.setProduct(product);
-    // TODO: Add org, node (, attributes?)
+    EventHeader header = headerFactory.create();
 
     ZipEntry zipEntry = new ZipEntry("header.json");
     output.putNextEntry(zipEntry);
