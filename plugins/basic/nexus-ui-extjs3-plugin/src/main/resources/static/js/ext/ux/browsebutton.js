@@ -177,15 +177,24 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
      * @see Ext.Button.initComponent
      */
     initComponent: function(){
+        var me = this;
+
         Ext.ux.form.BrowseButton.superclass.initComponent.call(this);
+
+        // FIXME: This should never have fucked with the handler, should have registered a new event
+
         // Store references to the original handler and scope before nulling them.
         // This is done so that this class can control when the handler is called.
         // There are some cases where the hidden file input browse button doesn't completely cover the Ext.Button.
         // The handler shouldn't be called in these cases.  It should only be called if a new file is selected on the file system.  
         this.originalHandler = this.handler;
         this.originalScope = this.scope;
-        this.handler = null;
-        this.scope = null;
+
+        // Click the hidden input-file element when button is clicked
+        this.handler = function() {
+          me.inputFileEl.dom.click();
+        };
+        this.scope = me;
     },
     
     /**
