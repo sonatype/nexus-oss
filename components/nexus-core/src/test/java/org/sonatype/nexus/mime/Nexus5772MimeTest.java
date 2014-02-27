@@ -33,8 +33,10 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-// This test is an IT because after it runs tests keep on spitting out all sort of warnings related to magic file format")
-public class Nexus5772MimeIT
+/**
+ * Testing content detection aginst some most typical files.
+ */
+public class Nexus5772MimeTest
     extends TestSupport
 {
 
@@ -62,6 +64,8 @@ public class Nexus5772MimeIT
         "application/octet-stream"), "image/gif");
     assertComplete(mimeSupport, new FileContentLocator(util.resolveFile("src/test/resources/mime/file.zip"),
         "application/octet-stream"), "application/zip");
+    assertComplete(mimeSupport, new FileContentLocator(util.resolveFile("src/test/resources/mime/empty.zip"),
+        "application/octet-stream"), "application/zip");
     assertComplete(mimeSupport, new FileContentLocator(util.resolveFile("src/test/resources/mime/file.jar"),
         "application/octet-stream"), "application/zip");
   }
@@ -83,6 +87,15 @@ public class Nexus5772MimeIT
     {
       final StorageFileItem fileItem = mock(StorageFileItem.class);
       final File file = util.resolveFile("src/test/resources/mime/file.zip");
+      try (final InputStream is = new FileInputStream(file)) {
+        when(fileItem.getInputStream()).thenReturn(is);
+        when(fileItem.getName()).thenReturn(file.getName());
+        assertThat(mimeSupport.detectMimeTypesFromContent(fileItem), equalTo("application/zip"));
+      }
+    }
+    {
+      final StorageFileItem fileItem = mock(StorageFileItem.class);
+      final File file = util.resolveFile("src/test/resources/mime/empty.zip");
       try (final InputStream is = new FileInputStream(file)) {
         when(fileItem.getInputStream()).thenReturn(is);
         when(fileItem.getName()).thenReturn(file.getName());

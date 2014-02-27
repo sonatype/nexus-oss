@@ -65,7 +65,7 @@ extends AnalyticsITSupport
   /**
    * Verifies that events are exported.
    */
-  //@Test TODO the returned file is some tmp file not the exported one (e.g. sonatype-work/nexus/tmp/analytics-2670231769022899054.zip vs. sonatype-work/nexus/support/analytics-2670231769022899054.zip)
+  @Test
   void export() {
 
     configureAnalytics(true, false)
@@ -80,7 +80,6 @@ extends AnalyticsITSupport
     assertThat export.size, is(greaterThan(0L))
 
     assertThat export.file as File, FileMatchers.exists()
-    // TODO open zip and check content?
   }
 
 }

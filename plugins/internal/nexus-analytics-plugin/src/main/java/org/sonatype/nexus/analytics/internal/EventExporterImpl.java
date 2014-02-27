@@ -16,10 +16,6 @@ package org.sonatype.nexus.analytics.internal;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.nio.file.Files;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
@@ -34,7 +30,7 @@ import org.sonatype.nexus.analytics.EventData;
 import org.sonatype.nexus.analytics.EventExporter;
 import org.sonatype.nexus.analytics.EventHeader;
 import org.sonatype.nexus.analytics.EventStore;
-import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.wonderland.DownloadService;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -70,22 +66,20 @@ public class EventExporterImpl
 
   private final EventHeaderFactory headerFactory;
 
-  private final File exportDir;
+  private final DownloadService downloadService;
 
   private final ReentrantLock exportLock = new ReentrantLock();
 
   @Inject
-  public EventExporterImpl(final ApplicationDirectories applicationDirectories,
+  public EventExporterImpl(final DownloadService downloadService,
                            final EventStoreImpl eventStore,
                            final EventHeaderFactory headerFactory,
                            final Anonymizer anonymizer)
   {
+    this.downloadService = checkNotNull(downloadService);
     this.eventStore = checkNotNull(eventStore);
     this.anonymizer = checkNotNull(anonymizer);
     this.headerFactory = checkNotNull(headerFactory);
-
-    this.exportDir = applicationDirectories.getWorkDirectory("support"); // FIXME: Sort out common place for these things?
-    log.info("Export directory: {}", exportDir);
   }
 
   /**
@@ -202,20 +196,10 @@ public class EventExporterImpl
     }
 
     // Move completed export file into place
-    File target = new File(exportDir, uniquePrefix() + ".zip");
-    Files.move(file.toPath(), target.toPath());
+    File target = downloadService.move(file, downloadService.uniqueName("analytics-") + ".zip");
 
     log.info("Exported {} partitions, {} events to: {}, took: {}", partitionCount, eventCount, target, watch);
     return target;
-  }
-
-  private static final AtomicLong counter = new AtomicLong();
-
-  /**
-   * Generate a unique file prefix.
-   */
-  private String uniquePrefix() {
-    return "analytics-" + new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date()) + "-" + counter.incrementAndGet();
   }
 
   private void writeHeader(final JsonFactory jsonFactory, final ZipOutputStream output) throws Exception {

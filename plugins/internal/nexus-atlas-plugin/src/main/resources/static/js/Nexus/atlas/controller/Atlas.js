@@ -203,7 +203,7 @@ NX.define('Nexus.atlas.controller.Atlas', {
     authTicket = Sonatype.utils.base64.encode(authTicket);
 
     if (Nexus.util.DownloadHelper.downloadUrl(
-        Nexus.siesta.basePath + '/atlas/support-zip/' + fileName + '?t=' + authTicket))
+        Nexus.siesta.basePath + '/wonderland/download/' + fileName + '?t=' + authTicket))
     {
       // if download was initated close the window
       win.close();
