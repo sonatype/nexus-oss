@@ -63,13 +63,17 @@ public class Nexus5772MimeIT
     mimeTypes.clear();
   }
 
-  protected void assertComplete(final DefaultMimeSupport mimeSupport)
+  protected void assertComplete(final DefaultMimeSupport mimeSupport, boolean emptyZipSupport)
       throws IOException
   {
     assertComplete(mimeSupport, new FileContentLocator(util.resolveFile("src/test/resources/mime/file.gif"),
         "application/octet-stream"), "image/gif");
     assertComplete(mimeSupport, new FileContentLocator(util.resolveFile("src/test/resources/mime/file.zip"),
         "application/octet-stream"), "application/zip");
+    if (emptyZipSupport) {
+      assertComplete(mimeSupport, new FileContentLocator(util.resolveFile("src/test/resources/mime/empty.zip"),
+          "application/octet-stream"), "application/zip");
+    }
     assertComplete(mimeSupport, new FileContentLocator(util.resolveFile("src/test/resources/mime/file.jar"),
         "application/octet-stream"), "application/zip");
   }
@@ -91,7 +95,7 @@ public class Nexus5772MimeIT
   {
     System.setProperty(DefaultMimeSupport.MIME_MAGIC_OPENDESKTOP_KEY, Boolean.FALSE.toString());
     System.setProperty(DefaultMimeSupport.MIME_MAGIC_FILE_KEY, util.resolvePath(CLASSIC_MAGIC_FILE_PATH));
-    assertComplete(new DefaultMimeSupport());
+    assertComplete(new DefaultMimeSupport(), true);
   }
 
   /**
@@ -105,7 +109,7 @@ public class Nexus5772MimeIT
   {
     System.setProperty(DefaultMimeSupport.MIME_MAGIC_OPENDESKTOP_KEY, Boolean.FALSE.toString());
     System.setProperty(DefaultMimeSupport.MIME_MAGIC_FILE_KEY, util.resolvePath(OPENDESKTOP_MAGIC_FILE_PATH));
-    assertComplete(new DefaultMimeSupport());
+    assertComplete(new DefaultMimeSupport(), true);
   }
 
   /**
@@ -118,7 +122,7 @@ public class Nexus5772MimeIT
   {
     System.setProperty(DefaultMimeSupport.MIME_MAGIC_OPENDESKTOP_KEY, Boolean.TRUE.toString());
     System.setProperty(DefaultMimeSupport.MIME_MAGIC_FILE_KEY, util.resolvePath(CLASSIC_MAGIC_FILE_PATH));
-    assertComplete(new DefaultMimeSupport());
+    assertComplete(new DefaultMimeSupport(), false);
   }
 
   /**
@@ -130,7 +134,7 @@ public class Nexus5772MimeIT
   {
     System.setProperty(DefaultMimeSupport.MIME_MAGIC_OPENDESKTOP_KEY, Boolean.TRUE.toString());
     System.setProperty(DefaultMimeSupport.MIME_MAGIC_FILE_KEY, util.resolvePath(OPENDESKTOP_MAGIC_FILE_PATH));
-    assertComplete(new DefaultMimeSupport());
+    assertComplete(new DefaultMimeSupport(), false);
   }
 
   /**
@@ -141,6 +145,6 @@ public class Nexus5772MimeIT
       throws IOException
   {
     System.setProperty(DefaultMimeSupport.MIME_MAGIC_FILE_KEY, util.resolvePath("foo/bar"));
-    assertComplete(new DefaultMimeSupport());
+    assertComplete(new DefaultMimeSupport(), false);
   }
 }

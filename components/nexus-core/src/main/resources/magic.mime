@@ -11,3 +11,9 @@
 
 # Bzip2
 0		string BZh	application/x-bzip
+
+# Empty Zip
+0		string			PK\005\006		application/zip
+
+# Spanning Zip
+0		string			PK\007\008		application/zip
