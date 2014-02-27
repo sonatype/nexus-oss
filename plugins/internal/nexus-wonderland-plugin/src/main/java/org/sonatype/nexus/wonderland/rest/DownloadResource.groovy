@@ -24,10 +24,17 @@ import javax.annotation.Nullable
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
-import javax.ws.rs.*
+import javax.ws.rs.GET
+import javax.ws.rs.HeaderParam
+import javax.ws.rs.Path
+import javax.ws.rs.PathParam
+import javax.ws.rs.Produces
+import javax.ws.rs.QueryParam
 import javax.ws.rs.core.Response
 
-import static javax.ws.rs.core.Response.Status.*
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST
+import static javax.ws.rs.core.Response.Status.FORBIDDEN
+import static javax.ws.rs.core.Response.Status.NOT_FOUND
 import static org.sonatype.nexus.wonderland.AuthTicketService.AUTH_TICKET_HEADER
 
 /**
@@ -94,7 +101,7 @@ class DownloadResource
           .build()
     }
     catch (IllegalAccessException e) {
-      throw new WebApplicationMessageException(FORBIDDEN, e.message)
+      throw new WebApplicationMessageException(FORBIDDEN, e.toString())
     }
   }
 }
