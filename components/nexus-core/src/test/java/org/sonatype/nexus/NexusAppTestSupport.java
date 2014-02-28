@@ -153,7 +153,9 @@ public abstract class NexusAppTestSupport
       throws Exception
   {
     // FIXME: This needs to be fired as many component relies on this to cleanup (like EHCache)
-    eventBus.post(new NexusStoppedEvent(null));
+    if (eventBus != null) {
+      eventBus.post(new NexusStoppedEvent(null));
+    }
     waitForTasksToStop();
     super.tearDown();
     // remove Shiro thread locals, as things like DelegatingSubjects might lead us to old instance of SM
