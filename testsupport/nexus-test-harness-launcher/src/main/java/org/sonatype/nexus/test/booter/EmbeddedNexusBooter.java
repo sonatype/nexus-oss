@@ -16,6 +16,7 @@ package org.sonatype.nexus.test.booter;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -216,6 +217,28 @@ public class EmbeddedNexusBooter
         }
       }
       testRealm = null;
+
+      try {
+        // The JVM caches URLs along with their current URL handler in a couple of static maps.
+        // This causes unexpected issues when restarting legacy tests (even when using isolated
+        // classloaders) because the cached handler persists across the restart and still refers
+        // to the now shutdown framework. Felix has a few tricks to workaround this, but these
+        // are defeated by the isolated legacy test classloader as the new framework cannot see
+        // the old handler classes to reflectively update them.
+
+        // (the other solution would be to not shutdown the framework when running legacy tests,
+        // this would keep the old URL handlers alive at the cost of a few additional resources)
+
+        Class<?> jarFileFactoryClass = Class.forName("sun.net.www.protocol.jar.JarFileFactory");
+        Field fileCacheField = jarFileFactoryClass.getDeclaredField("fileCache");
+        Field urlCacheField = jarFileFactoryClass.getDeclaredField("urlCache");
+        fileCacheField.setAccessible(true);
+        urlCacheField.setAccessible(true);
+        ((Map<?, ?>) fileCacheField.get(null)).clear();
+        ((Map<?, ?>) urlCacheField.get(null)).clear();
+      } catch (Exception e) {
+        log.warn("Unable to clear URL cache", e);
+      }
 
       Thread.yield();
       System.gc();

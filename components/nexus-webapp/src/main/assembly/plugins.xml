@@ -26,6 +26,9 @@
 
   <dependencySets>
     <dependencySet>
+      <!--
+      Legacy Nexus plugin bundles
+      -->
       <outputDirectory>/WEB-INF/plugin-repository</outputDirectory>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <useProjectArtifact>false</useProjectArtifact>
@@ -56,6 +59,22 @@
         <include>*:nexus-capabilities-plugin</include>
         <include>*:nexus-atlas-plugin</include>
         <include>*:nexus-wonderland-plugin</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <!--
+      Pure OSGi bundles
+      -->
+      <outputDirectory>/WEB-INF/bundles</outputDirectory>
+      <useTransitiveDependencies>true</useTransitiveDependencies>
+      <useProjectArtifact>false</useProjectArtifact>
+      <useStrictFiltering>true</useStrictFiltering>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+      <scope>provided</scope>
+      <unpack>false</unpack>
+      <includes>
+        <include>*:bcprov*</include>
       </includes>
     </dependencySet>
   </dependencySets>

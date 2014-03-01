@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Sonatype Nexus (TM) Open Source Version
@@ -19,37 +18,38 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>nexus-plugins</artifactId>
+    <groupId>org.sonatype.nexus.buildsupport</groupId>
+    <artifactId>nexus-buildsupport</artifactId>
     <version>2.8.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-plugins-osgi</artifactId>
+  <artifactId>nexus-buildsupport-osgi</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>nexus-obr-plugin</module>
-    <module>nexus-obr-client</module>
-  </modules>
+  <properties>
+    <osgi-spec.version>4.3.1</osgi-spec.version>
+  </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.core</artifactId>
+        <version>${osgi-spec.version}</version>
+      </dependency>
 
       <dependency>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>org.osgi.service.obr</artifactId>
-        <version>1.0.2</version>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.compendium</artifactId>
+        <version>${osgi-spec.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.apache.felix</groupId>
-        <artifactId>org.apache.felix.main.distribution</artifactId>
-        <classifier>project</classifier>
-        <type>tar.gz</type>
+        <artifactId>org.apache.felix.framework</artifactId>
         <version>4.2.1</version>
       </dependency>
-
     </dependencies>
   </dependencyManagement>
 
