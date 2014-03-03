@@ -63,22 +63,22 @@ extends DirectComponentSupport
     validate(xo)
     globalRestApiSettings.baseUrl = xo.baseUrl
     globalRestApiSettings.forceBaseUrl = StringUtils.isBlank(xo.baseUrl) ? null : xo.forceBaseUrl
-    nexusConfiguration.saveConfiguration();
-    return read();
+    nexusConfiguration.saveConfiguration()
+    return read()
   }
 
   private static validate(final SystemGeneralXO xo) {
     def validations = new ValidationResponse()
     if (!StringUtils.isBlank(xo.baseUrl)) {
       try {
-        new URL(xo.baseUrl);
+        new URL(xo.baseUrl)
       }
       catch (MalformedURLException e) {
         validations.addValidationError(new ValidationMessage('baseUrl', e.message))
       }
     }
     if (!validations.valid) {
-      throw new InvalidConfigurationException(validations);
+      throw new InvalidConfigurationException(validations)
     }
   }
 }

@@ -42,9 +42,9 @@ class SystemNotificationsComponent
 extends DirectComponentSupport
 {
 
-  private static final TRUST_STORE_TYPE = 'smtp';
+  private static final TRUST_STORE_TYPE = 'smtp'
 
-  private static final TRUST_STORE_ID = 'global';
+  private static final TRUST_STORE_ID = 'global'
 
   @Inject
   NexusEmailer emailer
@@ -84,9 +84,9 @@ extends DirectComponentSupport
       SMTPSslEnabled = notificationsXO.connectionType == SystemNotificationsXO.ConnectionType.SSL
       SMTPTlsEnabled = notificationsXO.connectionType == SystemNotificationsXO.ConnectionType.TLS
     }
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration.saveConfiguration()
     trustStore?.setEnabled(TRUST_STORE_TYPE, TRUST_STORE_ID, notificationsXO.useTrustStoreForSmtp)
-    return read();
+    return read()
   }
 
   private static SystemNotificationsXO.ConnectionType getConnectionType(final NexusEmailer emailer) {

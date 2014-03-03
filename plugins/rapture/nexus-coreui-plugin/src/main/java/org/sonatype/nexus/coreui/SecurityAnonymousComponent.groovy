@@ -69,7 +69,7 @@ extends DirectComponentSupport
       }
       else {
         username = 'anonymous'
-        password = 'anonymous'  // FIXME is there another way to get default anonymous user/password
+        password = 'anonymous' // FIXME is there another way to get default anonymous user/password
       }
     }
     else {
@@ -78,7 +78,7 @@ extends DirectComponentSupport
     }
     nexusConfiguration.setAnonymousAccess(anonymousXO.enabled, username, password)
     nexusConfiguration.saveConfiguration()
-    return read();
+    return read()
   }
 
 }

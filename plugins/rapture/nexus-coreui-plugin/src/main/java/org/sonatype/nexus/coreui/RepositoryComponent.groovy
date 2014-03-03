@@ -55,7 +55,7 @@ class RepositoryComponent
 extends DirectComponentSupport
 {
 
-  private static final TRUST_STORE_TYPE = 'repository';
+  private static final TRUST_STORE_TYPE = 'repository'
 
   @Inject
   RepositoryRegistry repositoryRegistry
@@ -260,7 +260,7 @@ extends DirectComponentSupport
               format = template.contentClass.id
 
           if (type == 'virtual' && template.contentClass.id.startsWith('maven')) {
-            masterFormat = template.contentClass.id == 'maven1' ? 'maven2' : 'maven1';
+            masterFormat = template.contentClass.id == 'maven1' ? 'maven2' : 'maven1'
           }
 
           if ((type == (typeFilter ?: type) && (format == (formatFilter ?: format)))) {
@@ -403,7 +403,7 @@ extends DirectComponentSupport
   }
 
   def static doGetMavenHosted(MavenHostedRepository repo, RepositoryXO xo) {
-    if (!xo) xo = new RepositoryHostedMavenXO();
+    if (!xo) xo = new RepositoryHostedMavenXO()
     if (xo instanceof RepositoryHostedMavenXO) {
       xo.with {
         indexable = repo.indexable
@@ -414,7 +414,7 @@ extends DirectComponentSupport
   }
 
   def static doGetHosted(HostedRepository repo, RepositoryXO xo) {
-    if (!xo) xo = new RepositoryHostedXO();
+    if (!xo) xo = new RepositoryHostedXO()
     if (xo instanceof RepositoryHostedXO) {
       xo.with {
         writePolicy = repo.writePolicy
@@ -424,7 +424,7 @@ extends DirectComponentSupport
   }
 
   def static doGetMavenProxy(MavenProxyRepository repo, RepositoryXO xo) {
-    if (!xo) xo = new RepositoryProxyMavenXO();
+    if (!xo) xo = new RepositoryProxyMavenXO()
     if (xo instanceof RepositoryProxyMavenXO) {
       xo.with {
         repositoryPolicy = repo.repositoryPolicy
@@ -438,7 +438,7 @@ extends DirectComponentSupport
   }
 
   def doGetProxy(ProxyRepository repo, RepositoryXO xo) {
-    if (!xo) xo = new RepositoryProxyXO();
+    if (!xo) xo = new RepositoryProxyXO()
     if (xo instanceof RepositoryProxyXO) {
       xo.with {
         def rsc = repo.remoteStorageContext
@@ -478,7 +478,7 @@ extends DirectComponentSupport
   }
 
   def static doGetGroup(GroupRepository repo, RepositoryXO xo) {
-    if (!xo) xo = new RepositoryGroupXO();
+    if (!xo) xo = new RepositoryGroupXO()
     if (xo instanceof RepositoryGroupXO) {
       xo.with {
         memberRepositoryIds = repo.memberRepositoryIds
@@ -488,7 +488,7 @@ extends DirectComponentSupport
   }
 
   def static doGetVirtual(ShadowRepository repo, RepositoryXO xo) {
-    if (!xo) xo = new RepositoryVirtualXO();
+    if (!xo) xo = new RepositoryVirtualXO()
     if (xo instanceof RepositoryVirtualXO) {
       xo.with {
         synchronizeAtStartup = repo.synchronizeAtStartup
@@ -499,7 +499,7 @@ extends DirectComponentSupport
   }
 
   def doGet(Repository repo, RepositoryXO xo, List<RepositoryTemplateXO> templates) {
-    if (!xo) xo = new RepositoryXO();
+    if (!xo) xo = new RepositoryXO()
     if (xo instanceof RepositoryXO) {
       xo.with {
         id = repo.id
@@ -535,15 +535,15 @@ extends DirectComponentSupport
     return null
   }
 
-  private static final Pattern BRACKETS_PATTERN = Pattern.compile("(.*)( \\(.*\\))");
+  private static final Pattern BRACKETS_PATTERN = Pattern.compile("(.*)( \\(.*\\))")
 
   def static String nameOfProvider(List<RepositoryTemplateXO> templates, type, provider) {
     def template = templates.find { template -> template.type == type && template.provider == provider }
     def name = template?.providerName
     if (name) {
-      Matcher m = BRACKETS_PATTERN.matcher(name);
+      Matcher m = BRACKETS_PATTERN.matcher(name)
       if (m.matches() && m.groupCount() == 2) {
-        name = m.group(1);
+        name = m.group(1)
       }
     }
     return name

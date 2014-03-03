@@ -77,13 +77,13 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:targets:create')
   RepositoryTargetXO create(final RepositoryTargetXO target) {
-    validate(target);
-    target.id = Long.toHexString(System.nanoTime());
+    validate(target)
+    target.id = Long.toHexString(System.nanoTime())
     def result = new Target(
         target.id, target.name, repositoryTypeRegistry.contentClasses[target.format], target.patterns
     )
     targetRegistry.addRepositoryTarget(result)
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration.saveConfiguration()
     return asRepositoryTarget(result)
   }
 
@@ -91,14 +91,14 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:targets:update')
   RepositoryTargetXO update(final RepositoryTargetXO target) {
-    validate(target);
+    validate(target)
     // TODO validate id and that id exists
     if (target.id) {
       def result = new Target(
           target.id, target.name, repositoryTypeRegistry.contentClasses[target.format], target.patterns
       )
       targetRegistry.addRepositoryTarget(result)
-      nexusConfiguration.saveConfiguration();
+      nexusConfiguration.saveConfiguration()
       return asRepositoryTarget(result)
     }
     // TODO throw exception
@@ -110,7 +110,7 @@ extends DirectComponentSupport
   @RequiresPermissions('nexus:targets:delete')
   void delete(final String id) {
     targetRegistry.removeRepositoryTarget(id)
-    nexusConfiguration.saveConfiguration();
+    nexusConfiguration.saveConfiguration()
   }
 
   private static RepositoryTargetXO asRepositoryTarget(Target input) {
@@ -142,7 +142,7 @@ extends DirectComponentSupport
     }
 
     if (!validations.valid) {
-      throw new InvalidConfigurationException(validations);
+      throw new InvalidConfigurationException(validations)
     }
   }
 

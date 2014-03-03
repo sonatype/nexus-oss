@@ -60,7 +60,7 @@ extends DirectComponentSupport
   SecurityRealmXO update(final SecurityRealmXO realmXO) {
     // TODO validation?
     securitySystem.realms = realmXO.realms
-    return read();
+    return read()
   }
 
   @DirectMethod

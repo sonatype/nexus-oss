@@ -79,21 +79,21 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasks:delete')
   void delete(final String id) {
-    nexusScheduler.getTaskById(id)?.cancel();
+    nexusScheduler.getTaskById(id)?.cancel()
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasksrun:get')
   void run(final String id) {
-    nexusScheduler.getTaskById(id)?.runNow();
+    nexusScheduler.getTaskById(id)?.runNow()
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasksrun:delete')
   void stop(final String id) {
-    nexusScheduler.getTaskById(id)?.cancelOnly();
+    nexusScheduler.getTaskById(id)?.cancelOnly()
   }
 
   /**
@@ -117,88 +117,88 @@ extends DirectComponentSupport
       case TaskState.WAITING:
       case TaskState.FINISHED:
       case TaskState.BROKEN:
-        return 'Waiting';
+        return 'Waiting'
       case TaskState.RUNNING:
-        return 'Running';
+        return 'Running'
       case TaskState.SLEEPING:
-        return 'Blocked';
+        return 'Blocked'
       case TaskState.CANCELLING:
-        return 'Cancelling';
+        return 'Cancelling'
       case TaskState.CANCELLED:
-        return 'Cancelled';
+        return 'Cancelled'
       default:
-        return 'Unknown';
+        return 'Unknown'
     }
   }
 
   private static String getSchedule(final Schedule schedule) {
     if (ManualRunSchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_MANUAL;
+      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_MANUAL
     }
     else if (RunNowSchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_RUN_NOW;
+      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_RUN_NOW
     }
     else if (OnceSchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_ONCE;
+      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_ONCE
     }
     else if (HourlySchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_HOURLY;
+      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_HOURLY
     }
     else if (DailySchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_DAILY;
+      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_DAILY
     }
     else if (WeeklySchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_WEEKLY;
+      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_WEEKLY
     }
     else if (MonthlySchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_MONTHLY;
+      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_MONTHLY
     }
     else if (CronSchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_ADVANCED;
+      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_ADVANCED
     }
     else {
-      return schedule.getClass().getName();
+      return schedule.getClass().getName()
     }
   }
 
   private static Date getNextRun(final ScheduledTask<?> task) {
-    Date nextRunTime = null;
+    Date nextRunTime = null
 
     // Run now type tasks should never have a next run time
     if (!task.schedule.class.isAssignableFrom(RunNowSchedule.class) && task.nextRun) {
-      nextRunTime = task.nextRun;
+      nextRunTime = task.nextRun
     }
 
-    return nextRunTime;
+    return nextRunTime
   }
 
   protected static String getLastRunResult(final ScheduledTask<?> task) {
-    String lastRunResult = null;
+    String lastRunResult = null
 
     if (task.lastStatus != null) {
-      lastRunResult = TaskState.BROKEN.equals(task.lastStatus) ? "Error" : "Ok";
+      lastRunResult = TaskState.BROKEN.equals(task.lastStatus) ? "Error" : "Ok"
       if (task.duration != 0) {
-        long milliseconds = task.duration;
+        long milliseconds = task.duration
 
-        int hours = (int) ((milliseconds / 1000) / 3600);
-        int minutes = (int) ((milliseconds / 1000) / 60 - hours * 60);
-        int seconds = (int) (((long) (milliseconds / 1000)) % 60);
+        int hours = (int) ((milliseconds / 1000) / 3600)
+        int minutes = (int) ((milliseconds / 1000) / 60 - hours * 60)
+        int seconds = (int) (((long) (milliseconds / 1000)) % 60)
 
-        lastRunResult += " [";
+        lastRunResult += " ["
         if (hours != 0) {
-          lastRunResult += hours;
-          lastRunResult += "h";
+          lastRunResult += hours
+          lastRunResult += "h"
         }
         if (minutes != 0 || hours != 0) {
-          lastRunResult += minutes;
-          lastRunResult += "m";
+          lastRunResult += minutes
+          lastRunResult += "m"
         }
-        lastRunResult += seconds;
-        lastRunResult += "s";
-        lastRunResult += "]";
+        lastRunResult += seconds
+        lastRunResult += "s"
+        lastRunResult += "]"
       }
     }
-    return lastRunResult;
+    return lastRunResult
   }
 
 }

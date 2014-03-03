@@ -66,7 +66,7 @@ extends DirectComponentSupport
         return asRepositoryRoute(input)
       }
       catch (NoSuchRepositoryException e) {
-        return null;
+        return null
       }
     }
   }
@@ -75,7 +75,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:routes:create')
   RepositoryRouteXO create(final RepositoryRouteXO routeXO) {
-    routeXO.id = Long.toHexString(System.nanoTime());
+    routeXO.id = Long.toHexString(System.nanoTime())
     return addToMapper(routeXO)
   }
 
@@ -97,7 +97,7 @@ extends DirectComponentSupport
   @RequiresPermissions('nexus:routes:delete')
   void delete(final String id) {
     if (repositoryMapper.removeMapping(id)) {
-      nexusConfiguration.saveConfiguration();
+      nexusConfiguration.saveConfiguration()
     }
     else {
       throw new IllegalArgumentException('Route with id "' + id + '" not found')
@@ -105,35 +105,35 @@ extends DirectComponentSupport
   }
 
   def asRepositoryRoute(final RepositoryPathMapping input) {
-      return new RepositoryRouteXO(
-          id: input.id,
-          pattern: input.patterns[0],
-          mappingType: input.mappingType,
-          groupId: input.groupId,
-          groupName: input.groupId != '*' ? repositoryName(input.id, input.groupId) : input.groupId,
-          mappedRepositoriesIds: input.mappedRepositories,
-          mappedRepositoriesNames: input.mappedRepositories.collect { repositoryId ->
-            return repositoryName(input.id, repositoryId)
-          }
-      )
+    return new RepositoryRouteXO(
+        id: input.id,
+        pattern: input.patterns[0],
+        mappingType: input.mappingType,
+        groupId: input.groupId,
+        groupName: input.groupId != '*' ? repositoryName(input.id, input.groupId) : input.groupId,
+        mappedRepositoriesIds: input.mappedRepositories,
+        mappedRepositoriesNames: input.mappedRepositories.collect { repositoryId ->
+          return repositoryName(input.id, repositoryId)
+        }
+    )
   }
 
   def repositoryName(final String routeId, final String repositoryId) {
     try {
-      return repositoryRegistry.getRepository(repositoryId).name;
+      return repositoryRegistry.getRepository(repositoryId).name
     }
     catch (NoSuchRepositoryAccessException e) {
-      log.debug("Access Denied to group '{}' contained within route: '{}", repositoryId, routeId);
-      throw e;
+      log.debug("Access Denied to group '{}' contained within route: '{}", repositoryId, routeId)
+      throw e
     }
     catch (NoSuchRepositoryException e) {
-      log.debug("Cannot find repository '{}' contained within route: '{}", repositoryId, routeId);
-      throw e;
+      log.debug("Cannot find repository '{}' contained within route: '{}", repositoryId, routeId)
+      throw e
     }
   }
 
   def addToMapper(final RepositoryRouteXO routeXO) {
-    validate(routeXO);
+    validate(routeXO)
     def route = new RepositoryPathMapping(
         routeXO.id, routeXO.mappingType, routeXO.groupId, [routeXO.pattern], routeXO.mappedRepositoriesIds
     )
@@ -167,7 +167,7 @@ extends DirectComponentSupport
     }
 
     if (!validations.valid) {
-      throw new InvalidConfigurationException(validations);
+      throw new InvalidConfigurationException(validations)
     }
   }
 

@@ -111,15 +111,15 @@ extends DirectComponentSupport
         xo.httpsAuthNtlmHost, xo.httpsAuthNtlmDomain
     )
 
-    nexusConfiguration.saveConfiguration();
-    return read();
+    nexusConfiguration.saveConfiguration()
+    return read()
   }
 
   def static validate(final SystemHttpXO xo) {
     def validations = new ValidationResponse()
     // TODO validate
     if (!validations.valid) {
-      throw new InvalidConfigurationException(validations);
+      throw new InvalidConfigurationException(validations)
     }
   }
 
