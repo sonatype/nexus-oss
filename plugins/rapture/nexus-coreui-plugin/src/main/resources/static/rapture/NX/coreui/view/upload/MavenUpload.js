@@ -33,7 +33,8 @@ Ext.define('NX.coreui.view.upload.MavenUpload', {
     store = Ext.create('NX.coreui.store.RepositoryOfType');
     store.load({
       params: {
-        type: 'hosted+maven'
+        type: 'hosted',
+        format: 'maven2'
       }
     });
 
