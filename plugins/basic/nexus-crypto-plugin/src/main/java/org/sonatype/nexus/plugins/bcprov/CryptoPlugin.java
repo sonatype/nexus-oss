@@ -18,6 +18,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.plugin.PluginIdentity;
 
+import com.google.common.base.Throwables;
 import org.eclipse.sisu.EagerSingleton;
 import org.jetbrains.annotations.NonNls;
 
@@ -52,5 +53,16 @@ public class CryptoPlugin
   @Inject
   public CryptoPlugin() throws Exception {
     super(GROUP_ID, ARTIFACT_ID);
+    try {
+      if (!JCETester.isUnlimitedStrengthPolicyInstalled()) {
+        log.warn(
+            "This JVM does not have JCE Unlimited Strength Jurisdiction Policy Files installed, required by {} plugin.",
+            getCoordinates()
+        );
+      }
+    }
+    catch (RuntimeException e) {
+      throw new AssertionError("Unsuitable JVM for running Nexus", e);
+    }
   }
 }

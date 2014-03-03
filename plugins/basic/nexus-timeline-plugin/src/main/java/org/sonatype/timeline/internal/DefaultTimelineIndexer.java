@@ -183,6 +183,7 @@ public class DefaultTimelineIndexer
       throws IOException
   {
     indexWriter.commit();
+    searcherManager.maybeRefresh();
   }
 
   protected void retrieve(final long fromTime, final long toTime, final Set<String> types,
@@ -278,6 +279,7 @@ public class DefaultTimelineIndexer
     }
     finally {
       searcherManager.release(searcher);
+      searcherManager.maybeRefresh();
     }
   }
 

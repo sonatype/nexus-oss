@@ -47,7 +47,8 @@
             memoryStoreEvictionPolicy="LFU"
             />
 
-    <cache name="path-cache" 
+    <!-- Nexus NFC -->
+    <cache name="nx-repository-path-cache" 
             maxElementsInMemory="100000"
             eternal="false"
             timeToIdleSeconds="120"

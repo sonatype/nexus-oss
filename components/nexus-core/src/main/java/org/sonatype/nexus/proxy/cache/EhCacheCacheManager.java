@@ -38,7 +38,7 @@ public class EhCacheCacheManager
 {
   private final net.sf.ehcache.CacheManager cacheManager;
 
-  public static final String SINGLE_PATH_CACHE_NAME = "repository-nf-cache";
+  public static final String SINGLE_PATH_CACHE_NAME = "nx-repository-path-cache";
 
   @Inject
   public EhCacheCacheManager(final EventBus eventBus, final net.sf.ehcache.CacheManager cacheManager) {
