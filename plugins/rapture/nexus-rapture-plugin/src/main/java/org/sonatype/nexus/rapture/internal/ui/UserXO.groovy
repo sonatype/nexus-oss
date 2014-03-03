@@ -11,19 +11,19 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.rapture.internal.ux
+package org.sonatype.nexus.rapture.internal.ui
 
 import groovy.transform.ToString
 
 /**
- * Permission exchange object.
+ * User exchange object.
  *
  * @since 2.8
  */
 @ToString(includePackage = false, includeNames = true)
-class PermissionXO
+class UserXO
 {
   String id
 
-  int value
+  boolean authenticated
 }

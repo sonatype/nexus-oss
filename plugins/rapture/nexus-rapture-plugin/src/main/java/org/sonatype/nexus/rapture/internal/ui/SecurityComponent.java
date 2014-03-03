@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.rapture.internal.ux;
+package org.sonatype.nexus.rapture.internal.ui;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -44,7 +44,7 @@ import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.subject.Subject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.rapture.internal.ux.StateComponent.shouldSend;
+import static org.sonatype.nexus.rapture.internal.ui.StateComponent.shouldSend;
 
 /**
  * Security Ext.Direct component.

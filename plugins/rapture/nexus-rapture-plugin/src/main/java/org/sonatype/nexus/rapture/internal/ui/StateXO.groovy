@@ -11,19 +11,19 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.rapture.internal.ux
+package org.sonatype.nexus.rapture.internal.ui
 
 import groovy.transform.ToString
 
 /**
- * License exchange object.
+ * State exchange object.
  *
  * @since 2.8
  */
 @ToString(includePackage = false, includeNames = true)
-class LicenseXO
+class StateXO
 {
-  boolean required
+  Map<String, Object> values
 
-  boolean installed
+  List<CommandXO> commands
 }

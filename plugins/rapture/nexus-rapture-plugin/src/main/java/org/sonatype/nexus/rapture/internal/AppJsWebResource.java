@@ -23,7 +23,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.rapture.internal.ux.StateComponent;
+import org.sonatype.nexus.rapture.internal.ui.StateComponent;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.webresources.WebResourceService;
 import org.sonatype.sisu.goodies.template.TemplateParameters;

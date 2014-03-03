@@ -11,19 +11,19 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.rapture.internal.ux
+package org.sonatype.nexus.rapture.internal.ui
 
 import groovy.transform.ToString
 
 /**
- * State exchange object.
+ * Status exchange object.
  *
  * @since 2.8
  */
 @ToString(includePackage = false, includeNames = true)
-class StateXO
+class StatusXO
 {
-  Map<String, Object> values
+  String edition
 
-  List<CommandXO> commands
+  String version
 }
