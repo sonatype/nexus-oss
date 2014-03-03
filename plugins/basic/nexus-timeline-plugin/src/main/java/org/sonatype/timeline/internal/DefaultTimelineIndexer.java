@@ -41,6 +41,8 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.SearcherFactory;
+import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
@@ -71,6 +73,8 @@ public class DefaultTimelineIndexer
   private Directory directory;
 
   private IndexWriter indexWriter;
+
+  private SearcherManager searcherManager;
 
   private int generation = 0;
 
@@ -116,6 +120,7 @@ public class DefaultTimelineIndexer
     indexWriter = new IndexWriter(directory, config);
     indexWriter.commit();
 
+    searcherManager = new SearcherManager(indexWriter, false, new SearcherFactory());
     generation = generation + 1;
   }
 
@@ -189,7 +194,8 @@ public class DefaultTimelineIndexer
       // new in Lucene 3.5, it would bitch IllegalArgEx if we ask for "top 0" docs
       return;
     }
-    final IndexSearcher searcher = new IndexSearcher(IndexReader.open(indexWriter, false));
+    searcherManager.maybeRefresh();
+    final IndexSearcher searcher = searcherManager.acquire();
     try {
       if (searcher.maxDoc() == 0) {
         // index empty
@@ -241,14 +247,15 @@ public class DefaultTimelineIndexer
       }
     }
     finally {
-      searcher.close();
+      searcherManager.release(searcher);
     }
   }
 
   protected int purge(final long fromTime, final long toTime, final Set<String> types, final Set<String> subTypes)
       throws IOException
   {
-    final IndexSearcher searcher = new IndexSearcher(IndexReader.open(indexWriter, false));
+    searcherManager.maybeRefresh();
+    final IndexSearcher searcher = searcherManager.acquire();
     try {
       if (searcher.maxDoc() == 0) {
         // empty index, nothing to purge
@@ -270,7 +277,7 @@ public class DefaultTimelineIndexer
       return topDocs.scoreDocs.length;
     }
     finally {
-      searcher.close();
+      searcherManager.release(searcher);
     }
   }
 
@@ -279,6 +286,10 @@ public class DefaultTimelineIndexer
   protected void closeIndexWriter()
       throws IOException
   {
+    if (searcherManager != null) {
+      searcherManager.close();
+      searcherManager = null;
+    }
     if (indexWriter != null) {
       indexWriter.commit();
       indexWriter.close();
