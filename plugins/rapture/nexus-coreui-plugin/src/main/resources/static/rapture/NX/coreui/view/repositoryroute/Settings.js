@@ -20,6 +20,8 @@ Ext.define('NX.coreui.view.repositoryroute.Settings', {
   settingsFormSuccessMessage: function (data) {
     return 'Repository route updated: ' + data['pattern'];
   },
+  editableCondition: NX.Conditions.isPermitted('nexus:routes', 'update'),
+  editableMarker: 'You do not have permission to update routes',
 
   models: [
     'Reference'

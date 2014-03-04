@@ -24,7 +24,9 @@ Ext.define('NX.coreui.view.user.Add', {
     },
     settingsFormSuccessMessage: function (data) {
       return 'User created: ' + data['id'];
-    }
+    },
+    editableCondition: NX.Conditions.isPermitted('security:users', 'create'),
+    editableMarker: 'You do not have permission to create users'
   },
 
   initComponent: function () {

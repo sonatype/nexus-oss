@@ -24,7 +24,9 @@ Ext.define('NX.coreui.view.repositoryroute.Add', {
     },
     settingsFormSuccessMessage: function (data) {
       return 'Repository route created: ' + data['pattern'];
-    }
+    },
+    editableCondition: NX.Conditions.isPermitted('nexus:routes', 'create'),
+    editableMarker: 'You do not have permission to create routes'
   }
 
 });

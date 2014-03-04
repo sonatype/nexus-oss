@@ -28,6 +28,8 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
       settingsFormSuccessMessage: function (data) {
         return 'Role created: ' + data['name'];
       },
+      editableCondition: NX.Conditions.isPermitted('security:roles', 'create'),
+      editableMarker: 'You do not have permission to create roles',
       source: me.source
     };
 

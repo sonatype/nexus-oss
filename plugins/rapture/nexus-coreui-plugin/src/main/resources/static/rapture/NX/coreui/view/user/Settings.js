@@ -20,6 +20,8 @@ Ext.define('NX.coreui.view.user.Settings', {
   settingsFormSuccessMessage: function (data) {
     return 'User updated: ' + data['id'];
   },
+  editableCondition: NX.Conditions.isPermitted('security:users', 'update'),
+  editableMarker: 'You do not have permission to update users',
 
   initComponent: function () {
     var me = this;

@@ -14,6 +14,9 @@ Ext.define('NX.coreui.view.repository.RepositorySettings', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-repository-settings',
 
+  editableCondition: NX.Conditions.isPermitted('nexus:repositories', 'update'),
+  editableMarker: 'You do not have permission to update repositories',
+
   initComponent: function () {
     var me = this;
 

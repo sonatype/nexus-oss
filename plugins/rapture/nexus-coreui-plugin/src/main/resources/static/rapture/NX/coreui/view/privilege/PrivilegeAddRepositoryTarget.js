@@ -39,6 +39,8 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
       api: {
         submit: 'NX.direct.coreui_Privilege.createForRepositoryTarget'
       },
+      editableCondition: NX.Conditions.isPermitted('security:privileges', 'create'),
+      editableMarker: 'You do not have permission to create privileges',
 
       items: [
         {

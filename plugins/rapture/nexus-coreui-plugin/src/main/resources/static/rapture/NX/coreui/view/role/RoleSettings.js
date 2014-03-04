@@ -20,6 +20,8 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
   settingsFormSuccessMessage: function (data) {
     return 'Role updated: ' + data['name'];
   },
+  editableCondition: NX.Conditions.isPermitted('security:roles', 'update'),
+  editableMarker: 'You do not have permission to update roles',
 
   initComponent: function () {
     var me = this,

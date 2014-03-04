@@ -24,7 +24,9 @@ Ext.define('NX.coreui.view.repositorytarget.Add', {
     },
     settingsFormSuccessMessage: function (data) {
       return 'Repository target created: ' + data['name'];
-    }
+    },
+    editableCondition: NX.Conditions.isPermitted('nexus:targets', 'create'),
+    editableMarker: 'You do not have permission to create targets'
   }
 
 });

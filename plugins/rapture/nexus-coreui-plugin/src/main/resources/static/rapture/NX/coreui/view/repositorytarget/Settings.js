@@ -20,6 +20,8 @@ Ext.define('NX.coreui.view.repositorytarget.Settings', {
   settingsFormSuccessMessage: function (data) {
     return 'Repository target updated: ' + data['name'];
   },
+  editableCondition: NX.Conditions.isPermitted('nexus:targets', 'update'),
+  editableMarker: 'You do not have permission to update targets',
 
   initComponent: function () {
     var me = this;

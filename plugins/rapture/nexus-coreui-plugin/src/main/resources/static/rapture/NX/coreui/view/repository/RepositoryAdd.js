@@ -14,6 +14,9 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-repository-add',
 
+  editableCondition: NX.Conditions.isPermitted('nexus:repositories', 'create'),
+  editableMarker: 'You do not have permission to create repositories',
+
   defaultFocus: 'id',
 
   initComponent: function () {
