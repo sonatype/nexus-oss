@@ -19,6 +19,16 @@ Ext.define('NX.view.SettingsForm', {
   extend: 'Ext.form.Panel',
   alias: 'widget.nx-settingsform',
 
+  /**
+   * @cfg {NX.util.condition.Condition} The condition to be satisfied in order for this form to be editable.
+   */
+  editableCondition: undefined,
+
+  /**
+   * @cfg {string} Optional text to be shown in case that form is not editable (condition is not satisfied).
+   */
+  editableMarker: undefined,
+
   bodyPadding: 10,
   autoScroll: true,
 
@@ -47,6 +57,65 @@ Ext.define('NX.view.SettingsForm', {
         }
       }
     }
-  ]
+  ],
+
+  /**
+   * @public
+   * Sets the read only state for all fields of this form.
+   * @param {boolean} editable
+   * @param {string} [markerText] text to be shown as a marker in case that form is not editable
+   */
+  setEditable: function (editable) {
+    var me = this,
+        bottomBar;
+
+    me.setEditableOnItems(me, editable);
+
+    bottomBar = me.getDockedItems('toolbar[dock="bottom"]')[0];
+    if (bottomBar) {
+      if (editable) {
+        if (bottomBar.editableMarker) {
+          bottomBar.remove(bottomBar.editableMarker);
+        }
+        bottomBar.enable();
+      }
+      else {
+        if (me.editableMarker) {
+          bottomBar.editableMarker = Ext.widget({
+            xtype: 'label',
+            text: me.editableMarker,
+            // TODO replace style with css class?
+            style: {
+              fontSize: '10px',
+              fontWeight: 'bold'
+            }
+          });
+          bottomBar.add(bottomBar.editableMarker);
+        }
+        bottomBar.disable();
+      }
+    }
+  },
+
+  /**
+   * @private
+   * Sets read only on container items.
+   * @param {Ext.container.Container} container
+   * @param {boolean} editable
+   */
+  setEditableOnItems: function (container, editable) {
+    var me = this;
+
+    if (container.items) {
+      container.items.each(function (item) {
+        if (Ext.isFunction(item.setReadOnly)) {
+          item.setReadOnly(!editable);
+        }
+        if (item.isXType('container')) {
+          me.setEditableOnItems(item, editable);
+        }
+      });
+    }
+  }
 
 });

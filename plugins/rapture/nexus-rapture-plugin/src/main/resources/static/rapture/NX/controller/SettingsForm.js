@@ -35,6 +35,9 @@ Ext.define('NX.controller.SettingsForm', {
         'form[settingsForm=true]': {
           beforerender: me.loadForm
         },
+        'form[settingsForm=true][editableCondition]': {
+          afterrender: me.bindEditableCondition
+        },
         'form[settingsForm=true] button[action=save]': {
           click: me.submitForm
         }
@@ -84,6 +87,28 @@ Ext.define('NX.controller.SettingsForm', {
           me.loadForm(form);
         }
       });
+    }
+  },
+
+  /**
+   * @private
+   * Toggle editable on settings form hen editable condition is satisfied (if specified).
+   * @param {NX.view.SettingsForm} form
+   */
+  bindEditableCondition: function (form) {
+    if (Ext.isDefined(form.editableCondition)) {
+      form.mon(
+          form.editableCondition,
+          {
+            satisfied: function () {
+              form.setEditable(true);
+            },
+            unsatisfied: function () {
+              form.setEditable(false);
+            },
+            scope: form
+          }
+      );
     }
   }
 
