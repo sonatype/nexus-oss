@@ -17,7 +17,6 @@ Ext.define('NX.coreui.view.system.General', {
   items: [
     {
       xtype: 'nx-settingsform',
-      settingsForm: true,
       settingsFormSuccessMessage: 'General system settings $action',
       api: {
         load: 'NX.direct.coreui_SystemGeneral.read',
