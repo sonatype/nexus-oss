@@ -18,7 +18,7 @@
  * @since 2.7
  */
 Ext.define('NX.coreui.view.capability.SettingsFieldSet', {
-  extend: 'Ext.form.FieldSet',
+  extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-capability-settings-fieldset',
 
   requires: [
@@ -40,8 +40,6 @@ Ext.define('NX.coreui.view.capability.SettingsFieldSet', {
       autoHeight: false,
       autoScroll: true,
       collapsed: false,
-      labelWidth: 120,
-      labelSeparator: '',
       items: []
     });
 

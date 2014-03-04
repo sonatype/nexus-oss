@@ -34,7 +34,6 @@ Ext.define('NX.coreui.view.system.General', {
           xtype: 'textfield',
           name: 'baseUrl',
           fieldLabel: 'Base URL',
-          width: 500,
           emptyText: NX.util.Url.baseUrl
         },
         {

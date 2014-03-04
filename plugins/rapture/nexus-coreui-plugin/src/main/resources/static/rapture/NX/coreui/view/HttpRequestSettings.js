@@ -18,14 +18,12 @@ Ext.define('NX.coreui.view.HttpRequestSettings', {
     {
       xtype: 'textfield',
       name: 'userAgentCustomisation',
-      fieldLabel: 'User-agent customization',
-      width: 400
+      fieldLabel: 'User-agent customization'
     },
     {
       xtype: 'textfield',
       name: 'urlParameters',
-      fieldLabel: 'URL parameters',
-      width: 400
+      fieldLabel: 'URL parameters'
     },
     {
       xtype: 'numberfield',

@@ -38,8 +38,7 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
         store: 'RoleBySource',
         queryMode: 'local',
         displayField: 'name',
-        valueField: 'id',
-        width: 500
+        valueField: 'id'
       }
     }
     else {

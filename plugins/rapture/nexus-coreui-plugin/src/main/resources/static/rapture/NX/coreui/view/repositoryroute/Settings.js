@@ -71,8 +71,7 @@ Ext.define('NX.coreui.view.repositoryroute.Settings', {
         store: me.groupStore,
         queryMode: 'local',
         displayField: 'name',
-        valueField: 'id',
-        width: 500
+        valueField: 'id'
       },
       {
         xtype: 'nx-itemselector',

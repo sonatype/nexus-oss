@@ -45,8 +45,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtual', {
         store: me.repositoryStore,
         queryMode: 'local',
         displayField: 'name',
-        valueField: 'id',
-        width: 500
+        valueField: 'id'
       },
       {
         xtype: 'checkbox',

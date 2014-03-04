@@ -78,7 +78,6 @@ Ext.define('NX.coreui.view.system.Http', {
               name: 'nonProxyHosts',
               fieldLabel: 'Non Proxy Hosts',
               emptyText: 'enter a hostname',
-              width: 400,
               sorted: true
             }
           ]

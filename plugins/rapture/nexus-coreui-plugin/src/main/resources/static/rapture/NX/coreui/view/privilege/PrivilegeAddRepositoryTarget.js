@@ -64,8 +64,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
           store: me.repositoryStore,
           queryMode: 'local',
           displayField: 'name',
-          valueField: 'id',
-          width: 500
+          valueField: 'id'
         },
         {
           xtype: 'combo',
@@ -77,8 +76,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
           store: me.targetStore,
           queryMode: 'local',
           displayField: 'name',
-          valueField: 'id',
-          width: 500
+          valueField: 'id'
         }
       ]
     };

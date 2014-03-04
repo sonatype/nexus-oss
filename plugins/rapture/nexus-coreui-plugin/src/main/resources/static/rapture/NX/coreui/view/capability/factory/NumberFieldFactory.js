@@ -35,8 +35,7 @@ Ext.define('NX.coreui.view.capability.factory.NumberFieldFactory', {
       itemCls: formField.required ? 'required-field' : '',
       helpText: formField.helpText,
       allowBlank: formField.required ? false : true,
-      regex: formField.regexValidation ? new RegExp(formField.regexValidation) : null,
-      anchor: '96%'
+      regex: formField.regexValidation ? new RegExp(formField.regexValidation) : null
     };
     if (formField.initialValue) {
       item.value = Number(formField.initialValue);

@@ -49,8 +49,7 @@ Ext.define('NX.coreui.view.maven.MavenUpload', {
         displayField: 'name',
         valueField: 'id',
         store: store,
-        editable: false,
-        width: 500
+        editable: false
       }
     ]);
   }

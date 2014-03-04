@@ -11,16 +11,10 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 Ext.define('NX.coreui.view.capability.Add', {
-  extend: 'Ext.window.Window',
+  extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-capability-add',
 
   title: 'Create new capability',
-
-  layout: 'fit',
-  autoShow: true,
-  modal: true,
-  constrain: true,
-  width: 640,
 
   initComponent: function () {
     var me = this;

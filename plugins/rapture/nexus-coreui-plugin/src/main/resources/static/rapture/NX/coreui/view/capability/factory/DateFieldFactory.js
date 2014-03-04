@@ -37,8 +37,7 @@ Ext.define('NX.coreui.view.capability.factory.DateFieldFactory', {
       helpText: formField.helpText,
       allowBlank: formField.required ? false : true,
       regex: formField.regexValidation ? new RegExp(formField.regexValidation) : null,
-      value: new Date(),
-      anchor: '96%'
+      value: new Date()
     };
     if (formField.initialValue) {
       item.value = new Date(Number(formField.initialValue));

@@ -28,22 +28,19 @@ Ext.define('NX.coreui.view.upload.UploadArtifact', {
       name: 'group',
       itemId: 'group',
       fieldLabel: 'Group',
-      emptyText: 'enter a group name',
-      width: 500
+      emptyText: 'enter a group name'
     },
     {
       name: 'artifact',
       itemId: 'artifact',
       fieldLabel: 'Artifact',
-      emptyText: 'enter an artifact name',
-      width: 500
+      emptyText: 'enter an artifact name'
     },
     {
       name: 'version',
       itemId: 'version',
       fieldLabel: 'Version',
-      emptyText: 'enter a version',
-      width: 500
+      emptyText: 'enter a version'
     },
     {
       xtype: 'combo',
@@ -54,8 +51,7 @@ Ext.define('NX.coreui.view.upload.UploadArtifact', {
       queryMode: 'local',
       displayField: 'name',
       valueField: 'id',
-      store: ['pom', 'jar', 'ejb', 'war', 'ear', 'rar', 'par', 'maven-archetype', 'maven-plugin'],
-      width: 500
+      store: ['pom', 'jar', 'ejb', 'war', 'ear', 'rar', 'par', 'maven-archetype', 'maven-plugin']
     }
   ],
 
