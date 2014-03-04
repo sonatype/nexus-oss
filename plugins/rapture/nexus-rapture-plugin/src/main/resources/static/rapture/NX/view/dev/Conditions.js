@@ -47,7 +47,8 @@ Ext.define('NX.view.dev.Conditions', {
   ],
 
   tbar : [
-    { xtype: 'checkbox', itemId: 'showAll', boxLabel: 'ShowAll', value: false }
+    { xtype: 'checkbox', itemId: 'showSatisfied', boxLabel: 'Show Satisfied', value: true },
+    { xtype: 'checkbox', itemId: 'showUnsatisfied', boxLabel: 'Show Unsatisfied', value: true }
   ]
 
 });

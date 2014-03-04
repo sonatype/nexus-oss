@@ -27,8 +27,12 @@ Ext.define('NX.controller.dev.Conditions', {
 
   refs: [
     {
-      ref: 'showAll',
-      selector: 'nx-dev-conditions #showAll'
+      ref: 'showSatisfied',
+      selector: 'nx-dev-conditions #showSatisfied'
+    },
+    {
+      ref: 'showUnsatisfied',
+      selector: 'nx-dev-conditions #showUnsatisfied'
     },
     {
       ref: 'devPanelTabs',
@@ -43,10 +47,16 @@ Ext.define('NX.controller.dev.Conditions', {
   init: function () {
     var me = this;
 
-    me.showAllFilter = Ext.create('Ext.util.Filter', {
-      id: 'showAll',
+    me.excludeSatisfiedFilter = Ext.create('Ext.util.Filter', {
+      id: 'excludeSatisfiedFilter',
       filterFn: function (record) {
-        return Ext.isDefined(record.get('condition'));
+        return record.get('satisfied') !== true;
+      }
+    });
+    me.excludeUnsatisfiedFilter = Ext.create('Ext.util.Filter', {
+      id: 'excludeUnsatisfiedFilter',
+      filterFn: function (record) {
+        return record.get('satisfied') !== false;
       }
     });
 
@@ -58,11 +68,11 @@ Ext.define('NX.controller.dev.Conditions', {
         }
       },
       component: {
-        'nx-dev-conditions': {
-          afterrender: me.showAll
+        'nx-dev-conditions #showSatisfied': {
+          change: me.syncSatisfiedFilter
         },
-        'nx-dev-conditions #showAll': {
-          change: me.showAll
+        'nx-dev-conditions #showUnsatisfied': {
+          change: me.syncUnsatisfiedFilter
         }
       }
     });
@@ -86,16 +96,29 @@ Ext.define('NX.controller.dev.Conditions', {
     }
   },
 
-  showAll: function () {
+  syncSatisfiedFilter: function () {
     var me = this,
-        showAll = me.getShowAll().getValue(),
+        value = me.getShowSatisfied().getValue(),
         store = me.getStore('NX.store.dev.Condition');
 
-    if (showAll) {
-      store.removeFilter(me.showAllFilter);
+    if (value) {
+      store.removeFilter(me.excludeSatisfiedFilter);
     }
     else {
-      store.addFilter(me.showAllFilter);
+      store.addFilter(me.excludeSatisfiedFilter);
+    }
+  },
+
+  syncUnsatisfiedFilter: function () {
+    var me = this,
+        value = me.getShowUnsatisfied().getValue(),
+        store = me.getStore('NX.store.dev.Condition');
+
+    if (value) {
+      store.removeFilter(me.excludeUnsatisfiedFilter);
+    }
+    else {
+      store.addFilter(me.excludeUnsatisfiedFilter);
     }
   },
 
