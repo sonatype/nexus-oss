@@ -54,25 +54,31 @@ Ext.define('NX.controller.SettingsForm', {
 
     if (forms) {
       Ext.each(forms, function (form) {
-        me.loadForm(form);
-        if (form.settingsFormTitle) {
-          NX.Messages.add({ text: form.settingsFormTitle + ' refreshed', type: 'default'});
-        }
+        me.loadForm(form, {
+          success: function (basicForm, action) {
+            var title = me.getSettingsFormSuccessMessage(form, action);
+            if (title) {
+              NX.Messages.add({ text: title, type: 'default' });
+            }
+          }
+        });
       });
     }
   },
 
   /**
    * @private
+   * Loads the form if form's api load function is defined.
    */
-  loadForm: function (form) {
+  loadForm: function (form, options) {
     if (form.api && form.api.load) {
-      form.load();
+      form.load(options);
     }
   },
 
   /**
    * @private
+   * Submits the form containing the button, if form's api submit function is defined.
    */
   submitForm: function (button) {
     var me = this,
@@ -80,14 +86,37 @@ Ext.define('NX.controller.SettingsForm', {
 
     if (form.api && form.api.submit) {
       form.getForm().submit({
-        success: function () {
-          if (form.settingsFormTitle) {
-            NX.Messages.add({ text: form.settingsFormTitle + ' updated', type: 'success' });
+        success: function (basicForm, action) {
+          var title = me.getSettingsFormSuccessMessage(form, action);
+          if (title) {
+            NX.Messages.add({ text: title, type: 'success' });
           }
+          form.fireEvent('submitted', form, action);
           me.loadForm(form);
         }
       });
     }
+  },
+
+  /**
+   * @private
+   * Calculates title based on form's {NX.view.SettingsForm#getSettingsFormSuccessMessage}.
+   * @param {NX.view.SettingsForm} form
+   * @param {Ext.form.action.Action} action
+   */
+  getSettingsFormSuccessMessage: function (form, action) {
+    var title;
+
+    if (form.settingsFormSuccessMessage) {
+      if (Ext.isFunction(form.settingsFormSuccessMessage)) {
+        title = form.settingsFormSuccessMessage(action.result.data)
+      }
+      else {
+        title = form.settingsFormSuccessMessage.toString();
+      }
+    }
+    title = title.replace(/\$action/, action.type.indexOf('submit') > -1 ? 'updated' : 'refreshed');
+    return title;
   },
 
   /**

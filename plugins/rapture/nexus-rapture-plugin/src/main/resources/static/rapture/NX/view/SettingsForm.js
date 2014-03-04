@@ -28,8 +28,9 @@ Ext.define('NX.view.SettingsForm', {
   /**
    * @cfg {string/function} Text to be used when displaying submit/load messages. If is a function it will be called
    * with submit/load response data as parameter and it should return a String.
+   * If text contains "${action}", it will be replaced with performed action.
    */
-  settingsFormTitle: undefined,
+  settingsFormSuccessMessage: undefined,
 
   /**
    * @cfg {NX.util.condition.Condition} The condition to be satisfied in order for this form to be editable.

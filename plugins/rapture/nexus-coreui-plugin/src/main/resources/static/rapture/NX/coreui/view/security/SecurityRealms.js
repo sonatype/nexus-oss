@@ -22,7 +22,7 @@ Ext.define('NX.coreui.view.security.SecurityRealms', {
     {
       xtype: 'nx-settingsform',
       settingsForm: true,
-      settingsFormTitle: 'Security Realms settings',
+      settingsFormSuccessMessage: 'Security Realms settings $action',
       api: {
         load: 'NX.direct.coreui_SecurityRealm.read',
         submit: 'NX.direct.coreui_SecurityRealm.update'

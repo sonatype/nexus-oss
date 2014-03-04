@@ -22,7 +22,7 @@ Ext.define('NX.coreui.view.system.Http', {
     {
       xtype: 'nx-settingsform',
       settingsForm: true,
-      settingsFormTitle: 'HTTP system settings',
+      settingsFormSuccessMessage: 'HTTP system settings $action',
       api: {
         load: 'NX.direct.coreui_SystemHttp.read',
         submit: 'NX.direct.coreui_SystemHttp.update'

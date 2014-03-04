@@ -18,7 +18,7 @@ Ext.define('NX.coreui.view.system.Notifications', {
     {
       xtype: 'nx-settingsform',
       settingsForm: true,
-      settingsFormTitle: 'Notifications system settings',
+      settingsFormSuccessMessage: 'Notifications system settings $action',
       api: {
         load: 'NX.direct.coreui_SystemNotifications.read',
         submit: 'NX.direct.coreui_SystemNotifications.update'

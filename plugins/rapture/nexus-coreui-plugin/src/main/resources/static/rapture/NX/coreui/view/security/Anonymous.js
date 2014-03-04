@@ -21,7 +21,7 @@ Ext.define('NX.coreui.view.security.Anonymous', {
       {
         xtype: 'nx-settingsform',
         settingsForm: true,
-        settingsFormTitle: 'Anonymous security settings',
+        settingsFormSuccessMessage: 'Anonymous security settings $action',
         api: {
           load: 'NX.direct.coreui_SecurityAnonymous.read',
           submit: 'NX.direct.coreui_SecurityAnonymous.update'
