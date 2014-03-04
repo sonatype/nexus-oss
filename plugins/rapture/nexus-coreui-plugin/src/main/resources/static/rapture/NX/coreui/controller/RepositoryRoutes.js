@@ -83,11 +83,8 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
         'nx-coreui-repositoryroute-list button[action=new]': {
           click: me.showAddWindow
         },
-        'nx-coreui-repositoryroute-add button[action=add]': {
-          click: me.create
-        },
-        'nx-coreui-repositoryroute-settings button[action=save]': {
-          click: me.update
+        'nx-coreui-repositoryroute-settings': {
+          submitted: me.onSettingsSubmitted
         },
         'nx-coreui-repositoryroute-settings #mappingType': {
           change: me.onMappingTypeChanged
@@ -153,44 +150,18 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
 
   /**
    * @private
-   * Creates a new repository route.
    */
-  create: function (button) {
+  onSettingsSubmitted: function (form, action) {
     var me = this,
-        win = button.up('window'),
-        form = button.up('form');
+        win = form.up('nx-coreui-repositoryroute-add');
 
-    form.submit({
-      waitMsg: 'Creating route...',
-      success: function (form, action) {
-        win.close();
-        NX.Messages.add({
-          text: 'Route created: ' + me.getDescription(me.getRepositoryRouteModel().create(action.result.data)),
-          type: 'success'
-        });
-        me.loadStoreAndSelect(action.result.data.id);
-      }
-    });
-  },
-
-  /**
-   * @private
-   * Updates a repository route.
-   */
-  update: function (button) {
-    var me = this,
-        form = button.up('form');
-
-    form.submit({
-      waitMsg: 'Updating route...',
-      success: function (form, action) {
-        NX.Messages.add({
-          text: 'Route updated: ' + me.getDescription(me.getRepositoryRouteModel().create(action.result.data)),
-          type: 'success'
-        });
-        me.loadStore();
-      }
-    });
+    if (win) {
+      win.close();
+      me.loadStoreAndSelect(action.result.data.id);
+    }
+    else {
+      me.loadStore();
+    }
   },
 
   /**

@@ -24,6 +24,9 @@ Ext.define('NX.coreui.view.repository.RepositoryAddVirtual', {
       template: me.template,
       api: {
         submit: 'NX.direct.coreui_Repository.createVirtual'
+      },
+      settingsFormSuccessMessage: function (data) {
+        return 'Shadow repository created: ' + data['id'];
       }
     };
 

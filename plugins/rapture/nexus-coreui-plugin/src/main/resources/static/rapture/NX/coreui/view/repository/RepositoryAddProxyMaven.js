@@ -24,6 +24,9 @@ Ext.define('NX.coreui.view.repository.RepositoryAddProxyMaven', {
       template: me.template,
       api: {
         submit: 'NX.direct.coreui_Repository.createProxyMaven'
+      },
+      settingsFormSuccessMessage: function (data) {
+        return 'Maven Proxy repository created: ' + data['id'];
       }
     };
 

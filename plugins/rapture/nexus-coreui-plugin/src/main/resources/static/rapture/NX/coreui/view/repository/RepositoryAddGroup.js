@@ -24,6 +24,9 @@ Ext.define('NX.coreui.view.repository.RepositoryAddGroup', {
       template: me.template,
       api: {
         submit: 'NX.direct.coreui_Repository.createGroup'
+      },
+      settingsFormSuccessMessage: function (data) {
+        return 'Group repository created: ' + data['id'];
       }
     };
 

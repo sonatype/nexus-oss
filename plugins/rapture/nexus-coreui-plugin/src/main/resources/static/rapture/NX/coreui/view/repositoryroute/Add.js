@@ -21,6 +21,9 @@ Ext.define('NX.coreui.view.repositoryroute.Add', {
     xtype: 'nx-coreui-repositoryroute-settings',
     api: {
       submit: 'NX.direct.coreui_RepositoryRoute.create'
+    },
+    settingsFormSuccessMessage: function (data) {
+      return 'Repository route created: ' + data['pattern'];
     }
   }
 

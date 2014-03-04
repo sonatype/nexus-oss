@@ -17,6 +17,9 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsGroup', {
   api: {
     submit: 'NX.direct.coreui_Repository.updateGroup'
   },
+  settingsFormSuccessMessage: function (data) {
+    return 'Repository updated: ' + data['id'];
+  },
 
   initComponent: function () {
     var me = this;

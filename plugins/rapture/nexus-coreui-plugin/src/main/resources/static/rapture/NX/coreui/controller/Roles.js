@@ -87,11 +87,8 @@ Ext.define('NX.coreui.controller.Roles', {
         'nx-coreui-role-list menuitem[action=newmapping]': {
           click: me.showAddWindowMapping
         },
-        'nx-coreui-role-add button[action=add]': {
-          click: me.create
-        },
-        'nx-coreui-role-settings button[action=save]': {
-          click: me.update
+        'nx-coreui-role-settings': {
+          submitted: me.onSettingsSubmitted
         }
       }
     });
@@ -202,44 +199,18 @@ Ext.define('NX.coreui.controller.Roles', {
 
   /**
    * @private
-   * Creates a new role.
    */
-  create: function (button) {
+  onSettingsSubmitted: function (form, action) {
     var me = this,
-        win = button.up('window'),
-        form = button.up('form');
+        win = form.up('nx-coreui-role-add');
 
-    form.submit({
-      waitMsg: 'Creating role...',
-      success: function (form, action) {
-        win.close();
-        NX.Messages.add({
-          text: 'Role created: ' + me.getDescription(me.getRoleModel().create(action.result.data)),
-          type: 'success'
-        });
-        me.loadStoreAndSelect(action.result.data.id);
-      }
-    });
-  },
-
-  /**
-   * @private
-   * Updates a role.
-   */
-  update: function (button) {
-    var me = this,
-        form = button.up('form');
-
-    form.submit({
-      waitMsg: 'Updating role...',
-      success: function (form, action) {
-        NX.Messages.add({
-          text: 'Role updated: ' + me.getDescription(me.getRoleModel().create(action.result.data)),
-          type: 'success'
-        });
-        me.loadStore();
-      }
-    });
+    if (win) {
+      win.close();
+      me.loadStoreAndSelect(action.result.data.id);
+    }
+    else {
+      me.loadStore();
+    }
   },
 
   /**

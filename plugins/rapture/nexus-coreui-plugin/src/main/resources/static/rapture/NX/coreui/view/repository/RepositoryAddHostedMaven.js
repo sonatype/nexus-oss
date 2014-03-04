@@ -24,6 +24,9 @@ Ext.define('NX.coreui.view.repository.RepositoryAddHostedMaven', {
       template: me.template,
       api: {
         submit: 'NX.direct.coreui_Repository.createHostedMaven'
+      },
+      settingsFormSuccessMessage: function (data) {
+        return 'Maven Hosted repository created: ' + data['id'];
       }
     };
 

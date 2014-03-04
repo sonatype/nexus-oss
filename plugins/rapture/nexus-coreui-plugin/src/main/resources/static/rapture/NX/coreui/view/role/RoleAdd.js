@@ -25,6 +25,9 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
       api: {
         submit: 'NX.direct.coreui_Role.create'
       },
+      settingsFormSuccessMessage: function (data) {
+        return 'Role created: ' + data['name'];
+      },
       source: me.source
     };
 

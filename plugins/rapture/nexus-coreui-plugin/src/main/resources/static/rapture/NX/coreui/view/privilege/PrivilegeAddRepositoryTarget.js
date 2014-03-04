@@ -39,6 +39,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
       api: {
         submit: 'NX.direct.coreui_Privilege.createForRepositoryTarget'
       },
+
       items: [
         {
           name: 'name',

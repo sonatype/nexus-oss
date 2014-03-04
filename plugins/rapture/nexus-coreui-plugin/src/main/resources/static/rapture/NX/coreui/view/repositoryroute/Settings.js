@@ -17,6 +17,9 @@ Ext.define('NX.coreui.view.repositoryroute.Settings', {
   api: {
     submit: 'NX.direct.coreui_RepositoryRoute.update'
   },
+  settingsFormSuccessMessage: function (data) {
+    return 'Repository route updated: ' + data['pattern'];
+  },
 
   models: [
     'Reference'

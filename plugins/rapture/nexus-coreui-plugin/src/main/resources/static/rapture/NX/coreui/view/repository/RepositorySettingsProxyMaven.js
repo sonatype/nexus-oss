@@ -12,7 +12,7 @@
  */
 Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
   extend: 'NX.coreui.view.repository.RepositorySettings',
-  alias: ['widget.nx-repository-settings-proxy-maven1','widget.nx-repository-settings-proxy-maven2'],
+  alias: ['widget.nx-repository-settings-proxy-maven1', 'widget.nx-repository-settings-proxy-maven2'],
   requires: [
     'NX.coreui.view.AuthenticationSettings',
     'NX.coreui.view.HttpRequestSettings'
@@ -20,6 +20,9 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
 
   api: {
     submit: 'NX.direct.coreui_Repository.updateProxyMaven'
+  },
+  settingsFormSuccessMessage: function (data) {
+    return 'Repository updated: ' + data['id'];
   },
 
   initComponent: function () {
@@ -65,7 +68,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         name: 'fileTypeValidation',
         fieldLabel: 'File Content Validation',
         value: true
-      },{
+      },
+      {
         xtype: 'combo',
         name: 'checksumPolicy',
         fieldLabel: 'Checksum Policy',

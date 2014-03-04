@@ -21,6 +21,9 @@ Ext.define('NX.coreui.view.user.Add', {
     xtype: 'nx-coreui-user-settings',
     api: {
       submit: 'NX.direct.coreui_User.create'
+    },
+    settingsFormSuccessMessage: function (data) {
+      return 'User created: ' + data['id'];
     }
   },
 

@@ -17,6 +17,9 @@ Ext.define('NX.coreui.view.repositorytarget.Settings', {
   api: {
     submit: 'NX.direct.coreui_RepositoryTarget.update'
   },
+  settingsFormSuccessMessage: function (data) {
+    return 'Repository target updated: ' + data['name'];
+  },
 
   initComponent: function () {
     var me = this;

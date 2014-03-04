@@ -114,8 +114,8 @@ Ext.define('NX.controller.SettingsForm', {
       else {
         title = form.settingsFormSuccessMessage.toString();
       }
+      title = title.replace(/\$action/, action.type.indexOf('submit') > -1 ? 'updated' : 'refreshed');
     }
-    title = title.replace(/\$action/, action.type.indexOf('submit') > -1 ? 'updated' : 'refreshed');
     return title;
   },
 

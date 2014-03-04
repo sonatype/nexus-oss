@@ -21,6 +21,9 @@ Ext.define('NX.coreui.view.repositorytarget.Add', {
     xtype: 'nx-coreui-repositorytarget-settings',
     api: {
       submit: 'NX.direct.coreui_RepositoryTarget.create'
+    },
+    settingsFormSuccessMessage: function (data) {
+      return 'Repository target created: ' + data['name'];
     }
   }
 

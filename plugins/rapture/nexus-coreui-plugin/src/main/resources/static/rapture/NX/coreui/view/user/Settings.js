@@ -17,6 +17,9 @@ Ext.define('NX.coreui.view.user.Settings', {
   api: {
     submit: 'NX.direct.coreui_User.update'
   },
+  settingsFormSuccessMessage: function (data) {
+    return 'User updated: ' + data['id'];
+  },
 
   initComponent: function () {
     var me = this;

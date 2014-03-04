@@ -70,8 +70,8 @@ Ext.define('NX.coreui.controller.Privileges', {
         'nx-coreui-privilege-list menuitem[action=newrepositorytarget]': {
           click: me.showAddWindowRepositoryTarget
         },
-        'nx-coreui-privilege-add-repositorytarget button[action=add]': {
-          click: me.create
+        'nx-coreui-privilege-add-repositorytarget form': {
+          submitted: me.onSettingsSubmitted
         },
         'nx-coreui-privilege-add-repositorytarget #repositoryId': {
           change: me.filterRepositoryTargets
@@ -145,26 +145,24 @@ Ext.define('NX.coreui.controller.Privileges', {
 
   /**
    * @private
-   * Creates a new privilege for a repository target.
    */
-  create: function (button) {
+  onSettingsSubmitted: function (form, action) {
     var me = this,
-        win = button.up('window'),
-        form = button.up('form');
+        win = form.up('nx-coreui-privilege-add-repositorytarget');
 
-    form.submit({
-      waitMsg: 'Creating privilege...',
-      success: function (form, action) {
-        win.close();
-        Ext.Array.each(action.result.data, function (privilege) {
-          NX.Messages.add({
-            text: 'Privilege created: ' + privilege.name,
-            type: 'success'
-          });
+    if (win) {
+      win.close();
+      me.loadStoreAndSelect(action.result.data.id);
+      Ext.Array.each(action.result.data, function (privilege) {
+        NX.Messages.add({
+          text: 'Privilege created: ' + privilege.name,
+          type: 'success'
         });
-        me.loadStoreAndSelect(action.result.data[0].id);
-      }
-    });
+      });
+    }
+    else {
+      me.loadStore();
+    }
   },
 
   /**

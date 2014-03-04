@@ -69,11 +69,8 @@ Ext.define('NX.coreui.controller.Users', {
         'nx-coreui-user-list button[action=new]': {
           click: me.showAddWindow
         },
-        'nx-coreui-user-add button[action=add]': {
-          click: me.create
-        },
-        'nx-coreui-user-settings button[action=save]': {
-          click: me.update
+        'nx-coreui-user-settings': {
+          submitted: me.onSettingsSubmitted
         }
       }
     });
@@ -106,44 +103,18 @@ Ext.define('NX.coreui.controller.Users', {
 
   /**
    * @private
-   * Creates a new user.
    */
-  create: function (button) {
+  onSettingsSubmitted: function (form, action) {
     var me = this,
-        win = button.up('window'),
-        form = button.up('form');
+        win = form.up('nx-coreui-user-add');
 
-    form.submit({
-      waitMsg: 'Creating user...',
-      success: function (form, action) {
-        win.close();
-        NX.Messages.add({
-          text: 'User created: ' + me.getDescription(me.getUserModel().create(action.result.data)),
-          type: 'success'
-        });
-        me.loadStoreAndSelect(action.result.data.id);
-      }
-    });
-  },
-
-  /**
-   * @private
-   * Updates a user.
-   */
-  update: function (button) {
-    var me = this,
-        form = button.up('form');
-
-    form.submit({
-      waitMsg: 'Updating user...',
-      success: function (form, action) {
-        NX.Messages.add({
-          text: 'User updated: ' + me.getDescription(me.getUserModel().create(action.result.data)),
-          type: 'success'
-        });
-        me.loadStore();
-      }
-    });
+    if (win) {
+      win.close();
+      me.loadStoreAndSelect(action.result.data.id);
+    }
+    else {
+      me.loadStore();
+    }
   },
 
   /**

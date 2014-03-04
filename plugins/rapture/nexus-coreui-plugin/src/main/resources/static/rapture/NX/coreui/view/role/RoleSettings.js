@@ -17,6 +17,9 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
   api: {
     submit: 'NX.direct.coreui_Role.update'
   },
+  settingsFormSuccessMessage: function (data) {
+    return 'Role updated: ' + data['name'];
+  },
 
   initComponent: function () {
     var me = this,

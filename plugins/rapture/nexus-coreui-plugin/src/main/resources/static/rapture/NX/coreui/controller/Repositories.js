@@ -99,14 +99,8 @@ Ext.define('NX.coreui.controller.Repositories', {
         'nx-coreui-repository-list menuitem[action=new]': {
           click: me.showAddWindow
         },
-        'nx-coreui-repository-add button[action=add]': {
-          click: me.create
-        },
-        'nx-coreui-repository-settings-tab button[action=save]': {
-          click: me.update
-        },
-        'nx-coreui-repository-settings-tab button[action=discard]': {
-          click: me.discard
+        'nx-coreui-repository-settings': {
+          submitted: me.onSettingsSubmitted
         }
       }
     });
@@ -207,53 +201,18 @@ Ext.define('NX.coreui.controller.Repositories', {
 
   /**
    * @private
-   * Rests form.
    */
-  discard: function (button) {
-    var form = button.up('form');
-    form.loadRecord(form.getRecord());
-  },
-
-  /**
-   * @private
-   * Creates a new repository.
-   */
-  create: function (button) {
+  onSettingsSubmitted: function (form, action) {
     var me = this,
-        win = button.up('window'),
-        form = button.up('form');
+        win = form.up('nx-coreui-repository-add');
 
-    form.submit({
-      waitMsg: 'Creating repository...',
-      success: function (form, action) {
-        win.close();
-        NX.Messages.add({
-          text: 'Repository created: ' + me.getDescription(me.getRepositoryModel().create(action.result.data)),
-          type: 'success'
-        });
-        me.loadStoreAndSelect(action.result.data.id);
-      }
-    });
-  },
-
-  /**
-   * @private
-   * Updates a repository.
-   */
-  update: function (button) {
-    var me = this,
-        form = button.up('form');
-
-    form.submit({
-      waitMsg: 'Updating repository...',
-      success: function (form, action) {
-        NX.Messages.add({
-          text: 'Repository updated: ' + me.getDescription(me.getRepositoryModel().create(action.result.data)),
-          type: 'success'
-        });
-        me.loadStore();
-      }
-    });
+    if (win) {
+      win.close();
+      me.loadStoreAndSelect(action.result.data.id);
+    }
+    else {
+      me.loadStore();
+    }
   },
 
   /**

@@ -17,6 +17,9 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMaven', {
   api: {
     submit: 'NX.direct.coreui_Repository.updateHostedMaven'
   },
+  settingsFormSuccessMessage: function (data) {
+    return 'Repository updated: ' + data['id'];
+  },
 
   initComponent: function () {
     var me = this;

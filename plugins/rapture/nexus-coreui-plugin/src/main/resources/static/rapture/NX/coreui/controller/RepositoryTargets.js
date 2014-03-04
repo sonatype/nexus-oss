@@ -90,11 +90,8 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
         'nx-coreui-repositorytarget-list button[action=new]': {
           click: me.showAddWindow
         },
-        'nx-coreui-repositorytarget-add button[action=add]': {
-          click: me.create
-        },
-        'nx-coreui-repositorytarget-settings button[action=save]': {
-          click: me.update
+        'nx-coreui-repositorytarget-settings': {
+          submitted: me.onSettingsSubmitted
         }
       }
     });
@@ -140,44 +137,18 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
 
   /**
    * @private
-   * Creates a new repository target.
    */
-  create: function (button) {
+  onSettingsSubmitted: function (form, action) {
     var me = this,
-        win = button.up('window'),
-        form = button.up('form');
+        win = form.up('nx-coreui-repositorytarget-add');
 
-    form.submit({
-      waitMsg: 'Updating target...',
-      success: function (form, action) {
-        win.close();
-        NX.Messages.add({
-          text: 'Target created: ' + me.getDescription(me.getRepositoryTargetModel().create(action.result.data)),
-          type: 'success'
-        });
-        me.loadStoreAndSelect(action.result.data.id);
-      }
-    });
-  },
-
-  /**
-   * @private
-   * Updates a repository target.
-   */
-  update: function (button) {
-    var me = this,
-        form = button.up('form');
-
-    form.submit({
-      waitMsg: 'Updating target...',
-      success: function (form, action) {
-        NX.Messages.add({
-          text: 'Target updated: ' + me.getDescription(me.getRepositoryTargetModel().create(action.result.data)),
-          type: 'success'
-        });
-        me.loadStore();
-      }
-    });
+    if (win) {
+      win.close();
+      me.loadStoreAndSelect(action.result.data.id);
+    }
+    else {
+      me.loadStore();
+    }
   },
 
   /**
