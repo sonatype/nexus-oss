@@ -19,6 +19,7 @@
 Ext.define('NX.ext.form.field.Base', {
   override: 'Ext.form.field.Base',
 
-  labelWidth: 180
+  labelWidth: 180,
+  width: 600
 
 });
