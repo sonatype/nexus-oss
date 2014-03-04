@@ -20,6 +20,18 @@ Ext.define('NX.view.SettingsForm', {
   alias: 'widget.nx-settingsform',
 
   /**
+   * @cfg {boolean} [settingsForm=true] Marker that we have a settings form
+   * ({NX.controller.SettingsForm} controller kicks in)
+   */
+  settingsForm: true,
+
+  /**
+   * @cfg {string/function} Text to be used when displaying submit/load messages. If is a function it will be called
+   * with submit/load response data as parameter and it should return a String.
+   */
+  settingsFormTitle: undefined,
+
+  /**
    * @cfg {NX.util.condition.Condition} The condition to be satisfied in order for this form to be editable.
    */
   editableCondition: undefined,
@@ -109,7 +121,14 @@ Ext.define('NX.view.SettingsForm', {
     if (container.items) {
       container.items.each(function (item) {
         if (Ext.isFunction(item.setReadOnly)) {
-          item.setReadOnly(!editable);
+          if (editable) {
+            item.setReadOnly(item.readOnlyBackup);
+            delete item.readOnlyBackup;
+          }
+          else {
+            item.readOnlyBackup = item.readOnly || false;
+            item.setReadOnly(true);
+          }
         }
         if (item.isXType('container')) {
           me.setEditableOnItems(item, editable);
