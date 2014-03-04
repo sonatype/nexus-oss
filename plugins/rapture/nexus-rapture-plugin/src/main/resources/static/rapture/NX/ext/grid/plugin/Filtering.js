@@ -98,20 +98,10 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
       me.logDebug(
           'Filtering ' + me.filteredStore.storeId + ' on [' + me.filterValue + '] using fields: ' + me.filteredFields
       );
-      me.filteredStore.filterBy(function (record) {
-        for (var i = 0; i < me.filteredFields.length; i++) {
-          var filteredField = me.filteredFields[i];
-          if (filteredField) {
-            if (me.matches(me.filterValue, record, filteredField, record.data[filteredField])) {
-              return true;
-            }
-          }
-        }
-        return false;
-      }, me);
+      me.filteredStore.filter(me.filteringFilter);
     }
     else {
-      me.filteredStore.clearFilter();
+      me.filteredStore.removeFilter(me.filteringFilter);
       me.logDebug('Filtering cleared on ' + me.filteredStore.storeId);
     }
   },
@@ -120,9 +110,21 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
    * @private
    * Clear filter value if store is filtered from outside.
    */
-  syncFilterValue: function () {
-    var me = this;
-    if (me.filterValue) {
+  syncFilterValue: function (store, filters) {
+    var me = this,
+        filteringFilterRemoved = true;
+
+    if (filters) {
+      Ext.Array.each(filters, function (filter) {
+        if (filter.id === me.filteringFilter.id) {
+          filteringFilterRemoved = false;
+          return false;
+        }
+        return true;
+      });
+    }
+
+    if (me.filterValue && filteringFilterRemoved) {
       me.clearFilter();
       me.grid.fireEvent('filteringautocleared');
     }
@@ -140,6 +142,21 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
     grid.filterable = true;
     grid.filter = Ext.Function.bind(me.filter, me);
     grid.clearFilter = Ext.Function.bind(me.clearFilter, me);
+
+    me.filteringFilter = Ext.create('Ext.util.Filter', {
+      id: 'filteringPlugin',
+      filterFn: function (record) {
+        for (var i = 0; i < me.filteredFields.length; i++) {
+          var filteredField = me.filteredFields[i];
+          if (filteredField) {
+            if (me.matches(me.filterValue, record, filteredField, record.data[filteredField])) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+    });
 
     grid.mon(grid, {
       reconfigure: me.onReconfigure,
