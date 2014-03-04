@@ -23,6 +23,9 @@ Ext.define('NX.coreui.view.system.General', {
         load: 'NX.direct.coreui_SystemGeneral.read',
         submit: 'NX.direct.coreui_SystemGeneral.update'
       },
+      editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
+      editableMarker: 'You do not have permission to configure general settings',
+
       items: [
         {
           xtype: 'label',

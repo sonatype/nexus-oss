@@ -23,6 +23,9 @@ Ext.define('NX.coreui.view.system.Notifications', {
         load: 'NX.direct.coreui_SystemNotifications.read',
         submit: 'NX.direct.coreui_SystemNotifications.update'
       },
+      editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
+      editableMarker: 'You do not have permission to configure notifications',
+
       items: [
         {
           xtype: 'label',

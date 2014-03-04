@@ -27,6 +27,8 @@ Ext.define('NX.coreui.view.system.Http', {
         load: 'NX.direct.coreui_SystemHttp.read',
         submit: 'NX.direct.coreui_SystemHttp.update'
       },
+      editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
+      editableMarker: 'You do not have permission to configure http',
       items: [
         // request settings
         {

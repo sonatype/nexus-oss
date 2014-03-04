@@ -27,6 +27,8 @@ Ext.define('NX.coreui.view.security.SecurityRealms', {
         load: 'NX.direct.coreui_SecurityRealm.read',
         submit: 'NX.direct.coreui_SecurityRealm.update'
       },
+      editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
+      editableMarker: 'You do not have permission to configure realms',
 
       items: [
         {

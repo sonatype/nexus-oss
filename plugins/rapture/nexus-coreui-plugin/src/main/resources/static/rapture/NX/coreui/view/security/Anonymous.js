@@ -26,6 +26,8 @@ Ext.define('NX.coreui.view.security.Anonymous', {
           load: 'NX.direct.coreui_SecurityAnonymous.read',
           submit: 'NX.direct.coreui_SecurityAnonymous.update'
         },
+        editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
+        editableMarker: 'You do not have permission to configure anonymous user',
         items: [
           {
             xtype: 'label',
