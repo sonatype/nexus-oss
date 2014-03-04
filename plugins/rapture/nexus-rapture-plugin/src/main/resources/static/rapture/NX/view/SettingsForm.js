@@ -26,6 +26,12 @@ Ext.define('NX.view.SettingsForm', {
   settingsForm: true,
 
   /**
+   * @cfg {boolean} [settingsFormSubmit=true] True if settings form should be submitted automatically when 'submit'
+   * button is clicked. Set this to false if custom processing is needed.
+   */
+  settingsFormSubmit: true,
+
+  /**
    * @cfg {string/function} Text to be used when displaying submit/load messages. If is a function it will be called
    * with submit/load response data as parameter and it should return a String.
    * If text contains "${action}", it will be replaced with performed action.
