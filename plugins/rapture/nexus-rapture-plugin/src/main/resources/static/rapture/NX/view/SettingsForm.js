@@ -88,7 +88,14 @@ Ext.define('NX.view.SettingsForm', {
     var me = this,
         bottomBar;
 
-    me.setEditableOnItems(me, editable);
+    // TODO Can we do something about how form looks like when is disabled?
+
+    if (editable) {
+      me.enable();
+    }
+    else {
+      me.disable();
+    }
 
     bottomBar = me.getDockedItems('toolbar[dock="bottom"]')[0];
     if (bottomBar) {
@@ -96,7 +103,6 @@ Ext.define('NX.view.SettingsForm', {
         if (bottomBar.editableMarker) {
           bottomBar.remove(bottomBar.editableMarker);
         }
-        bottomBar.enable();
       }
       else {
         if (me.editableMarker) {
@@ -111,36 +117,7 @@ Ext.define('NX.view.SettingsForm', {
           });
           bottomBar.add(bottomBar.editableMarker);
         }
-        bottomBar.disable();
       }
-    }
-  },
-
-  /**
-   * @private
-   * Sets read only on container items.
-   * @param {Ext.container.Container} container
-   * @param {boolean} editable
-   */
-  setEditableOnItems: function (container, editable) {
-    var me = this;
-
-    if (container.items) {
-      container.items.each(function (item) {
-        if (Ext.isFunction(item.setReadOnly)) {
-          if (editable) {
-            item.setReadOnly(item.readOnlyBackup);
-            delete item.readOnlyBackup;
-          }
-          else {
-            item.readOnlyBackup = item.readOnly || false;
-            item.setReadOnly(true);
-          }
-        }
-        if (item.isXType('container')) {
-          me.setEditableOnItems(item, editable);
-        }
-      });
     }
   }
 
