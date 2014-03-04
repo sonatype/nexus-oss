@@ -53,14 +53,11 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsGroup', {
   reloadRepositories: function () {
     var me = this;
 
-    // TODO: cannot load the store as the item selector used for members is giving errors
-    if (me.repositoriesStore.getCount() === 0) {
-      me.repositoriesStore.load({
-        params: {
-          format: me.template.format
-        }
-      });
-    }
+    me.repositoriesStore.load({
+      params: {
+        format: me.template.format
+      }
+    });
   }
 
 });
