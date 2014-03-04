@@ -73,6 +73,16 @@ Ext.define('NX.ext.form.field.ItemSelector', {
         button.glyph = 'xf103@FontAwesome'; // fa-angle-double-down
         break;
     }
+  },
+
+  // HACK: Looks like original item selector forgot to unbind from store which results in NPEs in #populateFromStore
+  onDestroy: function () {
+    var me = this;
+
+    if (me.store) {
+      me.store.un('load', me.populateFromStore, me);
+    }
+    this.callParent();
   }
 
 });
