@@ -37,6 +37,7 @@ Ext.define('NX.app.PluginConfig', {
     },
 
     // dev controllers (visible when ?debug and rapture capability debugAllowed = true)
+    { id: 'dev.Conditions', active: 'NX.app.Application.debugMode' },
     { id: 'dev.Developer', active: 'NX.app.Application.debugMode'},
     { id: 'dev.Permissions', active: 'NX.app.Application.debugMode'},
     { id: 'dev.Stores', active: 'NX.app.Application.debugMode'},
