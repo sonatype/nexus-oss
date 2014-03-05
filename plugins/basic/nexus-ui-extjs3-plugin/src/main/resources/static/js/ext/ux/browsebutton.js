@@ -208,9 +208,6 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
             this.buttonCt = this.el.child('.x-btn-mc em');
         }
 
-        var width = this.buttonCt.getWidth();
-        var height = this.buttonCt.getHeight();
-
         this.buttonCt.position('relative'); // this is important!
         var styleCfg = {
             position: 'absolute',
