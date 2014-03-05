@@ -116,7 +116,7 @@ NX.define('Sonatype.repoServer.Maven2InformationPanel', {
         },
         scope : this,
         method : 'GET',
-        suppressStatus : '404'
+        suppressStatus : 404
       });
     }
     else {
