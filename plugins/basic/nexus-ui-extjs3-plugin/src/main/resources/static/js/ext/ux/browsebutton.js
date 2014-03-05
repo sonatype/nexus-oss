@@ -300,7 +300,6 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
      * @private
      */
     setClipSize: function(){
-      var me = this;
         if (this.clipEl) {
             var width = this.buttonCt.getWidth();
             var height = this.buttonCt.getHeight();
