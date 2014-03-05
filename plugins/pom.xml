@@ -298,7 +298,23 @@
         <type>jar</type>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
-      
+
+      <!-- quartz -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-quartz-plugin</artifactId>
+        <type>nexus-plugin</type>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-quartz-plugin</artifactId>
+        <type>jar</type>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
       <!-- kenai -->
 
       <dependency>
