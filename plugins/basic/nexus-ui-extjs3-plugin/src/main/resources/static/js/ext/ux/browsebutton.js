@@ -57,7 +57,7 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
      * Debug mode doesn't make clipEl transparent so that one can see how effectively it covers the Ext.Button.
      * In addition, clipEl is given a green background and floatEl a red background to see how well they are positioned.
      */
-    debug: false,
+    debug: window.location.search === '?debug',
 
     /*
      * Private constants:
@@ -146,14 +146,17 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
      */
     BROWSERS_OFFSETS: {
         Ext2: {
+            IE10:  {left: -8, top: -16, width: 16,  height: 22},
             IE9:   {left: -8, top: -16, width: 16,  height: 22},
             IE8:   {left: -8, top: -16, width: 16,  height: 22},
             IE:    {left: -8, top: -3,  width: 16,  height: 6},
             Opera: {left: -8, top: -3,  width: -18, height: -1},
             Gecko: {left: -8, top: -6,  width: 16,  height: 10},
-            Safari:{left: -4, top: -2,  width: 6,   height: 6}
+            Safari:{left: -4, top: -2,  width: 6,   height: 6},
+            Chrome:{left: -4, top: -2,  width: 6,   height: 6}
         },
         Ext3: {
+            IE10:  {left: -7,           width: 10},
             IE9:   {left: -7,           width: 10},
             IE8:   {left: -7,           width: 10},
             IE:    {left: -3,           width: 6},
@@ -167,7 +170,7 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
      * @private
      * @author 4Him
      */
-    isExt2x: Ext.version.match(/^2\./),
+    isExt2x: false, // HACK: jdillon we are only in 3 now fuck 2
     
     
     /*
@@ -189,12 +192,8 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
         // The handler shouldn't be called in these cases.  It should only be called if a new file is selected on the file system.  
         this.originalHandler = this.handler;
         this.originalScope = this.scope;
-
-        // Click the hidden input-file element when button is clicked
-        this.handler = function() {
-          me.inputFileEl.dom.click();
-        };
-        this.scope = me;
+        this.handler = null;
+        this.scope = null;
     },
     
     /**
@@ -208,6 +207,10 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
         } else {
             this.buttonCt = this.el.child('.x-btn-mc em');
         }
+
+        var width = this.buttonCt.getWidth();
+        var height = this.buttonCt.getHeight();
+
         this.buttonCt.position('relative'); // this is important!
         var styleCfg = {
             position: 'absolute',
@@ -215,6 +218,7 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
             top: '0px', // default
             left: '0px' // default
         };
+
         // browser specifics for better overlay tightness - modified by 4Him
         for(var browser in this.BROWSERS_OFFSETS.Ext2) {
             if(Ext['is'+browser]) {
@@ -299,15 +303,17 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
      * @private
      */
     setClipSize: function(){
+      var me = this;
         if (this.clipEl) {
             var width = this.buttonCt.getWidth();
             var height = this.buttonCt.getHeight();
+
             // The button container can have a width and height of zero when it's rendered in a hidden panel.
             // This is most noticable when using a card layout, as the items are all rendered but hidden,
             // (unless deferredRender is set to true). 
             // In this case, the clip size can't be determined, so we attempt to set it later.
             // This check repeats until the button container has a size. 
-            if (width === 0 || (height === 0 && (!Ext.isIE8 && !Ext.isIE9)) ) {  // ugly hack (Ext.isIE8) by 4Him
+            if (width === 0 || (height === 0 && (!Ext.isIE8 && !Ext.isIE9 && !Ext.isIE10)) ) {  // ugly hack (Ext.isIE8) by 4Him
                 this.setClipSize.defer(100, this);
             } else {
                 // Loop by 4Him
@@ -318,6 +324,7 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
                         break;
                     }
                 }
+
                 this.clipEl.setSize(width, height);
             }
         }
