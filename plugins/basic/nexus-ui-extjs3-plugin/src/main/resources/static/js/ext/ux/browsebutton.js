@@ -180,8 +180,6 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
      * @see Ext.Button.initComponent
      */
     initComponent: function(){
-        var me = this;
-
         Ext.ux.form.BrowseButton.superclass.initComponent.call(this);
 
         // FIXME: This should never have fucked with the handler, should have registered a new event
