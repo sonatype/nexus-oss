@@ -152,7 +152,7 @@ public class ModelUtilsTest
 
     final Xpp3Dom dom = ModelUtils.load("3", file, DOM_READER, V1_V2_UPGRADER, V2_V3_UPGRADER);
 
-    assertThat(dom.toString(), equalTo(
+    assertThat(normalizeLineEndings(dom.toString()), equalTo(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  <version>3</version>\n  <v2field>foo</v2field>\n  <v3field>bar</v3field>\n</foo>"));
   }
 
@@ -164,7 +164,7 @@ public class ModelUtilsTest
 
     final Xpp3Dom dom = ModelUtils.load("2", file, DOM_READER, V1_V2_UPGRADER, V2_V3_UPGRADER);
 
-    assertThat(dom.toString(), equalTo(
+    assertThat(normalizeLineEndings(dom.toString()), equalTo(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  <version>2</version>\n  <v2field>foo</v2field>\n</foo>"));
   }
 
@@ -176,7 +176,7 @@ public class ModelUtilsTest
 
     final Xpp3Dom dom = ModelUtils.load("1", file, DOM_READER, V1_V2_UPGRADER, V2_V3_UPGRADER);
 
-    assertThat(dom.toString(), equalTo(
+    assertThat(normalizeLineEndings(dom.toString()), equalTo(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  <version>1</version>\n</foo>"));
   }
 
@@ -270,4 +270,10 @@ public class ModelUtilsTest
         "<foo>\n  <version>1</version>\n</foo>"));
   }
 
+  /**
+   * Normalize OS-specific differences in line endings.
+   */
+  private String normalizeLineEndings(String input) {
+    return input == null ? null : input.replaceAll("\r\n", "\n");
+  }
 }
