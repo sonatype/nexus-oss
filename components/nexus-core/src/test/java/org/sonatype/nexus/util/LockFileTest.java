@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -57,7 +56,7 @@ public class LockFileTest
       assertThat(lf2.lock(), is(false));
 
       // verify who holds the lock
-      assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf1"));
+      assertThat(lf1.readBytes(), equalTo(lf1.getPayload()));
     }
     finally {
       // cleanup
@@ -83,21 +82,21 @@ public class LockFileTest
       assertThat(lf2.lock(), is(false));
 
       // verify who holds the lock
-      assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf1"));
+      assertThat(lf1.readBytes(), equalTo(lf1.getPayload()));
 
       // pass over the lock
       lf1.release();
       assertThat(lf2.lock(), is(true));
 
       // verify who holds the lock
-      assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf2"));
+      assertThat(lf2.readBytes(), equalTo(lf2.getPayload()));
 
       // repeating same step should be idempotent
       assertThat(lf1.lock(), is(false));
       assertThat(lf2.lock(), is(true));
 
       // verify who holds the lock
-      assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf2"));
+      assertThat(lf2.readBytes(), equalTo(lf2.getPayload()));
     }
     finally {
       // cleanup
@@ -165,7 +164,7 @@ public class LockFileTest
           if (lockFile.lock()) {
             locked++;
             // verify that content of the file equals to our payload, as we own the lock
-            assertThat(Files.toByteArray(lockFile.getFile()), equalTo(lockFile.getPayload()));
+            assertThat(lockFile.readBytes(), equalTo(lockFile.getPayload()));
           }
           barrier.await(); // wait for others to attempt, and the one won should hold the lock during that
         }
