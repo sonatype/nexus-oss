@@ -14,8 +14,8 @@
 package org.sonatype.nexus.analytics.rest
 
 import com.yammer.metrics.annotation.Timed
-import io.kazuki.v0.store.keyvalue.KeyValuePair
 import io.kazuki.v0.store.keyvalue.KeyValueIterable
+import io.kazuki.v0.store.keyvalue.KeyValuePair
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.nexus.analytics.EventData
 import org.sonatype.nexus.analytics.EventExporter
@@ -119,7 +119,8 @@ class EventsResource
           break
         }
       }
-    } finally {
+    }
+    finally {
       if (eventEntries != null) {
         eventEntries.close()
       }
@@ -168,7 +169,8 @@ class EventsResource
     // FIXME: Need to resolve how to deal with this, large # of events could take a while to export
     // FIXME: And we may need to provide another way to express this to the user and/or allow them to download the file
 
-    def file = eventExporter.export(false) // no drop
+    def file = eventExporter.export(false)
+    // no drop
     return [
         file: file.absolutePath,
         name: file.name,
