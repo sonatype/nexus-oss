@@ -10,12 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.analytics.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.analytics.EventExporter;
+import org.sonatype.nexus.analytics.EventSubmitter;
 import org.sonatype.nexus.scheduling.NexusTaskSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -27,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named(SubmitTask.ID)
 public class SubmitTask
-  extends NexusTaskSupport
+    extends NexusTaskSupport
 {
   // FIXME: Presently the ID *MUST* be the class.simpleName
   // FIXME: if a different value is used, the scheduling components will not work
@@ -37,9 +39,14 @@ public class SubmitTask
 
   private final EventExporter eventExporter;
 
+  private EventSubmitter eventSubmitter;
+
   @Inject
-  public SubmitTask(final EventExporter eventExporter) {
+  public SubmitTask(final EventExporter eventExporter,
+                    final EventSubmitter eventSubmitter)
+  {
     this.eventExporter = checkNotNull(eventExporter);
+    this.eventSubmitter = checkNotNull(eventSubmitter);
   }
 
   @Override
@@ -49,7 +56,9 @@ public class SubmitTask
 
   @Override
   protected void execute() throws Exception {
+    // TODO Do we want to catch exceptions during sending to server or let them float?
+    // TODO Removing exported items should happen only after a successful submission, or we should have the means of resubmitting a zip
     // HACK: for now simply export with-out drop
-    eventExporter.export(false);
+    eventSubmitter.submit(eventExporter.export(false));
   }
 }
