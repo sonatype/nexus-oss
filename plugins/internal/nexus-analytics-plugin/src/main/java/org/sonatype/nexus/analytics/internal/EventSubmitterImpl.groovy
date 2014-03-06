@@ -13,12 +13,13 @@
 
 package org.sonatype.nexus.analytics.internal
 
+import com.sonatype.analytics.client.AnalyticsClient
 import com.sonatype.analytics.client.AnalyticsClientBuilder
-import com.sun.jersey.api.client.Client
 import com.sun.jersey.client.apache4.ApacheHttpClient4
 import com.sun.jersey.client.apache4.ApacheHttpClient4Handler
 import org.sonatype.nexus.analytics.EventSubmitter
 import org.sonatype.nexus.apachehttpclient.Hc4Provider
+import org.sonatype.sisu.goodies.common.ComponentSupport
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -32,31 +33,38 @@ import javax.inject.Singleton
 @Named
 @Singleton
 class EventSubmitterImpl
-implements EventSubmitter
+    extends ComponentSupport
+    implements EventSubmitter
 {
 
-  private final String analyticsServiceUrl
+  private final String serviceUrl
 
   private final Hc4Provider hc4Provider
 
   @Inject
-  EventSubmitterImpl(final @Named('${nexus.analytics.service.url:-http://analytics.sonatype.com}') String analyticsServiceUrl,
+  EventSubmitterImpl(final @Named('${nexus.analytics.serviceUrl:-https://analytics.sonatype.com}') String serviceUrl,
                      final Hc4Provider hc4Provider)
   {
-    assert analyticsServiceUrl
+    assert serviceUrl
     assert hc4Provider
 
-    this.analyticsServiceUrl = analyticsServiceUrl
+    this.serviceUrl = serviceUrl
+    log.info 'Service URL: {}', serviceUrl
+
     this.hc4Provider = hc4Provider
   }
 
   @Override
-  void submit(final File export) {
-    AnalyticsClientBuilder.createFor(analyticsServiceUrl, client()).upload(export);
+  void submit(final File file) {
+    assert file && file.exists()
+    log.debug 'Submitting: {}', file
+
+    client().upload(file)
   }
 
-  private Client client() {
-    return new ApacheHttpClient4(new ApacheHttpClient4Handler(hc4Provider.createHttpClient(), null, false))
+  private AnalyticsClient client() {
+    def transport = new ApacheHttpClient4(new ApacheHttpClient4Handler(hc4Provider.createHttpClient(), null, false))
+    return AnalyticsClientBuilder.createFor(serviceUrl, transport)
   }
 
 }

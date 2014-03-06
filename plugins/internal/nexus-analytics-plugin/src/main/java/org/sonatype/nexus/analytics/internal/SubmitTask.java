@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.analytics.internal;
 
+import java.io.File;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -56,9 +58,12 @@ public class SubmitTask
 
   @Override
   protected void execute() throws Exception {
+    File file = eventExporter.export(true);
+
     // TODO Do we want to catch exceptions during sending to server or let them float?
     // TODO Removing exported items should happen only after a successful submission, or we should have the means of resubmitting a zip
-    // HACK: for now simply export with-out drop
-    eventSubmitter.submit(eventExporter.export(false));
+    eventSubmitter.submit(file);
+
+    // TODO: Cleanup submitted files, don't want to leak these
   }
 }

@@ -21,5 +21,5 @@ import java.io.File;
  */
 public interface EventSubmitter
 {
-  void submit(File export) throws Exception;
+  void submit(File file) throws Exception;
 }

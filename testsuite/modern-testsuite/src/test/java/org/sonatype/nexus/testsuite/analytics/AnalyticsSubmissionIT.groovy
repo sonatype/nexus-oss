@@ -23,7 +23,9 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.hamcrest.Matchers.*
+import static org.hamcrest.Matchers.containsString
+import static org.hamcrest.Matchers.hasItem
+import static org.hamcrest.Matchers.hasSize
 
 /**
  * Submission of events analytics related ITs.
@@ -64,7 +66,7 @@ extends AnalyticsITSupport
         .start()
 
     return super.configureNexus(configuration)
-        .setSystemProperty('nexus.analytics.service.url', analyticsServer.url.toExternalForm())
+        .setSystemProperty('nexus.analytics.serviceUrl', analyticsServer.url.toExternalForm())
   }
 
   Scheduler scheduler() {
