@@ -114,6 +114,8 @@
             <sharedDependency>com.sun.jersey:jersey-server</sharedDependency>
             <sharedDependency>com.sun.jersey:jersey-servlet</sharedDependency>
             <sharedDependency>com.sun.jersey:jersey-client</sharedDependency>
+            <sharedDependency>com.sun.jersey.contribs:jersey-multipart</sharedDependency>
+            <sharedDependency>com.sun.jersey.contribs:jersey-apache-client4</sharedDependency>
             <sharedDependency>org.sonatype.sisu.jacksbee:jacksbee-runtime</sharedDependency>
           </sharedDependencies>
         </configuration>
