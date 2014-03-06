@@ -38,19 +38,13 @@
       <dependency>
         <groupId>io.kazuki</groupId>
         <artifactId>kazuki-db</artifactId>
-        <version>0.1.5</version>
+        <version>0.1.6</version>
       </dependency>
 
       <dependency>
         <groupId>org.jdbi</groupId>
         <artifactId>jdbi</artifactId>
         <version>2.53</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.jolbox</groupId>
-        <artifactId>bonecp</artifactId>
-        <version>0.8.0.RELEASE</version>
       </dependency>
 
       <dependency>
