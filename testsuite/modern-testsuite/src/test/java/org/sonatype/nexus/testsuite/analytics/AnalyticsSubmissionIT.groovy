@@ -33,7 +33,7 @@ import static org.hamcrest.Matchers.hasSize
  * @since 2.8
  */
 class AnalyticsSubmissionIT
-extends AnalyticsITSupport
+    extends AnalyticsITSupport
 {
 
   private Server analyticsServer
@@ -74,13 +74,14 @@ extends AnalyticsITSupport
   }
 
   private static class ServerRecorder
-  extends Record
+      extends Record
   {
-
     private List<String> requestsContent = []
 
     @Override
-    boolean execute(final HttpServletRequest request, final HttpServletResponse response, final Map<Object, Object> ctx) throws Exception {
+    boolean execute(final HttpServletRequest request, final HttpServletResponse response, final Map<Object, Object> ctx)
+        throws Exception
+    {
       requestsContent << request.inputStream.text
       return super.execute(request, response, ctx)
     }
