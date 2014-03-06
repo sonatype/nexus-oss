@@ -27,6 +27,7 @@ Ext.define('NX.app.Application', {
     // Ext overrides
     'NX.ext.form.action.DirectSubmit',
     'NX.ext.form.field.Base',
+    'NX.ext.form.field.Checkbox',
     'NX.ext.form.FieldContainer',
 
     // require custom extensions so we don't need to requirement explicitly everywhere
