@@ -84,7 +84,7 @@ Ext.define('NX.view.Main', {
       { xtype: 'nx-header-browse-mode' },
       { xtype: 'nx-header-admin-mode' },
       '->',
-      { xtype: 'nx-searchbox', itemId: 'quicksearch', emptyText: 'quick search' },
+      { xtype: 'nx-searchbox', itemId: 'quicksearch', emptyText: 'quick search', width: 200 },
       '->',
       { xtype: 'nx-header-messages', ui: 'header' },
       { xtype: 'nx-header-refresh', ui: 'header' },
