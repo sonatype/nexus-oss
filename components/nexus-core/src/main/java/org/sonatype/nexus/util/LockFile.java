@@ -22,6 +22,7 @@ import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.charset.Charset;
 
+import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,9 +127,7 @@ public class LockFile
    * obtained. Package-scoped as this is only used by tests.
    */
   byte[] readBytes() throws IOException {
-    if (randomAccessFile == null) {
-      throw new IllegalStateException("No lock obtained, cannot read file contents.");
-    }
+    Preconditions.checkState(randomAccessFile != null, "No lock obtained, cannot read file contents.");
 
     byte[] buffer = new byte[(int) randomAccessFile.length()];
     randomAccessFile.seek(0);
