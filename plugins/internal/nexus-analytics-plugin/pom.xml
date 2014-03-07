@@ -40,6 +40,11 @@
     </dependency>
 
     <dependency>
+      <groupId>com.sonatype.analytics</groupId>
+      <artifactId>analytics-client</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-groovy-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
@@ -72,6 +77,12 @@
       <artifactId>nexus-siesta-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.ws.rs</groupId>
+          <artifactId>jsr311-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
