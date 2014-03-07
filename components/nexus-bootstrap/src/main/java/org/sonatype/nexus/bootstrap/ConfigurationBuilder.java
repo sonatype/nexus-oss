@@ -68,11 +68,19 @@ public class ConfigurationBuilder
   public ConfigurationBuilder properties(final String resource, final boolean required) throws IOException {
     URL url = getResource(resource);
     if (url == null) {
+      final File file = new File(resource);
+      if (file.exists()) {
+        url = file.toURI().toURL();
+      }
+    }
+
+    if (url == null) {
       if (required) {
         throw new IllegalStateException("Missing required resource: " + resource);
       }
       return this;
     }
+    log.info("Using property file: {}", url.toString());
     return properties(url);
   }
 
