@@ -87,7 +87,7 @@ public class VelocityContentRenderer
     final List<CollectionEntry> entries = Lists.newArrayListWithCapacity(children.size());
     
     // use request URL (it does not contain any parameters) as the base URL of collection entries
-    final String collUrl = request.getRequestURL().toString();
+    final String collUrl = BaseUrlHolder.get() + request.getServletPath() + request.getPathInfo();
     for (StorageItem child : children) {
       if (child.isVirtual() || !child.getRepositoryItemUid().getBooleanAttributeValue(IsHiddenAttribute.class)) {
         if (!uniqueNames.contains(child.getName())) {
