@@ -665,7 +665,7 @@ public class DefaultNexusConfiguration
       return instantiateRepository(configuration, klazz, repositoryModel.getProviderHint(), repositoryModel);
     }
     catch (Exception e) {
-      throw new ConfigurationException("Cannot instantianate repository " + repositoryModel.getProviderRole() + ":"
+      throw new ConfigurationException("Cannot instantiate repository " + repositoryModel.getProviderRole() + ":"
           + repositoryModel.getProviderHint(), e);
     }
   }

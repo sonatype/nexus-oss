@@ -76,13 +76,13 @@
       <dependency>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>org.eclipse.tycho.noopsecurity</artifactId>
-        <version>0.13.0</version>
+        <version>0.19.0</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-metadata-model</artifactId>
-        <version>0.12.0</version>
+        <version>0.19.0</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>

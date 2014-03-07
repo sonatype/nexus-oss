@@ -35,6 +35,5 @@ public class LogConfigurationCustomizerImpl
     config.setLoggerLevel("io.kazuki", DEFAULT);
     config.setLoggerLevel("org.skife.jdbi", DEFAULT);
     config.setLoggerLevel("org.antlr.stringtemplate", DEFAULT);
-    config.setLoggerLevel("com.jolbox.bonecp", DEFAULT);
   }
 }

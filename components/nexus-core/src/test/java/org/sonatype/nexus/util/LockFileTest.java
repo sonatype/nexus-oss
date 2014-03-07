@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -57,7 +56,7 @@ public class LockFileTest
       assertThat(lf2.lock(), is(false));
 
       // verify who holds the lock
-      assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf1"));
+      assertThat(lf1.readBytes(), equalTo(lf1.getPayload()));
     }
     finally {
       // cleanup
@@ -83,21 +82,21 @@ public class LockFileTest
       assertThat(lf2.lock(), is(false));
 
       // verify who holds the lock
-      assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf1"));
+      assertThat(lf1.readBytes(), equalTo(lf1.getPayload()));
 
       // pass over the lock
       lf1.release();
       assertThat(lf2.lock(), is(true));
 
       // verify who holds the lock
-      assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf2"));
+      assertThat(lf2.readBytes(), equalTo(lf2.getPayload()));
 
       // repeating same step should be idempotent
       assertThat(lf1.lock(), is(false));
       assertThat(lf2.lock(), is(true));
 
       // verify who holds the lock
-      assertThat(Files.toString(lockFile, Charset.forName("UTF-8")), equalTo("lf2"));
+      assertThat(lf2.readBytes(), equalTo(lf2.getPayload()));
     }
     finally {
       // cleanup
@@ -125,11 +124,21 @@ public class LockFileTest
     }
 
     ex.shutdown();
-    ex.awaitTermination(10L, TimeUnit.SECONDS);
+    // Any exceptions thrown by the FileLockerRunnables will lead to a timeout because of the cyclic barrier
+    boolean timelyCompletion = ex.awaitTermination(10L, TimeUnit.SECONDS);
+
+    if (!timelyCompletion) {
+      log("Test execution timed out.");
+    }
 
     int totalLocksHappened = 0;
-    for (FileLockerRunnable flr : flrs) {
-      totalLocksHappened += flr.getLocked();
+
+    for(FileLockerRunnable flr : flrs){
+      // If a runnable encountered an exception, use it to fail the test
+      if (flr.getCaughtException() != null) {
+        throw new Exception(flr.getCaughtException());
+      }
+      totalLocksHappened+= flr.getLocked();
     }
     assertThat(totalLocksHappened, equalTo(attempts));
   }
@@ -145,6 +154,8 @@ public class LockFileTest
 
     private int locked;
 
+    private Exception caughtException;
+
     public FileLockerRunnable(final File lockFile, String name,
                               final CyclicBarrier barrier, final int attempts)
     {
@@ -157,6 +168,8 @@ public class LockFileTest
       return locked;
     }
 
+    public Exception getCaughtException() { return caughtException; }
+
     @Override
     public Integer call() throws Exception {
       for (int i = 0; i < attempts; i++) {
@@ -165,9 +178,14 @@ public class LockFileTest
           if (lockFile.lock()) {
             locked++;
             // verify that content of the file equals to our payload, as we own the lock
-            assertThat(Files.toByteArray(lockFile.getFile()), equalTo(lockFile.getPayload()));
+            assertThat(lockFile.readBytes(), equalTo(lockFile.getPayload()));
           }
           barrier.await(); // wait for others to attempt, and the one won should hold the lock during that
+        }
+        catch (Exception e) {
+          // If an exception gets thrown, hang on to it so that it can be reported by the test
+          // Unconventional, but it seems the cyclic barrier rules out normal approach of getting the exception from Future.get()
+          this.caughtException = e;
         }
         finally {
           lockFile.release(); // the one locked should release for next attempt
