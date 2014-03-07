@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.testsuite.analytics
 
+import org.apache.commons.io.FileUtils
 import org.junit.Test
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration
 import org.sonatype.nexus.testsuite.client.Scheduler
@@ -56,6 +57,7 @@ class AnalyticsSubmissionIT
     assertThat analyticsServerRecorder.requestsContent[0], containsString('Content-Type: application/zip')
     assertThat analyticsServerRecorder.requestsContent[0], containsString('Content-Disposition: ')
     assertThat analyticsServerRecorder.requestsContent[0], containsString('filename="analytics')
+    assertThat FileUtils.listFiles(new File(nexus().workDirectory,'downloads'), ['zip'] as String[], false), hasSize(0)
   }
 
   @Override

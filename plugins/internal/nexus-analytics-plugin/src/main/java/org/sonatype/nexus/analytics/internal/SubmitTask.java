@@ -14,6 +14,7 @@
 package org.sonatype.nexus.analytics.internal;
 
 import java.io.File;
+import java.nio.file.Files;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -64,6 +65,6 @@ public class SubmitTask
     // TODO Removing exported items should happen only after a successful submission, or we should have the means of resubmitting a zip
     eventSubmitter.submit(file);
 
-    // TODO: Cleanup submitted files, don't want to leak these
+    Files.delete(file.toPath());
   }
 }
