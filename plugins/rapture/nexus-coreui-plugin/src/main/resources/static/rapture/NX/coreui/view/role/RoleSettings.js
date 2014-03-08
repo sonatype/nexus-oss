@@ -77,8 +77,7 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
         store: 'Privilege',
         valueField: 'id',
         displayField: 'name',
-        delimiter: null,
-        height: 253
+        delimiter: null
       },
       {
         xtype: 'nx-itemselector',
@@ -89,11 +88,8 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
         store: 'Role',
         valueField: 'id',
         displayField: 'name',
-        delimiter: null,
-        height: 253
+        delimiter: null
       }
-
-      // TODO roles/privileges
     ];
 
     me.callParent(arguments);

@@ -19,6 +19,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
   alias: 'widget.nx-itemselector',
 
   width: 600,
+  height: 253,
 
   /**
    * Override super *private* impl so we can control the button configuration.
