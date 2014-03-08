@@ -77,6 +77,81 @@ Ext.define('NX.ext.form.field.ItemSelector', {
     }
   },
 
+  createList: function (title) {
+    var me = this,
+        tbar;
+
+    // only create filter box for from field
+    if (!me.fromField) {
+      tbar = {
+        xtype: 'nx-searchbox',
+        emptyText: 'filter',
+        listeners: {
+          search: me.onSearch,
+          searchcleared: me.onSearchCleared,
+          scope: me
+        }
+      }
+    }
+
+    return Ext.create('Ext.ux.form.MultiSelect', {
+      // We don't want the multiselects themselves to act like fields,
+      // so override these methods to prevent them from including
+      // any of their values
+      submitValue: false,
+      getSubmitData: function () {
+        return null;
+      },
+      getModelData: function () {
+        return null;
+      },
+      flex: 1,
+      dragGroup: me.ddGroup,
+      dropGroup: me.ddGroup,
+      title: title,
+      store: {
+        model: me.store.model,
+        data: []
+      },
+      displayField: me.displayField,
+      valueField: me.valueField,
+      disabled: me.disabled,
+      listeners: {
+        boundList: {
+          scope: me,
+          itemdblclick: me.onItemDblClick,
+          drop: me.syncValue
+        }
+      },
+      tbar: tbar
+    });
+  },
+
+  /**
+   * @private
+   */
+  onSearch: function (searchbox, value) {
+    var me = this;
+
+    me.fromField.store.filter({ id: 'filter', filterFn: function (model) {
+      var stringValue = model.get(me.displayField);
+      if (stringValue) {
+        stringValue = stringValue.toString();
+        return stringValue.toLowerCase().indexOf(value.toLowerCase()) != -1;
+      }
+      return false;
+    }})
+  },
+
+  /**
+   * @private
+   */
+  onSearchCleared: function () {
+    var me = this;
+
+    me.fromField.store.clearFilter();
+  },
+
   // HACK: Looks like original item selector forgot to unbind from store which results in NPEs in #populateFromStore
   onDestroy: function () {
     var me = this;
