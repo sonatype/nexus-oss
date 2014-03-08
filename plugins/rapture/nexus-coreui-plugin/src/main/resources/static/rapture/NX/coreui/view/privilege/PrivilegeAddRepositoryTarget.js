@@ -82,19 +82,6 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
     };
 
     me.callParent(arguments);
-  },
-
-  reloadTargets: function (formatFilter) {
-    var me = this;
-
-    if (formatFilter) {
-      me.targetStore.load({
-        params: {
-          formatFilter: formatFilter
-        }
-      });
-    }
-    me.targetStore.load();
   }
 
 });

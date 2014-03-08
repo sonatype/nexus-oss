@@ -16,7 +16,6 @@ Ext.define('NX.coreui.store.RepositoryTarget', {
 
   proxy: {
     type: 'direct',
-    paramOrder: 'formatFilter',
 
     api: {
       read: 'NX.direct.coreui_RepositoryTarget.read'
@@ -31,5 +30,19 @@ Ext.define('NX.coreui.store.RepositoryTarget', {
   },
 
   sortOnLoad: true,
-  sorters: { property: 'name', direction: 'ASC' }
+  sorters: { property: 'name', direction: 'ASC' },
+
+  filterByFormat: function (format) {
+    var me = this;
+
+    me.filter({ id: 'formatFilter', filterFn: function (target) {
+      var targetFormat = target.get('format');
+      return (targetFormat === 'any') || (targetFormat === format);
+    }});
+  },
+
+  removeFilterByFormat: function () {
+    this.removeFilter('formatFilter');
+  }
+
 });

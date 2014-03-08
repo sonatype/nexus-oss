@@ -52,24 +52,11 @@ extends DirectComponentSupport
   @Inject
   NexusConfiguration nexusConfiguration
 
-  /**
-   * Retrieve a list of available repository targets, optionally filtered by format.
-   */
   @DirectMethod
   @RequiresPermissions('nexus:targets:read')
-  List<RepositoryTargetXO> read(String formatFilter) {
+  List<RepositoryTargetXO> read() {
     return targetRegistry.repositoryTargets.collect { input ->
-      return asRepositoryTarget(input)
-    }.findResults { target ->
-      if (target != 'any' && formatFilter) {
-        if (target.format == formatFilter) {
-          return target
-        }
-        return null
-      }
-      else {
-        return target
-      }
+      asRepositoryTarget(input)
     }
   }
 

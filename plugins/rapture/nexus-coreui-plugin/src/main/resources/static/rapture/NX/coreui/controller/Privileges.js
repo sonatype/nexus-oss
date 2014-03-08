@@ -116,10 +116,18 @@ Ext.define('NX.coreui.controller.Privileges', {
    * @private
    */
   filterRepositoryTargets: function (repositoryIdCombo) {
-    repositoryIdCombo.up('form').down('#repositoryTargetId').setValue(undefined);
-    repositoryIdCombo.up('window').reloadTargets(
-        repositoryIdCombo.getStore().getById(repositoryIdCombo.getValue()).get('format')
-    );
+    var targetCombo = repositoryIdCombo.up('form').down('#repositoryTargetId'),
+        repositoryId = repositoryIdCombo.getValue(),
+        format;
+
+    targetCombo.setValue(undefined);
+    if (repositoryId) {
+      format = repositoryIdCombo.getStore().getById(repositoryId).get('format');
+      targetCombo.getStore().filterByFormat(format);
+    }
+    else {
+      targetCombo.getStore().removeFilterByFormat();
+    }
   },
 
   /**
