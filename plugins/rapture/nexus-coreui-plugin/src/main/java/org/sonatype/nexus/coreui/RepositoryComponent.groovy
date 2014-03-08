@@ -93,7 +93,7 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
   List<RepositoryXO> read() {
-    def templates = templates(null)
+    def templates = readTemplates(null)
     return repositoryRegistry.repositories.collect { asRepositoryXO(it, templates) }
   }
 
@@ -298,7 +298,7 @@ extends DirectComponentSupport
       updateClosure(created, repositoryXO)
     }
     nexusConfiguration.saveConfiguration()
-    return asRepositoryXO(created, templates(null))
+    return asRepositoryXO(created, readTemplates(null))
   }
 
   def <T extends Repository> RepositoryXO update(RepositoryXO repositoryXO, Class<T> repoType, Closure... updateClosures) {
@@ -312,7 +312,7 @@ extends DirectComponentSupport
         updateClosure(updated, repositoryXO)
       }
       nexusConfiguration.saveConfiguration()
-      return asRepositoryXO(updated, templates(null))
+      return asRepositoryXO(updated, readTemplates(null))
     }
     throw new IllegalArgumentException('Missing id for repository to be updated')
   }
