@@ -24,5 +24,6 @@ import groovy.transform.ToString
 class RepositoryReferenceXO
 extends ReferenceXO
 {
+  String type
   String format
 }

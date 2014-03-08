@@ -24,8 +24,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsGroup', {
   initComponent: function () {
     var me = this;
 
-    me.repositoriesStore = Ext.create('NX.coreui.store.RepositoryOfType');
-    me.reloadRepositories();
+    me.repositoryStore = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
+    me.repositoryStore.filter({ property: 'format', value: me.template.format });
 
     me.items = [
       {
@@ -40,7 +40,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsGroup', {
         buttons: ['up', 'add', 'remove', 'down'],
         fromTitle: 'Available Repositories',
         toTitle: 'Ordered Member Repositories',
-        store: me.repositoriesStore,
+        store: me.repositoryStore,
         valueField: 'id',
         displayField: 'name',
         delimiter: null
@@ -48,16 +48,6 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsGroup', {
     ];
 
     me.callParent(arguments);
-  },
-
-  reloadRepositories: function () {
-    var me = this;
-
-    me.repositoriesStore.load({
-      params: {
-        format: me.template.format
-      }
-    });
   }
 
 });

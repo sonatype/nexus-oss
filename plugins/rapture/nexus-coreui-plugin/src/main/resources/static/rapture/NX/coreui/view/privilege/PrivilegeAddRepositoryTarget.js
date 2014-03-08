@@ -25,7 +25,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
   initComponent: function () {
     var me = this;
 
-    me.repositoryStore = Ext.create('NX.coreui.store.RepositoryOfType');
+    me.repositoryStore = Ext.create('NX.coreui.store.RepositoryReference');
     me.mon(me.repositoryStore, 'load', function (store) {
       store.add(Ext.create('NX.coreui.model.Reference', { id: '', name: 'All Repositories' }));
     });

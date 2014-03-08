@@ -18,13 +18,11 @@ Ext.define('NX.coreui.view.maven.MavenUpload', {
     var me = this,
         store;
 
-    store = Ext.create('NX.coreui.store.RepositoryOfType');
-    store.load({
-      params: {
-        type: 'hosted',
-        format: 'maven2'
-      }
-    });
+    store = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
+    store.filter(
+        { property: 'type', value: 'hosted' },
+        { property: 'format', value: 'maven2' }
+    );
 
     me.items = {
       xtype: 'nx-coreui-upload-artifact',

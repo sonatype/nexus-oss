@@ -24,8 +24,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtual', {
   initComponent: function () {
     var me = this;
 
-    me.repositoryStore = Ext.create('NX.coreui.store.RepositoryOfType');
-    me.reloadRepositories();
+    me.repositoryStore = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
+    me.repositoryStore.filter({ property: 'format', value: me.template.masterFormat });
 
     me.items = [
       {
@@ -56,16 +56,6 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtual', {
     ];
 
     me.callParent(arguments);
-  },
-
-  reloadRepositories: function () {
-    var me = this;
-
-    me.repositoryStore.load({
-      params: {
-        format: me.template.masterFormat
-      }
-    });
   }
 
 });

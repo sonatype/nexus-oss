@@ -127,8 +127,8 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
         settings = me.getSettings();
 
     if (settings) {
-      settings.reloadGroups();
-      settings.reloadRepositories();
+      settings.down('#groupId').getStore().load();
+      settings.down('#mappedRepositoriesIds').getStore().load();
     }
   },
 

@@ -22,6 +22,7 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
+import org.sonatype.nexus.extdirect.model.StoreLoadParameters
 import org.sonatype.nexus.proxy.ResourceStoreRequest
 import org.sonatype.nexus.proxy.item.RepositoryItemUid
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository
@@ -94,6 +95,39 @@ extends DirectComponentSupport
   List<RepositoryXO> read() {
     def templates = templates(null, null)
     return repositoryRegistry.repositories.collect { asRepositoryXO(it, templates) }
+  }
+
+  /**
+   * Retrieve a list of available repositories references.
+   */
+  @DirectMethod
+  @RequiresPermissions('nexus:repositories:read')
+  List<RepositoryReferenceXO> readReferences(final @Nullable StoreLoadParameters parameters) {
+    def List<Repository> repositories = repositoryRegistry.repositories
+    if (parameters) {
+      def type = parameters.getFilter('type')
+      if (type) {
+        def clazz = typesToClass[type]
+        if (!clazz) {
+          throw new IllegalArgumentException('Repository type not supported: ' + type)
+        }
+        repositories = repositoryRegistry.getRepositoriesWithFacet(clazz)
+      }
+      def format = parameters.getFilter('format')
+      if (format) {
+        repositories = repositories.findResults {
+          it.repositoryContentClass.id == format ? it : null
+        }
+      }
+    }
+    repositories.collect {
+      new RepositoryReferenceXO(
+          id: it.id,
+          name: it.name,
+          type: typeOf(it),
+          format: it.repositoryContentClass.id
+      )
+    }
   }
 
   @DirectMethod
@@ -185,37 +219,6 @@ extends DirectComponentSupport
   @RequiresPermissions('nexus:repositories:delete')
   void delete(final String id) {
     repositoryRegistry.removeRepository(id)
-  }
-
-  /**
-   * Retrieve a list of available repositories by specified type.
-   */
-  @DirectMethod
-  @RequiresPermissions('nexus:repositories:read')
-  List<RepositoryReferenceXO> filterBy(final String type, final String format) {
-    def List<Repository> repositories
-    if (type) {
-      def clazz = typesToClass[type]
-      if (!clazz) {
-        throw new IllegalArgumentException('Repository type not supported: ' + type)
-      }
-      repositories = repositoryRegistry.getRepositoriesWithFacet(clazz)
-    }
-    else {
-      repositories = repositoryRegistry.repositories
-    }
-    if (format) {
-      repositories = repositories.findResults {
-        it.repositoryContentClass.id == format ? it : null
-      }
-    }
-    repositories.collect {
-      new RepositoryReferenceXO(
-          id: it.id,
-          name: it.name,
-          format: it.repositoryContentClass.id
-      )
-    }
   }
 
   /**

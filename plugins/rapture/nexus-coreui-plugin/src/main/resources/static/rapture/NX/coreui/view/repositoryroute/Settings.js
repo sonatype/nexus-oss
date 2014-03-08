@@ -30,12 +30,14 @@ Ext.define('NX.coreui.view.repositoryroute.Settings', {
   initComponent: function () {
     var me = this;
 
-    me.groupStore = Ext.create('NX.coreui.store.RepositoryOfType');
+    me.groupStore = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
     me.mon(me.groupStore, 'load', function (store) {
       store.add(Ext.create('NX.coreui.model.Reference', { id: '*', name: 'All Repository Groups' }));
     });
+    me.groupStore.filter({ property: 'type', value: 'group' });
 
-    me.repositoryStore = Ext.create('NX.coreui.store.RepositoryOfType');
+    me.repositoryStore = Ext.create('NX.coreui.store.RepositoryReference');
+    me.repositoryStore.load();
 
     me.items = [
       {
@@ -65,6 +67,7 @@ Ext.define('NX.coreui.view.repositoryroute.Settings', {
       {
         xtype: 'combo',
         name: 'groupId',
+        itemId: 'groupId',
         fieldLabel: 'Repository Group',
         emptyText: 'select a group',
         editable: false,
@@ -88,28 +91,6 @@ Ext.define('NX.coreui.view.repositoryroute.Settings', {
     ];
 
     me.callParent(arguments);
-
-    me.reloadGroups();
-    me.reloadRepositories();
-  },
-
-  reloadGroups: function () {
-    var me = this;
-
-    me.groupStore.load({
-      params: {
-        type: 'group'
-      }
-    });
-  },
-
-  reloadRepositories: function () {
-    var me = this;
-
-    // TODO: cannot load the store as the item selector used for mappedRepositoriesIds is giving errors
-    if (!me.repositoryStore.getCount()) {
-      me.repositoryStore.load();
-    }
   }
 
 });

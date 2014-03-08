@@ -18,7 +18,7 @@
 Ext.define('NX.coreui.controller.MavenUpload', {
   extend: 'Ext.app.Controller',
   requires: [
-    'NX.coreui.store.RepositoryOfType'
+    'NX.coreui.store.RepositoryReference'
   ],
 
   views: [

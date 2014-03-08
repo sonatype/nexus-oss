@@ -15,6 +15,7 @@ Ext.define('NX.coreui.model.RepositoryReference', {
   fields: [
     'id',
     'name',
-    { name: 'format', defaultValue: undefined }
+    'type',
+    'format'
   ]
 });
