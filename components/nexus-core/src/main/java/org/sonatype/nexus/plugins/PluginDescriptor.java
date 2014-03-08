@@ -40,8 +40,6 @@ public final class PluginDescriptor
 
   private PluginMetadata metadata;
 
-  private List<String> exportedClassnames = Collections.emptyList();
-
   private List<GAVCoordinate> importedPlugins = Collections.emptyList();
 
   private List<GAVCoordinate> resolvedPlugins = Collections.emptyList();
@@ -64,10 +62,6 @@ public final class PluginDescriptor
 
   public PluginMetadata getPluginMetadata() {
     return metadata;
-  }
-
-  public List<String> getExportedClassnames() {
-    return exportedClassnames;
   }
 
   public List<GAVCoordinate> getImportedPlugins() {
@@ -117,10 +111,6 @@ public final class PluginDescriptor
 
   void setPluginMetadata(final PluginMetadata metadata) {
     this.metadata = metadata;
-  }
-
-  void setExportedClassnames(final List<String> classNames) {
-    exportedClassnames = Collections.unmodifiableList(new ArrayList<String>(classNames));
   }
 
   void setImportedPlugins(final List<GAVCoordinate> plugins) {

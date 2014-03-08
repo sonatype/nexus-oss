@@ -180,7 +180,18 @@ class P2Runtime
       initParams.put("osgi.debug", new File(eclipseDir, ".options").getAbsolutePath());
     }
     initParams.put(EclipseInstance.TEMPDIR_PROPERTY, p2BridgeAgentsTempDir.getAbsolutePath());
+    initParams.put("osgi.framework", findEclipseFramework(new File(p2BridgePluginDir, "dependencies")));
+    initParams.put("eclipse.enableStateSaver", "false");
     return initParams;
+  }
+
+  private static String findEclipseFramework(final File dir) {
+    for (final File f : dir.listFiles()) {
+      if (f.getName().startsWith("org.eclipse.osgi")) {
+        return f.toURI().toString();
+      }
+    }
+    throw new IllegalStateException("Could not locate org.eclipse.osgi bundle");
   }
 
   private String scanBridgedPackages(final File dir) {

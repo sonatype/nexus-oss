@@ -47,7 +47,7 @@
         <artifactId>org.apache.felix.main.distribution</artifactId>
         <classifier>project</classifier>
         <type>tar.gz</type>
-        <version>3.2.2</version>
+        <version>4.2.1</version>
       </dependency>
 
     </dependencies>

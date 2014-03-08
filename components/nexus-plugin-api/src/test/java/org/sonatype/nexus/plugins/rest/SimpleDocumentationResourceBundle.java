@@ -13,37 +13,25 @@
 
 package org.sonatype.nexus.plugins.rest;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import org.sonatype.nexus.mime.DefaultMimeSupport;
 import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
+
+import org.eclipse.sisu.space.URLClassSpace;
 
 public class SimpleDocumentationResourceBundle
     extends AbstractDocumentationResourceBundle
 {
   public SimpleDocumentationResourceBundle() {
-    super(new DefaultMimeSupport());
+    super(new DefaultMimeSupport(), new URLClassSpace(new URLClassLoader(
+        new URL[] { SimpleDocumentationResourceBundle.class.getResource("/docs.zip") })));
   }
 
   @Override
   public String getPluginId() {
     return "test";
-  }
-
-  @Override
-  protected ZipFile getZipFile()
-      throws IOException
-  {
-    final String file = new File(getClass().getResource("/docs.zip").getFile()).getCanonicalPath();
-    try {
-      return new ZipFile(file);
-    }
-    catch (ZipException e) {
-      throw new IOException(e.getMessage() + ": " + file, e);
-    }
   }
 
   @Override
