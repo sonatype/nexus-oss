@@ -67,6 +67,30 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
         name: 'description',
         fieldLabel: 'Description',
         emptyText: 'enter a description'
+      },
+      {
+        xtype: 'nx-itemselector',
+        name: 'privileges',
+        buttons: ['add', 'remove'],
+        fromTitle: 'Privileges',
+        toTitle: 'Given',
+        store: 'Privilege',
+        valueField: 'id',
+        displayField: 'name',
+        delimiter: null,
+        height: 253
+      },
+      {
+        xtype: 'nx-itemselector',
+        name: 'roles',
+        buttons: ['add', 'remove'],
+        fromTitle: 'Roles',
+        toTitle: 'Contained',
+        store: 'Role',
+        valueField: 'id',
+        displayField: 'name',
+        delimiter: null,
+        height: 253
       }
 
       // TODO roles/privileges

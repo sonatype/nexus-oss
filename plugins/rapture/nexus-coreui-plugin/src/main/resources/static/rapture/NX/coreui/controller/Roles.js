@@ -21,7 +21,8 @@ Ext.define('NX.coreui.controller.Roles', {
   stores: [
     'Role',
     'RoleSource',
-    'RoleBySource'
+    'RoleBySource',
+    'Privilege'
   ],
   views: [
     'role.RoleAdd',
@@ -69,7 +70,7 @@ Ext.define('NX.coreui.controller.Roles', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadRoleSource
+          refresh: me.loadRelatedStores
         }
       },
       store: {
@@ -79,7 +80,7 @@ Ext.define('NX.coreui.controller.Roles', {
       },
       component: {
         'nx-coreui-role-list': {
-          beforerender: me.loadRoleSource
+          beforerender: me.loadRelatedStores
         },
         'nx-coreui-role-list menuitem[action=newrole]': {
           click: me.showAddWindowRole
@@ -137,14 +138,15 @@ Ext.define('NX.coreui.controller.Roles', {
 
   /**
    * @private
-   * (Re)load role source store.
+   * (Re)load related stores.
    */
-  loadRoleSource: function () {
+  loadRelatedStores: function () {
     var me = this,
         list = me.getList();
 
     if (list) {
       me.getRoleSourceStore().load();
+      me.getPrivilegeStore().load();
     }
   },
 
