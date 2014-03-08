@@ -28,6 +28,7 @@ Ext.define('NX.app.Application', {
     'NX.ext.form.action.DirectSubmit',
     'NX.ext.form.field.Base',
     'NX.ext.form.field.Checkbox',
+    'NX.ext.form.field.Display',
     'NX.ext.form.FieldContainer',
 
     // require custom extensions so we don't need to requirement explicitly everywhere
