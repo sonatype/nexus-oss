@@ -15,6 +15,10 @@ package org.sonatype.nexus.extdirect.model;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import org.sonatype.configuration.validation.ValidationMessage;
 
@@ -50,4 +54,16 @@ public class ValidationResponse
       }
     }
   }
+
+  public ValidationResponse(final ConstraintViolationException cause) {
+    super(false, Lists.newArrayList());
+    Set<ConstraintViolation<?>> violations = cause.getConstraintViolations();
+    if (violations != null && violations.size() > 0) {
+      errors = Maps.newHashMap();
+      for (ConstraintViolation<?> violation : violations) {
+        errors.put(violation.getPropertyPath().toString(), violation.getMessage());
+      }
+    }
+  }
+
 }

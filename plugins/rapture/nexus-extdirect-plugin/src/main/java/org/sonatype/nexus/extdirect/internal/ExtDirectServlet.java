@@ -33,6 +33,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -185,6 +186,9 @@ public class ExtDirectServlet
             return asResponse(error(e));
           }
           return asResponse(invalid((InvalidConfigurationException) e));
+        }
+        if (e instanceof ConstraintViolationException) {
+          return asResponse(invalid((ConstraintViolationException) e));
         }
         return asResponse(error(e));
       }

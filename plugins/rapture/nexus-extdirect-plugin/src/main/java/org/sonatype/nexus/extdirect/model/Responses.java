@@ -15,6 +15,8 @@ package org.sonatype.nexus.extdirect.model;
 
 import java.util.List;
 
+import javax.validation.ConstraintViolationException;
+
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 
@@ -47,5 +49,9 @@ public class Responses
 
   public static ValidationResponse invalid(final List<ValidationMessage> messages) {
     return new ValidationResponse(messages);
+  }
+
+  public static ValidationResponse invalid(final ConstraintViolationException cause) {
+    return new ValidationResponse(cause);
   }
 }
