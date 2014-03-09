@@ -124,6 +124,28 @@
         <artifactId>UserAgentUtils</artifactId>
         <version>1.12</version>
       </dependency>
+
+      <dependency>
+        <groupId>javax.validation</groupId>
+        <artifactId>validation-api</artifactId>
+        <version>1.1.0.Final</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.bval</groupId>
+        <artifactId>bval-guice</artifactId>
+        <version>0.5</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.bval</groupId>
+            <artifactId>org.apache.bval.bundle</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.bval</groupId>
+        <artifactId>bval-jsr303</artifactId>
+        <version>0.5</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
