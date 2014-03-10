@@ -104,19 +104,10 @@ Ext.define('NX.coreui.controller.Roles', {
   },
 
   onSelection: function (list, model) {
-    var me = this,
-        bottomBar;
+    var me = this;
 
     if (Ext.isDefined(model)) {
       me.getSettings().loadRecord(model);
-      bottomBar = me.getSettings().getDockedItems('toolbar[dock="bottom"]')[0];
-      // TODO disable update when read only
-      if (model.get('readOnly')) {
-        bottomBar.hide();
-      }
-      else {
-        bottomBar.show();
-      }
     }
   },
 

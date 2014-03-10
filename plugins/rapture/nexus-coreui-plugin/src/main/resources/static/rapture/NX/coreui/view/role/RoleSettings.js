@@ -20,8 +20,13 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
   settingsFormSuccessMessage: function (data) {
     return 'Role updated: ' + data['name'];
   },
-  editableCondition: NX.Conditions.isPermitted('security:roles', 'update'),
-  editableMarker: 'You do not have permission to update roles',
+  editableCondition: NX.Conditions.and(
+      NX.Conditions.isPermitted('security:roles', 'update'),
+      NX.Conditions.formHasRecord('nx-coreui-role-settings', function (model) {
+        return !model.get('readOnly');
+      })
+  ),
+  editableMarker: 'You do not have permission to update roles or role is readonly',
 
   initComponent: function () {
     var me = this,
