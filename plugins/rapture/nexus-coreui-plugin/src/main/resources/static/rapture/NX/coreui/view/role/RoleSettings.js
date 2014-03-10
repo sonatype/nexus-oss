@@ -30,7 +30,10 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
 
   initComponent: function () {
     var me = this,
-        idField;
+        idField,
+        roleStore = Ext.create('NX.coreui.store.Role');
+
+    roleStore.load();
 
     if (me.source) {
       idField = {
@@ -88,10 +91,11 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
       {
         xtype: 'nx-itemselector',
         name: 'roles',
+        itemId: 'roles',
         buttons: ['add', 'remove'],
         fromTitle: 'Roles',
         toTitle: 'Contained',
-        store: 'Role',
+        store: roleStore,
         valueField: 'id',
         displayField: 'name',
         delimiter: null

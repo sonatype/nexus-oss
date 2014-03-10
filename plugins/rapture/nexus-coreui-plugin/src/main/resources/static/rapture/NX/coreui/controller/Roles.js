@@ -142,6 +142,7 @@ Ext.define('NX.coreui.controller.Roles', {
     if (list) {
       me.getRoleSourceStore().load();
       me.getPrivilegeStore().load();
+      me.getSettings().down('#roles').getStore().load();
     }
   },
 
