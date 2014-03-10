@@ -22,10 +22,10 @@ Ext.define('NX.coreui.controller.Users', {
     'User'
   ],
   views: [
-    'user.Add',
-    'user.Feature',
-    'user.List',
-    'user.Settings'
+    'user.UserAdd',
+    'user.UserFeature',
+    'user.UserList',
+    'user.UserSettings'
   ],
   refs: [
     {
