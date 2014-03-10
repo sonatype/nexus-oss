@@ -59,7 +59,7 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
           }
         },
         {
-          xtype: 'nx-coreui-capability-settings-fieldset',
+          xtype: 'nx-coreui-capability-settingsfieldset',
           title: 'Settings'
         }
       ],
@@ -71,11 +71,11 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
       ],
 
       getValues: function () {
-        return me.down('nx-coreui-capability-settings-fieldset').exportCapability(this.getForm())
+        return me.down('nx-coreui-capability-settingsfieldset').exportCapability(this.getForm())
       },
 
       markInvalid: function (errors) {
-        return me.down('nx-coreui-capability-settings-fieldset').markInvalid(this.getForm(), errors)
+        return me.down('nx-coreui-capability-settingsfieldset').markInvalid(this.getForm(), errors)
       }
 
     };

@@ -168,7 +168,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
 
   showSettings: function (capabilityModel, capabilityTypeModel) {
     var settings = this.getSettings(),
-        settingsFieldSet = settings.down('nx-coreui-capability-settings-fieldset');
+        settingsFieldSet = settings.down('nx-coreui-capability-settingsfieldset');
 
     if (capabilityModel) {
       settings.loadRecord(capabilityModel);
@@ -196,7 +196,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
 
     capabilityTypeModel = this.getCapabilityTypeStore().getById(combo.value);
     win.down('nx-coreui-capability-about').showAbout(capabilityTypeModel.get('about'));
-    win.down('nx-coreui-capability-settings-fieldset').setCapabilityType(capabilityTypeModel);
+    win.down('nx-coreui-capability-settingsfieldset').setCapabilityType(capabilityTypeModel);
   },
 
   onCapabilityStatusBeforeLoad: function () {

@@ -19,7 +19,7 @@
  */
 Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
   extend: 'Ext.form.FieldContainer',
-  alias: 'widget.nx-coreui-capability-settings-fieldset',
+  alias: 'widget.nx-coreui-capability-settingsfieldset',
 
   requires: [
     'NX.coreui.view.capability.factory.CapabilityCheckboxFactory',

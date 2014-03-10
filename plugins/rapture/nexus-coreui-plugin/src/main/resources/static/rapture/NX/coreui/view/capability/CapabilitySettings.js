@@ -17,15 +17,15 @@ Ext.define('NX.coreui.view.capability.CapabilitySettings', {
   title: 'Settings',
 
   items: {
-    xtype: 'nx-coreui-capability-settings-fieldset'
+    xtype: 'nx-coreui-capability-settingsfieldset'
   },
 
   getValues: function () {
-    return this.down('nx-coreui-capability-settings-fieldset').exportCapability(this.getForm())
+    return this.down('nx-coreui-capability-settingsfieldset').exportCapability(this.getForm())
   },
 
   markInvalid: function (errors) {
-    return this.down('nx-coreui-capability-settings-fieldset').markInvalid(this.getForm(), errors)
+    return this.down('nx-coreui-capability-settingsfieldset').markInvalid(this.getForm(), errors)
   }
 
 });
