@@ -126,6 +126,6 @@ public class NexusRestletResource
   }
 
   protected void handleError(Throwable throwable) {
-    logger.debug("ERROR: {}", throwable, throwable);
+    logger.error(throwable.toString(), throwable);
   }
 }

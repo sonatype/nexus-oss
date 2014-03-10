@@ -15,6 +15,7 @@ package org.sonatype.nexus.webapp;
 
 import java.io.File;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -30,20 +31,21 @@ import org.sonatype.nexus.util.LockFile;
 import org.sonatype.nexus.util.file.DirSupport;
 
 import com.google.common.base.Throwables;
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.ClassWorld;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.context.Context;
 import org.eclipse.sisu.plexus.PlexusSpaceModule;
 import org.eclipse.sisu.space.BeanScanning;
 import org.eclipse.sisu.space.ClassSpace;
 import org.eclipse.sisu.space.URLClassSpace;
 import org.eclipse.sisu.wire.WireModule;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.launch.Framework;
+import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +62,8 @@ public class WebappBootstrap
   private static final Logger log = LoggerFactory.getLogger(WebappBootstrap.class);
 
   private LockFile lockFile;
+
+  private Framework framework;
 
   private PlexusContainer container;
 
@@ -112,18 +116,37 @@ public class WebappBootstrap
       lockFile = new LockFile(new File(workDir, "nexus.lock"));
       checkState(lockFile.lock(), "Nexus work directory already in use: %s", workDir);
 
-      final ClassWorld world = new ClassWorld("nexus", Thread.currentThread().getContextClassLoader());
-      final ClassRealm realm = world.getRealm("nexus");
+      properties.put(Constants.FRAMEWORK_STORAGE, workDir + "/felix-cache");
+      properties.put(Constants.FRAMEWORK_STORAGE_CLEAN, Constants.FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
+      properties.put(Constants.FRAMEWORK_BUNDLE_PARENT, Constants.FRAMEWORK_BUNDLE_PARENT_FRAMEWORK);
+      properties.put(Constants.FRAMEWORK_BOOTDELEGATION, "*");
+
+      framework = ServiceLoader.load(FrameworkFactory.class).iterator().next().newFramework(properties);
+
+      framework.init();
+      framework.start();
+
+      File[] bundles = new File(properties.get("nexus-app") + "/bundles").listFiles();
+
+      // auto-install anything in the bundles repository
+      if (bundles != null && bundles.length > 0) {
+        BundleContext ctx = framework.getBundleContext();
+        for (File bundle : bundles) {
+          try {
+            ctx.installBundle("reference:" + bundle.toURI()).start();
+          }
+          catch (Exception e) {
+            log.warn("Problem installing: {}", bundle, e);
+          }
+        }
+      }
 
       // create the injector
-      ClassSpace space = new URLClassSpace(realm);
-      injector = Guice.createInjector(new WireModule(new AbstractModule()
-      {
-        @Override
-        protected void configure() {
-          bind(ClassRealm.class).toInstance(realm); // TEMP: won't be required in next step
-        }
-      }, new CoreModule(context, properties), new PlexusSpaceModule(space, BeanScanning.INDEX)));
+      ClassSpace coreSpace = new URLClassSpace(Thread.currentThread().getContextClassLoader());
+      injector = Guice.createInjector(
+          new WireModule(
+              new CoreModule(context, properties, framework),
+              new PlexusSpaceModule(coreSpace, BeanScanning.INDEX)));
       log.debug("Injector: {}", injector);
       
       container = injector.getInstance(PlexusContainer.class);
@@ -190,6 +213,18 @@ public class WebappBootstrap
       container.dispose();
       context.removeAttribute(PlexusConstants.PLEXUS_KEY);
       container = null;
+    }
+
+    // stop OSGi framework
+    if (framework != null) {
+      try {
+        framework.stop();
+        framework.waitForStop(0);
+      }
+      catch (Exception e) {
+        log.error("Failed to stop OSGi framework", e);
+      }
+      framework = null;
     }
 
     // release lock

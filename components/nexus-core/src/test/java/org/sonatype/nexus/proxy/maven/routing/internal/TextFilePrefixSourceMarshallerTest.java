@@ -115,7 +115,7 @@ public class TextFilePrefixSourceMarshallerTest
     for (String header : TextFilePrefixSourceMarshaller.HEADERS) {
       sb.append(header).append(System.getProperty("line.separator"));
     }
-    return content.replace(TextFilePrefixSourceMarshaller.MAGIC + "\n", sb.toString());
+    return content.replace(TextFilePrefixSourceMarshaller.MAGIC + System.getProperty("line.separator"), sb.toString());
   }
 
   @Test

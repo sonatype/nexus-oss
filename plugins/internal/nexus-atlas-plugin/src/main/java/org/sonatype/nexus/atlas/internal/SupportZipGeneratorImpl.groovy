@@ -21,15 +21,13 @@ import org.sonatype.nexus.atlas.SupportBundleCustomizer
 import org.sonatype.nexus.atlas.SupportZipGenerator
 import org.sonatype.nexus.atlas.SupportZipGenerator.Request
 import org.sonatype.nexus.atlas.SupportZipGenerator.Result
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration
+import org.sonatype.nexus.wonderland.DownloadService
 import org.sonatype.sisu.goodies.common.ByteSize
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
-import java.nio.file.Files
-import java.util.concurrent.atomic.AtomicLong
 import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 
@@ -54,7 +52,7 @@ class SupportZipGeneratorImpl
 {
   private final List<SupportBundleCustomizer> bundleCustomizers
 
-  private final File supportDir
+  private final DownloadService downloadService
 
   /**
    * The maximum (uncompressed) size of any one file that is included into the ZIP file when limit files is enabled.
@@ -67,28 +65,21 @@ class SupportZipGeneratorImpl
   private final ByteSize maxZipFileSize
 
   @Inject
-  SupportZipGeneratorImpl(final ApplicationConfiguration applicationConfiguration,
+  SupportZipGeneratorImpl(final DownloadService downloadService,
                           final List<SupportBundleCustomizer> bundleCustomizers,
                           final @Named('${atlas.supportZipGenerator.maxFileSize:-30mb}') ByteSize maxFileSize,
                           final @Named('${atlas.supportZipGenerator.maxZipFileSize:-20mb}') ByteSize maxZipFileSize)
   {
-    assert applicationConfiguration
+    assert downloadService
     this.bundleCustomizers = checkNotNull(bundleCustomizers)
 
-    // resolve where support archives will be stored
-    supportDir = applicationConfiguration.getWorkingDirectory('support')
-    log.info 'Support directory: {}', supportDir
+    this.downloadService = downloadService
 
     this.maxFileSize = maxFileSize
     log.info 'Maximum included file size: {}', maxFileSize
 
     this.maxZipFileSize = maxZipFileSize
     log.info 'Maximum ZIP file size: {}', maxZipFileSize
-  }
-
-  @Override
-  File getDirectory() {
-    return supportDir
   }
 
   /**
@@ -177,20 +168,11 @@ class SupportZipGeneratorImpl
     }
   }
 
-  private static final AtomicLong counter = new AtomicLong()
-
-  /**
-   * Generate a unique file prefix.
-   */
-  private String uniquePrefix() {
-    return "support-${new Date().format('yyyyMMdd-HHmmss')}-${counter.incrementAndGet()}"
-  }
-
   /**
    * Create a ZIP file with content from given sources.
    */
   private Result createZip(final Request request, final List<ContentSource> sources) {
-    def prefix = uniquePrefix()
+    def prefix = downloadService.uniqueName('support-')
 
     // Write zip to temporary file first
     def file = File.createTempFile("${prefix}-", '.zip').canonicalFile
@@ -333,8 +315,7 @@ class SupportZipGeneratorImpl
     }
 
     // move the file into place
-    def target = new File(supportDir, "${prefix}.zip")
-    Files.move(file.toPath(), target.toPath())
+    def target = downloadService.move(file, "${prefix}.zip")
     log.info 'Created support ZIP file: {}', target
 
     return new Result(

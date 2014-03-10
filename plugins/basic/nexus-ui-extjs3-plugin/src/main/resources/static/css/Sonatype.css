@@ -34,7 +34,7 @@ body {
     background-color: black;
     background-image: url("../../static/images/header_bg.gif");
     background-repeat: repeat-x;
-    height: 60px; /* needs to match the height of the background image */
+    height: 64px; /* needs to match the height of the background image */
 }
 
 #logo {

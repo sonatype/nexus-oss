@@ -53,10 +53,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <!--
-    NOTE: This is bringing in jackson2
-    -->
-
     <dependency>
       <groupId>io.kazuki</groupId>
       <artifactId>kazuki-db</artifactId>
@@ -87,21 +83,6 @@
         <exclusion>
           <groupId>com.google.code.findbugs</groupId>
           <artifactId>annotations</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>com.jolbox</groupId>
-      <artifactId>bonecp</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

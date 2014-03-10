@@ -11,7 +11,7 @@
             memoryStoreEvictionPolicy="LFU"
             />
 
-    <cache name="path-cache"
+    <cache name="nx-repository-path-cache"
             maxElementsInMemory="100000"
             eternal="false"
             timeToIdleSeconds="120"

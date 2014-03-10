@@ -18,28 +18,17 @@
  * @since 2.7
  */
 NX.define('Nexus.atlas.view.SupportZipCreated', {
-  extend: 'Ext.Window',
-
+  extend: 'Nexus.wonderland.view.FileCreated',
+  xtype: 'nx-atlas-view-supportzip-created',
   mixins: [
     'Nexus.LogAwareMixin'
   ],
-
   requires: [
-    'Nexus.atlas.Icons',
-    'Nexus.wonderland.AuthenticateButton'
+    'Nexus.atlas.Icons'
   ],
 
-  xtype: 'nx-atlas-view-supportzip-created',
-  cls: 'nx-atlas-view-supportzip-created',
-
-  title: 'Support ZIP Created',
-
-  autoShow: true,
-  constrain: true,
-  resizable: false,
-  width: 500,
-  border: false,
-  modal: true,
+  fileType: 'Support ZIP',
+  downloadButtonId: 'nx-atlas-button-supportzip-download',
 
   /**
    * @override
@@ -48,6 +37,10 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
     var me = this,
         icons = Nexus.atlas.Icons;
 
+    me.fileIcon = icons.get('zip').variant('x32');
+
+    Nexus.atlas.view.SupportZipCreated.superclass.initComponent.apply(me, arguments);
+
     me.truncatedWarning = NX.create('Ext.Component', {
       cls: 'nx-atlas-view-supportzip-created-truncated-warning',
       html: '<span>' + icons.get('warning').img +
@@ -55,94 +48,7 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
       hidden: true
     });
 
-    Ext.apply(me, {
-      items: [
-        {
-          xtype: 'component',
-          border: false,
-          cls: 'nx-atlas-view-supportzip-created-description',
-          html: icons.get('zip').variant('x32').img + '<div>Support ZIP has been created.' +
-              '<br/><br/>You can reference this file on the filesystem or download the file from your browser.</div>'
-        },
-        me.truncatedWarning,
-        {
-          xtype: 'form',
-          itemId: 'form',
-          border: false,
-          monitorValid: true,
-          layoutConfig: {
-            labelSeparator: '',
-            labelWidth: 40
-          },
-          labelAlign: 'right',
-          items: [
-            {
-              xtype: 'textfield',
-              fieldLabel: 'Name',
-              helpText: 'Support ZIP file name',
-              name: 'name',
-              readOnly: true,
-              grow: true,
-              style: {
-                border: 0,
-                background: 'none'
-              }
-            },
-            {
-              xtype: 'textfield',
-              fieldLabel: 'Size',
-              helpText: 'Size if ZIP file in bytes',  // FIXME: Would like to render in bytes/kilobytes/megabytes
-              name: 'size',
-              readOnly: true,
-              grow: true,
-              style: {
-                border: 0,
-                background: 'none'
-              }
-            },
-            {
-              xtype: 'textfield',
-              fieldLabel: 'Path',
-              helpText: 'Support ZIP file location',
-              name: 'file',
-              readOnly: true,
-              selectOnFocus: true,
-              anchor: '96%'
-            },
-            {
-              xtype: 'hidden',
-              name: 'truncated'
-            }
-          ],
-
-          buttonAlign: 'right',
-          buttons: [
-            { text: 'Close', xtype: 'link-button', handler: me.close, scope: me },
-            { text: 'Download', xtype: 'nx-wonderland-button-authenticate', formBind: true, id: 'nx-atlas-button-supportzip-download' }
-          ]
-        }
-      ],
-
-      keys: [
-        {
-          // Download on ENTER
-          key: Ext.EventObject.ENTER,
-          scope: me,
-          fn: function () {
-            var btn = Ext.getCmp('nx-atlas-button-supportzip-download');
-            btn.fireEvent('click', btn);
-          }
-        },
-        {
-          // Close on ESC
-          key: Ext.EventObject.ESC,
-          scope: me,
-          fn: me.close
-        }
-      ]
-    });
-
-    me.constructor.superclass.initComponent.apply(me, arguments);
+    me.items.insert(1, me.truncatedWarning);
   },
 
   /**
@@ -151,20 +57,12 @@ NX.define('Nexus.atlas.view.SupportZipCreated', {
    * @public
    */
   setValues: function (values) {
-    this.down('form').getForm().setValues(values);
+    Nexus.atlas.view.SupportZipCreated.superclass.setValues.apply(this, arguments);
 
     // if truncated show the warning
     if (values.truncated) {
       this.truncatedWarning.show();
     }
-  },
-
-  /**
-   * Get form values.
-   *
-   * @public
-   */
-  getValues: function () {
-    return this.down('form').getForm().getValues();
   }
+
 });

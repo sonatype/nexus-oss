@@ -13,16 +13,24 @@
 
 //
 // Helper to [re]install a plugin bundle into a nexus installation.
-//
-// Usage:
-//
-//    groovy -Dinstall=<nexus-install-directory> -Dplugin=<nexus-plugin-bundle-zip> ./buildsupport/scripts/installplugin.groovy
-//
 
-def pluginFile = System.getProperty('plugin') as File
+CliBuilder cli = new CliBuilder(
+    usage: 'groovy installplugin.groovy -i <nexus-install-directory> -p <nexus-plugin-bundle-zip>',
+    header: 'A utility to install a plugin for development purposes'
+)
+cli.with {
+  p longOpt: 'plugin', args: 1, 'Path to <nexus-plugin-bundle-zip>', required: true
+  i longOpt: 'install', args: 1, 'Path to <nexus-install-directory>', required: true
+}
+def options = cli.parse(args)
+if(!options) {
+  return
+}
+
+def pluginFile = options.p as File
 assert pluginFile && pluginFile.exists()
 
-def installDir = System.getProperty('install') as File
+def installDir = options.i as File
 assert installDir && installDir.exists()
 
 def repoDir = new File(installDir, 'nexus/WEB-INF/plugin-repository')

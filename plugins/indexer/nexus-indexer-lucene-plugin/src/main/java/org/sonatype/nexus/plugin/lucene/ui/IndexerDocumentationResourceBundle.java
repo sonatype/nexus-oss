@@ -27,7 +27,6 @@ import org.sonatype.nexus.rest.index.AbstractIndexerNexusPlexusResource;
 public class IndexerDocumentationResourceBundle
     extends AbstractDocumentationResourceBundle
 {
-
   @Override
   public String getPluginId() {
     return "nexus-indexer-lucene-plugin";
@@ -37,12 +36,4 @@ public class IndexerDocumentationResourceBundle
   public String getDescription() {
     return "Lucene Indexer Plugin API";
   }
-
-  @Override
-  protected ZipFile getZipFile()
-      throws IOException
-  {
-    return getZipFile(AbstractIndexerNexusPlexusResource.class);
-  }
-
 }

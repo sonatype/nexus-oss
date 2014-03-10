@@ -80,6 +80,27 @@
           </sharedDependencies>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>prepare-package</phase>
+            <configuration>
+              <target>
+                <!--
+                BC provider will be installed as a separate bundle to pass signature verification
+                -->
+                <manifest file="${project.build.directory}/nexus-plugin-bundle/osgi.metadata" mode="update">
+                  <attribute name="Require-Bundle" value="bcprov"/>
+                </manifest>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 

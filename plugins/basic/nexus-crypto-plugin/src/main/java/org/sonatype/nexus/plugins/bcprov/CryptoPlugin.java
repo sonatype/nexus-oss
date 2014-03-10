@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.plugins.bcprov;
 
+import javax.crypto.Cipher;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -31,6 +32,13 @@ import org.jetbrains.annotations.NonNls;
 public class CryptoPlugin
     extends PluginIdentity
 {
+  /**
+   * Algorithm we use for testing the unlimited sthrength policy files being installed.
+   *
+   * @since 2.8
+   */
+  private static final String UCRYPTO_TEST_ALGORITHM = "AES";
+
   /**
    * Prefix for ID-like things.
    */
@@ -52,5 +60,11 @@ public class CryptoPlugin
   @Inject
   public CryptoPlugin() throws Exception {
     super(GROUP_ID, ARTIFACT_ID);
+    // Javadoc: If JCE unlimited strength jurisdiction policy files are installed, Integer.MAX_VALUE will be returned.
+    if (!(Cipher.getMaxAllowedKeyLength(UCRYPTO_TEST_ALGORITHM) == Integer.MAX_VALUE)) {
+      log.warn(
+          "This JVM does not have JCE Unlimited Strength Jurisdiction Policy Files installed, required by Nexus."
+      );
+    }
   }
 }
