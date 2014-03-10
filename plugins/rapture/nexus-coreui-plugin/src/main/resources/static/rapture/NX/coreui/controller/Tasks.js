@@ -25,8 +25,8 @@ Ext.define('NX.coreui.controller.Tasks', {
     'TaskType'
   ],
   views: [
-    'task.Feature',
-    'task.List'
+    'task.TaskFeature',
+    'task.TaskList'
   ],
   refs: [
     {
