@@ -142,7 +142,6 @@ extends DirectComponentSupport
   void delete(final @NotNull(message = 'ID may not be null') String id,
               final @NotNull(message = 'Realm may not be null') String realm)
   {
-    // TODO check that user to be deleted is not the current user or user marked with anonymous
     securitySystem.deleteUser(id, realm)
   }
 

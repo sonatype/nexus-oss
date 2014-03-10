@@ -196,6 +196,9 @@ public class SecurityComponent
   public Map<String, Object> getState() {
     HashMap<String, Object> state = Maps.newHashMap();
     state.put("user", getUser());
+    state.put(
+        "anonymousUsername", securitySystem.isAnonymousAccessEnabled() ? securitySystem.getAnonymousUsername() : null
+    );
     return state;
   }
 
