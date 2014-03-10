@@ -36,19 +36,26 @@ Ext.define('NX.coreui.view.user.UserAdd', {
 
     me.down('#id').setReadOnly(false);
 
-    me.down('form').insert(5, {
-      xtype: 'nx-password',
-      name: 'password',
-      fieldLabel: 'Password',
-      emptyText: 'enter a password'
-    });
-
-    me.down('form').insert(6, {
-      xtype: 'nx-password',
-      fieldLabel: 'Confirm Password',
-      emptyText: 'confirm above password',
-      submitValue: false
-    });
+    me.down('form').insert(5, [
+      {
+        xtype: 'nx-password',
+        name: 'password',
+        itemId: 'password',
+        fieldLabel: 'Password',
+        emptyText: 'enter a password'
+      },
+      {
+        xtype: 'nx-password',
+        allowBlank: true,
+        fieldLabel: 'Confirm Password',
+        emptyText: 'confirm above password',
+        submitValue: false,
+        validator: function () {
+          var me = this;
+          return (me.up('form').down('#password').getValue() === me.getValue()) ? true : 'Passwords don\'t match';
+        }
+      }
+    ]);
   }
 
 });
