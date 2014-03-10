@@ -14,8 +14,12 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.apache.bval.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.model.Password
+import org.sonatype.nexus.validation.Create
 import org.sonatype.security.usermanagement.UserStatus
+
+import javax.validation.constraints.NotNull
 
 /**
  * User exchange object.
@@ -25,11 +29,28 @@ import org.sonatype.security.usermanagement.UserStatus
 @ToString(includePackage = false, includeNames = true)
 class UserXO
 {
+  @NotNull
+  @NotEmpty
   String id
+
   String realm
+
+  @NotNull
+  @NotEmpty
   String firstName
+
+  @NotNull
+  @NotEmpty
   String lastName
+
+  @NotNull
+  @NotEmpty
   String email
+
+  @NotNull
   UserStatus status
+
+  @NotNull
+  @NotEmpty(groups = Create.class)
   Password password
 }

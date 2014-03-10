@@ -15,11 +15,14 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
+import org.sonatype.nexus.validation.Create
+import org.sonatype.nexus.validation.Update
 import org.sonatype.security.SecuritySystem
 import org.sonatype.security.usermanagement.DefaultUser
 import org.sonatype.security.usermanagement.UserSearchCriteria
@@ -27,6 +30,9 @@ import org.sonatype.security.usermanagement.UserSearchCriteria
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
+import javax.validation.groups.Default
 
 /**
  * User {@link DirectComponent}.
@@ -70,7 +76,8 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('security:users:create')
-  UserXO create(final UserXO userXO) {
+  @Validate(groups = [Create.class, Default.class])
+  UserXO create(final @Valid UserXO userXO) {
     asUserXO(securitySystem.addUser(new DefaultUser(
         userId: userXO.id,
         source: 'default',
@@ -88,7 +95,8 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('security:users:create')
-  UserXO update(final UserXO userXO) {
+  @Validate(groups = [Update.class, Default.class])
+  UserXO update(final @Valid UserXO userXO) {
     asUserXO(securitySystem.updateUser(securitySystem.getUser(userXO.id).with {
       firstName = userXO.firstName
       lastName = userXO.lastName
@@ -107,7 +115,10 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('security:users:delete')
-  void delete(final String id, final String realm) {
+  @Validate
+  void delete(final @NotNull(message = 'User ID may not be null') String id,
+              final @NotNull(message = 'Realm may not be null') String realm)
+  {
     // TODO check that user to be deleted is not the current user or user marked with anonymous
     securitySystem.deleteUser(id, realm)
   }
