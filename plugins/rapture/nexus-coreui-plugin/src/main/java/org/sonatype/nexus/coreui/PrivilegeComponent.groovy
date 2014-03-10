@@ -31,6 +31,7 @@ import org.sonatype.nexus.proxy.repository.Repository
 import org.sonatype.nexus.proxy.targets.TargetRegistry
 import org.sonatype.nexus.validation.Create
 import org.sonatype.security.SecuritySystem
+import org.sonatype.security.authorization.AuthorizationManager
 import org.sonatype.security.authorization.Privilege
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor
@@ -119,7 +120,11 @@ extends DirectComponentSupport
   @RequiresPermissions('security:privileges:delete')
   @Validate
   void delete(final @NotNull(message = 'ID may not be null') String id) {
-    securitySystem.getAuthorizationManager(DEFAULT_SOURCE).deletePrivilege(id)
+    AuthorizationManager authorizationManager = securitySystem.getAuthorizationManager(DEFAULT_SOURCE)
+    if (authorizationManager.getPrivilege(id)?.isReadOnly()) {
+      throw new IllegalAccessException("Privilege [${id}] is readonly and cannot be deleted")
+    }
+    authorizationManager.deletePrivilege(id)
   }
 
   def PrivilegeXO asPrivilegeXO(Privilege input) {
