@@ -59,10 +59,25 @@ public class ValidationResponse
     super(false, Lists.newArrayList());
     Set<ConstraintViolation<?>> violations = cause.getConstraintViolations();
     if (violations != null && violations.size() > 0) {
-      errors = Maps.newHashMap();
       for (ConstraintViolation<?> violation : violations) {
-        errors.put(violation.getPropertyPath().toString(), violation.getMessage());
+        String key = violation.getPropertyPath().toString();
+        if (key == null || key.trim().isEmpty()) {
+          if (messages == null) {
+            messages = Lists.newArrayList();
+          }
+          messages.add(violation.getMessage());
+        }
+        else {
+          if (errors == null) {
+            errors = Maps.newHashMap();
+          }
+          errors.put(key, violation.getMessage());
+        }
       }
+    }
+    else if (cause.getMessage() != null) {
+      messages = Lists.newArrayList();
+      messages.add(cause.getMessage());
     }
   }
 
