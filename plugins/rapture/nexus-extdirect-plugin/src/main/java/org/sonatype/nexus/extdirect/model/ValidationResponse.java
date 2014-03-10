@@ -20,10 +20,13 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Ext.Direct validation response.
@@ -37,26 +40,26 @@ public class ValidationResponse
 
   private Map<String, String> errors;
 
+  public ValidationResponse(final InvalidConfigurationException cause) {
+    super(false, Lists.newArrayList());
+    checkNotNull(cause, "cause may not be null");
+    if (cause.getValidationResponse() == null || cause.getValidationResponse().getValidationErrors().size() == 0) {
+      messages = Lists.newArrayList();
+      messages.add(cause.getMessage());
+    }
+    else {
+      convertValidationMessages(cause.getValidationResponse().getValidationErrors());
+    }
+  }
+
   public ValidationResponse(List<ValidationMessage> validationMessages) {
     super(false, Lists.newArrayList());
-    if (validationMessages != null) {
-      errors = Maps.newHashMap();
-      for (ValidationMessage validationMessage : validationMessages) {
-        if ("*".equals(validationMessage.getKey())) {
-          if (messages == null) {
-            messages = Lists.newArrayList();
-          }
-          messages.add(validationMessage.getMessage());
-        }
-        else {
-          errors.put(validationMessage.getKey(), validationMessage.getMessage());
-        }
-      }
-    }
+    convertValidationMessages(validationMessages);
   }
 
   public ValidationResponse(final ConstraintViolationException cause) {
     super(false, Lists.newArrayList());
+    checkNotNull(cause, "cause may not be null");
     Set<ConstraintViolation<?>> violations = cause.getConstraintViolations();
     if (violations != null && violations.size() > 0) {
       for (ConstraintViolation<?> violation : violations) {
@@ -78,6 +81,23 @@ public class ValidationResponse
     else if (cause.getMessage() != null) {
       messages = Lists.newArrayList();
       messages.add(cause.getMessage());
+    }
+  }
+
+  private void convertValidationMessages(final List<ValidationMessage> validationMessages) {
+    if (validationMessages != null) {
+      errors = Maps.newHashMap();
+      for (ValidationMessage validationMessage : validationMessages) {
+        if ("*".equals(validationMessage.getKey())) {
+          if (messages == null) {
+            messages = Lists.newArrayList();
+          }
+          messages.add(validationMessage.getMessage());
+        }
+        else {
+          errors.put(validationMessage.getKey(), validationMessage.getMessage());
+        }
+      }
     }
   }
 

@@ -23,6 +23,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -33,9 +34,11 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.model.Response;
@@ -182,13 +185,20 @@ public class ExtDirectServlet
       private Object handleException(final RegisteredMethod method, final Throwable e) {
         log.error("Failed to invoke action method {}", method.getFullJavaMethodName(), e);
         if (e instanceof InvalidConfigurationException) {
-          if (((InvalidConfigurationException) e).getValidationResponse() == null) {
+          InvalidConfigurationException cause = (InvalidConfigurationException) e;
+          ValidationResponse vr = cause.getValidationResponse();
+          if (vr == null || vr.getValidationErrors() == null || vr.getValidationErrors().size() == 0) {
             return asResponse(error(e));
           }
-          return asResponse(invalid((InvalidConfigurationException) e));
+          return asResponse(invalid(cause));
         }
         if (e instanceof ConstraintViolationException) {
-          return asResponse(invalid((ConstraintViolationException) e));
+          ConstraintViolationException cause = (ConstraintViolationException) e;
+          Set<ConstraintViolation<?>> violations = cause.getConstraintViolations();
+          if (violations == null || violations.size() == 0) {
+            return asResponse(error(e));
+          }
+          return asResponse(invalid(cause));
         }
         return asResponse(error(e));
       }
