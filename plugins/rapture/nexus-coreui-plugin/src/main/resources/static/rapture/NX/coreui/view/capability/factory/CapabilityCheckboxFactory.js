@@ -18,10 +18,8 @@
  * @since 2.7
  */
 Ext.define('NX.coreui.view.capability.factory.CapabilityCheckboxFactory', {
-
   singleton: true,
-
-  supports: ['checkbox'],
+  alias: 'nx.capability.factory.checkbox',
 
   /**
    * Creates a checkbox.

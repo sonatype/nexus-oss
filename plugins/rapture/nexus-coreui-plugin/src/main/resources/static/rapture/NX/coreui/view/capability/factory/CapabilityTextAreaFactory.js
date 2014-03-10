@@ -18,10 +18,11 @@
  * @since 2.7
  */
 Ext.define('NX.coreui.view.capability.factory.CapabilityTextAreaFactory', {
-
   singleton: true,
-
-  supports: ['textarea', 'text-area'],
+  alias: [
+    'nx.capability.factory.textarea',
+    'nx.capability.factory.text-area'
+  ],
 
   /**
    * Creates a textarea.

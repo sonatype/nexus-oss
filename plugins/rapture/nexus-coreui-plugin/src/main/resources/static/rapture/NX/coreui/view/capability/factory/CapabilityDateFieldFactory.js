@@ -18,10 +18,11 @@
  * @since 2.7
  */
 Ext.define('NX.coreui.view.capability.factory.CapabilityDateFieldFactory', {
-
   singleton: true,
-
-  supports: ['datefield', 'date'],
+  alias: [
+    'nx.capability.factory.datefield',
+    'nx.capability.factory.date'
+  ],
 
   /**
    * Creates a datefield.

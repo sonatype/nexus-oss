@@ -18,8 +18,14 @@
  * @since 2.7
  */
 Ext.define('NX.coreui.view.capability.factory.CapabilityComboFactory', {
-
   singleton: true,
+  alias: [
+    'nx.capability.factory.combo',
+    'nx.capability.factory.combobox',
+    'nx.capability.factory.repo',
+    'nx.capability.factory.repo-or-group',
+    'nx.capability.factory.repo-target'
+  ],
 
   mixins: {
     logAware: 'NX.LogAware'
@@ -28,8 +34,6 @@ Ext.define('NX.coreui.view.capability.factory.CapabilityComboFactory', {
   requires: [
     'NX.util.Url'
   ],
-
-  supports: ['combo', 'combobox', 'repo', 'repo-or-group', 'repo-target'],
 
   /**
    * Map of stores / store url.

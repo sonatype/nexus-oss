@@ -44,26 +44,12 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
     });
 
     me.callParent(arguments);
-
-    me.factories = Ext.create('Ext.util.MixedCollection');
-
-    me.addFactory(NX.coreui.view.capability.factory.CapabilityCheckboxFactory);
-    me.addFactory(NX.coreui.view.capability.factory.CapabilityComboFactory);
-    me.addFactory(NX.coreui.view.capability.factory.CapabilityDateFieldFactory);
-    me.addFactory(NX.coreui.view.capability.factory.CapabilityNumberFieldFactory);
-    me.addFactory(NX.coreui.view.capability.factory.CapabilityTextAreaFactory);
-    me.addFactory(NX.coreui.view.capability.factory.CapabilityTextFieldFactory);
   },
 
   /**
    * @property
    */
   capabilityType: undefined,
-
-  /**
-   * @private
-   */
-  factories: undefined,
 
   /**
    * Renders fields for a capability type.
@@ -90,9 +76,9 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
 
       if (me.capabilityType.get('formFields')) {
         Ext.each(me.capabilityType.get('formFields'), function (formField) {
-          var factory = me.factories.get(formField.type);
+          var factory = Ext.ClassManager.getByAlias('nx.capability.factory.' + formField.type);
           if (!factory) {
-            factory = me.factories.get('string');
+            factory = Ext.ClassManager.getByAlias('nx.capability.factory.string');
           }
           if (factory) {
             item = Ext.apply(factory.create(formField), {
@@ -201,17 +187,6 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
     }
 
     return undefined;
-  },
-
-  /**
-   * @private
-   */
-  addFactory: function (factory) {
-    var me = this;
-
-    Ext.each(factory.supports, function (supported) {
-      me.factories.add(supported, factory);
-    });
   }
 
 });

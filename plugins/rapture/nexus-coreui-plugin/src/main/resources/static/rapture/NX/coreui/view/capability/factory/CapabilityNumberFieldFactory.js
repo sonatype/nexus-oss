@@ -18,10 +18,11 @@
  * @since 2.7
  */
 Ext.define('NX.coreui.view.capability.factory.CapabilityNumberFieldFactory', {
-
   singleton: true,
-
-  supports: ['numberfield', 'number'],
+  alias: [
+    'nx.capability.factory.numberfield',
+    'nx.capability.factory.number'
+  ],
 
   /**
    * Creates a numberfield.

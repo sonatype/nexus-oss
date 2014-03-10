@@ -18,10 +18,12 @@
  * @since 2.7
  */
 Ext.define('NX.coreui.view.capability.factory.CapabilityTextFieldFactory', {
-
   singleton: true,
-
-  supports: ['textfield', 'string', 'password'],
+  alias: [
+    'nx.capability.factory.textfield',
+    'nx.capability.factory.string',
+    'nx.capability.factory.password'
+  ],
 
   /**
    * Creates a textfield.
