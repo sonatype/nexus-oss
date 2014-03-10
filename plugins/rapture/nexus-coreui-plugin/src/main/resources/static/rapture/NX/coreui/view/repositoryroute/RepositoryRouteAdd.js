@@ -10,19 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/**
- * Repository Route feature.
- *
- * @since 2.8
- */
-Ext.define('NX.coreui.view.repositoryroute.Feature', {
-  extend: 'NX.view.masterdetail.Panel',
-  alias: 'widget.nx-coreui-repositoryroute-feature',
+Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteAdd', {
+  extend: 'NX.view.AddWindow',
+  alias: 'widget.nx-coreui-repositoryroute-add',
 
-  list: 'nx-coreui-repositoryroute-list',
+  title: 'Create new route',
+  defaultFocus: 'name',
 
-  iconName: 'repositoryroute-default',
-
-  tabs: { xtype: 'nx-coreui-repositoryroute-settings' }
+  items: {
+    xtype: 'nx-coreui-repositoryroute-settings',
+    api: {
+      submit: 'NX.direct.coreui_RepositoryRoute.create'
+    },
+    settingsFormSuccessMessage: function (data) {
+      return 'Repository route created: ' + data['pattern'];
+    },
+    editableCondition: NX.Conditions.isPermitted('nexus:routes', 'create'),
+    editableMarker: 'You do not have permission to create routes'
+  }
 
 });

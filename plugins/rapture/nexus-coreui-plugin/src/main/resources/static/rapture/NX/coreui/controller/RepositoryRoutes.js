@@ -31,10 +31,10 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
     'Repository'
   ],
   views: [
-    'repositoryroute.Add',
-    'repositoryroute.Feature',
-    'repositoryroute.List',
-    'repositoryroute.Settings'
+    'repositoryroute.RepositoryRouteAdd',
+    'repositoryroute.RepositoryRouteFeature',
+    'repositoryroute.RepositoryRouteList',
+    'repositoryroute.RepositoryRouteSettings'
   ],
   refs: [
     {
