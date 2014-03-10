@@ -19,7 +19,6 @@ Ext.define('NX.coreui.app.PluginConfig', {
   controllers: [
     'NX.coreui.controller.Capabilities',
     'NX.coreui.controller.MavenUpload',
-    'NX.coreui.controller.Plugin',
     'NX.coreui.controller.PluginConsole',
     'NX.coreui.controller.Repositories',
     'NX.coreui.controller.RepositoryTargets',
@@ -27,6 +26,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.Privileges',
     'NX.coreui.controller.Roles',
     'NX.coreui.controller.Security',
+    'NX.coreui.controller.System',
     'NX.coreui.controller.Tasks',
     'NX.coreui.controller.UploadArtifact',
     'NX.coreui.controller.Users'

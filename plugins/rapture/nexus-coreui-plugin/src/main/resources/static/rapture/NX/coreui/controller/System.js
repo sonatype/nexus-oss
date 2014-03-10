@@ -10,11 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-Ext.define('NX.coreui.controller.Plugin', {
+Ext.define('NX.coreui.controller.System', {
   extend: 'Ext.app.Controller',
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'system.General',
@@ -28,14 +25,7 @@ Ext.define('NX.coreui.controller.Plugin', {
   init: function () {
     var me = this;
 
-    // HACK: Show some items only if user is logged in for testing
-    var visibleIfLoggedIn = function () {
-      return Ext.isDefined(NX.State.getUser());
-    };
-
     me.getApplication().getFeaturesController().registerFeature([
-
-      // system
       {
         mode: 'admin',
         path: '/System',
@@ -45,7 +35,9 @@ Ext.define('NX.coreui.controller.Plugin', {
           variants: ['x16', 'x32']
         },
         weight: 1000,
-        visible: visibleIfLoggedIn
+        visible: function () {
+          return NX.Permissions.check('nexus:settings', 'read');
+        }
       },
       {
         mode: 'admin',
@@ -55,7 +47,9 @@ Ext.define('NX.coreui.controller.Plugin', {
           file: 'wrench.png',
           variants: ['x16', 'x32']
         },
-        visible: visibleIfLoggedIn
+        visible: function () {
+          return NX.Permissions.check('nexus:settings', 'read');
+        }
       },
       {
         mode: 'admin',
@@ -65,7 +59,9 @@ Ext.define('NX.coreui.controller.Plugin', {
           file: 'transmit.png',
           variants: ['x16', 'x32']
         },
-        visible: visibleIfLoggedIn
+        visible: function () {
+          return NX.Permissions.check('nexus:settings', 'read');
+        }
       },
       {
         mode: 'admin',
@@ -75,7 +71,9 @@ Ext.define('NX.coreui.controller.Plugin', {
           file: 'emails.png',
           variants: ['x16', 'x32']
         },
-        visible: visibleIfLoggedIn
+        visible: function () {
+          return NX.Permissions.check('nexus:settings', 'read');
+        }
       },
     ]);
   }
