@@ -56,6 +56,10 @@ Ext.define('NX.coreui.view.user.UserAccount', {
     ];
 
     me.callParent(arguments);
+
+    me.items.get(0).getDockedItems('toolbar[dock="bottom"]')[0].add({
+      xtype: 'button', text: 'Change Password', action: 'changepassword', ui: 'danger', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true
+    });
   }
 
 });

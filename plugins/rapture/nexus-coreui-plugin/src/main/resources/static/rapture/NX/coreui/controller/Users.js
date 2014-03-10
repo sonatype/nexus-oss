@@ -27,6 +27,7 @@ Ext.define('NX.coreui.controller.Users', {
   views: [
     'user.UserAccount',
     'user.UserAdd',
+    'user.UserChangePassword',
     'user.UserFeature',
     'user.UserList',
     'user.UserSettings'
@@ -114,6 +115,13 @@ Ext.define('NX.coreui.controller.Users', {
         },
         'nx-coreui-user-list menuitem[action=filter]': {
           click: me.filterBySource
+        },
+        'nx-coreui-user-account button[action=changepassword]': {
+          click: me.showChangePasswordWindow,
+          afterrender: me.bindChangePasswordButton
+        },
+        'nx-coreui-user-changepassword button[action=changepassword]': {
+          click: me.changePassword
         }
       }
     });
@@ -142,6 +150,20 @@ Ext.define('NX.coreui.controller.Users', {
    */
   showAddWindow: function () {
     Ext.widget('nx-coreui-user-add');
+  },
+
+  /**
+   * @private
+   */
+  showChangePasswordWindow: function () {
+    NX.Security.doWithAuthenticationToken(
+        'Changing password requires validation of your credentials.',
+        {
+          success: function (authToken) {
+            Ext.widget('nx-coreui-user-changepassword', { authToken: authToken });
+          }
+        }
+    );
   },
 
   /**
@@ -287,6 +309,39 @@ Ext.define('NX.coreui.controller.Users', {
         NX.Messages.add({
           text: 'User deleted: ' + description, type: 'success'
         });
+      }
+    });
+  },
+
+  /**
+   * @override
+   * @private
+   * Enable 'Change Password' when user has 'security:userschangepw:update' permission.
+   */
+  bindChangePasswordButton: function (button) {
+    button.mon(
+        NX.Conditions.and(
+            NX.Conditions.isPermitted('security:userschangepw', 'update')
+        ),
+        {
+          satisfied: button.enable,
+          unsatisfied: button.disable,
+          scope: button
+        }
+    );
+  },
+
+  /**
+   * @private
+   */
+  changePassword: function (button) {
+    var win = button.up('window'),
+        password = button.up('form').down('#password').getValue();
+
+    NX.direct.coreui_User.changePassword(win.authToken, password, function (response) {
+      if (Ext.isDefined(response) && response.success) {
+        win.close();
+        NX.Messages.add({ text: 'Password changed', type: 'success' });
       }
     });
   }

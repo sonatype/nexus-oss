@@ -26,8 +26,10 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
 import org.sonatype.nexus.user.UserAccountManager
+import org.sonatype.nexus.util.Tokens
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
+import org.sonatype.nexus.wonderland.AuthTicketService
 import org.sonatype.security.SecuritySystem
 import org.sonatype.security.usermanagement.*
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager
@@ -59,6 +61,9 @@ extends DirectComponentSupport
 
   @Inject
   UserAccountManager userAccountManager
+
+  @Inject
+  AuthTicketService authTickets
 
   @Inject
   BeanLocator beanLocator
@@ -170,6 +175,23 @@ extends DirectComponentSupport
       return it
     })
     return readAccount()
+  }
+
+  @DirectMethod
+  @RequiresUser
+  @RequiresAuthentication
+  @RequiresPermissions('security:userschangepw:update')
+  @Validate
+  void changePassword(final @NotNull(message = 'AuthToken may not be null') String authToken,
+                      final @NotNull(message = 'Password may not be null') String password)
+  {
+    if (authTickets.redeemTicket(authToken)) {
+      String currentUserId = securitySystem.getSubject().getPrincipal().toString()
+      securitySystem.changePassword(currentUserId, Tokens.decodeBase64String(password))
+    }
+    else {
+      throw new IllegalAccessException('Invalid authentication ticket')
+    }
   }
 
   /**
