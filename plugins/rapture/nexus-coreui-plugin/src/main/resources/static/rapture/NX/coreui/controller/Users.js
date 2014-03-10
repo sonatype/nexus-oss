@@ -40,6 +40,10 @@ Ext.define('NX.coreui.controller.Users', {
     {
       ref: 'settings',
       selector: 'nx-coreui-user-feature nx-coreui-user-settings'
+    },
+    {
+      ref: 'roleTree',
+      selector: 'nx-coreui-user-feature nx-coreui-role-tree'
     }
   ],
   icons: {
@@ -122,6 +126,9 @@ Ext.define('NX.coreui.controller.Users', {
         },
         'nx-coreui-user-changepassword button[action=changepassword]': {
           click: me.changePassword
+        },
+        'nx-coreui-user-feature nx-coreui-role-tree': {
+          activate: me.onRoleTreeActivate
         }
       }
     });
@@ -142,6 +149,7 @@ Ext.define('NX.coreui.controller.Users', {
 
     if (Ext.isDefined(model)) {
       me.getSettings().loadRecord(model);
+      me.getRoleTree().loadRecord(model.data);
     }
   },
 
@@ -253,6 +261,17 @@ Ext.define('NX.coreui.controller.Users', {
     userSourceButton.sourceId = menuItem.source.getId();
 
     me.loadStore();
+  },
+
+  /**
+   * @private
+   */
+  onRoleTreeActivate: function (panel) {
+    var me = this;
+
+    panel.loadRecord({
+      roles: me.getSettings().down('#roles').getValue()
+    });
   },
 
   /**

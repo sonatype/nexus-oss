@@ -19,5 +19,8 @@ Ext.define('NX.coreui.view.user.UserFeature', {
   // FIXME: This seems strange to configure icon name here for the detail panel
   iconName: 'user-default',
 
-  tabs: { xtype: 'nx-coreui-user-settings' }
+  tabs: [
+    { xtype: 'nx-coreui-user-settings', title: 'Settings' },
+    { xtype: 'nx-coreui-role-tree', title: 'Role Tree' }
+  ]
 });

@@ -18,6 +18,9 @@ Ext.define('NX.coreui.view.role.RoleFeature', {
 
   iconName: 'role-default',
 
-  tabs: { xtype: 'nx-coreui-role-settings' }
+  tabs: [
+    { xtype: 'nx-coreui-role-settings', title: 'Settings' },
+    { xtype: 'nx-coreui-role-tree', title: 'Role Tree' }
+  ]
 
 });

@@ -80,6 +80,7 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
       {
         xtype: 'nx-itemselector',
         name: 'privileges',
+        itemId: 'privileges',
         buttons: ['add', 'remove'],
         fromTitle: 'Privileges',
         toTitle: 'Given',
