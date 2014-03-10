@@ -26,10 +26,10 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
     'RepositoryFormat'
   ],
   views: [
-    'repositorytarget.Add',
-    'repositorytarget.Feature',
-    'repositorytarget.List',
-    'repositorytarget.Settings'
+    'repositorytarget.RepositoryTargetAdd',
+    'repositorytarget.RepositoryTargetFeature',
+    'repositorytarget.RepositoryTargetList',
+    'repositorytarget.RepositoryTargetSettings'
   ],
   refs: [
     {
