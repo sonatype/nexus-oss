@@ -83,7 +83,7 @@ Ext.define('NX.coreui.view.role.RoleTree', {
     if (me.active) {
       Ext.suspendLayouts();
       me.getStore().getRootNode().removeAll();
-      if (me.model) {
+      if (Ext.isDefined(me.model) && me.roleStore.getCount() > 0 && me.privilegeStore.getCount() > 0) {
         me.pushIf(children, me.expandRoles(me.model.roles));
         me.pushIf(children, me.expandPrivileges(me.model.privileges));
         if (children.length) {
