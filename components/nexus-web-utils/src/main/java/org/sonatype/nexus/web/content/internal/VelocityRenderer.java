@@ -94,9 +94,10 @@ public class VelocityRenderer
   public void renderCollection(final HttpServletRequest request, final HttpServletResponse response,
       final StorageCollectionItem coll, final Collection<StorageItem> children) throws IOException
   {
+    final Map<String, Object> dataModel = createBaseModel(coll.getResourceStoreRequest());
     final Set<String> uniqueNames = Sets.newHashSetWithExpectedSize(children.size());
     final List<CollectionEntry> entries = Lists.newArrayListWithCapacity(children.size());
-    final String collUrl = request.getRequestURL().toString();
+    final String collUrl = dataModel.get("nexusRoot") + request.getServletPath() + request.getPathInfo();
     for (StorageItem child : children) {
       if (child.isVirtual() || !child.getRepositoryItemUid().getBooleanAttributeValue(IsHiddenAttribute.class)) {
         if (!uniqueNames.contains(child.getName())) {
@@ -113,7 +114,6 @@ public class VelocityRenderer
 
     Collections.sort(entries, new CollectionEntryComparator());
 
-    final Map<String, Object> dataModel = createBaseModel(coll.getResourceStoreRequest());
     dataModel.put("requestPath", coll.getPath());
     dataModel.put("listItems", entries);
     render(getTemplate("repositoryContentHtml.vm"), dataModel, response);
