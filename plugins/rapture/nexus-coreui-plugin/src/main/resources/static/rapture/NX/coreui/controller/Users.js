@@ -49,11 +49,11 @@ Ext.define('NX.coreui.controller.Users', {
       file: 'user.png',
       variants: ['x16', 'x32']
     },
-    'user-source-default': {
+    'default-security-source': {
       file: 'user.png',
       variants: ['x16']
     },
-    'user-source-allconfigured': {
+    'allconfigured-security-source': {
       file: 'user.png',
       variants: ['x16']
     }
@@ -186,7 +186,7 @@ Ext.define('NX.coreui.controller.Users', {
         userSourceButton.sourceId = 'default';
       }
       store.each(function (source) {
-        var iconCls = NX.Icons.cls('user-source-' + source.getId().toLowerCase(), 'x16');
+        var iconCls = NX.Icons.cls(source.getId().toLowerCase() + '-security-source', 'x16');
         userSourceButton.menu.add({
           text: source.get('name'),
           iconCls: iconCls,

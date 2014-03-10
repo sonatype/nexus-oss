@@ -48,6 +48,10 @@ Ext.define('NX.coreui.controller.Roles', {
     'role-default': {
       file: 'user_policeman.png',
       variants: ['x16', 'x32']
+    },
+    'role-externalmapping': {
+      file: 'shield.png',
+      variants: ['x16', 'x32']
     }
   },
   features: {
@@ -167,13 +171,15 @@ Ext.define('NX.coreui.controller.Roles', {
       store.each(function (source) {
         menuItems.push({
           text: source.get('name'),
+          iconCls: NX.Icons.cls(source.getId().toLowerCase() + '-security-source', 'x16'),
           action: 'newmapping',
           source: source.getId()
         });
       });
       newButton.menu.add({
         text: 'External Role Mapping',
-        menu: menuItems
+        menu: menuItems,
+        iconCls: NX.Icons.cls('role-externalmapping', 'x16')
       });
     }
   },

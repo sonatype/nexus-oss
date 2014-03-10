@@ -33,7 +33,7 @@ Ext.define('NX.coreui.view.role.RoleList', {
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
       menu: [
-        { text: 'Nexus Role', action: 'newrole' }
+        { text: 'Nexus Role', action: 'newrole', iconCls: NX.Icons.cls('role-default', 'x16') }
       ]
     },
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
