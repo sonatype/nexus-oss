@@ -107,10 +107,6 @@ Ext.define('NX.controller.Temp', {
       },
 
       // user
-      'feature-account': {
-        file: 'user.png',
-        variants: ['x16', 'x32']
-      },
       'feature-notifications': {
         file: 'emails.png',
         variants: ['x16', 'x32']
@@ -258,11 +254,6 @@ Ext.define('NX.controller.Temp', {
       },
 
       // user mode
-      {
-        mode: 'user',
-        path: '/Account',
-        visible: visibleIfLoggedIn
-      },
       {
         mode: 'user',
         path: '/Notifications',

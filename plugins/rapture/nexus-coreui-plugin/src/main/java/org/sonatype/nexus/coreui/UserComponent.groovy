@@ -19,11 +19,13 @@ import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.apache.shiro.authz.annotation.RequiresUser
 import org.eclipse.sisu.inject.BeanLocator
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
+import org.sonatype.nexus.user.UserAccountManager
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.security.SecuritySystem
@@ -56,6 +58,9 @@ extends DirectComponentSupport
   SecuritySystem securitySystem
 
   @Inject
+  UserAccountManager userAccountManager
+
+  @Inject
   BeanLocator beanLocator
 
   /**
@@ -85,6 +90,23 @@ extends DirectComponentSupport
           name: entry.description ?: entry.key.value
       )
     }
+  }
+
+  /**
+   * @return current logged in user account.
+   */
+  @DirectMethod
+  @RequiresPermissions('security:users:read')
+  @RequiresUser
+  UserAccountXO readAccount() {
+    String currentUserId = securitySystem.getSubject().getPrincipal().toString()
+    User user = userAccountManager.readAccount(currentUserId)
+    return new UserAccountXO(
+        id: user.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.emailAddress
+    )
   }
 
   /**
@@ -128,6 +150,26 @@ extends DirectComponentSupport
       }
       return it
     }))
+  }
+
+  /**
+   * @param userAccountXO to be updated
+   * @return current logged in user account
+   */
+  @DirectMethod
+  @RequiresUser
+  @RequiresAuthentication
+  @RequiresPermissions('security:users:create')
+  @Validate
+  UserAccountXO updateAccount(final @NotNull(message = 'UserAccountXO may not be null') @Valid UserAccountXO userAccountXO) {
+    String currentUserId = securitySystem.getSubject().getPrincipal().toString()
+    userAccountManager.updateAccount(userAccountManager.readAccount(currentUserId).with {
+      firstName = userAccountXO.firstName
+      lastName = userAccountXO.lastName
+      emailAddress = userAccountXO.email
+      return it
+    })
+    return readAccount()
   }
 
   /**

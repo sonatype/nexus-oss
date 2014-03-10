@@ -25,6 +25,7 @@ Ext.define('NX.coreui.controller.Users', {
 
   ],
   views: [
+    'user.UserAccount',
     'user.UserAdd',
     'user.UserFeature',
     'user.UserList',
@@ -45,6 +46,10 @@ Ext.define('NX.coreui.controller.Users', {
       file: 'group.png',
       variants: ['x16', 'x32']
     },
+    'feature-account': {
+      file: 'user.png',
+      variants: ['x16', 'x32']
+    },
     'user-default': {
       file: 'user.png',
       variants: ['x16', 'x32']
@@ -58,13 +63,24 @@ Ext.define('NX.coreui.controller.Users', {
       variants: ['x16']
     }
   },
-  features: {
-    path: '/Security/Users',
-    view: { xtype: 'nx-coreui-user-feature' },
-    visible: function () {
-      return NX.Permissions.check('security:users', 'read');
+  features: [
+    {
+      mode: 'admin',
+      path: '/Security/Users',
+      view: { xtype: 'nx-coreui-user-feature' },
+      visible: function () {
+        return NX.Permissions.check('security:users', 'read');
+      }
+    },
+    {
+      mode: 'user',
+      path: '/Account',
+      view: { xtype: 'nx-coreui-user-account' },
+      visible: function () {
+        return NX.Permissions.check('security:users', 'read');
+      }
     }
-  },
+  ],
   permission: 'security:users',
 
   /**
