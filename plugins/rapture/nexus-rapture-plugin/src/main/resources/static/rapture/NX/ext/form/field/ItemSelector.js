@@ -128,6 +128,17 @@ Ext.define('NX.ext.form.field.ItemSelector', {
     });
   },
 
+  // HACK: avoid exceptions when the store is reloaded
+  populateFromStore: function (store) {
+    var me = this,
+        fromStore = me.fromField.store;
+
+    if (fromStore) {
+      fromStore.removeAll();
+    }
+    me.callParent(arguments);
+  },
+
   /**
    * @private
    */
