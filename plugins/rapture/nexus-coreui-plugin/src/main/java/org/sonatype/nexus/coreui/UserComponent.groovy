@@ -25,7 +25,10 @@ import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.security.SecuritySystem
 import org.sonatype.security.usermanagement.DefaultUser
+import org.sonatype.security.usermanagement.RoleIdentifier
+import org.sonatype.security.usermanagement.User
 import org.sonatype.security.usermanagement.UserSearchCriteria
+import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -45,20 +48,11 @@ import javax.validation.groups.Default
 class UserComponent
 extends DirectComponentSupport
 {
+
+  public static final String DEFAULT_SOURCE = SecurityXmlUserManager.SOURCE
+
   @Inject
   SecuritySystem securitySystem
-
-  def asUserXO = {
-    new UserXO(
-        id: it.userId,
-        realm: it.source,
-        firstName: it.firstName,
-        lastName: it.lastName,
-        email: it.emailAddress,
-        status: it.status,
-        password: Password.fakePassword()
-    )
-  }
 
   /**
    * Retrieve a list of available users.
@@ -66,7 +60,9 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('security:users:read')
   List<UserXO> read() {
-    securitySystem.searchUsers(new UserSearchCriteria(source: 'default')).collect(asUserXO)
+    securitySystem.searchUsers(new UserSearchCriteria(source: 'default')).collect { user ->
+      asUserXO(user)
+    }
   }
 
   /**
@@ -80,11 +76,14 @@ extends DirectComponentSupport
   UserXO create(final @NotNull(message = 'UserXO may not be null') @Valid UserXO userXO) {
     asUserXO(securitySystem.addUser(new DefaultUser(
         userId: userXO.id,
-        source: 'default',
+        source: DEFAULT_SOURCE,
         firstName: userXO.firstName,
         lastName: userXO.lastName,
         emailAddress: userXO.email,
-        status: userXO.status
+        status: userXO.status,
+        roles: userXO.roles?.collect { id ->
+          new RoleIdentifier(DEFAULT_SOURCE, id)
+        }
     ), userXO.password?.valueIfValid))
   }
 
@@ -102,7 +101,9 @@ extends DirectComponentSupport
       lastName = userXO.lastName
       emailAddress = userXO.email
       status = userXO.status
-
+      roles = userXO.roles?.collect { id ->
+        new RoleIdentifier(DEFAULT_SOURCE, id)
+      }
       return it
     }))
   }
@@ -121,6 +122,21 @@ extends DirectComponentSupport
   {
     // TODO check that user to be deleted is not the current user or user marked with anonymous
     securitySystem.deleteUser(id, realm)
+  }
+
+  private static asUserXO(final User user) {
+    new UserXO(
+        id: user.userId,
+        realm: user.source,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.emailAddress,
+        status: user.status,
+        password: Password.fakePassword(),
+        roles: user.roles.collect { role ->
+          role.roleId
+        }
+    )
   }
 
 }

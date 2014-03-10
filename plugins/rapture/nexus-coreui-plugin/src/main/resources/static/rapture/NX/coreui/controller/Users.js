@@ -19,7 +19,8 @@ Ext.define('NX.coreui.controller.Users', {
     'User'
   ],
   stores: [
-    'User'
+    'User',
+    'Role'
   ],
   views: [
     'user.UserAdd',
@@ -65,7 +66,15 @@ Ext.define('NX.coreui.controller.Users', {
     me.callParent();
 
     me.listen({
+      controller: {
+        '#Refresh': {
+          refresh: me.loadRelatedStores
+        }
+      },
       component: {
+        'nx-coreui-user-list': {
+          beforerender: me.loadRelatedStores
+        },
         'nx-coreui-user-list button[action=new]': {
           click: me.showAddWindow
         },
@@ -99,6 +108,19 @@ Ext.define('NX.coreui.controller.Users', {
    */
   showAddWindow: function () {
     Ext.widget('nx-coreui-user-add');
+  },
+
+  /**
+   * @private
+   * (Re)load related stores.
+   */
+  loadRelatedStores: function () {
+    var me = this,
+        list = me.getList();
+
+    if (list) {
+      me.getRoleStore().load();
+    }
   },
 
   /**

@@ -62,6 +62,17 @@ Ext.define('NX.coreui.view.user.UserSettings', {
           ['disabled', 'Disabled']
         ],
         queryMode: 'local'
+      },
+      {
+        xtype: 'nx-itemselector',
+        name: 'roles',
+        buttons: ['add', 'remove'],
+        fromTitle: 'Roles',
+        toTitle: 'Given',
+        store: 'Role',
+        valueField: 'id',
+        displayField: 'name',
+        delimiter: null
       }
     ];
 

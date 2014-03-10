@@ -50,7 +50,11 @@ class UserXO
   @NotNull
   UserStatus status
 
-  @NotNull
+  @NotNull(groups = Create.class)
   @NotEmpty(groups = Create.class)
   Password password
+
+  @NotNull
+  @NotEmpty
+  Set<String> roles
 }
