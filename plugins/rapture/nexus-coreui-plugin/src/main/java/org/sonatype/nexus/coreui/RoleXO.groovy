@@ -14,6 +14,9 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.apache.bval.constraints.NotEmpty
+
+import javax.validation.constraints.NotNull
 
 /**
  * Role exchange object.
@@ -23,9 +26,16 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class RoleXO
 {
+  @NotNull
+  @NotEmpty
   String id
+
   String source
+
+  @NotNull
+  @NotEmpty
   String name
+
   String description
   Boolean readOnly
   Set<String> privileges

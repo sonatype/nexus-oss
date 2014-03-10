@@ -14,6 +14,9 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.apache.bval.constraints.NotEmpty
+
+import javax.validation.constraints.NotNull
 
 /**
  * Privilege exchange object.
@@ -23,8 +26,18 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class PrivilegeRepositoryTargetXO
 {
+  @NotNull
+  @NotEmpty
   String name
+
+  @NotNull
+  @NotEmpty
   String description
+
+  @NotNull
+  @NotEmpty
   String repositoryTargetId
+
+  @NotNull
   String repositoryId
 }

@@ -77,7 +77,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:users:create')
   @Validate(groups = [Create.class, Default.class])
-  UserXO create(final @Valid UserXO userXO) {
+  UserXO create(final @NotNull(message = 'UserXO may not be null') @Valid UserXO userXO) {
     asUserXO(securitySystem.addUser(new DefaultUser(
         userId: userXO.id,
         source: 'default',
@@ -96,7 +96,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:users:create')
   @Validate(groups = [Update.class, Default.class])
-  UserXO update(final @Valid UserXO userXO) {
+  UserXO update(final @NotNull(message = 'UserXO may not be null') @Valid UserXO userXO) {
     asUserXO(securitySystem.updateUser(securitySystem.getUser(userXO.id).with {
       firstName = userXO.firstName
       lastName = userXO.lastName
@@ -116,7 +116,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:users:delete')
   @Validate
-  void delete(final @NotNull(message = 'User ID may not be null') String id,
+  void delete(final @NotNull(message = 'ID may not be null') String id,
               final @NotNull(message = 'Realm may not be null') String realm)
   {
     // TODO check that user to be deleted is not the current user or user marked with anonymous

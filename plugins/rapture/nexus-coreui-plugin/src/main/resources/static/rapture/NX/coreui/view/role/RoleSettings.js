@@ -65,6 +65,7 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
       },
       {
         name: 'description',
+        allowBlank: true,
         fieldLabel: 'Description',
         emptyText: 'enter a description'
       },

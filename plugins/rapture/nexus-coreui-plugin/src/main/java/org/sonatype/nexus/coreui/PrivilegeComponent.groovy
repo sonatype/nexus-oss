@@ -15,6 +15,7 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.nexus.extdirect.DirectComponent
@@ -28,6 +29,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.proxy.repository.GroupRepository
 import org.sonatype.nexus.proxy.repository.Repository
 import org.sonatype.nexus.proxy.targets.TargetRegistry
+import org.sonatype.nexus.validation.Create
 import org.sonatype.security.SecuritySystem
 import org.sonatype.security.authorization.Privilege
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor
@@ -37,6 +39,9 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
+import javax.validation.groups.Default
 
 /**
  * Privilege {@link DirectComponent}.
@@ -75,7 +80,8 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('security:roles:create')
-  List<PrivilegeXO> createForRepositoryTarget(final PrivilegeRepositoryTargetXO privilegeXO) {
+  @Validate(groups = [Create.class, Default.class])
+  List<PrivilegeXO> createForRepositoryTarget(final @NotNull(message = 'PrivilegeXO may not be null') @Valid PrivilegeRepositoryTargetXO privilegeXO) {
     def repositoryId = '', groupId = ''
     if (privilegeXO.repositoryId) {
       Repository repository = repositoryRegistry.getRepository(privilegeXO.repositoryId)
@@ -111,7 +117,8 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('security:privileges:delete')
-  void delete(final String id) {
+  @Validate
+  void delete(final @NotNull(message = 'ID may not be null') String id) {
     securitySystem.getAuthorizationManager(DEFAULT_SOURCE).deletePrivilege(id)
   }
 

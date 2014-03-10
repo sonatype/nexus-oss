@@ -15,10 +15,13 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.validation.Create
+import org.sonatype.nexus.validation.Update
 import org.sonatype.security.SecuritySystem
 import org.sonatype.security.authorization.AuthorizationManager
 import org.sonatype.security.authorization.Role
@@ -27,6 +30,9 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
+import javax.validation.groups.Default
 
 /**
  * Role {@link DirectComponent}.
@@ -81,7 +87,8 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('security:roles:create')
-  RoleXO create(final RoleXO roleXO) {
+  @Validate(groups = [Create.class, Default.class])
+  RoleXO create(final @NotNull(message = 'RoleXO may not be null') @Valid RoleXO roleXO) {
     return asRoleXO(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).addRole(
         new Role(
             roleId: roleXO.id,
@@ -98,27 +105,26 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('security:roles:update')
-  RoleXO update(final RoleXO roleXO) {
-    if (roleXO.id) {
-      return asRoleXO(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).updateRole(
-          new Role(
-              roleId: roleXO.id,
-              source: roleXO.source,
-              name: roleXO.name,
-              description: roleXO.description,
-              readOnly: false,
-              privileges: roleXO.privileges,
-              roles: roleXO.roles
-          )
-      ), roleXO.source)
-    }
-    throw new IllegalArgumentException('Missing id for role to be updated')
+  @Validate(groups = [Update.class, Default.class])
+  RoleXO update(final @NotNull(message = 'RoleXO may not be null') @Valid RoleXO roleXO) {
+    return asRoleXO(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).updateRole(
+        new Role(
+            roleId: roleXO.id,
+            source: roleXO.source,
+            name: roleXO.name,
+            description: roleXO.description,
+            readOnly: false,
+            privileges: roleXO.privileges,
+            roles: roleXO.roles
+        )
+    ), roleXO.source)
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('security:roles:delete')
-  void delete(final String id) {
+  @Validate
+  void delete(final @NotNull(message = 'ID may not be null') String id) {
     securitySystem.getAuthorizationManager(DEFAULT_SOURCE).deleteRole(id)
   }
 
