@@ -94,7 +94,9 @@
     -->
     <nexus.version>3.0.0-SNAPSHOT</nexus.version>
 
-    <!-- FIXME: WTF is this for, part of the http proxy changes, used in subst in test files :-( -->
+    <!--
+    NOTE: Leaving this asis for now, lots of configuration related stuff will change making this value irrelevant.
+    -->
     <nexus.configuration.version>2.8.0</nexus.configuration.version>
 
     <!--
