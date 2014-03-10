@@ -112,7 +112,7 @@ Ext.define('NX.controller.SettingsForm', {
 
     if (form.settingsFormSuccessMessage) {
       if (Ext.isFunction(form.settingsFormSuccessMessage)) {
-        title = form.settingsFormSuccessMessage(action.result.data)
+        title = form.settingsFormSuccessMessage(action.result.data);
       }
       else {
         title = form.settingsFormSuccessMessage.toString();
