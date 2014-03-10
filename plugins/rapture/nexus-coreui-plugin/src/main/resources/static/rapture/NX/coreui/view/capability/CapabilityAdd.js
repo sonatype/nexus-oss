@@ -20,7 +20,7 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
     var me = this;
 
     me.items = {
-      xtype: 'form',
+      xtype: 'nx-settingsform',
       items: [
         {
           xtype: 'fieldset',
@@ -62,12 +62,6 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
           xtype: 'nx-coreui-capability-settingsfieldset',
           title: 'Settings'
         }
-      ],
-
-      buttonAlign: 'left',
-      buttons: [
-        { text: 'Add', action: 'add', formBind: true, ui: 'primary' },
-        { text: 'Cancel', handler: me.close, scope: me }
       ],
 
       getValues: function () {

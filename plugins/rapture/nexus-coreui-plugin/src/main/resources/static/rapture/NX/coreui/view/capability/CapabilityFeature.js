@@ -20,7 +20,7 @@ Ext.define('NX.coreui.view.capability.CapabilityFeature', {
 
   tabs: [
     { xtype: 'nx-coreui-capability-summary' },
-    { xtype: 'nx-coreui-capability-settings' },
+    { xtype: 'nx-coreui-capability-settings', title: 'Settings' },
     { xtype: 'nx-coreui-capability-status' },
     { xtype: 'nx-coreui-capability-about' }
   ]
