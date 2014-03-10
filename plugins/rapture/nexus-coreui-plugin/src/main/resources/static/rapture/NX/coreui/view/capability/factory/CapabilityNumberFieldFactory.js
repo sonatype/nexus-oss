@@ -13,36 +13,32 @@
 /*global NX*/
 
 /**
- * 'textfield' factory.
+ * 'numberfield' factory.
  *
  * @since 2.7
  */
-Ext.define('NX.coreui.view.capability.factory.TextFieldFactory', {
+Ext.define('NX.coreui.view.capability.factory.CapabilityNumberFieldFactory', {
 
   singleton: true,
 
-  supports: ['textfield', 'string', 'password'],
+  supports: ['numberfield', 'number'],
 
   /**
-   * Creates a textfield.
-   * @param formField capability type form field to create textfield for
-   * @returns {*} created textfield (never null)
+   * Creates a numberfield.
+   * @param formField capability type form field to create numberfield for
+   * @returns {*} created numberfield (never null)
    */
   create: function (formField) {
     var item = {
-      xtype: 'textfield',
-      htmlDecode: true,
+      xtype: 'numberfield',
       fieldLabel: formField.label,
       itemCls: formField.required ? 'required-field' : '',
       helpText: formField.helpText,
       allowBlank: formField.required ? false : true,
       regex: formField.regexValidation ? new RegExp(formField.regexValidation) : null
     };
-    if (formField.type === 'password') {
-      item.inputType = 'password';
-    }
     if (formField.initialValue) {
-      item.value = formField.initialValue;
+      item.value = Number(formField.initialValue);
     }
     return item;
   }

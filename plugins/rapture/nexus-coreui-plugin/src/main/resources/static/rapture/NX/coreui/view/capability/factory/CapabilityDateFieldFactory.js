@@ -17,7 +17,7 @@
  *
  * @since 2.7
  */
-Ext.define('NX.coreui.view.capability.factory.DateFieldFactory', {
+Ext.define('NX.coreui.view.capability.factory.CapabilityDateFieldFactory', {
 
   singleton: true,
 

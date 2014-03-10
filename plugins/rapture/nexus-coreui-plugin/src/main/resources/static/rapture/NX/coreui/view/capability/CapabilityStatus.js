@@ -10,34 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global NX*/
+Ext.define('NX.coreui.view.capability.CapabilityStatus', {
+  extend: 'Ext.panel.Panel',
+  alias: 'widget.nx-coreui-capability-status',
 
-/**
- * 'checkbox' factory.
- *
- * @since 2.7
- */
-Ext.define('NX.coreui.view.capability.factory.CheckboxFactory', {
+  title: 'Status',
 
-  singleton: true,
+  autoScroll: true,
+  html: '',
 
-  supports: ['checkbox'],
-
-  /**
-   * Creates a checkbox.
-   * @param formField capability type form field to create checkbox for
-   * @returns {*} created checkbox (never null)
-   */
-  create: function (formField) {
-    var item = {
-      xtype: 'checkbox',
-      fieldLabel: formField.label,
-      helpText: formField.helpText
-    };
-    if (formField.initialValue) {
-      item.checked = Boolean('true' === formField.initialValue);
+  showStatus: function (status) {
+    this.html = status;
+    if (this.body) {
+      this.body.update(status);
     }
-    return item;
   }
 
 });

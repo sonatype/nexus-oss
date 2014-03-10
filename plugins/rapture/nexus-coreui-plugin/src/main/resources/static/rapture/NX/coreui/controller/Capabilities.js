@@ -28,14 +28,14 @@ Ext.define('NX.coreui.controller.Capabilities', {
     'CapabilityStatus'
   ],
   views: [
-    'capability.Feature',
-    'capability.Add',
-    'capability.List',
-    'capability.Summary',
-    'capability.Settings',
-    'capability.Status',
-    'capability.About',
-    'capability.SettingsFieldSet'
+    'capability.CapabilityFeature',
+    'capability.CapabilityAdd',
+    'capability.CapabilityList',
+    'capability.CapabilitySummary',
+    'capability.CapabilitySettings',
+    'capability.CapabilityStatus',
+    'capability.CapabilityAbout',
+    'capability.CapabilitySettingsFieldSet'
   ],
   refs: [
     { ref: 'list', selector: 'nx-coreui-capability-list' },

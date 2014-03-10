@@ -17,17 +17,17 @@
  *
  * @since 2.7
  */
-Ext.define('NX.coreui.view.capability.SettingsFieldSet', {
+Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-capability-settings-fieldset',
 
   requires: [
-    'NX.coreui.view.capability.factory.CheckboxFactory',
-    'NX.coreui.view.capability.factory.ComboFactory',
-    'NX.coreui.view.capability.factory.DateFieldFactory',
-    'NX.coreui.view.capability.factory.NumberFieldFactory',
-    'NX.coreui.view.capability.factory.TextAreaFactory',
-    'NX.coreui.view.capability.factory.TextFieldFactory'
+    'NX.coreui.view.capability.factory.CapabilityCheckboxFactory',
+    'NX.coreui.view.capability.factory.CapabilityComboFactory',
+    'NX.coreui.view.capability.factory.CapabilityDateFieldFactory',
+    'NX.coreui.view.capability.factory.CapabilityNumberFieldFactory',
+    'NX.coreui.view.capability.factory.CapabilityTextAreaFactory',
+    'NX.coreui.view.capability.factory.CapabilityTextFieldFactory'
   ],
 
   /**
@@ -47,12 +47,12 @@ Ext.define('NX.coreui.view.capability.SettingsFieldSet', {
 
     me.factories = Ext.create('Ext.util.MixedCollection');
 
-    me.addFactory(NX.coreui.view.capability.factory.CheckboxFactory);
-    me.addFactory(NX.coreui.view.capability.factory.ComboFactory);
-    me.addFactory(NX.coreui.view.capability.factory.DateFieldFactory);
-    me.addFactory(NX.coreui.view.capability.factory.NumberFieldFactory);
-    me.addFactory(NX.coreui.view.capability.factory.TextAreaFactory);
-    me.addFactory(NX.coreui.view.capability.factory.TextFieldFactory);
+    me.addFactory(NX.coreui.view.capability.factory.CapabilityCheckboxFactory);
+    me.addFactory(NX.coreui.view.capability.factory.CapabilityComboFactory);
+    me.addFactory(NX.coreui.view.capability.factory.CapabilityDateFieldFactory);
+    me.addFactory(NX.coreui.view.capability.factory.CapabilityNumberFieldFactory);
+    me.addFactory(NX.coreui.view.capability.factory.CapabilityTextAreaFactory);
+    me.addFactory(NX.coreui.view.capability.factory.CapabilityTextFieldFactory);
   },
 
   /**
