@@ -15,7 +15,7 @@
  *
  * @since 2.8
  */
-Ext.define('NX.coreui.view.task.Feature', {
+Ext.define('NX.coreui.view.task.TaskFeature', {
   extend: 'NX.view.masterdetail.Panel',
   alias: 'widget.nx-coreui-task-feature',
 

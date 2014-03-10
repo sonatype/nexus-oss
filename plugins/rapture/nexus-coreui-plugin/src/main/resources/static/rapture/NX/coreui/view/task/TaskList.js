@@ -15,7 +15,7 @@
  *
  * @since 2.8
  */
-Ext.define('NX.coreui.view.task.List', {
+Ext.define('NX.coreui.view.task.TaskList', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-coreui-task-list',
 
