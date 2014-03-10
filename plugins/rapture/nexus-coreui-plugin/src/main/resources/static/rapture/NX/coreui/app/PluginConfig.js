@@ -26,7 +26,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.RepositoryRoutes',
     'NX.coreui.controller.Privileges',
     'NX.coreui.controller.Roles',
-    'NX.coreui.controller.SecurityRealms',
+    'NX.coreui.controller.Security',
     'NX.coreui.controller.Tasks',
     'NX.coreui.controller.UploadArtifact',
     'NX.coreui.controller.Users'

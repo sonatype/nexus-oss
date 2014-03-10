@@ -17,7 +17,6 @@ Ext.define('NX.coreui.controller.Plugin', {
   },
 
   views: [
-    'security.Anonymous',
     'system.General',
     'system.Http',
     'system.Notifications'
@@ -35,28 +34,6 @@ Ext.define('NX.coreui.controller.Plugin', {
     };
 
     me.getApplication().getFeaturesController().registerFeature([
-      // security
-      {
-        mode: 'admin',
-        path: '/Security',
-        view: 'NX.view.feature.Group',
-        iconConfig: {
-          file: 'security.png',
-          variants: ['x16', 'x32']
-        },
-        weight: 90,
-        visible: visibleIfLoggedIn
-      },
-      {
-        mode: 'admin',
-        path: '/Security/Anonymous',
-        view: 'NX.coreui.view.security.Anonymous',
-        iconConfig: {
-          file: 'user_silhouette.png',
-          variants: ['x16', 'x32']
-        },
-        visible: visibleIfLoggedIn
-      },
 
       // system
       {

@@ -10,13 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-Ext.define('NX.coreui.controller.SecurityRealms', {
+Ext.define('NX.coreui.controller.Security', {
   extend: 'Ext.app.Controller',
   mixins: {
     logAware: 'NX.LogAware'
   },
 
   views: [
+    'security.Anonymous',
     'security.SecurityRealms'
   ],
 
@@ -25,7 +26,7 @@ Ext.define('NX.coreui.controller.SecurityRealms', {
   ],
 
   refs: [
-    { ref: 'settings', selector: 'nx-coreui-security-realms' }
+    { ref: 'securityRealms', selector: 'nx-coreui-security-realms' }
   ],
 
   /**
@@ -41,34 +42,61 @@ Ext.define('NX.coreui.controller.SecurityRealms', {
       }
     });
 
-    me.getApplication().getFeaturesController().registerFeature({
-      mode: 'admin',
-      path: '/Security/Realms',
-      view: { xtype: 'nx-coreui-security-realms' },
-      visible: function () {
-        return NX.Permissions.check('nexus:settings', 'read');
+    me.getApplication().getFeaturesController().registerFeature([
+      {
+        mode: 'admin',
+        path: '/Security',
+        view: 'NX.view.feature.Group',
+        iconConfig: {
+          file: 'security.png',
+          variants: ['x16', 'x32']
+        },
+        weight: 90,
+        visible: function () {
+          return NX.Permissions.check('nexus:settings', 'read');
+        }
+      },
+      {
+        mode: 'admin',
+        path: '/Security/Anonymous',
+        view: 'NX.coreui.view.security.Anonymous',
+        iconConfig: {
+          file: 'user_silhouette.png',
+          variants: ['x16', 'x32']
+        },
+        visible: function () {
+          return NX.Permissions.check('nexus:settings', 'read');
+        }
+      },
+      {
+        mode: 'admin',
+        path: '/Security/Realms',
+        view: { xtype: 'nx-coreui-security-realms' },
+        visible: function () {
+          return NX.Permissions.check('nexus:settings', 'read');
+        }
       }
-    });
+    ]);
 
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadRealmType
+          refresh: me.loadRelatedStores
         }
       },
       component: {
         'nx-coreui-security-realms': {
-          beforerender: me.loadRealmType
+          beforerender: me.loadRelatedStores
         }
       }
     });
   },
 
-  loadRealmType: function () {
+  loadRelatedStores: function () {
     var me = this,
-        settings = me.getSettings();
+        securityRealms = me.getSecurityRealms();
 
-    if (settings) {
+    if (securityRealms) {
       me.getRealmTypeStore().load();
     }
   }
