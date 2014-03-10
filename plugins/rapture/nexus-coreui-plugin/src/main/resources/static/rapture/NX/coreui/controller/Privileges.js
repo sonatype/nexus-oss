@@ -46,6 +46,18 @@ Ext.define('NX.coreui.controller.Privileges', {
     'privilege-default': {
       file: 'medal_gold_1.png',
       variants: ['x16', 'x32']
+    },
+    'privilege-method': {
+      file: 'medal_gold_1.png',
+      variants: ['x16', 'x32']
+    },
+    'privilege-repository': {
+      file: 'database.png',
+      variants: ['x16', 'x32']
+    },
+    'privilege-target': {
+      file: 'target.png',
+      variants: ['x16', 'x32']
     }
   },
   features: {
@@ -95,6 +107,9 @@ Ext.define('NX.coreui.controller.Privileges', {
         'Description': model.get('description'),
         'Method': model.get('method')
       };
+      if (model.get('permission')) {
+        info['Permission'] = model.get('permission');
+      }
       if (model.get('repositoryTargetName')) {
         info['Repository Target'] = model.get('repositoryTargetName');
       }
@@ -160,7 +175,7 @@ Ext.define('NX.coreui.controller.Privileges', {
 
     if (win) {
       win.close();
-      me.loadStoreAndSelect(action.result.data.id);
+      me.loadStoreAndSelect(action.result.data[0].id);
       Ext.Array.each(action.result.data, function (privilege) {
         NX.Messages.add({
           text: 'Privilege created: ' + privilege.name,

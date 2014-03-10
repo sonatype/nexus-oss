@@ -51,7 +51,6 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
         },
         {
           name: 'description',
-          allowBlank: true,
           fieldLabel: 'Description',
           emptyText: 'enter a description'
         },

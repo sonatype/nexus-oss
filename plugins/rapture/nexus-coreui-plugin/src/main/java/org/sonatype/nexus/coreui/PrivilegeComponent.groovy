@@ -79,7 +79,7 @@ extends DirectComponentSupport
 
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:roles:create')
+  @RequiresPermissions('security:privileges:create')
   @Validate(groups = [Create.class, Default.class])
   List<PrivilegeXO> createForRepositoryTarget(final @NotNull(message = 'PrivilegeXO may not be null') @Valid PrivilegeRepositoryTargetXO privilegeXO) {
     def repositoryId = '', groupId = ''
@@ -132,7 +132,8 @@ extends DirectComponentSupport
           return descriptor.type == input.type ? descriptor : null
         }?.name,
         readOnly: input.readOnly,
-        method: input.getPrivilegeProperty('method')
+        method: input.getPrivilegeProperty('method'),
+        permission: input.getPrivilegeProperty('permission')
     )
     input.properties.each { key, value ->
       if (key == 'repositoryTargetId') {

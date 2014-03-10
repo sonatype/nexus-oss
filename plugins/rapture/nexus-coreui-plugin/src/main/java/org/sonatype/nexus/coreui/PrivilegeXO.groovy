@@ -30,6 +30,7 @@ class PrivilegeXO
   String typeName
   Boolean readOnly
   String method
+  String permission
   String repositoryId
   String repositoryName
   String repositoryTargetId
