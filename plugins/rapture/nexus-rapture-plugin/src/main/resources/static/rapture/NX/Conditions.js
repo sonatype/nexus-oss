@@ -44,11 +44,20 @@ Ext.define('NX.Conditions', {
 
   /**
    * @param {String} grid a grid selector as specified by (@link Ext.ComponentQuery#query}
-   * @param {Function} [fn] to be called when grid has a selection to perform additional checks on teh passed in model
+   * @param {Function} [fn] to be called when grid has a selection to perform additional checks on the passed in model
    * @returns {NX.util.condition.GridHasSelection}
    */
-  gridHasSelection: function (grid, fn, fnScope) {
+  gridHasSelection: function (grid, fn) {
     return Ext.create('NX.util.condition.GridHasSelection', { grid: grid, fn: fn });
+  },
+
+  /**
+   * @param {String} form a {@link NX.view.SettingsForm} selector as specified by (@link Ext.ComponentQuery#query}
+   * @param {Function} [fn] to be called when form has a record to perform additional checks on the passed in model
+   * @returns {NX.util.condition.FormHasRecord}
+   */
+  formHasRecord: function (form, fn) {
+    return Ext.create('NX.util.condition.FormHasRecord', { form: form, fn: fn });
   },
 
   /**
