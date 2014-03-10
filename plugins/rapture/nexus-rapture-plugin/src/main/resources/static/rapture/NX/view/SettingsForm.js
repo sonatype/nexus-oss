@@ -79,6 +79,36 @@ Ext.define('NX.view.SettingsForm', {
   ],
 
   /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
+
+    me.callParent(arguments);
+
+    me.addEvents(
+        /**
+         * @event recordloaded
+         * Fires when a record is loaded via {@link Ext.form.Panel#loadRecord}.
+         * @param {Ext.form.Panel} this form
+         * @param { Ext.data.Model} loaded record
+         */
+        'recordloaded'
+    );
+  },
+
+  /**
+   * @override
+   * Fires 'recordloaded' after record was loaded.
+   */
+  loadRecord: function (record) {
+    var me = this;
+
+    me.callParent(arguments);
+    me.fireEvent('recordloaded', me, record);
+  },
+
+  /**
    * @public
    * Sets the read only state for all fields of this form.
    * @param {boolean} editable
