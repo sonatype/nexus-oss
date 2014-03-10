@@ -16,7 +16,6 @@ Ext.define('NX.coreui.store.User', {
 
   proxy: {
     type: 'direct',
-    paramsAsHash: false,
 
     api: {
       read: 'NX.direct.coreui_User.read'

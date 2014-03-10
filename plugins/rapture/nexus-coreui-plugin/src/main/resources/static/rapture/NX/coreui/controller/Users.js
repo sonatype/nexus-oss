@@ -20,7 +20,9 @@ Ext.define('NX.coreui.controller.Users', {
   ],
   stores: [
     'User',
+    'UserSource',
     'Role'
+
   ],
   views: [
     'user.UserAdd',
@@ -46,6 +48,14 @@ Ext.define('NX.coreui.controller.Users', {
     'user-default': {
       file: 'user.png',
       variants: ['x16', 'x32']
+    },
+    'user-source-default': {
+      file: 'user.png',
+      variants: ['x16']
+    },
+    'user-source-allconfigured': {
+      file: 'user.png',
+      variants: ['x16']
     }
   },
   features: {
@@ -71,6 +81,11 @@ Ext.define('NX.coreui.controller.Users', {
           refresh: me.loadRelatedStores
         }
       },
+      store: {
+        '#UserSource': {
+          load: me.onUserSourceLoad
+        }
+      },
       component: {
         'nx-coreui-user-list': {
           beforerender: me.loadRelatedStores
@@ -80,6 +95,9 @@ Ext.define('NX.coreui.controller.Users', {
         },
         'nx-coreui-user-settings': {
           submitted: me.onSettingsSubmitted
+        },
+        'nx-coreui-user-list menuitem[action=filter]': {
+          click: me.filterBySource
         }
       }
     });
@@ -112,6 +130,32 @@ Ext.define('NX.coreui.controller.Users', {
 
   /**
    * @private
+   * Load store for selected source.
+   */
+  loadStore: function () {
+    var me = this,
+        list = me.getList(),
+        userSourceButton;
+
+    if (list) {
+      userSourceButton = list.down('button[action=filter]');
+      if (!userSourceButton.sourceId) {
+        userSourceButton.sourceId = 'default';
+      }
+      me.getUserStore().load({
+        params: {
+          filter: [
+            {
+              property: 'source', value: userSourceButton.sourceId
+            }
+          ]
+        }
+      });
+    }
+  },
+
+  /**
+   * @private
    * (Re)load related stores.
    */
   loadRelatedStores: function () {
@@ -119,8 +163,58 @@ Ext.define('NX.coreui.controller.Users', {
         list = me.getList();
 
     if (list) {
+      me.getUserSourceStore().load();
       me.getRoleStore().load();
     }
+  },
+
+  /**
+   * @private
+   * (Re)create user source filters.
+   */
+  onUserSourceLoad: function (store) {
+    var me = this,
+        list = me.getList(),
+        userSourceButton;
+
+    if (list) {
+      userSourceButton = list.down('button[action=filter]');
+      if (userSourceButton.menu.items.length > 1) {
+        userSourceButton.menu.removeAll();
+      }
+      if (!userSourceButton.sourceId) {
+        userSourceButton.sourceId = 'default';
+      }
+      store.each(function (source) {
+        var iconCls = NX.Icons.cls('user-source-' + source.getId().toLowerCase(), 'x16');
+        userSourceButton.menu.add({
+          text: source.get('name'),
+          iconCls: iconCls,
+          group: 'usersource',
+          checked: userSourceButton.sourceId === source.getId(),
+          action: 'filter',
+          source: source
+        });
+        if (userSourceButton.sourceId === source.getId()) {
+          userSourceButton.setText(source.get('name'));
+          userSourceButton.setIconCls(iconCls);
+        }
+      });
+    }
+  },
+
+  /**
+   * @private
+   */
+  filterBySource: function (menuItem) {
+    var me = this,
+        userSourceButton = me.getList().down('button[action=filter]');
+
+    userSourceButton.setText(menuItem.source.get('name'));
+    userSourceButton.setIconCls(menuItem.iconCls);
+    userSourceButton.sourceId = menuItem.source.getId();
+
+    me.loadStore();
   },
 
   /**
