@@ -22,6 +22,23 @@ Ext.define('NX.coreui.view.role.RoleTree', {
   rootVisible: false,
   lines: false,
 
+  listeners: {
+    activate: function () {
+      var me = this;
+      me.active = true;
+      me.buildTree();
+    },
+    deactivate: function () {
+      var me = this;
+      me.active = false;
+    },
+    beforeitemexpand: function (node) {
+      var me = this;
+      me.addRoles(node, node.get('roles'));
+      me.addPrivileges(node, node.get('privileges'));
+    }
+  },
+
   /**
    * @override
    */
@@ -37,23 +54,13 @@ Ext.define('NX.coreui.view.role.RoleTree', {
     me.privilegeStore.load();
 
     me.store = Ext.create('Ext.data.TreeStore', {
-      fields: ['text', 'weight'],
+      fields: ['text', 'weight', 'roles', 'privileges'],
       root: {
         expanded: true,
         text: 'Roles',
         children: []
       }
     });
-
-    me.listeners = {
-      activate: function () {
-        me.active = true;
-        me.buildTree();
-      },
-      deactivate: function () {
-        me.active = false;
-      }
-    };
 
     me.callParent(arguments);
   },
@@ -77,67 +84,60 @@ Ext.define('NX.coreui.view.role.RoleTree', {
    * Builds the tree for current model.
    */
   buildTree: function () {
-    var me = this,
-        children = [];
+    var me = this;
 
     if (me.active) {
-      Ext.suspendLayouts();
       me.getStore().getRootNode().removeAll();
       if (Ext.isDefined(me.model) && me.roleStore.getCount() > 0 && me.privilegeStore.getCount() > 0) {
-        me.pushIf(children, me.expandRoles(me.model.roles));
-        me.pushIf(children, me.expandPrivileges(me.model.privileges));
-        if (children.length) {
-          me.getStore().getRootNode().appendChild(children);
-          me.getStore().sort([
-            { property: 'weight', direction: 'ASC' },
-            { property: 'text', direction: 'ASC' }
-          ]);
-        }
+        me.addRoles(me.getStore().getRootNode(), me.model.roles);
+        me.addPrivileges(me.getStore().getRootNode(), me.model.privileges);
+        me.getStore().sort([
+          { property: 'weight', direction: 'ASC' },
+          { property: 'text', direction: 'ASC' }
+        ]);
       }
-      Ext.resumeLayouts(true);
     }
   },
 
   /**
    * @private
+   * Add roles to node.
    */
-  expandRoles: function (roleIds) {
+  addRoles: function (node, roleIds) {
     var me = this,
         children = [];
 
     if (roleIds) {
       Ext.each(Ext.Array.from(roleIds), function (roleId) {
-        var role = me.roleStore.getById(roleId),
-            expanded = [];
-
+        var role = me.roleStore.getById(roleId);
         if (role) {
-          me.pushIf(expanded, me.expandRoles(role.get('roles')));
-          me.pushIf(expanded, me.expandPrivileges(role.get('privileges')));
           children.push({
             text: role.get('name'),
-            children: expanded.length ? expanded : undefined,
-            leaf: expanded.length === 0,
+            roles: role.get('roles'),
+            privileges: role.get('privileges'),
+            leaf: !role.get('roles') || role.get('roles').length === 0,
             iconCls: NX.Icons.cls('role-default', 'x16'),
             weight: 0
           });
         }
       });
+      if (children.length) {
+        node.appendChild(children);
+      }
     }
-
-    return children.length ? children : undefined;
   },
 
   /**
    * @private
+   * Add privileges to node.
    */
-  expandPrivileges: function (privilegeIds) {
+  addPrivileges: function (node, privilegeIds) {
     var me = this,
         children = [];
 
     if (privilegeIds) {
       Ext.each(Ext.Array.from(privilegeIds), function (privilegeId) {
         var privilege = me.privilegeStore.getById(privilegeId);
-
         if (privilege) {
           children.push({
             text: privilege.get('name'),
@@ -147,17 +147,9 @@ Ext.define('NX.coreui.view.role.RoleTree', {
           });
         }
       });
-    }
-
-    return children.length ? children : undefined;
-  },
-
-  /**
-   * @private
-   */
-  pushIf: function (array, entries) {
-    if (array && entries && entries.length) {
-      Ext.Array.push(array, entries);
+      if (children.length) {
+        node.appendChild(children);
+      }
     }
   }
 
