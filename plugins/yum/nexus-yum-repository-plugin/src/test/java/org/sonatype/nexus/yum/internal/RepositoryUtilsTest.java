@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.yum.internal;
 
+import java.io.File;
+
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -41,6 +43,9 @@ public class RepositoryUtilsTest
   {
     final Repository repo = mock(Repository.class);
     when(repo.getLocalUrl()).thenReturn(localUrl);
-    assertThat(getBaseDir(repo).getAbsolutePath(), is(expected));
+
+    // make the expected path canonical, due to Windows
+    String canonicalPath = new File(expected).getCanonicalPath();
+    assertThat(getBaseDir(repo).getAbsolutePath(), is(canonicalPath));
   }
 }

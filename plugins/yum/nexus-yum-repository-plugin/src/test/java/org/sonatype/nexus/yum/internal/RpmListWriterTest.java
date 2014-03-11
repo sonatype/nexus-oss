@@ -49,7 +49,8 @@ public class RpmListWriterTest
   public void shouldListFileInSubDirs()
       throws Exception
   {
-    assertThat(writeRpmListFile(rpmsDir(), NO_VERSION), FileMatchers.containsOnly(FILE_CONTENT));
+    assertThat(writeRpmListFile(rpmsDir(), NO_VERSION), FileMatchers.containsOnly(
+        osIndependent(FILE_CONTENT)));
   }
 
   @Test
@@ -92,7 +93,7 @@ public class RpmListWriterTest
         listFileFactory(writeRpmListFile(rpmsDir(), NO_VERSION)),
         new RpmScanner(new SerialScanner())
     ).writeList();
-    assertThat(rpmListFile, FileMatchers.containsOnly(FILE_CONTENT));
+    assertThat(rpmListFile, FileMatchers.containsOnly(osIndependent(FILE_CONTENT)));
   }
 
   @Test
@@ -101,7 +102,7 @@ public class RpmListWriterTest
   {
     assertThat(
         writeRpmListFile(rpmsDir(), "2.2-2"),
-        FileMatchers.containsOnly("conflict-artifact/2.2-2/conflict-artifact-2.2-2.noarch.rpm\n")
+        FileMatchers.containsOnly(osIndependent("conflict-artifact/2.2-2/conflict-artifact-2.2-2.noarch.rpm\n"))
     );
   }
 
@@ -111,14 +112,14 @@ public class RpmListWriterTest
   {
     final File rpmListFile = new RpmListWriter(
         rpmsDir(),
-        "conflict-artifact/2.2-1/conflict-artifact-2.2-1.noarch.rpm",
+        osIndependent("conflict-artifact/2.2-1/conflict-artifact-2.2-1.noarch.rpm"),
         null,
         true,
         false,
         listFileFactory(writeRpmListFile(rpmsDir(), NO_VERSION)),
         new RpmScanner(new SerialScanner())
     ).writeList();
-    assertThat(rpmListFile, FileMatchers.containsOnly(FILE_CONTENT));
+    assertThat(rpmListFile, FileMatchers.containsOnly(osIndependent(FILE_CONTENT)));
   }
 
   @Test
@@ -172,4 +173,6 @@ public class RpmListWriterTest
       }
     };
   }
+
+  private String osIndependent(final String fileContent) { return fileContent.replace("/", File.separator); }
 }

@@ -218,7 +218,7 @@ public class GenerateMetadataTaskSettingsTest
   {
     final Repository repo = mock(Repository.class);
     when(repo.getId()).thenReturn(REPO);
-    when(repo.getLocalUrl()).thenReturn(rpmsDir().getAbsolutePath());
+    when(repo.getLocalUrl()).thenReturn(osIndependentUri(rpmsDir()));
     final RepositoryRegistry repoRegistry = mock(RepositoryRegistry.class);
     when(repoRegistry.getRepository(anyString())).thenReturn(repo);
     return repoRegistry;
