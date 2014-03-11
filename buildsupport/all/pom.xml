@@ -171,7 +171,7 @@
         <groupId>org.sonatype.nexus.buildsupport</groupId>
         <artifactId>nexus-buildsupport-ui</artifactId>
         <type>pom</type>
-        <version>2.8.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <scope>import</scope>
       </dependency>
     </dependencies>
