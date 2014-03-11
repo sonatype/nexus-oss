@@ -14,7 +14,6 @@
 package org.sonatype.nexus.plugins.capabilities.internal.storage;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -24,8 +23,11 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+
 import io.kazuki.v0.internal.v2schema.Attribute;
+import io.kazuki.v0.internal.v2schema.Attribute.Type;
 import io.kazuki.v0.internal.v2schema.Schema;
 import io.kazuki.v0.store.KazukiException;
 import io.kazuki.v0.store.Key;
@@ -35,7 +37,6 @@ import io.kazuki.v0.store.keyvalue.KeyValueStore;
 import io.kazuki.v0.store.lifecycle.Lifecycle;
 import io.kazuki.v0.store.schema.SchemaStore;
 import io.kazuki.v0.store.schema.TypeValidation;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -71,7 +72,12 @@ public class DefaultCapabilityStorage
     lifecycle.start();
 
     if (schemaStore.retrieveSchema(CAPABILITY_SCHEMA) == null) {
-      Schema schema = new Schema(Collections.<Attribute>emptyList());
+      Schema schema = new Schema(ImmutableList.of(
+          new Attribute("version", Type.I32, null, false),
+          new Attribute("type", Type.UTF8_SMALLSTRING, null, true),
+          new Attribute("enabled", Type.BOOLEAN, null, true),
+          new Attribute("notes", Type.UTF8_TEXT, null, true),
+          new Attribute("properties", Type.MAP, null, true)));
 
       log.info("Creating schema for 'capability' type");
 
