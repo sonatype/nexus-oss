@@ -51,7 +51,9 @@ public class PasswordHelper
     }
 
     if (password != null) {
-      return plexusCipher.encryptAndDecorate(password, encoding);
+      synchronized (plexusCipher) {
+        return plexusCipher.encryptAndDecorate(password, encoding);
+      }
     }
 
     return null;
@@ -72,7 +74,9 @@ public class PasswordHelper
     }
 
     if (encodedPassword != null) {
-      return plexusCipher.decryptDecorated(encodedPassword, encoding);
+      synchronized (plexusCipher) {
+        return plexusCipher.decryptDecorated(encodedPassword, encoding);
+      }
     }
     return null;
   }

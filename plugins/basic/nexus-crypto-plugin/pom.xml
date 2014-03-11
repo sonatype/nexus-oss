@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-plugins-basic</artifactId>
-    <version>2.8.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-crypto-plugin</artifactId>
@@ -80,7 +80,9 @@
           </sharedDependencies>
         </configuration>
       </plugin>
+
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
