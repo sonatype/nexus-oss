@@ -13,6 +13,11 @@
 
 package org.sonatype.security.realms.url;
 
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.sonatype.security.realms.url.config.model.Configuration;
 
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
@@ -21,9 +26,9 @@ import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.security.realms.url.config.UrlRealmConfiguration;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
+import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
-import org.sonatype.tests.http.server.jetty.behaviour.BasicAuth;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -35,6 +40,7 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.eclipse.jetty.util.B64Code;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,20 +75,40 @@ public class UrlRealmTest
 
   protected UrlRealm urlRealm;
 
+  /**
+   * HTTP Basic auth, copied and fixed from org.sonatype.tests.http.server.jetty.behaviour.BasicAuth
+   * Fixed to challenge if 401 is the response, hence, properly implements HTTP Basic, unlike the one from Testsuite.
+   */
+  public static class BasicAuth
+      implements Behaviour
+  {
+    private final String password;
+
+    private final String user;
+
+    public BasicAuth(String user, String password) {
+      this.user = user;
+      this.password = password;
+    }
+
+    public boolean execute(HttpServletRequest request, HttpServletResponse response, Map<Object, Object> ctx)
+        throws Exception
+    {
+      String userPass = new String(B64Code.encode((user + ":" + password).getBytes("UTF-8")));
+      if (("Basic " + userPass).equals(request.getHeader("Authorization"))) {
+        return true;
+      }
+      response.setHeader("WWW-Authenticate", "Basic realm=\"Secure\"");
+      response.sendError(401, "not authorized");
+      return false;
+    }
+  }
+
   @Before
   public void prepare() throws Exception {
     server = Server.server().port(0).serve("/*").withBehaviours(new BasicAuth(username, password),
         Behaviours.content("not important"));
     server.start();
-
-    // build client
-    BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
-    credsProvider.setCredentials(
-        AuthScope.ANY,
-        new UsernamePasswordCredentials(username, password));
-    httpClient = HttpClients.custom()
-        .setDefaultCredentialsProvider(credsProvider)
-        .build();
 
     // prepare URLRealm
     when(applicationConfiguration.getGlobalRemoteStorageContext()).thenReturn(new DefaultRemoteStorageContext(null));
@@ -93,7 +119,6 @@ public class UrlRealmTest
     model.setDefaultRole(DEFAULT_ROLE);
     when(urlRealmConfiguration.getConfiguration()).thenReturn(model);
 
-    when(hc4Provider.createHttpClient(Mockito.any(RemoteStorageContext.class))).thenReturn(httpClient);
     urlRealm = new UrlRealm(applicationConfiguration, urlRealmConfiguration, hc4Provider);
   }
 
@@ -115,6 +140,16 @@ public class UrlRealmTest
   public void testAuthc()
       throws Exception
   {
+    // build client
+    BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
+    credsProvider.setCredentials(
+        AuthScope.ANY,
+        new UsernamePasswordCredentials(username, password));
+    httpClient = HttpClients.custom()
+        .setDefaultCredentialsProvider(credsProvider)
+        .build();
+    when(hc4Provider.createHttpClient(Mockito.any(RemoteStorageContext.class))).thenReturn(httpClient);
+
     final AuthenticationInfo info = urlRealm.getAuthenticationInfo(new UsernamePasswordToken(username, password));
     assertThat(info, notNullValue());
   }
@@ -123,6 +158,16 @@ public class UrlRealmTest
   public void testAuthcWrongCreds()
       throws Exception
   {
+    // build client
+    BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
+    credsProvider.setCredentials(
+        AuthScope.ANY,
+        new UsernamePasswordCredentials(username, "cake"));
+    httpClient = HttpClients.custom()
+        .setDefaultCredentialsProvider(credsProvider)
+        .build();
+    when(hc4Provider.createHttpClient(Mockito.any(RemoteStorageContext.class))).thenReturn(httpClient);
+
     urlRealm.getAuthenticationInfo(new UsernamePasswordToken(username, "cake"));
   }
 
@@ -130,6 +175,16 @@ public class UrlRealmTest
   public void testAuthcJunkCreds()
       throws Exception
   {
+    // build client
+    BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
+    credsProvider.setCredentials(
+        AuthScope.ANY,
+        new UsernamePasswordCredentials("fakeuser", "hack-me-in"));
+    httpClient = HttpClients.custom()
+        .setDefaultCredentialsProvider(credsProvider)
+        .build();
+    when(hc4Provider.createHttpClient(Mockito.any(RemoteStorageContext.class))).thenReturn(httpClient);
+
     urlRealm.getAuthenticationInfo(new UsernamePasswordToken("fakeuser", "hack-me-in"));
   }
 
