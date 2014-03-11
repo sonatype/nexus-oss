@@ -16,8 +16,8 @@
 <model xmlns="http://modello.codehaus.org/MODELLO/1.4.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.0 http://modello.codehaus.org/xsd/modello-1.4.0.xsd"
-       xsd.namespace="http://www.sonatype.org/xsd/kenai-realm-plugin-1.0.0"
-       xsd.targetNamespace="http://www.sonatype.org/xsd/kenai-realm-plugin-1.0.0">
+       xsd.namespace="http://www.sonatype.org/xsd/url-realm-plugin-1.0.0"
+       xsd.targetNamespace="http://www.sonatype.org/xsd/url-realm-plugin-1.0.0">
 
   <id>urlrealm</id>
 
