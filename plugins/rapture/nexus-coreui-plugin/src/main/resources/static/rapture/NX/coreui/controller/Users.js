@@ -42,6 +42,10 @@ Ext.define('NX.coreui.controller.Users', {
       selector: 'nx-coreui-user-feature nx-coreui-user-settings'
     },
     {
+      ref: 'privilegeTrace',
+      selector: 'nx-coreui-user-feature nx-coreui-privilege-trace'
+    },
+    {
       ref: 'roleTree',
       selector: 'nx-coreui-user-feature nx-coreui-role-tree'
     }
@@ -127,6 +131,9 @@ Ext.define('NX.coreui.controller.Users', {
         'nx-coreui-user-changepassword button[action=changepassword]': {
           click: me.changePassword
         },
+        'nx-coreui-user-feature nx-coreui-privilege-trace': {
+          activate: me.onPrivilegeTraceActivate
+        },
         'nx-coreui-user-feature nx-coreui-role-tree': {
           activate: me.onRoleTreeActivate
         }
@@ -149,6 +156,7 @@ Ext.define('NX.coreui.controller.Users', {
 
     if (Ext.isDefined(model)) {
       me.getSettings().loadRecord(model);
+      me.getPrivilegeTrace().loadRecord(model.data);
       me.getRoleTree().loadRecord(model.data);
     }
   },
@@ -267,6 +275,17 @@ Ext.define('NX.coreui.controller.Users', {
    * @private
    */
   onRoleTreeActivate: function (panel) {
+    var me = this;
+
+    panel.loadRecord({
+      roles: me.getSettings().down('#roles').getValue()
+    });
+  },
+
+  /**
+   * @private
+   */
+  onPrivilegeTraceActivate: function (panel) {
     var me = this;
 
     panel.loadRecord({

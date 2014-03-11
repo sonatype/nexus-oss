@@ -20,6 +20,7 @@ Ext.define('NX.coreui.view.role.RoleFeature', {
 
   tabs: [
     { xtype: 'nx-coreui-role-settings', title: 'Settings' },
+    { xtype: 'nx-coreui-privilege-trace', title: 'Privilege Trace' },
     { xtype: 'nx-coreui-role-tree', title: 'Role Tree' }
   ]
 

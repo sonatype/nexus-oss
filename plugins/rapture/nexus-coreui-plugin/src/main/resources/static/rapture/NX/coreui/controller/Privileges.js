@@ -26,7 +26,8 @@ Ext.define('NX.coreui.controller.Privileges', {
   views: [
     'privilege.PrivilegeFeature',
     'privilege.PrivilegeList',
-    'privilege.PrivilegeAddRepositoryTarget'
+    'privilege.PrivilegeAddRepositoryTarget',
+    'privilege.PrivilegeTrace'
   ],
   refs: [
     {

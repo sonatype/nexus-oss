@@ -41,6 +41,10 @@ Ext.define('NX.coreui.controller.Roles', {
       selector: 'nx-coreui-role-feature nx-coreui-role-settings'
     },
     {
+      ref: 'privilegeTrace',
+      selector: 'nx-coreui-role-feature nx-coreui-privilege-trace'
+    },
+    {
       ref: 'roleTree',
       selector: 'nx-coreui-role-feature nx-coreui-role-tree'
     }
@@ -100,6 +104,9 @@ Ext.define('NX.coreui.controller.Roles', {
         'nx-coreui-role-settings': {
           submitted: me.onSettingsSubmitted
         },
+        'nx-coreui-role-feature nx-coreui-privilege-trace': {
+          activate: me.onPrivilegeTraceActivate
+        },
         'nx-coreui-role-feature nx-coreui-role-tree': {
           activate: me.onRoleTreeActivate
         }
@@ -116,6 +123,7 @@ Ext.define('NX.coreui.controller.Roles', {
 
     if (Ext.isDefined(model)) {
       me.getSettings().loadRecord(model);
+      me.getPrivilegeTrace().loadRecord(model.data);
       me.getRoleTree().loadRecord(model.data);
     }
   },
@@ -204,6 +212,18 @@ Ext.define('NX.coreui.controller.Roles', {
           scope: button
         }
     );
+  },
+
+  /**
+   * @private
+   */
+  onPrivilegeTraceActivate: function (panel) {
+    var me = this;
+
+    panel.loadRecord({
+      roles: me.getSettings().down('#roles').getValue(),
+      privileges: me.getSettings().down('#privileges').getValue()
+    });
   },
 
   /**

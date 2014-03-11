@@ -21,6 +21,7 @@ Ext.define('NX.coreui.view.user.UserFeature', {
 
   tabs: [
     { xtype: 'nx-coreui-user-settings', title: 'Settings' },
+    { xtype: 'nx-coreui-privilege-trace', title: 'Privilege Trace' },
     { xtype: 'nx-coreui-role-tree', title: 'Role Tree' }
   ]
 });
