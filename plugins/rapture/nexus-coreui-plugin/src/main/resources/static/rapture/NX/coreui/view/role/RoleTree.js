@@ -22,23 +22,6 @@ Ext.define('NX.coreui.view.role.RoleTree', {
   rootVisible: false,
   lines: false,
 
-  listeners: {
-    activate: function () {
-      var me = this;
-      me.active = true;
-      me.buildTree();
-    },
-    deactivate: function () {
-      var me = this;
-      me.active = false;
-    },
-    beforeitemexpand: function (node) {
-      var me = this;
-      me.addRoles(node, node.get('roles'));
-      me.addPrivileges(node, node.get('privileges'));
-    }
-  },
-
   /**
    * @override
    */
@@ -65,6 +48,32 @@ Ext.define('NX.coreui.view.role.RoleTree', {
     me.callParent(arguments);
   },
 
+  listeners: {
+    activate: function () {
+      var me = this;
+      me.active = true;
+      me.buildTree();
+    },
+    deactivate: function () {
+      var me = this;
+      me.active = false;
+    },
+    beforeitemexpand: function (node) {
+      var me = this;
+      if (!node.processed) {
+        Ext.suspendLayouts();
+        me.addRoles(node, node.get('roles'));
+        me.addPrivileges(node, node.get('privileges'));
+        me.getStore().sort([
+          { property: 'weight', direction: 'ASC' },
+          { property: 'text', direction: 'ASC' }
+        ]);
+        node.processed = true;
+        Ext.resumeLayouts(true);
+      }
+    }
+  },
+
   /**
    * @public
    * Loads the roles / privileges of specified model into the role tree.
@@ -87,6 +96,7 @@ Ext.define('NX.coreui.view.role.RoleTree', {
     var me = this;
 
     if (me.active) {
+      Ext.suspendLayouts();
       me.getStore().getRootNode().removeAll();
       if (Ext.isDefined(me.model) && me.roleStore.getCount() > 0 && me.privilegeStore.getCount() > 0) {
         me.addRoles(me.getStore().getRootNode(), me.model.roles);
@@ -96,6 +106,7 @@ Ext.define('NX.coreui.view.role.RoleTree', {
           { property: 'text', direction: 'ASC' }
         ]);
       }
+      Ext.resumeLayouts(true);
     }
   },
 
