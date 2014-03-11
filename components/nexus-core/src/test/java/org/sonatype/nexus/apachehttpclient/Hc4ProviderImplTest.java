@@ -13,21 +13,26 @@
 
 package org.sonatype.nexus.apachehttpclient;
 
-import java.net.URL;
-import java.util.Set;
-
+import org.sonatype.nexus.apachehttpclient.Hc4Provider.Builder;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
+import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
+import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
@@ -42,7 +47,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import static org.mockito.Mockito.mock;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.when;
 
 public class Hc4ProviderImplTest
@@ -190,7 +196,8 @@ public class Hc4ProviderImplTest
       when(remoteProxySettings.getHttpProxySettings()).thenReturn(http);
       when(remoteProxySettings.getHttpsProxySettings()).thenReturn(https);
       Assert
-          .assertTrue("NTLM HTTP proxy auth-proxy set", testSubject.reuseConnectionsNeeded(applicationConfiguration.getGlobalRemoteStorageContext()));
+          .assertTrue("NTLM HTTP proxy auth-proxy set",
+              testSubject.reuseConnectionsNeeded(applicationConfiguration.getGlobalRemoteStorageContext()));
     }
 
     // HTTPS proxy is NTLM
@@ -201,8 +208,51 @@ public class Hc4ProviderImplTest
       when(remoteProxySettings.getHttpProxySettings()).thenReturn(http);
       when(remoteProxySettings.getHttpsProxySettings()).thenReturn(https);
       Assert
-          .assertTrue("NTLM HTTPS proxy auth-proxy set", testSubject.reuseConnectionsNeeded(applicationConfiguration.getGlobalRemoteStorageContext()));
+          .assertTrue("NTLM HTTPS proxy auth-proxy set",
+              testSubject.reuseConnectionsNeeded(applicationConfiguration.getGlobalRemoteStorageContext()));
     }
+  }
+
+
+  @Test
+  public void credentialsProviderReplaced() {
+    testSubject = new Hc4ProviderImpl(applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller, null);
+
+    final Builder builder = testSubject.prepareHttpClient(applicationConfiguration.getGlobalRemoteStorageContext());
+
+    final RemoteAuthenticationSettings remoteAuthenticationSettings = new UsernamePasswordRemoteAuthenticationSettings(
+        "user", "pass");
+    testSubject.applyAuthenticationConfig(builder, remoteAuthenticationSettings, null);
+
+    final DefaultRemoteHttpProxySettings httpProxy = new DefaultRemoteHttpProxySettings();
+    httpProxy.setHostname("http-proxy");
+    httpProxy.setPort(8080);
+    httpProxy.setProxyAuthentication(new UsernamePasswordRemoteAuthenticationSettings("http-proxy", "http-pass"));
+    final DefaultRemoteHttpProxySettings httpsProxy = new DefaultRemoteHttpProxySettings();
+    httpsProxy.setHostname("https-proxy");
+    httpsProxy.setPort(9090);
+    httpsProxy.setProxyAuthentication(new UsernamePasswordRemoteAuthenticationSettings("https-proxy", "https-pass"));
+    final DefaultRemoteProxySettings remoteProxySettings = new DefaultRemoteProxySettings();
+    remoteProxySettings.setHttpProxySettings(httpProxy);
+    remoteProxySettings.setHttpsProxySettings(httpsProxy);
+
+    testSubject.applyProxyConfig(builder, remoteProxySettings);
+
+    final CredentialsProvider credentialsProvider = builder.getCredentialsProvider();
+
+    assertThat(credentialsProvider.getCredentials(AuthScope.ANY), notNullValue(Credentials.class));
+    assertThat(credentialsProvider.getCredentials(AuthScope.ANY).getUserPrincipal().getName(), equalTo("user"));
+    assertThat(credentialsProvider.getCredentials(AuthScope.ANY).getPassword(), equalTo("pass"));
+
+    final AuthScope httpProxyAuthScope = new AuthScope(new HttpHost("http-proxy", 8080));
+    assertThat(credentialsProvider.getCredentials(httpProxyAuthScope), notNullValue(Credentials.class));
+    assertThat(credentialsProvider.getCredentials(httpProxyAuthScope).getUserPrincipal().getName(), equalTo("http-proxy"));
+    assertThat(credentialsProvider.getCredentials(httpProxyAuthScope).getPassword(), equalTo("http-pass"));
+
+    final AuthScope httpsProxyAuthScope = new AuthScope(new HttpHost("https-proxy", 9090));
+    assertThat(credentialsProvider.getCredentials(httpsProxyAuthScope), notNullValue(Credentials.class));
+    assertThat(credentialsProvider.getCredentials(httpsProxyAuthScope).getUserPrincipal().getName(), equalTo("https-proxy"));
+    assertThat(credentialsProvider.getCredentials(httpsProxyAuthScope).getPassword(), equalTo("https-pass"));
   }
 
   // ==
