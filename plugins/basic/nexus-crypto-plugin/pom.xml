@@ -93,7 +93,7 @@
                 BC provider will be installed as a separate bundle to pass signature verification
                 -->
                 <manifest file="${project.build.directory}/nexus-plugin-bundle/osgi.metadata" mode="update">
-                  <attribute name="Require-Bundle" value="bcprov"/>
+                  <attribute name="Require-Bundle" value="bcprov,org.sonatype.nexus.plugin-api"/>
                 </manifest>
               </target>
             </configuration>
