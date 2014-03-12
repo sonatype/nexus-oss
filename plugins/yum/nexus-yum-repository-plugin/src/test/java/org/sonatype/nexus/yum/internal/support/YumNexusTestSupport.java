@@ -305,4 +305,9 @@ public class YumNexusTestSupport
     return item;
   }
 
+  // for Windows builds, since win file paths aren't valid URLs
+  protected String osIndependentUri(File file) throws IOException {
+    return file.getCanonicalFile().toURI().toString();
+  }
+
 }

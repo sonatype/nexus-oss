@@ -118,7 +118,7 @@ public class GenerateMetadataTaskConcurrencyTest
 
     final MavenHostedRepository repository = mock(MavenHostedRepository.class);
     when(repository.getId()).thenReturn("REPO");
-    when(repository.getLocalUrl()).thenReturn(tmpDir.getAbsolutePath());
+    when(repository.getLocalUrl()).thenReturn(osIndependentUri(tmpDir));
     when(repository.getProviderRole()).thenReturn(Repository.class.getName());
     when(repository.getProviderHint()).thenReturn("maven2");
     when(repository.adaptToFacet(HostedRepository.class)).thenReturn(repository);
