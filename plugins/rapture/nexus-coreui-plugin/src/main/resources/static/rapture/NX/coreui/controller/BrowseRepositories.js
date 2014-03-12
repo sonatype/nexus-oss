@@ -56,6 +56,10 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
           beforerender: me.load,
           selectionchange: me.onSelectionChange,
           itemdblclick: me.onItemDblClick
+        },
+        'nx-coreui-repository-browse-list button[action=admin]': {
+          afterrender: me.bindAdminButton,
+          click: me.navigateToAdminMode
         }
       }
     });
@@ -87,6 +91,42 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
         list = me.getList();
 
     list.collapse();
+  },
+
+  /**
+   * @protected
+   * Show 'Admin' when user has 'delete' permission.
+   */
+  bindAdminButton: function (button) {
+    button.mon(
+        NX.Conditions.and(
+            NX.Conditions.isPermitted('nexus:repositories', 'update')
+        ),
+        {
+          satisfied: button.show,
+          unsatisfied: button.hide,
+          scope: button
+        }
+    );
+    button.mon(
+        NX.Conditions.and(
+            NX.Conditions.gridHasSelection('nx-coreui-repository-browse-list')
+        ),
+        {
+          satisfied: button.enable,
+          unsatisfied: button.disable,
+          scope: button
+        }
+    );
+  },
+
+  navigateToAdminMode: function () {
+    var me = this,
+        list = me.getList();
+
+    NX.Bookmarks.navigateTo(NX.Bookmarks.fromSegments([
+      'admin/repository/repositories', list.getSelectionModel().getSelection()[0].getId()
+    ]));
   }
 
 });

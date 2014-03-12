@@ -35,5 +35,9 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseList', {
     { header: 'Provider', dataIndex: 'providerName' }
   ],
 
+  tbar: [
+    { xtype: 'button', text: 'Administrate', glyph: 'xf013@FontAwesome' /* fa-gear */, action: 'admin', disabled: true, hidden: true }
+  ],
+
   plugins: ['gridfilterbox']
 });

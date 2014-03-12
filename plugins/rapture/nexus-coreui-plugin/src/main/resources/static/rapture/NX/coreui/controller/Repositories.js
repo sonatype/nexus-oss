@@ -96,6 +96,10 @@ Ext.define('NX.coreui.controller.Repositories', {
         'nx-coreui-repository-list': {
           beforerender: me.loadRepositoryTemplate
         },
+        'nx-coreui-repository-list button[action=browse]': {
+          afterrender: me.bindBrowseButton,
+          click: me.navigateToBrowseMode
+        },
         'nx-coreui-repository-list menuitem[action=new]': {
           click: me.showAddWindow
         },
@@ -275,6 +279,33 @@ Ext.define('NX.coreui.controller.Repositories', {
       return 'Unavailable' + (remoteStatusReason ? ' due to ' + remoteStatusReason : '');
     }
     return remoteStatus;
+  },
+
+  /**
+   * @protected
+   * Enable 'Browse' when user has selected a repository.
+   */
+  bindBrowseButton: function (button) {
+    var me = this;
+    button.mon(
+        NX.Conditions.and(
+            NX.Conditions.gridHasSelection(me.list)
+        ),
+        {
+          satisfied: button.enable,
+          unsatisfied: button.disable,
+          scope: button
+        }
+    );
+  },
+
+  navigateToBrowseMode: function () {
+    var me = this,
+        list = me.getList();
+
+    NX.Bookmarks.navigateTo(NX.Bookmarks.fromSegments([
+      'browse/repository/standard', list.getSelectionModel().getSelection()[0].getId()
+    ]));
   }
 
 });
