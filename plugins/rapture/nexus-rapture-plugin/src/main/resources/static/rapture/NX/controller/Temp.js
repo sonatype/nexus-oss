@@ -216,14 +216,6 @@ Ext.define('NX.controller.Temp', {
       },
       {
         mode: 'browse',
-        path: '/Repository/Standard',
-        description: 'Browse standard repositories',
-        iconName: 'feature-repository',
-        weight: 10,
-        authenticationRequired: false
-      },
-      {
-        mode: 'browse',
         path: '/Repository/Staging',
         description: 'Browse staging repositories',
         iconName: 'feature-staging-repositories',

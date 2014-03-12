@@ -18,6 +18,11 @@ Ext.define('NX.coreui.app.PluginConfig', {
 
   controllers: [
     'NX.coreui.controller.Capabilities',
+    'NX.coreui.controller.BrowseRepositories',
+    'NX.coreui.controller.BrowseRepositoryItemInfo',
+    'NX.coreui.controller.BrowseRepositoryItemClm',
+    'NX.coreui.controller.BrowseStorage',
+    'NX.coreui.controller.BrowseIndex',
     'NX.coreui.controller.MavenUpload',
     'NX.coreui.controller.PluginConsole',
     'NX.coreui.controller.Repositories',
