@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -342,7 +343,12 @@ public class DefaultSecuritySystem
           + " does not support writing.");
     }
 
+    final User oldUser = userManager.getUser(user.getUserId());
     userManager.updateUser(user);
+    if (oldUser.getStatus() == UserStatus.active && user.getStatus() != oldUser.getStatus()) {
+      // clear the realm authc caches as user got disabled
+      eventBus.post(new UserPrincipalsExpired(user.getUserId(), user.getSource()));
+    }
 
     // then save the users Roles
     for (UserManager tmpUserManager : userManagerFacade.getUserManagers().values()) {
@@ -363,8 +369,8 @@ public class DefaultSecuritySystem
       }
     }
 
-    // clear the realm caches
-    this.eventBus.post(new AuthorizationConfigurationChanged());
+    // clear the realm authz caches as user might get roles changed
+    eventBus.post(new AuthorizationConfigurationChanged());
 
     return user;
   }
@@ -388,7 +394,8 @@ public class DefaultSecuritySystem
     UserManager userManager = userManagerFacade.getUserManager(source);
     userManager.deleteUser(userId);
 
-    this.eventBus.post(new UserPrincipalsExpired(userId, source));
+    // flush authc
+    eventBus.post(new UserPrincipalsExpired(userId, source));
   }
 
   public Set<RoleIdentifier> getUsersRoles(String userId, String source)
@@ -426,6 +433,8 @@ public class DefaultSecuritySystem
     if (!foundUser) {
       throw new UserNotFoundException(userId);
     }
+    // clear the authz realm caches
+    eventBus.post(new AuthorizationConfigurationChanged());
   }
 
   public User getUser(String userId)
@@ -631,6 +640,8 @@ public class DefaultSecuritySystem
           + "' but could not find the UserManager for that source.");
     }
 
+    // flush authc
+    eventBus.post(new UserPrincipalsExpired(userId, user.getSource()));
   }
 
   public void forgotPassword(String userId, String email)
@@ -695,6 +706,9 @@ public class DefaultSecuritySystem
 
     this.changePassword(userId, newClearTextPassword);
 
+    // flush authc
+    eventBus.post(new UserPrincipalsExpired(userId, user.getSource()));
+
     // send email
     this.getSecurityEmailer().sendResetPassword(user.getEmailAddress(), newClearTextPassword);
 
@@ -740,8 +754,19 @@ public class DefaultSecuritySystem
   public void setAnonymousUsername(String anonymousUsername)
       throws InvalidConfigurationException
   {
+    User user = null;
+    try {
+      user = getUser(securityConfiguration.getAnonymousUsername());
+    }
+    catch (UserNotFoundException e) {
+      // ignore
+    }
     this.securityConfiguration.setAnonymousUsername(anonymousUsername);
     this.securityConfiguration.save();
+    // flush authc, if anon existed before change
+    if (user != null) {
+      eventBus.post(new UserPrincipalsExpired(user.getUserId(), user.getSource()));
+    }
   }
 
   public String getAnonymousPassword() {
@@ -751,8 +776,19 @@ public class DefaultSecuritySystem
   public void setAnonymousPassword(String anonymousPassword)
       throws InvalidConfigurationException
   {
+    User user = null;
+    try {
+      user = getUser(securityConfiguration.getAnonymousUsername());
+    }
+    catch (UserNotFoundException e) {
+      // ignore
+    }
     this.securityConfiguration.setAnonymousPassword(anonymousPassword);
     this.securityConfiguration.save();
+    if (user != null) {
+      // flush authc, if anon exists
+      eventBus.post(new UserPrincipalsExpired(user.getUserId(), user.getSource()));
+    }
   }
 
   public synchronized void start() {
@@ -797,35 +833,73 @@ public class DefaultSecuritySystem
     getSecurityManager().setRealms(new ArrayList<Realm>(this.getRealmsFromConfigSource()));
   }
 
-  private void clearRealmCaches() {
+  /**
+   * Looks up registered {@link AuthenticatingRealm}s, and clears their authc caches if they
+   * have it set.
+   *
+   * @since 2.8
+   */
+  private void clearAuthcRealmCaches() {
     // NOTE: we don't need to iterate all the Sec Managers, they use the same Realms, so one is fine.
-    if (this.getSecurityManager().getRealms() != null) {
-      for (Realm realm : this.getSecurityManager().getRealms()) {
-        // check if its a AuthorizingRealm, if so clear the cache
-        if (AuthorizingRealm.class.isInstance(realm)) {
-          // clear the cache
-          AuthorizingRealm aRealm = (AuthorizingRealm) realm;
-
-          Cache cache = aRealm.getAuthorizationCache();
-          if (cache != null) {
-            cache.clear();
-          }
+    final Collection<Realm> realms = getSecurityManager().getRealms();
+    if (realms != null) {
+      for (Realm realm : realms) {
+        if (realm instanceof AuthenticatingRealm) {
+          clearIfNonNull(((AuthenticatingRealm) realm).getAuthenticationCache());
         }
       }
     }
   }
 
+  /**
+   * Looks up registered {@link AuthorizingRealm}s, and clears their authz caches if they
+   * have it set.
+   *
+   * @since 2.8
+   */
+  private void clearAuthzRealmCaches() {
+    // NOTE: we don't need to iterate all the Sec Managers, they use the same Realms, so one is fine.
+    final Collection<Realm> realms = getSecurityManager().getRealms();
+    if (realms != null) {
+      for (Realm realm : realms) {
+        if (realm instanceof AuthorizingRealm) {
+          clearIfNonNull(((AuthorizingRealm) realm).getAuthorizationCache());
+        }
+      }
+    }
+  }
+
+  /**
+   * Clears Shiro cache if passed instance is not {@code null}.
+   *
+   * @since 2.8
+   */
+  private void clearIfNonNull(@Nullable final Cache cache) {
+    if (cache != null) {
+      cache.clear();
+    }
+  }
+
+  // ==
+
+  @Subscribe
+  public void onEvent(final UserPrincipalsExpired evt) {
+    // TODO: we could do this better, not flushing whole cache for single user being deleted
+    clearAuthcRealmCaches();
+  }
+
   @Subscribe
   public void onEvent(final AuthorizationConfigurationChanged evt) {
-    this.clearRealmCaches();
+    // TODO: we could do this better, not flushing whole cache for single user roles being updated
+    clearAuthzRealmCaches();
   }
 
   @Subscribe
   public void onEvent(final SecurityConfigurationChanged evt) {
-    this.clearRealmCaches();
-    this.securityConfiguration.clearCache();
-
-    this.setSecurityManagerRealms();
+    clearAuthcRealmCaches();
+    clearAuthzRealmCaches();
+    securityConfiguration.clearCache();
+    setSecurityManagerRealms();
   }
 
   public RealmSecurityManager getSecurityManager() {
