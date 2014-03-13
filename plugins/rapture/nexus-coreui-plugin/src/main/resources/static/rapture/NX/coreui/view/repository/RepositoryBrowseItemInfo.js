@@ -42,6 +42,10 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseItemInfo', {
           }
         }
       ]
+    },
+    {
+      xtype: 'nx-info-panel',
+      title: undefined
     }
   ]
 
