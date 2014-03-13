@@ -73,7 +73,7 @@ define('Nexus/config',['extjs', 'Nexus/messagebox', 'Sonatype/init', 'Nexus/conf
           repositoryStatuses : servicePath + '/repository_statuses',
           repoTemplates : servicePath + '/templates/repositories',
           repoTemplate : {
-            virtual : servicePath + '/templates/repositories/default_virtual',
+            virtual : servicePath + '/templates/repositories/default_virtual_m2_m1',
             hosted : servicePath + '/templates/repositories/default_hosted_release', // default
             hosted_release : servicePath + '/templates/repositories/default_hosted_release',
             hosted_snapshot : servicePath + '/templates/repositories/default_hosted_snapshot',
