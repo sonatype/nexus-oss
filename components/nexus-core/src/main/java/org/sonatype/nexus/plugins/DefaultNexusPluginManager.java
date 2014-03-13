@@ -13,6 +13,10 @@
 
 package org.sonatype.nexus.plugins;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,6 +46,7 @@ import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactExcep
 import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
 import org.sonatype.nexus.util.AlphanumComparator;
 import org.sonatype.plugin.metadata.GAVCoordinate;
+import org.sonatype.plugins.model.ClasspathDependency;
 import org.sonatype.plugins.model.PluginDependency;
 import org.sonatype.plugins.model.PluginMetadata;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -65,10 +70,12 @@ import org.eclipse.sisu.plexus.PlexusXmlBeanConverter;
 import org.eclipse.sisu.plexus.PlexusXmlBeanModule;
 import org.eclipse.sisu.space.BundleClassSpace;
 import org.eclipse.sisu.space.ClassSpace;
+import org.eclipse.sisu.space.URLClassSpace;
 import org.eclipse.sisu.wire.ParameterKeys;
 import org.eclipse.sisu.wire.WireModule;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.wiring.BundleWiring;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -308,23 +315,44 @@ public class DefaultNexusPluginManager
   {
     final String location = "reference:"+plugin.getFile().getParentFile().toURI();
 
-    final ClassSpace pluginSpace;
+    final Bundle pluginBundle;
     try {
-      Bundle pluginBundle = systemBundleProvider.get().getBundleContext().installBundle(location);
-      pluginSpace = new BundleClassSpace(pluginBundle);
+      pluginBundle = systemBundleProvider.get().getBundleContext().installBundle(location);
       pluginBundle.start();
     }
     catch (BundleException e) {
       throw new IllegalStateException("Problem installing: "+location, e);
     }
 
+    final List<URL> scanList = new ArrayList<URL>();
+
+    final URL pluginURL = toURL(plugin);
+    if (null != pluginURL) {
+      scanList.add(pluginURL);
+    }
+
+    for (final ClasspathDependency d : descriptor.getPluginMetadata().getClasspathDependencies()) {
+      final GAVCoordinate gav =
+          new GAVCoordinate(d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getClassifier(), d.getType());
+
+      final URL url = toURL(repositoryManager.resolveDependencyArtifact(plugin, gav));
+      if (null != url) {
+        if (d.isHasComponents() || d.isShared() || hasComponents(url)) {
+          scanList.add(url);
+        }
+      }
+    }
+
     final List<PlexusBeanModule> beanModules = new ArrayList<PlexusBeanModule>();
 
     // Scan for Plexus XML components
+    final ClassSpace pluginSpace = new BundleClassSpace(pluginBundle);
     beanModules.add(new PlexusXmlBeanModule(pluginSpace, variables));
 
     // Scan for annotated components
-    beanModules.add(new PlexusAnnotatedBeanModule(pluginSpace, variables).with(NexusTypeBinder.STRATEGY));
+    final ClassLoader pluginLoader = pluginBundle.adapt(BundleWiring.class).getClassLoader();
+    final ClassSpace scanSpace = new URLClassSpace(pluginLoader, scanList.toArray(new URL[scanList.size()]));
+    beanModules.add(new PlexusAnnotatedBeanModule(scanSpace, variables).with(NexusTypeBinder.STRATEGY));
 
     // Assemble plugin components and resources
     final List<Module> modules = new ArrayList<Module>();
@@ -345,6 +373,41 @@ public class DefaultNexusPluginManager
     });
 
     Guice.createInjector(new WireModule(modules));
+  }
+
+  private static URL toURL(final PluginRepositoryArtifact artifact) {
+    try {
+      return artifact.getFile().toURI().toURL();
+    }
+    catch (final MalformedURLException e) {
+      return null; // should never happen
+    }
+  }
+
+  private static boolean hasComponents(final URL url) {
+    // this has to happen in generic way, as for example Nexus IDE may provide
+    // various URLs using XmlNexusPluginRepository for example
+    try {
+      final URL sisuIndexUrl = url.toURI().resolve("META-INF/sisu/" + Named.class.getName()).toURL();
+      if (exists(sisuIndexUrl)) {
+        return true;
+      }
+      // no need for plx XML discovery, as that will be picked up
+      // even without scanning
+    }
+    catch (Exception e) {
+      // just neglect any URISyntaxEx or MalformedUrlEx
+    }
+    return false;
+  }
+
+  private static boolean exists(final URL url) {
+    try (final InputStream content = url.openStream()) {
+      return true;
+    }
+    catch (IOException e) {
+      return false;
+    }
   }
 
   private void reportMissingPlugin(final PluginManagerResponse response,

@@ -24,6 +24,8 @@ import com.google.common.base.Strings;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+// FIXME: Unify with StaticWebResource impl
+
 /**
  * URL-based {@link WebResource} implementation.
  *
@@ -63,7 +65,14 @@ public class UrlWebResource
         else {
           this.contentType = contentType;
         }
-        this.size = connection.getContentLengthLong();
+
+        // support for legacy int and modern long content-length
+        long size = connection.getContentLengthLong();
+        if (size == -1) {
+          size = connection.getContentLength();
+        }
+        this.size = size;
+
         this.lastModified = connection.getLastModified();
       }
     }

@@ -215,16 +215,14 @@ public class Hc4ProviderBase
       }
 
       if (credentials != null) {
-        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         if (proxyHost != null) {
-          credentialsProvider.setCredentials(new AuthScope(proxyHost), credentials);
+          builder.setCredentials(new AuthScope(proxyHost), credentials);
           builder.getRequestConfigBuilder().setProxyPreferredAuthSchemes(authorisationPreference);
         }
         else {
-          credentialsProvider.setCredentials(AuthScope.ANY, credentials);
+          builder.setCredentials(AuthScope.ANY, credentials);
           builder.getRequestConfigBuilder().setTargetPreferredAuthSchemes(authorisationPreference);
         }
-        builder.getHttpClientBuilder().setDefaultCredentialsProvider(credentialsProvider);
       }
     }
   }

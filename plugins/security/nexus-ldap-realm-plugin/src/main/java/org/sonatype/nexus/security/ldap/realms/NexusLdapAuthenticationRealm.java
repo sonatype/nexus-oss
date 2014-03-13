@@ -19,6 +19,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.security.ldap.realms.AbstractLdapAuthenticatingRealm;
 import org.sonatype.security.ldap.realms.LdapManager;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.eclipse.sisu.Description;
 
@@ -32,7 +33,7 @@ public class NexusLdapAuthenticationRealm
   public static final String ROLE = "NexusLdapAuthenticationRealm";
 
   @Inject
-  public NexusLdapAuthenticationRealm(final LdapManager ldapManager) {
-    super(ldapManager);
+  public NexusLdapAuthenticationRealm(final EventBus eventBus, final LdapManager ldapManager) {
+    super(eventBus, ldapManager);
   }
 }

@@ -77,9 +77,8 @@ public class KenaiRealm
     this.kenaiRealmConfiguration = checkNotNull(kenaiRealmConfiguration);
     this.hc4Provider = checkNotNull(hc4Provider);
     setName(ROLE);
-
-    // TODO: write another test before enabling this
-    // this.setAuthenticationCachingEnabled( true );
+    setAuthenticationCachingEnabled(true);
+    setAuthorizationCachingEnabled(true);
   }
 
   // ------------ AUTHENTICATION ------------

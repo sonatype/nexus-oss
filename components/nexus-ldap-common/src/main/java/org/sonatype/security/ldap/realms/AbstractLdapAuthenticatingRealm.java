@@ -16,22 +16,27 @@ package org.sonatype.security.ldap.realms;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.naming.NamingException;
 
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.NoLdapUserRolesFoundException;
+import org.sonatype.security.ldap.realms.persist.LdapClearCacheEvent;
 import org.sonatype.sisu.goodies.common.Loggers;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Strings;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
-import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.authc.credential.SimpleCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.cache.Cache;
 import org.apache.shiro.realm.ldap.AbstractLdapRealm;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -48,9 +53,38 @@ public abstract class AbstractLdapAuthenticatingRealm
 
   private final LdapManager ldapManager;
 
-  public AbstractLdapAuthenticatingRealm(final LdapManager ldapManager) {
-    setName(NAME);
+  public AbstractLdapAuthenticatingRealm(final EventBus eventBus, final LdapManager ldapManager) {
     this.ldapManager = checkNotNull(ldapManager);
+    setName(NAME);
+    setAuthenticationCachingEnabled(true);
+    setAuthorizationCachingEnabled(true);
+    // using simple credentials matcher
+    setCredentialsMatcher(new SimpleCredentialsMatcher());
+
+    eventBus.register(this);
+  }
+
+  /**
+   * Handler that clears caches when needed.
+   *
+   * @since 2.8
+   */
+  @AllowConcurrentEvents
+  @Subscribe
+  public void on(final LdapClearCacheEvent evt) {
+    clearIfNonNull(getAuthenticationCache());
+    clearIfNonNull(getAuthorizationCache());
+  }
+
+  /**
+   * Clears Shiro cache if passed instance is not {@code null}.
+   *
+   * @since 2.8
+   */
+  protected void clearIfNonNull(@Nullable final Cache cache) {
+    if (cache != null) {
+      cache.clear();
+    }
   }
 
   @Override
@@ -69,7 +103,8 @@ public abstract class AbstractLdapAuthenticatingRealm
 
     try {
       this.ldapManager.authenticateUser(username, pass);
-      return this.buildAuthenticationInfo(username, null);
+      // creating AuthInfo with plain pass (relates to creds matcher too)
+      return new SimpleAuthenticationInfo(username, pass.toCharArray(), getName());
     }
     catch (org.sonatype.security.authentication.AuthenticationException e) {
       if (this.logger.isDebugEnabled()) {
@@ -104,18 +139,5 @@ public abstract class AbstractLdapAuthenticatingRealm
     }
     return null;
 
-  }
-
-  protected AuthenticationInfo buildAuthenticationInfo(String username, char[] password) {
-    return new SimpleAuthenticationInfo(username, password, getName());
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see org.apache.shiro.realm.AuthenticatingRealm#getCredentialsMatcher()
-   */
-  @Override
-  public CredentialsMatcher getCredentialsMatcher() {
-    return new AllowAllCredentialsMatcher();
   }
 }

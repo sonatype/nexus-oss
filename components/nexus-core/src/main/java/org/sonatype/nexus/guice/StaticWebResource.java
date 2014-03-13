@@ -20,6 +20,8 @@ import java.net.URLConnection;
 
 import org.sonatype.nexus.web.WebResource;
 
+// FIXME: Unify with UrlWebResource impl
+
 /**
  * {@link WebResource} contributed from a Nexus plugin.
  */
@@ -60,7 +62,13 @@ class StaticWebResource
     try {
       final URLConnection urlConnection = resourceURL.openConnection();
       try (final InputStream is = urlConnection.getInputStream()) {
-        this.size = urlConnection.getContentLengthLong();
+        // support for legacy int and modern long content-length
+        long size = urlConnection.getContentLengthLong();
+        if (size == -1) {
+          size = urlConnection.getContentLength();
+        }
+        this.size = size;
+
         this.lastModified = urlConnection.getLastModified();
       }
     }

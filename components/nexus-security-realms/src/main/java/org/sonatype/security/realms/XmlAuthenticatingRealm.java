@@ -34,10 +34,8 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.PasswordMatcher;
 import org.apache.shiro.authc.credential.PasswordService;
-import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.realm.Realm;
-import org.apache.shiro.subject.PrincipalCollection;
 import org.eclipse.sisu.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +52,7 @@ import org.slf4j.LoggerFactory;
 @Named(XmlAuthenticatingRealm.ROLE)
 @Description("Xml Authenticating Realm")
 public class XmlAuthenticatingRealm
-    extends AuthorizingRealm
+    extends AuthenticatingRealm
     implements Realm
 {
   private static final Logger logger = LoggerFactory.getLogger(XmlAuthenticatingRealm.class);
@@ -78,6 +76,7 @@ public class XmlAuthenticatingRealm
     passwordMatcher.setPasswordService(this.passwordService);
     setCredentialsMatcher(passwordMatcher);
     setName(ROLE);
+    setAuthenticationCachingEnabled(true);
   }
 
   @Override
@@ -114,11 +113,6 @@ public class XmlAuthenticatingRealm
       throw new AccountException("User '" + upToken.getUsername() + "' is in illegal status '"
           + user.getStatus() + "'.");
     }
-  }
-
-  @Override
-  protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection arg0) {
-    return null;
   }
 
   /*

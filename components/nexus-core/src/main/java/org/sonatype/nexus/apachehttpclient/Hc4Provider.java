@@ -16,12 +16,17 @@ package org.sonatype.nexus.apachehttpclient;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
+import com.google.common.annotations.VisibleForTesting;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HttpContext;
 
@@ -122,6 +127,10 @@ public interface Hc4Provider
 
     private final RequestConfig.Builder requestConfigBuilder;
 
+    private final CredentialsProvider credentialsProvider;
+
+    private boolean credentialsProviderAltered;
+
     Builder() {
       this(HttpClientBuilder.create(), ConnectionConfig.copy(ConnectionConfig.DEFAULT),
           SocketConfig.copy(SocketConfig.DEFAULT), RequestConfig.copy(RequestConfig.DEFAULT));
@@ -134,10 +143,39 @@ public interface Hc4Provider
       this.connectionConfigBuilder = checkNotNull(connectionConfigBuilder);
       this.socketConfigBuilder = checkNotNull(socketConfigBuilder);
       this.requestConfigBuilder = checkNotNull(requestConfigBuilder);
+      this.credentialsProvider = new BasicCredentialsProvider();
+      this.credentialsProviderAltered = false;
     }
 
+    /**
+     * Returns the {@link HttpClientBuilder}.
+     * <p/>Word of warning about method {@link HttpClientBuilder#setDefaultCredentialsProvider(CredentialsProvider)}:
+     * by design, this method replaces any previously set credentials provider, and, there is no getter for it to
+     * inspect any existing previously set value. Hence, be careful when using this method! Recommended way to
+     * set multiple credentials from multiple places is to use {@link #setCredentials(AuthScope, Credentials)}.
+     */
     public HttpClientBuilder getHttpClientBuilder() {
       return httpClientBuilder;
+    }
+
+    /**
+     * Sets the {@link Credentials credentials} for the given authentication scope. Any previous credentials for the
+     * given scope will be overwritten. See {@link CredentialsProvider#setCredentials(AuthScope, Credentials)}. This
+     * method, once invoked, will replace any credentials provider set on {@link HttpClientBuilder} when {@link
+     * #build()} method is called to build the client.
+     *
+     * @since 2.8.0
+     */
+    public Builder setCredentials(AuthScope authscope, Credentials credentials) {
+      checkNotNull(authscope);
+      credentialsProvider.setCredentials(authscope, credentials);
+      credentialsProviderAltered = true;
+      return this;
+    }
+
+    @VisibleForTesting
+    CredentialsProvider getCredentialsProvider() {
+      return credentialsProvider;
     }
 
     public ConnectionConfig.Builder getConnectionConfigBuilder() {
@@ -162,6 +200,9 @@ public interface Hc4Provider
       httpClientBuilder.setDefaultConnectionConfig(connectionConfigBuilder.build());
       httpClientBuilder.setDefaultSocketConfig(socketConfigBuilder.build());
       httpClientBuilder.setDefaultRequestConfig(requestConfigBuilder.build());
+      if (credentialsProviderAltered) {
+        httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+      }
       return httpClientBuilder.build();
     }
   }

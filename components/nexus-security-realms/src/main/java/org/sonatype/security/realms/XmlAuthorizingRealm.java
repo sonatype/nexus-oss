@@ -76,6 +76,8 @@ public class XmlAuthorizingRealm
     this.userManagerMap = userManagerMap;
     setCredentialsMatcher(new Sha1CredentialsMatcher());
     setName(ROLE);
+    setAuthenticationCachingEnabled(false); // we authz only, no authc done by this realm
+    setAuthorizationCachingEnabled(true);
   }
 
   @Override

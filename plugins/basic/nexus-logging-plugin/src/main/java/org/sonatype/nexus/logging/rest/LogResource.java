@@ -24,12 +24,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.logging.LoggingPlugin;
 import org.sonatype.nexus.logging.model.MarkerXO;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.siesta.common.Resource;
+import org.sonatype.sisu.siesta.common.error.ObjectNotFoundException;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.codehaus.plexus.util.StringUtils;
@@ -90,7 +92,11 @@ public class LogResource
     if (count == null) {
       count = Long.MAX_VALUE;
     }
-    return Response.ok(logManager.getApplicationLogAsStream("nexus.log", from, count).getInputStream())
+    NexusStreamResponse streamResponse = logManager.getApplicationLogAsStream("nexus.log", from, count);
+    if (streamResponse == null) {
+      throw new ObjectNotFoundException("nexus.log not found");
+    }
+    return Response.ok(streamResponse.getInputStream())
         .header("Content-Disposition", "attachment; filename=\"nexus.log\"")
         .build();
   }
