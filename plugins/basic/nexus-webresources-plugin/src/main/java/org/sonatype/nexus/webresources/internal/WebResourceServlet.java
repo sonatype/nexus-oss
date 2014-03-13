@@ -107,7 +107,13 @@ public class WebResourceServlet
     }
     response.setHeader("Content-Type", contentType);
     response.setDateHeader("Last-Modified", resource.getLastModified());
-    response.setHeader("Content-Length", String.valueOf(resource.getSize()));
+
+    // set content-length, complain if invalid
+    long size = resource.getSize();
+    if (size < 0) {
+      log.warn("Resource {} has invalid size: {}", resource.getPath(), size);
+    }
+    response.setHeader("Content-Length", String.valueOf(size));
 
     // set max-age if cacheable
     if (resource.isCacheable()) {
