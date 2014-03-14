@@ -1,0 +1,62 @@
+/**
+ * @class Ext.panel.Panel
+ */
+
+/**
+ * ui: 'feature-content'
+ */
+@include extjs-panel-ui(
+  $ui: 'feature-content',
+
+  $ui-header-padding: 4px 10px 5px,
+  $ui-header-color: #1f1f1f,
+  $ui-header-background-color: #E0E0E0,
+  $ui-header-icon-height: 32,
+  $ui-header-icon-width: 32,
+  $ui-header-text-transform: $panel-light-header-text-transform,
+  $ui-tool-background-image: $panel-light-tool-background-image
+);
+
+/**
+ * ui: 'feature-menu'
+ */
+@include extjs-panel-ui(
+  $ui: 'feature-menu',
+
+  $ui-header-padding: 4px
+);
+
+/**
+ * ui: 'feature-detail'
+ */
+@include extjs-panel-ui(
+  $ui: 'feature-detail',
+
+  $ui-header-padding: 4px 10px 6px,
+  $ui-header-color: #FFFFFF,
+  $ui-header-background-color: #8D8D8D
+);
+
+/**
+ * ui: 'messages'
+ */
+@include extjs-panel-ui(
+  $ui: 'messages',
+
+  $ui-header-padding: 4px,
+  $ui-header-color: #DDDDDD,
+  $ui-header-background-color: #000000
+);
+
+/**
+ * ui: 'developer'
+ */
+@include extjs-panel-ui(
+  $ui: 'developer',
+
+  $ui-header-padding: 4px,
+  $ui-header-color: #ffffff,
+  $ui-header-background-color: #3d4e7e
+);
+
+

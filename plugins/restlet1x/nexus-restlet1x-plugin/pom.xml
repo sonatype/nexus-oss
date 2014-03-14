@@ -49,11 +49,6 @@
       <artifactId>nexus-restlet-bridge</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>commons-fileupload</groupId>
-      <artifactId>commons-fileupload</artifactId>
-    </dependency>
-
     <!--
     Exposed here to allow dependent plugins to use annotations for API generation only.  This is excluded from the plugin bundle.
     -->
@@ -99,8 +94,6 @@
             <sharedDependency>com.noelios.restlet:com.noelios.restlet.ext.servlet</sharedDependency>
             <!-- Used by org.sonatype.nexus.rest.ResourceSupport -->
             <sharedDependency>javax.ws.rs:javax.ws.rs</sharedDependency>
-            <!-- Participates in public API of Plexus bridge for Restlet 1.x, is must for consumer to have it -->
-            <sharedDependency>commons-fileupload:commons-fileupload</sharedDependency>
           </sharedDependencies>
         </configuration>
       </plugin>

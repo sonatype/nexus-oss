@@ -1,0 +1,22 @@
+<project name="resources-impl">
+    <target name="-before-inherit-resources"/>
+    <target name="-before-copy-resources"/>
+    
+    <!--'-init-compiler' defined in init-impl.xml-->
+    <target name="-compile-resources" depends="-init-compiler">
+        <x-compile refid="${compiler.ref.id}">
+            <![CDATA[
+                resources
+                    -excludes=-all*.css
+                    -out=${build.resources.dir}
+                and
+                resources
+                    -model=true
+                    -out=${build.dir}
+            ]]>
+        </x-compile>
+    </target>
+    
+    <target name="-after-copy-resources"/>
+    <target name="-after-inherit-resources"/>
+</project>

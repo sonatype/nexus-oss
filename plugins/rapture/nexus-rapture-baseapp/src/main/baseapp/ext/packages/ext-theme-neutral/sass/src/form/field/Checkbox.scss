@@ -1,0 +1,92 @@
+.#{$prefix}form-cb-wrap {
+    height: $form-field-height;
+    @if $include-ext-toolbar-toolbar and $form-toolbar-field-height != $form-field-height {
+        .#{$prefix}toolbar-item & {
+            height: $form-toolbar-field-height;
+        }
+    }
+}
+
+.#{$prefix}form-cb {
+    margin-top: round(($form-field-height - $form-checkbox-size) / 2);
+    @if $include-ext-toolbar-toolbar and $form-toolbar-field-height != $form-field-height {
+        .#{$prefix}toolbar-item & {
+            margin-top: round(($form-toolbar-field-height - $form-checkbox-size) / 2);
+        }
+    }
+}
+
+.#{$prefix}form-checkbox {
+    width: $form-checkbox-size;
+    height: $form-checkbox-size;
+    background: theme-background-image($form-checkbox-image) no-repeat;
+}
+
+.#{$prefix}form-cb-checked .#{$prefix}form-checkbox {
+    background-position: 0 (0 - $form-checkbox-size);
+}
+
+/* Focused */
+.#{$prefix}form-checkbox-focus {
+    background-position: (0 - $form-checkbox-size) 0;
+}
+.#{$prefix}form-cb-checked {
+    .#{$prefix}form-checkbox-focus {
+        background-position: (0 - $form-checkbox-size) (0 - $form-checkbox-size);
+    }
+}
+
+/* boxLabel */
+.#{$prefix}form-cb-label {
+    margin-top: round(($form-field-height - $form-label-line-height) / 2);
+    font: $form-label-font;
+    .#{$prefix}toolbar-item & {
+        @if $form-toolbar-label-font != $form-label-font {
+            font: $form-toolbar-label-font;
+        }
+        @if ($form-field-height != $form-toolbar-field-height) or ($form-label-line-height != $form-toolbar-label-line-height) {
+            margin-top: round(($form-toolbar-field-height - $form-toolbar-label-line-height) / 2);
+        }
+    }
+}
+
+.#{$prefix}form-cb-label-before {
+    padding-right: $form-checkbox-label-spacing + $form-checkbox-size;
+}
+
+@if $include-rtl {
+    .#{$prefix}rtl.#{$prefix}field .#{$prefix}form-cb-label-before {
+        padding-right: 0;
+        padding-left: $form-checkbox-label-spacing + $form-checkbox-size;
+    }
+}
+
+.#{$prefix}form-cb-label-after {
+    padding-left: $form-checkbox-label-spacing + $form-checkbox-size;
+}
+
+@if $include-rtl {
+    .#{$prefix}rtl.#{$prefix}field .#{$prefix}form-cb-label-after {
+        padding-left: 0;
+        padding-right: $form-checkbox-label-spacing + $form-checkbox-size;
+    }
+}
+
+// This is to work around lack of min-width support in older IE browsers. If it's determined
+// that there is no box label, the following class is applied to the wrapper around the inputEl.
+// See EXTJSIV-10302 and EXTJSIV-10977.
+.#{$prefix}form-cb-wrap-inner-no-box-label {
+    .#{$prefix}form-cb {
+        position: static;
+    }
+
+    @if $include-ie {
+        .#{$prefix}quirks .#{$prefix}ie &,
+        .#{$prefix}ie7m & {
+            display: inline;
+            width: $form-checkbox-size;
+            zoom: 1;
+        }
+    }
+}
+

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# get the directory in which the script reside
+DIR="$( cd "$( dirname "$0" )" && pwd )"
+
+java -cp "$DIR/binary/selenium-server-standalone-2.37.0.jar:$DIR/binary/js.jar:$DIR/commons-io-2.2/commons-io-2.2.jar" \
+    org.mozilla.javascript.tools.shell.Main -f "$DIR/launcher-common.js" "$DIR/webdriver-launcher.js" "$DIR" "$@" \
+    2>"$DIR/webdriver.log"

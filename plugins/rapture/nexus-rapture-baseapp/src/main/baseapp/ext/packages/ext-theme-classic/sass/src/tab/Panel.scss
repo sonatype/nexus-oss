@@ -1,0 +1,9 @@
+.#{$prefix}tab-icon-el {
+    top: -1px;
+}
+
+// In IE a disabled icon needs to be hidden or the opacity effect covers some of the text 
+.#{$prefix}tab-noicon .#{$prefix}tab-icon {
+    display: none;
+}
+

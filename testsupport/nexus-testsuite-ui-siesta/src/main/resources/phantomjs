@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# get the directory in which the script reside
+DIR="$( cd "$( dirname "$0" )" && pwd )"
+
+if [[ $OSTYPE =~ "darwin" ]]; then
+    PHANTOM_BINARY="phantomjs-1.6.0-macosx/bin/phantomjs"
+elif [[ `expr match $(uname -m) ".*64"` == "0" ]]; then
+    PHANTOM_BINARY="phantomjs-1.6.0-linux-i686-dynamic/bin/phantomjs"
+else
+    PHANTOM_BINARY="phantomjs-1.6.0-linux-x86_64-dynamic/bin/phantomjs"
+fi
+
+"$DIR/binary/$PHANTOM_BINARY" "$DIR/phantomjs-launcher.js" $DIR "$@"

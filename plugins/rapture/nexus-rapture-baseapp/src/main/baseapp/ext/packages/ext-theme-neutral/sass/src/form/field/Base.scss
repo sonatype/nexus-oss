@@ -1,0 +1,40 @@
+.#{$prefix}form-field {
+    color: $form-field-color;
+}
+
+.#{$prefix}form-item,
+.#{$prefix}form-field {
+    font: $form-field-font;
+    @if $include-ext-toolbar-toolbar and $form-field-font != $form-toolbar-field-font {
+        .#{$prefix}toolbar-item & {
+            font: $form-toolbar-field-font;
+        }
+    }
+}
+
+.#{$prefix}form-type-text,
+.#{$prefix}form-type-password,
+.#{$prefix}form-type-number,
+.#{$prefix}form-type-email,
+.#{$prefix}form-type-search,
+.#{$prefix}form-type-tel {
+    textarea.#{$prefix}form-invalid-field, input.#{$prefix}form-invalid-field {
+        background-color: $form-field-invalid-background-color;
+        @if not is-null($form-field-invalid-background-image) {
+            background-image: theme-background-image($form-field-invalid-background-image);
+            background-repeat: $form-field-invalid-background-repeat;
+            background-position: $form-field-invalid-background-position;
+        }
+        border-color: $form-field-invalid-border-color;
+    }
+}
+
+@if $form-field-disabled-opacity != 1 {
+    .#{$prefix}item-disabled .#{$prefix}form-item-label,
+    .#{$prefix}item-disabled .#{$prefix}form-field,
+    .#{$prefix}item-disabled .#{$prefix}form-display-field,
+    .#{$prefix}item-disabled .#{$prefix}form-cb-label,
+    .#{$prefix}item-disabled .#{$prefix}form-trigger {
+        @include opacity($form-field-disabled-opacity);
+    }
+}

@@ -63,15 +63,6 @@
       <artifactId>com.noelios.restlet.ext.servlet</artifactId>
     </dependency>
 
-    <!--
-    For org.restlet.ext.fileupload, since it depends on commons-fileupload, and that depends on commons-io, but for
-    some reason, this last dependency is declared as optional
-    -->
-    <dependency>
-      <groupId>commons-fileupload</groupId>
-      <artifactId>commons-fileupload</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>org.json</artifactId>

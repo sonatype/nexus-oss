@@ -1,0 +1,28 @@
+.#{$prefix}form-display-field-body {
+    height: $form-field-height;
+
+    @if $include-ext-toolbar-toolbar and $form-toolbar-field-height != $form-field-height {
+        .#{$prefix}toolbar-item & {
+            height: $form-toolbar-field-height;
+        }
+    }
+}
+
+.#{$prefix}form-display-field {
+    font: $form-display-field-font;
+    color: $form-display-field-color;
+    margin-top: round(($form-field-height - $form-display-field-line-height) / 2);
+
+    @if $include-ext-toolbar-toolbar {
+        .#{$prefix}toolbar-item & {
+            @if $form-toolbar-field-height != $form-field-height {
+                margin-top: round(($form-toolbar-field-height - $form-toolbar-display-field-line-height) / 2);
+            }
+
+            @if $form-toolbar-display-field-font != $form-display-field-font {
+                font: $form-toolbar-display-field-font;
+            }
+        }
+    }
+
+}

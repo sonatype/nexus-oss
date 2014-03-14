@@ -1,0 +1,21 @@
+.#{$prefix}form-item-label {
+    display: block;
+}
+
+.#{$prefix}form-item-label-right {
+    text-align: right;
+}
+
+.#{$prefix}form-item-label-top {
+    display: block;
+    @if $include-ie {
+        zoom: 1;
+    }
+}
+.#{$prefix}form-invalid-icon {
+    overflow: hidden;
+    ul {
+        display: none;
+    }
+}
+

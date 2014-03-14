@@ -1,0 +1,41 @@
+.#{$prefix}fieldset {
+    display: block; /* preserve margins in IE */
+    position: relative;
+}
+
+.#{$prefix}fieldset-header {
+    overflow: hidden; // fixes a webkit bug where legend elements that have floated children are not displayed
+
+    .#{$prefix}form-item,
+    .#{$prefix}tool {
+        float: left;
+    }
+    
+    .#{$prefix}fieldset-header-text {
+        float: left;
+    }
+
+    .#{$prefix}form-cb-wrap {
+        font-size: 0;
+        line-height: 0;
+        height: auto; // override form-cb-wrap's height from neutral theme
+    }
+
+    .#{$prefix}form-cb {
+        margin: 0; // override the default checkbox margin
+        position: static; // Checkboxes are now absolutely positioned so reset the positioning (see EXTJSIV-10302).
+    }
+}
+
+@if $include-rtl {
+    .#{$prefix}rtl.#{$prefix}fieldset-header {
+        .#{$prefix}form-item,
+        .#{$prefix}tool {
+            float: right;
+        }
+        
+        .#{$prefix}fieldset-header-text {
+            float: right;
+        }
+    }
+}

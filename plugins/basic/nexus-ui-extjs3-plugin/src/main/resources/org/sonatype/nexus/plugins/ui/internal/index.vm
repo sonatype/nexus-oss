@@ -32,10 +32,12 @@
   #if ($debug)
     <script src="static/ext-3.4.1.1/adapter/ext/ext-base-debug.js" type="text/javascript" charset="utf-8"></script>
     <script src="static/ext-3.4.1.1/ext-all-debug.js" type="text/javascript" charset="utf-8"></script>
+    <script src="static/rapture/extdirect-debug.js" type="text/javascript" charset="utf-8"></script>
   #else
     ## load aggregated/minified files
     <script src="static/ext-3.4.1.1/adapter/ext/ext-base.js" type="text/javascript" charset="utf-8"></script>
     <script src="static/ext-3.4.1.1/ext-all.js" type="text/javascript" charset="utf-8"></script>
+    <script src="static/rapture/extdirect-prod.js" type="text/javascript" charset="utf-8"></script>
   #end
 
   <script src="js/$buildQualifier/sonatype-lib.js" type="text/javascript" charset="utf-8"></script>

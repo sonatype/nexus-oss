@@ -1,0 +1,198 @@
+.#{$prefix}body {
+    margin: 0;
+}
+
+img {
+    border: 0;
+}
+
+.#{$prefix}border-box, 
+.#{$prefix}border-box * {
+    box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    -ms-box-sizing:border-box;
+    -webkit-box-sizing:border-box;
+}
+
+.#{$prefix}rtl {
+    direction: rtl;
+}
+
+.#{$prefix}ltr {
+    direction: ltr;
+}
+
+.#{$prefix}clear {
+    overflow: hidden;
+    clear: both;
+    font-size: 0;
+    line-height: 0;
+    display: table;
+}
+
+@if $include-ie {
+    .#{$prefix}strict .#{$prefix}ie7 .#{$prefix}clear {
+        // In IE7 strict the clear element has to have both a height and width of 0, otherwise the height of its parent element gets
+        // increased by 1px.  We cannot simply add the zero height/width for all browsers, because in IE quirks the height
+        // of the clear element's parent element gets increased by 1px if the clear element has either height:0 or width:0.
+        height: 0;
+        width: 0;
+    }
+}
+
+.#{$prefix}layer {
+    position: absolute !important;
+    overflow: hidden;
+    zoom: 1;
+}
+
+// Support for Floating config fixed: true which creates a fixed Layer.
+// Currently only available in browsers which support position: fixed
+.#{$prefix}fixed-layer {
+    position: fixed !important;
+    overflow: hidden;
+    zoom: 1;
+}
+
+.#{$prefix}shim {
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    @include opacity(0);
+}
+
+.#{$prefix}hide-display {
+    display: none !important;
+}
+
+.#{$prefix}hide-visibility {
+    visibility: hidden !important;
+}
+
+@if $include-ie {
+    .#{$prefix}ie6 .#{$prefix}item-disabled {
+        filter: none;
+    }
+}
+
+.#{$prefix}hidden,
+.#{$prefix}hide-offsets {
+    // to deal with inline elements that can't be position:absolute
+    display: block !important;
+    // ensure the browser disallows tabbing into this element
+    visibility: hidden !important;
+    position: absolute !important;
+    // hide using top since left  can trigger a horizontal scrollbar in rtl mode.
+    top: -10000px !important;
+}
+
+.#{$prefix}hide-nosize {
+    height: 0 !important;
+    width: 0 !important;
+}
+
+// A hide method which is still accessible to screen readers
+.#{$prefix}hide-clip {
+    position: absolute!important;
+    clip: rect(0,0,0,0);
+
+    // IE6 and IE7 use space separators
+    clip: rect(0 0 0 0);
+}
+
+.#{$prefix}masked-relative {
+    position: relative;
+}
+
+// Element shadows for IE 8 and below
+@if $include-ie {
+    .#{$prefix}ie-shadow {
+        background-color: #777;
+        display: none;
+        position: absolute;
+        overflow: hidden;
+        zoom: 1;
+    }
+}
+
+.#{$prefix}unselectable {
+    @include no-select;
+}
+
+.#{$prefix}selectable {
+    cursor: auto;
+
+    // Mozilla and WebKit support these properties
+    -moz-user-select: text;
+    -webkit-user-select: text;
+
+    // IE 10 is expected to support this
+    -ms-user-select: text;
+
+    // No browsers currently support these
+    user-select: text;
+    -o-user-select: text;
+}
+
+.#{$prefix}list-plain {
+    // removes default styling from ul elements
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.#{$prefix}table-plain {
+    border-collapse: collapse;
+    border-spacing: 0;
+    // inherit font size from parent node instead of using the browser's default font
+    // size for tables. (can't use font-size: inherit because of lack of IE6/7 support)
+    font-size: 1em;
+}
+
+.#{$prefix}frame-tl,
+.#{$prefix}frame-tr,
+.#{$prefix}frame-tc,
+.#{$prefix}frame-bl,
+.#{$prefix}frame-br,
+.#{$prefix}frame-bc {
+    overflow: hidden;
+    background-repeat: no-repeat;
+}
+
+.#{$prefix}frame-tc,
+.#{$prefix}frame-bc {
+    background-repeat: repeat-x;
+}
+
+.#{$prefix}frame-mc {
+    background-repeat: repeat-x;
+    overflow: hidden;
+}
+
+.#{$prefix}proxy-el {
+    position: absolute;
+    background: rgb(180, 180, 180);
+    @include opacity(0.8);
+}
+
+// Element shadows for browsers that support CSS3 box-shadow
+.#{$prefix}css-shadow {
+    position: absolute;
+    @include border-radius($css-shadow-border-radius);
+}
+
+.#{$prefix}item-disabled,
+.#{$prefix}item-disabled * {
+    cursor: default;
+}
+
+// TODO: remove outline from individual components that need it instead of resetting globally
+.#{$prefix}webkit {
+    * {
+        &:focus {
+            outline:none !important;
+        }
+    }
+}
+

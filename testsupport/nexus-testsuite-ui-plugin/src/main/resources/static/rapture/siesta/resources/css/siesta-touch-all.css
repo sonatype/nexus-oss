@@ -1,0 +1,334 @@
+/*
+
+Siesta 2.0.5
+Copyright(c) 2009-2013 Bryntum AB
+http://bryntum.com/contact
+http://bryntum.com/products/siesta/license
+
+*/
+.siesta-hidden {
+	position       : absolute;
+	left           : -10000px;
+	top            : -10000px;
+}.ghost-cursor {
+    position   : absolute;
+    width      : 19px;
+    height     : 22px;
+    left       : 0px;
+    top        : 0px;
+    z-index    : 1000001;
+    background : url(../images/cursor-hand.png) no-repeat left center;
+}
+
+.ghost-cursor-press {
+    background : url(../images/cursor-hand-press.png) no-repeat left center;
+}
+
+.ghost-cursor-message {
+    background                  : none repeat scroll 0 0 #FFFFFF;
+    border                      : 1px solid #CCCCCC;
+    color                       : #666666;
+    padding                     : 2px 4px;
+    position                    : absolute;
+    z-index                     : 101;
+    border-radius               : 5px;
+    box-shadow                  : 1px 1px 1px rgba(200, 200, 200, 0.1);
+    -webkit-transition-property : opacity, top;
+    -webkit-transition-duration : 2s;
+    -moz-transition-property    : opacity, top;
+    -moz-transition-duration    : 2s;
+    transition-property         : opacity, top;
+    transition-duration         : 2s;
+    opacity                     : 1;
+}
+
+.ghost-cursor-click-indicator {
+    position                    : absolute;
+    border-radius               : 100%;
+    margin-left                 : -3px;
+    margin-top                  : -3px;
+    -webkit-transition-property : opacity, width, height, margin-left, margin-top, visibility;
+    -webkit-transition-duration : 2.5s;
+    -moz-transition-property    : opacity, width, height, margin-left, margin-top, visibility;
+    -moz-transition-duration    : 2.5s;
+    transition-property         : opacity, width, height, margin-left, margin-top, visibility;
+    transition-duration         : 2.5s;
+    border                      : 2px solid darkred;
+    opacity                     : 0.7;
+    width                       : 7px;
+    height                      : 7px;
+    z-index                     : 101;
+}
+
+.ghost-cursor-click-indicator-big {
+    margin-left : -21px;
+    margin-top  : -21px;
+    height      : 50px;
+    width       : 50px;
+    opacity     : 0;
+    visibility  : hidden;
+}
+
+.x-ie .ghost-cursor {
+    z-index : -1;
+    display : none;
+}
+/*
+	Play icons from:
+	Author      :    Sekkyumu
+	HomePage    :    http://sekkyumu.deviantart.com/
+	License     :    Creative Commons Attribution 3.0 License
+*/
+
+.tr-iframe-wrapper {
+    position    : absolute;
+    width       : 100% !important;
+    height      : 100% !important;
+    left        : -10000px;
+    top         : -10000px;
+    
+    background-color    : white;
+}
+
+iframe.tr-iframe {
+	position    : absolute;
+    width       : 100% !important;
+    height      : 100% !important;
+}
+
+.tr-iframe-wrapper.active {
+    left        : 0px;
+    top         : 0px;
+    z-index     : 0;
+}
+
+.mainarea-panel, .tr-testgrid, .x-layout-card-item
+{
+    background:transparent !important;
+}
+
+
+/*=======================================================================================================================================================================================================================
+    Icons
+*/
+
+.tr-icon-run-failed .x-button-label {
+    background: transparent url(../images/PlayRed.png) no-repeat 0 -8px;
+    height:16px;
+}
+
+.tr-icon-run-all .x-button-label{
+    background: transparent url(../images/PlayAll.png) no-repeat 0 -8px;
+    height:16px;
+}
+
+.tr-icon-stop .x-button-label{
+    background: transparent url(../images/Stop.png) no-repeat 0 -8px;
+    height:16px;
+}
+
+/*=======================================================================================================================================================================================================================
+    Unsorted
+*/
+
+.launching
+{
+    background: url(../images/clock_48.png) no-repeat 5px center !important;
+    padding-left:60px;
+}
+
+#splashLoader {
+    background: url(../images/logo_small2.png) no-repeat center 25%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+}
+
+#loading {
+    color: #9EB2CD;
+    font-size: 120%;
+    position: absolute;
+    width: 170px;
+    left: 50%;
+    margin: 55% 0 0 -59px;
+}
+
+#loading .x-loading-spinner {
+    font-size: 160%;
+    margin: -27px 0 0 -45px;
+}
+
+.suite-bar .x-title
+{
+    opacity:0.5;
+}/*=======================================================================================================================================================================================================================
+    Row in tests grid - result cell
+*/
+
+.tr-folder-item {
+	background-color       : lightcyan;
+	font-weight            : bolder;
+}
+
+.tr-test-status {
+    background-position: 0px center;
+    background-repeat: no-repeat;
+    padding-left        : 25px;
+}
+
+.tr-test-status-empty {
+    background-image : url(../images/document_16.png) !important;
+}
+
+.tr-test-status-failed {
+    background-image : url(../images/bug.png) !important;
+}
+
+.tr-test-status-thrown {
+    background-image : url(../images/flag-red.png) !important;
+}
+
+.tr-test-status-working {
+    background-image : url(../images/hourglass.png) !important;
+}
+
+.tr-test-status-passed {
+    background-image : url(../images/ok.png) !important;
+}
+
+.tr-test-status-missing {
+    background-image : url(../images/cross.png) !important;
+}
+
+.tr-test-status-running {
+    background-image : url(../images/lightning.png) !important;
+}
+
+.tr-folder-green {
+    background-image : url(../images/folder_green.png) !important;
+}
+
+.tr-folder-yellow {
+    background-image : url(../images/folder_yellow.png) !important;
+}
+
+.tr-folder-red {
+    background-image : url(../images/folder_red.png) !important;
+}
+
+.tr-test-todo-pass
+{
+    color: green;    
+    font-weight:bold;
+}
+
+.tr-test-todo-fail
+{
+    color: #666;    
+}
+
+
+.tr-test-results {
+    height             : 1.7em;
+    position           : absolute;
+    right              : 2.14em;
+    bottom             : 0.44em;
+    text-align         : right;
+    line-height        : 1.7em;
+    margin-right    : 20px;
+}
+
+.tr-test-results-passed, .tr-test-results-failed
+{
+    overflow        : hidden;
+    float           : left;
+    padding-left    : 20px;
+}
+
+.tr-test-results
+{
+    margin-right    : 15px;
+}
+
+.tr-test-results-passed
+{
+    background : url(../images/ok.png) no-repeat left center;
+}
+
+.tr-test-results-failed
+{
+    margin-left     : 20px;
+    background      : url(../images/bug.png) no-repeat left center;
+}
+/*=======================================================================================================================================================================================================================
+    Assertion row - result cell
+*/
+
+
+.result-list .x-list-item-label
+{
+    min-height:0 !important;
+    padding:0 !important;
+}
+
+.siesta-initializing
+{
+    color:#777;    
+}
+
+
+.tr-assertion-row-failed {
+    background : #ff8186 url(../images/bug.png) no-repeat 10px center;
+    padding-left : 35px !important;
+}
+
+.tr-assertion-row-passed {
+    background : transparent url(../images/ok.png) no-repeat 10px center;
+    padding-left : 35px !important;
+}
+
+.tr-waiting-row-passed
+{
+    background : transparent url(../images/clock_check.png) no-repeat 10px center;
+    padding-left : 35px !important;
+}
+
+.tr-diagnostic-row
+{
+    background-color        : #d5e7f0;
+    border : 1px solid lightblue;
+}
+
+.tr-summary-row
+{
+    padding: 0.65em 0.8em;
+    background-color: #115788;
+    color:#fff;
+}
+
+.tr-summary-failure {
+    background-color        : #FF8186 !important;
+}
+
+.result-summary-button .passed-indicator,
+.result-summary-button .failed-indicator
+{
+    line-height:21px;
+    overflow:hidden;
+    float:left;
+    padding-left:25px;
+}
+
+
+.result-summary-button .passed-indicator
+{
+    background : url(../images/ok.png) no-repeat left center;
+}
+
+.result-summary-button .failed-indicator
+{
+    margin-left:15px;
+    background : url(../images/bug.png) no-repeat left center;
+}

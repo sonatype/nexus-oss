@@ -1,0 +1,6 @@
+// EXTJSIV-9714: The overflow:hidden on .x-layer can cause the editor to not display
+// correctly in IE quirks/6/7 in some cases in RTL mode.  The tagName is included in this
+//selector to ensure a higher specificity than ".x-layer"
+div.#{$prefix}editor {
+    overflow: visible;
+}

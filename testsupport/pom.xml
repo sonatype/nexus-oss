@@ -35,6 +35,8 @@
     <module>nexus-it-helper-plugin</module>
     <module>nexus-test-environment-maven-plugin</module>
     <module>nexus-test-harness-launcher</module>
+    <module>nexus-testsuite-ui-plugin</module>
+    <module>nexus-testsuite-ui-siesta</module>
   </modules>
 
   <dependencyManagement>

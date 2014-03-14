@@ -72,6 +72,8 @@ import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * This implementation wraps a Shiro SecurityManager, and adds user management.
  */
@@ -391,6 +393,25 @@ public class DefaultSecuritySystem
   public void deleteUser(String userId, String source)
       throws UserNotFoundException, NoSuchUserManagerException
   {
+    checkNotNull(userId, "User ID may not be null");
+
+    Subject subject = getSubject();
+    if (subject != null && subject.getPrincipal() != null && userId.equals(subject.getPrincipal().toString())) {
+      throw new IllegalArgumentException(
+          "The user with user ID [" + userId
+              + "] cannot be deleted, as that is the user currently logged into the application."
+      );
+    }
+
+    if (isAnonymousAccessEnabled() && userId.equals(getAnonymousUsername())) {
+      throw new IllegalArgumentException(
+          "The user with user ID [" + userId
+              + "] cannot be deleted, since it is marked user used for Anonymous access in Server Administration. "
+              + "To delete this user, disable anonymous access or, "
+              + "change the anonymous username and password to another valid values!"
+      );
+    }
+
     UserManager userManager = userManagerFacade.getUserManager(source);
     userManager.deleteUser(userId);
 

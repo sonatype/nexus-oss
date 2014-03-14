@@ -166,6 +166,14 @@
         <version>3.0.0-SNAPSHOT</version>
         <scope>import</scope>
       </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.buildsupport</groupId>
+        <artifactId>nexus-buildsupport-ui</artifactId>
+        <type>pom</type>
+        <version>3.0.0-SNAPSHOT</version>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

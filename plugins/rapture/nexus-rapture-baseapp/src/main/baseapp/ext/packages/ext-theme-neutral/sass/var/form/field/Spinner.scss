@@ -1,0 +1,16 @@
+/**
+ * @class Ext.form.field.Spinner
+ */
+
+/**
+ * @var {number}
+ * The height of the Spinner trigger buttons
+ */
+$spinner-btn-height: $form-field-height / 2 !default;
+
+/**
+ * @var {number}
+ * The height of the Spinner trigger buttons when the Spinner is used on a
+ * {@link Ext.toolbar.Toolbar Toolbar}
+ */
+$spinner-toolbar-btn-height: $form-toolbar-field-height / 2 !default;

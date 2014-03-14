@@ -1,0 +1,262 @@
+.#{$prefix}grid-body {
+    background: $grid-body-background-color;
+    border-width: $grid-body-border-width;
+    border-style: $grid-body-border-style;
+    border-color: $grid-body-border-color;
+}
+
+.#{$prefix}grid-empty {
+    padding: $grid-empty-padding;
+    color: $grid-empty-color;
+    background-color: $grid-empty-background-color;
+    font: $grid-empty-font-weight $grid-empty-font-size $grid-empty-font-family;
+}
+
+.#{$prefix}grid-cell {
+    @if $grid-row-cell-color {
+        color: $grid-row-cell-color;
+    }
+    font: $grid-row-cell-font;
+    background-color: $grid-row-cell-background-color;
+    border-color: $grid-row-cell-border-color;
+    border-style: $grid-row-cell-border-style;
+}
+
+.#{$prefix}grid-td {
+    .#{$prefix}grid-row-alt & {
+        background-color: $grid-row-cell-alt-background-color;
+    }
+
+    .#{$prefix}grid-row-before-over & {
+        border-bottom-style: $grid-row-cell-over-border-style;
+        border-bottom-color: $grid-row-cell-over-border-color;
+    }
+
+    .#{$prefix}grid-row-over & {
+        border-bottom-style: $grid-row-cell-over-border-style;
+        border-bottom-color: $grid-row-cell-over-border-color;
+    }
+
+    .#{$prefix}grid-row-before-selected & {
+        border-bottom-style: $grid-row-cell-selected-border-style;
+        border-bottom-color: $grid-row-cell-selected-border-color;
+    }
+
+    .#{$prefix}grid-row-selected & {
+        border-bottom-style: $grid-row-cell-selected-border-style;
+        border-bottom-color: $grid-row-cell-selected-border-color;
+    }
+
+    .#{$prefix}grid-row-before-focused & {
+        border-bottom-style: $grid-row-cell-focus-border-style;
+        border-bottom-color: $grid-row-cell-focus-border-color;
+        @if $grid-no-row-lines-show-focus-border {
+            border-bottom-width: $grid-row-cell-border-width
+        }
+    }
+
+    .#{$prefix}grid-row-focused & {
+        @if $grid-row-cell-focus-color != $grid-row-cell-color {
+            color: $grid-row-cell-focus-color;
+        }
+        background-color: $grid-row-cell-focus-background-color;
+    }
+
+    .#{$prefix}grid-row-over & {
+        @if $grid-row-cell-over-color != $grid-row-cell-color or
+            $grid-row-cell-over-color != $grid-row-cell-focus-color {
+            color: $grid-row-cell-over-color;
+        }
+        background-color: $grid-row-cell-over-background-color;
+    }
+
+    .#{$prefix}grid-row-selected & {
+        @if $grid-row-cell-selected-color != $grid-row-cell-color or
+            $grid-row-cell-selected-color != $grid-row-cell-focus-color or
+            $grid-row-cell-selected-color != $grid-row-cell-over-color {
+            color: $grid-row-cell-selected-color;
+        }
+        background-color: $grid-row-cell-selected-background-color;
+    }
+
+    .#{$prefix}grid-row-focused & {
+        border-bottom-style: $grid-row-cell-focus-border-style;
+        border-bottom-color: $grid-row-cell-focus-border-color;
+        @if $grid-no-row-lines-show-focus-border {
+            border-bottom-width: $grid-row-cell-border-width
+        }
+    }
+
+    @if $grid-no-row-lines-show-focus-border {
+        // use x-grid-table to increase specificity to equal the previous 2 rules.
+        .#{$prefix}grid-table .#{$prefix}grid-row-focused-first & {
+            border-top: $grid-row-cell-border-width $grid-row-cell-focus-border-style $grid-row-cell-focus-border-color;
+        }
+    } @else {
+        .#{$prefix}grid-with-row-lines .#{$prefix}grid-row-focused-first & {
+            border-top: $grid-row-cell-border-width $grid-row-cell-focus-border-style $grid-row-cell-focus-border-color;
+        }
+    }
+
+    // The two rules below ensure that summary rows which are embedded within
+    // selected/focused wrapped rows do not also get a visible border.
+    .#{$prefix}grid-row-selected .#{$prefix}grid-row-summary & {
+        border-bottom-color: $grid-row-cell-selected-background-color;
+        border-top-width: 0;
+    }
+
+    .#{$prefix}grid-row-focused .#{$prefix}grid-row-summary & {
+        border-bottom-color: $grid-row-cell-focus-background-color;
+        border-top-width: 0;
+    }
+}
+
+.#{$prefix}grid-with-row-lines {
+    .#{$prefix}grid-td {
+        border-bottom-width: $grid-row-cell-border-width;
+    }
+
+    // since the top border of each row is the bottom border of the row above, the top
+    // border of the first row goes on the table element.
+    .#{$prefix}grid-table {
+        border-top: $grid-row-cell-border-width solid $grid-row-cell-background-color;
+    }
+
+    .#{$prefix}grid-table-over-first {
+        border-top-style: $grid-row-cell-over-border-style;
+        border-top-color: $grid-row-cell-over-border-color;
+    }
+
+    .#{$prefix}grid-table-selected-first {
+        border-top-style: $grid-row-cell-selected-border-style;
+        border-top-color: $grid-row-cell-selected-border-color;
+    }
+}
+
+@if $grid-no-row-lines-show-focus-border {
+    // use grid-view class to increase specificity to match the previous rules for
+    // over/selected
+    .#{$prefix}grid-body .#{$prefix}grid-table-focused-first {
+        border-top: $grid-row-cell-border-width $grid-row-cell-focus-border-style $grid-row-cell-focus-border-color;
+    }
+} @else {
+    .#{$prefix}grid-with-row-lines .#{$prefix}grid-table-focused-first {
+        border-top-style: $grid-row-cell-focus-border-style;
+        border-top-color: $grid-row-cell-focus-border-color;
+    }
+}
+
+.#{$prefix}grid-cell-inner {
+    text-overflow: $grid-cell-inner-text-overflow;
+    padding: $grid-cell-inner-padding;
+}
+
+@if $include-rtl and (left($grid-cell-inner-padding) != right($grid-cell-inner-padding)) {
+    .#{$prefix}rtl.#{$prefix}grid-cell-inner {
+        padding: rtl($grid-cell-inner-padding);
+    }
+}
+
+@if $grid-no-row-lines-show-focus-border {
+    .#{$prefix}grid-no-row-lines {
+        .#{$prefix}grid-row-focused {
+            .#{$prefix}grid-cell-inner {
+                // when the grid has no row lines we need to subtract the border width from the 
+                // top and bottom padding when the row is focused so that the focus border does
+                // not increase the row height.
+                padding-top: top($grid-cell-inner-padding) - $grid-row-cell-border-width;
+                padding-bottom: bottom($grid-cell-inner-padding) - $grid-row-cell-border-width;
+            }
+        }
+    }
+}
+
+@if $include-ext-grid-column-rownumberer
+    or $include-ext-selection-checkboxmodel
+    or $include-ext-grid-plugin-rowexpander {
+    // .x-grid-cell-special is used by RowNumberer, CheckboxModel, and RowExpander
+    .#{$prefix}grid-cell-special {
+        @if $grid-cell-special-border-width != 0 {
+            border-color: $grid-cell-special-border-color;
+            border-style: $grid-cell-special-border-style;
+            border-right-width: $grid-cell-special-border-width;
+        }
+        @if not is-null($grid-cell-special-background-color) {
+            @if is-null($grid-cell-special-background-gradient) {
+                background-color: $grid-cell-special-background-color;
+            } @else {
+                @include background-gradient($grid-cell-special-background-color, $grid-cell-special-background-gradient);
+            }
+
+            .#{$prefix}grid-row-selected & {
+                @if not is-null($grid-cell-special-selected-border-color) {
+                    border-right-color: $grid-cell-special-selected-border-color;
+                }
+
+                @if not is-null($grid-row-cell-selected-background-color) {
+                    @if is-null($grid-cell-special-background-gradient) {
+                        background-color: $grid-row-cell-selected-background-color;
+                    } @else {
+                        @include background-gradient($grid-row-cell-selected-background-color, $grid-cell-special-background-gradient, left);
+                    }
+                }
+            }
+
+            @if $include-slicer-gradient {
+                .#{$prefix}nlg & {
+                    background-repeat: repeat-y;
+                    background-image: slicer-background-image(grid-cell-special, 'grid/cell-special-bg');
+                }
+
+                .#{$prefix}nlg .#{$prefix}grid-row-selected & {
+                    background-image: slicer-background-image(grid-cell-special-selected, 'grid/cell-special-selected-bg');
+                }
+                @include x-slicer(grid-cell-special);
+                @include x-slicer(grid-cell-special-selected);
+            }
+        }
+    }
+
+    @if $include-rtl and $grid-cell-special-border-width != 0 {
+        .#{$prefix}rtl.#{$prefix}grid-cell-special {
+            border-right-width: 0;
+            border-left-width: $grid-cell-special-border-width;
+        }
+    }
+}
+
+.#{$prefix}grid-dirty-cell {
+    background: theme-background-image('grid/dirty') no-repeat 0 0;
+}
+
+@if $include-rtl {
+    .#{$prefix}rtl.#{$prefix}grid-dirty-cell {
+        background-image: theme-background-image('grid/dirty-rtl');
+        background-position: right 0;
+    }
+}
+
+// add grid-row class to increase specificity over the state rules that set background-color
+// e.g. .x-grid-row-over .x-grid-td, .x-grid-row-focused .x-grid-td
+.#{$prefix}grid-row .#{$prefix}grid-cell-selected {
+    color: $grid-cell-selected-color;
+    background-color: $grid-cell-selected-background-color;
+}
+
+// Column lines on leading edge where there may be whitespace following
+.#{$prefix}grid-with-col-lines .#{$prefix}grid-cell {
+    border-right-width: $grid-row-cell-border-width;
+}
+
+// Column lines in RTL mode - leading edge is left.
+@if $include-rtl {
+    .#{$prefix}rtl.#{$prefix}grid-with-col-lines .#{$prefix}grid-cell {
+        border-right-width: 0;
+        border-left-width: $grid-row-cell-border-width;
+    }
+}
+
+.#{$prefix}grid-resize-marker {
+    width: $grid-row-cell-border-width;
+    background-color: $grid-resize-marker-background-color;
+}

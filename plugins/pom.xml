@@ -49,6 +49,7 @@
     <module>capabilities</module>
     <module>indexer</module>
     <module>internal</module>
+    <module>rapture</module>
     <module>maven</module>
     <module>osgi</module>
     <module>p2</module>
@@ -470,6 +471,56 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-plugin-console-plugin</artifactId>
+        <type>jar</type>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <!-- rapture -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-rapture-baseapp</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-rapture-plugin</artifactId>
+        <type>nexus-plugin</type>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-rapture-plugin</artifactId>
+        <type>jar</type>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-coreui-plugin</artifactId>
+        <type>nexus-plugin</type>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-coreui-plugin</artifactId>
+        <type>jar</type>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-extdirect-plugin</artifactId>
+        <type>nexus-plugin</type>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-extdirect-plugin</artifactId>
         <type>jar</type>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>

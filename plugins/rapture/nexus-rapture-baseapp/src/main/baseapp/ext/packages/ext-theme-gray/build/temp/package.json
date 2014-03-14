@@ -1,0 +1,11 @@
+{
+  "name": "ext-theme-gray",
+  "format": "1",
+  "version": "4.2.2",
+  "compatVersion": "4.2.0",
+  "creator": "Sencha",
+  "summary": "Ext JS Gray Theme",
+  "detailedDescription": "The Gray Theme extends the Classic Theme and shifts the color palette to shades of gray",
+  "type": "theme",
+  "extend": "ext-theme-classic"
+}

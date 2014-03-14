@@ -1,0 +1,27 @@
+// form items
+.#{$prefix}form-item {
+    vertical-align: top;
+    table-layout: fixed;
+}
+
+// Allow for positioned child elements, e.g. custom icons
+.#{$prefix}form-item-body {
+    position: relative;
+}
+
+@if $include-rtl {
+    // EXTJSIV-9100: in IE quirks in rtl mode relatively positioning a td element (the form-item-body)
+    // causes the td to display outside of the table.  This only happens when the table itself
+    // is absolutely positioned (e.g. hbox layout on a toolbar) To fix this we relatively
+    // position the tr element at right: 0;
+    .#{$prefix}rtl.#{$prefix}form-item .#{$prefix}form-item-input-row {
+        position: relative;
+        right: 0;
+    }
+}
+
+.#{$prefix}form-form-item {
+    td {
+        border-top: 1px solid transparent;
+    }
+}

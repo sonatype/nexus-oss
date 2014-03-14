@@ -1,0 +1,78 @@
+#*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2007-2013 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *#
+#set($raptureUrl="$baseUrl/static/rapture")
+#set($baseappMode="debug") ## or "prod"
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sonatype Nexus</title>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="description" content="Sonatype Nexus"/>
+
+  ## force browser to behave, IE=edge seems to have issues on IE 11 setting stylesheets (maybe other shit too)
+  <meta http-equiv="X-UA-Compatible" content="IE=9,chrome=1"/>
+
+  <link rel="icon" type="image/png" href="$raptureUrl/resources/favicon.png"/>
+  <!--[if IE]>
+  <link rel="SHORTCUT ICON" href="$raptureUrl/resources/favicon.ico"/>
+  <![endif]-->
+
+  #macro(style $src)
+    <link rel="stylesheet" type="text/css" href="$src">
+  #end
+
+  #style("$raptureUrl/resources/baseapp-${baseappMode}.css")
+  #style("$raptureUrl/resources/rapture.css")
+  #style("$raptureUrl/resources/loading.css")
+</head>
+<body class="x-border-box">
+
+<div id="loading-mask"></div>
+<div id="loading">
+  <div class="loading-indicator">
+    <img id="loading-image" src="$raptureUrl/resources/images/loading.jpg"/>
+    <br/>
+    <div style="text-align: center;">
+      <img id="loading-spinner" src="$raptureUrl/resources/images/loading-spinner.gif"/>
+      <span id="loading-msg">Loading...</span>
+    </div>
+  </div>
+  <div id="code-load" class="x-hide-display">
+    #macro(message $text)
+      <script type="text/javascript">document.getElementById('loading-msg').innerHTML = '$text';</script>
+    #end
+    #macro(script $src)
+      <script type="text/javascript" src="$src"></script>
+    #end
+
+    ## Load core application first
+    #message("Loading baseapp...")
+    #script("$raptureUrl/baseapp-${baseappMode}.js")
+
+    ## Then load extensions and the main application
+    #message("Initializing...")
+    #script("$raptureUrl/extdirect-${baseappMode}.js")
+    #script("$raptureUrl/app.js")
+  </div>
+</div>
+
+## Fields required for history management
+<form id="history-form" class="x-hide-display">
+  <input type="hidden" id="x-history-field"/>
+  <iframe id="x-history-frame"></iframe>
+</form>
+
+</body>
+</html>

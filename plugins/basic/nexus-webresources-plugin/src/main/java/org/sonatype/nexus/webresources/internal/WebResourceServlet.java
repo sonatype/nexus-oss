@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.web.ErrorStatusException;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.WebResource;
 import org.sonatype.nexus.web.WebResource.Prepareable;
 import org.sonatype.nexus.web.WebUtils;
@@ -78,10 +78,22 @@ public class WebResourceServlet
     if ("".equals(path) || "/".equals(path)) {
       path = "/index.html";
     }
+    else if (path.endsWith("/")) {
+      path += "index.html";
+    }
 
     WebResource resource = webResources.getResource(path);
     if (resource == null) {
-      throw new ErrorStatusException(SC_NOT_FOUND, "Not Found", "Resource not found");
+      // if there is an index.html for the requested path, redirect to it
+      if (webResources.getResource(path + "/index.html") != null) {
+        String location = String.format("%s%s/", BaseUrlHolder.get(), path);
+        log.debug("Redirecting: {} -> {}", path, location);
+        response.sendRedirect(location);
+      }
+      else {
+        response.sendError(SC_NOT_FOUND);
+      }
+      return;
     }
 
     serveResource(resource, request, response);

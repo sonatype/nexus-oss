@@ -1,0 +1,1006 @@
+/**
+ * Creates a visual theme for a Tab Bar
+ *
+ * @param {string} $ui
+ * The name of the UI being created. Can not included spaces or special punctuation
+ * (used in CSS class names).
+ *
+ * @param {number} [$ui-strip-height=$tabbar-strip-height]
+ * The height of the Tab Bar strip
+ *
+ * @param {number/list} [$ui-strip-border-width=$tabbar-strip-border-width]
+ * The border-width of the Tab Bar strip
+ *
+ * @param {number/list} [$ui-strip-plain-border-width=$tabbar-strip-plain-border-width]
+ * The border-width of the {@link Ext.tab.Panel#plain plain} Tab Bar strip
+ *
+ * @param {color} [$ui-strip-border-color=$tabbar-strip-border-color]
+ * The border-color of the Tab Bar strip
+ *
+ * @param {color} [$ui-strip-background-color=$tabbar-strip-background-color]
+ * The background-color of the Tab Bar strip
+ *
+ * @param {number/list} [$ui-border-width=$tabbar-border-width]
+ * The border-width of the Tab Bar
+ *
+ * @param {color} [$ui-border-color=$tabbar-border-color]
+ * The border-color of the Tab Bar
+ *
+ * @param {number/list} [$ui-padding=$tabbar-padding]
+ * The padding of the Tab Bar
+ *
+ * @param {color} [$ui-background-color=$tabbar-background-color]
+ * The background color of the  Tab Bar
+ *
+ * @param {string/list} [$ui-background-gradient=$tabbar-background-gradient]
+ * The background-gradient of the Tab Bar. Can be either the name of a predefined gradient
+ * or a list of color stops. Used as the `$type` parameter for 
+ * {@link Global_CSS#background-gradient}.
+ *
+ * @param {number} [$ui-scroller-width=$tabbar-scroller-width]
+ * The width of the Tab Bar scrollers
+ *
+ * @param {string} [$ui-scroller-cursor=$tabbar-scroller-cursor]
+ * The cursor of the Tab Bar scrollers
+ *
+ * @param {string} [$ui-scroller-cursor-disabled=$tabbar-scroller-cursor-disabled]
+ * The cursor of disabled Tab Bar scrollers
+ *
+ * @param {number} [$ui-scroller-opacity=$tabbar-scroller-opacity]
+ * The opacity of Tab Bar scrollers
+ *
+ * @param {number} [$ui-scroller-opacity-over=$tabbar-scroller-opacity-over]
+ * The opacity of hovered Tab Bar scrollers
+ *
+ * @param {number} [$ui-scroller-opacity-pressed=$tabbar-scroller-opacity-pressed]
+ * The opacity of pressed Tab Bar scrollers
+ *
+ * @param {number} [$ui-scroller-opacity-disabled=$tabbar-scroller-opacity-disabled]
+ * The opacity of disabled Tab Bar scrollers
+ *
+ * @param {number} [$ui-tab-height]
+ * The height of tabs that will be used in this tabbar UI. The tabbar body is given
+ * a fixed height to leave room for the tabs, and so that the tabbar does not collapse
+ * when it does not contain any tabs.
+ *
+ * @member Ext.tab.Bar
+ */ 
+@mixin extjs-tab-bar-ui(
+    $ui,
+    
+    $ui-strip-height: $tabbar-strip-height,
+    $ui-strip-border-width: $tabbar-strip-border-width,
+    $ui-strip-plain-border-width: $tabbar-strip-plain-border-width,
+    $ui-strip-border-color: $tabbar-strip-border-color,
+    $ui-strip-background-color: $tabbar-strip-background-color,
+
+    $ui-border-width: $tabbar-border-width,
+    $ui-border-color: $tabbar-border-color,
+    $ui-padding: $tabbar-padding,
+    $ui-background-color: $tabbar-base-color,
+    $ui-background-gradient: $tabbar-background-gradient,
+    $ui-scroller-width: $tabbar-scroller-width,
+
+    $ui-scroller-cursor: $tabbar-scroller-cursor,
+    $ui-scroller-cursor-disabled: $tabbar-scroller-cursor-disabled,
+    $ui-scroller-opacity: $tabbar-scroller-opacity,
+    $ui-scroller-opacity-over: $tabbar-scroller-opacity-over,
+    $ui-scroller-opacity-pressed: $tabbar-scroller-opacity-pressed,
+    $ui-scroller-opacity-disabled: $tabbar-scroller-opacity-disabled,
+    $ui-tab-height: $tab-line-height + vertical($tab-text-padding) + 
+        vertical($tab-padding) + $tab-border-width
+) {
+    // Tab Bar
+    .#{$prefix}tab-bar-#{$ui} {
+        @if $ui-border-width != 0 {
+            border-style: solid;
+            border-color: $ui-border-color;
+        }
+    }
+    .#{$prefix}tab-bar-#{$ui}-top {
+        padding: $ui-padding;
+        @if $ui-border-width != 0 {
+            border-width: $ui-border-width;
+        }
+    }
+
+    .#{$prefix}tab-bar-#{$ui}-bottom {
+        padding: flip-vertical($ui-padding);
+        @if $ui-border-width != 0 {
+            border-width: flip-vertical($ui-border-width);
+        }
+    }
+
+    .#{$prefix}tab-bar-#{$ui}-left {
+        padding: rotate270($ui-padding);
+        @if $ui-border-width != 0 {
+            border-width: rotate270($ui-border-width);
+        }
+    }
+
+    @if $include-rtl {
+        .#{$prefix}rtl.#{$prefix}tab-bar-#{$ui}-left {
+            padding: rtl(rotate270($ui-padding));
+            @if $ui-border-width != 0 {
+                border-width: rtl(rotate270($ui-border-width));
+            }
+        }
+    }
+
+    .#{$prefix}tab-bar-#{$ui}-right {
+        padding: rotate90($ui-padding);
+        @if $ui-border-width != 0 {
+            border-width: rotate90($ui-border-width);
+        }
+    }
+
+    @if $include-rtl {
+        .#{$prefix}rtl.#{$prefix}tab-bar-#{$ui}-right {
+            padding: rtl(rotate90($ui-padding));
+            @if $ui-border-width != 0 {
+                border-width: rtl(rotate90($ui-border-width));
+            }
+        }
+    }
+
+    $ui-height: $ui-tab-height + $ui-strip-height + vertical($ui-padding) + vertical($ui-border-width);
+    $ui-content-height: $ui-tab-height + $ui-strip-height;
+    // horizontal tabbars need a fixed height so that they doesn't lose height when all tabs are closed
+    .#{$prefix}tab-bar-#{$ui}-horizontal {
+        height: $ui-height;
+
+        @if $include-content-box {
+            .#{$prefix}content-box & {
+                height: $ui-content-height;
+            }
+        }
+    }
+
+    // vertical tabbars need a fixed width so that they doesn't expand to fill their container
+    // when rendered ouside of a tabpanel
+    .#{$prefix}tab-bar-#{$ui}-vertical {
+        width: $ui-height;
+
+        @if $include-content-box {
+            .#{$prefix}content-box & {
+                width: $ui-content-height;
+            }
+        }
+    }
+
+    $strip-size: max($ui-strip-height - vertical($ui-strip-border-width), 0);
+    .#{$prefix}tab-bar-body-#{$ui}-top {
+        padding-bottom: $strip-size;
+    }
+
+    .#{$prefix}tab-bar-body-#{$ui}-bottom {
+        padding-top: $strip-size;
+    }
+
+    .#{$prefix}tab-bar-body-#{$ui}-left {
+        padding-right: $strip-size;
+    }
+
+    @if $include-rtl {
+        .#{$prefix}rtl.#{$prefix}tab-bar-body-#{$ui}-left {
+            padding-right: 0;
+            padding-left: $strip-size;
+        }
+    }
+
+    .#{$prefix}tab-bar-body-#{$ui}-right {
+        padding-left: $strip-size;
+    }
+
+    @if $include-rtl {
+        .#{$prefix}rtl.#{$prefix}tab-bar-body-#{$ui}-right {
+            padding-left: 0;
+            padding-right: $strip-size;
+        }
+    }
+
+    .#{$prefix}tab-bar-strip-#{$ui} {
+        border-style: solid;
+        border-color: $ui-strip-border-color;
+        background-color: $ui-strip-background-color;
+    }
+
+    @if $include-content-box {
+        .#{$prefix}tab-bar-strip-#{$ui}-horizontal {
+            .#{$prefix}content-box & {
+                height: $ui-strip-height - vertical($ui-strip-border-width);
+            }
+        }
+    }
+
+    @if $include-content-box {
+        .#{$prefix}tab-bar-strip-#{$ui}-vertical {
+            .#{$prefix}content-box & {
+                width: $ui-strip-height - vertical($ui-strip-border-width);
+            }
+        }
+    }
+
+    .#{$prefix}tab-bar-strip-#{$ui}-top {
+        border-width: $ui-strip-border-width;
+        height: $ui-strip-height;
+        .#{$prefix}tab-bar-plain & {
+            border-width: $ui-strip-plain-border-width;
+        }
+    }
+
+    .#{$prefix}tab-bar-strip-#{$ui}-bottom {
+        border-width: flip-vertical($ui-strip-border-width);
+        height: $ui-strip-height;
+        .#{$prefix}tab-bar-plain & {
+            border-width: flip-vertical($ui-strip-plain-border-width);
+        }
+    }
+
+    .#{$prefix}tab-bar-strip-#{$ui}-left {
+        border-width: rotate270($ui-strip-border-width);
+        width: $ui-strip-height;
+        .#{$prefix}tab-bar-plain & {
+            border-width: rotate270($ui-strip-plain-border-width);
+        }
+    }
+
+    @if $include-rtl {
+        .#{$prefix}rtl.#{$prefix}tab-bar-strip-#{$ui}-left {
+            border-width: rtl(rotate270($ui-strip-border-width));
+            .#{$prefix}tab-bar-plain & {
+                border-width: rtl(rotate270($ui-strip-plain-border-width));
+            }
+        }
+    }
+
+    .#{$prefix}tab-bar-strip-#{$ui}-right {
+        border-width: rotate90($ui-strip-border-width);
+        width: $ui-strip-height;
+        .#{$prefix}tab-bar-plain & {
+            border-width: rotate90($ui-strip-plain-border-width);
+        }
+    }
+
+    @if $include-rtl {
+        .#{$prefix}rtl.#{$prefix}tab-bar-strip-#{$ui}-right {
+            border-width: rtl(rotate90($ui-strip-border-width));
+            .#{$prefix}tab-bar-plain & {
+                border-width: rtl(rotate90($ui-strip-plain-border-width));
+            }
+        }
+    }
+
+    .#{$prefix}tab-bar-#{$ui} {
+        background-color: $ui-background-color;
+    }
+
+    @if not is-null($ui-background-gradient) {
+        .#{$prefix}tab-bar-#{$ui}-top {
+            @include background-gradient($ui-background-color, $ui-background-gradient, top);
+
+            @if $include-slicer-gradient {
+                .#{$prefix}nlg & {
+                    background: slicer-background-image(tab-bar-#{$ui}-top, 'tab-bar/tab-bar-#{$ui}-top-bg');
+                }
+            }
+        }
+
+        .#{$prefix}tab-bar-#{$ui}-bottom {
+            @include background-gradient($ui-background-color, $ui-background-gradient, bottom);
+
+            @if $include-slicer-gradient {
+                .#{$prefix}nlg & {
+                    background: slicer-background-image(tab-bar-#{$ui}-bottom, 'tab-bar/tab-bar-#{$ui}-bottom-bg') bottom 0;
+                }
+            }
+        }
+
+        .#{$prefix}tab-bar-#{$ui}-left {
+            @include background-gradient($ui-background-color, $ui-background-gradient, left);
+
+            @if $include-slicer-gradient {
+                .#{$prefix}nlg & {
+                    background: slicer-background-image(tab-bar-#{$ui}-left, 'tab-bar/tab-bar-#{$ui}-left-bg');
+                }
+            }
+        }
+
+        .#{$prefix}tab-bar-#{$ui}-right {
+            @include background-gradient($ui-background-color, $ui-background-gradient, right);
+
+            @if $include-slicer-gradient {
+                .#{$prefix}nlg & {
+                    background: slicer-background-image(tab-bar-#{$ui}-right, 'tab-bar/tab-bar-#{$ui}-right-bg') 0 right;
+                }
+            }
+        }
+    }
+
+    $needs-transparency-fix: (($ui-scroller-opacity != 1 or $ui-scroller-opacity-over != 1 or
+        $ui-scroller-opacity-pressed != 1) and is-null($ui-background-gradient));
+    .#{$prefix}tab-bar-#{$ui} {
+        .#{$prefix}box-scroller {
+            cursor: $ui-scroller-cursor;
+            @if $ui-scroller-opacity != 1 {
+                @include opacity($ui-scroller-opacity);
+            }
+            @if $needs-transparency-fix {
+                // EXTJSIV-8846: partially transparent png images do not display correctly
+                // in winXP/IE8m when the image element has a transparent background.
+                // to fix this, we give the element the same background-color as the tabbar.
+                background-color: $ui-background-color;
+            }
+        }
+
+        @if $needs-transparency-fix {
+            // plain tabbars have transparent backgrounds, so we use a white bg to overcome
+            // the png transparency issues. See EXTJSIV-8846
+            .#{$prefix}box-scroller-plain .#{$prefix}box-scroller {
+                background-color: transparent;
+                @if $include-ie {
+                    .#{$prefix}ie8m & {
+                        background-color: #fff;
+                    }
+                }
+            }
+        }
+
+        @if $ui-scroller-opacity-over != 1 {
+            .#{$prefix}box-scroller-hover {
+                @include opacity($ui-scroller-opacity-over);
+            }
+        }
+
+        @if $ui-scroller-opacity-pressed != 1 {
+            .#{$prefix}box-scroller-pressed {
+                @include opacity($ui-scroller-opacity-pressed);
+            }
+        }
+
+        $scroller-width: $ui-scroller-width;
+        $scroller-height: $ui-tab-height;
+
+        .#{$prefix}tabbar-scroll-left,
+        .#{$prefix}tabbar-scroll-right {
+            height: $scroller-height;
+            width: $scroller-width;
+        }
+
+        .#{$prefix}tabbar-scroll-top,
+        .#{$prefix}tabbar-scroll-bottom {
+            width: $scroller-height;
+            height: $scroller-width;
+        }
+        
+    }
+
+    .#{$prefix}box-scroller {
+        .#{$prefix}tab-bar-#{$ui}-bottom & {
+            margin-top: top($ui-strip-border-width);
+        }
+
+        .#{$prefix}tab-bar-#{$ui}-right & {
+            margin-left: top($ui-strip-border-width);
+        }
+        
+        @if $include-rtl {
+            .#{$prefix}rtl.#{$prefix}tab-bar-#{$ui}-right & {
+                margin-left: 0;
+                margin-right: top($ui-strip-border-width);
+            }
+        }
+    }
+
+    @if $tabbar-scroller-symmetrical-icons {
+        .#{$prefix}tab-bar-#{$ui} {
+            .#{$prefix}tabbar-scroll-left {
+                background-image: theme-background-image('tab-bar/#{$ui}-scroll-left');
+            }
+
+            .#{$prefix}tabbar-scroll-right {
+                background-image: theme-background-image('tab-bar/#{$ui}-scroll-right');
+            }
+
+            .#{$prefix}tabbar-scroll-top {
+                background-image: theme-background-image('tab-bar/#{$ui}-scroll-top');
+            }
+
+            .#{$prefix}tabbar-scroll-bottom {
+                background-image: theme-background-image('tab-bar/#{$ui}-scroll-bottom');
+            }
+        }
+
+        @if $include-rtl {
+            .#{$prefix}rtl.#{$prefix}tab-bar-#{$ui} {
+                .#{$prefix}tabbar-scroll-left {
+                    background-image: theme-background-image('tab-bar/#{$ui}-scroll-right');
+                }
+                .#{$prefix}tabbar-scroll-right {
+                    background-image: theme-background-image('tab-bar/#{$ui}-scroll-left');
+                }
+            }
+        }
+
+        @if $tabbar-scroller-include-plain-icon {
+            .#{$prefix}tab-bar-#{$ui} .#{$prefix}box-scroller-plain {
+                .#{$prefix}tabbar-scroll-left {
+                    background-image: theme-background-image('tab-bar/#{$ui}-plain-scroll-left');
+                }
+
+                .#{$prefix}tabbar-scroll-right {
+                    background-image: theme-background-image('tab-bar/#{$ui}-plain-scroll-right');
+                }
+
+                .#{$prefix}tabbar-scroll-top {
+                    background-image: theme-background-image('tab-bar/#{$ui}-plain-scroll-top');
+                }
+
+                .#{$prefix}tabbar-scroll-bottom {
+                    background-image: theme-background-image('tab-bar/#{$ui}-plain-scroll-bottom');
+                }
+            }
+
+            @if $include-rtl {
+                .#{$prefix}rtl.#{$prefix}tab-bar-#{$ui} .#{$prefix}box-scroller-plain {
+                    .#{$prefix}tabbar-scroll-left {
+                        background-image: theme-background-image('tab-bar/#{$ui}-plain-scroll-right');
+                    }
+
+                    .#{$prefix}tabbar-scroll-right {
+                        background-image: theme-background-image('tab-bar/#{$ui}-plain-scroll-left');
+                    }
+                }
+            }
+        }
+    } @else {
+        .#{$prefix}tab-bar-#{$ui}-top {
+            .#{$prefix}tabbar-scroll-left {
+                background-image: theme-background-image('tab-bar/#{$ui}-scroll-left-top');
+            }
+            .#{$prefix}tabbar-scroll-right {
+                background-image: theme-background-image('tab-bar/#{$ui}-scroll-right-top');
+            }
+        }
+
+        @if $include-rtl {
+            .#{$prefix}rtl.#{$prefix}tab-bar-#{$ui}-top {
+                .#{$prefix}tabbar-scroll-left {
+                    background-image: theme-background-image('tab-bar/#{$ui}-scroll-right-top');
+                }
+                .#{$prefix}tabbar-scroll-right {
+                    background-image: theme-background-image('tab-bar/#{$ui}-scroll-left-top');
+                }
+            }
+        }
+
+        .#{$prefix}tab-bar-#{$ui}-bottom {
+            .#{$prefix}tabbar-scroll-left {
+                background-image: theme-background-image('tab-bar/#{$ui}-scroll-left-bottom');
+            }
+            .#{$prefix}tabbar-scroll-right {
+                background-image: theme-background-image('tab-bar/#{$ui}-scroll-right-bottom');
+            }
+        }
+
+        @if $include-rtl {
+            .#{$prefix}rtl.#{$prefix}tab-bar-#{$ui}-bottom {
+                .#{$prefix}tabbar-scroll-left {
+                    background-image: theme-background-image('tab-bar/#{$ui}-scroll-right-bottom');
+                }
+                .#{$prefix}tabbar-scroll-right {
+                    background-image: theme-background-image('tab-bar/#{$ui}-scroll-left-bottom');
+                }
+            }
+        }
+
+        .#{$prefix}tab-bar-#{$ui}-left {
+            .#{$prefix}tabbar-scroll-top {
+                background-image: theme-background-image('tab-bar/#{$ui}-scroll-top-left');
+            }
+            .#{$prefix}tabbar-scroll-bottom {
+                background-image: theme-background-image('tab-bar/#{$ui}-scroll-bottom-left');
+            }
+        }
+
+        @if $include-rtl {
+            .#{$prefix}rtl.#{$prefix}tab-bar-#{$ui}-left {
+                .#{$prefix}tabbar-scroll-top {
+                    background-image: theme-background-image('tab-bar/#{$ui}-scroll-top-right');
+                }
+                .#{$prefix}tabbar-scroll-bottom {
+                    background-image: theme-background-image('tab-bar/#{$ui}-scroll-bottom-right');
+                }
+            }
+        }
+
+        .#{$prefix}tab-bar-#{$ui}-right {
+            .#{$prefix}tabbar-scroll-top {
+                background-image: theme-background-image('tab-bar/#{$ui}-scroll-top-right');
+            }
+            .#{$prefix}tabbar-scroll-bottom {
+                background-image: theme-background-image('tab-bar/#{$ui}-scroll-bottom-right');
+            }
+        }
+
+        @if $include-rtl {
+            .#{$prefix}rtl.#{$prefix}tab-bar-#{$ui}-right {
+                .#{$prefix}tabbar-scroll-top {
+                    background-image: theme-background-image('tab-bar/#{$ui}-scroll-top-left');
+                }
+                .#{$prefix}tabbar-scroll-bottom {
+                    background-image: theme-background-image('tab-bar/#{$ui}-scroll-bottom-left');
+                }
+            }
+        }
+    }
+            
+    .#{$prefix}tab-bar-#{$ui} {
+        @if $tabbar-scroller-include-hover-background-position {
+            .#{$prefix}tabbar-scroll-left-hover,
+            .#{$prefix}tabbar-scroll-right-hover {
+                background-position: -$ui-scroller-width 0;
+            }
+
+            .#{$prefix}tabbar-scroll-top-hover,
+            .#{$prefix}tabbar-scroll-bottom-hover {
+                background-position: 0 (-$ui-scroller-width);
+            }
+        }
+
+        .#{$prefix}box-scroller-disabled {
+            @if $ui-scroller-opacity-disabled != 1 {
+                @include opacity($ui-scroller-opacity-disabled);
+            }
+            @if not is-null($ui-scroller-cursor-disabled) {
+                cursor: $ui-scroller-cursor-disabled;
+            }
+        }
+    }
+
+    // TODO: change these calls to pass "none" as the stretch direction once
+    // SDKTOOLS-439 is implemented
+    $stretch: slicer-background-stretch(tab-bar-#{$ui}-top, bottom);
+    $stretch: slicer-background-stretch(tab-bar-#{$ui}-bottom, top);
+    $stretch: slicer-background-stretch(tab-bar-#{$ui}-left, right);
+    $stretch: slicer-background-stretch(tab-bar-#{$ui}-right, left);
+
+    @include x-slicer(tab-bar-#{$ui}-top);
+    @include x-slicer(tab-bar-#{$ui}-bottom);
+    @include x-slicer(tab-bar-#{$ui}-left);
+    @include x-slicer(tab-bar-#{$ui}-right);
+}
+
+/**
+ * Creates a visual theme for a Tab Panel
+ *
+ * @param {string} $ui
+ * The name of the UI being created. Can not included spaces or special punctuation
+ * (used in CSS class names).
+ *
+ * @param {color} [$ui-tab-background-color=$tab-base-color]
+ * The background-color of Tabs
+ *
+ * @param {color} [$ui-tab-background-color-over=$tab-base-color-over]
+ * The background-color of hovered Tabs
+ *
+ * @param {color} [$ui-tab-background-color-active=$tab-base-color-active]
+ * The background-color of the active Tab
+ *
+ * @param {color} [$ui-tab-background-color-disabled=$tab-base-color-disabled]
+ * The background-color of disabled Tabs
+ *
+ * @param {list} [$ui-tab-border-radius=$tab-border-radius]
+ * The border-radius of Tabs
+ *
+ * @param {number} [$ui-tab-border-width=$tab-border-width]
+ * The border-width of Tabs
+ *
+ * @param {number/list} [$ui-tab-margin=$tab-margin]
+ * The border-width of Tabs
+ *
+ * @param {number/list} [$ui-tab-padding=$tab-padding]
+ * The padding of Tabs
+ *
+ * @param {number/list} [$ui-tab-text-padding=$tab-text-padding]
+ * The padding of the Tab's text element
+ *
+ * @param {color} [$ui-tab-border-color=$tab-border-color]
+ * The border-color of Tabs
+ *
+ * @param {color} [$ui-tab-border-color-over=$tab-border-color-over]
+ * The border-color of hovered Tabs
+ *
+ * @param {color} [$ui-tab-border-color-active=$tab-border-color-active]
+ * The border-color of the active Tab
+ *
+ * @param {color} [$ui-tab-border-color-disabled=$tab-border-color-disabled]
+ * The border-color of disabled Tabs
+ *
+ * @param {string} [$ui-tab-cursor=$tab-cursor]
+ * The Tab cursor
+ *
+ * @param {string} [$ui-tab-cursor-disabled=$tab-cursor-disabled]
+ * The cursor of disabled Tabs
+ *
+ * @param {number} [$ui-tab-font-size=$tab-font-size]
+ * The font-size of Tabs
+ *
+ * @param {number} [$ui-tab-font-size-over=$tab-font-size-over]
+ * The font-size of hovered Tabs
+ *
+ * @param {number} [$ui-tab-font-size-active=$tab-font-size-active]
+ * The font-size of the active Tab
+ *
+ * @param {number} [$ui-tab-font-size-disabled=$tab-font-size-disabled]
+ * The font-size of disabled Tabs
+ *
+ * @param {string} [$ui-tab-font-weight=$tab-font-weight]
+ * The font-weight of Tabs
+ *
+ * @param {string} [$ui-tab-font-weight-over=$tab-font-weight-over]
+ * The font-weight of hovered Tabs
+ *
+ * @param {string} [$ui-tab-font-weight-active=$tab-font-weight-active]
+ * The font-weight of the active Tab
+ *
+ * @param {string} [$ui-tab-font-weight-disabled=$tab-font-weight-disabled]
+ * The font-weight of disabled Tabs
+ *
+ * @param {string} [$ui-tab-font-family=$tab-font-family]
+ * The font-family of Tabs
+ *
+ * @param {string} [$ui-tab-font-family-over=$tab-font-family-over]
+ * The font-family of hovered Tabs
+ *
+ * @param {string} [$ui-tab-font-family-active=$tab-font-family-active]
+ * The font-family of the active Tab
+ *
+ * @param {string} [$ui-tab-font-family-disabled=$tab-font-family-disabled]
+ * The font-family of disabled Tabs
+ *
+ * @param {number} [$ui-tab-line-height=$tab-line-height]
+ * The line-height of Tabs
+ *
+ * @param {color} [$ui-tab-color=$tab-color]
+ * The text color of Tabs
+ *
+ * @param {color} [$ui-tab-color-over=$tab-color-over]
+ * The text color of hovered Tabs
+ *
+ * @param {color} [$ui-tab-color-active=$tab-color-active]
+ * The text color of the active Tab
+ *
+ * @param {color} [$ui-tab-color-disabled=$tab-color-disabled]
+ * The text color of disabled Tabs
+ *
+ * @param {string/list} [$ui-tab-background-gradient=$tab-background-gradient]
+ * The background-gradient for Tabs. Can be either the name of a predefined gradient
+ * or a list of color stops. Used as the `$type` parameter for 
+ * {@link Global_CSS#background-gradient}.
+ *
+ * @param {string/list} [$ui-tab-background-gradient-over=$tab-background-gradient-over]
+ * The background-gradient for hovered Tabs. Can be either the name of a predefined gradient
+ * or a list of color stops. Used as the `$type` parameter for 
+ * {@link Global_CSS#background-gradient}.
+ *
+ * @param {string/list} [$ui-tab-background-gradient-active=$tab-background-gradient-active]
+ * The background-gradient for the active Tab. Can be either the name of a predefined gradient
+ * or a list of color stops. Used as the `$type` parameter for 
+ * {@link Global_CSS#background-gradient}.
+ *
+ * @param {string/list} [$ui-tab-background-gradient-disabled=$tab-background-gradient-disabled]
+ * The background-gradient for disabled Tabs. Can be either the name of a predefined gradient
+ * or a list of color stops. Used as the `$type` parameter for 
+ * {@link Global_CSS#background-gradient}.
+ *
+ * @param {number} [$ui-tab-inner-border-width=$tab-inner-border-width]
+ * The inner border-width of Tabs
+ *
+ * @param {color} [$ui-tab-inner-border-color=$tab-inner-border-color]
+ * The inner border-color of Tabs
+ *
+ * @param {number} [$ui-tab-icon-width=$tab-icon-width]
+ * The width of the Tab close icon
+ *
+ * @param {number} [$ui-tab-icon-height=$tab-icon-height]
+ * The height of the Tab close icon
+ *
+ * @param {number} [$ui-tab-icon-spacing=$tab-icon-spacing]
+ * the space in between the text and the close button
+ *
+ * @param {list} [$ui-tab-icon-background-position=$tab-icon-background-position]
+ * The background-position of Tab icons
+ *
+ * @param {color} [$ui-tab-glyph-color=$tab-glyph-color]
+ * The color of Tab glyph icons
+ *
+ * @param {color} [$ui-tab-glyph-color-over=$tab-glyph-color-over]
+ * The color of a Tab glyph icon when the Tab is hovered
+ *
+ * @param {color} [$ui-tab-glyph-color-active=$tab-glyph-color-active]
+ * The color of a Tab glyph icon when the Tab is active
+ *
+ * @param {color} [$ui-tab-glyph-color-disabled=$tab-glyph-color-disabled]
+ * The color of a Tab glyph icon when the Tab is disabled
+ *
+ * @param {number} [$ui-tab-glyph-opacity=$tab-glyph-opacity]
+ * The opacity of a Tab glyph icon
+ *
+ * @param {number} [$ui-tab-glyph-opacity-disabled=$tab-glyph-opacity-disabled]
+ * The opacity of a Tab glyph icon when the Tab is disabled
+ *
+ * @param {number} [$ui-tab-opacity-disabled=$tab-opacity-disabled]
+ * opacity to apply to the tab's main element when the tab is disabled
+ *
+ * @param {number} [$ui-tab-text-opacity-disabled=$tab-text-opacity-disabled]
+ * opacity to apply to the tab's text element when the tab is disabled
+ *
+ * @param {number} [$ui-tab-icon-opacity-disabled=$tab-icon-opacity-disabled]
+ * opacity to apply to the tab's icon element when the tab is disabled
+ *
+ * @param {number} [$ui-strip-height=$tabbar-strip-height]
+ * The height of the Tab Bar strip
+ *
+ * @param {number/list} [$ui-strip-border-width=$tabbar-strip-border-width]
+ * The border-width of the Tab Bar strip
+ *
+ * @param {number/list} [$ui-strip-plain-border-width=$tabbar-strip-plain-border-width]
+ * The border-width of the {@link Ext.tab.Panel#plain plain} Tab Bar strip
+ *
+ * @param {color} [$ui-strip-border-color=$tabbar-strip-border-color]
+ * The border-color of the Tab Bar strip
+ *
+ * @param {color} [$ui-strip-background-color=$tabbar-strip-background-color]
+ * The background-color of the Tab Bar strip
+ *
+ * @param {number/list} [$ui-bar-border-width=$tabbar-border-width]
+ * The border-width of the Tab Bar
+ *
+ * @param {color} [$ui-bar-border-color=$tabbar-border-color]
+ * The border-color of the Tab Bar
+ *
+ * @param {number/list} [$ui-bar-padding=$tabbar-padding]
+ * The padding of the Tab Bar
+ *
+ * @param {color} [$ui-bar-background-color=$tabbar-background-color]
+ * The background color of the  Tab Bar
+ *
+ * @param {string/list} [$ui-bar-background-gradient=$tabbar-background-gradient]
+ * The background-gradient of the Tab Bar. Can be either the name of a predefined gradient
+ * or a list of color stops. Used as the `$type` parameter for 
+ * {@link Global_CSS#background-gradient}.
+ *
+ * @param {number} [$ui-bar-scroller-width=$tabbar-scroller-width]
+ * The width of the Tab Bar scrollers
+ *
+ * @param {string} [$ui-bar-scroller-cursor=$tabbar-scroller-cursor]
+ * The cursor of the Tab Bar scrollers
+ *
+ * @param {string} [$ui-bar-scroller-cursor-disabled=$tabbar-scroller-cursor-disabled]
+ * The cursor of disabled Tab Bar scrollers
+ *
+ * @param {number} [$ui-bar-scroller-opacity=$tabbar-scroller-opacity]
+ * The opacity of Tab Bar scrollers
+ *
+ * @param {number} [$ui-bar-scroller-opacity-over=$tabbar-scroller-opacity-over]
+ * The opacity of hovered Tab Bar scrollers
+ *
+ * @param {number} [$ui-bar-scroller-opacity-pressed=$tabbar-scroller-opacity-pressed]
+ * The opacity of pressed Tab Bar scrollers
+ *
+ * @param {number} [$ui-bar-scroller-opacity-disabled=$tabbar-scroller-opacity-disabled]
+ * The opacity of disabled Tab Bar scrollers
+ *
+ * @param {number} [$ui-tab-closable-icon-width=$tab-closable-icon-width]
+ * The width of the Tab close icon
+ *
+ * @param {number} [$ui-tab-closable-icon-height=$tab-closable-icon-height]
+ * The height of the Tab close icon
+ *
+ * @param {number} [$ui-tab-closable-icon-top=$tab-closable-icon-top]
+ * The distance to offset the Tab close icon from the top of the tab
+ *
+ * @param {number} [$ui-tab-closable-icon-right=$tab-closable-icon-right]
+ * The distance to offset the Tab close icon from the right of the tab
+ *
+ * @param {number} [$ui-tab-closable-icon-spacing=$tab-closable-icon-spacing]
+ * the space in between the text and the close button
+ *
+ * @member Ext.tab.Panel
+ */ 
+@mixin extjs-tab-panel-ui(
+    $ui,
+    
+    $ui-tab-background-color: $tab-base-color,
+    $ui-tab-background-color-over: $tab-base-color-over,
+    $ui-tab-background-color-active: $tab-base-color-active,
+    $ui-tab-background-color-disabled: $tab-base-color-disabled,
+    $ui-tab-border-radius: $tab-border-radius,
+    $ui-tab-border-width: $tab-border-width,
+    $ui-tab-margin: $tab-margin,
+    $ui-tab-padding: $tab-padding,
+    $ui-tab-text-padding: $tab-text-padding,
+    $ui-tab-border-color: $tab-border-color,
+    $ui-tab-border-color-over: $tab-border-color-over,
+    $ui-tab-border-color-active: $tab-border-color-active,
+    $ui-tab-border-color-disabled: $tab-border-color-disabled,
+    $ui-tab-cursor: $tab-cursor,
+    $ui-tab-cursor-disabled: $tab-cursor-disabled,
+    $ui-tab-font-size: $tab-font-size,
+    $ui-tab-font-size-over: $tab-font-size-over,
+    $ui-tab-font-size-active: $tab-font-size-active,
+    $ui-tab-font-size-disabled: $tab-font-size-disabled,
+    $ui-tab-font-weight: $tab-font-weight,
+    $ui-tab-font-weight-over: $tab-font-weight-over,
+    $ui-tab-font-weight-active: $tab-font-weight-active,
+    $ui-tab-font-weight-disabled: $tab-font-weight-disabled,
+    $ui-tab-font-family: $tab-font-family,
+    $ui-tab-font-family-over: $tab-font-family-over,
+    $ui-tab-font-family-active: $tab-font-family-active,
+    $ui-tab-font-family-disabled: $tab-font-family-disabled,
+    $ui-tab-line-height: $tab-line-height,
+    $ui-tab-color: $tab-color,
+    $ui-tab-color-over: $tab-color-over,
+    $ui-tab-color-active: $tab-color-active,
+    $ui-tab-color-disabled: $tab-color-disabled,
+    $ui-tab-background-gradient: $tab-background-gradient,
+    $ui-tab-background-gradient-over: $tab-background-gradient-over,
+    $ui-tab-background-gradient-active: $tab-background-gradient-active,
+    $ui-tab-background-gradient-disabled: $tab-background-gradient-disabled,
+
+    $ui-tab-inner-border-width: $tab-inner-border-width,
+    $ui-tab-inner-border-color: $tab-inner-border-color,
+
+    $ui-tab-icon-width: $tab-icon-width,
+    $ui-tab-icon-height: $tab-icon-height,
+    $ui-tab-icon-spacing: $tab-icon-spacing,
+    $ui-tab-icon-background-position: $tab-icon-background-position,
+
+    $ui-tab-glyph-color: $tab-glyph-color,
+    $ui-tab-glyph-color-over: $tab-glyph-color-over,
+    $ui-tab-glyph-color-active: $tab-glyph-color-active,
+    $ui-tab-glyph-color-disabled: $tab-glyph-color-disabled,
+    $ui-tab-glyph-opacity: $tab-glyph-opacity,
+    $ui-tab-glyph-opacity-disabled: $tab-glyph-opacity-disabled,
+
+    $ui-tab-opacity-disabled: $tab-opacity-disabled,
+    $ui-tab-text-opacity-disabled: $tab-text-opacity-disabled,
+    $ui-tab-icon-opacity-disabled: $tab-icon-opacity-disabled,
+
+    $ui-strip-height: $tabbar-strip-height,
+    $ui-strip-border-width: $tabbar-strip-border-width,
+    $ui-strip-plain-border-width: $tabbar-strip-plain-border-width,
+    $ui-strip-border-color: $tabbar-strip-border-color,
+    $ui-strip-background-color: $tabbar-strip-background-color,
+
+    $ui-bar-border-width: $tabbar-border-width,
+    $ui-bar-border-color: $tabbar-border-color,
+    $ui-bar-padding: $tabbar-padding,
+    $ui-bar-background-color: $tabbar-base-color,
+    $ui-bar-background-gradient: $tabbar-background-gradient,
+    $ui-bar-scroller-width: $tabbar-scroller-width,
+
+    $ui-bar-scroller-cursor: $tabbar-scroller-cursor,
+    $ui-bar-scroller-cursor-disabled: $tabbar-scroller-cursor-disabled,
+    $ui-bar-scroller-opacity: $tabbar-scroller-opacity,
+    $ui-bar-scroller-opacity-over: $tabbar-scroller-opacity-over,
+    $ui-bar-scroller-opacity-pressed: $tabbar-scroller-opacity-pressed,
+    $ui-bar-scroller-opacity-disabled: $tabbar-scroller-opacity-disabled,
+
+    $ui-tab-closable-icon-width: $tab-closable-icon-width,
+    $ui-tab-closable-icon-height: $tab-closable-icon-height,
+    $ui-tab-closable-icon-top: $tab-closable-icon-top,
+    $ui-tab-closable-icon-right: $tab-closable-icon-right,
+    $ui-tab-closable-icon-spacing: $tab-closable-icon-spacing
+) {
+    @if $include-tab-default-ui or $ui != 'default' {
+        @include extjs-tab-ui(
+            $ui: $ui,
+            
+            $ui-background-color: $ui-tab-background-color,
+            $ui-background-color-over: $ui-tab-background-color-over,
+            $ui-background-color-active: $ui-tab-background-color-active,
+            $ui-background-color-disabled: $ui-tab-background-color-disabled,
+            $ui-border-radius: $ui-tab-border-radius,
+            $ui-border-width: $ui-tab-border-width,
+            $ui-margin: $ui-tab-margin,
+            $ui-padding: $ui-tab-padding,
+            $ui-text-padding: $ui-tab-text-padding,
+            $ui-border-color: $ui-tab-border-color,
+            $ui-border-color-over: $ui-tab-border-color-over,
+            $ui-border-color-active: $ui-tab-border-color-active,
+            $ui-border-color-disabled: $ui-tab-border-color-disabled,
+            $ui-cursor: $ui-tab-cursor,
+            $ui-cursor-disabled: $ui-tab-cursor-disabled,
+            $ui-font-size: $ui-tab-font-size,
+            $ui-font-size-over: $ui-tab-font-size-over,
+            $ui-font-size-active: $ui-tab-font-size-active,
+            $ui-font-size-disabled: $ui-tab-font-size-disabled,
+            $ui-font-weight: $ui-tab-font-weight,
+            $ui-font-weight-over: $ui-tab-font-weight-over,
+            $ui-font-weight-active: $ui-tab-font-weight-active,
+            $ui-font-weight-disabled: $ui-tab-font-weight-disabled,
+            $ui-font-family: $ui-tab-font-family,
+            $ui-font-family-over: $ui-tab-font-family-over,
+            $ui-font-family-active: $ui-tab-font-family-active,
+            $ui-font-family-disabled: $ui-tab-font-family-disabled,
+            $ui-line-height: $ui-tab-line-height,
+            $ui-color: $ui-tab-color,
+            $ui-color-over: $ui-tab-color-over,
+            $ui-color-active: $ui-tab-color-active,
+            $ui-color-disabled: $ui-tab-color-disabled,
+            $ui-background-gradient: $ui-tab-background-gradient,
+            $ui-background-gradient-over: $ui-tab-background-gradient-over,
+            $ui-background-gradient-active: $ui-tab-background-gradient-active,
+            $ui-background-gradient-disabled: $ui-tab-background-gradient-disabled,
+
+            $ui-inner-border-width: $ui-tab-inner-border-width,
+            $ui-inner-border-color: $ui-tab-inner-border-color,
+
+            $ui-icon-width: $ui-tab-icon-width,
+            $ui-icon-height: $ui-tab-icon-height,
+            $ui-icon-spacing: $ui-tab-icon-spacing,
+            $ui-icon-background-position: $ui-tab-icon-background-position,
+
+            $ui-glyph-color: $ui-tab-glyph-color,
+            $ui-glyph-color-over: $ui-tab-glyph-color-over,
+            $ui-glyph-color-active: $ui-tab-glyph-color-active,
+            $ui-glyph-color-disabled: $ui-tab-glyph-color-disabled,
+            $ui-glyph-opacity: $ui-tab-glyph-opacity,
+            $ui-glyph-opacity-disabled: $ui-tab-glyph-opacity-disabled,
+
+            $ui-opacity-disabled: $ui-tab-opacity-disabled,
+            $ui-text-opacity-disabled: $ui-tab-text-opacity-disabled,
+            $ui-icon-opacity-disabled: $ui-tab-icon-opacity-disabled,
+
+            $ui-closable-icon-width: $ui-tab-closable-icon-width,
+            $ui-closable-icon-height: $ui-tab-closable-icon-height,
+            $ui-closable-icon-top: $ui-tab-closable-icon-top,
+            $ui-closable-icon-right: $ui-tab-closable-icon-right,
+            $ui-closable-icon-spacing: $ui-tab-closable-icon-spacing,
+
+            $ui-border-bottom-color: $ui-strip-border-color
+        );
+    }
+
+    @if $include-tabbar-default-ui or $ui != 'default' {
+        @include extjs-tab-bar-ui(
+            $ui: $ui,
+
+            $ui-strip-height: $ui-strip-height,
+            $ui-strip-border-width: $ui-strip-border-width,
+            $ui-strip-plain-border-width: $ui-strip-plain-border-width,
+            $ui-strip-border-color: $ui-strip-border-color,
+            $ui-strip-background-color: $ui-strip-background-color,
+
+            $ui-border-width: $ui-bar-border-width,
+            $ui-border-color: $ui-bar-border-color,
+            $ui-padding: $ui-bar-padding,
+            $ui-background-color: $ui-bar-background-color,
+            $ui-background-gradient: $ui-bar-background-gradient,
+            $ui-scroller-width: $ui-bar-scroller-width,
+
+            $ui-scroller-cursor: $ui-bar-scroller-cursor,
+            $ui-scroller-cursor-disabled: $ui-bar-scroller-cursor-disabled,
+            $ui-scroller-opacity: $ui-bar-scroller-opacity,
+            $ui-scroller-opacity-over: $ui-bar-scroller-opacity-over,
+            $ui-scroller-opacity-pressed: $ui-bar-scroller-opacity-pressed,
+            $ui-scroller-opacity-disabled: $ui-bar-scroller-opacity-disabled,
+            $ui-tab-height: $ui-tab-line-height + vertical($ui-tab-text-padding) + 
+                vertical($ui-tab-padding) + $ui-tab-border-width
+        );
+    }
+}
+
+@include extjs-tab-panel-ui(
+    $ui: 'default'
+);
+
+.#{$prefix}tab-bar-plain {
+    border-width: $tabbar-plain-border-width;
+    padding: $tabbar-plain-padding;
+    height: $tab-line-height + vertical($tab-text-padding) + 
+        vertical($tab-padding) + $tab-border-width + 
+        $tabbar-strip-height + vertical($tabbar-plain-padding) + vertical($tabbar-plain-border-width);
+}

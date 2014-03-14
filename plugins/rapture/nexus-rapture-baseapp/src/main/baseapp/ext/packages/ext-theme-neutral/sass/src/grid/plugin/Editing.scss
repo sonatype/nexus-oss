@@ -1,0 +1,80 @@
+.#{$prefix}grid-editor {
+
+    @if $include-ext-form-field-text {
+        .#{$prefix}form-text {
+            font: $grid-editor-font;
+
+            @if $grid-editor-padding != $form-field-padding {
+                padding: $grid-editor-padding;
+            }
+
+            @if $grid-editor-height != $form-field-height {
+                height: $grid-editor-height;
+
+                @if $include-content-box {
+                    .#{$prefix}content-box & {
+                        height: $grid-editor-content-height;
+                    }
+                }
+            }
+
+            @if $include-ff {
+                .#{$prefix}gecko & {
+                    // firefox adds an additional px of horizontal space inside text inputs
+                    padding-left: max((left($grid-editor-padding) - 1), 0);
+                    padding-right: max((right($grid-editor-padding) - 1), 0);
+                }
+            }
+        }
+    }
+
+    @if $include-ext-form-field-trigger {
+        @if $grid-editor-height != $form-field-height {
+            .#{$prefix}form-trigger {
+                height: $grid-editor-height;
+            }
+        }
+    }
+
+    @if $include-ext-form-field-spinner {
+        @if $grid-editor-height != $form-field-height {
+            .#{$prefix}form-spinner-up, .#{$prefix}form-spinner-down {
+                height: $grid-editor-height / 2;
+            }
+        }
+    }
+
+    @if $include-ext-form-field-checkbox {
+        @if $grid-editor-height != $form-field-height {
+            .#{$prefix}form-cb {
+                margin-top: round(($grid-editor-height - $form-checkbox-size) / 2);
+            }
+
+            .#{$prefix}form-cb-wrap {
+                height: $grid-editor-height;
+            }
+        }
+    }
+
+    @if $include-ext-form-field-display {
+        .#{$prefix}form-display-field-body {
+            height: $grid-editor-height;
+        }
+
+        .#{$prefix}form-display-field {
+            font: $grid-editor-font;
+            padding: 
+                top($grid-editor-padding) + $form-field-border-width
+                right($grid-editor-padding) + $form-field-border-width
+                bottom($grid-editor-padding) + $form-field-border-width
+                left($grid-editor-padding) + $form-field-border-width;
+            text-overflow: $grid-cell-inner-text-overflow;
+        }
+
+        @if $include-ext-grid-column-action {
+            .#{$prefix}form-action-col-field {
+                padding: $grid-actioncolumn-cell-padding;
+            }
+        }
+    }
+}

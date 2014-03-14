@@ -1,0 +1,506 @@
+/**
+ * @class Ext.button.Button
+ */
+
+/**
+ * ui: 'primary'
+ */
+
+$button-primary-base-color: #2476C3 !default;
+$button-primary-base-color-over: button-default-background-color-over($button-primary-base-color) !default;
+$button-primary-base-color-focus: button-default-background-color-focus($button-primary-base-color) !default;
+$button-primary-base-color-pressed: button-default-background-color-pressed($button-primary-base-color) !default;
+$button-primary-base-color-disabled: button-default-background-color-disabled($button-primary-base-color) !default;
+
+$button-primary-border-color: #17558E !default;
+$button-primary-border-color-over: button-default-border-color-over($button-primary-border-color) !default;
+$button-primary-border-color-focus: button-default-border-color-focus($button-primary-border-color) !default;
+$button-primary-border-color-pressed: button-default-border-color-pressed($button-primary-border-color) !default;
+$button-primary-border-color-disabled: button-default-border-color-disabled($button-primary-border-color) !default;
+
+$button-primary-background-color: $button-primary-base-color !default;
+$button-primary-background-color-over: $button-primary-base-color-over !default;
+$button-primary-background-color-focus: $button-primary-base-color-focus !default;
+$button-primary-background-color-pressed: $button-primary-base-color-pressed !default;
+$button-primary-background-color-disabled: $button-primary-base-color-disabled !default;
+
+$button-primary-background-gradient: 'glossy-button' !default;
+$button-primary-background-gradient-over: 'glossy-button-over' !default;
+$button-primary-background-gradient-focus: $button-primary-background-gradient-over !default;
+$button-primary-background-gradient-pressed: 'glossy-button-pressed' !default;
+$button-primary-background-gradient-disabled: 'glossy-button-disabled' !default;
+
+$button-primary-color: #FFFFFF !default;
+$button-primary-color-over: button-default-color-over($button-primary-color) !default;
+$button-primary-color-focus: button-default-color-focus($button-primary-color) !default;
+$button-primary-color-pressed: button-default-color-pressed($button-primary-color) !default;
+$button-primary-color-disabled: button-default-color-disabled($button-primary-color) !default;
+
+$button-primary-glyph-color: $button-primary-color !default;
+$button-primary-glyph-opacity: .5 !default;
+
+@include extjs-button-small-ui(
+  $ui: 'primary',
+
+  $border-color: $button-primary-border-color,
+  $border-color-over: $button-primary-border-color-over,
+  $border-color-focus: $button-primary-border-color-focus,
+  $border-color-pressed: $button-primary-border-color-pressed,
+  $border-color-disabled: $button-primary-border-color-disabled,
+
+  $background-color: $button-primary-background-color,
+  $background-color-over: $button-primary-background-color-over,
+  $background-color-focus: $button-primary-background-color-focus,
+  $background-color-pressed: $button-primary-background-color-pressed,
+  $background-color-disabled: $button-primary-background-color-disabled,
+
+  $color: $button-primary-color,
+  $color-over: $button-primary-color-over,
+  $color-focus: $button-primary-color-focus,
+  $color-pressed: $button-primary-color-pressed,
+  $color-disabled: $button-primary-color-disabled,
+
+  $font-size: $button-small-font-size,
+  $font-size-over: $button-small-font-size-over,
+  $font-size-focus: $button-small-font-size-focus,
+  $font-size-pressed: $button-small-font-size-pressed,
+  $font-size-disabled: $button-small-font-size-disabled,
+
+  $font-weight: $button-small-font-weight,
+  $font-weight-over: $button-small-font-weight-over,
+  $font-weight-focus: $button-small-font-weight-focus,
+  $font-weight-pressed: $button-small-font-weight-pressed,
+  $font-weight-disabled: $button-small-font-weight-disabled,
+
+  $font-family: $button-small-font-family,
+  $font-family-over: $button-small-font-family-over,
+  $font-family-focus: $button-small-font-family-focus,
+  $font-family-pressed: $button-small-font-family-pressed,
+  $font-family-disabled: $button-small-font-family-disabled
+);
+
+/**
+ * ui: 'danger'
+ */
+
+$button-danger-base-color: #d64b46 !default;
+$button-danger-base-color-over: button-default-background-color-over($button-danger-base-color) !default;
+$button-danger-base-color-focus: button-default-background-color-focus($button-danger-base-color) !default;
+$button-danger-base-color-pressed: button-default-background-color-pressed($button-danger-base-color) !default;
+$button-danger-base-color-disabled: button-default-background-color-disabled($button-danger-base-color) !default;
+
+$button-danger-border-color: #802420 !default;
+$button-danger-border-color-over: button-default-border-color-over($button-danger-border-color) !default;
+$button-danger-border-color-focus: button-default-border-color-focus($button-danger-border-color) !default;
+$button-danger-border-color-pressed: button-default-border-color-pressed($button-danger-border-color) !default;
+$button-danger-border-color-disabled: button-default-border-color-disabled($button-danger-border-color) !default;
+
+$button-danger-background-color: $button-danger-base-color !default;
+$button-danger-background-color-over: $button-danger-base-color-over !default;
+$button-danger-background-color-focus: $button-danger-base-color-focus !default;
+$button-danger-background-color-pressed: $button-danger-base-color-pressed !default;
+$button-danger-background-color-disabled: $button-danger-base-color-disabled !default;
+
+$button-danger-background-gradient: 'glossy-button' !default;
+$button-danger-background-gradient-over: 'glossy-button-over' !default;
+$button-danger-background-gradient-focus: $button-danger-background-gradient-over !default;
+$button-danger-background-gradient-pressed: 'glossy-button-pressed' !default;
+$button-danger-background-gradient-disabled: 'glossy-button-disabled' !default;
+
+$button-danger-color: #FFFFFF !default;
+$button-danger-color-over: button-default-color-over($button-danger-color) !default;
+$button-danger-color-focus: button-default-color-focus($button-danger-color) !default;
+$button-danger-color-pressed: button-default-color-pressed($button-danger-color) !default;
+$button-danger-color-disabled: button-default-color-disabled($button-danger-color) !default;
+
+$button-danger-glyph-color: $button-danger-color !default;
+$button-danger-glyph-opacity: .5 !default;
+
+@include extjs-button-small-ui(
+  $ui: 'danger',
+
+  $border-color: $button-danger-border-color,
+  $border-color-over: $button-danger-border-color-over,
+  $border-color-focus: $button-danger-border-color-focus,
+  $border-color-pressed: $button-danger-border-color-pressed,
+  $border-color-disabled: $button-danger-border-color-disabled,
+
+  $background-color: $button-danger-background-color,
+  $background-color-over: $button-danger-background-color-over,
+  $background-color-focus: $button-danger-background-color-focus,
+  $background-color-pressed: $button-danger-background-color-pressed,
+  $background-color-disabled: $button-danger-background-color-disabled,
+
+  $color: $button-danger-color,
+  $color-over: $button-danger-color-over,
+  $color-focus: $button-danger-color-focus,
+  $color-pressed: $button-danger-color-pressed,
+  $color-disabled: $button-danger-color-disabled,
+
+  $font-size: $button-small-font-size,
+  $font-size-over: $button-small-font-size-over,
+  $font-size-focus: $button-small-font-size-focus,
+  $font-size-pressed: $button-small-font-size-pressed,
+  $font-size-disabled: $button-small-font-size-disabled,
+
+  $font-weight: $button-small-font-weight,
+  $font-weight-over: $button-small-font-weight-over,
+  $font-weight-focus: $button-small-font-weight-focus,
+  $font-weight-pressed: $button-small-font-weight-pressed,
+  $font-weight-disabled: $button-small-font-weight-disabled,
+
+  $font-family: $button-small-font-family,
+  $font-family-over: $button-small-font-family-over,
+  $font-family-focus: $button-small-font-family-focus,
+  $font-family-pressed: $button-small-font-family-pressed,
+  $font-family-disabled: $button-small-font-family-disabled
+);
+
+/**
+ * ui: 'warning'
+ */
+
+$button-warning-base-color: #F2862F !default;
+$button-warning-base-color-over: button-default-background-color-over($button-warning-base-color) !default;
+$button-warning-base-color-focus: button-default-background-color-focus($button-warning-base-color) !default;
+$button-warning-base-color-pressed: button-default-background-color-pressed($button-warning-base-color) !default;
+$button-warning-base-color-disabled: button-default-background-color-disabled($button-warning-base-color) !default;
+
+$button-warning-border-color: #C56213 !default;
+$button-warning-border-color-over: button-default-border-color-over($button-warning-border-color) !default;
+$button-warning-border-color-focus: button-default-border-color-focus($button-warning-border-color) !default;
+$button-warning-border-color-pressed: button-default-border-color-pressed($button-warning-border-color) !default;
+$button-warning-border-color-disabled: button-default-border-color-disabled($button-warning-border-color) !default;
+
+$button-warning-background-color: $button-warning-base-color !default;
+$button-warning-background-color-over: $button-warning-base-color-over !default;
+$button-warning-background-color-focus: $button-warning-base-color-focus !default;
+$button-warning-background-color-pressed: $button-warning-base-color-pressed !default;
+$button-warning-background-color-disabled: $button-warning-base-color-disabled !default;
+
+$button-warning-background-gradient: 'glossy-button' !default;
+$button-warning-background-gradient-over: 'glossy-button-over' !default;
+$button-warning-background-gradient-focus: $button-warning-background-gradient-over !default;
+$button-warning-background-gradient-pressed: 'glossy-button-pressed' !default;
+$button-warning-background-gradient-disabled: 'glossy-button-disabled' !default;
+
+$button-warning-color: #FFFFFF !default;
+$button-warning-color-over: button-default-color-over($button-warning-color) !default;
+$button-warning-color-focus: button-default-color-focus($button-warning-color) !default;
+$button-warning-color-pressed: button-default-color-pressed($button-warning-color) !default;
+$button-warning-color-disabled: button-default-color-disabled($button-warning-color) !default;
+
+$button-warning-glyph-color: $button-warning-color !default;
+$button-warning-glyph-opacity: .5 !default;
+
+@include extjs-button-small-ui(
+  $ui: 'warning',
+
+  $border-color: $button-warning-border-color,
+  $border-color-over: $button-warning-border-color-over,
+  $border-color-focus: $button-warning-border-color-focus,
+  $border-color-pressed: $button-warning-border-color-pressed,
+  $border-color-disabled: $button-warning-border-color-disabled,
+
+  $background-color: $button-warning-background-color,
+  $background-color-over: $button-warning-background-color-over,
+  $background-color-focus: $button-warning-background-color-focus,
+  $background-color-pressed: $button-warning-background-color-pressed,
+  $background-color-disabled: $button-warning-background-color-disabled,
+
+  $color: $button-warning-color,
+  $color-over: $button-warning-color-over,
+  $color-focus: $button-warning-color-focus,
+  $color-pressed: $button-warning-color-pressed,
+  $color-disabled: $button-warning-color-disabled,
+
+  $font-size: $button-small-font-size,
+  $font-size-over: $button-small-font-size-over,
+  $font-size-focus: $button-small-font-size-focus,
+  $font-size-pressed: $button-small-font-size-pressed,
+  $font-size-disabled: $button-small-font-size-disabled,
+
+  $font-weight: $button-small-font-weight,
+  $font-weight-over: $button-small-font-weight-over,
+  $font-weight-focus: $button-small-font-weight-focus,
+  $font-weight-pressed: $button-small-font-weight-pressed,
+  $font-weight-disabled: $button-small-font-weight-disabled,
+
+  $font-family: $button-small-font-family,
+  $font-family-over: $button-small-font-family-over,
+  $font-family-focus: $button-small-font-family-focus,
+  $font-family-pressed: $button-small-font-family-pressed,
+  $font-family-disabled: $button-small-font-family-disabled
+);
+
+/**
+ * ui: 'success'
+ */
+
+$button-success-base-color: #0B9743 !default;
+$button-success-base-color-over: button-default-background-color-over($button-success-base-color) !default;
+$button-success-base-color-focus: button-default-background-color-focus($button-success-base-color) !default;
+$button-success-base-color-pressed: button-default-background-color-pressed($button-success-base-color) !default;
+$button-success-base-color-disabled: button-default-background-color-disabled($button-success-base-color) !default;
+
+$button-success-border-color: #04642A !default;
+$button-success-border-color-over: button-default-border-color-over($button-success-border-color) !default;
+$button-success-border-color-focus: button-default-border-color-focus($button-success-border-color) !default;
+$button-success-border-color-pressed: button-default-border-color-pressed($button-success-border-color) !default;
+$button-success-border-color-disabled: button-default-border-color-disabled($button-success-border-color) !default;
+
+$button-success-background-color: $button-success-base-color !default;
+$button-success-background-color-over: $button-success-base-color-over !default;
+$button-success-background-color-focus: $button-success-base-color-focus !default;
+$button-success-background-color-pressed: $button-success-base-color-pressed !default;
+$button-success-background-color-disabled: $button-success-base-color-disabled !default;
+
+$button-success-background-gradient: 'glossy-button' !default;
+$button-success-background-gradient-over: 'glossy-button-over' !default;
+$button-success-background-gradient-focus: $button-success-background-gradient-over !default;
+$button-success-background-gradient-pressed: 'glossy-button-pressed' !default;
+$button-success-background-gradient-disabled: 'glossy-button-disabled' !default;
+
+$button-success-color: #FFFFFF !default;
+$button-success-color-over: button-default-color-over($button-success-color) !default;
+$button-success-color-focus: button-default-color-focus($button-success-color) !default;
+$button-success-color-pressed: button-default-color-pressed($button-success-color) !default;
+$button-success-color-disabled: button-default-color-disabled($button-success-color) !default;
+
+$button-success-glyph-color: $button-success-color !default;
+$button-success-glyph-opacity: .5 !default;
+
+@include extjs-button-small-ui(
+  $ui: 'success',
+
+  $border-color: $button-success-border-color,
+  $border-color-over: $button-success-border-color-over,
+  $border-color-focus: $button-success-border-color-focus,
+  $border-color-pressed: $button-success-border-color-pressed,
+  $border-color-disabled: $button-success-border-color-disabled,
+
+  $background-color: $button-success-background-color,
+  $background-color-over: $button-success-background-color-over,
+  $background-color-focus: $button-success-background-color-focus,
+  $background-color-pressed: $button-success-background-color-pressed,
+  $background-color-disabled: $button-success-background-color-disabled,
+
+  $color: $button-success-color,
+  $color-over: $button-success-color-over,
+  $color-focus: $button-success-color-focus,
+  $color-pressed: $button-success-color-pressed,
+  $color-disabled: $button-success-color-disabled,
+
+  $font-size: $button-small-font-size,
+  $font-size-over: $button-small-font-size-over,
+  $font-size-focus: $button-small-font-size-focus,
+  $font-size-pressed: $button-small-font-size-pressed,
+  $font-size-disabled: $button-small-font-size-disabled,
+
+  $font-weight: $button-small-font-weight,
+  $font-weight-over: $button-small-font-weight-over,
+  $font-weight-focus: $button-small-font-weight-focus,
+  $font-weight-pressed: $button-small-font-weight-pressed,
+  $font-weight-disabled: $button-small-font-weight-disabled,
+
+  $font-family: $button-small-font-family,
+  $font-family-over: $button-small-font-family-over,
+  $font-family-focus: $button-small-font-family-focus,
+  $font-family-pressed: $button-small-font-family-pressed,
+  $font-family-disabled: $button-small-font-family-disabled
+);
+
+/**
+ * ui: 'plain'
+ */
+
+@include extjs-button-small-ui(
+  $ui: 'plain',
+
+  $border-color: transparent,
+  $border-color-over: $button-default-border-color-over,
+  $border-color-focus: $button-default-border-color-focus,
+  $border-color-pressed: $button-default-border-color-pressed,
+  $border-color-disabled: transparent,
+
+  $background-color: transparent,
+  $background-color-over: $button-default-background-color-over,
+  $background-color-focus: $button-default-background-color-focus,
+  $background-color-pressed: $button-default-background-color-pressed,
+  $background-color-disabled: transparent,
+
+  $color: #1f1f1f,
+  $color-over: #E8E8E8,
+  $color-focus: #E8E8E8,
+  $color-pressed: #E8E8E8,
+  $color-disabled: #C6C6C6,
+
+  $font-size: $button-small-font-size,
+  $font-size-over: $button-small-font-size-over,
+  $font-size-focus: $button-small-font-size-focus,
+  $font-size-pressed: $button-small-font-size-pressed,
+  $font-size-disabled: $button-small-font-size-disabled,
+
+  $font-weight: $button-small-font-weight,
+  $font-weight-over: $button-small-font-weight-over,
+  $font-weight-focus: $button-small-font-weight-focus,
+  $font-weight-pressed: $button-small-font-weight-pressed,
+  $font-weight-disabled: $button-small-font-weight-disabled,
+
+  $font-family: $button-small-font-family,
+  $font-family-over: $button-small-font-family-over,
+  $font-family-focus: $button-small-font-family-focus,
+  $font-family-pressed: $button-small-font-family-pressed,
+  $font-family-disabled: $button-small-font-family-disabled,
+
+  $glyph-color: #C6C6C6,
+  $glyph-opacity: 1
+);
+
+/**
+ * ui: 'header'
+ */
+
+$button-header-toolbar-border-color: #2a5200 !default;
+$button-header-toolbar-border-color-over: button-toolbar-border-color-over($button-header-toolbar-border-color) !default;
+$button-header-toolbar-border-color-focus: button-toolbar-border-color-focus($button-header-toolbar-border-color) !default;
+$button-header-toolbar-border-color-pressed: button-toolbar-border-color-pressed($button-header-toolbar-border-color) !default;
+$button-header-toolbar-border-color-disabled: button-toolbar-border-color-disabled($button-header-toolbar-border-color) !default;
+
+$button-header-toolbar-background-color: #316400 !default;
+$button-header-toolbar-background-color-over: button-toolbar-background-color-over($button-header-toolbar-background-color) !default;
+$button-header-toolbar-background-color-focus: button-toolbar-background-color-focus($button-header-toolbar-background-color) !default;
+$button-header-toolbar-background-color-pressed: button-toolbar-background-color-pressed($button-header-toolbar-background-color) !default;
+$button-header-toolbar-background-color-disabled: button-toolbar-background-color-disabled($button-header-toolbar-background-color) !default;
+
+$button-header-toolbar-background-gradient: 'glossy-button' !default;
+$button-header-toolbar-background-gradient-over: 'glossy-button-over' !default;
+$button-header-toolbar-background-gradient-focus: $button-header-toolbar-background-gradient-over !default;
+$button-header-toolbar-background-gradient-pressed: 'glossy-button-pressed' !default;
+$button-header-toolbar-background-gradient-disabled: 'glossy-button-disabled' !default;
+
+$button-header-toolbar-color: #FFFFFF !default;
+$button-header-toolbar-color-over: button-toolbar-color-over($button-header-toolbar-color) !default;
+$button-header-toolbar-color-focus: button-toolbar-color-focus($button-header-toolbar-color) !default;
+$button-header-toolbar-color-pressed: button-toolbar-color-pressed($button-header-toolbar-color) !default;
+$button-header-toolbar-color-disabled: button-toolbar-color-disabled($button-header-toolbar-color) !default;
+
+$button-header-toolbar-glyph-color: $button-header-toolbar-color !default;
+$button-header-toolbar-glyph-opacity: .5 !default;
+
+@include extjs-button-toolbar-medium-ui(
+  $ui: 'header',
+
+  $border-color: transparent,
+  $border-color-over: $button-header-toolbar-border-color-over,
+  $border-color-focus: $button-header-toolbar-border-color-focus,
+  $border-color-pressed: $button-header-toolbar-border-color-pressed,
+  $border-color-disabled: transparent,
+
+  $background-color: transparent,
+  $background-color-over: $button-header-toolbar-background-color-over,
+  $background-color-focus: $button-header-toolbar-background-color-focus,
+  $background-color-pressed: $button-header-toolbar-background-color-pressed,
+  $background-color-disabled: transparent,
+
+  $color: $button-header-toolbar-color,
+  $color-over: $button-header-toolbar-color-over,
+  $color-focus: $button-header-toolbar-color-focus,
+  $color-pressed: $button-header-toolbar-color-pressed,
+  $color-disabled: $button-header-toolbar-color-disabled,
+
+  $font-size: $button-medium-font-size,
+  $font-size-over: $button-medium-font-size-over,
+  $font-size-focus: $button-medium-font-size-focus,
+  $font-size-pressed: $button-medium-font-size-pressed,
+  $font-size-disabled: $button-medium-font-size-disabled,
+
+  $font-weight: $button-medium-font-weight,
+  $font-weight-over: $button-medium-font-weight-over,
+  $font-weight-focus: $button-medium-font-weight-focus,
+  $font-weight-pressed: $button-medium-font-weight-pressed,
+  $font-weight-disabled: $button-medium-font-weight-disabled,
+
+  $font-family: $button-medium-font-family,
+  $font-family-over: $button-medium-font-family-over,
+  $font-family-focus: $button-medium-font-family-focus,
+  $font-family-pressed: $button-medium-font-family-pressed,
+  $font-family-disabled: $button-medium-font-family-disabled,
+
+  $glyph-color: #FFFFFF,
+  $glyph-opacity: 0.5
+);
+
+/**
+ * ui: 'headermode'
+ */
+
+$button-headermode-toolbar-border-color: #17558E !default;
+$button-headermode-toolbar-border-color-over: button-toolbar-border-color-over($button-headermode-toolbar-border-color) !default;
+$button-headermode-toolbar-border-color-focus: button-toolbar-border-color-focus($button-headermode-toolbar-border-color) !default;
+$button-headermode-toolbar-border-color-pressed: button-toolbar-border-color-pressed($button-headermode-toolbar-border-color) !default;
+$button-headermode-toolbar-border-color-disabled: button-toolbar-border-color-disabled($button-headermode-toolbar-border-color) !default;
+
+$button-headermode-toolbar-background-color: #2476C3 !default;
+$button-headermode-toolbar-background-color-over: button-toolbar-background-color-over($button-headermode-toolbar-background-color) !default;
+$button-headermode-toolbar-background-color-focus: button-toolbar-background-color-focus($button-headermode-toolbar-background-color) !default;
+$button-headermode-toolbar-background-color-pressed: button-toolbar-background-color-pressed($button-headermode-toolbar-background-color) !default;
+$button-headermode-toolbar-background-color-disabled: button-toolbar-background-color-disabled($button-headermode-toolbar-background-color) !default;
+
+$button-headermode-toolbar-background-gradient: 'glossy-button' !default;
+$button-headermode-toolbar-background-gradient-over: 'glossy-button-over' !default;
+$button-headermode-toolbar-background-gradient-focus: $button-headermode-toolbar-background-gradient-over !default;
+$button-headermode-toolbar-background-gradient-pressed: 'glossy-button-pressed' !default;
+$button-headermode-toolbar-background-gradient-disabled: 'glossy-button-disabled' !default;
+
+$button-headermode-toolbar-color: #FFFFFF !default;
+$button-headermode-toolbar-color-over: button-toolbar-color-over($button-headermode-toolbar-color) !default;
+$button-headermode-toolbar-color-focus: button-toolbar-color-focus($button-headermode-toolbar-color) !default;
+$button-headermode-toolbar-color-pressed: button-toolbar-color-pressed($button-headermode-toolbar-color) !default;
+$button-headermode-toolbar-color-disabled: button-toolbar-color-disabled($button-headermode-toolbar-color) !default;
+
+$button-headermode-toolbar-glyph-color: $button-headermode-toolbar-color !default;
+$button-headermode-toolbar-glyph-opacity: .5 !default;
+
+@include extjs-button-toolbar-medium-ui(
+  $ui: 'headermode',
+
+  $border-color: transparent,
+  $border-color-over: $button-headermode-toolbar-border-color-over,
+  $border-color-focus: $button-headermode-toolbar-border-color-focus,
+  $border-color-pressed: $button-headermode-toolbar-border-color-pressed,
+  $border-color-disabled: transparent,
+
+  $background-color: transparent,
+  $background-color-over: $button-headermode-toolbar-background-color-over,
+  $background-color-focus: $button-headermode-toolbar-background-color-focus,
+  $background-color-pressed: $button-headermode-toolbar-background-color-pressed,
+  $background-color-disabled: transparent,
+
+  $color: $button-headermode-toolbar-color,
+  $color-over: $button-headermode-toolbar-color-over,
+  $color-focus: $button-headermode-toolbar-color-focus,
+  $color-pressed: $button-headermode-toolbar-color-pressed,
+  $color-disabled: $button-headermode-toolbar-color-disabled,
+
+  $font-size: $button-medium-font-size,
+  $font-size-over: $button-medium-font-size-over,
+  $font-size-focus: $button-medium-font-size-focus,
+  $font-size-pressed: $button-medium-font-size-pressed,
+  $font-size-disabled: $button-medium-font-size-disabled,
+
+  $font-weight: $button-medium-font-weight,
+  $font-weight-over: $button-medium-font-weight-over,
+  $font-weight-focus: $button-medium-font-weight-focus,
+  $font-weight-pressed: $button-medium-font-weight-pressed,
+  $font-weight-disabled: $button-medium-font-weight-disabled,
+
+  $font-family: $button-medium-font-family,
+  $font-family-over: $button-medium-font-family-over,
+  $font-family-focus: $button-medium-font-family-focus,
+  $font-family-pressed: $button-medium-font-family-pressed,
+  $font-family-disabled: $button-medium-font-family-disabled,
+
+  $glyph-color: #FFFFFF,
+  $glyph-opacity: 0.5
+);

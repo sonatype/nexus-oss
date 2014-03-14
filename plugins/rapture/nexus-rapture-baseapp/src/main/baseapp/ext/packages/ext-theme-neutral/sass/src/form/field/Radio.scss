@@ -1,0 +1,18 @@
+.#{$prefix}form-radio {
+    width: $form-radio-size;
+    height: $form-radio-size;
+    background: theme-background-image($form-radio-image) no-repeat;
+}
+
+.#{$prefix}form-cb-checked .#{$prefix}form-radio {
+    background-position: 0 (0 - $form-radio-size);
+}
+
+.#{$prefix}form-radio-focus {
+    background-position: (0 - $form-radio-size) 0;
+}
+.#{$prefix}form-cb-checked {
+    .#{$prefix}form-radio-focus {
+        background-position: (0 - $form-radio-size) (0 - $form-radio-size);
+    }
+}

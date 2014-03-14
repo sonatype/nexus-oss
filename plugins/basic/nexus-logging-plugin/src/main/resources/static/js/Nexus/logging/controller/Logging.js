@@ -26,7 +26,8 @@ NX.define('Nexus.logging.controller.Logging', {
     'Nexus.logging.view.Panel',
     'Nexus.logging.view.Add',
     'Nexus.logging.view.Mark',
-    'Nexus.util.DownloadHelper'
+    'Nexus.util.DownloadHelper',
+    'Nexus.util.ExtDirect'
   ],
 
   init: function () {
@@ -119,6 +120,7 @@ NX.define('Nexus.logging.controller.Logging', {
 
     me.controlSelection(grid);
     store.on('write', me.onSuccessfulWrite, me);
+    store.on('exception', me.onFailingWrite, store);
     store.load();
   },
 
@@ -177,6 +179,17 @@ NX.define('Nexus.logging.controller.Logging', {
       });
       store.load();
     }
+  },
+
+  /**
+   * Shows success messages after records has been successfully written.
+   * @private
+   */
+  onFailingWrite: function (proxy, type, action, options, response, args) {
+    Nexus.messages.show('Logging', 'Failed to ' + action + ' loggers: ' + response.message);
+    // HACK: this is the store not Logging controller
+    // This is because we get the proxy as first param when we should get the store
+    this.load();
   },
 
   /**
@@ -278,18 +291,15 @@ NX.define('Nexus.logging.controller.Logging', {
       icon: icons.get('loggers_reset').variant('x32').cls,
       fn: function (btn) {
         if (btn === 'ok') {
-          Ext.Ajax.request({
-            url: Nexus.siesta.basePath + '/logging/loggers',
-            method: 'DELETE',
-            suppressStatus: true,
-            callback: function () {
+          NX.direct.logging_Loggers.reset(function (response, status) {
+            if (!Nexus.util.ExtDirect.showExceptionIfPresent('Loggers', response, status)) {
               store.load();
-            },
-            success: function () {
-              Nexus.messages.show('Logging', 'Loggers had been reset');
-            },
-            failure: function (response) {
-              Nexus.messages.show('Logging', 'Failed to reset loggers: ' + me.parseExceptionMessage(response));
+              if (response.success) {
+                Nexus.messages.show('Logging', 'Loggers had been reset');
+              }
+              else {
+                Nexus.messages.show('Logging', 'Failed to reset loggers: ' + response.message);
+              }
             }
           });
         }
@@ -318,18 +328,16 @@ NX.define('Nexus.logging.controller.Logging', {
 
     win.close();
 
-    Ext.Ajax.request({
-      url: Nexus.siesta.basePath + '/logging/log/mark',
-      method: 'PUT',
-      suppressStatus: true,
-      jsonData: values,
-      success: function () {
-        Nexus.messages.show('Logging', 'Log has been marked with: ' + values.message);
-        // refresh the log view
-        me.retrieveLog(Ext.getCmp('nx-logging-view-log'));
-      },
-      failure: function (response) {
-        Nexus.messages.show('Logging', 'Failed to mark log file: ' + me.parseExceptionMessage(response));
+    NX.direct.logging_Log.mark(values, function (response, status) {
+      if (!Nexus.util.ExtDirect.showExceptionIfPresent('Logging', response, status)) {
+        if (response.success) {
+          Nexus.messages.show('Logging', 'Log has been marked with: ' + values.message);
+          // refresh the log view
+          me.retrieveLog(Ext.getCmp('nx-logging-view-log'));
+        }
+        else {
+          Nexus.messages.show('Logging', 'Failed to mark log file: ' + response.message);
+        }
       }
     });
   },

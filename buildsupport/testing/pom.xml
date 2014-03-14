@@ -28,7 +28,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <selenium.version>2.26.0</selenium.version>
+    <selenium.version>2.38.0</selenium.version>
   </properties>
 
   <dependencyManagement>
@@ -134,7 +134,13 @@
       <dependency>
         <groupId>com.saucelabs</groupId>
         <artifactId>saucerest</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.saucelabs</groupId>
+        <artifactId>sauce_junit</artifactId>
+        <version>1.0.19</version>
       </dependency>
 
       <dependency>

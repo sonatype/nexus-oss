@@ -1,0 +1,47 @@
+.#{$prefix}toolbar-default {
+
+    .#{$prefix}toolbar-scroll-left {
+        margin-right: $toolbar-horizontal-spacing / 2;
+    }
+
+    .#{$prefix}toolbar-scroll-right {
+        margin-left: $toolbar-horizontal-spacing / 2;
+    }
+
+    // Default toolbar scroller rendition is opacity 60%
+    .#{$prefix}toolbar-scroll-left, .#{$prefix}toolbar-scroll-right {
+         @include opacity(0.6);
+    }
+
+    // 80% opacity for hover
+    .#{$prefix}toolbar-scroll-left-hover, .#{$prefix}toolbar-scroll-right-hover {
+         background-position: 0 0;
+         @include opacity(0.8);
+    }
+
+    // 100% opacity for pressed
+    .#{$prefix}toolbar-scroll-left-pressed, .#{$prefix}toolbar-scroll-right-pressed {
+         background-position: 0 0;
+         @include opacity(1);
+    }
+
+    // 25% for disabled
+    .#{$prefix}box-scroller-disabled {
+         @include opacity(0.25);
+    }
+
+    .#{$prefix}box-scroller {
+        // EXTJSIV-8846: partially transparent png images do not display correctly
+        // in winXP/IE8m when the image element has a transparent background.
+        // to fix this, we give the element the same background-color as the toolbar.
+        background-color: $toolbar-background-color;
+    }
+}
+
+.#{$prefix}toolbar-scroller {
+    padding: $toolbar-vertical-spacing ($toolbar-horizontal-spacing / 2) $toolbar-vertical-spacing ($toolbar-horizontal-spacing / 2);
+}
+
+.#{$prefix}toolbar-vertical-scroller {
+    padding: ($toolbar-vertical-spacing / 2) $toolbar-horizontal-spacing ($toolbar-vertical-spacing / 2) $toolbar-horizontal-spacing;
+}

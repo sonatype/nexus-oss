@@ -1,0 +1,12 @@
+// add tag name to increase specificity of border rules over those in derived themes
+td.#{$prefix}grid-rowwrap {
+    .#{$prefix}grid-table {
+        border: 0;
+    }
+    .#{$prefix}grid-cell {
+        // disable row border on cells inside of a rowwrap, because the rowrap element
+        // has the row border
+        border-bottom: 0;
+        background-color: transparent;
+    }
+}

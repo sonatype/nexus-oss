@@ -1,0 +1,53 @@
+.#{$prefix}form-text {
+    color: $form-field-color;
+    padding: $form-field-padding;
+    background: $form-field-background-color repeat-x 0 0;
+    border-width: $form-field-border-width; 
+    border-style: $form-field-border-style;
+    border-color: $form-field-border-color;
+    @if not is-null($form-field-background-image) {
+        background-image: theme-background-image($form-field-background-image);
+    }
+    height: $form-field-height;
+    line-height: $form-field-content-height;
+    @if $include-ext-toolbar-toolbar and $form-toolbar-field-height != $form-field-height {
+        .#{$prefix}field-toolbar & {
+            height: $form-toolbar-field-height;
+            line-height: $form-toolbar-field-content-height;
+        }
+    }
+
+    @if $include-content-box {
+        .#{$prefix}content-box & {
+            height: $form-field-content-height;
+        }
+
+        @if $include-ext-toolbar-toolbar and $form-toolbar-field-height != $form-field-height {
+            .#{$prefix}content-box .#{$prefix}field-toolbar & {
+                height: $form-toolbar-field-content-height;
+            }
+        }
+
+    }
+}
+
+.#{$prefix}form-focus {
+    border-color: $form-field-focus-border-color;
+}
+
+.#{$prefix}form-empty-field,
+textarea.#{$prefix}form-empty-field {
+    color: $form-field-empty-color;
+}
+
+@if $include-ie {
+    // In oldIE, text inputs get a mysterious extra pixel of spacing above and below.
+    // This is targeted at IE6-IE7 (all modes) and IE9m Quirks mode.
+    .#{$prefix}quirks .#{$prefix}ie,
+    .#{$prefix}ie7m {
+        .#{$prefix}form-text {
+            margin-top: -1px;
+            margin-bottom: -1px;
+        }
+    }
+}

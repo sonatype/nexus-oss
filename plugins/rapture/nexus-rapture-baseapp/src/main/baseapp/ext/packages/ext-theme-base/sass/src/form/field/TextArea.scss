@@ -1,0 +1,9 @@
+.#{$prefix}form-textarea {
+    overflow: auto;
+    resize: none; //Disable browser resizable textarea
+    @if $include-safari {
+        .#{$prefix}safari.#{$prefix}mac & {
+            margin-bottom: -2px; // another bogus margin bug, safari/mac only
+        }
+    }
+}

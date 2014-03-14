@@ -1,0 +1,46 @@
+/**
+ * @class Ext.grid.plugin.Editing
+ */
+
+/**
+ * @var {number}
+ * The height of grid editor text fields.  Defaults to $form-field-height.  If grid row
+ * height is smaller than $form-field-height, defaults to the grid row height.  Grid row
+ * height is caluclated by adding $grid-row-cell-line-height to the top and bottom values of
+ * $grid-cell-inner-padding.
+ */
+$grid-editor-height: if($grid-row-height < $form-field-height, $grid-row-height, $form-field-height) !default;
+
+/**
+ * @var {number/list}
+ * The padding of grid editor text fields.
+ */
+$grid-editor-padding:
+    top($form-field-padding)
+    right($grid-cell-inner-padding) - $form-field-border-width
+    bottom($form-field-padding)
+    left($grid-cell-inner-padding) - $form-field-border-width !default;
+
+/**
+ * @var {number}
+ * The font size of the grid editor text
+ */
+$grid-editor-font-size: $grid-row-cell-font-size !default;
+
+/**
+ * @var {string}
+ * The font-weight of the grid editor text
+ */
+$grid-editor-font-weight: $grid-row-cell-font-weight !default;
+
+/**
+ * @var {string}
+ * The font-family of the grid editor text
+ */
+$grid-editor-font-family: $grid-row-cell-font-family !default;
+
+// private
+$grid-editor-content-height: $grid-editor-height - vertical($grid-editor-padding) - vertical($form-field-border-width);
+
+// private
+$grid-editor-font: $grid-editor-font-weight #{$grid-editor-font-size}/#{$grid-editor-content-height} $grid-editor-font-family;

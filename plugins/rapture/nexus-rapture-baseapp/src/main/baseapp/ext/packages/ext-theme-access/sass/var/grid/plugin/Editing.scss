@@ -1,0 +1,8 @@
+/** @class Ext.grid.plugin.Editing */
+//
+
+$grid-editor-padding:
+    1px
+    right($grid-cell-inner-padding) - $form-field-border-width
+    2px
+    left($grid-cell-inner-padding) - $form-field-border-width !default;

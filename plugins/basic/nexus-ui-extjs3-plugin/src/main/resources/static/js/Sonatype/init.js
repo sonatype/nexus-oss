@@ -14,6 +14,8 @@
 define('Sonatype/init',['extjs', 'sonatype', 'Nexus/util/observable', 'sonatype'], function(Ext, Sonatype, Nexus) {
   Ext.apply(Sonatype, {
           init : function() {
+            Ext.Direct.addProvider(NX.direct.api.REMOTING_API);
+
             Ext.QuickTips.init();
             Ext.apply(Ext.QuickTips.getQuickTip(), {
               showDelay : 250,

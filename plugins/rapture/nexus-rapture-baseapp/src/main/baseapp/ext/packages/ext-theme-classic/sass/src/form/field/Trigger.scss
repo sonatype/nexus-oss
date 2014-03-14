@@ -1,0 +1,21 @@
+.#{$prefix}form-trigger {
+    height: $form-field-height;
+
+    @if $include-content-box {
+        .#{$prefix}content-box & {
+            height: $form-field-height - vertical($form-trigger-border-width);
+        }
+    }
+}
+
+@if $include-ext-toolbar-toolbar and $form-toolbar-field-height != $form-field-height {
+    .#{$prefix}field-toolbar .#{$prefix}form-trigger {
+        height: $form-toolbar-field-height;
+
+        @if $include-content-box {
+            .#{$prefix}content-box & {
+                height: $form-toolbar-field-height - vertical($form-trigger-border-width);
+            }
+        }
+    }
+}

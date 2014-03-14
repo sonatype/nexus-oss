@@ -1,0 +1,95 @@
+@function button-default-border-color-over($border-color) {
+    @return lighten($border-color, 10%);
+}
+
+@function button-default-border-color-focus($border-color) {
+    @return lighten($border-color, 10%);
+}
+
+@function button-default-border-color-pressed($border-color) {
+    @return darken($border-color, 10%);
+}
+
+@function button-default-border-color-disabled($border-color) {
+    @return desaturate(lighten($border-color, 30%), 30%);
+}
+
+@function button-default-background-color-over($background-color) {
+    @return lighten($background-color, 10%);
+}
+
+@function button-default-background-color-focus($background-color) {
+    @return lighten($background-color, 10%);
+}
+
+@function button-default-background-color-pressed($background-color) {
+    @return darken($background-color, 10%);
+}
+
+@function button-default-background-color-disabled($background-color) {
+    @return desaturate(lighten($background-color, 30%), 30%);
+}
+
+@function button-default-color-over($color) {
+    @return $color;
+}
+
+@function button-default-color-focus($color) {
+    @return $color;
+}
+
+@function button-default-color-pressed($color) {
+    @return $color
+}
+
+@function button-default-color-disabled($color) {
+    @return $color;
+}
+
+@function button-toolbar-border-color-over($border-color) {
+    @return button-default-border-color-over($border-color);
+}
+
+@function button-toolbar-border-color-focus($border-color) {
+    @return button-default-border-color-focus($border-color);
+}
+
+@function button-toolbar-border-color-pressed($border-color) {
+    @return button-default-border-color-pressed($border-color);
+}
+
+@function button-toolbar-border-color-disabled($border-color) {
+    @return button-default-border-color-disabled($border-color);
+}
+
+@function button-toolbar-background-color-over($background-color) {
+    @return button-default-background-color-over($background-color);
+}
+
+@function button-toolbar-background-color-focus($background-color) {
+    @return button-default-background-color-focus($background-color);
+}
+
+@function button-toolbar-background-color-pressed($background-color) {
+    @return button-default-background-color-pressed($background-color);
+}
+
+@function button-toolbar-background-color-disabled($background-color) {
+    @return button-default-background-color-disabled($background-color);
+}
+
+@function button-toolbar-color-over($color) {
+    @return button-default-color-over($color);
+}
+
+@function button-toolbar-color-focus($color) {
+    @return button-default-color-focus($color);
+}
+
+@function button-toolbar-color-pressed($color) {
+    @return button-default-color-pressed($color);
+}
+
+@function button-toolbar-color-disabled($color) {
+    @return button-default-color-disabled($color);
+}

@@ -1,0 +1,8 @@
+{
+    "name": "ext-theme-access",
+    "type": "theme",
+    "creator": "Sencha",
+    "version": "4.2.2",
+    "compatVersion": "4.2.0",
+    "extend": "ext-theme-classic"
+}

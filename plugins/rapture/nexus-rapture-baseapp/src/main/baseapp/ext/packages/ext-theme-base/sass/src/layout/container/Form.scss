@@ -1,0 +1,14 @@
+// form items within form layout have 5px margin around them
+.#{$prefix}form-layout-table {
+    border-collapse: separate;
+    border-spacing: 0 2px;
+}
+
+@if $include-ie {
+    // IE6 cannot do border-spacing 0 2px;
+    // So we revert pack to a pad row for IE6, see (form/Panel.scss)
+    .#{$prefix}ie6 .#{$prefix}form-layout-table {
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+}

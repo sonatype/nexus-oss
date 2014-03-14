@@ -1,0 +1,11 @@
+{
+  "name": "ext-theme-classic",
+  "format": "1",
+  "version": "4.2.2",
+  "compatVersion": "4.2.0",
+  "creator": "Sencha",
+  "summary": "Ext JS Classic Theme",
+  "detailedDescription": "The Classic Theme is the tried and true theme for Ext JS",
+  "type": "theme",
+  "extend": "ext-theme-neutral"
+}

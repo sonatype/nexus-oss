@@ -240,7 +240,7 @@ public class CapabilitiesResource
     return asCapabilityStatus(capabilityRegistry.disable(capabilityIdentity(id)));
   }
 
-  static Map<String, String> asMap(final List<PropertyXO> properties) {
+  public static Map<String, String> asMap(final List<PropertyXO> properties) {
     final Map<String, String> map = Maps.newHashMap();
 
     if (properties != null) {
@@ -252,7 +252,7 @@ public class CapabilitiesResource
     return map;
   }
 
-  static CapabilityStatusXO asCapabilityStatus(final CapabilityReference reference) {
+  public static CapabilityStatusXO asCapabilityStatus(final CapabilityReference reference) {
     checkNotNull(reference);
 
     CapabilityDescriptor descriptor = reference.context().descriptor();

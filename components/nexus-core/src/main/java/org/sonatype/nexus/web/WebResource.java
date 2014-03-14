@@ -32,6 +32,14 @@ public interface WebResource
 
   String UNKNOWN_CONTENT_TYPE = "application/octet-stream";
 
+  String HTML = "text/html";
+
+  String PLAIN = "text/plain";
+
+  String CSS = "text/css";
+
+  String JAVASCRIPT = "application/x-javascript";
+
   /**
    * The path where the resource is mounted under the servlet-context.
    */

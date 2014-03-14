@@ -1,0 +1,83 @@
+/**
+ * @class Ext.window.Window
+ */
+
+@include extjs-window-ui(
+  $ui: 'message-default',
+
+  $ui-padding: 4px,
+
+  $ui-border-width: 2px,
+  $ui-border-color: #1F1F1F,
+
+  $ui-header-border-width: 2px,
+  $ui-header-color: #ffffff,
+  $ui-header-background-color: #444444,
+
+  $ui-body-color: #000000,
+  $ui-body-background-color: #FFFFFF
+);
+
+@include extjs-window-ui(
+  $ui: 'message-primary',
+
+  $ui-padding: 4px,
+
+  $ui-border-width: 2px,
+  $ui-border-color: #1c5e9b,
+
+  $ui-header-border-width: 2px,
+  $ui-header-color: #ffffff,
+  $ui-header-background-color: #2476c3,
+
+  $ui-body-color: #000000,
+  $ui-body-background-color: #FFFFFF
+);
+
+@include extjs-window-ui(
+  $ui: 'message-danger',
+
+  $ui-padding: 4px,
+
+  $ui-border-width: 2px,
+  $ui-border-color: #802420,
+
+  $ui-header-border-width: 2px,
+  $ui-header-color: #ffffff,
+  $ui-header-background-color: #d64b46,
+
+  $ui-body-color: #000000,
+  $ui-body-background-color: #FFFFFF
+);
+
+@include extjs-window-ui(
+  $ui: 'message-warning',
+
+  $ui-padding: 4px,
+
+  $ui-border-width: 2px,
+  $ui-border-color: #c06a25,
+
+  $ui-header-border-width: 2px,
+  $ui-header-color: #ffffff,
+  $ui-header-background-color: #f69e40,
+
+  $ui-body-color: #000000,
+  $ui-body-background-color: #FFFFFF
+);
+
+@include extjs-window-ui(
+  $ui: 'message-success',
+
+  $ui-padding: 4px,
+
+  $ui-border-width: 2px,
+  $ui-border-color: #408140,
+
+  $ui-header-border-width: 2px,
+  $ui-header-color: #ffffff,
+  $ui-header-background-color: #5ab45a,
+
+  $ui-body-color: #000000,
+  $ui-body-background-color: #FFFFFF
+);

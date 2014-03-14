@@ -46,6 +46,7 @@
     <module>rest</module>
     <module>shiro</module>
     <module>testing</module>
+    <module>ui</module>
 
     <!-- aggregator -->
     <module>all</module>

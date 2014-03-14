@@ -281,6 +281,19 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-testsuite-ui-plugin</artifactId>
+        <type>nexus-plugin</type>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-testsuite-ui-siesta</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-testsupport</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
@@ -407,6 +420,8 @@
             <excludes>
               <exclude>**/Abstract*</exclude>
               <exclude>**/*$*</exclude>
+              <!--TODO remove this line once CI is ready for Ui testing (has web drivers installed)-->
+              <exclude>**/rapture/*</exclude>
             </excludes>
           </configuration>
         </plugin>
@@ -549,11 +564,18 @@
               <exclude>**/nexus-ui-extjs3-plugin/src/main/resources/static/js/ext/ux/**</exclude>
               <exclude>**/nexus-ui-extjs3-plugin/src/main/resources/static/css/ext/ux/**</exclude>
               <exclude>**/nexus-ui-extjs3-plugin/src/main/js-lib/**</exclude>
+              <exclude>**/nexus-rapture-baseapp/src/main/resources/**</exclude>
+              <exclude>**/nexus-rapture-baseapp/src/main/baseapp/**</exclude>
+              <exclude>**/nexus-rapture-plugin/src/main/resources/static/rapture/Ext/ux/**</exclude>
+              <exclude>**/nexus-rapture-plugin/src/main/resources/static/rapture/resources/fonts/**</exclude>
+              <exclude>**/nexus-testsuite-ui-plugin/src/main/resources/static/rapture/siesta/**</exclude>
+              <exclude>**/nexus-testsuite-ui-siesta/src/main/resources/**</exclude>
 
               <!--
               Excludes for specific classes which have compatible, yet different licences.
               -->
               <exclude>**/nexus-ldap-common/**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
+              <exclude>**/nexus-extdirect-plugin/**/com/softwarementors/**</exclude>
             </excludes>
           </configuration>
         </plugin>
