@@ -94,9 +94,13 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
   },
 
   onRefresh: function () {
-    var me = this;
-    me.roots.removeAll();
-    me.setModel(me.model);
+    var me = this,
+        panel = me.getPanel();
+
+    if (panel) {
+      me.roots.removeAll();
+      me.setModel(me.model);
+    }
   },
 
   onSelection: function (list, model) {
