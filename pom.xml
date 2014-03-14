@@ -544,7 +544,7 @@
               <_nouses>true</_nouses>
               <_nodefaultversion>true</_nodefaultversion>
               <_removeheaders>
-                Embed*,Import-Package,Include-Resource
+                Embed*,Import-Package,Include-Resource,Private-Package
               </_removeheaders>
             </instructions>
           </configuration>
