@@ -39,7 +39,7 @@ import javax.validation.ConstraintViolationException;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.model.Response;
 
@@ -82,15 +82,15 @@ public class ExtDirectServlet
 
   private static final Logger log = LoggerFactory.getLogger(ExtDirectServlet.class);
 
-  private final ApplicationConfiguration applicationConfiguration;
+  private final ApplicationDirectories directories;
 
   private final BeanLocator beanLocator;
 
   @Inject
-  public ExtDirectServlet(final ApplicationConfiguration applicationConfiguration,
+  public ExtDirectServlet(final ApplicationDirectories directories,
                           final BeanLocator beanLocator)
   {
-    this.applicationConfiguration = checkNotNull(applicationConfiguration);
+    this.directories = checkNotNull(directories);
     this.beanLocator = checkNotNull(beanLocator);
   }
 
@@ -136,7 +136,7 @@ public class ExtDirectServlet
           }
         })
     );
-    File apiFile = new File(applicationConfiguration.getTemporaryDirectory(), "extdirect/api.js");
+    File apiFile = new File(directories.getTemporaryDirectory(), "extdirect/api.js");
     return Lists.newArrayList(
         new ApiConfiguration(
             "nexus",

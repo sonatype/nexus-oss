@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.plugin.support.FileWebResource;
 import org.sonatype.nexus.web.WebResource;
 import org.sonatype.nexus.web.WebResourceBundle;
@@ -40,15 +40,15 @@ import static org.sonatype.nexus.web.WebResource.JAVASCRIPT;
 public class ExtDirectWebResources
     implements WebResourceBundle
 {
-  private final ApplicationConfiguration applicationConfiguration;
+  private final ApplicationDirectories directories;
 
   @Inject
-  public ExtDirectWebResources(final ApplicationConfiguration applicationConfiguration) {
-    this.applicationConfiguration = checkNotNull(applicationConfiguration);
+  public ExtDirectWebResources(final ApplicationDirectories directories) {
+    this.directories = checkNotNull(directories);
   }
 
   private WebResource create(final String fileName, final String path) {
-    File file = new File(applicationConfiguration.getTemporaryDirectory(), fileName);
+    File file = new File(directories.getTemporaryDirectory(), fileName);
     return new FileWebResource(file, path, JAVASCRIPT, true);
   }
 
