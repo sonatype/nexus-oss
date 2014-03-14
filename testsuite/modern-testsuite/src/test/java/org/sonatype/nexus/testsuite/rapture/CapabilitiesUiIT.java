@@ -11,22 +11,34 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.testsuite;
+package org.sonatype.nexus.testsuite.rapture;
 
 import org.junit.Test;
 
 /**
  * @since 2.8
  */
-public class UiSmokeIT
-    extends UiISiestaLiteTSupport
+public class CapabilitiesUiIT
+    extends SiestaStandardUiITSupport
 {
 
-  public UiSmokeIT(final WebDriverFactory driverFactory) {
-    super(driverFactory);
+  public CapabilitiesUiIT(final String executable, final String[] options) {
+    super(executable, options);
   }
 
   @Test
-  public void smokeIt() {}
+  public void capability_directjengine() throws Exception {
+    run("tests/capability/direct.js");
+  }
+
+  @Test
+  public void capability_list() throws Exception {
+    run("tests/capability/list.js");
+  }
+
+  @Test
+  public void capability_sanity() throws Exception {
+    run("tests/capability/sanity.js");
+  }
 
 }

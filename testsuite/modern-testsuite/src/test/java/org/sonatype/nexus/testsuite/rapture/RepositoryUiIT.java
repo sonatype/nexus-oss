@@ -11,36 +11,34 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.testsuite.capabilities;
-
-import org.sonatype.nexus.testsuite.UiISiestaStandardTSupport;
+package org.sonatype.nexus.testsuite.rapture;
 
 import org.junit.Test;
 
 /**
  * @since 2.8
  */
-public class CapabilitiesUiIT
-    extends UiISiestaStandardTSupport
+public class RepositoryUiIT
+    extends SiestaLiteUiITSupport
 {
 
-  public CapabilitiesUiIT(final String executable, final String[] options) {
-    super(executable, options);
+  public RepositoryUiIT(final WebDriverFactory driverFactory) {
+    super(driverFactory);
   }
 
   @Test
-  public void capability_directjengine() throws Exception {
-    run("tests/capability/direct.js");
+  public void repository_directjengine() throws Exception {
+    run("tests/repository/directjengine.js");
   }
 
   @Test
-  public void capability_list() throws Exception {
-    run("tests/capability/list.js");
+  public void repository_sanity() throws Exception {
+    run("tests/repository/sanity.js");
   }
 
   @Test
-  public void capability_sanity() throws Exception {
-    run("tests/capability/sanity.js");
+  public void remove_repository() throws Exception {
+    run("tests/repository/remove-repository.js");
   }
 
 }

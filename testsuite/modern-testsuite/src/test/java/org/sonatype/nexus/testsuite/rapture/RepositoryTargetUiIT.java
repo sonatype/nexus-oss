@@ -13,42 +13,29 @@
 
 package org.sonatype.nexus.testsuite.rapture;
 
-import org.sonatype.nexus.testsuite.UiISiestaLiteTSupport;
-import org.sonatype.nexus.testsuite.UiISiestaStandardTSupport;
-
 import org.junit.Test;
 
 /**
- * Rapture framework related Siesta tests.
+ * Rapture repository targets related Siesta tests.
  *
  * @since 2.8
  */
-public class FrameworkIT
-    extends UiISiestaLiteTSupport
+public class RepositoryTargetUiIT
+    extends SiestaLiteUiITSupport
 {
 
-  public FrameworkIT(final WebDriverFactory driverFactory) {
+  public RepositoryTargetUiIT(final WebDriverFactory driverFactory) {
     super(driverFactory);
   }
 
   @Test
-  public void framework_Bookmarking() throws Exception {
-    run("tests/framework/functional/Bookmarking.js");
+  public void repositorytarget_RepositoryTargetCRUD() throws Exception {
+    run("tests/repositorytarget/RepositoryTargetCRUD.js");
   }
 
   @Test
-  public void framework_LoginLogout() throws Exception {
-    run("tests/framework/functional/LoginLogout.js");
-  }
-
-  @Test
-  public void framework_ModeButtons() throws Exception {
-    run("tests/framework/functional/ModeButtons.js");
-  }
-
-  @Test
-  public void framework_UnsupportedBrowser() throws Exception {
-    run("tests/framework/functional/UnsupportedBrowser.js");
+  public void repositorytarget_RepositoryTargetExtDirect() throws Exception {
+    run("tests/repositorytarget/RepositoryTargetExtDirect.js");
   }
 
 }

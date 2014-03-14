@@ -11,36 +11,41 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.testsuite.repository;
-
-import org.sonatype.nexus.testsuite.UiISiestaLiteTSupport;
+package org.sonatype.nexus.testsuite.rapture;
 
 import org.junit.Test;
 
 /**
+ * Rapture framework related Siesta tests.
+ *
  * @since 2.8
  */
-public class RepositoryUiIT
-    extends UiISiestaLiteTSupport
+public class FrameworkUiIT
+    extends SiestaLiteUiITSupport
 {
 
-  public RepositoryUiIT(final WebDriverFactory driverFactory) {
+  public FrameworkUiIT(final WebDriverFactory driverFactory) {
     super(driverFactory);
   }
 
   @Test
-  public void repository_directjengine() throws Exception {
-    run("tests/repository/directjengine.js");
+  public void framework_Bookmarking() throws Exception {
+    run("tests/framework/functional/Bookmarking.js");
   }
 
   @Test
-  public void repository_sanity() throws Exception {
-    run("tests/repository/sanity.js");
+  public void framework_LoginLogout() throws Exception {
+    run("tests/framework/functional/LoginLogout.js");
   }
 
   @Test
-  public void remove_repository() throws Exception {
-    run("tests/repository/remove-repository.js");
+  public void framework_ModeButtons() throws Exception {
+    run("tests/framework/functional/ModeButtons.js");
+  }
+
+  @Test
+  public void framework_UnsupportedBrowser() throws Exception {
+    run("tests/framework/functional/UnsupportedBrowser.js");
   }
 
 }

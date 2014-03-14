@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.testsuite;
+package org.sonatype.nexus.testsuite.rapture;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -52,7 +52,7 @@ import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Str
  * @since 2.8
  */
 @NexusStartAndStopStrategy(EACH_TEST)
-public class UiISiestaLiteTSupport
+public class SiestaLiteUiITSupport
     extends NexusRunningParametrizedITSupport
 {
 
@@ -67,7 +67,7 @@ public class UiISiestaLiteTSupport
     );
   }
 
-  public UiISiestaLiteTSupport(final WebDriverFactory driverFactory) {
+  public SiestaLiteUiITSupport(final WebDriverFactory driverFactory) {
     super("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle");
     this.driverFactory = driverFactory;
   }

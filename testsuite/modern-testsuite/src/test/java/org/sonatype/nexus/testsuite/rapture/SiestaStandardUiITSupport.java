@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.testsuite;
+package org.sonatype.nexus.testsuite.rapture;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -40,7 +40,7 @@ import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Str
  * @since 2.8
  */
 @NexusStartAndStopStrategy(EACH_TEST)
-public class UiISiestaStandardTSupport
+public class SiestaStandardUiITSupport
     extends NexusRunningParametrizedITSupport
 {
 
@@ -63,7 +63,7 @@ public class UiISiestaStandardTSupport
     );
   }
 
-  public UiISiestaStandardTSupport(final String executable, final String[] options) {
+  public SiestaStandardUiITSupport(final String executable, final String[] options) {
     super("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle");
     this.executable = executable;
     this.options = options;

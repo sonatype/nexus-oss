@@ -13,31 +13,20 @@
 
 package org.sonatype.nexus.testsuite.rapture;
 
-import org.sonatype.nexus.testsuite.UiISiestaLiteTSupport;
-
 import org.junit.Test;
 
 /**
- * Rapture repository targets related Siesta tests.
- *
  * @since 2.8
  */
-public class RepositoryTargetIT
-    extends UiISiestaLiteTSupport
+public class SmokeUiIT
+    extends SiestaLiteUiITSupport
 {
 
-  public RepositoryTargetIT(final WebDriverFactory driverFactory) {
+  public SmokeUiIT(final WebDriverFactory driverFactory) {
     super(driverFactory);
   }
 
   @Test
-  public void repositorytarget_RepositoryTargetCRUD() throws Exception {
-    run("tests/repositorytarget/RepositoryTargetCRUD.js");
-  }
-
-  @Test
-  public void repositorytarget_RepositoryTargetExtDirect() throws Exception {
-    run("tests/repositorytarget/RepositoryTargetExtDirect.js");
-  }
+  public void smokeIt() {}
 
 }

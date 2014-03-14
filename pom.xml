@@ -420,6 +420,8 @@
             <excludes>
               <exclude>**/Abstract*</exclude>
               <exclude>**/*$*</exclude>
+              <!--TODO remove this line once CI is ready for Ui testing (has web drivers installed)-->
+              <exclude>**/rapture/*</exclude>
             </excludes>
           </configuration>
         </plugin>
