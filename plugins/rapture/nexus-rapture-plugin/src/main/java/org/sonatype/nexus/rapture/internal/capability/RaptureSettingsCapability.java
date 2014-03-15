@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Rapture Settings capability.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named(RaptureSettingsCapabilityDescriptor.TYPE_ID)
 public class RaptureSettingsCapability

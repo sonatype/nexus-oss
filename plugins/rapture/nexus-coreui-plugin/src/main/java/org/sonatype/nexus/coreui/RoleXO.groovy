@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull
 /**
  * Role exchange object.
  *
- * @since 2.8
+ * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
 class RoleXO

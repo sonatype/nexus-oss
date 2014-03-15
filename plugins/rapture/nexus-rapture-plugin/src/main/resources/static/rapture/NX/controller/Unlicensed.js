@@ -13,7 +13,7 @@
 /**
  * Controls content of unlicensed panel.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.controller.Unlicensed', {
   extend: 'Ext.app.Controller',

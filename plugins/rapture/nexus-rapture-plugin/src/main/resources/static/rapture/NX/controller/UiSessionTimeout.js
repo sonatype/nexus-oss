@@ -13,7 +13,7 @@
 /**
  * UI Session Timeout management.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.controller.UiSessionTimeout', {
   extend: 'Ext.app.Controller',

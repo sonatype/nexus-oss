@@ -13,7 +13,7 @@
 /**
  * Permissions management.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.controller.Permissions', {
   extend: 'Ext.app.Controller',

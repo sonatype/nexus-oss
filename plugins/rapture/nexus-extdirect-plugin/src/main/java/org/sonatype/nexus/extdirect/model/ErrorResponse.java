@@ -23,7 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Ext.Direct error response.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class ErrorResponse
     extends Response<Object>

@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 /**
  * Ext Store load parameters.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class StoreLoadParameters
 {

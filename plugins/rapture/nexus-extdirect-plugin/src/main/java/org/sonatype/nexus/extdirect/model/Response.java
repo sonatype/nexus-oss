@@ -16,7 +16,7 @@ package org.sonatype.nexus.extdirect.model;
 /**
  * Ext.Direct response.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class Response<T>
 {

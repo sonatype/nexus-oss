@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Implemented by components that provide state values/commands.
  *
- * @since 2.8
+ * @since 3.0
  */
 public interface StateContributor
 {

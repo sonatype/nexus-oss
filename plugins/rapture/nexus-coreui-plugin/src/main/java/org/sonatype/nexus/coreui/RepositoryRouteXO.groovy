@@ -20,7 +20,7 @@ import static org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType
 /**
  * Repository Route exchange object.
  *
- * @since 2.8
+ * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
 class RepositoryRouteXO

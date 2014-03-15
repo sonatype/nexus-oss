@@ -13,7 +13,7 @@
 /**
  * Task type store.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.store.TaskType', {
   extend: 'Ext.data.Store',

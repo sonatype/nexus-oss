@@ -13,7 +13,7 @@
 /**
  * Task master/detail panel.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.view.task.TaskFeature', {
   extend: 'NX.view.masterdetail.Panel',

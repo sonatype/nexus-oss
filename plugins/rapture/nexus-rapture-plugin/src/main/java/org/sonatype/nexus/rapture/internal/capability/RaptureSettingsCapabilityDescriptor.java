@@ -39,7 +39,7 @@ import org.jetbrains.annotations.NonNls;
 /**
  * {@link RaptureSettingsCapability} descriptor.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named(RaptureSettingsCapabilityDescriptor.TYPE_ID)
 @Singleton

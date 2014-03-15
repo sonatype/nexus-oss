@@ -15,7 +15,7 @@
  * A {@link NX.util.condition.Condition} that is satisfied when a grid, specified by its selector, exists and has a
  * selection. Optionally, a function could be used to provide additional checking when grid has a selection.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.util.condition.GridHasSelection', {
   extend: 'NX.util.condition.Condition',

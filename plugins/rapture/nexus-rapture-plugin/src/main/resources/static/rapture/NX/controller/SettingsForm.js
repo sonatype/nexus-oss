@@ -14,7 +14,7 @@
  * Controls forms marked with settingsForm = true by adding save/discard/refresh functionality using form configured
  * api.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.controller.SettingsForm', {
   extend: 'Ext.app.Controller',

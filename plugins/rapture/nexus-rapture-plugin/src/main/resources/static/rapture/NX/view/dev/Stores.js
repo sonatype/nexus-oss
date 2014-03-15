@@ -13,7 +13,7 @@
 /**
  * Stores developer panel controller.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.view.dev.Stores', {
   extend: 'Ext.Panel',

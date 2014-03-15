@@ -49,7 +49,7 @@ import static org.sonatype.nexus.rapture.internal.ui.StateComponent.shouldSend;
 /**
  * Security Ext.Direct component.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @Singleton

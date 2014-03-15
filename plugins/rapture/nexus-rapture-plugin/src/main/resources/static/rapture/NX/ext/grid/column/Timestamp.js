@@ -14,7 +14,7 @@
  * A {@link Ext.grid.column.Column} definition class which renders a passed timestamp according to a configured
  * {@link #format}.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.ext.grid.column.Timestamp', {
   extend: 'Ext.grid.column.Column',

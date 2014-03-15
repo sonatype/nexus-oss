@@ -13,7 +13,7 @@
 /**
  * Unlicensed panel.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.view.Unlicensed', {
   extend: 'Ext.panel.Panel',

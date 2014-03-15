@@ -20,7 +20,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy
 /**
  * Repository Hosted Maven exchange object.
  *
- * @since 2.8
+ * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
 class RepositoryHostedMavenXO

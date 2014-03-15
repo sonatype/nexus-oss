@@ -16,7 +16,7 @@ package org.sonatype.nexus.rapture;
 /**
  * RaptureSettings.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class RaptureSettings
 {

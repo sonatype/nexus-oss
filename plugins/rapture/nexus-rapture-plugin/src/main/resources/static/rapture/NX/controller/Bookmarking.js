@@ -13,7 +13,7 @@
 /**
  * Controls bookmarking.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.controller.Bookmarking', {
   extend: 'Ext.app.Controller',

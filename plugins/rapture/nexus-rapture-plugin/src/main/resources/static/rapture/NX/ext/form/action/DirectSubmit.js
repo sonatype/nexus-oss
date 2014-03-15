@@ -16,7 +16,7 @@
  * @see "https://support.sencha.com/index.php#ticket-16118"
  * @see "https://support.sencha.com/index.php#ticket-16102"
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.ext.form.action.DirectSubmit', {
   override: 'Ext.form.action.DirectSubmit',

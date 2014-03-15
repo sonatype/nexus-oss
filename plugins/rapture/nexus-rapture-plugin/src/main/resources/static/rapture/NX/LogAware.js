@@ -14,7 +14,7 @@
 /**
  * Adds logging support helpers to objects.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.LogAware', {
   requires: [

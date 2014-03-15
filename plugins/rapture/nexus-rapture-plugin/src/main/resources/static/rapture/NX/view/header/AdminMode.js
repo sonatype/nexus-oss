@@ -13,7 +13,7 @@
 /**
  * "admin" mode button.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.view.header.AdminMode', {
   extend: 'NX.view.header.Mode',

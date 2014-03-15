@@ -23,7 +23,7 @@ import com.google.common.base.Preconditions;
 /**
  * Rapture.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @Singleton

@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkState;
  * An {@link SsmJsonRequestProcessorThread} that is binds the thread to Shiro subject as well as setting user id in
  * MDC.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 public class ExtDirectJsonRequestProcessorThread

@@ -13,7 +13,7 @@
 /**
  * Security Realm model.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.store.RealmType', {
   extend: 'Ext.data.Store',

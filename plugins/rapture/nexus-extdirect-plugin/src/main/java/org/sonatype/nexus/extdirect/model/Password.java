@@ -16,7 +16,7 @@ package org.sonatype.nexus.extdirect.model;
 /**
  * A password field.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class Password
     extends Base64String

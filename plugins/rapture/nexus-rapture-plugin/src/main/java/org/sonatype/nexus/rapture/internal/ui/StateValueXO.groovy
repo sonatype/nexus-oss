@@ -18,7 +18,7 @@ import groovy.transform.ToString
 /**
  * State value exchange object.
  *
- * @since 2.8
+ * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
 class StateValueXO

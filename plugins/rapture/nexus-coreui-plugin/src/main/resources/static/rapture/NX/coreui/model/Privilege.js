@@ -13,7 +13,7 @@
 /**
  * Privilege model.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.model.Privilege', {
   extend: 'Ext.data.Model',

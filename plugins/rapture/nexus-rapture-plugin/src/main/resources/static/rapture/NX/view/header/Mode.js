@@ -13,7 +13,7 @@
 /**
  * Base class for mode buttons.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.view.header.Mode', {
   extend: 'Ext.button.Button',

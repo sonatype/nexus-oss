@@ -13,7 +13,7 @@
 /**
  * Controls content of unsupported browser panel.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.controller.UnsupportedBrowser', {
   extend: 'Ext.app.Controller',

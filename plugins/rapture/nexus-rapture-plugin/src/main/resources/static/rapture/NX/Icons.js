@@ -14,7 +14,7 @@
 /**
  * Helpers to interact with Icon controller.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.Icons', {
   singleton: true,

@@ -13,7 +13,7 @@
 /**
  * Developer Conditions controller.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.controller.dev.Conditions', {
   extend: 'Ext.app.Controller',

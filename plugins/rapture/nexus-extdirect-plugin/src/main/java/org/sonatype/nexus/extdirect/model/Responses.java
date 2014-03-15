@@ -25,7 +25,7 @@ import org.sonatype.configuration.validation.ValidationMessage;
 /**
  * Ext.Direct response builder.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class Responses
 {

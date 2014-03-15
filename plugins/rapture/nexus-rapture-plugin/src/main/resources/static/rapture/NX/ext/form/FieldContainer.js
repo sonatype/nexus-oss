@@ -14,7 +14,7 @@
 /**
  * **{@link Ext.form.FieldContainer}** override, that changes default label width.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.ext.form.FieldContainer', {
   override: 'Ext.form.FieldContainer',

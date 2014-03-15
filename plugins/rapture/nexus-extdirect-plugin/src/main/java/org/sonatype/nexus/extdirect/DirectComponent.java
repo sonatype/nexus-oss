@@ -16,7 +16,7 @@ package org.sonatype.nexus.extdirect;
 /**
  * Marker interface for Ext.Direct resources.
  *
- * @since 2.8
+ * @since 3.0
  */
 public interface DirectComponent
 {

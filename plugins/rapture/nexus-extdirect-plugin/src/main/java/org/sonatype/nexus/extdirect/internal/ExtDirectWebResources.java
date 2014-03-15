@@ -33,7 +33,7 @@ import static org.sonatype.nexus.web.WebResource.JAVASCRIPT;
 /**
  * Ext.Direct web-resources.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @Singleton

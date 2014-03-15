@@ -32,7 +32,7 @@ import javax.inject.Singleton
 /**
  * Repository Storage Item Info {@link DirectComponent}.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @Singleton

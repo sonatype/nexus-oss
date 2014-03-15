@@ -13,7 +13,7 @@
 /**
  * Privilege add panel (for repository target).
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
   extend: 'NX.view.AddWindow',

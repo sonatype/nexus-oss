@@ -22,7 +22,7 @@ import org.eclipse.sisu.EagerSingleton;
 /**
  * Ext.Direct plugin.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @EagerSingleton

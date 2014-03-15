@@ -13,7 +13,7 @@
 /**
  * "user" mode button.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.view.header.User', {
   extend: 'NX.view.header.Mode',

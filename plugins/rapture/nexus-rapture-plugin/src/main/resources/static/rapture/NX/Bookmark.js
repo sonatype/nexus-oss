@@ -13,7 +13,7 @@
 /**
  * A bookmark.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.Bookmark', {
 

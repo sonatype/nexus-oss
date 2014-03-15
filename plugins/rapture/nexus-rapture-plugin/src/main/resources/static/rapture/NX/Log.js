@@ -14,7 +14,7 @@
 /**
  * Global logging helper.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.Log', {
   singleton: true,

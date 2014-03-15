@@ -13,7 +13,7 @@
 /**
  * Role tree panel.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.view.role.RoleTree', {
   extend: 'Ext.tree.Panel',

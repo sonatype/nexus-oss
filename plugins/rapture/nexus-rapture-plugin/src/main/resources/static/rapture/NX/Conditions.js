@@ -14,7 +14,7 @@
 /**
  * Access point for available {NX.util.condition.Condition}s.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.Conditions', {
   singleton: true,

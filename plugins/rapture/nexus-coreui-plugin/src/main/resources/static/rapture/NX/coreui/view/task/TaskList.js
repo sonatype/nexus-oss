@@ -13,7 +13,7 @@
 /**
  * Task list.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.view.task.TaskList', {
   extend: 'Ext.grid.Panel',

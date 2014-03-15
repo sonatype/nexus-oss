@@ -19,7 +19,7 @@ import org.sonatype.nexus.extdirect.model.Password
 /**
  * Anonymous Security Settings exchange object.
  *
- * @since 2.8
+ * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
 class SecurityAnonymousXO

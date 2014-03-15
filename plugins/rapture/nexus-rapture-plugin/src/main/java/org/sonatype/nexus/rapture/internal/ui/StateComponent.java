@@ -46,7 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * State Ext.Direct component.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @Singleton

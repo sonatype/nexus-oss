@@ -13,7 +13,7 @@
 /**
  * Maven upload controller.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.controller.MavenUpload', {
   extend: 'Ext.app.Controller',

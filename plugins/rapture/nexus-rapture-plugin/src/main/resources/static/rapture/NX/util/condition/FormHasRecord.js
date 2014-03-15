@@ -16,7 +16,7 @@
  * selector, exists and has a record. Optionally, a function could be used to provide additional checking when form has
  * a record.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.util.condition.FormHasRecord', {
   extend: 'NX.util.condition.Condition',

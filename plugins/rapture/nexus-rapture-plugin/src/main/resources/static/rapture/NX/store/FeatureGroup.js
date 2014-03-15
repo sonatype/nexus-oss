@@ -14,7 +14,7 @@
 /**
  * Store containing {@link Feature} records for selected feature group (children of feature node).
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.store.FeatureGroup', {
   extend: 'Ext.data.ArrayStore',

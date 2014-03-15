@@ -13,7 +13,7 @@
 /**
  * Developer Conditions grid.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.view.dev.Conditions', {
   extend: 'Ext.grid.Panel',

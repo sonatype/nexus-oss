@@ -13,7 +13,7 @@
 /**
  * Repository Route feature.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteFeature', {
   extend: 'NX.view.masterdetail.Panel',

@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * Support for template-based {@link WebResource} implementations.
  *
- * @since 2.8
+ * @since 3.0
  */
 public abstract class TemplateWebResource
     extends GeneratedWebResource

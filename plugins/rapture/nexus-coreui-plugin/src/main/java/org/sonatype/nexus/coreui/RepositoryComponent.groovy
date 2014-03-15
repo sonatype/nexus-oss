@@ -47,7 +47,7 @@ import java.util.regex.Pattern
 /**
  * Repository {@link DirectComponent}.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @Singleton

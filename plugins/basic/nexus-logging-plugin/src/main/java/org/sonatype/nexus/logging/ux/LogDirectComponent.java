@@ -34,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Log Ext.Direct resource.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @Singleton

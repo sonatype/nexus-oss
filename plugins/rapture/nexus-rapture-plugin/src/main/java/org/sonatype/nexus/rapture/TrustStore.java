@@ -14,7 +14,7 @@
 package org.sonatype.nexus.rapture;
 
 /**
- * @since 2.8
+ * @since 3.0
  */
 public interface TrustStore
 {

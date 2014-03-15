@@ -23,7 +23,7 @@ import org.eclipse.sisu.EagerSingleton;
 /**
  * Automatically create Rapture capabilities.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @EagerSingleton

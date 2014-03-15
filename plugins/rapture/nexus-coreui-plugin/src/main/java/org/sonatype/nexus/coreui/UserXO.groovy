@@ -24,7 +24,7 @@ import javax.validation.constraints.NotNull
 /**
  * User exchange object.
  *
- * @since 2.8
+ * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
 class UserXO

@@ -14,7 +14,7 @@
 /**
  * Holds application context values.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.State', {
   singleton: true,

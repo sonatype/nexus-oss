@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Configuration adapter for {@link RaptureSettingsCapability}.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class RaptureSettingsCapabilityConfiguration
     extends RaptureSettings

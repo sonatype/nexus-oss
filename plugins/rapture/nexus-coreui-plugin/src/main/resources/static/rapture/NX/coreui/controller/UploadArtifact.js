@@ -13,7 +13,7 @@
 /**
  * Artifact upload controller.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.controller.UploadArtifact', {
   extend: 'Ext.app.Controller',

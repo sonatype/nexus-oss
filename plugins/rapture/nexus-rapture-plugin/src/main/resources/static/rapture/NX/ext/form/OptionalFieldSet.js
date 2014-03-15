@@ -13,7 +13,7 @@
 /**
  * A **{@link Ext.form.FieldSet}** that enable/disable contained items on expand/collapse.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.ext.form.OptionalFieldSet', {
   extend: 'Ext.form.FieldSet',

@@ -13,7 +13,7 @@
 /**
  * Privilege trace panel.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
   extend: 'Ext.Panel',

@@ -13,7 +13,7 @@
 /**
  * Repository Route model.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.model.RepositoryRoute', {
   extend: 'Ext.data.Model',

@@ -56,7 +56,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 /**
  * Capabilities Ext.Direct resource.
  *
- * @since 2.7
+ * @since 3.0
  */
 @Named
 @Singleton

@@ -20,7 +20,7 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy
 /**
  * Repository Proxy Maven exchange object.
  *
- * @since 2.8
+ * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
 class RepositoryProxyMavenXO

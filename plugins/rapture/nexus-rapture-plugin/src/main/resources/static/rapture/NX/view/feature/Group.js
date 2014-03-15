@@ -14,7 +14,7 @@
 /**
  * Shows an icon display of features in the {@link FeatureGroup} store.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.view.feature.Group', {
   extend: 'Ext.panel.Panel',

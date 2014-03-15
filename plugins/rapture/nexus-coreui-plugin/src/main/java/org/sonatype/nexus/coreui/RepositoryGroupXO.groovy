@@ -17,7 +17,7 @@ import groovy.transform.ToString
 /**
  * Repository Group exchange object.
  * 
- * @since 2.8
+ * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
 class RepositoryGroupXO

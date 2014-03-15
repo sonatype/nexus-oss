@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Ext.Direct module.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 public class ExtDirectModule

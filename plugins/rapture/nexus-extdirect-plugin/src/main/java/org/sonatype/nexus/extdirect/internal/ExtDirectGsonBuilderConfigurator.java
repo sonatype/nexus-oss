@@ -33,7 +33,7 @@ import org.apache.shiro.codec.Base64;
 /**
  * Additional GSon type adapters.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class ExtDirectGsonBuilderConfigurator
     extends DefaultGsonBuilderConfigurator

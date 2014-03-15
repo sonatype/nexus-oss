@@ -26,7 +26,7 @@ import org.sonatype.sisu.goodies.template.TemplateParameters;
  * Keeping this page at the same level as {@code /index.html} so that
  * paths/config will work properly when this becomes the main {@code /index.html} page.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @Singleton

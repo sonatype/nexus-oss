@@ -15,7 +15,7 @@
  * A {@link NX.util.condition.Condition} that is satisfied when all AND-ed {@link NX.util.condition.Condition}s
  * are satisfied.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.util.condition.Conjunction', {
   extend: 'NX.util.condition.Condition',

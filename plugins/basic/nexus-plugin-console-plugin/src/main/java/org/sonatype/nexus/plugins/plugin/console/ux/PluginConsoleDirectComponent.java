@@ -29,7 +29,7 @@ import com.softwarementors.extjs.djn.config.annotations.DirectMethod;
 /**
  * Plugin Console Ext.Direct resource.
  *
- * @since 2.7
+ * @since 3.0
  */
 @Named
 @Singleton

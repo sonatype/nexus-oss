@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Provides {@code /static/rapture/app.js}.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @Singleton

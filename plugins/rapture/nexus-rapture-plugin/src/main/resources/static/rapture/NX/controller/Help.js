@@ -13,7 +13,7 @@
 /**
  * Controls header menu.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.controller.Help', {
   extend: 'Ext.app.Controller',

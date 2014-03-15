@@ -14,7 +14,7 @@
 /**
  * **{@link Ext.form.field.Base}** override, that changes default label width.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.ext.form.field.Base', {
   override: 'Ext.form.field.Base',

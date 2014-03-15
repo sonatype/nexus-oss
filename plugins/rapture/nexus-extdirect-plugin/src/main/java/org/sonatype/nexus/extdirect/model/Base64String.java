@@ -15,7 +15,7 @@ package org.sonatype.nexus.extdirect.model;
 
 /**
  * Works as a marker for fields
- * @since 2.8
+ * @since 3.0
  */
 public class Base64String
 {

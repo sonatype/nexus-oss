@@ -14,7 +14,7 @@
 /**
  * Helpers to show dialog boxes.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.Dialogs', {
   singleton: true,

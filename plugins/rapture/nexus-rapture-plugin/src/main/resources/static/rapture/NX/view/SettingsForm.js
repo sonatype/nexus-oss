@@ -13,7 +13,7 @@
 /**
  * Base form panel.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.view.SettingsForm', {
   extend: 'Ext.form.Panel',

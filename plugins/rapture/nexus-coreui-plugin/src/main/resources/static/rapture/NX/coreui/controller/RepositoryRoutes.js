@@ -13,7 +13,7 @@
 /**
  * Repository Routes controller.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.controller.RepositoryRoutes', {
   extend: 'NX.controller.MasterDetail',

@@ -13,7 +13,7 @@
 /**
  * "search" mode button.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.view.header.SearchMode', {
   extend: 'NX.view.header.Mode',

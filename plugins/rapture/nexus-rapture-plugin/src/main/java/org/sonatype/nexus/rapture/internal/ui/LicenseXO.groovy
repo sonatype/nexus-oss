@@ -18,7 +18,7 @@ import groovy.transform.ToString
 /**
  * License exchange object.
  *
- * @since 2.8
+ * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
 class LicenseXO

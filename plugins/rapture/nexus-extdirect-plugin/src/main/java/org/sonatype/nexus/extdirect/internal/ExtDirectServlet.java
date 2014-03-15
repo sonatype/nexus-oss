@@ -72,7 +72,7 @@ import static org.sonatype.nexus.extdirect.model.Responses.success;
 /**
  * Ext.Direct Servlet.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @Singleton

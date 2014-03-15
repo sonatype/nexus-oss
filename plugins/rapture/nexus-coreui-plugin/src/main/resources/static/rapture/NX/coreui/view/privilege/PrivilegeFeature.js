@@ -13,7 +13,7 @@
 /**
  * Privilege feature.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.view.privilege.PrivilegeFeature', {
   extend: 'NX.view.masterdetail.Panel',

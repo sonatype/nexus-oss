@@ -30,7 +30,7 @@ import javax.inject.Singleton
 /**
  * Anonymous Security Settings {@link DirectComponent}.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @Singleton

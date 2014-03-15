@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Ext.Direct validation response.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class ValidationResponse
     extends Response<Object>

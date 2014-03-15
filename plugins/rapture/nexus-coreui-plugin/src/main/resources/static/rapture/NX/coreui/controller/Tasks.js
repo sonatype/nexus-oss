@@ -13,7 +13,7 @@
 /**
  * Task master/detail controller.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.coreui.controller.Tasks', {
   extend: 'NX.controller.MasterDetail',

@@ -36,7 +36,7 @@ import com.softwarementors.extjs.djn.config.annotations.DirectMethod;
 /**
  * Capability Type Ext.Direct resource.
  *
- * @since 2.7
+ * @since 3.0
  */
 @Named
 @Singleton

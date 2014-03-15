@@ -17,7 +17,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 /**
  * Support for {@link DirectComponent} implementations.
  *
- * @since 2.8
+ * @since 3.0
  */
 public abstract class DirectComponentSupport
   extends ComponentSupport

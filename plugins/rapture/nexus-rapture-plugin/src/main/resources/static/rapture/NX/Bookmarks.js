@@ -14,7 +14,7 @@
 /**
  * Helpers to interact with **{@link NX.controller.Bookmarking}** controller.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.Bookmarks', {
   singleton: true,

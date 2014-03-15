@@ -13,7 +13,7 @@
 /**
  * Refresh controller.
  *
- * @since 2.8
+ * @since 3.0
  */
 Ext.define('NX.controller.Refresh', {
   extend: 'Ext.app.Controller',
