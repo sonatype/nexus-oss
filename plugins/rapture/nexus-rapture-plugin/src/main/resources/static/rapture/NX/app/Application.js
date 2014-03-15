@@ -114,6 +114,9 @@ Ext.define('NX.app.Application', {
     },
     debugMode: function () {
       return NX.State.getValue('debug') === true;
+    },
+    pluginActive: function (coordinates) {
+      return NX.State.getValue('plugins').indexOf(coordinates) > -1;
     }
   },
 
