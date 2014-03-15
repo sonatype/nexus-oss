@@ -22,14 +22,22 @@ Ext.define('NX.coreui.app.PluginConfig', {
   ],
 
   controllers: [
-    'NX.coreui.controller.Capabilities',
+    { id: 'NX.coreui.controller.Capabilities',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-capabilities-plugin');
+      }
+    },
     'NX.coreui.controller.BrowseRepositories',
     'NX.coreui.controller.BrowseRepositoryItemInfo',
     'NX.coreui.controller.BrowseRepositoryItemClm',
     'NX.coreui.controller.BrowseStorage',
     'NX.coreui.controller.BrowseIndex',
     'NX.coreui.controller.MavenUpload',
-    'NX.coreui.controller.PluginConsole',
+    { id: 'NX.coreui.controller.PluginConsole',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-plugin-console-plugin');
+      }
+    },
     'NX.coreui.controller.Repositories',
     'NX.coreui.controller.RepositoryTargets',
     'NX.coreui.controller.RepositoryRoutes',
