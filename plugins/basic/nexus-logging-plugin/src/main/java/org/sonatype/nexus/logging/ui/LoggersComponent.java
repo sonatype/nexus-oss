@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.logging.ux;
+package org.sonatype.nexus.logging.ui;
 
 import java.util.List;
 
@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
 import org.sonatype.nexus.logging.LoggingConfigurator;
 import org.sonatype.nexus.logging.LoggingPlugin;
@@ -34,21 +35,21 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Loggers Ext.Direct resource.
+ * Loggers {@link DirectComponent}.
  *
  * @since 3.0
  */
 @Named
 @Singleton
 @DirectAction(action = "logging_Loggers")
-public class LoggersDirectComponent
+public class LoggersComponent
     extends DirectComponentSupport
 {
 
   private final LoggingConfigurator configurator;
 
   @Inject
-  public LoggersDirectComponent(final LoggingConfigurator configurator) {
+  public LoggersComponent(final LoggingConfigurator configurator) {
     this.configurator = checkNotNull(configurator, "configurator");
   }
 

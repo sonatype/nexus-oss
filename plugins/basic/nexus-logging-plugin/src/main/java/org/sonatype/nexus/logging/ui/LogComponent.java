@@ -11,12 +11,13 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.logging.ux;
+package org.sonatype.nexus.logging.ui;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
@@ -32,21 +33,21 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Log Ext.Direct resource.
+ * Log {@link DirectComponent}.
  *
  * @since 3.0
  */
 @Named
 @Singleton
 @DirectAction(action = "logging_Log")
-public class LogDirectComponent
+public class LogComponent
     extends DirectComponentSupport
 {
 
   private final LogManager logManager;
 
   @Inject
-  public LogDirectComponent(final LogManager logManager) {
+  public LogComponent(final LogManager logManager) {
     this.logManager = checkNotNull(logManager);
   }
 

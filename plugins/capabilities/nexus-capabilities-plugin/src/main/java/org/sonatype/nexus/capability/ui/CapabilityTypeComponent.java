@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.capability.ux;
+package org.sonatype.nexus.capability.ui;
 
 import java.util.List;
 
@@ -22,6 +22,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.capability.ux.model.CapabilityTypeUX;
 import org.sonatype.nexus.capability.ux.model.FormFieldUX;
+import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.Selectable;
@@ -34,21 +35,21 @@ import com.softwarementors.extjs.djn.config.annotations.DirectAction;
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod;
 
 /**
- * Capability Type Ext.Direct resource.
+ * Capability Type {@link DirectComponent}.
  *
  * @since 3.0
  */
 @Named
 @Singleton
 @DirectAction(action = "capability_CapabilityType")
-public class CapabilityTypeDirectComponent
+public class CapabilityTypeComponent
     extends DirectComponentSupport
 {
 
   private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
 
   @Inject
-  public CapabilityTypeDirectComponent(final CapabilityDescriptorRegistry capabilityDescriptorRegistry) {
+  public CapabilityTypeComponent(final CapabilityDescriptorRegistry capabilityDescriptorRegistry) {
     this.capabilityDescriptorRegistry = capabilityDescriptorRegistry;
   }
 

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.capability.ux;
+package org.sonatype.nexus.capability.ui;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -29,6 +29,7 @@ import org.sonatype.nexus.capability.ux.model.CapabilityStatusUX;
 import org.sonatype.nexus.capability.ux.model.CapabilityUX;
 import org.sonatype.nexus.capability.ux.model.PropertyUX;
 import org.sonatype.nexus.capability.ux.model.TagUX;
+import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
@@ -54,23 +55,23 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabil
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
 /**
- * Capabilities Ext.Direct resource.
+ * Capabilities {@link DirectComponent}.
  *
  * @since 3.0
  */
 @Named
 @Singleton
 @DirectAction(action = "capability_Capability")
-public class CapabilityDirectComponent
+public class CapabilityComponent
     extends DirectComponentSupport
 {
 
-  private static final Logger log = LoggerFactory.getLogger(CapabilityDirectComponent.class);
+  private static final Logger log = LoggerFactory.getLogger(CapabilityComponent.class);
 
   private final CapabilityRegistry capabilityRegistry;
 
   @Inject
-  public CapabilityDirectComponent(final CapabilityRegistry capabilityRegistry) {
+  public CapabilityComponent(final CapabilityRegistry capabilityRegistry) {
     this.capabilityRegistry = checkNotNull(capabilityRegistry);
   }
 

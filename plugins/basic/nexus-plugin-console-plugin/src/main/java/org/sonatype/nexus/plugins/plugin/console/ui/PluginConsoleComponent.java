@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plugins.plugin.console.ux;
+package org.sonatype.nexus.plugins.plugin.console.ui;
 
 import java.util.List;
 
@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
 import org.sonatype.nexus.plugins.plugin.console.PluginConsoleManager;
 import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
@@ -27,21 +28,21 @@ import com.softwarementors.extjs.djn.config.annotations.DirectAction;
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod;
 
 /**
- * Plugin Console Ext.Direct resource.
+ * Plugin Console {@link DirectComponent}.
  *
  * @since 3.0
  */
 @Named
 @Singleton
 @DirectAction(action = "pluginconsole_PluginConsole")
-public class PluginConsoleDirectComponent
+public class PluginConsoleComponent
     extends DirectComponentSupport
 {
 
   private final PluginConsoleManager pluginConsoleManager;
 
   @Inject
-  public PluginConsoleDirectComponent(final PluginConsoleManager pluginConsoleManager) {
+  public PluginConsoleComponent(final PluginConsoleManager pluginConsoleManager) {
     this.pluginConsoleManager = pluginConsoleManager;
   }
 
