@@ -98,7 +98,7 @@ Ext.define('NX.coreui.view.role.RoleTree', {
     if (me.active) {
       Ext.suspendLayouts();
       me.getStore().getRootNode().removeAll();
-      if (Ext.isDefined(me.model) && me.roleStore.getCount() > 0 && me.privilegeStore.getCount() > 0) {
+      if (Ext.isDefined(me.model) && (me.roleStore.getCount() || me.privilegeStore.getCount())) {
         me.addRoles(me.getStore().getRootNode(), me.model.roles);
         me.addPrivileges(me.getStore().getRootNode(), me.model.privileges);
         me.getStore().sort([
@@ -126,7 +126,7 @@ Ext.define('NX.coreui.view.role.RoleTree', {
             text: role.get('name'),
             roles: role.get('roles'),
             privileges: role.get('privileges'),
-            leaf: !role.get('roles') || role.get('roles').length === 0,
+            leaf: false,
             iconCls: NX.Icons.cls('role-default', 'x16'),
             weight: 0
           });
