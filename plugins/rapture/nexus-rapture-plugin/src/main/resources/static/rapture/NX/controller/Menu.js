@@ -100,6 +100,9 @@ Ext.define('NX.controller.Menu', {
         '#Permissions': {
           changed: me.refreshMenu
         },
+        '#State': {
+          changed: me.onStateChange
+        },
         '#Bookmarking': {
           navigate: me.navigateTo
         },
@@ -261,6 +264,29 @@ Ext.define('NX.controller.Menu', {
   onLogout: function () {
     var me = this;
     me.navigateToFirstFeature = true;
+  },
+
+  /**
+   * @private
+   * On a state change check features visibility and trigger a menu refresh if necessary.
+   */
+  onStateChange: function () {
+    var me = this,
+        shouldRefresh = false;
+
+    me.getFeatureStore().each(function (feature) {
+      var visible, previousVisible;
+      if (feature.get('mode') === me.mode) {
+        visible = feature.get('visible')();
+        previousVisible = me.getFeatureMenuStore().getRootNode().findChild('path', feature.get('path'), true) !== null;
+        shouldRefresh = (visible !== previousVisible);
+      }
+      return !shouldRefresh;
+    });
+
+    if (shouldRefresh) {
+      me.refreshMenu();
+    }
   },
 
   /**
