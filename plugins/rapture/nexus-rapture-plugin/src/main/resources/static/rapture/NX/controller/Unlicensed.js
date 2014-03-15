@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Controls content of unlicensed panel.
+ * Unlicensed uber mode controller.
  *
  * @since 3.0
  */

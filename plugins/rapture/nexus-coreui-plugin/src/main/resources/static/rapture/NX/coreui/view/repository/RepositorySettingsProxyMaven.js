@@ -10,6 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/**
+ * Maven proxy repository settings form.
+ *
+ * @since 3.0
+ */
 Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
   extend: 'NX.coreui.view.repository.RepositorySettings',
   alias: ['widget.nx-repository-settings-proxy-maven1', 'widget.nx-repository-settings-proxy-maven2'],

@@ -15,7 +15,7 @@
 /**
  * 'numberfield' factory.
  *
- * @since 2.7
+ * @since 3.0
  */
 Ext.define('NX.coreui.view.capability.factory.CapabilityNumberFieldFactory', {
   singleton: true,

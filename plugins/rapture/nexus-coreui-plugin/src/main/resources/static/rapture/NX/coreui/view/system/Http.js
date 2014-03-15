@@ -10,6 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/**
+ * System http settings form.
+ *
+ * @since 3.0
+ */
 Ext.define('NX.coreui.view.system.Http', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-system-http',

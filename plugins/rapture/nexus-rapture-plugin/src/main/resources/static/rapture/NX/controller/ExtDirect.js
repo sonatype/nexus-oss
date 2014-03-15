@@ -12,6 +12,8 @@
  */
 /**
  * Watches over Ext.Direct communication.
+ *
+ * @since 3.0
  */
 Ext.define('NX.controller.ExtDirect', {
   extend: 'Ext.app.Controller',

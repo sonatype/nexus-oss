@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Task master/detail controller.
+ * Tasks controller.
  *
  * @since 3.0
  */

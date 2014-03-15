@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Developer Conditions controller.
+ * Conditions developer panel controller.
  *
  * @since 3.0
  */

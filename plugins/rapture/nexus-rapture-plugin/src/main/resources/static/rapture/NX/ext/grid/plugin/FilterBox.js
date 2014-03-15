@@ -12,6 +12,8 @@
  */
 /**
  * Filter plugin for grids.
+ *
+ * @since 3.0
  */
 Ext.define('NX.ext.grid.plugin.FilterBox', {
   extend: 'NX.ext.grid.plugin.Filtering',

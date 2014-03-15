@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Controls header menu.
+ * Header help controller.
  *
  * @since 3.0
  */

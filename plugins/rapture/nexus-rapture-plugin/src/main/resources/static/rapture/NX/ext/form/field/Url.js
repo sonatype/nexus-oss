@@ -12,6 +12,8 @@
  */
 /**
  * An URL **{@link Ext.form.field.Text}**.
+ *
+ * @since 3.0
  */
 Ext.define('NX.ext.form.field.Url', {
   extend: 'Ext.form.field.Text',

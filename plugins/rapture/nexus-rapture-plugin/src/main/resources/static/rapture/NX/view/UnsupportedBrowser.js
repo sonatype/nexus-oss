@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Unsupported browser panel.
+ * Unsupported browser uber mode panel.
  *
  * @since 3.0
  */

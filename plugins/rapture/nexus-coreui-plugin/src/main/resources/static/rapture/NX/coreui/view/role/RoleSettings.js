@@ -10,6 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/**
+ * Role settings form.
+ *
+ * @since 3.0
+ */
 Ext.define('NX.coreui.view.role.RoleSettings', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-role-settings',

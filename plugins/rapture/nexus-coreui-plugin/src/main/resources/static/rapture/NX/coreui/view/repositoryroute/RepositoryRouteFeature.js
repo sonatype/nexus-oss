@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Repository Route feature.
+ * Repository Route feature panel.
  *
  * @since 3.0
  */

@@ -12,6 +12,8 @@
  */
 /**
  * A form field that allows managing multiple values.
+ *
+ * @since 3.0
  */
 Ext.define('NX.ext.form.field.ValueSet', {
   extend: 'Ext.form.FieldContainer',

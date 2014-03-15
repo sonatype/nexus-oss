@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Privilege add panel (for repository target).
+ * Privilege add window (for repository target).
  *
  * @since 3.0
  */

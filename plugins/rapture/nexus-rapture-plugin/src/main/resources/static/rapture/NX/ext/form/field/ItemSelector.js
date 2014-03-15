@@ -13,6 +13,8 @@
 
 /**
  * Extension of Ext.ux.form.ItemSelector to allow better control over button configurations.
+ *
+ * @since 3.0
  */
 Ext.define('NX.ext.form.field.ItemSelector', {
   extend: 'Ext.ux.form.ItemSelector',

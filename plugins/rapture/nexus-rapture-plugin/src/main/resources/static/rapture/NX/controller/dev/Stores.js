@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Stores developer panel.
+ * Stores developer panel controller.
  *
  * @since 3.0
  */

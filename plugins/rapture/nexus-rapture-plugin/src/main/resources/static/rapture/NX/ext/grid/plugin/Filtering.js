@@ -12,6 +12,8 @@
  */
 /**
  * A grid plugins that adds filtering capabilities.
+ *
+ * @since 3.0
  */
 Ext.define('NX.ext.grid.plugin.Filtering', {
   extend: 'Ext.AbstractPlugin',

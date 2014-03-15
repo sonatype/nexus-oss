@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Permissions management.
+ * Permissions management controller.
  *
  * @since 3.0
  */

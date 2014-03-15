@@ -14,6 +14,8 @@
  * Renders icon in a column.
  *
  * Icon must be registered first with NX.controller.Icon.
+ *
+ * @since 3.0
  */
 Ext.define('NX.ext.grid.IconColumn', {
   extend: 'Ext.grid.column.Column',

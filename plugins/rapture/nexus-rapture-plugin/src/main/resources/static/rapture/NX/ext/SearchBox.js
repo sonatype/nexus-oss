@@ -12,6 +12,8 @@
  */
 /**
  * A search box.
+ *
+ * @since 3.0
  */
 Ext.define('NX.ext.SearchBox', {
   extend: 'Ext.form.field.Trigger',

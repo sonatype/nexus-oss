@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Base form panel.
+ * Abstract settings form.
  *
  * @since 3.0
  */

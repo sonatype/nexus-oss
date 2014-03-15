@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * UI Session Timeout management.
+ * UI Session Timeout controller.
  *
  * @since 3.0
  */
