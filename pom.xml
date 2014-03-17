@@ -439,7 +439,7 @@
         </plugin>
 
         <!--
-        For legacy-plugins which still need Plexus descriptors.
+        For maven-plugins which still need Plexus descriptors.
         -->
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
