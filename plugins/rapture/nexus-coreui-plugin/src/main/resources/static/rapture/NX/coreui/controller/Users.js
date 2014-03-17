@@ -91,7 +91,7 @@ Ext.define('NX.coreui.controller.Users', {
       path: '/Account',
       view: { xtype: 'nx-coreui-user-account' },
       visible: function () {
-        return NX.Permissions.check('security:users', 'read');
+        return NX.Security.hasUser();
       }
     }
   ],
