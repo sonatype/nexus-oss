@@ -359,12 +359,12 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @override
    * @private
-   * Enable 'Change Password' when user has 'security:userschangepw:update' permission.
+   * Enable 'Change Password' when user has 'security:userschangepw:create' permission.
    */
   bindChangePasswordButton: function (button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('security:userschangepw', 'update')
+            NX.Conditions.isPermitted('security:userschangepw', 'create')
         ),
         {
           satisfied: button.enable,
