@@ -59,6 +59,9 @@ extends DirectComponentSupport
   @Inject
   NexusConfiguration nexusConfiguration
 
+  /**
+   * @return list of repository targets
+   */
   @DirectMethod
   @RequiresPermissions('nexus:targets:read')
   List<RepositoryTargetXO> read() {
@@ -67,6 +70,11 @@ extends DirectComponentSupport
     }
   }
 
+  /**
+   * Creates a repository target.
+   * @param target to be created
+   * @return created target
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:targets:create')
@@ -82,6 +90,11 @@ extends DirectComponentSupport
     return asRepositoryTarget(result)
   }
 
+  /**
+   * Updates a repository target.
+   * @param target to be updated
+   * @return updated target
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:targets:update')
@@ -96,6 +109,10 @@ extends DirectComponentSupport
     return asRepositoryTarget(result)
   }
 
+  /**
+   * Deletes a repository target.
+   * @param id of target to be deleted
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:targets:delete')
