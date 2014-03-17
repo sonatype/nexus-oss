@@ -118,17 +118,17 @@ public class WebappBootstrap
       lockFile = new LockFile(new File(workDir, "nexus.lock"));
       checkState(lockFile.lock(), "Nexus work directory already in use: %s", workDir);
 
-      String exports;
+      StringBuilder exports = new StringBuilder("com.sun.net.httpserver,");
       InputStream is = getClass().getClassLoader().getResourceAsStream("META-INF/MANIFEST.MF");
       try {
-        exports = new Manifest(is).getMainAttributes().getValue(Constants.EXPORT_PACKAGE);
+        exports.append(new Manifest(is).getMainAttributes().getValue(Constants.EXPORT_PACKAGE));
       }
       finally {
         is.close();
       }
 
       // export additional core (non-plugin) packages from system bundle
-      properties.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, exports);
+      properties.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, exports.toString());
 
       properties.put(Constants.FRAMEWORK_STORAGE, workDir + "/felix-cache");
       properties.put(Constants.FRAMEWORK_STORAGE_CLEAN, Constants.FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
