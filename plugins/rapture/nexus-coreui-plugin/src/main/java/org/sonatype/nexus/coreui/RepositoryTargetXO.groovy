@@ -14,6 +14,10 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.apache.bval.constraints.NotEmpty
+import org.sonatype.nexus.validation.Update
+
+import javax.validation.constraints.NotNull
 
 /**
  * Repository Target exchange object.
@@ -23,11 +27,19 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class RepositoryTargetXO
 {
+  @NotNull(groups = Update.class)
+  @NotEmpty(groups = Update.class)
   String id
 
+  @NotNull
+  @NotEmpty
   String name
 
+  @NotNull
+  @NotEmpty
   String format
 
+  @NotNull
+  @NotEmpty
   List<String> patterns
 }
