@@ -36,6 +36,8 @@ import javax.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
+import java.util.regex.Pattern
+import java.util.regex.PatternSyntaxException
 
 /**
  * Repository Target {@link DirectComponent}.
@@ -117,6 +119,21 @@ extends DirectComponentSupport
     def contentClass = repositoryTypeRegistry.contentClasses[target.format]
     if (!contentClass) {
       validations.addValidationError(new ValidationMessage('format', 'Repository type does not exist'))
+    }
+
+    def invalidPatterns = []
+    target.patterns.each { pattern ->
+      try {
+        Pattern.compile(pattern)
+      }
+      catch (PatternSyntaxException e) {
+        invalidPatterns << pattern
+      }
+    }
+    if (invalidPatterns.size() > 0) {
+      validations.addValidationError(new ValidationMessage(
+          'patterns', 'The following are not valid regular expressions: ' + invalidPatterns.join(','))
+      )
     }
 
     if (!validations.valid) {
