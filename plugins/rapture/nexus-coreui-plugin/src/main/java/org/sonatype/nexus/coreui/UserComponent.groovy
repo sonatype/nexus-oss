@@ -101,7 +101,6 @@ extends DirectComponentSupport
    * @return current logged in user account.
    */
   @DirectMethod
-  @RequiresPermissions('security:users:read')
   @RequiresUser
   UserAccountXO readAccount() {
     String currentUserId = securitySystem.getSubject().getPrincipal().toString()
@@ -142,7 +141,7 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:users:create')
+  @RequiresPermissions('security:users:update')
   @Validate(groups = [Update.class, Default.class])
   UserXO update(final @NotNull(message = 'UserXO may not be null') @Valid UserXO userXO) {
     asUserXO(securitySystem.updateUser(securitySystem.getUser(userXO.id).with {
@@ -164,7 +163,6 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresUser
   @RequiresAuthentication
-  @RequiresPermissions('security:users:create')
   @Validate
   UserAccountXO updateAccount(final @NotNull(message = 'UserAccountXO may not be null') @Valid UserAccountXO userAccountXO) {
     String currentUserId = securitySystem.getSubject().getPrincipal().toString()
