@@ -13,44 +13,33 @@
 package org.sonatype.nexus.webapp;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.jar.Manifest;
 
+import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.sonatype.nexus.NxApplication;
 import org.sonatype.nexus.bootstrap.ConfigurationBuilder;
 import org.sonatype.nexus.bootstrap.ConfigurationHolder;
 import org.sonatype.nexus.bootstrap.EnvironmentVariables;
-import org.sonatype.nexus.guice.NexusModules.CoreModule;
-import org.sonatype.nexus.log.LogManager;
-import org.sonatype.nexus.util.LockFile;
-import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.nexus.bootstrap.LockFile;
 
-import com.google.common.base.Throwables;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.servlet.GuiceServletContextListener;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.context.Context;
-import org.eclipse.sisu.plexus.PlexusSpaceModule;
-import org.eclipse.sisu.space.BeanScanning;
-import org.eclipse.sisu.space.ClassSpace;
-import org.eclipse.sisu.space.URLClassSpace;
-import org.eclipse.sisu.wire.WireModule;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
+import org.osgi.framework.startlevel.FrameworkStartLevel;
+import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Web application bootstrap {@link ServletContextListener}.
@@ -58,7 +47,7 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 2.8
  */
 public class WebappBootstrap
-    extends GuiceServletContextListener
+    implements ServletContextListener
 {
   private static final Logger log = LoggerFactory.getLogger(WebappBootstrap.class);
 
@@ -66,15 +55,6 @@ public class WebappBootstrap
 
   private Framework framework;
 
-  private PlexusContainer container;
-
-  private Injector injector;
-
-  private NxApplication application;
-
-  private LogManager logManager;
-
-  @Override
   public void contextInitialized(final ServletContextEvent event) {
     log.info("Initializing");
 
@@ -111,11 +91,14 @@ public class WebappBootstrap
       requireProperty(properties, "application-conf");
       requireProperty(properties, "security-xml-file");
 
-      // lock the work directory
       File workDir = new File(properties.get("nexus-work")).getCanonicalFile();
-      DirSupport.mkdir(workDir);
+      mkdir(workDir.toPath());
+
+      // lock the work directory
       lockFile = new LockFile(new File(workDir, "nexus.lock"));
-      checkState(lockFile.lock(), "Nexus work directory already in use: %s", workDir);
+      if (!lockFile.lock()) {
+        throw new IllegalStateException("Nexus work directory already in use: " + workDir);
+      }
 
       StringBuilder exports = new StringBuilder("com.sun.net.httpserver,");
       InputStream is = getClass().getClassLoader().getResourceAsStream("META-INF/MANIFEST.MF");
@@ -138,11 +121,22 @@ public class WebappBootstrap
       framework.init();
       framework.start();
 
+      BundleContext ctx = framework.getBundleContext();
+
+      // register as service so framework bundles can access it
+      ctx.registerService(ServletContext.class, context, null);
+
+      // register tracker to find out when filter is ready (and initialization is complete)
+      ServiceTracker<Filter, Filter> filterTracker = new ServiceTracker<Filter, Filter>(ctx, Filter.class, null);
+      filterTracker.open();
+
       File[] bundles = new File(properties.get("nexus-app") + "/bundles").listFiles();
 
       // auto-install anything in the bundles repository
       if (bundles != null && bundles.length > 0) {
-        BundleContext ctx = framework.getBundleContext();
+        FrameworkStartLevel startLevel = framework.adapt(FrameworkStartLevel.class);
+        startLevel.setStartLevel(1);
+        startLevel.setInitialBundleStartLevel(8);
         for (File bundle : bundles) {
           try {
             ctx.installBundle("reference:" + bundle.toURI()).start();
@@ -151,37 +145,27 @@ public class WebappBootstrap
             log.warn("Problem installing: {}", bundle, e);
           }
         }
+        startLevel.setStartLevel(8);
       }
 
-      // create the injector
-      ClassSpace coreSpace = new URLClassSpace(Thread.currentThread().getContextClassLoader());
-      injector = Guice.createInjector(
-          new WireModule(
-              new CoreModule(context, properties, framework),
-              new PlexusSpaceModule(coreSpace, BeanScanning.INDEX)));
-      log.debug("Injector: {}", injector);
-
-      container = injector.getInstance(PlexusContainer.class);
-      context.setAttribute(PlexusConstants.PLEXUS_KEY, container);
-      injector.getInstance(Context.class).put(PlexusConstants.PLEXUS_KEY, container);
-      log.debug("Container: {}", container);
-
-      // configure guice servlet (add injector to servlet context)
-      super.contextInitialized(event);
-
-      // configure logging
-      logManager = container.lookup(LogManager.class);
-      log.debug("Log manager: {}", logManager);
-      logManager.configure();
-
-      // start the application
-      application = container.lookup(NxApplication.class);
-      log.debug("Application: {}", application);
-      application.start();
+      Filter filter;
+      while (true) {
+        filter = filterTracker.getService();
+        if (filter != null) {
+          DelegatingFilter.setDelegate(filter);
+          break;
+        }
+        try {
+          Thread.sleep(100);
+        }
+        catch (InterruptedException e) {
+          // continue to wait
+        }
+      }
     }
     catch (Exception e) {
-      log.error("Failed to initialize", e);
-      throw Throwables.propagate(e);
+      log.error("Failed to start Nexus", e);
+      throw e instanceof RuntimeException ? ((RuntimeException) e) : new RuntimeException(e);
     }
 
     log.info("Initialized");
@@ -193,39 +177,22 @@ public class WebappBootstrap
     }
   }
 
-  @Override
+  private static void mkdir(final Path dir) throws IOException {
+    try {
+      Files.createDirectories(dir);
+    }
+    catch (FileAlreadyExistsException e) {
+      // this happens when last element of path exists, but is a symlink.
+      // A simple test with Files.isDirectory should be able to  detect this
+      // case as by default, it follows symlinks.
+      if (!Files.isDirectory(dir)) {
+        throw e;
+      }
+    }
+  }
+
   public void contextDestroyed(final ServletContextEvent event) {
     log.info("Destroying");
-
-    ServletContext context = event.getServletContext();
-
-    // stop application
-    if (application != null) {
-      try {
-        application.stop();
-      }
-      catch (Exception e) {
-        log.error("Failed to stop application", e);
-      }
-      application = null;
-    }
-
-    // shutdown logging
-    if (logManager != null) {
-      logManager.shutdown();
-      logManager = null;
-    }
-
-    // unset injector from context
-    super.contextDestroyed(event);
-    injector = null;
-
-    // cleanup the container
-    if (container != null) {
-      container.dispose();
-      context.removeAttribute(PlexusConstants.PLEXUS_KEY);
-      container = null;
-    }
 
     // stop OSGi framework
     if (framework != null) {
@@ -234,7 +201,7 @@ public class WebappBootstrap
         framework.waitForStop(0);
       }
       catch (Exception e) {
-        log.error("Failed to stop OSGi framework", e);
+        log.error("Failed to stop Nexus", e);
       }
       framework = null;
     }
@@ -246,11 +213,5 @@ public class WebappBootstrap
     }
 
     log.info("Destroyed");
-  }
-
-  @Override
-  protected Injector getInjector() {
-    checkState(injector != null, "Missing injector reference");
-    return injector;
   }
 }

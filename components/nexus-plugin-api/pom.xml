@@ -117,7 +117,7 @@
             <!--
             Re-export core packages to plugins (which in turn require this bundle)
             -->
-            <Require-Bundle>system.bundle;visibility:=reexport</Require-Bundle>
+            <Require-Bundle>org.sonatype.nexus.extender;visibility:=reexport</Require-Bundle>
           </instructions>
         </configuration>
       </plugin>
