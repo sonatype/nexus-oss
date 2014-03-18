@@ -27,6 +27,10 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
+  <properties>
+    <kazuki.version>0.3.2</kazuki.version>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -37,8 +41,14 @@
 
       <dependency>
         <groupId>io.kazuki</groupId>
-        <artifactId>kazuki-db</artifactId>
-        <version>0.1.6</version>
+        <artifactId>kazuki-api</artifactId>
+        <version>${kazuki.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.kazuki</groupId>
+        <artifactId>kazuki-impl</artifactId>
+        <version>${kazuki.version}</version>
       </dependency>
 
       <dependency>

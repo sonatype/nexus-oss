@@ -55,7 +55,12 @@
 
     <dependency>
       <groupId>io.kazuki</groupId>
-      <artifactId>kazuki-db</artifactId>
+      <artifactId>kazuki-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.kazuki</groupId>
+      <artifactId>kazuki-impl</artifactId>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
