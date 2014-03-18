@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.yum.internal.task.MergeMetadataTask.ID;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
-public class MergeMetadataTaskTest
+public class MergeMetadataTaskIT
     extends YumNexusTestSupport
 {
 

@@ -20,7 +20,7 @@ import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class NexusAetherTest
+public class NexusAetherIT
     extends AbstractMavenRepoContentTests
 {
 

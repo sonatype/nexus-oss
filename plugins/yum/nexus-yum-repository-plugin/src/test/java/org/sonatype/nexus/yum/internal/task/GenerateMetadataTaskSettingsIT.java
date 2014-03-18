@@ -53,7 +53,7 @@ import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.ID;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 @SuppressWarnings("unchecked")
-public class GenerateMetadataTaskSettingsTest
+public class GenerateMetadataTaskSettingsIT
     extends YumNexusTestSupport
 {
 

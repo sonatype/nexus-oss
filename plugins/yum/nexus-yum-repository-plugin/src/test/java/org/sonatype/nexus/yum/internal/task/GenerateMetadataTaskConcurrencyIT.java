@@ -59,7 +59,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.ID;
 
-public class GenerateMetadataTaskConcurrencyTest
+public class GenerateMetadataTaskConcurrencyIT
     extends YumNexusTestSupport
 {
 
@@ -69,7 +69,7 @@ public class GenerateMetadataTaskConcurrencyTest
 
   public static final int PARALLEL_THREAD_COUNT = 5;
 
-  public static final Logger LOG = LoggerFactory.getLogger(GenerateMetadataTaskConcurrencyTest.class);
+  public static final Logger LOG = LoggerFactory.getLogger(GenerateMetadataTaskConcurrencyIT.class);
 
   private static final int MAX_PARALLEL_SCHEDULER_THREADS = 20;
 

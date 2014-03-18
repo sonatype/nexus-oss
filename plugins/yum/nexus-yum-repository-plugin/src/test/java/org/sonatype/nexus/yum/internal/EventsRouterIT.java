@@ -23,7 +23,7 @@ import org.sonatype.nexus.yum.internal.support.SchedulerYumNexusTestSupport;
 
 import org.junit.Test;
 
-public class EventsRouterTest
+public class EventsRouterIT
     extends SchedulerYumNexusTestSupport
 {
 
