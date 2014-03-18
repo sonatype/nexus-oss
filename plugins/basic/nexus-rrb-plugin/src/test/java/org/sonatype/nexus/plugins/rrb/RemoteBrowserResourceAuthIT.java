@@ -33,7 +33,7 @@ import org.restlet.data.Form;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 
-public class RemoteBrowserResourceAuthTest
+public class RemoteBrowserResourceAuthIT
     extends AbstractPluginTestCase
 {
   private ServletServer server = null;

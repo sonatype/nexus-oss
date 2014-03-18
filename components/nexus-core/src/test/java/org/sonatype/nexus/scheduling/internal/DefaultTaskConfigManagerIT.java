@@ -71,7 +71,7 @@ import static org.hamcrest.Matchers.is;
  *
  * @author cstamas
  */
-public class DefaultTaskConfigManagerTest
+public class DefaultTaskConfigManagerIT
     extends NexusAppTestSupport
 {
   private DefaultScheduler defaultScheduler;
