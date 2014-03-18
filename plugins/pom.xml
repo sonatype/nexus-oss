@@ -201,22 +201,6 @@
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
-      <!-- plexusplugin -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-plexusplugin-plugin</artifactId>
-        <type>nexus-plugin</type>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-plexusplugin-plugin</artifactId>
-        <type>jar</type>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
       <!-- h2 -->
 
       <dependency>
