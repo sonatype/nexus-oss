@@ -28,7 +28,7 @@
 
   <dependencies>
     <!--
-    Prevent Servlet API from being included in the WAR.
+    Prevent these from being included in the WAR lib.
     -->
     <dependency>
       <groupId>org.eclipse.jetty.orbit</groupId>
@@ -37,8 +37,52 @@
     </dependency>
 
     <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-extender</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-oss-edition</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!--
+    Runtime only, use the OSGi API for compile time.
+    -->
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.framework</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
     </dependency>
 
     <dependency>
@@ -57,40 +101,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.framework</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-bootstrap</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>com.yammer.metrics</groupId>
-      <artifactId>metrics-servlet</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.yammer.metrics</groupId>
-      <artifactId>metrics-web</artifactId>
+      <artifactId>metrics-core</artifactId>
     </dependency>
 
     <dependency>
@@ -100,7 +112,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-oss-edition</artifactId>
+      <artifactId>nexus-bootstrap</artifactId>
     </dependency>
 
     <!--
@@ -364,7 +376,7 @@
       </plugin>
 
       <!--
-      Generate Export-Package header for core (non-plugin) content.
+      Generate Export-Package header for bootstrap content.
       -->
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -387,27 +399,13 @@
                 </Embed-Dependency>
                 <Embed-Transitive>true</Embed-Transitive>
                 <_exportcontents>
-                  ch.*,com.*,eu.*,javax.*,net.*,org.*
+                  javax.*|ch.*|com.*|org.*
                 </_exportcontents>
+                <_removeheaders>
+                  Embed*,Import-Package,Include-Resource,Private-Package
+                </_removeheaders>
               </instructions>
             </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!--
-      Ensure we have an index for all dependencies in the WAR.
-      -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>sisu-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>index-war</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>index</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

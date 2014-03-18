@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.web.internal;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -51,7 +52,8 @@ final class DynamicServletPipeline
    * Refreshes stable cache with the latest dynamic definitions.
    */
   public synchronized void refreshCache() {
-    servletDefinitionCache = servletDefinitions.toArray(servletDefinitionCache);
+    final Object[] snapshot = servletDefinitions.toArray();
+    servletDefinitionCache = Arrays.copyOf(snapshot, snapshot.length, ServletDefinition[].class);
     if (log.isDebugEnabled()) {
       final StringBuilder buf = new StringBuilder("Updated servlet definitions:");
       for (final ServletDefinition sd : servletDefinitionCache) {

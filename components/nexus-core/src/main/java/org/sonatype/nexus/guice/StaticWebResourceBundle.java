@@ -38,7 +38,7 @@ public class StaticWebResourceBundle
 
   @Inject
   public StaticWebResourceBundle(final ClassSpace space, final MimeSupport mimeSupport) {
-    for (Enumeration<URL> e = space.findEntries("static/", null, true); e.hasMoreElements();) {
+    for (Enumeration<URL> e = space.findEntries("static", "*", true); e.hasMoreElements();) {
       final URL url = e.nextElement();
       final String path = getPublishedPath(url);
       if (path != null) {

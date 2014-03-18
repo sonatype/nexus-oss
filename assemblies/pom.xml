@@ -30,6 +30,7 @@
 
   <modules>
     <module>nexus-bundle-template</module>
+    <module>nexus-karaf-template</module>
   </modules>
 
   <dependencyManagement>

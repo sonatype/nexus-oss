@@ -78,8 +78,25 @@
       <scope>provided</scope>
       <unpack>false</unpack>
       <includes>
-        <include>*:bcprov*</include>
+        <include>*:nexus-oss-edition</include>
         <include>*:nexus-plugin-api</include>
+        <include>*:bcprov*</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <!--
+      Exploded OSGi bundle
+      -->
+      <outputDirectory>/WEB-INF/bundles/nexus-extender</outputDirectory>
+      <useTransitiveDependencies>true</useTransitiveDependencies>
+      <useProjectArtifact>false</useProjectArtifact>
+      <useStrictFiltering>true</useStrictFiltering>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+      <scope>provided</scope>
+      <unpack>true</unpack>
+      <includes>
+        <include>*:nexus-extender</include>
       </includes>
     </dependencySet>
   </dependencySets>

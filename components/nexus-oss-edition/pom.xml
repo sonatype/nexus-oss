@@ -25,6 +25,7 @@
 
   <artifactId>nexus-oss-edition</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -32,5 +33,24 @@
       <artifactId>nexus-core</artifactId>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <!--
+      Generate OSGi metadata.
+      -->
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Fragment-Host>org.sonatype.nexus.extender</Fragment-Host>
+            <_removeheaders>Import-Package,Include-Resource,Private-Package</_removeheaders>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
