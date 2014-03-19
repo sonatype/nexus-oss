@@ -250,6 +250,9 @@ public class ScheduledServiceListPlexusResource
       catch (InvalidConfigurationException e) {
         handleConfigurationException(e);
       }
+      catch (IllegalArgumentException e) {
+        throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(), e);
+      }
     }
     return result;
   }

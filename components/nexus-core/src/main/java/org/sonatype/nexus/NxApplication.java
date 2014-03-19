@@ -154,8 +154,6 @@ public class NxApplication
       applicationStatusSource.getSystemStatus().setState(SystemState.STARTED);
       applicationStatusSource.getSystemStatus().setStartedAt(new Date());
 
-      synchronizeShadowsAtStartup();
-
       if (log.isInfoEnabled()) {
         final File workDir = nexusConfiguration.getWorkingDirectory();
         String workDirPath = null;
@@ -184,6 +182,9 @@ public class NxApplication
       log.error("Could not start Nexus, user configuration exception!", e);
       throw Throwables.propagate(e);
     }
+
+    // Only after started, as scheduler might not be ready yet
+    synchronizeShadowsAtStartup();
   }
 
   @Override

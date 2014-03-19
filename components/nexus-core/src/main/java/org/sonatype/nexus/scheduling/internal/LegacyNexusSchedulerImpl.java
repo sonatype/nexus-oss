@@ -21,26 +21,28 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.Scheduler;
 import org.sonatype.scheduling.schedules.Schedule;
 
+import org.eclipse.sisu.Priority;
+
 /**
- * The Nexus scheduler.
+ * The legacy Nexus scheduler.
  */
-@Named
 @Singleton
-public class DefaultNexusScheduler
-    implements NexusScheduler
+@Named
+@Priority(50)
+public class LegacyNexusSchedulerImpl
+    implements LegacyNexusScheduler
 {
 
   private final Scheduler scheduler;
 
   @Inject
-  public DefaultNexusScheduler(final Scheduler scheduler) {
+  public LegacyNexusSchedulerImpl(final Scheduler scheduler) {
     this.scheduler = scheduler;
   }
 

@@ -42,6 +42,8 @@ public class MDCAwareCallable<T>
       throws Exception
   {
     MDCUtils.setContextMap(mdcContext);
-    return delegate.call();
+    final T result = delegate.call();
+    MDCUtils.setContextMap(null);
+    return result;
   }
 }
