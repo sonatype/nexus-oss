@@ -56,7 +56,8 @@ extends DirectComponentSupport
   RepositoryRegistry repositoryRegistry
 
   /**
-   * Retrieve a list of available repository routes.
+   * Retrieve repository routes.
+   * @return a list of repository routes
    */
   @DirectMethod
   @RequiresPermissions('nexus:routes:read')
@@ -71,6 +72,11 @@ extends DirectComponentSupport
     }
   }
 
+  /**
+   * Creates a repository route.
+   * @param routeXO to be created
+   * @return created repository route
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:routes:create')
@@ -79,6 +85,11 @@ extends DirectComponentSupport
     return addToMapper(routeXO)
   }
 
+  /**
+   * Updates a repository route.
+   * @param routeXO to be updated
+   * @return updated repository route
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:routes:update')
@@ -92,6 +103,10 @@ extends DirectComponentSupport
     throw new IllegalArgumentException('Missing id for route to be updated')
   }
 
+  /**
+   * Deletes a repository route.
+   * @param id of repository route to be deleted
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:routes:delete')
