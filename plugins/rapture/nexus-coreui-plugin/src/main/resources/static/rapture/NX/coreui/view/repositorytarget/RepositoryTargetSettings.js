@@ -61,16 +61,7 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettings', {
         fieldLabel: 'Patterns',
         emptyText: 'enter a pattern expression',
         input: {
-          xtype: 'textfield',
-          validator: function(value){
-            try {
-              new RegExp(value);
-            }
-            catch (err) {
-              return err.message;
-            }
-            return true
-          }
+          xtype: 'nx-regexp'
         },
         sorted: true
       }
