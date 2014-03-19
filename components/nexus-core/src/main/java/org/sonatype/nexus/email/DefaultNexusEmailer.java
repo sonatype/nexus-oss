@@ -17,6 +17,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.mail.Session;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.micromailer.Address;
@@ -129,7 +130,13 @@ public class DefaultNexusEmailer
     prependNexusBaseUrl(request);
 
     if (emailSettingsConfigured()) {
-      return getEMailer().sendMail(request);
+      ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+      try {
+        Thread.currentThread().setContextClassLoader(Session.class.getClassLoader());
+        return getEMailer().sendMail(request);
+      } finally {
+        Thread.currentThread().setContextClassLoader(tccl);
+      }
     }
 
     final String message = SimpleFormat.format(
