@@ -73,7 +73,7 @@ public class NexusExtender
     injector = Guice.createInjector(
         new WireModule(
             new CoreModule(servletContext, properties, systemBundle),
-            new PlexusSpaceModule(coreSpace, BeanScanning.INDEX)));
+            new PlexusSpaceModule(coreSpace, BeanScanning.GLOBAL_INDEX)));
     log.debug("Injector: {}", injector);
 
     // listener = new GuiceServletContextListener()
