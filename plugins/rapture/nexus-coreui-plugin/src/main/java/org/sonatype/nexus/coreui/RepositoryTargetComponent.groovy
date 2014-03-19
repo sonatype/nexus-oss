@@ -60,7 +60,8 @@ extends DirectComponentSupport
   NexusConfiguration nexusConfiguration
 
   /**
-   * @return list of repository targets
+   * Retrieves repository targets.
+   * @return a list of repository targets
    */
   @DirectMethod
   @RequiresPermissions('nexus:targets:read')
