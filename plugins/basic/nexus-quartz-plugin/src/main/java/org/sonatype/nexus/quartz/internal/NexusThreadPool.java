@@ -13,8 +13,12 @@
 
 package org.sonatype.nexus.quartz.internal;
 
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 import java.util.concurrent.TimeUnit;
@@ -35,14 +39,14 @@ import org.quartz.spi.ThreadPool;
 public class NexusThreadPool
     implements ThreadPool
 {
-  private final ThreadPoolExecutor threadPoolExecutor;
+  private final NexusThreadPoolExecutor threadPoolExecutor;
 
   private final NexusExecutorService nexusExecutorService;
 
   public NexusThreadPool(final int poolSize) {
-    this.threadPoolExecutor = new ThreadPoolExecutor(poolSize, poolSize,
+    this.threadPoolExecutor = new NexusThreadPoolExecutor(poolSize, poolSize,
         0L, TimeUnit.MILLISECONDS,
-        new LinkedBlockingQueue<Runnable>(poolSize), // bounded queue
+        new SynchronousQueue<Runnable>(), // no queuing
         new NexusThreadFactory("qz", "nx-tasks"),
         new AbortPolicy());
     // wrapper for Shiro integration
@@ -53,6 +57,9 @@ public class NexusThreadPool
   @Override
   public boolean runInThread(final Runnable runnable) {
     try {
+      // this below is true as we do not use queue on executor
+      // combined with abort policy. Meaning, if no exception,
+      // the task is accepted for execution
       nexusExecutorService.submit(runnable);
       return true;
     }
@@ -63,8 +70,18 @@ public class NexusThreadPool
 
   @Override
   public int blockForAvailableThreads() {
-    threadPoolExecutor.purge();
-    return Math.max(0, threadPoolExecutor.getMaximumPoolSize() - threadPoolExecutor.getActiveCount());
+    try {
+      threadPoolExecutor.getSemaphore().acquire();
+      try {
+        return threadPoolExecutor.getSemaphore().availablePermits() + 1;
+      }
+      finally {
+        threadPoolExecutor.getSemaphore().release();
+      }
+    }
+    catch (InterruptedException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override
@@ -98,5 +115,48 @@ public class NexusThreadPool
   @Override
   public void setInstanceName(final String schedName) {
     // ?
+  }
+
+  // ==
+
+  public static class NexusThreadPoolExecutor
+      extends ThreadPoolExecutor
+  {
+
+    private final Semaphore semaphore;
+
+    public NexusThreadPoolExecutor(final int corePoolSize, final int maximumPoolSize, final long keepAliveTime,
+                                   final TimeUnit unit,
+                                   final BlockingQueue<Runnable> workQueue,
+                                   final ThreadFactory threadFactory,
+                                   final RejectedExecutionHandler handler)
+    {
+      super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
+      this.semaphore = new Semaphore(maximumPoolSize);
+    }
+
+    public Semaphore getSemaphore() {
+      return semaphore;
+    }
+
+    @Override
+    protected void beforeExecute(Thread t, Runnable r) {
+      try {
+        semaphore.tryAcquire();
+      }
+      finally {
+        super.beforeExecute(t, r);
+      }
+    }
+
+    @Override
+    protected void afterExecute(Runnable r, Throwable t) {
+      try {
+        semaphore.release();
+      }
+      finally {
+        super.afterExecute(r, t);
+      }
+    }
   }
 }
