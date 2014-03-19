@@ -80,7 +80,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:targets:create')
   @Validate(groups = [Create.class, Default.class])
-  RepositoryTargetXO create(final @NotNull(message = 'Target may not be null') @Valid RepositoryTargetXO target) {
+  RepositoryTargetXO create(final @NotNull(message = '[target] may not be null') @Valid RepositoryTargetXO target) {
     validate(target)
     target.id = Long.toHexString(System.nanoTime())
     def result = new Target(
@@ -100,7 +100,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:targets:update')
   @Validate(groups = [Update.class, Default.class])
-  RepositoryTargetXO update(final @NotNull(message = 'Target may not be null') @Valid RepositoryTargetXO target) {
+  RepositoryTargetXO update(final @NotNull(message = '[target] may not be null') @Valid RepositoryTargetXO target) {
     validate(target)
     def result = new Target(
         target.id, target.name, repositoryTypeRegistry.contentClasses[target.format], target.patterns
@@ -117,7 +117,8 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:targets:delete')
-  void delete(final @NotNull(message = 'ID may not be null') String id) {
+  @Validate
+  void delete(final @NotNull(message = '[id] may not be null') String id) {
     targetRegistry.removeRepositoryTarget(id)
     nexusConfiguration.saveConfiguration()
   }
