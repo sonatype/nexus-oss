@@ -89,6 +89,22 @@
   <build>
     <plugins>
       <!--
+      Generate Sisu index.
+      -->
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>sisu-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>index-extender</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>index</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!--
       Generate OSGi metadata.
       -->
       <plugin>
@@ -99,6 +115,9 @@
           <instructions>
             <Bundle-Activator>org.sonatype.nexus.extender.NexusExtender</Bundle-Activator>
             <Require-Bundle>system.bundle;visibility:=reexport</Require-Bundle>
+            <Include-Resource>
+              {maven-resources},META-INF/sisu=${project.build.outputDirectory}/META-INF/sisu
+            </Include-Resource>
             <Embed-Dependency>*;scope=compile</Embed-Dependency>
             <Embed-Directory>lib</Embed-Directory>
             <Embed-Transitive>true</Embed-Transitive>
