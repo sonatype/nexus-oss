@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.quartz.internal.guice.QuartzModule;
 import org.sonatype.nexus.quartz.internal.store.CalendarRecord;
 import org.sonatype.nexus.quartz.internal.store.JobDetailRecord;
 import org.sonatype.nexus.quartz.internal.store.KVJobStore;
@@ -90,7 +91,7 @@ public class QuartzImplIT
 
   private final PersistingJob persistingJob;
 
-  private QuartzImpl quartz;
+  private QuartzSupportImpl quartz;
 
   public QuartzImplIT() {
     this.job1 = new Job1();
@@ -179,7 +180,7 @@ public class QuartzImplIT
     jobs.add(job2be);
     jobs.add(job3be);
     jobs.add(persistingJobBe);
-    this.quartz = new QuartzImpl(jobs, kvJobStore);
+    this.quartz = new QuartzSupportImpl(jobs, kvJobStore);
     this.quartz.start();
   }
 

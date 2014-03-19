@@ -21,6 +21,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.quartz.internal.store.TriggerWrapper.State;
+import org.sonatype.nexus.util.NexusUberClassloader;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
@@ -65,17 +66,21 @@ public class KazukiJobDao
 
   private final Lifecycle lifecycle;
 
+  private final NexusUberClassloader nexusUberClassloader;
+
   private final ObjectMapper mapper;
 
   @Inject
   public KazukiJobDao(final @Named("nexusquartz") KeyValueStore store,
                       final @Named("nexusquartz") SchemaStore schemaStore,
-                      final @Named("nexusquartz") Lifecycle lifecycle)
+                      final @Named("nexusquartz") Lifecycle lifecycle,
+                      final NexusUberClassloader nexusUberClassloader)
       throws Exception
   {
     this.store = checkNotNull(store);
     this.schemaStore = checkNotNull(schemaStore);
     this.lifecycle = checkNotNull(lifecycle);
+    this.nexusUberClassloader = checkNotNull(nexusUberClassloader);
     this.mapper = createJackson();
   }
 
@@ -381,9 +386,11 @@ public class KazukiJobDao
   }
 
   private JobDetail convert(final JobDetailRecord record) {
+    final ClassLoader original = Thread.currentThread().getContextClassLoader();
     try {
       final Class<?> clazz = Scheduler.class.getClassLoader().loadClass(record.getQuartzType());
       if (JobDetail.class.isAssignableFrom(clazz)) {
+        Thread.currentThread().setContextClassLoader(nexusUberClassloader);
         return (JobDetail) mapper.convertValue(record.getData(), clazz);
       }
       else {
@@ -392,6 +399,9 @@ public class KazukiJobDao
     }
     catch (Exception e) {
       throw Throwables.propagate(e);
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(original);
     }
   }
 

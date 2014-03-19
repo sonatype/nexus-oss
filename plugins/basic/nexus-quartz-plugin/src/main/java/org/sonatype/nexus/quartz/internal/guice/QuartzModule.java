@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.quartz.internal;
+package org.sonatype.nexus.quartz.internal.guice;
 
 import java.io.File;
 

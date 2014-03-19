@@ -13,29 +13,36 @@
 
 package org.sonatype.nexus.quartz.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.log.LogConfigurationCustomizer;
-import org.sonatype.nexus.log.LoggerLevel;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.nexus.quartz.QuartzSupport;
+
+import org.quartz.Scheduler;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Quartz {@link LogConfigurationCustomizer}.
+ * {@link Provider} for Quartz's {@link Scheduler}, allowing direct injection of it if needed.
  *
- * @since 2.8
+ * @since 3.0
  */
-@Named
 @Singleton
-public class QuartzLogConfigurationCustomizer
-    extends ComponentSupport
-    implements LogConfigurationCustomizer
+@Named
+public class QuartzProvider
+    implements Provider<Scheduler>
 {
-  @Override
-  public void customize(LogConfigurationCustomizer.Configuration configuration) {
-    configuration.setLoggerLevel("org.sonatype.nexus.quartz", LoggerLevel.DEFAULT);
+  private final QuartzSupport quartzSupport;
 
-    // Quartz is chatty at INFO
-    configuration.setLoggerLevel("org.quartz", LoggerLevel.WARN);
+  @Inject
+  public QuartzProvider(final QuartzSupport quartzSupport) {
+    this.quartzSupport = checkNotNull(quartzSupport);
+  }
+
+  @Override
+  public Scheduler get() {
+    return quartzSupport.getScheduler();
   }
 }

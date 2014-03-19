@@ -11,31 +11,32 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.quartz.internal;
+package org.sonatype.nexus.quartz;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.log.LogConfigurationCustomizer;
-import org.sonatype.nexus.log.LoggerLevel;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.quartz.Job;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.Trigger;
 
 /**
- * Quartz {@link LogConfigurationCustomizer}.
+ * Component managing Quartz {@link Scheduler}.
  *
  * @since 2.8
  */
-@Named
-@Singleton
-public class QuartzLogConfigurationCustomizer
-    extends ComponentSupport
-    implements LogConfigurationCustomizer
+public interface QuartzSupport
 {
-  @Override
-  public void customize(LogConfigurationCustomizer.Configuration configuration) {
-    configuration.setLoggerLevel("org.sonatype.nexus.quartz", LoggerLevel.DEFAULT);
+  /**
+   * Returns the Quartz {@link Scheduler} instance.
+   */
+  Scheduler getScheduler();
 
-    // Quartz is chatty at INFO
-    configuration.setLoggerLevel("org.quartz", LoggerLevel.WARN);
-  }
+  /**
+   * Helper method to ease "one time" execution of a {@link Job}.
+   */
+  <T extends Job> JobKey execute(final Class<T> clazz);
+
+  /**
+   * Helper method to ease scheduling of a {@link Job}.
+   */
+  <T extends Job> JobKey scheduleJob(final Class<T> clazz, final Trigger trigger);
 }

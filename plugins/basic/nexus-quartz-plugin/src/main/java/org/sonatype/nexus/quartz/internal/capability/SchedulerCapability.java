@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.capability.support.CapabilitySupport;
-import org.sonatype.nexus.quartz.internal.QuartzImpl;
+import org.sonatype.nexus.quartz.internal.QuartzSupportImpl;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
@@ -50,10 +50,10 @@ public class SchedulerCapability
 
   private static final Messages messages = I18N.create(Messages.class);
 
-  private final QuartzImpl quartzImpl;
+  private final QuartzSupportImpl quartzImpl;
 
   @Inject
-  public SchedulerCapability(final QuartzImpl quartzImpl) {
+  public SchedulerCapability(final QuartzSupportImpl quartzImpl) {
     this.quartzImpl = checkNotNull(quartzImpl);
   }
 

@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.quartz.Quartz;
+import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.nexus.quartz.internal.store.KVJobStore;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
@@ -39,15 +39,15 @@ import org.quartz.spi.TriggerFiredBundle;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Implementation of {@link Quartz}.
+ * Implementation of {@link QuartzSupport}.
  *
  * @since 2.8
  */
 @Singleton
 @Named
-public class QuartzImpl
+public class QuartzSupportImpl
     extends LifecycleSupport
-    implements Quartz, JobFactory
+    implements QuartzSupport, JobFactory
 {
   private final Iterable<BeanEntry<Named, Job>> jobEntries;
 
@@ -60,8 +60,8 @@ public class QuartzImpl
   private int threadPoolSize;
 
   @Inject
-  public QuartzImpl(final Iterable<BeanEntry<Named, Job>> jobEntries,
-                    final KVJobStore kazukiJobStore)
+  public QuartzSupportImpl(final Iterable<BeanEntry<Named, Job>> jobEntries,
+                           final KVJobStore kazukiJobStore)
       throws Exception
   {
     this.jobEntries = checkNotNull(jobEntries);
@@ -74,7 +74,7 @@ public class QuartzImpl
   protected void doStart() throws Exception {
     // create Scheduler
     DirectSchedulerFactory.getInstance()
-        .createScheduler(new SimpleThreadPool(threadPoolSize, Thread.NORM_PRIORITY), kazukiJobStore);
+        .createScheduler(new NexusThreadPool(threadPoolSize), kazukiJobStore);
     scheduler = DirectSchedulerFactory.getInstance().getScheduler();
     scheduler.setJobFactory(this);
     if (active) {

@@ -19,7 +19,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
-import org.sonatype.nexus.quartz.internal.QuartzModule;
+import org.sonatype.nexus.quartz.internal.guice.QuartzModule;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
