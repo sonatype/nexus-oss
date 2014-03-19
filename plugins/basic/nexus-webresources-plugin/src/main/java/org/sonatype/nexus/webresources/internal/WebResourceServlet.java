@@ -16,6 +16,7 @@ package org.sonatype.nexus.webresources.internal;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -44,6 +45,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
  *
  * @since 2.8
  */
+@Priority(Integer.MIN_VALUE)
 @Singleton
 @Named
 public class WebResourceServlet

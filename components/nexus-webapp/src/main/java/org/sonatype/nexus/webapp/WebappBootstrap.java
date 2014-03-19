@@ -14,8 +14,10 @@
 package org.sonatype.nexus.webapp;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.jar.Manifest;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -53,7 +55,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Web application bootstrap {@link ServletContextListener}.
- *
+ * 
  * @since 2.8
  */
 public class WebappBootstrap
@@ -116,10 +118,21 @@ public class WebappBootstrap
       lockFile = new LockFile(new File(workDir, "nexus.lock"));
       checkState(lockFile.lock(), "Nexus work directory already in use: %s", workDir);
 
+      StringBuilder exports = new StringBuilder("com.sun.net.httpserver,");
+      InputStream is = getClass().getClassLoader().getResourceAsStream("META-INF/MANIFEST.MF");
+      try {
+        exports.append(new Manifest(is).getMainAttributes().getValue(Constants.EXPORT_PACKAGE));
+      }
+      finally {
+        is.close();
+      }
+
+      // export additional core (non-plugin) packages from system bundle
+      properties.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, exports.toString());
+
       properties.put(Constants.FRAMEWORK_STORAGE, workDir + "/felix-cache");
       properties.put(Constants.FRAMEWORK_STORAGE_CLEAN, Constants.FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
-      properties.put(Constants.FRAMEWORK_BUNDLE_PARENT, Constants.FRAMEWORK_BUNDLE_PARENT_FRAMEWORK);
-      properties.put(Constants.FRAMEWORK_BOOTDELEGATION, "*");
+      properties.put(Constants.FRAMEWORK_BOOTDELEGATION, "sun.*");
 
       framework = ServiceLoader.load(FrameworkFactory.class).iterator().next().newFramework(properties);
 
@@ -148,7 +161,7 @@ public class WebappBootstrap
               new CoreModule(context, properties, framework),
               new PlexusSpaceModule(coreSpace, BeanScanning.INDEX)));
       log.debug("Injector: {}", injector);
-      
+
       container = injector.getInstance(PlexusContainer.class);
       context.setAttribute(PlexusConstants.PLEXUS_KEY, container);
       injector.getInstance(Context.class).put(PlexusConstants.PLEXUS_KEY, container);

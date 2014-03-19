@@ -439,7 +439,7 @@
         </plugin>
 
         <!--
-        For legacy-plugins which still need Plexus descriptors.
+        For maven-plugins which still need Plexus descriptors.
         -->
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
@@ -527,6 +527,27 @@
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>sisu-maven-bridge-maven-plugin</artifactId>
           <version>3.1</version>
+        </plugin>
+
+        <!--
+        Generate basic OSGi metadata.
+        -->
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>2.4.0</version>
+          <configuration>
+            <instructions>
+              <!--
+              Defaults while plugins use Require-Bundle.
+              -->
+              <_nouses>true</_nouses>
+              <_nodefaultversion>true</_nodefaultversion>
+              <_removeheaders>
+                Embed*,Import-Package,Include-Resource,Private-Package
+              </_removeheaders>
+            </instructions>
+          </configuration>
         </plugin>
 
         <!--

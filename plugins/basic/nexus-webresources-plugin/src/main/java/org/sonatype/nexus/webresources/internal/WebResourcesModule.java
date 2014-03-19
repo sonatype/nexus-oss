@@ -17,8 +17,6 @@ import javax.inject.Named;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
-import org.eclipse.sisu.inject.DefaultRankingFunction;
-import org.eclipse.sisu.inject.RankingFunction;
 
 /**
  * Web resources module.
@@ -36,9 +34,6 @@ public class WebResourcesModule
       @Override
       protected void configureServlets() {
         serve("/*").with(WebResourceServlet.class);
-
-        // low binding to allow other servlets to take precedence
-        bind(RankingFunction.class).toInstance(new DefaultRankingFunction(0));
       }
     });
   }

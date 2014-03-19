@@ -80,6 +80,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -357,6 +358,38 @@
               <descriptors>
                 <descriptor>${project.basedir}/src/main/assembly/plugins.xml</descriptor>
               </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--
+      Generate Export-Package header for core (non-plugin) content.
+      -->
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>manifest</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+            <configuration>
+              <supportedProjectTypes>
+                <type>war</type>
+              </supportedProjectTypes>
+              <instructions>
+                <Embed-Dependency>
+                  javax.servlet;inline=true,
+                  *;scope=compile;inline=true
+                </Embed-Dependency>
+                <Embed-Transitive>true</Embed-Transitive>
+                <_exportcontents>
+                  ch.*,com.*,eu.*,javax.*,net.*,org.*
+                </_exportcontents>
+              </instructions>
             </configuration>
           </execution>
         </executions>

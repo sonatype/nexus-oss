@@ -79,6 +79,7 @@
       <unpack>false</unpack>
       <includes>
         <include>*:bcprov*</include>
+        <include>*:nexus-plugin-api</include>
       </includes>
     </dependencySet>
   </dependencySets>
