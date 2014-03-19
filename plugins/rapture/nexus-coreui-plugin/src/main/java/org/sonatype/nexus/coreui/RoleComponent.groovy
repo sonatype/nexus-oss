@@ -81,6 +81,22 @@ extends DirectComponentSupport
   }
 
   /**
+   * Retrieves available role sources.
+   * @return list of sources
+   */
+  @DirectMethod
+  List<ReferenceXO> readSources() {
+    return authorizationManagers.findResults { manager ->
+      return manager.source == DEFAULT_SOURCE ? null : manager
+    }.collect { manager ->
+      return new ReferenceXO(
+          id: manager.source,
+          name: manager.source
+      )
+    }
+  }
+
+  /**
    * Retrieves roles from specified source.
    * @param source to retrieve roles from
    * @return a list of roles
@@ -150,22 +166,6 @@ extends DirectComponentSupport
   @Validate
   void delete(final @NotNull(message = '[id] may not be null') String id) {
     securitySystem.getAuthorizationManager(DEFAULT_SOURCE).deleteRole(id)
-  }
-
-  /**
-   * Retrieves available role sources.
-   * @return list of sources
-   */
-  @DirectMethod
-  List<ReferenceXO> sources() {
-    return authorizationManagers.findResults { manager ->
-      return manager.source == DEFAULT_SOURCE ? null : manager
-    }.collect { manager ->
-      return new ReferenceXO(
-          id: manager.source,
-          name: manager.source
-      )
-    }
   }
 
   private static RoleXO asRoleXO(Role input, String source) {
