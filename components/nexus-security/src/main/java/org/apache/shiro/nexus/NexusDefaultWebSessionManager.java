@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.apache.shiro.nexus5727;
+package org.apache.shiro.nexus;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -22,7 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Fixed {@link DefaultWebSessionManager} for issue SHIRO-443. This subclass is put into package of Shiro to have
+ * Nexus customized {@link DefaultWebSessionManager}.
+ *
+ * Provides fixes for issue SHIRO-443. This subclass is put into package of Shiro to have
  * shiro-guice's TypeListener applied to it, and result in same behavior as for other Shiro classes.
  *
  * @author cstamas
@@ -31,10 +33,10 @@ import org.slf4j.LoggerFactory;
  * @see <a href="https://issues.sonatype.org/browse/NEXUS-5727>NEXUS-5727 Shiro's session validating thread created
  *      multiple times</a>
  */
-public class FixedDefaultWebSessionManager
+public class NexusDefaultWebSessionManager
     extends DefaultWebSessionManager
 {
-  private static final Logger log = LoggerFactory.getLogger(FixedDefaultWebSessionManager.class);
+  private static final Logger log = LoggerFactory.getLogger(NexusDefaultWebSessionManager.class);
 
   @Inject
   public void configureProperties(
