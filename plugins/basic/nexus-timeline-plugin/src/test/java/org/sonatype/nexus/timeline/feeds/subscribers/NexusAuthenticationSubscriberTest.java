@@ -11,42 +11,37 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.timeline.feeds;
+package org.sonatype.nexus.timeline.feeds.subscribers;
 
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.timeline.feeds.subscribers.NexusAuthenticationEventInspector;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.MatcherAssert.*;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link NexusAuthenticationEventInspector}.
+ * Tests for {@link NexusAuthenticationSubscriber}.
  */
-public class NexusAuthenticationEventInspectorTest
+public class NexusAuthenticationSubscriberTest
     extends TestSupport
 {
-  private NexusAuthenticationEventInspector underTest;
+  private NexusAuthenticationSubscriber underTest;
 
-  private DummyFeedRecorder feedRecorder;
+  private DummyFeedRecorder feedRecorder = new DummyFeedRecorder();
 
   @Mock
   private NexusConfiguration nexusConfiguration;
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks( this );
-    feedRecorder = new DummyFeedRecorder();
-    underTest = new NexusAuthenticationEventInspector(feedRecorder, nexusConfiguration);
-
+    underTest = new NexusAuthenticationSubscriber(feedRecorder, nexusConfiguration);
     when(nexusConfiguration.getAnonymousUsername()).thenReturn("anonymous");
   }
 

@@ -11,11 +11,8 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.timeline.feeds.record;
+package org.sonatype.nexus.timeline.feeds.subscribers;
 
-import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
@@ -26,7 +23,8 @@ import org.sonatype.nexus.proxy.maven.uid.IsMavenArtifactSignatureAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenChecksumAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenRepositoryMetadataAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.timeline.feeds.subscribers.ItemChangesFeedEventInspector;
+import org.sonatype.nexus.timeline.feeds.FeedRecorder;
+import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
@@ -65,8 +63,8 @@ public class ItemChangesFeedEventInspectorTest
 
   @Test
   public void eventsOnHiddenFilesAreNotRecorded() {
-    final ItemChangesFeedEventInspector underTest =
-        new ItemChangesFeedEventInspector(feedRecorder);
+    final ItemChangesFeedSubscriber underTest =
+        new ItemChangesFeedSubscriber(feedRecorder);
     final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
     when(repositoryItemUid.getBooleanAttributeValue(IsHiddenAttribute.class)).thenReturn(true);
     underTest.on(evt);
@@ -76,8 +74,8 @@ public class ItemChangesFeedEventInspectorTest
 
   @Test
   public void eventsOnMavenMetadataSignatureAndHashFilesShouldNotBeRecorded() {
-    final ItemChangesFeedEventInspector underTest =
-        new ItemChangesFeedEventInspector(feedRecorder);
+    final ItemChangesFeedSubscriber underTest =
+        new ItemChangesFeedSubscriber(feedRecorder);
     {
       final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
       when(repositoryItemUid.getBooleanAttributeValue(IsMavenRepositoryMetadataAttribute.class)).thenReturn(

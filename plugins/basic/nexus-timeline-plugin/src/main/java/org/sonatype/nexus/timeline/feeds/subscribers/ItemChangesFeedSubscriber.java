@@ -38,12 +38,12 @@ import com.google.common.eventbus.Subscribe;
 
 @Named
 @Singleton
-public class ItemChangesFeedEventInspector
+public class ItemChangesFeedSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
   @Inject
-  public ItemChangesFeedEventInspector(final FeedRecorder feedRecorder) {
+  public ItemChangesFeedSubscriber(final FeedRecorder feedRecorder) {
     super(feedRecorder);
   }
 

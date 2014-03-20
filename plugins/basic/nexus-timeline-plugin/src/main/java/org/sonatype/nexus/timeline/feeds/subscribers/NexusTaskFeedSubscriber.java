@@ -43,12 +43,12 @@ import com.google.common.eventbus.Subscribe;
  */
 @Named
 @Singleton
-public class NexusTaskFeedEventInspector
+public class NexusTaskFeedSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber
 {
   @Inject
-  public NexusTaskFeedEventInspector(final FeedRecorder feedRecorder) {
+  public NexusTaskFeedSubscriber(final FeedRecorder feedRecorder) {
     super(feedRecorder);
   }
 

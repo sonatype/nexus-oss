@@ -34,15 +34,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @Singleton
-public class NexusBootEventInspector
+public class NexusBootSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber
 {
   private final ApplicationStatusSource applicationStatusSource;
 
   @Inject
-  public NexusBootEventInspector(final FeedRecorder feedRecorder,
-                                 final ApplicationStatusSource applicationStatusSource)
+  public NexusBootSubscriber(final FeedRecorder feedRecorder,
+                             final ApplicationStatusSource applicationStatusSource)
   {
     super(feedRecorder);
     this.applicationStatusSource = checkNotNull(applicationStatusSource);

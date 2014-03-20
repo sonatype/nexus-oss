@@ -19,8 +19,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 import org.sonatype.nexus.timeline.feeds.SystemEvent;
 
@@ -29,43 +29,52 @@ import com.google.common.eventbus.Subscribe;
 
 @Named
 @Singleton
-public class RepositoryEventLocalStatusChangedInspector
+public class RepositoryEventProxyModeChangedSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
   @Inject
-  public RepositoryEventLocalStatusChangedInspector(final FeedRecorder feedRecorder) {
+  public RepositoryEventProxyModeChangedSubscriber(final FeedRecorder feedRecorder) {
     super(feedRecorder);
   }
 
   @Subscribe
   @AllowConcurrentEvents
-  public void on(final RepositoryEventLocalStatusChanged revt) {
-    final StringBuilder sb = new StringBuilder("The repository '");
+  public void on(final RepositoryEventProxyModeChanged revt) {
+    final StringBuilder sb = new StringBuilder("The proxy mode of repository '");
     sb.append(revt.getRepository().getName());
-    sb.append("' (ID='").append(revt.getRepository().getId()).append("') was put ");
-    LocalStatus newStatus = revt.getNewLocalStatus();
-    if (LocalStatus.IN_SERVICE.equals(newStatus)) {
-      sb.append("IN SERVICE.");
+    sb.append("' (ID='").append(revt.getRepository().getId()).append("') was set to ");
+    if (ProxyMode.ALLOW.equals(revt.getNewProxyMode())) {
+      sb.append("Allow.");
     }
-    else if (LocalStatus.OUT_OF_SERVICE.equals(newStatus)) {
-      sb.append("OUT OF SERVICE.");
+    else if (ProxyMode.BLOCKED_AUTO.equals(revt.getNewProxyMode())) {
+      sb.append("Blocked (auto).");
+    }
+    else if (ProxyMode.BLOCKED_MANUAL.equals(revt.getNewProxyMode())) {
+      sb.append("Blocked (by user).");
     }
     else {
-      sb.append(revt.getRepository().getLocalStatus().toString()).append(".");
+      sb.append(revt.getRepository().getProxyMode().toString()).append(".");
     }
     sb.append(" The previous state was ");
-    if (LocalStatus.IN_SERVICE.equals(revt.getOldLocalStatus())) {
-      sb.append("IN SERVICE.");
+    if (ProxyMode.ALLOW.equals(revt.getOldProxyMode())) {
+      sb.append("Allow.");
     }
-    else if (LocalStatus.OUT_OF_SERVICE.equals(revt.getOldLocalStatus())) {
-      sb.append("OUT OF SERVICE.");
+    else if (ProxyMode.BLOCKED_AUTO.equals(revt.getOldProxyMode())) {
+      sb.append("Blocked (auto).");
+    }
+    else if (ProxyMode.BLOCKED_MANUAL.equals(revt.getOldProxyMode())) {
+      sb.append("Blocked (by user).");
     }
     else {
-      sb.append(revt.getOldLocalStatus().toString()).append(".");
+      sb.append(revt.getOldProxyMode().toString()).append(".");
     }
+    if (revt.getCause() != null) {
+      sb.append(" Last detected transport error: ").append(revt.getCause().getMessage());
+    }
+
     getFeedRecorder()
-        .addSystemEvent(new SystemEvent(revt.getEventDate(), SystemEvent.ACTION_REPO_LSTATUS_CHANGES, sb.toString()));
+        .addSystemEvent(new SystemEvent(revt.getEventDate(), SystemEvent.ACTION_REPO_PSTATUS_CHANGES, sb.toString()));
   }
 
 }

@@ -13,45 +13,54 @@
 
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
+import java.util.HashSet;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.configuration.Configurable;
+import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailed;
-import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedChecksum;
-import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedFileType;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
-import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent.NexusItemInfo;
+import org.sonatype.nexus.timeline.feeds.SystemEvent;
 
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 @Named
 @Singleton
-public class ItemValidationFeedEventInspector
+public class ConfigurationChangeSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
   @Inject
-  public ItemValidationFeedEventInspector(final FeedRecorder feedRecorder) {
+  public ConfigurationChangeSubscriber(final FeedRecorder feedRecorder) {
     super(feedRecorder);
   }
 
   @Subscribe
   @AllowConcurrentEvents
-  public void on(final RepositoryItemValidationEventFailed ievt) {
-    String action = NexusArtifactEvent.ACTION_BROKEN;
-    if (ievt instanceof RepositoryItemValidationEventFailedChecksum) {
-      action = NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM;
+  public void on(final ConfigurationChangeEvent event) {
+    if (event.getChanges().isEmpty()) {
+      return;
     }
-    else if (ievt instanceof RepositoryItemValidationEventFailedFileType) {
-      action = NexusArtifactEvent.ACTION_BROKEN_INVALID_CONTENT;
+
+    final StringBuilder msg = new StringBuilder();
+    msg.append("Nexus server configuration was changed: ");
+    // keep list unique, one component might be reported multiple times
+    final HashSet<String> changes = Sets.newHashSet();
+    for (Configurable changed : event.getChanges()) {
+      changes.add(changed.getName());
     }
-    final NexusArtifactEvent nae = new NexusArtifactEvent(ievt.getEventDate(), action, ievt.getMessage(),
-        new NexusItemInfo(ievt.getItem().getPath(), ievt.getItem().getRepositoryId(), ievt.getItem().getRemoteUrl()));
-    getFeedRecorder().addNexusArtifactEvent(nae);
+    msg.append(changes.toString());
+
+    if (event.getUserId() != null) {
+      msg.append(", change was made by [" + event.getUserId() + "]");
+    }
+
+    getFeedRecorder().addSystemEvent(new SystemEvent(event.getEventDate(), SystemEvent.ACTION_CONFIG, msg.toString()));
   }
 }

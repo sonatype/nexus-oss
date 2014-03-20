@@ -11,12 +11,17 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.timeline.feeds;
+package org.sonatype.nexus.timeline.feeds.subscribers;
 
 import java.util.List;
 import java.util.Set;
 
 import org.sonatype.nexus.timeline.Entry;
+import org.sonatype.nexus.timeline.feeds.AuthcAuthzEvent;
+import org.sonatype.nexus.timeline.feeds.FeedRecorder;
+import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
+import org.sonatype.nexus.timeline.feeds.SystemEvent;
+import org.sonatype.nexus.timeline.feeds.SystemProcess;
 
 import com.google.common.base.Predicate;
 

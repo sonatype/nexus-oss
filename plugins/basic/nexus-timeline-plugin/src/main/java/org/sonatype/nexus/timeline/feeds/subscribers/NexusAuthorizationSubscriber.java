@@ -35,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named
 @Singleton
-public class NexusAuthorizationEventInspector
+public class NexusAuthorizationSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
@@ -44,8 +44,8 @@ public class NexusAuthorizationEventInspector
   private volatile NexusAuthorizationEvent lastNexusAuthorizationEvent;
 
   @Inject
-  public NexusAuthorizationEventInspector(final FeedRecorder feedRecorder,
-                                          final NexusConfiguration nexusConfiguration)
+  public NexusAuthorizationSubscriber(final FeedRecorder feedRecorder,
+                                      final NexusConfiguration nexusConfiguration)
   {
     super(feedRecorder);
     this.nexusConfiguration = checkNotNull(nexusConfiguration);

@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named
 @Singleton
-public class RepositoryRegistryRepositoryEventInspector
+public class RepositoryRegistryRepositoryEventSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
@@ -51,9 +51,9 @@ public class RepositoryRegistryRepositoryEventInspector
   private final RepositoryRegistry repoRegistry;
 
   @Inject
-  public RepositoryRegistryRepositoryEventInspector(final FeedRecorder feedRecorder,
-                                                    final ApplicationStatusSource applicationStatusSource,
-                                                    final RepositoryRegistry repoRegistry)
+  public RepositoryRegistryRepositoryEventSubscriber(final FeedRecorder feedRecorder,
+                                                     final ApplicationStatusSource applicationStatusSource,
+                                                     final RepositoryRegistry repoRegistry)
   {
     super(feedRecorder);
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
