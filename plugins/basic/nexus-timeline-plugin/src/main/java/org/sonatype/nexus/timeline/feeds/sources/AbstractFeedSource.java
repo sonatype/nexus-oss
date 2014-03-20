@@ -20,6 +20,7 @@ import java.util.Map;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.timeline.feeds.rest.FeedSource;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.sun.syndication.feed.synd.SyndFeed;

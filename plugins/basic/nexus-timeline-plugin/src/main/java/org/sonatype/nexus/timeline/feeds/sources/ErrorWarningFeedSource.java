@@ -40,7 +40,6 @@ import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
-import org.restlet.data.MediaType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -160,7 +159,7 @@ public class ErrorWarningFeedSource
           // }
 
           SyndContent content = new SyndContentImpl();
-          content.setType(MediaType.TEXT_PLAIN.toString());
+          content.setType("text/plain");
           content.setValue(contentValue.toString());
           entry.setDescription(content);
 

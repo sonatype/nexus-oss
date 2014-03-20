@@ -20,26 +20,27 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.nexus.web.BaseUrlHolder;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.siesta.common.Resource;
+import org.sonatype.sisu.siesta.common.error.WebApplicationMessageException;
 
+import com.google.common.collect.Maps;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.restlet.Context;
-import org.restlet.data.Form;
-import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.data.Status;
-import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -47,61 +48,27 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Feed publishing REST resource. All the components implementing {@link FeedSource} interface will get auto-registered
  * by this resource, and published.
  *
- * @author cstamas
- * @author dip
- * @since 3.0 (relocated from nexus-timeline-plugin)
+ * @since 3.0
  */
-@Path("/feeds/{" + FeedPlexusResource.FEED_KEY + "}")
-@Produces({"application/rss+xml", "application/atom+xml", "text/xml"})
 @Named
 @Singleton
+@Path("/feeds/{" + FeedPlexusResource.FEED_KEY + "}")
+@Produces({FeedPlexusResource.APPLICATION_RSS_XML, FeedPlexusResource.APPLICATION_ATOM_XML, MediaType.TEXT_XML})
 public class FeedPlexusResource
-    extends AbstractNexusPlexusResource
+    extends ComponentSupport
+    implements Resource
 {
-  public static final MediaType RSS_MEDIA_TYPE = new MediaType("application/rss+xml", "RSS syndication documents");
+  public static final String APPLICATION_RSS_XML = "application/rss+xml";
 
-  public static final MediaType ATOM_MEDIA_TYPE = MediaType.APPLICATION_ATOM_XML;
+  public static final String APPLICATION_ATOM_XML = MediaType.APPLICATION_ATOM_XML;
 
   public static final String FEED_KEY = "feedKey";
-
-  private static final String RSS_2_0 = "rss_2.0";
-
-  private static final String ATOM_1_0 = "atom_1.0";
 
   private final Map<String, FeedSource> feeds;
 
   @Inject
   public FeedPlexusResource(final Map<String, FeedSource> feeds) {
     this.feeds = checkNotNull(feeds);
-  }
-
-  @Override
-  public Object getPayloadInstance() {
-    // RO resource, no payload
-    return null;
-  }
-
-  @Override
-  public String getResourceUri() {
-    return "/feeds/{" + FEED_KEY + "}";
-  }
-
-  @Override
-  public PathProtectionDescriptor getResourceProtection() {
-    return new PathProtectionDescriptor("/feeds/*", "authcBasic,perms[nexus:feeds]");
-  }
-
-  @Override
-  public List<Variant> getVariants() {
-    List<Variant> result = super.getVariants();
-
-    // the default resource implementation returns
-    // application/xml and application/json
-    result.add(new Variant(RSS_MEDIA_TYPE));
-    result.add(new Variant(ATOM_MEDIA_TYPE));
-    result.add(new Variant(MediaType.TEXT_XML));
-
-    return result;
   }
 
   /**
@@ -113,89 +80,27 @@ public class FeedPlexusResource
    * @param from    The number of skipped entries (for paging).
    * @param count   The count of entries to be returned (for paging).
    */
-  @Override
   @GET
-  @ResourceMethodSignature(pathParams = {@PathParam("feedKey")}, queryParams = {
-      @QueryParam("from"), @QueryParam("count"), @QueryParam("r")
-  }, output = String.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
-      throws ResourceException
+  @RequiresPermissions("nexus:feeds")
+  public SyndFeed get(@PathParam(FEED_KEY) String feedKey, @DefaultValue("0") @QueryParam("from") int from,
+                      @DefaultValue("40") @QueryParam("count") int count, final @Context UriInfo uriInfo)
   {
-    MediaType mediaType = variant.getMediaType();
-    if (!MediaType.APPLICATION_JSON.equals(mediaType, true)) {
-      final SyndFeed feed = getFeed(request);
-
-      if (ATOM_MEDIA_TYPE.equals(mediaType, true)) {
-        feed.setFeedType(ATOM_1_0);
-      }
-      else {
-        feed.setFeedType(RSS_2_0);
-
-        // set the content type to RSS by default,
-        // however keep text/xml if it was requested this way (IE bug, see NEXUS-991)
-        if (!MediaType.TEXT_XML.equals(mediaType, true)) {
-          mediaType = RSS_MEDIA_TYPE;
-        }
-      }
-      feed.setLink(request.getResourceRef().toString());
-      return new FeedRepresentation(mediaType, feed);
-    }
-    else {
-      throw new ResourceException(Status.CLIENT_ERROR_NOT_ACCEPTABLE,
-          "Supported content type is '" + RSS_MEDIA_TYPE.getMainType() + "' and '" + ATOM_MEDIA_TYPE.getMainType() +
-              "' only."
-      );
-    }
-  }
-
-  private SyndFeed getFeed(final Request request)
-      throws ResourceException
-  {
-    final Form params = request.getResourceRef().getQueryAsForm();
-    Integer from = null;
-    Integer count = null;
-
-    try {
-      if (params.getFirstValue("from") != null) {
-        from = Integer.valueOf(params.getFirstValue("from"));
-      }
-
-      if (params.getFirstValue("count") != null) {
-        count = Integer.valueOf(params.getFirstValue("count"));
-      }
-    }
-    catch (NumberFormatException e) {
-      throw new ResourceException(
-          Status.CLIENT_ERROR_BAD_REQUEST,
-          "The 'from' and 'count' parameters must be numbers!",
-          e);
-    }
-
-    final String feedKey = (String) request.getAttributes().get(FEED_KEY);
+    final Map<String, String> params = getParameters(uriInfo);
     final SyndFeed feed;
     try {
       final FeedSource src = feeds.get(feedKey);
       if (src != null) {
-        feed = src.getFeed(from, count, params.getValuesMap());
+        feed = src.getFeed(from, count, params);
       }
       else {
-        throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Feed " + feedKey + " not found!");
+        throw new WebApplicationMessageException(Status.NOT_FOUND, "Feed " + feedKey + " not found!");
       }
     }
     catch (IOException e) {
-      throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
+      throw new WebApplicationException(e);
     }
 
-    // resolve all links, if needed. Create absolute URLs
-    if (feed.getLink() != null) {
-      // full URLs should not be touched
-      if (!feed.getLink().startsWith("http")) {
-        if (feed.getLink().startsWith("/")) {
-          feed.setLink(feed.getLink().substring(1));
-        }
-        feed.setLink(createRootReference(request, feed.getLink()).toString());
-      }
-    }
+    feed.setLink(BaseUrlHolder.get() + "/service/siesta/feeds/" + feedKey);
     for (SyndEntry entry : (List<SyndEntry>) feed.getEntries()) {
       if (entry.getLink() != null) {
         // full URLs should not be touched
@@ -203,10 +108,21 @@ public class FeedPlexusResource
           if (entry.getLink().startsWith("/")) {
             entry.setLink(entry.getLink().substring(1));
           }
-          entry.setLink(createRootReference(request, entry.getLink()).toString());
+          entry.setLink(BaseUrlHolder.get() + entry.getLink());
         }
       }
     }
     return feed;
+  }
+
+  /**
+   * Just repack into simple KV map, using only the first values.
+   */
+  private Map<String, String> getParameters(final UriInfo uriInfo) {
+    final Map<String, String> result = Maps.newHashMap();
+    for (String key : uriInfo.getQueryParameters().keySet()) {
+      result.put(key, uriInfo.getQueryParameters().getFirst(key));
+    }
+    return result;
   }
 }

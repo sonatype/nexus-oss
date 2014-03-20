@@ -31,7 +31,6 @@ import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
-import org.restlet.data.MediaType;
 
 @Named(AuthcAuthzFeedSource.CHANNEL_KEY)
 @Singleton
@@ -69,7 +68,7 @@ public class AuthcAuthzFeedSource
         entry.setTitle(item.getAction());
       }
       final SyndContent content = new SyndContentImpl();
-      content.setType(MediaType.TEXT_PLAIN.toString());
+      content.setType("text/plain");
       content.setValue(item.getMessage());
       entry.setPublishedDate(item.getEventDate());
       entry.setAuthor(feed.getAuthor());

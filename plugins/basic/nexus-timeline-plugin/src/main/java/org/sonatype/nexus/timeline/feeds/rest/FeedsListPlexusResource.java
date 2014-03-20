@@ -21,77 +21,49 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
-import org.sonatype.nexus.rest.model.FeedListResource;
-import org.sonatype.nexus.rest.model.FeedListResourceResponse;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.nexus.timeline.model.FeedEntriesXO;
+import org.sonatype.nexus.timeline.model.FeedEntryXO;
+import org.sonatype.nexus.web.BaseUrlHolder;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.siesta.common.Resource;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A resource that lists existing feeds, published by {@link FeedSource} components.
  *
- * @author cstamas
- * @author dip
- * @since 3.0 (relocated from nexus-timeline-plugin)
+ * @since 3.0
  */
-@Path(FeedsListPlexusResource.RESOURCE_URI)
-@Produces({"application/xml", "application/json"})
+@Path("/feeds")
+@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Named
 @Singleton
 public class FeedsListPlexusResource
-    extends AbstractNexusPlexusResource
+    extends ComponentSupport
+    implements Resource
 {
-  public static final String RESOURCE_URI = "/feeds";
-
-  private final List<FeedSource> feeds;
+  private final List<FeedSource> feedSources;
 
   @Inject
-  public FeedsListPlexusResource(final List<FeedSource> feeds) {
-    this.feeds = checkNotNull(feeds);
+  public FeedsListPlexusResource(final List<FeedSource> feedSources) {
+    this.feedSources = checkNotNull(feedSources);
   }
 
-  @Override
-  public Object getPayloadInstance() {
-    // RO resource, no payload
-    return null;
-  }
-
-  @Override
-  public String getResourceUri() {
-    return RESOURCE_URI;
-  }
-
-  @Override
-  public PathProtectionDescriptor getResourceProtection() {
-    return new PathProtectionDescriptor(getResourceUri(), "authcBasic,perms[nexus:feeds]");
-  }
-
-  /**
-   * Get the list of feeds available from the Nexus server.
-   */
-  @Override
   @GET
-  @ResourceMethodSignature(output = FeedListResourceResponse.class)
-  public Object get(Context context, Request req, Response res, Variant variant)
-      throws ResourceException
-  {
-    final FeedListResourceResponse response = new FeedListResourceResponse();
-    final List<FeedSource> sources = feeds;
-    for (FeedSource source : sources) {
-      final FeedListResource resource = new FeedListResource();
-      resource.setResourceURI(createChildReference(req, this, source.getFeedKey()).toString());
-      resource.setName(source.getFeedName());
-      response.addData(resource);
+  @RequiresPermissions("nexus:feeds")
+  public FeedEntriesXO get() {
+    final FeedEntriesXO result = new FeedEntriesXO();
+    for (FeedSource feedSource : feedSources) {
+      final FeedEntryXO entry = new FeedEntryXO();
+      entry.setResourceURI(BaseUrlHolder.get() + "/service/siesta/feeds/" + feedSource.getFeedKey());
+      entry.setName(feedSource.getFeedName());
+      entry.setDescription(feedSource.getFeedDescription());
+      result.getFeedEntries().add(entry);
     }
-    return response;
+    return result;
   }
 }

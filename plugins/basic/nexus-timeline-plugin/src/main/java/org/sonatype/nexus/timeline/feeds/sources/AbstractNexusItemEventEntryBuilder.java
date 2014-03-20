@@ -17,20 +17,19 @@ import java.util.Date;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
-import org.restlet.data.MediaType;
 
 /**
  * @author Juven Xu
@@ -91,11 +90,8 @@ abstract public class AbstractNexusItemEventEntryBuilder
 
   protected SyndContent buildDescription(NexusArtifactEvent event) {
     SyndContent content = new SyndContentImpl();
-
-    content.setType(MediaType.TEXT_PLAIN.toString());
-
+    content.setType("text/plain");
     StringBuilder msg = new StringBuilder();
-
     if (event.getMessage() != null) {
       msg.append(event.getMessage());
       msg.append(' ');
