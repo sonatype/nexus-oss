@@ -39,6 +39,7 @@ define('repoServer',
     'Sonatype/repoServer/referenceData',
     'Sonatype/repoServer/RepositoryGroupEditor',
     'Sonatype/repoServer/RepositoryRoutingPanel',
+    'Sonatype/repoServer/FeedView',
     'Sonatype/repoServer/ServerEditPanel',
     'Sonatype/repoServer/UserEditPanel',
     'Sonatype/repoServer/UserMappingEditor'

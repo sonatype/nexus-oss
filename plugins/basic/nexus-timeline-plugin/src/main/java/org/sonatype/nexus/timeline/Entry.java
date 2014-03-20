@@ -17,6 +17,8 @@ import java.util.Map;
 
 /**
  * Timeline entry.
+ *
+ * @since 3.0
  */
 public interface Entry
 {

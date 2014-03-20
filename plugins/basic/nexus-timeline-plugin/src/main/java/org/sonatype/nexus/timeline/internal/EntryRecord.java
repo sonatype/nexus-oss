@@ -28,6 +28,8 @@ import io.kazuki.v0.store.schema.model.Schema;
 
 /**
  * Timeline entry.
+ *
+ * @since 3.0
  */
 public final class EntryRecord
     implements Entry

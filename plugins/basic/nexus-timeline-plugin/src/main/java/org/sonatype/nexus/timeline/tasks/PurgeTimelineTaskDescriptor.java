@@ -23,6 +23,9 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 
+/**
+ * Task descriptor for {@link PurgeTimeline}.
+ */
 @Named("PurgeTimeline")
 @Singleton
 public class PurgeTimelineTaskDescriptor

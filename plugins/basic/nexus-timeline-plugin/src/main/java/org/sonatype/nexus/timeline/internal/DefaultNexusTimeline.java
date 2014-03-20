@@ -50,11 +50,9 @@ import io.kazuki.v0.store.schema.TypeValidation;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * This is the "real thing": implementation backed by spice Timeline. Until now, it was in Core, but it kept many
- * important and key dependencies in core too, and making Nexus Core literally a hostage of it.
+ * Implementation of {@link NexusTimeline} backed by Kazuki.
  *
- * @author cstamas
- * @since 2.0
+ * @since 3.0
  */
 @Named
 @Singleton
@@ -88,7 +86,7 @@ public class DefaultNexusTimeline
       start();
     }
     catch (Exception e) {
-      log.warn("Could not start timeline", e);
+      log.error("Could not start timeline", e);
     }
   }
 
@@ -98,7 +96,7 @@ public class DefaultNexusTimeline
       stop();
     }
     catch (Exception e) {
-      log.warn("Could not stop timeline", e);
+      log.error("Could not stop timeline", e);
     }
   }
 
@@ -214,11 +212,8 @@ public class DefaultNexusTimeline
         }
       }
     }
-    catch (IOException e) {
-      log.warn("Failed to process Timeline record in callback", e);
-    }
-    catch (KazukiException e) {
-      log.warn("Failed to iterate Timeline store", e);
+    catch (Exception e) {
+      log.warn("Failure during retrieve or callback, processing stopped", e);
     }
   }
 

@@ -18,8 +18,7 @@ import java.io.IOException;
 /**
  * Callback to receive and process timeline records.
  *
- * @author cstamas
- * @since 2.0
+ * @since 3.0
  */
 public interface TimelineCallback
 {

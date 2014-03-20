@@ -20,6 +20,8 @@ import com.google.common.collect.Lists;
 
 /**
  * Handy {@link TimelineCallback} that gathers all the found entries into list.
+ *
+ * @since 3.0
  */
 public class EntryListCallback
     implements TimelineCallback

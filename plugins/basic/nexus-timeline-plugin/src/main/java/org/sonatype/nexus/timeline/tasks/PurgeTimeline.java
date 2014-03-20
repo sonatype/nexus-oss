@@ -22,7 +22,7 @@ import org.sonatype.nexus.timeline.NexusTimeline;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Purge timeline.
+ * Purge timeline task.
  */
 @Named(PurgeTimelineTaskDescriptor.ID)
 public class PurgeTimeline

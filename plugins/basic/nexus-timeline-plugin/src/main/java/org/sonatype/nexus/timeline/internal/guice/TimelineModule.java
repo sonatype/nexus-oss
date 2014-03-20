@@ -35,7 +35,7 @@ import io.kazuki.v0.store.sequence.SequenceServiceConfiguration;
 /**
  * Timeline Guice module.
  *
- * @since 2.8.0
+ * @since 3.0
  */
 @Named
 public class TimelineModule

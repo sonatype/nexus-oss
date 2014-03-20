@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NonNls;
 /**
  * Timeline plugin.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @EagerSingleton

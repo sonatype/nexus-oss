@@ -33,7 +33,7 @@ import static org.sonatype.sisu.goodies.common.Varargs.$;
  * @since 2.6.1
  */
 @NexusStartAndStopStrategy(NexusStartAndStopStrategy.Strategy.EACH_TEST)
-public class TimelineITSupport
+public abstract class TimelineITSupport
     extends NexusRunningParametrizedITSupport
 {
   @Parameterized.Parameters

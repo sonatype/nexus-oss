@@ -24,6 +24,8 @@
  *   <li>tasks - where the Timeline maintenance tasks (purge timeline) is</li>
  *   <li>internal - the implementation and Guice module</li>
  * </ul>
+ *
+ * @since 3.0
  */
 
 package org.sonatype.nexus.timeline;

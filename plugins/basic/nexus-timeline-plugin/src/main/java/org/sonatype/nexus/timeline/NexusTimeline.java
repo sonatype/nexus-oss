@@ -23,7 +23,7 @@ import com.google.common.base.Predicate;
 /**
  * NexusTimeline is a journaling database if entries..
  *
- * @author cstamas
+ * @since 3.0
  */
 public interface NexusTimeline
     extends Lifecycle

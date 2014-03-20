@@ -64,6 +64,20 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- For legacy RRS/Atom feed support, using Rome -->
+    <dependency>
+      <groupId>rome</groupId>
+      <artifactId>rome</artifactId>
+    </dependency>
+
+    <!-- For legacy RRS/Atom feed support, backed by Timeline -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-timeline-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-testsupport</artifactId>
@@ -94,6 +108,8 @@
             <sharedDependency>com.noelios.restlet:com.noelios.restlet.ext.servlet</sharedDependency>
             <!-- Used by org.sonatype.nexus.rest.ResourceSupport -->
             <sharedDependency>javax.ws.rs:javax.ws.rs</sharedDependency>
+            <!-- For RSS feed support -->
+            <sharedDependency>rome:rome</sharedDependency>
           </sharedDependencies>
         </configuration>
       </plugin>
