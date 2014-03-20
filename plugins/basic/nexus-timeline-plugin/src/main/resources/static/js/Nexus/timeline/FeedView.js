@@ -18,7 +18,10 @@
  */
 NX.define('Nexus.timeline.FeedView', {
   extend : 'Ext.Panel',
-  requires : ['Nexus.timeline.FeedGrid'],
+  requires : [
+    'Nexus.siesta',
+    'Nexus.timeline.FeedGrid'
+  ],
 
   /*
    * config object: { feedUrl ; required title }
