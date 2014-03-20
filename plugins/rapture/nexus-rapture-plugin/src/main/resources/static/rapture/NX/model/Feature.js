@@ -31,6 +31,8 @@ Ext.define('NX.model.Feature', {
     { name: 'mode', defaultValue: 'admin' },
     { name: 'weight', defaultValue: 100 },
     { name: 'view', defaultValue: undefined },
+    { name: 'href', defaultValue: undefined },
+    { name: 'hrefTarget', defaultValue: '_blank' },
     { name: 'visible', defaultValue: true },
     { name: 'expanded', defaultValue: true },
     { name: 'bookmark', defaultValue: undefined },
