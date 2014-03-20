@@ -41,7 +41,7 @@ import com.sun.syndication.io.SyndFeedOutput;
  */
 @Named
 @Provider
-@Produces({RomeProvider.APPLICATION_RSS_XML, MediaType.APPLICATION_ATOM_XML})
+@Produces({RomeProvider.APPLICATION_RSS_XML, MediaType.APPLICATION_ATOM_XML, MediaType.TEXT_XML})
 public class RomeProvider
     implements Component, MessageBodyWriter<Object>
 {
@@ -73,6 +73,7 @@ public class RomeProvider
         feed.setFeedType(ATOM_1_0);
       }
       else {
+        // we write RSS for both media types
         feed.setFeedType(RSS_2_0);
       }
       final Writer w = new OutputStreamWriter(entityStream);
@@ -86,7 +87,8 @@ public class RomeProvider
 
   private boolean hasMatchingMediaType(final MediaType mediaType) {
     return matches(APPLICATION_RSS_XML_TYPE, mediaType)
-        || matches(MediaType.APPLICATION_ATOM_XML_TYPE, mediaType);
+        || matches(MediaType.APPLICATION_ATOM_XML_TYPE, mediaType)
+        || matches(MediaType.TEXT_XML_TYPE, mediaType);
   }
 
   private boolean matches(final MediaType m1, final MediaType m2) {
