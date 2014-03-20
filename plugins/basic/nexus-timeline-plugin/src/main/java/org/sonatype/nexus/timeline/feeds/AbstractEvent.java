@@ -14,12 +14,15 @@
 package org.sonatype.nexus.timeline.feeds;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.RequestContext;
 
-public class AbstractEvent
+import com.google.common.collect.Maps;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+public abstract class AbstractEvent
 {
   /**
    * The date of event.
@@ -42,13 +45,10 @@ public class AbstractEvent
   private final Map<String, Object> eventContext;
 
   public AbstractEvent(final Date eventDate, final String action, final String message) {
-    this.eventDate = eventDate;
-
-    this.action = action;
-
-    this.message = message;
-
-    this.eventContext = new HashMap<String, Object>();
+    this.eventDate = checkNotNull(eventDate);
+    this.action = checkNotNull(action);
+    this.message = checkNotNull(message);
+    this.eventContext = Maps.newHashMap();
   }
 
   public Date getEventDate() {
@@ -76,7 +76,12 @@ public class AbstractEvent
     }
   }
 
+  @Override
   public String toString() {
-    return getMessage();
+    return getClass().getSimpleName() + "{" +
+        "message='" + message + '\'' +
+        ", action='" + action + '\'' +
+        ", eventDate=" + eventDate +
+        '}';
   }
 }

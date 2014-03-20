@@ -13,15 +13,13 @@
 
 package org.sonatype.nexus.timeline.feeds.record;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -31,31 +29,22 @@ import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenArtifactSignatureAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenChecksumAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenRepositoryMetadataAttribute;
+import org.sonatype.nexus.timeline.feeds.FeedRecorder;
+import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
+import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent.NexusItemInfo;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
-/**
- * Event inspector that persists item events into Timeline.
- *
- * @author Juven Xu
- * @author cstamas
- */
 @Named
 @Singleton
 public class ItemChangesFeedEventInspector
-    extends AbstractFeedRecorderEventInspector
+    extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
-
-  public ItemChangesFeedEventInspector() {
-  }
-
-  // for now used just for UTs
-  ItemChangesFeedEventInspector(final FeedRecorder feedRecorder,
-                                final ApplicationStatusSource applicationStatusSource)
-  {
-    super(feedRecorder, applicationStatusSource);
+  @Inject
+  public ItemChangesFeedEventInspector(final FeedRecorder feedRecorder) {
+    super(feedRecorder);
   }
 
   // RETRIEVE event creates a lot of noise in events, so we are not processing those
@@ -90,13 +79,7 @@ public class ItemChangesFeedEventInspector
         && !((StorageFileItem) ievt.getItem()).isContentGenerated()) {
       StorageFileItem pomItem = (StorageFileItem) ievt.getItem();
 
-      NexusItemInfo ai = new NexusItemInfo();
-      ai.setRepositoryId(pomItem.getRepositoryId());
-      ai.setPath(pomItem.getPath());
-      ai.setRemoteUrl(pomItem.getRemoteUrl());
-
       String action;
-
       if (ievt instanceof RepositoryItemEventCache) {
         action = NexusArtifactEvent.ACTION_CACHED;
       }
@@ -110,7 +93,8 @@ public class ItemChangesFeedEventInspector
         return;
       }
 
-      NexusArtifactEvent nae = new NexusArtifactEvent(ievt.getEventDate(), action, "", ai);
+      NexusArtifactEvent nae = new NexusArtifactEvent(ievt.getEventDate(), action, "",
+          new NexusItemInfo(pomItem.getPath(), pomItem.getRepositoryId(), pomItem.getRemoteUrl()));
       // set context
       nae.addEventContext(ievt.getItemContext());
       // set attributes

@@ -13,39 +13,37 @@
 
 package org.sonatype.nexus.timeline.feeds.record;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
+import org.sonatype.nexus.timeline.feeds.FeedRecorder;
+import org.sonatype.nexus.timeline.feeds.SystemEvent;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
-/**
- * @author Juven Xu
- */
 @Named
 @Singleton
 public class RepositoryEventProxyModeChangedInspector
-    extends AbstractFeedRecorderEventInspector
+    extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
+  @Inject
+  public RepositoryEventProxyModeChangedInspector(final FeedRecorder feedRecorder) {
+    super(feedRecorder);
+  }
 
   @Subscribe
   @AllowConcurrentEvents
-  public void inspect(final RepositoryEventProxyModeChanged evt) {
-    RepositoryEventProxyModeChanged revt = (RepositoryEventProxyModeChanged) evt;
-
-    StringBuilder sb = new StringBuilder("The proxy mode of repository '");
-
+  public void on(final RepositoryEventProxyModeChanged revt) {
+    final StringBuilder sb = new StringBuilder("The proxy mode of repository '");
     sb.append(revt.getRepository().getName());
-
     sb.append("' (ID='").append(revt.getRepository().getId()).append("') was set to ");
-
     if (ProxyMode.ALLOW.equals(revt.getNewProxyMode())) {
       sb.append("Allow.");
     }
@@ -58,9 +56,7 @@ public class RepositoryEventProxyModeChangedInspector
     else {
       sb.append(revt.getRepository().getProxyMode().toString()).append(".");
     }
-
     sb.append(" The previous state was ");
-
     if (ProxyMode.ALLOW.equals(revt.getOldProxyMode())) {
       sb.append("Allow.");
     }
@@ -73,12 +69,12 @@ public class RepositoryEventProxyModeChangedInspector
     else {
       sb.append(revt.getOldProxyMode().toString()).append(".");
     }
-
     if (revt.getCause() != null) {
       sb.append(" Last detected transport error: ").append(revt.getCause().getMessage());
     }
 
-    getFeedRecorder().addSystemEvent(FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION, sb.toString());
+    getFeedRecorder()
+        .addSystemEvent(new SystemEvent(revt.getEventDate(), SystemEvent.ACTION_REPO_PSTATUS_CHANGES, sb.toString()));
   }
 
 }

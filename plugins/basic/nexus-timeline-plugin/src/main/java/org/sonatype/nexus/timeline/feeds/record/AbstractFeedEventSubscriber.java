@@ -13,36 +13,21 @@
 
 package org.sonatype.nexus.timeline.feeds.record;
 
-public class NexusItemInfo
+import org.sonatype.nexus.timeline.feeds.FeedRecorder;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+public abstract class AbstractFeedEventSubscriber
+    extends ComponentSupport
 {
-  private String path;
+  private final FeedRecorder feedRecorder;
 
-  private String repositoryId;
-
-  private String remoteUrl;
-
-  public String getPath() {
-    return path;
+  protected AbstractFeedEventSubscriber(final FeedRecorder feedRecorder) {
+    this.feedRecorder = checkNotNull(feedRecorder);
   }
 
-  public void setPath(String path) {
-    this.path = path;
+  protected FeedRecorder getFeedRecorder() {
+    return feedRecorder;
   }
-
-  public String getRepositoryId() {
-    return repositoryId;
-  }
-
-  public void setRepositoryId(String repositoryId) {
-    this.repositoryId = repositoryId;
-  }
-
-  public String getRemoteUrl() {
-    return remoteUrl;
-  }
-
-  public void setRemoteUrl(String remoteUrl) {
-    this.remoteUrl = remoteUrl;
-  }
-
 }

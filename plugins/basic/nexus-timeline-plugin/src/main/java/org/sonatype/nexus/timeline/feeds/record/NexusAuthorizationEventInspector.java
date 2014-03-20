@@ -23,9 +23,9 @@ import org.sonatype.nexus.auth.ResourceInfo;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
+import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.timeline.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.proxy.access.AccessManager;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class NexusAuthorizationEventInspector
-    extends AbstractFeedRecorderEventInspector
+    extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
   private final NexusConfiguration nexusConfiguration;
@@ -44,13 +44,16 @@ public class NexusAuthorizationEventInspector
   private volatile NexusAuthorizationEvent lastNexusAuthorizationEvent;
 
   @Inject
-  public NexusAuthorizationEventInspector(final NexusConfiguration nexusConfiguration) {
+  public NexusAuthorizationEventInspector(final FeedRecorder feedRecorder,
+                                          final NexusConfiguration nexusConfiguration)
+  {
+    super(feedRecorder);
     this.nexusConfiguration = checkNotNull(nexusConfiguration);
   }
 
   @Subscribe
   @AllowConcurrentEvents
-  public void inspect(NexusAuthorizationEvent nae) {
+  public void on(NexusAuthorizationEvent nae) {
     if (!isRecordedEvent(nae)) {
       // do nothing
       return;
@@ -64,7 +67,7 @@ public class NexusAuthorizationEventInspector
             + ai.getRemoteIP() + ", user agent:\"" + ai.getUserAgent() + "\"";
     log.debug(msg);
 
-    final AuthcAuthzEvent aae = new AuthcAuthzEvent(nae.getEventDate(), FeedRecorder.SYSTEM_AUTHZ, msg);
+    final AuthcAuthzEvent aae = new AuthcAuthzEvent(nae.getEventDate(), AuthcAuthzEvent.ACTION_AUTHZ, msg);
     final String ip = ai.getRemoteIP();
     if (ip != null) {
       nae.getEventContext().put(AccessManager.REQUEST_REMOTE_ADDRESS, ip);

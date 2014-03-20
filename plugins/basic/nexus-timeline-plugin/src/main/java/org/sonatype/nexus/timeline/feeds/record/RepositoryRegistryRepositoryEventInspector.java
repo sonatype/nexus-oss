@@ -17,10 +17,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -32,27 +32,31 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.timeline.feeds.FeedRecorder;
+import org.sonatype.nexus.timeline.feeds.SystemEvent;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * Creates timeline entries (for feeds) about repository configuration related changes.
- *
- * @author Juven Xu
- */
 @Named
 @Singleton
 public class RepositoryRegistryRepositoryEventInspector
-    extends AbstractFeedRecorderEventInspector
+    extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
+  private final ApplicationStatusSource applicationStatusSource;
+
   private final RepositoryRegistry repoRegistry;
 
   @Inject
-  public RepositoryRegistryRepositoryEventInspector(final RepositoryRegistry repoRegistry) {
+  public RepositoryRegistryRepositoryEventInspector(final FeedRecorder feedRecorder,
+                                                    final ApplicationStatusSource applicationStatusSource,
+                                                    final RepositoryRegistry repoRegistry)
+  {
+    super(feedRecorder);
+    this.applicationStatusSource = checkNotNull(applicationStatusSource);
     this.repoRegistry = checkNotNull(repoRegistry);
   }
 
@@ -68,13 +72,12 @@ public class RepositoryRegistryRepositoryEventInspector
     inspect(e);
   }
 
-  protected void inspect(Event<?> evt) {
+  private void inspect(Event<?> evt) {
     if (!isNexusStarted()) {
       return;
     }
 
-    Repository repository = null;
-
+    Repository repository;
     if (evt instanceof RepositoryRegistryRepositoryEvent) {
       repository = ((RepositoryRegistryRepositoryEvent) evt).getRepository();
     }
@@ -86,7 +89,6 @@ public class RepositoryRegistryRepositoryEventInspector
       // check registry for existence, wont be able to do much
       // if doesn't exist yet
       repoRegistry.getRepository(repository.getId());
-
       inspectForTimeline(evt, repository);
     }
     catch (NoSuchRepositoryException e) {
@@ -94,28 +96,20 @@ public class RepositoryRegistryRepositoryEventInspector
     }
   }
 
-  private void inspectForTimeline(Event<?> evt, Repository repository) {
-    // we do not want RSS entries about boot and repo additions during boot
-    StringBuilder sb = new StringBuilder();
-
+  private void inspectForTimeline(final Event<?> evt, final Repository repository) {
+    final StringBuilder sb = new StringBuilder();
     if (repository.getRepositoryKind().isFacetAvailable(GroupRepository.class)) {
       sb.append(" repository group ");
     }
     else {
       sb.append(" repository ");
     }
-
     sb.append(repository.getName());
-
     sb.append(" (ID=");
-
     sb.append(repository.getId());
-
     sb.append(") ");
-
     if (repository.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
       sb.append(" as proxy repository for URL ");
-
       sb.append(repository.adaptToFacet(ProxyRepository.class).getRemoteUrl());
     }
     else if (repository.getRepositoryKind().isFacetAvailable(HostedRepository.class)) {
@@ -123,22 +117,14 @@ public class RepositoryRegistryRepositoryEventInspector
     }
     else if (repository.getRepositoryKind().isFacetAvailable(ShadowRepository.class)) {
       sb.append(" as ");
-
       sb.append(repository.getClass().getName());
-
       sb.append(" virtual repository for ");
-
       sb.append(repository.adaptToFacet(ShadowRepository.class).getMasterRepository().getName());
-
       sb.append(" (ID=");
-
       sb.append(repository.adaptToFacet(ShadowRepository.class).getMasterRepository().getId());
-
       sb.append(") ");
     }
-
     sb.append(".");
-
     if (evt instanceof RepositoryRegistryEventAdd) {
       sb.insert(0, "Registered");
     }
@@ -149,6 +135,10 @@ public class RepositoryRegistryRepositoryEventInspector
       sb.insert(0, "Updated");
     }
 
-    getFeedRecorder().addSystemEvent(FeedRecorder.SYSTEM_CONFIG_ACTION, sb.toString());
+    getFeedRecorder().addSystemEvent(new SystemEvent(evt.getEventDate(), SystemEvent.ACTION_CONFIG, sb.toString()));
+  }
+
+  private boolean isNexusStarted() {
+    return applicationStatusSource.getSystemStatus().isNexusStarted();
   }
 }

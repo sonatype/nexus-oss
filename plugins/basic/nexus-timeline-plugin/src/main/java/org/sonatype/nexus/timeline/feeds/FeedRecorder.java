@@ -23,53 +23,18 @@ import com.google.common.base.Predicate;
 /**
  * A recorder for events for later retrieval. The Actions are "generic" Nexus event related. For specific (Maven, P2)
  * actions, look into specific sources. Note: This is actually event recorder, not feed recorder.
- *
- * @author cstamas
  */
 public interface FeedRecorder
 {
-  /**
-   * System event action: boot
-   */
-  public static final String SYSTEM_BOOT_ACTION = "BOOT";
-
-  /**
-   * System event action: configuration
-   */
-  public static final String SYSTEM_CONFIG_ACTION = "CONFIG";
-
-  /**
-   * System event action: repository local status changes
-   */
-  public static final String SYSTEM_REPO_LSTATUS_CHANGES_ACTION = "REPO_LSTATUS_CHANGES";
-
-  /**
-   * System event action: repository proxy status auto change
-   */
-  public static final String SYSTEM_REPO_PSTATUS_CHANGES_ACTION = "REPO_PSTATUS_CHANGES";
-
-  /**
-   * System event action: repository proxy status auto change
-   */
-  public static final String SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION = "REPO_PSTATUS_AUTO_CHANGES";
-
-  /**
-   * System event action: authentication
-   */
-  public static final String SYSTEM_AUTHC = "AUTHC";
-
-  /**
-   * System event action: authorization
-   */
-  public static final String SYSTEM_AUTHZ = "AUTHZ";
-  
   // creating
 
-  void addNexusArtifactEvent(NexusArtifactEvent nae);
+  void addNexusArtifactEvent(NexusArtifactEvent evt);
 
-  void addSystemEvent(String action, String message);
+  void addSystemEvent(SystemEvent evt);
 
   void addAuthcAuthzEvent(AuthcAuthzEvent evt);
+
+  // tasks
 
   SystemProcess systemProcessStarted(String action, String message);
 

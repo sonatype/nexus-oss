@@ -22,9 +22,9 @@ import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
+import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.timeline.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.proxy.access.AccessManager;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -35,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class NexusAuthenticationEventInspector
-    extends AbstractFeedRecorderEventInspector
+    extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
   private final NexusConfiguration nexusConfiguration;
@@ -43,13 +43,16 @@ public class NexusAuthenticationEventInspector
   private volatile NexusAuthenticationEvent lastNexusAuthenticationEvent;
 
   @Inject
-  public NexusAuthenticationEventInspector(final NexusConfiguration nexusConfiguration) {
+  public NexusAuthenticationEventInspector(final FeedRecorder feedRecorder,
+                                           final NexusConfiguration nexusConfiguration)
+  {
+    super(feedRecorder);
     this.nexusConfiguration = checkNotNull(nexusConfiguration);
   }
 
   @Subscribe
   @AllowConcurrentEvents
-  public void inspect(final NexusAuthenticationEvent nae) {
+  public void on(final NexusAuthenticationEvent nae) {
     if (!isRecordedEvent(nae)) {
       // do nothing
       return;
@@ -62,7 +65,7 @@ public class NexusAuthenticationEventInspector
             : "Unable to authenticate"), ai.getUserid(), StringUtils.defaultString(ai.getRemoteIP(), "[unknown]"));
     log.debug(msg);
 
-    final AuthcAuthzEvent aae = new AuthcAuthzEvent(nae.getEventDate(), FeedRecorder.SYSTEM_AUTHC, msg);
+    final AuthcAuthzEvent aae = new AuthcAuthzEvent(nae.getEventDate(), AuthcAuthzEvent.ACTION_AUTHC, msg);
     final String ip = ai.getRemoteIP();
     if (ip != null) {
       nae.getEventContext().put(AccessManager.REQUEST_REMOTE_ADDRESS, ip);

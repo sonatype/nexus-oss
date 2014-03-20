@@ -23,6 +23,33 @@ import java.util.Date;
 public class SystemEvent
     extends AbstractEvent
 {
+  public static final String TYPE = "SYSTEM";
+
+  /**
+   * System event action: boot
+   */
+  public static final String ACTION_BOOT = "BOOT";
+
+  /**
+   * System event action: configuration
+   */
+  public static final String ACTION_CONFIG = "CONFIG";
+
+  /**
+   * System event action: repository local status changes
+   */
+  public static final String ACTION_REPO_LSTATUS_CHANGES = "REPO_LSTATUS_CHANGES";
+
+  /**
+   * System event action: repository proxy status auto change
+   */
+  public static final String ACTION_REPO_PSTATUS_CHANGES = "REPO_PSTATUS_CHANGES";
+
+  /**
+   * System event action: repository proxy status auto change
+   */
+  public static final String ACTION_REPO_PSTATUS_AUTO_CHANGES = "REPO_PSTATUS_AUTO_CHANGES";
+
   public SystemEvent(final Date eventDate, final String action, final String message) {
     super(eventDate, action, message);
   }

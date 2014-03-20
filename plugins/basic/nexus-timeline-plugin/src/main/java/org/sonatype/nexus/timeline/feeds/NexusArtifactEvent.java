@@ -14,10 +14,11 @@
 package org.sonatype.nexus.timeline.feeds;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
-import org.sonatype.nexus.timeline.feeds.record.NexusItemInfo;
+import com.google.common.collect.Maps;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A class thet encapsulates a Nexus artifact event: caching, deploying, deleting or retrieving of it.
@@ -27,6 +28,8 @@ import org.sonatype.nexus.timeline.feeds.record.NexusItemInfo;
 public class NexusArtifactEvent
     extends AbstractEvent
 {
+  public static final String TYPE = "REPO_EVENTS";
+
   public static final String ACTION_CACHED = "cached";
 
   public static final String ACTION_DEPLOYED = "deployed";
@@ -40,6 +43,33 @@ public class NexusArtifactEvent
   public static final String ACTION_BROKEN_WRONG_REMOTE_CHECKSUM = "brokenWRC";
 
   public static final String ACTION_BROKEN_INVALID_CONTENT = "brokenIC";
+
+  public static class NexusItemInfo
+  {
+    private final String path;
+
+    private final String repositoryId;
+
+    private final String remoteUrl;
+
+    public NexusItemInfo(final String path, final String repositoryId, final String remoteUrl) {
+      this.path = checkNotNull(path);
+      this.repositoryId = checkNotNull(repositoryId);
+      this.remoteUrl = checkNotNull(remoteUrl);
+    }
+
+    public String getPath() {
+      return path;
+    }
+
+    public String getRepositoryId() {
+      return repositoryId;
+    }
+
+    public String getRemoteUrl() {
+      return remoteUrl;
+    }
+  }
 
   /**
    * The artifactInfo about artifact.
@@ -55,10 +85,8 @@ public class NexusArtifactEvent
                             final NexusItemInfo nexusItemInfo)
   {
     super(eventDate, action, message);
-
-    this.nexusItemInfo = nexusItemInfo;
-
-    this.itemAttributes = new HashMap<String, String>();
+    this.nexusItemInfo = checkNotNull(nexusItemInfo);
+    this.itemAttributes = Maps.newHashMap();
   }
 
   public NexusItemInfo getNexusItemInfo() {

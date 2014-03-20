@@ -19,7 +19,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,13 +27,21 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.timeline.feeds.record.NexusItemInfo;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
 import org.sonatype.nexus.timeline.NexusTimeline;
+import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent.NexusItemInfo;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -67,39 +74,6 @@ public class DefaultFeedRecorder
   public static final String DATE = "date";
 
   /**
-   * Event type: repository
-   */
-  private static final String REPO_EVENT_TYPE = "REPO_EVENTS";
-
-  private static final Set<String> REPO_EVENT_TYPE_SET = new HashSet<String>(1);
-
-  {
-    REPO_EVENT_TYPE_SET.add(REPO_EVENT_TYPE);
-  }
-
-  /**
-   * Event type: system
-   */
-  private static final String SYSTEM_EVENT_TYPE = "SYSTEM";
-
-  private static final Set<String> SYSTEM_EVENT_TYPE_SET = new HashSet<String>(1);
-
-  {
-    SYSTEM_EVENT_TYPE_SET.add(SYSTEM_EVENT_TYPE);
-  }
-
-  /**
-   * Event type: authc/authz
-   */
-  private static final String AUTHC_AUTHZ_EVENT_TYPE = "AUTHC_AUTHZ";
-
-  private static final Set<String> AUTHC_AUTHZ_EVENT_TYPE_SET = new HashSet<String>(1);
-
-  {
-    AUTHC_AUTHZ_EVENT_TYPE_SET.add(AUTHC_AUTHZ_EVENT_TYPE);
-  }
-
-  /**
    * The time format used in events.
    */
   private static final String EVENT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSZ";
@@ -109,18 +83,41 @@ public class DefaultFeedRecorder
    */
   private final NexusTimeline nexusTimeline;
 
-  /**
-   * The Feed filter (will checks for user access )
-   */
-  private final FeedArtifactEventFilter feedArtifactEventFilter;
+  private final NexusItemAuthorizer nexusItemAuthorizer;
+
+  private final RepositoryRegistry repositoryRegistry;
 
   @Inject
   public DefaultFeedRecorder(final NexusTimeline nexusTimeline,
-                             final FeedArtifactEventFilter feedArtifactEventFilter)
+                             final NexusItemAuthorizer nexusItemAuthorizer,
+                             final RepositoryRegistry repositoryRegistry)
   {
     this.nexusTimeline = checkNotNull(nexusTimeline);
-    this.feedArtifactEventFilter = checkNotNull(feedArtifactEventFilter);
+    this.nexusItemAuthorizer = checkNotNull(nexusItemAuthorizer);
+    this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }
+
+  // filtering
+
+  private boolean filterEvent(NexusArtifactEvent event) {
+    try {
+      final Repository repo = repositoryRegistry.getRepository(event.getNexusItemInfo().getRepositoryId());
+      final ResourceStoreRequest req = new ResourceStoreRequest(event.getNexusItemInfo().getPath());
+      if (!this.nexusItemAuthorizer.authorizePath(repo, req, Action.read)) {
+        return false;
+      }
+    }
+    catch (NoSuchRepositoryException e) {
+      // Can't get repository for artifact, therefore we can't authorize access, therefore you don't see it
+      log.debug(
+          "Feed entry contained invalid repository id " + event.getNexusItemInfo().getRepositoryId(),
+          e);
+      return false;
+    }
+    return true;
+  }
+
+  // feed recorder
 
   protected DateFormat getDateFormat() {
     return new SimpleDateFormat(EVENT_DATE_FORMAT);
@@ -147,13 +144,7 @@ public class DefaultFeedRecorder
     for (Entry record : data) {
       Map<String, String> map = record.getData();
 
-      NexusItemInfo ai = new NexusItemInfo();
-
-      ai.setRepositoryId(map.get(REPOSITORY));
-
-      ai.setPath(map.get(REPOSITORY_PATH));
-
-      ai.setRemoteUrl(map.get(REMOTE_URL));
+      final NexusItemInfo ai = new NexusItemInfo(map.get(REPOSITORY_PATH), map.get(REPOSITORY),map.get(REMOTE_URL));
 
       HashMap<String, String> ctx = new HashMap<String, String>();
       HashMap<String, String> atr = new HashMap<String, String>();
@@ -185,10 +176,11 @@ public class DefaultFeedRecorder
         nae.addItemAttributes(atr);
       }
 
-      result.add(nae);
+      if (filterEvent(nae)) {
+        result.add(nae);
+      }
     }
-
-    return this.feedArtifactEventFilter.filterArtifactEventList(result);
+    return result;
   }
 
   protected List<SystemEvent> getSesFromMaps(List<Entry> data) {
@@ -260,13 +252,13 @@ public class DefaultFeedRecorder
   public List<NexusArtifactEvent> getNexusArtifectEvents(Set<String> subtypes, Integer from, Integer count,
                                                          Predicate<Entry> filter)
   {
-    List<Entry> result = getEvents(REPO_EVENT_TYPE_SET, subtypes, from, count, filter);
+    List<Entry> result = getEvents(ImmutableSet.of(NexusArtifactEvent.TYPE), subtypes, from, count, filter);
 
     return getAisFromMaps(result);
   }
 
   public List<SystemEvent> getSystemEvents(Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter) {
-    List<Entry> result = getEvents(SYSTEM_EVENT_TYPE_SET, subtypes, from, count, filter);
+    List<Entry> result = getEvents(ImmutableSet.of(SystemEvent.TYPE), subtypes, from, count, filter);
 
     return getSesFromMaps(result);
   }
@@ -274,16 +266,14 @@ public class DefaultFeedRecorder
   public List<AuthcAuthzEvent> getAuthcAuthzEvents(Set<String> subtypes, Integer from, Integer count,
                                                    Predicate<Entry> filter)
   {
-    List<Entry> result = getEvents(AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, from, count, filter);
+    List<Entry> result = getEvents(ImmutableSet.of(AuthcAuthzEvent.TYPE), subtypes, from, count, filter);
 
     return getAaesFromMaps(result);
   }
 
   // ==
 
-  public void addSystemEvent(String action, String message) {
-    SystemEvent event = new SystemEvent(new Date(), action, message);
-
+  public void addSystemEvent(SystemEvent event) {
     addToTimeline(event);
   }
 
@@ -314,7 +304,7 @@ public class DefaultFeedRecorder
 
     map.put(DATE, getDateFormat().format(evt.getEventDate()));
 
-    addToTimeline(map, AUTHC_AUTHZ_EVENT_TYPE, evt.getAction());
+    addToTimeline(map, AuthcAuthzEvent.TYPE, evt.getAction());
   }
 
   public void addNexusArtifactEvent(NexusArtifactEvent nae) {
@@ -339,7 +329,7 @@ public class DefaultFeedRecorder
 
     map.put(ACTION, nae.getAction());
 
-    addToTimeline(map, REPO_EVENT_TYPE, nae.getAction());
+    addToTimeline(map, NexusArtifactEvent.TYPE, nae.getAction());
   }
 
   public SystemProcess systemProcessStarted(String action, String message) {
@@ -387,7 +377,7 @@ public class DefaultFeedRecorder
 
     map.put(MESSAGE, se.getMessage());
 
-    addToTimeline(map, SYSTEM_EVENT_TYPE, se.getAction());
+    addToTimeline(map, SystemEvent.TYPE, se.getAction());
   }
 
   protected void addToTimeline(Map<String, String> map, String t1, String t2) {

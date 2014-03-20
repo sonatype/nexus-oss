@@ -13,38 +13,38 @@
 
 package org.sonatype.nexus.timeline.feeds.record;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.timeline.feeds.FeedRecorder;
+import org.sonatype.nexus.timeline.feeds.SystemEvent;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
-/**
- * @author Juven Xu
- */
 @Named
 @Singleton
 public class RepositoryEventLocalStatusChangedInspector
-    extends AbstractFeedRecorderEventInspector
+    extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
+  @Inject
+  public RepositoryEventLocalStatusChangedInspector(final FeedRecorder feedRecorder) {
+    super(feedRecorder);
+  }
+
   @Subscribe
   @AllowConcurrentEvents
-  public void inspect(final RepositoryEventLocalStatusChanged revt) {
-    StringBuilder sb = new StringBuilder("The repository '");
-
+  public void on(final RepositoryEventLocalStatusChanged revt) {
+    final StringBuilder sb = new StringBuilder("The repository '");
     sb.append(revt.getRepository().getName());
-
     sb.append("' (ID='").append(revt.getRepository().getId()).append("') was put ");
-
     LocalStatus newStatus = revt.getNewLocalStatus();
-
     if (LocalStatus.IN_SERVICE.equals(newStatus)) {
       sb.append("IN SERVICE.");
     }
@@ -54,9 +54,7 @@ public class RepositoryEventLocalStatusChangedInspector
     else {
       sb.append(revt.getRepository().getLocalStatus().toString()).append(".");
     }
-
     sb.append(" The previous state was ");
-
     if (LocalStatus.IN_SERVICE.equals(revt.getOldLocalStatus())) {
       sb.append("IN SERVICE.");
     }
@@ -66,8 +64,8 @@ public class RepositoryEventLocalStatusChangedInspector
     else {
       sb.append(revt.getOldLocalStatus().toString()).append(".");
     }
-
-    getFeedRecorder().addSystemEvent(FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION, sb.toString());
+    getFeedRecorder()
+        .addSystemEvent(new SystemEvent(revt.getEventDate(), SystemEvent.ACTION_REPO_LSTATUS_CHANGES, sb.toString()));
   }
 
 }

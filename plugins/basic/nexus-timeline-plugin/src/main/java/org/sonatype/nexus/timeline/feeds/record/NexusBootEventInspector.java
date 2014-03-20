@@ -13,41 +13,55 @@
 
 package org.sonatype.nexus.timeline.feeds.record;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
+import org.sonatype.nexus.timeline.feeds.SystemEvent;
 
 import com.google.common.eventbus.Subscribe;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Boot listening event inspector. This one is intentionally not async, to mark exact time stamps of Nexus important
  * events: when it booted and when shutdown was commenced.
- *
- * @author cstamas
  */
 @Named
 @Singleton
 public class NexusBootEventInspector
-    extends AbstractFeedRecorderEventInspector
+    extends AbstractFeedEventSubscriber
     implements EventSubscriber
 {
+  private final ApplicationStatusSource applicationStatusSource;
+
+  @Inject
+  public NexusBootEventInspector(final FeedRecorder feedRecorder,
+                                 final ApplicationStatusSource applicationStatusSource)
+  {
+    super(feedRecorder);
+    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+  }
+
   @Subscribe
   public void on(final NexusStartedEvent e) {
-    getFeedRecorder().addSystemEvent(
-        FeedRecorder.SYSTEM_BOOT_ACTION,
-        "Started Nexus (version " + getApplicationStatusSource().getSystemStatus().getVersion() + " "
-            + getApplicationStatusSource().getSystemStatus().getEditionShort() + ")");
+    getFeedRecorder().addSystemEvent(new SystemEvent(e.getEventDate(), SystemEvent.ACTION_BOOT,
+        "Started Nexus (version " + applicationStatusSource.getSystemStatus().getVersion() + " "
+            + applicationStatusSource.getSystemStatus().getEditionShort() + ")"
+    ));
   }
 
   @Subscribe
   public void on(final NexusStoppedEvent e) {
-    getFeedRecorder().addSystemEvent(
-        FeedRecorder.SYSTEM_BOOT_ACTION,
-        "Stopping Nexus (version " + getApplicationStatusSource().getSystemStatus().getVersion() + " "
-            + getApplicationStatusSource().getSystemStatus().getEditionShort() + ")");
+    getFeedRecorder().addSystemEvent(new SystemEvent(e.getEventDate(),
+        SystemEvent.ACTION_BOOT,
+        "Stopping Nexus (version " + applicationStatusSource.getSystemStatus().getVersion() + " "
+            + applicationStatusSource.getSystemStatus().getEditionShort() + ")"
+    ));
   }
 }

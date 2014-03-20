@@ -15,11 +15,11 @@ package org.sonatype.nexus.timeline.feeds.record;
 
 import java.lang.reflect.Method;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.timeline.feeds.SystemProcess;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.scheduling.events.NexusTaskEvent;
@@ -27,6 +27,8 @@ import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
+import org.sonatype.nexus.timeline.feeds.FeedRecorder;
+import org.sonatype.nexus.timeline.feeds.SystemProcess;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -36,23 +38,23 @@ import com.google.common.eventbus.Subscribe;
  * <em>intentionally synchronous EventInspector</em>! Reasoning is mainly to avoid unordered event arrivals (stopped
  * before started), but also, one can easily see by inspecting where these events are fired (see
  * {@link AbstractNexusTask}), that those are fired from already pooled thread (task executing thread), and not the
- * main
- * HTTP request processing ones, hence, this event inspector being synchronous will not steal much CPU cycles from it
- * (well, will do as much to decide does it "accepts" the event, but that is negligible, and will be fixed once we
- * start
- * using "event bus" since then it will not even be invoked).
- *
- * @author cstamas
+ * main HTTP request processing ones, hence, this event inspector being synchronous will not steal much CPU cycles from
+ * it.
  */
 @Named
 @Singleton
 public class NexusTaskFeedEventInspector
-    extends AbstractFeedRecorderEventInspector
+    extends AbstractFeedEventSubscriber
     implements EventSubscriber
 {
+  @Inject
+  public NexusTaskFeedEventInspector(final FeedRecorder feedRecorder) {
+    super(feedRecorder);
+  }
+
   @Subscribe
   @AllowConcurrentEvents
-  public void inspect(final NexusTaskEvent evt) {
+  public void on(final NexusTaskEvent evt) {
     if (evt instanceof NexusTaskEventStarted<?>) {
       final String action = getActionFromTask(((NexusTaskEventStarted<?>) evt).getNexusTask());
       final String message = getMessageFromTask(((NexusTaskEventStarted<?>) evt).getNexusTask());

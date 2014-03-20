@@ -23,6 +23,18 @@ import java.util.Date;
 public class AuthcAuthzEvent
     extends AbstractEvent
 {
+  public static final String TYPE = "AUTHC_AUTHZ";
+
+  /**
+   * System event action: authentication
+   */
+  public static final String ACTION_AUTHC = "AUTHC";
+
+  /**
+   * System event action: authorization
+   */
+  public static final String ACTION_AUTHZ = "AUTHZ";
+
   public AuthcAuthzEvent(final Date eventDate, final String action, final String message) {
     super(eventDate, action, message);
   }

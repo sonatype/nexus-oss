@@ -13,49 +13,45 @@
 
 package org.sonatype.nexus.timeline.feeds.record;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailed;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedChecksum;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedFileType;
+import org.sonatype.nexus.timeline.feeds.FeedRecorder;
+import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
+import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent.NexusItemInfo;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
-/**
- * Event inspector that creates feeds about failed item validations.
- *
- * @author cstamas
- */
 @Named
 @Singleton
 public class ItemValidationFeedEventInspector
-    extends AbstractFeedRecorderEventInspector
+    extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
+  @Inject
+  public ItemValidationFeedEventInspector(final FeedRecorder feedRecorder) {
+    super(feedRecorder);
+  }
+
   @Subscribe
   @AllowConcurrentEvents
-  public void inspect(final RepositoryItemValidationEventFailed ievt) {
-    final NexusItemInfo ai = new NexusItemInfo();
-    ai.setRepositoryId(ievt.getItem().getRepositoryId());
-    ai.setPath(ievt.getItem().getPath());
-    ai.setRemoteUrl(ievt.getItem().getRemoteUrl());
-
+  public void on(final RepositoryItemValidationEventFailed ievt) {
     String action = NexusArtifactEvent.ACTION_BROKEN;
-
     if (ievt instanceof RepositoryItemValidationEventFailedChecksum) {
       action = NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM;
     }
     else if (ievt instanceof RepositoryItemValidationEventFailedFileType) {
       action = NexusArtifactEvent.ACTION_BROKEN_INVALID_CONTENT;
     }
-
-    final NexusArtifactEvent nae = new NexusArtifactEvent(ievt.getEventDate(), action, ievt.getMessage(), ai);
-
+    final NexusArtifactEvent nae = new NexusArtifactEvent(ievt.getEventDate(), action, ievt.getMessage(),
+        new NexusItemInfo(ievt.getItem().getPath(), ievt.getItem().getRepositoryId(), ievt.getItem().getRemoteUrl()));
     getFeedRecorder().addNexusArtifactEvent(nae);
   }
 }
