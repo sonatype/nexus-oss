@@ -35,7 +35,7 @@ public class DummyFeedRecorder
   }
 
   @Override
-  public void addSystemEvent(final String action, final String message) {
+  public void addSystemEvent(SystemEvent event) {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 

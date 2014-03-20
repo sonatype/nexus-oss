@@ -26,6 +26,7 @@ import org.sonatype.nexus.proxy.maven.uid.IsMavenArtifactSignatureAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenChecksumAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenRepositoryMetadataAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.timeline.feeds.subscribers.ItemChangesFeedEventInspector;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
@@ -44,9 +45,6 @@ public class ItemChangesFeedEventInspectorTest
 
   @Mock
   private FeedRecorder feedRecorder;
-
-  @Mock
-  private ApplicationStatusSource applicationStatusSource;
 
   @Mock
   private Repository repository;
@@ -68,7 +66,7 @@ public class ItemChangesFeedEventInspectorTest
   @Test
   public void eventsOnHiddenFilesAreNotRecorded() {
     final ItemChangesFeedEventInspector underTest =
-        new ItemChangesFeedEventInspector(feedRecorder, applicationStatusSource);
+        new ItemChangesFeedEventInspector(feedRecorder);
     final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
     when(repositoryItemUid.getBooleanAttributeValue(IsHiddenAttribute.class)).thenReturn(true);
     underTest.on(evt);
@@ -79,7 +77,7 @@ public class ItemChangesFeedEventInspectorTest
   @Test
   public void eventsOnMavenMetadataSignatureAndHashFilesShouldNotBeRecorded() {
     final ItemChangesFeedEventInspector underTest =
-        new ItemChangesFeedEventInspector(feedRecorder, applicationStatusSource);
+        new ItemChangesFeedEventInspector(feedRecorder);
     {
       final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
       when(repositoryItemUid.getBooleanAttributeValue(IsMavenRepositoryMetadataAttribute.class)).thenReturn(

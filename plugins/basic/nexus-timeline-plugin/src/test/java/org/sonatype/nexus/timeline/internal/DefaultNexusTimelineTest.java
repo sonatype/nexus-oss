@@ -23,7 +23,6 @@ import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
 import org.sonatype.nexus.timeline.NexusTimeline;
-import org.sonatype.nexus.timeline.internal.guice.TimelineModule;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.Time;
 import org.sonatype.sisu.goodies.eventbus.EventBus;

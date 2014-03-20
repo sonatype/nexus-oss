@@ -16,7 +16,7 @@ package org.sonatype.nexus.timeline.feeds;
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.timeline.feeds.record.NexusAuthenticationEventInspector;
+import org.sonatype.nexus.timeline.feeds.subscribers.NexusAuthenticationEventInspector;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
@@ -45,8 +45,7 @@ public class NexusAuthenticationEventInspectorTest
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks( this );
     feedRecorder = new DummyFeedRecorder();
-    underTest = new NexusAuthenticationEventInspector(nexusConfiguration);
-    underTest.setFeedRecorder(feedRecorder);
+    underTest = new NexusAuthenticationEventInspector(feedRecorder, nexusConfiguration);
 
     when(nexusConfiguration.getAnonymousUsername()).thenReturn("anonymous");
   }
@@ -61,18 +60,18 @@ public class NexusAuthenticationEventInspectorTest
     // we send same event 5 times, but only one of them should be recorded since the rest 4 are "similar" and within
     // 2 sec
     for (int i = 0; i < 5; i++) {
-      underTest.inspect(naeSuccess);
+      underTest.on(naeSuccess);
     }
     // we send another event 5 times, but only one of them should be recorded since it is not "similar" to previous
     // sent ones, but the rest 4 are "similar" and within 2 sec
     for (int i = 0; i < 5; i++) {
-      underTest.inspect(naeFailed);
+      underTest.on(naeFailed);
     }
     // we sleep a bit over two seconds
     Thread.sleep(2100L);
     // and we send again the second event, but this one should be recorded, since the gap between last sent and this
     // is more than 2 seconds
-    underTest.inspect(naeFailed);
+    underTest.on(naeFailed);
 
     // total 11 events "fired", but 3 recorded due to "similarity filtering"
     assertThat(feedRecorder.getReceivedEventCount(), is(expected));
