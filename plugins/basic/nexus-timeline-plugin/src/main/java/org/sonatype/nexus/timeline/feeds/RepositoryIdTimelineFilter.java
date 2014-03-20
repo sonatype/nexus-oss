@@ -19,12 +19,6 @@ import org.sonatype.nexus.timeline.Entry;
 
 import com.google.common.base.Predicate;
 
-/**
- * Timeline filter that filters by repository IDs.
- *
- * @author: cstamas
- * @since 2.0
- */
 public class RepositoryIdTimelineFilter
     implements Predicate<Entry>
 {

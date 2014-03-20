@@ -41,13 +41,9 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * A feed recorder that uses DefaultNexus to record feeds.
- */
 @Named
 @Singleton
 public class DefaultFeedRecorder
@@ -332,8 +328,8 @@ public class DefaultFeedRecorder
     addToTimeline(map, NexusArtifactEvent.TYPE, nae.getAction());
   }
 
-  public SystemProcess systemProcessStarted(String action, String message) {
-    SystemProcess prc = new SystemProcess(new Date(), action, message, new Date());
+  public TaskEvent taskStarted(String action, String message) {
+    TaskEvent prc = new TaskEvent(new Date(), action, message, new Date());
 
     addToTimeline(prc);
 
@@ -342,7 +338,7 @@ public class DefaultFeedRecorder
     return prc;
   }
 
-  public void systemProcessFinished(SystemProcess prc, String finishMessage) {
+  public void taskFinished(TaskEvent prc, String finishMessage) {
     prc.finished(finishMessage);
 
     addToTimeline(prc);
@@ -350,7 +346,7 @@ public class DefaultFeedRecorder
     log.debug(prc.getMessage());
   }
 
-  public void systemProcessCanceled(SystemProcess prc, String cancelMessage) {
+  public void taskCanceled(TaskEvent prc, String cancelMessage) {
     prc.canceled(cancelMessage);
 
     addToTimeline(prc);
@@ -358,7 +354,7 @@ public class DefaultFeedRecorder
     log.debug(prc.getMessage());
   }
 
-  public void systemProcessBroken(SystemProcess prc, Throwable e) {
+  public void taskBroken(TaskEvent prc, Throwable e) {
     prc.broken(e);
 
     addToTimeline(prc);

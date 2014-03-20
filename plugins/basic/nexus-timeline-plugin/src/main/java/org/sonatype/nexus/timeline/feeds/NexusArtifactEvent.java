@@ -20,11 +20,6 @@ import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * A class thet encapsulates a Nexus artifact event: caching, deploying, deleting or retrieving of it.
- *
- * @author cstamas
- */
 public class NexusArtifactEvent
     extends AbstractEvent
 {

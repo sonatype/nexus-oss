@@ -21,7 +21,7 @@ import org.sonatype.nexus.timeline.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.timeline.feeds.SystemEvent;
-import org.sonatype.nexus.timeline.feeds.SystemProcess;
+import org.sonatype.nexus.timeline.feeds.TaskEvent;
 
 import com.google.common.base.Predicate;
 
@@ -50,22 +50,22 @@ public class DummyFeedRecorder
   }
 
   @Override
-  public SystemProcess systemProcessStarted(final String action, final String message) {
+  public TaskEvent taskStarted(final String action, final String message) {
     return null;  //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
-  public void systemProcessFinished(final SystemProcess prc, final String finishMessage) {
+  public void taskFinished(final TaskEvent prc, final String finishMessage) {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
-  public void systemProcessCanceled(final SystemProcess prc, final String cancelMessage) {
+  public void taskCanceled(final TaskEvent prc, final String cancelMessage) {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
-  public void systemProcessBroken(final SystemProcess prc, final Throwable e) {
+  public void taskBroken(final TaskEvent prc, final Throwable e) {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 

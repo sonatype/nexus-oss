@@ -28,7 +28,7 @@ import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.SystemProcess;
+import org.sonatype.nexus.timeline.feeds.TaskEvent;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -58,39 +58,40 @@ public class NexusTaskFeedSubscriber
     if (evt instanceof NexusTaskEventStarted<?>) {
       final String action = getActionFromTask(((NexusTaskEventStarted<?>) evt).getNexusTask());
       final String message = getMessageFromTask(((NexusTaskEventStarted<?>) evt).getNexusTask());
-      final SystemProcess prc = getFeedRecorder().systemProcessStarted(action, message);
-      putSystemProcessFromEventContext((NexusTaskEventStarted<?>) evt, prc);
+      final TaskEvent prc = getFeedRecorder().taskStarted(action, message);
+      putTaskEventFromEventContext((NexusTaskEventStarted<?>) evt, prc);
     }
     else if (evt instanceof NexusTaskEventStoppedDone<?>) {
-      final SystemProcess prc =
-          getSystemProcessFromEventContext(((NexusTaskEventStoppedDone<?>) evt).getStartedEvent());
+      final TaskEvent prc =
+          getTaskEventFromEventContext(((NexusTaskEventStoppedDone<?>) evt).getStartedEvent());
       final String message = getMessageFromTask(((NexusTaskEventStoppedDone<?>) evt).getNexusTask());
-      getFeedRecorder().systemProcessFinished(prc, message);
+      getFeedRecorder().taskFinished(prc, message);
     }
     else if (evt instanceof NexusTaskEventStoppedCanceled<?>) {
-      final SystemProcess prc =
-          getSystemProcessFromEventContext(((NexusTaskEventStoppedCanceled<?>) evt).getStartedEvent());
+      final TaskEvent prc =
+          getTaskEventFromEventContext(((NexusTaskEventStoppedCanceled<?>) evt).getStartedEvent());
       final String message = getMessageFromTask(((NexusTaskEventStoppedCanceled<?>) evt).getNexusTask());
-      getFeedRecorder().systemProcessCanceled(prc, message);
+      getFeedRecorder().taskCanceled(prc, message);
     }
     else if (evt instanceof NexusTaskEventStoppedFailed<?>) {
-      final SystemProcess prc =
-          getSystemProcessFromEventContext(((NexusTaskEventStoppedFailed<?>) evt).getStartedEvent());
-      getFeedRecorder().systemProcessBroken(prc, ((NexusTaskEventStoppedFailed<?>) evt).getFailureCause());
+      final TaskEvent prc =
+          getTaskEventFromEventContext(((NexusTaskEventStoppedFailed<?>) evt).getStartedEvent());
+      getFeedRecorder().taskBroken(prc, ((NexusTaskEventStoppedFailed<?>) evt).getFailureCause());
     }
   }
 
   // ==
 
-  protected void putSystemProcessFromEventContext(final NexusTaskEventStarted<?> evt, final SystemProcess prc) {
-    evt.getEventContext().put(SystemProcess.class.getName(), prc);
+  protected void putTaskEventFromEventContext(final NexusTaskEventStarted<?> evt, final TaskEvent prc) {
+    evt.getEventContext().put(TaskEvent.class.getName(), prc);
   }
 
-  protected SystemProcess getSystemProcessFromEventContext(final NexusTaskEventStarted<?> evt) {
-    return (SystemProcess) evt.getEventContext().get(SystemProcess.class.getName());
+  protected TaskEvent getTaskEventFromEventContext(final NexusTaskEventStarted<?> evt) {
+    return (TaskEvent) evt.getEventContext().get(TaskEvent.class.getName());
   }
 
   protected String getActionFromTask(final NexusTask<?> task) {
+    // TODO: change of NexusTask in Quartz is anyway expected, so expose this
     if (task instanceof AbstractNexusTask<?>) {
       try {
         final Method getActionMethod = AbstractNexusTask.class.getDeclaredMethod("getAction");
@@ -105,6 +106,7 @@ public class NexusTaskFeedSubscriber
   }
 
   protected String getMessageFromTask(final NexusTask<?> task) {
+    // TODO: change of NexusTask in Quartz is anyway expected, so expose this
     if (task instanceof AbstractNexusTask<?>) {
       try {
         final Method getMessageMethod = AbstractNexusTask.class.getDeclaredMethod("getMessage");

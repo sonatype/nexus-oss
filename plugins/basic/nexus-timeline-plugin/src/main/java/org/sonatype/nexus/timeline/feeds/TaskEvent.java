@@ -22,7 +22,7 @@ import java.util.Date;
  *
  * @author cstamas
  */
-public class SystemProcess
+public class TaskEvent
     extends SystemEvent
 {
   enum Status
@@ -55,7 +55,7 @@ public class SystemProcess
    */
   private Throwable errorCause;
 
-  public SystemProcess(final Date eventDate, final String action, final String message, final Date started) {
+  public TaskEvent(final Date eventDate, final String action, final String message, final Date started) {
     super(eventDate, action, message);
 
     this.started = started;

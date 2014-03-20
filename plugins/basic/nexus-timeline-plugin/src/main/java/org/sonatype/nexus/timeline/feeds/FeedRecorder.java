@@ -17,12 +17,15 @@ import java.util.List;
 import java.util.Set;
 
 import org.sonatype.nexus.timeline.Entry;
+import org.sonatype.nexus.timeline.NexusTimeline;
 
 import com.google.common.base.Predicate;
 
 /**
- * A recorder for events for later retrieval. The Actions are "generic" Nexus event related. For specific (Maven, P2)
- * actions, look into specific sources. Note: This is actually event recorder, not feed recorder.
+ * A recorder for events for later retrieval. The Actions are "generic" Nexus event related. This component
+ * provides a slight abstraction over {@link NexusTimeline}, that is used by it.
+ *
+ * @since 3.0
  */
 public interface FeedRecorder
 {
@@ -36,13 +39,13 @@ public interface FeedRecorder
 
   // tasks
 
-  SystemProcess systemProcessStarted(String action, String message);
+  TaskEvent taskStarted(String action, String message);
 
-  void systemProcessFinished(SystemProcess prc, String finishMessage);
+  void taskFinished(TaskEvent prc, String finishMessage);
 
-  void systemProcessCanceled(SystemProcess prc, String cancelMessage);
+  void taskCanceled(TaskEvent prc, String cancelMessage);
 
-  void systemProcessBroken(SystemProcess prc, Throwable e);
+  void taskBroken(TaskEvent prc, Throwable e);
 
   // reading
 

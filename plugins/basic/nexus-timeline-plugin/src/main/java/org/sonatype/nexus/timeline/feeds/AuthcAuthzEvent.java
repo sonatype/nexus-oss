@@ -15,11 +15,6 @@ package org.sonatype.nexus.timeline.feeds;
 
 import java.util.Date;
 
-/**
- * A event that encapsulate authentication and authorization event.
- *
- * @author juven
- */
 public class AuthcAuthzEvent
     extends AbstractEvent
 {
