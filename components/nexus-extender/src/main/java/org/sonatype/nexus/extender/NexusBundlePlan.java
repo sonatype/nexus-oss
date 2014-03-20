@@ -41,6 +41,7 @@ import org.eclipse.sisu.plexus.PlexusBeanModule;
 import org.eclipse.sisu.plexus.PlexusBindingModule;
 import org.eclipse.sisu.plexus.PlexusXmlBeanConverter;
 import org.eclipse.sisu.plexus.PlexusXmlBeanModule;
+import org.eclipse.sisu.space.BeanScanning;
 import org.eclipse.sisu.space.BundleClassSpace;
 import org.eclipse.sisu.space.ClassSpace;
 import org.eclipse.sisu.wire.EntryListAdapter;
@@ -86,7 +87,8 @@ public class NexusBundlePlan
     beanModules.add(new PlexusXmlBeanModule(pluginSpace, variables));
 
     // Scan for annotated components
-    beanModules.add(new PlexusAnnotatedBeanModule(pluginSpace, variables).with(NexusTypeBinder.STRATEGY));
+    beanModules.add(new PlexusAnnotatedBeanModule(pluginSpace, variables, BeanScanning.INDEX)
+        .with(NexusTypeBinder.STRATEGY));
 
     // Assemble plugin components and resources
     final List<Module> modules = new ArrayList<Module>();
