@@ -30,11 +30,6 @@ import org.sonatype.nexus.timeline.feeds.RepositoryIdTimelineFilter;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 
-/**
- * The overall changes feed.
- *
- * @author cstamas
- */
 @Named(RecentCachedOrDeployedFileFeedSource.CHANNEL_KEY)
 @Singleton
 public class RecentCachedOrDeployedFileFeedSource

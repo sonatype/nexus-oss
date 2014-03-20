@@ -32,9 +32,6 @@ import org.sonatype.nexus.timeline.feeds.RepositoryIdTimelineFilter;
 
 import com.google.common.base.Predicate;
 
-/**
- * @author juven
- */
 @Named(RecentCachedOrDeployedReleaseArtifactFeedSource.CHANNEL_KEY)
 @Singleton
 public class RecentCachedOrDeployedReleaseArtifactFeedSource

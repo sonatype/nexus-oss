@@ -15,9 +15,6 @@ package org.sonatype.nexus.timeline.feeds.sources;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 
-/**
- * @author Juven Xu
- */
 public interface SyndEntryBuilder<T>
 {
   boolean shouldBuildEntry(T source);

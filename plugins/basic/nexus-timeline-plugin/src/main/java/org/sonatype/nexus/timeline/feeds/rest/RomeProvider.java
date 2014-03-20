@@ -35,7 +35,7 @@ import com.sun.syndication.io.SyndFeedOutput;
 
 /**
  * A JAX-RS {@link MessageBodyWriter} that is backed by Rome. It supports {@code application/rss+xml} and {@code
- * application/atom+xml} media types only, and writing instanceof of {@link SyndFeed}.
+ * application/atom+xml} media types only, and instances of {@link SyndFeed}.
  *
  * @since 3.0
  */

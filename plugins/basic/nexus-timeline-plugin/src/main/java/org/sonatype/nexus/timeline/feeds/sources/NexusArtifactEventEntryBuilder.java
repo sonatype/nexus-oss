@@ -21,11 +21,6 @@ import org.sonatype.nexus.proxy.maven.gav.Gav;
 
 import org.codehaus.plexus.util.StringUtils;
 
-/**
- * Build feeds entry based on maven artifacts( poms and claasifiers)
- *
- * @author Juven Xu
- */
 @Named("artifact")
 @Singleton
 public class NexusArtifactEventEntryBuilder

@@ -26,11 +26,6 @@ import org.sonatype.nexus.timeline.feeds.SystemEvent;
 
 import com.google.common.collect.ImmutableSet;
 
-/**
- * The system changes feed.
- *
- * @author cstamas
- */
 @Named(SystemRepositoryStatusChangesFeedSource.CHANNEL_KEY)
 @Singleton
 public class SystemRepositoryStatusChangesFeedSource

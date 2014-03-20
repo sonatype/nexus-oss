@@ -20,9 +20,9 @@ import com.sun.syndication.feed.synd.SyndFeed;
 
 /**
  * A Feed source. Components implementing this interface produce feeds, and will be automatically published by
- * {@link FeedPlexusResource} and {@link FeedsListPlexusResource}.
+ * {@link FeedResource} and {@link FeedsListResource}.
  *
- * @since 3.0 (relocated from nexus-timeline-plugin)
+ * @since 3.0
  */
 public interface FeedSource
 {

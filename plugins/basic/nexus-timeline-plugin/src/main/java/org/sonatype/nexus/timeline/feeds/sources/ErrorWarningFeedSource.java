@@ -43,11 +43,6 @@ import com.sun.syndication.feed.synd.SyndFeed;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * Show Nexus ERROR and WARN log lines from last log file.
- *
- * @author cstamas
- */
 @Named(ErrorWarningFeedSource.CHANNEL_KEY)
 @Singleton
 public class ErrorWarningFeedSource

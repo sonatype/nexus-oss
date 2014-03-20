@@ -31,13 +31,6 @@ import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * All NexusArtifactEvent related FeedSource should be inherited from this class. </br> Here we name it with
- * "NexusItemEvent" is because file is a kind of item, maven artifact is another, (maybe there will be p2 items) so
- * NexusArtifactEvent is misleading.
- *
- * @author Juven Xu
- */
 public abstract class AbstractNexusItemEventFeedSource
     extends AbstractFeedSource
 {

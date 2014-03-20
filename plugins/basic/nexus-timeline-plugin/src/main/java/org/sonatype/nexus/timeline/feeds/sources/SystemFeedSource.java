@@ -24,11 +24,6 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 import org.sonatype.nexus.timeline.feeds.SystemEvent;
 
-/**
- * The system changes feed.
- *
- * @author cstamas
- */
 @Named(SystemFeedSource.CHANNEL_KEY)
 @Singleton
 public class SystemFeedSource

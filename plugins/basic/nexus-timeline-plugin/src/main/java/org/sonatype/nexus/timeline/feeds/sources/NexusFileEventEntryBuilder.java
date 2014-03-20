@@ -19,11 +19,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 
-/**
- * Build feeds entry based on files
- *
- * @author Juven Xu
- */
 @Named("file")
 @Singleton
 public class NexusFileEventEntryBuilder

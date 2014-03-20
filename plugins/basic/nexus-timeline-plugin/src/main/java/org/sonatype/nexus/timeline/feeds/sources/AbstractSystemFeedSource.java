@@ -37,11 +37,6 @@ import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 
-/**
- * The system changes feed.
- *
- * @author cstamas
- */
 public abstract class AbstractSystemFeedSource
     extends AbstractFeedSource
 {

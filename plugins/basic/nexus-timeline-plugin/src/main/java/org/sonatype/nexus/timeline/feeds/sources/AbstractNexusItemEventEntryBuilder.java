@@ -31,10 +31,7 @@ import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 
-/**
- * @author Juven Xu
- */
-abstract public class AbstractNexusItemEventEntryBuilder
+public abstract class AbstractNexusItemEventEntryBuilder
     extends ComponentSupport
     implements SyndEntryBuilder<NexusArtifactEvent>
 {

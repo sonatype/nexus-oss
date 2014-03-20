@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * And abstract class for feeds sources. This class implements all needed to create a feed,
  * implementors needs only to implement 3 abtract classes.
  *
- * @since 3.0 (relocated from nexus-timeline-plugin)
+ * @since 3.0
  */
 public abstract class AbstractFeedSource
     extends ComponentSupport

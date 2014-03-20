@@ -31,9 +31,6 @@ import org.sonatype.nexus.timeline.feeds.RepositoryIdTimelineFilter;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 
-/**
- * @author Juven Xu
- */
 @Named(RecentChangedReleaseArtifactFeedSource.CHANNEL_KEY)
 @Singleton
 public class RecentChangedReleaseArtifactFeedSource
