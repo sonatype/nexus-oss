@@ -18,9 +18,8 @@ import java.util.Date;
 import java.util.Map;
 
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.timeline.feeds.rest.FeedSource;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.web.BaseUrlHolder;
+import org.sonatype.nexus.timeline.feeds.rest.FeedSource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -29,8 +28,7 @@ import com.sun.syndication.feed.synd.SyndFeedImpl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * And abstract class for feeds sources. This class implements all needed to create a feed,
- * implementors needs only to implement 3 abtract classes.
+ * Support class for {@link FeedSource} implementations.
  *
  * @since 3.0
  */
