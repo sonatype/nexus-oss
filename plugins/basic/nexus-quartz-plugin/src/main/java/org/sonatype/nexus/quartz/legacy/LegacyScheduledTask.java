@@ -27,6 +27,8 @@ import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.Schedule;
 
 import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.Trigger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -38,10 +40,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class LegacyScheduledTask<T>
     implements ScheduledTask<T>
 {
+  private final Scheduler scheduler;
+
   private final JobDetail jobDetail;
 
-  public LegacyScheduledTask(final JobDetail jobDetail) {
+  private final Trigger trigger;
+
+  public LegacyScheduledTask(final Scheduler scheduler,
+                             final JobDetail jobDetail,
+                             final Trigger trigger)
+  {
+    this.scheduler = checkNotNull(scheduler);
     this.jobDetail = checkNotNull(jobDetail);
+    this.trigger = checkNotNull(trigger);
   }
 
   @Override
@@ -71,6 +82,7 @@ public class LegacyScheduledTask<T>
 
   @Override
   public void setName(final String name) {
+
   }
 
   @Override
@@ -85,32 +97,35 @@ public class LegacyScheduledTask<T>
 
   @Override
   public Date getScheduledAt() {
-    return null;
+    return trigger.getStartTime();
   }
 
   @Override
   public void runNow() {
-
+    scheduler.triggerJob(jobDetail.getKey());
   }
 
   @Override
   public void cancelOnly() {
-
+    scheduler.interrupt(jobDetail.getKey());
   }
 
   @Override
   public void cancel() {
-
+    scheduler.interrupt(jobDetail.getKey());
+    scheduler.deleteJob(jobDetail.getKey());
   }
 
   @Override
   public void cancel(final boolean interrupt) {
-
+    if (interrupt) {
+      scheduler.interrupt(jobDetail.getKey());
+    }
+    scheduler.deleteJob(jobDetail.getKey());
   }
 
   @Override
   public void reset() {
-
   }
 
   @Override
@@ -130,7 +145,7 @@ public class LegacyScheduledTask<T>
 
   @Override
   public Date getLastRun() {
-    return null;
+    return trigger.getPreviousFireTime();
   }
 
   @Override
@@ -145,12 +160,12 @@ public class LegacyScheduledTask<T>
 
   @Override
   public Date getNextRun() {
-    return null;
+    return trigger.getNextFireTime();
   }
 
   @Override
   public boolean isEnabled() {
-    return false;
+    return scheduler.is;
   }
 
   @Override
@@ -180,6 +195,6 @@ public class LegacyScheduledTask<T>
 
   @Override
   public Map<String, String> getTaskParams() {
-    return null;
+    return jobDetail.getJobDataMap();
   }
 }

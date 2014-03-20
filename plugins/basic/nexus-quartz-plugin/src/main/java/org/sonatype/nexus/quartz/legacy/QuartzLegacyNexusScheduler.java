@@ -13,9 +13,9 @@
 
 package org.sonatype.nexus.quartz.legacy;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.RejectedExecutionException;
 
 import javax.inject.Inject;
@@ -40,14 +40,19 @@ import org.sonatype.scheduling.schedules.WeeklySchedule;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.eclipse.sisu.Priority;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobKey;
 import org.quartz.ScheduleBuilder;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.quartz.impl.matchers.GroupMatcher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
@@ -102,11 +107,12 @@ public class QuartzLegacyNexusScheduler
           .build();
       final Trigger trigger = TriggerBuilder.newTrigger()
           .withIdentity(triggerKey(jobDetail.getKey().getName(), jobDetail.getKey().getGroup()))
+          .forJob(jobDetail.getKey())
           .startNow()
           .build();
       try {
         quartzSupport.getScheduler().scheduleJob(jobDetail, trigger);
-        return new LegacyScheduledTask<T>(jobDetail);
+        return new LegacyScheduledTask<T>(quartzSupport.getScheduler(), jobDetail, trigger);
       }
       catch (SchedulerException e) {
         throw new RejectedExecutionException("Could not submit job:", e);
@@ -129,12 +135,13 @@ public class QuartzLegacyNexusScheduler
           .usingJobData(jobDataMap)
           .build();
       final Trigger trigger = TriggerBuilder.newTrigger()
-          .withIdentity(name)
+          .withIdentity(triggerKey(jobDetail.getKey().getName(), jobDetail.getKey().getGroup()))
+          .forJob(jobDetail.getKey())
           .withSchedule(toQuartzSchedule(schedule))
           .build();
       try {
         quartzSupport.getScheduler().scheduleJob(jobDetail, trigger);
-        return new LegacyScheduledTask<T>(jobDetail);
+        return new LegacyScheduledTask<T>(quartzSupport.getScheduler(), jobDetail, trigger);
       }
       catch (SchedulerException e) {
         throw new RejectedExecutionException("Could not submit job:", e);
@@ -150,19 +157,70 @@ public class QuartzLegacyNexusScheduler
       throws RejectedExecutionException, NullPointerException
   {
     if (task != null) {
-      // do it
+      final JobDataMap jobDataMap = new JobDataMap(task.getTaskParams());
+      final JobDetail jobDetail = JobBuilder.newJob()
+          .ofType(LegacyWrapperJob.class)
+          .withIdentity(jobKey(task.getId()))
+          .withDescription(task.getName())
+          .usingJobData(jobDataMap)
+          .build();
+      final Trigger trigger = TriggerBuilder.newTrigger()
+          .withIdentity(triggerKey(jobDetail.getKey().getName(), jobDetail.getKey().getGroup()))
+          .forJob(jobDetail.getKey())
+          .withSchedule(toQuartzSchedule(task.getSchedule()))
+          .build();
+      try {
+        quartzSupport.getScheduler().addJob(jobDetail, true);
+        quartzSupport.getScheduler().rescheduleJob(trigger.getKey(), trigger);
+        return new LegacyScheduledTask<T>(quartzSupport.getScheduler(), jobDetail, trigger);
+      }
+      catch (SchedulerException e) {
+        throw new RejectedExecutionException("Could not submit job:", e);
+      }
     }
     return task;
   }
 
   @Override
   public Map<String, List<ScheduledTask<?>>> getActiveTasks() {
-    return Collections.emptyMap();
+    try {
+      final List<JobExecutionContext> jobExecutionContexts = quartzSupport.getScheduler().getCurrentlyExecutingJobs();
+      final Map<String, List<ScheduledTask<?>>> result = Maps.newHashMap();
+      for (JobExecutionContext jobExecutionContext : jobExecutionContexts) {
+        final JobDetail jobDetail = jobExecutionContext.getJobDetail();
+        final Trigger trigger = jobExecutionContext.getTrigger();
+        final LegacyScheduledTask st = new LegacyScheduledTask<>(quartzSupport.getScheduler(), jobDetail, trigger);
+        if (!result.containsKey(st.getType())) {
+          result.put(st.getType(), Lists.<ScheduledTask<?>>newArrayList());
+        }
+        result.get(st.getType()).add(st);
+      }
+      return result;
+    }
+    catch (SchedulerException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override
   public Map<String, List<ScheduledTask<?>>> getAllTasks() {
-    return Collections.emptyMap();
+    try {
+      final Set<JobKey> jobKeys = quartzSupport.getScheduler().getJobKeys(GroupMatcher.<JobKey>anyGroup());
+      final Map<String, List<ScheduledTask<?>>> result = Maps.newHashMap();
+      for (JobKey jobKey : jobKeys) {
+        final JobDetail jobDetail = quartzSupport.getScheduler().getJobDetail(jobKey);
+        final Trigger trigger = quartzSupport.getScheduler().getTrigger(triggerKey(jobKey.getName()));
+        final LegacyScheduledTask st = new LegacyScheduledTask<>(quartzSupport.getScheduler(), jobDetail, trigger);
+        if (!result.containsKey(st.getType())) {
+          result.put(st.getType(), Lists.<ScheduledTask<?>>newArrayList());
+        }
+        result.get(st.getType()).add(st);
+      }
+      return result;
+    }
+    catch (SchedulerException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override
@@ -171,7 +229,8 @@ public class QuartzLegacyNexusScheduler
   {
     try {
       final JobDetail jobDetail = quartzSupport.getScheduler().getJobDetail(jobKey(id));
-      return new LegacyScheduledTask<>(jobDetail);
+      final Trigger trigger = quartzSupport.getScheduler().getTrigger(triggerKey(id));
+      return new LegacyScheduledTask<>(quartzSupport.getScheduler(), jobDetail, trigger);
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
@@ -179,11 +238,12 @@ public class QuartzLegacyNexusScheduler
 
   }
 
-
+  @Override
   public NexusTask<?> createTaskInstance(String taskType) throws IllegalArgumentException {
     return lookupTask(taskType);
   }
 
+  @Override
   public <T> T createTaskInstance(final Class<T> taskType) throws IllegalArgumentException {
     log.debug("Creating task: {}", taskType);
 

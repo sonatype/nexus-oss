@@ -31,6 +31,8 @@ import com.google.common.base.Throwables;
 import org.quartz.SchedulerConfigException;
 import org.quartz.spi.ThreadPool;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * Nexus specific implementation of {@link ThreadPool} that is integrated with Shiro.
  *
@@ -39,11 +41,19 @@ import org.quartz.spi.ThreadPool;
 public class NexusThreadPool
     implements ThreadPool
 {
+  /**
+   * The "bare" executor (non-Shiro aware), needed to implement blocking logic and gather some stats.
+   */
   private final NexusThreadPoolExecutor threadPoolExecutor;
 
+  /**
+   * The shiro aware executor wrapper service. Using this wrapper are the Jobs scheduled and made Shiro
+   * Subject equipped.
+   */
   private final NexusExecutorService nexusExecutorService;
 
   public NexusThreadPool(final int poolSize) {
+    checkArgument(poolSize > 0, "Pool size must be greater than zero");
     this.threadPoolExecutor = new NexusThreadPoolExecutor(poolSize, poolSize,
         0L, TimeUnit.MILLISECONDS,
         new SynchronousQueue<Runnable>(), // no queuing
@@ -119,6 +129,10 @@ public class NexusThreadPool
 
   // ==
 
+  /**
+   * Nexus specific thread pool executor that helps implementing the blocking logic using a Semaphore and using
+   * the "hooks" on {@link ThreadPoolExecutor} class.
+   */
   public static class NexusThreadPoolExecutor
       extends ThreadPoolExecutor
   {

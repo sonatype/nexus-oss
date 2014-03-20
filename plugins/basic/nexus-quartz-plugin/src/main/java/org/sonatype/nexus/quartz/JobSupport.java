@@ -27,17 +27,13 @@ public abstract class JobSupport
     extends ComponentSupport
     implements InterruptableJob
 {
-  private volatile boolean interrupted;
-
-  protected JobSupport() {
-    this.interrupted = false;
-  }
+  private volatile boolean interrupted = false;
 
   @Override
   public void interrupt()
       throws UnableToInterruptJobException
   {
-    this.interrupted = true;
+    interrupted = true;
   }
 
   public boolean isInterrupted() {

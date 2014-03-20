@@ -17,29 +17,36 @@ import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.scheduling.NexusTask;
 
 import com.google.common.base.Throwables;
 import org.quartz.Job;
+import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.PersistJobDataAfterExecution;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Legacy wrapper job. Not a singleton. It lookups legacy task, prepopulates it's parameters, executes it, and returns
- * the parameters into jobDataMap for persisting it, if needed.
+ * Legacy task wrapping job. It lookups legacy task, prepopulates it's parameters, executes it, and returns
+ * the parameters and result into jobDataMap for persisting it, if needed.
  *
  * @since 3.0
  */
 @Named
-// TODO: I _think_ we have no task param changes, params are changed only by user
-// @PersistJobDataAfterExecution
+@Singleton
+@PersistJobDataAfterExecution
 public class LegacyWrapperJob
     implements Job
 {
   public static final String LEGACY_JOB_TYPE_KEY = "quartz.legacy.jobType";
+
+  public static final String LEGACY_JOB_RESULT_KEY = "quartz.legacy.jobResult";
+
+  public static final String LEGACY_JOB_FAILURE_CAUSE_KEY = "quartz.legacy.jobFailureCause";
 
   private final QuartzLegacyNexusScheduler quartzLegacyNexusScheduler;
 
@@ -52,14 +59,29 @@ public class LegacyWrapperJob
   public void execute(final JobExecutionContext context) throws JobExecutionException {
     final NexusTask<?> legacyJob = quartzLegacyNexusScheduler
         .createTaskInstance(context.getJobDetail().getJobDataMap().getString(LEGACY_JOB_TYPE_KEY));
-    for (Entry<String, Object> entry : context.getJobDetail().getJobDataMap().entrySet()) {
+    final JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
+    for (Entry<String, Object> entry : jobDataMap.entrySet()) {
       legacyJob.addParameter(entry.getKey(), String.valueOf(entry.getValue()));
     }
+    Object result = null;
+    Throwable failure = null;
     try {
-      legacyJob.call();
+      result = legacyJob.call();
     }
     catch (Exception e) {
-      Throwables.propagate(e);
+      failure = e;
     }
+    finally {
+      if (result != null) {
+        jobDataMap.put(LEGACY_JOB_RESULT_KEY, result);
+      }
+      if (failure != null) {
+        jobDataMap.put(LEGACY_JOB_FAILURE_CAUSE_KEY, failure);
+      }
+      for (Entry<String, String> entry : legacyJob.getParameters().entrySet()) {
+        jobDataMap.put(entry.getKey(), entry.getValue());
+      }
+    }
+    throw Throwables.propagate(failure);
   }
 }
