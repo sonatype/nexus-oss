@@ -52,9 +52,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @Singleton
-@Path("/feeds/{" + FeedPlexusResource.FEED_KEY + "}")
-@Produces({FeedPlexusResource.APPLICATION_RSS_XML, FeedPlexusResource.APPLICATION_ATOM_XML, MediaType.TEXT_XML})
-public class FeedPlexusResource
+@Path("/feeds/{" + FeedResource.FEED_KEY + "}")
+@Produces({FeedResource.APPLICATION_RSS_XML, FeedResource.APPLICATION_ATOM_XML, MediaType.TEXT_XML})
+public class FeedResource
     extends ComponentSupport
     implements Resource
 {
@@ -67,7 +67,7 @@ public class FeedPlexusResource
   private final Map<String, FeedSource> feeds;
 
   @Inject
-  public FeedPlexusResource(final Map<String, FeedSource> feeds) {
+  public FeedResource(final Map<String, FeedSource> feeds) {
     this.feeds = checkNotNull(feeds);
   }
 

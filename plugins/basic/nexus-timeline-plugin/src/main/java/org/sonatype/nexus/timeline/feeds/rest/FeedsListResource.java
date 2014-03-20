@@ -42,17 +42,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Named
 @Singleton
-public class FeedsListPlexusResource
+public class FeedsListResource
     extends ComponentSupport
     implements Resource
 {
   private final List<FeedSource> feedSources;
 
   @Inject
-  public FeedsListPlexusResource(final List<FeedSource> feedSources) {
+  public FeedsListResource(final List<FeedSource> feedSources) {
     this.feedSources = checkNotNull(feedSources);
   }
 
+  /**
+   * Lists all the feeds existing.
+   */
   @GET
   @RequiresPermissions("nexus:feeds")
   public FeedEntriesXO get() {
