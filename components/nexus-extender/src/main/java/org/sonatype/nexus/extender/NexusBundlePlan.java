@@ -50,6 +50,8 @@ import org.eclipse.sisu.wire.WireModule;
 import org.osgi.framework.Bundle;
 
 /**
+ * {@link BundlePlan} that configures bundles using the Nexus binding strategy.
+ * 
  * @since 3.0
  */
 public class NexusBundlePlan
@@ -76,7 +78,7 @@ public class NexusBundlePlan
   public BindingPublisher prepare(final Bundle bundle) {
 
     // ignore anything that isn't a Nexus plugin
-    if (bundle.findEntries("META-INF/nexus", "plugin.xml", false) != null) {
+    if (bundle.getResource("META-INF/nexus/plugin.xml") == null) {
       return null;
     }
 

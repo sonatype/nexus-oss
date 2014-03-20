@@ -23,35 +23,44 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 /**
+ * Filter that delegates to a cached (static) instance populated by {@link FilterTracker}.
+ * This helps us link the surrounding JEE/WAR environment with the dynamic OSGi container.
+ * 
  * @since 3.0
  */
 public class DelegatingFilter
     implements Filter
 {
-  private static Filter delegate;
+  private static FilterConfig cachedConfig;
 
-  private static FilterConfig deferredConfig;
+  private static volatile Filter delegate;
 
-  public static synchronized void setDelegate(final Filter delegate) {
-    DelegatingFilter.delegate = delegate;
-    if (deferredConfig != null) {
+  public synchronized static void set(Filter filter) {
+    if (cachedConfig != null) {
       try {
-        delegate.init(deferredConfig);
+        filter.init(cachedConfig);
       }
-      catch (final ServletException e) {
-        throw new RuntimeException(e);
+      catch (ServletException e) {
+        throw new IllegalStateException(e);
       }
-      deferredConfig = null;
+    }
+    delegate = filter;
+  }
+
+  public synchronized static void unset(Filter filter) {
+    if (delegate == filter) {
+      delegate = null;
+    }
+    if (cachedConfig != null) {
+      filter.destroy();
     }
   }
 
   public void init(final FilterConfig filterConfig) throws ServletException {
     synchronized (DelegatingFilter.class) {
+      cachedConfig = filterConfig;
       if (delegate != null) {
         delegate.init(filterConfig);
-      }
-      else {
-        deferredConfig = filterConfig;
       }
     }
   }
@@ -59,14 +68,18 @@ public class DelegatingFilter
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
       throws IOException, ServletException
   {
-    if (delegate != null) {
-      delegate.doFilter(request, response, chain);
+    Filter filter = delegate;
+    if (filter != null) {
+      filter.doFilter(request, response, chain);
     }
   }
 
   public void destroy() {
-    if (delegate != null) {
-      delegate.destroy();
+    synchronized (DelegatingFilter.class) {
+      cachedConfig = null;
+      if (delegate != null) {
+        delegate.destroy();
+      }
     }
   }
 }

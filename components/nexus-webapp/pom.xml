@@ -28,24 +28,41 @@
 
   <dependencies>
     <!--
-    Prevent Servlet API from being included in the WAR.
+    Prevent these from being included in the WAR lib.
     -->
     <dependency>
       <groupId>org.eclipse.jetty.orbit</groupId>
       <artifactId>javax.servlet</artifactId>
       <scope>provided</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-extender</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
       <scope>provided</scope>
+    </dependency>
+
+    <!--
+    Runtime only, use the OSGi API for compile time.
+    -->
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.framework</artifactId>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
@@ -86,11 +103,6 @@
     <dependency>
       <groupId>com.yammer.metrics</groupId>
       <artifactId>metrics-logback</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.framework</artifactId>
     </dependency>
 
     <dependency>
@@ -364,7 +376,7 @@
       </plugin>
 
       <!--
-      Generate Export-Package header for core (non-plugin) content.
+      Generate Export-Package header for bootstrap content.
       -->
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -391,23 +403,6 @@
                 </_exportcontents>
               </instructions>
             </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!--
-      Ensure we have an index for all dependencies in the WAR.
-      -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>sisu-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>index-war</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>index</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

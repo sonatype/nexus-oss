@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.jar.Manifest;
 
-import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -37,7 +36,6 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.startlevel.FrameworkStartLevel;
-import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,10 +53,14 @@ public class WebappBootstrap
 
   private Framework framework;
 
+  private ListenerTracker listenerTracker;
+
+  private FilterTracker filterTracker;
+
   public void contextInitialized(final ServletContextEvent event) {
     log.info("Initializing");
 
-    ServletContext context = event.getServletContext();
+    ServletContext servletContext = event.getServletContext();
 
     try {
       // Use bootstrap configuration if it exists, else load it
@@ -70,7 +72,7 @@ public class WebappBootstrap
         log.info("Loading configuration for WAR deployment environment");
 
         // FIXME: This is what was done before, it seems completely wrong in WAR deployment since there is no bundle
-        String baseDir = System.getProperty("bundleBasedir", context.getRealPath("/WEB-INF"));
+        String baseDir = System.getProperty("bundleBasedir", servletContext.getRealPath("/WEB-INF"));
 
         properties = new ConfigurationBuilder()
             .defaults()
@@ -90,6 +92,9 @@ public class WebappBootstrap
       requireProperty(properties, "nexus-app");
       requireProperty(properties, "application-conf");
       requireProperty(properties, "security-xml-file");
+
+      // pass bootstrap properties to embedded servlet listener
+      servletContext.setAttribute("nexus.properties", properties);
 
       File workDir = new File(properties.get("nexus-work")).getCanonicalFile();
       mkdir(workDir.toPath());
@@ -122,21 +127,15 @@ public class WebappBootstrap
       framework.start();
 
       BundleContext ctx = framework.getBundleContext();
+      FrameworkStartLevel startLevel = framework.adapt(FrameworkStartLevel.class);
+      startLevel.setStartLevel(1);
 
-      // register as service so framework bundles can access it
-      ctx.registerService(ServletContext.class, context, null);
-
-      // register tracker to find out when filter is ready (and initialization is complete)
-      ServiceTracker<Filter, Filter> filterTracker = new ServiceTracker<Filter, Filter>(ctx, Filter.class, null);
-      filterTracker.open();
+      startLevel.setInitialBundleStartLevel(8);
 
       File[] bundles = new File(properties.get("nexus-app") + "/bundles").listFiles();
 
       // auto-install anything in the bundles repository
       if (bundles != null && bundles.length > 0) {
-        FrameworkStartLevel startLevel = framework.adapt(FrameworkStartLevel.class);
-        startLevel.setStartLevel(1);
-        startLevel.setInitialBundleStartLevel(8);
         for (File bundle : bundles) {
           try {
             ctx.installBundle("reference:" + bundle.toURI()).start();
@@ -145,23 +144,19 @@ public class WebappBootstrap
             log.warn("Problem installing: {}", bundle, e);
           }
         }
-        startLevel.setStartLevel(8);
       }
 
-      Filter filter;
-      while (true) {
-        filter = filterTracker.getService();
-        if (filter != null) {
-          DelegatingFilter.setDelegate(filter);
-          break;
-        }
-        try {
-          Thread.sleep(100);
-        }
-        catch (InterruptedException e) {
-          // continue to wait
-        }
-      }
+      startLevel.setStartLevel(8); // activate all installed bundles
+
+      // wait for the Nexus listener
+      listenerTracker = new ListenerTracker(ctx, "nexus", servletContext);
+      listenerTracker.open();
+      listenerTracker.waitForService(0);
+
+      // wait for the Nexus filter
+      filterTracker = new FilterTracker(ctx, "nexus");
+      filterTracker.open();
+      filterTracker.waitForService(0);
     }
     catch (Exception e) {
       log.error("Failed to start Nexus", e);
@@ -183,7 +178,7 @@ public class WebappBootstrap
     }
     catch (FileAlreadyExistsException e) {
       // this happens when last element of path exists, but is a symlink.
-      // A simple test with Files.isDirectory should be able to  detect this
+      // A simple test with Files.isDirectory should be able to detect this
       // case as by default, it follows symlinks.
       if (!Files.isDirectory(dir)) {
         throw e;
@@ -194,7 +189,16 @@ public class WebappBootstrap
   public void contextDestroyed(final ServletContextEvent event) {
     log.info("Destroying");
 
-    // stop OSGi framework
+    if (filterTracker != null) {
+      filterTracker.close();
+      filterTracker = null;
+    }
+
+    if (listenerTracker != null) {
+      listenerTracker.close();
+      listenerTracker = null;
+    }
+
     if (framework != null) {
       try {
         framework.stop();
@@ -206,7 +210,6 @@ public class WebappBootstrap
       framework = null;
     }
 
-    // release lock
     if (lockFile != null) {
       lockFile.release();
       lockFile = null;

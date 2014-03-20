@@ -89,9 +89,7 @@ public class NexusModules
       bind(ParameterKeys.PROPERTIES).toInstance(properties);
       bind(Bundle.class).toInstance(systemBundle);
 
-      install(new MetricsModule());
       install(new CommonModule());
-
       install(new ServletModule()
       {
         @Override
@@ -106,6 +104,7 @@ public class NexusModules
           bind(RankingFunction.class).toInstance(new DefaultRankingFunction(0x70000000));
         }
       });
+      install(new MetricsModule());
 
       install(new SecurityWebModule(servletContext, true));
     }

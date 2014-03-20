@@ -27,48 +27,49 @@
   <packaging>bundle</packaging>
 
   <dependencies>
+    <!--
+    These are provided by the bootstrap layer.
+    -->
     <dependency>
       <groupId>org.eclipse.jetty.orbit</groupId>
       <artifactId>javax.servlet</artifactId>
       <scope>provided</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-core</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>com.yammer.metrics</groupId>
       <artifactId>metrics-core</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>com.yammer.metrics</groupId>
       <artifactId>metrics-logback</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-interpolation</artifactId>
@@ -113,17 +114,23 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-Activator>org.sonatype.nexus.extender.NexusExtender</Bundle-Activator>
-            <Require-Bundle>system.bundle;visibility:=reexport</Require-Bundle>
-            <Include-Resource>
-              {maven-resources},META-INF/sisu=${project.build.outputDirectory}/META-INF/sisu
-            </Include-Resource>
-            <Embed-Dependency>*;scope=compile</Embed-Dependency>
+            <Bundle-Activator>
+              org.sonatype.nexus.extender.NexusExtender
+            </Bundle-Activator>
+            <Embed-Dependency>
+              *;scope=compile
+            </Embed-Dependency>
             <Embed-Directory>lib</Embed-Directory>
             <Embed-Transitive>true</Embed-Transitive>
             <_exportcontents>
               !lib.*,com.*,eu.*,javax.*,net.*,org.*
             </_exportcontents>
+            <Include-Resource>
+              {maven-resources},META-INF/sisu=${project.build.outputDirectory}/META-INF/sisu
+            </Include-Resource>
+            <Require-Bundle>
+              system.bundle;visibility:=reexport
+            </Require-Bundle>
           </instructions>
         </configuration>
       </plugin>
