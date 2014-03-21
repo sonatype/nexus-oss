@@ -36,7 +36,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A resource that lists existing feeds, implemented by {@link FeedSource} components.
+ * A resource that lists existing feeds, implemented by {@link FeedSource} components. This is a REST resource, meaning
+ * it produces "usual" JSON or XML response, but is a read only resource.
  *
  * @since 3.0
  */

@@ -42,14 +42,18 @@ import com.sun.syndication.io.SyndFeedOutput;
  */
 @Named
 @Provider
-@Produces({RomeProvider.APPLICATION_RSS_XML, MediaType.APPLICATION_ATOM_XML, MediaType.TEXT_XML})
+@Produces({RomeProvider.APPLICATION_RSS_XML, RomeProvider.APPLICATION_ATOM_XML, MediaType.TEXT_XML})
 public class RomeProvider
     extends ComponentSupport
     implements Component, MessageBodyWriter<Object>
 {
   public static final String APPLICATION_RSS_XML = "application/rss+xml";
 
-  public static final MediaType APPLICATION_RSS_XML_TYPE = MediaType.valueOf(APPLICATION_RSS_XML);
+  public static final String APPLICATION_ATOM_XML = MediaType.APPLICATION_ATOM_XML;
+
+  private static final MediaType APPLICATION_RSS_XML_TYPE = MediaType.valueOf(APPLICATION_RSS_XML);
+
+  private static final MediaType APPLICATION_ATOM_XML_TYPE = MediaType.APPLICATION_ATOM_XML_TYPE;
 
   private static final String RSS_2_0 = "rss_2.0";
 
@@ -71,7 +75,7 @@ public class RomeProvider
   {
     try {
       final SyndFeed feed = (SyndFeed) t;
-      if (matches(MediaType.APPLICATION_ATOM_XML_TYPE, mediaType)) {
+      if (matches(APPLICATION_ATOM_XML_TYPE, mediaType)) {
         feed.setFeedType(ATOM_1_0);
       }
       else {
@@ -90,7 +94,7 @@ public class RomeProvider
 
   private boolean hasMatchingMediaType(final MediaType mediaType) {
     return matches(APPLICATION_RSS_XML_TYPE, mediaType)
-        || matches(MediaType.APPLICATION_ATOM_XML_TYPE, mediaType)
+        || matches(APPLICATION_ATOM_XML_TYPE, mediaType)
         || matches(MediaType.TEXT_XML_TYPE, mediaType);
   }
 

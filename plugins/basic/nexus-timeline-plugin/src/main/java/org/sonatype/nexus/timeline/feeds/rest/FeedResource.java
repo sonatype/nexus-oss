@@ -54,23 +54,20 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Feed publishing REST resource. All the components implementing {@link FeedSource} interface will get auto-registered
- * by this resource, and published.
+ * Feed publishing resource. All the components implementing {@link FeedSource} interface will get auto-registered
+ * by this resource, and published. This resource is not a "usual" resource, meaning it produces feed content (RSS/2.0
+ * or Atom/1.0, based on client's request) and not the "usual" JSON or XML response.
  *
  * @since 3.0
  */
 @Named
 @Singleton
 @Path(TimelinePlugin.SERVICE_PREFIX + "/feeds/{" + FeedResource.FEED_KEY + "}")
-@Produces({FeedResource.APPLICATION_RSS_XML, FeedResource.APPLICATION_ATOM_XML, MediaType.TEXT_XML})
+@Produces({RomeProvider.APPLICATION_RSS_XML, RomeProvider.APPLICATION_ATOM_XML, MediaType.TEXT_XML})
 public class FeedResource
     extends ComponentSupport
     implements Resource
 {
-  public static final String APPLICATION_RSS_XML = "application/rss+xml";
-
-  public static final String APPLICATION_ATOM_XML = MediaType.APPLICATION_ATOM_XML;
-
   public static final String FEED_KEY = "feedKey";
 
   private final ApplicationStatusSource applicationStatusSource;
