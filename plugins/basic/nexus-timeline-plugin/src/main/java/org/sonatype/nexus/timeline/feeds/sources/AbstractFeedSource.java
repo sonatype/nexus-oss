@@ -156,6 +156,7 @@ public abstract class AbstractFeedSource
     }
     final List<Predicate<Entry>> filters = Lists.newArrayList();
     for (Map.Entry<String, String> param : params.entrySet()) {
+      // TODO: maybe all with "_" as prefix? But then how to filter for type and subType?
       if (param.getKey().equals("_dc")) {
         continue;
       }

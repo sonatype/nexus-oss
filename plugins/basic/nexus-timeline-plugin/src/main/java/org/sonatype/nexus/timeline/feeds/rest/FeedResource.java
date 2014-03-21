@@ -126,6 +126,9 @@ public class FeedResource
         if (event.getAuthor() != null) {
           entry.setAuthor(event.getAuthor());
         }
+        else {
+          entry.setAuthor(feed.getAuthor());
+        }
         if (event.getLink() != null) {
           if (event.getLink().startsWith("http:") || event.getLink().startsWith("https:")) {
             // this is full URL, use it as is

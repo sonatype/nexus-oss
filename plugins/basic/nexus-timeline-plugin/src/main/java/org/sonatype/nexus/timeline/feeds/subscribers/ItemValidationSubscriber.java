@@ -76,7 +76,7 @@ public class ItemValidationSubscriber
           ievt.getClass().getName(),
           ievt.getEventDate(),
           userId,
-          "/content/repositories/" + fileItem.getRepositoryId() + "/" + fileItem.getParentPath(), // link to item parent
+          "/content/repositories/" + fileItem.getRepositoryId() + fileItem.getParentPath(), // link to item parent
           data
       );
       getFeedRecorder().addEvent(fe);
