@@ -20,8 +20,12 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.plugin.support.DocumentationBundleSupport;
 import org.sonatype.nexus.timeline.TimelinePlugin;
 
-@Named
-@Singleton
+/**
+ * Documentation bundle for timeline.
+ */
+// TODO: Enunciate craps out on timeline due to a bug (two xml-ish @produces on same resource)
+//@Named
+//@Singleton
 public class TimelineDocumentationResourceBundle
     extends DocumentationBundleSupport
 {
