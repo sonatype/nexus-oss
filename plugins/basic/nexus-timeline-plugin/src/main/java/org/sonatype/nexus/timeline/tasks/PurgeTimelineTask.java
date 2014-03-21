@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Purge timeline task.
  */
 @Named(PurgeTimelineTaskDescriptor.ID)
-public class PurgeTimeline
+public class PurgeTimelineTask
     extends AbstractNexusTask<Object>
 {
   /**
@@ -35,7 +35,7 @@ public class PurgeTimeline
   private final NexusTimeline timeline;
 
   @Inject
-  public PurgeTimeline(final NexusTimeline timeline) {
+  public PurgeTimelineTask(final NexusTimeline timeline) {
     this.timeline = checkNotNull(timeline);
   }
 
