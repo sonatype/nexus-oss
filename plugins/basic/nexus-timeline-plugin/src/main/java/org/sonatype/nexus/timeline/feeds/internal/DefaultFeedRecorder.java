@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline.feeds.internal;
 
 import java.io.IOException;
@@ -71,6 +72,13 @@ public class DefaultFeedRecorder
 
   // filtering
 
+  /**
+   * Filters out "item related" records based on required privileges of the caller. It's okay to invoke this method
+   * for any record (ie. even non "item related" records) as it will quickly return in a moment in realises that record
+   * is not about item. For non-item records this filter will always return {@code true}. In other words, this method
+   * will return {@code false} only for records that are about item, and caller does not have permissions to {@link
+   * Action#read} the item.
+   */
   private boolean filterRecord(final Entry record) {
     final String repoId = record.getData().get("repo.id");
     final String itemPath = record.getData().get("item.path");
@@ -102,6 +110,7 @@ public class DefaultFeedRecorder
     if (evt.getAuthor() != null) {
       data.put("_author", evt.getAuthor());
     }
+    // we use TL internal class
     final EntryRecord record = new EntryRecord(
         evt.getPublished().getTime(),
         evt.getEventType(),
@@ -119,6 +128,8 @@ public class DefaultFeedRecorder
     {
       @Override
       public boolean processNext(final Entry rec) throws IOException {
+        // we filter for permission only after Timeline used passed in filter predicate
+        // filtering for permission is more costly than checking field equalities
         if (filterRecord(rec)) {
           final Map<String, String> data = Maps.newHashMap(rec.getData());
           data.remove("_type");

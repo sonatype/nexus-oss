@@ -24,9 +24,7 @@ public interface TimelineCallback
 {
   /**
    * Method to process next constructed {@link Entry}. Should return {@code false} if no more records are
-   * needed. or simply the processing should stop.
-   *
-   * @return {@code true} if next record is awaited, {@code false} if no more records needed.
+   * needed and the processing should stop.
    */
   boolean processNext(Entry rec)
       throws IOException;

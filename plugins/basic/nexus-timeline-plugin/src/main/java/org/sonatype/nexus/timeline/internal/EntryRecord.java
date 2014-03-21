@@ -26,7 +26,7 @@ import io.kazuki.v0.store.schema.model.Attribute.Type;
 import io.kazuki.v0.store.schema.model.Schema;
 
 /**
- * Timeline entry.
+ * Timeline entry persisted into KZ.
  *
  * @since 3.0
  */
