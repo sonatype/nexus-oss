@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline.tasks;
 
 import javax.inject.Inject;
@@ -21,17 +22,14 @@ import org.sonatype.nexus.timeline.Timeline;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Purge timeline task.
+ * Purge Timeline task.
+ *
+ * @since 3.0
  */
 @Named(PurgeTimelineTaskDescriptor.ID)
 public class PurgeTimelineTask
     extends AbstractNexusTask<Object>
 {
-  /**
-   * System event action: timeline purge
-   */
-  public static final String ACTION = "TL_PURGE";
-
   private final Timeline timeline;
 
   @Inject
@@ -52,13 +50,12 @@ public class PurgeTimelineTask
   }
 
   @Override
-  protected String getAction() {
-    return ACTION;
+  public String getAction() {
+    return "TL_PURGE";
   }
 
   @Override
-  protected String getMessage() {
-    return "Purging Timeline records.";
+  public String getMessage() {
+    return "Purging Timeline.";
   }
-
 }
