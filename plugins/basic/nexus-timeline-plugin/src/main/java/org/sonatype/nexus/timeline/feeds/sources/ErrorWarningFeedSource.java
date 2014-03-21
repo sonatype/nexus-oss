@@ -39,6 +39,12 @@ import com.google.common.io.Files;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Error/Warning feed. This one is special, in a sense it does not source events from {@link FeedRecorder} but
+ * instead parses the real Nexus logs and produces {@link FeedEvent} instances out of it. This also means that
+ * this source does not make use of any renderer, as it wants to present log lines "as-is", hence uses the "raw" title
+ * and content values.
+ */
 @Named(ErrorWarningFeedSource.CHANNEL_KEY)
 @Singleton
 public class ErrorWarningFeedSource

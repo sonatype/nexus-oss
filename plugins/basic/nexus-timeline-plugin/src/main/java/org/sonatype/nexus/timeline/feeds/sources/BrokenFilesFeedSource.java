@@ -25,6 +25,11 @@ import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
 import com.google.common.collect.ImmutableSet;
 
+/**
+ * Broken files: those that fail file content validation, fail proxy checksum policy and such.
+ *
+ * @since 3.0
+ */
 @Named(BrokenFilesFeedSource.CHANNEL_KEY)
 @Singleton
 public class BrokenFilesFeedSource

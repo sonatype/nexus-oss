@@ -162,7 +162,7 @@ NX.define('Nexus.timeline.FeedView', {
   }
 
 }, function() {
-  Sonatype.config.repos.urls.feeds = Nexus.siesta.basePath + '/feeds';
+  Sonatype.config.repos.urls.feeds = Nexus.siesta.basePath + '/timeline/feeds';
   Sonatype.Events.addListener('nexusNavigationInit', function(panel) {
     var sp = Sonatype.lib.Permissions;
     panel.add({

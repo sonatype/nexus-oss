@@ -6,6 +6,11 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.rest.FeedContentRenderer;
 
+/**
+ * A {@link FeedContentRenderer} that renders feed content as {@link "plain/text"}.
+ *
+ * @since 3.0
+ */
 @Singleton
 @Named("text/plain")
 public class PlainTextFeedContentRenderer

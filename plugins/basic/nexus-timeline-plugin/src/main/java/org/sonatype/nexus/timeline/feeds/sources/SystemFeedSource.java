@@ -25,6 +25,11 @@ import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
 import com.google.common.collect.ImmutableSet;
 
+/**
+ * System changes feed source.
+ *
+ * @since 3.0
+ */
 @Named(SystemFeedSource.CHANNEL_KEY)
 @Singleton
 public class SystemFeedSource

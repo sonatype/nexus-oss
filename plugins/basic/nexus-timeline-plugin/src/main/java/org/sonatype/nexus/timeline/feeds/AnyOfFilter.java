@@ -21,6 +21,12 @@ import com.google.common.base.Predicate;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Predicate for {@link Entry} filtering that implements "key" associated value is in set of. When the values set has
+ * one value, it's basically reduces to "equals" predicate.
+ *
+ * @since 3.0
+ */
 public class AnyOfFilter
     implements Predicate<Entry>
 {

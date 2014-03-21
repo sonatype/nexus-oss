@@ -23,7 +23,9 @@ import com.google.common.base.Predicate;
 
 /**
  * A recorder for events for later retrieval. The Actions are "generic" Nexus event related. This component
- * provides a slight abstraction over {@link NexusTimeline}, that is used by it.
+ * provides a slight abstraction over {@link NexusTimeline}, that is used by it. Still, these "families" and
+ * "subtypes" below are not by all means the only one possible to be recorded. You can still extend this set
+ * by your types and subtypes. There are only the events recoded out of the box by this plugin.
  *
  * @since 3.0
  */

@@ -26,6 +26,11 @@ import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
 import com.google.common.collect.ImmutableSet;
 
+/**
+ * Authentication and authorization related feed source.
+ *
+ * @since 3.0
+ */
 @Named(AuthcAuthzFeedSource.CHANNEL_KEY)
 @Singleton
 public class AuthcAuthzFeedSource
@@ -47,7 +52,8 @@ public class AuthcAuthzFeedSource
                                final Map<String, String> params)
       throws IOException
   {
-    feed.addAll(getFeedRecorder().getEvents(ImmutableSet.of(FeedRecorder.FAMILY_AUTH), null, from, count, filters(params)));
+    feed.addAll(
+        getFeedRecorder().getEvents(ImmutableSet.of(FeedRecorder.FAMILY_AUTH), null, from, count, filters(params)));
   }
 
 }

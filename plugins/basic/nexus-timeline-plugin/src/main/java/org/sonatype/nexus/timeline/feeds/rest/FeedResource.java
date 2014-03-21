@@ -33,7 +33,9 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.timeline.TimelinePlugin;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
+import org.sonatype.nexus.timeline.feeds.FeedSource;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.siesta.common.Resource;
@@ -59,7 +61,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @Singleton
-@Path("/feeds/{" + FeedResource.FEED_KEY + "}")
+@Path(TimelinePlugin.SERVICE_PREFIX + "/feeds/{" + FeedResource.FEED_KEY + "}")
 @Produces({FeedResource.APPLICATION_RSS_XML, FeedResource.APPLICATION_ATOM_XML, MediaType.TEXT_XML})
 public class FeedResource
     extends ComponentSupport

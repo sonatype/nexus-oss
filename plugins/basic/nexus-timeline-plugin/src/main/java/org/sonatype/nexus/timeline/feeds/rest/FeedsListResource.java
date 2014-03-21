@@ -23,6 +23,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.sonatype.nexus.timeline.TimelinePlugin;
+import org.sonatype.nexus.timeline.feeds.FeedSource;
 import org.sonatype.nexus.timeline.model.FeedEntriesXO;
 import org.sonatype.nexus.timeline.model.FeedEntryXO;
 import org.sonatype.nexus.web.BaseUrlHolder;
@@ -34,11 +36,11 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A resource that lists existing feeds, published by {@link FeedSource} components.
+ * A resource that lists existing feeds, implemented by {@link FeedSource} components.
  *
  * @since 3.0
  */
-@Path("/feeds")
+@Path(TimelinePlugin.SERVICE_PREFIX + "/feeds")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Named
 @Singleton

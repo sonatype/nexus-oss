@@ -11,17 +11,15 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.timeline.feeds.rest;
+package org.sonatype.nexus.timeline.feeds;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.sonatype.nexus.timeline.feeds.FeedEvent;
-
 /**
- * A Feed source. Components implementing this interface produce feeds, and will be automatically published by
- * {@link FeedResource} and {@link FeedsListResource}.
+ * A Feed source component. By implementing this interface, one can produce feeds, and will be automatically published
+ * by feeds REST resource.
  *
  * @since 3.0
  */

@@ -43,6 +43,11 @@ import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Default implementation of {@link FeedRecorder}.
+ *
+ * @since 3.0
+ */
 @Named
 @Singleton
 public class DefaultFeedRecorder

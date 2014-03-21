@@ -29,6 +29,11 @@ import com.google.common.collect.ImmutableSet;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Predicates.and;
 
+/**
+ * Broken artifacts: those that fail file content validation, fail proxy checksum policy and such.
+ *
+ * @since 3.0
+ */
 @Named(BrokenArtifactsFeedSource.CHANNEL_KEY)
 @Singleton
 public class BrokenArtifactsFeedSource

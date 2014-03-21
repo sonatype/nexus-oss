@@ -29,11 +29,12 @@ import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.feeds.AnyOfFilter;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.rest.FeedSource;
+import org.sonatype.nexus.timeline.feeds.FeedSource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.codehaus.plexus.util.StringUtils;
@@ -103,6 +104,12 @@ public abstract class AbstractFeedSource
 
   // ==
 
+  /**
+   * Produces a predicate that applies only to Maven artifacts, those that are stored in some instance of {@link
+   * MavenRepository} and lie on path that complies with given maven repository layout. This predicate will apply
+   * only for artifacts (and POMs), but not to hash or signature files (nor to any other maven repository metadata).
+   * For non maven repository this predicate never applies.
+   */
   protected Predicate<Entry> isMavenArtifact(final RepositoryRegistry repositoryRegistry) {
     return new Predicate<Entry>()
     {
@@ -114,8 +121,24 @@ public abstract class AbstractFeedSource
           try {
             final MavenRepository repository = repositoryRegistry
                 .getRepositoryWithFacet(repoId, MavenRepository.class);
-            final Gav gav = repository.getGavCalculator().pathToGav(itemPath);
-            return gav != null && !gav.isSignature() && !gav.isHash();
+            if (repository != null) {
+              final Gav gav = repository.getGavCalculator().pathToGav(itemPath);
+              // Hack: we mutate the entry, but putting in gav for reuse
+              if (!Strings.isNullOrEmpty(gav.getClassifier())) {
+                input.getData().put("item.gav", String
+                    .format("%s:%s:%s:%s:%s", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
+                        gav.getExtension(), gav.getClassifier()));
+              }
+              else {
+                input.getData().put("item.gav", String
+                    .format("%s:%s:%s:%s", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
+                        gav.getExtension()));
+              }
+              return gav != null && !gav.isSignature() && !gav.isHash();
+            }
+            else {
+              return false;
+            }
           }
           catch (NoSuchRepositoryException e) {
             // fall through
@@ -126,6 +149,12 @@ public abstract class AbstractFeedSource
     };
   }
 
+  /**
+   * Produces a predicate that applies only to {@link MavenRepository} instances that have {@link RepositoryPolicy}
+   * equals to the passed in value (or in case of {@link RepositoryPolicy#MIXED} only the repository type is enforced).
+   * Using this predicate one can express "is release repository" or "is snapshot repository". For non maven repository
+   * this predicate never applies.
+   */
   protected Predicate<Entry> isMavenRepositoryWithPolicy(final RepositoryRegistry repositoryRegistry,
                                                          final RepositoryPolicy policy)
   {
@@ -139,7 +168,12 @@ public abstract class AbstractFeedSource
           try {
             final MavenRepository repository = repositoryRegistry
                 .getRepositoryWithFacet(repoId, MavenRepository.class);
-            return repository.getRepositoryPolicy().equals(policy);
+            if (repository != null) {
+              return policy == RepositoryPolicy.MIXED || repository.getRepositoryPolicy().equals(policy);
+            }
+            else {
+              return false; // not even a maven repository
+            }
           }
           catch (NoSuchRepositoryException e) {
             // fall thru
@@ -150,6 +184,23 @@ public abstract class AbstractFeedSource
     };
   }
 
+  /**
+   * Creates predicates out of the map keys and values. It consider entry key for key, and value as "allowed value".
+   * Hence, for values, one might use comma separated values. It uses {@link AnyOfFilter} to implement predicate for
+   * each map entry. Values are turned into sets in method {@link #valueSet(String)}.
+   * <p/>
+   * Example HTTP request with query parameters {@code ?foo=1&bar=a,b,c} will be turned into predicates like
+   * (pseudo code):
+   * <pre>
+   *   and(
+   *     value of "foo" member of {1}, // this basically means "foo=1"
+   *     value of "bar" member of {a,b,c}, // this basically means "bar" value is in set of {a,b,c}
+   *   );
+   * </pre>
+   *
+   * @see {@link AnyOfFilter}
+   * @see {@link #valueSet(String)}
+   */
   protected Predicate<Entry> filters(final Map<String, String> params) {
     if (params.isEmpty()) {
       return Predicates.alwaysTrue();
@@ -166,10 +217,13 @@ public abstract class AbstractFeedSource
     return Predicates.and(filters);
   }
 
+  /**
+   * Creates a string set out of passed in string. Separator detected is comma.
+   */
   protected Set<String> valueSet(final String value) {
     final HashSet<String> result = Sets.newHashSet();
     if (value.contains(",")) {
-      String[] values = StringUtils.split(value, ",");
+      final String[] values = StringUtils.split(value, ",");
       result.addAll(Arrays.asList(values));
     }
     else {
