@@ -158,7 +158,7 @@ Ext.define('NX.controller.Menu', {
     var me = this,
         path = featureMenuModel.get('path');
 
-    if (path !== me.currentSelectedPath) {
+    if ((path !== me.currentSelectedPath) || featureMenuModel.hasChildNodes()) {
       me.currentSelectedPath = path;
 
       me.logDebug('Selected feature: ' + path);
