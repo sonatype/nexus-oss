@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline.feeds.sources;
 
 import java.io.IOException;
@@ -122,21 +123,20 @@ public abstract class AbstractFeedSource
                 .getRepositoryWithFacet(repoId, MavenRepository.class);
             if (repository != null) {
               final Gav gav = repository.getGavCalculator().pathToGav(itemPath);
-              // Hack: we mutate the entry, but putting in gav for reuse
-              if (!Strings.isNullOrEmpty(gav.getClassifier())) {
-                input.getData().put("item.gav", String
-                    .format("%s:%s:%s:%s:%s", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
-                        gav.getExtension(), gav.getClassifier()));
+              if (gav != null && !gav.isSignature() && !gav.isHash()) {
+                // Hack: we mutate the entry, but putting in gav for reuse
+                if (!Strings.isNullOrEmpty(gav.getClassifier())) {
+                  input.getData().put("item.gav", String
+                      .format("%s:%s:%s:%s:%s", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
+                          gav.getExtension(), gav.getClassifier()));
+                }
+                else {
+                  input.getData().put("item.gav", String
+                      .format("%s:%s:%s:%s", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
+                          gav.getExtension()));
+                }
+                return true;
               }
-              else {
-                input.getData().put("item.gav", String
-                    .format("%s:%s:%s:%s", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
-                        gav.getExtension()));
-              }
-              return gav != null && !gav.isSignature() && !gav.isHash();
-            }
-            else {
-              return false;
             }
           }
           catch (NoSuchRepositoryException e) {
