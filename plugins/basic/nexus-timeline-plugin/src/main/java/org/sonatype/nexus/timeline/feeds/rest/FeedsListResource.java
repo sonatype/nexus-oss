@@ -65,7 +65,7 @@ public class FeedsListResource
     final FeedEntriesXO result = new FeedEntriesXO();
     for (FeedSource feedSource : feedSources) {
       final FeedEntryXO entry = new FeedEntryXO();
-      entry.setResourceURI(BaseUrlHolder.get() + "/service/siesta/feeds/" + feedSource.getFeedKey());
+      entry.setResourceURI(BaseUrlHolder.get() + "/service/siesta" + TimelinePlugin.SERVICE_PREFIX + "/feeds" + feedSource.getFeedKey());
       entry.setName(feedSource.getFeedName());
       entry.setDescription(feedSource.getFeedDescription());
       result.getFeedEntries().add(entry);
