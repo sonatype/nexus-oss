@@ -10,22 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline;
 
 import java.util.Map;
 import java.util.Set;
 
-import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
-
 import com.google.common.base.Predicate;
 
 /**
- * Timeline is a journaling database if entries.
+ * Timeline is a journaling database of entries.
  *
  * @since 3.0
  */
 public interface Timeline
-    extends Lifecycle
 {
   /**
    * Appends a single record to the Timeline.
