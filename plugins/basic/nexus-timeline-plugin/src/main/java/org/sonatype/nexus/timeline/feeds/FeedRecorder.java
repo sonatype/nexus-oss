@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -22,7 +22,7 @@ import org.sonatype.nexus.timeline.Timeline;
 import com.google.common.base.Predicate;
 
 /**
- * A recorder for events for later retrieval. The Actions are "generic" Nexus event related. This component
+ * A recorder for events and their retrieval. The Actions are "generic" Nexus event related. This component
  * provides a slight abstraction over {@link Timeline}, that is used by it. Still, these "families" and
  * "subtypes" below are not by all means the only one possible to be recorded. You can still extend this set
  * by your types and subtypes. There are only the events recoded out of the box by this plugin.

@@ -17,9 +17,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.sonatype.nexus.timeline.Timeline;
+
 /**
- * A Feed source component. By implementing this interface, one can produce feeds, and will be automatically published
- * by feeds REST resource.
+ * A Feed source. By implementing this interface, one can produce a feed that will be automatically published
+ * by feeds resource. A feed source might use {@link FeedRecorder} as source, or use directly {@link Timeline}
+ * as source, but does not have to either. Feeds might be sources from any suitable source or produced in any
+ * way (ie. by reading up a file).
  *
  * @since 3.0
  */

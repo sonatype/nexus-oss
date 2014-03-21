@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -25,8 +25,8 @@ import javax.ws.rs.core.MediaType;
 
 import org.sonatype.nexus.timeline.TimelinePlugin;
 import org.sonatype.nexus.timeline.feeds.FeedSource;
-import org.sonatype.nexus.timeline.model.FeedEntriesXO;
-import org.sonatype.nexus.timeline.model.FeedEntryXO;
+import org.sonatype.nexus.timeline.feeds.rest.model.FeedEntriesXO;
+import org.sonatype.nexus.timeline.feeds.rest.model.FeedEntryXO;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.siesta.common.Resource;
