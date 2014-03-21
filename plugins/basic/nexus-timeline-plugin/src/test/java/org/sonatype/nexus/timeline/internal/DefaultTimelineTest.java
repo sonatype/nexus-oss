@@ -22,7 +22,7 @@ import java.util.Set;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
-import org.sonatype.nexus.timeline.NexusTimeline;
+import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.Time;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -43,7 +43,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
-public class DefaultNexusTimelineTest
+public class DefaultTimelineTest
     extends TestSupport
 {
   @Mock
@@ -52,7 +52,7 @@ public class DefaultNexusTimelineTest
   @Mock
   private EventBus eventBus;
 
-  private DefaultNexusTimeline defaultNexusTimeline;
+  private DefaultTimeline defaultNexusTimeline;
 
   @Before
   public void prepare() throws Exception {
@@ -67,11 +67,11 @@ public class DefaultNexusTimelineTest
       protected void configure() {
         bind(ApplicationDirectories.class).toInstance(applicationDirectories);
         bind(EventBus.class).toInstance(eventBus);
-        bind(NexusTimeline.class).to(DefaultNexusTimeline.class).asEagerSingleton();
+        bind(Timeline.class).to(DefaultTimeline.class).asEagerSingleton();
       }
     };
-    defaultNexusTimeline = (DefaultNexusTimeline) Guice.createInjector(testModule, new TimelineModule())
-        .getInstance(NexusTimeline.class);
+    defaultNexusTimeline = (DefaultTimeline) Guice.createInjector(testModule, new TimelineModule())
+        .getInstance(Timeline.class);
     defaultNexusTimeline.start();
   }
 

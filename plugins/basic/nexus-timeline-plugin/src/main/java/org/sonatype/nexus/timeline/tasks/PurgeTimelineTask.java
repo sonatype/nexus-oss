@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
-import org.sonatype.nexus.timeline.NexusTimeline;
+import org.sonatype.nexus.timeline.Timeline;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,10 +32,10 @@ public class PurgeTimelineTask
    */
   public static final String ACTION = "TL_PURGE";
 
-  private final NexusTimeline timeline;
+  private final Timeline timeline;
 
   @Inject
-  public PurgeTimelineTask(final NexusTimeline timeline) {
+  public PurgeTimelineTask(final Timeline timeline) {
     this.timeline = checkNotNull(timeline);
   }
 

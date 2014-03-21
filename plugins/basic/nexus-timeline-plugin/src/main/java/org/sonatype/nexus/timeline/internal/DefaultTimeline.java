@@ -27,7 +27,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.timeline.Entry;
-import org.sonatype.nexus.timeline.NexusTimeline;
+import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.nexus.timeline.TimelineCallback;
 import org.sonatype.nexus.timeline.TimelinePlugin;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -50,15 +50,15 @@ import io.kazuki.v0.store.schema.TypeValidation;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Implementation of {@link NexusTimeline} backed by Kazuki.
+ * Implementation of {@link Timeline} backed by Kazuki.
  *
  * @since 3.0
  */
 @Named
 @Singleton
-public class DefaultNexusTimeline
+public class DefaultTimeline
     extends LifecycleSupport
-    implements NexusTimeline
+    implements Timeline
 {
   private final Lifecycle lifecycle;
 
@@ -67,10 +67,10 @@ public class DefaultNexusTimeline
   private final SchemaStore schemaStore;
 
   @Inject
-  public DefaultNexusTimeline(final EventBus eventBus,
-                              final @Named(TimelinePlugin.ARTIFACT_ID) Lifecycle lifecycle,
-                              final @Named(TimelinePlugin.ARTIFACT_ID) JournalStore journalStore,
-                              final @Named(TimelinePlugin.ARTIFACT_ID) SchemaStore schemaStore)
+  public DefaultTimeline(final EventBus eventBus,
+                         final @Named(TimelinePlugin.ARTIFACT_ID) Lifecycle lifecycle,
+                         final @Named(TimelinePlugin.ARTIFACT_ID) JournalStore journalStore,
+                         final @Named(TimelinePlugin.ARTIFACT_ID) SchemaStore schemaStore)
   {
     this.lifecycle = checkNotNull(lifecycle);
     this.journalStore = checkNotNull(journalStore);
@@ -106,7 +106,7 @@ public class DefaultNexusTimeline
   public void doStart()
       throws IOException
   {
-    log.debug("Starting Timeline...");
+    log.debug("Starting Timeline");
     try {
       lifecycle.init();
       lifecycle.start();
@@ -116,7 +116,7 @@ public class DefaultNexusTimeline
         log.info("Creating schema for {} type", EntryRecord.SCHEMA_NAME);
         schemaStore.createSchema(EntryRecord.SCHEMA_NAME, EntryRecord.SCHEMA);
       }
-      log.info("Started Timeline...");
+      log.info("Started Timeline");
     }
     catch (KazukiException e) {
       throw new IOException("Could not start Timeline", e);
@@ -127,10 +127,10 @@ public class DefaultNexusTimeline
   public void doStop()
       throws IOException
   {
-    log.debug("Stopping Timeline...");
+    log.debug("Stopping Timeline");
     lifecycle.stop();
     lifecycle.shutdown();
-    log.info("Stopped Timeline...");
+    log.info("Stopped Timeline");
   }
 
   // API

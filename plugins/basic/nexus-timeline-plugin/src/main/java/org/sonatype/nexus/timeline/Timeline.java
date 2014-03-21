@@ -20,11 +20,11 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 import com.google.common.base.Predicate;
 
 /**
- * NexusTimeline is a journaling database if entries..
+ * Timeline is a journaling database if entries.
  *
  * @since 3.0
  */
-public interface NexusTimeline
+public interface Timeline
     extends Lifecycle
 {
   /**

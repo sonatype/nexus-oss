@@ -7,7 +7,7 @@ import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.rest.FeedContentRenderer;
 
 /**
- * A {@link FeedContentRenderer} that renders feed content as {@link "plain/text"}.
+ * A {@link FeedContentRenderer} that renders feed content as {@link "text/plain"}.
  *
  * @since 3.0
  */

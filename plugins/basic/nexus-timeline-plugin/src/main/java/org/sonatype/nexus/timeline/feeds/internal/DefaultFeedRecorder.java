@@ -30,7 +30,7 @@ import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.timeline.Entry;
-import org.sonatype.nexus.timeline.NexusTimeline;
+import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.nexus.timeline.TimelineCallback;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
@@ -54,18 +54,18 @@ public class DefaultFeedRecorder
     extends ComponentSupport
     implements FeedRecorder
 {
-  private final NexusTimeline nexusTimeline;
+  private final Timeline timeline;
 
   private final NexusItemAuthorizer nexusItemAuthorizer;
 
   private final RepositoryRegistry repositoryRegistry;
 
   @Inject
-  public DefaultFeedRecorder(final NexusTimeline nexusTimeline,
+  public DefaultFeedRecorder(final Timeline timeline,
                              final NexusItemAuthorizer nexusItemAuthorizer,
                              final RepositoryRegistry repositoryRegistry)
   {
-    this.nexusTimeline = checkNotNull(nexusTimeline);
+    this.timeline = checkNotNull(timeline);
     this.nexusItemAuthorizer = checkNotNull(nexusItemAuthorizer);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }
@@ -108,7 +108,7 @@ public class DefaultFeedRecorder
         evt.getEventType(),
         evt.getEventSubType(),
         data);
-    nexusTimeline.add(record);
+    timeline.add(record);
   }
 
   @Override
@@ -141,7 +141,7 @@ public class DefaultFeedRecorder
         return true;
       }
     };
-    nexusTimeline.retrieve(from, count, types, subTypes, filter, callback);
+    timeline.retrieve(from, count, types, subTypes, filter, callback);
     return result;
   }
 }

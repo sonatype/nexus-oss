@@ -14,7 +14,7 @@
 /**
  * Nexus Timeline plugin.
  * <p/>
- * This plugin introduces the Kazuki backed {@link org.sonatype.nexus.timeline.NexusTimeline} implementation, along
+ * This plugin introduces the Kazuki backed {@link org.sonatype.nexus.timeline.Timeline} implementation, along
  * with some maintenance tasks, feed related REST endpoints and feed related internal code.
  * <p/>
  * Subpackages of this package are:

@@ -17,13 +17,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.sonatype.nexus.timeline.Entry;
-import org.sonatype.nexus.timeline.NexusTimeline;
+import org.sonatype.nexus.timeline.Timeline;
 
 import com.google.common.base.Predicate;
 
 /**
  * A recorder for events for later retrieval. The Actions are "generic" Nexus event related. This component
- * provides a slight abstraction over {@link NexusTimeline}, that is used by it. Still, these "families" and
+ * provides a slight abstraction over {@link Timeline}, that is used by it. Still, these "families" and
  * "subtypes" below are not by all means the only one possible to be recorded. You can still extend this set
  * by your types and subtypes. There are only the events recoded out of the box by this plugin.
  *
