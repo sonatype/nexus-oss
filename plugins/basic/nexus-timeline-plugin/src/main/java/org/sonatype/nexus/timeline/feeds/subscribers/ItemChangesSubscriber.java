@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -20,6 +22,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
+import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -29,21 +32,21 @@ import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenArtifactSignatureAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenChecksumAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenRepositoryMetadataAttribute;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
-import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent.NexusItemInfo;
 
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 @Named
 @Singleton
-public class ItemChangesFeedSubscriber
+public class ItemChangesSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
   @Inject
-  public ItemChangesFeedSubscriber(final FeedRecorder feedRecorder) {
+  public ItemChangesSubscriber(final FeedRecorder feedRecorder) {
     super(feedRecorder);
   }
 
@@ -77,30 +80,44 @@ public class ItemChangesFeedSubscriber
         && !ievt.getItemUid().getBooleanAttributeValue(IsMavenArtifactSignatureAttribute.class) // "*.asc"
         && !ievt.getItemUid().getBooleanAttributeValue(IsMavenChecksumAttribute.class) // "*.sha1" or "*.md5"
         && !((StorageFileItem) ievt.getItem()).isContentGenerated()) {
-      StorageFileItem pomItem = (StorageFileItem) ievt.getItem();
 
       String action;
       if (ievt instanceof RepositoryItemEventCache) {
-        action = NexusArtifactEvent.ACTION_CACHED;
+        action = FeedRecorder.ITEM_CACHED;
       }
       else if (ievt instanceof RepositoryItemEventStore) {
-        action = NexusArtifactEvent.ACTION_DEPLOYED;
+        action = FeedRecorder.ITEM_DEPLOYED;
       }
       else if (ievt instanceof RepositoryItemEventDelete) {
-        action = NexusArtifactEvent.ACTION_DELETED;
+        action = FeedRecorder.ITEM_DELETED;
       }
       else {
         return;
       }
 
-      NexusArtifactEvent nae = new NexusArtifactEvent(ievt.getEventDate(), action, "",
-          new NexusItemInfo(pomItem.getPath(), pomItem.getRepositoryId(), pomItem.getRemoteUrl()));
-      // set context
-      nae.addEventContext(ievt.getItemContext());
-      // set attributes
-      nae.addItemAttributes(ievt.getItem().getRepositoryItemAttributes().asMap());
-
-      getFeedRecorder().addNexusArtifactEvent(nae);
+      final StorageFileItem fileItem = (StorageFileItem) ievt.getItem();
+      final Map<String, String> data = Maps.newHashMap();
+      putIfNotNull(data, "repo.id", fileItem.getRepositoryItemUid().getRepository().getId());
+      putIfNotNull(data, "repo.name", fileItem.getRepositoryItemUid().getRepository().getName());
+      putIfNotNull(data, "item.path", fileItem.getPath());
+      putIfNotNull(data, "item.remoteUrl", fileItem.getRemoteUrl());
+      final String userId = (String) fileItem.getResourceStoreRequest().getRequestContext()
+          .get(AccessManager.REQUEST_USER);
+      putIfNotNull(data, "user.id", userId);
+      putIfNotNull(data, "user.ip",
+          (String) fileItem.getResourceStoreRequest().getRequestContext().get(AccessManager.REQUEST_REMOTE_ADDRESS));
+      putIfNotNull(data, "user.ua",
+          (String) fileItem.getResourceStoreRequest().getRequestContext().get(AccessManager.REQUEST_AGENT));
+      final FeedEvent fe = new FeedEvent(
+          FeedRecorder.FAMILY_ITEM,
+          action,
+          evt.getClass().getName(),
+          evt.getEventDate(),
+          userId,
+          "/content/repositories/" + fileItem.getRepositoryId() + "/" + fileItem.getParentPath(), // link to item parent
+          data
+      );
+      getFeedRecorder().addEvent(fe);
     }
   }
 

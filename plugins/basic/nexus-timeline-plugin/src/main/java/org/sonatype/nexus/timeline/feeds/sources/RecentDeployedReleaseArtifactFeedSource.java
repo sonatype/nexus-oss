@@ -15,50 +15,50 @@ package org.sonatype.nexus.timeline.feeds.sources;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.timeline.Entry;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
-import org.sonatype.nexus.timeline.feeds.RepositoryIdTimelineFilter;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Predicates.and;
 
 @Named(RecentDeployedReleaseArtifactFeedSource.CHANNEL_KEY)
 @Singleton
 public class RecentDeployedReleaseArtifactFeedSource
-    extends AbstractNexusReleaseArtifactEventFeedSource
+    extends AbstractFeedSource
 {
   public static final String CHANNEL_KEY = "recentlyDeployedReleaseArtifacts";
 
+  private final RepositoryRegistry repositoryRegistry;
+
   @Inject
-  public RecentDeployedReleaseArtifactFeedSource(
-      final ApplicationStatusSource applicationStatusSource,
-      final FeedRecorder feedRecorder,
-      final @Named("artifact") SyndEntryBuilder<NexusArtifactEvent> syndEntryBuilder,
-      final RepositoryRegistry repositoryRegistry)
+  public RecentDeployedReleaseArtifactFeedSource(final FeedRecorder feedRecorder,
+                                                 final RepositoryRegistry repositoryRegistry)
   {
-    super(applicationStatusSource, feedRecorder, syndEntryBuilder, CHANNEL_KEY,
-        "New deployed release artifacts",
-        "New deployed release artifacts in all Nexus repositories (deployed).",
-        repositoryRegistry);
+    super(feedRecorder,
+        CHANNEL_KEY,
+        "New releases of Maven2 artifacts",
+        "New releases of Maven2 artifacts across all repositories (deploys)");
+    this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }
 
   @Override
-  public List<NexusArtifactEvent> getEventList(Integer from, Integer count, Map<String, String> params) {
-    final Set<String> repositoryIds = getRepoIdsFromParams(params);
-    Predicate<Entry> filter =
-        (repositoryIds == null || repositoryIds.isEmpty()) ? null
-            : new RepositoryIdTimelineFilter(repositoryIds);
-
-    return getFeedRecorder()
-        .getNexusArtifectEvents(ImmutableSet.of(NexusArtifactEvent.ACTION_DEPLOYED), from, count, filter);
+  public void fillInEntries(final List<FeedEvent> entries, final int from, final int count,
+                            final Map<String, String> params)
+  {
+    entries.addAll(getFeedRecorder()
+        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_ITEM), ImmutableSet.of(FeedRecorder.ITEM_DEPLOYED), from, count,
+            and(isMavenArtifact(repositoryRegistry),
+                isMavenRepositoryWithPolicy(repositoryRegistry, RepositoryPolicy.RELEASE),
+                filters(params))
+        ));
   }
 }

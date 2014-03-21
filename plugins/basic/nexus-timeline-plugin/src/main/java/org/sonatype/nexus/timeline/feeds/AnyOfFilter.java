@@ -11,13 +11,31 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.timeline.feeds.sources;
+package org.sonatype.nexus.timeline.feeds;
 
-import com.sun.syndication.feed.synd.SyndEntry;
+import java.util.Set;
 
-public interface SyndEntryBuilder<T>
+import org.sonatype.nexus.timeline.Entry;
+
+import com.google.common.base.Predicate;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+public class AnyOfFilter
+    implements Predicate<Entry>
 {
-  boolean shouldBuildEntry(T source);
+  private final String key;
 
-  SyndEntry buildEntry(T source);
+  private final Set<String> values;
+
+  public AnyOfFilter(final String key, final Set<String> values) {
+    this.key = checkNotNull(key);
+    this.values = checkNotNull(values);
+  }
+
+  @Override
+  public boolean apply(final Entry hit) {
+    return (hit.getData().containsKey(key)
+        && values.contains(hit.getData().get(key)));
+  }
 }

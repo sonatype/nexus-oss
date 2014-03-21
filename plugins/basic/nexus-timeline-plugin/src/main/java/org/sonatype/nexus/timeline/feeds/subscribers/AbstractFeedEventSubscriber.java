@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
+import java.util.Map;
+
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -29,5 +31,13 @@ public abstract class AbstractFeedEventSubscriber
 
   protected FeedRecorder getFeedRecorder() {
     return feedRecorder;
+  }
+
+  protected void putIfNotNull(final Map<String, String> map, final String key, final String value) {
+    checkNotNull(map);
+    checkNotNull(key);
+    if (value != null && !value.trim().isEmpty()) {
+      map.put(key, value);
+    }
   }
 }

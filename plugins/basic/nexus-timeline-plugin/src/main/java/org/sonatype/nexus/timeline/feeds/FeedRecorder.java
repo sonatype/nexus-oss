@@ -29,30 +29,70 @@ import com.google.common.base.Predicate;
  */
 public interface FeedRecorder
 {
+  // ==
+
+  String FAMILY_SYSTEM = "system";
+
+  String SYSTEM_BOOT = "boot";
+
+  String SYSTEM_CONFIG = "config";
+
+  // ==
+
+  String FAMILY_AUTH = "auth";
+
+  String AUTH_AUTHC = "authc";
+
+  String AUTH_AUTHZ = "authz";
+
+  // ==
+
+  String FAMILY_REPO = "repo";
+
+  String REPO_CREATED = "created";
+
+  String REPO_DROPPED = "dropped";
+
+  String REPO_UPDATED = "updated";
+
+  String REPO_LSTATUS = "local";
+
+  String REPO_PSTATUS = "proxy";
+
+  // ==
+
+  String FAMILY_ITEM = "item";
+
+  String ITEM_CACHED = "cached";
+
+  String ITEM_DEPLOYED = "deployed";
+
+  String ITEM_DELETED = "deleted";
+
+  String ITEM_RETRIEVED = "retrieved";
+
+  String ITEM_BROKEN = "broken";
+
+  String ITEM_BROKEN_WRONG_REMOTE_CHECKSUM = "brokenWRC";
+
+  String ITEM_BROKEN_INVALID_CONTENT = "brokenIC";
+
+  // ==
+
+  String FAMILY_TASK = "task";
+
+  String TASK_STARTED = "started";
+
+  String TASK_FINISHED = "finished";
+
+  String TASK_CANCELED = "canceled";
+
+  String TASK_FAILED = "failed";
+
   // creating
 
-  void addNexusArtifactEvent(NexusArtifactEvent evt);
+  void addEvent(FeedEvent entry);
 
-  void addSystemEvent(SystemEvent evt);
-
-  void addAuthcAuthzEvent(AuthcAuthzEvent evt);
-
-  // tasks
-
-  TaskEvent taskStarted(String action, String message);
-
-  void taskFinished(TaskEvent prc, String finishMessage);
-
-  void taskCanceled(TaskEvent prc, String cancelMessage);
-
-  void taskBroken(TaskEvent prc, Throwable e);
-
-  // reading
-
-  List<NexusArtifactEvent> getNexusArtifectEvents(Set<String> subtypes, Integer from, Integer count,
-                                                  Predicate<Entry> filter);
-
-  List<SystemEvent> getSystemEvents(Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter);
-
-  List<AuthcAuthzEvent> getAuthcAuthzEvents(Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter);
+  List<FeedEvent> getEvents(Set<String> types, Set<String> subtypes, int from, int count,
+                            Predicate<Entry> filter);
 }

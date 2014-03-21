@@ -14,9 +14,10 @@
 package org.sonatype.nexus.timeline.feeds.rest;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
-import com.sun.syndication.feed.synd.SyndFeed;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 
 /**
  * A Feed source. Components implementing this interface produce feeds, and will be automatically published by
@@ -48,6 +49,6 @@ public interface FeedSource
    * @param count  Count of the entries to generate.
    * @param params A map of all the client made parameters.
    */
-  SyndFeed getFeed(Integer from, Integer count, Map<String, String> params)
+  List<FeedEvent> getFeed(int from, int count, Map<String, String> params)
       throws IOException;
 }

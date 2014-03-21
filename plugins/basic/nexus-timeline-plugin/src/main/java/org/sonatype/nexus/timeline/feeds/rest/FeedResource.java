@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.timeline.feeds.rest;
 
-import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -32,14 +32,21 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.siesta.common.Resource;
 import org.sonatype.sisu.siesta.common.error.WebApplicationMessageException;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.sun.syndication.feed.synd.SyndContent;
+import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.feed.synd.SyndFeedImpl;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -64,11 +71,20 @@ public class FeedResource
 
   public static final String FEED_KEY = "feedKey";
 
+  private final ApplicationStatusSource applicationStatusSource;
+
   private final Map<String, FeedSource> feeds;
 
+  private final FeedContentRenderer feedContentRenderer;
+
   @Inject
-  public FeedResource(final Map<String, FeedSource> feeds) {
+  public FeedResource(final ApplicationStatusSource applicationStatusSource,
+                      final Map<String, FeedSource> feeds,
+                      final FeedContentRenderer feedContentRenderer)
+  {
+    this.applicationStatusSource = checkNotNull(applicationStatusSource);
     this.feeds = checkNotNull(feeds);
+    this.feedContentRenderer = checkNotNull(feedContentRenderer);
   }
 
   /**
@@ -85,34 +101,53 @@ public class FeedResource
   public SyndFeed get(@PathParam(FEED_KEY) String feedKey, @DefaultValue("0") @QueryParam("from") int from,
                       @DefaultValue("40") @QueryParam("count") int count, final @Context UriInfo uriInfo)
   {
-    final Map<String, String> params = getParameters(uriInfo);
-    final SyndFeed feed;
-    try {
-      final FeedSource src = feeds.get(feedKey);
-      if (src != null) {
-        feed = src.getFeed(from, count, params);
-      }
-      else {
-        throw new WebApplicationMessageException(Status.NOT_FOUND, "Feed " + feedKey + " not found!");
-      }
-    }
-    catch (IOException e) {
-      throw new WebApplicationException(e);
+    final FeedSource feedSource = feeds.get(feedKey);
+    if (feedSource == null) {
+      throw new WebApplicationMessageException(Status.NOT_FOUND, "Feed " + feedKey + " not found!");
     }
 
-    feed.setLink(BaseUrlHolder.get() + "/service/siesta/feeds/" + feedKey);
-    for (SyndEntry entry : (List<SyndEntry>) feed.getEntries()) {
-      if (entry.getLink() != null) {
-        // full URLs should not be touched
-        if (!entry.getLink().startsWith("http")) {
-          if (entry.getLink().startsWith("/")) {
-            entry.setLink(entry.getLink().substring(1));
-          }
-          entry.setLink(BaseUrlHolder.get() + entry.getLink());
+    try {
+      final Map<String, String> params = getParameters(uriInfo);
+      final List<FeedEvent> feedEvents = feedSource.getFeed(from, count, params);
+
+      final SyndFeed feed = new SyndFeedImpl();
+      feed.setTitle(feedSource.getFeedName());
+      feed.setDescription(feedSource.getFeedDescription());
+      feed.setAuthor("Nexus " + applicationStatusSource.getSystemStatus().getVersion());
+      feed.setPublishedDate(new Date());
+      feed.setLink(BaseUrlHolder.get() + "/service/siesta/feeds/" + feedSource.getFeedKey());
+
+
+      final List<SyndEntry> entries = Lists.newArrayListWithCapacity(feedEvents.size());
+      for (FeedEvent event : feedEvents) {
+        final SyndEntry entry = new SyndEntryImpl();
+        entry.setTitle(feedContentRenderer.getTitle(event));
+        entry.setPublishedDate(event.getPublished());
+        if (event.getAuthor() != null) {
+          entry.setAuthor(event.getAuthor());
         }
+        if (event.getLink() != null) {
+          if (event.getLink().startsWith("http:") || event.getLink().startsWith("https:")) {
+            // this is full URL, use it as is
+            entry.setLink(event.getLink());
+          }
+          else {
+            entry.setLink(BaseUrlHolder.get() + event.getLink());
+          }
+        }
+        final SyndContent content = new SyndContentImpl();
+        content.setType(feedContentRenderer.getContentType(event));
+        content.setValue(feedContentRenderer.getContent(event));
+        entry.setDescription(content);
+        entries.add(entry);
       }
+      feed.setEntries(entries);
+      return feed;
     }
-    return feed;
+    catch (Exception e) {
+      log.error("Problem during feed creation", e);
+      throw new WebApplicationException(e);
+    }
   }
 
   /**
@@ -123,6 +158,8 @@ public class FeedResource
     for (String key : uriInfo.getQueryParameters().keySet()) {
       result.put(key, uriInfo.getQueryParameters().getFirst(key));
     }
+    result.remove("from");
+    result.remove("count");
     return result;
   }
 }

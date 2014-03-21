@@ -17,11 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.sonatype.nexus.timeline.Entry;
-import org.sonatype.nexus.timeline.feeds.AuthcAuthzEvent;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
-import org.sonatype.nexus.timeline.feeds.SystemEvent;
-import org.sonatype.nexus.timeline.feeds.TaskEvent;
 
 import com.google.common.base.Predicate;
 
@@ -35,60 +32,14 @@ public class DummyFeedRecorder
   }
 
   @Override
-  public void addNexusArtifactEvent(final NexusArtifactEvent nae) {
-    //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public void addSystemEvent(SystemEvent event) {
-    //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public void addAuthcAuthzEvent(AuthcAuthzEvent evt) {
+  public void addEvent(final FeedEvent entry) {
     receivedEventCount++;
   }
 
   @Override
-  public TaskEvent taskStarted(final String action, final String message) {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public void taskFinished(final TaskEvent prc, final String finishMessage) {
-    //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public void taskCanceled(final TaskEvent prc, final String cancelMessage) {
-    //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public void taskBroken(final TaskEvent prc, final Throwable e) {
-    //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public List<NexusArtifactEvent> getNexusArtifectEvents(final Set<String> subtypes, final Integer from,
-                                                         final Integer count,
-                                                         final Predicate<Entry> filter)
+  public List<FeedEvent> getEvents(final Set<String> types, final Set<String> subtypes, final int from, final int count,
+                                   final Predicate<Entry> filter)
   {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public List<SystemEvent> getSystemEvents(final Set<String> subtypes, final Integer from, final Integer count,
-                                           final Predicate<Entry> filter)
-  {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public List<AuthcAuthzEvent> getAuthcAuthzEvents(final Set<String> subtypes, final Integer from,
-                                                   final Integer count,
-                                                   final Predicate<Entry> filter)
-  {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    return null;
   }
 }

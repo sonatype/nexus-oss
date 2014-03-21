@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -21,20 +23,16 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.HostedRepository;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.SystemEvent;
 
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
@@ -42,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named
 @Singleton
-public class RepositoryRegistryRepositoryEventSubscriber
+public class RepositoryChangeSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
@@ -51,9 +49,9 @@ public class RepositoryRegistryRepositoryEventSubscriber
   private final RepositoryRegistry repoRegistry;
 
   @Inject
-  public RepositoryRegistryRepositoryEventSubscriber(final FeedRecorder feedRecorder,
-                                                     final ApplicationStatusSource applicationStatusSource,
-                                                     final RepositoryRegistry repoRegistry)
+  public RepositoryChangeSubscriber(final FeedRecorder feedRecorder,
+                                    final ApplicationStatusSource applicationStatusSource,
+                                    final RepositoryRegistry repoRegistry)
   {
     super(feedRecorder);
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
@@ -62,7 +60,13 @@ public class RepositoryRegistryRepositoryEventSubscriber
 
   @Subscribe
   @AllowConcurrentEvents
-  public void on(final RepositoryRegistryRepositoryEvent e) {
+  public void on(final RepositoryRegistryEventAdd e) {
+    inspect(e);
+  }
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryRegistryEventRemove e) {
     inspect(e);
   }
 
@@ -76,8 +80,7 @@ public class RepositoryRegistryRepositoryEventSubscriber
     if (!isNexusStarted()) {
       return;
     }
-
-    Repository repository;
+    final Repository repository;
     if (evt instanceof RepositoryRegistryRepositoryEvent) {
       repository = ((RepositoryRegistryRepositoryEvent) evt).getRepository();
     }
@@ -85,57 +88,40 @@ public class RepositoryRegistryRepositoryEventSubscriber
       repository = ((RepositoryConfigurationUpdatedEvent) evt).getRepository();
     }
 
-    try {
-      // check registry for existence, wont be able to do much
-      // if doesn't exist yet
-      repoRegistry.getRepository(repository.getId());
-      inspectForTimeline(evt, repository);
-    }
-    catch (NoSuchRepositoryException e) {
-      log.debug("Attempted to handle repository that isn't yet in registry");
-    }
-  }
-
-  private void inspectForTimeline(final Event<?> evt, final Repository repository) {
-    final StringBuilder sb = new StringBuilder();
-    if (repository.getRepositoryKind().isFacetAvailable(GroupRepository.class)) {
-      sb.append(" repository group ");
-    }
-    else {
-      sb.append(" repository ");
-    }
-    sb.append(repository.getName());
-    sb.append(" (ID=");
-    sb.append(repository.getId());
-    sb.append(") ");
-    if (repository.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
-      sb.append(" as proxy repository for URL ");
-      sb.append(repository.adaptToFacet(ProxyRepository.class).getRemoteUrl());
-    }
-    else if (repository.getRepositoryKind().isFacetAvailable(HostedRepository.class)) {
-      sb.append(" as hosted repository");
-    }
-    else if (repository.getRepositoryKind().isFacetAvailable(ShadowRepository.class)) {
-      sb.append(" as ");
-      sb.append(repository.getClass().getName());
-      sb.append(" virtual repository for ");
-      sb.append(repository.adaptToFacet(ShadowRepository.class).getMasterRepository().getName());
-      sb.append(" (ID=");
-      sb.append(repository.adaptToFacet(ShadowRepository.class).getMasterRepository().getId());
-      sb.append(") ");
-    }
-    sb.append(".");
+    final Map<String, String> data = Maps.newHashMap();
+    final String action;
     if (evt instanceof RepositoryRegistryEventAdd) {
-      sb.insert(0, "Registered");
+      action = FeedRecorder.REPO_CREATED;
     }
     else if (evt instanceof RepositoryRegistryEventRemove) {
-      sb.insert(0, "Unregistered");
+      action = FeedRecorder.REPO_DROPPED;
     }
-    else if (evt instanceof RepositoryConfigurationUpdatedEvent) {
-      sb.insert(0, "Updated");
+    else {
+      action = FeedRecorder.REPO_UPDATED;
+      final RepositoryConfigurationUpdatedEvent configured = (RepositoryConfigurationUpdatedEvent) evt;
+      putIfNotNull(data, "localUrlChanged", String.valueOf(configured.isLocalUrlChanged()));
+      putIfNotNull(data, "remoteUrlChanged", String.valueOf(configured.isRemoteUrlChanged()));
+      putIfNotNull(data, "downloadRemoteIndexEnabled", String.valueOf(configured.isDownloadRemoteIndexEnabled()));
+      putIfNotNull(data, "madeSearchable", String.valueOf(configured.isMadeSearchable()));
+      putIfNotNull(data, "localStatusChanged", String.valueOf(configured.isLocalStatusChanged()));
     }
 
-    getFeedRecorder().addSystemEvent(new SystemEvent(evt.getEventDate(), SystemEvent.ACTION_CONFIG, sb.toString()));
+    putIfNotNull(data, "repo.id", repository.getId());
+    putIfNotNull(data, "repo.name", repository.getName());
+    // TODO: who changed it?
+    //putIfNotNull(data, "user.id", userId);
+    //putIfNotNull(data, "user.ip", userIp);
+    //putIfNotNull(data, "user.ua", userAgent);
+    final FeedEvent fe = new FeedEvent(
+        FeedRecorder.FAMILY_REPO,
+        action,
+        evt.getClass().getName(),
+        evt.getEventDate(),
+        null, // TODO: who changed it?
+        "/", // link to UI
+        data
+    );
+    getFeedRecorder().addEvent(fe);
   }
 
   private boolean isNexusStarted() {

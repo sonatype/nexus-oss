@@ -20,33 +20,36 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.SystemEvent;
 
 import com.google.common.collect.ImmutableSet;
 
 @Named(SystemRepositoryStatusChangesFeedSource.CHANNEL_KEY)
 @Singleton
 public class SystemRepositoryStatusChangesFeedSource
-    extends AbstractSystemFeedSource
+    extends AbstractFeedSource
 {
   public static final String CHANNEL_KEY = "systemRepositoryStatusChanges";
 
   @Inject
   public SystemRepositoryStatusChangesFeedSource(
-      final ApplicationStatusSource applicationStatusSource,
       final FeedRecorder feedRecorder)
   {
-    super(applicationStatusSource, feedRecorder, CHANNEL_KEY, "Repository Status Changes",
+    super(feedRecorder,
+        CHANNEL_KEY,
+        "Repository Status Changes",
         "Repository Status Changes in Nexus (user interventions and automatic).");
   }
 
-  public List<SystemEvent> getEventList(Integer from, Integer count, Map<String, String> params) {
-    return getFeedRecorder().getSystemEvents(
-        ImmutableSet.of(SystemEvent.ACTION_REPO_LSTATUS_CHANGES,
-            SystemEvent.ACTION_REPO_PSTATUS_CHANGES, SystemEvent.ACTION_REPO_PSTATUS_AUTO_CHANGES),
-        from, count, null
-    );
+  @Override
+  public void fillInEntries(final List<FeedEvent> entries, final int from, final int count,
+                            final Map<String, String> params)
+  {
+    entries.addAll(getFeedRecorder()
+        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_REPO),
+            ImmutableSet.of(FeedRecorder.REPO_LSTATUS, FeedRecorder.REPO_PSTATUS), from, count,
+            filters(params)
+        ));
   }
 }

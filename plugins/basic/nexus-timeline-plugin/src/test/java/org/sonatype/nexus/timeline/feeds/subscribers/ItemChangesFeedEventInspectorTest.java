@@ -14,6 +14,7 @@
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
 import org.sonatype.nexus.proxy.RequestContext;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -23,8 +24,8 @@ import org.sonatype.nexus.proxy.maven.uid.IsMavenArtifactSignatureAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenChecksumAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenRepositoryMetadataAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
@@ -56,15 +57,18 @@ public class ItemChangesFeedEventInspectorTest
   @Before
   public void setup() {
     when(repository.getId()).thenReturn("test");
+    when(repository.getName()).thenReturn("test");
     when(storageFileItem.getItemContext()).thenReturn(new RequestContext());
     when(storageFileItem.getRepositoryItemUid()).thenReturn(repositoryItemUid);
     when(storageFileItem.getRepositoryItemAttributes()).thenReturn(new DefaultAttributes());
+    when(storageFileItem.getResourceStoreRequest()).thenReturn(new ResourceStoreRequest("blah"));
+    when(repositoryItemUid.getRepository()).thenReturn(repository);
   }
 
   @Test
   public void eventsOnHiddenFilesAreNotRecorded() {
-    final ItemChangesFeedSubscriber underTest =
-        new ItemChangesFeedSubscriber(feedRecorder);
+    final ItemChangesSubscriber underTest =
+        new ItemChangesSubscriber(feedRecorder);
     final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
     when(storageFileItem.getPath()).thenReturn("/some/path");
     when(storageFileItem.getRepositoryId()).thenReturn("central");
@@ -77,8 +81,8 @@ public class ItemChangesFeedEventInspectorTest
 
   @Test
   public void eventsOnMavenMetadataSignatureAndHashFilesShouldNotBeRecorded() {
-    final ItemChangesFeedSubscriber underTest =
-        new ItemChangesFeedSubscriber(feedRecorder);
+    final ItemChangesSubscriber underTest =
+        new ItemChangesSubscriber(feedRecorder);
     when(storageFileItem.getPath()).thenReturn("/some/path");
     when(storageFileItem.getRepositoryId()).thenReturn("central");
     when(storageFileItem.getRemoteUrl()).thenReturn("http://repo1.maven.org/maven2");
@@ -111,6 +115,6 @@ public class ItemChangesFeedEventInspectorTest
     when(repositoryItemUid.getBooleanAttributeValue(IsMavenChecksumAttribute.class)).thenReturn(false);
     underTest.on(evt);
     // method touched only once
-    verify(feedRecorder, times(1)).addNexusArtifactEvent(any(NexusArtifactEvent.class));
+    verify(feedRecorder, times(1)).addEvent(any(FeedEvent.class));
   }
 }

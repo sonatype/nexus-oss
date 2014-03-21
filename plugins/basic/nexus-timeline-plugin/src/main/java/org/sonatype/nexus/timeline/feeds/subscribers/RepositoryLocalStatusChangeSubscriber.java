@@ -13,45 +13,54 @@
 
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailed;
-import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedChecksum;
-import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedFileType;
+import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent;
-import org.sonatype.nexus.timeline.feeds.NexusArtifactEvent.NexusItemInfo;
 
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 @Named
 @Singleton
-public class ItemValidationFeedSubscriber
+public class RepositoryLocalStatusChangeSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
   @Inject
-  public ItemValidationFeedSubscriber(final FeedRecorder feedRecorder) {
+  public RepositoryLocalStatusChangeSubscriber(final FeedRecorder feedRecorder) {
     super(feedRecorder);
   }
 
   @Subscribe
   @AllowConcurrentEvents
-  public void on(final RepositoryItemValidationEventFailed ievt) {
-    String action = NexusArtifactEvent.ACTION_BROKEN;
-    if (ievt instanceof RepositoryItemValidationEventFailedChecksum) {
-      action = NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM;
-    }
-    else if (ievt instanceof RepositoryItemValidationEventFailedFileType) {
-      action = NexusArtifactEvent.ACTION_BROKEN_INVALID_CONTENT;
-    }
-    final NexusArtifactEvent nae = new NexusArtifactEvent(ievt.getEventDate(), action, ievt.getMessage(),
-        new NexusItemInfo(ievt.getItem().getPath(), ievt.getItem().getRepositoryId(), ievt.getItem().getRemoteUrl()));
-    getFeedRecorder().addNexusArtifactEvent(nae);
+  public void on(final RepositoryEventLocalStatusChanged revt) {
+    final Map<String, String> data = Maps.newHashMap();
+    putIfNotNull(data, "oldLocalStatus", revt.getOldLocalStatus().name());
+    putIfNotNull(data, "newLocalStatus", revt.getNewLocalStatus().name());
+    putIfNotNull(data, "repo.id", revt.getRepository().getId());
+    putIfNotNull(data, "repo.name", revt.getRepository().getName());
+    // TODO: who changed it?
+    //putIfNotNull(data, "user.id", userId);
+    //putIfNotNull(data, "user.ip", userIp);
+    //putIfNotNull(data, "user.ua", userAgent);
+    final FeedEvent fe = new FeedEvent(
+        FeedRecorder.FAMILY_REPO,
+        FeedRecorder.REPO_LSTATUS,
+        revt.getClass().getName(),
+        revt.getEventDate(),
+        null, // TODO: who changed it?
+        "/", // link to UI
+        data
+    );
+    getFeedRecorder().addEvent(fe);
   }
 }

@@ -26,20 +26,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.log.LogManager;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.io.Closer;
 import com.google.common.io.Files;
-import com.sun.syndication.feed.synd.SyndContent;
-import com.sun.syndication.feed.synd.SyndContentImpl;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndEntryImpl;
-import com.sun.syndication.feed.synd.SyndFeed;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -55,23 +51,24 @@ public class ErrorWarningFeedSource
   private final LogManager logManager;
 
   @Inject
-  public ErrorWarningFeedSource(final ApplicationStatusSource applicationStatusSource, final FeedRecorder feedRecorder,
+  public ErrorWarningFeedSource(final FeedRecorder feedRecorder,
                                 final LogManager logManager)
   {
-    super(applicationStatusSource, feedRecorder, CHANNEL_KEY, "Errors and Warnings",
+    super(feedRecorder,
+        CHANNEL_KEY,
+        "Errors and Warnings",
         "ERROR and WARN level entries from last Nexus log");
     this.logManager = checkNotNull(logManager);
   }
 
   @Override
-  protected void fillInEntries(final SyndFeed feed, final Integer from, final Integer count,
+  protected void fillInEntries(final List<FeedEvent> feed, final int from, final int count,
                                final Map<String, String> params)
       throws IOException
   {
     final Iterable<String> logFilenamesToScan = getLogFilenamesToScan(params);
-    // default same as org.sonatype.nexus.timeline.feeds.DefaultFeedRecorder.DEFAULT_PAGE_SIZE
-    int remainingCount = count != null ? count : 40;
-    final List<SyndEntry> entries = Lists.newArrayList();
+    int remainingCount = count;
+    final List<FeedEvent> entries = Lists.newArrayList();
     for (String logFileName : logFilenamesToScan) {
       final File logFile = logManager.getLogFile(logFileName);
       if (logFile == null) {
@@ -82,11 +79,11 @@ public class ErrorWarningFeedSource
         // run as WAR or user completely customized logging configuration.
         break;
       }
-      final List<SyndEntry> logFileEntries = extractEntriesFromLogfile(feed, logFile, remainingCount);
+      final List<FeedEvent> logFileEntries = extractEntriesFromLogfile(logFile, remainingCount);
       remainingCount -= logFileEntries.size();
       entries.addAll(logFileEntries);
     }
-    feed.setEntries(entries);
+    feed.addAll(entries);
   }
 
   // ==
@@ -116,10 +113,10 @@ public class ErrorWarningFeedSource
    * @param logFile          the log file to scan.
    * @param entriesToExtract The number how much "newest" entries should be collected.
    */
-  private List<SyndEntry> extractEntriesFromLogfile(final SyndFeed feed, final File logFile, final int entriesToExtract)
+  private List<FeedEvent> extractEntriesFromLogfile(final File logFile, final int entriesToExtract)
       throws IOException
   {
-    final List<SyndEntry> entries = Lists.newArrayList();
+    final List<FeedEvent> entries = Lists.newArrayList();
     Closer closer = Closer.create();
     try {
       final BufferedReader reader =
@@ -127,20 +124,6 @@ public class ErrorWarningFeedSource
       String logLine = reader.readLine();
       while (logLine != null) {
         if (logLine.contains(" WARN ") || logLine.contains(" ERROR ")) {
-          final SyndEntry entry = new SyndEntryImpl();
-          entry.setPublishedDate(new Date()); // FIXME: item.getEventDate();
-          entry.setAuthor(feed.getAuthor());
-          entry.setLink("/");
-
-          if (logLine.contains(" ERROR ")) {
-            entry.setTitle("Error");
-          }
-          else if (logLine.contains(" WARN ")) {
-            entry.setTitle("Warning");
-          }
-
-          final StringBuilder contentValue = new StringBuilder();
-          contentValue.append(logLine);
 
           // FIXME: Grab following stacktrace if any in log
           // if ( StringUtils.isNotEmpty( item.getStackTrace() ) )
@@ -153,10 +136,22 @@ public class ErrorWarningFeedSource
           // contentValue.append( "<br/>" ).append( stackTrace );
           // }
 
-          SyndContent content = new SyndContentImpl();
-          content.setType("text/plain");
-          content.setValue(contentValue.toString());
-          entry.setDescription(content);
+          final FeedEvent entry = new FeedEvent(
+              "type",
+              "subType",
+              "foo", // ignored
+              new Date(), // TODO: timestamp from log file?
+              null,
+              null,
+              Maps.<String, String>newHashMap()
+          );
+          if (logLine.contains(" ERROR ")) {
+            entry.getData().put("_title", "Error");
+          }
+          else if (logLine.contains(" WARN ")) {
+            entry.getData().put("_title", "Warning");
+          }
+          entry.getData().put("_content", logLine);
 
           entries.add(entry);
           if (entries.size() > entriesToExtract) {

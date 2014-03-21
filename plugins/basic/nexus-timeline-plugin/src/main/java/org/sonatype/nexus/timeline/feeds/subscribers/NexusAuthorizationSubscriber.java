@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -23,10 +25,10 @@ import org.sonatype.nexus.auth.ResourceInfo;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.timeline.feeds.AuthcAuthzEvent;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.util.StringUtils;
@@ -59,20 +61,30 @@ public class NexusAuthorizationSubscriber
       return;
     }
     lastNexusAuthorizationEvent = nae;
+
     final ClientInfo ai = nae.getClientInfo();
     final ResourceInfo ri = nae.getResourceInfo();
-    final String msg =
-        "Unable to authorize user [" + ai.getUserid() + "] for " + ri.getAction() + "(" + ri.getAccessProtocol()
-            + " method \"" + ri.getAccessMethod() + "\") to " + ri.getAccessedUri() + " from IP Address "
-            + ai.getRemoteIP() + ", user agent:\"" + ai.getUserAgent() + "\"";
-    log.debug(msg);
 
-    final AuthcAuthzEvent aae = new AuthcAuthzEvent(nae.getEventDate(), AuthcAuthzEvent.ACTION_AUTHZ, msg);
-    final String ip = ai.getRemoteIP();
-    if (ip != null) {
-      nae.getEventContext().put(AccessManager.REQUEST_REMOTE_ADDRESS, ip);
-    }
-    getFeedRecorder().addAuthcAuthzEvent(aae);
+    final Map<String, String> data = Maps.newHashMap();
+    putIfNotNull(data, "success", String.valueOf(nae.isSuccessful()));
+    putIfNotNull(data, "user.id", ai.getUserid());
+    putIfNotNull(data, "user.ip", ai.getRemoteIP());
+    putIfNotNull(data, "user.ua", ai.getUserAgent());
+    putIfNotNull(data, "res.proto", ri.getAccessProtocol());
+    putIfNotNull(data, "res.method", ri.getAccessMethod());
+    putIfNotNull(data, "res.action", ri.getAction().name());
+    putIfNotNull(data, "res.uri", ri.getAccessedUri());
+    final FeedEvent fe = new FeedEvent(
+        FeedRecorder.FAMILY_AUTH,
+        FeedRecorder.AUTH_AUTHZ,
+        nae.getClass().getName(),
+        nae.getEventDate(),
+        null, // "system"
+        "/", // link to UI
+        data
+    );
+    getFeedRecorder().addEvent(fe);
+
   }
 
   // ==

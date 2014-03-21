@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -21,9 +23,10 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.SystemEvent;
 
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -50,18 +53,37 @@ public class NexusBootSubscriber
 
   @Subscribe
   public void on(final NexusStartedEvent e) {
-    getFeedRecorder().addSystemEvent(new SystemEvent(e.getEventDate(), SystemEvent.ACTION_BOOT,
-        "Started Nexus (version " + applicationStatusSource.getSystemStatus().getVersion() + " "
-            + applicationStatusSource.getSystemStatus().getEditionShort() + ")"
-    ));
+    final Map<String, String> data = Maps.newHashMap();
+    putIfNotNull(data, "boot.action", "Started");
+    putIfNotNull(data, "nx.version", applicationStatusSource.getSystemStatus().getVersion());
+    putIfNotNull(data, "nx.edition", applicationStatusSource.getSystemStatus().getEditionShort());
+    final FeedEvent fe = new FeedEvent(
+        FeedRecorder.FAMILY_SYSTEM,
+        FeedRecorder.SYSTEM_BOOT,
+        e.getClass().getName(),
+        e.getEventDate(),
+        null, // "system" is booting
+        "/", // link to UI
+        data
+    );
+    getFeedRecorder().addEvent(fe);
   }
 
   @Subscribe
   public void on(final NexusStoppedEvent e) {
-    getFeedRecorder().addSystemEvent(new SystemEvent(e.getEventDate(),
-        SystemEvent.ACTION_BOOT,
-        "Stopping Nexus (version " + applicationStatusSource.getSystemStatus().getVersion() + " "
-            + applicationStatusSource.getSystemStatus().getEditionShort() + ")"
-    ));
+    final Map<String, String> data = Maps.newHashMap();
+    putIfNotNull(data, "boot.action", "Stopped");
+    putIfNotNull(data, "nx.version", applicationStatusSource.getSystemStatus().getVersion());
+    putIfNotNull(data, "nx.edition", applicationStatusSource.getSystemStatus().getEditionShort());
+    final FeedEvent fe = new FeedEvent(
+        FeedRecorder.FAMILY_SYSTEM,
+        FeedRecorder.SYSTEM_BOOT,
+        e.getClass().getName(),
+        e.getEventDate(),
+        null, // "system" is booting
+        "/", // link to UI
+        data
+    );
+    getFeedRecorder().addEvent(fe);
   }
 }

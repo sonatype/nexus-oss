@@ -21,16 +21,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.timeline.feeds.AuthcAuthzEvent;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
-import com.google.common.collect.Lists;
-import com.sun.syndication.feed.synd.SyndContent;
-import com.sun.syndication.feed.synd.SyndContentImpl;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndEntryImpl;
-import com.sun.syndication.feed.synd.SyndFeed;
+import com.google.common.collect.ImmutableSet;
 
 @Named(AuthcAuthzFeedSource.CHANNEL_KEY)
 @Singleton
@@ -40,43 +34,20 @@ public class AuthcAuthzFeedSource
   public static final String CHANNEL_KEY = "authcAuthz";
 
   @Inject
-  public AuthcAuthzFeedSource(final ApplicationStatusSource applicationStatusSource,
-                              final FeedRecorder feedRecorder)
-  {
-    super(applicationStatusSource,
+  public AuthcAuthzFeedSource(final FeedRecorder feedRecorder) {
+    super(
         feedRecorder,
         CHANNEL_KEY,
         "Authentication and Authorization",
-        "Authentication and Authorization Events");
+        "Login and Access activities");
   }
 
-  protected void fillInEntries(final SyndFeed feed, final Integer from, final Integer count,
+  @Override
+  protected void fillInEntries(final List<FeedEvent> feed, final int from, final int count,
                                final Map<String, String> params)
       throws IOException
   {
-    final List<AuthcAuthzEvent> items = getFeedRecorder().getAuthcAuthzEvents(null, from, count, null);
-    final List<SyndEntry> entries = Lists.newArrayListWithCapacity(items.size());
-    for (AuthcAuthzEvent item : items) {
-      final SyndEntry entry = new SyndEntryImpl();
-      if (AuthcAuthzEvent.ACTION_AUTHC.equals(item.getAction())) {
-        entry.setTitle("Authentication");
-      }
-      else if (AuthcAuthzEvent.ACTION_AUTHZ.equals(item.getAction())) {
-        entry.setTitle("Authorization");
-      }
-      else {
-        entry.setTitle(item.getAction());
-      }
-      final SyndContent content = new SyndContentImpl();
-      content.setType("text/plain");
-      content.setValue(item.getMessage());
-      entry.setPublishedDate(item.getEventDate());
-      entry.setAuthor(feed.getAuthor());
-      entry.setLink("/");
-      entry.setDescription(content);
-      entries.add(entry);
-    }
-    feed.setEntries(entries);
+    feed.addAll(getFeedRecorder().getEvents(ImmutableSet.of(FeedRecorder.FAMILY_AUTH), null, from, count, filters(params)));
   }
 
 }

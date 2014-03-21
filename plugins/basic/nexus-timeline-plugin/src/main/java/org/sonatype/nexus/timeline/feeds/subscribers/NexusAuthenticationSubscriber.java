@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -22,10 +24,10 @@ import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.timeline.feeds.AuthcAuthzEvent;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.util.StringUtils;
@@ -59,18 +61,24 @@ public class NexusAuthenticationSubscriber
     }
 
     lastNexusAuthenticationEvent = nae;
-    final ClientInfo ai = nae.getClientInfo();
-    final String msg =
-        String.format("%s user [%s] from IP address %s", (nae.isSuccessful() ? "Successfully authenticated"
-            : "Unable to authenticate"), ai.getUserid(), StringUtils.defaultString(ai.getRemoteIP(), "[unknown]"));
-    log.debug(msg);
 
-    final AuthcAuthzEvent aae = new AuthcAuthzEvent(nae.getEventDate(), AuthcAuthzEvent.ACTION_AUTHC, msg);
-    final String ip = ai.getRemoteIP();
-    if (ip != null) {
-      nae.getEventContext().put(AccessManager.REQUEST_REMOTE_ADDRESS, ip);
-    }
-    getFeedRecorder().addAuthcAuthzEvent(aae);
+    final ClientInfo ai = nae.getClientInfo();
+
+    final Map<String, String> data = Maps.newHashMap();
+    putIfNotNull(data, "success", String.valueOf(nae.isSuccessful()));
+    putIfNotNull(data, "user.id", ai.getUserid());
+    putIfNotNull(data, "user.ip", ai.getRemoteIP());
+    putIfNotNull(data, "user.ua", ai.getUserAgent());
+    final FeedEvent fe = new FeedEvent(
+        FeedRecorder.FAMILY_AUTH,
+        FeedRecorder.AUTH_AUTHC,
+        nae.getClass().getName(),
+        nae.getEventDate(),
+        null, // "system"
+        "/", // link to UI
+        data
+    );
+    getFeedRecorder().addEvent(fe);
   }
 
   // ==

@@ -20,25 +20,33 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.SystemEvent;
+
+import com.google.common.collect.ImmutableSet;
 
 @Named(SystemFeedSource.CHANNEL_KEY)
 @Singleton
 public class SystemFeedSource
-    extends AbstractSystemFeedSource
+    extends AbstractFeedSource
 {
   public static final String CHANNEL_KEY = "systemChanges";
 
   @Inject
-  public SystemFeedSource(final ApplicationStatusSource applicationStatusSource,
-                          final FeedRecorder feedRecorder)
-  {
-    super(applicationStatusSource, feedRecorder, CHANNEL_KEY, "System changes", "System wide changes in Nexus");
+  public SystemFeedSource(final FeedRecorder feedRecorder) {
+    super(feedRecorder,
+        CHANNEL_KEY,
+        "System changes",
+        "System wide changes in Nexus");
   }
 
-  public List<SystemEvent> getEventList(Integer from, Integer count, Map<String, String> params) {
-    return getFeedRecorder().getSystemEvents(null, from, count, null);
+  @Override
+  public void fillInEntries(final List<FeedEvent> entries, final int from, final int count,
+                            final Map<String, String> params)
+  {
+    entries.addAll(getFeedRecorder()
+        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_SYSTEM), null, from, count,
+            filters(params)
+        ));
   }
 }

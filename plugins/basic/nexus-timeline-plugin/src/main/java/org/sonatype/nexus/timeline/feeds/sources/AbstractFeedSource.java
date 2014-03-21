@@ -14,16 +14,29 @@
 package org.sonatype.nexus.timeline.feeds.sources;
 
 import java.io.IOException;
-import java.util.Date;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.timeline.Entry;
+import org.sonatype.nexus.timeline.feeds.AnyOfFilter;
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 import org.sonatype.nexus.timeline.feeds.rest.FeedSource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.feed.synd.SyndFeedImpl;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,8 +49,6 @@ public abstract class AbstractFeedSource
     extends ComponentSupport
     implements FeedSource
 {
-  private final ApplicationStatusSource applicationStatusSource;
-
   private final FeedRecorder feedRecorder;
 
   private final String feedKey;
@@ -46,13 +57,12 @@ public abstract class AbstractFeedSource
 
   private final String feedDescription;
 
-  protected AbstractFeedSource(final ApplicationStatusSource applicationStatusSource,
-                               final FeedRecorder feedRecorder,
-                               final String feedKey,
-                               final String feedName,
-                               final String feedDescription)
+  protected AbstractFeedSource(
+      final FeedRecorder feedRecorder,
+      final String feedKey,
+      final String feedName,
+      final String feedDescription)
   {
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
     this.feedRecorder = checkNotNull(feedRecorder);
     this.feedKey = checkNotNull(feedKey);
     this.feedName = checkNotNull(feedName);
@@ -79,19 +89,91 @@ public abstract class AbstractFeedSource
   }
 
   @Override
-  public SyndFeed getFeed(Integer from, Integer count, Map<String, String> params)
+  public List<FeedEvent> getFeed(int from, int count, Map<String, String> params)
       throws IOException
   {
-    final SyndFeedImpl feed = new SyndFeedImpl();
-    feed.setTitle(getFeedName());
-    feed.setDescription(getFeedDescription());
-    feed.setAuthor("Nexus " + applicationStatusSource.getSystemStatus().getVersion());
-    feed.setPublishedDate(new Date());
-    fillInEntries(feed, from, count, params);
-    return feed;
+    final List<FeedEvent> events = Lists.newArrayList();
+    fillInEntries(events, from, count, params);
+    return events;
   }
 
-  protected abstract void fillInEntries(final SyndFeed feed, final Integer from, final Integer count,
+  protected abstract void fillInEntries(final List<FeedEvent> feed, final int from, final int count,
                                         final Map<String, String> params)
       throws IOException;
+
+  // ==
+
+  protected Predicate<Entry> isMavenArtifact(final RepositoryRegistry repositoryRegistry) {
+    return new Predicate<Entry>()
+    {
+      @Override
+      public boolean apply(final Entry input) {
+        final String repoId = input.getData().get("repo.id");
+        final String itemPath = input.getData().get("item.path");
+        if (repoId != null && itemPath != null) {
+          try {
+            final MavenRepository repository = repositoryRegistry
+                .getRepositoryWithFacet(repoId, MavenRepository.class);
+            final Gav gav = repository.getGavCalculator().pathToGav(itemPath);
+            return gav != null && !gav.isSignature() && !gav.isHash();
+          }
+          catch (NoSuchRepositoryException e) {
+            // fall through
+          }
+        }
+        return false;
+      }
+    };
+  }
+
+  protected Predicate<Entry> isMavenRepositoryWithPolicy(final RepositoryRegistry repositoryRegistry,
+                                                         final RepositoryPolicy policy)
+  {
+    return new Predicate<Entry>()
+    {
+      @Override
+      public boolean apply(final Entry input) {
+        final String repoId = input.getData().get("repo.id");
+        final String itemPath = input.getData().get("item.path");
+        if (repoId != null && itemPath != null) {
+          try {
+            final MavenRepository repository = repositoryRegistry
+                .getRepositoryWithFacet(repoId, MavenRepository.class);
+            return repository.getRepositoryPolicy().equals(policy);
+          }
+          catch (NoSuchRepositoryException e) {
+            // fall thru
+          }
+        }
+        return false;
+      }
+    };
+  }
+
+  protected Predicate<Entry> filters(final Map<String, String> params) {
+    if (params.isEmpty()) {
+      return Predicates.alwaysTrue();
+    }
+    final List<Predicate<Entry>> filters = Lists.newArrayList();
+    for (Map.Entry<String, String> param : params.entrySet()) {
+      if (param.getKey().equals("_dc")) {
+        continue;
+      }
+      final AnyOfFilter filter = new AnyOfFilter(param.getKey(), valueSet(param.getValue()));
+      filters.add(filter);
+    }
+    return Predicates.and(filters);
+  }
+
+  protected Set<String> valueSet(final String value) {
+    final HashSet<String> result = Sets.newHashSet();
+    if (value.contains(",")) {
+      String[] values = StringUtils.split(value, ",");
+      result.addAll(Arrays.asList(values));
+    }
+    else {
+      result.add(value);
+    }
+    return result;
+  }
 }

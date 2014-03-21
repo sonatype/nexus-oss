@@ -27,6 +27,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.siesta.common.Component;
 
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -43,6 +44,7 @@ import com.sun.syndication.io.SyndFeedOutput;
 @Provider
 @Produces({RomeProvider.APPLICATION_RSS_XML, MediaType.APPLICATION_ATOM_XML, MediaType.TEXT_XML})
 public class RomeProvider
+    extends ComponentSupport
     implements Component, MessageBodyWriter<Object>
 {
   public static final String APPLICATION_RSS_XML = "application/rss+xml";
@@ -81,6 +83,7 @@ public class RomeProvider
       output.output(feed, w);
     }
     catch (FeedException e) {
+      log.error("Problem during write", e);
       throw new IOException(e);
     }
   }
