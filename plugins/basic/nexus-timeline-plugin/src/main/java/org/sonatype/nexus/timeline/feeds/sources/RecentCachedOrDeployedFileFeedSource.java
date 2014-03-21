@@ -36,7 +36,7 @@ public class RecentCachedOrDeployedFileFeedSource
     super(feedRecorder,
         CHANNEL_KEY,
         "New files",
-        "New files in all Nexus repositories (cached or deployed).");
+        "New files (cached or deployed).");
   }
 
   @Override

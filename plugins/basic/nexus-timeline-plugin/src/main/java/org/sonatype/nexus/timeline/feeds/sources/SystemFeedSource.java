@@ -41,7 +41,7 @@ public class SystemFeedSource
   public SystemFeedSource(final FeedRecorder feedRecorder) {
     super(feedRecorder,
         CHANNEL_KEY,
-        "System changes",
+        "System Changes",
         "System wide changes in Nexus");
   }
 

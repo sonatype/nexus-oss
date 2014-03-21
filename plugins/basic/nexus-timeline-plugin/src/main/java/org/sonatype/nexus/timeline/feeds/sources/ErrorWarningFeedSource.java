@@ -62,7 +62,7 @@ public class ErrorWarningFeedSource
   {
     super(feedRecorder,
         CHANNEL_KEY,
-        "Errors and Warnings",
+        "Nexus logged Errors and Warnings",
         "ERROR and WARN level entries from last Nexus log");
     this.logManager = checkNotNull(logManager);
   }

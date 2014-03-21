@@ -41,8 +41,8 @@ public class RecentCachedArtifactFeedSource
   public RecentCachedArtifactFeedSource(final FeedRecorder feedRecorder, final RepositoryRegistry repositoryRegistry) {
     super(feedRecorder,
         CHANNEL_KEY,
-        "New cached artifacts",
-        "New cached artifacts in all Nexus repositories (cached).");
+        "New remote artifacts",
+        "New remote artifacts (cached).");
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }
 

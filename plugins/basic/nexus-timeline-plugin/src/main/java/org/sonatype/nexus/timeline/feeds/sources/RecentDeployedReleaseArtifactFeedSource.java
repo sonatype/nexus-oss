@@ -44,8 +44,8 @@ public class RecentDeployedReleaseArtifactFeedSource
   {
     super(feedRecorder,
         CHANNEL_KEY,
-        "New releases of Maven2 artifacts",
-        "New releases of Maven2 artifacts across all repositories (deploys)");
+        "New deployed Maven2 releases",
+        "New deployed Maven2 releases (deploys)");
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }
 

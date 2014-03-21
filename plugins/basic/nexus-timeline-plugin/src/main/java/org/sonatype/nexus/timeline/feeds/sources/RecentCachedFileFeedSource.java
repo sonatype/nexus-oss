@@ -36,8 +36,8 @@ public class RecentCachedFileFeedSource
   public RecentCachedFileFeedSource(final FeedRecorder feedRecorder) {
     super(feedRecorder,
         CHANNEL_KEY,
-        "New cached files",
-        "New cached files in all Nexus repositories (cached).");
+        "New remote files",
+        "New remote files (cached).");
   }
 
   @Override

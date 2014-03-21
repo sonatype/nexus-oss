@@ -46,7 +46,7 @@ public class RecentCachedOrDeployedReleaseArtifactFeedSource
     super(feedRecorder,
         CHANNEL_KEY,
         "New release artifacts",
-        "New release artifacts in all Nexus repositories (cached or deployed).");
+        "New release artifacts (cached or deployed).");
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }
 
