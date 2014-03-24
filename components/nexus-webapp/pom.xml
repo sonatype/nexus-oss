@@ -35,21 +35,25 @@
       <artifactId>javax.servlet</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-extender</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
@@ -72,22 +76,17 @@
 
     <dependency>
       <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>log4j-over-slf4j</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
     </dependency>
 
     <dependency>
@@ -103,11 +102,6 @@
     <dependency>
       <groupId>com.yammer.metrics</groupId>
       <artifactId>metrics-logback</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-interpolation</artifactId>
     </dependency>
 
     <dependency>
@@ -399,8 +393,11 @@
                 </Embed-Dependency>
                 <Embed-Transitive>true</Embed-Transitive>
                 <_exportcontents>
-                  javax.*,ch.*,com.*,org.*
+                  javax.*|ch.*|com.*|org.*
                 </_exportcontents>
+                <_removeheaders>
+                  Embed*,Import-Package,Include-Resource,Private-Package
+                </_removeheaders>
               </instructions>
             </configuration>
           </execution>

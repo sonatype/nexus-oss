@@ -80,7 +80,11 @@ public class NexusContextListener
     final BundleContext ctx = extender.getBundleContext();
 
     servletContext = event.getServletContext();
-    final Map<?, ?> variables = (Map<?, ?>) servletContext.getAttribute("nexus.properties");
+    Map<?, ?> variables = (Map<?, ?>) servletContext.getAttribute("nexus.properties");
+    if (variables == null) {
+      variables = System.getProperties();
+    }
+
     final Bundle systemBundle = ctx.getBundle(0);
 
     final ClassSpace coreSpace = new BundleClassSpace(ctx.getBundle());

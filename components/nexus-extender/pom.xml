@@ -123,14 +123,19 @@
             <Embed-Directory>lib</Embed-Directory>
             <Embed-Transitive>true</Embed-Transitive>
             <_exportcontents>
-              !lib.*,com.*,eu.*,javax.*,net.*,org.*
+              !lib.*,
+              com.*|eu.*|javax.*|net.*|org.*;-noimport:=true,
+              javax.servlet,
+              javax.servlet.http
             </_exportcontents>
-            <Include-Resource>
-              {maven-resources},META-INF/sisu=${project.build.outputDirectory}/META-INF/sisu
-            </Include-Resource>
             <Require-Bundle>
-              system.bundle;visibility:=reexport
+              system.bundle;visibility:=reexport,
+              org.sonatype.nexus.jettyapp;visibility:=reexport;resolution:=optional
             </Require-Bundle>
+            <Import-Package>
+              javax.servlet,
+              javax.servlet.http
+            </Import-Package>
           </instructions>
         </configuration>
       </plugin>

@@ -122,6 +122,11 @@
     -->
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
+
+    <!--
+    Directory containing generated sisu metadata.
+    -->
+    <sisu.meta>${project.build.outputDirectory}/META-INF/sisu</sisu.meta>
   </properties>
 
   <modules>
@@ -199,6 +204,12 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-extender</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-jettyapp</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
@@ -549,8 +560,11 @@
               -->
               <_nouses>true</_nouses>
               <_nodefaultversion>true</_nodefaultversion>
+              <Include-Resource>
+                {maven-resources},$(if;$(dir;${sisu.meta});META-INF/sisu=${sisu.meta})
+              </Include-Resource>
               <_removeheaders>
-                Embed*,Import-Package,Include-Resource,Private-Package
+                Embed*,Include-Resource,Private-Package
               </_removeheaders>
             </instructions>
           </configuration>
