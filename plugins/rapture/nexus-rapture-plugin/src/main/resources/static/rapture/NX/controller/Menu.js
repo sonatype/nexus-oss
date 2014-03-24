@@ -158,7 +158,7 @@ Ext.define('NX.controller.Menu', {
     var me = this,
         path = featureMenuModel.get('path');
 
-    if ((path !== me.currentSelectedPath) || featureMenuModel.hasChildNodes()) {
+    if ((path !== me.currentSelectedPath) || featureMenuModel.get('group')) {
       me.currentSelectedPath = path;
 
       me.logDebug('Selected feature: ' + path);
@@ -330,7 +330,7 @@ Ext.define('NX.controller.Menu', {
 
     me.getFeatureStore().each(function (rec) {
       feature = rec.getData();
-      if (feature.visible() && visibleModes.indexOf(feature.mode) === -1) {
+      if (feature.visible() && !feature.group && visibleModes.indexOf(feature.mode) === -1) {
         visibleModes.push(feature.mode);
       }
     });
@@ -410,6 +410,7 @@ Ext.define('NX.controller.Menu', {
   refreshTree: function () {
     var me = this,
         menuTitle = me.mode,
+        groupsToRemove = [],
         feature, segments, parent, child, modeButton;
 
     me.logDebug('Refreshing tree (mode ' + me.mode + ')');
@@ -461,6 +462,16 @@ Ext.define('NX.controller.Menu', {
           parent = child;
         }
       }
+    });
+
+    // remove all groups without children
+    me.getFeatureMenuStore().getRootNode().eachChild(function (node) {
+      if (node.get('group') && !node.hasChildNodes()) {
+        groupsToRemove.push(node);
+      }
+    });
+    Ext.Array.each(groupsToRemove, function (node) {
+      node.parentNode.removeChild(node, true);
     });
 
     me.getFeatureMenuStore().sort([

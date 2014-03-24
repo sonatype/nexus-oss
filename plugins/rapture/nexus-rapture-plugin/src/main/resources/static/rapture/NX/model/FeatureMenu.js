@@ -25,6 +25,7 @@ Ext.define('NX.model.FeatureMenu', {
     { name: 'mode' },
     { name: 'text' },
     { name: 'weight', defaultValue: 100 },
+    { name: 'group', defaultValue: false },
     { name: 'view' },
     { name: 'bookmark' },
     { name: 'iconName' }
