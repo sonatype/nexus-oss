@@ -47,7 +47,7 @@ public class LogbackOverridesTest
   public void writeLogbackXml() throws Exception {
     File logbackXml = util.createTempFile();
 
-    Map<String, LoggerLevel> loggers = Maps.newHashMap();
+    Map<String, LoggerLevel> loggers = Maps.newLinkedHashMap();
     loggers.put("foo", LoggerLevel.ERROR);
     loggers.put("bar", LoggerLevel.INFO);
 
