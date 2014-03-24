@@ -99,7 +99,18 @@ public class CapabilityStorageConverter
       List<CCapability> capabilities = configuration.getCapabilities();
 
       if (capabilities != null) {
+        boolean outreachMarkerCapabilityCreated = false;
+
         for (final CCapability c : capabilities) {
+
+          // NEXUS-6349: due to an older bug, OutreachMarkerCapability could be present multiple times in capabilities.xml
+          // this will make sure we just create one, as that capability should be a singleton
+          if ("OutreachMarkerCapability".equals(c.getTypeId())) {
+            if (outreachMarkerCapabilityCreated) {
+              continue;
+            }
+            outreachMarkerCapabilityCreated = true;
+          }
 
           Map<String, String> properties = Maps.newHashMap();
           if (c.getProperties() != null) {
