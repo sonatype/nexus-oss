@@ -51,15 +51,12 @@ Ext.define('NX.coreui.controller.Security', {
       {
         mode: 'admin',
         path: '/Security',
-        view: 'NX.view.feature.Group',
+        group: true,
         iconConfig: {
           file: 'security.png',
           variants: ['x16', 'x32']
         },
-        weight: 90,
-        visible: function () {
-          return NX.Permissions.check('nexus:settings', 'read');
-        }
+        weight: 90
       },
       {
         mode: 'admin',

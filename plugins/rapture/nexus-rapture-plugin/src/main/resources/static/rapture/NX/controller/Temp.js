@@ -145,15 +145,13 @@ Ext.define('NX.controller.Temp', {
     me.getApplication().getFeaturesController().registerFeature([
       {
         path: '/Repository',
-        view: 'NX.view.feature.Group',
-        weight: 50,
-        visible: visibleIfLoggedIn
+        group: true,
+        weight: 50
       },
       {
         path: '/Staging',
-        view: 'NX.view.feature.Group',
-        weight: 60,
-        visible: visibleIfLoggedIn
+        group: true,
+        weight: 60
       },
       {
         path: '/Staging/Repositories',
@@ -161,9 +159,8 @@ Ext.define('NX.controller.Temp', {
       },
       {
         path: '/Procurement',
-        view: 'NX.view.feature.Group',
-        weight: 60,
-        visible: visibleIfLoggedIn
+        group: true,
+        weight: 60
       },
       {
         path: '/Procurement/Repositories',
@@ -180,8 +177,7 @@ Ext.define('NX.controller.Temp', {
       },
       {
         path: '/Support',
-        view: 'NX.view.feature.Group',
-        visible: visibleIfLoggedIn
+        group: true
       },
       {
         path: '/Support/Overview',
@@ -215,7 +211,7 @@ Ext.define('NX.controller.Temp', {
       {
         mode: 'browse',
         path: '/Repository',
-        view: 'NX.view.feature.Group',
+        group: true,
         authenticationRequired: false
       },
       {
@@ -258,9 +254,8 @@ Ext.define('NX.controller.Temp', {
       {
         mode: 'user',
         path: '/Client Settings',
-        view: 'NX.view.feature.Group',
-        weight: 200,
-        visible: visibleIfLoggedIn
+        group: true,
+        weight: 200
       },
       {
         mode: 'user',

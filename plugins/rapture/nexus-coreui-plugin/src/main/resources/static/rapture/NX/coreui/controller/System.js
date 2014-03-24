@@ -34,15 +34,12 @@ Ext.define('NX.coreui.controller.System', {
       {
         mode: 'admin',
         path: '/System',
-        view: 'NX.view.feature.Group',
+        group: true,
         iconConfig: {
           file: 'cog.png',
           variants: ['x16', 'x32']
         },
-        weight: 1000,
-        visible: function () {
-          return NX.Permissions.check('nexus:settings', 'read');
-        }
+        weight: 1000
       },
       {
         mode: 'admin',

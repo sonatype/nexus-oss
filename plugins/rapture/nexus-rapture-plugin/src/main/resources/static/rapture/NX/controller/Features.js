@@ -57,6 +57,10 @@ Ext.define('NX.controller.Features', {
           feature.mode = 'admin';
         }
 
+        if (!feature.view && feature.group === true) {
+          feature.view = 'NX.view.feature.Group';
+        }
+
         if (!feature.view && !feature.href) {
           me.logWarn('Using default view for feature at path: ' + feature.path);
           feature.view = 'NX.view.feature.TODO';
