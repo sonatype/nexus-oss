@@ -94,7 +94,7 @@ public class ItemSubscriber
 
       final StorageFileItem fileItem = (StorageFileItem) ievt.getItem();
       final Map<String, String> data = Maps.newHashMap();
-      putIfNotNull(data, "validation", ievt.getMessage());
+      putIfNotNull(data, "validationMessage", ievt.getMessage());
       putIfNotNull(data, "repoId", fileItem.getRepositoryItemUid().getRepository().getId());
       putIfNotNull(data, "repoName", fileItem.getRepositoryItemUid().getRepository().getName());
       putIfNotNull(data, "itemPath", fileItem.getPath());
