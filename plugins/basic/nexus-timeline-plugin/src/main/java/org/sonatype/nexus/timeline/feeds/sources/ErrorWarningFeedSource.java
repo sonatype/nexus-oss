@@ -143,9 +143,8 @@ public class ErrorWarningFeedSource
           // }
 
           final FeedEvent entry = new FeedEvent(
-              "type",
-              "subType",
-              "foo", // ignored
+              "LOG",
+              "ERROR_WARNING", // ignored
               new Date(), // TODO: timestamp from log file?
               null,
               null,

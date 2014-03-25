@@ -38,13 +38,6 @@ public class FeedEvent
   private final String eventSubType; // groups events to logical sets
 
   /**
-   * Event class this feed event originates ("is made from"). It is recommended to use the FQCN of the event
-   * or some appropriate identifier. This value will drive the rendering of the event, as based on it will
-   * proper template be selected when rendering feed.
-   */
-  private final String eventClass; // determines exact class of originating Nx event
-
-  /**
    * Date when event happened.
    */
   private final Date published;
@@ -66,7 +59,6 @@ public class FeedEvent
 
   public FeedEvent(final String eventType,
                    final String eventSubType,
-                   final String eventClass,
                    final Date published,
                    @Nullable final String author,
                    @Nullable final String link,
@@ -74,7 +66,6 @@ public class FeedEvent
   {
     this.eventType = checkNotNull(eventType);
     this.eventSubType = checkNotNull(eventSubType);
-    this.eventClass = checkNotNull(eventClass);
     this.published = checkNotNull(published);
     this.author = author;
     this.link = link;
@@ -87,10 +78,6 @@ public class FeedEvent
 
   public String getEventSubType() {
     return eventSubType;
-  }
-
-  public String getEventClass() {
-    return eventClass;
   }
 
   public Date getPublished() {

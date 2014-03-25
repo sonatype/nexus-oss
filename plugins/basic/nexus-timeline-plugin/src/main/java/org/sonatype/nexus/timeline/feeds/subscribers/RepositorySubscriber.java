@@ -96,7 +96,6 @@ public class RepositorySubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_REPO,
         FeedRecorder.REPO_LSTATUS,
-        revt.getClass().getName(),
         revt.getEventDate(),
         null, // TODO: who changed it?
         "/", // link to UI
@@ -123,7 +122,6 @@ public class RepositorySubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_REPO,
         FeedRecorder.REPO_PSTATUS,
-        revt.getClass().getName(),
         revt.getEventDate(),
         null, // TODO: who changed it?
         "/", // link to UI
@@ -171,7 +169,6 @@ public class RepositorySubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_REPO,
         action,
-        evt.getClass().getName(),
         evt.getEventDate(),
         null, // TODO: who changed it?
         "/", // link to UI

@@ -64,7 +64,6 @@ public class SystemSubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_SYSTEM,
         FeedRecorder.SYSTEM_BOOT,
-        e.getClass().getName(),
         e.getEventDate(),
         null, // "system" is booting
         "/", // link to UI
@@ -82,7 +81,6 @@ public class SystemSubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_SYSTEM,
         FeedRecorder.SYSTEM_BOOT,
-        e.getClass().getName(),
         e.getEventDate(),
         null, // "system" is booting
         "/", // link to UI
@@ -108,7 +106,6 @@ public class SystemSubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_SYSTEM,
         FeedRecorder.SYSTEM_CONFIG,
-        event.getClass().getName(),
         event.getEventDate(),
         event.getUserId(),
         "/", // link to UI

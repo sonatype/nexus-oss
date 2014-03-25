@@ -13,35 +13,47 @@
 
 package org.sonatype.nexus.timeline.feeds.internal;
 
+import java.net.URL;
+import java.util.Map;
+
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
-import org.sonatype.nexus.timeline.feeds.rest.FeedContentRenderer;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.template.TemplateEngine;
+import org.sonatype.sisu.goodies.template.TemplateParameters;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A {@link FeedContentRenderer} that renders feed content as {@link "text/plain"}.
+ * Component renders feed content as {@link "text/plain"}.
  *
  * @since 3.0
  */
 @Singleton
-@Named("text/plain")
-public class PlainTextFeedContentRenderer
-    implements FeedContentRenderer
+@Named
+public class PlaintextRenderer
+    extends ComponentSupport
 {
-  @Override
+  private final Provider<TemplateEngine> templateEngineProvider;
+
+  @Inject
+  public PlaintextRenderer(
+      final Provider<TemplateEngine> templateEngineProvider)
+  {
+    this.templateEngineProvider = checkNotNull(templateEngineProvider, "velocityEngineProvider");
+  }
+
   public String getContentType(final FeedEvent evt) {
     return "text/plain";
   }
 
-  @Override
   public String getTitle(final FeedEvent evt) {
-    // allow override, like when event is not coming from timeline
-    // but is parsed from Nexus Log, see ErrorWarningFeedSource
-    if (evt.getData().containsKey("_title")) {
-      return evt.getData().get("_title");
-    }
+    // OOTB provided recorder titles
     if (FeedRecorder.FAMILY_SYSTEM.equals(evt.getEventType())) {
       if (FeedRecorder.SYSTEM_BOOT.equals(evt.getEventSubType())) {
         return "Nexus " + evt.getData().get("boot.action");
@@ -124,21 +136,26 @@ public class PlainTextFeedContentRenderer
     }
 
     // TODO: Some human-readable fallback?
-    return evt.getEventType() + ":" + evt.getEventSubType() + ":" + evt.getEventClass();
+    return evt.getEventType() + ":" + evt.getEventSubType();
   }
 
-  @Override
-  public String getContent(FeedEvent evt) {
-    // allow override, like when event is not coming from timeline
-    // but is parsed from Nexus Log, see ErrorWarningFeedSource
-    if (evt.getData().containsKey("_content")) {
-      return evt.getData().get("_content");
+  public String getContent(final FeedEvent evt) {
+    final URL templateURL = getTemplateFor(evt);
+    if (templateURL != null) {
+      final TemplateParameters templateParameters = new TemplateParameters();
+      for (Map.Entry<String, String> d : evt.getData().entrySet()) {
+        final String key = d.getKey().replace('.', '_'); // TODO: or handle this at subscribers?
+        templateParameters.set(key, d.getValue());
+      }
+      return templateEngineProvider.get().render(this, templateURL, templateParameters);
     }
-    // TODO: implement this
-    // get the template by
-    evt.getEventClass();
-    // render template with
+    // TODO: Some human-readable fallback?
     return evt.getData().toString();
   }
 
+  // ==
+
+  private URL getTemplateFor(final FeedEvent evt) {
+    return getClass().getResource("plaintext-" + evt.getEventType() + "-" + evt.getEventSubType() + ".vm");
+  }
 }

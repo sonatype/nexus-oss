@@ -79,7 +79,6 @@ public class AuthSubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_AUTH,
         FeedRecorder.AUTH_AUTHC,
-        nae.getClass().getName(),
         nae.getEventDate(),
         null, // "system"
         "/", // link to UI
@@ -112,7 +111,6 @@ public class AuthSubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_AUTH,
         FeedRecorder.AUTH_AUTHZ,
-        nae.getClass().getName(),
         nae.getEventDate(),
         null, // "system"
         "/", // link to UI

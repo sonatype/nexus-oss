@@ -109,7 +109,6 @@ public class ItemSubscriber
       final FeedEvent fe = new FeedEvent(
           FeedRecorder.FAMILY_ITEM,
           action,
-          ievt.getClass().getName(),
           ievt.getEventDate(),
           userId,
           "/content/repositories/" + fileItem.getRepositoryId() + fileItem.getParentPath(), // link to item parent
@@ -166,7 +165,6 @@ public class ItemSubscriber
       final FeedEvent fe = new FeedEvent(
           FeedRecorder.FAMILY_ITEM,
           action,
-          evt.getClass().getName(),
           evt.getEventDate(),
           userId,
           "/content/repositories/" + fileItem.getRepositoryId() + fileItem.getParentPath(), // link to item parent

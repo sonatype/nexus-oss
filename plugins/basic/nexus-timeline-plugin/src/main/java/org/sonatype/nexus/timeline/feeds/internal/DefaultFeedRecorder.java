@@ -103,7 +103,6 @@ public class DefaultFeedRecorder
     data.putAll(evt.getData());
     data.put("_type", evt.getEventType());
     data.put("_subType", evt.getEventSubType());
-    data.put("_class", evt.getEventClass());
     if (evt.getLink() != null) {
       data.put("_link", evt.getLink());
     }
@@ -134,13 +133,11 @@ public class DefaultFeedRecorder
           final Map<String, String> data = Maps.newHashMap(rec.getData());
           data.remove("_type");
           data.remove("_subType");
-          data.remove("_class");
           data.remove("_link");
           data.remove("_author");
           final FeedEvent evt = new FeedEvent(
               rec.getType(),
               rec.getSubType(),
-              rec.getData().get("_class"),
               new Date(rec.getTimestamp()),
               rec.getData().get("_link"), // nullable
               rec.getData().get("_author"), // nullable

@@ -60,7 +60,6 @@ public class TaskSubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_TASK,
         FeedRecorder.TASK_STARTED,
-        evt.getClass().getName(),
         evt.getEventDate(),
         null, // "system" is running it
         "/", // link to UI
@@ -82,7 +81,6 @@ public class TaskSubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_TASK,
         FeedRecorder.TASK_FINISHED,
-        evt.getClass().getName(),
         evt.getEventDate(),
         null, // "system" is running it
         "/", // link to UI
@@ -104,7 +102,6 @@ public class TaskSubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_TASK,
         FeedRecorder.TASK_CANCELED,
-        evt.getClass().getName(),
         evt.getEventDate(),
         null, // "system" is running it
         "/", // link to UI
@@ -126,7 +123,6 @@ public class TaskSubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_TASK,
         FeedRecorder.TASK_FAILED,
-        evt.getClass().getName(),
         evt.getEventDate(),
         null, // "system" is running it
         "/", // link to UI
