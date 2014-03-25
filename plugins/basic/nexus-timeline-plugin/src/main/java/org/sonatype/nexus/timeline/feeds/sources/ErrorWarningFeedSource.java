@@ -143,7 +143,7 @@ public class ErrorWarningFeedSource
           // }
 
           final FeedEvent entry = new FeedEvent(
-              "LOG",
+              "LOG", // ignored
               "ERROR_WARNING", // ignored
               new Date(), // TODO: timestamp from log file?
               null,
@@ -151,12 +151,12 @@ public class ErrorWarningFeedSource
               Maps.<String, String>newHashMap()
           );
           if (logLine.contains(" ERROR ")) {
-            entry.getData().put("_title", "Error");
+            entry.setTitle("Error");
           }
           else if (logLine.contains(" WARN ")) {
-            entry.getData().put("_title", "Warning");
+            entry.setTitle("Warning");
           }
-          entry.getData().put("_content", logLine);
+          entry.setContent(logLine);
 
           entries.add(entry);
           if (entries.size() > entriesToExtract) {

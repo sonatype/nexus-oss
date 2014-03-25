@@ -151,6 +151,6 @@ public class PlaintextRenderer
   // ==
 
   private URL getTemplateFor(final FeedEvent evt) {
-    return getClass().getResource("plaintext-" + evt.getEventType() + "-" + evt.getEventSubType() + ".vm");
+    return getClass().getResource("plaintext-" + evt.getTemplateId() + ".vm");
   }
 }

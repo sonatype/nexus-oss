@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * The default {@link FeedContentRenderer} honors overrides, and if needed, dispatches to some rendered (for now
  * "plaintext" only).
- *
+ * 
  * @since 3.0
  */
 @Singleton
@@ -51,8 +51,9 @@ public class DefaultFeedContentRenderer
   public String getTitle(final FeedEvent evt) {
     // allow override, like when event is not coming from timeline
     // but is parsed from Nexus Log, see ErrorWarningFeedSource
-    if (evt.getData().containsKey("_title")) {
-      return evt.getData().get("_title");
+    final String title = evt.getTitle();
+    if (title != null) {
+      return title;
     }
     return plainTextRenderer.getTitle(evt);
   }
@@ -61,8 +62,9 @@ public class DefaultFeedContentRenderer
   public String getContent(final FeedEvent evt) {
     // allow override, like when event is not coming from timeline
     // but is parsed from Nexus Log, see ErrorWarningFeedSource
-    if (evt.getData().containsKey("_content")) {
-      return evt.getData().get("_content");
+    final String content = evt.getContent();
+    if (content != null) {
+      return content;
     }
     return plainTextRenderer.getContent(evt);
   }

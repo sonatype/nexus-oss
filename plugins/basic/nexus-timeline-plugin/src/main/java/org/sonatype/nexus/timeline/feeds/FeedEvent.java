@@ -36,7 +36,7 @@ public class FeedEvent
    * 2nd level selectivity.
    */
   private final String eventSubType; // groups events to logical sets
-
+  
   /**
    * Date when event happened.
    */
@@ -79,7 +79,7 @@ public class FeedEvent
   public String getEventSubType() {
     return eventSubType;
   }
-
+  
   public Date getPublished() {
     return published;
   }
@@ -94,5 +94,58 @@ public class FeedEvent
 
   public Map<String, String> getData() {
     return data;
+  }
+  
+  // ==
+  
+  /**
+   * Returns the templateID needed to render this entry. Never returns {@code null}.
+   */
+  public String getTemplateId() {
+    if (getData().containsKey("_template")) {
+      return getData().get("_template");
+    } else {
+      return getEventType() + "-" + getEventSubType();
+    }
+  }
+
+  /**
+   * Allows to override the needed template for this entry.
+   */
+  public void setTemplateId(final String templateId) {
+    checkNotNull(templateId);
+    getData().put("_template", templateId);
+  }
+
+  /**
+   * Returns the title override for this entry. If {@code null} is returned,
+   * the default templating mechanism will be used to render title.
+   */
+  public String getTitle() {
+    return getData().get("_title");
+  }
+  
+  /**
+   * Allows to override the needed title for this entry.
+   */
+  public void setTitle(final String title) {
+    checkNotNull(title);
+    getData().put("_title", title);
+  }
+  
+  /**
+   * Returns the content override for this entry. If {@code null} is returned,
+   * the default templating mechanism will be used to render title.
+   */
+  public String getContent() {
+    return getData().get("_content");
+  }
+  
+  /**
+   * Allows to override the needed content for this entry.
+   */
+  public void setContent(final String content) {
+    checkNotNull(content);
+    getData().put("_content", content);
   }
 }
