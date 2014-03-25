@@ -48,10 +48,6 @@ public class PlaintextRenderer
     this.templateEngineProvider = checkNotNull(templateEngineProvider, "velocityEngineProvider");
   }
 
-  public String getContentType(final FeedEvent evt) {
-    return "text/plain";
-  }
-
   public String getTitle(final FeedEvent evt) {
     // OOTB provided recorder titles
     if (FeedRecorder.FAMILY_SYSTEM.equals(evt.getEventType())) {
