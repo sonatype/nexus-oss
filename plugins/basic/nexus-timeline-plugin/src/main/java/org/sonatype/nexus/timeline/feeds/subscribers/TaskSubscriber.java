@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
 import java.lang.reflect.Method;
@@ -34,16 +35,16 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 /**
- * Task subscriber. Intentionally not async, as this hooks into tasks and not into content related events.
+ * Subscriber listening for events recorded under {@link FeedRecorder#FAMILY_TASK} event type.
  */
 @Named
 @Singleton
-public class NexusTaskSubscriber
+public class TaskSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber
 {
   @Inject
-  public NexusTaskSubscriber(final FeedRecorder feedRecorder) {
+  public TaskSubscriber(final FeedRecorder feedRecorder) {
     super(feedRecorder);
   }
 

@@ -25,8 +25,15 @@ import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventCacheCreate;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventCacheUpdate;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreUpdate;
+import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailed;
+import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedChecksum;
+import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedFileType;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.uid.IsMavenArtifactSignatureAttribute;
@@ -39,14 +46,17 @@ import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
+/**
+ * Subscriber listening for events recorded under {@link FeedRecorder#FAMILY_ITEM} event type.
+ */
 @Named
 @Singleton
-public class ItemChangesSubscriber
+public class ItemSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
   @Inject
-  public ItemChangesSubscriber(final FeedRecorder feedRecorder) {
+  public ItemSubscriber(final FeedRecorder feedRecorder) {
     super(feedRecorder);
   }
 
@@ -70,6 +80,45 @@ public class ItemChangesSubscriber
     inspectForNexus(evt);
   }
 
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryItemValidationEventFailed ievt) {
+    if (ievt.getItem() instanceof StorageFileItem) {
+      String action = FeedRecorder.ITEM_BROKEN;
+      if (ievt instanceof RepositoryItemValidationEventFailedChecksum) {
+        action = FeedRecorder.ITEM_BROKEN_WRONG_REMOTE_CHECKSUM;
+      }
+      else if (ievt instanceof RepositoryItemValidationEventFailedFileType) {
+        action = FeedRecorder.ITEM_BROKEN_INVALID_CONTENT;
+      }
+
+      final StorageFileItem fileItem = (StorageFileItem) ievt.getItem();
+      final Map<String, String> data = Maps.newHashMap();
+      putIfNotNull(data, "validation", ievt.getMessage());
+      putIfNotNull(data, "repo.id", fileItem.getRepositoryItemUid().getRepository().getId());
+      putIfNotNull(data, "repo.name", fileItem.getRepositoryItemUid().getRepository().getName());
+      putIfNotNull(data, "item.path", fileItem.getPath());
+      putIfNotNull(data, "item.remoteUrl", fileItem.getRemoteUrl());
+      final String userId = (String) fileItem.getResourceStoreRequest().getRequestContext()
+          .get(AccessManager.REQUEST_USER);
+      putIfNotNull(data, "user.id", userId);
+      putIfNotNull(data, "user.ip",
+          (String) fileItem.getResourceStoreRequest().getRequestContext().get(AccessManager.REQUEST_REMOTE_ADDRESS));
+      putIfNotNull(data, "user.ua",
+          (String) fileItem.getResourceStoreRequest().getRequestContext().get(AccessManager.REQUEST_AGENT));
+      final FeedEvent fe = new FeedEvent(
+          FeedRecorder.FAMILY_ITEM,
+          action,
+          ievt.getClass().getName(),
+          ievt.getEventDate(),
+          userId,
+          "/content/repositories/" + fileItem.getRepositoryId() + fileItem.getParentPath(), // link to item parent
+          data
+      );
+      getFeedRecorder().addEvent(fe);
+    }
+  }
+
   private void inspectForNexus(Event<?> evt) {
     RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
 
@@ -82,11 +131,17 @@ public class ItemChangesSubscriber
         && !((StorageFileItem) ievt.getItem()).isContentGenerated()) {
 
       String action;
-      if (ievt instanceof RepositoryItemEventCache) {
+      if (ievt instanceof RepositoryItemEventCacheCreate) {
         action = FeedRecorder.ITEM_CACHED;
       }
-      else if (ievt instanceof RepositoryItemEventStore) {
+      else if (ievt instanceof RepositoryItemEventCacheUpdate) {
+        action = FeedRecorder.ITEM_CACHED_UPDATE;
+      }
+      else if (ievt instanceof RepositoryItemEventStoreCreate) {
         action = FeedRecorder.ITEM_DEPLOYED;
+      }
+      else if (ievt instanceof RepositoryItemEventStoreUpdate) {
+        action = FeedRecorder.ITEM_DEPLOYED_UPDATE;
       }
       else if (ievt instanceof RepositoryItemEventDelete) {
         action = FeedRecorder.ITEM_DELETED;

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
 import java.util.Map;
@@ -23,6 +24,8 @@ import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
+import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
+import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
@@ -37,9 +40,12 @@ import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Subscriber listening for events recorded under {@link FeedRecorder#FAMILY_REPO} event type.
+ */
 @Named
 @Singleton
-public class RepositoryChangeSubscriber
+public class RepositorySubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
@@ -48,9 +54,9 @@ public class RepositoryChangeSubscriber
   private final RepositoryRegistry repoRegistry;
 
   @Inject
-  public RepositoryChangeSubscriber(final FeedRecorder feedRecorder,
-                                    final ApplicationStatusSource applicationStatusSource,
-                                    final RepositoryRegistry repoRegistry)
+  public RepositorySubscriber(final FeedRecorder feedRecorder,
+                              final ApplicationStatusSource applicationStatusSource,
+                              final RepositoryRegistry repoRegistry)
   {
     super(feedRecorder);
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
@@ -73,6 +79,57 @@ public class RepositoryChangeSubscriber
   @AllowConcurrentEvents
   public void on(final RepositoryConfigurationUpdatedEvent e) {
     inspect(e);
+  }
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryEventLocalStatusChanged revt) {
+    final Map<String, String> data = Maps.newHashMap();
+    putIfNotNull(data, "oldLocalStatus", revt.getOldLocalStatus().name());
+    putIfNotNull(data, "newLocalStatus", revt.getNewLocalStatus().name());
+    putIfNotNull(data, "repo.id", revt.getRepository().getId());
+    putIfNotNull(data, "repo.name", revt.getRepository().getName());
+    // TODO: who changed it?
+    //putIfNotNull(data, "user.id", userId);
+    //putIfNotNull(data, "user.ip", userIp);
+    //putIfNotNull(data, "user.ua", userAgent);
+    final FeedEvent fe = new FeedEvent(
+        FeedRecorder.FAMILY_REPO,
+        FeedRecorder.REPO_LSTATUS,
+        revt.getClass().getName(),
+        revt.getEventDate(),
+        null, // TODO: who changed it?
+        "/", // link to UI
+        data
+    );
+    getFeedRecorder().addEvent(fe);
+  }
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryEventProxyModeChanged revt) {
+    final Map<String, String> data = Maps.newHashMap();
+    putIfNotNull(data, "oldProxyMode", revt.getOldProxyMode().name());
+    putIfNotNull(data, "newProxyMode", revt.getNewProxyMode().name());
+    if (revt.getCause() != null) {
+      putIfNotNull(data, "lastError", String.valueOf(revt.getCause()));
+    }
+    putIfNotNull(data, "repo.id", revt.getRepository().getId());
+    putIfNotNull(data, "repo.name", revt.getRepository().getName());
+    // TODO: who changed it?
+    //putIfNotNull(data, "user.id", userId);
+    //putIfNotNull(data, "user.ip", userIp);
+    //putIfNotNull(data, "user.ua", userAgent);
+    final FeedEvent fe = new FeedEvent(
+        FeedRecorder.FAMILY_REPO,
+        FeedRecorder.REPO_PSTATUS,
+        revt.getClass().getName(),
+        revt.getEventDate(),
+        null, // TODO: who changed it?
+        "/", // link to UI
+        data
+    );
+    getFeedRecorder().addEvent(fe);
   }
 
   private void inspect(Event<?> evt) {

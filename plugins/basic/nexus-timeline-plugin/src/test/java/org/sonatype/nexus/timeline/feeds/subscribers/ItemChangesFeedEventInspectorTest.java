@@ -67,8 +67,8 @@ public class ItemChangesFeedEventInspectorTest
 
   @Test
   public void eventsOnHiddenFilesAreNotRecorded() {
-    final ItemChangesSubscriber underTest =
-        new ItemChangesSubscriber(feedRecorder);
+    final ItemSubscriber underTest =
+        new ItemSubscriber(feedRecorder);
     final RepositoryItemEventStoreCreate evt = new RepositoryItemEventStoreCreate(repository, storageFileItem);
     when(storageFileItem.getPath()).thenReturn("/some/path");
     when(storageFileItem.getRepositoryId()).thenReturn("central");
@@ -81,8 +81,8 @@ public class ItemChangesFeedEventInspectorTest
 
   @Test
   public void eventsOnMavenMetadataSignatureAndHashFilesShouldNotBeRecorded() {
-    final ItemChangesSubscriber underTest =
-        new ItemChangesSubscriber(feedRecorder);
+    final ItemSubscriber underTest =
+        new ItemSubscriber(feedRecorder);
     when(storageFileItem.getPath()).thenReturn("/some/path");
     when(storageFileItem.getRepositoryId()).thenReturn("central");
     when(storageFileItem.getRemoteUrl()).thenReturn("http://repo1.maven.org/maven2");

@@ -10,8 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
+import java.util.HashSet;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -19,6 +21,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.configuration.Configurable;
+import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
@@ -26,25 +30,26 @@ import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Boot listening event inspector. This one is intentionally not async, to mark exact time stamps of Nexus important
- * events: when it booted and when shutdown was commenced.
+ * Subscriber listening for events recorded under {@link FeedRecorder#FAMILY_SYSTEM} event type.
  */
 @Named
 @Singleton
-public class NexusBootSubscriber
+public class SystemSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber
 {
   private final ApplicationStatusSource applicationStatusSource;
 
   @Inject
-  public NexusBootSubscriber(final FeedRecorder feedRecorder,
-                             final ApplicationStatusSource applicationStatusSource)
+  public SystemSubscriber(final FeedRecorder feedRecorder,
+                          final ApplicationStatusSource applicationStatusSource)
   {
     super(feedRecorder);
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
@@ -85,4 +90,31 @@ public class NexusBootSubscriber
     );
     getFeedRecorder().addEvent(fe);
   }
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final ConfigurationChangeEvent event) {
+    if (event.getChanges().isEmpty()) {
+      return;
+    }
+    // keep list unique, one component might be reported multiple times
+    final HashSet<String> changes = Sets.newHashSet();
+    for (Configurable changed : event.getChanges()) {
+      changes.add(changed.getName());
+    }
+    final Map<String, String> data = Maps.newHashMap();
+    putIfNotNull(data, "changes", changes.toString());
+    putIfNotNull(data, "user.id", event.getUserId());
+    final FeedEvent fe = new FeedEvent(
+        FeedRecorder.FAMILY_SYSTEM,
+        FeedRecorder.SYSTEM_CONFIG,
+        event.getClass().getName(),
+        event.getEventDate(),
+        event.getUserId(),
+        "/", // link to UI
+        data
+    );
+    getFeedRecorder().addEvent(fe);
+  }
+
 }

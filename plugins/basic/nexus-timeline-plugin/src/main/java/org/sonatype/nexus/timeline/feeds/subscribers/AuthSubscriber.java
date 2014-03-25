@@ -20,6 +20,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.auth.ClientInfo;
+import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.auth.NexusAuthorizationEvent;
 import org.sonatype.nexus.auth.ResourceInfo;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -35,19 +36,24 @@ import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Subscriber listening for events recorded under {@link FeedRecorder#FAMILY_AUTH} event type.
+ */
 @Named
 @Singleton
-public class NexusAuthorizationSubscriber
+public class AuthSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
   private final NexusConfiguration nexusConfiguration;
 
+  private volatile NexusAuthenticationEvent lastNexusAuthenticationEvent;
+
   private volatile NexusAuthorizationEvent lastNexusAuthorizationEvent;
 
   @Inject
-  public NexusAuthorizationSubscriber(final FeedRecorder feedRecorder,
-                                      final NexusConfiguration nexusConfiguration)
+  public AuthSubscriber(final FeedRecorder feedRecorder,
+                        final NexusConfiguration nexusConfiguration)
   {
     super(feedRecorder);
     this.nexusConfiguration = checkNotNull(nexusConfiguration);
@@ -55,8 +61,37 @@ public class NexusAuthorizationSubscriber
 
   @Subscribe
   @AllowConcurrentEvents
+  public void on(final NexusAuthenticationEvent nae) {
+    if (!isRecordedAuthcEvent(nae)) {
+      // do nothing
+      return;
+    }
+
+    lastNexusAuthenticationEvent = nae;
+
+    final ClientInfo ai = nae.getClientInfo();
+
+    final Map<String, String> data = Maps.newHashMap();
+    putIfNotNull(data, "success", String.valueOf(nae.isSuccessful()));
+    putIfNotNull(data, "user.id", ai.getUserid());
+    putIfNotNull(data, "user.ip", ai.getRemoteIP());
+    putIfNotNull(data, "user.ua", ai.getUserAgent());
+    final FeedEvent fe = new FeedEvent(
+        FeedRecorder.FAMILY_AUTH,
+        FeedRecorder.AUTH_AUTHC,
+        nae.getClass().getName(),
+        nae.getEventDate(),
+        null, // "system"
+        "/", // link to UI
+        data
+    );
+    getFeedRecorder().addEvent(fe);
+  }
+
+  @Subscribe
+  @AllowConcurrentEvents
   public void on(NexusAuthorizationEvent nae) {
-    if (!isRecordedEvent(nae)) {
+    if (!isRecordedAuthzEvent(nae)) {
       // do nothing
       return;
     }
@@ -84,12 +119,35 @@ public class NexusAuthorizationSubscriber
         data
     );
     getFeedRecorder().addEvent(fe);
-
   }
 
   // ==
 
-  protected boolean isRecordedEvent(final NexusAuthorizationEvent nae) {
+  protected boolean isRecordedAuthcEvent(final NexusAuthenticationEvent nae) {
+    // we record everything except anonymous related ones
+    if (StringUtils.equals(nexusConfiguration.getAnonymousUsername(), nae.getClientInfo().getUserid())) {
+      return false;
+    }
+
+    // if here, we record the event if not similar to previous one
+    return !isSimilarAuthcEvent(nae);
+  }
+
+  protected boolean isSimilarAuthcEvent(final NexusAuthenticationEvent nae) {
+    // event is similar (to previously processed one) if there was previously processed at all, the carried
+    // AuthenticationItem equals to the one carried by previously processed one, and the events happened in range
+    // less than 2 seconds
+    if (lastNexusAuthenticationEvent != null
+        && (lastNexusAuthenticationEvent.isSuccessful() == nae.isSuccessful())
+        && lastNexusAuthenticationEvent.getClientInfo().equals(nae.getClientInfo())
+        && (System.currentTimeMillis() - lastNexusAuthenticationEvent.getEventDate().getTime() < 2000L)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  protected boolean isRecordedAuthzEvent(final NexusAuthorizationEvent nae) {
     // we record only authz failures
     if (nae.isSuccessful()) {
       return false;
@@ -100,10 +158,10 @@ public class NexusAuthorizationSubscriber
     }
 
     // if here, we record the event if not similar to previous one
-    return !isSimilarEvent(nae);
+    return !isSimilarAuthzEvent(nae);
   }
 
-  protected boolean isSimilarEvent(final NexusAuthorizationEvent nae) {
+  protected boolean isSimilarAuthzEvent(final NexusAuthorizationEvent nae) {
     // event is similar (to previously processed one) if there was previously processed at all, the carried
     // AuthenticationItem equals to the one carried by previously processed one, and the events happened in range
     // less than 2 seconds

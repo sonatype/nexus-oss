@@ -67,7 +67,11 @@ public interface FeedRecorder
 
   String ITEM_CACHED = "cached";
 
+  String ITEM_CACHED_UPDATE = "cachedU";
+
   String ITEM_DEPLOYED = "deployed";
+
+  String ITEM_DEPLOYED_UPDATE = "deployedU";
 
   String ITEM_DELETED = "deleted";
 
