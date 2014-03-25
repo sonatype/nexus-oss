@@ -1,0 +1,4 @@
+Changed configurations of: $changes
+#if ($user_id)
+ Change made by user $user_id
+#end

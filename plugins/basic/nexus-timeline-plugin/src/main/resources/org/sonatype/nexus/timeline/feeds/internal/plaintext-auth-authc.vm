@@ -1,0 +1,11 @@
+#if($success == "true" )
+User ID $user_id logged in.
+#else
+Login attempt with ID $user_id
+#end
+#if($user_ip)
+ IP=$user_ip
+#end
+#if($user_ua)
+ UA=$user_ua
+#end
