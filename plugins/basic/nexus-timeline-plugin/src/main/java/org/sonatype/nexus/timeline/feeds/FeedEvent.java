@@ -135,7 +135,7 @@ public class FeedEvent
   
   /**
    * Returns the content override for this entry. If {@code null} is returned,
-   * the default templating mechanism will be used to render title.
+   * the default templating mechanism will be used to render content.
    */
   public String getContent() {
     return getData().get("_content");
