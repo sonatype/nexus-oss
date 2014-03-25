@@ -73,9 +73,9 @@ public class AuthSubscriber
 
     final Map<String, String> data = Maps.newHashMap();
     putIfNotNull(data, "success", String.valueOf(nae.isSuccessful()));
-    putIfNotNull(data, "user.id", ai.getUserid());
-    putIfNotNull(data, "user.ip", ai.getRemoteIP());
-    putIfNotNull(data, "user.ua", ai.getUserAgent());
+    putIfNotNull(data, "userId", ai.getUserid());
+    putIfNotNull(data, "userIp", ai.getRemoteIP());
+    putIfNotNull(data, "userUa", ai.getUserAgent());
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_AUTH,
         FeedRecorder.AUTH_AUTHC,
@@ -101,13 +101,13 @@ public class AuthSubscriber
 
     final Map<String, String> data = Maps.newHashMap();
     putIfNotNull(data, "success", String.valueOf(nae.isSuccessful()));
-    putIfNotNull(data, "user.id", ai.getUserid());
-    putIfNotNull(data, "user.ip", ai.getRemoteIP());
-    putIfNotNull(data, "user.ua", ai.getUserAgent());
-    putIfNotNull(data, "res.proto", ri.getAccessProtocol());
-    putIfNotNull(data, "res.method", ri.getAccessMethod());
-    putIfNotNull(data, "res.action", ri.getAction().name());
-    putIfNotNull(data, "res.uri", ri.getAccessedUri());
+    putIfNotNull(data, "userId", ai.getUserid());
+    putIfNotNull(data, "userIp", ai.getRemoteIP());
+    putIfNotNull(data, "userUa", ai.getUserAgent());
+    putIfNotNull(data, "resProto", ri.getAccessProtocol());
+    putIfNotNull(data, "resMethod", ri.getAccessMethod());
+    putIfNotNull(data, "resAction", ri.getAction().name());
+    putIfNotNull(data, "resUri", ri.getAccessedUri());
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_AUTH,
         FeedRecorder.AUTH_AUTHZ,

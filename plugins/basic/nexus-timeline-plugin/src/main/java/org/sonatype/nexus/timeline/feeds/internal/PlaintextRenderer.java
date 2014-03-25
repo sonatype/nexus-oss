@@ -52,7 +52,7 @@ public class PlaintextRenderer
     // OOTB provided recorder titles
     if (FeedRecorder.FAMILY_SYSTEM.equals(evt.getEventType())) {
       if (FeedRecorder.SYSTEM_BOOT.equals(evt.getEventSubType())) {
-        return "Nexus " + evt.getData().get("boot.action");
+        return "Nexus " + evt.getData().get("bootAction");
       }
       else if (FeedRecorder.SYSTEM_CONFIG.equals(evt.getEventSubType())) {
         return "Configuration change";
@@ -118,16 +118,16 @@ public class PlaintextRenderer
 
     if (FeedRecorder.FAMILY_TASK.equals(evt.getEventType())) {
       if (FeedRecorder.TASK_STARTED.equals(evt.getEventSubType())) {
-        return "Started: " + evt.getData().get("task.name");
+        return "Started: " + evt.getData().get("taskName");
       }
       else if (FeedRecorder.TASK_FINISHED.equals(evt.getEventSubType())) {
-        return "Finished: " + evt.getData().get("task.name");
+        return "Finished: " + evt.getData().get("taskName");
       }
       else if (FeedRecorder.TASK_CANCELED.equals(evt.getEventSubType())) {
-        return "Canceled: " + evt.getData().get("task.name");
+        return "Canceled: " + evt.getData().get("taskName");
       }
       else if (FeedRecorder.TASK_FAILED.equals(evt.getEventSubType())) {
-        return "Failed: " + evt.getData().get("task.name");
+        return "Failed: " + evt.getData().get("taskName");
       }
     }
 
@@ -140,8 +140,7 @@ public class PlaintextRenderer
     if (templateURL != null) {
       final TemplateParameters templateParameters = new TemplateParameters();
       for (Map.Entry<String, String> d : evt.getData().entrySet()) {
-        final String key = d.getKey().replace('.', '_'); // TODO: or handle this at subscribers?
-        templateParameters.set(key, d.getValue());
+        templateParameters.set(d.getKey(), d.getValue());
       }
       return templateEngineProvider.get().render(this, templateURL, templateParameters);
     }

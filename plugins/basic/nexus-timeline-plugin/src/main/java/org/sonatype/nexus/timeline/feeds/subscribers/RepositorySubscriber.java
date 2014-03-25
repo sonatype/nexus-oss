@@ -87,8 +87,8 @@ public class RepositorySubscriber
     final Map<String, String> data = Maps.newHashMap();
     putIfNotNull(data, "oldLocalStatus", revt.getOldLocalStatus().name());
     putIfNotNull(data, "newLocalStatus", revt.getNewLocalStatus().name());
-    putIfNotNull(data, "repo.id", revt.getRepository().getId());
-    putIfNotNull(data, "repo.name", revt.getRepository().getName());
+    putIfNotNull(data, "repoId", revt.getRepository().getId());
+    putIfNotNull(data, "repoName", revt.getRepository().getName());
     // TODO: who changed it?
     //putIfNotNull(data, "user.id", userId);
     //putIfNotNull(data, "user.ip", userIp);
@@ -113,8 +113,8 @@ public class RepositorySubscriber
     if (revt.getCause() != null) {
       putIfNotNull(data, "lastError", String.valueOf(revt.getCause()));
     }
-    putIfNotNull(data, "repo.id", revt.getRepository().getId());
-    putIfNotNull(data, "repo.name", revt.getRepository().getName());
+    putIfNotNull(data, "repoId", revt.getRepository().getId());
+    putIfNotNull(data, "repoName", revt.getRepository().getName());
     // TODO: who changed it?
     //putIfNotNull(data, "user.id", userId);
     //putIfNotNull(data, "user.ip", userIp);
@@ -160,8 +160,8 @@ public class RepositorySubscriber
       putIfNotNull(data, "localStatusChanged", String.valueOf(configured.isLocalStatusChanged()));
     }
 
-    putIfNotNull(data, "repo.id", repository.getId());
-    putIfNotNull(data, "repo.name", repository.getName());
+    putIfNotNull(data, "repoId", repository.getId());
+    putIfNotNull(data, "repoName", repository.getName());
     // TODO: who changed it?
     //putIfNotNull(data, "user.id", userId);
     //putIfNotNull(data, "user.ip", userIp);

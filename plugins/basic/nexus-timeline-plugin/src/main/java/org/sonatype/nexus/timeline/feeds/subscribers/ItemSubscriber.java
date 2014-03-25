@@ -95,16 +95,16 @@ public class ItemSubscriber
       final StorageFileItem fileItem = (StorageFileItem) ievt.getItem();
       final Map<String, String> data = Maps.newHashMap();
       putIfNotNull(data, "validation", ievt.getMessage());
-      putIfNotNull(data, "repo.id", fileItem.getRepositoryItemUid().getRepository().getId());
-      putIfNotNull(data, "repo.name", fileItem.getRepositoryItemUid().getRepository().getName());
-      putIfNotNull(data, "item.path", fileItem.getPath());
-      putIfNotNull(data, "item.remoteUrl", fileItem.getRemoteUrl());
+      putIfNotNull(data, "repoId", fileItem.getRepositoryItemUid().getRepository().getId());
+      putIfNotNull(data, "repoName", fileItem.getRepositoryItemUid().getRepository().getName());
+      putIfNotNull(data, "itemPath", fileItem.getPath());
+      putIfNotNull(data, "itemRemoteUrl", fileItem.getRemoteUrl());
       final String userId = (String) fileItem.getResourceStoreRequest().getRequestContext()
           .get(AccessManager.REQUEST_USER);
-      putIfNotNull(data, "user.id", userId);
-      putIfNotNull(data, "user.ip",
+      putIfNotNull(data, "userId", userId);
+      putIfNotNull(data, "userIp",
           (String) fileItem.getResourceStoreRequest().getRequestContext().get(AccessManager.REQUEST_REMOTE_ADDRESS));
-      putIfNotNull(data, "user.ua",
+      putIfNotNull(data, "userUa",
           (String) fileItem.getResourceStoreRequest().getRequestContext().get(AccessManager.REQUEST_AGENT));
       final FeedEvent fe = new FeedEvent(
           FeedRecorder.FAMILY_ITEM,
@@ -151,16 +151,16 @@ public class ItemSubscriber
 
       final StorageFileItem fileItem = (StorageFileItem) ievt.getItem();
       final Map<String, String> data = Maps.newHashMap();
-      putIfNotNull(data, "repo.id", fileItem.getRepositoryItemUid().getRepository().getId());
-      putIfNotNull(data, "repo.name", fileItem.getRepositoryItemUid().getRepository().getName());
-      putIfNotNull(data, "item.path", fileItem.getPath());
-      putIfNotNull(data, "item.remoteUrl", fileItem.getRemoteUrl());
+      putIfNotNull(data, "repoId", fileItem.getRepositoryItemUid().getRepository().getId());
+      putIfNotNull(data, "repoName", fileItem.getRepositoryItemUid().getRepository().getName());
+      putIfNotNull(data, "itemPath", fileItem.getPath());
+      putIfNotNull(data, "itemRemoteUrl", fileItem.getRemoteUrl());
       final String userId = (String) fileItem.getResourceStoreRequest().getRequestContext()
           .get(AccessManager.REQUEST_USER);
-      putIfNotNull(data, "user.id", userId);
-      putIfNotNull(data, "user.ip",
+      putIfNotNull(data, "userId", userId);
+      putIfNotNull(data, "userIp",
           (String) fileItem.getResourceStoreRequest().getRequestContext().get(AccessManager.REQUEST_REMOTE_ADDRESS));
-      putIfNotNull(data, "user.ua",
+      putIfNotNull(data, "userUa",
           (String) fileItem.getResourceStoreRequest().getRequestContext().get(AccessManager.REQUEST_AGENT));
       final FeedEvent fe = new FeedEvent(
           FeedRecorder.FAMILY_ITEM,

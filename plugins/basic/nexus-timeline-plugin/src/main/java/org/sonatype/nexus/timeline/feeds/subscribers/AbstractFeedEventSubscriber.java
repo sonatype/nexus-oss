@@ -38,6 +38,8 @@ public abstract class AbstractFeedEventSubscriber
     checkNotNull(key);
     if (value != null && !value.trim().isEmpty()) {
       map.put(key, value);
+    } else {
+      map.put(key, "n/a");
     }
   }
 }

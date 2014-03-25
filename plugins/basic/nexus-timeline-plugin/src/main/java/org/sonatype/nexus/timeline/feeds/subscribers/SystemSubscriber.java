@@ -58,9 +58,9 @@ public class SystemSubscriber
   @Subscribe
   public void on(final NexusStartedEvent e) {
     final Map<String, String> data = Maps.newHashMap();
-    putIfNotNull(data, "boot.action", "Started");
-    putIfNotNull(data, "nx.version", applicationStatusSource.getSystemStatus().getVersion());
-    putIfNotNull(data, "nx.edition", applicationStatusSource.getSystemStatus().getEditionShort());
+    putIfNotNull(data, "bootAction", "Started");
+    putIfNotNull(data, "nxVersion", applicationStatusSource.getSystemStatus().getVersion());
+    putIfNotNull(data, "nxEdition", applicationStatusSource.getSystemStatus().getEditionShort());
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_SYSTEM,
         FeedRecorder.SYSTEM_BOOT,
@@ -75,9 +75,9 @@ public class SystemSubscriber
   @Subscribe
   public void on(final NexusStoppedEvent e) {
     final Map<String, String> data = Maps.newHashMap();
-    putIfNotNull(data, "boot.action", "Stopped");
-    putIfNotNull(data, "nx.version", applicationStatusSource.getSystemStatus().getVersion());
-    putIfNotNull(data, "nx.edition", applicationStatusSource.getSystemStatus().getEditionShort());
+    putIfNotNull(data, "bootAction", "Stopped");
+    putIfNotNull(data, "nxVersion", applicationStatusSource.getSystemStatus().getVersion());
+    putIfNotNull(data, "nxEdition", applicationStatusSource.getSystemStatus().getEditionShort());
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_SYSTEM,
         FeedRecorder.SYSTEM_BOOT,
@@ -102,7 +102,7 @@ public class SystemSubscriber
     }
     final Map<String, String> data = Maps.newHashMap();
     putIfNotNull(data, "changes", changes.toString());
-    putIfNotNull(data, "user.id", event.getUserId());
+    putIfNotNull(data, "userId", event.getUserId());
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_SYSTEM,
         FeedRecorder.SYSTEM_CONFIG,

@@ -1,17 +1,6 @@
 #if($success == "true" )
-Successful authorization of ID $user_id on resource
+Successful authorization of $userId on resource
 #else
-Failed authorization for ID $user_id on resource
+Failed authorization for $userId on resource
 #end
-#if($res_proto)
- $res_proto
-#end
-#if($res_method)
- $res_method
-#end
-#if($res_uri)
- $res_uri
-#end
-#if($res_action)
- action=$res_action
-#end
+$res_proto $res_method $res_uri $res_action
