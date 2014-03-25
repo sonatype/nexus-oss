@@ -51,7 +51,7 @@ public class RecentCachedArtifactFeedSource
                             final Map<String, String> params)
   {
     entries.addAll(getFeedRecorder()
-        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_ITEM), ImmutableSet.of(FeedRecorder.ITEM_CACHED), from, count,
+        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_ITEM), ImmutableSet.of(FeedRecorder.ITEM_CACHED, FeedRecorder.ITEM_CACHED_UPDATE), from, count,
             and(isMavenArtifact(repositoryRegistry), filters(params))
         ));
   }

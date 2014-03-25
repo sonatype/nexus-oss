@@ -54,7 +54,7 @@ public class RecentDeployedReleaseArtifactFeedSource
                             final Map<String, String> params)
   {
     entries.addAll(getFeedRecorder()
-        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_ITEM), ImmutableSet.of(FeedRecorder.ITEM_DEPLOYED), from, count,
+        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_ITEM), ImmutableSet.of(FeedRecorder.ITEM_DEPLOYED, FeedRecorder.ITEM_DEPLOYED_UPDATE), from, count,
             and(isMavenArtifact(repositoryRegistry),
                 isMavenRepositoryWithPolicy(repositoryRegistry, RepositoryPolicy.RELEASE),
                 filters(params))

@@ -45,7 +45,7 @@ public class RecentCachedOrDeployedFileFeedSource
   {
     entries.addAll(getFeedRecorder()
         .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_ITEM),
-            ImmutableSet.of(FeedRecorder.ITEM_CACHED, FeedRecorder.ITEM_DEPLOYED), from, count,
+            ImmutableSet.of(FeedRecorder.ITEM_CACHED, FeedRecorder.ITEM_DEPLOYED, FeedRecorder.ITEM_CACHED_UPDATE, FeedRecorder.ITEM_DEPLOYED_UPDATE), from, count,
             filters(params)
         ));
   }
