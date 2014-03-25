@@ -1,0 +1,4 @@
+Proxy mode of repository $repoId ($repoName) changed from $oldProxyMode to $newProxyMode.
+#if($lastError)
+Last reported error was: $lastError
+#end
