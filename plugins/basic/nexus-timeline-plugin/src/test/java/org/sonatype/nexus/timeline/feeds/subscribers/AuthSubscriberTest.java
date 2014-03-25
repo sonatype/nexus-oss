@@ -27,12 +27,12 @@ import static org.hamcrest.MatcherAssert.*;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link NexusAuthenticationSubscriber}.
+ * Tests for {@link AuthSubscriber}.
  */
-public class NexusAuthenticationSubscriberTest
+public class AuthSubscriberTest
     extends TestSupport
 {
-  private NexusAuthenticationSubscriber underTest;
+  private AuthSubscriber underTest;
 
   private DummyFeedRecorder feedRecorder = new DummyFeedRecorder();
 
@@ -41,7 +41,7 @@ public class NexusAuthenticationSubscriberTest
 
   @Before
   public void setUp() throws Exception {
-    underTest = new NexusAuthenticationSubscriber(feedRecorder, nexusConfiguration);
+    underTest = new AuthSubscriber(feedRecorder, nexusConfiguration);
     when(nexusConfiguration.getAnonymousUsername()).thenReturn("anonymous");
   }
 
