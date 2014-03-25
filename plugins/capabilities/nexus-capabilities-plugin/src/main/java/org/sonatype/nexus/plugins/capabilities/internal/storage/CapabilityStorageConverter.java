@@ -101,6 +101,12 @@ public class CapabilityStorageConverter
       if (capabilities != null) {
         for (final CCapability c : capabilities) {
 
+          // NEXUS-6349: do not convert outreach related capabilities and let outreach plugin recreate them
+          if ("OutreachMarkerCapability".equals(c.getTypeId()) ||
+              "OutreachManagementCapability".equals(c.getTypeId())) {
+            continue;
+          }
+
           Map<String, String> properties = Maps.newHashMap();
           if (c.getProperties() != null) {
             for (final CCapabilityProperty property : c.getProperties()) {
