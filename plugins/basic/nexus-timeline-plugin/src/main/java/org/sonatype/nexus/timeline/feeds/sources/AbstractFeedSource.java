@@ -115,8 +115,8 @@ public abstract class AbstractFeedSource
     {
       @Override
       public boolean apply(final Entry input) {
-        final String repoId = input.getData().get("repo.id");
-        final String itemPath = input.getData().get("item.path");
+        final String repoId = input.getData().get("repoId");
+        final String itemPath = input.getData().get("itemPath");
         if (repoId != null && itemPath != null) {
           try {
             final MavenRepository repository = repositoryRegistry
@@ -126,12 +126,12 @@ public abstract class AbstractFeedSource
               if (gav != null && !gav.isSignature() && !gav.isHash()) {
                 // Hack: we mutate the entry, but putting in gav for reuse
                 if (!Strings.isNullOrEmpty(gav.getClassifier())) {
-                  input.getData().put("item.gav", String
+                  input.getData().put("itemGav", String
                       .format("%s:%s:%s:%s:%s", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
                           gav.getExtension(), gav.getClassifier()));
                 }
                 else {
-                  input.getData().put("item.gav", String
+                  input.getData().put("itemGav", String
                       .format("%s:%s:%s:%s", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
                           gav.getExtension()));
                 }
@@ -161,9 +161,8 @@ public abstract class AbstractFeedSource
     {
       @Override
       public boolean apply(final Entry input) {
-        final String repoId = input.getData().get("repo.id");
-        final String itemPath = input.getData().get("item.path");
-        if (repoId != null && itemPath != null) {
+        final String repoId = input.getData().get("repoId");
+        if (repoId != null) {
           try {
             final MavenRepository repository = repositoryRegistry
                 .getRepositoryWithFacet(repoId, MavenRepository.class);
