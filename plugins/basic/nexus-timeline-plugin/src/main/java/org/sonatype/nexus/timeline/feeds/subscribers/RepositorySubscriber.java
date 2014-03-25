@@ -29,7 +29,6 @@ import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
@@ -51,16 +50,12 @@ public class RepositorySubscriber
 {
   private final ApplicationStatusSource applicationStatusSource;
 
-  private final RepositoryRegistry repoRegistry;
-
   @Inject
   public RepositorySubscriber(final FeedRecorder feedRecorder,
-                              final ApplicationStatusSource applicationStatusSource,
-                              final RepositoryRegistry repoRegistry)
+                              final ApplicationStatusSource applicationStatusSource)
   {
     super(feedRecorder);
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
-    this.repoRegistry = checkNotNull(repoRegistry);
   }
 
   @Subscribe
