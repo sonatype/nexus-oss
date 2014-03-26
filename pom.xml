@@ -2,7 +2,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-2013 Sonatype, Inc.
+    Copyright (c) 2007-2014 Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.buildsupport</groupId>
     <artifactId>public-parent</artifactId>
-    <version>5</version>
+    <version>6</version>
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
@@ -102,7 +102,7 @@
     <!--
     Configuration of 'nexus-plugin' packaging and bundles.
     -->
-    <nexus-plugin-bundle.version>1.2-SNAPSHOT</nexus-plugin-bundle.version>
+    <nexus-plugin-bundle.version>1.2</nexus-plugin-bundle.version>
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
 
     <!-- logging configuration used in logback config files to control test logging -->
@@ -439,7 +439,7 @@
         </plugin>
 
         <!--
-        For legacy-plugins which still need Plexus descriptors.
+        For maven-plugins which still need Plexus descriptors.
         -->
         <plugin>
           <groupId>org.codehaus.plexus</groupId>

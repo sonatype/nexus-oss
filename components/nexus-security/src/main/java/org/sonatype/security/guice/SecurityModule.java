@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.security.guice;
 
 import java.lang.reflect.Constructor;
@@ -31,7 +30,7 @@ import org.apache.shiro.guice.ShiroModule;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.nexus5727.FixedDefaultSessionManager;
+import org.apache.shiro.nexus.NexusDefaultSessionManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
@@ -70,10 +69,10 @@ public class SecurityModule
 
   @Override
   protected void bindSessionManager(AnnotatedBindingBuilder<SessionManager> bind) {
-    // workaround for NEXUS-5727, see FixedDefaultSessionManager javadoc for clues
-    bind.to(FixedDefaultSessionManager.class).asEagerSingleton();
-    // this is a PrivateModule, so explicitly binding the FixedDefaultSessionManager class
-    bind(FixedDefaultSessionManager.class);
+    // workaround for NEXUS-5727, see NexusDefaultSessionManager javadoc for clues
+    bind.to(NexusDefaultSessionManager.class).asEagerSingleton();
+    // this is a PrivateModule, so explicitly binding the NexusDefaultSessionManager class
+    bind(NexusDefaultSessionManager.class);
   }
 
   /**

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.security.guice;
 
 import java.util.HashMap;
@@ -29,7 +28,7 @@ import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.nexus5727.FixedDefaultSessionManager;
+import org.apache.shiro.nexus.NexusDefaultSessionManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.eclipse.sisu.space.BeanScanning;
 import org.eclipse.sisu.space.SpaceModule;
@@ -74,9 +73,9 @@ public class SecurityModuleTest
     assertThat(securityManager, instanceOf(DefaultSecurityManager.class));
     DefaultSecurityManager defaultSecurityManager = (DefaultSecurityManager) securityManager;
 
-    assertThat(defaultSecurityManager.getSessionManager(), instanceOf(FixedDefaultSessionManager.class));
-    FixedDefaultSessionManager sessionManager =
-        (FixedDefaultSessionManager) defaultSecurityManager.getSessionManager();
+    assertThat(defaultSecurityManager.getSessionManager(), instanceOf(NexusDefaultSessionManager.class));
+    NexusDefaultSessionManager sessionManager =
+        (NexusDefaultSessionManager) defaultSecurityManager.getSessionManager();
     assertThat(sessionManager.getSessionDAO(), instanceOf(EnterpriseCacheSessionDAO.class));
     assertThat(
         ((EhCacheManager) ((EnterpriseCacheSessionDAO) sessionManager.getSessionDAO()).getCacheManager())

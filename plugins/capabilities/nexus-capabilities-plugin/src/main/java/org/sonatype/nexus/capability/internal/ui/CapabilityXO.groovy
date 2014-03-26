@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -11,24 +11,42 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plexusplugin.rest.ui;
+package org.sonatype.nexus.capability.internal.ui
 
-import org.sonatype.nexus.plugins.ui.contribution.UiContributionBuilder;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
+import groovy.transform.ToString
+import org.apache.bval.constraints.NotEmpty
+import org.sonatype.nexus.validation.Update
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.validation.constraints.NotNull
 
-@Component(role = UiContributor.class, hint = "PlexusPluginUiContributor")
-public class PlexusPluginUiContributor
-    implements UiContributor
+/**
+ * Capability status exchange object.
+ *
+ * @since 3.0
+ */
+@ToString(includePackage = false, includeNames = true)
+class CapabilityXO
 {
+  @NotNull(groups = Update.class)
+  @NotEmpty(groups = Update.class)
+  String id
 
-  public static final String ARTIFACT_ID = "nexus-plexusplugin-plugin";
+  @NotNull
+  @NotEmpty
+  String typeId
 
-  public static final String GROUP_ID = "org.sonatype.nexus.plugins";
+  @NotNull
+  Boolean enabled
 
-  @Override
-  public UiContribution contribute(final boolean debug) {
-    return new UiContributionBuilder(this, GROUP_ID, ARTIFACT_ID).build(debug);
-  }
+  String notes
+
+  Map<String, String> properties
+
+  Boolean active
+  Boolean error
+  String description
+  String stateDescription
+  String status
+  String typeName
+  Map<String, String> tags
 }

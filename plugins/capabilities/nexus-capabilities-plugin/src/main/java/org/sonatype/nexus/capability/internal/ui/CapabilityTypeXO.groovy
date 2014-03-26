@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,31 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
+package org.sonatype.nexus.capability.internal.ui
+
+import groovy.transform.ToString
+
 /**
- * Capability status store.
+ * Capability Type exchange object.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.store.CapabilityStatus', {
-  extend: 'Ext.data.Store',
-  model: 'NX.coreui.model.CapabilityStatus',
-
-  proxy: {
-    type: 'direct',
-    paramsAsHash: false,
-    api: {
-      read: 'NX.direct.capability_Capability.readStatus',
-    },
-
-    reader: {
-      type: 'json',
-      root: 'data',
-      idProperty: 'id',
-      successProperty: 'success'
-    }
-  },
-
-  sortOnLoad: true,
-  sorters: { property: 'typeName', direction: 'ASC' }
-
-});
+@ToString(includePackage = false, includeNames = true)
+class CapabilityTypeXO
+{
+  String id
+  String name
+  String about
+  List<FormFieldXO> formFields
+}

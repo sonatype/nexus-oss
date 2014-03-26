@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.plugins.capabilities.internal.storage;
 
 import java.io.IOException;
@@ -26,14 +25,15 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
-import io.kazuki.v0.internal.v2schema.Attribute;
-import io.kazuki.v0.internal.v2schema.Attribute.Type;
-import io.kazuki.v0.internal.v2schema.Schema;
+import io.kazuki.v0.store.schema.model.Attribute;
+import io.kazuki.v0.store.schema.model.Attribute.Type;
+import io.kazuki.v0.store.schema.model.Schema;
 import io.kazuki.v0.store.KazukiException;
 import io.kazuki.v0.store.Key;
 import io.kazuki.v0.store.keyvalue.KeyValueIterable;
 import io.kazuki.v0.store.keyvalue.KeyValuePair;
 import io.kazuki.v0.store.keyvalue.KeyValueStore;
+import io.kazuki.v0.store.keyvalue.KeyValueStoreIteration.SortDirection;
 import io.kazuki.v0.store.lifecycle.Lifecycle;
 import io.kazuki.v0.store.schema.SchemaStore;
 import io.kazuki.v0.store.schema.TypeValidation;
@@ -128,7 +128,7 @@ public class DefaultCapabilityStorage
     Map<CapabilityIdentity, CapabilityStorageItem> items = Maps.newHashMap();
 
     try (KeyValueIterable<KeyValuePair<CapabilityStorageItem>> entries = keyValueStore.iterators().entries(
-        CAPABILITY_SCHEMA, CapabilityStorageItem.class
+        CAPABILITY_SCHEMA, CapabilityStorageItem.class, SortDirection.ASCENDING
     )) {
       for (KeyValuePair<CapabilityStorageItem> entry : entries) {
         items.put(asCapabilityIdentity(entry.getKey()), entry.getValue());

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -11,25 +11,27 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.plexusplugin.rest.docs;
+package org.sonatype.nexus.capability.internal.ui
 
-import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
-import org.sonatype.nexus.web.WebResourceBundle;
+import groovy.transform.ToString
 
-import org.codehaus.plexus.component.annotations.Component;
-
-@Component(role = WebResourceBundle.class, hint = "PlexusPluginResourceBundle")
-public class PlexusPluginResourceBundle
-    extends AbstractDocumentationResourceBundle
+/**
+ * Form field exchange object.
+ *
+ * @since 3.0
+ */
+@ToString(includePackage = false, includeNames = true)
+class FormFieldXO
 {
-
-  @Override
-  public String getPluginId() {
-    return "nexus-plexusplugin-plugin";
-  }
-
-  @Override
-  public String getDescription() {
-    return "PlexusPlugin Plugin API";
-  }
+  String id
+  String type
+  String label
+  String helpText
+  Boolean required
+  String regexValidation
+  String initialValue
+  String storePath
+  String storeRoot
+  String idMapping
+  String nameMapping
 }
