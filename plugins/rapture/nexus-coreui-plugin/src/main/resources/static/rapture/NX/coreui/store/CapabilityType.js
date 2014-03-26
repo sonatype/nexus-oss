@@ -23,7 +23,7 @@ Ext.define('NX.coreui.store.CapabilityType', {
     type: 'direct',
     paramsAsHash: false,
     api: {
-      read: 'NX.direct.capability_CapabilityType.read'
+      read: 'NX.direct.capability_Capability.readTypes'
     },
 
     reader: {
