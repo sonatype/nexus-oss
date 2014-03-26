@@ -119,6 +119,7 @@
             <Embed-Transitive>true</Embed-Transitive>
             <_exportcontents>
               !lib.*,
+              !com.google.inject.internal.*,
               javax.servlet;provider=nexus;mandatory:=provider,
               javax.servlet.http;provider=nexus;mandatory:=provider,
               com.*|eu.*|javax.*|net.*|org.*;-noimport:=true
