@@ -19,7 +19,7 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-coreui-capability-list',
 
-  store: 'CapabilityStatus',
+  store: 'Capability',
 
   columns: [
     {
