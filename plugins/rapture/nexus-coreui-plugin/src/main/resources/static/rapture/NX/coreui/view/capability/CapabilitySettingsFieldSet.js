@@ -110,19 +110,17 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
         values = form.getFieldValues(),
         value,
         capability = {
+          id: values.id,
           typeId: me.capabilityType.get('id'),
           enabled: values.enabled,
-          properties: []
+          properties: {}
         };
 
     if (me.capabilityType && me.capabilityType.get('formFields')) {
       Ext.each(me.capabilityType.get('formFields'), function (formField) {
         value = values['property.' + formField.id];
         if (Ext.isDefined(value)) {
-          capability.properties[capability.properties.length] = {
-            key: formField.id,
-            value: String(value)
-          };
+          capability.properties[formField.id] = String(value);
         }
       });
     }
@@ -149,8 +147,8 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
     }
 
     if (capabilityModel.data.properties) {
-      Ext.each(capabilityModel.data.properties, function (property) {
-        data['property.' + property.key] = property.value;
+      Ext.Object.each(capabilityModel.data.properties, function (key, value) {
+        data['property.' + key] = value;
       });
     }
 

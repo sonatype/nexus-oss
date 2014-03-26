@@ -19,9 +19,17 @@ Ext.define('NX.coreui.model.Capability', {
   extend: 'Ext.data.Model',
   fields: [
     'id',
+    'typeId',
     'enabled',
-    'description',
     'notes',
-    'properties'
+    'properties',
+
+    'active',
+    'error',
+    'description',
+    'stateDescription',
+    'status',
+    'typeName',
+    'tags'
   ]
 });

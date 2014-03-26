@@ -10,31 +10,43 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
+package org.sonatype.nexus.capability.internal.ui
+
+import groovy.transform.ToString
+import org.apache.bval.constraints.NotEmpty
+import org.sonatype.nexus.validation.Update
+
+import javax.validation.constraints.NotNull
+
 /**
- * Capability store.
+ * Capability status exchange object.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.store.Capability', {
-  extend: 'Ext.data.Store',
-  model: 'NX.coreui.model.Capability',
+@ToString(includePackage = false, includeNames = true)
+class CapabilityXO
+{
+  @NotNull(groups = Update.class)
+  @NotEmpty(groups = Update.class)
+  String id
 
-  proxy: {
-    type: 'direct',
-    paramsAsHash: false,
-    api: {
-      read: 'NX.direct.capability_Capability.read'
-    },
+  @NotNull
+  @NotEmpty
+  String typeId
 
-    reader: {
-      type: 'json',
-      root: 'data',
-      idProperty: 'id',
-      successProperty: 'success'
-    }
-  },
+  @NotNull
+  Boolean enabled
 
-  sortOnLoad: true,
-  sorters: { property: 'typeName', direction: 'ASC' }
+  String notes
 
-});
+  Map<String, String> properties
+
+  Boolean active
+  Boolean error
+  String description
+  String stateDescription
+  String status
+  String typeName
+  Map<String, String> tags
+}

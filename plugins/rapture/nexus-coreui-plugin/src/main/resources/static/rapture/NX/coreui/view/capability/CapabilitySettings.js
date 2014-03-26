@@ -19,16 +19,20 @@ Ext.define('NX.coreui.view.capability.CapabilitySettings', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-capability-settings',
 
-  items: {
-    xtype: 'nx-coreui-capability-settingsfieldset'
-  },
+  items: [
+    {
+      xtype: 'hiddenfield',
+      name: 'id'
+    },
+    { xtype: 'nx-coreui-capability-settingsfieldset' }
+  ],
 
   getValues: function () {
-    return this.down('nx-coreui-capability-settingsfieldset').exportCapability(this.getForm())
+    return this.down('nx-coreui-capability-settingsfieldset').exportCapability(this.getForm());
   },
 
   markInvalid: function (errors) {
-    return this.down('nx-coreui-capability-settingsfieldset').markInvalid(this.getForm(), errors)
+    return this.down('nx-coreui-capability-settingsfieldset').markInvalid(this.getForm(), errors);
   }
 
 });
