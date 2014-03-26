@@ -64,13 +64,6 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-extdirect-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-crypto-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
@@ -86,6 +79,13 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-groovy-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-extdirect-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
