@@ -35,7 +35,7 @@ public class SupportBundle
     /**
      * Support bundle content source inclusion type.
      */
-    public static enum Type
+    enum Type
     {
       SYSINFO,
       THREAD,
@@ -59,7 +59,7 @@ public class SupportBundle
     /**
      * Support bundle content source inclusion priority.
      */
-    public static enum Priority
+    enum Priority
     {
       OPTIONAL(999),
       LOW(100),
