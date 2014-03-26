@@ -91,6 +91,7 @@
       <unpack>false</unpack>
       <includes>
         <include>*:jetty-osgi-boot</include>
+        <include>*:nexus-oss-edition</include>
         <include>*:nexus-plugin-api</include>
         <include>*:bcprov*</include>
       </includes>

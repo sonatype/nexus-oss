@@ -78,6 +78,7 @@
       <scope>provided</scope>
       <unpack>false</unpack>
       <includes>
+        <include>*:nexus-oss-edition</include>
         <include>*:nexus-plugin-api</include>
         <include>*:bcprov*</include>
       </includes>

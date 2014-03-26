@@ -31,11 +31,13 @@ import org.sonatype.nexus.bootstrap.ConfigurationHolder;
 import org.sonatype.nexus.bootstrap.EnvironmentVariables;
 import org.sonatype.nexus.bootstrap.LockFile;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.startlevel.FrameworkStartLevel;
+import org.osgi.framework.wiring.BundleRevision;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,23 +132,27 @@ public class WebappBootstrap
       FrameworkStartLevel startLevel = framework.adapt(FrameworkStartLevel.class);
       startLevel.setStartLevel(1);
 
-      startLevel.setInitialBundleStartLevel(8);
+      startLevel.setInitialBundleStartLevel(80);
 
-      File[] bundles = new File(properties.get("nexus-app") + "/bundles").listFiles();
+      File[] bundleFiles = new File(properties.get("nexus-app") + "/bundles").listFiles();
 
       // auto-install anything in the bundles repository
-      if (bundles != null && bundles.length > 0) {
-        for (File bundle : bundles) {
+      if (bundleFiles != null && bundleFiles.length > 0) {
+        for (File file : bundleFiles) {
           try {
-            ctx.installBundle("reference:" + bundle.toURI()).start();
+            Bundle bundle = ctx.installBundle("reference:" + file.toURI());
+            BundleRevision revision = bundle.adapt(BundleRevision.class);
+            if (revision != null && (revision.getTypes() & BundleRevision.TYPE_FRAGMENT) == 0) {
+              bundle.start(); // only need to start non-fragment bundles
+            }
           }
           catch (Exception e) {
-            log.warn("Problem installing: {}", bundle, e);
+            log.warn("Problem installing: {}", file, e);
           }
         }
       }
 
-      startLevel.setStartLevel(8); // activate all installed bundles
+      startLevel.setStartLevel(80); // activate all installed bundles
 
       // wait for the Nexus listener
       listenerTracker = new ListenerTracker(ctx, "nexus", servletContext);

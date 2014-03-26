@@ -547,7 +547,7 @@
         </plugin>
 
         <!--
-        Generate basic OSGi metadata.
+        Generate basic OSGi metadata, include optional generated Sisu index.
         -->
         <plugin>
           <groupId>org.apache.felix</groupId>

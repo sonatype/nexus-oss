@@ -80,11 +80,6 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-core</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-oss-edition</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
@@ -124,9 +119,9 @@
             <Embed-Transitive>true</Embed-Transitive>
             <_exportcontents>
               !lib.*,
-              com.*|eu.*|javax.*|net.*|org.*;-noimport:=true,
-              javax.servlet,
-              javax.servlet.http
+              javax.servlet;provider=nexus;mandatory:=provider,
+              javax.servlet.http;provider=nexus;mandatory:=provider,
+              com.*|eu.*|javax.*|net.*|org.*;-noimport:=true
             </_exportcontents>
             <Require-Bundle>
               system.bundle;visibility:=reexport,
