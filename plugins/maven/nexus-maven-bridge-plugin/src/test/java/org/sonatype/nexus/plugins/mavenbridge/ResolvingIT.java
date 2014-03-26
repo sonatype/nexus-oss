@@ -33,7 +33,7 @@ import org.sonatype.tests.http.server.fluent.Server;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ResolvingTest
+public class ResolvingIT
     extends AbstractMavenRepoContentTests
 {
   protected NexusMavenBridge mavenBridge;

@@ -42,7 +42,7 @@ import static org.hamcrest.Matchers.is;
  * @author cstamas
  * @since 2.6
  */
-public class MacPluginEventSubscriberTest
+public class MacPluginEventSubscriberIT
     extends NexusAppTestSupport
 {
   protected IndexerManager indexerManager;

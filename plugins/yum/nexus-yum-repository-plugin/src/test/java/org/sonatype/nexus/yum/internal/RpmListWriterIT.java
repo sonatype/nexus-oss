@@ -25,7 +25,7 @@ import static java.io.File.pathSeparator;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
-public class RpmListWriterTest
+public class RpmListWriterIT
     extends YumNexusTestSupport
 {
 

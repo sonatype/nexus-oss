@@ -64,7 +64,7 @@ import static org.mockito.Mockito.when;
  * Test for SearchNGIndexPlexusResource
  */
 @Category(Slow.class) // ~27s
-public class SearchNGIndexPlexusResourceTest
+public class SearchNGIndexPlexusResourceIT
     extends AbstractMavenRepoContentTests
 {
 
