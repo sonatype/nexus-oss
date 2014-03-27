@@ -45,7 +45,6 @@
     <fileSet>
       <directory>${project.build.directory}/dependency/apache-karaf-${karaf.version}</directory>
       <outputDirectory>${project.build.finalName}/karaf</outputDirectory>
-      <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
       <excludes>
         <exclude>**/demos/**</exclude>
@@ -55,7 +54,7 @@
 
   <dependencySets>
     <dependencySet>
-      <outputDirectory>${project.build.finalName}/bundles/nexus-jettyapp-${project.version}</outputDirectory>
+      <outputDirectory>${project.build.finalName}/bundles/nexus-jettyapp</outputDirectory>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <useProjectArtifact>false</useProjectArtifact>
       <useStrictFiltering>true</useStrictFiltering>
@@ -68,7 +67,7 @@
       </includes>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>${project.build.finalName}/bundles/nexus-extender-${project.version}</outputDirectory>
+      <outputDirectory>${project.build.finalName}/bundles/nexus-extender</outputDirectory>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <useProjectArtifact>false</useProjectArtifact>
       <useStrictFiltering>true</useStrictFiltering>
@@ -81,7 +80,7 @@
       </includes>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>${project.build.finalName}/bundles</outputDirectory>
+      <outputDirectory>${project.build.finalName}/karaf/deploy</outputDirectory>
       <useTransitiveDependencies>true</useTransitiveDependencies>
       <useProjectArtifact>false</useProjectArtifact>
       <useStrictFiltering>true</useStrictFiltering>
@@ -97,7 +96,7 @@
       </includes>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>${project.build.finalName}/bundles</outputDirectory>
+      <outputDirectory>${project.build.finalName}/plugin-repository</outputDirectory>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <useProjectArtifact>false</useProjectArtifact>
       <useStrictFiltering>true</useStrictFiltering>

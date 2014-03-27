@@ -129,8 +129,8 @@
               org.sonatype.nexus.jettyapp;visibility:=reexport;resolution:=optional
             </Require-Bundle>
             <Import-Package>
-              javax.servlet,
-              javax.servlet.http
+              javax.servlet;provider=!,
+              javax.servlet.http;provider=!
             </Import-Package>
           </instructions>
         </configuration>

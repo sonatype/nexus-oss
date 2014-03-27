@@ -1,0 +1,22 @@
+ld = { log:display $args } ;
+lde = { log:display-exception $args } ;
+la = { bundle:list -t 0 $args } ;
+ls = { service:list $args } ;
+cl = { config:list "(service.pid=$args)" } ;
+halt = { system:shutdown -h -f $args } ;
+help = { *:help $args | more } ;
+man = { help $args } ;
+log:list = { log:get ALL } ;
+
+nexus-start = {
+ install reference:file:../bundles/nexus-jettyapp reference:file:../bundles/nexus-extender;
+ start org.eclipse.jetty.osgi.boot org.sonatype.nexus:nexus-jettyapp org.sonatype.nexus:nexus-extender;
+};
+
+nexus-stop = {
+ stop org.sonatype.nexus:nexus-extender org.sonatype.nexus:nexus-jettyapp org.eclipse.jetty.osgi.boot;
+ each ($.context bundles) {if {($it symbolicName|grep "org.sonatype.nexus.plugins"|tac)}{$it uninstall}};
+ uninstall org.sonatype.nexus:nexus-extender org.sonatype.nexus:nexus-jettyapp;
+ refresh org.sonatype.nexus:nexus-oss-edition;
+};
+

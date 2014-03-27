@@ -1,0 +1,3 @@
+export JAVA_MAX_MEM=1024M
+export JAVA_MAX_PERM_MEM=192M
+export KARAF_OPTS="-Djetty.home.bundle=org.eclipse.jetty.osgi.boot"
