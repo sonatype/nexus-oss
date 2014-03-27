@@ -28,7 +28,7 @@ import org.restlet.data.Response;
 
 public class FeedUtil
 {
-  private static final String FEED_URL_PART = "service/local/feeds/";
+  private static final String FEED_URL_PART = "service/siesta/timeline/feeds/";
 
   public static SyndFeed getFeed(String feedId)
       throws IllegalArgumentException, FeedException, IOException
