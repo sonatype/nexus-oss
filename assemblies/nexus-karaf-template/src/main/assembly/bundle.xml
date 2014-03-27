@@ -25,6 +25,14 @@
 
   <fileSets>
     <fileSet>
+      <directory>src/main/resources</directory>
+      <outputDirectory></outputDirectory>
+      <fileMode>0644</fileMode>
+      <includes>
+        <include>README.txt</include>
+      </includes>
+    </fileSet>
+    <fileSet>
       <directory>src/main/resources/content</directory>
       <outputDirectory>${project.build.finalName}</outputDirectory>
       <fileMode>0644</fileMode>
