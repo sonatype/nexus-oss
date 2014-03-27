@@ -10,22 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
+package org.sonatype.nexus.capability.internal.ui
+
+import groovy.transform.ToString
+
 /**
- * Capability status model.
+ * Form field exchange object.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.model.CapabilityStatus', {
-  extend: 'Ext.data.Model',
-  fields: [
-    'enabled',
-    'active',
-    'typeId',
-    'typeName',
-    'description',
-    'status',
-    'stateDescription',
-    'notes',
-    'tags'
-  ]
-});
+@ToString(includePackage = false, includeNames = true)
+class FormFieldXO
+{
+  String id
+  String type
+  String label
+  String helpText
+  Boolean required
+  String regexValidation
+  String initialValue
+  String storePath
+  String storeRoot
+  String idMapping
+  String nameMapping
+}

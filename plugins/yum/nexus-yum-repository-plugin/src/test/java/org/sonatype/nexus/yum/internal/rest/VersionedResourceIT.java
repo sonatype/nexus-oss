@@ -47,7 +47,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class VersionedResourceTest
+public class VersionedResourceIT
     extends YumNexusTestSupport
 {
 

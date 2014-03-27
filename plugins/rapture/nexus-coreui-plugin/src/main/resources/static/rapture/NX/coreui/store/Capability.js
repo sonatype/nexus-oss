@@ -32,6 +32,9 @@ Ext.define('NX.coreui.store.Capability', {
       idProperty: 'id',
       successProperty: 'success'
     }
-  }
+  },
+
+  sortOnLoad: true,
+  sorters: { property: 'typeName', direction: 'ASC' }
 
 });

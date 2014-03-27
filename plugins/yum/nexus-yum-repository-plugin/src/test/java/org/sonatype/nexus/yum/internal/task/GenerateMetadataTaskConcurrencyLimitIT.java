@@ -48,11 +48,11 @@ import static org.sonatype.scheduling.TaskState.RUNNING;
  * @author sherold
  * @author bvoss
  */
-public class GenerateMetadataTaskConcurrencyLimitTest
+public class GenerateMetadataTaskConcurrencyLimitIT
     extends SchedulerYumNexusTestSupport
 {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GenerateMetadataTaskConcurrencyLimitTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GenerateMetadataTaskConcurrencyLimitIT.class);
 
   @Rule
   public ConcurrentRule concurrently = new ConcurrentRule();

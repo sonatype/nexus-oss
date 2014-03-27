@@ -24,7 +24,7 @@ import org.sonatype.nexus.templates.repository.maven.Maven1ProxyRepositoryTempla
 
 import org.junit.Test;
 
-public class GroupUpdateTest
+public class GroupUpdateIT
     extends NexusAppTestSupport
 {
 

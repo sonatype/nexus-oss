@@ -46,7 +46,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(Slow.class) // ~20s
-public class ProtectedRepositoryRegistryTest
+public class ProtectedRepositoryRegistryIT
     extends NexusAppTestSupport
 {
 

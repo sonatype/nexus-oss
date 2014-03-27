@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  * Tests for {@link DefaultScheduler}.
  */
 @Category(Slow.class) // ~15s
-public class DefaultSchedulerTest
+public class DefaultSchedulerIT
     extends TestSupport
 {
   protected DefaultScheduler defaultScheduler;

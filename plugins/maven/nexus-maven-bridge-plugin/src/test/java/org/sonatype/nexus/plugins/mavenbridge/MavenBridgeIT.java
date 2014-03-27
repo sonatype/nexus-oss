@@ -33,7 +33,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelSource;
 import org.junit.Test;
 
-public class MavenBridgeTest
+public class MavenBridgeIT
     extends AbstractMavenRepoContentTests
 {
 
