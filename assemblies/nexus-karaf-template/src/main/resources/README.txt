@@ -2,6 +2,18 @@ First boot Karaf framework with:
 
    ./nexus-karaf-template-3.0.0-SNAPSHOT/karaf/bin/karaf
 
+Make sure that Karaf has started with the basic bootstrap bundles/fragments:
+
+   karaf@root()>  list
+
+   START LEVEL 100 , List Threshold: 50
+   ID | State     | Lvl | Version          | Name                                
+   ------------------------------------------------------------------------------
+   88 | Installed |  80 | 3.0.0.SNAPSHOT   | org.sonatype.nexus:nexus-oss-edition
+   89 | Installed |  80 | 3.0.0.SNAPSHOT   | org.sonatype.nexus:nexus-plugin-api 
+   90 | Installed |  80 | 8.1.11.v20130520 | Jetty OSGi Boot                     
+   91 | Resolved  |  80 | 1.48             | bcprov                              
+
 Start Nexus from inside Karaf with:
 
    karaf@root()>  nexus-start
