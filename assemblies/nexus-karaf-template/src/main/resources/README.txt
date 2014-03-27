@@ -6,6 +6,12 @@ Start Nexus from inside Karaf with:
 
    karaf@root()>  nexus-start
 
+Note: starting the plugins takes longer on Karaf than on pure-Felix (used in the webapp) at the moment.
+
+Once Nexus is fully initialized, point your browser to:
+
+   http://127.0.0.1:8080/nexus/
+
 Stop Nexus from inside Karaf with:
 
    karaf@root()>  nexus-stop
