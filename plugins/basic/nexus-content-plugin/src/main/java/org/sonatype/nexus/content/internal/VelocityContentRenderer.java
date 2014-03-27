@@ -37,6 +37,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
+import org.sonatype.nexus.proxy.item.StorageCompositeItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
@@ -49,7 +50,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -120,10 +120,23 @@ public class VelocityContentRenderer
   {
     final Map<String, Object> dataModel = createBaseModel();
     dataModel.put("req", resourceStoreRequest);
-    dataModel.put("item", item);
     if (item != null) {
+      dataModel.put("item", item);
       dataModel.put("itemContext", filterItemContext(item.getItemContext()).flatten());
       dataModel.put("itemAttributes", filterItemAttributes(item.getRepositoryItemAttributes()).asMap());
+      if (item instanceof StorageCompositeItem) {
+        final StorageCompositeItem compositeItem = (StorageCompositeItem) item;
+        final List<String> sources = Lists.newArrayList();
+        for (StorageItem source : compositeItem.getSources()) {
+          if (!source.isVirtual()) {
+            sources.add(source.getRepositoryItemUid().toString());
+          }
+          else {
+            sources.add(source.getPath());
+          }
+        }
+        dataModel.put("compositeSources", sources);
+      }
     }
     dataModel.put("exception", exception);
     final Reasoning reasoning = buildReasoning(exception);
