@@ -186,8 +186,10 @@ public class LocalContentDiscovererImplTest
           entrySource.readEntries(),
           hasItems("/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
               "/com/sonatype", "/org/apache"));
-      assertThat(entrySource.readEntries(), not(hasItems("/org/sonatype")));
-      assertThat(entrySource.readEntries().size(), equalTo(5));
+      // NEXUS-6485: Not true anymore, we do include empty directories due to "depth" optimization
+      // see LocalContentDiscovererImpl
+      // assertThat(entrySource.readEntries(), not(hasItems("/org/sonatype")));
+      assertThat(entrySource.readEntries().size(), equalTo(6)); // was 5
     }
   }
 }
