@@ -76,10 +76,18 @@ public class NexusHttpAuthenticationFilter
   private TemplateRenderer templateRenderer;
 
   @Inject
-  private ApplicationStatusSource applicationStatusSource;
-
-  @Inject
   private BrowserDetector browserDetector;
+  
+  // ==
+  
+  private String nexusVersion;
+  
+  @Inject
+  public void setApplicationVersion(final ApplicationStatusSource applicationStatusSource) {
+    this.nexusVersion = applicationStatusSource.getSystemStatus().getVersion();
+  }
+  
+  // ==
 
   protected SecuritySystem getSecuritySystem() {
     return securitySystem;
@@ -180,7 +188,7 @@ public class NexusHttpAuthenticationFilter
       // omit WWW-Authenticate we do NOT want to have browser prompt
 
       Map<String,Object> params = ImmutableMap.of(
-          "nexusVersion", applicationStatusSource.getSystemStatus().getVersion(),
+          "nexusVersion", nexusVersion,
           "nexusRoot", (Object)BaseUrlHolder.get()
       );
       TemplateLocator template = templateRenderer.template(
