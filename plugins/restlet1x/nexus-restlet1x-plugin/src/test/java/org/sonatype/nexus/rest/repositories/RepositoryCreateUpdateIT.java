@@ -34,7 +34,7 @@ import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 
-public class RepositoryCreateUpdateTest
+public class RepositoryCreateUpdateIT
     extends NexusAppTestSupport
 {
 

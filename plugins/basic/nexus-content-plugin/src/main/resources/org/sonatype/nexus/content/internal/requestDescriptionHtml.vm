@@ -88,6 +88,10 @@
 <p>
   #if($item)
     FOUND (Item found and retrieved)
+    #if($compositeSources)
+      <br/>Composed from following sources:
+      #list($compositeSources)
+    #end
   #elseif ($exception)
     NOT FOUND (Item not found, core threw exception)
   #end
