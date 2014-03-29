@@ -41,7 +41,7 @@ public class Nexus538SystemFeedsIT
 
     SyndFeed feed = FeedUtil.getFeed("systemChanges");
     this.validateLinksInFeeds(feed);
-    Assert.assertTrue(findFeedEntry(feed, "Booting", null));
+    Assert.assertTrue(findFeedEntry(feed, "Nexus started", null));
   }
 
   @Test //( dependsOnMethods = { "bootEventTest" } )
@@ -88,10 +88,10 @@ public class Nexus538SystemFeedsIT
     SyndFeed systemStatusFeed = FeedUtil.getFeed("systemRepositoryStatusChanges");
     this.validateLinksInFeeds(systemStatusFeed);
 
-    Assert.assertTrue(findFeedEntry(systemFeed, "Repository proxy mode change",
+    Assert.assertTrue(findFeedEntry(systemFeed, "Repository proxy state change",
         new String[]{"release-proxy-repo-1"}));
 
-    Assert.assertTrue(findFeedEntry(systemStatusFeed, "Repository proxy mode change",
+    Assert.assertTrue(findFeedEntry(systemStatusFeed, "Repository proxy state change",
         new String[]{"release-proxy-repo-1"}));
   }
 

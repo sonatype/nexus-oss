@@ -58,7 +58,7 @@ public class SystemSubscriber
   @Subscribe
   public void on(final NexusStartedEvent e) {
     final Map<String, String> data = Maps.newHashMap();
-    putIfNotNull(data, "bootAction", "Started");
+    putIfNotNull(data, "bootAction", "started");
     putIfNotNull(data, "nxVersion", applicationStatusSource.getSystemStatus().getVersion());
     putIfNotNull(data, "nxEdition", applicationStatusSource.getSystemStatus().getEditionShort());
     final FeedEvent fe = new FeedEvent(
@@ -75,7 +75,7 @@ public class SystemSubscriber
   @Subscribe
   public void on(final NexusStoppedEvent e) {
     final Map<String, String> data = Maps.newHashMap();
-    putIfNotNull(data, "bootAction", "Stopped");
+    putIfNotNull(data, "bootAction", "stopped");
     putIfNotNull(data, "nxVersion", applicationStatusSource.getSystemStatus().getVersion());
     putIfNotNull(data, "nxEdition", applicationStatusSource.getSystemStatus().getEditionShort());
     final FeedEvent fe = new FeedEvent(
