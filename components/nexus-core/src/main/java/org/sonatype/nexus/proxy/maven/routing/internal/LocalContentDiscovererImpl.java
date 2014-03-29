@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -37,6 +39,7 @@ import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -72,8 +75,10 @@ public class LocalContentDiscovererImpl
   {
     final DiscoveryResult<MavenRepository> discoveryResult =
         new DiscoveryResult<MavenRepository>(mavenRepository);
+    // NEXUS-6485: Since this fix, prefixes will do include empty directories due to "depth" optimization
     final WalkerContext context =
-        new DefaultWalkerContext(mavenRepository, new ResourceStoreRequest("/"), new DefaultStoreWalkerFilter(),
+        new DefaultWalkerContext(mavenRepository, new ResourceStoreRequest("/"),
+            new DepthLimitedStoreWalkerFilter(config.getLocalScrapeDepth()),
             true);
     final PrefixCollectorProcessor prefixCollectorProcessor = new PrefixCollectorProcessor();
     context.getProcessors().add(prefixCollectorProcessor);
@@ -113,6 +118,23 @@ public class LocalContentDiscovererImpl
     return parentOMatic.getAllLeafPaths();
   }
 
+  protected static class DepthLimitedStoreWalkerFilter
+      extends DefaultStoreWalkerFilter
+  {
+    private final int scrapeDepth;
+
+    public DepthLimitedStoreWalkerFilter(final int scrapeDepth) {
+      checkArgument(scrapeDepth > 0);
+      this.scrapeDepth = scrapeDepth;
+    }
+
+    @Override
+    public boolean shouldProcessRecursively(WalkerContext context, StorageCollectionItem coll) {
+      // limit the scrape depth AND whatever else needed
+      return (coll.getPathDepth() <= scrapeDepth) && super.shouldProcessRecursively(context, coll);
+    }
+  }
+
   protected static class PrefixCollectorProcessor
       extends AbstractWalkerProcessor
   {
@@ -124,6 +146,15 @@ public class LocalContentDiscovererImpl
 
     public ParentOMatic getParentOMatic() {
       return parentOMatic;
+    }
+
+    @Override
+    public void onCollectionEnter(WalkerContext context, StorageCollectionItem coll)
+        throws Exception {
+      // StorageCollectionItem is NOT sent to #processItem, everything else is
+      // cancelation
+      CancelableUtil.checkInterruption();
+      parentOMatic.addPath(coll.getPath());
     }
 
     @Override

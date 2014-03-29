@@ -48,12 +48,10 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-restlet1x-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
-      <scope>provided</scope>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-testsupport</artifactId>
+      <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>

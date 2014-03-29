@@ -183,17 +183,21 @@ public abstract class AbstractProxyRepository
   }
 
   private void createRepositoryStatusCheckerThread() {
-    if (repositoryStatusCheckerThread == null) {
-      repositoryStatusCheckerThread =
-          new RepositoryStatusCheckerThread(LoggerFactory.getLogger(getClass().getName() + "-"
-              + getId()), this);
-      repositoryStatusCheckerThread.setRunning(true);
-      repositoryStatusCheckerThread.setDaemon(true);
-      repositoryStatusCheckerThread.start();
+    // only for proxy kind
+    if (getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
+      if (repositoryStatusCheckerThread == null) {
+        repositoryStatusCheckerThread =
+            new RepositoryStatusCheckerThread(LoggerFactory.getLogger(getClass().getName() + "-"
+                + getId()), this);
+        repositoryStatusCheckerThread.setRunning(true);
+        repositoryStatusCheckerThread.setDaemon(true);
+        repositoryStatusCheckerThread.start();
+      }
     }
   }
 
   private void disposeRepositoryStatusCheckerThread() {
+    // not depend on kind, as it might be "transformed" from proxy to hosted
     if (repositoryStatusCheckerThread != null) {
       repositoryStatusCheckerThread.setRunning(false);
       repositoryStatusCheckerThread.interrupt();
@@ -203,7 +207,7 @@ public abstract class AbstractProxyRepository
   @Override
   public void dispose() {
     super.dispose();
-    // kill our daemon thread too
+    // kill our daemon thread too, if needed
     disposeRepositoryStatusCheckerThread();
   }
 
