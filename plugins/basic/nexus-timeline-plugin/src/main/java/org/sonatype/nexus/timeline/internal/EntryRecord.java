@@ -64,11 +64,10 @@ public final class EntryRecord
     this.timestamp = timestamp;
     this.type = type;
     this.subType = subType;
-    final Map<String, String> tmp = Maps.newHashMap();
+    this.data = Maps.newHashMap();
     if (data != null) {
-      tmp.putAll(data);
+      this.data.putAll(data);
     }
-    this.data = Collections.unmodifiableMap(tmp);
   }
 
   @Override
