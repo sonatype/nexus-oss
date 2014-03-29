@@ -139,8 +139,8 @@ public class DefaultFeedRecorder
               rec.getType(),
               rec.getSubType(),
               new Date(rec.getTimestamp()),
-              rec.getData().get("_link"), // nullable
               rec.getData().get("_author"), // nullable
+              rec.getData().get("_link"), // nullable
               data
           );
           result.add(evt);
