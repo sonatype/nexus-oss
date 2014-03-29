@@ -167,7 +167,7 @@ public abstract class AbstractFeedSource
             final MavenRepository repository = repositoryRegistry
                 .getRepositoryWithFacet(repoId, MavenRepository.class);
             if (repository != null) {
-              return policy == RepositoryPolicy.MIXED || repository.getRepositoryPolicy().equals(policy);
+              return policy == RepositoryPolicy.MIXED || policy == repository.getRepositoryPolicy();
             }
             else {
               return false; // not even a maven repository
