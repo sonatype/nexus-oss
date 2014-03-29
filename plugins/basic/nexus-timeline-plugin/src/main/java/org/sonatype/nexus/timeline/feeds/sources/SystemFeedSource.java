@@ -50,7 +50,7 @@ public class SystemFeedSource
                             final Map<String, String> params)
   {
     entries.addAll(getFeedRecorder()
-        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_SYSTEM), null, from, count,
+        .getEvents(ImmutableSet.of(FeedRecorder.FAMILY_SYSTEM, FeedRecorder.FAMILY_REPO), null, from, count,
             filters(params)
         ));
   }
