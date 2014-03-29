@@ -146,8 +146,8 @@ public class ErrorWarningFeedSource
               "LOG", // ignored
               "ERROR_WARNING", // ignored
               new Date(), // TODO: timestamp from log file?
-              null,
-              null,
+              null, // author "system"
+              null, // no link (maybe log config? or support?)
               Maps.<String, String>newHashMap()
           );
           if (logLine.contains(" ERROR ")) {
