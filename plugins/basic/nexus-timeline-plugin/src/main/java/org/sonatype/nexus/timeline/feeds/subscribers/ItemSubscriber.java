@@ -111,7 +111,7 @@ public class ItemSubscriber
           action,
           ievt.getEventDate(),
           userId,
-          "/content/repositories/" + fileItem.getRepositoryId() + fileItem.getParentPath(), // link to item parent
+          "/content/repositories/" + fileItem.getRepositoryId() + fileItem.getPath(), // link to item
           data
       );
       getFeedRecorder().addEvent(fe);
@@ -167,7 +167,7 @@ public class ItemSubscriber
           action,
           evt.getEventDate(),
           userId,
-          "/content/repositories/" + fileItem.getRepositoryId() + fileItem.getParentPath(), // link to item parent
+          "/content/repositories/" + fileItem.getRepositoryId() + fileItem.getPath(), // link to item
           data
       );
       getFeedRecorder().addEvent(fe);
