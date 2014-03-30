@@ -77,7 +77,7 @@ public class ErrorPageFilter
           response,
           e.getResponseCode(),
           e.getReasonPhrase(),
-          e.toString(), // e.getMessage() maybe null, use toString()
+          messageOf(e),
           e.getCause()
       );
     }
@@ -93,9 +93,20 @@ public class ErrorPageFilter
           response,
           SC_INTERNAL_SERVER_ERROR,
           null, // default reason phrase will be used
-          e.toString(), // e.getMessage() maybe null, use toString()
+          messageOf(e),
           e
       );
     }
+  }
+
+  /**
+   * Returns the message of given throwable, or if message is null will toString throwable.
+   */
+  private static String messageOf(final Throwable cause) {
+    String message = cause.getMessage();
+    if (message == null) {
+      return cause.toString();
+    }
+    return message;
   }
 }
