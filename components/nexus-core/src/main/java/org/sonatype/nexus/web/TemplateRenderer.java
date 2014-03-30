@@ -15,6 +15,7 @@ package org.sonatype.nexus.web;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -40,9 +41,9 @@ public interface TemplateRenderer
   void renderErrorPage(HttpServletRequest request,
                        HttpServletResponse response,
                        int responseCode,
-                       String reasonPhrase,
+                       @Nullable String reasonPhrase,
                        String errorDescription,
-                       Throwable exception)
+                       @Nullable Throwable exception)
       throws IOException;
 
   interface TemplateLocator
