@@ -134,15 +134,6 @@
             </privileges>
         </role>
         <role>
-            <id>ui-system-feeds</id>
-            <name>UI: System Feeds</name>
-            <description>Gives access to the System Feeds screen in Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>44</privilege>
-            </privileges>
-        </role>
-        <role>
             <id>ui-logs-config-files</id>
             <name>UI: Logs and Config Files</name>
             <description>Gives access to the Logs and Config Files screen in Nexus UI</description>
@@ -1089,22 +1080,6 @@
                 <property>
                     <key>permission</key>
                     <value>nexus:configuration</value>
-                </property>
-            </properties>
-        </privilege>
-        <privilege>
-            <id>44</id>
-            <type>method</type>
-            <name>RSS Feeds - (read)</name>
-            <description>Give permission to view the different RSS feeds.  The extents of this privilege are related to the allowed targets.</description>
-            <properties>
-                <property>
-                    <key>method</key>
-                    <value>read</value>
-                </property>
-                <property>
-                    <key>permission</key>
-                    <value>nexus:feeds</value>
                 </property>
             </properties>
         </privilege>
