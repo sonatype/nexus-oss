@@ -149,13 +149,14 @@ public class HttpClientManagerImpl
                 " from proxy " + proxyRepository + " but no location present");
           }
 
+          // Some complication here as it appears that something may be null, but its not clear what was null
           final URI sourceUri = ((HttpUriRequest)request).getURI();
           final String sourceScheme = schemeOf(sourceUri);
-          final String sourceHost = sourceUri.getHost();
+          final String sourceHost = hostOf(sourceUri);
 
           final URI targetUri = createLocationURI(locationHeader.getValue());
           final String targetScheme = schemeOf(targetUri);
-          final String targetHost = targetUri.getHost();
+          final String targetHost = hostOf(targetUri);
 
           // nag about redirection peculiarities, in any case
           if (!Objects.equals(sourceScheme, targetScheme)) {
@@ -197,6 +198,17 @@ public class HttpClientManagerImpl
       if (scheme != null) {
         return scheme.toLowerCase(Locale.US);
       }
+    }
+    return null;
+  }
+
+  /**
+   * Return host of given uri or null.
+   */
+  @Nullable
+  private static String hostOf(final URI uri) {
+    if (uri != null) {
+      return uri.getHost();
     }
     return null;
   }
