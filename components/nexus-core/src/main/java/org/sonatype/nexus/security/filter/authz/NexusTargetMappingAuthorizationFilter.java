@@ -15,6 +15,7 @@ package org.sonatype.nexus.security.filter.authz;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -28,12 +29,9 @@ import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
-import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.sisu.goodies.common.Loggers;
 
 import com.google.common.base.Strings;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 
@@ -73,7 +71,8 @@ public class NexusTargetMappingAuthorizationFilter
   private String getResourceStorePath(final ServletRequest request) {
     String path = WebUtils.getPathWithinApplication((HttpServletRequest) request);
     if (getPathPrefix() != null) {
-      final Matcher m = getPathPrefixPattern().matcher(path);
+      final Pattern p = getPathPrefixPattern();
+      final Matcher m = p.matcher(path);
       if (m.matches()) {
         path = getPathReplacement();
         // TODO: hardcoded currently
@@ -90,7 +89,7 @@ public class NexusTargetMappingAuthorizationFilter
         // where KIND = {"repositories", "groups", ...}, ID is a repo ID, and REPO_PATH is a repository path
         // being here, means we could not even match anything of these, usually having newline in string
         // as that's the only thing the "dotSTAR" regex would not match (it would match any other character)
-        log.info(formatMessage(request, "Cannot translate request to Nexus repository path"));
+        log.warn(formatMessage(request, "Cannot translate request to Nexus repository path, expected pattern {}"), p);
         return null;
       }
     }
@@ -162,7 +161,7 @@ public class NexusTargetMappingAuthorizationFilter
       return storeRequest != null && rootRouter.authorizePath(storeRequest, nxAction);
     }
     catch (IllegalArgumentException e) { // Enum.valueOf
-      log.info(formatMessage(request, "Cannot translate Shiro action '{}' to Nexus action"), action);
+      log.warn(formatMessage(request, "Cannot translate Shiro action '{}' to Nexus action"), action);
       return false;
     }
   }
@@ -178,18 +177,6 @@ public class NexusTargetMappingAuthorizationFilter
       if (!Strings.isNullOrEmpty(query)) {
         sb.append("?").append(query);
       }
-      final String userAgent = hsr.getHeader("User-Agent");
-      if (!Strings.isNullOrEmpty(userAgent)) {
-        sb.append(", UA: ").append(userAgent);
-      }
-      final String ip = RemoteIPFinder.findIP(hsr);
-      if (!Strings.isNullOrEmpty(ip)) {
-        sb.append(", IP: ").append(ip);
-      }
-    }
-    final Subject subject = SecurityUtils.getSubject();
-    if (subject != null && (subject.isAuthenticated() || subject.isRemembered())) {
-      sb.append(", UserId: ").append(subject.getPrincipals());
     }
     return sb.toString();
   }
