@@ -17,7 +17,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.mail.Session;
 
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.EMailer;
@@ -77,15 +76,7 @@ public class DefaultSmtpSettingsValidator
 
     request.getBodyContext().put(DefaultMailType.BODY_KEY, body.toString());
 
-    MailRequestStatus status;
-    ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-    try {
-      Thread.currentThread().setContextClassLoader(Session.class.getClassLoader());
-      status = emailer.sendSyncedMail(request);
-    }
-    finally {
-      Thread.currentThread().setContextClassLoader(tccl);
-    }
+    MailRequestStatus status = emailer.sendSyncedMail(request);
 
     if (status.getErrorCause() != null) {
       log.error("Unable to send e-mail", status.getErrorCause());
