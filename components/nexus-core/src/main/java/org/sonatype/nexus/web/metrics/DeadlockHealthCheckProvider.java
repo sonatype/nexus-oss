@@ -10,35 +10,38 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.webapp.metrics;
+package org.sonatype.nexus.web.metrics;
 
+import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import com.yammer.metrics.core.HealthCheck;
-import com.yammer.metrics.core.HealthCheckRegistry;
-import org.eclipse.sisu.BeanEntry;
-import org.eclipse.sisu.Mediator;
+import com.yammer.metrics.core.VirtualMachineMetrics;
+import com.yammer.metrics.util.DeadlockHealthCheck;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Manages {@link HealthCheck} registrations via Sisu component mediation.
+ * {@link DeadlockHealthCheck} provider.
  *
  * @since 2.8
  */
 @Named
-public class HealthCheckMediator
-    extends ComponentSupport
-    implements Mediator<Named, HealthCheck, HealthCheckRegistry>
+@Singleton
+public class DeadlockHealthCheckProvider
+  implements Provider<HealthCheck>
 {
-  public void add(final BeanEntry<Named, HealthCheck> entry, final HealthCheckRegistry registry) throws Exception {
-    log.debug("Registering: {}", entry);
-    registry.register(entry.getValue());
+  private final VirtualMachineMetrics metrics;
+
+  @Inject
+  public DeadlockHealthCheckProvider(final VirtualMachineMetrics metrics) {
+    this.metrics = checkNotNull(metrics);
   }
 
-  public void remove(final BeanEntry<Named, HealthCheck> entry, final HealthCheckRegistry registry) throws Exception {
-    log.debug("Un-registering: {}", entry);
-    registry.unregister(entry.getValue());
+  @Override
+  public HealthCheck get() {
+    return new DeadlockHealthCheck(metrics);
   }
 }
-

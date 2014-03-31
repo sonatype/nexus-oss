@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2014 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+  <id>bundle</id>
+
+  <formats>
+    <format>zip</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <fileSets>
+    <fileSet>
+      <directory>src/main/resources</directory>
+      <outputDirectory></outputDirectory>
+      <fileMode>0644</fileMode>
+      <includes>
+        <include>README.txt</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/resources/content</directory>
+      <outputDirectory>${project.build.finalName}</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+      <excludes>
+        <exclude>**/.placeholder</exclude>
+      </excludes>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/resources/sonatype-work</directory>
+      <outputDirectory>sonatype-work</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+      <excludes>
+        <exclude>**/.placeholder</exclude>
+      </excludes>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/dependency/apache-karaf-${karaf.version}</directory>
+      <outputDirectory>${project.build.finalName}/karaf</outputDirectory>
+      <directoryMode>0755</directoryMode>
+      <excludes>
+        <exclude>**/demos/**</exclude>
+      </excludes>
+    </fileSet>
+  </fileSets>
+
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>${project.build.finalName}/bundles/nexus-jettyapp</outputDirectory>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <useProjectArtifact>false</useProjectArtifact>
+      <useStrictFiltering>true</useStrictFiltering>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+      <scope>provided</scope>
+      <unpack>true</unpack>
+      <includes>
+        <include>*:nexus-jettyapp</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>${project.build.finalName}/bundles/nexus-extender</outputDirectory>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <useProjectArtifact>false</useProjectArtifact>
+      <useStrictFiltering>true</useStrictFiltering>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+      <scope>provided</scope>
+      <unpack>true</unpack>
+      <includes>
+        <include>*:nexus-extender</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>${project.build.finalName}/karaf/deploy</outputDirectory>
+      <useTransitiveDependencies>true</useTransitiveDependencies>
+      <useProjectArtifact>false</useProjectArtifact>
+      <useStrictFiltering>true</useStrictFiltering>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+      <scope>provided</scope>
+      <unpack>false</unpack>
+      <includes>
+        <include>*:jetty-osgi-boot</include>
+        <include>*:nexus-oss-edition</include>
+        <include>*:nexus-plugin-api</include>
+        <include>*:bcprov*</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>${project.build.finalName}/plugin-repository</outputDirectory>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <useProjectArtifact>false</useProjectArtifact>
+      <useStrictFiltering>true</useStrictFiltering>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+      <scope>provided</scope>
+      <unpack>true</unpack>
+      <includes>
+        <include>*:nexus-content-plugin</include>
+        <include>*:nexus-webresources-plugin</include>
+        <include>*:nexus-crypto-plugin</include>
+        <include>*:nexus-groovy-plugin</include>
+        <include>*:nexus-h2-plugin</include>
+        <include>*:nexus-kazuki-plugin</include>
+        <include>*:nexus-restlet1x-plugin</include>
+        <include>*:nexus-siesta-plugin</include>
+        <include>*:nexus-logging-plugin</include>
+        <include>*:nexus-lvo-plugin</include>
+        <include>*:nexus-plugin-console-plugin</include>
+        <include>*:nexus-ldap-realm-plugin</include>
+        <include>*:nexus-rrb-plugin</include>
+        <include>*:nexus-indexer-lucene-plugin</include>
+        <include>*:nexus-timeline-plugin</include>
+        <include>*:nexus-archetype-plugin</include>
+        <include>*:nexus-maven-bridge-plugin</include>
+        <include>*:nexus-ui-extjs3-plugin</include>
+        <include>*:nexus-capabilities-plugin</include>
+        <include>*:nexus-atlas-plugin</include>
+        <include>*:nexus-wonderland-plugin</include>
+        <!-- rapture -->
+        <include>*:nexus-rapture-plugin</include>
+        <include>*:nexus-extdirect-plugin</include>
+        <include>*:nexus-coreui-plugin</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+
+</assembly>

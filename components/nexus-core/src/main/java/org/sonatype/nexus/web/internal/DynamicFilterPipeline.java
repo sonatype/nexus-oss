@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.web.internal;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -77,7 +78,8 @@ final class DynamicFilterPipeline
    * Refreshes stable cache with the latest dynamic definitions.
    */
   public synchronized void refreshCache() {
-    filterDefinitionCache = filterDefinitions.toArray(filterDefinitionCache);
+    final Object[] snapshot = filterDefinitions.toArray();
+    filterDefinitionCache = Arrays.copyOf(snapshot, snapshot.length, FilterDefinition[].class);
     if (log.isDebugEnabled()) {
       final StringBuilder buf = new StringBuilder("Updated filter definitions:");
       for (final FilterDefinition fd : filterDefinitionCache) {

@@ -115,6 +115,7 @@
           <exclude>WEB-INF/lib/logback-access*.jar</exclude>
           <exclude>WEB-INF/lib/metrics-core*.jar</exclude>
           <exclude>WEB-INF/lib/metrics-logback*.jar</exclude>
+          <exclude>WEB-INF/lib/plexus-interpolation*.jar</exclude>
           <exclude>WEB-INF/classes/logback.xml</exclude>
           <exclude>WEB-INF/classes/logback-access.xml</exclude>
         </excludes>
