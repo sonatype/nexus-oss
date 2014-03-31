@@ -429,8 +429,7 @@ public class DefaultRepositoryRouter
         throw new ItemNotFoundException(
             reasonFor(
                 request,
-                "Repository kind '" + explodedPath[0] + "' not exists",
-                request.getRequestPath()));
+                "Repository kind '" + explodedPath[0] + "' not exists"));
       }
 
       result.setStrippedPrefix(PathUtils.concatPaths(explodedPath[0]));
@@ -506,7 +505,7 @@ public class DefaultRepositoryRouter
     }
 
     // nothing found
-    throw new NoSuchRepositoryException("pathPrefixOrId: '" + pathPrefixOrId + "'");
+    throw new NoSuchRepositoryException(pathPrefixOrId);
   }
 
   protected StorageItem retrieveVirtualPath(ResourceStoreRequest request, RequestRoute route)
