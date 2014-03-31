@@ -429,7 +429,7 @@ public class DefaultRepositoryRouter
         throw new ItemNotFoundException(
             reasonFor(
                 request,
-                "BUG: Cannot deduce repository kind from request %s (this method should not be invoked with path having less than 2 segments)!",
+                "Repository kind '" + explodedPath[0] + "' not exists",
                 request.getRequestPath()));
       }
 
