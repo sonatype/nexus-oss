@@ -22,6 +22,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.lang.StringUtils;
 import org.sonatype.nexus.NxApplication;
 import org.sonatype.nexus.bootstrap.ConfigurationBuilder;
 import org.sonatype.nexus.bootstrap.ConfigurationHolder;
@@ -92,11 +93,23 @@ public class WebappBootstrap
         // FIXME: This is what was done before, it seems completely wrong in WAR deployment since there is no bundle
         String baseDir = System.getProperty("bundleBasedir", context.getRealPath("/WEB-INF"));
 
+        // Read nexus properties file path from servlet context; use built-in value if not configured
+        String nexusPropertiesFile = context.getInitParameter("nexusPropertiesFile");
+        if (StringUtils.isBlank(nexusPropertiesFile)) {
+          nexusPropertiesFile = "/nexus.properties";
+        }
+
+        // Read nexus test properties file path from servlet context; use built-in value if not configured
+        String nexusTestPropertiesFile = context.getInitParameter("nexusTestPropertiesFile");
+        if (StringUtils.isBlank(nexusTestPropertiesFile)) {
+          nexusTestPropertiesFile = "/nexus-test.properties";
+        }
+
         properties = new ConfigurationBuilder()
             .defaults()
             .set("bundleBasedir", new File(baseDir).getCanonicalPath())
-            .properties("/nexus.properties", true)
-            .properties("/nexus-test.properties", false)
+            .properties(nexusPropertiesFile, true)
+            .properties(nexusTestPropertiesFile, false)
             .custom(new EnvironmentVariables())
             .build();
 
