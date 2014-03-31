@@ -77,7 +77,7 @@ public class ErrorPageFilter
           response,
           e.getResponseCode(),
           e.getReasonPhrase(),
-          e.getMessage(),
+          messageOf(e),
           e.getCause()
       );
     }
@@ -88,7 +88,25 @@ public class ErrorPageFilter
     catch (Exception e) {
       // runtime and servlet exceptions will end here (thrown probably by some non-nexus filter or servlet)
       log.warn("Unexpected exception", e);
-      templateRenderer.renderErrorPage(request, response, SC_INTERNAL_SERVER_ERROR, null /*default*/, e.getMessage(), e);
+      templateRenderer.renderErrorPage(
+          request,
+          response,
+          SC_INTERNAL_SERVER_ERROR,
+          null, // default reason phrase will be used
+          messageOf(e),
+          e
+      );
     }
+  }
+
+  /**
+   * Returns the message of given throwable, or if message is null will toString throwable.
+   */
+  private static String messageOf(final Throwable cause) {
+    String message = cause.getMessage();
+    if (message == null) {
+      return cause.toString();
+    }
+    return message;
   }
 }
