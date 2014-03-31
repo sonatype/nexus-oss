@@ -21,6 +21,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+/**
+ * @deprecated avoid future usage or sub-classes.
+ */
+@Deprecated
 public abstract class AbstractApplicationStatusSource
     extends ComponentSupport
     implements ApplicationStatusSource
