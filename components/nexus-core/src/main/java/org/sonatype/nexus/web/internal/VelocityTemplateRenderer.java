@@ -20,6 +20,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -72,9 +73,9 @@ public class VelocityTemplateRenderer
   public void renderErrorPage(final HttpServletRequest request,
                               final HttpServletResponse response,
                               final int responseCode,
-                              final String reasonPhrase,
+                              final @Nullable String reasonPhrase,
                               final String errorDescription,
-                              final Throwable exception)
+                              final @Nullable Throwable exception)
       throws IOException
   {
     checkNotNull(request);
