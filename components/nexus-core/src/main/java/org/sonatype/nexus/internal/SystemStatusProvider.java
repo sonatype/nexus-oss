@@ -10,17 +10,35 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus;
+package org.sonatype.nexus.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
- * The source of common data from App.
+ * {@link SystemStatus} provider.
  *
- * @deprecated Use SystemStatus provider instead.
+ * @since 3.0
  */
-@Deprecated
-public interface ApplicationStatusSource
+@Named
+public class SystemStatusProvider
+  extends ComponentSupport
+  implements Provider<SystemStatus>
 {
-  SystemStatus getSystemStatus();
+  private final ApplicationStatusSource statusSource;
 
-  boolean setState(SystemState state);
+  @Inject
+  public SystemStatusProvider(final ApplicationStatusSource statusSource) {
+    this.statusSource = statusSource;
+  }
+
+  @Override
+  public SystemStatus get() {
+    return statusSource.getSystemStatus();
+  }
 }

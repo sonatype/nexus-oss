@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.web.internal;
 
 import java.io.BufferedWriter;
@@ -26,7 +27,7 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -61,10 +62,10 @@ public class VelocityTemplateRenderer
 
   @Inject
   public VelocityTemplateRenderer(final Provider<VelocityEngine> velocityEngineProvider,
-                                  final ApplicationStatusSource applicationStatusSource)
+                                  final SystemStatus systemStatus)
   {
     this.velocityEngineProvider = checkNotNull(velocityEngineProvider);
-    this.applicationVersion = checkNotNull(applicationStatusSource).getSystemStatus().getVersion();
+    this.applicationVersion = systemStatus.getVersion();
   }
 
   @Override
