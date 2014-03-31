@@ -35,7 +35,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -89,9 +88,7 @@ public class VelocityTemplateRenderer
     dataModel.put("statusName", Strings.isNullOrEmpty(reasonPhrase) ? errorDescription : reasonPhrase);
     dataModel.put("errorDescription", StringEscapeUtils.escapeHtml(errorDescription));
 
-    if (null != exception) {
-      dataModel.put("errorStackTrace", StringEscapeUtils.escapeHtml(ExceptionUtils.getStackTrace(exception)));
-    }
+    // NOTE: specifically not including stack trace, we do not want to include this in details shown to users
 
     if (Strings.isNullOrEmpty(reasonPhrase)) {
       response.setStatus(responseCode);
