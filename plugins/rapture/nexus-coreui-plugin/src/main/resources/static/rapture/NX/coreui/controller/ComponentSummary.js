@@ -11,15 +11,15 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Browse repository information page controller.
+ * Component details summary controller.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.controller.BrowseRepositoryItemInfo', {
+Ext.define('NX.coreui.controller.ComponentSummary', {
   extend: 'Ext.app.Controller',
 
   views: [
-    'repository.RepositoryBrowseItemInfo'
+    'component.ComponentSummary'
   ],
 
   /**
@@ -29,7 +29,7 @@ Ext.define('NX.coreui.controller.BrowseRepositoryItemInfo', {
     var me = this;
 
     me.getApplication().getIconController().addIcons({
-      'repository-browse-item-info': {
+      'component-summary': {
         file: 'information.png',
         variants: ['x16', 'x32']
       }
@@ -37,24 +37,24 @@ Ext.define('NX.coreui.controller.BrowseRepositoryItemInfo', {
 
     me.listen({
       component: {
-        'nx-coreui-repository-itemcontainer': {
-          itemselected: me.onItemSelected,
-          itemdeselected: me.onItemDeselected
+        'nx-coreui-component-detail': {
+          componentavailable: me.onComponentAvailable,
+          componentunavailable: me.onComponentUnavailable
         }
       }
     });
   },
 
-  onItemSelected: function (infoContainer, node) {
-    var panel = infoContainer.down('nx-coreui-repository-browse-item-info');
+  onComponentAvailable: function (detailPanel, componentRef) {
+    var panel = detailPanel.down('nx-coreui-component-summary');
 
     if (!panel) {
-      panel = infoContainer.addTab({ xtype: 'nx-coreui-repository-browse-item-info' });
+      panel = detailPanel.add({ xtype: 'nx-coreui-component-summary' });
     }
 
-    panel.down('#title').setText('Information about ' + node.get('text'));
+    panel.down('#title').setText('Information about ' + componentRef.uri);
 
-    NX.direct.coreui_RepositoryStorageItemInfo.read(node.get('repositoryId'), node.get('path'), function (response) {
+    NX.direct.coreui_RepositoryStorageItemInfo.read(componentRef.repositoryId, componentRef.uri, function (response) {
       if (Ext.isDefined(response) && response.success) {
         panel.down('nx-info-panel').showInfo({
           'Path': response.data.path,
@@ -68,11 +68,11 @@ Ext.define('NX.coreui.controller.BrowseRepositoryItemInfo', {
     });
   },
 
-  onItemDeselected: function (infoContainer) {
-    var panel = infoContainer.down('nx-coreui-repository-browse-item-info');
+  onComponentUnavailable: function (detailPanel) {
+    var panel = detailPanel.down('nx-coreui-component-summary');
 
     if (panel) {
-      infoContainer.removeTab(panel);
+      detailPanel.remove(panel);
     }
   }
 

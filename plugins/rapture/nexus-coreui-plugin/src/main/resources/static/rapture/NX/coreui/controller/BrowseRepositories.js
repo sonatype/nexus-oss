@@ -20,9 +20,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
   views: [
     'repository.RepositoryBrowseFeature',
-    'repository.RepositoryBrowseInfoTabPanel',
-    'repository.RepositoryBrowseList',
-    'repository.RepositoryBrowseTabs'
+    'repository.RepositoryBrowseList'
   ],
   refs: [
     {

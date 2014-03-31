@@ -15,9 +15,9 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseInfoTabPanel', {
+Ext.define('NX.coreui.view.component.ComponentDetail', {
   extend: 'Ext.Panel',
-  alias: 'widget.nx-coreui-repository-browse-info-tabpanel',
+  alias: 'widget.nx-coreui-component-detail',
 
   layout: 'card',
 
@@ -34,7 +34,7 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseInfoTabPanel', {
     ]
   },
 
-  add: function (component) {
+  add: function (panel) {
     var me = this,
         added = me.callParent(arguments);
 
@@ -56,19 +56,34 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseInfoTabPanel', {
     });
 
     me.getLayout().getActiveItem().button.toggle(true, true);
+    me.show();
 
     return added;
   },
 
-  remove: function (component) {
+  remove: function (panel) {
     var me = this,
         removed = me.callParent(arguments);
 
-    if (component.button) {
-      me.getHeader().down('#buttons').remove(component.button);
+    if (panel.button) {
+      me.getHeader().down('#buttons').remove(panel.button);
+    }
+
+    if (me.items.length === 0) {
+      me.hide();
     }
 
     return removed;
+  },
+
+  setComponent: function (component) {
+    var me = this;
+    if (component) {
+      me.fireEvent('componentavailable', me, component);
+    }
+    else {
+      me.fireEvent('componentunavailable', me);
+    }
   }
 
 });

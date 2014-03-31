@@ -28,10 +28,9 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     'NX.coreui.controller.BrowseRepositories',
-    'NX.coreui.controller.BrowseRepositoryItemInfo',
-    'NX.coreui.controller.BrowseRepositoryItemClm',
     'NX.coreui.controller.BrowseStorage',
     'NX.coreui.controller.BrowseIndex',
+    'NX.coreui.controller.ComponentSummary',
     'NX.coreui.controller.MavenUpload',
     { id: 'NX.coreui.controller.PluginConsole',
       active: function () {
@@ -45,6 +44,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.Roles',
     'NX.coreui.controller.Security',
     'NX.coreui.controller.System',
+    'NX.coreui.controller.Search',
     'NX.coreui.controller.Tasks',
     'NX.coreui.controller.UploadArtifact',
     'NX.coreui.controller.Users'

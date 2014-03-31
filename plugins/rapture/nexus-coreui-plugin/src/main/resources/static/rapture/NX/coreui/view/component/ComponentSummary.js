@@ -15,15 +15,15 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseItemInfo', {
+Ext.define('NX.coreui.view.repository.ComponentSummary', {
   extend: 'Ext.Panel',
-  alias: 'widget.nx-coreui-repository-browse-item-info',
+  alias: 'widget.nx-coreui-component-summary',
 
   margin: 5,
 
   buttonConfig: {
     tooltip: 'Info',
-    iconCls: NX.Icons.cls('repository-browse-item-info', 'x32')
+    iconCls: NX.Icons.cls('component-summary', 'x32')
     //glyph: 'xf05a@FontAwesome' /* fa-info-circle */
   },
 
@@ -35,7 +35,7 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseItemInfo', {
         marginBottom: '10px'
       },
       items: [
-        { xtype: 'component', html: NX.Icons.img('repository-browse-item-info', 'x16') },
+        { xtype: 'component', html: NX.Icons.img('component-summary', 'x16') },
         { xtype: 'label',
           itemId: 'title',
           margin: '0 0 0 5',

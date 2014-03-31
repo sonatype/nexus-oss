@@ -28,12 +28,20 @@ Ext.define('NX.coreui.controller.BrowseIndex', {
       selector: 'nx-coreui-repository-browse-feature'
     },
     {
+      ref: 'list',
+      selector: 'nx-coreui-repository-browse-list'
+    },
+    {
       ref: 'panel',
       selector: 'nx-coreui-repository-browse-index'
     },
     {
       ref: 'tree',
       selector: 'nx-coreui-repository-browse-index-tree'
+    },
+    {
+      ref: 'componentDetail',
+      selector: 'nx-coreui-component-detail'
     }
   ],
 
@@ -48,24 +56,40 @@ Ext.define('NX.coreui.controller.BrowseIndex', {
         'nx-coreui-repository-browse-list': {
           selection: me.onSelection
         },
+        'nx-coreui-repository-browse-index': {
+          activate: me.onActivate,
+          deactivate: me.onDeactivate
+        },
         'nx-coreui-repository-browse-index-tree': {
-          select: me.onItemSelected
+          select: me.onNodeSelected,
+          beforeitemexpand: me.onBeforeItemExpand
         }
       }
     });
   },
 
-  onSelection: function (list, model) {
-    var me = this,
-        panel = me.getPanel(),
-        tree;
+  onActivate: function (panel) {
+    var me = this;
 
-    if (model.get('indexable') || model.get('downloadRemoteIndexes')) {
+    panel.active = true;
+    me.buildTree(me.getList().getSelectionModel().getSelection()[0]);
+  },
+
+  onDeactivate: function (panel) {
+    panel.active = false;
+  },
+
+  onSelection: function (repositoryGrid, repositoryModel) {
+    var me = this,
+        panel = me.getPanel();
+
+    if (repositoryModel.get('indexable') || repositoryModel.get('downloadRemoteIndexes')) {
       if (!panel) {
-        me.getFeature().addTab({ xtype: 'nx-coreui-repository-browse-index', title: 'Index' });
+        panel = me.getFeature().addTab({ xtype: 'nx-coreui-repository-browse-index', title: 'Index' });
       }
-      tree = me.getTree();
-      tree.getStore().getRootNode().set('text', model.get('name'));
+      if (panel.active) {
+        me.buildTree(repositoryModel);
+      }
     }
     else {
       if (panel) {
@@ -74,15 +98,36 @@ Ext.define('NX.coreui.controller.BrowseIndex', {
     }
   },
 
-  onItemSelected: function (tree, node) {
+  buildTree: function (repositoryModel) {
     var me = this,
-        panel = me.getPanel();
+        tree = me.getTree();
 
-    if (node.isRoot()) {
-      panel.fireEvent('itemdeselected', panel);
-    }
-    else {
-      panel.fireEvent('itemselected', panel, node.get('text'));
+    tree.getStore().setRootNode({
+      repositoryId: repositoryModel.getId(),
+      text: repositoryModel.get('name')
+    });
+    me.onNodeSelected(tree, tree.getStore().getRootNode());
+  },
+
+  onNodeSelected: function (tree, node) {
+    var me = this;
+
+    me.getComponentDetail().setComponent(node.isRoot() ? undefined : {
+      repositoryId: node.get('repositoryId'),
+      uri: node.get('path')
+    });
+  },
+
+  onBeforeItemExpand: function (node) {
+    if (!node.processed) {
+      node.processed = true;
+      NX.direct.coreui_RepositoryStorage.read(node.get('repositoryId'), node.getPath('name'), function (response) {
+        if (Ext.isDefined(response) && response.success && response.data && response.data.length) {
+          Ext.suspendLayouts();
+          node.appendChild(response.data);
+          Ext.resumeLayouts(true);
+        }
+      });
     }
   }
 
