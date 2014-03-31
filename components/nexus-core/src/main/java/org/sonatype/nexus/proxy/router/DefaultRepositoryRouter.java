@@ -429,8 +429,7 @@ public class DefaultRepositoryRouter
         throw new ItemNotFoundException(
             reasonFor(
                 request,
-                "BUG: Cannot deduce repository kind from request %s (this method should not be invoked with path having less than 2 segments)!",
-                request.getRequestPath()));
+                "Repository kind '" + explodedPath[0] + "' is unknown"));
       }
 
       result.setStrippedPrefix(PathUtils.concatPaths(explodedPath[0]));
@@ -506,7 +505,7 @@ public class DefaultRepositoryRouter
     }
 
     // nothing found
-    throw new NoSuchRepositoryException("pathPrefixOrId: '" + pathPrefixOrId + "'");
+    throw new NoSuchRepositoryException(pathPrefixOrId);
   }
 
   protected StorageItem retrieveVirtualPath(ResourceStoreRequest request, RequestRoute route)
