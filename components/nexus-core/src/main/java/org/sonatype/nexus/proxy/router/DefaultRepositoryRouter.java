@@ -429,7 +429,7 @@ public class DefaultRepositoryRouter
         throw new ItemNotFoundException(
             reasonFor(
                 request,
-                "Repository kind '" + explodedPath[0] + "' not exists"));
+                "Repository kind '" + explodedPath[0] + "' is unknown"));
       }
 
       result.setStrippedPrefix(PathUtils.concatPaths(explodedPath[0]));
