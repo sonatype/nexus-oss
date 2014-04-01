@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.plugins.bcprov;
 
 import javax.crypto.Cipher;
@@ -33,13 +32,6 @@ public class CryptoPlugin
     extends PluginIdentity
 {
   /**
-   * Algorithm we use for testing the unlimited sthrength policy files being installed.
-   *
-   * @since 2.8
-   */
-  private static final String UCRYPTO_TEST_ALGORITHM = "AES";
-
-  /**
    * Prefix for ID-like things.
    */
   @NonNls
@@ -60,11 +52,11 @@ public class CryptoPlugin
   @Inject
   public CryptoPlugin() throws Exception {
     super(GROUP_ID, ARTIFACT_ID);
-    // Javadoc: If JCE unlimited strength jurisdiction policy files are installed, Integer.MAX_VALUE will be returned.
-    if (!(Cipher.getMaxAllowedKeyLength(UCRYPTO_TEST_ALGORITHM) == Integer.MAX_VALUE)) {
-      log.warn(
-          "This JVM does not have JCE Unlimited Strength Jurisdiction Policy Files installed, required by Nexus."
-      );
+
+    if (Cipher.getMaxAllowedKeyLength("AES") == Integer.MAX_VALUE) {
+      log.info("Unlimited strength JCE policy detected");
     }
+
+    // TODO: Add specific warnings for algorithms we know specifically may affect NX behavior negatively if low strength/default policy is in place
   }
 }

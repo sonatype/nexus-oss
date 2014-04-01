@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,16 +19,20 @@ Ext.define('NX.coreui.view.capability.CapabilitySettings', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-capability-settings',
 
-  items: {
-    xtype: 'nx-coreui-capability-settingsfieldset'
-  },
+  items: [
+    {
+      xtype: 'hiddenfield',
+      name: 'id'
+    },
+    { xtype: 'nx-coreui-capability-settingsfieldset' }
+  ],
 
   getValues: function () {
-    return this.down('nx-coreui-capability-settingsfieldset').exportCapability(this.getForm())
+    return this.down('nx-coreui-capability-settingsfieldset').exportCapability(this.getForm());
   },
 
   markInvalid: function (errors) {
-    return this.down('nx-coreui-capability-settingsfieldset').markInvalid(this.getForm(), errors)
+    return this.down('nx-coreui-capability-settingsfieldset').markInvalid(this.getForm(), errors);
   }
 
 });

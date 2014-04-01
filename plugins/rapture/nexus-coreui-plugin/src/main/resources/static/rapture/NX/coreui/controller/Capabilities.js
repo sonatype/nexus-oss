@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -24,13 +24,11 @@ Ext.define('NX.coreui.controller.Capabilities', {
   list: 'nx-coreui-capability-list',
 
   stores: [
-    'CapabilityStatus',
     'Capability',
     'CapabilityType'
   ],
   models: [
-    'Capability',
-    'CapabilityStatus'
+    'Capability'
   ],
   views: [
     'capability.CapabilityFeature',
@@ -100,12 +98,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
         }
       },
       store: {
-        '#CapabilityStatus': {
-          beforeload: me.onCapabilityStatusBeforeLoad
-        },
-        '#Capability': {
-          load: me.reselect
-        },
         '#CapabilityType': {
           load: me.onCapabilityTypeLoad,
           datachanged: me.onCapabilityTypeLoad
@@ -127,15 +119,14 @@ Ext.define('NX.coreui.controller.Capabilities', {
 
   onSelection: function (list, model) {
     var me = this,
-        capabilityModel, capabilityTypeModel;
+        capabilityTypeModel;
 
     if (Ext.isDefined(model)) {
-      capabilityModel = me.getCapabilityStore().getById(model.get('id'));
       capabilityTypeModel = me.getCapabilityTypeStore().getById(model.get('typeId'));
 
       me.showTitle(model);
-      me.showSummary(model, capabilityModel);
-      me.showSettings(capabilityModel, capabilityTypeModel);
+      me.showSummary(model);
+      me.showSettings(model, capabilityTypeModel);
       me.showAbout(capabilityTypeModel);
       me.showStatus(model);
     }
@@ -152,7 +143,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     }
   },
 
-  showSummary: function (model, capabilityModel) {
+  showSummary: function (model) {
     var summary = this.getSummary(),
         info = {
           'Type': model.get('typeName'),
@@ -166,9 +157,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     }
 
     summary.showInfo(info);
-    if (capabilityModel) {
-      summary.down('form').loadRecord(capabilityModel);
-    }
+    summary.down('form').loadRecord(model);
   },
 
   showSettings: function (capabilityModel, capabilityTypeModel) {
@@ -202,12 +191,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
     capabilityTypeModel = this.getCapabilityTypeStore().getById(combo.value);
     win.down('nx-coreui-capability-about').showAbout(capabilityTypeModel.get('about'));
     win.down('nx-coreui-capability-settingsfieldset').setCapabilityType(capabilityTypeModel);
-  },
-
-  onCapabilityStatusBeforeLoad: function () {
-    var me = this;
-
-    me.getCapabilityStore().load();
   },
 
   loadCapabilityType: function () {
@@ -249,18 +232,15 @@ Ext.define('NX.coreui.controller.Capabilities', {
     var me = this,
         win = button.up('window'),
         form = button.up('form'),
-        capabilityModel = me.getCapabilityModel().create(),
         values = form.getValues(),
         remainingErrors;
 
-    capabilityModel.set(values);
-
-    NX.direct.capability_Capability.create(capabilityModel.data, function (response) {
+    NX.direct.capability_Capability.create(values, function (response) {
       if (Ext.isDefined(response)) {
         if (response.success) {
           win.close();
           NX.Messages.add({
-            text: 'Capability created: ' + me.getDescription(me.getCapabilityStatusModel().create(response.data)),
+            text: 'Capability created: ' + me.getDescription(me.getCapabilityModel().create(response.data)),
             type: 'success'
           });
           me.loadStoreAndSelect(response.data.id);
@@ -278,17 +258,14 @@ Ext.define('NX.coreui.controller.Capabilities', {
   updateCapability: function (button) {
     var me = this,
         form = button.up('form'),
-        capabilityModel = form.getRecord(),
         values = form.getValues(),
         remainingErrors;
 
-    capabilityModel.set(values);
-
-    NX.direct.capability_Capability.update(capabilityModel.data, function (response) {
+    NX.direct.capability_Capability.update(values, function (response) {
       if (Ext.isDefined(response)) {
         if (response.success) {
           NX.Messages.add({
-            text: 'Capability updated: ' + me.getDescription(me.getCapabilityStatusModel().create(response.data)),
+            text: 'Capability updated: ' + me.getDescription(me.getCapabilityModel().create(response.data)),
             type: 'success'
           });
           me.loadStore();

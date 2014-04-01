@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.security.filter.authc;
 
 import java.io.IOException;
@@ -77,10 +76,18 @@ public class NexusHttpAuthenticationFilter
   private TemplateRenderer templateRenderer;
 
   @Inject
-  private ApplicationStatusSource applicationStatusSource;
-
-  @Inject
   private BrowserDetector browserDetector;
+  
+  // ==
+  
+  private String nexusVersion;
+  
+  @Inject
+  public void setApplicationVersion(final ApplicationStatusSource applicationStatusSource) {
+    this.nexusVersion = applicationStatusSource.getSystemStatus().getVersion();
+  }
+  
+  // ==
 
   protected SecuritySystem getSecuritySystem() {
     return securitySystem;
@@ -181,7 +188,7 @@ public class NexusHttpAuthenticationFilter
       // omit WWW-Authenticate we do NOT want to have browser prompt
 
       Map<String,Object> params = ImmutableMap.of(
-          "nexusVersion", applicationStatusSource.getSystemStatus().getVersion(),
+          "nexusVersion", nexusVersion,
           "nexusRoot", (Object)BaseUrlHolder.get()
       );
       TemplateLocator template = templateRenderer.template(

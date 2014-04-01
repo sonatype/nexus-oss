@@ -2,7 +2,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-2013 Sonatype, Inc.
+    Copyright (c) 2007-2014 Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.buildsupport</groupId>
     <artifactId>public-parent</artifactId>
-    <version>5</version>
+    <version>6</version>
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
@@ -102,7 +102,7 @@
     <!--
     Configuration of 'nexus-plugin' packaging and bundles.
     -->
-    <nexus-plugin-bundle.version>1.2-SNAPSHOT</nexus-plugin-bundle.version>
+    <nexus-plugin-bundle.version>1.2</nexus-plugin-bundle.version>
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
 
     <!-- logging configuration used in logback config files to control test logging -->
@@ -122,6 +122,11 @@
     -->
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
+
+    <!--
+    Directory containing generated sisu metadata.
+    -->
+    <sisu.meta>${project.build.outputDirectory}/META-INF/sisu</sisu.meta>
   </properties>
 
   <modules>
@@ -193,6 +198,18 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-ehcache</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-extender</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-jettyapp</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
@@ -530,7 +547,7 @@
         </plugin>
 
         <!--
-        Generate basic OSGi metadata.
+        Generate basic OSGi metadata, include optional generated Sisu index.
         -->
         <plugin>
           <groupId>org.apache.felix</groupId>
@@ -543,8 +560,11 @@
               -->
               <_nouses>true</_nouses>
               <_nodefaultversion>true</_nodefaultversion>
+              <Include-Resource>
+                {maven-resources},$(if;$(dir;${sisu.meta});META-INF/sisu=${sisu.meta})
+              </Include-Resource>
               <_removeheaders>
-                Embed*,Import-Package,Include-Resource,Private-Package
+                Embed*,Include-Resource,Private-Package
               </_removeheaders>
             </instructions>
           </configuration>

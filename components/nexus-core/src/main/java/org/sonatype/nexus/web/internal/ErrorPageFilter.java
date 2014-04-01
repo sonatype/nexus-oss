@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.web.internal;
 
 import java.io.IOException;
@@ -78,7 +77,7 @@ public class ErrorPageFilter
           response,
           e.getResponseCode(),
           e.getReasonPhrase(),
-          e.getMessage(),
+          messageOf(e),
           e.getCause()
       );
     }
@@ -89,7 +88,25 @@ public class ErrorPageFilter
     catch (Exception e) {
       // runtime and servlet exceptions will end here (thrown probably by some non-nexus filter or servlet)
       log.warn("Unexpected exception", e);
-      templateRenderer.renderErrorPage(request, response, SC_INTERNAL_SERVER_ERROR, null /*default*/, e.getMessage(), e);
+      templateRenderer.renderErrorPage(
+          request,
+          response,
+          SC_INTERNAL_SERVER_ERROR,
+          null, // default reason phrase will be used
+          messageOf(e),
+          e
+      );
     }
+  }
+
+  /**
+   * Returns the message of given throwable, or if message is null will toString throwable.
+   */
+  private static String messageOf(final Throwable cause) {
+    String message = cause.getMessage();
+    if (message == null) {
+      return cause.toString();
+    }
+    return message;
   }
 }

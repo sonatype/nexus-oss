@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.proxy.mapping;
 
 import java.util.ArrayList;
@@ -20,9 +19,8 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,13 +28,16 @@ import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryGroupingCoreConfiguration;
+import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType;
@@ -44,10 +45,8 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
+import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -76,27 +75,29 @@ public class DefaultRequestRepositoryMapper
 {
   private final RepositoryRegistry repositoryRegistry;
 
-  private final List<RepositoryPathMapping> blockings = Lists.newCopyOnWriteArrayList();
-
-  private final List<RepositoryPathMapping> inclusions = Lists.newCopyOnWriteArrayList();
-
-  private final List<RepositoryPathMapping> exclusions = Lists.newCopyOnWriteArrayList();
+  private final ApplicationConfigurationValidator validator;
 
   /**
    * The compiled flag.
    */
   private volatile boolean compiled = false;
 
+  private volatile List<RepositoryPathMapping> blockings = new CopyOnWriteArrayList<RepositoryPathMapping>();
+
+  private volatile List<RepositoryPathMapping> inclusions = new CopyOnWriteArrayList<RepositoryPathMapping>();
+
+  private volatile List<RepositoryPathMapping> exclusions = new CopyOnWriteArrayList<RepositoryPathMapping>();
+
   @Inject
-  public DefaultRequestRepositoryMapper(final EventBus eventBus,
-                                        final ApplicationConfiguration applicationConfiguration,
-                                        final RepositoryRegistry repositoryRegistry)
+  public DefaultRequestRepositoryMapper(EventBus eventBus, ApplicationConfiguration applicationConfiguration,
+      RepositoryRegistry repositoryRegistry, ApplicationConfigurationValidator validator)
   {
     super("Repository Grouping Configuration", eventBus, applicationConfiguration);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    this.validator = checkNotNull(validator);
   }
 
-  // == Config
+  // ==
 
   @Override
   protected void initializeConfiguration()
@@ -132,58 +133,11 @@ public class DefaultRequestRepositoryMapper
     return wasDirty;
   }
 
-  // == Public API
-
-  /**
-   * Side effect: configuration framework will mark this component "dirty" after method returns.
-   */
-  @Override
-  public boolean addMapping(final RepositoryPathMapping mapping)
-      throws ConfigurationException
-  {
-    try {
-      final CPathMappingItem model = convert(mapping);
-      removeMapping(model.getId());
-      getCurrentConfiguration(true).addPathMapping(model);
-      return true;
-    }
-    catch (IllegalArgumentException e) {
-      throw new InvalidConfigurationException("Mapping to be added is invalid", e);
-    }
-  }
-
-  /**
-   * Side effect: configuration framework will mark this component "dirty" after method returns.
-   */
-  @Override
-  public boolean removeMapping(final String id) {
-    for (Iterator<CPathMappingItem> i = getCurrentConfiguration(true).getPathMappings().iterator(); i.hasNext(); ) {
-      CPathMappingItem mapping = i.next();
-      if (mapping.getId().equals(id)) {
-        i.remove();
-        return true;
-      }
-    }
-    return false;
-  }
+  // ==
 
   @Override
-  public Map<String, RepositoryPathMapping> getMappings() {
-    final HashMap<String, RepositoryPathMapping> result = Maps.newHashMap();
-    final CRepositoryGrouping config = getCurrentConfiguration(false);
-    if (config != null) {
-      final List<CPathMappingItem> items = config.getPathMappings();
-      for (CPathMappingItem item : items) {
-        RepositoryPathMapping mapping = convert(item);
-        result.put(mapping.getId(), mapping);
-      }
-    }
-    return Collections.unmodifiableMap(result);
-  }
-
-  @Override
-  public List<Repository> getMappedRepositories(final Repository repository, final ResourceStoreRequest request,
-                                                final List<Repository> resolvedRepositories)
+  public List<Repository> getMappedRepositories(Repository repository, ResourceStoreRequest request,
+                                                List<Repository> resolvedRepositories)
       throws NoSuchRepositoryException
   {
     if (!compiled) {
@@ -192,24 +146,30 @@ public class DefaultRequestRepositoryMapper
 
     // NEXUS-2852: to make our life easier, we will work with repository IDs,
     // and will fill the result with Repositories at the end
-    final LinkedHashSet<String> reposIdSet = Sets.newLinkedHashSetWithExpectedSize(resolvedRepositories.size());
+    LinkedHashSet<String> reposIdSet = new LinkedHashSet<String>(resolvedRepositories.size());
+
     for (Repository resolvedRepositorty : resolvedRepositories) {
       reposIdSet.add(resolvedRepositorty.getId());
     }
 
+    // if include found, add it to the list.
+    boolean firstAdd = true;
+
     for (RepositoryPathMapping mapping : blockings) {
       if (mapping.matches(repository, request)) {
-        log.debug(
-            "The request path [{}] is blocked by rule {}", request.getRequestPath(), mapping);
+        if (log.isDebugEnabled()) {
+          log.debug(
+              "The request path [" + request.toString() + "] is blocked by rule " + mapping.toString());
+        }
+
         request.addAppliedMappingsList(repository, Collections.singletonList(mapping.toString()));
+
         return Collections.emptyList();
       }
     }
 
-    // if include found, add it to the list.
-    boolean firstAdd = true;
     // for tracking what is applied
-    final ArrayList<RepositoryPathMapping> appliedMappings = Lists.newArrayList();
+    ArrayList<RepositoryPathMapping> appliedMappings = new ArrayList<RepositoryPathMapping>();
 
     // include, if found a match
     // NEXUS-2852: watch to not add multiple times same repository
@@ -218,13 +178,15 @@ public class DefaultRequestRepositoryMapper
     for (RepositoryPathMapping mapping : inclusions) {
       if (mapping.matches(repository, request)) {
         appliedMappings.add(mapping);
+
         if (firstAdd) {
           reposIdSet.clear();
+
           firstAdd = false;
         }
 
-        // add only those that are in initial resolvedRepositories list
-        // (and preserve ordering)
+        // add only those that are in initial resolvedRepositories list and that are non-user managed
+        // (preserve ordering)
         if (mapping.getMappedRepositories().size() == 1
             && "*".equals(mapping.getMappedRepositories().get(0))) {
           for (Repository repo : resolvedRepositories) {
@@ -233,7 +195,7 @@ public class DefaultRequestRepositoryMapper
         }
         else {
           for (Repository repo : resolvedRepositories) {
-            if (mapping.getMappedRepositories().contains(repo.getId())) {
+            if (mapping.getMappedRepositories().contains(repo.getId()) || !repo.isUserManaged()) {
               reposIdSet.add(repo.getId());
             }
           }
@@ -241,7 +203,7 @@ public class DefaultRequestRepositoryMapper
       }
     }
 
-    // then, if exclude found, remove those
+    // then, if exlude found, remove those
     for (RepositoryPathMapping mapping : exclusions) {
       if (mapping.matches(repository, request)) {
         appliedMappings.add(mapping);
@@ -249,67 +211,97 @@ public class DefaultRequestRepositoryMapper
         if (mapping.getMappedRepositories().size() == 1
             && "*".equals(mapping.getMappedRepositories().get(0))) {
           reposIdSet.clear();
+
           break;
         }
 
         for (String repositoryId : mapping.getMappedRepositories()) {
-          reposIdSet.remove(repositoryId);
+          Repository mappedRepository = repositoryRegistry.getRepository(repositoryId);
+
+          // but only if is user managed
+          if (mappedRepository.isUserManaged()) {
+            reposIdSet.remove(mappedRepository.getId());
+          }
         }
       }
     }
 
     // store the applied mappings to request context
-    final ArrayList<String> appliedMappingsList = Lists.newArrayListWithCapacity(appliedMappings.size());
+    ArrayList<String> appliedMappingsList = new ArrayList<String>(appliedMappings.size());
+
     for (RepositoryPathMapping mapping : appliedMappings) {
       appliedMappingsList.add(mapping.toString());
     }
+
     request.addAppliedMappingsList(repository, appliedMappingsList);
 
     // log it if needed
     if (log.isDebugEnabled()) {
       if (appliedMappings.isEmpty()) {
-        log.debug("No mapping exists for request path [{}]", request.getRequestPath());
+        log.debug("No mapping exists for request path [" + request.toString() + "]");
       }
       else {
-        final StringBuilder sb =
-            new StringBuilder("Request for path \"")
-                .append(request.getRequestPath())
-                .append("\" with the initial list of processable repositories of \"")
-                .append(resolvedRepositories)
-                .append("\" got these mappings applied:\n");
+        StringBuilder sb =
+            new StringBuilder("Request for path \"" + request.toString()
+                + "\" with the initial list of processable repositories of \""
+                + getResourceStoreListAsString(resolvedRepositories)
+                + "\" got these mappings applied:\n");
 
         for (RepositoryPathMapping mapping : appliedMappings) {
           sb.append(" * ").append(mapping.toString()).append("\n");
         }
+
         log.debug(sb.toString());
+
         if (reposIdSet.size() == 0) {
           log.debug(
-              "Mapping for path [{}] excluded all repositories from servicing the request", request.getRequestPath());
+              "Mapping for path [" + request.toString()
+                  + "] excluded all storages from servicing the request.");
         }
         else {
           log.debug(
-              "Request for path [{}] is MAPPED to reposes: {}", request.getRequestPath(), reposIdSet);
+              "Request path for [" + request.toString() + "] is MAPPED to reposes: " + reposIdSet);
         }
       }
     }
 
-    // build up the response list with Repositories
-    final ArrayList<Repository> result = Lists.newArrayListWithCapacity(reposIdSet.size());
+    ArrayList<Repository> result = new ArrayList<Repository>(reposIdSet.size());
+
     try {
       for (String repoId : reposIdSet) {
         result.add(repositoryRegistry.getRepository(repoId));
       }
     }
     catch (NoSuchRepositoryException e) {
-      log.warn(
-          "Some of the Routes contains references to non-existent repositories! Please check the following mappings: \"{}\".",
-          appliedMappingsList);
+      log.error(
+          "Some of the Routes contains references to non-existant repositories! Please check the following mappings: \""
+              + appliedMappingsList.toString() + "\".");
+
       throw e;
     }
+
     return result;
   }
 
-  // == Internal
+  public String getResourceStoreListAsString(List<? extends ResourceStore> stores) {
+    if (stores == null) {
+      return "[]";
+    }
+    ArrayList<String> repoIdList = new ArrayList<String>(stores.size());
+
+    for (ResourceStore store : stores) {
+      if (store instanceof Repository) {
+        repoIdList.add(((Repository) store).getId());
+      }
+      else {
+        repoIdList.add(store.getClass().getName());
+      }
+    }
+
+    return StringUtils.join(repoIdList.iterator(), ", ");
+  }
+
+  // ==
 
   protected synchronized void compile()
       throws NoSuchRepositoryException
@@ -317,79 +309,86 @@ public class DefaultRequestRepositoryMapper
     if (compiled) {
       return;
     }
+
     blockings.clear();
+
     inclusions.clear();
+
     exclusions.clear();
 
     if (getCurrentConfiguration(false) == null) {
-      log.debug("No Routes defined, have nothing to compile.");
+      if (log.isDebugEnabled()) {
+        log.debug("No Routes defined, have nothing to compile.");
+      }
+
       return;
     }
 
-    final Map<String, RepositoryPathMapping> mappings = getMappings();
-    for (RepositoryPathMapping mapping : mappings.values()) {
-      switch (mapping.getMappingType()) {
-        case BLOCKING:
-          blockings.add(mapping);
-          break;
-        case INCLUSION:
-          inclusions.add(mapping);
-          break;
-        case EXCLUSION:
-          exclusions.add(mapping);
-          break;
-        default:
-          log.warn("Unknown mapping type: {}", mapping.getMappingType());
-          throw new IllegalArgumentException("Unknown mapping type: " + mapping.getMappingType());
+    List<CPathMappingItem> pathMappings = getCurrentConfiguration(false).getPathMappings();
+
+    for (CPathMappingItem item : pathMappings) {
+      if (CPathMappingItem.BLOCKING_RULE_TYPE.equals(item.getRouteType())) {
+        blockings.add(convert(item));
+      }
+      else if (CPathMappingItem.INCLUSION_RULE_TYPE.equals(item.getRouteType())) {
+        inclusions.add(convert(item));
+      }
+      else if (CPathMappingItem.EXCLUSION_RULE_TYPE.equals(item.getRouteType())) {
+        exclusions.add(convert(item));
+      }
+      else {
+        log.warn("Unknown route type: " + item.getRouteType());
+
+        throw new IllegalArgumentException("Unknown route type: " + item.getRouteType());
       }
     }
+
     compiled = true;
   }
 
-  protected RepositoryPathMapping convert(final CPathMappingItem item) throws IllegalArgumentException {
-    validate(item);
-    MappingType type;
-    switch (item.getRouteType()) {
-      case CPathMappingItem.BLOCKING_RULE_TYPE:
-        type = MappingType.BLOCKING;
-        break;
-      case CPathMappingItem.INCLUSION_RULE_TYPE:
-        type = MappingType.INCLUSION;
-        break;
-      case CPathMappingItem.EXCLUSION_RULE_TYPE:
-        type = MappingType.EXCLUSION;
-        break;
-      default:
-        log.warn("Unknown route type: {}", item.getRouteType());
-        throw new IllegalArgumentException("Unknown route type: " + item.getRouteType());
+  protected RepositoryPathMapping convert(CPathMappingItem item)
+      throws IllegalArgumentException
+  {
+    MappingType type = null;
+
+    if (CPathMappingItem.BLOCKING_RULE_TYPE.equals(item.getRouteType())) {
+      type = MappingType.BLOCKING;
     }
+    else if (CPathMappingItem.INCLUSION_RULE_TYPE.equals(item.getRouteType())) {
+      type = MappingType.INCLUSION;
+    }
+    else if (CPathMappingItem.EXCLUSION_RULE_TYPE.equals(item.getRouteType())) {
+      type = MappingType.EXCLUSION;
+    }
+    else {
+      log.warn("Unknown route type: " + item.getRouteType());
+
+      throw new IllegalArgumentException("Unknown route type: " + item.getRouteType());
+    }
+
     return new RepositoryPathMapping(item.getId(), type, item.getGroupId(), item.getRoutePatterns(),
         item.getRepositories());
   }
 
-  protected CPathMappingItem convert(final RepositoryPathMapping item) throws IllegalArgumentException {
-    validate(item);
-    String routeType;
-    switch (item.getMappingType()) {
-      case BLOCKING:
-        routeType = CPathMappingItem.BLOCKING_RULE_TYPE;
-        break;
-      case INCLUSION:
-        routeType = CPathMappingItem.INCLUSION_RULE_TYPE;
-        break;
-      case EXCLUSION:
-        routeType = CPathMappingItem.EXCLUSION_RULE_TYPE;
-        break;
-      default:
-        log.warn("Unknown route type: {}", item.getMappingType());
-        throw new IllegalArgumentException("Unknown route type: " + item.getMappingType());
+  protected CPathMappingItem convert(RepositoryPathMapping item) {
+    String routeType = null;
+
+    if (MappingType.BLOCKING.equals(item.getMappingType())) {
+      routeType = CPathMappingItem.BLOCKING_RULE_TYPE;
     }
-    final CPathMappingItem result = new CPathMappingItem();
+    else if (MappingType.INCLUSION.equals(item.getMappingType())) {
+      routeType = CPathMappingItem.INCLUSION_RULE_TYPE;
+    }
+    else if (MappingType.EXCLUSION.equals(item.getMappingType())) {
+      routeType = CPathMappingItem.EXCLUSION_RULE_TYPE;
+    }
+
+    CPathMappingItem result = new CPathMappingItem();
     result.setId(item.getId());
     result.setGroupId(item.getGroupId());
     result.setRepositories(item.getMappedRepositories());
     result.setRouteType(routeType);
-    final ArrayList<String> patterns = Lists.newArrayListWithCapacity(item.getPatterns().size());
+    ArrayList<String> patterns = new ArrayList<String>(item.getPatterns().size());
     for (Pattern pattern : item.getPatterns()) {
       patterns.add(pattern.toString());
     }
@@ -397,77 +396,76 @@ public class DefaultRequestRepositoryMapper
     return result;
   }
 
-  private final Random rand = new Random(System.currentTimeMillis());
+  // ==
 
-  protected boolean isBlank(final String str) {
-    return (str == null || str.trim().length() == 0);
-  }
-
-  protected void validate(final CPathMappingItem pathItem)
-      throws IllegalArgumentException
+  @Override
+  public boolean addMapping(RepositoryPathMapping mapping)
+      throws ConfigurationException
   {
-    if (pathItem == null) {
-      throw new IllegalArgumentException("CPathMappingItem cannot be null");
-    }
-    if (isBlank(pathItem.getId()) || "0".equals(pathItem.getId())) {
-      // fix it
-      pathItem.setId(Long.toHexString(System.nanoTime() + rand.nextInt(2008)));
-    }
-    if (isBlank(pathItem.getGroupId())) {
-      // fix it
-      pathItem.setGroupId(CPathMappingItem.ALL_GROUPS);
-    }
-    if (pathItem.getRoutePatterns() == null || pathItem.getRoutePatterns().isEmpty()) {
-      throw new IllegalArgumentException("CPathMappingItem has no route patterns defined");
-    }
-    for (String regexp : pathItem.getRoutePatterns()) {
-      try {
-        Pattern.compile(regexp);
-      }
-      catch (PatternSyntaxException e) {
-        throw new IllegalArgumentException("CPathMappingItem contains invalid pattern", e);
-      }
-    }
-    if (!CPathMappingItem.INCLUSION_RULE_TYPE.equals(pathItem.getRouteType())
-        && !CPathMappingItem.EXCLUSION_RULE_TYPE.equals(pathItem.getRouteType())
-        && !CPathMappingItem.BLOCKING_RULE_TYPE.equals(pathItem.getRouteType())) {
-      throw new IllegalArgumentException("CPathMappingItem has invalid type: " + pathItem.getRouteType());
-    }
+    removeMapping(mapping.getId());
+
+    CPathMappingItem pathItem = convert(mapping);
+
+    // validate
+    this.validate(pathItem);
+
+    getCurrentConfiguration(true).addPathMapping(convert(mapping));
+
+    return true;
   }
 
-  protected void validate(final RepositoryPathMapping pathItem)
-      throws IllegalArgumentException
+  protected void validate(CPathMappingItem pathItem)
+      throws InvalidConfigurationException
   {
-    if (pathItem == null) {
-      throw new IllegalArgumentException("RepositoryPathMapping cannot be null");
-    }
-    // 'id' is created when mapping added
-    // 'type'
-    if (pathItem.getMappingType() == null) {
-      throw new IllegalArgumentException("RepositoryPathMapping 'type' cannot be null");
-    }
-    // 'groupId' is fixed when mapping added
-    // 'patterns'
-    if (pathItem.getPatterns() == null || pathItem.getPatterns().isEmpty()) {
-      throw new IllegalArgumentException("RepositoryPathMapping 'patterns' cannot be null or empty");
-    }
-    // 'repositories'
-    if (pathItem.getMappingType() != MappingType.BLOCKING &&
-        (pathItem.getMappedRepositories() == null || pathItem.getMappedRepositories().isEmpty())) {
-      throw new IllegalArgumentException("RepositoryPathMapping has no 'repositories' defined");
+    ValidationResponse response = this.validator.validateGroupsSettingPathMappingItem(null, pathItem);
+    if (!response.isValid()) {
+      throw new InvalidConfigurationException(response);
     }
   }
 
-  /**
-   * Handler for repository removal: if repository is removed, path mappings assigned to that repository
-   * are removed too, and repository references from removed from all other mappings.
-   */
+  @Override
+  public boolean removeMapping(String id) {
+    for (Iterator<CPathMappingItem> i = getCurrentConfiguration(true).getPathMappings().iterator(); i.hasNext(); ) {
+      CPathMappingItem mapping = i.next();
+
+      if (mapping.getId().equals(id)) {
+        i.remove();
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @Override
+  public Map<String, RepositoryPathMapping> getMappings() {
+    final HashMap<String, RepositoryPathMapping> result = new HashMap<String, RepositoryPathMapping>();
+
+    final CRepositoryGrouping config = getCurrentConfiguration(false);
+
+    if (config != null) {
+      List<CPathMappingItem> items = config.getPathMappings();
+
+      for (CPathMappingItem item : items) {
+        RepositoryPathMapping mapping = convert(item);
+
+        result.put(mapping.getId(), mapping);
+      }
+    }
+
+    return Collections.unmodifiableMap(result);
+  }
+
   @Subscribe
   public void onEvent(final RepositoryRegistryEventRemove evt) {
     final String repoId = evt.getRepository().getId();
-    final List<CPathMappingItem> pathMappings = getCurrentConfiguration(true).getPathMappings();
+
+    List<CPathMappingItem> pathMappings = getCurrentConfiguration(true).getPathMappings();
+
     for (Iterator<CPathMappingItem> iterator = pathMappings.iterator(); iterator.hasNext(); ) {
-      final CPathMappingItem item = iterator.next();
+      CPathMappingItem item = iterator.next();
+
       if (item.getGroupId().equals(repoId)) {
         iterator.remove();
       }
@@ -476,4 +474,5 @@ public class DefaultRequestRepositoryMapper
       }
     }
   }
+
 }

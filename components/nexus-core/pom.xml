@@ -1,7 +1,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-2013 Sonatype, Inc.
+    Copyright (c) 2007-2014 Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -316,6 +316,11 @@
 
     <dependency>
       <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-logback</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.yammer.metrics</groupId>
       <artifactId>metrics-guice</artifactId>
       <exclusions>
         <exclusion>
@@ -328,6 +333,16 @@
     <dependency>
       <groupId>com.yammer.metrics</groupId>
       <artifactId>metrics-httpclient</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-servlet</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.yammer.metrics</groupId>
+      <artifactId>metrics-web</artifactId>
     </dependency>
 
     <dependency>

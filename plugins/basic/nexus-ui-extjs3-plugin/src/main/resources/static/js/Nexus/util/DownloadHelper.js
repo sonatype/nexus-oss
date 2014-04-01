@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -25,6 +25,20 @@ NX.define('Nexus.util.DownloadHelper', {
   ],
 
   /**
+   * @private
+   *
+   * ExtJS component identifier for nested iframe.
+   */
+  windowId: 'nx-download-frame',
+
+  /**
+   * @private
+   *
+   * Window names in IE are very picky, using '_' instead of '-' so that its its a valid javascript identifier.
+   */
+  windowName: 'nx_download_frame',
+
+  /**
    * Get the hidden download frame.
    *
    * @private
@@ -34,13 +48,13 @@ NX.define('Nexus.util.DownloadHelper', {
     var me = this, frame;
 
     // create the download frame if needed
-    frame = Ext.get('nx-download-frame');
+    frame = Ext.get(me.windowId);
     if (!frame) {
       frame = Ext.getBody().createChild({
         tag: 'iframe',
         cls: 'x-hidden',
-        id: 'nx-download-frame',
-        name: 'nx-download-frame'
+        id: me.windowId,
+        name: me.windowName
       });
       me.logDebug('Created download-frame: ' + frame);
     }
@@ -68,7 +82,7 @@ NX.define('Nexus.util.DownloadHelper', {
     // TODO: Form method could be handy to GET/POST w/params vs link to just GET?
 
     // open new window in hidden download-from to initiate download
-    win = NX.global.open(url, 'nx-download-frame');
+    win = NX.global.open(url, me.windowName);
     if (win == null) {
       alert('Download window pop-up was blocked!');
       return false;

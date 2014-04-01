@@ -1,0 +1,171 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2007-2014 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+package org.sonatype.nexus.extender;
+
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Map;
+
+import javax.servlet.Filter;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
+import org.sonatype.nexus.NxApplication;
+import org.sonatype.nexus.guice.NexusModules.CoreModule;
+import org.sonatype.nexus.log.LogManager;
+import org.sonatype.nexus.web.internal.NexusGuiceFilter;
+
+import com.google.common.base.Throwables;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.servlet.GuiceServletContextListener;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.context.Context;
+import org.eclipse.sisu.plexus.PlexusSpaceModule;
+import org.eclipse.sisu.space.BeanScanning;
+import org.eclipse.sisu.space.BundleClassSpace;
+import org.eclipse.sisu.space.ClassSpace;
+import org.eclipse.sisu.wire.WireModule;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Collections.singletonMap;
+
+/**
+ * {@link ServletContextListener} that bootstraps the core Nexus application.
+ * 
+ * @since 3.0
+ */
+public class NexusContextListener
+    extends GuiceServletContextListener
+{
+  private static final Logger log = LoggerFactory.getLogger(NexusContextListener.class);
+
+  private final NexusExtender extender;
+
+  private ServletContext servletContext;
+
+  private Injector injector;
+
+  private PlexusContainer container;
+
+  private LogManager logManager;
+
+  private NxApplication application;
+
+  private ServiceRegistration<Filter> registration;
+
+  public NexusContextListener(final NexusExtender extender) {
+    this.extender = extender;
+  }
+
+  @Override
+  public void contextInitialized(final ServletContextEvent event) {
+    final BundleContext ctx = extender.getBundleContext();
+
+    servletContext = event.getServletContext();
+    Map<?, ?> variables = (Map<?, ?>) servletContext.getAttribute("nexus.properties");
+    if (variables == null) {
+      variables = System.getProperties();
+    }
+
+    final Bundle systemBundle = ctx.getBundle(0);
+
+    final ClassSpace coreSpace = new BundleClassSpace(ctx.getBundle());
+    injector = Guice.createInjector(
+        new WireModule(
+            new CoreModule(servletContext, variables, systemBundle),
+            new PlexusSpaceModule(coreSpace, BeanScanning.INDEX)));
+    log.debug("Injector: {}", injector);
+
+    super.contextInitialized(event);
+
+    container = injector.getInstance(PlexusContainer.class);
+    servletContext.setAttribute(PlexusConstants.PLEXUS_KEY, container);
+    injector.getInstance(Context.class).put(PlexusConstants.PLEXUS_KEY, container);
+    log.debug("Container: {}", container);
+
+    extender.doStart(); // start tracking nexus bundles
+
+    try {
+      logManager = container.lookup(LogManager.class);
+      log.debug("Log manager: {}", logManager);
+      logManager.configure();
+
+      application = container.lookup(NxApplication.class);
+      log.debug("Application: {}", application);
+      application.start();
+    }
+    catch (final Exception e) {
+      log.error("Failed to start application", e);
+      Throwables.propagate(e);
+    }
+
+    // register our dynamic filter with the surrounding bootstrap code
+    final Filter filter = injector.getInstance(NexusGuiceFilter.class);
+    final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "nexus"));
+    registration = ctx.registerService(Filter.class, filter, properties);
+  }
+
+  @Override
+  public void contextDestroyed(final ServletContextEvent event) {
+
+    // remove our dynamic filter
+    if (registration != null) {
+      registration.unregister();
+      registration = null;
+    }
+
+    if (application != null) {
+      try {
+        application.stop();
+      }
+      catch (final Exception e) {
+        log.error("Failed to stop application", e);
+      }
+      application = null;
+    }
+
+    if (logManager != null) {
+      logManager.shutdown();
+      logManager = null;
+    }
+
+    extender.doStop(); // stop tracking bundles
+
+    if (container != null) {
+      container.dispose();
+      container = null;
+    }
+
+    if (servletContext != null) {
+      servletContext.removeAttribute(PlexusConstants.PLEXUS_KEY);
+      super.contextDestroyed(new ServletContextEvent(servletContext));
+      servletContext = null;
+    }
+
+    injector = null;
+  }
+
+  @Override
+  protected Injector getInjector() {
+    checkState(injector != null, "Missing injector reference");
+    return injector;
+  }
+}

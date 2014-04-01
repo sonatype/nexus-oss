@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -110,19 +110,17 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
         values = form.getFieldValues(),
         value,
         capability = {
+          id: values.id,
           typeId: me.capabilityType.get('id'),
           enabled: values.enabled,
-          properties: []
+          properties: {}
         };
 
     if (me.capabilityType && me.capabilityType.get('formFields')) {
       Ext.each(me.capabilityType.get('formFields'), function (formField) {
         value = values['property.' + formField.id];
         if (Ext.isDefined(value)) {
-          capability.properties[capability.properties.length] = {
-            key: formField.id,
-            value: String(value)
-          };
+          capability.properties[formField.id] = String(value);
         }
       });
     }
@@ -149,8 +147,8 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
     }
 
     if (capabilityModel.data.properties) {
-      Ext.each(capabilityModel.data.properties, function (property) {
-        data['property.' + property.key] = property.value;
+      Ext.Object.each(capabilityModel.data.properties, function (key, value) {
+        data['property.' + key] = value;
       });
     }
 

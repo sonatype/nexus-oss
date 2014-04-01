@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.ByteArrayInputStream;
@@ -187,8 +186,10 @@ public class LocalContentDiscovererImplTest
           entrySource.readEntries(),
           hasItems("/archetype-catalog.xml", "/archetype-catalog.xml.sha1", "/archetype-catalog.xml.md5",
               "/com/sonatype", "/org/apache"));
-      assertThat(entrySource.readEntries(), not(hasItems("/org/sonatype")));
-      assertThat(entrySource.readEntries().size(), equalTo(5));
+      // NEXUS-6485: Not true anymore, we do include empty directories due to "depth" optimization
+      // see LocalContentDiscovererImpl
+      // assertThat(entrySource.readEntries(), not(hasItems("/org/sonatype")));
+      assertThat(entrySource.readEntries().size(), equalTo(6)); // was 5
     }
   }
 }

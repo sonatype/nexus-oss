@@ -1,7 +1,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-2013 Sonatype, Inc.
+    Copyright (c) 2007-2014 Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -116,21 +116,7 @@ Assume you have a standard Java web application build with [Maven][3]. To build 
 use the [rpm-maven-plugin][12] by Codehaus. Its goal _attached-rpm_ automatically attaches the RPM file as Maven 
 build artifact so that the RPM is uploaded to Nexus in the _deploy_ phase. A minimal _pom.xml_ would look like this:
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
 
-    Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-2013 Sonatype, Inc.
-    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
-
-    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
-    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
-
-    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
-    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
-    Eclipse Foundation. All other trademarks are the property of their respective owners.
-
--->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sonatype.nexus.yum.its</groupId>

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.web.internal;
 
 import java.io.IOException;
@@ -22,7 +23,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.nexus.web.WebUtils;
 
@@ -36,43 +36,48 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class ErrorPageServlet
-  extends HttpServlet
+    extends HttpServlet
 {
-  private final ApplicationStatusSource applicationStatusSource;
-
   private final TemplateRenderer templateRenderer;
 
   private final WebUtils webUtils;
 
   @Inject
-  public ErrorPageServlet(final ApplicationStatusSource applicationStatusSource,
-                          final TemplateRenderer templateRenderer,
+  public ErrorPageServlet(final TemplateRenderer templateRenderer,
                           final WebUtils webUtils)
   {
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
     this.templateRenderer = checkNotNull(templateRenderer);
     this.webUtils = checkNotNull(webUtils);
   }
 
   @Override
   protected void service(final HttpServletRequest request, final HttpServletResponse response)
-      throws ServletException, IOException {
+      throws ServletException, IOException
+  {
     webUtils.addNoCacheResponseHeaders(response);
 
     Integer errorCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
-    String errorMessage = (String)request.getAttribute("javax.servlet.error.message");
+    String errorMessage = (String) request.getAttribute("javax.servlet.error.message");
+    Throwable cause = (Throwable) request.getAttribute("javax.servlet.error.exception");
+
+    // this happens if someone browses directly to the error page
     if (errorCode == null) {
-      // this happens if someone "browses" to error page
       errorCode = 404;
       errorMessage = "Not found";
     }
+
+    // error message must always be non-null when rendering
+    if (errorMessage == null) {
+      errorMessage = "Unknown error";
+    }
+
     templateRenderer.renderErrorPage(
         request,
         response,
         errorCode,
         null, // default reason phrase will be used
         errorMessage,
-        (Throwable)request.getAttribute("javax.servlet.error.exception")
+        cause
     );
   }
 }

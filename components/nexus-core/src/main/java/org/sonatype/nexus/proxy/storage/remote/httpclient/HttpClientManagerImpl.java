@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,13 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
 import java.net.URI;
 import java.util.Locale;
 import java.util.Objects;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -39,6 +39,9 @@ import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.protocol.HttpContext;
+import org.slf4j.Logger;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Default implementation of {@link HttpClientManager}.
@@ -64,14 +67,14 @@ public class HttpClientManagerImpl
    */
   @Inject
   public HttpClientManagerImpl(final Hc4Provider hc4Provider, final UserAgentBuilder userAgentBuilder) {
-    this.hc4Provider = Preconditions.checkNotNull(hc4Provider);
-    this.userAgentBuilder = Preconditions.checkNotNull(userAgentBuilder);
+    this.hc4Provider = checkNotNull(hc4Provider);
+    this.userAgentBuilder = checkNotNull(userAgentBuilder);
   }
 
   @Override
   public HttpClient create(final ProxyRepository proxyRepository, final RemoteStorageContext ctx) {
-    Preconditions.checkNotNull(proxyRepository);
-    Preconditions.checkNotNull(ctx);
+    checkNotNull(proxyRepository);
+    checkNotNull(ctx);
     final Builder builder = hc4Provider.prepareHttpClient(ctx);
     configure(proxyRepository, ctx, builder);
     return builder.build();
@@ -128,57 +131,85 @@ public class HttpClientManagerImpl
                                                                 final RemoteStorageContext ctx)
   {
     // Prevent redirection to index pages
-    final RedirectStrategy doNotRedirectToIndexPagesStrategy = new DefaultRedirectStrategy()
+    return new DefaultRedirectStrategy()
     {
       @Override
-      public boolean isRedirected(final HttpRequest request, final HttpResponse response,
-                                  final HttpContext context)
+      public boolean isRedirected(final HttpRequest request, final HttpResponse response, final HttpContext context)
           throws ProtocolException
       {
+        final Logger logger = HttpClientRemoteStorage.outboundRequestLog;
+
         if (super.isRedirected(request, response, context)) {
           // code below comes from DefaultRedirectStrategy, as method super.getLocationURI cannot be used
           // since it modifies context state, and would result in false circular reference detection
           final Header locationHeader = response.getFirstHeader("location");
           if (locationHeader == null) {
             // got a redirect response, but no location header
-            throw new ProtocolException(
-                "Received redirect response " + response.getStatusLine()
-                    + " from proxy " + proxyRepository + " but no location present");
+            throw new ProtocolException("Received redirect response " + response.getStatusLine() +
+                " from proxy " + proxyRepository + " but no location present");
           }
+
+          // Some complication here as it appears that something may be null, but its not clear what was null
           final URI sourceUri = ((HttpUriRequest)request).getURI();
+          final String sourceScheme = schemeOf(sourceUri);
+          final String sourceHost = hostOf(sourceUri);
+
           final URI targetUri = createLocationURI(locationHeader.getValue());
+          final String targetScheme = schemeOf(targetUri);
+          final String targetHost = hostOf(targetUri);
+
           // nag about redirection peculiarities, in any case
-          if (!Objects.equals(sourceUri.getScheme().toLowerCase(Locale.US), targetUri.getScheme().toLowerCase(
-              Locale.US))) {
-            if ("http".equals(targetUri.getScheme().toLowerCase(Locale.US))) {
+          if (!Objects.equals(sourceScheme, targetScheme)) {
+            if ("http".equals(targetScheme)) {
               // security risk: HTTPS > HTTP downgrade, you are not safe as you think!
-              HttpClientRemoteStorage.outboundRequestLog.debug(
-                  "Downgrade from HTTPS to HTTP during redirection {} -> {}",
-                  sourceUri, targetUri);
+              logger.debug("Downgrade from HTTPS to HTTP during redirection {} -> {}", sourceUri, targetUri);
             }
-            if ("https".equals(targetUri.getScheme().toLowerCase(Locale.US)) &&
-                Objects.equals(sourceUri.getHost(), targetUri.getHost())) {
+            else if ("https".equals(targetScheme) && Objects.equals(sourceHost, targetHost)) {
               // misconfiguration: your repository configured with wrong protocol and causes performance problems?
-              HttpClientRemoteStorage.outboundRequestLog.debug(
-                  "Protocol upgrade during redirection on same host {} -> {}",
-                  sourceUri, targetUri);
+              logger.debug("Protocol upgrade during redirection on same host {} -> {}", sourceUri, targetUri);
             }
           }
+
           // this logic below should trigger only for content fetches made by RRS retrieveItem
           // hence, we do this ONLY if the HttpRequest is "marked" as such request
           if (Boolean.TRUE == context.getAttribute(HttpClientRemoteStorage.CONTENT_RETRIEVAL_MARKER_KEY)) {
             if (targetUri.getPath().endsWith("/")) {
-              HttpClientRemoteStorage.outboundRequestLog.debug("Not following redirection to index {} -> {}", sourceUri,
-                  targetUri);
+              logger.debug("Not following redirection to index {} -> {}", sourceUri, targetUri);
               return false;
             }
           }
-          HttpClientRemoteStorage.outboundRequestLog.debug("Following redirection {} -> {}", sourceUri, targetUri);
+
+          logger.debug("Following redirection {} -> {}", sourceUri, targetUri);
           return true;
         }
+
         return false;
       }
     };
-    return doNotRedirectToIndexPagesStrategy;
+  }
+
+  /**
+   * Return the scheme of given uri in lower-case, or null if the scheme can not be determined.
+   */
+  @Nullable
+  private static String schemeOf(final URI uri) {
+    if (uri != null) {
+      String scheme = uri.getScheme();
+      if (scheme != null) {
+        return scheme.toLowerCase(Locale.US);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Return host of given uri or null.
+   */
+  @Nullable
+  private static String hostOf(final URI uri) {
+    if (uri != null) {
+      return uri.getHost();
+    }
+    return null;
   }
 }

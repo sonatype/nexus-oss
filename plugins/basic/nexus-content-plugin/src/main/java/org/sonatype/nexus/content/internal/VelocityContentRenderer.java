@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.content.internal;
 
 import java.io.IOException;
@@ -38,6 +37,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
+import org.sonatype.nexus.proxy.item.StorageCompositeItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
@@ -50,7 +50,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -121,10 +120,23 @@ public class VelocityContentRenderer
   {
     final Map<String, Object> dataModel = createBaseModel();
     dataModel.put("req", resourceStoreRequest);
-    dataModel.put("item", item);
     if (item != null) {
+      dataModel.put("item", item);
       dataModel.put("itemContext", filterItemContext(item.getItemContext()).flatten());
       dataModel.put("itemAttributes", filterItemAttributes(item.getRepositoryItemAttributes()).asMap());
+      if (item instanceof StorageCompositeItem) {
+        final StorageCompositeItem compositeItem = (StorageCompositeItem) item;
+        final List<String> sources = Lists.newArrayList();
+        for (StorageItem source : compositeItem.getSources()) {
+          if (!source.isVirtual()) {
+            sources.add(source.getRepositoryItemUid().toString());
+          }
+          else {
+            sources.add(source.getPath());
+          }
+        }
+        dataModel.put("compositeSources", sources);
+      }
     }
     dataModel.put("exception", exception);
     final Reasoning reasoning = buildReasoning(exception);

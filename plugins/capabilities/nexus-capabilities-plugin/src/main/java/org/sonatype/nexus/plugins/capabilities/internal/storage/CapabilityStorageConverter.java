@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.plugins.capabilities.internal.storage;
 
 import java.io.File;
@@ -101,6 +100,12 @@ public class CapabilityStorageConverter
 
       if (capabilities != null) {
         for (final CCapability c : capabilities) {
+
+          // NEXUS-6349: do not convert outreach related capabilities and let outreach plugin recreate them
+          if ("OutreachMarkerCapability".equals(c.getTypeId()) ||
+              "OutreachManagementCapability".equals(c.getTypeId())) {
+            continue;
+          }
 
           Map<String, String> properties = Maps.newHashMap();
           if (c.getProperties() != null) {

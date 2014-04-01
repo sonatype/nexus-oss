@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.proxy.repository;
 
 import java.io.IOException;
@@ -184,17 +183,21 @@ public abstract class AbstractProxyRepository
   }
 
   private void createRepositoryStatusCheckerThread() {
-    if (repositoryStatusCheckerThread == null) {
-      repositoryStatusCheckerThread =
-          new RepositoryStatusCheckerThread(LoggerFactory.getLogger(getClass().getName() + "-"
-              + getId()), this);
-      repositoryStatusCheckerThread.setRunning(true);
-      repositoryStatusCheckerThread.setDaemon(true);
-      repositoryStatusCheckerThread.start();
+    // only for proxy kind
+    if (getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
+      if (repositoryStatusCheckerThread == null) {
+        repositoryStatusCheckerThread =
+            new RepositoryStatusCheckerThread(LoggerFactory.getLogger(getClass().getName() + "-"
+                + getId()), this);
+        repositoryStatusCheckerThread.setRunning(true);
+        repositoryStatusCheckerThread.setDaemon(true);
+        repositoryStatusCheckerThread.start();
+      }
     }
   }
 
   private void disposeRepositoryStatusCheckerThread() {
+    // not depend on kind, as it might be "transformed" from proxy to hosted
     if (repositoryStatusCheckerThread != null) {
       repositoryStatusCheckerThread.setRunning(false);
       repositoryStatusCheckerThread.interrupt();
@@ -204,7 +207,7 @@ public abstract class AbstractProxyRepository
   @Override
   public void dispose() {
     super.dispose();
-    // kill our daemon thread too
+    // kill our daemon thread too, if needed
     disposeRepositoryStatusCheckerThread();
   }
 

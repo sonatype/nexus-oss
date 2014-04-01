@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2013 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.guice;
 
 import java.net.URL;
@@ -39,7 +38,7 @@ public class StaticWebResourceBundle
 
   @Inject
   public StaticWebResourceBundle(final ClassSpace space, final MimeSupport mimeSupport) {
-    for (Enumeration<URL> e = space.findEntries("static/", null, true); e.hasMoreElements();) {
+    for (Enumeration<URL> e = space.findEntries("static", "*", true); e.hasMoreElements();) {
       final URL url = e.nextElement();
       final String path = getPublishedPath(url);
       if (path != null) {
