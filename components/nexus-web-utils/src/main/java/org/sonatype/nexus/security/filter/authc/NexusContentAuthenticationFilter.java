@@ -19,11 +19,17 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.annotations.VisibleForTesting;
+
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Nexus {code}/content{code} {@link AuthenticationFilter}.
@@ -35,6 +41,9 @@ import org.apache.shiro.web.filter.authc.AuthenticationFilter;
 public class NexusContentAuthenticationFilter
     extends NexusSecureHttpAuthenticationFilter
 {
+  private static final Logger LOG = LoggerFactory.getLogger(NexusContentAuthenticationFilter.class);
+  private static final String USERNAME_HEADER = "X-USERNAME";
+
   @Inject
   @Nullable
   private List<NexusContentRestrictionConstituent> constituents;
@@ -78,5 +87,32 @@ public class NexusContentAuthenticationFilter
     else {
       return super.createToken(request, response);
     }
+  }
+
+  @Override
+  protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request, ServletResponse response) {
+    addUserInHeader(response);
+
+    return super.onLoginSuccess(token, subject, request, response);
+  }
+
+  private void addUserInHeader(ServletResponse response) {
+    HttpServletResponse httpResponse = (HttpServletResponse) response;
+    String username = null;
+    Subject currentUser = SecurityUtils.getSubject();
+
+    LOG.debug(String.valueOf(currentUser));
+
+    Object principal = currentUser.getPrincipal();
+    if (principal != null) {
+      username = principal.toString().trim();
+    }
+
+    if (username == null || username.trim().isEmpty()) {
+      username = "-";
+    } else {
+      httpResponse.addHeader(USERNAME_HEADER, username);
+    }
+    LOG.debug(username);
   }
 }
