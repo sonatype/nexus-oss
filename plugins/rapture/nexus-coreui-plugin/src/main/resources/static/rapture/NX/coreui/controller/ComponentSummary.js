@@ -52,20 +52,7 @@ Ext.define('NX.coreui.controller.ComponentSummary', {
       panel = detailPanel.add({ xtype: 'nx-coreui-component-summary' });
     }
 
-    panel.down('#title').setText('Information about ' + componentRef.uri);
-
-    NX.direct.coreui_RepositoryStorageItemInfo.read(componentRef.repositoryId, componentRef.uri, function (response) {
-      if (Ext.isDefined(response) && response.success) {
-        panel.down('nx-info-panel').showInfo({
-          'Path': response.data.path,
-          'Size': response.data.size ? response.data.size + ' bytes' : null,
-          'Created': NX.util.DateFormat.timestamp(response.data.created),
-          'Modified': NX.util.DateFormat.timestamp(response.data.modified),
-          'SHA-1': response.data.sha1,
-          'MD5': response.data.md5
-        });
-      }
-    });
+    panel.down('#title').setText('Summary of ' + componentRef.uri);
   },
 
   onComponentUnavailable: function (detailPanel) {
