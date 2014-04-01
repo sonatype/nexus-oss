@@ -48,7 +48,7 @@ Ext.define('NX.ext.SearchBox', {
          * @event search
          * Fires when a search values was typed. Fires with a delay of **{@link #searchDelay}**.
          * @param {NX.view.header.SearchBox} this search box
-         * @param {String} width search value
+         * @param {String} search value
          */
         'search',
 
