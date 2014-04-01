@@ -1,0 +1,203 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2007-2014 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+/**
+ * Search controller.
+ * FIXME move to core ui
+ *
+ * @since 3.0
+ */
+Ext.define('NX.coreui.controller.Search', {
+  extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Bookmarks'
+  ],
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
+
+  stores: [
+    'SearchFilter',
+    'SearchCriteria',
+    'SearchResult'
+  ],
+
+  views: [
+    'search.SearchFeature',
+    'search.TextSearchCriteria'
+  ],
+
+  refs: [
+    {
+      ref: 'searchFeature',
+      selector: 'nx-searchfeature'
+    },
+    {
+      ref: 'quickSearch',
+      selector: 'nx-header-panel #quicksearch'
+    },
+    {
+      ref: 'componentDetail',
+      selector: 'nx-coreui-component-detail'
+    }
+  ],
+
+  /**
+   * @override
+   */
+  init: function () {
+    var me = this;
+
+    me.getApplication().getIconController().addIcons({
+      'feature-search': {
+        file: 'magnifier.png',
+        variants: ['x16', 'x32']
+      }
+    });
+
+    me.getSearchFilterStore().each(function (model) {
+      me.getApplication().getFeaturesController().registerFeature({
+        path: '/' + model.get('name'),
+        mode: 'search',
+        view: { xtype: 'nx-searchfeature', searchFilter: model },
+        iconConfig: {
+          name: model.get('iconName') ? model.get('iconName') : 'feature-search'
+        },
+        description: model.get('description'),
+        authenticationRequired: false
+      });
+    });
+
+    me.listen({
+      component: {
+        'nx-searchfeature': {
+          afterrender: me.initCriterias
+        },
+        'nx-searchfeature menuitem[action=add]': {
+          click: me.addCriteria
+        },
+        'nx-searchfeature component[searchCriteria=true]': {
+          search: me.onSearchCriteriaChange,
+          searchcleared: me.onSearchCriteriaChange
+        },
+        'nx-searchfeature grid': {
+          selectionchange: me.onSelectionChange
+        }
+      }
+    });
+
+  },
+
+  initCriterias: function () {
+    var me = this,
+        searchPanel = me.getSearchFeature(),
+        searchFilter = searchPanel.searchFilter,
+        searchCriteriaPanel = searchPanel.down('#criteria'),
+        searchCriteriaStore = me.getSearchCriteriaStore(),
+        addCriteriaMenu = [],
+        searchCriteria;
+
+    me.getSearchResultStore().removeAll();
+    me.getSearchResultStore().clearFilter(true);
+
+    if (searchFilter && searchFilter.get('criterias')) {
+      Ext.Array.each(Ext.Array.from(searchFilter.get('criterias')), function (criteriaRef) {
+        var criteria = searchCriteriaStore.getById(criteriaRef.id);
+
+        if (criteria) {
+          var cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-' + criteria.getId());
+          if (!cmpClass) {
+            cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-text');
+          }
+          searchCriteria = searchCriteriaPanel.add(cmpClass.create(Ext.apply(criteria.get('config'), {
+            criteriaId: criteria.getId(),
+            value: criteriaRef.value,
+            hidden: criteriaRef.hidden
+          })));
+          if (criteriaRef.value) {
+            me.applyFilter(searchCriteria, false);
+          }
+        }
+      });
+    }
+
+    searchCriteriaStore.each(function (criteria) {
+      addCriteriaMenu.push({
+        text: criteria.get('config').fieldLabel,
+        criteria: criteria,
+        action: 'add'
+      });
+    });
+
+    searchCriteriaPanel.add({
+      xtype: 'button',
+      itemId: 'addButton',
+      text: 'More Criteria',
+      glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
+      menu: addCriteriaMenu
+    });
+  },
+
+  addCriteria: function (menuitem) {
+    var me = this,
+        searchPanel = me.getSearchFeature(),
+        searchCriteria = searchPanel.down('#criteria'),
+        addButton = searchCriteria.down('#addButton'),
+        criteria = menuitem.criteria,
+        cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-' + criteria.getId());
+
+    if (!cmpClass) {
+      cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-text');
+    }
+    searchCriteria.remove(addButton, false);
+    searchCriteria.add(cmpClass.create(Ext.apply(criteria.get('config'), { criteriaId: criteria.getId() })));
+    searchCriteria.add(addButton);
+  },
+
+  onSearchCriteriaChange: function (searchCriteria) {
+    var me = this;
+    me.applyFilter(searchCriteria, true);
+  },
+
+  applyFilter: function (searchCriteria, apply) {
+    var me = this,
+        store = me.getSearchResultStore(),
+        filter = searchCriteria.filter;
+
+    if (filter && Ext.isFunction(filter) && !(filter instanceof Ext.util.Filter)) {
+      filter = searchCriteria.filter();
+    }
+
+    if (filter) {
+      store.addFilter(Ext.apply(filter, { id: searchCriteria.criteriaId }), apply);
+    }
+    else {
+      // TODO code bellow is a workaround stores not removing filters when remoteFilter = true
+      // store.removeFilter(searchCriteria.criteriaId);
+      if (store.filters.removeAtKey(searchCriteria.criteriaId) && apply) {
+        if (store.filters.length) {
+          store.filter();
+        }
+        else {
+          store.clearFilter();
+        }
+        store.fireEvent('filterchange', store, store.filters.items);
+      }
+    }
+  },
+
+  onSelectionChange: function (selectionModel, selected) {
+    var me = this;
+    me.getComponentDetail().setComponent(selected[0] ? selected[0].data : undefined);
+  }
+
+});
