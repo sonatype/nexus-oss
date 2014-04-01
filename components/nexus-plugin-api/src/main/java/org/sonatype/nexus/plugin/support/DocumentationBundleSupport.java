@@ -59,14 +59,16 @@ public abstract class DocumentationBundleSupport
         URL url = e.nextElement();
 
         String name = url.getPath();
-        name = name.substring(1 + name.lastIndexOf("/docs/"), name.length());
+        if (!name.endsWith("/")) {
+          name = name.substring(1 + name.lastIndexOf("/docs/"), name.length());
 
-        // to lessen clash possibilities, this way only within single plugin may be clashes, but one
-        // plugin is usually developed by one team or one user so this is okay
-        // system-wide clashes are much harder to resolve
-        String path = "/" + getPluginId() + "/" + getPathPrefix() + "/" + name;
+          // to lessen clash possibilities, this way only within single plugin may be clashes, but one
+          // plugin is usually developed by one team or one user so this is okay
+          // system-wide clashes are much harder to resolve
+          String path = "/" + getPluginId() + "/" + getPathPrefix() + "/" + name;
 
-        resources.add(new UrlWebResource(url, path, mimeSupport.guessMimeTypeFromPath(name)));
+          resources.add(new UrlWebResource(url, path, mimeSupport.guessMimeTypeFromPath(name)));
+        }
       }
     }
 

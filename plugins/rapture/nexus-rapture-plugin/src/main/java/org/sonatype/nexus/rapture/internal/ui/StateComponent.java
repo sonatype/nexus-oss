@@ -27,8 +27,7 @@ import javax.servlet.http.HttpSession;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
-import org.sonatype.nexus.plugins.NexusPluginManager;
-import org.sonatype.nexus.plugins.PluginResponse;
+import org.sonatype.nexus.plugin.PluginIdentity;
 import org.sonatype.nexus.rapture.Rapture;
 import org.sonatype.nexus.rapture.StateContributor;
 import org.sonatype.nexus.util.DigesterUtils;
@@ -62,7 +61,7 @@ public class StateComponent
 
   private final ApplicationStatusSource applicationStatusSource;
 
-  private final NexusPluginManager pluginManager;
+  private final List<PluginIdentity> pluginIdentities;
 
   private final List<Provider<StateContributor>> stateContributors;
 
@@ -73,12 +72,12 @@ public class StateComponent
   @Inject
   public StateComponent(final Rapture rapture,
                         final ApplicationStatusSource applicationStatusSource,
-                        final NexusPluginManager pluginManager,
+                        final List<PluginIdentity> pluginIdentities,
                         final List<Provider<StateContributor>> stateContributors)
   {
     this.rapture = checkNotNull(rapture, "rapture");
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
-    this.pluginManager = checkNotNull(pluginManager);
+    this.pluginIdentities = checkNotNull(pluginIdentities);
     this.stateContributors = checkNotNull(stateContributors);
   }
 
@@ -225,12 +224,8 @@ public class StateComponent
   private List<String> getPlugins() {
     List<String> plugins = Lists.newArrayList();
 
-    Map<GAVCoordinate, PluginResponse> pluginResponses = pluginManager.getPluginResponses();
-
-    for (Entry<GAVCoordinate, PluginResponse> entry : pluginResponses.entrySet()) {
-      if (entry.getValue().isSuccessful()) {
-        plugins.add(entry.getKey().getGroupId() + ":" + entry.getKey().getArtifactId());
-      }
+    for (PluginIdentity plugin : pluginIdentities) {
+      plugins.add(plugin.getCoordinates().getGroupId() + ":" + plugin.getCoordinates().getArtifactId());
     }
 
     Collections.sort(plugins);
