@@ -11,11 +11,11 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Browse repository item info panel.
+ * Component summary panel.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.ComponentSummary', {
+Ext.define('NX.coreui.view.component.ComponentSummary', {
   extend: 'Ext.Panel',
   alias: 'widget.nx-coreui-component-summary',
 
