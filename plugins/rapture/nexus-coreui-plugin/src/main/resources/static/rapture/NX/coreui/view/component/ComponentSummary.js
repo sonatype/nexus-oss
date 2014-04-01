@@ -19,17 +19,15 @@ Ext.define('NX.coreui.view.repository.ComponentSummary', {
   extend: 'Ext.Panel',
   alias: 'widget.nx-coreui-component-summary',
 
-  margin: 5,
-
   buttonConfig: {
-    tooltip: 'Info',
+    tooltip: 'Summary',
     iconCls: NX.Icons.cls('component-summary', 'x32')
-    //glyph: 'xf05a@FontAwesome' /* fa-info-circle */
   },
 
   items: [
     {
       xtype: 'panel',
+      margin: 5,
       layout: 'hbox',
       style: {
         marginBottom: '10px'
@@ -47,10 +45,6 @@ Ext.define('NX.coreui.view.repository.ComponentSummary', {
           }
         }
       ]
-    },
-    {
-      xtype: 'nx-info-panel',
-      title: undefined
     }
   ]
 

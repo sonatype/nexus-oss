@@ -22,6 +22,9 @@ Ext.define('NX.coreui.view.component.ComponentDetail', {
   layout: 'card',
 
   header: {
+    style: {
+      backgroundColor: 'white',
+    },
     items: [
       {
         xtype: 'panel',
@@ -41,7 +44,6 @@ Ext.define('NX.coreui.view.component.ComponentDetail', {
     Ext.Array.each(Ext.Array.from(added), function (cmp) {
       var btnConfig = {
         xtype: 'button',
-        text: cmp.title,
         toggleGroup: me.getId(),
         panel: cmp,
         handler: function () {
