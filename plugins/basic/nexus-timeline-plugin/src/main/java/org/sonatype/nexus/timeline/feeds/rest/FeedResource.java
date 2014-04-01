@@ -96,7 +96,7 @@ public class FeedResource
    * @param count   The count of entries to be returned (for paging).
    */
   @GET
-  @RequiresPermissions("nexus:feeds")
+  @RequiresPermissions("nexus:feeds:read")
   public SyndFeed get(@PathParam(FEED_KEY) String feedKey, @DefaultValue("0") @QueryParam("from") int from,
                       @DefaultValue("40") @QueryParam("count") int count, final @Context UriInfo uriInfo)
   {

@@ -60,7 +60,7 @@ public class FeedsListResource
    * Lists all the feeds existing.
    */
   @GET
-  @RequiresPermissions("nexus:feeds")
+  @RequiresPermissions("nexus:feeds:read")
   public FeedEntriesXO get() {
     final FeedEntriesXO result = new FeedEntriesXO();
     for (FeedSource feedSource : feedSources) {
