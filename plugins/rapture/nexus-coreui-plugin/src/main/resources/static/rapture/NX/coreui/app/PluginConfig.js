@@ -31,6 +31,8 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.BrowseStorage',
     'NX.coreui.controller.BrowseIndex',
     'NX.coreui.controller.ComponentSummary',
+    'NX.coreui.controller.ComponentLicense',
+    'NX.coreui.controller.ComponentSecurity',
     'NX.coreui.controller.MavenUpload',
     { id: 'NX.coreui.controller.PluginConsole',
       active: function () {
