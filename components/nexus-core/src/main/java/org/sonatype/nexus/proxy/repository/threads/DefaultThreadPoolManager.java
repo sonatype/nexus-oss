@@ -23,8 +23,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.threads.NexusExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
@@ -40,75 +38,40 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class DefaultThreadPoolManager
     implements ThreadPoolManager
 {
-  private static final int GROUP_REPOSITORY_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
-      "nexus.groupRepositoryThreadPoolSize", 200);
-
-  private static final int PROXY_REPOSITORY_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
-      "nexus.proxyRepositoryThreadPoolSize", 50);
+  private static final int REPOSITORY_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
+      "nexus.repositoryThreadPoolSize", 50);
   
   private final EventBus eventBus;
 
-  private final NexusExecutorService groupRepositoryThreadPool;
-
-  private final NexusExecutorService proxyRepositoryThreadPool;
+  private final NexusExecutorService repositoryThreadPool;
 
   @Inject
   public DefaultThreadPoolManager(final EventBus eventBus) {
     this.eventBus = checkNotNull(eventBus);
-    // direct hand-off used! Group pool will use caller thread to execute the task when full!
-    final ThreadPoolExecutor gTarget =
-        new ThreadPoolExecutor(0, GROUP_REPOSITORY_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS,
-            new SynchronousQueue<Runnable>(), new NexusThreadFactory("group", "Group TPool"),
-            new CallerRunsPolicy());
-
     // direct hand-off used! Proxy pool will use caller thread to execute the task when full!
-    final ThreadPoolExecutor pTarget =
-        new ThreadPoolExecutor(0, PROXY_REPOSITORY_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS,
-            new SynchronousQueue<Runnable>(), new NexusThreadFactory("proxy", "Proxy TPool"),
+    final ThreadPoolExecutor target =
+        new ThreadPoolExecutor(0, REPOSITORY_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS,
+            new SynchronousQueue<Runnable>(), new NexusThreadFactory("repo", "Repository TPool"),
             new CallerRunsPolicy());
 
-    this.groupRepositoryThreadPool = NexusExecutorService.forCurrentSubject(gTarget);
-    this.proxyRepositoryThreadPool = NexusExecutorService.forCurrentSubject(pTarget);
+    this.repositoryThreadPool = NexusExecutorService.forCurrentSubject(target);
     eventBus.register(this);
   }
 
   @Override
   public ExecutorService getRepositoryThreadPool(Repository repository) {
-    if (repository.getRepositoryKind().isFacetAvailable(GroupRepository.class)) {
-      return groupRepositoryThreadPool;
-    }
-    else if (repository.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
-      return proxyRepositoryThreadPool;
-    }
-    else {
-      return null;
-    }
-  }
-
-  @Override
-  public synchronized void createPool(Repository repository) {
-    // nop for now
-  }
-
-  @Override
-  public synchronized void removePool(Repository repository) {
-    // nop for now
-  }
-
-  public synchronized void shutdown() {
-    eventBus.unregister(this);
-    terminatePool(groupRepositoryThreadPool);
-    terminatePool(proxyRepositoryThreadPool);
+    return repositoryThreadPool;
   }
 
   @Subscribe
   public void on(final NexusStoppedEvent e) {
-    shutdown();
+    eventBus.unregister(this);
+    terminatePool(repositoryThreadPool);
   }
 
   // ==
 
-  protected void terminatePool(final ExecutorService executorService) {
+  private void terminatePool(final ExecutorService executorService) {
     if (executorService != null) {
       executorService.shutdownNow();
     }
