@@ -37,7 +37,11 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
           type: 'hbox',
           align: 'bottom'
         },
-        bodyPadding: 10
+        bodyPadding: 10,
+
+        tbar: [
+          { xtype: 'button', text: 'Save', glyph: 'xf0c7@FontAwesome' /* fa-save */, action: 'save' },
+        ]
       },
       {
         xtype: 'panel',

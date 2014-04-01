@@ -11,17 +11,34 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Search filter model.
+ * Save filter window.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.model.SearchFilter', {
-  extend: 'Ext.data.Model',
-  fields: [
-    'id',
-    'name',
-    'description',
-    'criterias',
-    'readOnly'
-  ]
+Ext.define('NX.coreui.view.search.SaveSearchFilter', {
+  extend: 'NX.view.AddWindow',
+  alias: 'widget.nx-coreui-search-save',
+
+  title: 'Save search filter',
+  defaultFocus: 'name',
+
+  items: {
+    xtype: 'nx-settingsform',
+    items: [
+      {
+        xtype: 'textfield',
+        name: 'name',
+        fieldLabel: 'Name',
+        emptyText: 'enter a filter name'
+      },
+      {
+        xtype: 'textfield',
+        name: 'description',
+        fieldLabel: 'Description',
+        emptyText: 'enter a filter description',
+        allowBlank: true
+      }
+    ]
+  }
+
 });

@@ -30,10 +30,14 @@ Ext.define('NX.coreui.controller.Search', {
     'SearchCriteria',
     'SearchResult'
   ],
+  models: [
+    'SearchFilter'
+  ],
 
   views: [
     'search.SearchFeature',
-    'search.TextSearchCriteria'
+    'search.TextSearchCriteria',
+    'search.SaveSearchFilter'
   ],
 
   refs: [
@@ -64,9 +68,19 @@ Ext.define('NX.coreui.controller.Search', {
       }
     });
 
+    me.getApplication().getFeaturesController().registerFeature({
+      path: '/Saved',
+      mode: 'search',
+      group: true,
+      iconConfig: {
+        name: 'feature-search'
+      },
+      weight: 500
+    });
+
     me.getSearchFilterStore().each(function (model) {
       me.getApplication().getFeaturesController().registerFeature({
-        path: '/' + model.get('name'),
+        path: '/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
         mode: 'search',
         view: { xtype: 'nx-searchfeature', searchFilter: model },
         iconConfig: {
@@ -91,6 +105,12 @@ Ext.define('NX.coreui.controller.Search', {
         },
         'nx-searchfeature grid': {
           selectionchange: me.onSelectionChange
+        },
+        'nx-searchfeature button[action=save]': {
+          click: me.showSaveSearchFilterWindow
+        },
+        'nx-coreui-search-save button[action=add]': {
+          click: me.saveSearchFilter
         }
       }
     });
@@ -145,6 +165,8 @@ Ext.define('NX.coreui.controller.Search', {
       glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
       menu: addCriteriaMenu
     });
+
+    me.getSearchResultStore().filter();
   },
 
   addCriteria: function (menuitem) {
@@ -198,6 +220,50 @@ Ext.define('NX.coreui.controller.Search', {
   onSelectionChange: function (selectionModel, selected) {
     var me = this;
     me.getComponentDetail().setComponent(selected[0] ? selected[0].data : undefined);
+  },
+
+  showSaveSearchFilterWindow: function () {
+    Ext.widget('nx-coreui-search-save');
+  },
+
+  saveSearchFilter: function (button) {
+    var me = this,
+        win = button.up('window'),
+        values = button.up('form').getValues(),
+        criterias = [],
+        model;
+
+    Ext.Array.each(Ext.ComponentQuery.query('nx-searchfeature component[searchCriteria=true]'), function (cmp) {
+      criterias.push({
+        id: cmp.criteriaId,
+        value: cmp.getValue(),
+        hidden: cmp.hidden
+      })
+    });
+
+    model = me.getSearchFilterModel().create(Ext.apply(values, {
+      id: values.name,
+      criterias: criterias,
+      readOnly: false
+    }));
+
+    me.getSearchFilterStore().add(model);
+
+    me.getApplication().getFeaturesController().registerFeature({
+      path: '/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
+      mode: 'search',
+      view: { xtype: 'nx-searchfeature', searchFilter: model },
+      iconConfig: {
+        name: model.get('iconName') ? model.get('iconName') : 'feature-search'
+      },
+      description: model.get('description'),
+      authenticationRequired: false
+    });
+
+    me.getController('Menu').refreshTree();
+    NX.Bookmarks.navigateTo(NX.Bookmarks.fromToken('search/saved/' + model.get('name')))
+
+    win.close();
   }
 
 });
