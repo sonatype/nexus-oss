@@ -10,11 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.filter.authz;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -26,8 +29,11 @@ import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.sisu.goodies.common.Loggers;
 
+import com.google.common.base.Strings;
 import org.apache.shiro.web.util.WebUtils;
+import org.slf4j.Logger;
 
 /**
  * A filter that maps the targetId from the Request.
@@ -37,6 +43,13 @@ import org.apache.shiro.web.util.WebUtils;
 public class NexusTargetMappingAuthorizationFilter
     extends AbstractNexusAuthorizationFilter
 {
+  /**
+   * Request attribute key used to cache action, as in case of PUT verb it is doing heavy lifting.
+   */
+  private static final String ACTION_KEY = NexusTargetMappingAuthorizationFilter.class.getName() + ".action";
+
+  private static final Logger log = Loggers.getLogger(NexusTargetMappingAuthorizationFilter.class);
+
   @Inject
   private RepositoryRouter rootRouter;
 
@@ -50,101 +63,121 @@ public class NexusTargetMappingAuthorizationFilter
     return pathReplacement;
   }
 
-  public void setPathReplacement(String pathReplacement) {
+  public void setPathReplacement(final String pathReplacement) {
     this.pathReplacement = pathReplacement;
   }
 
-  public String getResourceStorePath(ServletRequest request) {
+  @Nullable
+  private String getResourceStorePath(final ServletRequest request) {
     String path = WebUtils.getPathWithinApplication((HttpServletRequest) request);
-
     if (getPathPrefix() != null) {
-      Matcher m = this.getPathPrefixPattern().matcher(path);
-
+      final Pattern p = getPathPrefixPattern();
+      final Matcher m = p.matcher(path);
       if (m.matches()) {
         path = getPathReplacement();
-
         // TODO: hardcoded currently
         if (path.contains("@1")) {
           path = path.replaceAll("@1", Matcher.quoteReplacement(m.group(1)));
         }
-
         if (path.contains("@2")) {
           path = path.replaceAll("@2", Matcher.quoteReplacement(m.group(2)));
         }
         // and so on... this will be reworked to be dynamic
       }
       else {
-        throw new IllegalArgumentException(
-            "The request path does not matches the incoming request? This is misconfiguration in web.xml!");
+        // what happens here: router requests are formed as: /KIND/ID/REPO_PATH
+        // where KIND = {"repositories", "groups", ...}, ID is a repo ID, and REPO_PATH is a repository path
+        // being here, means we could not even match anything of these, usually having newline in string
+        // as that's the only thing the "dotSTAR" regex would not match (it would match any other character)
+        log.warn(formatMessage(request, "Cannot translate request to Nexus repository path, expected pattern {}"), p);
+        return null;
       }
     }
 
     return path;
   }
 
-  protected ResourceStoreRequest getResourceStoreRequest(ServletRequest request, boolean localOnly) {
-    ResourceStoreRequest rsr = new ResourceStoreRequest(getResourceStorePath(request), localOnly);
-
+  @Nullable
+  private ResourceStoreRequest getResourceStoreRequest(final ServletRequest request, final boolean localOnly) {
+    final String resourceStorePath = getResourceStorePath(request);
+    if (resourceStorePath == null) {
+      return null;
+    }
+    final ResourceStoreRequest rsr = new ResourceStoreRequest(resourceStorePath, localOnly, false);
     rsr.getRequestContext().put(RequestContext.CTX_AUTH_CHECK_ONLY, true);
-
     return rsr;
   }
 
   @Override
-  protected String getHttpMethodAction(ServletRequest request) {
-
-    String method = ((HttpServletRequest) request).getMethod().toLowerCase();
-
-    if ("put".equals(method)) {
-      // heavy handed thing
-      // doing a LOCAL ONLY request to check is this exists?
-      try {
-        rootRouter.retrieveItem(getResourceStoreRequest(request, true));
+  protected String getHttpMethodAction(final ServletRequest request) {
+    // caching the action as it might be costly to calculate it for PUT
+    if (request.getAttribute(ACTION_KEY) == null) {
+      String method = ((HttpServletRequest) request).getMethod().toLowerCase();
+      // Shiro's HttpMethodPermissionFilter has fixed set of verbs and their action mapping
+      // But, we do know to differentiate create/update by looking at the existence of the content item
+      // This happens in the HTTP Verb is PUT, mapping to nexus otherwise corresponds to that done by Shiro
+      if ("put".equals(method)) {
+        // heavy handed thing
+        // doing a LOCAL ONLY request to check is this exists?
+        try {
+          final ResourceStoreRequest storeRequest = getResourceStoreRequest(request, true);
+          if (storeRequest != null) {
+            rootRouter.retrieveItem(storeRequest);
+          }
+          // if storeRequest is null, isAccessAllowed will return false anyway
+        }
+        catch (ItemNotFoundException e) {
+          // the path does not exists, it is a CREATE
+          method = "post";
+        }
+        catch (AccessDeniedException e) {
+          // no access for read, so chances are post or put doesn't matter
+          method = "post";
+        }
+        catch (Exception e) {
+          // Problems like IO errors and others will boil down here
+          throw new IllegalStateException(formatMessage(request, "Cannot translate request to Nexus action"), e);
+        }
       }
-      catch (ItemNotFoundException e) {
-        // the path does not exists, it is a CREATE
-        method = "post";
-      }
-      catch (AccessDeniedException e) {
-        // no access for read, so chances are post or put doesnt matter
-        method = "post";
-      }
-      catch (Exception e) {
-        // huh?
-        throw new IllegalStateException("Got exception during target mapping!", e);
-      }
-
-      // the path exists, this is UPDATE
-      return super.getHttpMethodAction(method);
+      request.setAttribute(ACTION_KEY, super.getHttpMethodAction(method));
     }
-    else {
-      return super.getHttpMethodAction(request);
-    }
+    return (String) request.getAttribute(ACTION_KEY);
   }
 
   @Override
-  public boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue)
+  public boolean isAccessAllowed(final ServletRequest request, final ServletResponse response, final Object mappedValue)
       throws IOException
   {
-    // let check the mappedValues 1st
-    boolean result = false;
-
     if (mappedValue != null) {
-      result = super.isAccessAllowed(request, response, mappedValue);
-
       // if we are not allowed at start, forbid it
-      if (!result) {
+      if (!super.isAccessAllowed(request, response, mappedValue)) {
         return false;
       }
     }
-
-    String actionVerb = getHttpMethodAction(request);
-    Action action = Action.valueOf(actionVerb);
-
-    if (null == action) {
+    final String action = getHttpMethodAction(request);
+    try {
+      final Action nxAction = Action.valueOf(action);
+      final ResourceStoreRequest storeRequest = getResourceStoreRequest(request, false);
+      return storeRequest != null && rootRouter.authorizePath(storeRequest, nxAction);
+    }
+    catch (IllegalArgumentException e) { // Enum.valueOf
+      log.warn(formatMessage(request, "Cannot translate Shiro action '{}' to Nexus action"), action);
       return false;
     }
+  }
 
-    return rootRouter.authorizePath(getResourceStoreRequest(request, false), action);
+  // ==
+
+  private String formatMessage(final ServletRequest request, final String message) {
+    final StringBuilder sb = new StringBuilder(message);
+    if (request instanceof HttpServletRequest) {
+      final HttpServletRequest hsr = (HttpServletRequest) request;
+      sb.append(", request: ").append(hsr.getMethod()).append(" ").append(hsr.getRequestURL());
+      final String query = hsr.getQueryString();
+      if (!Strings.isNullOrEmpty(query)) {
+        sb.append("?").append(query);
+      }
+    }
+    return sb.toString();
   }
 }

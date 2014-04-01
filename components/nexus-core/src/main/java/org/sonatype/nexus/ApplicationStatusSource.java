@@ -15,8 +15,9 @@ package org.sonatype.nexus;
 /**
  * The source of common data from App.
  *
- * @author cstamas
+ * @deprecated Use SystemStatus provider instead.
  */
+@Deprecated
 public interface ApplicationStatusSource
 {
   SystemStatus getSystemStatus();

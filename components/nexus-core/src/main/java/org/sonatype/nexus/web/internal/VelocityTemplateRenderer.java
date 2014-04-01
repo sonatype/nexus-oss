@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.web.internal;
 
 import java.io.BufferedWriter;
@@ -19,6 +20,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -26,7 +28,7 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -34,7 +36,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -61,19 +62,19 @@ public class VelocityTemplateRenderer
 
   @Inject
   public VelocityTemplateRenderer(final Provider<VelocityEngine> velocityEngineProvider,
-                                  final ApplicationStatusSource applicationStatusSource)
+                                  final SystemStatus systemStatus)
   {
     this.velocityEngineProvider = checkNotNull(velocityEngineProvider);
-    this.applicationVersion = checkNotNull(applicationStatusSource).getSystemStatus().getVersion();
+    this.applicationVersion = systemStatus.getVersion();
   }
 
   @Override
   public void renderErrorPage(final HttpServletRequest request,
                               final HttpServletResponse response,
                               final int responseCode,
-                              final String reasonPhrase,
+                              final @Nullable String reasonPhrase,
                               final String errorDescription,
-                              final Throwable exception)
+                              final @Nullable Throwable exception)
       throws IOException
   {
     checkNotNull(request);
@@ -88,9 +89,7 @@ public class VelocityTemplateRenderer
     dataModel.put("statusName", Strings.isNullOrEmpty(reasonPhrase) ? errorDescription : reasonPhrase);
     dataModel.put("errorDescription", StringEscapeUtils.escapeHtml(errorDescription));
 
-    if (null != exception) {
-      dataModel.put("errorStackTrace", StringEscapeUtils.escapeHtml(ExceptionUtils.getStackTrace(exception)));
-    }
+    // NOTE: specifically not including stack trace, we do not want to include this in details shown to users
 
     if (Strings.isNullOrEmpty(reasonPhrase)) {
       response.setStatus(responseCode);

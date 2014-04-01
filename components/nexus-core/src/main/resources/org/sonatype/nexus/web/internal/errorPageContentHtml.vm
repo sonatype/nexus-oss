@@ -25,9 +25,5 @@
   <body>
     <h1>${statusCode} - ${statusName}</h1>
     <p>${errorDescription}</p>
-    #if (${errorStackTrace})
-    <p>
-    <pre>${errorStackTrace}</pre>
-    #end
   </body>
 </html>

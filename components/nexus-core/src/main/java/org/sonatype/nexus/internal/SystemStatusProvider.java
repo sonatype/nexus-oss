@@ -10,35 +10,35 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.webapp.metrics;
+package org.sonatype.nexus.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.yammer.metrics.core.HealthCheck;
-import com.yammer.metrics.core.HealthCheckRegistry;
-import org.eclipse.sisu.BeanEntry;
-import org.eclipse.sisu.Mediator;
-
 /**
- * Manages {@link HealthCheck} registrations via Sisu component mediation.
+ * {@link SystemStatus} provider.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
-public class HealthCheckMediator
-    extends ComponentSupport
-    implements Mediator<Named, HealthCheck, HealthCheckRegistry>
+public class SystemStatusProvider
+  extends ComponentSupport
+  implements Provider<SystemStatus>
 {
-  public void add(final BeanEntry<Named, HealthCheck> entry, final HealthCheckRegistry registry) throws Exception {
-    log.debug("Registering: {}", entry);
-    registry.register(entry.getValue());
+  private final ApplicationStatusSource statusSource;
+
+  @Inject
+  public SystemStatusProvider(final ApplicationStatusSource statusSource) {
+    this.statusSource = statusSource;
   }
 
-  public void remove(final BeanEntry<Named, HealthCheck> entry, final HealthCheckRegistry registry) throws Exception {
-    log.debug("Un-registering: {}", entry);
-    registry.unregister(entry.getValue());
+  @Override
+  public SystemStatus get() {
+    return statusSource.getSystemStatus();
   }
 }
-
