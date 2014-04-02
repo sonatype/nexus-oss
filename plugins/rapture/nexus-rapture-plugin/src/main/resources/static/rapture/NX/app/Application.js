@@ -27,6 +27,7 @@ Ext.define('NX.app.Application', {
     'Ext.util.LocalStorage',
     'NX.view.Viewport',
     'NX.util.Url',
+    'NX.util.DownloadHelper',
     'NX.State',
 
     // Ext overrides
