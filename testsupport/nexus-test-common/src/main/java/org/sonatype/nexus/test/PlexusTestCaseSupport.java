@@ -54,7 +54,10 @@ import org.junit.Before;
  * alternative Hamcrest libraries.
  * <p/>
  * TODO: integrate this directly with sisu-inject-plexus
+ *
+ * @deprecated Avoid any future usage, remove any existing use.
  */
+@Deprecated
 public abstract class PlexusTestCaseSupport
 {
   protected final TestUtil util = new TestUtil(this);

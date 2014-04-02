@@ -128,10 +128,6 @@ public abstract class NexusTestSupport
     }
   }
 
-  public File getPlexusHomeDir() {
-    return plexusHomeDir;
-  }
-
   public File getWorkHomeDir() {
     return workHomeDir;
   }
@@ -172,17 +168,4 @@ public abstract class NexusTestSupport
       IOUtils.copy(in, out);
     }
   }
-
-  protected void copyFromClasspathToFile(String path, String outputFilename)
-      throws IOException
-  {
-    copyFromClasspathToFile(path, new File(outputFilename));
-  }
-
-  protected void copyFromClasspathToFile(String path, File output)
-      throws IOException
-  {
-    FileUtils.copyInputStreamToFile(getClass().getResourceAsStream(path), output);
-  }
-
 }
