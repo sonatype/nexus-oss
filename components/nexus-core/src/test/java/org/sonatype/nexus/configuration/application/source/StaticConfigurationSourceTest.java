@@ -19,6 +19,8 @@ import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 public class StaticConfigurationSourceTest
     extends AbstractApplicationConfigurationSourceTest
 {

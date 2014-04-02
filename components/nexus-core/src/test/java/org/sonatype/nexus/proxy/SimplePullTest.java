@@ -57,6 +57,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SimplePullTest
     extends AbstractProxyTestEnvironment
@@ -90,7 +92,7 @@ public class SimplePullTest
               new ResourceStoreRequest(
                   "/repositories/repo1/activemq/activemq-core/1.2/broken/activemq-core-1.2", false));
 
-      Assert.fail("We should not be able to pull this path!");
+      fail("We should not be able to pull this path!");
     }
     catch (ItemNotFoundException e) {
       // good, the layout says this is not a file!
@@ -433,7 +435,7 @@ public class SimplePullTest
     try {
       group.retrieveItem(new ResourceStoreRequest("/some/path/that/we/know/is/not/existing/123456/12.foo"));
       // anything else should fail
-      Assert.fail("We expected an exception here!");
+      fail("We expected an exception here!");
     }
     catch (GroupItemNotFoundException e) {
       final String dumpStr = dumpNotFoundReasoning(e, 0);
@@ -497,7 +499,7 @@ public class SimplePullTest
         }
       }, null);
 
-      Assert.fail("We expected a LocalStorageEofException to be thrown");
+      fail("We expected a LocalStorageEofException to be thrown");
     }
     catch (LocalStorageEOFException e) {
       // good, we expected this
@@ -532,7 +534,7 @@ public class SimplePullTest
 
       try {
         final StorageItem item = repository.retrieveItem(request);
-        Assert.fail("We expected a LocalStorageEofException to be thrown");
+        fail("We expected a LocalStorageEofException to be thrown");
       }
       catch (LocalStorageEOFException e) {
         // good, we expected this

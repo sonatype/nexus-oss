@@ -21,6 +21,7 @@ import org.sonatype.nexus.obr.metadata.ObrSite;
 
 import org.junit.Test;
 import org.osgi.service.obr.Resource;
+import static org.junit.Assert.*;
 
 public class ObrResourceReaderTest
     extends AbstractObrMetadataTest

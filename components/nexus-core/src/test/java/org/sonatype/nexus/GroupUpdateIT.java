@@ -23,6 +23,7 @@ import org.sonatype.nexus.templates.repository.maven.Maven1HostedRepositoryTempl
 import org.sonatype.nexus.templates.repository.maven.Maven1ProxyRepositoryTemplate;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class GroupUpdateIT
     extends NexusAppTestSupport

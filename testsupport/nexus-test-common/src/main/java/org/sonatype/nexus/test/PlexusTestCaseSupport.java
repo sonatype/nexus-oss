@@ -131,7 +131,7 @@ public abstract class PlexusTestCaseSupport
     }
     catch (final PlexusContainerException e) {
       e.printStackTrace();
-      fail("Failed to create plexus container.");
+      Assert.fail("Failed to create plexus container.");
     }
   }
 
@@ -324,80 +324,6 @@ public abstract class PlexusTestCaseSupport
   @After
   final public void tearDownJunit() throws Exception {
     tearDown();
-  }
-
-  @Deprecated
-  protected void fail() {
-    Assert.fail();
-  }
-
-  @Deprecated
-  protected void fail(String message) {
-    Assert.fail(message);
-  }
-
-  /**
-   * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
-   */
-  @Deprecated
-  protected void assertTrue(boolean condition) {
-    Assert.assertTrue(condition);
-  }
-
-  /**
-   * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
-   */
-  @Deprecated
-  protected void assertTrue(String message, boolean condition) {
-    Assert.assertTrue(message, condition);
-  }
-
-  /**
-   * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
-   */
-  @Deprecated
-  protected void assertFalse(boolean condition) {
-    Assert.assertFalse(condition);
-  }
-
-  /**
-   * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
-   */
-  @Deprecated
-  protected void assertFalse(String message, boolean condition) {
-    Assert.assertFalse(message, condition);
-  }
-
-  /**
-   * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
-   */
-  @Deprecated
-  protected void assertNotNull(Object obj) {
-    Assert.assertNotNull(obj);
-  }
-
-  /**
-   * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
-   */
-  @Deprecated
-  protected void assertNotNull(String message, Object obj) {
-    Assert.assertNotNull(message, obj);
-  }
-
-  /**
-   * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
-   */
-  @Deprecated
-  protected void assertNull(Object obj) {
-    Assert.assertNull(obj);
-  }
-
-  /**
-   * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
-   */
-  @Deprecated
-  protected void assertNull(String message, Object obj) {
-    Assert.assertNull(message, obj);
   }
 
   /**

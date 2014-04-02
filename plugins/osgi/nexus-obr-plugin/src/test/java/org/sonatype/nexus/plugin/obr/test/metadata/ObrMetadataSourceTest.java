@@ -24,6 +24,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.junit.Test;
 import org.osgi.service.obr.Requirement;
 import org.osgi.service.obr.Resource;
+import static org.junit.Assert.*;
 
 public class ObrMetadataSourceTest
     extends AbstractObrMetadataTest

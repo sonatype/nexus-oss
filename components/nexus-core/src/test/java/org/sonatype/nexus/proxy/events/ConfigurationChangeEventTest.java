@@ -23,6 +23,7 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class ConfigurationChangeEventTest
     extends AbstractProxyTestEnvironment

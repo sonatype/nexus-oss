@@ -24,6 +24,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class RepoConversionTest
     extends AbstractProxyTestEnvironment

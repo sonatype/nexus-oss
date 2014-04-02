@@ -20,6 +20,8 @@ import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 public class DefaultPasswordGeneratorTest
     extends PlexusTestCaseSupport
 {

@@ -22,6 +22,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public abstract class M1ResourceStoreTest
     extends AbstractProxyTestEnvironment
 {

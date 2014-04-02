@@ -24,6 +24,7 @@ import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class LinkTest
     extends AbstractProxyTestEnvironment

@@ -18,6 +18,7 @@ import java.net.URL;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class GroupReindexIndexerManagerTest
     extends AbstractIndexerManagerTest

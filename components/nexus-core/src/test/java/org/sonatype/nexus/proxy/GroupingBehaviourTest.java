@@ -25,6 +25,7 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.codehaus.plexus.digest.Md5Digester;
 import org.codehaus.plexus.digest.Sha1Digester;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class GroupingBehaviourTest
     extends AbstractProxyTestEnvironment

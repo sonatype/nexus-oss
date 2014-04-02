@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class M1RepositoryTest
     extends M1ResourceStoreTest

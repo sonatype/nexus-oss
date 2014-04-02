@@ -58,6 +58,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+import static org.junit.Assert.*;
 
 @Category(Slow.class) // ~25s
 public class M2RepositoryIT

@@ -46,6 +46,7 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.Assert;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 // This is an IT just because it runs longer then 15 seconds
 public class DownloadRemoteIndexerManagerIT

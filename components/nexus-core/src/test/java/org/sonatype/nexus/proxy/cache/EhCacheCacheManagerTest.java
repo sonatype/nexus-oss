@@ -17,6 +17,7 @@ import java.util.Collection;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class EhCacheCacheManagerTest
     extends AbstractNexusTestEnvironment
