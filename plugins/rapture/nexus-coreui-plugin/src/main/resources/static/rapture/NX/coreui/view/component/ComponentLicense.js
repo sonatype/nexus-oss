@@ -11,31 +11,29 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Browse repository CLM license info panel.
- * FIXME move to proui
+ * Component CLM License Details panel.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseItemClmLicense', {
+Ext.define('NX.coreui.view.component.ComponentLicense', {
   extend: 'Ext.Panel',
-  alias: 'widget.nx-coreui-repository-browse-item-clm-license',
-
-  margin: 5,
+  alias: 'widget.nx-coreui-component-license',
 
   buttonConfig: {
-    tooltip: 'Component License',
-    iconCls: NX.Icons.cls('repository-browse-item-clm-license', 'x32')
+    tooltip: 'License Details',
+    iconCls: NX.Icons.cls('component-license', 'x32')
   },
 
   items: [
     {
       xtype: 'panel',
+      margin: 5,
       layout: 'hbox',
       style: {
         marginBottom: '10px'
       },
       items: [
-        { xtype: 'component', html: NX.Icons.img('repository-browse-item-clm-license', 'x16') },
+        { xtype: 'component', html: NX.Icons.img('component-license', 'x16') },
         { xtype: 'label',
           itemId: 'title',
           margin: '0 0 0 5',

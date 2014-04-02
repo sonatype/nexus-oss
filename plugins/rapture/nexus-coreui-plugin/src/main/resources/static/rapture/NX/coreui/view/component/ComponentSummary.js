@@ -11,31 +11,29 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Browse repository CLM security info panel.
- * FIXME move to proui
+ * Component summary panel.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseItemClmSecurity', {
+Ext.define('NX.coreui.view.component.ComponentSummary', {
   extend: 'Ext.Panel',
-  alias: 'widget.nx-coreui-repository-browse-item-clm-security',
-
-  margin: 5,
+  alias: 'widget.nx-coreui-component-summary',
 
   buttonConfig: {
-    tooltip: 'Component Security',
-    iconCls: NX.Icons.cls('repository-browse-item-clm-security', 'x32')
+    tooltip: 'Summary',
+    iconCls: NX.Icons.cls('component-summary', 'x32')
   },
 
   items: [
     {
       xtype: 'panel',
+      margin: 5,
       layout: 'hbox',
       style: {
         marginBottom: '10px'
       },
       items: [
-        { xtype: 'component', html: NX.Icons.img('repository-browse-item-clm-security', 'x16') },
+        { xtype: 'component', html: NX.Icons.img('component-summary', 'x16') },
         { xtype: 'label',
           itemId: 'title',
           margin: '0 0 0 5',

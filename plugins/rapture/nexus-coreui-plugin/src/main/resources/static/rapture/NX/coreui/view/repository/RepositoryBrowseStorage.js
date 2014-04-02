@@ -17,7 +17,7 @@
  */
 Ext.define('NX.coreui.view.repository.RepositoryBrowseStorage', {
   extend: 'Ext.Panel',
-  alias: ['widget.nx-coreui-repository-browse-storage', 'widget.nx-coreui-repository-itemcontainer'],
+  alias: 'widget.nx-coreui-repository-browse-storage',
 
   layout: 'border',
 
@@ -30,7 +30,7 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseStorage', {
       header: false
     },
     {
-      xtype: 'nx-coreui-repository-browse-info-tabpanel',
+      xtype: 'nx-coreui-component-detail',
       region: 'east',
       collapsible: true,
       split: true,
@@ -38,26 +38,6 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseStorage', {
       headerPosition: 'right',
       hidden: true
     }
-  ],
-
-  addTab: function (tab) {
-    var me = this,
-        tabpanel = me.down('nx-coreui-repository-browse-info-tabpanel'),
-        added = tabpanel.add(tab);
-
-    tabpanel.show();
-
-    return added;
-  },
-
-  removeTab: function (tab) {
-    var me = this,
-        tabpanel = me.down('nx-coreui-repository-browse-info-tabpanel');
-
-    tabpanel.remove(tab);
-    if (tabpanel.items.length === 0) {
-      tabpanel.hide();
-    }
-  }
+  ]
 
 });

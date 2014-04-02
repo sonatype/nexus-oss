@@ -63,6 +63,7 @@ Ext.define('NX.controller.SettingsForm', {
             if (title) {
               NX.Messages.add({ text: title, type: 'default' });
             }
+            form.fireEvent('loaded', form, action);
           }
         });
       });
@@ -75,7 +76,11 @@ Ext.define('NX.controller.SettingsForm', {
    */
   loadForm: function (form, options) {
     if (form.api && form.api.load) {
-      form.load(options);
+      form.load(Ext.applyIf(options || {}, {
+        success: function (basicForm, action) {
+          form.fireEvent('loaded', form, action);
+        }
+      }));
     }
   },
 

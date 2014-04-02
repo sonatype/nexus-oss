@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
 
   items: {
     xtype: 'nx-settingsform',
-    editableCondition: NX.Conditions.isPermitted('security:userschangepw', 'update'),
+    editableCondition: NX.Conditions.isPermitted('security:userschangepw', 'create'),
     editableMarker: 'You do not have permission to change your password',
 
     items: [

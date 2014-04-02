@@ -59,6 +59,17 @@ Ext.define('NX.view.feature.Content', {
     ]
   },
 
+  listeners: {
+    afterRender: function(){
+      var me = this,
+          title = me.down('#title'),
+          description = me.down('#description');
+
+      me.setTitle(title.text);
+      me.setDescription(description.text);
+    }
+  },
+
   /**
    * Custom handling for title since we are using custom header component.
    *
@@ -67,7 +78,7 @@ Ext.define('NX.view.feature.Content', {
    */
   setTitle: function(text) {
     var me = this,
-        label = me.down('label[itemId=title]');
+        label = me.down('#title');
 
     me.callParent(arguments);
 
@@ -82,7 +93,7 @@ Ext.define('NX.view.feature.Content', {
    */
   setDescription: function(text) {
     var me = this,
-        label = me.down('label[itemId=description]');
+        label = me.down('#description');
 
     label.setText(text);
   },

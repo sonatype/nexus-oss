@@ -100,6 +100,9 @@ Ext.define('NX.controller.Menu', {
         '#Permissions': {
           changed: me.refreshMenu
         },
+        '#State': {
+          changed: me.onStateChange
+        },
         '#Bookmarking': {
           navigate: me.navigateTo
         },
@@ -155,14 +158,16 @@ Ext.define('NX.controller.Menu', {
     var me = this,
         path = featureMenuModel.get('path');
 
-    if (path !== me.currentSelectedPath) {
+    if ((path !== me.currentSelectedPath) || featureMenuModel.get('group')) {
       me.currentSelectedPath = path;
 
       me.logDebug('Selected feature: ' + path);
-      me.selectFeature(me.getFeatureStore().getById(featureMenuModel.get('path')));
-      me.populateFeatureGroupStore(featureMenuModel);
-      if (me.bookmarkingEnabled) {
-        me.bookmark(featureMenuModel);
+      if (!featureMenuModel.get('href')) {
+        me.selectFeature(me.getFeatureStore().getById(featureMenuModel.get('path')));
+        me.populateFeatureGroupStore(featureMenuModel);
+        if (me.bookmarkingEnabled) {
+          me.bookmark(featureMenuModel);
+        }
       }
     }
   },
@@ -265,6 +270,29 @@ Ext.define('NX.controller.Menu', {
 
   /**
    * @private
+   * On a state change check features visibility and trigger a menu refresh if necessary.
+   */
+  onStateChange: function () {
+    var me = this,
+        shouldRefresh = false;
+
+    me.getFeatureStore().each(function (feature) {
+      var visible, previousVisible;
+      if (feature.get('mode') === me.mode) {
+        visible = feature.get('visible')();
+        previousVisible = me.getFeatureMenuStore().getRootNode().findChild('path', feature.get('path'), true) !== null;
+        shouldRefresh = (visible !== previousVisible);
+      }
+      return !shouldRefresh;
+    });
+
+    if (shouldRefresh) {
+      me.refreshMenu();
+    }
+  },
+
+  /**
+   * @private
    */
   bookmark: function (node) {
     var me = this,
@@ -302,7 +330,7 @@ Ext.define('NX.controller.Menu', {
 
     me.getFeatureStore().each(function (rec) {
       feature = rec.getData();
-      if (feature.visible() && visibleModes.indexOf(feature.mode) === -1) {
+      if (feature.visible() && !feature.group && visibleModes.indexOf(feature.mode) === -1) {
         visibleModes.push(feature.mode);
       }
     });
@@ -382,6 +410,7 @@ Ext.define('NX.controller.Menu', {
   refreshTree: function () {
     var me = this,
         menuTitle = me.mode,
+        groupsToRemove = [],
         feature, segments, parent, child, modeButton;
 
     me.logDebug('Refreshing tree (mode ' + me.mode + ')');
@@ -433,6 +462,16 @@ Ext.define('NX.controller.Menu', {
           parent = child;
         }
       }
+    });
+
+    // remove all groups without children
+    me.getFeatureMenuStore().getRootNode().eachChild(function (node) {
+      if (node.get('group') && !node.hasChildNodes()) {
+        groupsToRemove.push(node);
+      }
+    });
+    Ext.Array.each(groupsToRemove, function (node) {
+      node.parentNode.removeChild(node, true);
     });
 
     me.getFeatureMenuStore().sort([

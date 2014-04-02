@@ -25,13 +25,11 @@ Ext.define('NX.coreui.view.user.UserAccount', {
     me.items = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'User settings $action',
+        settingsFormSuccessMessage: 'User account settings $action',
         api: {
           load: 'NX.direct.coreui_User.readAccount',
           submit: 'NX.direct.coreui_User.updateAccount'
         },
-        editableCondition: NX.Conditions.isPermitted('security:users', 'update'),
-        editableMarker: 'You do not have permission to update your account',
         items: [
           {
             name: 'id',

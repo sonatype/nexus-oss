@@ -11,31 +11,29 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Browse repository item info panel.
+ * Component CLM Security Issues panel.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseItemInfo', {
+Ext.define('NX.coreui.view.component.ComponentSecurity', {
   extend: 'Ext.Panel',
-  alias: 'widget.nx-coreui-repository-browse-item-info',
-
-  margin: 5,
+  alias: 'widget.nx-coreui-component-security',
 
   buttonConfig: {
-    tooltip: 'Info',
-    iconCls: NX.Icons.cls('repository-browse-item-info', 'x32')
-    //glyph: 'xf05a@FontAwesome' /* fa-info-circle */
+    tooltip: 'Security Issues',
+    iconCls: NX.Icons.cls('component-security', 'x32')
   },
 
   items: [
     {
       xtype: 'panel',
+      margin: 5,
       layout: 'hbox',
       style: {
         marginBottom: '10px'
       },
       items: [
-        { xtype: 'component', html: NX.Icons.img('repository-browse-item-info', 'x16') },
+        { xtype: 'component', html: NX.Icons.img('component-security', 'x16') },
         { xtype: 'label',
           itemId: 'title',
           margin: '0 0 0 5',
@@ -47,10 +45,6 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseItemInfo', {
           }
         }
       ]
-    },
-    {
-      xtype: 'nx-info-panel',
-      title: undefined
     }
   ]
 

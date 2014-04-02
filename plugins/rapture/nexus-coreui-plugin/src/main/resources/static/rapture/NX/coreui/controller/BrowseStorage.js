@@ -20,12 +20,17 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
 
   views: [
     'repository.RepositoryBrowseStorage',
-    'repository.RepositoryBrowseStorageTree'
+    'repository.RepositoryBrowseStorageTree',
+    'component.ComponentDetail'
   ],
   refs: [
     {
       ref: 'feature',
       selector: 'nx-coreui-repository-browse-feature'
+    },
+    {
+      ref: 'list',
+      selector: 'nx-coreui-repository-browse-list'
     },
     {
       ref: 'panel',
@@ -34,14 +39,12 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
     {
       ref: 'tree',
       selector: 'nx-coreui-repository-browse-storage-tree'
+    },
+    {
+      ref: 'componentDetail',
+      selector: 'nx-coreui-component-detail'
     }
   ],
-
-  /**
-   * @private
-   * Roots cache.
-   */
-  roots: Ext.create('Ext.util.MixedCollection'),
 
   /**
    * @override
@@ -81,81 +84,69 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
     });
 
     me.listen({
-      controller: {
-        '#Refresh': {
-          refresh: me.onRefresh
-        }
-      },
       component: {
         'nx-coreui-repository-browse-list': {
           selection: me.onSelection
         },
+        'nx-coreui-repository-browse-storage': {
+          activate: me.onActivate,
+          deactivate: me.onDeactivate
+        },
         'nx-coreui-repository-browse-storage-tree': {
-          select: me.onItemSelected,
+          select: me.onNodeSelected,
           beforeitemexpand: me.onBeforeItemExpand
         }
       }
     });
   },
 
-  onRefresh: function () {
-    var me = this,
-        panel = me.getPanel();
+  onActivate: function (panel) {
+    var me = this;
 
-    if (panel) {
-      me.roots.removeAll();
-      me.setModel(me.model);
-    }
+    panel.active = true;
+    me.buildTree(me.getList().getSelectionModel().getSelection()[0]);
   },
 
-  onSelection: function (list, model) {
+  onDeactivate: function (panel) {
+    panel.active = false;
+  },
+
+  onSelection: function (repositoryGrid, repositoryModel) {
     var me = this,
         panel = me.getPanel();
 
     if (!panel) {
-      me.getFeature().addTab({ xtype: 'nx-coreui-repository-browse-storage', title: 'Storage' });
+      panel = me.getFeature().addTab({ xtype: 'nx-coreui-repository-browse-storage', title: 'Storage' });
     }
-    me.setModel(model);
-  },
-
-  setModel: function (model) {
-    var me = this,
-        tree = me.getTree(),
-        root = me.roots.get(model.getId());
-
-    me.model = model;
-    if (!root) {
-      me.roots.add({
-        id: model.getId(),
-        node: tree.getStore().setRootNode({
-          text: model.get('name')
-        })
-      });
-      tree.getStore().getRootNode().collapse();
-    }
-    else {
-      tree.getStore().setRootNode(root.node);
+    if (panel.active) {
+      me.buildTree(repositoryModel);
     }
   },
 
-  onItemSelected: function (tree, node) {
+  buildTree: function (repositoryModel) {
     var me = this,
-        panel = me.getPanel();
+        tree = me.getTree();
 
-    if (node.isRoot()) {
-      panel.fireEvent('itemdeselected', panel);
-    }
-    else {
-      panel.fireEvent('itemselected', panel, node);
-    }
+    tree.getStore().setRootNode({
+      repositoryId: repositoryModel.getId(),
+      text: repositoryModel.get('name')
+    });
+    me.onNodeSelected(tree, tree.getStore().getRootNode());
+  },
+
+  onNodeSelected: function (tree, node) {
+    var me = this;
+
+    me.getComponentDetail().setComponent(node.isRoot() ? undefined : {
+      repositoryId: node.get('repositoryId'),
+      uri: node.get('path')
+    });
   },
 
   onBeforeItemExpand: function (node) {
-    var me = this;
-
     if (!node.processed) {
       node.processed = true;
-      NX.direct.coreui_RepositoryStorage.read(me.model.getId(), node.getPath('name'), function (response) {
+      NX.direct.coreui_RepositoryStorage.read(node.get('repositoryId'), node.getPath('name'), function (response) {
         if (Ext.isDefined(response) && response.success && response.data && response.data.length) {
           Ext.suspendLayouts();
           node.appendChild(response.data);

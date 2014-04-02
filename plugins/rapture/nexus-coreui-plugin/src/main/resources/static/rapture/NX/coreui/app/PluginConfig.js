@@ -22,14 +22,23 @@ Ext.define('NX.coreui.app.PluginConfig', {
   ],
 
   controllers: [
-    'NX.coreui.controller.Capabilities',
+    { id: 'NX.coreui.controller.Capabilities',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-capabilities-plugin');
+      }
+    },
     'NX.coreui.controller.BrowseRepositories',
-    'NX.coreui.controller.BrowseRepositoryItemInfo',
-    'NX.coreui.controller.BrowseRepositoryItemClm',
     'NX.coreui.controller.BrowseStorage',
     'NX.coreui.controller.BrowseIndex',
+    'NX.coreui.controller.ComponentSummary',
+    'NX.coreui.controller.ComponentLicense',
+    'NX.coreui.controller.ComponentSecurity',
     'NX.coreui.controller.MavenUpload',
-    'NX.coreui.controller.PluginConsole',
+    { id: 'NX.coreui.controller.PluginConsole',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-plugin-console-plugin');
+      }
+    },
     'NX.coreui.controller.Repositories',
     'NX.coreui.controller.RepositoryTargets',
     'NX.coreui.controller.RepositoryRoutes',
@@ -37,6 +46,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.Roles',
     'NX.coreui.controller.Security',
     'NX.coreui.controller.System',
+    'NX.coreui.controller.Search',
     'NX.coreui.controller.Tasks',
     'NX.coreui.controller.UploadArtifact',
     'NX.coreui.controller.Users'
