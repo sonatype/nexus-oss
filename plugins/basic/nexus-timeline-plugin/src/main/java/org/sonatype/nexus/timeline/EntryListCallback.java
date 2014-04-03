@@ -13,22 +13,25 @@
 package org.sonatype.nexus.timeline;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.timeline.TimelineCallback;
-import org.sonatype.timeline.TimelineRecord;
+import com.google.common.collect.Lists;
 
+/**
+ * Handy {@link TimelineCallback} that gathers all the found entries into list.
+ *
+ * @since 3.0
+ */
 public class EntryListCallback
     implements TimelineCallback
 {
-  private final List<Entry> entries = new ArrayList<Entry>();
+  private final List<Entry> entries = Lists.newArrayList();
 
   @Override
-  public boolean processNext(TimelineRecord rec)
+  public boolean processNext(Entry rec)
       throws IOException
   {
-    entries.add(new TimelineRecordWrapper(rec));
+    entries.add(rec);
     return true;
   }
 

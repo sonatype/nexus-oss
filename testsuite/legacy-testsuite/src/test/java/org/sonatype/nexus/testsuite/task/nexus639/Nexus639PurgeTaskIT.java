@@ -18,7 +18,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.sonatype.nexus.timeline.tasks.PurgeTimelineTaskDescriptor;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -47,7 +46,7 @@ public class Nexus639PurgeTaskIT
     ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
     repo.setKey("purgeOlderThan");
     repo.setValue("0");
-    TaskScheduleUtil.runTask("purge", PurgeTimelineTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("purge", "PurgeTimeline", repo);
 
     // validate the feeds contain nothing.
 
