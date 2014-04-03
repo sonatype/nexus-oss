@@ -131,7 +131,7 @@ public class LocalContentDiscovererImpl
     @Override
     public boolean shouldProcessRecursively(WalkerContext context, StorageCollectionItem coll) {
       // limit the scrape depth AND whatever else needed
-      return (coll.getPathDepth() <= scrapeDepth) && super.shouldProcessRecursively(context, coll);
+      return (coll.getPathDepth() < scrapeDepth) && super.shouldProcessRecursively(context, coll);
     }
   }
 
