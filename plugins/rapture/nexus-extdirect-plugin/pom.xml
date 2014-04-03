@@ -45,16 +45,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.yahoo.platform.yui</groupId>
-      <artifactId>yuicompressor</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>rhino</groupId>
-      <artifactId>js</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
     </dependency>

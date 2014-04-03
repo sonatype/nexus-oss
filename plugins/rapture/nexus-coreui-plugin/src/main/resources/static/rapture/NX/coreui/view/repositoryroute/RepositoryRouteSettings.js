@@ -50,7 +50,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
         name: 'id'
       },
       {
-        xtype: 'textfield',
+        xtype: 'nx-regexp',
         name: 'pattern',
         fieldLabel: 'URL pattern',
         emptyText: 'enter a pattern'

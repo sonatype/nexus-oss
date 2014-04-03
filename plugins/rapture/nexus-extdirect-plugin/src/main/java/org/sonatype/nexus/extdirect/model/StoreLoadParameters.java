@@ -24,8 +24,37 @@ import com.google.common.base.Preconditions;
 public class StoreLoadParameters
 {
 
+  private Integer page;
+
+  private Integer start;
+
+  private Integer limit;
+
   private List<Filter> filter;
 
+  public Integer getPage() {
+    return page;
+  }
+
+  public void setPage(final Integer page) {
+    this.page = page;
+  }
+
+  public Integer getStart() {
+    return start;
+  }
+
+  public void setStart(final Integer start) {
+    this.start = start;
+  }
+
+  public Integer getLimit() {
+    return limit;
+  }
+
+  public void setLimit(final Integer limit) {
+    this.limit = limit;
+  }
 
   public String getFilter(String property) {
     Preconditions.checkNotNull(property, "property");

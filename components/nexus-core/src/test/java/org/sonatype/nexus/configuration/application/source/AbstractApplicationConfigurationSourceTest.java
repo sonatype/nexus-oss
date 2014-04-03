@@ -20,6 +20,7 @@ import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public abstract class AbstractApplicationConfigurationSourceTest
     extends NexusAppTestSupport

@@ -40,6 +40,7 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.extdirect.DirectComponent;
+import org.sonatype.nexus.extdirect.ExtDirectPlugin;
 import org.sonatype.nexus.extdirect.model.Response;
 
 import com.google.common.base.Function;
@@ -135,7 +136,7 @@ public class ExtDirectServlet
           }
         })
     );
-    File apiFile = new File(directories.getTemporaryDirectory(), "extdirect/api.js");
+    File apiFile = new File(directories.getTemporaryDirectory(), ExtDirectPlugin.ARTIFACT_ID + "/api.js");
     return Lists.newArrayList(
         new ApiConfiguration(
             "nexus",

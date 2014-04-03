@@ -20,6 +20,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class RepositoryEvictUnusedItemsTest
     extends AbstractProxyTestEnvironment

@@ -27,6 +27,7 @@ import org.sonatype.security.SecuritySystem;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class DefaultNexusConfigurationTest
     extends NexusAppTestSupport

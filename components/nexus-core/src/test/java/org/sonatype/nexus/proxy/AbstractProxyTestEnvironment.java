@@ -41,6 +41,7 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.PlexusContainer;
 import org.slf4j.Logger;
+import static org.junit.Assert.*;
 
 /**
  * The Class AbstractProxyTestEnvironment.

@@ -806,8 +806,8 @@ public class DefaultNexusConfiguration
     if (rtd.getInstanceCount() >= maxCount) {
       String msg =
           "Repository \"" + repositoryModel.getName() + "\" (id=" + repositoryModel.getId()
-              + ") cannot be created. It's repository type " + rtd.toString() + " is limited to " + maxCount
-              + " instances, and it already has " + String.valueOf(rtd.getInstanceCount()) + " of them.";
+              + ") cannot be created. It's repository type " + rtd + " is limited to " + maxCount
+              + " instances, and it already has " + rtd.getInstanceCount() + " of them.";
 
       log.warn(msg);
 

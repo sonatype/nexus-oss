@@ -48,6 +48,7 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettings', {
         name: 'format',
         fieldLabel: 'Repository Type',
         emptyText: 'select a repository type',
+        editable: false,
         store: 'RepositoryFormat',
         queryMode: 'local',
         displayField: 'name',
@@ -59,6 +60,9 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettings', {
         itemId: 'patterns',
         fieldLabel: 'Patterns',
         emptyText: 'enter a pattern expression',
+        input: {
+          xtype: 'nx-regexp'
+        },
         sorted: true
       }
     ];

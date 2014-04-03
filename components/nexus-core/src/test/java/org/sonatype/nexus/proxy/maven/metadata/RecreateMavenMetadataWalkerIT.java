@@ -48,6 +48,7 @@ import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * @author Juven Xu

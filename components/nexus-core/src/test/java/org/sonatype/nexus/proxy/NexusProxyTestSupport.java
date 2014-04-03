@@ -18,6 +18,7 @@ import java.net.ServerSocket;
 import org.sonatype.nexus.test.NexusTestSupport;
 
 import org.codehaus.plexus.context.Context;
+import static org.junit.Assert.*;
 
 public abstract class NexusProxyTestSupport
     extends NexusTestSupport

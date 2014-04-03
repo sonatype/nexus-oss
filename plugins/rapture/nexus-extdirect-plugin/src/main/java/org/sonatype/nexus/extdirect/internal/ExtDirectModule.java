@@ -47,6 +47,7 @@ public class ExtDirectModule
       protected void configureServlets() {
         Map<String, String> directServletConfig = Maps.newHashMap();
         directServletConfig.put(GlobalParameters.PROVIDERS_URL, MOUNT_POINT.substring(1));
+        directServletConfig.put("minify", Boolean.FALSE.toString());
         directServletConfig.put(GlobalParameters.DEBUG, Boolean.toString(log.isDebugEnabled()));
         directServletConfig.put(
             GlobalParameters.JSON_REQUEST_PROCESSOR_THREAD_CLASS, ExtDirectJsonRequestProcessorThread.class.getName()

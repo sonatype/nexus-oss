@@ -38,6 +38,7 @@ import org.apache.maven.index.packer.IndexPacker;
 import org.apache.maven.index.packer.IndexPackingRequest;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 // This is an IT just because it runs longer then 15 seconds
 public class ReindexIT

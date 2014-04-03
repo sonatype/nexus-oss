@@ -229,9 +229,9 @@ public class ItemNotFoundException
    */
   @Deprecated
   public ItemNotFoundException(final ResourceStoreRequest request, final Repository repository, final Throwable cause) {
-    this(repository != null ? "Item not found for request \"" + String.valueOf(request) + "\" in repository \""
+    this(repository != null ? "Item not found for request \"" + request + "\" in repository \""
         + RepositoryStringUtils.getHumanizedNameString(repository) + "\"!" : "Item not found for request \""
-        + String.valueOf(request) + "\"!", request, repository, cause);
+        + request + "\"!", request, repository, cause);
   }
 
   /**

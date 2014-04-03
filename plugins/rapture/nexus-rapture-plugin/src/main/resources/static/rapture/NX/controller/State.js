@@ -152,11 +152,11 @@ Ext.define('NX.controller.State', {
     if (map) {
       Ext.Object.each(map, function (key, value) {
         valueToSet = value;
-        if (Ext.isObject(value) && value.hash && value.value) {
+        if (Ext.isObject(value) && Ext.isDefined(value.hash) && Ext.isDefined(value.value)) {
           hash = value.hash;
           valueToSet = value.value;
         }
-        if (valueToSet) {
+        if (Ext.isDefined(valueToSet)) {
           if (!Ext.isPrimitive(valueToSet) && !Ext.isArray(valueToSet)
               && Ext.ClassManager.getByAlias('nx.state.' + key)) {
             valueToSet = Ext.ClassManager.instantiateByAlias('nx.state.' + key, valueToSet);

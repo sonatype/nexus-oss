@@ -48,6 +48,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.doReturn;
+import static org.junit.Assert.*;
 
 public class PathBasedRequestRepositoryMapperTest
     extends AbstractNexusTestEnvironment

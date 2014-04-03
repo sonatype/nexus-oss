@@ -23,6 +23,7 @@ import javax.naming.ldap.InitialLdapContext;
 import org.sonatype.security.ldap.LdapTestSupport;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class LdapGroupDAOIT
     extends LdapTestSupport

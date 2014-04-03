@@ -29,6 +29,7 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class M1LayoutedM2ShadowRepositoryTest
     extends AbstractShadowRepositoryTest

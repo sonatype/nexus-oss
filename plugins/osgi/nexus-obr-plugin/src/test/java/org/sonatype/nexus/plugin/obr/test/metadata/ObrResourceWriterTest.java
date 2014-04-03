@@ -26,6 +26,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.osgi.service.obr.Resource;
+import static org.junit.Assert.*;
 
 public class ObrResourceWriterTest
     extends AbstractObrMetadataTest

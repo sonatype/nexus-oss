@@ -21,6 +21,7 @@ import org.sonatype.nexus.templates.repository.maven.Maven1HostedRepositoryTempl
 import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class IndexableRepositoryTest
     extends NexusAppTestSupport

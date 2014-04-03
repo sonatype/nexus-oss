@@ -20,6 +20,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
 import org.junit.Assert;
+import static org.junit.Assert.*;
 
 public abstract class AbstractShadowRepositoryTest
     extends AbstractProxyTestEnvironment

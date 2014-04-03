@@ -89,8 +89,7 @@ public class VelocityRepresentation
       return getEngine(context).getTemplate(templateName);
     }
     catch (Exception e) {
-      throw new IllegalArgumentException("Cannot get the template with name " + String.valueOf(templateName),
-          e);
+      throw new IllegalArgumentException("Cannot get the template with name " + templateName, e);
     }
     finally {
       Thread.currentThread().setContextClassLoader(original);

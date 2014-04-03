@@ -197,14 +197,10 @@ Ext.define('NX.controller.MasterDetail', {
         tabs = list.up('nx-masterdetail-panel').down('nx-masterdetail-tabs'),
         bookmark = NX.Bookmarks.fromToken(NX.Bookmarks.getBookmark().getSegment(0)),
         segments = [],
-        idBookmark, selectedTabBookmark;
+        selectedTabBookmark;
 
     if (modelId) {
-      idBookmark = modelId;
-      if (NX.Bookmarks.encode(idBookmark) != idBookmark) {
-        idBookmark = NX.Bookmarks.encode(idBookmark);
-      }
-      segments.push(idBookmark);
+      segments.push(encodeURIComponent(modelId));
       selectedTabBookmark = tabs.getBookmarkOfSelectedTab();
       if (selectedTabBookmark) {
         segments.push(selectedTabBookmark);
@@ -227,17 +223,10 @@ Ext.define('NX.controller.MasterDetail', {
       modelId = bookmark.getSegment(1);
       tabBookmark = bookmark.getSegment(2);
       if (modelId) {
+        modelId = decodeURIComponent(modelId);
         me.logDebug('Navigate to: ' + modelId + (tabBookmark ? ":" + tabBookmark : ''));
         store = list.getStore();
         model = store.getById(modelId);
-        // lets try to see if we can find the record by encoded value
-        // TODO review this as it can be a performance penalty
-        // Maybe we should ass a marker that the bookmark was encoded and only search in that case
-        if (!model) {
-          model = store.getAt(store.findBy(function (model) {
-            return NX.Bookmarks.encode(model.getId()) === modelId;
-          }));
-        }
         if (model) {
           list.getSelectionModel().select(model, false, true);
           list.getView().focusRow(model);

@@ -84,14 +84,15 @@ Ext.define('NX.coreui.controller.Users', {
       view: { xtype: 'nx-coreui-user-feature' },
       visible: function () {
         return NX.Permissions.check('security:users', 'read');
-      }
+      },
+      weight: 30
     },
     {
       mode: 'user',
       path: '/Account',
       view: { xtype: 'nx-coreui-user-account' },
       visible: function () {
-        return NX.Permissions.check('security:users', 'read');
+        return NX.Security.hasUser();
       }
     }
   ],
@@ -359,12 +360,12 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @override
    * @private
-   * Enable 'Change Password' when user has 'security:userschangepw:update' permission.
+   * Enable 'Change Password' when user has 'security:userschangepw:create' permission.
    */
   bindChangePasswordButton: function (button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('security:userschangepw', 'update')
+            NX.Conditions.isPermitted('security:userschangepw', 'create')
         ),
         {
           satisfied: button.enable,

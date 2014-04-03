@@ -72,7 +72,7 @@ public class CapabilityStorageConverter
 
       // ensure that there are no capabilities in Kazuki
       checkState(
-          capabilityStorage.getAll().size() == 0,
+          capabilityStorage.getAll().isEmpty(),
           "Could not upgrade capabilities.xml to Kazuki as Kazuki already contains capabilities"
       );
 

@@ -97,7 +97,7 @@ public class CapabilitiesImpl
       throws MultipleCapabilitiesFoundException, NexusClientNotFoundException
   {
     final Collection<Capability> capabilities = get(filter);
-    if (capabilities.size() == 0) {
+    if (capabilities.isEmpty()) {
       throw new NexusClientNotFoundException(
           String.format("No capability found matching filter '%s'", filter),
           NO_RESPONSE_BODY

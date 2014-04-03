@@ -23,6 +23,8 @@ import org.sonatype.security.ldap.LdapTestSupport;
 
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 public class LdapUserDAOIT
     extends LdapTestSupport
 {

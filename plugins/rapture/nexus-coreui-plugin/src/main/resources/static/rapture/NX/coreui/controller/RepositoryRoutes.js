@@ -141,9 +141,11 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
 
     if (newValue === 'BLOCKING') {
       mappedRepositories.hide();
+      mappedRepositories.disable(); // so is not validated/sent
       mappedRepositories.setValue(undefined);
     }
     else {
+      mappedRepositories.enable();
       mappedRepositories.show();
     }
   },

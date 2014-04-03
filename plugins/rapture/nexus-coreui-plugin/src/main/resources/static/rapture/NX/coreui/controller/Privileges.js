@@ -66,7 +66,8 @@ Ext.define('NX.coreui.controller.Privileges', {
     view: { xtype: 'nx-coreui-privilege-feature' },
     visible: function () {
       return NX.Permissions.check('security:privileges', 'read');
-    }
+    },
+    weight: 10
   },
   permission: 'security:privileges',
 

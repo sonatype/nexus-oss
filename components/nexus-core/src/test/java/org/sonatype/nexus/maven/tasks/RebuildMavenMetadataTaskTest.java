@@ -24,6 +24,7 @@ import org.codehaus.plexus.util.DirectoryScanner;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.*;
 
 public class RebuildMavenMetadataTaskTest
     extends AbstractMavenRepoContentTests

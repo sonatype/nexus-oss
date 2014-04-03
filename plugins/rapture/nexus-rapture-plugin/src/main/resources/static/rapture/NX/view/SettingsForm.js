@@ -91,9 +91,23 @@ Ext.define('NX.view.SettingsForm', {
          * @event recordloaded
          * Fires when a record is loaded via {@link Ext.form.Panel#loadRecord}.
          * @param {Ext.form.Panel} this form
-         * @param { Ext.data.Model} loaded record
+         * @param {Ext.data.Model} loaded record
          */
-        'recordloaded'
+        'recordloaded',
+        /**
+         * @event loaded
+         * Fires after form was loaded via configured api.
+         * @param {Ext.form.Panel} this form
+         * @param {Ext.form.action.Action} load action
+         */
+        'loaded',
+        /**
+         * @event submitted
+         * Fires after form was submitted via configured api.
+         * @param {Ext.form.Panel} this form
+         * @param {Ext.form.action.Action} submit action
+         */
+        'submitted'
     );
   },
 

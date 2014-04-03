@@ -36,6 +36,7 @@ import org.junit.Test;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.junit.Assert.*;
 
 public class DefaultRepositoryRegistryTest
     extends AbstractNexusTestEnvironment

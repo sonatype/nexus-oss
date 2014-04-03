@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.extdirect.internal;
 
 import java.io.File;
@@ -20,6 +21,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.extdirect.ExtDirectPlugin;
 import org.sonatype.nexus.plugin.support.FileWebResource;
 import org.sonatype.nexus.web.WebResource;
 import org.sonatype.nexus.web.WebResourceBundle;
@@ -57,8 +59,8 @@ public class ExtDirectWebResources
   @Override
   public List<WebResource> getResources() {
     return ImmutableList.of(
-        create("extdirect/api-min.js", "/static/rapture/extdirect-prod.js"),
-        create("extdirect/api-debug.js", "/static/rapture/extdirect-debug.js")
+        create(ExtDirectPlugin.ARTIFACT_ID + "/api.js", "/static/rapture/extdirect-prod.js"),
+        create(ExtDirectPlugin.ARTIFACT_ID + "/api-debug.js", "/static/rapture/extdirect-debug.js")
     );
   }
 }

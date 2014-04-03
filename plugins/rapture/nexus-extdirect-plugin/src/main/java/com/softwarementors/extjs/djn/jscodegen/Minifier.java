@@ -10,13 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.test;
+package com.softwarementors.extjs.djn.jscodegen;
 
-public interface Names
+import com.softwarementors.extjs.djn.StringUtils;
+
+/**
+ * This is an override of original Minifier code, that will not do any minification, or order to get rid of
+ * yui compressor / rhino.
+ */
+public class Minifier
 {
 
-  static final String BASE_DIR = "basedir";
+  public static String getMinifiedFileName(String file) {
+    return file.replace(".js", "-min.js");
+  }
 
-  static final String BASE_DIR_CONF = "${" + BASE_DIR + ":-.}";
+  public static final String minify( String input, String inputFilename, int debugCodeLength ) {
+    throw new IllegalStateException("Minification is not supposed to be used");
+  }
 
 }

@@ -421,7 +421,7 @@ public class DefaultCapabilityRegistry
       }
     }
 
-    if (vr.getValidationErrors().size() > 0) {
+    if (!vr.getValidationErrors().isEmpty()) {
       throw new InvalidConfigurationException(vr);
     }
   }
@@ -452,7 +452,7 @@ public class DefaultCapabilityRegistry
         }
       }
 
-      if (vr.getValidationErrors().size() > 0) {
+      if (!vr.getValidationErrors().isEmpty()) {
         throw new InvalidConfigurationException(vr);
       }
     }

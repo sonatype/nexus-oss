@@ -18,6 +18,7 @@ import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.scheduling.SchedulerTask;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * Test if the repo folders(storage, indexer, proxy attributes) were deleted correctly

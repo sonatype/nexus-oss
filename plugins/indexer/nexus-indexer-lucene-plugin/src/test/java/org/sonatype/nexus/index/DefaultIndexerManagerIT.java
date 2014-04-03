@@ -29,6 +29,7 @@ import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.treeview.DefaultTreeNodeFactory;
 import org.apache.maven.index.treeview.TreeNode;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 // This is an IT just because it runs longer then 15 seconds
 public class DefaultIndexerManagerIT

@@ -29,6 +29,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
 import org.codehaus.plexus.context.Context;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public abstract class LdapSchemaTestSupport
     extends LdapTestSupport

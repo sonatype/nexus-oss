@@ -10,13 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
+package org.sonatype.nexus.coreui
+
+import groovy.transform.ToString
+
 /**
- * Browse repository tabs.
+ * Search result exchange object.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseTabs', {
-  extend: 'Ext.tab.Panel',
-  alias: 'widget.nx-coreui-repository-browse-tabs'
-
-});
+@ToString(includePackage = false, includeNames = true)
+class SearchResultXO
+{
+  String repositoryId
+  String uri
+  String version
+  String path
+}

@@ -17,7 +17,11 @@ import java.io.InputStream;
 
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 
+import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 public class FileConfigurationSourceTest
     extends AbstractApplicationConfigurationSourceTest

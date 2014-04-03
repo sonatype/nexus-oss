@@ -27,6 +27,7 @@ Ext.define('NX.app.Application', {
     'Ext.util.LocalStorage',
     'NX.view.Viewport',
     'NX.util.Url',
+    'NX.util.DownloadHelper',
     'NX.State',
 
     // Ext overrides
@@ -48,6 +49,7 @@ Ext.define('NX.app.Application', {
     'NX.ext.form.field.ClearableComboBox',
     'NX.ext.form.field.Email',
     'NX.ext.form.field.Password',
+    'NX.ext.form.field.RegExp',
     'NX.ext.form.field.Url',
     'NX.ext.form.field.ValueSet',
     'NX.ext.grid.column.Timestamp',
@@ -114,6 +116,9 @@ Ext.define('NX.app.Application', {
     },
     debugMode: function () {
       return NX.State.getValue('debug') === true;
+    },
+    pluginActive: function (coordinates) {
+      return NX.State.getValue('plugins').indexOf(coordinates) > -1;
     }
   },
 

@@ -60,6 +60,16 @@ Ext.define('NX.Conditions', {
   },
 
   /**
+   * @param {String} key state value key
+   * @param {Function} [fn] An optional function to be called when a state value changes. If not specified, a boolean
+   * check against value will be performed
+   * @returns {NX.util.condition.WatchState}
+   */
+  watchState: function (key, fn) {
+    return Ext.create('NX.util.condition.WatchState', { key: key, fn: fn });
+  },
+
+  /**
    * Takes as parameter {NX.util.condition.Condition}s to be AND-ed.
    * @returns {NX.util.condition.Conjunction}
    */

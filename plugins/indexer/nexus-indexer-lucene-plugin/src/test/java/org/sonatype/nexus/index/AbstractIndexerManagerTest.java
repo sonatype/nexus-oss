@@ -28,6 +28,7 @@ import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.SearchType;
 import org.apache.maven.index.context.IndexingContext;
+import static org.junit.Assert.*;
 
 public abstract class AbstractIndexerManagerTest
     extends AbstractMavenRepoContentTests
