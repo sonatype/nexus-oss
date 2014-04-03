@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.walker;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -28,8 +29,11 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.proxy.walker.WalkerContext.TraversalType;
 import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.collect.Lists;
 
 /**
  * The Class Walker.
@@ -48,6 +52,7 @@ public class DefaultWalker
 
   public static final String WALKER_THROTTLE_INFO = Walker.class.getSimpleName() + ".throttleInfo";
 
+  @Override
   public void walk(WalkerContext context)
       throws WalkerException
   {
@@ -76,33 +81,21 @@ public class DefaultWalker
         beforeWalk(context);
 
         if (!context.isStopped()) {
-          StorageItem item = null;
-
-          item = context.getRepository().retrieveItem(true, context.getResourceStoreRequest());
-
-          int collCount = 0;
-
-          if (StorageCollectionItem.class.isAssignableFrom(item.getClass())) {
-            try {
-              WalkerFilter filter =
-                  context.getFilter() != null ? context.getFilter() : new DefaultStoreWalkerFilter();
-              collCount = walkRecursive(0, context, filter, (StorageCollectionItem) item);
+          final StorageItem item = context.getRepository().retrieveItem(true, context.getResourceStoreRequest());
+          final WalkerFilter filter =
+              context.getFilter() != null ? context.getFilter() : new DefaultStoreWalkerFilter();
+          try {
+            if (StorageCollectionItem.class.isAssignableFrom(item.getClass())) {
+              int collCount = walkRecursive(0, context, filter, (StorageCollectionItem) item);
               context.getContext().put(WALKER_WALKED_COLLECTION_COUNT, collCount);
             }
-            catch (Exception e) {
-              context.stop(e);
-            }
-          }
-          else {
-            try {
-              WalkerFilter filter =
-                  context.getFilter() != null ? context.getFilter() : new DefaultStoreWalkerFilter();
+            else {
               walkItem(context, filter, item);
               context.getContext().put(WALKER_WALKED_COLLECTION_COUNT, 1);
             }
-            catch (Exception e) {
-              context.stop(e);
-            }
+          }
+          catch (Exception e) {
+            context.stop(e);
           }
 
           if (!context.isStopped()) {
@@ -114,12 +107,10 @@ public class DefaultWalker
         if (log.isDebugEnabled()) {
           log.debug("ItemNotFound where walking should start, bailing out.", ex);
         }
-
         context.stop(ex);
       }
       catch (Exception ex) {
         log.warn("Got exception while doing retrieve, bailing out.", ex);
-
         context.stop(ex);
       }
     }
@@ -179,11 +170,8 @@ public class DefaultWalker
     if (context.isStopped()) {
       return collCount;
     }
-
-    boolean shouldProcess = filter.shouldProcess(context, coll);
-
-    boolean shouldProcessRecursively = filter.shouldProcessRecursively(context, coll);
-
+    final boolean shouldProcess = filter.shouldProcess(context, coll);
+    final boolean shouldProcessRecursively = filter.shouldProcessRecursively(context, coll);
     if (!shouldProcess && !shouldProcessRecursively) {
       return collCount;
     }
@@ -191,7 +179,6 @@ public class DefaultWalker
     // user may call stop()
     if (shouldProcess) {
       onCollectionEnter(context, coll);
-
       collCount++;
     }
 
@@ -199,33 +186,32 @@ public class DefaultWalker
       return collCount;
     }
 
-    Collection<StorageItem> ls = null;
-
+    final List<StorageCollectionItem> collections = Lists.newArrayList();
     if (shouldProcessRecursively) {
       try {
-        ls = context.getRepository().list(false, coll);
+        final List<StorageItem> ls = Lists.newArrayList(context.getRepository().list(false, coll));
 
         if (context.getItemComparator() != null) {
-          final ArrayList<StorageItem> list = new ArrayList<StorageItem>(ls);
-          Collections.sort(list, context.getItemComparator());
-          ls = list;
+          Collections.sort(ls, context.getItemComparator());
         }
 
         for (StorageItem i : ls) {
-          if (!(i instanceof StorageCollectionItem)) {
+          if (context.isProcessCollections() || !(i instanceof StorageCollectionItem)) {
             walkItem(context, filter, i);
-
             if (context.isStopped()) {
               return collCount;
             }
           }
 
           if (i instanceof StorageCollectionItem) {
-            // user may call stop()
-            collCount = walkRecursive(collCount, context, filter, (StorageCollectionItem) i);
-
-            if (context.isStopped()) {
-              return collCount;
+            if (context.getTraversalType() == TraversalType.DEPTH_FIRST) {
+              // user may call stop()
+              collCount = walkRecursive(collCount, context, filter, (StorageCollectionItem) i);
+              if (context.isStopped()) {
+                return collCount;
+              }
+            } else {
+              collections.add((StorageCollectionItem) i);
             }
           }
         }
@@ -238,6 +224,15 @@ public class DefaultWalker
     // user may call stop()
     if (shouldProcess) {
       onCollectionExit(context, coll);
+    }
+
+    if (context.getTraversalType() == TraversalType.BREADTH_FIRST) {
+      for (StorageCollectionItem collection : collections) {
+        collCount = walkRecursive(collCount, context, filter, collection);
+        if (context.isStopped()) {
+          break;
+        }
+      }
     }
 
     return collCount;
