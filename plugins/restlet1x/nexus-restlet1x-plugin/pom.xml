@@ -94,6 +94,8 @@
             <sharedDependency>com.noelios.restlet:com.noelios.restlet.ext.servlet</sharedDependency>
             <!-- Used by org.sonatype.nexus.rest.ResourceSupport -->
             <sharedDependency>javax.ws.rs:javax.ws.rs</sharedDependency>
+            <!-- For RSS feed support -->
+            <sharedDependency>rome:rome</sharedDependency>
           </sharedDependencies>
         </configuration>
       </plugin>
