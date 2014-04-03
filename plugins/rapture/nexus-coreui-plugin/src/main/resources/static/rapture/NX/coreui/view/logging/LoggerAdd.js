@@ -28,6 +28,7 @@ Ext.define('NX.coreui.view.search.LoggerAdd', {
       {
         xtype: 'textfield',
         name: 'name',
+        itemId: 'name',
         fieldLabel: 'Name',
         emptyText: 'enter a logger name'
       },
