@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
 import java.util.Comparator;
@@ -29,15 +30,16 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.walker.WalkerContext.TraversalType;
 
 import com.google.common.collect.Lists;
 import junit.framework.Assert;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.fail;
 
 public class WalkerTest
     extends AbstractProxyTestEnvironment
@@ -354,6 +356,79 @@ public class WalkerTest
 
     public void onCollectionExit(WalkerContext context, StorageCollectionItem coll) {
       collExits++;
+    }
+  }
+
+  // ==
+
+  /**
+   * Tests the new "breadth first" walk type.
+   */
+  @Test
+  public void testBreadthFirstWalk()
+      throws Exception
+  {
+    // fetch some content to have on walk on something
+    getRootRouter().retrieveItem(
+        new ResourceStoreRequest("/groups/test/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar"));
+    getRootRouter().retrieveItem(
+        new ResourceStoreRequest("/groups/test/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.pom"));
+
+    final WalkerContext wc = new DefaultWalkerContext(
+        getRepositoryRegistry().getRepository("repo1"),
+        new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT, true, false),
+        null,
+        TraversalType.BREADTH_FIRST,
+        true
+    );
+
+    final BreadthFirstWalkerProcessor walkerProcessor = new BreadthFirstWalkerProcessor();
+    wc.getProcessors().add(walkerProcessor);
+    walker.walk(wc);
+
+    assertThat("Should not be stopped!", wc.isStopped(), is(false));
+
+    if (wc.getStopCause() != null) {
+      wc.getStopCause().printStackTrace();
+      assertThat("Should be no exception!", false);
+    }
+
+    assertThat(walkerProcessor.hadCollectionsProcessed, is(true));
+  }
+
+  private class BreadthFirstWalkerProcessor
+      extends AbstractWalkerProcessor
+  {
+    public boolean inCollection = false;
+
+    public boolean hadCollectionsProcessed = false;
+
+    @Override
+    public void onCollectionEnter(WalkerContext context, StorageCollectionItem coll) {
+      // checking boxing of calls
+      if (inCollection) {
+        context.stop(new Exception("Boxing violated on enter of " + coll.getRepositoryItemUid()));
+        return;
+      }
+      inCollection = true;
+      System.out.println("Entered coll " + coll.getPath());
+    }
+
+    @Override
+    public void processItem(WalkerContext context, StorageItem item) {
+      hadCollectionsProcessed = hadCollectionsProcessed || item instanceof StorageCollectionItem;
+      System.out.println("Processed " + item.getPath());
+    }
+
+    @Override
+    public void onCollectionExit(WalkerContext context, StorageCollectionItem coll) {
+      // checking boxing of calls
+      if (!inCollection) {
+        context.stop(new Exception("Boxing violated on exit of " + coll.getRepositoryItemUid()));
+        return;
+      }
+      inCollection = false;
+      System.out.println("Exited coll " + coll.getPath());
     }
   }
 

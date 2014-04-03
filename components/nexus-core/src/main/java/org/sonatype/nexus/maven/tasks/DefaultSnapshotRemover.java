@@ -10,12 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.maven.tasks;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,11 +54,16 @@ import org.sonatype.nexus.proxy.walker.DottedStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerContext.TraversalType;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
 import org.sonatype.nexus.util.PathUtils;
 import org.sonatype.scheduling.TaskUtil;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -189,22 +194,24 @@ public class DefaultSnapshotRemover
     if (log.isDebugEnabled()) {
       log.debug(
           "Collecting deletable snapshots on repository " + repository.getId() + " from storage directory "
-              + repository.getLocalUrl());
+              + repository.getLocalUrl()
+      );
     }
 
     final ParentOMatic parentOMatic = new ParentOMatic();
 
     // create a walker to collect deletables and let it loose on collections only
-    SnapshotRemoverWalkerProcessor snapshotRemoveProcessor =
+    final SnapshotRemoverWalkerProcessor snapshotRemoveProcessor =
         new SnapshotRemoverWalkerProcessor(repository, request, parentOMatic);
 
-    DefaultWalkerContext ctxMain =
-        new DefaultWalkerContext(repository, new ResourceStoreRequest("/"), new DottedStoreWalkerFilter());
-
+    final DefaultWalkerContext ctxMain =
+        new DefaultWalkerContext(repository,
+            new ResourceStoreRequest("/"),
+            new DottedStoreWalkerFilter(),
+            TraversalType.BREADTH_FIRST,
+            false);
     ctxMain.getContext().put(DeleteOperation.DELETE_OPERATION_CTX_KEY, getDeleteOperation(request));
-
     ctxMain.getProcessors().add(snapshotRemoveProcessor);
-
     walker.walk(ctxMain);
 
     if (ctxMain.getStopCause() != null) {
@@ -219,7 +226,8 @@ public class DefaultSnapshotRemover
       log.debug(
           "Collected and deleted " + snapshotRemoveProcessor.getDeletedSnapshots()
               + " snapshots with alltogether " + snapshotRemoveProcessor.getDeletedFiles()
-              + " files on repository " + repository.getId());
+              + " files on repository " + repository.getId()
+      );
     }
 
     // if we are processing a hosted-snapshot repository, we need to rebuild maven metadata
@@ -287,11 +295,9 @@ public class DefaultSnapshotRemover
 
     private final SnapshotRemovalRequest request;
 
-    private final Map<Version, List<StorageFileItem>> remainingSnapshotsAndFiles =
-        new HashMap<Version, List<StorageFileItem>>();
+    private final Map<Version, List<StorageFileItem>> remainingSnapshotsAndFiles = Maps.newHashMap();
 
-    private final Map<Version, List<StorageFileItem>> deletableSnapshotsAndFiles =
-        new HashMap<Version, List<StorageFileItem>>();
+    private final Map<Version, List<StorageFileItem>> deletableSnapshotsAndFiles = Maps.newHashMap();
 
     private final ParentOMatic collectionNodes;
 
@@ -301,6 +307,8 @@ public class DefaultSnapshotRemover
 
     private final long gracePeriodInMillis;
 
+    private final List<StorageItem> items;
+
     private boolean shouldProcessCollection;
 
     private boolean removeWholeGAV;
@@ -309,7 +317,8 @@ public class DefaultSnapshotRemover
 
     private int deletedFiles = 0;
 
-    public SnapshotRemoverWalkerProcessor(MavenRepository repository, SnapshotRemovalRequest request,
+    public SnapshotRemoverWalkerProcessor(final MavenRepository repository,
+                                          final SnapshotRemovalRequest request,
                                           final ParentOMatic collectionNodes)
     {
       this.repository = repository;
@@ -328,6 +337,7 @@ public class DefaultSnapshotRemover
       }
 
       gracePeriodInMillis = Math.max(0, request.getGraceDaysAfterRelease()) * MILLIS_IN_A_DAY;
+      items = Lists.newArrayList();
     }
 
     protected void addStorageFileItemToMap(Map<Version, List<StorageFileItem>> map, Gav gav, StorageFileItem item) {
@@ -352,13 +362,28 @@ public class DefaultSnapshotRemover
     }
 
     @Override
+    public void onCollectionEnter(WalkerContext context, StorageCollectionItem coll) {
+      items.clear();
+      deletableSnapshotsAndFiles.clear();
+      remainingSnapshotsAndFiles.clear();
+      shouldProcessCollection = coll.getPath().endsWith("SNAPSHOT");
+    }
+
+    @Override
     public void processItem(WalkerContext context, StorageItem item)
         throws Exception
     {
+      if (!shouldProcessCollection) {
+        return;
+      }
+      items.add(item);
     }
 
     @Override
     public void onCollectionExit(WalkerContext context, StorageCollectionItem coll) {
+      if (!shouldProcessCollection) {
+        return;
+      }
       try {
         doOnCollectionExit(context, coll);
       }
@@ -374,31 +399,12 @@ public class DefaultSnapshotRemover
       if (log.isDebugEnabled()) {
         log.debug("onCollectionExit() :: " + coll.getRepositoryItemUid().toString());
       }
-
-      shouldProcessCollection = coll.getPath().endsWith("SNAPSHOT");
-
-      if (!shouldProcessCollection) {
-        return;
-      }
-
-      deletableSnapshotsAndFiles.clear();
-
-      remainingSnapshotsAndFiles.clear();
-
       removeWholeGAV = false;
-
-      Gav gav = null;
-
-      Collection<StorageItem> items;
-
-      items = repository.list(false, coll);
-
-      HashSet<Long> versionsToRemove = new HashSet<Long>();
-
+      final HashSet<Long> versionsToRemove = Sets.newHashSet();
       // gathering the facts
       for (StorageItem item : items) {
         if (!item.isVirtual() && !StorageCollectionItem.class.isAssignableFrom(item.getClass())) {
-          gav =
+          final Gav gav =
               ((MavenRepository) coll.getRepositoryItemUid().getRepository()).getGavCalculator().pathToGav(
                   item.getPath());
 
@@ -526,11 +532,7 @@ public class DefaultSnapshotRemover
               if (gavHasMoreTimestampedSnapshots) {
                 file.getItemContext().put(MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV, Boolean.TRUE);
               }
-
-              gav = (Gav) file.getItemContext().get(Gav.class.getName());
-
               repository.deleteItem(false, createResourceStoreRequest(file, context));
-
               deletedFiles++;
             }
             catch (ItemNotFoundException e) {
@@ -550,9 +552,7 @@ public class DefaultSnapshotRemover
       }
 
       removeDirectoryIfEmpty(repository, coll);
-
       updateMetadataIfNecessary(context, coll);
-
     }
 
     /**
