@@ -29,9 +29,13 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.web.guice.SecurityWebModule;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
 import com.yammer.metrics.guice.InstrumentationModule;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.apache.bval.guice.Validate;
 import org.apache.bval.guice.ValidationModule;
 import org.apache.shiro.guice.aop.ShiroAopModule;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
@@ -147,6 +151,23 @@ public class NexusModules
         @Override
         public ValidationProviderResolver getDefaultValidationProviderResolver() {
           return null;
+        }
+      });
+
+      // TCCL workaround for Apache/BVal visibility issue
+      binder().bindInterceptor(Matchers.any(), Matchers.annotatedWith(Validate.class), new MethodInterceptor()
+      {
+        public Object invoke(MethodInvocation mi) throws Throwable {
+          Thread self = Thread.currentThread();
+          ClassLoader tccl = self.getContextClassLoader();
+          try {
+            // continue validation using our classloader as context
+            self.setContextClassLoader(getClass().getClassLoader());
+            return mi.proceed();
+          }
+          finally {
+            self.setContextClassLoader(tccl);
+          }
         }
       });
 
