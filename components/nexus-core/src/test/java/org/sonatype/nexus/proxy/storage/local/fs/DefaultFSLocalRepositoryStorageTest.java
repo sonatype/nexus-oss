@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.LinkPersister;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -43,6 +44,7 @@ import org.mockito.Mockito;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -102,6 +104,8 @@ public class DefaultFSLocalRepositoryStorageTest
     AttributesHandler attributesHandler = mock(AttributesHandler.class);
     when(repository.getAttributesHandler()).thenReturn(attributesHandler);
     when(repository.getLocalStorageContext()).thenReturn(new DefaultLocalStorageContext(null));
+    RepositoryItemUid uid = mock(RepositoryItemUid.class);
+    when(repository.createUid(anyString())).thenReturn(uid);
 
 
     DefaultFSLocalRepositoryStorage localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage(wastebasket,
@@ -133,6 +137,8 @@ public class DefaultFSLocalRepositoryStorageTest
     // Mocks
     Wastebasket wastebasket = mock(Wastebasket.class);
     Repository repository = mock(Repository.class);
+    RepositoryItemUid uid = mock(RepositoryItemUid.class);
+    when(repository.createUid(anyString())).thenReturn(uid);
     final DefaultLocalStorageContext localStorageContext = new DefaultLocalStorageContext(null);
     when(repository.getLocalStorageContext()).thenReturn(localStorageContext);
     FSPeer fsPeer = mock(FSPeer.class);
