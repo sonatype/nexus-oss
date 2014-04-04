@@ -102,8 +102,18 @@ Ext.define('NX.coreui.view.support.FileCreated', {
           ],
 
           buttons: [
-            { text: 'Download', action: 'download', formBind: true, ui: 'primary' },
-            { text: 'Cancel', handler: me.close, scope: me }
+            {
+              text: 'Download',
+              action: 'download',
+              formBind: true,
+              ui: 'primary',
+              glyph: 'xf023@FontAwesome' /* fa-lock */
+            },
+            {
+              text: 'Cancel',
+              handler: me.close,
+              scope: me
+            }
           ]
         }
       ]
