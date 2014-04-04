@@ -99,8 +99,13 @@ Ext.define('NX.coreui.controller.SysInfo', {
    * Refresh the system information panel.
    */
   onRefresh: function () {
-    NX.Messages.add({ text: 'System Information refreshed', type: 'default' });
-    this.load();
+    var me = this,
+        panel = me.getSysInfo();
+
+    if (panel) {
+      me.load();
+      NX.Messages.add({ text: 'System Information refreshed', type: 'default' });
+    }
   },
 
   /**
