@@ -30,8 +30,7 @@ Ext.define('NX.coreui.view.support.SupportZip', {
     items: [
       {
         xtype: 'label',
-        html: '<div>Creates a ZIP file containing useful support information about your server. ' +
-            'No information will be sent to Sonatype when creating the support ZIP file.' +
+        html: '<div>No information will be sent to Sonatype when creating the support ZIP file.' +
             '<br/><br/>Select the contents and options for support ZIP creation:<br/><br/></div>'
       },
       {
