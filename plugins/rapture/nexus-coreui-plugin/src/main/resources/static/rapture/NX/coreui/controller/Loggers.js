@@ -39,7 +39,7 @@ Ext.define('NX.coreui.controller.Loggers', {
     var me = this;
 
     me.getApplication().getIconController().addIcons({
-      'feature-system-logging': {
+      'feature-support-logging': {
         file: 'book.png',
         variants: ['x16', 'x32']
       },
@@ -50,7 +50,7 @@ Ext.define('NX.coreui.controller.Loggers', {
     });
 
     me.getApplication().getFeaturesController().registerFeature({
-      path: '/System/Logging',
+      path: '/Support/Logging',
       description: 'Allows changing logging configuration',
       view: { xtype: 'nx-coreui-logger-list' },
       visible: function () {
