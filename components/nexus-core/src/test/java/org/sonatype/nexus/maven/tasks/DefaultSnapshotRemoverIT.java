@@ -26,6 +26,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.sisu.litmus.testsupport.TestUtil;
 import org.sonatype.tests.http.runner.junit.ServerResource;
 import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Get;
@@ -35,8 +36,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -47,10 +48,13 @@ import static org.junit.Assert.assertTrue;
 public class DefaultSnapshotRemoverIT
     extends AbstractMavenRepoContentTests
 {
+  private TestUtil testUtil = new TestUtil(this);
+
   @Rule
   public ServerResource serverResource = new ServerResource(Server.server()
-      .serve("/central/**").withBehaviours(Get.get(new File("target/test-classes/reposes/central")))
-      .serve("/apache-snapshots/**").withBehaviours(Get.get(new File("target/test-classes/reposes/apache-snapshots")))
+      .serve("/central/*").withBehaviours(Get.get(testUtil.resolveFile("target/test-classes/reposes/central")))
+      .serve("/apache-snapshots/*").withBehaviours(
+          Get.get(testUtil.resolveFile("target/test-classes/reposes/apache-snapshots")))
       .getServerProvider());
 
   private SnapshotRemover snapshotRemover;
