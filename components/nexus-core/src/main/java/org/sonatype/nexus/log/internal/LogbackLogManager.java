@@ -576,8 +576,8 @@ public class LogbackLogManager
       case Level.DEBUG_INT:
         return LoggerLevel.DEBUG;
 
-      case Level.TRACE_INT:
-        return LoggerLevel.TRACE;
+      case Level.OFF_INT:
+        return LoggerLevel.OFF;
 
       default:
         return LoggerLevel.TRACE;
