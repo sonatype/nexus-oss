@@ -93,14 +93,6 @@ Ext.define('NX.controller.Temp', {
         file: 'information.png',
         variants: ['x16', 'x32']
       },
-      'feature-support-supportzip': {
-        file: 'file_extension_zip.png',
-        variants: ['x16', 'x32']
-      },
-      'feature-support-supporttools': {
-        file: 'globe_place.png',
-        variants: ['x16', 'x32']
-      },
       'feature-support-analytics': {
         file: 'system_monitor.png',
         variants: ['x16', 'x32']
@@ -174,14 +166,6 @@ Ext.define('NX.controller.Temp', {
       {
         path: '/Support',
         group: true
-      },
-      {
-        path: '/Support/Overview',
-        visible: visibleIfLoggedIn
-      },
-      {
-        path: '/Support/Support ZIP',
-        visible: visibleIfLoggedIn
       },
       {
         path: '/Support/Analytics',

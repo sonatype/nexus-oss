@@ -56,6 +56,16 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.Roles',
     'NX.coreui.controller.Security',
     'NX.coreui.controller.System',
+    { id: 'NX.coreui.controller.SysInfo',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-atlas-plugin');
+      }
+    },
+    { id: 'NX.coreui.controller.SupportZip',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-atlas-plugin');
+      }
+    },
     'NX.coreui.controller.Search',
     'NX.coreui.controller.Tasks',
     'NX.coreui.controller.UploadArtifact',
