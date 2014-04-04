@@ -93,10 +93,6 @@ Ext.define('NX.controller.Temp', {
         file: 'information.png',
         variants: ['x16', 'x32']
       },
-      'feature-support-analytics': {
-        file: 'system_monitor.png',
-        variants: ['x16', 'x32']
-      },
 
       // user
       'feature-notifications': {
@@ -166,10 +162,6 @@ Ext.define('NX.controller.Temp', {
       {
         path: '/Support',
         group: true
-      },
-      {
-        path: '/Support/Analytics',
-        visible: visibleIfLoggedIn
       },
 
       // browse mode
