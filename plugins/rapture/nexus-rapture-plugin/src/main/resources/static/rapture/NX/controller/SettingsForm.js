@@ -33,7 +33,7 @@ Ext.define('NX.controller.SettingsForm', {
       },
       component: {
         'form[settingsForm=true]': {
-          beforerender: me.loadForm
+          afterrender: me.loadForm
         },
         'form[settingsForm=true][editableCondition]': {
           afterrender: me.bindEditableCondition
@@ -77,6 +77,7 @@ Ext.define('NX.controller.SettingsForm', {
   loadForm: function (form, options) {
     if (form.api && form.api.load) {
       form.load(Ext.applyIf(options || {}, {
+        waitMsg: form.settingsFormLoadMessage,
         success: function (basicForm, action) {
           form.fireEvent('loaded', form, action);
         }
@@ -94,6 +95,7 @@ Ext.define('NX.controller.SettingsForm', {
 
     if (form.api && form.api.submit) {
       form.getForm().submit({
+        waitMsg: form.settingsFormSubmitMessage,
         success: function (basicForm, action) {
           var title = me.getSettingsFormSuccessMessage(form, action);
           if (title) {

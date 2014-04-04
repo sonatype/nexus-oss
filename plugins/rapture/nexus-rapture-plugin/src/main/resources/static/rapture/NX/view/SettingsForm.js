@@ -39,6 +39,16 @@ Ext.define('NX.view.SettingsForm', {
   settingsFormSuccessMessage: undefined,
 
   /**
+   * @cfg {string/function} [settingsFormLoadMessage: 'Loading...'] Text to be used as mask while loading data.
+   */
+  settingsFormLoadMessage: 'Loading...',
+
+  /**
+   * @cfg {string/function} [settingsFormSubmitMessage: 'Saving...'] Text to be used as mask while submitting data.
+   */
+  settingsFormSubmitMessage: 'Saving...',
+
+  /**
    * @cfg {NX.util.condition.Condition} The condition to be satisfied in order for this form to be editable.
    */
   editableCondition: undefined,
@@ -50,6 +60,7 @@ Ext.define('NX.view.SettingsForm', {
 
   bodyPadding: 10,
   autoScroll: true,
+  waitMsgTarget: true,
 
   defaults: {
     xtype: 'textfield',
