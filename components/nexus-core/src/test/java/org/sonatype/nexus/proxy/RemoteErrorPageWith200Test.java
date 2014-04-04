@@ -10,32 +10,37 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
-import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.internal.ErrorServlet;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
+import org.sonatype.tests.http.runner.junit.ServerResource;
+import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.jetty.behaviour.DeliverBodyBehaviour;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class RemoteErrorPageWith200Test
     extends AbstractProxyTestEnvironment
 {
-
   private RemoteRepositoryStorage remoteStorage;
 
   private ProxyRepository aProxyRepository;
 
-  private String baseUrl;
+  @Rule
+  public ServerResource server = new ServerResource(Server.server().serve("/*")
+      .withBehaviours(new DeliverBodyBehaviour(200, "text/html; charset=UTF-8", "<html>some content</html>"))
+      .getServerProvider());
 
   @Override
   public void setUp()
@@ -52,16 +57,17 @@ public class RemoteErrorPageWith200Test
   protected EnvironmentBuilder getEnvironmentBuilder()
       throws Exception
   {
-
-    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
-    this.baseUrl = ss.getUrl("200ErrorTest");
-    return new M2TestsuiteEnvironmentBuilder(ss);
-
+    return new M2TestsuiteEnvironmentBuilder("200ErrorTest")
+    {
+      protected void createRemoteServer(final String repoId) {
+        // nop, we will create server using a rule
+      }
+    };
   }
 
   @Test
   public void testRemoteReturnsErrorWith200StatusHeadersNotSet()
-      throws ItemNotFoundException, IOException
+      throws Exception
   {
 
     String expectedContent = "my cool expected content";
@@ -71,7 +77,7 @@ public class RemoteErrorPageWith200Test
     // remote request
     ResourceStoreRequest storeRequest = new ResourceStoreRequest("random/file.txt");
     DefaultStorageFileItem item =
-        (DefaultStorageFileItem) remoteStorage.retrieveItem(aProxyRepository, storeRequest, this.baseUrl);
+        (DefaultStorageFileItem) remoteStorage.retrieveItem(aProxyRepository, storeRequest, server.getServerProvider().getUrl().toExternalForm());
 
     // result should be HTML
     try (InputStream io = item.getInputStream()) {
@@ -82,7 +88,7 @@ public class RemoteErrorPageWith200Test
 
   @Test
   public void testRemoteReturnsErrorWith200StatusHeadersSet()
-      throws RemoteAccessException, StorageException, ItemNotFoundException
+      throws Exception
   {
 
     String expectedContent = "error page";
@@ -93,7 +99,7 @@ public class RemoteErrorPageWith200Test
     ResourceStoreRequest storeRequest = new ResourceStoreRequest("random/file.txt");
     try {
       DefaultStorageFileItem item =
-          (DefaultStorageFileItem) remoteStorage.retrieveItem(aProxyRepository, storeRequest, this.baseUrl);
+          (DefaultStorageFileItem) remoteStorage.retrieveItem(aProxyRepository, storeRequest, server.getServerProvider().getUrl().toExternalForm());
       Assert.fail("expected  RemoteStorageException");
     }
     // expect artifact not found

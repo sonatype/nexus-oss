@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 import java.io.ByteArrayInputStream;
@@ -22,7 +23,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -52,11 +52,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -64,15 +61,11 @@ public class SimplePullTest
     extends AbstractProxyTestEnvironment
 {
 
-  private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
-
   @Override
   protected EnvironmentBuilder getEnvironmentBuilder()
       throws Exception
   {
-    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
-    this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder(ss);
-    return jettyTestsuiteEnvironmentBuilder;
+    return new M2TestsuiteEnvironmentBuilder("repo1", "repo2", "repo3");
   }
 
   @Before
@@ -90,7 +83,8 @@ public class SimplePullTest
       item =
           getRootRouter().retrieveItem(
               new ResourceStoreRequest(
-                  "/repositories/repo1/activemq/activemq-core/1.2/broken/activemq-core-1.2", false));
+                  "/repositories/repo1/activemq/activemq-core/1.2/broken/activemq-core-1.2", false)
+          );
 
       fail("We should not be able to pull this path!");
     }
@@ -308,7 +302,8 @@ public class SimplePullTest
         getFile(getRepositoryRegistry().getRepository("repo1"),
             "/activemq/activemq-core/1.2/activemq-core-1.2.jar"),
         getFile(getRepositoryRegistry().getRepository("inhouse"),
-            "/activemq/activemq-core/1.2/activemq-core-1.2.jar")));
+            "/activemq/activemq-core/1.2/activemq-core-1.2.jar")
+    ));
   }
 
   @Test
@@ -318,7 +313,8 @@ public class SimplePullTest
     try {
       getRootRouter().retrieveItem(
           new ResourceStoreRequest(
-              "/groups/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar-there-is-no-such", false));
+              "/groups/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar-there-is-no-such", false)
+      );
       fail();
     }
     catch (ItemNotFoundException e) {
@@ -350,7 +346,8 @@ public class SimplePullTest
     try {
       getRootRouter().retrieveItem(
           new ResourceStoreRequest("/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar/",
-              false));
+              false)
+      );
 
       fail("The path ends with slash '/'!");
     }
@@ -374,7 +371,8 @@ public class SimplePullTest
     try {
       getRootRouter().retrieveItem(
           new ResourceStoreRequest(
-              "/groups/test/classworlds/classworlds/1.1-alpha-2/classworlds-1.1-alpha-2-nonexistent.pom", false));
+              "/groups/test/classworlds/classworlds/1.1-alpha-2/classworlds-1.1-alpha-2-nonexistent.pom", false)
+      );
       fail("We should not find this!");
     }
     catch (ItemNotFoundException e) {
@@ -522,8 +520,8 @@ public class SimplePullTest
   public void testNXCM4852EofFromRemote()
       throws Exception
   {
-    final int port = jettyTestsuiteEnvironmentBuilder.getServletServer().getPort();
-    jettyTestsuiteEnvironmentBuilder.stopService();
+    final int port = ((M2TestsuiteEnvironmentBuilder)environmentBuilder()).server().getPort();
+    environmentBuilder().stopService();
 
     final Server server = Server.withPort(port);
     server.serve("/*").withBehaviours(new DropConnection()).start();

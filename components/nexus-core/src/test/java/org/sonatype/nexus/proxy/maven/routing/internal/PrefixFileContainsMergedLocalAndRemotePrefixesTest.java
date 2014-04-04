@@ -93,7 +93,7 @@ public class PrefixFileContainsMergedLocalAndRemotePrefixesTest
 
         @Override
         public void buildEnvironment(AbstractProxyTestEnvironment env)
-            throws ConfigurationException, IOException, ComponentLookupException
+            throws Exception
         {
           // deploy a file into cache of proxy repo, that is NOT on remote
           final File repoRoot =
@@ -102,11 +102,10 @@ public class PrefixFileContainsMergedLocalAndRemotePrefixesTest
           Files.createParentDirs(fakeArtifact);
           Files.write("dummy content".getBytes(), fakeArtifact);
 
-          final PlexusContainer container = env.getPlexusContainer();
           final List<String> reposes = new ArrayList<String>();
           {
             // adding one proxy
-            final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+            final M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
             CRepository repoConf = new DefaultCRepository();
             repoConf.setProviderRole(Repository.class.getName());
             repoConf.setProviderHint("maven2");

@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import java.io.File;
+
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
@@ -19,6 +21,9 @@ import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.scheduling.CancellableProgressListenerWrapper;
 import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.tests.http.runner.junit.ServerResource;
+import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Get;
 
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Binder;
@@ -26,6 +31,7 @@ import com.google.inject.Module;
 import com.google.inject.name.Names;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -38,6 +44,12 @@ import org.junit.Test;
 public class Nexus4588CancellationTest
     extends AbstractMavenRepoContentTests
 {
+  @Rule
+  public ServerResource serverResource = new ServerResource(Server.server()
+      .serve("/central/**").withBehaviours(Get.get(new File("target/test-classes/reposes/central")))
+      .serve("/apache-snapshots/**").withBehaviours(Get.get(new File("target/test-classes/reposes/apache-snapshots")))
+      .getServerProvider());
+
 
   @Override
   protected Module[] getTestCustomModules() {

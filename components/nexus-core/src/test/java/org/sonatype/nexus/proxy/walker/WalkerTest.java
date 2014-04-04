@@ -15,7 +15,6 @@ package org.sonatype.nexus.proxy.walker;
 import java.util.Comparator;
 import java.util.List;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
 import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
@@ -35,16 +34,13 @@ import junit.framework.Assert;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.fail;
 
 public class WalkerTest
     extends AbstractProxyTestEnvironment
 {
-  private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
-
   private Walker walker;
 
   private RepositoryRegistry repositoryRegistry;
@@ -62,9 +58,7 @@ public class WalkerTest
   protected EnvironmentBuilder getEnvironmentBuilder()
       throws Exception
   {
-    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
-    this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder(ss);
-    return jettyTestsuiteEnvironmentBuilder;
+    return new M2TestsuiteEnvironmentBuilder("repo1", "repo2", "repo3");
   }
 
   @Test

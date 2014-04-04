@@ -10,15 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.jettytestsuite.WebappContext;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -32,8 +30,6 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
@@ -44,42 +40,41 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class M2TestsuiteEnvironmentBuilder
     extends AbstractJettyEnvironmentBuilder
 {
+  public M2TestsuiteEnvironmentBuilder(final String... reposes) {
+    this(Arrays.asList(reposes));
+  }
 
-  public M2TestsuiteEnvironmentBuilder(ServletServer servletServer) {
-    super(servletServer);
+  public M2TestsuiteEnvironmentBuilder(final List<String> reposes) {
+    super(reposes);
   }
 
   @Override
   public void buildEnvironment(AbstractProxyTestEnvironment env)
-      throws ConfigurationException,
-             IOException,
-             ComponentLookupException
+      throws Exception
   {
-    PlexusContainer container = env.getPlexusContainer();
-
     List<String> reposes = new ArrayList<String>();
-    for (WebappContext remoteRepo : getServletServer().getWebappContexts()) {
-      M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
-
+    for (String remoteRepoId : repoIds()) {
+      // create proxy for remote
+      M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
       CRepository repoConf = new DefaultCRepository();
-
       repoConf.setProviderRole(Repository.class.getName());
       repoConf.setProviderHint("maven2");
-      repoConf.setId(remoteRepo.getName());
-      repoConf.setName(remoteRepo.getName());
+      repoConf.setId(remoteRepoId);
+      repoConf.setName(remoteRepoId);
       repoConf.setNotFoundCacheActive(true);
 
       repoConf.setLocalStorage(new CLocalStorage());
       repoConf.getLocalStorage().setProvider("file");
       repoConf.getLocalStorage().setUrl(
           env
-              .getApplicationConfiguration().getWorkingDirectory("proxy/store/" + remoteRepo.getName()).toURI()
-              .toURL().toString());
+              .getApplicationConfiguration().getWorkingDirectory("proxy/store/" + remoteRepoId).toURI()
+              .toURL().toString()
+      );
 
       Xpp3Dom ex = new Xpp3Dom("externalConfiguration");
       repoConf.setExternalConfiguration(ex);
       M2RepositoryConfiguration exConf = new M2RepositoryConfiguration(ex);
-      if (remoteRepo.getName().endsWith("-snapshot")) {
+      if (remoteRepoId.endsWith("-snapshot")) {
         exConf.setRepositoryPolicy(RepositoryPolicy.SNAPSHOT);
       }
       else {
@@ -90,7 +85,7 @@ public class M2TestsuiteEnvironmentBuilder
 
       repoConf.setRemoteStorage(new CRemoteStorage());
       repoConf.getRemoteStorage().setProvider(env.getRemoteProviderHintFactory().getDefaultHttpRoleHint());
-      repoConf.getRemoteStorage().setUrl(getServletServer().getUrl(remoteRepo.getName()));
+      repoConf.getRemoteStorage().setUrl(server().getUrl() + "/" + remoteRepoId + "/");
 
       repo.configure(repoConf);
 
@@ -103,7 +98,7 @@ public class M2TestsuiteEnvironmentBuilder
     }
 
     // ading one hosted only
-    M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+    M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
 
     CRepository repoConf = new DefaultCRepository();
 
@@ -131,7 +126,7 @@ public class M2TestsuiteEnvironmentBuilder
     env.getRepositoryRegistry().addRepository(repo);
 
     // add a hosted snapshot repo
-    M2Repository repoSnapshot = (M2Repository) container.lookup(Repository.class, "maven2");
+    M2Repository repoSnapshot = (M2Repository) env.lookup(Repository.class, "maven2");
 
     CRepository repoSnapshotConf = new DefaultCRepository();
 
@@ -144,7 +139,8 @@ public class M2TestsuiteEnvironmentBuilder
     repoSnapshotConf.getLocalStorage().setUrl(
         env
             .getApplicationConfiguration().getWorkingDirectory("proxy/store/inhouse-snapshot").toURI().toURL()
-            .toString());
+            .toString()
+    );
 
     Xpp3Dom exSnapRepo = new Xpp3Dom("externalConfiguration");
     repoSnapshotConf.setExternalConfiguration(exSnapRepo);
@@ -161,7 +157,7 @@ public class M2TestsuiteEnvironmentBuilder
     env.getRepositoryRegistry().addRepository(repoSnapshot);
 
     // add a group
-    M2GroupRepository group = (M2GroupRepository) container.lookup(GroupRepository.class, "maven2");
+    M2GroupRepository group = (M2GroupRepository) env.lookup(GroupRepository.class, "maven2");
 
     CRepository repoGroupConf = new DefaultCRepository();
 

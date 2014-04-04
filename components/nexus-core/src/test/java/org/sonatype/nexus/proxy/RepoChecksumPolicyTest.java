@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.proxy;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.ChecksumContentValidator;
@@ -35,15 +34,11 @@ public class RepoChecksumPolicyTest
 
   private static final String ITEM_WITH_SHA1_AND_MD5 = "/activemq-with-all/activemq-core/1.2/activemq-core-1.2.jar";
 
-  private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
-
   @Override
   protected EnvironmentBuilder getEnvironmentBuilder()
       throws Exception
   {
-    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
-    this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder(ss);
-    return jettyTestsuiteEnvironmentBuilder;
+    return new M2TestsuiteEnvironmentBuilder("checksumTestRepo");
   }
 
   protected M2Repository getRepository()

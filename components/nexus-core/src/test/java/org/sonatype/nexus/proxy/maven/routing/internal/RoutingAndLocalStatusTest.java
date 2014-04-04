@@ -12,13 +12,11 @@
  */
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -44,15 +42,12 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.After;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Testing interaction of {@link Repository#getLocalStatus()} and WL.
@@ -119,13 +114,12 @@ public class RoutingAndLocalStatusTest
 
       @Override
       public void buildEnvironment(AbstractProxyTestEnvironment env)
-          throws ConfigurationException, IOException, ComponentLookupException
+          throws Exception
       {
-        final PlexusContainer container = env.getPlexusContainer();
         final List<String> reposes = new ArrayList<String>();
         {
           // adding 1st proxy, that is out of service
-          final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+          final M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
           CRepository repoConf = new DefaultCRepository();
           repoConf.setProviderRole(Repository.class.getName());
           repoConf.setProviderHint("maven2");
@@ -155,7 +149,7 @@ public class RoutingAndLocalStatusTest
         }
         {
           // adding 2nd proxy
-          final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+          final M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
           CRepository repoConf = new DefaultCRepository();
           repoConf.setProviderRole(Repository.class.getName());
           repoConf.setProviderHint("maven2");
@@ -184,7 +178,7 @@ public class RoutingAndLocalStatusTest
         }
         {
           // adding one hosted
-          final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+          final M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
           CRepository repoConf = new DefaultCRepository();
           repoConf.setProviderRole(Repository.class.getName());
           repoConf.setProviderHint("maven2");
@@ -208,7 +202,7 @@ public class RoutingAndLocalStatusTest
         {
           // add a group
           final M2GroupRepository group =
-              (M2GroupRepository) container.lookup(GroupRepository.class, "maven2");
+              (M2GroupRepository) env.lookup(GroupRepository.class, "maven2");
           CRepository repoGroupConf = new DefaultCRepository();
           repoGroupConf.setProviderRole(GroupRepository.class.getName());
           repoGroupConf.setProviderHint("maven2");
