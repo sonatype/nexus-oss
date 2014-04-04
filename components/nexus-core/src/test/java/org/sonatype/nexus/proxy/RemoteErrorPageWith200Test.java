@@ -39,7 +39,7 @@ public class RemoteErrorPageWith200Test
 
   @Rule
   public ServerResource server = new ServerResource(Server.server().serve("/*")
-      .withBehaviours(new DeliverBodyBehaviour(200, "text/html; charset=UTF-8", "<html>some content</html>"))
+      .withServlet(new ErrorServlet())
       .getServerProvider());
 
   @Override
