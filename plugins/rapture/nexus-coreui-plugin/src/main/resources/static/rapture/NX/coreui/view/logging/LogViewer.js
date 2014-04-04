@@ -11,13 +11,13 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Log panel.
+ * Log Viewer panel.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.logging.Log', {
+Ext.define('NX.coreui.view.logging.LogViewer', {
   extend: 'Ext.panel.Panel',
-  alias: 'widget.nx-coreui-log',
+  alias: 'widget.nx-coreui-log-viewer',
 
   layout: 'fit',
 

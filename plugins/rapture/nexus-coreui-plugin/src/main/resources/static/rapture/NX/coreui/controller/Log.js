@@ -22,13 +22,13 @@ Ext.define('NX.coreui.controller.Log', {
   },
 
   views: [
-    'logging.Log',
+    'logging.LogViewer',
     'logging.LogMark'
   ],
   refs: [
     {
       ref: 'log',
-      selector: 'nx-coreui-log'
+      selector: 'nx-coreui-log-viewer'
     }
   ],
 
@@ -36,16 +36,16 @@ Ext.define('NX.coreui.controller.Log', {
     var me = this;
 
     me.getApplication().getIconController().addIcons({
-      'feature-support-logging': {
+      'feature-support-logviewer': {
         file: 'book.png',
         variants: ['x16', 'x32']
       }
     });
 
     me.getApplication().getFeaturesController().registerFeature({
-      path: '/Support/Logging',
+      path: '/Support/Log Viewer',
       description: 'View current log',
-      view: { xtype: 'nx-coreui-log' },
+      view: { xtype: 'nx-coreui-log-viewer' },
       visible: function () {
         return NX.Permissions.check('nexus:logs', 'read');
       }
@@ -58,24 +58,24 @@ Ext.define('NX.coreui.controller.Log', {
         }
       },
       component: {
-        'nx-coreui-log': {
+        'nx-coreui-log-viewer': {
           afterrender: me.retrieveLog,
           destroy: me.stopRetrieveLogTask
         },
-        'nx-coreui-log button[action=download]': {
+        'nx-coreui-log-viewer button[action=download]': {
           click: me.downloadLog
         },
-        'nx-coreui-log button[action=mark]': {
+        'nx-coreui-log-viewer button[action=mark]': {
           afterrender: me.bindMarkButton,
           click: me.showMarkWindow
         },
         'nx-coreui-log-mark form': {
           submitted: me.onLogMarked
         },
-        'nx-coreui-log #refreshPeriod': {
+        'nx-coreui-log-viewer #refreshPeriod': {
           change: me.changeRefreshPeriod
         },
-        'nx-coreui-log #refreshSize': {
+        'nx-coreui-log-viewer #refreshSize': {
           change: me.changeRefreshSize
         }
       }
