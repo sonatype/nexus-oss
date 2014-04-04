@@ -33,6 +33,16 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.ComponentSummary',
     'NX.coreui.controller.ComponentLicense',
     'NX.coreui.controller.ComponentSecurity',
+    { id: 'NX.coreui.controller.Log',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-logging-plugin');
+      }
+    },
+    { id: 'NX.coreui.controller.Loggers',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-logging-plugin');
+      }
+    },
     'NX.coreui.controller.MavenUpload',
     { id: 'NX.coreui.controller.PluginConsole',
       active: function () {
