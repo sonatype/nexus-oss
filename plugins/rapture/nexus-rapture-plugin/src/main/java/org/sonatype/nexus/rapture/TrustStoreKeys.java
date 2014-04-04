@@ -15,11 +15,11 @@ package org.sonatype.nexus.rapture;
 /**
  * @since 3.0
  */
-public interface TrustStore
+public interface TrustStoreKeys
 {
 
   boolean isEnabled(String type, String id);
 
-  TrustStore setEnabled(String type, String id, Boolean enabled);
+  TrustStoreKeys setEnabled(String type, String id, Boolean enabled);
 
 }
