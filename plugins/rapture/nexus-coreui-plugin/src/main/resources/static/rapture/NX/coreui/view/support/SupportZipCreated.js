@@ -15,7 +15,7 @@
  *
  * @since 3.0
  */
-Ext.define('Nexus.atlas.view.SupportZipCreated', {
+Ext.define('NX.coreui.view.support.SupportZipCreated', {
   extend: 'NX.coreui.view.support.FileCreated',
   alias: 'widget.nx-coreui-support-supportzipcreated',
 
