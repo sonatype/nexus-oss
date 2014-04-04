@@ -20,9 +20,11 @@ import org.sonatype.tests.http.runner.junit.ServerResource;
 import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Get;
 
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 public class RemoteMirrorDownloadTest
     extends NexusAppTestSupport
@@ -31,16 +33,18 @@ public class RemoteMirrorDownloadTest
 
   @Rule
   public ServerResource server = new ServerResource(Server.server()
-      .serve("/repo-with-mirror/**").withBehaviours(
-          Get.get(testUtil.resolveFile("target/test-classes/repo-with-mirror")))
-      .serve("/repo-mirror/**").withBehaviours(Get.get(testUtil.resolveFile("target/test-classes/repo-mirror")))
+      .serve("/repo-with-mirror/*")
+      .withBehaviours(Get.get(testUtil.resolveFile("target/test-classes/repo-with-mirror")))
       .getServerProvider());
 
   @Test
   public void testRemoteMetadataDownload() throws Exception {
     final NexusRepositoryMetadataHandler repoMetadata = lookup(NexusRepositoryMetadataHandler.class);
-    String url = server.getServerProvider().getUrl() + "repo-with-mirror/";
+    String url = server.getServerProvider().getUrl() + "/repo-with-mirror/";
     final RepositoryMetadata metadata = repoMetadata.readRemoteRepositoryMetadata(url);
-    Assert.assertNotNull(metadata);
+    assertThat(metadata, notNullValue());
+    assertThat(metadata.getMirrors(), hasSize(2));
+    assertThat(metadata.getMirrors().get(0).getId(), equalTo("mirror1"));
+    assertThat(metadata.getMirrors().get(1).getId(), equalTo("mirror2"));
   }
 }
