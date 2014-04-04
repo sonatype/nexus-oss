@@ -63,9 +63,6 @@ Ext.define('NX.coreui.controller.SupportZip', {
         'nx-coreui-support-supportzip form': {
           submitted: me.showSupportZipCreatedWindow
         },
-        'nx-coreui-support-supportzipcreated form': {
-          afterrender: me.installEnterKey
-        },
         'nx-coreui-support-supportzipcreated button[action=download]': {
           click: me.download
         }
@@ -99,22 +96,6 @@ Ext.define('NX.coreui.controller.SupportZip', {
           }
         }
     );
-  },
-
-  /**
-   * @private
-   */
-  installEnterKey: function (form) {
-    var me = this;
-
-    me.keyNav = Ext.create('Ext.util.KeyNav', form.el, {
-      enter: function () {
-        if (form.isValid()) {
-          me.download(form.down('button[action=download]'));
-        }
-      },
-      scope: this
-    });
   }
 
 });
