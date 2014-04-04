@@ -21,6 +21,7 @@ Ext.define('NX.coreui.view.support.SupportZip', {
 
   items: {
     xtype: 'nx-settingsform',
+    settingsFormSubmitMessage: 'Creating support ZIP...',
     settingsFormSuccessMessage: 'Support ZIP created',
     api: {
       submit: 'NX.direct.atlas_SupportZip.create'
