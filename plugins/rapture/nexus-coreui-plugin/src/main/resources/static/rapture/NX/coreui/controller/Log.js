@@ -212,7 +212,7 @@ Ext.define('NX.coreui.controller.Log', {
 
     textarea.setValue(text);
     // scroll to the bottom
-    textarea.getEl().dom.scrollTop = 1000000;
+    textarea.getEl().down('textarea').dom.scrollTop = 1000000;
   },
 
   /**
