@@ -80,8 +80,6 @@ public class YumNexusTestSupport
 
   public static final String TMP_DIR_KEY = "java.io.tmpdir";
 
-  protected final TestUtil util = new TestUtil(this);
-
   @Rule
   public final TestTracer tracer = new TestTracer(this);
 

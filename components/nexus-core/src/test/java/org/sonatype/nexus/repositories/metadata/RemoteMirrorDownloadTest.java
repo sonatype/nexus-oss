@@ -29,12 +29,10 @@ import static org.hamcrest.Matchers.*;
 public class RemoteMirrorDownloadTest
     extends NexusAppTestSupport
 {
-  private TestUtil testUtil = new TestUtil(this);
-
   @Rule
   public ServerResource server = new ServerResource(Server.server()
       .serve("/repo-with-mirror/*")
-      .withBehaviours(Get.get(testUtil.resolveFile("target/test-classes/repo-with-mirror")))
+      .withBehaviours(Get.get(util.resolveFile("target/test-classes/repo-with-mirror")))
       .getServerProvider());
 
   @Test
