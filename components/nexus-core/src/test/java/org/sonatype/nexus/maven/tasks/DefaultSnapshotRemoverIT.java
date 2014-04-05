@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.maven.tasks;
 
 import java.io.File;
@@ -26,7 +27,6 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.sisu.litmus.testsupport.TestUtil;
 import org.sonatype.tests.http.runner.junit.ServerResource;
 import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Get;
@@ -48,20 +48,17 @@ import static org.junit.Assert.assertTrue;
 public class DefaultSnapshotRemoverIT
     extends AbstractMavenRepoContentTests
 {
-  private TestUtil testUtil = new TestUtil(this);
-
   @Rule
   public ServerResource serverResource = new ServerResource(Server.server()
-      .serve("/central/*").withBehaviours(Get.get(testUtil.resolveFile("target/test-classes/reposes/central")))
+      .serve("/central/*").withBehaviours(Get.get(util.resolveFile("target/test-classes/reposes/central")))
       .serve("/apache-snapshots/*").withBehaviours(
-          Get.get(testUtil.resolveFile("target/test-classes/reposes/apache-snapshots")))
+          Get.get(util.resolveFile("target/test-classes/reposes/apache-snapshots")))
       .getServerProvider());
 
   private SnapshotRemover snapshotRemover;
-  
+
   @Override
-  protected void setUp() throws Exception
-  {
+  protected void setUp() throws Exception {
     super.setUp();
     snapshotRemover = lookup(SnapshotRemover.class);
   }
