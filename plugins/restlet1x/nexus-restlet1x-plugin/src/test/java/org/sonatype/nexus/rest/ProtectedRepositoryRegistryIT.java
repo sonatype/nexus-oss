@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest;
 
 import java.io.File;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -27,6 +29,7 @@ import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.security.PlexusConfiguredRealm;
 import org.sonatype.nexus.proxy.targets.Target;
 import org.sonatype.nexus.proxy.targets.TargetRegistry;
 import org.sonatype.nexus.security.WebSecurityUtil;
@@ -37,9 +40,15 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
+import com.google.common.collect.Maps;
+import com.google.inject.Binder;
+import com.google.inject.Key;
+import com.google.inject.Module;
+import com.google.inject.name.Names;
 import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.junit.Test;
@@ -53,6 +62,24 @@ public class ProtectedRepositoryRegistryIT
   private RepositoryRegistry repositoryRegistry = null;
 
   private SecuritySystem securitySystem = null;
+
+  @Override
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new Module()
+    {
+      @Override
+      public void configure(final Binder binder) {
+        final Map<String, String> privileges = Maps.newHashMap();
+        privileges.put("repo1user", "nexus:target:*:repo1:*,nexus:view:repository:repo1");
+        privileges.put("repo1userNoView", "nexus:target:*:repo1:*");
+        privileges.put("repoall", "nexus:target:*:*:*,nexus:view:repository:*");
+
+        final PlexusConfiguredRealm realm = new PlexusConfiguredRealm(privileges);
+        binder.bind(Key.get(Realm.class, Names.named("default"))).toInstance(realm);
+      }
+    });
+  }
 
   @Override
   protected boolean runWithSecurityDisabled() {
