@@ -11,35 +11,43 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Mark log window.
+ * KeyNav controller.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.search.LogMark', {
-  extend: 'NX.view.AddWindow',
-  alias: 'widget.nx-coreui-log-mark',
+Ext.define('NX.controller.KeyNav', {
+  extend: 'Ext.app.Controller',
 
-  title: 'Mark log',
-  defaultFocus: 'message',
+  /**
+   * @override
+   */
+  init: function () {
+    var me = this;
 
-  items: {
-    xtype: 'nx-settingsform',
-    api: {
-      submit: 'NX.direct.logging_Log.mark'
-    },
-    settingsFormSuccessMessage: 'Log has been marked',
-    settingsFormSubmitOnEnter: true,
-    editableCondition: NX.Conditions.isPermitted('nexus:logconfig', 'update'),
-    editableMarker: 'You do not have permission to mark the log',
-    items: [
-      {
-        xtype: 'textfield',
-        name: 'message',
-        itemId: 'message',
-        fieldLabel: 'Message',
-        emptyText: 'enter a marker text'
+    me.listen({
+      component: {
+        'form button[bindToEnter=true]': {
+          afterrender: me.installEnterKey
+        }
       }
-    ]
+    });
+  },
+
+  /**
+   * @private
+   * Install a key nav that will trigger click on any form buttons marked with "bindToEnter: true",
+   * (usually submit button) on ENTER.
+   */
+  installEnterKey: function (button) {
+    var form = button.up('form');
+
+    button.keyNav = Ext.create('Ext.util.KeyNav', form.el, {
+      enter: function () {
+        if (!button.isDisabled()) {
+          button.fireEvent('click', button);
+        }
+      }
+    });
   }
 
 });

@@ -86,6 +86,7 @@ Ext.define('NX.app.Application', {
     'ExtDirect',
     'Features',
     'Icon',
+    'KeyNav',
     'Message',
     'Permissions'
   ],

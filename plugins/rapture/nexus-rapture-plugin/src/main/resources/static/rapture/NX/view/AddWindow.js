@@ -31,7 +31,7 @@ Ext.define('NX.view.AddWindow', {
     if (Ext.isDefined(me.items) && !Ext.isArray(me.items)) {
       if (!me.items.buttons) {
         me.items.buttons = [
-          { text: 'Add', action: 'add', formBind: true, ui: 'primary' },
+          { text: 'Add', action: 'add', formBind: true, ui: 'primary', bindToEnter:  me.items.settingsFormSubmitOnEnter },
           { text: 'Cancel', handler: function () {
             this.up('window').close();
           }}
