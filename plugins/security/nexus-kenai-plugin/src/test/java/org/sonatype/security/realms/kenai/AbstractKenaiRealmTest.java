@@ -21,6 +21,9 @@ import org.sonatype.tests.http.server.fluent.Server;
 
 import org.junit.Rule;
 
+/**
+ * Kenai test super class. Note: NexusAppTestSupport needed as these tests boot whole security up.
+ */
 public abstract class AbstractKenaiRealmTest
     extends NexusAppTestSupport
 {
