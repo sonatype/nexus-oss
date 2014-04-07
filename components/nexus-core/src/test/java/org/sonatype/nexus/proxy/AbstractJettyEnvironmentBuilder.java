@@ -19,6 +19,7 @@ import java.util.List;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Get;
+import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Head;
 
 import com.google.common.collect.Lists;
 
@@ -80,6 +81,6 @@ public abstract class AbstractJettyEnvironmentBuilder
   protected void createRemoteServer(final String repoId) {
     final File repoRoot = testUtil.resolveFile("target/test-classes/" + repoId);
     checkArgument(repoRoot.isDirectory(), "Repository not exists: " + repoRoot.getAbsolutePath());
-    server().serve("/" + repoId + "/*").withBehaviours(Get.get(repoRoot));
+    server().serve("/" + repoId + "/*").withBehaviours(new Get(repoRoot.getAbsolutePath()), new Head(repoRoot.getAbsolutePath()));
   }
 }
