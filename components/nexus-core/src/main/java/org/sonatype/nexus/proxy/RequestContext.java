@@ -155,6 +155,11 @@ public class RequestContext
     return delegate.put(key, value);
   }
 
+  @Deprecated
+  public Object put(final Object key, final Object value) {
+    return delegate.put((String) key, value);
+  }
+
   public Object remove(final Object key) {
     return delegate.remove(key);
   }
