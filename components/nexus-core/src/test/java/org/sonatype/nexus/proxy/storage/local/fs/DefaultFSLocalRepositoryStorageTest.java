@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage.local.fs;
 
 import java.io.File;
@@ -22,31 +23,30 @@ import java.util.List;
 import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.LinkPersister;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.uid.IsItemAttributeMetacontentAttribute;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.DefaultLocalStorageContext;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 /**
@@ -55,7 +55,7 @@ import static org.mockito.Mockito.when;
  * @since 2.0
  */
 public class DefaultFSLocalRepositoryStorageTest
-    extends PlexusTestCaseSupport
+    extends TestSupport
 {
 
   /**
@@ -65,7 +65,7 @@ public class DefaultFSLocalRepositoryStorageTest
   @Test
   public void testListFilesThrowsItemNotFoundException() throws Exception {
 
-    File repoLocation = new File(getBasedir(), "target/" + getClass().getSimpleName() + "/repo/");
+    File repoLocation = new File(util.getBaseDir(), "target/" + getClass().getSimpleName() + "/repo/");
 
     // the contents of the "valid" directory, only contains a "valid.txt" file
     File validDir = new File(repoLocation, "valid/");
@@ -160,19 +160,58 @@ public class DefaultFSLocalRepositoryStorageTest
 
     // object to test
     DefaultFSLocalRepositoryStorage localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage(wastebasket,
-        linkPersister, mimeSupport, fsPeer)
-    {
-      // expose protected method
-      @Override
-      public AbstractStorageItem retrieveItemFromFile(Repository repository, ResourceStoreRequest request,
-                                                      File target)
-          throws ItemNotFoundException, LocalStorageException
-      {
-        return super.retrieveItemFromFile(repository, request, target);
-      }
-    };
+        linkPersister, mimeSupport, fsPeer);
 
     // expected to throw a ItemNotFoundException
     localRepositoryStorageUnderTest.retrieveItemFromFile(repository, new ResourceStoreRequest("not-used"), mockFile);
+  }
+
+  /**
+   * Verifies that attribute files (used by {@link DefaultFSLocalRepositoryStorage}, that stores attributea within LS)
+   * are not checked for being a link, as this is redundant check.
+   */
+  @Test
+  public void attributeFileIsNotCheckedForBeingLink()
+      throws Exception
+  {
+    // Mocks
+    Wastebasket wastebasket = mock(Wastebasket.class);
+    Repository repository = mock(Repository.class);
+    RepositoryItemUid uid = mock(RepositoryItemUid.class);
+    when(repository.getId()).thenReturn("test");
+    when(repository.createUid(anyString())).thenReturn(uid);
+    when(repository.getAttributesHandler()).thenReturn(mock(AttributesHandler.class));
+    final DefaultLocalStorageContext localStorageContext = new DefaultLocalStorageContext(null);
+    when(repository.getLocalStorageContext()).thenReturn(localStorageContext);
+    FSPeer fsPeer = mock(FSPeer.class);
+    MimeSupport mimeSupport = mock(MimeSupport.class);
+    when(mimeSupport.guessMimeTypeFromPath(Mockito.any(MimeRulesSource.class), Mockito.anyString()))
+        .thenReturn("text/plain");
+
+    // mock file
+    File mockFile = mock(File.class);
+    when(mockFile.isDirectory()).thenReturn(false);
+    when(mockFile.isFile()).thenReturn(true);
+    when(mockFile.exists()).thenReturn(true);
+
+    // link persister
+    LinkPersister linkPersister = mock(LinkPersister.class);
+
+    // test subject
+    DefaultFSLocalRepositoryStorage localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage(wastebasket,
+        linkPersister, mimeSupport, fsPeer);
+
+    // plain file, it result in 1 method call on link persister to check is content a link or not
+    when(uid.getBooleanAttributeValue(IsItemAttributeMetacontentAttribute.class)).thenReturn(false);
+    localRepositoryStorageUnderTest.retrieveItemFromFile(repository, new ResourceStoreRequest("not-used"), mockFile);
+    Mockito.verify(linkPersister, times(1)).isLinkContent(Mockito.any(ContentLocator.class));
+
+    // reset the mock
+    Mockito.reset(linkPersister);
+
+    // attribute file, it result in 0 method call on link persister as is redundtant
+    when(uid.getBooleanAttributeValue(IsItemAttributeMetacontentAttribute.class)).thenReturn(true);
+    localRepositoryStorageUnderTest.retrieveItemFromFile(repository, new ResourceStoreRequest("not-used"), mockFile);
+    Mockito.verify(linkPersister, times(0)).isLinkContent(Mockito.any(ContentLocator.class));
   }
 }
