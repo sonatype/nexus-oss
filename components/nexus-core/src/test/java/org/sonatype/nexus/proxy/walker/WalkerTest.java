@@ -87,9 +87,57 @@ public class WalkerTest
     wp = new TestWalkerProcessor();
 
     // this is a group
-    wc =
-        new DefaultWalkerContext(getRepositoryRegistry().getRepository("test"), new ResourceStoreRequest(
+    wc = new DefaultWalkerContext(getRepositoryRegistry().getRepository("test"), new ResourceStoreRequest(
             RepositoryItemUid.PATH_ROOT, true));
+
+    wc.getProcessors().add(wp);
+
+    walker.walk(wc);
+
+    assertThat("Should not be stopped!", wc.isStopped(), is(false));
+
+    if (wc.getStopCause() != null) {
+      wc.getStopCause().printStackTrace();
+
+      fail("Should be no exception!");
+    }
+
+    Assert.assertEquals(10, wp.collEnters);
+    Assert.assertEquals(10, wp.collExits);
+    Assert.assertEquals(0, wp.colls);
+    Assert.assertEquals(4, wp.files);
+    Assert.assertEquals(0, wp.links);
+  }
+
+  /**
+   * This test expects same numbers as {@link #testWalker()} since it walks same content but in "breadth-first" way.
+   * All other walk parameters (filter and processCollections) are same default as on {@link #testWalker()} test.
+   */
+  @Test
+  public void testWalkerBreadthFirst()
+      throws Exception
+  {
+
+    // fetch some content to have on walk on something
+    getRootRouter().retrieveItem(
+        new ResourceStoreRequest("/groups/test/activemq/activemq-core/1.2/activemq-core-1.2.jar", false));
+    getRootRouter().retrieveItem(
+        new ResourceStoreRequest("/groups/test/xstream/xstream/1.2.2/xstream-1.2.2.pom", false));
+    getRootRouter().retrieveItem(new ResourceStoreRequest("/groups/test/rome/rome/0.9/rome-0.9.pom", false));
+    getRootRouter().retrieveItem(new ResourceStoreRequest("/groups/test/repo3.txt", false));
+
+    TestWalkerProcessor wp = null;
+    WalkerContext wc = null;
+
+    wp = new TestWalkerProcessor();
+
+    // this is a group
+    wc = new DefaultWalkerContext(
+        getRepositoryRegistry().getRepository("test"),
+        new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT, true),
+        null, // no filter
+        TraversalType.BREADTH_FIRST,
+        false); // default
 
     wc.getProcessors().add(wp);
 
@@ -411,13 +459,11 @@ public class WalkerTest
         return;
       }
       inCollection = true;
-      System.out.println("Entered coll " + coll.getPath());
     }
 
     @Override
     public void processItem(WalkerContext context, StorageItem item) {
       hadCollectionsProcessed = hadCollectionsProcessed || item instanceof StorageCollectionItem;
-      System.out.println("Processed " + item.getPath());
     }
 
     @Override
@@ -428,7 +474,6 @@ public class WalkerTest
         return;
       }
       inCollection = false;
-      System.out.println("Exited coll " + coll.getPath());
     }
   }
 
