@@ -458,13 +458,10 @@ public class Nexus537RepoTargetsIT
     return result;
   }
 
-  @Override
   @Before
-  public void oncePerClassSetUp()
+  public void setupTargets()
       throws Exception
   {
-    super.oncePerClassSetUp();
-
     // create my repo targets
     RepositoryTargetResource fooTarget = new RepositoryTargetResource();
     fooTarget.setContentClass("maven2");

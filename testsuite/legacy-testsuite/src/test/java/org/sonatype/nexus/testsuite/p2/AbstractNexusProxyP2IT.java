@@ -47,7 +47,7 @@ public abstract class AbstractNexusProxyP2IT
 
   protected ServerProvider buildServerProvider() {
     return Server.withPort(TestProperties.getInteger("proxy.server.port"))
-        .serve("/*").fromDirectory(new File(TestProperties.getString("proxy-repo-target-dir")))
+        .serve("/remote/*").fromDirectory(new File(TestProperties.getString("proxy-repo-target-dir")))
         .getServerProvider();
   }
 
