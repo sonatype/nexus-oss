@@ -20,8 +20,7 @@ Ext.define('NX.coreui.controller.System', {
 
   views: [
     'system.General',
-    'system.Http',
-    'system.Notifications'
+    'system.Http'
   ],
 
   /**
@@ -64,19 +63,7 @@ Ext.define('NX.coreui.controller.System', {
         visible: function () {
           return NX.Permissions.check('nexus:settings', 'read');
         }
-      },
-      {
-        mode: 'admin',
-        path: '/System/Notifications',
-        view: 'NX.coreui.view.system.Notifications',
-        iconConfig: {
-          file: 'emails.png',
-          variants: ['x16', 'x32']
-        },
-        visible: function () {
-          return NX.Permissions.check('nexus:settings', 'read');
-        }
-      },
+      }
     ]);
   }
 });

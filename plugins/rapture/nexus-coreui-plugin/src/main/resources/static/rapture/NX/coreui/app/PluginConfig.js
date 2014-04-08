@@ -44,6 +44,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     'NX.coreui.controller.MavenUpload',
+    'NX.coreui.controller.NotificationSettings',
     { id: 'NX.coreui.controller.PluginConsole',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-plugin-console-plugin');

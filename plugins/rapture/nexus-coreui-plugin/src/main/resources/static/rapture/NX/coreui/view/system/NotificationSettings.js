@@ -11,21 +11,21 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * System notifications settings form.
+ * Notification System Settings form.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.system.Notifications', {
+Ext.define('NX.coreui.view.system.NotificationSettings', {
   extend: 'NX.view.SettingsPanel',
-  alias: 'widget.nx-coreui-system-notifications',
+  alias: 'widget.nx-coreui-system-notification-settings',
 
   items: [
     {
       xtype: 'nx-settingsform',
       settingsFormSuccessMessage: 'Notifications system settings $action',
       api: {
-        load: 'NX.direct.coreui_SystemNotifications.read',
-        submit: 'NX.direct.coreui_SystemNotifications.update'
+        load: 'NX.direct.coreui_NotificationSettings.read',
+        submit: 'NX.direct.coreui_NotificationSettings.update'
       },
       editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
       editableMarker: 'You do not have permission to configure notifications',
@@ -42,40 +42,66 @@ Ext.define('NX.coreui.view.system.Notifications', {
         },
         {
           xtype: 'checkbox',
+          name: 'enabled',
           fieldLabel: 'Enable E-mail notifications'
         },
-
-        // TODO: additional notification addresses and role configuration
+        {
+          xtype: 'nx-valueset',
+          name: 'notifyEmails',
+          fieldLabel: 'Notify email addresses',
+          emptyText: 'enter an email',
+          input: {
+            xtype: 'nx-email'
+          },
+          sorted: true,
+          allowBlank: true
+        },
+        {
+          xtype: 'nx-itemselector',
+          name: 'notifyRoles',
+          buttons: ['add', 'remove'],
+          fromTitle: 'Roles',
+          toTitle: 'Notified Roles',
+          store: 'Role',
+          valueField: 'id',
+          displayField: 'name',
+          delimiter: null,
+          allowBlank: true
+        },
 
         {
           xtype: 'label',
           html: '<p>SMTP settings.</p>'
         },
         {
-          name: 'host',
-          itemId: 'host',
+          name: 'smtpHost',
+          itemId: 'smtpHost',
           fieldLabel: 'Host'
         },
         {
           xtype: 'numberfield',
-          name: 'port',
-          itemId: 'port',
-          fieldLabel: 'port'
+          name: 'smtpPort',
+          itemId: 'smtpPort',
+          fieldLabel: 'Port',
+          minValue: 1,
+          maxValue: 65536,
+          allowDecimals: false,
+          allowExponential: false
         },
         {
-          name: 'username',
+          name: 'smtpUsername',
           allowBlank: true,
           fieldLabel: 'Username'
         },
         {
           xtype: 'nx-password',
-          name: 'password',
+          name: 'smtpPassword',
           fieldLabel: 'Password',
           allowBlank: true
         },
         {
           xtype: 'combo',
-          name: 'connectionType',
+          name: 'smtpConnectionType',
           fieldLabel: 'Connection',
           emptyText: 'select a connection type',
           editable: false,
@@ -90,17 +116,25 @@ Ext.define('NX.coreui.view.system.Notifications', {
             if (combo.getValue() === 'SSL') {
               return {
                 name: 'useTrustStoreForSmtp',
-                host: form.down('#host'),
-                port: form.down('#port')
+                host: form.down('#smtpHost'),
+                port: form.down('#smtpPort')
               };
             }
             return undefined
           }
         }
-
-        // TODO: test button
       ]
     }
-  ]
+  ],
+
+  initComponent: function () {
+    var me = this;
+
+    me.callParent(arguments);
+
+    me.items.get(0).getDockedItems('toolbar[dock="bottom"]')[0].add({
+      xtype: 'button', text: 'Verify SMTP connection', formBind: true, action: 'verify', glyph: 'xf003@FontAwesome' /* fa-envelope-o */
+    });
+  }
 
 });
