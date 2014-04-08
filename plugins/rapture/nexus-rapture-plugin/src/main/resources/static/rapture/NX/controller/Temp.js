@@ -64,16 +64,6 @@ Ext.define('NX.controller.Temp', {
         variants: ['x16', 'x32']
       },
 
-      // procurement
-      'feature-procurement': {
-        file: 'database_blue.png',
-        variants: ['x16', 'x32']
-      },
-      'feature-procurement-repositories': {
-        file: 'database_blue.png',
-        variants: ['x16', 'x32']
-      },
-
       // system
       'feature-system-pgp': {
         file: 'gnupg_keys.png',
@@ -91,10 +81,6 @@ Ext.define('NX.controller.Temp', {
       },
       'feature-support-overview': {
         file: 'information.png',
-        variants: ['x16', 'x32']
-      },
-      'feature-support-analytics': {
-        file: 'system_monitor.png',
         variants: ['x16', 'x32']
       },
 
@@ -145,15 +131,6 @@ Ext.define('NX.controller.Temp', {
         path: '/Staging/Repositories',
         visible: visibleIfLoggedIn
       },
-      {
-        path: '/Procurement',
-        group: true,
-        weight: 60
-      },
-      {
-        path: '/Procurement/Repositories',
-        visible: visibleIfLoggedIn
-      },
 
       {
         path: '/System/PGP',
@@ -166,10 +143,6 @@ Ext.define('NX.controller.Temp', {
       {
         path: '/Support',
         group: true
-      },
-      {
-        path: '/Support/Analytics',
-        visible: visibleIfLoggedIn
       },
 
       // browse mode
@@ -195,13 +168,6 @@ Ext.define('NX.controller.Temp', {
         path: '/Repository/Staging',
         description: 'Browse staging repositories',
         iconName: 'feature-staging-repositories',
-        visible: visibleIfLoggedIn
-      },
-      {
-        mode: 'browse',
-        path: '/Repository/Procurement',
-        description: 'Browse procurement repositories',
-        iconName: 'feature-procurement-repositories',
         visible: visibleIfLoggedIn
       },
       {

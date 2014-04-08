@@ -10,36 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+package org.sonatype.nexus.rapture;
+
 /**
- * Mark log window.
- *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.search.LogMark', {
-  extend: 'NX.view.AddWindow',
-  alias: 'widget.nx-coreui-log-mark',
+public interface TrustStoreKeys
+{
 
-  title: 'Mark log',
-  defaultFocus: 'message',
+  boolean isEnabled(String type, String id);
 
-  items: {
-    xtype: 'nx-settingsform',
-    api: {
-      submit: 'NX.direct.logging_Log.mark'
-    },
-    settingsFormSuccessMessage: 'Log has been marked',
-    settingsFormSubmitOnEnter: true,
-    editableCondition: NX.Conditions.isPermitted('nexus:logconfig', 'update'),
-    editableMarker: 'You do not have permission to mark the log',
-    items: [
-      {
-        xtype: 'textfield',
-        name: 'message',
-        itemId: 'message',
-        fieldLabel: 'Message',
-        emptyText: 'enter a marker text'
-      }
-    ]
-  }
+  TrustStoreKeys setEnabled(String type, String id, Boolean enabled);
 
-});
+}

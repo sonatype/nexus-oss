@@ -22,7 +22,7 @@ import org.sonatype.nexus.email.NexusEmailer
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
-import org.sonatype.nexus.rapture.TrustStore
+import org.sonatype.nexus.rapture.TrustStoreKeys
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -53,7 +53,7 @@ extends DirectComponentSupport
 
   @Inject
   @Nullable
-  TrustStore trustStore
+  TrustStoreKeys trustStoreKeys
 
   @DirectMethod
   @RequiresPermissions('nexus:settings:read')
@@ -64,7 +64,7 @@ extends DirectComponentSupport
         username: emailer.SMTPUsername,
         password: Password.fakePassword(),
         connectionType: getConnectionType(emailer),
-        useTrustStoreForSmtp: trustStore?.isEnabled(TRUST_STORE_TYPE, TRUST_STORE_ID),
+        useTrustStoreForSmtp: trustStoreKeys?.isEnabled(TRUST_STORE_TYPE, TRUST_STORE_ID),
         systemEmail: emailer.SMTPSystemEmailAddress.mailAddress
     )
   }
@@ -84,7 +84,7 @@ extends DirectComponentSupport
       SMTPTlsEnabled = notificationsXO.connectionType == SystemNotificationsXO.ConnectionType.TLS
     }
     nexusConfiguration.saveConfiguration()
-    trustStore?.setEnabled(TRUST_STORE_TYPE, TRUST_STORE_ID, notificationsXO.useTrustStoreForSmtp)
+    trustStoreKeys?.setEnabled(TRUST_STORE_TYPE, TRUST_STORE_ID, notificationsXO.useTrustStoreForSmtp)
     return read()
   }
 

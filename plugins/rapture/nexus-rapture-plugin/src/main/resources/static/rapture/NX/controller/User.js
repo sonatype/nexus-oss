@@ -86,12 +86,6 @@ Ext.define('NX.controller.User', {
         },
         'nx-authenticate button[action=authenticate]': {
           click: me.doAuthenticateAction
-        },
-        'nx-login form': {
-          afterrender: me.installLoginEnterKey
-        },
-        'nx-authenticate form': {
-          afterrender: me.installAuthenticateEnterKey
         }
       }
     });
@@ -201,38 +195,6 @@ Ext.define('NX.controller.User', {
         win.down('#password').focus();
       }
     }
-  },
-
-  /**
-   * @private
-   */
-  installLoginEnterKey: function (form) {
-    var me = this;
-
-    me.keyNav = Ext.create('Ext.util.KeyNav', form.el, {
-      enter: function () {
-        if (form.isValid()) {
-          me.login(form.down('button[action=login]'));
-        }
-      },
-      scope: this
-    });
-  },
-
-  /**
-   * @private
-   */
-  installAuthenticateEnterKey: function (form) {
-    var me = this;
-
-    me.keyNav = Ext.create('Ext.util.KeyNav', form.el, {
-      enter: function () {
-        if (form.isValid()) {
-          me.doAuthenticateAction(form.down('button[action=authenticate]'));
-        }
-      },
-      scope: this
-    });
   },
 
   /**

@@ -67,7 +67,7 @@ Ext.define('NX.view.Login', {
         ],
 
         buttons: [
-          { text: 'Login', action: 'login', formBind: true, ui: 'primary' },
+          { text: 'Login', action: 'login', formBind: true, bindToEnter: true, ui: 'primary' },
           { text: 'Cancel', handler: me.close, scope: me }
         ]
       }

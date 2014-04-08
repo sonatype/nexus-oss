@@ -30,7 +30,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfigu
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry
 import org.sonatype.nexus.proxy.repository.*
-import org.sonatype.nexus.rapture.TrustStore
+import org.sonatype.nexus.rapture.TrustStoreKeys
 import org.sonatype.nexus.rest.RepositoryURLBuilder
 import org.sonatype.nexus.templates.TemplateManager
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider
@@ -77,7 +77,7 @@ extends DirectComponentSupport
 
   @Inject
   @Nullable
-  TrustStore trustStore
+  TrustStoreKeys trustStoreKeys
 
   private def typesToClass = [
       'proxy': ProxyRepository.class,
@@ -359,7 +359,7 @@ extends DirectComponentSupport
           retrievalRetryCount: repositoryXO.retries
       )
     }
-    trustStore?.setEnabled(TRUST_STORE_TYPE, repo.id, repositoryXO.useTrustStoreForRemoteStorageUrl)
+    trustStoreKeys?.setEnabled(TRUST_STORE_TYPE, repo.id, repositoryXO.useTrustStoreForRemoteStorageUrl)
   }
 
   def static doUpdateProxyMaven = { MavenProxyRepository repo, RepositoryProxyMavenXO repositoryXO ->
@@ -449,7 +449,7 @@ extends DirectComponentSupport
         def rcs = rsc?.remoteConnectionSettings
         proxyMode = repo.proxyMode
         remoteStorageUrl = repo.remoteUrl
-        useTrustStoreForRemoteStorageUrl = trustStore?.isEnabled(TRUST_STORE_TYPE, repo.id)
+        useTrustStoreForRemoteStorageUrl = trustStoreKeys?.isEnabled(TRUST_STORE_TYPE, repo.id)
         autoBlockActive = repo.autoBlockActive
         fileTypeValidation = repo.fileTypeValidation
         userAgentCustomisation = rcs?.userAgentCustomizationString
