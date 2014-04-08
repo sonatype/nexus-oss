@@ -10,12 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.rrb;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.AbstractPluginTestCase;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -25,17 +22,30 @@ import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider
 import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-import junit.framework.Assert;
-import org.codehaus.plexus.context.Context;
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.nio.BlockingChannelConnector;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.security.Password;
 import org.junit.Test;
 import org.restlet.data.Form;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+
 public class RemoteBrowserResourceAuthIT
     extends AbstractPluginTestCase
 {
-  private ServletServer server = null;
+  private Server server = null;
 
   @Override
   protected void setUp()
@@ -43,46 +53,63 @@ public class RemoteBrowserResourceAuthIT
   {
     super.setUp();
 
-    this.server = this.lookup(ServletServer.class);
+    server = new Server();
+    server.addConnector(new BlockingChannelConnector());
+    ServletContextHandler webappContext = new ServletContextHandler();
+    webappContext.setContextPath("/auth-test");
+    HandlerCollection handlers = new HandlerCollection();
+    handlers.setHandlers(new Handler[]{webappContext, new DefaultHandler()});
+    server.setHandler(handlers);
+
+    final ServletHolder servletHolder = new ServletHolder(new ValidHTMLJettyDefaultServlet());
+    servletHolder.setInitParameter("resourceBase", util.resolvePath("target"));
+    servletHolder.setInitParameter("dirAllowed", Boolean.TRUE.toString());
+
+    webappContext.getServletHandler().addServletWithMapping(servletHolder, "/*");
+
+    Constraint constraint = new Constraint();
+    constraint.setName(Constraint.__BASIC_AUTH);
+    constraint.setRoles(new String[]{"users"});
+    constraint.setAuthenticate(true);
+
+    ConstraintMapping cm = new ConstraintMapping();
+    cm.setConstraint(constraint);
+    cm.setPathSpec("/*");
+
+    ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+    securityHandler.setRealmName("Test Server");
+    securityHandler.setAuthMethod("BASIC");
+    securityHandler.setStrict(true);
+    securityHandler.setConstraintMappings(new ConstraintMapping[]{cm});
+    HashLoginService hashLoginService = new HashLoginService("Test Server");
+    securityHandler.setLoginService(hashLoginService);
+    webappContext.setSecurityHandler(securityHandler);
+
+    hashLoginService.putUser("admin", new Password("admin"), new String[]{"users"});
+
+    server.start();
 
     // ping nexus to wake up
     startNx();
   }
 
   @Override
-  protected void customizeContext(Context context) {
-    super.customizeContext(context);
+  protected void tearDown()
+      throws Exception
+  {
 
-    int port = 0;
-    ServerSocket socket = null;
-    try {
-      socket = new ServerSocket(0);
-      port = socket.getLocalPort();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      Assert.fail("Could not find free port: " + e.getMessage());
-    }
-    finally {
-      try {
-        socket.close();
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-        Assert.fail("Could not close socket: " + e.getMessage());
-      }
+    if (server != null) {
+      server.stop();
     }
 
-    context.put("jetty-port", Integer.toString(port));
-    context.put("resource-base", "target");
-
+    super.tearDown();
   }
 
   @Test
   public void testSiteWithAuth()
       throws Exception
   {
-    String remoteUrl = server.getUrl("auth-test/");
+    String remoteUrl = "http://localhost:" + server.getConnectors()[0].getLocalPort() + "/auth-test/";
 
     String repoId = "testSiteWithAuth";
     RepositoryRegistry repoRegistry = this.lookup(RepositoryRegistry.class);
@@ -122,22 +149,7 @@ public class RemoteBrowserResourceAuthIT
     PlexusResource plexusResource = this.lookup(PlexusResource.class, RemoteBrowserResource.class.getName());
     String jsonString = plexusResource.get(null, request, null, null).toString();
 
-    // TODO: do some better validation then this
-    Assert.assertTrue(jsonString.contains("/classes/"));
-    Assert.assertTrue(jsonString.contains("/test-classes/"));
-
+    assertThat(jsonString, containsString("/classes/"));
+    assertThat(jsonString, containsString("/test-classes/"));
   }
-
-  @Override
-  protected void tearDown()
-      throws Exception
-  {
-
-    if (this.server != null) {
-      this.server.stop();
-    }
-
-    super.tearDown();
-  }
-
 }
