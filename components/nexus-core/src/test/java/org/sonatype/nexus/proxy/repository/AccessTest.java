@@ -10,14 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.repository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
@@ -25,13 +27,20 @@ import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.security.PlexusConfiguredRealm;
 import org.sonatype.nexus.proxy.targets.Target;
 import org.sonatype.nexus.proxy.targets.TargetRegistry;
 import org.sonatype.nexus.security.WebSecurityUtil;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 
+import com.google.common.collect.Maps;
+import com.google.inject.Binder;
+import com.google.inject.Key;
+import com.google.inject.Module;
+import com.google.inject.name.Names;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.junit.Assert;
@@ -40,7 +49,27 @@ import org.junit.Test;
 public class AccessTest
     extends AbstractProxyTestEnvironment
 {
-  private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
+  @Override
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new Module()
+    {
+      @Override
+      public void configure(final Binder binder) {
+        final Map<String, String> privileges = Maps.newHashMap();
+        privileges.put("allrepo3", "nexus:target:*:repo3:*,nexus:view:repository:repo3,nexus:view:repository:test");
+        privileges.put("allrepo1", "nexus:target:*:repo1:*,nexus:view:repository:repo1,nexus:view:repository:test");
+        privileges.put("alltest", "nexus:target:*:test:*,nexus:view:repository:test,nexus:view:repository:repo3,nexus:view:repository:repo1");
+
+        privileges.put("repo3-noview", "nexus:target:*:repo3:*");
+        privileges.put("repo1-noview", "nexus:target:*:repo1:*");
+        privileges.put("test-noview", "nexus:target:*:test:*");
+
+        final PlexusConfiguredRealm realm = new PlexusConfiguredRealm(privileges);
+        binder.bind(Key.get(Realm.class, Names.named("default"))).toInstance(realm);
+      }
+    });
+  }
 
   @Override
   public void setUp()
@@ -94,11 +123,7 @@ public class AccessTest
   protected EnvironmentBuilder getEnvironmentBuilder()
       throws Exception
   {
-    if (this.jettyTestsuiteEnvironmentBuilder == null) {
-      ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
-      this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder(ss);
-    }
-    return this.jettyTestsuiteEnvironmentBuilder;
+    return new M2TestsuiteEnvironmentBuilder("repo1", "repo2", "repo3");
   }
 
   @Test

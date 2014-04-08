@@ -10,36 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
-import java.io.IOException;
-
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 
 import com.google.common.base.Throwables;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
 public class RemoteAuthTest
     extends AbstractProxyTestEnvironment
 {
 
-  private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
-
   @Override
   protected EnvironmentBuilder getEnvironmentBuilder()
       throws Exception
   {
-    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
-    this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder(ss)
+    return new M2TestsuiteEnvironmentBuilder(
+        ImmutableList.of("repo1", "repo2", "repo3"))
     {
+      protected void createRemoteServers() {
+        super.createRemoteServers();
+        server().getServerProvider().addAuthentication("/repo2/**", "BASIC");
+        server().getServerProvider().addAuthentication("/repo3/**", "DIGEST");
+        server().getServerProvider().addUser("cstamas", "cstamas123");
+        server().getServerProvider().addUser("brian", "brian123");
+      }
+
       @Override
       public void buildEnvironment(AbstractProxyTestEnvironment env)
-          throws ConfigurationException, IOException, ComponentLookupException
+          throws Exception
       {
         super.buildEnvironment(env);
 
@@ -70,8 +73,6 @@ public class RemoteAuthTest
         }
       }
     };
-
-    return jettyTestsuiteEnvironmentBuilder;
   }
 
   @Test

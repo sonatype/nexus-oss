@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -37,13 +38,20 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.proxy.security.PlexusConfiguredRealm;
 import org.sonatype.nexus.proxy.targets.Target;
 import org.sonatype.nexus.proxy.targets.TargetRegistry;
 import org.sonatype.nexus.security.WebSecurityUtil;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 
+import com.google.common.collect.Maps;
+import com.google.inject.Binder;
+import com.google.inject.Key;
+import com.google.inject.Module;
+import com.google.inject.name.Names;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -64,6 +72,27 @@ public class DefaultRepositoryRouterTest
   private ApplicationConfiguration applicationConfiguration;
 
   private TargetRegistry targetRegistry;
+
+  @Override
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new Module()
+    {
+      @Override
+      public void configure(final Binder binder) {
+        final Map<String, String> privileges = Maps.newHashMap();
+        privileges.put("repo1user", "nexus:target:*:repo1:*,nexus:view:repository:repo1");
+        privileges.put("repo1userNoView", "nexus:target:*:repo1:*");
+        privileges.put("admin", "nexus:target:*:*:*,nexus:view:repository:*");
+
+        privileges.put("nxcm4999user", "nexus:view:repository:group1,nexus:target:maven2-all:group1:*");
+        privileges.put("nxcm4999userNoSources", "nexus:view:repository:group1,nexus:target:nxcm4999:group1:*");
+
+        final PlexusConfiguredRealm realm = new PlexusConfiguredRealm(privileges);
+        binder.bind(Key.get(Realm.class, Names.named("default"))).toInstance(realm);
+      }
+    });
+  }
 
   @Override
   protected void setUp()

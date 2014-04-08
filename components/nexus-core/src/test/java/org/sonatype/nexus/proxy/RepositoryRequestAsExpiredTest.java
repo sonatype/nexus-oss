@@ -10,11 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
-import java.io.IOException;
-
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
@@ -30,8 +28,6 @@ import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.behaviour.Record;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.After;
 import org.junit.Test;
@@ -46,8 +42,6 @@ public class RepositoryRequestAsExpiredTest
     extends AbstractProxyTestEnvironment
 {
   private static final String PROXY_REPO_ID = "proxy-repo";
-
-  private EnvironmentBuilder environmentBuilder;
 
   private final Record record;
 
@@ -74,53 +68,50 @@ public class RepositoryRequestAsExpiredTest
       throws Exception
   {
     lookup(ApplicationStatusSource.class).setState(SystemState.STARTED);
-    if (environmentBuilder == null) {
-      this.environmentBuilder = new EnvironmentBuilder()
+    return new EnvironmentBuilder()
+    {
+      @Override
+      public void startService() {
+      }
+
+      @Override
+      public void stopService() {
+      }
+
+      @Override
+      public void buildEnvironment(AbstractProxyTestEnvironment env)
+          throws Exception
       {
-        @Override
-        public void startService() {
-        }
-
-        @Override
-        public void stopService() {
-        }
-
-        @Override
-        public void buildEnvironment(AbstractProxyTestEnvironment env)
-            throws ConfigurationException, IOException, ComponentLookupException
         {
-          final PlexusContainer container = env.getPlexusContainer();
-          {
-            // adding one proxy
-            final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
-            CRepository repoConf = new DefaultCRepository();
-            repoConf.setProviderRole(Repository.class.getName());
-            repoConf.setProviderHint("maven2");
-            repoConf.setId(PROXY_REPO_ID);
-            repoConf.setName(PROXY_REPO_ID);
-            repoConf.setNotFoundCacheActive(true);
-            repoConf.setLocalStorage(new CLocalStorage());
-            repoConf.getLocalStorage().setProvider("file");
-            repoConf.getLocalStorage().setUrl(
-                env.getApplicationConfiguration().getWorkingDirectory("proxy/store/" + PROXY_REPO_ID).toURI().toURL()
-                    .toString());
-            Xpp3Dom ex = new Xpp3Dom("externalConfiguration");
-            repoConf.setExternalConfiguration(ex);
-            M2RepositoryConfiguration exConf = new M2RepositoryConfiguration(ex);
-            exConf.setRepositoryPolicy(RepositoryPolicy.RELEASE);
-            exConf.setChecksumPolicy(ChecksumPolicy.STRICT_IF_EXISTS);
-            repoConf.setRemoteStorage(new CRemoteStorage());
-            repoConf.getRemoteStorage().setProvider(
-                env.getRemoteProviderHintFactory().getDefaultHttpRoleHint());
-            repoConf.getRemoteStorage().setUrl("http://localhost:" + server.getPort() + "/");
-            repo.configure(repoConf);
-            env.getApplicationConfiguration().getConfigurationModel().addRepository(repoConf);
-            env.getRepositoryRegistry().addRepository(repo);
-          }
+          // adding one proxy
+          final M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
+          CRepository repoConf = new DefaultCRepository();
+          repoConf.setProviderRole(Repository.class.getName());
+          repoConf.setProviderHint("maven2");
+          repoConf.setId(PROXY_REPO_ID);
+          repoConf.setName(PROXY_REPO_ID);
+          repoConf.setNotFoundCacheActive(true);
+          repoConf.setLocalStorage(new CLocalStorage());
+          repoConf.getLocalStorage().setProvider("file");
+          repoConf.getLocalStorage().setUrl(
+              env.getApplicationConfiguration().getWorkingDirectory("proxy/store/" + PROXY_REPO_ID).toURI().toURL()
+                  .toString()
+          );
+          Xpp3Dom ex = new Xpp3Dom("externalConfiguration");
+          repoConf.setExternalConfiguration(ex);
+          M2RepositoryConfiguration exConf = new M2RepositoryConfiguration(ex);
+          exConf.setRepositoryPolicy(RepositoryPolicy.RELEASE);
+          exConf.setChecksumPolicy(ChecksumPolicy.STRICT_IF_EXISTS);
+          repoConf.setRemoteStorage(new CRemoteStorage());
+          repoConf.getRemoteStorage().setProvider(
+              env.getRemoteProviderHintFactory().getDefaultHttpRoleHint());
+          repoConf.getRemoteStorage().setUrl("http://localhost:" + server.getPort() + "/");
+          repo.configure(repoConf);
+          env.getApplicationConfiguration().getConfigurationModel().addRepository(repoConf);
+          env.getRepositoryRegistry().addRepository(repo);
         }
-      };
-    }
-    return environmentBuilder;
+      }
+    };
   }
 
   protected Repository getRepository()

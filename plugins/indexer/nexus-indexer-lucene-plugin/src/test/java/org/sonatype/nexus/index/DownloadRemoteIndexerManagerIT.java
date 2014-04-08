@@ -18,41 +18,42 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ServerSocket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.sonatype.jettytestsuite.BlockingServer;
+import org.sonatype.nexus.index.tasks.MockedIndexerManager;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
+import org.sonatype.tests.http.runner.junit.ServerResource;
+import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Get;
+import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Head;
 
+import com.google.inject.Binder;
+import com.google.inject.Module;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.treeview.DefaultTreeNodeFactory;
 import org.apache.maven.index.treeview.TreeNode;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Response;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertTrue;
 
 // This is an IT just because it runs longer then 15 seconds
 public class DownloadRemoteIndexerManagerIT
     extends AbstractIndexerManagerTest
 {
-  private Server server;
+  @Rule
+  public ServerResource serverResource = new ServerResource(Server.server()
+      .serve("/*").withBehaviours(new Get(util.resolvePath("target/repos/fake-central")), new Head(util.resolvePath(
+          "target/repos/fake-central")))
+      .getServerProvider());
 
   private File fakeCentral;
 
@@ -65,36 +66,9 @@ public class DownloadRemoteIndexerManagerIT
     fakeCentral = new File(getBasedir(), "target/repos/fake-central");
     fakeCentral.mkdirs();
 
-    // create proxy server
-    ServerSocket s = new ServerSocket(0);
-    int port = s.getLocalPort();
-    s.close();
-
-    server = new BlockingServer(port);
-
-    ResourceHandler resource_handler = new ResourceHandler()
-    {
-      @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request,
-                         HttpServletResponse response)
-          throws IOException, ServletException
-      {
-        System.out.print("JETTY: " + target);
-        super.handle(target, baseRequest, request, response);
-        System.out.println("  ::  " + ((Response) response).getStatus());
-      }
-    };
-    resource_handler.setResourceBase(fakeCentral.getAbsolutePath());
-    HandlerList handlers = new HandlerList();
-    handlers.setHandlers(new Handler[]{resource_handler, new DefaultHandler()});
-    server.setHandler(handlers);
-
-    System.out.print("JETTY Started on port: " + port);
-    server.start();
-
     // update central to use proxy server
     central.setDownloadRemoteIndexes(true);
-    central.setRemoteUrl("http://localhost:" + port);
+    central.setRemoteUrl("http://localhost:" + serverResource.getServerProvider().getPort());
     central.setRepositoryPolicy(RepositoryPolicy.SNAPSHOT);
 
     nexusConfiguration().saveConfiguration();
@@ -109,11 +83,11 @@ public class DownloadRemoteIndexerManagerIT
   protected void tearDown()
       throws Exception
   {
-    server.stop();
-
-    FileUtils.forceDelete(fakeCentral);
-
-    super.tearDown();
+    try {
+      FileUtils.forceDelete(fakeCentral);
+    } finally {
+      super.tearDown();
+    }
   }
 
   @Test

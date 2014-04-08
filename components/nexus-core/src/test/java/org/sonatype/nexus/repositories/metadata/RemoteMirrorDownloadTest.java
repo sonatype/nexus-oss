@@ -10,51 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repositories.metadata;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
+import org.sonatype.sisu.litmus.testsupport.TestUtil;
+import org.sonatype.tests.http.runner.junit.ServerResource;
+import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Get;
 
-import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 public class RemoteMirrorDownloadTest
     extends NexusAppTestSupport
 {
-  private ServletServer server;
+  @Rule
+  public ServerResource server = new ServerResource(Server.server()
+      .serve("/repo-with-mirror/*")
+      .withBehaviours(Get.get(util.resolveFile("target/test-classes/repo-with-mirror")))
+      .getServerProvider());
 
   @Test
   public void testRemoteMetadataDownload() throws Exception {
-    NexusRepositoryMetadataHandler repoMetadata = this.lookup(NexusRepositoryMetadataHandler.class);
-
-    String url = this.server.getUrl("repo-with-mirror" + "/");
-
-    RepositoryMetadata metadata = repoMetadata.readRemoteRepositoryMetadata(url);
-
-    Assert.assertNotNull(metadata);
+    final NexusRepositoryMetadataHandler repoMetadata = lookup(NexusRepositoryMetadataHandler.class);
+    String url = server.getServerProvider().getUrl() + "/repo-with-mirror/";
+    final RepositoryMetadata metadata = repoMetadata.readRemoteRepositoryMetadata(url);
+    assertThat(metadata, notNullValue());
+    assertThat(metadata.getMirrors(), hasSize(2));
+    assertThat(metadata.getMirrors().get(0).getId(), equalTo("mirror1"));
+    assertThat(metadata.getMirrors().get(1).getId(), equalTo("mirror2"));
   }
-
-  @Override
-  protected void setUp()
-      throws Exception
-  {
-    super.setUp();
-
-    server = this.lookup(ServletServer.class);
-    server.start();
-  }
-
-  @Override
-  protected void tearDown()
-      throws Exception
-  {
-    if (server != null) {
-      server.stop();
-    }
-
-    super.tearDown();
-  }
-
-
 }

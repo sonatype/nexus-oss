@@ -20,6 +20,11 @@ public class RouterTest
 {
 
   @Override
+  protected EnvironmentBuilder getEnvironmentBuilder() throws Exception {
+    return new M2TestsuiteEnvironmentBuilder("repo1");
+  }
+
+  @Override
   protected String getItemPath() {
     return "/activemq/activemq-core/1.2/activemq-core-1.2.jar";
   }

@@ -71,6 +71,11 @@ public class M2RepositoryIT
   protected static final String SPOOF_SNAPSHOT = "/spoof/spoof/1.0-SNAPSHOT/spoof-1.0-SNAPSHOT.txt";
 
   @Override
+  protected EnvironmentBuilder getEnvironmentBuilder() throws Exception {
+    return new M2TestsuiteEnvironmentBuilder("repo1");
+  }
+
+  @Override
   protected String getItemPath() {
     return "/activemq/activemq-core/1.2/activemq-core-1.2.jar";
   }

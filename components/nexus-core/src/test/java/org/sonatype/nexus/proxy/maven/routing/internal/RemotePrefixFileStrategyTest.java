@@ -13,7 +13,6 @@
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.ServerSocket;
@@ -26,7 +25,6 @@ import java.util.zip.GZIPOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -49,15 +47,11 @@ import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 public class RemotePrefixFileStrategyTest
     extends AbstractRoutingProxyTest
@@ -106,13 +100,12 @@ public class RemotePrefixFileStrategyTest
 
       @Override
       public void buildEnvironment(AbstractProxyTestEnvironment env)
-          throws ConfigurationException, IOException, ComponentLookupException
+          throws Exception
       {
-        final PlexusContainer container = env.getPlexusContainer();
         final List<String> reposes = new ArrayList<String>();
         {
           // adding one proxy
-          final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+          final M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
           CRepository repoConf = new DefaultCRepository();
           repoConf.setProviderRole(Repository.class.getName());
           repoConf.setProviderHint("maven2");
@@ -141,7 +134,7 @@ public class RemotePrefixFileStrategyTest
         }
         {
           // adding one hosted
-          final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+          final M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
           CRepository repoConf = new DefaultCRepository();
           repoConf.setProviderRole(Repository.class.getName());
           repoConf.setProviderHint("maven2");
@@ -165,7 +158,7 @@ public class RemotePrefixFileStrategyTest
         {
           // add a group
           final M2GroupRepository group =
-              (M2GroupRepository) container.lookup(GroupRepository.class, "maven2");
+              (M2GroupRepository) env.lookup(GroupRepository.class, "maven2");
           CRepository repoGroupConf = new DefaultCRepository();
           repoGroupConf.setProviderRole(GroupRepository.class.getName());
           repoGroupConf.setProviderHint("maven2");

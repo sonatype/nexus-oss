@@ -15,7 +15,6 @@ package org.sonatype.nexus.proxy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDeleteItem;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDeleteRoot;
@@ -24,8 +23,8 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import com.google.common.eventbus.Subscribe;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 /**
  * NXCM-3747 Test: implementation separates the events sent out when deleting a collection, making a distinction about
@@ -38,15 +37,11 @@ import static org.hamcrest.Matchers.equalTo;
 public class DeleteEventsTest
     extends AbstractProxyTestEnvironment
 {
-  private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
-
   @Override
   protected EnvironmentBuilder getEnvironmentBuilder()
       throws Exception
   {
-    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
-    this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder(ss);
-    return jettyTestsuiteEnvironmentBuilder;
+    return new M2TestsuiteEnvironmentBuilder("repo1");
   }
 
   @Test

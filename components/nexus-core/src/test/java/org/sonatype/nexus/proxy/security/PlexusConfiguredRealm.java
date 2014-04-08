@@ -10,12 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.security;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -34,7 +36,14 @@ public class PlexusConfiguredRealm
     extends AuthorizingRealm
 {
 
-  private Map<String, String> userPrivilageMap;
+  private final Map<String, String> userPrivileges;
+
+  public PlexusConfiguredRealm(final Map<String, String> privileges) {
+    this.userPrivileges = Maps.newHashMap();
+    if (privileges != null) {
+      this.userPrivileges.putAll(privileges);
+    }
+  }
 
   @Override
   protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
@@ -42,12 +51,12 @@ public class PlexusConfiguredRealm
 
     // check the userPrivilageMap key set for the user
 
-    if (StringUtils.isNotEmpty(username) && this.userPrivilageMap.containsKey(username)) {
+    if (StringUtils.isNotEmpty(username) && this.userPrivileges.containsKey(username)) {
       SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 
       // "nexus:target:" + <targetId> + ":" + <repoId> + ":" + <action>
       // String priv = "nexus:target:" + "*" + ":" + "repo1" + ":" + "*";
-      info.addObjectPermissions(this.buildPermissions(this.userPrivilageMap.get(username)));
+      info.addObjectPermissions(this.buildPermissions(this.userPrivileges.get(username)));
       return info;
     }
 
@@ -68,7 +77,7 @@ public class PlexusConfiguredRealm
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
       throws AuthenticationException
   {
-    if (this.userPrivilageMap.containsKey(token.getPrincipal().toString())) {
+    if (this.userPrivileges.containsKey(token.getPrincipal().toString())) {
       return new SimpleAuthenticationInfo(token.getPrincipal().toString(), token.getCredentials(), this.getName());
     }
 

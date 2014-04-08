@@ -148,13 +148,12 @@ public class PrefixFileUpdatePropagationContentTest
 
       @Override
       public void buildEnvironment(AbstractProxyTestEnvironment env)
-          throws ConfigurationException, IOException, ComponentLookupException
+          throws Exception
       {
-        final PlexusContainer container = env.getPlexusContainer();
         final List<String> reposes = new ArrayList<String>();
         {
           // adding one proxy
-          final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+          final M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
           CRepository repoConf = new DefaultCRepository();
           repoConf.setProviderRole(Repository.class.getName());
           repoConf.setProviderHint("maven2");
@@ -183,7 +182,7 @@ public class PrefixFileUpdatePropagationContentTest
         }
         {
           // adding one proxy
-          final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+          final M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
           CRepository repoConf = new DefaultCRepository();
           repoConf.setProviderRole(Repository.class.getName());
           repoConf.setProviderHint("maven2");
@@ -212,7 +211,7 @@ public class PrefixFileUpdatePropagationContentTest
         }
         {
           // adding one proxy
-          final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+          final M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
           CRepository repoConf = new DefaultCRepository();
           repoConf.setProviderRole(Repository.class.getName());
           repoConf.setProviderHint("maven2");
@@ -242,7 +241,7 @@ public class PrefixFileUpdatePropagationContentTest
         {
           // add a group
           final M2GroupRepository group =
-              (M2GroupRepository) container.lookup(GroupRepository.class, "maven2");
+              (M2GroupRepository) env.lookup(GroupRepository.class, "maven2");
           CRepository repoGroupConf = new DefaultCRepository();
           repoGroupConf.setProviderRole(GroupRepository.class.getName());
           repoGroupConf.setProviderHint("maven2");
@@ -265,7 +264,7 @@ public class PrefixFileUpdatePropagationContentTest
         {
           // add 2nd group
           final M2GroupRepository group =
-              (M2GroupRepository) container.lookup(GroupRepository.class, "maven2");
+              (M2GroupRepository) env.lookup(GroupRepository.class, "maven2");
           CRepository repoGroupConf = new DefaultCRepository();
           repoGroupConf.setProviderRole(GroupRepository.class.getName());
           repoGroupConf.setProviderHint("maven2");
