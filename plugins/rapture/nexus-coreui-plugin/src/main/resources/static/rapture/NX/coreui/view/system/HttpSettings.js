@@ -63,7 +63,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
               name: 'httpPort',
               fieldLabel: 'Port',
               minValue: 1,
-              maxValue: 65536,
+              maxValue: 65535,
               allowDecimals: false,
               allowExponential: false,
               allowBlank: false
