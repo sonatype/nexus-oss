@@ -71,8 +71,8 @@
 
     <!-- Starting up Jetty "fake remote" -->
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty-testsuite</artifactId>
+      <groupId>org.sonatype.http-testing-harness</groupId>
+      <artifactId>junit-runner</artifactId>
     </dependency>
 
     <!-- We use Wagon to deploy WagonUtil etc -->

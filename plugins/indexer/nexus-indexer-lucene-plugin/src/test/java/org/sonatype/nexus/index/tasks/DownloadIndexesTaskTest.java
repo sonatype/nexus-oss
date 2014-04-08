@@ -12,11 +12,16 @@
  */
 package org.sonatype.nexus.index.tasks;
 
+import java.util.List;
+
 import org.sonatype.nexus.NexusAppTestSupport;
+import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 
+import com.google.inject.Binder;
+import com.google.inject.Module;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,6 +34,20 @@ public class DownloadIndexesTaskTest
 {
   protected NexusScheduler nexusScheduler;
 
+  @Override
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new Module()
+    {
+      @Override
+      public void configure(final Binder binder) {
+        MockedIndexerManager mockedIndexerManager = new MockedIndexerManager();
+        binder.bind(IndexerManager.class).toInstance(mockedIndexerManager);
+      }
+    });
+  }
+
+  @Override
   protected void setUp()
       throws Exception
   {
@@ -36,12 +55,6 @@ public class DownloadIndexesTaskTest
 
     nexusScheduler = lookup(NexusScheduler.class);
     MockedIndexerManager.mockInvoked = false;
-  }
-
-  protected void tearDown()
-      throws Exception
-  {
-    super.tearDown();
   }
 
   @Test
