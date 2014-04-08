@@ -15,28 +15,31 @@ package org.sonatype.nexus.integrationtests;
 import java.io.File;
 import java.io.IOException;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.tests.http.runner.junit.ServerResource;
+import org.sonatype.tests.http.server.api.ServerProvider;
+import org.sonatype.tests.http.server.fluent.Server;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.artifact.Gav;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Rule;
 import org.restlet.data.MediaType;
 
 public abstract class AbstractNexusProxyIntegrationTest
     extends AbstractNexusIntegrationTest
 {
+  @Rule
+  public ServerResource serverResource = new ServerResource(
+      buildServerProvider()
+  );
 
   protected String baseProxyURL = null;
 
   protected String localStorageDir = null;
 
   protected Integer proxyPort;
-
-  protected ServletServer proxyServer = null;
 
   protected final RepositoryMessageUtil repositoryUtil;
 
@@ -54,18 +57,10 @@ public abstract class AbstractNexusProxyIntegrationTest
     this.repositoryUtil = new RepositoryMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
-  @Before
-  public void startProxy() throws Exception {
-    this.proxyServer = lookup(ServletServer.class);
-    this.proxyServer.start();
-  }
-
-  @After
-  public void stopProxy() throws Exception {
-    if (this.proxyServer != null) {
-      this.proxyServer.stop();
-      this.proxyServer = null;
-    }
+  protected ServerProvider buildServerProvider() {
+    return Server.withPort(TestProperties.getInteger("proxy.server.port"))
+        .serve("/*").fromDirectory(new File(TestProperties.getString("proxy-repo-target-dir")))
+        .getServerProvider();
   }
 
   public File getLocalFile(String repositoryId, Gav gav) {

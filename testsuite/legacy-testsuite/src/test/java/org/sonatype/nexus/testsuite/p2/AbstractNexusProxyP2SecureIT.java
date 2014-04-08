@@ -12,9 +12,11 @@
  */
 package org.sonatype.nexus.testsuite.p2;
 
-import org.sonatype.jettytestsuite.ServletServer;
+import java.io.File;
 
-import org.junit.Before;
+import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.tests.http.server.api.ServerProvider;
+import org.sonatype.tests.http.server.fluent.Server;
 
 public abstract class AbstractNexusProxyP2SecureIT
     extends AbstractNexusProxyP2IT
@@ -24,12 +26,14 @@ public abstract class AbstractNexusProxyP2SecureIT
     super(testRepositoryId);
   }
 
-  @Before
-  public void startProxy() throws Exception {
-    if (proxyServer == null) {
-      proxyServer = this.lookup(ServletServer.class, "secure");
-      proxyServer.start();
-    }
+  @Override
+  protected ServerProvider buildServerProvider() {
+    ServerProvider serverProvider = Server.withPort(TestProperties.getInteger("proxy.server.port"))
+        .serve("/*").fromDirectory(new File(TestProperties.getString("proxy-repo-target-dir")))
+        .getServerProvider();
+    serverProvider.addAuthentication("/*", "BASIC");
+    serverProvider.addUser("admin", "admin");
+    return serverProvider;
   }
 
 }

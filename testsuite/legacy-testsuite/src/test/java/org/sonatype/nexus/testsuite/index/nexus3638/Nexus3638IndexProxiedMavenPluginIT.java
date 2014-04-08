@@ -16,46 +16,34 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 
-import org.sonatype.jettytestsuite.ControlledServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.tests.http.runner.junit.ServerResource;
+import org.sonatype.tests.http.server.api.ServerProvider;
+import org.sonatype.tests.http.server.fluent.Server;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.artifact.Gav;
 import org.hamcrest.MatcherAssert;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 
 public class Nexus3638IndexProxiedMavenPluginIT
     extends AbstractNexusIntegrationTest
 {
+  @Rule
+  public ServerResource serverResource = new ServerResource(buildServerProvider());
 
-  private ControlledServer server;
-
-  @Before
-  public void start()
-      throws Exception
-  {
-    server = lookup(ControlledServer.class);
-    server.addServer("nexus3638", getTestFile("repo"), 10);
-    server.start();
-  }
-
-  @After
-  public void stop()
-      throws Exception
-  {
-    if (server != null) {
-      server.stop();
-    }
+  protected ServerProvider buildServerProvider() {
+    return Server.withPort(TestProperties.getInteger("proxy.server.port"))
+        .serve("/nexus3638/*").fromDirectory(getTestFile("repo"))
+        .getServerProvider();
   }
 
   @Test

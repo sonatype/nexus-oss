@@ -13,11 +13,17 @@
 package org.sonatype.nexus.testsuite.proxy.nexus1113;
 
 import java.io.File;
+import java.util.Map;
 
 import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.testsuite.proxy.AbstractNexusWebProxyIntegrationTest;
+import org.sonatype.tests.http.server.api.ServerProvider;
+import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.jetty.impl.MonitorableProxyServlet;
 
+import com.google.common.collect.Maps;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,15 +33,13 @@ import org.junit.experimental.categories.Category;
 public class Nexus1113WebProxyWithAuthenticationIT
     extends AbstractNexusWebProxyIntegrationTest
 {
-
-  @Override
-  @Before
-  public void startWebProxy()
-      throws Exception
-  {
-    super.startWebProxy();
-    server.getProxyServlet().setUseAuthentication(true);
-    server.getProxyServlet().getAuthentications().put("admin", "123");
+  protected ServerProvider buildHttpProxyServerProvider() {
+    final Map<String, String> users = Maps.newHashMap();
+    users.put("admin", "123");
+    this.monitorableProxyServlet = new MonitorableProxyServlet(true, users);
+    return Server.withPort(TestProperties.getInteger("webproxy-server-port"))
+        .serve("/*").withServlet(monitorableProxyServlet)
+        .getServerProvider();
   }
 
   @Test
@@ -54,21 +58,6 @@ public class Nexus1113WebProxyWithAuthenticationIT
     Assert.assertTrue(FileTestingUtils.compareFileSHA1s(jarArtifact, jarFile));
 
     String artifactUrl = baseProxyURL + "release-proxy-repo-1/nexus1113/artifact/1.0/artifact-1.0.jar";
-    Assert.assertTrue("Proxy was not accessed", server.getAccessedUris().contains(artifactUrl));
-  }
-
-  @Override
-  @After
-  public void stopWebProxy()
-      throws Exception
-  {
-    if (server != null) {
-      if (server.getProxyServlet() != null) {
-        server.getProxyServlet().setUseAuthentication(false);
-        server.getProxyServlet().setAuthentications(null);
-      }
-    }
-
-    super.stopWebProxy();
+    Assert.assertTrue("Proxy was not accessed", monitorableProxyServlet.getAccessedUris().contains(artifactUrl));
   }
 }

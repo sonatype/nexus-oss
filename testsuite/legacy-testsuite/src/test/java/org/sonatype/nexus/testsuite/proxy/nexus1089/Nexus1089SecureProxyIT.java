@@ -14,39 +14,27 @@ package org.sonatype.nexus.testsuite.proxy.nexus1089;
 
 import java.io.File;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.tests.http.server.api.ServerProvider;
+import org.sonatype.tests.http.server.fluent.Server;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 public class Nexus1089SecureProxyIT
     extends AbstractNexusProxyIntegrationTest
 {
-  protected ServletServer secureProxyServer = null;
-
-  @Override
-  @Before
-  public void startProxy()
-      throws Exception
-  {
-    secureProxyServer = lookup(ServletServer.class, "secure");
-    secureProxyServer.start();
-  }
-
-  @Override
-  @After
-  public void stopProxy()
-      throws Exception
-  {
-    if (secureProxyServer != null) {
-      secureProxyServer.stop();
-    }
+  protected ServerProvider buildServerProvider() {
+    final ServerProvider serverProvider = Server.withPort(TestProperties.getInteger("proxy.server.port"))
+        .serve("/*").fromDirectory(new File(TestProperties.getString("proxy-repo-target-dir")))
+        .getServerProvider();
+    serverProvider.addAuthentication("/*", "BASIC");
+    serverProvider.addUser("admin", "admin");
+    return serverProvider;
   }
 
   @Test

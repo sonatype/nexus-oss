@@ -12,10 +12,9 @@
  */
 package org.sonatype.nexus.testsuite.p2.nxcm2947;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
+import org.sonatype.tests.http.server.api.ServerProvider;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Test;
 
 public class NXCM2947P2SecureProxyIT
@@ -26,9 +25,11 @@ public class NXCM2947P2SecureProxyIT
     super("nxcm2947");
   }
 
-  @Override
-  protected ServletServer lookupProxyServer() throws ComponentLookupException {
-    return lookup(ServletServer.class, "secure");
+  protected ServerProvider buildServerProvider() {
+    final ServerProvider serverProvider = super.buildServerProvider();
+    serverProvider.addAuthentication("/*", "BASIC");
+    serverProvider.addUser("admin", "admin");
+    return serverProvider;
   }
 
   @Test

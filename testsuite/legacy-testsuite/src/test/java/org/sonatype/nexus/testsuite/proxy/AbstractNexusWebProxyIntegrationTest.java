@@ -10,42 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.proxy;
 
-import org.sonatype.jettytestsuite.ProxyServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.tests.http.runner.junit.ServerResource;
+import org.sonatype.tests.http.server.api.ServerProvider;
+import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.jetty.impl.MonitorableProxyServlet;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Rule;
 
 public abstract class AbstractNexusWebProxyIntegrationTest
     extends AbstractNexusProxyIntegrationTest
 {
-
   protected static final int webProxyPort;
-
-  protected ProxyServer server;
 
   static {
     webProxyPort = TestProperties.getInteger("webproxy.server.port");
   }
 
-  @Before
-  public void startWebProxy()
-      throws Exception
-  {
-    server = lookup(ProxyServer.class);
-    server.start();
-  }
+  protected MonitorableProxyServlet monitorableProxyServlet;
 
-  @After
-  public void stopWebProxy()
-      throws Exception
-  {
-    if (server != null) {
-      server.stop();
-    }
-  }
+  @Rule
+  public ServerResource serverResource = new ServerResource(buildHttpProxyServerProvider());
 
+  protected ServerProvider buildHttpProxyServerProvider() {
+    this.monitorableProxyServlet = new MonitorableProxyServlet();
+    return Server.withPort(TestProperties.getInteger("webproxy-server-port"))
+        .serve("/*").withServlet(monitorableProxyServlet)
+        .getServerProvider();
+  }
 }

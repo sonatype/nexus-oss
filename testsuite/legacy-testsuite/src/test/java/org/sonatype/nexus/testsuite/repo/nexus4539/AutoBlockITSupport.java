@@ -15,6 +15,7 @@ package org.sonatype.nexus.testsuite.repo.nexus4539;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.GenericServlet;
 import javax.servlet.ServletException;
@@ -23,23 +24,27 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.jettytestsuite.ControlledServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.tests.http.runner.junit.ServerResource;
+import org.sonatype.tests.http.server.api.Behaviour;
+import org.sonatype.tests.http.server.api.ServerProvider;
+import org.sonatype.tests.http.server.fluent.Server;
 
 import com.google.common.collect.Lists;
 import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 
@@ -57,7 +62,8 @@ public abstract class AutoBlockITSupport
 
   protected static final String REPO = "basic";
 
-  protected ControlledServer server;
+  @Rule
+  public ServerResource serverResource = new ServerResource(buildServerProvider());
 
   protected Integer sleepTime;
 
@@ -69,6 +75,28 @@ public abstract class AutoBlockITSupport
     super(REPO);
   }
 
+  protected ServerProvider buildServerProvider() {
+    return Server.withPort(TestProperties.getInteger("proxy.server.port"))
+        .serve("/*").withBehaviours(new Behaviour() {
+          @Override
+          public boolean execute(final HttpServletRequest request, final HttpServletResponse response,
+                                 final Map<Object, Object> ctx)
+              throws Exception
+          {
+            pathsTouched.add(request.getPathInfo());
+            try {
+              if (sleepTime != -1) {
+                Thread.sleep(sleepTime * 1000);
+              }
+            }
+            catch (InterruptedException e) {
+              response.sendError(Status.CLIENT_ERROR_REQUEST_TIMEOUT.getCode());
+            }
+            return false;
+          }
+        }).getServerProvider();
+  }
+
   @SuppressWarnings("serial")
   @Before
   public void setup()
@@ -76,28 +104,6 @@ public abstract class AutoBlockITSupport
   {
     sleepTime = -1;
     pathsTouched = Lists.newArrayList();
-
-    server = lookup(ControlledServer.class);
-    server.getProxyingContext().addServlet(new ServletHolder(new GenericServlet()
-    {
-      @Override
-      public void service(ServletRequest req, ServletResponse res)
-          throws ServletException, IOException
-      {
-        pathsTouched.add(((HttpServletRequest) req).getPathInfo());
-        try {
-          if (sleepTime != -1) {
-            Thread.sleep(sleepTime * 1000);
-          }
-        }
-        catch (InterruptedException e) {
-          HttpServletResponse resp = (HttpServletResponse) res;
-          resp.sendError(Status.CLIENT_ERROR_REQUEST_TIMEOUT.getCode());
-        }
-      }
-    }), "/*");
-    server.start();
-
     this.repoUtil = new RepositoryMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
@@ -106,7 +112,6 @@ public abstract class AutoBlockITSupport
       throws StoppingException
   {
     pathsTouched = null;
-    server.stop();
   }
 
   /**

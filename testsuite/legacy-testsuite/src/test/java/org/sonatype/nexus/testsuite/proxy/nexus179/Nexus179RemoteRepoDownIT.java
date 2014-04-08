@@ -54,7 +54,7 @@ public class Nexus179RemoteRepoDownIT
       throws Exception
   {
     // stop the proxy
-    this.stopProxy();
+    serverResource.getServerProvider().stop();
 
     // delete everything under this tests group id if exist anything
     this.deleteFromRepository("nexus179/");
@@ -76,7 +76,7 @@ public class Nexus179RemoteRepoDownIT
     }
 
     // Start up the proxy
-    this.startProxy();
+    serverResource.getServerProvider().start();
 
     // should not be able to download artifact after starting proxy, without clearing the cache.
     try {
