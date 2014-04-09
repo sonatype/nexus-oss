@@ -317,7 +317,7 @@ public class ContentServlet
     }
     else {
       responseCode = SC_INTERNAL_SERVER_ERROR;
-      logger.warn(exception.getMessage(), exception);
+      logger.warn(exception.getMessage() + "{}", requestDetails(request), exception);
     }
 
     throw new ErrorStatusException(responseCode, null, exception.getMessage());
