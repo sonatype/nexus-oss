@@ -33,6 +33,7 @@ import org.junit.experimental.categories.Category;
 public class Nexus1113WebProxyWithAuthenticationIT
     extends AbstractNexusWebProxyIntegrationTest
 {
+  @Override
   protected ServerProvider buildHttpProxyServerProvider() {
     final Map<String, String> users = Maps.newHashMap();
     users.put("admin", "123");

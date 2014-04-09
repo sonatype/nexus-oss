@@ -30,9 +30,7 @@ public class Nexus1089SecureProxyIT
 {
   @Override
   public ServerProvider buildServerProvider() {
-    final ServerProvider serverProvider = Server.withPort(TestProperties.getInteger("proxy-repo-port"))
-        .serve("/*").fromDirectory(new File(TestProperties.getString("proxy-repo-target-dir")))
-        .getServerProvider();
+    final ServerProvider serverProvider = super.buildServerProvider();
     serverProvider.addAuthentication("/*", "BASIC");
     serverProvider.addUser("admin", "admin");
     return serverProvider;

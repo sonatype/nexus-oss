@@ -34,7 +34,7 @@ public abstract class AbstractNexusWebProxyIntegrationTest
   protected MonitorableProxyServlet monitorableProxyServlet;
 
   @Rule
-  public ServerResource serverResource = new ServerResource(buildHttpProxyServerProvider());
+  public ServerResource httpProxyResource = new ServerResource(buildHttpProxyServerProvider());
 
   protected ServerProvider buildHttpProxyServerProvider() {
     this.monitorableProxyServlet = new MonitorableProxyServlet();
