@@ -62,7 +62,7 @@ Ext.define('NX.coreui.controller.NotificationSettings', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.refreshRoles
+          refresh: me.loadRoles
         }
       },
       component: {
@@ -89,18 +89,6 @@ Ext.define('NX.coreui.controller.NotificationSettings', {
 
     if (panel) {
       me.getRoleStore().load();
-    }
-  },
-
-  /**
-   * @private
-   */
-  refreshRoles: function () {
-    var me = this,
-        panel = me.getPanel();
-
-    if (panel) {
-      me.loadRoles();
     }
   },
 
