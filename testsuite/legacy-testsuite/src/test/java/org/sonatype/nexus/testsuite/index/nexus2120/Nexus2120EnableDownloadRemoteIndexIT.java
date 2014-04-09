@@ -68,7 +68,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
   private final List<String> accessedPaths = Lists.newArrayList();
 
   protected ServerProvider buildServerProvider() {
-    final ServerProvider serverProvider = Server.withPort(TestProperties.getInteger("proxy.server.port"))
+    final ServerProvider serverProvider = Server.withPort(TestProperties.getInteger("proxy-repo-port"))
         .serve("/repository/*").fromDirectory(getTestFile("basic"))
         .getServerProvider();
     serverProvider.addFilter("/*", new Filter()
