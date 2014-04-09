@@ -68,10 +68,10 @@ public class Nexus2120EnableDownloadRemoteIndexIT
   private final List<String> accessedPaths = Lists.newArrayList();
 
   protected ServerProvider buildServerProvider() {
-    final ServerProvider serverProvider = Server.withPort(TestProperties.getInteger("proxy-repo-port"))
+    final ServerProvider serverProvider = Server.withPort(TestProperties.getInteger("webproxy-server-port"))
         .serve("/repository/*").fromDirectory(getTestFile("basic"))
         .getServerProvider();
-    serverProvider.addFilter("/*", new Filter()
+    serverProvider.addFilter("/repository/*", new Filter()
     {
       @Override
       public void init(final FilterConfig filterConfig) throws ServletException {
@@ -83,6 +83,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
           throws IOException, ServletException
       {
         accessedPaths.add(((HttpServletRequest) request).getPathInfo());
+        chain.doFilter(request, response);
       }
 
       @Override
@@ -152,7 +153,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
     TaskScheduleUtil.waitForAllTasksToStop(UpdateIndexTask.class);
 
     // did nexus downloaded indexes?
-    assertThat(accessedPaths, contains("/repository/.index/nexus-maven-repository-index.gz"));
+    assertThat("Bad: " + accessedPaths, accessedPaths, hasItem("/.index/nexus-maven-repository-index.gz"));
 
     RequestFacade.doGet(URI);
   }
