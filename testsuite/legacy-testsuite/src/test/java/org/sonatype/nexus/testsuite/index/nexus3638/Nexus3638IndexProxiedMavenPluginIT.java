@@ -41,7 +41,7 @@ public class Nexus3638IndexProxiedMavenPluginIT
   public ServerResource serverResource = new ServerResource(buildServerProvider());
 
   protected ServerProvider buildServerProvider() {
-    return Server.withPort(TestProperties.getInteger("proxy.server.port"))
+    return Server.withPort(TestProperties.getInteger("webproxy-server-port"))
         .serve("/nexus3638/*").fromDirectory(getTestFile("repo"))
         .getServerProvider();
   }

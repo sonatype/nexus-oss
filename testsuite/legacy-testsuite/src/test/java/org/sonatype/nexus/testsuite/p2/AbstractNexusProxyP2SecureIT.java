@@ -28,7 +28,7 @@ public abstract class AbstractNexusProxyP2SecureIT
 
   @Override
   protected ServerProvider buildServerProvider() {
-    ServerProvider serverProvider = Server.withPort(TestProperties.getInteger("proxy.server.port"))
+    ServerProvider serverProvider = Server.withPort(TestProperties.getInteger("proxy-repo-port"))
         .serve("/*").fromDirectory(new File(TestProperties.getString("proxy-repo-target-dir")))
         .getServerProvider();
     serverProvider.addAuthentication("/*", "BASIC");

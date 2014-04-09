@@ -52,7 +52,7 @@ public class Nexus5291OverloadResponseIs503IT
   }
 
   @Override
-  protected ServerProvider buildServerProvider() {
+  public ServerProvider buildServerProvider() {
     return Server.withPort(TestProperties.getInteger("proxy.server.port")).serve("/*")
         .withBehaviours(Behaviours.pause(Time.days(1))).getServerProvider();
   }

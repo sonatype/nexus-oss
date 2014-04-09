@@ -28,8 +28,9 @@ import org.junit.experimental.categories.Category;
 public class Nexus1089SecureProxyIT
     extends AbstractNexusProxyIntegrationTest
 {
-  protected ServerProvider buildServerProvider() {
-    final ServerProvider serverProvider = Server.withPort(TestProperties.getInteger("proxy.server.port"))
+  @Override
+  public ServerProvider buildServerProvider() {
+    final ServerProvider serverProvider = Server.withPort(TestProperties.getInteger("proxy-server-port"))
         .serve("/*").fromDirectory(new File(TestProperties.getString("proxy-repo-target-dir")))
         .getServerProvider();
     serverProvider.addAuthentication("/*", "BASIC");
