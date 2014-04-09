@@ -53,6 +53,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.RepositoryTargets',
     'NX.coreui.controller.RepositoryRoutes',
     'NX.coreui.controller.Privileges',
+    'NX.coreui.controller.RealmSettings',
     'NX.coreui.controller.Roles',
     'NX.coreui.controller.Security',
     'NX.coreui.controller.System',
