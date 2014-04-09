@@ -10,13 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.p2;
 
-import java.io.File;
-
-import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.tests.http.server.api.ServerProvider;
-import org.sonatype.tests.http.server.fluent.Server;
 
 public abstract class AbstractNexusProxyP2SecureIT
     extends AbstractNexusProxyP2IT
@@ -28,9 +25,7 @@ public abstract class AbstractNexusProxyP2SecureIT
 
   @Override
   protected ServerProvider buildServerProvider() {
-    ServerProvider serverProvider = Server.withPort(TestProperties.getInteger("proxy-repo-port"))
-        .serve("/*").fromDirectory(new File(TestProperties.getString("proxy-repo-target-dir")))
-        .getServerProvider();
+    ServerProvider serverProvider = super.buildServerProvider();
     serverProvider.addAuthentication("/*", "BASIC");
     serverProvider.addUser("admin", "admin");
     return serverProvider;
