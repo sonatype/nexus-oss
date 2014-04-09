@@ -22,7 +22,6 @@ Ext.define('NX.coreui.controller.Security', {
   },
 
   views: [
-    'security.Anonymous',
     'security.SecurityRealms'
   ],
 
@@ -57,18 +56,6 @@ Ext.define('NX.coreui.controller.Security', {
           variants: ['x16', 'x32']
         },
         weight: 90
-      },
-      {
-        mode: 'admin',
-        path: '/Security/Anonymous',
-        view: 'NX.coreui.view.security.Anonymous',
-        iconConfig: {
-          file: 'user_silhouette.png',
-          variants: ['x16', 'x32']
-        },
-        visible: function () {
-          return NX.Permissions.check('nexus:settings', 'read');
-        }
       },
       {
         mode: 'admin',
