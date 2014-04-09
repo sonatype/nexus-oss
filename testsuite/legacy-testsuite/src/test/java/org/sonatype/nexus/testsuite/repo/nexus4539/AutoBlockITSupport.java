@@ -76,7 +76,7 @@ public abstract class AutoBlockITSupport
   }
 
   protected ServerProvider buildServerProvider() {
-    return Server.withPort(TestProperties.getInteger("proxy.server.port"))
+    return Server.withPort(TestProperties.getInteger("proxy-repo-port"))
         .serve("/*").withBehaviours(new Behaviour() {
           @Override
           public boolean execute(final HttpServletRequest request, final HttpServletResponse response,
