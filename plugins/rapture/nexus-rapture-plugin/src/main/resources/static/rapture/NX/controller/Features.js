@@ -139,7 +139,7 @@ Ext.define('NX.controller.Features', {
    */
   configureIcon: function (path, feature) {
     var me = this,
-        defaultIconName = 'feature-' + path.toLowerCase().replace(/\//g, '-').replace(/\s/g, '');
+        defaultIconName = 'feature-' + feature.mode + '-' + path.toLowerCase().replace(/\//g, '-').replace(/\s/g, '');
 
     // inline icon registration for feature
     if (feature.iconConfig) {
