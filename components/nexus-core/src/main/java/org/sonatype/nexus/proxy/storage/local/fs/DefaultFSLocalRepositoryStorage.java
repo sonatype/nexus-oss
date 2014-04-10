@@ -47,6 +47,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
+import org.sonatype.nexus.proxy.item.uid.IsItemAttributeMetacontentAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.AbstractLocalRepositoryStorage;
@@ -194,7 +195,7 @@ public class DefaultFSLocalRepositoryStorage
       path = RepositoryItemUid.PATH_ROOT;
     }
 
-    RepositoryItemUid uid = repository.createUid(path);
+    final RepositoryItemUid uid = repository.createUid(path);
 
     final AbstractStorageItem result;
     if (target.isDirectory()) {
@@ -214,7 +215,10 @@ public class DefaultFSLocalRepositoryStorage
           repository.getMimeRulesSource(), target.getAbsolutePath()));
 
       try {
-        if (getLinkPersister().isLinkContent(fileContent)) {
+        // Probe for link only if we KNOW it's not an attribute but "plain" content
+        final boolean isAttribute = uid.getBooleanAttributeValue(IsItemAttributeMetacontentAttribute.class);
+        final boolean isLink = !isAttribute && getLinkPersister().isLinkContent(fileContent);
+        if (isLink) {
           try {
             DefaultStorageLinkItem link =
                 new DefaultStorageLinkItem(repository, request, target.canRead(), target.canWrite(),
