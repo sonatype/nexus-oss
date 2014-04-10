@@ -34,6 +34,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.ComponentLicense',
     'NX.coreui.controller.ComponentSecurity',
     'NX.coreui.controller.HttpSettings',
+    'NX.coreui.controller.GeneralSettings',
     { id: 'NX.coreui.controller.Log',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-logging-plugin');

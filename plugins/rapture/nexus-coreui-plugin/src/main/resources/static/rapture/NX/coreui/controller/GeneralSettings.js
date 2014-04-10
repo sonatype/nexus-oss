@@ -11,15 +11,15 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * System settings related controller.
+ * General System Settings controller.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.controller.System', {
+Ext.define('NX.coreui.controller.GeneralSettings', {
   extend: 'Ext.app.Controller',
 
   views: [
-    'system.Notifications'
+    'system.GeneralSettings'
   ],
 
   /**
@@ -28,29 +28,47 @@ Ext.define('NX.coreui.controller.System', {
   init: function () {
     var me = this;
 
+    me.getApplication().getIconController().addIcons({
+      'feature-system-general': {
+        file: 'wrench.png',
+        variants: ['x16', 'x32']
+      }
+    });
+
     me.getApplication().getFeaturesController().registerFeature([
       {
         mode: 'admin',
-        path: '/System',
-        group: true,
-        iconConfig: {
-          file: 'cog.png',
-          variants: ['x16', 'x32']
-        },
-        weight: 1000
-      },
-      {
-        mode: 'admin',
-        path: '/System/Notifications',
-        view: 'NX.coreui.view.system.Notifications',
-        iconConfig: {
-          file: 'emails.png',
-          variants: ['x16', 'x32']
-        },
+        path: '/System/General',
+        view: { xtype: 'nx-coreui-system-general-settings' },
         visible: function () {
           return NX.Permissions.check('nexus:settings', 'read');
         }
       }
     ]);
+
+    me.listen({
+      component: {
+        'nx-coreui-system-general-settings #baseUrl': {
+          change: me.onBaseUrlChange
+        }
+      }
+    });
+  },
+
+  /**
+   * @private
+   * Enables force base URL if base url is set.
+   */
+  onBaseUrlChange: function (baseUrl) {
+    var forceBaseUrl = baseUrl.up('form').down('#forceBaseUrl');
+
+    if (!baseUrl.getValue()) {
+      forceBaseUrl.setValue(false);
+      forceBaseUrl.disable();
+    }
+    else if (forceBaseUrl.isDisabled()) {
+      forceBaseUrl.enable();
+    }
   }
+
 });
