@@ -60,8 +60,6 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.Privileges',
     'NX.coreui.controller.RealmSettings',
     'NX.coreui.controller.Roles',
-    'NX.coreui.controller.Security',
-    'NX.coreui.controller.System',
     { id: 'NX.coreui.controller.SysInfo',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-atlas-plugin');
