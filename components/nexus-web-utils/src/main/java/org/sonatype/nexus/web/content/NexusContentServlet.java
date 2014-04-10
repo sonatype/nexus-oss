@@ -312,7 +312,7 @@ public class NexusContentServlet
   private String requestDetails(HttpServletRequest request) {
     StringBuilder sb = new StringBuilder();
     // getRemoteAddr respects x-forwarded-for if enabled and avoids potential DNS lookups
-    sb.append(" [client=").append(request.getRemoteAddr());
+    sb.append("[client=").append(request.getRemoteAddr());
     sb.append(",ua=").append(request.getHeader("User-Agent"));
     sb.append(",req=").append(request.getMethod()).append(' ').append(request.getRequestURL().toString());
     sb.append(']');
