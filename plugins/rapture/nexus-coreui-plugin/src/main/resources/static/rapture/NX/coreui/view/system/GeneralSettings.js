@@ -11,21 +11,21 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * System general settings form.
+ * General System Settings form.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.system.General', {
+Ext.define('NX.coreui.view.system.GeneralSettings', {
   extend: 'NX.view.SettingsPanel',
-  alias: 'widget.nx-coreui-system-general',
+  alias: 'widget.nx-coreui-system-general-settings',
 
   items: [
     {
       xtype: 'nx-settingsform',
       settingsFormSuccessMessage: 'General system settings $action',
       api: {
-        load: 'NX.direct.coreui_SystemGeneral.read',
-        submit: 'NX.direct.coreui_SystemGeneral.update'
+        load: 'NX.direct.coreui_GeneralSettings.read',
+        submit: 'NX.direct.coreui_GeneralSettings.update'
       },
       editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
       editableMarker: 'You do not have permission to configure general settings',
@@ -38,22 +38,18 @@ Ext.define('NX.coreui.view.system.General', {
         {
           xtype: 'textfield',
           name: 'baseUrl',
+          itemId: 'baseUrl',
           fieldLabel: 'Base URL',
+          allowBlank: true,
+          vtype: 'url',
           emptyText: NX.util.Url.baseUrl
         },
         {
           xtype: 'checkbox',
           name: 'forceBaseUrl',
-          boxLabel: 'Force base URL'
-        },
-        {
-          xtype: 'label',
-          html: '<p>Version updates.</p>'
-        },
-        {
-          xtype: 'checkbox',
-          name: 'checkForUpdates',
-          boxLabel: 'Check for new version updates'
+          itemId: 'forceBaseUrl',
+          boxLabel: 'Force base URL',
+          disabled: true
         }
       ]
     }

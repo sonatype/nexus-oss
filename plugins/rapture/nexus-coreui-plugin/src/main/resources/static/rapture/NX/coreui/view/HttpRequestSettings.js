@@ -33,12 +33,20 @@ Ext.define('NX.coreui.view.HttpRequestSettings', {
     {
       xtype: 'numberfield',
       name: 'timeout',
-      fieldLabel: 'Timeout seconds'
+      fieldLabel: 'Timeout seconds',
+      allowDecimals: false,
+      allowExponential: false,
+      minValue: 0,
+      maxValue: 3600
     },
     {
       xtype: 'numberfield',
       name: 'retries',
-      fieldLabel: 'Retry attempts'
+      fieldLabel: 'Retry attempts',
+      allowDecimals: false,
+      allowExponential: false,
+      minValue: 0,
+      maxValue: 10
     }
   ]
 

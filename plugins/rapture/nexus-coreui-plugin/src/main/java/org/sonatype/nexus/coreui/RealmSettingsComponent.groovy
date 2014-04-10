@@ -10,11 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import com.google.inject.Key
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.apache.shiro.realm.Realm
@@ -26,6 +28,8 @@ import org.sonatype.security.SecuritySystem
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
 
 /**
  * Realm Security Settings {@link DirectComponent}.
@@ -34,8 +38,8 @@ import javax.inject.Singleton
  */
 @Named
 @Singleton
-@DirectAction(action = 'coreui_SecurityRealm')
-class SecurityRealmComponent
+@DirectAction(action = 'coreui_RealmSettings')
+class RealmSettingsComponent
 extends DirectComponentSupport
 {
 
@@ -45,32 +49,44 @@ extends DirectComponentSupport
   @Inject
   BeanLocator beanLocator
 
+  /**
+   * Retrieves security realm settings.
+   * @return security realm settings
+   */
   @DirectMethod
   @RequiresPermissions('nexus:settings:read')
-  SecurityRealmXO read() {
-    return new SecurityRealmXO(
+  RealmSettingsXO read() {
+    return new RealmSettingsXO(
         realms: securitySystem.realms
     )
   }
 
-  @DirectMethod
-  @RequiresAuthentication
-  @RequiresPermissions('nexus:settings:update')
-  SecurityRealmXO update(final SecurityRealmXO realmXO) {
-    // TODO validation?
-    securitySystem.realms = realmXO.realms
-    return read()
-  }
-
+  /**
+   * Retrieves realm types.
+   * @return a list of realm types
+   */
   @DirectMethod
   @RequiresPermissions('nexus:componentrealmtypes:read')
-  List<ReferenceXO> realmTypes() {
+  List<ReferenceXO> readRealmTypes() {
     beanLocator.locate(Key.get(Realm.class, Named.class)).collect { entry ->
       new ReferenceXO(
           id: entry.key.value,
           name: entry.description
       )
     }
+  }
+
+  /**
+   * Updates security realm settings.
+   * @return updated security realm settings
+   */
+  @DirectMethod
+  @RequiresAuthentication
+  @RequiresPermissions('nexus:settings:update')
+  @Validate
+  RealmSettingsXO update(final @NotNull(message = '[realmSettings] may not be null') @Valid RealmSettingsXO realmSettingsXO) {
+    securitySystem.realms = realmSettingsXO.realms
+    return read()
   }
 
 }

@@ -11,13 +11,13 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * System http settings form.
+ * HTTP System Settings form.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.system.Http', {
+Ext.define('NX.coreui.view.system.HttpSettings', {
   extend: 'NX.view.SettingsPanel',
-  alias: 'widget.nx-coreui-system-http',
+  alias: 'widget.nx-coreui-system-http-settings',
   requires: [
     'NX.coreui.view.AuthenticationSettings',
     'NX.coreui.view.HttpRequestSettings'
@@ -28,8 +28,8 @@ Ext.define('NX.coreui.view.system.Http', {
       xtype: 'nx-settingsform',
       settingsFormSuccessMessage: 'HTTP system settings $action',
       api: {
-        load: 'NX.direct.coreui_SystemHttp.read',
-        submit: 'NX.direct.coreui_SystemHttp.update'
+        load: 'NX.direct.coreui_HttpSettings.read',
+        submit: 'NX.direct.coreui_HttpSettings.update'
       },
       editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
       editableMarker: 'You do not have permission to configure http',
@@ -65,6 +65,7 @@ Ext.define('NX.coreui.view.system.Http', {
               minValue: 1,
               maxValue: 65535,
               allowDecimals: false,
+              allowExponential: false,
               allowBlank: false
             },
             {
@@ -91,6 +92,7 @@ Ext.define('NX.coreui.view.system.Http', {
         {
           xtype: 'nx-optionalfieldset',
           title: 'HTTPS Proxy',
+          itemId: 'httpsProxy',
           checkboxToggle: true,
           checkboxName: 'httpsEnabled',
           collapsed: true,
@@ -112,6 +114,7 @@ Ext.define('NX.coreui.view.system.Http', {
               minValue: 1,
               maxValue: 65535,
               allowDecimals: false,
+              allowExponential: false,
               allowBlank: false
             },
             {

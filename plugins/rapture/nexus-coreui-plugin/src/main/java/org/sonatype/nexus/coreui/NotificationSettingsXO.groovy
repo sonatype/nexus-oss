@@ -10,60 +10,40 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.apache.bval.constraints.Email
 import org.sonatype.nexus.extdirect.model.Password
 
+import javax.validation.constraints.NotNull
+
 /**
- * HTTP System Settings exchange object.
+ * Notifications System Settings exchange object.
  *
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
-class SystemHttpXO
+class NotificationSettingsXO
 {
 
-  String userAgentCustomisation
+  @NotNull
+  @Email
+  String systemEmail
 
-  String urlParameters
+  Boolean enabled
+  Set<String> notifyEmails
+  Set<String> notifyRoles
 
-  Integer timeout
+  String smtpHost
+  Integer smtpPort
+  String smtpUsername
+  Password smtpPassword
+  ConnectionType smtpConnectionType
+  Boolean useTrustStoreForSmtp
 
-  Integer retries
-
-  boolean httpEnabled
-
-  String httpHost
-
-  Integer httpPort
-
-  boolean httpAuthEnabled
-
-  String httpAuthUsername
-
-  Password httpAuthPassword
-
-  String httpAuthNtlmHost
-
-  String httpAuthNtlmDomain
-
-  boolean httpsEnabled
-
-  String httpsHost
-
-  Integer httpsPort
-
-  boolean httpsAuthEnabled
-
-  String httpsAuthUsername
-
-  Password httpsAuthPassword
-
-  String httpsAuthNtlmHost
-
-  String httpsAuthNtlmDomain
-
-  Set<String> nonProxyHosts
-
+  public enum ConnectionType {
+    PLAIN, SSL, TLS
+  }
 }

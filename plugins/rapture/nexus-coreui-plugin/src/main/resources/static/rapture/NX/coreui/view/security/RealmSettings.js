@@ -15,9 +15,9 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.security.SecurityRealms', {
+Ext.define('NX.coreui.view.security.RealmSettings', {
   extend: 'NX.view.SettingsPanel',
-  alias: 'widget.nx-coreui-security-realms',
+  alias: 'widget.nx-coreui-security-realm-settings',
   requires: [
     'NX.ext.form.field.ItemSelector'
   ],
@@ -28,8 +28,8 @@ Ext.define('NX.coreui.view.security.SecurityRealms', {
       xtype: 'nx-settingsform',
       settingsFormSuccessMessage: 'Security Realms settings $action',
       api: {
-        load: 'NX.direct.coreui_SecurityRealm.read',
-        submit: 'NX.direct.coreui_SecurityRealm.update'
+        load: 'NX.direct.coreui_RealmSettings.read',
+        submit: 'NX.direct.coreui_RealmSettings.update'
       },
       editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
       editableMarker: 'You do not have permission to configure realms',

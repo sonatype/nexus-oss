@@ -21,30 +21,11 @@ Ext.define('NX.coreui.controller.Security', {
     logAware: 'NX.LogAware'
   },
 
-  views: [
-    'security.SecurityRealms'
-  ],
-
-  stores: [
-    'RealmType'
-  ],
-
-  refs: [
-    { ref: 'securityRealms', selector: 'nx-coreui-security-realms' }
-  ],
-
   /**
    * @override
    */
   init: function () {
     var me = this;
-
-    me.getApplication().getIconController().addIcons({
-      'feature-security-realms': {
-        file: 'shield.png',
-        variants: ['x16', 'x32']
-      }
-    });
 
     me.getApplication().getFeaturesController().registerFeature([
       {
@@ -56,38 +37,8 @@ Ext.define('NX.coreui.controller.Security', {
           variants: ['x16', 'x32']
         },
         weight: 90
-      },
-      {
-        mode: 'admin',
-        path: '/Security/Realms',
-        view: { xtype: 'nx-coreui-security-realms' },
-        visible: function () {
-          return NX.Permissions.check('nexus:settings', 'read');
-        }
       }
     ]);
-
-    me.listen({
-      controller: {
-        '#Refresh': {
-          refresh: me.loadRelatedStores
-        }
-      },
-      component: {
-        'nx-coreui-security-realms': {
-          beforerender: me.loadRelatedStores
-        }
-      }
-    });
-  },
-
-  loadRelatedStores: function () {
-    var me = this,
-        securityRealms = me.getSecurityRealms();
-
-    if (securityRealms) {
-      me.getRealmTypeStore().load();
-    }
   }
 
 });

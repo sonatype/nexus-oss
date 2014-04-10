@@ -34,6 +34,8 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.ComponentSummary',
     'NX.coreui.controller.ComponentLicense',
     'NX.coreui.controller.ComponentSecurity',
+    'NX.coreui.controller.HttpSettings',
+    'NX.coreui.controller.GeneralSettings',
     { id: 'NX.coreui.controller.Log',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-logging-plugin');
@@ -45,6 +47,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     'NX.coreui.controller.MavenUpload',
+    'NX.coreui.controller.NotificationSettings',
     { id: 'NX.coreui.controller.PluginConsole',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-plugin-console-plugin');
@@ -54,6 +57,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.RepositoryTargets',
     'NX.coreui.controller.RepositoryRoutes',
     'NX.coreui.controller.Privileges',
+    'NX.coreui.controller.RealmSettings',
     'NX.coreui.controller.Roles',
     'NX.coreui.controller.Security',
     'NX.coreui.controller.System',
