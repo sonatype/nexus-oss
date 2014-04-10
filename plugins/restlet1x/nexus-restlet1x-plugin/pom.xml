@@ -50,34 +50,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-core</artifactId>
-      <version>${enunciate.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.enunciate</groupId>
-          <artifactId>enunciate-core-rt</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-digester</groupId>
-          <artifactId>commons-digester</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>net.sf.apt-jelly</groupId>
-          <artifactId>apt-jelly-freemarker</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.servlet</groupId>
-          <artifactId>servlet-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-content-plugin</artifactId>
       <type>${nexus-plugin.type}</type>

@@ -16,14 +16,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.rest.indextreeview.AbstractIndexContentPlexusResource;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -70,9 +68,7 @@ public class GroupIndexContentPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(pathParams = {@PathParam(GroupIndexContentPlexusResource.GROUP_ID_KEY)},
-      output = IndexBrowserTreeViewResponseDTO.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public IndexBrowserTreeViewResponseDTO get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     return super.get(context, request, response, variant);

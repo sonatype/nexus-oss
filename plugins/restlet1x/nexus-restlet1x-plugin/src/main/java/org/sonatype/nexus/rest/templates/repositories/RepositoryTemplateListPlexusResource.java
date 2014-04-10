@@ -32,7 +32,6 @@ import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -71,8 +70,7 @@ public class RepositoryTemplateListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = RepositoryListResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public RepositoryListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     RepositoryListResourceResponse result = new RepositoryListResourceResponse();

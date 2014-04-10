@@ -25,7 +25,6 @@ import org.sonatype.nexus.rest.model.ConfigurationsListResource;
 import org.sonatype.nexus.rest.model.ConfigurationsListResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -67,8 +66,7 @@ public class ConfigurationListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = ConfigurationsListResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public ConfigurationsListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     ConfigurationsListResourceResponse result = new ConfigurationsListResourceResponse();

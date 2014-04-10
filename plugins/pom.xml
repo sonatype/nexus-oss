@@ -29,8 +29,6 @@
   <packaging>pom</packaging>
 
   <properties>
-    <!-- enunciate configuration -->
-    <enunciate.version>1.26.2</enunciate.version>
     <copyright.year>2013</copyright.year>
 
     <!-- nexus-plugin-bundle configuration -->

@@ -19,7 +19,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.NexusStreamResponse;
@@ -28,7 +27,6 @@ import org.sonatype.nexus.rest.global.GlobalConfigurationPlexusResource;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
@@ -92,8 +90,7 @@ public class ConfigurationPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(pathParams = {@PathParam("configKey")}, output = String.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public InputStreamRepresentation get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     String key = request.getAttributes().get(GlobalConfigurationPlexusResource.CONFIG_NAME_KEY).toString();

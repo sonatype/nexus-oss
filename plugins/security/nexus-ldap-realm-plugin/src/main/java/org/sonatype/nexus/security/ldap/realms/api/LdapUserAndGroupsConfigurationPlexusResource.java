@@ -29,7 +29,6 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.ldap.realms.persist.InvalidConfigurationException;
 import org.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -71,8 +70,7 @@ public class LdapUserAndGroupsConfigurationPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = LdapUserAndGroupConfigurationResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public LdapUserAndGroupConfigurationResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     // this could be null, if so do we want to return defaults? I would guess no...
@@ -92,9 +90,7 @@ public class LdapUserAndGroupsConfigurationPlexusResource
    */
   @Override
   @PUT
-  @ResourceMethodSignature(input = LdapUserAndGroupConfigurationResponse.class,
-      output = LdapUserAndGroupConfigurationResponse.class)
-  public Object put(Context context, Request request, Response response, Object payload)
+  public LdapUserAndGroupConfigurationResponse put(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     LdapUserAndGroupConfigurationResponse confResponse = (LdapUserAndGroupConfigurationResponse) payload;

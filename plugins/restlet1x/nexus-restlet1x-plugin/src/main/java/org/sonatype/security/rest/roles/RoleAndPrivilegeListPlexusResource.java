@@ -34,12 +34,10 @@ import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.RoleAndPrivilegeListFilterResourceRequest;
 import org.sonatype.security.rest.model.RoleAndPrivilegeListResource;
 import org.sonatype.security.rest.model.RoleAndPrivilegeListResourceResponse;
-import org.sonatype.security.rest.model.RoleListResourceResponse;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
@@ -91,9 +89,7 @@ public class RoleAndPrivilegeListPlexusResource
 
   @POST
   @Override
-  @ResourceMethodSignature(input = RoleAndPrivilegeListFilterResourceRequest.class,
-      output = RoleListResourceResponse.class)
-  public Object post(Context context, Request request, Response response, Object payload)
+  public RoleAndPrivilegeListResourceResponse post(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     RoleAndPrivilegeListResourceResponse result = new RoleAndPrivilegeListResourceResponse();

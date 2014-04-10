@@ -32,7 +32,6 @@ import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -80,8 +79,7 @@ public class RepositoryGroupListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = RepositoryGroupListResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public RepositoryGroupListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     RepositoryGroupListResourceResponse result = new RepositoryGroupListResourceResponse();
@@ -131,9 +129,7 @@ public class RepositoryGroupListPlexusResource
    */
   @Override
   @POST
-  @ResourceMethodSignature(input = RepositoryGroupResourceResponse.class,
-      output = RepositoryGroupResourceResponse.class)
-  public Object post(Context context, Request request, Response response, Object payload)
+  public RepositoryGroupResourceResponse post(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     RepositoryGroupResourceResponse groupRequest = (RepositoryGroupResourceResponse) payload;
