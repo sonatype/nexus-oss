@@ -70,6 +70,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     }
   },
   features: {
+    mode: 'admin',
     path: '/Repository/Repositories',
     view: { xtype: 'nx-coreui-repository-feature' },
     visible: function () {

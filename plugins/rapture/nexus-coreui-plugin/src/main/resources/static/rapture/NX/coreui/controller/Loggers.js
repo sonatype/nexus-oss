@@ -50,6 +50,7 @@ Ext.define('NX.coreui.controller.Loggers', {
     });
 
     me.getApplication().getFeaturesController().registerFeature({
+      mode: 'admin',
       path: '/Support/Logging',
       description: 'Allows changing logging configuration',
       view: { xtype: 'nx-coreui-logger-list' },

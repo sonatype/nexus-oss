@@ -58,6 +58,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     }
   },
   features: {
+    mode: 'admin',
     path: '/System/Capabilities',
     view: { xtype: 'nx-coreui-capability-feature' },
     visible: function () {

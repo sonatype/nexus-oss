@@ -44,15 +44,14 @@ Ext.define('NX.coreui.controller.SysInfo', {
       }
     });
 
-    me.getApplication().getFeaturesController().registerFeature([
-      {
-        path: '/Support/System Information',
-        view: { xtype: 'nx-coreui-support-sysinfo' },
-        visible: function () {
-          return NX.Permissions.check('nexus:atlas', 'read');
-        }
+    me.getApplication().getFeaturesController().registerFeature({
+      mode: 'admin',
+      path: '/Support/System Information',
+      view: { xtype: 'nx-coreui-support-sysinfo' },
+      visible: function () {
+        return NX.Permissions.check('nexus:atlas', 'read');
       }
-    ]);
+    });
 
     me.listen({
       controller: {

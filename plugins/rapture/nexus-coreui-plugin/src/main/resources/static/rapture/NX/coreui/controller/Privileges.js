@@ -62,6 +62,7 @@ Ext.define('NX.coreui.controller.Privileges', {
     }
   },
   features: {
+    mode: 'admin',
     path: '/Security/Privileges',
     view: { xtype: 'nx-coreui-privilege-feature' },
     visible: function () {

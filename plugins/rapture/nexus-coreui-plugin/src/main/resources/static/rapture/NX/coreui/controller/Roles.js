@@ -69,6 +69,7 @@ Ext.define('NX.coreui.controller.Roles', {
     }
   },
   features: {
+    mode: 'admin',
     path: '/Security/Roles',
     view: { xtype: 'nx-coreui-role-feature' },
     visible: function () {

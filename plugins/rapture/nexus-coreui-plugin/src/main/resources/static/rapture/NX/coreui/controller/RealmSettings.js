@@ -49,16 +49,14 @@ Ext.define('NX.coreui.controller.RealmSettings', {
       }
     });
 
-    me.getApplication().getFeaturesController().registerFeature(
-      {
-        mode: 'admin',
-        path: '/Security/Realms',
-        view: { xtype: 'nx-coreui-security-realm-settings' },
-        visible: function () {
-          return NX.Permissions.check('nexus:settings', 'read');
-        }
+    me.getApplication().getFeaturesController().registerFeature({
+      mode: 'admin',
+      path: '/Security/Realms',
+      view: { xtype: 'nx-coreui-security-realm-settings' },
+      visible: function () {
+        return NX.Permissions.check('nexus:settings', 'read');
       }
-    );
+    });
 
     me.listen({
       controller: {

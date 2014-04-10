@@ -47,16 +47,15 @@ Ext.define('NX.coreui.controller.SupportZip', {
       }
     });
 
-    me.getApplication().getFeaturesController().registerFeature([
-      {
-        path: '/Support/Support ZIP',
-        view: { xtype: 'nx-coreui-support-supportzip' },
-        description: 'Creates a ZIP file containing useful support information about your server',
-        visible: function () {
-          return NX.Permissions.check('nexus:atlas', 'create');
-        }
+    me.getApplication().getFeaturesController().registerFeature({
+      mode: 'admin',
+      path: '/Support/Support ZIP',
+      view: { xtype: 'nx-coreui-support-supportzip' },
+      description: 'Creates a ZIP file containing useful support information about your server',
+      visible: function () {
+        return NX.Permissions.check('nexus:atlas', 'create');
       }
-    ]);
+    });
 
     me.listen({
       component: {

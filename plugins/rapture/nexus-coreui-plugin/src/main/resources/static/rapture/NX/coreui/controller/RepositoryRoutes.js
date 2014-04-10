@@ -57,6 +57,7 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
     }
   },
   features: {
+    mode: 'admin',
     path: '/Repository/Routing',
     view: { xtype: 'nx-coreui-repositoryroute-feature' },
     visible: function () {

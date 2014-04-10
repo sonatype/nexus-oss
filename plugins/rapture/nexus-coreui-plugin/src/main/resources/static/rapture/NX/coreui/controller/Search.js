@@ -80,8 +80,8 @@ Ext.define('NX.coreui.controller.Search', {
 
     me.getSearchFilterStore().each(function (model) {
       me.getApplication().getFeaturesController().registerFeature({
-        path: '/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
         mode: 'search',
+        path: '/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
         view: { xtype: 'nx-searchfeature', searchFilter: model },
         iconConfig: {
           name: model.get('iconName') ? model.get('iconName') : 'feature-search'

@@ -61,6 +61,7 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
     }
   },
   features: {
+    mode: 'admin',
     path: '/Repository/Targets',
     view: { xtype: 'nx-coreui-repositorytarget-feature' },
     visible: function () {

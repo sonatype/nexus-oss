@@ -49,6 +49,7 @@ Ext.define('NX.coreui.controller.Tasks', {
     }
   },
   features: {
+    mode: 'admin',
     path: '/System/Tasks',
     view: { xtype: 'nx-coreui-task-feature' },
     visible: function () {
