@@ -28,17 +28,14 @@ Ext.define('NX.coreui.controller.HttpSettings', {
   init: function () {
     var me = this;
 
-    me.getApplication().getIconController().addIcons({
-      'feature-system-http': {
-        file: 'transmit.png',
-        variants: ['x16', 'x32']
-      }
-    });
-
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/System/HTTP',
       view: { xtype: 'nx-coreui-system-http-settings' },
+      iconConfig: {
+        file: 'transmit.png',
+        variants: ['x16', 'x32']
+      },
       visible: function () {
         return NX.Permissions.check('nexus:settings', 'read');
       }

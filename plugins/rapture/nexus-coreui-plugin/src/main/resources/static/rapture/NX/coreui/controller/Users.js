@@ -56,10 +56,6 @@ Ext.define('NX.coreui.controller.Users', {
     }
   ],
   icons: {
-    'feature-security-users': {
-      file: 'group.png',
-      variants: ['x16', 'x32']
-    },
     'feature-account': {
       file: 'user.png',
       variants: ['x16', 'x32']
@@ -82,6 +78,10 @@ Ext.define('NX.coreui.controller.Users', {
       mode: 'admin',
       path: '/Security/Users',
       view: { xtype: 'nx-coreui-user-feature' },
+      iconConfig: {
+        file: 'group.png',
+        variants: ['x16', 'x32']
+      },
       visible: function () {
         return NX.Permissions.check('security:users', 'read');
       },

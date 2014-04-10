@@ -37,17 +37,14 @@ Ext.define('NX.coreui.controller.SysInfo', {
   init: function () {
     var me = this;
 
-    me.getApplication().getIconController().addIcons({
-      'feature-support-systeminformation': {
-        file: 'globe_place.png',
-        variants: ['x16', 'x32']
-      }
-    });
-
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/System Information',
       view: { xtype: 'nx-coreui-support-sysinfo' },
+      iconConfig: {
+        file: 'globe_place.png',
+        variants: ['x16', 'x32']
+      },
       visible: function () {
         return NX.Permissions.check('nexus:atlas', 'read');
       }

@@ -51,10 +51,6 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
     }
   ],
   icons: {
-    'feature-repository-targets': {
-      file: 'target.png',
-      variants: ['x16', 'x32']
-    },
     'target-default': {
       file: 'target.png',
       variants: ['x16', 'x32']
@@ -64,6 +60,10 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
     mode: 'admin',
     path: '/Repository/Targets',
     view: { xtype: 'nx-coreui-repositorytarget-feature' },
+    iconConfig: {
+      file: 'target.png',
+      variants: ['x16', 'x32']
+    },
     visible: function () {
       return NX.Permissions.check('nexus:targets', 'read');
     }

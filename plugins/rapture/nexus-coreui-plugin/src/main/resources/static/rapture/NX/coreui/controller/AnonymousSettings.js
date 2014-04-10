@@ -28,17 +28,14 @@ Ext.define('NX.coreui.controller.AnonymousSettings', {
   init: function () {
     var me = this;
 
-    me.getApplication().getIconController().addIcons({
-      'feature-security-anonymous': {
-        file: 'user_silhouette.png',
-        variants: ['x16', 'x32']
-      }
-    });
-
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Security/Anonymous',
       view: { xtype: 'nx-coreui-security-anonymous-settings' },
+      iconConfig: {
+        file: 'user_silhouette.png',
+        variants: ['x16', 'x32']
+      },
       visible: function () {
         return NX.Permissions.check('nexus:settings', 'read');
       }

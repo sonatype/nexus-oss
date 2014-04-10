@@ -39,10 +39,6 @@ Ext.define('NX.coreui.controller.Tasks', {
     }
   ],
   icons: {
-    'feature-system-tasks': {
-      file: 'time.png',
-      variants: ['x16', 'x32']
-    },
     'task-default': {
       file: 'time.png',
       variants: ['x16', 'x32']
@@ -52,6 +48,10 @@ Ext.define('NX.coreui.controller.Tasks', {
     mode: 'admin',
     path: '/System/Tasks',
     view: { xtype: 'nx-coreui-task-feature' },
+    iconConfig: {
+      file: 'time.png',
+      variants: ['x16', 'x32']
+    },
     visible: function () {
       return NX.Permissions.check('nexus:tasks', 'read');
     }

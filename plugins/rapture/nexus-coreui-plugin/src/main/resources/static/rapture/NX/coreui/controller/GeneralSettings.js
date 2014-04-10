@@ -28,23 +28,18 @@ Ext.define('NX.coreui.controller.GeneralSettings', {
   init: function () {
     var me = this;
 
-    me.getApplication().getIconController().addIcons({
-      'feature-system-general': {
+    me.getApplication().getFeaturesController().registerFeature({
+      mode: 'admin',
+      path: '/System/General',
+      view: { xtype: 'nx-coreui-system-general-settings' },
+      iconConfig: {
         file: 'wrench.png',
         variants: ['x16', 'x32']
+      },
+      visible: function () {
+        return NX.Permissions.check('nexus:settings', 'read');
       }
     });
-
-    me.getApplication().getFeaturesController().registerFeature([
-      {
-        mode: 'admin',
-        path: '/System/General',
-        view: { xtype: 'nx-coreui-system-general-settings' },
-        visible: function () {
-          return NX.Permissions.check('nexus:settings', 'read');
-        }
-      }
-    ]);
 
     me.listen({
       component: {

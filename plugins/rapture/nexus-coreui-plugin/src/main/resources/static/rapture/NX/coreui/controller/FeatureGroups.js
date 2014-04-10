@@ -24,48 +24,45 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
   init: function () {
     var me = this;
 
-    me.getApplication().getIconController().addIcons({
-      'feature-repository': {
-        file: 'database.png',
-        variants: ['x16', 'x32']
-      },
-      'feature-security': {
-        file: 'security.png',
-        variants: ['x16', 'x32']
-      },
-      'feature-support': {
-        file: 'support.png',
-        variants: ['x16', 'x32']
-      },
-      'feature-system': {
-        file: 'cog.png',
-        variants: ['x16', 'x32']
-      }
-    });
-
     me.getApplication().getFeaturesController().registerFeature([
       {
         mode: 'admin',
         path: '/Repository',
         group: true,
-        weight: 50
+        weight: 50,
+        iconConfig: {
+          file: 'database.png',
+          variants: ['x16', 'x32']
+        }
       },
       {
         mode: 'admin',
         path: '/Security',
         group: true,
-        weight: 90
+        weight: 90,
+        iconConfig: {
+          file: 'security.png',
+          variants: ['x16', 'x32']
+        }
       },
       {
         mode: 'admin',
         path: '/Support',
-        group: true
+        group: true,
+        iconConfig: {
+          file: 'support.png',
+          variants: ['x16', 'x32']
+        }
       },
       {
         mode: 'admin',
         path: '/System',
         group: true,
-        weight: 1000
+        weight: 1000,
+        iconConfig: {
+          file: 'cog.png',
+          variants: ['x16', 'x32']
+        }
       }
     ]);
   }

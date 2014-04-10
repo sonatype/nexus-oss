@@ -39,10 +39,6 @@ Ext.define('NX.coreui.controller.Loggers', {
     var me = this;
 
     me.getApplication().getIconController().addIcons({
-      'feature-support-logging': {
-        file: 'book.png',
-        variants: ['x16', 'x32']
-      },
       'logger-default': {
         file: 'book.png',
         variants: ['x16', 'x32']
@@ -54,6 +50,10 @@ Ext.define('NX.coreui.controller.Loggers', {
       path: '/Support/Logging',
       description: 'Allows changing logging configuration',
       view: { xtype: 'nx-coreui-logger-list' },
+      iconConfig: {
+        file: 'book.png',
+        variants: ['x16', 'x32']
+      },
       visible: function () {
         return NX.Permissions.check('nexus:logconfig', 'read');
       }

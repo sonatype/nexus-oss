@@ -42,17 +42,14 @@ Ext.define('NX.coreui.controller.RealmSettings', {
   init: function () {
     var me = this;
 
-    me.getApplication().getIconController().addIcons({
-      'feature-security-realms': {
-        file: 'shield.png',
-        variants: ['x16', 'x32']
-      }
-    });
-
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Security/Realms',
       view: { xtype: 'nx-coreui-security-realm-settings' },
+      iconConfig: {
+        file: 'shield.png',
+        variants: ['x16', 'x32']
+      },
       visible: function () {
         return NX.Permissions.check('nexus:settings', 'read');
       }

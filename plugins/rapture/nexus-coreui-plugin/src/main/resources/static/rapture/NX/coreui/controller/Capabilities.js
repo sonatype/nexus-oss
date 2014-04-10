@@ -48,10 +48,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
     { ref: 'about', selector: 'nx-coreui-capability-about' }
   ],
   icons: {
-    'feature-system-capabilities': {
-      file: 'brick.png',
-      variants: ['x16', 'x32']
-    },
     'capability-default': {
       file: 'brick.png',
       variants: ['x16', 'x32']
@@ -61,6 +57,10 @@ Ext.define('NX.coreui.controller.Capabilities', {
     mode: 'admin',
     path: '/System/Capabilities',
     view: { xtype: 'nx-coreui-capability-feature' },
+    iconConfig: {
+      file: 'brick.png',
+      variants: ['x16', 'x32']
+    },
     visible: function () {
       return NX.Permissions.check('nexus:capabilities', 'read');
     }

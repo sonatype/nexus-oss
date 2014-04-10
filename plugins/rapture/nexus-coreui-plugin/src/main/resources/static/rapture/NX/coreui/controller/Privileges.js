@@ -40,10 +40,6 @@ Ext.define('NX.coreui.controller.Privileges', {
     }
   ],
   icons: {
-    'feature-security-privileges': {
-      file: 'medal_gold_1.png',
-      variants: ['x16', 'x32']
-    },
     'privilege-default': {
       file: 'medal_gold_1.png',
       variants: ['x16', 'x32']
@@ -65,6 +61,10 @@ Ext.define('NX.coreui.controller.Privileges', {
     mode: 'admin',
     path: '/Security/Privileges',
     view: { xtype: 'nx-coreui-privilege-feature' },
+    iconConfig: {
+      file: 'medal_gold_1.png',
+      variants: ['x16', 'x32']
+    },
     visible: function () {
       return NX.Permissions.check('security:privileges', 'read');
     },

@@ -33,10 +33,6 @@ Ext.define('NX.coreui.controller.SupportZip', {
     var me = this;
 
     me.getApplication().getIconController().addIcons({
-      'feature-support-supportzip': {
-        file: 'file_extension_zip.png',
-        variants: ['x16', 'x32']
-      },
       'supportzip-zip': {
         file: 'file_extension_zip.png',
         variants: ['x16', 'x32']
@@ -52,6 +48,10 @@ Ext.define('NX.coreui.controller.SupportZip', {
       path: '/Support/Support ZIP',
       view: { xtype: 'nx-coreui-support-supportzip' },
       description: 'Creates a ZIP file containing useful support information about your server',
+      iconConfig: {
+        file: 'file_extension_zip.png',
+        variants: ['x16', 'x32']
+      },
       visible: function () {
         return NX.Permissions.check('nexus:atlas', 'create');
       }

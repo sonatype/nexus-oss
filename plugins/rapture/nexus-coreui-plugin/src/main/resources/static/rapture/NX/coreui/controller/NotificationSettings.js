@@ -40,10 +40,6 @@ Ext.define('NX.coreui.controller.NotificationSettings', {
     var me = this;
 
     me.getApplication().getIconController().addIcons({
-      'feature-system-notifications': {
-        file: 'emails.png',
-        variants: ['x16', 'x32']
-      },
       'verifysmtpconnection': {
         file: 'emails.png',
         variants: ['x16', 'x32']
@@ -54,6 +50,10 @@ Ext.define('NX.coreui.controller.NotificationSettings', {
       mode: 'admin',
       path: '/System/Notifications',
       view: { xtype: 'nx-coreui-system-notification-settings' },
+      iconConfig: {
+        file: 'emails.png',
+        variants: ['x16', 'x32']
+      },
       visible: function () {
         return NX.Permissions.check('nexus:settings', 'read');
       }

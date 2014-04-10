@@ -47,10 +47,6 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
     }
   ],
   icons: {
-    'feature-repository-routing': {
-      file: 'arrow_branch.png',
-      variants: ['x16', 'x32']
-    },
     'repositoryroute-default': {
       file: 'arrow_branch.png',
       variants: ['x16', 'x32']
@@ -60,6 +56,10 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
     mode: 'admin',
     path: '/Repository/Routing',
     view: { xtype: 'nx-coreui-repositoryroute-feature' },
+    iconConfig: {
+      file: 'arrow_branch.png',
+      variants: ['x16', 'x32']
+    },
     visible: function () {
       return NX.Permissions.check('nexus:routes', 'read');
     }

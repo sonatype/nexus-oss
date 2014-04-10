@@ -62,7 +62,7 @@ Ext.define('NX.coreui.controller.Search', {
     var me = this;
 
     me.getApplication().getIconController().addIcons({
-      'feature-search': {
+      'search-default': {
         file: 'magnifier.png',
         variants: ['x16', 'x32']
       }
@@ -72,9 +72,7 @@ Ext.define('NX.coreui.controller.Search', {
       path: '/Saved',
       mode: 'search',
       group: true,
-      iconConfig: {
-        name: 'feature-search'
-      },
+      iconName: 'search-default',
       weight: 500
     });
 
@@ -83,9 +81,7 @@ Ext.define('NX.coreui.controller.Search', {
         mode: 'search',
         path: '/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
         view: { xtype: 'nx-searchfeature', searchFilter: model },
-        iconConfig: {
-          name: model.get('iconName') ? model.get('iconName') : 'feature-search'
-        },
+        iconName: model.get('iconName') ? model.get('iconName') : 'search-default',
         description: model.get('description'),
         authenticationRequired: false
       });

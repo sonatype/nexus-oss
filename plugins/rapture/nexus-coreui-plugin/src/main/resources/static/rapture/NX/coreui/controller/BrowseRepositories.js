@@ -43,6 +43,10 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       iconName: 'feature-repository',
       weight: 10,
       authenticationRequired: false,
+      iconConfig: {
+        file: 'database.png',
+        variants: ['x16', 'x32']
+      },
       visible: function () {
         return NX.Permissions.check('nexus:repositories', 'read');
       }

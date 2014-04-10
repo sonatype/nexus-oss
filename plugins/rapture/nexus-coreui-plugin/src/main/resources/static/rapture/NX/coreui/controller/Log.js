@@ -35,18 +35,15 @@ Ext.define('NX.coreui.controller.Log', {
   init: function () {
     var me = this;
 
-    me.getApplication().getIconController().addIcons({
-      'feature-support-logging-logviewer': {
-        file: 'book.png',
-        variants: ['x16', 'x32']
-      }
-    });
-
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Logging/Log Viewer',
       description: 'View current log',
       view: { xtype: 'nx-coreui-log-viewer' },
+      iconConfig: {
+        file: 'book.png',
+        variants: ['x16', 'x32']
+      },
       visible: function () {
         return NX.Permissions.check('nexus:logs', 'read');
       }
