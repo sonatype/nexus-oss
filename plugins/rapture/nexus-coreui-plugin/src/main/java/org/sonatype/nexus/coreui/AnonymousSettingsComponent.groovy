@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
@@ -25,6 +26,8 @@ import org.sonatype.security.SecuritySystem
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
 
 /**
  * Anonymous Security Settings {@link DirectComponent}.
@@ -33,8 +36,8 @@ import javax.inject.Singleton
  */
 @Named
 @Singleton
-@DirectAction(action = 'coreui_SecurityAnonymous')
-class SecurityAnonymousComponent
+@DirectAction(action = 'coreui_AnonymousSettings')
+class AnonymousSettingsComponent
 extends DirectComponentSupport
 {
 
@@ -44,11 +47,15 @@ extends DirectComponentSupport
   @Inject
   SecuritySystem securitySystem
 
+  /**
+   * Retrieves anonymous security settings.
+   * @return anonymous security settings
+   */
   @DirectMethod
   @RequiresPermissions('nexus:settings:read')
-  SecurityAnonymousXO read() {
+  AnonymousSettingsXO read() {
     boolean customUser = nexusConfiguration.anonymousUsername != 'anonymous'
-    return new SecurityAnonymousXO(
+    return new AnonymousSettingsXO(
         enabled: nexusConfiguration.anonymousAccessEnabled,
         useCustomUser: customUser,
         username: customUser ? nexusConfiguration.anonymousUsername : null,
@@ -56,10 +63,14 @@ extends DirectComponentSupport
     )
   }
 
+  /**
+   * Updates anonymous security settings.
+   * @return updated anonymous security settings
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:settings:update')
-  SecurityAnonymousXO update(final SecurityAnonymousXO anonymousXO) {
+  AnonymousSettingsXO update(final @NotNull(message = '[anonymousXO] may not be null') @Valid AnonymousSettingsXO anonymousXO) {
     def username, password
     if (anonymousXO.enabled) {
       if (anonymousXO.useCustomUser) {

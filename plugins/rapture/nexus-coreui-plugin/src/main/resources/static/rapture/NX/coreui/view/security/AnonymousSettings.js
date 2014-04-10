@@ -15,9 +15,9 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.security.Anonymous', {
+Ext.define('NX.coreui.view.security.AnonymousSettings', {
   extend: 'NX.view.SettingsPanel',
-  alias: 'widget.nx-coreui-security-anonymous',
+  alias: 'widget.nx-coreui-security-anonymous-settings',
 
   initComponent: function () {
     var me = this;
@@ -27,8 +27,8 @@ Ext.define('NX.coreui.view.security.Anonymous', {
         xtype: 'nx-settingsform',
         settingsFormSuccessMessage: 'Anonymous security settings $action',
         api: {
-          load: 'NX.direct.coreui_SecurityAnonymous.read',
-          submit: 'NX.direct.coreui_SecurityAnonymous.update'
+          load: 'NX.direct.coreui_AnonymousSettings.read',
+          submit: 'NX.direct.coreui_AnonymousSettings.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
         editableMarker: 'You do not have permission to configure anonymous user',

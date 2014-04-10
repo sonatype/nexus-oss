@@ -22,6 +22,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
   ],
 
   controllers: [
+    'NX.coreui.controller.AnonymousSettings',
     { id: 'NX.coreui.controller.Capabilities',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-capabilities-plugin');

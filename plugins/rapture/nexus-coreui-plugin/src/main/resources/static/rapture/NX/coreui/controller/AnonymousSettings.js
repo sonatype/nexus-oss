@@ -10,21 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.coreui
-
-import groovy.transform.ToString
-import org.sonatype.nexus.extdirect.model.Password
-
 /**
- * Anonymous Security Settings exchange object.
+ * Anonymous Security Settings controller.
  *
  * @since 3.0
  */
-@ToString(includePackage = false, includeNames = true)
-class SecurityAnonymousXO
-{
-  Boolean enabled
-  Boolean useCustomUser
-  String username
-  Password password
-}
+Ext.define('NX.coreui.controller.AnonymousSettings', {
+  extend: 'Ext.app.Controller',
+
+  views: [
+    'security.AnonymousSettings',
+  ],
+
+  /**
+   * @override
+   */
+  init: function () {
+    var me = this;
+
+    me.getApplication().getIconController().addIcons({
+      'feature-security-anonymous': {
+        file: 'user_silhouette.png',
+        variants: ['x16', 'x32']
+      }
+    });
+
+    me.getApplication().getFeaturesController().registerFeature({
+      mode: 'admin',
+      path: '/Security/Anonymous',
+      view: { xtype: 'nx-coreui-security-anonymous-settings' },
+      visible: function () {
+        return NX.Permissions.check('nexus:settings', 'read');
+      }
+    });
+  }
+
+});
