@@ -10,15 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.bval.guice.Validate
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
-import org.sonatype.configuration.validation.InvalidConfigurationException
-import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings
 import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings
 import org.sonatype.nexus.configuration.application.NexusConfiguration
@@ -30,6 +30,8 @@ import org.sonatype.nexus.proxy.repository.*
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
 
 /**
  * HTTP System Settings {@link DirectComponent}.
@@ -38,10 +40,11 @@ import javax.inject.Singleton
  */
 @Named
 @Singleton
-@DirectAction(action = 'coreui_SystemHttp')
-class SystemHttpComponent
+@DirectAction(action = 'coreui_HttpSettings')
+class HttpSettingsComponent
 extends DirectComponentSupport
 {
+
   @Inject
   GlobalRemoteConnectionSettings connectionSettings
 
@@ -51,75 +54,74 @@ extends DirectComponentSupport
   @Inject
   NexusConfiguration nexusConfiguration
 
+  /**
+   * Retrieves HTTP system settings
+   * @return HTTP system settings
+   */
   @DirectMethod
   @RequiresPermissions('nexus:settings:read')
-  SystemHttpXO read() {
-    def xo = new SystemHttpXO(
+  HttpSettingsXO read() {
+    def httpSettingsXO = new HttpSettingsXO(
         userAgentCustomisation: connectionSettings.userAgentCustomizationString,
         urlParameters: connectionSettings.queryString,
-        timeout: connectionSettings.connectionTimeout,
+        timeout: connectionSettings.connectionTimeout == 0 ? 0 : connectionSettings.connectionTimeout / 1000,
         retries: connectionSettings.retrievalRetryCount,
         nonProxyHosts: proxySettings.nonProxyHosts
     )
 
     def (enabled, host, port, username, ntlmHost, ntlmDomain) = fromRemoteHttpProxySettings(proxySettings.httpProxySettings)
-    xo.httpEnabled = enabled
-    xo.httpHost = host
-    xo.httpPort = port
-    xo.httpAuthEnabled = StringUtils.isNotBlank(username as String)
-    xo.httpAuthUsername = username
-    xo.httpAuthPassword = Password.fakePassword()
-    xo.httpAuthNtlmHost = ntlmHost
-    xo.httpAuthNtlmDomain = ntlmDomain
+    httpSettingsXO.httpEnabled = enabled
+    httpSettingsXO.httpHost = host
+    httpSettingsXO.httpPort = port
+    httpSettingsXO.httpAuthEnabled = StringUtils.isNotBlank(username as String)
+    httpSettingsXO.httpAuthUsername = username
+    httpSettingsXO.httpAuthPassword = httpSettingsXO.httpAuthEnabled ? Password.fakePassword() : null
+    httpSettingsXO.httpAuthNtlmHost = ntlmHost
+    httpSettingsXO.httpAuthNtlmDomain = ntlmDomain
 
     (enabled, host, port, username, ntlmHost, ntlmDomain) = fromRemoteHttpProxySettings(proxySettings.httpsProxySettings)
-    xo.httpsEnabled = enabled
-    xo.httpsHost = host
-    xo.httpsPort = port
-    xo.httpsAuthEnabled = StringUtils.isNotBlank(username as String)
-    xo.httpsAuthUsername = username
-    xo.httpAuthPassword = Password.fakePassword()
-    xo.httpsAuthNtlmHost = ntlmHost
-    xo.httpsAuthNtlmDomain = ntlmDomain
+    httpSettingsXO.httpsEnabled = enabled
+    httpSettingsXO.httpsHost = host
+    httpSettingsXO.httpsPort = port
+    httpSettingsXO.httpsAuthEnabled = StringUtils.isNotBlank(username as String)
+    httpSettingsXO.httpsAuthUsername = username
+    httpSettingsXO.httpAuthPassword = httpSettingsXO.httpsAuthEnabled ? Password.fakePassword() : null
+    httpSettingsXO.httpsAuthNtlmHost = ntlmHost
+    httpSettingsXO.httpsAuthNtlmDomain = ntlmDomain
 
-    return xo
+    return httpSettingsXO
   }
 
+  /**
+   * Updates HTTP system settings .
+   * @return updated HTTP system settings
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:settings:update')
-  SystemHttpXO update(final SystemHttpXO xo) {
-    validate(xo)
+  @Validate
+  HttpSettingsXO update(final @NotNull(message = '[httpSettingsXO] may not be null') @Valid HttpSettingsXO httpSettingsXO) {
+    connectionSettings.userAgentCustomizationString = httpSettingsXO.userAgentCustomisation
+    connectionSettings.queryString = httpSettingsXO.urlParameters
+    connectionSettings.connectionTimeout = httpSettingsXO.timeout * 1000
+    connectionSettings.retrievalRetryCount = httpSettingsXO.retries
 
-    connectionSettings.userAgentCustomizationString = xo.userAgentCustomisation
-    connectionSettings.queryString = xo.urlParameters
-    connectionSettings.connectionTimeout = xo.timeout
-    connectionSettings.retrievalRetryCount = xo.retries
-
-    proxySettings.nonProxyHosts = xo.httpEnabled ? xo.nonProxyHosts : null
+    proxySettings.nonProxyHosts = httpSettingsXO.httpEnabled ? httpSettingsXO.nonProxyHosts : null
     proxySettings.httpProxySettings = toRemoteHttpProxySettings(
-        xo.httpEnabled, xo.httpHost, xo.httpPort,
-        xo.httpAuthEnabled,
-        xo.httpAuthUsername, getPassword(xo.httpAuthPassword, proxySettings.httpProxySettings?.proxyAuthentication),
-        xo.httpAuthNtlmHost, xo.httpAuthNtlmDomain
+        httpSettingsXO.httpEnabled, httpSettingsXO.httpHost, httpSettingsXO.httpPort,
+        httpSettingsXO.httpAuthEnabled,
+        httpSettingsXO.httpAuthUsername, getPassword(httpSettingsXO.httpAuthPassword, proxySettings.httpProxySettings?.proxyAuthentication),
+        httpSettingsXO.httpAuthNtlmHost, httpSettingsXO.httpAuthNtlmDomain
     )
     proxySettings.httpsProxySettings = toRemoteHttpProxySettings(
-        xo.httpsEnabled, xo.httpsHost, xo.httpsPort,
-        xo.httpsAuthEnabled,
-        xo.httpsAuthUsername, getPassword(xo.httpsAuthPassword, proxySettings.httpsProxySettings?.proxyAuthentication),
-        xo.httpsAuthNtlmHost, xo.httpsAuthNtlmDomain
+        httpSettingsXO.httpsEnabled, httpSettingsXO.httpsHost, httpSettingsXO.httpsPort,
+        httpSettingsXO.httpsAuthEnabled,
+        httpSettingsXO.httpsAuthUsername, getPassword(httpSettingsXO.httpsAuthPassword, proxySettings.httpsProxySettings?.proxyAuthentication),
+        httpSettingsXO.httpsAuthNtlmHost, httpSettingsXO.httpsAuthNtlmDomain
     )
 
     nexusConfiguration.saveConfiguration()
     return read()
-  }
-
-  def static validate(final SystemHttpXO xo) {
-    def validations = new ValidationResponse()
-    // TODO validate
-    if (!validations.valid) {
-      throw new InvalidConfigurationException(validations)
-    }
   }
 
   private static fromRemoteHttpProxySettings(final RemoteHttpProxySettings settings) {
@@ -157,7 +159,7 @@ extends DirectComponentSupport
     if (enabled) {
       def proxy = new DefaultRemoteHttpProxySettings(
           hostname: hostname,
-          port: port
+          port: port ?: 0
       )
       if (auth) {
         if (StringUtils.isNotBlank(ntlmHost)) {
