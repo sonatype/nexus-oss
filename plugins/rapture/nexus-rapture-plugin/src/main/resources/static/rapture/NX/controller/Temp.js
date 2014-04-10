@@ -50,17 +50,7 @@ Ext.define('NX.controller.Temp', {
         visible: visibleIfLoggedIn
       },
 
-
       // browse mode
-      {
-        mode: 'browse',
-        path: '/Feeds',
-        description: 'System event feeds',
-        iconConfig: {
-          file: 'feed.png',
-          variants: ['x16', 'x32']
-        }
-      },
       {
         mode: 'browse',
         path: '/Components',

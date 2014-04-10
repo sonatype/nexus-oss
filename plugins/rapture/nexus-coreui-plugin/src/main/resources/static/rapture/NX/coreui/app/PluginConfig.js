@@ -35,6 +35,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.ComponentLicense',
     'NX.coreui.controller.ComponentSecurity',
     'NX.coreui.controller.FeatureGroups',
+    'NX.coreui.controller.Feeds',
     'NX.coreui.controller.HttpSettings',
     'NX.coreui.controller.GeneralSettings',
     { id: 'NX.coreui.controller.Log',
