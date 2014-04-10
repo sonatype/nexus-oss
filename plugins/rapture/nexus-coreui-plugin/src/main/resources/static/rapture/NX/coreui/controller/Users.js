@@ -56,10 +56,6 @@ Ext.define('NX.coreui.controller.Users', {
     }
   ],
   icons: {
-    'feature-account': {
-      file: 'user.png',
-      variants: ['x16', 'x32']
-    },
     'user-default': {
       file: 'user.png',
       variants: ['x16', 'x32']
@@ -91,6 +87,10 @@ Ext.define('NX.coreui.controller.Users', {
       mode: 'user',
       path: '/Account',
       view: { xtype: 'nx-coreui-user-account' },
+      iconConfig: {
+        file: 'user.png',
+        variants: ['x16', 'x32']
+      },
       visible: function () {
         return NX.Security.hasUser();
       }

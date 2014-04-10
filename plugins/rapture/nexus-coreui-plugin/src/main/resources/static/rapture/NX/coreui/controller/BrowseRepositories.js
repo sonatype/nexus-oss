@@ -40,7 +40,6 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       path: '/Repository/Standard',
       description: 'Browse standard repositories',
       view: { xtype: 'nx-coreui-repository-browse-feature' },
-      iconName: 'feature-repository',
       weight: 10,
       authenticationRequired: false,
       iconConfig: {
