@@ -310,14 +310,16 @@ public class ContentServlet
       if (logger.isDebugEnabled()) {
         logger.warn("{} {}", exception.toString(), requestDetails(request), exception);
       }
-      else {
+      else if (logger.isWarnEnabled()) {
         logger.warn("{} {}", Throwables2.explain(exception), requestDetails(request));
       }
       throw (IOException) exception;
     }
     else {
       responseCode = SC_INTERNAL_SERVER_ERROR;
-      logger.warn("{} {}", exception.getMessage(), requestDetails(request), exception);
+      if (logger.isWarnEnabled()) {
+        logger.warn("{} {}", exception.getMessage(), requestDetails(request), exception);
+      }
     }
 
     throw new ErrorStatusException(responseCode, null, exception.getMessage());
