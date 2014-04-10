@@ -53,6 +53,7 @@ Ext.define('NX.app.Application', {
     'NX.ext.form.field.Url',
     'NX.ext.form.field.ValueSet',
     'NX.ext.form.field.Timestamp',
+    'NX.ext.grid.column.Link',
     'NX.ext.grid.column.Timestamp',
     'NX.Conditions'
   ],
