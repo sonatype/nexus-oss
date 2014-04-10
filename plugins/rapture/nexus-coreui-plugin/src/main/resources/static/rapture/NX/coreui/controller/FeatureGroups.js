@@ -11,11 +11,11 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * System settings related controller.
+ * Registers all feature groups for coreui.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.controller.System', {
+Ext.define('NX.coreui.controller.FeatureGroups', {
   extend: 'Ext.app.Controller',
 
   /**
@@ -24,15 +24,47 @@ Ext.define('NX.coreui.controller.System', {
   init: function () {
     var me = this;
 
+    me.getApplication().getIconController().addIcons({
+      'feature-repository': {
+        file: 'database.png',
+        variants: ['x16', 'x32']
+      },
+      'feature-security': {
+        file: 'security.png',
+        variants: ['x16', 'x32']
+      },
+      'feature-support': {
+        file: 'support.png',
+        variants: ['x16', 'x32']
+      },
+      'feature-system': {
+        file: 'cog.png',
+        variants: ['x16', 'x32']
+      }
+    });
+
     me.getApplication().getFeaturesController().registerFeature([
+      {
+        mode: 'admin',
+        path: '/Repository',
+        group: true,
+        weight: 50
+      },
+      {
+        mode: 'admin',
+        path: '/Security',
+        group: true,
+        weight: 90
+      },
+      {
+        mode: 'admin',
+        path: '/Support',
+        group: true
+      },
       {
         mode: 'admin',
         path: '/System',
         group: true,
-        iconConfig: {
-          file: 'cog.png',
-          variants: ['x16', 'x32']
-        },
         weight: 1000
       }
     ]);

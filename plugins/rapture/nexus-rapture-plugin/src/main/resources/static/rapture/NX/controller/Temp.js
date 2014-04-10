@@ -37,20 +37,12 @@ Ext.define('NX.controller.Temp', {
       },
 
       // staging
-      'feature-staging': {
-        file: 'database_green.png',
-        variants: ['x16', 'x32']
-      },
       'feature-staging-repositories': {
         file: 'database_green.png',
         variants: ['x16', 'x32']
       },
 
       // repository
-      'feature-repository': {
-        file: 'database.png',
-        variants: ['x16', 'x32']
-      },
       'feature-repository-repositories': {
         file: 'database.png',
         variants: ['x16', 'x32']
@@ -71,16 +63,6 @@ Ext.define('NX.controller.Temp', {
       },
       'feature-system-smartproxy': {
         file: 'servers_network.png',
-        variants: ['x16', 'x32']
-      },
-
-      // support
-      'feature-support': {
-        file: 'support.png',
-        variants: ['x16', 'x32']
-      },
-      'feature-support-overview': {
-        file: 'information.png',
         variants: ['x16', 'x32']
       },
 
@@ -118,16 +100,6 @@ Ext.define('NX.controller.Temp', {
 
     me.getApplication().getFeaturesController().registerFeature([
       {
-        path: '/Repository',
-        group: true,
-        weight: 50
-      },
-      {
-        path: '/Staging',
-        group: true,
-        weight: 60
-      },
-      {
         path: '/Staging/Repositories',
         visible: visibleIfLoggedIn
       },
@@ -140,10 +112,7 @@ Ext.define('NX.controller.Temp', {
         path: '/System/Smart Proxy',
         visible: visibleIfLoggedIn
       },
-      {
-        path: '/Support',
-        group: true
-      },
+
 
       // browse mode
       {
