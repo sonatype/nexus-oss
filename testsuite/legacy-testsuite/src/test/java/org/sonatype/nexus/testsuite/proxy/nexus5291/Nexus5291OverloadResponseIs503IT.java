@@ -10,17 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.proxy.nexus5291;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers;
+import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.sisu.goodies.common.Time;
+import org.sonatype.tests.http.server.api.ServerProvider;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.Status;
@@ -36,8 +37,6 @@ import static org.sonatype.nexus.integrationtests.RequestFacade.doGet;
 public class Nexus5291OverloadResponseIs503IT
     extends AbstractNexusProxyIntegrationTest
 {
-  protected Server server;
-
   @BeforeClass
   public static void setHc4Parameters() {
     System.setProperty("nexus.apacheHttpClient4x.connectionPoolMaxSize", "1");
@@ -52,22 +51,11 @@ public class Nexus5291OverloadResponseIs503IT
     System.clearProperty("nexus.apacheHttpClient4x.connectionPoolTimeout");
   }
 
-  @Before
   @Override
-  public void startProxy()
-      throws Exception
-  {
-    server = Server.withPort(proxyPort).serve("/").withBehaviours(Behaviours.pause(Time.days(1))).start();
-  }
-
-  @After
-  @Override
-  public void stopProxy()
-      throws Exception
-  {
-    if (server != null) {
-      server.stop();
-    }
+  public ServerProvider buildServerProvider() {
+    return Server.withPort(TestProperties.getInteger("proxy-repo-port"))
+        .serve("/*").withBehaviours(Behaviours.pause(Time.days(1)))
+        .getServerProvider();
   }
 
   @Test

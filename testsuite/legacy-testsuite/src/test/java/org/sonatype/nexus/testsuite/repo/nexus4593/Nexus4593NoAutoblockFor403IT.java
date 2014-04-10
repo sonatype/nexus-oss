@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.repo.nexus4593;
 
 import java.io.IOException;
@@ -27,8 +28,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import static org.sonatype.tests.http.server.fluent.Behaviours.content;
 import static org.sonatype.tests.http.server.fluent.Behaviours.error;
 import static org.sonatype.tests.http.server.fluent.Behaviours.get;
@@ -68,12 +69,12 @@ public class Nexus4593NoAutoblockFor403IT
   public void testNoAutoblockOn403()
       throws Exception
   {
-    stopProxy();
+    serverResource.getServerProvider().stop();
 
-    server = Server.withPort(proxyPort).start();
-
-    server.serve("/").withBehaviours(content("ok"));
-    server.serve("/remote/release-proxy-repo-1/nexus4593/*").withBehaviours(get(getTestFile("/")));
+    server = Server.withPort(proxyPort)
+        .serve("/").withBehaviours(content("ok"))
+        .serve("/remote/release-proxy-repo-1/nexus4593/*").withBehaviours(get(getTestFile("/")))
+        .start();
 
     downloadArtifact(GavUtil.newGav("nexus4593", "artifact", "1.0.0"), "target");
 
@@ -144,7 +145,7 @@ public class Nexus4593NoAutoblockFor403IT
       throws Exception
   {
     stopServer();
-    proxyServer.stop();
+    serverResource.getServerProvider().stop();
 
     server = Server.withPort(proxyPort).serve("/*").withBehaviours(error(code)).start();
   }

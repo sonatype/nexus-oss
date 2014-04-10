@@ -10,11 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.p2.nxcm2812;
 
 import java.io.IOException;
 
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,17 +28,12 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
 
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 /**
  * This IT checks that previously retrieved P2 metadata is used from cache, even when the proxied P2 repository is
@@ -86,24 +87,34 @@ public class NXCM2812UseCachedMetadataWhenProxyIsUnavailableIT
   private void replaceProxy()
       throws Exception
   {
-    final Handler handler = proxyServer.getServer().getHandler();
-    proxyServer.stop();
-    proxyServer.getServer().setHandler(new AbstractHandler()
+    serverResource.getServerProvider().stop();
+    serverResource.getServerProvider().addFilter("/*", new Filter()
     {
       @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+      public void init(final FilterConfig filterConfig) throws ServletException {
+        // nop
+      }
+
+      @Override
+      public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
           throws IOException, ServletException
       {
         for (final String path : P2Constants.METADATA_FILE_PATHS) {
+          final String target = ((HttpServletRequest) request).getPathInfo();
           if (target.endsWith(path)) {
-            response.sendError(503);
+            ((HttpServletResponse) response).sendError(503);
             return;
           }
         }
-        handler.handle(target, baseRequest, request, response);
+        chain.doFilter(request, response);
+      }
+
+      @Override
+      public void destroy() {
+        // nop
       }
     });
-    proxyServer.start();
+    serverResource.getServerProvider().start();
   }
 
 }

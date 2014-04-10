@@ -15,21 +15,21 @@ package org.sonatype.nexus.testsuite.p2;
 import java.io.File;
 import java.io.IOException;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.tests.http.runner.junit.ServerResource;
+import org.sonatype.tests.http.server.api.ServerProvider;
+import org.sonatype.tests.http.server.fluent.Server;
 
 import org.apache.commons.io.FileUtils;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Rule;
 
 import static org.sonatype.nexus.test.utils.FileTestingUtils.interpolationDirectoryCopy;
 
 public abstract class AbstractNexusProxyP2IT
     extends AbstractNexusP2IT
 {
-
-  protected ServletServer proxyServer;
+  @Rule
+  public ServerResource serverResource = new ServerResource(buildServerProvider());
 
   protected static final String localStorageDir;
 
@@ -45,27 +45,10 @@ public abstract class AbstractNexusProxyP2IT
     super(testRepositoryId);
   }
 
-  @SuppressWarnings("deprecation")
-  @Before
-  public void startProxy()
-      throws Exception
-  {
-    proxyServer = lookupProxyServer();
-    proxyServer.start();
-  }
-
-  @After
-  public void stopProxy()
-      throws Exception
-  {
-    if (proxyServer != null) {
-      proxyServer.stop();
-      proxyServer = null;
-    }
-  }
-
-  protected ServletServer lookupProxyServer() throws ComponentLookupException {
-    return lookup(ServletServer.class);
+  protected ServerProvider buildServerProvider() {
+    return Server.withPort(TestProperties.getInteger("proxy-repo-port"))
+        .serve("/remote/*").fromDirectory(new File(TestProperties.getString("proxy-repo-target-dir")))
+        .getServerProvider();
   }
 
   protected void replaceInFile(final String filename, final String target, final String replacement)

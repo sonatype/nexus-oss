@@ -14,25 +14,30 @@ package org.sonatype.nexus.testsuite.p2.nxcm0794;
 
 import java.net.URL;
 
-import org.sonatype.jettytestsuite.ProxyServer;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
+import org.sonatype.tests.http.runner.junit.ServerResource;
+import org.sonatype.tests.http.server.api.ServerProvider;
+import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.jetty.impl.MonitorableProxyServlet;
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 public class NXCM0794WebProxiedP2IT
     extends AbstractNexusProxyP2IT
 {
+  public MonitorableProxyServlet monitorableProxyServlet;
+
+  @Rule
+  public ServerResource httpProxy = new ServerResource(buildHttpProxyServerProvider());
 
   private static String baseProxyURL;
-
-  protected ProxyServer webProxyServer;
 
   static {
     baseProxyURL = TestProperties.getString("proxy.repo.base.url");
@@ -42,16 +47,15 @@ public class NXCM0794WebProxiedP2IT
     super("nxcm0794");
   }
 
+  protected ServerProvider buildHttpProxyServerProvider() {
+    this.monitorableProxyServlet = new MonitorableProxyServlet();
+    return Server.withPort(TestProperties.getInteger("webproxy-server-port"))
+        .serve("/*").withServlet(monitorableProxyServlet)
+        .getServerProvider();
+  }
+
   @Before
   public void startWebProxy() throws Exception {
-    try {
-      webProxyServer = lookup(ProxyServer.class);
-      webProxyServer.start();
-    }
-    catch (Exception e) {
-      throw new Exception("Current properties:\n" + TestProperties.getAll(), e);
-    }
-
     // ensuring the proxy is working!!!
     assertThat(
         downloadFile(
@@ -62,16 +66,6 @@ public class NXCM0794WebProxiedP2IT
     );
   }
 
-  @After
-  public void stopWebProxy()
-      throws Exception
-  {
-    if (webProxyServer != null) {
-      webProxyServer.stop();
-      webProxyServer = null;
-    }
-  }
-
   @Test
   public void test()
       throws Exception
@@ -79,12 +73,12 @@ public class NXCM0794WebProxiedP2IT
     installAndVerifyP2Feature();
 
     assertThat(
-        webProxyServer.getAccessedUris(),
+        monitorableProxyServlet.getAccessedUris(),
         hasItem(baseProxyURL + "nxcm0794/features/com.sonatype.nexus.p2.its.feature_1.0.0.jar")
     );
 
     assertThat(
-        webProxyServer.getAccessedUris(),
+        monitorableProxyServlet.getAccessedUris(),
         hasItem(baseProxyURL + "nxcm0794/plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar")
     );
   }
