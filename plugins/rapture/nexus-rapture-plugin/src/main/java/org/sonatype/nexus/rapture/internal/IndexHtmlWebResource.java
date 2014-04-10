@@ -21,10 +21,7 @@ import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 
 /**
- * Provides {@code /rapture.html}.
- *
- * Keeping this page at the same level as {@code /index.html} so that
- * paths/config will work properly when this becomes the main {@code /index.html} page.
+ * Provides {@code /index.html}.
  *
  * @since 3.0
  */
@@ -35,7 +32,7 @@ public class IndexHtmlWebResource
 {
   @Override
   public String getPath() {
-    return "/rapture.html";
+    return "/index.html";
   }
 
   @Override
