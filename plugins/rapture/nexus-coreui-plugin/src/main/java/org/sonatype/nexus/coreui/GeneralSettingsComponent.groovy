@@ -28,6 +28,8 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
 
 /**
  * General System Settings {@link DirectComponent}.
@@ -36,41 +38,50 @@ import javax.inject.Singleton
  */
 @Named
 @Singleton
-@DirectAction(action = 'coreui_SystemGeneral')
-class SystemGeneralComponent
+@DirectAction(action = 'coreui_GeneralSettings')
+class GeneralSettingsComponent
 extends DirectComponentSupport
 {
+
   @Inject
   GlobalRestApiSettings globalRestApiSettings
 
   @Inject
   NexusConfiguration nexusConfiguration
 
+  /**
+   * Retrieves general system settings.
+   * @return general system settings
+   */
   @DirectMethod
   @RequiresPermissions('nexus:settings:read')
-  SystemGeneralXO read() {
-    return new SystemGeneralXO(
+  GeneralSettingsXO read() {
+    return new GeneralSettingsXO(
         baseUrl: globalRestApiSettings.baseUrl,
         forceBaseUrl: globalRestApiSettings.forceBaseUrl
     )
   }
 
+  /**
+   * Updates general system settings.
+   * @return updated general system settings
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:settings:update')
-  SystemGeneralXO update(final SystemGeneralXO xo) {
-    validate(xo)
-    globalRestApiSettings.baseUrl = xo.baseUrl
-    globalRestApiSettings.forceBaseUrl = StringUtils.isBlank(xo.baseUrl) ? null : xo.forceBaseUrl
+  GeneralSettingsXO update(final @NotNull(message = '[generalSettings] may not be null') @Valid GeneralSettingsXO generalSettingsXO) {
+    validate(generalSettingsXO)
+    globalRestApiSettings.baseUrl = generalSettingsXO.baseUrl
+    globalRestApiSettings.forceBaseUrl = StringUtils.isBlank(generalSettingsXO.baseUrl) ? false : generalSettingsXO.forceBaseUrl
     nexusConfiguration.saveConfiguration()
     return read()
   }
 
-  private static validate(final SystemGeneralXO xo) {
+  private static validate(final GeneralSettingsXO generalSettingsXO) {
     def validations = new ValidationResponse()
-    if (!StringUtils.isBlank(xo.baseUrl)) {
+    if (!StringUtils.isBlank(generalSettingsXO.baseUrl)) {
       try {
-        new URL(xo.baseUrl)
+        new URL(generalSettingsXO.baseUrl)
       }
       catch (MalformedURLException e) {
         validations.addValidationError(new ValidationMessage('baseUrl', e.message))
@@ -80,4 +91,5 @@ extends DirectComponentSupport
       throw new InvalidConfigurationException(validations)
     }
   }
+
 }
