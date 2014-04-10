@@ -291,7 +291,7 @@ public class NexusContentServlet
       if (logger.isDebugEnabled()) {
         logger.warn("{} {}", exception.toString(), requestDetails(request), exception);
       }
-      else {
+      else if (logger.isWarnEnabled()) {
         logger.warn("{} {}", Throwables2.explain(exception), requestDetails(request));
       }
       // Do not attempt to render error page
@@ -299,23 +299,25 @@ public class NexusContentServlet
     }
     else {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      logger.warn("{} {}", exception.getMessage(), requestDetails(request), exception);
+      if (logger.isWarnEnabled()) {
+        logger.warn("{} {}", exception.getMessage(), requestDetails(request), exception);
+      }
     }
     renderer.renderErrorPage(request, response, rsr, exception);
   }
 
-    /**
-     * @return basic client request information for logging during exceptions ( NEXUS-6526 )
-     */
-    private String requestDetails(HttpServletRequest request) {
-      StringBuilder sb = new StringBuilder();
-      // getRemoteAddr respects x-forwarded-for if enabled and avoids potential DNS lookups
-      sb.append(" [client=").append(request.getRemoteAddr());
-      sb.append(",ua=").append(request.getHeader("User-Agent"));
-      sb.append(",req=").append(request.getMethod()).append(' ').append(request.getRequestURL().toString());
-      sb.append(']');
-      return sb.toString();
-    }
+  /**
+   * @return basic client request information for logging during exceptions ( NEXUS-6526 )
+   */
+  private String requestDetails(HttpServletRequest request) {
+    StringBuilder sb = new StringBuilder();
+    // getRemoteAddr respects x-forwarded-for if enabled and avoids potential DNS lookups
+    sb.append(" [client=").append(request.getRemoteAddr());
+    sb.append(",ua=").append(request.getHeader("User-Agent"));
+    sb.append(",req=").append(request.getMethod()).append(' ').append(request.getRequestURL().toString());
+    sb.append(']');
+    return sb.toString();
+  }
 
   /**
    * To be added to non-content responses, like collection rendered index page of describe response is.
