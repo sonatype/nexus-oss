@@ -14,8 +14,8 @@ package org.sonatype.nexus.logging;
 
 import java.util.Collection;
 
-import org.sonatype.nexus.logging.model.LevelXO;
-import org.sonatype.nexus.logging.model.LoggerXO;
+import org.sonatype.nexus.logging.ui.LevelXO;
+import org.sonatype.nexus.logging.ui.LoggerXO;
 
 /**
  * Dynamic loggers configuration.

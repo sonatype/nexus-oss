@@ -23,8 +23,8 @@ import javax.inject.Named;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.logging.LoggingConfigurator;
-import org.sonatype.nexus.logging.model.LevelXO;
-import org.sonatype.nexus.logging.model.LoggerXO;
+import org.sonatype.nexus.logging.ui.LevelXO;
+import org.sonatype.nexus.logging.ui.LoggerXO;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
@@ -60,7 +60,10 @@ public class LoggingConfiguratorImpl
   public Collection<LoggerXO> getLoggers() {
     Collection<LoggerXO> loggers = Lists.newArrayList();
     for (Entry<String, LoggerLevel> entry : logManager.getLoggers().entrySet()) {
-      loggers.add(new LoggerXO().withName(entry.getKey()).withLevel(LevelXO.valueOf(entry.getValue().name())));
+      LoggerXO logger = new LoggerXO();
+      logger.setName(entry.getKey());
+      logger.setLevel(LevelXO.valueOf(entry.getValue().name()));
+      loggers.add(logger);
     }
     return loggers;
   }

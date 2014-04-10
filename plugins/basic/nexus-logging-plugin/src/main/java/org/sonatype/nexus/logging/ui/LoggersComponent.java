@@ -22,7 +22,6 @@ import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
 import org.sonatype.nexus.logging.LoggingConfigurator;
 import org.sonatype.nexus.logging.LoggingPlugin;
-import org.sonatype.nexus.logging.model.LoggerXO;
 
 import com.google.common.collect.Lists;
 import com.softwarementors.extjs.djn.config.annotations.DirectAction;
