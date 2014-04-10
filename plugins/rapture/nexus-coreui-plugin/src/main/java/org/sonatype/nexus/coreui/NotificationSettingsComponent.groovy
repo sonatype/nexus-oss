@@ -180,10 +180,10 @@ extends DirectComponentSupport
       return "Untrusted Remote"
     }
     if (top instanceof CertPathBuilderException) {
-      return "Untrusted Remote (" + top.getMessage() + ")"
+      return "Untrusted Remote (${top.message})"
     }
     if (top instanceof UnknownHostException) {
-      return "Unknown host '" + top.getMessage() + "'"
+      return "Unknown Host (${top.message})"
     }
     return top.getMessage()
   }
