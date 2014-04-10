@@ -61,7 +61,7 @@ Ext.define('NX.coreui.view.system.NotificationSettings', {
           name: 'notifyRoles',
           buttons: ['add', 'remove'],
           fromTitle: 'Roles',
-          toTitle: 'Notified Roles',
+          toTitle: 'Notify users in roles',
           store: 'Role',
           valueField: 'id',
           displayField: 'name',
