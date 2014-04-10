@@ -18,11 +18,6 @@
 Ext.define('NX.coreui.controller.System', {
   extend: 'Ext.app.Controller',
 
-  views: [
-    'system.General',
-    'system.Http'
-  ],
-
   /**
    * @override
    */
@@ -39,31 +34,8 @@ Ext.define('NX.coreui.controller.System', {
           variants: ['x16', 'x32']
         },
         weight: 1000
-      },
-      {
-        mode: 'admin',
-        path: '/System/General',
-        view: 'NX.coreui.view.system.General',
-        iconConfig: {
-          file: 'wrench.png',
-          variants: ['x16', 'x32']
-        },
-        visible: function () {
-          return NX.Permissions.check('nexus:settings', 'read');
-        }
-      },
-      {
-        mode: 'admin',
-        path: '/System/HTTP',
-        view: 'NX.coreui.view.system.Http',
-        iconConfig: {
-          file: 'transmit.png',
-          variants: ['x16', 'x32']
-        },
-        visible: function () {
-          return NX.Permissions.check('nexus:settings', 'read');
-        }
       }
     ]);
   }
+
 });

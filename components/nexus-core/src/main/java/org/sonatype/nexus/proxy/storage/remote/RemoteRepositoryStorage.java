@@ -43,7 +43,6 @@ public interface RemoteRepositoryStorage
   /**
    * Check remote storage for reachability.
    *
-   * @param uid the uid
    * @return true, if available (reachable)
    * @throws RemoteStorageException the storage exception
    */
@@ -53,7 +52,6 @@ public interface RemoteRepositoryStorage
   /**
    * Gets the absolute url from base.
    *
-   * @param uid the uid
    * @return the absolute url from base
    * @throws RemoteStorageException when the repository in question has wrong/malformed URL set
    */
@@ -69,7 +67,6 @@ public interface RemoteRepositoryStorage
   /**
    * Check remote storage if contains item.
    *
-   * @param uid the uid
    * @return true, if successful
    * @throws RemoteStorageException the storage exception
    */
@@ -79,7 +76,6 @@ public interface RemoteRepositoryStorage
   /**
    * Check remote storage if contains item newer then newerThen.
    *
-   * @param uid the uid
    * @return true, if successful
    * @throws RemoteStorageException the storage exception
    */
@@ -110,7 +106,6 @@ public interface RemoteRepositoryStorage
   /**
    * Delete item.
    *
-   * @param uid the uid
    * @throws ItemNotFoundException  the item not found exception
    * @throws UnsupportedStorageOperationException
    *                                the unsupported storage operation exception
