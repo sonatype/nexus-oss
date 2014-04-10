@@ -10,19 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.walker;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class DefaultWalkerContext
     implements WalkerContext
@@ -35,9 +41,13 @@ public class DefaultWalkerContext
 
   private final WalkerThrottleController throttleController;
 
-  private Map<String, Object> context;
+  private final TraversalType traversalType;
 
-  private List<WalkerProcessor> processors;
+  private final boolean processCollections;
+
+  private final Map<String, Object> context;
+
+  private final List<WalkerProcessor> processors;
 
   private Throwable stopCause;
 
@@ -45,27 +55,34 @@ public class DefaultWalkerContext
 
   private volatile boolean running;
 
-  public DefaultWalkerContext(Repository store, ResourceStoreRequest request) {
+  public DefaultWalkerContext(final Repository store, final ResourceStoreRequest request) {
     this(store, request, null);
   }
 
-  public DefaultWalkerContext(Repository store, ResourceStoreRequest request, WalkerFilter filter) {
-    this(store, request, filter, true);
+  public DefaultWalkerContext(final Repository store, final ResourceStoreRequest request, final WalkerFilter filter) {
+    this(store, request, filter, TraversalType.DEPTH_FIRST, false);
   }
 
-  public DefaultWalkerContext(Repository store, ResourceStoreRequest request, WalkerFilter filter,
+  /**
+   * @deprecated Use another ctor.
+   */
+  @Deprecated
+  public DefaultWalkerContext(final Repository store, final ResourceStoreRequest request, final WalkerFilter filter,
                               boolean localOnly)
   {
-    super();
+    this(store, request, filter);
+  }
 
-    this.resourceStore = store;
-
-    this.request = request;
-
+  public DefaultWalkerContext(final Repository store,
+                              final ResourceStoreRequest request,
+                              @Nullable final WalkerFilter filter,
+                              final TraversalType traversalType,
+                              final boolean processCollections)
+    {
+    this.resourceStore = checkNotNull(store);
+    this.request =checkNotNull(request);
     this.walkerFilter = filter;
-
     this.running = true;
-
     if (request.getRequestContext().containsKey(WalkerThrottleController.CONTEXT_KEY, false)) {
       this.throttleController =
           (WalkerThrottleController) request.getRequestContext().get(WalkerThrottleController.CONTEXT_KEY, false);
@@ -73,6 +90,10 @@ public class DefaultWalkerContext
     else {
       this.throttleController = WalkerThrottleController.NO_THROTTLING;
     }
+    this.traversalType = checkNotNull(traversalType);
+    this.processCollections = processCollections;
+    this.context = Maps.newHashMap();
+    this.processors = Lists.newArrayList();
   }
 
   @Override
@@ -82,18 +103,11 @@ public class DefaultWalkerContext
 
   @Override
   public Map<String, Object> getContext() {
-    if (context == null) {
-      context = new HashMap<String, Object>();
-    }
     return context;
   }
 
   @Override
   public List<WalkerProcessor> getProcessors() {
-    if (processors == null) {
-      processors = new ArrayList<WalkerProcessor>();
-    }
-
     return processors;
   }
 
@@ -105,6 +119,16 @@ public class DefaultWalkerContext
   @Override
   public Repository getRepository() {
     return resourceStore;
+  }
+
+  @Override
+  public TraversalType getTraversalType() {
+    return traversalType;
+  }
+
+  @Override
+  public boolean isProcessCollections() {
+    return processCollections;
   }
 
   @Override
@@ -121,10 +145,8 @@ public class DefaultWalkerContext
       if (stopCause == null) {
         stopCause = e;
       }
-
       running = false;
     }
-
     return !running;
   }
 
@@ -136,7 +158,6 @@ public class DefaultWalkerContext
   @Override
   public void stop(Throwable cause) {
     running = false;
-
     stopCause = cause;
   }
 
@@ -145,6 +166,7 @@ public class DefaultWalkerContext
     return this.throttleController;
   }
 
+  @Override
   public Comparator<StorageItem> getItemComparator() {
     return itemComparator;
   }
