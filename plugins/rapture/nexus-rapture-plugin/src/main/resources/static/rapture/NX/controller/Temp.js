@@ -42,14 +42,6 @@ Ext.define('NX.controller.Temp', {
       },
 
       {
-        path: '/System/PGP',
-        iconConfig: {
-          file: 'gnupg_keys.png',
-          variants: ['x16', 'x32']
-        },
-        visible: visibleIfLoggedIn
-      },
-      {
         path: '/System/Smart Proxy',
         iconConfig: {
           file: 'servers_network.png',
