@@ -11,18 +11,29 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Security settings related controller.
+ * Security realms controller.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.controller.Security', {
+Ext.define('NX.coreui.controller.RealmSettings', {
   extend: 'Ext.app.Controller',
   mixins: {
     logAware: 'NX.LogAware'
   },
 
   views: [
-    'security.Anonymous'
+    'security.RealmSettings'
+  ],
+
+  stores: [
+    'RealmType'
+  ],
+
+  refs: [
+    {
+      ref: 'panel',
+      selector: 'nx-coreui-security-realm-settings'
+    }
   ],
 
   /**
@@ -31,30 +42,45 @@ Ext.define('NX.coreui.controller.Security', {
   init: function () {
     var me = this;
 
-    me.getApplication().getFeaturesController().registerFeature([
+    me.getApplication().getIconController().addIcons({
+      'feature-security-realms': {
+        file: 'shield.png',
+        variants: ['x16', 'x32']
+      }
+    });
+
+    me.getApplication().getFeaturesController().registerFeature(
       {
         mode: 'admin',
-        path: '/Security',
-        group: true,
-        iconConfig: {
-          file: 'security.png',
-          variants: ['x16', 'x32']
-        },
-        weight: 90
-      },
-      {
-        mode: 'admin',
-        path: '/Security/Anonymous',
-        view: 'NX.coreui.view.security.Anonymous',
-        iconConfig: {
-          file: 'user_silhouette.png',
-          variants: ['x16', 'x32']
-        },
+        path: '/Security/Realms',
+        view: { xtype: 'nx-coreui-security-realm-settings' },
         visible: function () {
           return NX.Permissions.check('nexus:settings', 'read');
         }
       }
-    ]);
+    );
+
+    me.listen({
+      controller: {
+        '#Refresh': {
+          refresh: me.loadRealmTypes
+        }
+      },
+      component: {
+        'nx-coreui-security-realm-settings': {
+          beforerender: me.loadRealmTypes
+        }
+      }
+    });
+  },
+
+  loadRealmTypes: function () {
+    var me = this,
+        panel = me.getPanel();
+
+    if (panel) {
+      me.getRealmTypeStore().load();
+    }
   }
 
 });
