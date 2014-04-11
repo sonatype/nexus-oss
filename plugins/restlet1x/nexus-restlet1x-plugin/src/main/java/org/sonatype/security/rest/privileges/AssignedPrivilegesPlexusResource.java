@@ -39,7 +39,6 @@ import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -84,8 +83,7 @@ public class AssignedPrivilegesPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = AssignedPrivilegeListResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public AssignedPrivilegeListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     String userId = getUserId(request);

@@ -31,6 +31,10 @@ Ext.define('NX.coreui.controller.Privileges', {
   ],
   refs: [
     {
+      ref: 'feature',
+      selector: 'nx-coreui-privilege-feature'
+    },
+    {
       ref: 'list',
       selector: 'nx-coreui-privilege-list'
     },
@@ -104,6 +108,7 @@ Ext.define('NX.coreui.controller.Privileges', {
         info;
 
     if (Ext.isDefined(model)) {
+      me.getFeature().setDescriptionIconName('privilege-' + model.get('type'));
       info = {
         'Id': model.get('id'),
         'Name': model.get('name'),

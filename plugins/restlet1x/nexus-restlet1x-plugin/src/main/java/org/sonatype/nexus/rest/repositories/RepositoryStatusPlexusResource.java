@@ -20,7 +20,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -36,7 +35,6 @@ import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
 import org.sonatype.nexus.rest.util.EnumUtil;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -80,9 +78,7 @@ public class RepositoryStatusPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(pathParams = {@PathParam(AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY)},
-      output = RepositoryStatusResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public RepositoryStatusResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     RepositoryStatusResourceResponse result = null;
@@ -136,10 +132,7 @@ public class RepositoryStatusPlexusResource
    */
   @Override
   @PUT
-  @ResourceMethodSignature(pathParams = {@PathParam(AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY)},
-      input = RepositoryStatusResourceResponse.class,
-      output = RepositoryStatusResourceResponse.class)
-  public Object put(Context context, Request request, Response response, Object payload)
+  public RepositoryStatusResourceResponse put(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     RepositoryStatusResourceResponse repoStatusRequest = (RepositoryStatusResourceResponse) payload;

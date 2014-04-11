@@ -55,7 +55,7 @@ public abstract class AbstractComponentListPlexusResource
   }
 
   @Override
-  public Object get(Context context, Request request, Response response, Variant variant) throws ResourceException {
+  public PlexusComponentListResourceResponse get(Context context, Request request, Response response, Variant variant) throws ResourceException {
     PlexusComponentListResourceResponse result = new PlexusComponentListResourceResponse();
 
     // get role from request

@@ -47,7 +47,6 @@ import org.sonatype.security.ldap.realms.persist.UsersGroupAuthTestLdapConfigura
 import org.sonatype.security.ldap.realms.persist.ValidationResponse;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -107,8 +106,7 @@ public class LdapUserAndGroupConfigTestPlexusResource
    */
   @Override
   @PUT
-  @ResourceMethodSignature(input = LdapUserAndGroupConfigTestRequest.class, output = LdapUserListResponse.class)
-  public Object put(Context context, Request request, Response response, Object payload)
+  public LdapUserListResponse put(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
 

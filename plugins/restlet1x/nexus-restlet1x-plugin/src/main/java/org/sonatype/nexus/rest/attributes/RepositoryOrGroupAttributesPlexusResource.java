@@ -16,11 +16,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -53,9 +51,6 @@ public class RepositoryOrGroupAttributesPlexusResource
    */
   @Override
   @DELETE
-  @ResourceMethodSignature(pathParams = {
-      @PathParam(AbstractAttributesPlexusResource.DOMAIN), @PathParam(AbstractAttributesPlexusResource.TARGET_ID)
-  })
   public void delete(Context context, Request request, Response response)
       throws ResourceException
   {

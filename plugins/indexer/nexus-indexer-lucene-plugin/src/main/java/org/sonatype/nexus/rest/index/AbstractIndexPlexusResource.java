@@ -90,7 +90,7 @@ public abstract class AbstractIndexPlexusResource
   }
 
   @Override
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public SearchResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     Form form = request.getResourceRef().getQueryAsForm();

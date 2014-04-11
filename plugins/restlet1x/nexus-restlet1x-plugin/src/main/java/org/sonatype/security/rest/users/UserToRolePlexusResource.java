@@ -25,7 +25,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -38,7 +37,6 @@ import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -102,10 +100,6 @@ public class UserToRolePlexusResource
    */
   @Override
   @PUT
-  @ResourceMethodSignature(input = UserToRoleResourceRequest.class, pathParams = {
-      @PathParam("sourceId"),
-      @PathParam("userId")
-  })
   public Object put(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
@@ -167,11 +161,7 @@ public class UserToRolePlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = UserToRoleResourceRequest.class, pathParams = {
-      @PathParam("sourceId"),
-      @PathParam("userId")
-  })
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public UserToRoleResourceRequest get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     String userId = this.getUserId(request);
@@ -205,7 +195,6 @@ public class UserToRolePlexusResource
    */
   @Override
   @DELETE
-  @ResourceMethodSignature(pathParams = {@PathParam("sourceId"), @PathParam("userId")})
   public void delete(Context context, Request request, Response response)
       throws ResourceException
   {

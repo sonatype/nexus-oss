@@ -74,7 +74,7 @@ public abstract class AbstractIndexContentPlexusResource
   }
 
   @Override
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public IndexBrowserTreeViewResponseDTO get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     String path = parsePathFromUri(request.getResourceRef().toString());

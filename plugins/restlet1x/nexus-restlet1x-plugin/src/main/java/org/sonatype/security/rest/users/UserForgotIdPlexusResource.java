@@ -18,14 +18,12 @@ import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -75,7 +73,6 @@ public class UserForgotIdPlexusResource
    */
   @Override
   @POST
-  @ResourceMethodSignature(pathParams = {@PathParam("email")})
   public Object post(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {

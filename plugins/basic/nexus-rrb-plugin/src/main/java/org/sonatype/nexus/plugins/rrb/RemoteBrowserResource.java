@@ -37,7 +37,6 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.thoughtworks.xstream.XStream;
 import org.apache.http.client.HttpClient;
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -109,8 +108,7 @@ public class RemoteBrowserResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = MavenRepositoryReaderResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public MavenRepositoryReaderResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     String id = request.getAttributes().get(AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY).toString();

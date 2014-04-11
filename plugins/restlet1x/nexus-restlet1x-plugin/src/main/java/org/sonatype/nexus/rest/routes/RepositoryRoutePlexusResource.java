@@ -24,7 +24,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -39,7 +38,6 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -93,9 +91,7 @@ public class RepositoryRoutePlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(pathParams = {@PathParam(AbstractRepositoryRoutePlexusResource.ROUTE_ID_KEY)},
-      output = RepositoryRouteResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public RepositoryRouteResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
 
@@ -156,10 +152,7 @@ public class RepositoryRoutePlexusResource
    */
   @Override
   @PUT
-  @ResourceMethodSignature(pathParams = {@PathParam(AbstractRepositoryRoutePlexusResource.ROUTE_ID_KEY)},
-      input = RepositoryRouteResourceResponse.class,
-      output = RepositoryRouteResourceResponse.class)
-  public Object put(Context context, Request request, Response response, Object payload)
+  public RepositoryRouteResourceResponse put(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     RepositoryRouteResourceResponse routeRequest = (RepositoryRouteResourceResponse) payload;
@@ -254,7 +247,6 @@ public class RepositoryRoutePlexusResource
    */
   @Override
   @DELETE
-  @ResourceMethodSignature(pathParams = {@PathParam(AbstractRepositoryRoutePlexusResource.ROUTE_ID_KEY)})
   public void delete(Context context, Request request, Response response)
       throws ResourceException
   {

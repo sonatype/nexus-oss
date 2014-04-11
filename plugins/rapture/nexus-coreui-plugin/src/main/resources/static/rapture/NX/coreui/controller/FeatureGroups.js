@@ -63,6 +63,15 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
           file: 'cog.png',
           variants: ['x16', 'x32']
         }
+      },
+      {
+        mode: 'browse',
+        path: '/Upload',
+        group: true,
+        iconConfig: {
+          file: 'upload.png',
+          variants: ['x16', 'x32']
+        }
       }
     ]);
   }

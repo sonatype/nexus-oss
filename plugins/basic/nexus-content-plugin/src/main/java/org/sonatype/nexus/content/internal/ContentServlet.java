@@ -308,19 +308,34 @@ public class ContentServlet
     else if (exception instanceof IOException) {
       // log and rethrow IOException, as it is handled in special way, see the ErrorPageFilter
       if (logger.isDebugEnabled()) {
-        logger.warn(exception.toString(), exception);
+        logger.warn("{} {}", exception.toString(), requestDetails(request), exception);
       }
-      else {
-        logger.warn(Throwables2.explain(exception));
+      else if (logger.isWarnEnabled()) {
+        logger.warn("{} {}", Throwables2.explain(exception), requestDetails(request));
       }
       throw (IOException) exception;
     }
     else {
       responseCode = SC_INTERNAL_SERVER_ERROR;
-      logger.warn(exception.getMessage(), exception);
+      if (logger.isWarnEnabled()) {
+        logger.warn("{} {}", exception.getMessage(), requestDetails(request), exception);
+      }
     }
 
     throw new ErrorStatusException(responseCode, null, exception.getMessage());
+  }
+
+  /**
+   * @return basic client request information for logging during exceptions ( NEXUS-6526 )
+   */
+  private String requestDetails(HttpServletRequest request) {
+    StringBuilder sb = new StringBuilder();
+    // getRemoteAddr respects x-forwarded-for if enabled and avoids potential DNS lookups
+    sb.append("[client=").append(request.getRemoteAddr());
+    sb.append(",ua=").append(request.getHeader("User-Agent"));
+    sb.append(",req=").append(request.getMethod()).append(' ').append(request.getRequestURL().toString());
+    sb.append(']');
+    return sb.toString();
   }
 
   // service
