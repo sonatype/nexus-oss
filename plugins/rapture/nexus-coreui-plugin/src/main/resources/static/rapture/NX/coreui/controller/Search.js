@@ -107,6 +107,9 @@ Ext.define('NX.coreui.controller.Search', {
         },
         'nx-coreui-search-save button[action=add]': {
           click: me.saveSearchFilter
+        },
+        'nx-main #quicksearch': {
+          search: me.onQuickSearch
         }
       }
     });
@@ -120,7 +123,18 @@ Ext.define('NX.coreui.controller.Search', {
         searchCriteriaPanel = searchPanel.down('#criteria'),
         searchCriteriaStore = me.getSearchCriteriaStore(),
         addCriteriaMenu = [],
+        bookmarkSegments = NX.Bookmarks.getBookmark().segments,
+        bookmarkValues = {},
         searchCriteria;
+
+    if (bookmarkSegments && bookmarkSegments.length > 1) {
+      Ext.Array.each(Ext.Array.slice(bookmarkSegments, 1), function (segment) {
+        var split = segment.split('=');
+        if (split.length == 2) {
+          bookmarkValues[split[0]] = decodeURIComponent(split[1]);
+        }
+      });
+    }
 
     me.getSearchResultStore().removeAll();
     me.getSearchResultStore().clearFilter(true);
@@ -136,7 +150,7 @@ Ext.define('NX.coreui.controller.Search', {
           }
           searchCriteria = searchCriteriaPanel.add(cmpClass.create(Ext.apply(criteria.get('config'), {
             criteriaId: criteria.getId(),
-            value: criteriaRef.value,
+            value: bookmarkValues[criteria.getId()] || criteriaRef.value,
             hidden: criteriaRef.hidden
           })));
           if (criteriaRef.value) {
@@ -260,6 +274,25 @@ Ext.define('NX.coreui.controller.Search', {
     NX.Bookmarks.navigateTo(NX.Bookmarks.fromToken('search/saved/' + model.get('name')))
 
     win.close();
+  },
+
+  /**
+   * @private
+   * @param {NX.ext.SearchBox} quickSearch search box
+   * @param {String} searchValue search value
+   */
+  onQuickSearch: function (quickSearch, searchValue) {
+    var me = this,
+        searchFeature = me.getSearchFeature();
+
+    if (!searchFeature || (searchFeature.searchFilter.getId() !== 'keyword')) {
+      NX.Bookmarks.navigateTo(NX.Bookmarks.fromSegments(
+          ['search/keyword', 'keyword=' + encodeURIComponent(searchValue)]
+      ));
+    }
+    else {
+      searchFeature.down('#criteria component[criteriaId=keyword]').setValue(searchValue);
+    }
   }
 
 });
