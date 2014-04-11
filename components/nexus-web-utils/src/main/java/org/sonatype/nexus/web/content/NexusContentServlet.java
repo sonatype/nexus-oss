@@ -289,19 +289,34 @@ public class NexusContentServlet
       // Do not log verbose traces for IO problems unless debug is enabled
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       if (logger.isDebugEnabled()) {
-        logger.warn(exception.toString(), exception);
+        logger.warn("{} {}", exception.toString(), requestDetails(request), exception);
       }
-      else {
-        logger.warn(Throwables2.explain(exception));
+      else if (logger.isWarnEnabled()) {
+        logger.warn("{} {}", Throwables2.explain(exception), requestDetails(request));
       }
       // Do not attempt to render error page
       return;
     }
     else {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      logger.warn(exception.getMessage(), exception);
+      if (logger.isWarnEnabled()) {
+        logger.warn("{} {}", exception.getMessage(), requestDetails(request), exception);
+      }
     }
     renderer.renderErrorPage(request, response, rsr, exception);
+  }
+
+  /**
+   * @return basic client request information for logging during exceptions ( NEXUS-6526 )
+   */
+  private String requestDetails(HttpServletRequest request) {
+    StringBuilder sb = new StringBuilder();
+    // getRemoteAddr respects x-forwarded-for if enabled and avoids potential DNS lookups
+    sb.append("[client=").append(request.getRemoteAddr());
+    sb.append(",ua=").append(request.getHeader("User-Agent"));
+    sb.append(",req=").append(request.getMethod()).append(' ').append(request.getRequestURL().toString());
+    sb.append(']');
+    return sb.toString();
   }
 
   /**
