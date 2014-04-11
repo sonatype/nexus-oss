@@ -52,14 +52,14 @@ extends DirectComponentSupport
    * @return a list of feed sources
    */
   @DirectMethod
-  @RequiresPermissions('nexus:capabilities:read')
+  @RequiresPermissions('nexus:feeds:read')
   List<FeedXO> read() {
     return feedSources.values().collect { source ->
       new FeedXO(
           key: source.feedKey,
           name: source.feedName,
           description: source.feedDescription,
-          url: "${BaseUrlHolder.get()}/service/siesta${TimelinePlugin.SERVICE_PREFIX}/feeds/${source.getFeedKey()}"
+          url: "${BaseUrlHolder.get()}/service/siesta${TimelinePlugin.SERVICE_PREFIX}/feeds/${source.feedKey}"
       )
     }
   }
@@ -69,7 +69,7 @@ extends DirectComponentSupport
    * @return a list of feed entries
    */
   @DirectMethod
-  @RequiresPermissions('nexus:capabilities:read')
+  @RequiresPermissions('nexus:feeds:read')
   PagedResponse<FeedEntryXO> readEntries(final StoreLoadParameters parameters) {
     String feedKey = parameters.getFilter('key')
     if (feedKey) {
