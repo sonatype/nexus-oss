@@ -38,7 +38,7 @@ Ext.define('NX.coreui.controller.Log', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Logging/Log Viewer',
-      description: 'View current log',
+      description: 'View the current log contents',
       view: { xtype: 'nx-coreui-log-viewer' },
       iconConfig: {
         file: 'script_text.png',

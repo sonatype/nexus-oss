@@ -48,7 +48,7 @@ Ext.define('NX.coreui.controller.Loggers', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Logging',
-      description: 'Allows changing logging configuration',
+      description: 'Control logging verbosity levels',
       view: { xtype: 'nx-coreui-logger-list' },
       iconConfig: {
         file: 'book.png',
