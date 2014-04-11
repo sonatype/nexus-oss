@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
@@ -355,7 +356,7 @@ extends DirectComponentSupport
       repo.remoteConnectionSettings = new DefaultRemoteConnectionSettings(
           userAgentCustomizationString: repositoryXO.userAgentCustomisation,
           queryString: repositoryXO.urlParameters,
-          connectionTimeout: repositoryXO.timeout,
+          connectionTimeout: repositoryXO.timeout * 1000,
           retrievalRetryCount: repositoryXO.retries
       )
     }
@@ -454,7 +455,7 @@ extends DirectComponentSupport
         fileTypeValidation = repo.fileTypeValidation
         userAgentCustomisation = rcs?.userAgentCustomizationString
         urlParameters = rcs?.queryString
-        timeout = rcs?.connectionTimeout
+        timeout = rcs?.connectionTimeout == 0 ? 0 : rcs?.connectionTimeout / 1000
         retries = rcs?.retrievalRetryCount
         httpRequestSettings = userAgentCustomisation || urlParameters || timeout || retries
         notFoundCacheTTL = repo.notFoundCacheTimeToLive
