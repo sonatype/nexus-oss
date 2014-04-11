@@ -198,9 +198,11 @@ Ext.define('NX.controller.Menu', {
         features = [],
         featureStore = me.getFeatureStore();
 
-    // add all children of the record to the group store
-    record.cascadeBy(function (node) {
-      features.push(featureStore.getById(node.get('path')));
+    // add all children of the record to the group store, but do not include the node for the current record
+    record.eachChild(function (node) {
+      node.cascadeBy(function (child) {
+        features.push(featureStore.getById(child.get('path')));
+      });
     });
 
     me.getFeatureGroupStore().loadData(features);
