@@ -41,7 +41,7 @@ Ext.define('NX.coreui.controller.Log', {
       description: 'View current log',
       view: { xtype: 'nx-coreui-log-viewer' },
       iconConfig: {
-        file: 'book.png',
+        file: 'script_text.png',
         variants: ['x16', 'x32']
       },
       visible: function () {
