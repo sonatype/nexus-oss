@@ -42,6 +42,7 @@ Ext.define('NX.coreui.controller.SysInfo', {
       path: '/Support/System Information',
       description: 'Shows system information',
       view: { xtype: 'nx-coreui-support-sysinfo' },
+      description: 'Provides useful support important details about your server',
       iconConfig: {
         file: 'globe_place.png',
         variants: ['x16', 'x32']
