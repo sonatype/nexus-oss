@@ -195,7 +195,7 @@ Ext.define('NX.coreui.controller.Loggers', {
 
     if (selection.length) {
       NX.Dialogs.askConfirmation('Confirm deletion?', selection[0].get('name'), function () {
-        NX.direct.logging_Loggers.destroy(selection[0].getId(), function (response) {
+        NX.direct.logging_Loggers.delete(selection[0].getId(), function (response) {
           me.loadStore();
           if (Ext.isDefined(response) && response.success) {
             NX.Messages.add({ text: 'Logger deleted: ' + selection[0].get('name'), type: 'success' });

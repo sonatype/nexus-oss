@@ -5,23 +5,22 @@
 // Generated on: 2014.04.10 at 03:00:56 PM PDT 
 //
 
-package org.sonatype.nexus.logging.ui;
+package org.sonatype.nexus.logging.internal.ui
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import groovy.transform.ToString
+import org.apache.bval.constraints.NotEmpty
+
+import javax.validation.constraints.NotNull
 
 /**
- * Marker.
+ * Marker exchange object.
  *
  * @since 3.0
  */
-public class MarkerXO
+@ToString(includePackage = false, includeNames = true)
+class MarkerXO
 {
-
-  @JsonProperty("message")
-  protected String message;
-
-  public String getMessage() {
-    return message;
-  }
-
+  @NotNull
+  @NotEmpty
+  String message
 }
