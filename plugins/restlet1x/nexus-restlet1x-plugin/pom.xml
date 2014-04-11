@@ -49,14 +49,6 @@
       <artifactId>nexus-restlet-bridge</artifactId>
     </dependency>
 
-    <!--
-    Exposed here to allow dependent plugins to use annotations for API generation only.  This is excluded from the plugin bundle.
-    -->
-    <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-core</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-content-plugin</artifactId>

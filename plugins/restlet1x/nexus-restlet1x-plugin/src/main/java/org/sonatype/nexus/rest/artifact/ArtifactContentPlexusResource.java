@@ -20,11 +20,10 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 
+import org.sonatype.nexus.rest.StorageFileItemRepresentation;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
@@ -84,13 +83,9 @@ public class ArtifactContentPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(queryParams = {
-      @QueryParam("g"), @QueryParam("a"), @QueryParam("v"),
-      @QueryParam("r"), @QueryParam("p"), @QueryParam("c"), @QueryParam("e")
-  }, output = String.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public StorageFileItemRepresentation get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
-    return getContent(variant, false, request, response);
+    return (StorageFileItemRepresentation) getContent(variant, false, request, response);
   }
 }

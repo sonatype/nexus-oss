@@ -22,7 +22,6 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationListResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -65,8 +64,7 @@ public class GlobalConfigurationListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = GlobalConfigurationListResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public GlobalConfigurationListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     GlobalConfigurationListResourceResponse result = new GlobalConfigurationListResourceResponse();

@@ -42,7 +42,7 @@ public abstract class AbstractLoginPlexusResource
   }
 
   @Override
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public AuthenticationLoginResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     AuthenticationLoginResource resource = new AuthenticationLoginResource();

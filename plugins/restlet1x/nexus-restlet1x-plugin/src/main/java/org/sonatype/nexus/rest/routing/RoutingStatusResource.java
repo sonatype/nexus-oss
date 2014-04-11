@@ -20,7 +20,6 @@ import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
@@ -40,7 +39,6 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -90,7 +88,6 @@ public class RoutingStatusResource
 
   @Override
   @GET
-  @ResourceMethodSignature(pathParams = {@PathParam(REPOSITORY_ID_KEY)}, output = RoutingStatusMessageWrapper.class)
   public RoutingStatusMessageWrapper get(final Context context, final Request request, final Response response,
                                          final Variant variant)
       throws ResourceException
@@ -175,7 +172,6 @@ public class RoutingStatusResource
    */
   @Override
   @DELETE
-  @ResourceMethodSignature(pathParams = {@PathParam(REPOSITORY_ID_KEY)})
   public void delete(final Context context, final Request request, final Response response)
       throws ResourceException
   {

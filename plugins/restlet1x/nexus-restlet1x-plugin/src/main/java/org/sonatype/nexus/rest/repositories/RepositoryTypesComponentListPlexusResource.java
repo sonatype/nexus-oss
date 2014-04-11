@@ -20,7 +20,6 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -35,7 +34,6 @@ import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
@@ -78,9 +76,7 @@ public class RepositoryTypesComponentListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(queryParams = {@QueryParam("repoType")},
-      output = NexusRepositoryTypeListResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public NexusRepositoryTypeListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     Form form = request.getResourceRef().getQueryAsForm();

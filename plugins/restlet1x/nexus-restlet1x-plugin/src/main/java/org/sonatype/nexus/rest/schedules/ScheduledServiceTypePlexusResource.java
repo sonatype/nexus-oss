@@ -28,7 +28,6 @@ import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -69,8 +68,7 @@ public class ScheduledServiceTypePlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = ScheduledServiceTypeResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public ScheduledServiceTypeResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     ScheduledServiceTypeResourceResponse result = new ScheduledServiceTypeResourceResponse();

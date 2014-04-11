@@ -146,19 +146,59 @@ Ext.define('NX.view.SettingsForm', {
    * @public
    * Sets the read only state for all fields of this form.
    * @param {boolean} editable
-   * @param {string} [markerText] text to be shown as a marker in case that form is not editable
    */
   setEditable: function (editable) {
     var me = this,
+        itemsToDisable = me.getChildItemsToDisable(),
         bottomBar;
 
-    // TODO Can we do something about how form looks like when is disabled?
-
     if (editable) {
-      me.enable();
+      Ext.Array.each(itemsToDisable, function (item) {
+        var enable = true,
+            form;
+
+        if (item.resetEditable) {
+          if (Ext.isFunction(item.setReadOnly)) {
+            item.setReadOnly(false);
+          }
+          else {
+            if (Ext.isDefined(item.resetFormBind)) {
+              item.formBind = item.resetFormBind;
+            }
+            if (item.formBind) {
+              form = item.up('form');
+              if (form && !form.isValid()) {
+                enable = false;
+              }
+            }
+            if (enable) {
+              item.enable();
+            }
+          }
+        }
+        if (Ext.isDefined(item.resetEditable)) {
+          delete item.resetEditable;
+          delete item.resetFormBind;
+        }
+      });
     }
     else {
-      me.disable();
+      Ext.Array.each(itemsToDisable, function (item) {
+        if (Ext.isFunction(item.setReadOnly)) {
+          if (item.resetEditable !== false && !item.readOnly) {
+            item.setReadOnly(true);
+            item.resetEditable = true;
+          }
+        }
+        else {
+          if (item.resetEditable !== false && !item.disabled) {
+            item.disable();
+            item.resetFormBind = item.formBind;
+            delete item.formBind;
+            item.resetEditable = true;
+          }
+        }
+      });
     }
 
     bottomBar = me.getDockedItems('toolbar[dock="bottom"]')[0];

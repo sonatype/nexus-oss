@@ -21,7 +21,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -35,7 +34,6 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -88,9 +86,7 @@ public class RepositoryGroupPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(pathParams = {@PathParam(RepositoryGroupPlexusResource.GROUP_ID_KEY)},
-      output = RepositoryGroupResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public RepositoryGroupResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     RepositoryGroupResourceResponse result = new RepositoryGroupResourceResponse();
@@ -127,10 +123,7 @@ public class RepositoryGroupPlexusResource
    */
   @Override
   @PUT
-  @ResourceMethodSignature(pathParams = {@PathParam(RepositoryGroupPlexusResource.GROUP_ID_KEY)},
-      input = RepositoryGroupResourceResponse.class,
-      output = RepositoryGroupResourceResponse.class)
-  public Object put(Context context, Request request, Response response, Object payload)
+  public RepositoryGroupResourceResponse put(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     RepositoryGroupResourceResponse groupRequest = (RepositoryGroupResourceResponse) payload;
@@ -171,7 +164,6 @@ public class RepositoryGroupPlexusResource
    */
   @Override
   @DELETE
-  @ResourceMethodSignature(pathParams = {@PathParam(RepositoryGroupPlexusResource.GROUP_ID_KEY)})
   public void delete(Context context, Request request, Response response)
       throws ResourceException
   {

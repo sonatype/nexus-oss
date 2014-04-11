@@ -33,7 +33,6 @@ import org.sonatype.security.ldap.realms.persist.ConfigurationValidator;
 import org.sonatype.security.ldap.realms.persist.ValidationResponse;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -84,7 +83,6 @@ public class LdapTestAuthenticationPlexusResource
    */
   @Override
   @PUT
-  @ResourceMethodSignature(input = LdapAuthenticationTestRequest.class)
   public Object put(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {

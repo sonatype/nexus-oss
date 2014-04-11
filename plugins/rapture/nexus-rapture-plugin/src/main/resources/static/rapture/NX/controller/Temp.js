@@ -41,15 +41,6 @@ Ext.define('NX.controller.Temp', {
         visible: visibleIfLoggedIn
       },
 
-      {
-        path: '/System/Smart Proxy',
-        iconConfig: {
-          file: 'servers_network.png',
-          variants: ['x16', 'x32']
-        },
-        visible: visibleIfLoggedIn
-      },
-
       // browse mode
       {
         mode: 'browse',

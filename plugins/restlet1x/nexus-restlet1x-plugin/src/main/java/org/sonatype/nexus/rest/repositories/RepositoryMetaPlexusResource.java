@@ -16,7 +16,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -28,7 +27,6 @@ import org.sonatype.nexus.rest.model.RepositoryMetaResource;
 import org.sonatype.nexus.rest.model.RepositoryMetaResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -67,9 +65,7 @@ public class RepositoryMetaPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(pathParams = {@PathParam(AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY)},
-      output = RepositoryMetaResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public RepositoryMetaResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     String repoId = this.getRepositoryId(request);

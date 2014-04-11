@@ -10,36 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.rest;
 
 import java.net.URL;
 import java.net.URLClassLoader;
 
 import org.sonatype.nexus.mime.DefaultMimeSupport;
-import org.sonatype.nexus.plugin.support.AbstractDocumentationResourceBundle;
+import org.sonatype.nexus.plugin.PluginIdentity;
+import org.sonatype.nexus.plugin.support.DocumentationBundleSupport;
 
 import org.eclipse.sisu.space.URLClassSpace;
 
 public class SimpleDocumentationResourceBundle
-    extends AbstractDocumentationResourceBundle
+    extends DocumentationBundleSupport
 {
-  public SimpleDocumentationResourceBundle() {
-    super(new DefaultMimeSupport(), new URLClassSpace(new URLClassLoader(
-        new URL[] { SimpleDocumentationResourceBundle.class.getResource("/docs.zip") })));
-  }
-
-  @Override
-  public String getPluginId() {
-    return "test";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Simple Test";
-  }
-
-  @Override
-  public String getPathPrefix() {
-    return "test";
+  public SimpleDocumentationResourceBundle() throws Exception {
+    super(
+        new DefaultMimeSupport(),
+        new URLClassSpace(new URLClassLoader(new URL[]{SimpleDocumentationResourceBundle.class.getResource("/docs.zip")})),
+        new PluginIdentity("test", "test"));
   }
 }

@@ -34,7 +34,6 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -79,8 +78,7 @@ public class RepositoryTargetListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = RepositoryTargetListResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public RepositoryTargetListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     RepositoryTargetListResourceResponse result = new RepositoryTargetListResourceResponse();
@@ -115,9 +113,7 @@ public class RepositoryTargetListPlexusResource
    */
   @Override
   @POST
-  @ResourceMethodSignature(input = RepositoryTargetResourceResponse.class,
-      output = RepositoryTargetResourceResponse.class)
-  public Object post(Context context, Request request, Response response, Object payload)
+  public RepositoryTargetResourceResponse post(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     RepositoryTargetResourceResponse result = (RepositoryTargetResourceResponse) payload;
