@@ -85,6 +85,7 @@ extends DirectComponentSupport
    * @param name logger name
    */
   @DirectMethod
+  @WithWriteLock
   @RequiresAuthentication
   @RequiresPermissions('nexus:logconfig:delete')
   @Validate
