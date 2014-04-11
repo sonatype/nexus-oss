@@ -37,14 +37,14 @@ Ext.define('NX.coreui.view.security.RealmSettings', {
       items: [
         {
           xtype: 'label',
-          html: '<p>Security realm settings.</p>'
+          html: '<p>Configure the active security realms and realm order.</p>'
         },
         {
           xtype: 'nx-itemselector',
           name: 'realms',
           buttons: ['up', 'add', 'remove', 'down'],
           fromTitle: 'Available',
-          toTitle: 'Selected',
+          toTitle: 'Active',
           store: 'RealmType',
           valueField: 'id',
           displayField: 'name',
