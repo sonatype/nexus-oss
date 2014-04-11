@@ -53,9 +53,9 @@ Ext.define('NX.view.feature.Content', {
       },
 
       // HACK: Testing what tool-like buttons look like in custom header
-      '->',
-      { xtype: 'button', ui: 'plain', scale: 'medium', glyph: 'xf013@FontAwesome' /* fa-gear */},
-      { xtype: 'button', ui: 'plain', scale: 'medium', glyph: 'xf059@FontAwesome' /* fa-question-circle */}
+      //'->',
+      //{ xtype: 'button', ui: 'plain', scale: 'medium', glyph: 'xf013@FontAwesome' /* fa-gear */},
+      //{ xtype: 'button', ui: 'plain', scale: 'medium', glyph: 'xf059@FontAwesome' /* fa-question-circle */}
     ]
   },
 
