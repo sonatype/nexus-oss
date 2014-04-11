@@ -22,7 +22,6 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.security.rest.authentication.AbstractLoginPlexusResource;
 import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -54,8 +53,7 @@ public class NexusLoginPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = AuthenticationLoginResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public AuthenticationLoginResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     return super.get(context, request, response, variant);

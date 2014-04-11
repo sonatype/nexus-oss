@@ -19,7 +19,6 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -30,7 +29,6 @@ import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -71,9 +69,7 @@ public class RepositoryStatusesListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(queryParams = {@QueryParam("forceCheck")},
-      output = RepositoryStatusListResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public RepositoryStatusListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     RepositoryStatusListResourceResponse result = new RepositoryStatusListResourceResponse();

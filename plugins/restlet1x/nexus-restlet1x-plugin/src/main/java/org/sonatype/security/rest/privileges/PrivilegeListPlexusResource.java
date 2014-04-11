@@ -28,7 +28,6 @@ import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -72,8 +71,7 @@ public class PrivilegeListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = PrivilegeListResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public PrivilegeListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     PrivilegeListResourceResponse result = new PrivilegeListResourceResponse();

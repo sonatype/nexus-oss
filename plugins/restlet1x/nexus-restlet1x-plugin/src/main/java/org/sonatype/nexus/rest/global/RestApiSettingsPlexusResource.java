@@ -19,10 +19,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 import org.sonatype.nexus.rest.model.RestApiResourceResponse;
-import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -67,8 +65,7 @@ public class RestApiSettingsPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = RestApiSettings.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public RestApiResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     RestApiResourceResponse resp = new RestApiResourceResponse();

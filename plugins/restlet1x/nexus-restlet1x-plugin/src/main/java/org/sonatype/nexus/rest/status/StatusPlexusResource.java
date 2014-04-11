@@ -22,7 +22,6 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
@@ -36,7 +35,6 @@ import org.sonatype.security.rest.authentication.AbstractUIPermissionCalculating
 import org.sonatype.security.rest.model.AuthenticationClientPermissions;
 
 import com.yammer.metrics.annotation.Timed;
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
@@ -86,8 +84,7 @@ public class StatusPlexusResource
   @Timed
   @Override
   @GET
-  @ResourceMethodSignature(queryParams = {@QueryParam("perms")}, output = StatusResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public StatusResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     final SystemStatus status = applicationStatusSource.getSystemStatus();

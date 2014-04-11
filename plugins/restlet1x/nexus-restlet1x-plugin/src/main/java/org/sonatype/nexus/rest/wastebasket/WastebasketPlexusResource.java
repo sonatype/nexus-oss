@@ -28,7 +28,6 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.EmptyTrashTask;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -81,8 +80,7 @@ public class WastebasketPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = WastebasketResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public WastebasketResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     WastebasketResourceResponse result = new WastebasketResourceResponse();
@@ -110,7 +108,6 @@ public class WastebasketPlexusResource
    */
   @Override
   @DELETE
-  @ResourceMethodSignature()
   public void delete(Context context, Request request, Response response)
       throws ResourceException
   {

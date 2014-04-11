@@ -17,12 +17,10 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 import org.apache.maven.model.Model;
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -70,11 +68,7 @@ public class ArtifactPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(queryParams = {
-      @QueryParam("g"), @QueryParam("a"), @QueryParam("v"),
-      @QueryParam("r")
-  }, output = Model.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public Model get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     return getPom(variant, request, response);

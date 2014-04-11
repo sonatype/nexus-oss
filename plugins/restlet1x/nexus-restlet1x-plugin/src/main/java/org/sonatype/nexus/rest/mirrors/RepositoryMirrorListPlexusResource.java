@@ -21,7 +21,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -32,7 +31,6 @@ import org.sonatype.nexus.rest.model.MirrorResourceListRequest;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -76,9 +74,7 @@ public class RepositoryMirrorListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(pathParams = {@PathParam(AbstractRepositoryMirrorPlexusResource.REPOSITORY_ID_KEY)},
-      output = MirrorResourceListResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public MirrorResourceListResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     MirrorResourceListResponse dto = new MirrorResourceListResponse();
@@ -109,10 +105,7 @@ public class RepositoryMirrorListPlexusResource
    */
   @Override
   @POST
-  @ResourceMethodSignature(pathParams = {@PathParam(AbstractRepositoryMirrorPlexusResource.REPOSITORY_ID_KEY)},
-      input = MirrorResourceListRequest.class,
-      output = MirrorResourceListResponse.class)
-  public Object post(Context context, Request request, Response response, Object payload)
+  public MirrorResourceListResponse post(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     MirrorResourceListResponse dto = new MirrorResourceListResponse();

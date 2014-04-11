@@ -26,9 +26,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -40,7 +38,6 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
@@ -95,10 +92,6 @@ public class UnpackPlexusResource
    */
   @Override
   @POST
-  @ResourceMethodSignature(
-      pathParams = {@PathParam(REPOSITORY_ID_KEY)},
-      queryParams = {@QueryParam(DELETE_BEFORE_UNPACK)}
-  )
   public Object upload(final Context context,
                        final Request request,
                        final Response response,
@@ -167,10 +160,6 @@ public class UnpackPlexusResource
    * everything at the current path will be removed before the zip file is unpacked.
    */
   @PUT
-  @ResourceMethodSignature(
-      pathParams = {@PathParam(REPOSITORY_ID_KEY)},
-      queryParams = {@QueryParam(DELETE_BEFORE_UNPACK)}
-  )
   public Object uploadPut(final Context context,
                           final Request request,
                           final Response response,

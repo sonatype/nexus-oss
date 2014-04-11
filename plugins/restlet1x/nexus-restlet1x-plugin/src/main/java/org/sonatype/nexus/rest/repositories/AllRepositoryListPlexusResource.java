@@ -21,7 +21,6 @@ import javax.ws.rs.Produces;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -66,8 +65,7 @@ public class AllRepositoryListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = RepositoryListResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public RepositoryListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     return listRepositories(request, true, true);

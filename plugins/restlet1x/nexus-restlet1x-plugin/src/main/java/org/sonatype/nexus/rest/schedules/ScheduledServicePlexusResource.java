@@ -23,7 +23,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -38,7 +37,6 @@ import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -91,9 +89,7 @@ public class ScheduledServicePlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(pathParams = {@PathParam(ScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY)},
-      output = ScheduledServiceResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public ScheduledServiceResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     ScheduledServiceResourceResponse result = new ScheduledServiceResourceResponse();
@@ -125,9 +121,7 @@ public class ScheduledServicePlexusResource
    */
   @Override
   @PUT
-  @ResourceMethodSignature(pathParams = {@PathParam(ScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY)},
-      input = ScheduledServiceResourceResponse.class, output = ScheduledServiceResourceStatusResponse.class)
-  public Object put(Context context, Request request, Response response, Object payload)
+  public ScheduledServiceResourceStatusResponse put(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     ScheduledServiceResourceResponse serviceRequest = (ScheduledServiceResourceResponse) payload;
@@ -220,7 +214,6 @@ public class ScheduledServicePlexusResource
    */
   @Override
   @DELETE
-  @ResourceMethodSignature(pathParams = {@PathParam(ScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY)})
   public void delete(Context context, Request request, Response response)
       throws ResourceException
   {

@@ -24,7 +24,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -55,7 +54,6 @@ import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 
 import com.thoughtworks.xstream.XStream;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -174,9 +172,7 @@ public class GlobalConfigurationPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(pathParams = {@PathParam(GlobalConfigurationPlexusResource.CONFIG_NAME_KEY)},
-      output = GlobalConfigurationResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public GlobalConfigurationResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     String configurationName = request.getAttributes().get(CONFIG_NAME_KEY).toString();
@@ -209,9 +205,7 @@ public class GlobalConfigurationPlexusResource
    */
   @Override
   @PUT
-  @ResourceMethodSignature(pathParams = {@PathParam(GlobalConfigurationPlexusResource.CONFIG_NAME_KEY)},
-      input = GlobalConfigurationResourceResponse.class)
-  public Object put(Context context, Request request, Response response, Object payload)
+  public GlobalConfigurationResourceResponse put(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     String configurationName = request.getAttributes().get(CONFIG_NAME_KEY).toString();

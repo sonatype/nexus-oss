@@ -34,7 +34,6 @@ import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -83,8 +82,7 @@ public class UserListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = UserListResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public UserListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     UserListResourceResponse result = new UserListResourceResponse();
@@ -105,8 +103,7 @@ public class UserListPlexusResource
    */
   @Override
   @POST
-  @ResourceMethodSignature(input = UserResourceRequest.class, output = UserResourceResponse.class)
-  public Object post(Context context, Request request, Response response, Object payload)
+  public UserResourceResponse post(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     UserResourceRequest requestResource = (UserResourceRequest) payload;

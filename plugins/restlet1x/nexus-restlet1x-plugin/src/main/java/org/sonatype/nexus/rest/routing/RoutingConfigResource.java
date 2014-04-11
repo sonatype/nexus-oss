@@ -20,7 +20,6 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
@@ -30,7 +29,6 @@ import org.sonatype.nexus.rest.model.RoutingConfigMessageWrapper;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 import com.google.common.primitives.Ints;
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -76,7 +74,6 @@ public class RoutingConfigResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(pathParams = {@PathParam(REPOSITORY_ID_KEY)}, output = RoutingConfigMessageWrapper.class)
   public RoutingConfigMessageWrapper get(final Context context, final Request request, final Response response,
                                          final Variant variant)
       throws ResourceException
@@ -96,8 +93,6 @@ public class RoutingConfigResource
    */
   @Override
   @PUT
-  @ResourceMethodSignature(pathParams = {@PathParam(REPOSITORY_ID_KEY)}, input = RoutingConfigMessageWrapper.class,
-      output = RoutingConfigMessageWrapper.class)
   public RoutingConfigMessageWrapper put(final Context context, final Request request, final Response response,
                                          final Object payload)
       throws ResourceException

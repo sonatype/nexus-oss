@@ -32,7 +32,6 @@ import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.RoleResourceRequest;
 import org.sonatype.security.rest.model.RoleResourceResponse;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -81,8 +80,7 @@ public class RoleListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = RoleListResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public RoleListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     RoleListResourceResponse result = new RoleListResourceResponse();
@@ -109,8 +107,7 @@ public class RoleListPlexusResource
    */
   @Override
   @POST
-  @ResourceMethodSignature(input = RoleResourceRequest.class, output = RoleResourceResponse.class)
-  public Object post(Context context, Request request, Response response, Object payload)
+  public RoleResourceResponse post(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     RoleResourceRequest resourceRequest = (RoleResourceRequest) payload;
