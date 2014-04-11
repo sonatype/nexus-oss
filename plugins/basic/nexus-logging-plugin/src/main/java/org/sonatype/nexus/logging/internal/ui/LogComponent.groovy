@@ -15,7 +15,6 @@ package org.sonatype.nexus.logging.internal.ui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import groovy.transform.WithReadLock
 import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
@@ -45,14 +44,6 @@ extends DirectComponentSupport
 
   @Inject
   LogManager logManager
-
-  @DirectMethod
-  @WithReadLock
-  @RequiresPermissions('nexus:logs:read')
-  String read(final Long fromByte,
-              final Long bytesCount) {
-
-  }
 
   /**
    * Logs a message at INFO level.
