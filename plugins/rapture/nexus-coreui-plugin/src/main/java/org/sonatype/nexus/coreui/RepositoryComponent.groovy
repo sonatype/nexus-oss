@@ -92,9 +92,11 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
-  List<RepositoryXO> read() {
+  List<RepositoryXO> read(final @Nullable StoreLoadParameters parameters) {
     def templates = readTemplates(null)
-    return repositoryRegistry.repositories.collect { asRepositoryXO(it, templates) }
+    return filter(parameters).collect { repository ->
+      asRepositoryXO(repository, templates)
+    }
   }
 
   /**
@@ -103,29 +105,12 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
   List<RepositoryReferenceXO> readReferences(final @Nullable StoreLoadParameters parameters) {
-    def List<Repository> repositories = repositoryRegistry.repositories
-    if (parameters) {
-      def typeFilter = parameters.getFilter('type')
-      if (typeFilter) {
-        def clazz = typesToClass[typeFilter]
-        if (!clazz) {
-          throw new IllegalArgumentException('Repository type not supported: ' + typeFilter)
-        }
-        repositories = repositoryRegistry.getRepositoriesWithFacet(clazz)
-      }
-      def formatFilter = parameters.getFilter('format')
-      if (formatFilter) {
-        repositories = repositories.findResults {
-          it.repositoryContentClass.id == formatFilter ? it : null
-        }
-      }
-    }
-    repositories.collect {
+    return filter(parameters).collect { repository ->
       new RepositoryReferenceXO(
-          id: it.id,
-          name: it.name,
-          type: typeOf(it),
-          format: it.repositoryContentClass.id
+          id: repository.id,
+          name: repository.name,
+          type: typeOf(repository),
+          format: repository.repositoryContentClass.id
       )
     }
   }
@@ -562,6 +547,47 @@ extends DirectComponentSupport
       return settings.password
     }
     return null
+  }
+
+  List<Repository> filter(final @Nullable StoreLoadParameters parameters) {
+    List<Repository> repositories = repositoryRegistry.repositories
+    boolean includeUserManaged = true
+    boolean includeNexusManaged = false
+    if (parameters) {
+      def typeFilter = parameters.getFilter('type')
+      if (typeFilter) {
+        def clazz = typesToClass[typeFilter]
+        if (!clazz) {
+          throw new IllegalArgumentException('Repository type not supported: ' + typeFilter)
+        }
+        repositories = repositoryRegistry.getRepositoriesWithFacet(clazz)
+      }
+      def formatFilter = parameters.getFilter('format')
+      if (formatFilter) {
+        repositories = repositories.findResults { Repository repository ->
+          repository.repositoryContentClass.id == formatFilter ? repository : null
+        }
+      }
+      def includeUserManagedFilter = parameters.getFilter('includeUserManaged')
+      if (includeUserManagedFilter != null) {
+        includeUserManaged = Boolean.valueOf(includeUserManagedFilter)
+      }
+      def includeNexusManagedFilter = parameters.getFilter('includeNexusManaged')
+      if (includeNexusManagedFilter != null) {
+        includeNexusManaged = Boolean.valueOf(includeNexusManagedFilter)
+      }
+    }
+    if (!includeUserManaged) {
+      repositories = repositories.findResults { Repository repository ->
+        return repository.userManaged ? null : repository
+      }
+    }
+    if (!includeNexusManaged) {
+      repositories = repositories.findResults { Repository repository ->
+        return repository.userManaged ? repository : null
+      }
+    }
+    return repositories
   }
 
 }
