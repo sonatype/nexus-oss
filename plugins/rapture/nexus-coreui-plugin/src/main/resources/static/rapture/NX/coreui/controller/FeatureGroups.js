@@ -28,6 +28,7 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'admin',
         path: '/Repository',
+        description: 'Repository administration',
         group: true,
         weight: 50,
         iconConfig: {
@@ -38,6 +39,7 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'admin',
         path: '/Security',
+        description: 'Security administration',
         group: true,
         weight: 90,
         iconConfig: {
@@ -48,6 +50,7 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'admin',
         path: '/Support',
+        description: 'Support tools',
         group: true,
         iconConfig: {
           file: 'support.png',
@@ -57,6 +60,7 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'admin',
         path: '/System',
+        description: 'System administration',
         group: true,
         weight: 1000,
         iconConfig: {
@@ -67,6 +71,7 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'browse',
         path: '/Upload',
+        description: 'Upload content to Nexus',
         group: true,
         iconConfig: {
           file: 'upload.png',
