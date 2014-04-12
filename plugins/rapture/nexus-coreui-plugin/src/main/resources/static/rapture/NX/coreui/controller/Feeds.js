@@ -74,7 +74,7 @@ Ext.define('NX.coreui.controller.Feeds', {
           navigate: me.navigateTo
         },
         '#Refresh': {
-          refresh: me.onRefresh
+          refresh: me.loadFeeds
         }
       },
       store: {
@@ -118,19 +118,6 @@ Ext.define('NX.coreui.controller.Feeds', {
 
     if (list) {
       me.navigateTo(NX.Bookmarks.getBookmark());
-    }
-  },
-
-  /**
-   * @private
-   */
-  onRefresh: function () {
-    var me = this,
-        list = me.getList();
-
-    if (list) {
-      me.loadFeeds();
-      NX.Messages.add({ text: 'Feeds refreshed', type: 'default' });
     }
   },
 
