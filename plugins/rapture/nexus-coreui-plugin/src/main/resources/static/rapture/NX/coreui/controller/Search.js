@@ -12,7 +12,6 @@
  */
 /**
  * Search controller.
- * FIXME move to core ui
  *
  * @since 3.0
  */
@@ -21,9 +20,6 @@ Ext.define('NX.coreui.controller.Search', {
   requires: [
     'NX.Bookmarks'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   stores: [
     'SearchFilter',
