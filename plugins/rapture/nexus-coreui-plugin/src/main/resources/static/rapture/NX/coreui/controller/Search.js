@@ -109,7 +109,8 @@ Ext.define('NX.coreui.controller.Search', {
           click: me.saveSearchFilter
         },
         'nx-main #quicksearch': {
-          search: me.onQuickSearch
+          search: me.onQuickSearch,
+          searchcleared: me.onQuickSearch
         }
       }
     });
@@ -305,10 +306,12 @@ Ext.define('NX.coreui.controller.Search', {
         searchFeature = me.getSearchFeature();
 
     if (!searchFeature || (searchFeature.searchFilter.getId() !== 'keyword')) {
-      NX.Bookmarks.navigateTo(
-          NX.Bookmarks.fromSegments(['search/keyword', 'keyword=' + encodeURIComponent(searchValue)]),
-          me
-      );
+      if (searchValue) {
+        NX.Bookmarks.navigateTo(
+            NX.Bookmarks.fromSegments(['search/keyword', 'keyword=' + encodeURIComponent(searchValue)]),
+            me
+        );
+      }
     }
     else {
       searchFeature.down('#criteria component[criteriaId=keyword]').setValue(searchValue);
