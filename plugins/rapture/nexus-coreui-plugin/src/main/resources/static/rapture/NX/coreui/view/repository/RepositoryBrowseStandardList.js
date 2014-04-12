@@ -38,6 +38,8 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseStandardList', {
     { header: 'Provider', dataIndex: 'providerName' }
   ],
 
+  emptyText: 'No standard repositories defined',
+
   tbar: [
     { xtype: 'button', text: 'Administrate', glyph: 'xf013@FontAwesome' /* fa-gear */, action: 'admin', disabled: true, hidden: true }
   ],

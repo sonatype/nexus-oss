@@ -38,6 +38,8 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseManagedList', {
     { header: 'Provider', dataIndex: 'providerName' }
   ],
 
+  emptyText: 'No managed repositories defined',
+
   plugins: ['gridfilterbox'],
 
   initComponent: function () {
