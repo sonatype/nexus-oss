@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.extdirect.internal;
 
 import java.io.BufferedReader;
@@ -157,10 +158,14 @@ public class ExtDirectServlet
       protected Object createInvokeInstanceForMethodWithDefaultConstructor(final RegisteredMethod method)
           throws Exception
       {
-        log.debug(
-            "Creating instance of action class '{}' mapped to '{}",
-            method.getActionClass().getName(), method.getActionName()
-        );
+        if (log.isDebugEnabled()) {
+          log.debug(
+              "Creating instance of action class '{}' mapped to '{}",
+              method.getActionClass().getName(), method.getActionName()
+          );
+        }
+
+        @SuppressWarnings("unchecked")
         Iterable<BeanEntry<Annotation, Object>> actionInstance = beanLocator.locate(
             Key.get((Class) method.getActionClass())
         );
@@ -171,6 +176,8 @@ public class ExtDirectServlet
       protected Object invokeMethod(final RegisteredMethod method, final Object actionInstance,
                                     final Object[] parameters) throws Exception
       {
+        // TODO: Add analytics event capture here
+
         try {
           return asResponse(super.invokeMethod(method, actionInstance, parameters));
         }
@@ -184,6 +191,7 @@ public class ExtDirectServlet
 
       private Object handleException(final RegisteredMethod method, final Throwable e) {
         log.error("Failed to invoke action method {}", method.getFullJavaMethodName(), e);
+
         if (e instanceof InvalidConfigurationException) {
           InvalidConfigurationException cause = (InvalidConfigurationException) e;
           ValidationResponse vr = cause.getValidationResponse();
@@ -192,6 +200,7 @@ public class ExtDirectServlet
           }
           return asResponse(invalid(cause));
         }
+
         if (e instanceof ConstraintViolationException) {
           ConstraintViolationException cause = (ConstraintViolationException) e;
           Set<ConstraintViolation<?>> violations = cause.getConstraintViolations();
@@ -200,6 +209,7 @@ public class ExtDirectServlet
           }
           return asResponse(invalid(cause));
         }
+
         return asResponse(error(e));
       }
 
