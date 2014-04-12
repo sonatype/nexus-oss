@@ -33,6 +33,8 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
     { header: 'Notes', dataIndex: 'notes', flex: 1 }
   ],
 
+  emptyText: 'No capabilities defined',
+
   viewConfig: {
     getRowClass: function (record) {
       if (record.get('enabled') && !record.get('active')) {
