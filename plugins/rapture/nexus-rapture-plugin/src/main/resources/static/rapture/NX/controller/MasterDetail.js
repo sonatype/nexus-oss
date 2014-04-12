@@ -129,14 +129,9 @@ Ext.define('NX.controller.MasterDetail', {
 
   refreshList: function () {
     var me = this,
-        list = me.getList(),
-        contentPanel;
+        list = me.getList();
 
     if (list) {
-      contentPanel = list.up('nx-feature-content');
-      if (contentPanel && contentPanel.title) {
-        NX.Messages.add({ text: contentPanel.title + ' refreshed', type: 'default'});
-      }
       me.loadStore();
     }
   },

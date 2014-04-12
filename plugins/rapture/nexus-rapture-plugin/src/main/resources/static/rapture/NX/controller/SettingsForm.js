@@ -59,10 +59,6 @@ Ext.define('NX.controller.SettingsForm', {
       Ext.each(forms, function (form) {
         me.loadForm(form, {
           success: function (basicForm, action) {
-            var title = me.getSettingsFormSuccessMessage(form, action);
-            if (title) {
-              NX.Messages.add({ text: title, type: 'default' });
-            }
             form.fireEvent('loaded', form, action);
           }
         });

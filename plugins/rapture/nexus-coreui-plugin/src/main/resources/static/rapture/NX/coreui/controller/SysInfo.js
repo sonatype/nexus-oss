@@ -55,7 +55,7 @@ Ext.define('NX.coreui.controller.SysInfo', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.onRefresh
+          refresh: me.load
         }
       },
       component: {
@@ -81,28 +81,16 @@ Ext.define('NX.coreui.controller.SysInfo', {
     var me = this,
         panel = me.getSysInfo();
 
-    me.logDebug('Refreshing sysinfo');
-
-    panel.getEl().mask('Loading...');
-    NX.direct.atlas_SystemInformation.read(function (response) {
-      panel.getEl().unmask();
-      if (Ext.isDefined(response) && response.success) {
-        panel.setInfo(response.data);
-      }
-    });
-  },
-
-  /**
-   * @private
-   * Refresh the system information panel.
-   */
-  onRefresh: function () {
-    var me = this,
-        panel = me.getSysInfo();
-
     if (panel) {
-      me.load();
-      NX.Messages.add({ text: 'System Information refreshed', type: 'default' });
+      me.logDebug('Refreshing sysinfo');
+
+      panel.getEl().mask('Loading...');
+      NX.direct.atlas_SystemInformation.read(function (response) {
+        panel.getEl().unmask();
+        if (Ext.isDefined(response) && response.success) {
+          panel.setInfo(response.data);
+        }
+      });
     }
   },
 

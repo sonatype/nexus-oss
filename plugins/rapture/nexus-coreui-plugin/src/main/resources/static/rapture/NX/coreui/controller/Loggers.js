@@ -62,7 +62,7 @@ Ext.define('NX.coreui.controller.Loggers', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.refreshList
+          refresh: me.loadStore
         }
       },
       store: {
@@ -104,20 +104,6 @@ Ext.define('NX.coreui.controller.Loggers', {
 
     if (list) {
       list.getStore().load();
-    }
-  },
-
-  /**
-   * @private
-   * Loads logger store and shows refresh message.
-   */
-  refreshList: function () {
-    var me = this,
-        list = me.getList();
-
-    if (list) {
-      NX.Messages.add({ text: 'Loggers refreshed', type: 'default'});
-      me.loadStore();
     }
   },
 
