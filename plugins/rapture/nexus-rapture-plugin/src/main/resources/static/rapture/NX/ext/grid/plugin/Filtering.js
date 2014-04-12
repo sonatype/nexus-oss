@@ -94,8 +94,17 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
    * Filters on current filter value.
    */
   applyFilter: function () {
-    var me = this;
+    var me = this,
+        remoteFilter = me.filteredStore.remoteFilter,
+        filters = me.filteredStore.filters.items;
 
+    // HACK: when remote filter is on store will not be locally filtered, so we have to trick ExtJS into doing local
+    // filtering by setting remoteFilter to false and temporary remove the other filters (will add them back after local
+    // filtering is performed)
+    if (remoteFilter) {
+      me.filteredStore.filters.clear();
+      me.filteredStore.remoteFilter = false;
+    }
     if (me.filterValue) {
       me.logDebug(
           'Filtering ' + me.filteredStore.storeId + ' on [' + me.filterValue + '] using fields: ' + me.filteredFields
@@ -105,6 +114,12 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
     else {
       me.filteredStore.removeFilter(me.filteringFilter);
       me.logDebug('Filtering cleared on ' + me.filteredStore.storeId);
+    }
+    if (remoteFilter) {
+      me.filteredStore.remoteFilter = remoteFilter;
+      if (filters) {
+        me.filteredStore.filters.add(filters);
+      }
     }
   },
 
