@@ -37,6 +37,8 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
     { header: 'Method', dataIndex: 'method', flex: 1 }
   ],
 
+  emptyText: 'No privileges defined',
+
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
       menu: [

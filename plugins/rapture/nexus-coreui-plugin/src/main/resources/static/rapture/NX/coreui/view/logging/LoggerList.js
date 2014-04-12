@@ -48,8 +48,10 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
         ],
         queryMode: 'local'
       }
-    },
+    }
   ],
+
+  emptyText: 'No loggers defined',
 
   tbar: [
     {

@@ -35,6 +35,8 @@ Ext.define('NX.coreui.view.role.RoleList', {
     {header: 'Description', dataIndex: 'description', flex: 1}
   ],
 
+  emptyText: 'No roles defined',
+
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
       menu: [
