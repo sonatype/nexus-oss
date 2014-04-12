@@ -32,6 +32,10 @@ Ext.define('NX.coreui.view.user.UserAccount', {
         },
         items: [
           {
+            xtype: 'label',
+            html: '<p>Manage your account settings.</p>'
+          },
+          {
             name: 'id',
             itemId: 'id',
             readOnly: true,
