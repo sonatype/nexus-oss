@@ -306,6 +306,10 @@ Ext.define('NX.coreui.controller.Repositories', {
     );
   },
 
+  /**
+   * @private
+   * Navigate to same repository in browse mode.
+   */
   navigateToBrowseMode: function () {
     var me = this,
         list = me.getList();

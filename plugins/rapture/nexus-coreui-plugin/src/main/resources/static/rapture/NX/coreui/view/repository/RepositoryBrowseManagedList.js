@@ -11,15 +11,13 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Repository grid.
+ * Browse Managed Repository grid.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryList', {
+Ext.define('NX.coreui.view.repository.RepositoryBrowseManagedList', {
   extend: 'Ext.grid.Panel',
-  alias: 'widget.nx-coreui-repository-list',
-
-  store: 'Repository',
+  alias: ['widget.nx-coreui-repository-browse-managed-list', 'widget.nx-coreui-repository-browse-list'],
 
   columns: [
     {
@@ -40,14 +38,18 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
     { header: 'Provider', dataIndex: 'providerName' }
   ],
 
-  tbar: [
-    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
-      menu: []
-    },
-    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
-    '-',
-    { xtype: 'button', text: 'Browse', glyph: 'xf0e8@FontAwesome' /* fa-sitemap */, action: 'browse', disabled: true }
-  ],
+  plugins: ['gridfilterbox'],
 
-  plugins: ['gridfilterbox']
+  initComponent: function () {
+    var me = this;
+
+    me.store = Ext.create('NX.coreui.store.Repository', { remoteFilter: true });
+    me.store.filter([
+      { property: 'includeUserManaged', value: 'false' },
+      { property: 'includeNexusManaged', value: 'true' }
+    ]);
+
+    me.callParent(arguments);
+  }
+
 });

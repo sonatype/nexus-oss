@@ -55,27 +55,6 @@ Ext.define('NX.controller.Temp', {
       },
       {
         mode: 'browse',
-        path: '/Repository/Staging',
-        description: 'Browse staging repositories',
-        iconConfig: {
-          file: 'database_green.png',
-          variants: ['x16', 'x32']
-        },
-        visible: visibleIfLoggedIn
-      },
-      {
-        mode: 'browse',
-        path: '/Repository/Managed',
-        description: 'Browse managed repositories',
-        iconConfig: {
-          file: 'database_yellow.png',
-          variants: ['x16', 'x32']
-        },
-        visible: visibleIfLoggedIn,
-        weight: 300
-      },
-      {
-        mode: 'browse',
         path: '/Repository/Trash',
         description: 'Browse repository trash',
         iconConfig: {

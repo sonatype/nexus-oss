@@ -11,15 +11,13 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Repository grid.
+ * Browse Standard Repository grid.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseList', {
+Ext.define('NX.coreui.view.repository.RepositoryBrowseStandardList', {
   extend: 'Ext.grid.Panel',
-  alias: 'widget.nx-coreui-repository-browse-list',
-
-  store: 'Repository',
+  alias: ['widget.nx-coreui-repository-browse-standard-list', 'widget.nx-coreui-repository-browse-list'],
 
   columns: [
     {
@@ -44,5 +42,14 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseList', {
     { xtype: 'button', text: 'Administrate', glyph: 'xf013@FontAwesome' /* fa-gear */, action: 'admin', disabled: true, hidden: true }
   ],
 
-  plugins: ['gridfilterbox']
+  plugins: ['gridfilterbox'],
+
+  initComponent: function () {
+    var me = this;
+
+    me.store = Ext.create('NX.coreui.store.Repository');
+
+    me.callParent(arguments);
+  }
+
 });
