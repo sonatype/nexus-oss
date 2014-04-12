@@ -31,6 +31,7 @@ Ext.define('NX.coreui.controller.AnonymousSettings', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Security/Anonymous',
+      description: 'Manage anonymous user configuration',
       view: { xtype: 'nx-coreui-security-anonymous-settings' },
       iconConfig: {
         file: 'user_silhouette.png',

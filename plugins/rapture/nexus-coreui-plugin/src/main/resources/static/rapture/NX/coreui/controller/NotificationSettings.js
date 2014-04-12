@@ -49,6 +49,7 @@ Ext.define('NX.coreui.controller.NotificationSettings', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/System/Notifications',
+      description: 'Manage notification configuration',
       view: { xtype: 'nx-coreui-system-notification-settings' },
       iconConfig: {
         file: 'emails.png',

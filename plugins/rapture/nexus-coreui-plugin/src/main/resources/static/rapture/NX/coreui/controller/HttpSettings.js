@@ -31,6 +31,7 @@ Ext.define('NX.coreui.controller.HttpSettings', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/System/HTTP',
+      description: 'Manage outbound HTTP/HTTPS configuration',
       view: { xtype: 'nx-coreui-system-http-settings' },
       iconConfig: {
         file: 'transmit.png',

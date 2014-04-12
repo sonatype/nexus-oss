@@ -56,6 +56,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
   features: {
     mode: 'admin',
     path: '/System/Capabilities',
+    description: 'Manage capabilities',
     view: { xtype: 'nx-coreui-capability-feature' },
     iconConfig: {
       file: 'brick.png',

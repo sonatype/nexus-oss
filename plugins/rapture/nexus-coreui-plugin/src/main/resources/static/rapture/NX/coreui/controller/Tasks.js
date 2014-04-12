@@ -47,6 +47,7 @@ Ext.define('NX.coreui.controller.Tasks', {
   features: {
     mode: 'admin',
     path: '/System/Tasks',
+    description: 'Manage scheduled tasks',
     view: { xtype: 'nx-coreui-task-feature' },
     iconConfig: {
       file: 'time.png',
