@@ -10,23 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline.internal;
 
-import java.util.Collections;
 import java.util.Map;
 
 import org.sonatype.nexus.timeline.Entry;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import io.kazuki.v0.store.schema.model.Attribute;
-import io.kazuki.v0.store.schema.model.Attribute.Type;
-import io.kazuki.v0.store.schema.model.Schema;
 
 /**
- * Timeline entry persisted into KZ.
+ * Timeline entry persistent entity.
  *
  * @since 3.0
  */
@@ -34,15 +30,6 @@ public final class EntryRecord
     implements Entry
 {
   public static final String SCHEMA_NAME = "timeline-entry";
-
-  public static final Schema SCHEMA = new Schema(
-      ImmutableList.of(
-          new Attribute("timestamp", Type.U64, null, false),
-          new Attribute("type", Type.UTF8_SMALLSTRING, null, false),
-          new Attribute("subType", Type.UTF8_SMALLSTRING, null, false),
-          new Attribute("data", Type.MAP, null, false)
-      )
-  );
 
   private final long timestamp;
 
