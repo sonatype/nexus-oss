@@ -61,17 +61,18 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.Privileges',
     'NX.coreui.controller.RealmSettings',
     'NX.coreui.controller.Roles',
-    { id: 'NX.coreui.controller.SysInfo',
-      active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-atlas-plugin');
-      }
-    },
+    'NX.coreui.controller.Search',
+    'NX.coreui.controller.SmtpSettings',
     { id: 'NX.coreui.controller.SupportZip',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-atlas-plugin');
       }
     },
-    'NX.coreui.controller.Search',
+    { id: 'NX.coreui.controller.SysInfo',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-atlas-plugin');
+      }
+    },
     'NX.coreui.controller.Tasks',
     'NX.coreui.controller.UploadArtifact',
     'NX.coreui.controller.Users'

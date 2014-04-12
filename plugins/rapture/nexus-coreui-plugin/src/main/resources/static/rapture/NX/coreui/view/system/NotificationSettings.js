@@ -36,11 +36,6 @@ Ext.define('NX.coreui.view.system.NotificationSettings', {
           html: '<p>E-mail notifications.</p>'
         },
         {
-          xtype: 'nx-email',
-          name: 'systemEmail',
-          fieldLabel: 'System E-mail'
-        },
-        {
           xtype: 'checkbox',
           name: 'enabled',
           fieldLabel: 'Enable E-mail notifications'
@@ -71,74 +66,9 @@ Ext.define('NX.coreui.view.system.NotificationSettings', {
           displayField: 'name',
           delimiter: null,
           allowBlank: true
-        },
-
-        {
-          xtype: 'label',
-          html: '<p>SMTP settings.</p>'
-        },
-        {
-          name: 'smtpHost',
-          itemId: 'smtpHost',
-          fieldLabel: 'Host'
-        },
-        {
-          xtype: 'numberfield',
-          name: 'smtpPort',
-          itemId: 'smtpPort',
-          fieldLabel: 'Port',
-          minValue: 1,
-          maxValue: 65536,
-          allowDecimals: false,
-          allowExponential: false
-        },
-        {
-          name: 'smtpUsername',
-          allowBlank: true,
-          fieldLabel: 'Username'
-        },
-        {
-          xtype: 'nx-password',
-          name: 'smtpPassword',
-          fieldLabel: 'Password',
-          allowBlank: true
-        },
-        {
-          xtype: 'combo',
-          name: 'smtpConnectionType',
-          fieldLabel: 'Connection',
-          emptyText: 'select a connection type',
-          editable: false,
-          store: [
-            ['PLAIN', 'Use plain SMTP'],
-            ['SSL', 'Use secure SMTP (SSL)'],
-            ['TLS', 'Use STARTTLS negotiation (TLS)']
-          ],
-          queryMode: 'local',
-          useTrustStore: function (combo) {
-            var form = combo.up('form');
-            if (combo.getValue() === 'SSL') {
-              return {
-                name: 'useTrustStoreForSmtp',
-                host: form.down('#smtpHost'),
-                port: form.down('#smtpPort')
-              };
-            }
-            return undefined
-          }
         }
       ]
     }
-  ],
-
-  initComponent: function () {
-    var me = this;
-
-    me.callParent(arguments);
-
-    me.items.get(0).getDockedItems('toolbar[dock="bottom"]')[0].add({
-      xtype: 'button', text: 'Verify SMTP connection', formBind: true, action: 'verify', glyph: 'xf003@FontAwesome' /* fa-envelope-o */
-    });
-  }
+  ]
 
 });

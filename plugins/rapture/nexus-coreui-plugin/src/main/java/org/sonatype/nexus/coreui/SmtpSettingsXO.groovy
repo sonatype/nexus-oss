@@ -14,16 +14,32 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.apache.bval.constraints.Email
+import org.sonatype.nexus.extdirect.model.Password
+
+import javax.validation.constraints.NotNull
 
 /**
- * Notifications System Settings exchange object.
+ * SMTP System Settings exchange object.
  *
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
-class NotificationSettingsXO
+class SmtpSettingsXO
 {
-  Boolean enabled
-  Set<String> notifyEmails
-  Set<String> notifyRoles
+
+  @NotNull
+  @Email
+  String systemEmail
+
+  String host
+  Integer port
+  String username
+  Password password
+  ConnectionType connectionType
+  Boolean useTrustStore
+
+  public enum ConnectionType {
+    PLAIN, SSL, TLS
+  }
 }

@@ -22,8 +22,7 @@ Ext.define('NX.coreui.controller.NotificationSettings', {
     'Role'
   ],
   views: [
-    'system.NotificationSettings',
-    'system.VerifySMTPConnection'
+    'system.NotificationSettings'
   ],
 
   refs: [
@@ -38,13 +37,6 @@ Ext.define('NX.coreui.controller.NotificationSettings', {
    */
   init: function () {
     var me = this;
-
-    me.getApplication().getIconController().addIcons({
-      'verifysmtpconnection': {
-        file: 'emails.png',
-        variants: ['x16', 'x32']
-      }
-    });
 
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
@@ -69,12 +61,6 @@ Ext.define('NX.coreui.controller.NotificationSettings', {
       component: {
         'nx-coreui-system-notification-settings': {
           beforerender: me.loadRoles
-        },
-        'nx-coreui-system-notification-settings button[action=verify]': {
-          click: me.showVerifyConnectionWindow
-        },
-        'nx-coreui-system-verifysmtpconnection button[action=verify]': {
-          click: me.verifyConnection
         }
       }
     });
@@ -91,39 +77,6 @@ Ext.define('NX.coreui.controller.NotificationSettings', {
     if (panel) {
       me.getRoleStore().load();
     }
-  },
-
-  /**
-   * @private
-   */
-  showVerifyConnectionWindow: function (button) {
-    var form = button.up('form'),
-        values = form.getForm().getFieldValues();
-
-    Ext.widget('nx-coreui-system-verifysmtpconnection', { smtpSettings: values });
-  },
-
-  /**
-   * @private
-   * Verifies SMTP connection.
-   */
-  verifyConnection: function (button) {
-    var me = this,
-        win = button.up('window'),
-        form = button.up('form'),
-        email = form.getForm().getFieldValues().email,
-        panel = me.getPanel(),
-        smtpSettings = panel.down('form').getForm().getFieldValues();
-
-    win.close();
-    panel.mask('Checking SMTP connection to ' + smtpSettings.smtpHost);
-
-    NX.direct.coreui_NotificationSettings.verifyConnection(smtpSettings, email, function (response) {
-      panel.unmask();
-      if (Ext.isDefined(response) && response.success) {
-        NX.Messages.add({ text: 'SMTP configuration validated successfully, check your inbox', type: 'success' });
-      }
-    });
   }
 
 });
