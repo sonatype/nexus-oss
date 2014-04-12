@@ -107,13 +107,14 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
     }
     if (me.filterValue) {
       me.logDebug(
-          'Filtering ' + me.filteredStore.storeId + ' on [' + me.filterValue + '] using fields: ' + me.filteredFields
+          'Filtering ' + me.filteredStore.self.getName() + ' on [' + me.filterValue
+              + '] using fields: ' + me.filteredFields
       );
       me.filteredStore.filter(me.filteringFilter);
     }
     else {
       me.filteredStore.removeFilter(me.filteringFilter);
-      me.logDebug('Filtering cleared on ' + me.filteredStore.storeId);
+      me.logDebug('Filtering cleared on ' + me.filteredStore.self.getName());
     }
     if (remoteFilter) {
       me.filteredStore.remoteFilter = remoteFilter;
@@ -236,7 +237,7 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
     var me = this;
     me.filteredStore = store;
     if (store) {
-      me.logDebug('Binding to store ' + me.filteredStore.storeId);
+      me.logDebug('Binding to store ' + me.filteredStore.self.getName());
       me.grid.mon(store, 'load', me.applyFilter, me);
       me.grid.mon(store, 'filterchange', me.syncFilterValue, me);
     }
@@ -250,7 +251,7 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
   unbindFromStore: function (store) {
     var me = this;
     if (store) {
-      me.logDebug('Unbinding from store ' + me.filteredStore.storeId);
+      me.logDebug('Unbinding from store ' + me.filteredStore.self.getName());
       me.grid.mun(store, 'load', me.applyFilter, me);
       me.grid.mun(store, 'filterchange', me.syncFilterValue, me);
     }
