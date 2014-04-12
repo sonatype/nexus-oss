@@ -37,7 +37,8 @@ Ext.define('NX.coreui.view.security.RealmSettings', {
       items: [
         {
           xtype: 'label',
-          html: '<p>Configure the active security realms and realm order.</p>'
+          html: '<p>Configure the active security realms and realm order.</p>' +
+              '<p>At least one security realm must be active.</p>'
         },
         {
           xtype: 'nx-itemselector',
