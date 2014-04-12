@@ -42,6 +42,8 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteList', {
     { header: 'Repositories', dataIndex: 'mappedRepositoriesNames', flex: 1 }
   ],
 
+  emptyText: 'No repository routes defined',
+
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }

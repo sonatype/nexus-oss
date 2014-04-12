@@ -35,6 +35,8 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetList', {
     { header: 'Patterns', dataIndex: 'patterns', flex: 1 }
   ],
 
+  emptyText: 'No repository targets defined',
+
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }

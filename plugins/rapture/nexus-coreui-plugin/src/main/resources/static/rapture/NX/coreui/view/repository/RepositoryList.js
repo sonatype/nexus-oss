@@ -40,6 +40,8 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
     { header: 'Provider', dataIndex: 'providerName' }
   ],
 
+  emptyText: 'No repositories defined',
+
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
       menu: []
