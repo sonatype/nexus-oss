@@ -225,6 +225,8 @@ Ext.define('NX.coreui.controller.Search', {
         store.fireEvent('filterchange', store, store.filters.items);
       }
     }
+
+    me.bookmarkFilters();
   },
 
   onSelectionChange: function (selectionModel, selected) {
@@ -278,6 +280,23 @@ Ext.define('NX.coreui.controller.Search', {
 
   /**
    * @private
+   * Bookmark search values.
+   */
+  bookmarkFilters: function () {
+    var me = this,
+        segments = [NX.Bookmarks.getBookmark().getSegment(0)];
+
+    Ext.Array.each(Ext.ComponentQuery.query('nx-searchfeature component[searchCriteria=true]'), function (cmp) {
+      if (cmp.getValue() && !cmp.isHidden()) {
+        segments.push(cmp.criteriaId + '=' + encodeURIComponent(cmp.getValue()));
+      }
+    });
+
+    NX.Bookmarks.bookmark(NX.Bookmarks.fromSegments(segments), me);
+  },
+
+  /**
+   * @private
    * @param {NX.ext.SearchBox} quickSearch search box
    * @param {String} searchValue search value
    */
@@ -286,9 +305,10 @@ Ext.define('NX.coreui.controller.Search', {
         searchFeature = me.getSearchFeature();
 
     if (!searchFeature || (searchFeature.searchFilter.getId() !== 'keyword')) {
-      NX.Bookmarks.navigateTo(NX.Bookmarks.fromSegments(
-          ['search/keyword', 'keyword=' + encodeURIComponent(searchValue)]
-      ));
+      NX.Bookmarks.navigateTo(
+          NX.Bookmarks.fromSegments(['search/keyword', 'keyword=' + encodeURIComponent(searchValue)]),
+          me
+      );
     }
     else {
       searchFeature.down('#criteria component[criteriaId=keyword]').setValue(searchValue);
