@@ -21,6 +21,7 @@ Ext.define('NX.coreui.view.support.SysInfo', {
 
   layout: 'fit',
   autoScroll: true,
+  bodyPadding: 10,
 
   tbar: [
     {
