@@ -70,6 +70,15 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       },
       {
         mode: 'browse',
+        path: '/Repository',
+        group: true,
+        iconConfig: {
+          file: 'database.png',
+          variants: ['x16', 'x32']
+        }
+      },
+      {
+        mode: 'browse',
         path: '/Upload',
         description: 'Upload content to Nexus',
         group: true,

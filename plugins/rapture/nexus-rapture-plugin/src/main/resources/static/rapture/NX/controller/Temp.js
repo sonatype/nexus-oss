@@ -32,27 +32,6 @@ Ext.define('NX.controller.Temp', {
     };
 
     me.getApplication().getFeaturesController().registerFeature([
-      // browse mode
-      {
-        mode: 'browse',
-        path: '/Components',
-        description: 'Browse components',
-        authenticationRequired: false,
-        iconConfig: {
-          file: 'box.png',
-          variants: ['x16', 'x32']
-        }
-      },
-      {
-        mode: 'browse',
-        path: '/Repository',
-        group: true,
-        authenticationRequired: false,
-        iconConfig: {
-          file: 'database.png',
-          variants: ['x16', 'x32']
-        }
-      },
       {
         mode: 'browse',
         path: '/Repository/Trash',
