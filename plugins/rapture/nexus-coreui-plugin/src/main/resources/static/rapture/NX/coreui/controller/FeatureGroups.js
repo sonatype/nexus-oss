@@ -71,6 +71,7 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'browse',
         path: '/Repository',
+        description: 'Browse repositories',
         group: true,
         iconConfig: {
           file: 'database.png',
