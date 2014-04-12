@@ -37,10 +37,14 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
         // request settings
         {
           xtype: 'label',
-          html: '<p>HTTP request settings.</p>'
+          html: '<p>Nexus uses HTTP to fetch content from remote servers.  In some cases customization of HTTP request configuration may be required.</p>'
         },
         {
           xtype: 'nx-coreui-httprequestsettings'
+        },
+        {
+          xtype: 'label',
+          html: '<p>When Nexus is behind a firewall or otherwise needs to have a proxy server configured to access remote servers via HTTP proxy server configuration may be required.</p>'
         },
         {
           xtype: 'nx-optionalfieldset',
