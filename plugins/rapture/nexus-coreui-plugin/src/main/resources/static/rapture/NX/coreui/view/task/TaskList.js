@@ -39,6 +39,8 @@ Ext.define('NX.coreui.view.task.TaskList', {
     { header: 'Last Result', dataIndex: 'lastRunResult' }
   ],
 
+  emptyText: 'No scheduled tasks defined',
+
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
