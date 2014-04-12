@@ -32,15 +32,6 @@ Ext.define('NX.controller.Temp', {
     };
 
     me.getApplication().getFeaturesController().registerFeature([
-      {
-        path: '/Staging/Repositories',
-        iconConfig: {
-          file: 'database_green.png',
-          variants: ['x16', 'x32']
-        },
-        visible: visibleIfLoggedIn
-      },
-
       // browse mode
       {
         mode: 'browse',
