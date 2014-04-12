@@ -35,7 +35,8 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
         items: [
           {
             xtype: 'label',
-            html: '<p>Anonymous user access settings.</p>'
+            html: '<p>Nexus can be configured to allow or disallow anonymous users from accessing the system.</p>' +
+                '<p>If only authenticated users should be allowed to use this server, disable anonymous access.</p>'
           },
           {
             xtype: 'checkbox',
@@ -49,7 +50,7 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
           },
           {
             xtype: 'nx-optionalfieldset',
-            title: 'Use custom anonymous user',
+            title: 'Customize anonymous user credentials',
             itemId: 'useCustomUser',
             checkboxToggle: true,
             checkboxName: 'useCustomUser',
@@ -57,7 +58,7 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
             items: [
               {
                 xtype: 'label',
-                html: '<p>Override the default anonymous user.</p>'
+                html: '<p>In rare cases the <em>anonymous</em> username and password may be overridden; this is normally not needed.</p>'
               },
               {
                 xtype: 'textfield',
