@@ -44,7 +44,7 @@ Ext.define('NX.coreui.view.system.NotificationSettings', {
         {
           xtype: 'nx-valueset',
           name: 'notifyEmails',
-          fieldLabel: 'Notify users in roles',
+          fieldLabel: 'Notify email addresses',
           emptyText: 'enter an email address',
           input: {
             xtype: 'nx-email'
