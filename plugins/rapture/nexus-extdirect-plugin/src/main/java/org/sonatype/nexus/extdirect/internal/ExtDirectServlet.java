@@ -184,11 +184,8 @@ public class ExtDirectServlet
       protected Object invokeMethod(final RegisteredMethod method, final Object actionInstance,
                                     final Object[] parameters) throws Exception
       {
-        if (log.isTraceEnabled()) {
-          log.trace("Invoking action method: {}, java-method: {}", method.getFullName(), method.getFullJavaMethodName());
-        }
-        else if (log.isDebugEnabled()) {
-          log.debug("Invoking action method: {}", method.getFullName());
+        if (log.isDebugEnabled()) {
+          log.debug("Invoking action method: {}, java-method: {}", method.getFullName(), method.getFullJavaMethodName());
         }
 
         Response response = null;
