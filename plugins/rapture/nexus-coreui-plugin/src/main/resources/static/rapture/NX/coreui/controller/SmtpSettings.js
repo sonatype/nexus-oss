@@ -49,7 +49,7 @@ Ext.define('NX.coreui.controller.SmtpSettings', {
       description: 'Manage email server SMTP configuration',
       view: { xtype: 'nx-coreui-system-smtp-settings' },
       iconConfig: {
-        file: 'emails.png',
+        file: 'email.png',
         variants: ['x16', 'x32']
       },
       visible: function () {
