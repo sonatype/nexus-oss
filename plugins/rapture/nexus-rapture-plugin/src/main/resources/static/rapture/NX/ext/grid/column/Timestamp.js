@@ -18,7 +18,7 @@
  */
 Ext.define('NX.ext.grid.column.Timestamp', {
   extend: 'Ext.grid.column.Column',
-  alias: ['widget.timestampcolumn'],
+  alias: ['widget.nx-timestampcolumn'],
   requires: [
     'Ext.Date',
     'NX.util.DateFormat'
