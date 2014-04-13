@@ -18,6 +18,7 @@ import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.sonatype.nexus.configuration.application.NexusConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.notification.NotificationManager
@@ -43,12 +44,11 @@ class NotificationSettingsComponent
 extends DirectComponentSupport
 {
 
-  private static final TRUST_STORE_TYPE = 'smtp'
-
-  private static final TRUST_STORE_ID = 'global'
-
   @Inject
   NotificationManager notificationManager
+
+  @Inject
+  NexusConfiguration nexusConfiguration
 
   /**
    * Retrieves notification system settings
@@ -80,6 +80,8 @@ extends DirectComponentSupport
     if (notificationSettingsXO.notifyEmails) notificationTarget.externalTargets.addAll(notificationSettingsXO.notifyEmails)
     if (notificationSettingsXO.notifyRoles) notificationTarget.targetRoles.addAll(notificationSettingsXO.notifyRoles)
     notificationManager.updateNotificationTarget(notificationTarget)
+
+    nexusConfiguration.saveConfiguration()
 
     return read()
   }
