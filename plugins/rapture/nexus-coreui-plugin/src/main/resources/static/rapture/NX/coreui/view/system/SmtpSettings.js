@@ -33,49 +33,24 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
       items: [
         {
           xtype: 'label',
-          html: '<p>SMTP settings.</p>'
+          html: '<p>Nexus can send email notifications for various events.</p>' +
+              '<p>To enable sending email please configure a SMTP server.</p>'
         },
         {
           xtype: 'nx-email',
           name: 'systemEmail',
-          fieldLabel: 'System E-mail'
-        },
-        {
-          name: 'host',
-          itemId: 'host',
-          fieldLabel: 'Host'
-        },
-        {
-          xtype: 'numberfield',
-          name: 'port',
-          itemId: 'port',
-          fieldLabel: 'Port',
-          minValue: 1,
-          maxValue: 65536,
-          allowDecimals: false,
-          allowExponential: false
-        },
-        {
-          name: 'username',
-          allowBlank: true,
-          fieldLabel: 'Username'
-        },
-        {
-          xtype: 'nx-password',
-          name: 'password',
-          fieldLabel: 'Password',
-          allowBlank: true
+          fieldLabel: 'Email address used as the FROM address for all email notifications'
         },
         {
           xtype: 'combo',
           name: 'connectionType',
-          fieldLabel: 'Connection',
+          fieldLabel: 'SMTP server type',
           emptyText: 'select a connection type',
           editable: false,
           store: [
-            ['PLAIN', 'Use plain SMTP'],
-            ['SSL', 'Use secure SMTP (SSL)'],
-            ['TLS', 'Use STARTTLS negotiation (TLS)']
+            ['PLAIN', 'Plain SMTP'],
+            ['SSL', 'Secure SMTP via SSL'],
+            ['TLS', 'Secure SMTP via TLS']
           ],
           queryMode: 'local',
           useTrustStore: function (combo) {
@@ -89,6 +64,32 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
             }
             return undefined
           }
+        },
+        {
+          name: 'host',
+          itemId: 'host',
+          fieldLabel: 'SMTP server hostname'
+        },
+        {
+          xtype: 'numberfield',
+          name: 'port',
+          itemId: 'port',
+          fieldLabel: 'SMTP server port',
+          minValue: 1,
+          maxValue: 65536,
+          allowDecimals: false,
+          allowExponential: false
+        },
+        {
+          name: 'username',
+          allowBlank: true,
+          fieldLabel: 'SMTP username to authenticate'
+        },
+        {
+          xtype: 'nx-password',
+          name: 'password',
+          fieldLabel: 'SMTP password',
+          allowBlank: true
         }
       ]
     }
