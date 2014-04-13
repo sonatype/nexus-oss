@@ -4,7 +4,7 @@
 Ext.require([
   'Ext.app.*',
   'Ext.button.*',
-  //'Ext.chart.*',
+  'Ext.chart.*',
   'Ext.container.*',
   'Ext.data.*',
   'Ext.dd.*',
