@@ -17,7 +17,7 @@
  *
  * @since 3.0
  */
-Ext.define('NX.ext.grid.IconColumn', {
+Ext.define('NX.ext.grid.column.Icon', {
   extend: 'Ext.grid.column.Column',
   alias: 'widget.iconcolumn',
 
