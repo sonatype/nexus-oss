@@ -21,6 +21,7 @@ import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.sonatype.nexus.testsuite.plugin.nexus2810.AbstractPluginConsoleIT;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -39,6 +40,7 @@ import static org.sonatype.nexus.test.utils.StatusMatchers.isSuccess;
 public class NXCM2124CheckConsoleDocumentationIT
     extends AbstractPluginConsoleIT
 {
+  @Ignore("FIXME: replace plugin console")
   @Test
   public void checkDoc()
       throws IOException

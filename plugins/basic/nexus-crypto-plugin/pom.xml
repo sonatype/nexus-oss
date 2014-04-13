@@ -25,12 +25,7 @@
 
   <artifactId>nexus-crypto-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
-
-  <properties>
-    <pluginName>Nexus Crypto Provider Plugin</pluginName>
-    <pluginDescription>Provides support for cryptography in Nexus.</pluginDescription>
-  </properties>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -69,39 +64,30 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
-          <sharedDependencies>
-            <sharedDependency>org.bouncycastle:bcprov-jdk15on</sharedDependency>
-            <sharedDependency>org.bouncycastle:bcpg-jdk15on</sharedDependency>
-            <sharedDependency>org.bouncycastle:bcpkix-jdk15on</sharedDependency>
-            <sharedDependency>org.sonatype.sisu.goodies:goodies-crypto</sharedDependency>
-          </sharedDependencies>
+          <instructions>
+            <Bundle-Name>Nexus Crypto Provider Plugin</Bundle-Name>
+            <Bundle-Description>Provides support for cryptography in Nexus.</Bundle-Description>
+            <Embed-Dependency>
+              *;scope=compile
+            </Embed-Dependency>
+            <Embed-Directory>lib</Embed-Directory>
+            <_exportcontents>
+              !lib.*,org.*;-noimport:=true
+            </_exportcontents>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api,
+              bcprov;resolution:=optional
+            </Require-Bundle>
+          </instructions>
         </configuration>
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>prepare-package</phase>
-            <configuration>
-              <target>
-                <!--
-                BC provider will be installed as a separate bundle to pass signature verification
-                -->
-                <manifest file="${project.build.directory}/nexus-plugin-bundle/osgi.metadata" mode="update">
-                  <attribute name="Require-Bundle" value="bcprov,org.sonatype.nexus.plugin-api"/>
-                </manifest>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

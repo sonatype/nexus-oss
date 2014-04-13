@@ -42,7 +42,6 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
         <configuration>
           <instructions>
             <Fragment-Host>org.sonatype.nexus.extender</Fragment-Host>

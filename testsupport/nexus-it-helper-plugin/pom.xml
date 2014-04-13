@@ -25,13 +25,7 @@
 
   <artifactId>nexus-it-helper-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
-
-  <properties>
-    <pluginName>Nexus Test Helper Plugin</pluginName>
-    <pluginDescription>This plugin injects some extra functionality into Nexus that are used when running ITs.
-    </pluginDescription>
-  </properties>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -46,7 +40,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -54,7 +47,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-extdirect-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -69,8 +61,21 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-Name>Nexus Test Helper Plugin</Bundle-Name>
+            <Bundle-Description>
+              This plugin injects some extra functionality into Nexus that are used when running ITs.
+            </Bundle-Description>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api,
+              org.sonatype.nexus.plugins.nexus-extdirect-plugin,
+              org.sonatype.nexus.plugins.nexus-restlet1x-plugin
+            </Require-Bundle>
+          </instructions>
+        </configuration>
       </plugin>
     </plugins>
   </build>

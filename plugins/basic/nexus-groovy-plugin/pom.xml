@@ -25,12 +25,7 @@
 
   <artifactId>nexus-groovy-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
-
-  <properties>
-    <pluginName>Nexus Groovy Provider Plugin</pluginName>
-    <pluginDescription>Provides access to Groovy runtime.</pluginDescription>
-  </properties>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -54,13 +49,29 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
-          <sharedDependencies>
-            <sharedDependency>org.codehaus.groovy:groovy-all</sharedDependency>
-          </sharedDependencies>
+          <instructions>
+            <Bundle-Name>Nexus Groovy Provider Plugin</Bundle-Name>
+            <Bundle-Description>Provides access to Groovy runtime.</Bundle-Description>
+            <Embed-Dependency>
+              *;scope=compile
+            </Embed-Dependency>
+            <Embed-Directory>lib</Embed-Directory>
+            <_exportcontents>
+              !lib.*,groovy.*|org.*;-noimport:=true
+            </_exportcontents>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api
+            </Require-Bundle>
+          </instructions>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

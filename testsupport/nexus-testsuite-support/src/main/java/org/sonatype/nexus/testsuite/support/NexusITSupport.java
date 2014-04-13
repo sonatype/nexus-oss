@@ -358,7 +358,7 @@ public abstract class NexusITSupport
       final Properties props = Properties2.load(pomUrl);
       final String version = props.getProperty("version");
       nexus.getConfiguration().addPlugins(
-          artifactResolver().resolveArtifact("org.sonatype.nexus:nexus-it-helper-plugin:zip:bundle:" + version)
+          artifactResolver().resolveArtifact("org.sonatype.nexus:nexus-it-helper-plugin:jar:" + version)
       );
     }
     catch (final IOException e) {

@@ -99,12 +99,6 @@
     -->
     <nexus.configuration.version>2.8.0</nexus.configuration.version>
 
-    <!--
-    Configuration of 'nexus-plugin' packaging and bundles.
-    -->
-    <nexus-plugin-bundle.version>1.2</nexus-plugin-bundle.version>
-    <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
-
     <!-- logging configuration used in logback config files to control test logging -->
     <test.log.level>INFO</test.log.level>
     <test.log.pattern>%date %level [%thread%X{DC}] %logger - %msg%n</test.log.pattern>
@@ -122,11 +116,6 @@
     -->
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
-
-    <!--
-    Directory containing generated sisu metadata.
-    -->
-    <sisu.meta>${project.build.outputDirectory}/META-INF/sisu</sisu.meta>
   </properties>
 
   <modules>
@@ -151,9 +140,9 @@
       <dependency>
         <groupId>${it.nexus.bundle.groupId}</groupId>
         <artifactId>${it.nexus.bundle.artifactId}</artifactId>
+        <version>${it.nexus.bundle.version}</version>
         <classifier>bundle</classifier>
         <type>zip</type>
-        <version>${it.nexus.bundle.version}</version>
       </dependency>
 
       <!-- components -->
@@ -291,15 +280,12 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-it-helper-plugin</artifactId>
-        <classifier>bundle</classifier>
-        <type>zip</type>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-testsuite-ui-plugin</artifactId>
-        <type>nexus-plugin</type>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
@@ -512,19 +498,6 @@
           </configuration>
         </plugin>
 
-        <!--
-        Support for nexus-plugin packaging.
-        -->
-        <plugin>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-          <version>${nexus-plugin-bundle.version}</version>
-          <extensions>true</extensions>
-          <configuration>
-            <bannedRootArtifactId>org.sonatype.nexus:nexus-plugin-api:jar:${nexus.version}</bannedRootArtifactId>
-          </configuration>
-        </plugin>
-
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>provided-dependencies-maven-plugin</artifactId>
@@ -553,6 +526,7 @@
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
           <version>2.4.0</version>
+          <extensions>true</extensions>
           <configuration>
             <instructions>
               <!--
@@ -561,13 +535,23 @@
               <_nouses>true</_nouses>
               <_nodefaultversion>true</_nodefaultversion>
               <Include-Resource>
-                {maven-resources},$(if;$(dir;${sisu.meta});META-INF/sisu=${sisu.meta})
+                /=${project.build.outputDirectory},{maven-resources}
               </Include-Resource>
               <_removeheaders>
                 Embed*,Include-Resource,Private-Package
               </_removeheaders>
             </instructions>
           </configuration>
+        </plugin>
+
+        <!--
+        Generate Karaf feature XML.
+        -->
+        <plugin>
+          <groupId>org.apache.karaf.tooling</groupId>
+          <artifactId>karaf-maven-plugin</artifactId>
+          <version>3.0.0</version>
+          <extensions>true</extensions>
         </plugin>
 
         <!--
@@ -1065,16 +1049,6 @@
     </profile>
 
     <!--
-    Support for loading Nexus projects in Intellij IDEA; as it doesn't handle the 'nexus-plugin' packaging WRT to dependency calculations.
-    -->
-    <profile>
-      <id>idea</id>
-      <properties>
-        <nexus-plugin.type>jar</nexus-plugin.type>
-      </properties>
-    </profile>
-
-    <!--
     Support for loading projects in Eclipse.
     -->
     <profile>
@@ -1128,19 +1102,6 @@
                         <versionRange>[1.0,)</versionRange>
                         <goals>
                           <goal>allocate-ports</goal>
-                        </goals>
-                      </pluginExecutionFilter>
-                      <action>
-                        <ignore/>
-                      </action>
-                    </pluginExecution>
-                    <pluginExecution>
-                      <pluginExecutionFilter>
-                        <groupId>org.sonatype.nexus</groupId>
-                        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-                        <versionRange>[1.0,)</versionRange>
-                        <goals>
-                          <goal>generate-metadata</goal>
                         </goals>
                       </pluginExecutionFilter>
                       <action>

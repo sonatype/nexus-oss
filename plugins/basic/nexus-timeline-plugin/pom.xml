@@ -25,12 +25,7 @@
 
   <artifactId>nexus-timeline-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
-
-  <properties>
-    <pluginName>Nexus Timeline Plugin</pluginName>
-    <pluginDescription>Adds timeline and feeds based on it.</pluginDescription>
-  </properties>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -43,7 +38,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-kazuki-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
@@ -64,7 +58,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-siesta-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
@@ -72,21 +65,18 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ui-extjs3-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-groovy-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-extdirect-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
@@ -109,13 +99,40 @@
       </plugin>
 
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
       </plugin>
 
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-Name>Nexus Timeline Plugin</Bundle-Name>
+            <Bundle-Description>Adds timeline and feeds based on it.</Bundle-Description>
+            <Embed-Dependency>
+              *;scope=compile
+            </Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+            <Embed-Directory>lib</Embed-Directory>
+            <_exportcontents>
+              !lib.*,com.*|org.*;-noimport:=true
+            </_exportcontents>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api,
+              org.sonatype.nexus.plugins.nexus-kazuki-plugin,
+              org.sonatype.nexus.plugins.nexus-siesta-plugin,
+              org.sonatype.nexus.plugins.nexus-ui-extjs3-plugin,
+              org.sonatype.nexus.plugins.nexus-groovy-plugin,
+              org.sonatype.nexus.plugins.nexus-extdirect-plugin
+            </Require-Bundle>
+          </instructions>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

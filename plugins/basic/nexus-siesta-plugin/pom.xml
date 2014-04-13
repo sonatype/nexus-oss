@@ -25,12 +25,7 @@
 
   <artifactId>nexus-siesta-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
-
-  <properties>
-    <pluginName>Nexus Siesta Plugin</pluginName>
-    <pluginDescription>Support for Siesta (Jersey) REST API.</pluginDescription>
-  </properties>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -93,7 +88,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ui-extjs3-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -101,29 +95,36 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
-          <sharedDependencies>
-            <sharedDependency>javax.ws.rs:jsr311-api</sharedDependency>
-            <sharedDependency>org.sonatype.sisu.siesta:siesta-common</sharedDependency>
-            <sharedDependency>org.sonatype.sisu.siesta:siesta-server</sharedDependency>
-            <sharedDependency>org.sonatype.sisu.siesta:siesta-client</sharedDependency>
-            <sharedDependency>org.sonatype.sisu.siesta:siesta-jackson</sharedDependency>
-            <sharedDependency>com.sun.jersey:jersey-core</sharedDependency>
-            <sharedDependency>com.sun.jersey:jersey-server</sharedDependency>
-            <sharedDependency>com.sun.jersey:jersey-servlet</sharedDependency>
-            <sharedDependency>com.sun.jersey:jersey-client</sharedDependency>
-            <sharedDependency>com.sun.jersey.contribs:jersey-multipart</sharedDependency>
-            <sharedDependency>com.sun.jersey.contribs:jersey-apache-client4</sharedDependency>
-            <sharedDependency>org.sonatype.sisu.jacksbee:jacksbee-runtime</sharedDependency>
-          </sharedDependencies>
+          <instructions>
+            <Bundle-Name>Nexus Siesta Plugin</Bundle-Name>
+            <Bundle-Description>Support for Siesta (Jersey) REST API.</Bundle-Description>
+            <Embed-Dependency>
+              *;scope=compile;artifactId=!aop*|jsr305|javax.inject|guava|sisu-guice|jackson-[cad]*|*eclipse*|slf4j*|v*
+            </Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+            <Embed-Directory>lib</Embed-Directory>
+            <_exportcontents>
+              !lib.*,com.*|javax.*|org.*;-noimport:=true
+            </_exportcontents>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api,
+              org.sonatype.nexus.plugins.nexus-ui-extjs3-plugin
+            </Require-Bundle>
+          </instructions>
         </configuration>
       </plugin>
 
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

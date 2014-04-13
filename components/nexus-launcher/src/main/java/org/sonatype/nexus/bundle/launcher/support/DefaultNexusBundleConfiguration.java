@@ -241,7 +241,7 @@ public class DefaultNexusBundleConfiguration
       else {
         overlays.add(
             fileTaskBuilder.expand(file(plugin))
-                .to().directory(path("sonatype-work/nexus/plugin-repository"))
+                .to().directory(path("sonatype-work/nexus/plugin-repository/" + plugin.getName()))
         );
       }
     }

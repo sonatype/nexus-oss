@@ -28,12 +28,7 @@
 
   <artifactId>nexus-ldap-realm-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
-
-  <properties>
-    <pluginName>Nexus OSS LDAP Plugin</pluginName>
-    <pluginDescription>Adds a LDAP security realm to Nexus.</pluginDescription>
-  </properties>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -45,21 +40,18 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ui-extjs3-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-crypto-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
@@ -84,18 +76,37 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
-          <sharedDependencies>
-            <sharedDependency>org.sonatype.nexus:nexus-ldap-common</sharedDependency>
-          </sharedDependencies>
+          <instructions>
+            <Bundle-Name>Nexus OSS LDAP Plugin</Bundle-Name>
+            <Bundle-Description>Adds a LDAP security realm to Nexus.</Bundle-Description>
+            <Embed-Dependency>
+              *;scope=compile
+            </Embed-Dependency>
+            <Embed-Directory>lib</Embed-Directory>
+            <_exportcontents>
+              !lib.*,org.*;-noimport:=true
+            </_exportcontents>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api,
+              org.sonatype.nexus.plugins.nexus-crypto-plugin,
+              org.sonatype.nexus.plugins.nexus-restlet1x-plugin,
+              org.sonatype.nexus.plugins.nexus-ui-extjs3-plugin
+            </Require-Bundle>
+          </instructions>
         </configuration>
       </plugin>
 
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

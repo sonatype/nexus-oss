@@ -43,31 +43,18 @@ public class PluginEnvironmentMojo
   {
     if (!artifact.isResolved()) {
       if (equivalent(artifact, project.getArtifact())) {
-        Artifact da;
-        File bundle;
-        if ("nexus-plugin".equals(project.getArtifact().getType())) {
-          da =
-              artifactFactory.createArtifactWithClassifier(project.getArtifact().getGroupId(),
-                  project.getArtifact().getArtifactId(),
-                  project.getArtifact().getVersion(), "zip",
-                  "bundle");
-          bundle =
-              new File(project.getBuild().getDirectory(), project.getBuild().getFinalName() + "-bundle.zip");
-        }
-        else {
-          da =
-              artifactFactory.createArtifactWithClassifier(project.getArtifact().getGroupId(),
-                  project.getArtifact().getArtifactId(),
-                  project.getArtifact().getVersion(),
-                  project.getArtifact().getType(),
-                  project.getArtifact().getClassifier());
-          String classifier =
-              project.getArtifact().getClassifier() == null ? "" : "-"
-                  + project.getArtifact().getClassifier();
-          bundle =
-              new File(project.getBuild().getDirectory(), project.getBuild().getFinalName() + classifier
-                  + "." + project.getArtifact().getType());
-        }
+        Artifact da =
+            artifactFactory.createArtifactWithClassifier(project.getArtifact().getGroupId(),
+                project.getArtifact().getArtifactId(),
+                project.getArtifact().getVersion(),
+                project.getArtifact().getType(),
+                project.getArtifact().getClassifier());
+        String classifier =
+            project.getArtifact().getClassifier() == null ? "" : "-"
+                + project.getArtifact().getClassifier();
+        File bundle =
+            new File(project.getBuild().getDirectory(), project.getBuild().getFinalName() + classifier
+                + "." + project.getArtifact().getType());
 
         da.setResolved(true);
         bundle = bundle.getAbsoluteFile();
@@ -133,39 +120,24 @@ public class PluginEnvironmentMojo
       return false;
     }
 
-    if (!("nexus-plugin".equals(ma.getType()) || "nexus-plugin".equals(artifact.getType())
-        || ma.getType() == null || artifact.getType() == null)) {
-      if (ma.getType() == null) {
-        if (!"jar".equals(artifact.getType())) {
-          if (artifact.getType() != null) {
-            return false;
-          }
-        }
-      }
-      else if (!ma.getType().equals(artifact.getType())) {
-        return false;
-      }
-
-      if (ma.getClassifier() == null) {
-        if (artifact.getClassifier() != null) {
+    if (ma.getType() == null) {
+      if (!"jar".equals(artifact.getType())) {
+        if (artifact.getType() != null) {
           return false;
         }
       }
-      else if (!ma.getClassifier().equals(artifact.getClassifier())) {
+    }
+    else if (!ma.getType().equals(artifact.getType())) {
+      return false;
+    }
+
+    if (ma.getClassifier() == null) {
+      if (artifact.getClassifier() != null) {
         return false;
       }
     }
-    else {
-      if ("nexus-plugin".equals(ma.getType())) {
-        if (!"bundle".equals(artifact.getClassifier()) && !"zip".equals(artifact.getType())) {
-          return false;
-        }
-      }
-      else {
-        if (!"bundle".equals(ma.getClassifier()) && !"zip".equals(ma.getType())) {
-          return false;
-        }
-      }
+    else if (!ma.getClassifier().equals(artifact.getClassifier())) {
+      return false;
     }
 
     return true;

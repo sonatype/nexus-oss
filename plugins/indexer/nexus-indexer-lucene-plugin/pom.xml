@@ -25,12 +25,7 @@
 
   <artifactId>nexus-indexer-lucene-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
-
-  <properties>
-    <pluginName>Nexus Indexer Lucene Plugin</pluginName>
-    <pluginDescription>Adds search capabilities for repository content.</pluginDescription>
-  </properties>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -67,14 +62,12 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ui-extjs3-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
@@ -100,25 +93,37 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
-          <sharedDependencies>
-            <sharedDependencies>org.sonatype.nexus.plugins:nexus-indexer-lucene-model</sharedDependencies>
-            <sharedDependencies>org.apache.maven.indexer:indexer-artifact</sharedDependencies>
-            <sharedDependencies>org.apache.maven.indexer:indexer-core</sharedDependencies>
-            <sharedDependencies>org.apache.lucene:lucene-core</sharedDependencies>
-            <sharedDependencies>org.apache.lucene:lucene-highlighter</sharedDependencies>
-            <sharedDependencies>org.apache.lucene:lucene-memory</sharedDependencies>
-            <sharedDependencies>org.sonatype.aether:aether-api</sharedDependencies>
-            <sharedDependencies>org.sonatype.aether:aether-util</sharedDependencies>
-          </sharedDependencies>
+          <instructions>
+            <Bundle-Name>Nexus Indexer Lucene Plugin</Bundle-Name>
+            <Bundle-Description>Adds search capabilities for repository content.</Bundle-Description>
+            <Embed-Dependency>
+              *;scope=compile;artifactId=!aether*|maven*|plexus*
+            </Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+            <Embed-Directory>lib</Embed-Directory>
+            <_exportcontents>
+              !lib.*,org.*;-noimport:=true
+            </_exportcontents>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api,
+              org.sonatype.nexus.plugins.nexus-restlet1x-plugin,
+              org.sonatype.nexus.plugins.nexus-ui-extjs3-plugin
+            </Require-Bundle>
+          </instructions>
         </configuration>
       </plugin>
 
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

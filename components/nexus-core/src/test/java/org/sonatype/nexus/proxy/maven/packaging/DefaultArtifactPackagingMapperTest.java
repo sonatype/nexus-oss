@@ -48,7 +48,6 @@ public class DefaultArtifactPackagingMapperTest
     assertThat(apm.getExtensionForPackaging("eclipse-plugin"), equalTo("jar"));
     assertThat(apm.getExtensionForPackaging("eclipse-feature"), equalTo("jar"));
     assertThat(apm.getExtensionForPackaging("eclipse-application"), equalTo("zip"));
-    assertThat(apm.getExtensionForPackaging("nexus-plugin"), equalTo("jar"));
     assertThat(apm.getExtensionForPackaging("java-source"), equalTo("jar"));
     assertThat(apm.getExtensionForPackaging("javadoc"), equalTo("jar"));
     assertThat(apm.getExtensionForPackaging("test-jar"), equalTo("jar"));
@@ -70,7 +69,6 @@ public class DefaultArtifactPackagingMapperTest
     assertThat(apm.getExtensionForPackaging("eclipse-plugin"), equalTo("jar"));
     assertThat(apm.getExtensionForPackaging("eclipse-feature"), equalTo("jar"));
     assertThat(apm.getExtensionForPackaging("eclipse-application"), equalTo("zip"));
-    assertThat(apm.getExtensionForPackaging("nexus-plugin"), equalTo("jar"));
     assertThat(apm.getExtensionForPackaging("java-source"), equalTo("jar"));
     assertThat(apm.getExtensionForPackaging("javadoc"), equalTo("jar"));
     assertThat(apm.getExtensionForPackaging("test-jar"), equalTo("jar"));

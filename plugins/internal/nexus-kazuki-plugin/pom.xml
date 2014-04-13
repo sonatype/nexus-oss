@@ -25,12 +25,7 @@
 
   <artifactId>nexus-kazuki-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
-
-  <properties>
-    <pluginName>Nexus Kazuki Plugin</pluginName>
-    <pluginDescription>Kazuki datastore provider.</pluginDescription>
-  </properties>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -42,14 +37,12 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-crypto-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-h2-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
@@ -107,13 +100,32 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
-          <sharedDependencies>
-            <sharedDependency>io.kazuki:kazuki-db</sharedDependency>
-          </sharedDependencies>
+          <instructions>
+            <Bundle-Name>Nexus Kazuki Plugin</Bundle-Name>
+            <Bundle-Description>Kazuki datastore provider.</Bundle-Description>
+            <Embed-Dependency>
+              *;scope=compile;artifactId=!jackson-annotations|jackson-core|jackson-databind|jsr305
+            </Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+            <Embed-Directory>lib</Embed-Directory>
+            <_exportcontents>
+              !lib.*,antlr.*|com.*|io.*|org.*;-noimport:=true
+            </_exportcontents>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api,
+              org.sonatype.nexus.plugins.nexus-crypto-plugin,
+              org.sonatype.nexus.plugins.nexus-h2-plugin
+            </Require-Bundle>
+          </instructions>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

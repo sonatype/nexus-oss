@@ -98,7 +98,7 @@ public class NexusITArtifactResolver
   public File resolvePluginFromDependencyManagement(final String groupId, final String artifactId)
       throws RuntimeException
   {
-    return resolveFromDependencyManagement(groupId, artifactId, "nexus-plugin", null, "zip", "bundle");
+    return resolveFromDependencyManagement(groupId, artifactId, "jar", null);
   }
 
   /**
@@ -112,18 +112,12 @@ public class NexusITArtifactResolver
    * @param classifier         Maven classifier of artifact to be resolved. If not specified (null), classifier is
    *                           not
    *                           considered while finding the dependency in dependency management
-   * @param overrideType       an optional type to be used to override the type specified in dependency management
-   *                           (e.g nexus-plugin -> zip)
-   * @param overrideClassifier an optional classifier to override the classifier specified in dependency management
-   *                           (e.g (not specified) -> bundle)
    * @return resolved artifact file
    */
   public File resolveFromDependencyManagement(final String groupId,
                                               final String artifactId,
                                               final String type,
-                                              final String classifier,
-                                              final String overrideType,
-                                              final String overrideClassifier)
+                                              final String classifier)
   {
     try {
       final Model model = modelResolver.resolveModel(model().pom(testProjectPomFile));
@@ -150,20 +144,15 @@ public class NexusITArtifactResolver
           coordinates.append(":").append(dependency.getArtifactId());
 
           String rExtension = dependency.getType();
-          if (overrideType != null) {
-            rExtension = overrideType;
-          }
           if (rExtension != null) {
             coordinates.append(":").append(rExtension);
           }
 
           String rClassifier = dependency.getClassifier();
-          if (overrideClassifier != null) {
-            rClassifier = overrideClassifier;
-          }
           if (rClassifier != null) {
             coordinates.append(":").append(rClassifier);
           }
+
           coordinates.append(":").append(dependency.getVersion());
           return resolveArtifact(coordinates.toString());
         }

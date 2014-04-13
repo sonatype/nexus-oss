@@ -26,12 +26,7 @@
 
   <artifactId>nexus-p2-bridge-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
-
-  <properties>
-    <pluginName>Nexus P2 Bridge Plugin</pluginName>
-    <pluginDescription>Bridge between Nexus and P2 Eclipse Runtime.</pluginDescription>
-  </properties>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -93,33 +88,22 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.sonatype.p2.bridge</groupId>
+                  <artifactId>p2-runtime</artifactId>
+                  <type>zip</type>
+                  <outputDirectory>${project.build.outputDirectory}/p2-runtime</outputDirectory>
+                  <destFileName>eclipse.zip</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.p2.bridge</groupId>
                   <artifactId>org.sonatype.p2.bridge.impl</artifactId>
-                  <outputDirectory>${project.build.directory}/dependency/bundles</outputDirectory>
+                  <outputDirectory>${project.build.outputDirectory}/p2-runtime/bundles</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.eclipse.tycho</groupId>
                   <artifactId>org.eclipse.tycho.noopsecurity</artifactId>
-                  <outputDirectory>${project.build.directory}/dependency/bundles</outputDirectory>
+                  <outputDirectory>${project.build.outputDirectory}/p2-runtime/bundles</outputDirectory>
                 </artifactItem>
               </artifactItems>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>copy-strip-version</id>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.sonatype.p2.bridge</groupId>
-                  <artifactId>p2-runtime</artifactId>
-                  <type>zip</type>
-                  <outputDirectory>${project.build.directory}/dependency</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-              <stripVersion>true</stripVersion>
             </configuration>
           </execution>
         </executions>
@@ -152,11 +136,38 @@
       </plugin>
 
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
-          <assemblyDescriptor>${project.basedir}/src/main/assemble/bundle.xml</assemblyDescriptor>
+          <instructions>
+            <Bundle-Name>Nexus P2 Bridge Plugin</Bundle-Name>
+            <Bundle-Description>Bridge between Nexus and P2 Eclipse Runtime.</Bundle-Description>
+            <Embed-Dependency>
+              *;scope=compile;artifactId=!plexus-utils
+            </Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+            <Embed-Directory>lib</Embed-Directory>
+            <_exportcontents>
+              !lib.*,org.*;-noimport:=true
+            </_exportcontents>
+            <Include-Resource>
+              /=${project.build.outputDirectory},
+              /p2-runtime/bridge/org.sonatype.p2.bridge.api.manifest
+                =${project.build.directory}/dependency/org.sonatype.p2.bridge.api/META-INF/MANIFEST.MF,
+              /p2-runtime/bridge/org.sonatype.p2.bridge.model.manifest
+                =${project.build.directory}/dependency/org.sonatype.p2.bridge.model/META-INF/MANIFEST.MF,
+              {maven-resources}
+            </Include-Resource>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api
+            </Require-Bundle>
+          </instructions>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

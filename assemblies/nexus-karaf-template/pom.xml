@@ -73,8 +73,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-content-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -82,8 +80,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-webresources-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -91,8 +87,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-crypto-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -100,8 +94,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-groovy-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -109,8 +101,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-h2-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -118,8 +108,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-kazuki-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -127,8 +115,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -136,8 +122,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-siesta-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -145,8 +129,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-lvo-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -154,8 +136,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-plugin-console-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -163,8 +143,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -172,8 +150,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-maven-bridge-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -181,8 +157,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-rrb-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -190,8 +164,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -199,8 +171,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-timeline-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -208,8 +178,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-archetype-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -217,8 +185,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ui-extjs3-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -226,8 +192,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -235,8 +199,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-logging-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -244,8 +206,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-atlas-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -253,8 +213,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-wonderland-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -264,8 +222,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-rapture-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -273,8 +229,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-extdirect-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -282,8 +236,6 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-coreui-plugin</artifactId>
       <version>${nexus.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
       <scope>provided</scope>
     </dependency>
   </dependencies>

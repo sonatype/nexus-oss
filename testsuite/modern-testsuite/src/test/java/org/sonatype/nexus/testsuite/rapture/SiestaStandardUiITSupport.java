@@ -108,7 +108,7 @@ public class SiestaStandardUiITSupport
 
   private File prepare() {
     File siestaJar = artifactResolver().resolveFromDependencyManagement(
-        "org.sonatype.nexus", "nexus-testsuite-ui-siesta", null, null, null, null
+        "org.sonatype.nexus", "nexus-testsuite-ui-siesta", null, null
     );
     File siestaDir = testIndex().getDirectory("siesta");
     tasks().expand(FileRef.file(siestaJar)).to().directory(FileRef.file(siestaDir)).run();

@@ -224,7 +224,7 @@ public class AbstractEnvironmentMojo
   private Map staticPorts;
 
   /**
-   * If true plugin won't include nexus-plugin dependencies with scope test
+   * If true plugin won't include dependencies with scope test
    */
   @Parameter
   private boolean excludeTestDependencies;
@@ -808,13 +808,27 @@ public class AbstractEnvironmentMojo
       else if ("bundle".equals(pluginArtifact.getClassifier()) && "zip".equals(pluginArtifact.getType())) {
         dest = pluginsFolder;
       }
+      else if (pluginArtifact.getArtifactId().endsWith("-plugin")) {
+        dest = pluginsFolder;
+      }
       else {
         dest = libsFolder;
       }
 
       String type = pluginArtifact.getType();
 
-      if ("jar".equals(type)) {
+      if (dest.equals(pluginsFolder)) {
+        File file = pluginArtifact.getFile();
+        if (file == null || !file.isFile()) {
+          throw new MojoFailureException("Could not properly resolve artifact " + pluginArtifact + ", got "
+              + file);
+        }
+        final String pluginKey = pluginArtifact.getGroupId() + ":" + pluginArtifact.getArtifactId();
+        if (!useBundlePluginsIfPresent || !bundlePlugins.containsKey(pluginKey)) {
+          unpack(file, new File(dest, pluginArtifact.getArtifactId() + '-' + pluginArtifact.getVersion()), type);
+        }
+      }
+      else if ("jar".equals(type)) {
         // System.out.println( "copying jar: "+ pluginArtifact.getFile().getAbsolutePath() + " to: "+
         // dest.getAbsolutePath() );
         copy(pluginArtifact.getFile(), dest);
@@ -917,12 +931,6 @@ public class AbstractEnvironmentMojo
       artifact = projectArtifacts.iterator().next();
     }
 
-    if ("nexus-plugin".equals(mavenArtifact.getType())) {
-      artifact =
-          artifactFactory.createArtifactWithClassifier(artifact.getGroupId(), artifact.getArtifactId(),
-              artifact.getVersion(), "zip", "bundle");
-    }
-
     return resolve(artifact);
   }
 
@@ -997,8 +1005,6 @@ public class AbstractEnvironmentMojo
   {
 
     Set<Artifact> projectArtifacts = new LinkedHashSet<Artifact>();
-    projectArtifacts.addAll(getFilteredArtifacts(null, null, "zip", "bundle"));
-    projectArtifacts.addAll(getFilteredArtifacts(null, null, "nexus-plugin", null));
     projectArtifacts.addAll(getNonTransitivePlugins(projectArtifacts));
 
     List<Artifact> resolvedArtifacts = new ArrayList<Artifact>();
@@ -1041,9 +1047,6 @@ public class AbstractEnvironmentMojo
       }
 
       LinkedHashSet<Artifact> plugins = new LinkedHashSet<Artifact>();
-      plugins.addAll(filtterArtifacts(result, getFilters(null, null, "nexus-plugin", null)));
-      plugins.addAll(filtterArtifacts(result, getFilters(null, null, "zip", "bundle")));
-
       plugins.addAll(getNonTransitivePlugins(plugins));
 
       if (!plugins.isEmpty()) {

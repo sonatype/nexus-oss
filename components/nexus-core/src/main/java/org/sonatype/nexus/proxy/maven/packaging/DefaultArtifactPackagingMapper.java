@@ -56,7 +56,6 @@ public class DefaultArtifactPackagingMapper
     defaults.put("eclipse-plugin", "jar");
     defaults.put("eclipse-feature", "jar");
     defaults.put("eclipse-application", "zip");
-    defaults.put("nexus-plugin", "jar");
     defaults.put("java-source", "jar");
     defaults.put("javadoc", "jar");
     defaults.put("test-jar", "jar");

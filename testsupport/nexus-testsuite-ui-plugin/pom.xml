@@ -25,12 +25,7 @@
 
   <artifactId>nexus-testsuite-ui-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
-
-  <properties>
-    <pluginName>Nexus UI Test Helper Plugin</pluginName>
-    <pluginDescription>This plugin adds resources for UI testing.</pluginDescription>
-  </properties>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -42,7 +37,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ui-extjs3-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -50,7 +44,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-rapture-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -59,8 +52,19 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-Name>Nexus UI Test Helper Plugin</Bundle-Name>
+            <Bundle-Description>This plugin adds resources for UI testing.</Bundle-Description>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api,
+              org.sonatype.nexus.plugins.nexus-rapture-plugin,
+              org.sonatype.nexus.plugins.nexus-ui-extjs3-plugin
+            </Require-Bundle>
+          </instructions>
+        </configuration>
       </plugin>
     </plugins>
   </build>
