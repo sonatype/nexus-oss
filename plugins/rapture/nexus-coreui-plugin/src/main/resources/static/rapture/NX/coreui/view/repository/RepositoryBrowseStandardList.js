@@ -44,7 +44,9 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseStandardList', {
     { xtype: 'button', text: 'Administrate', glyph: 'xf013@FontAwesome' /* fa-gear */, action: 'admin', disabled: true, hidden: true }
   ],
 
-  plugins: ['gridfilterbox'],
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: 'No standard repository matched criteria "$filter"' }
+  ],
 
   initComponent: function () {
     var me = this;

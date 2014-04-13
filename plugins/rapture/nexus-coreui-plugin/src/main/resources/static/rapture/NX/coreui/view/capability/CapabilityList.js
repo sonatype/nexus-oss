@@ -26,7 +26,9 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
       xtype: 'iconcolumn',
       width: 36,
       iconVariant: 'x16',
-      iconName: function() { return 'capability-default'; }
+      iconName: function () {
+        return 'capability-default';
+      }
     },
     { header: 'Type', dataIndex: 'typeName', flex: 1 },
     { header: 'Description', dataIndex: 'description', flex: 1 },
@@ -48,5 +50,8 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ],
 
-  plugins: [ 'gridfilterbox' ]
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: 'No capability matched criteria "$filter"' }
+  ]
+
 });

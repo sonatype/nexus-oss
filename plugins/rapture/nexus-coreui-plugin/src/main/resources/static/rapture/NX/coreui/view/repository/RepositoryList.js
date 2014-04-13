@@ -51,5 +51,8 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
     { xtype: 'button', text: 'Browse', glyph: 'xf0e8@FontAwesome' /* fa-sitemap */, action: 'browse', disabled: true }
   ],
 
-  plugins: ['gridfilterbox']
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: 'No repositories matched criteria "$filter"' }
+  ]
+
 });

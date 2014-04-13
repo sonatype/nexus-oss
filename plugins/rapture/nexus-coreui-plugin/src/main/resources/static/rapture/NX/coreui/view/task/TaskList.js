@@ -48,5 +48,8 @@ Ext.define('NX.coreui.view.task.TaskList', {
     { xtype: 'button', text: 'Stop', glyph: 'xf04d@FontAwesome' /* fa-stop */, action: 'stop', disabled: true }
   ],
 
-  plugins: ['gridfilterbox']
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: 'No scheduled task matched criteria "$filter"' }
+  ]
+
 });

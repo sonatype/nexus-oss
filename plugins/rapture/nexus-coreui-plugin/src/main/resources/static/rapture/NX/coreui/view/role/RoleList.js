@@ -46,5 +46,8 @@ Ext.define('NX.coreui.view.role.RoleList', {
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ],
 
-  plugins: ['gridfilterbox']
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: 'No role matched criteria "$filter"' }
+  ]
+
 });
