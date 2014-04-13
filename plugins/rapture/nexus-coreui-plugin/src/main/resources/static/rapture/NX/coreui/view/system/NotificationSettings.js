@@ -53,12 +53,9 @@ Ext.define('NX.coreui.view.system.NotificationSettings', {
           allowBlank: true
         },
         {
-          xtype: 'label',
-          html: '<p>Notify users who are in notify roles:</p>'
-        },
-        {
           xtype: 'nx-itemselector',
           name: 'notifyRoles',
+          fieldLabel: 'Notify users who are in notify roles',
           buttons: ['add', 'remove'],
           fromTitle: 'Available Roles',
           toTitle: 'Notify Roles',
@@ -66,7 +63,7 @@ Ext.define('NX.coreui.view.system.NotificationSettings', {
           valueField: 'id',
           displayField: 'name',
           delimiter: null,
-          allowBlank: true
+          allowBlank: true,
         }
       ]
     }
