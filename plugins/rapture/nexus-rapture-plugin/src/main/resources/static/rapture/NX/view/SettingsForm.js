@@ -73,8 +73,7 @@ Ext.define('NX.view.SettingsForm', {
   },
 
   fieldDefaults: {
-    labelAlign: 'top',
-    labelStyle: 'font-weight:bold'
+    labelAlign: 'top'
   },
 
   buttonAlign: 'left',
