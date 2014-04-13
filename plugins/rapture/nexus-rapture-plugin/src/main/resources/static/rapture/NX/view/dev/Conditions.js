@@ -30,7 +30,7 @@ Ext.define('NX.view.dev.Conditions', {
     { text: 'id', dataIndex: 'id', flex: 1 },
     { text: 'condition', dataIndex: 'condition', flex: 3 },
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       text: 'satisfied',
       dataIndex: 'satisfied',
       width: 80,

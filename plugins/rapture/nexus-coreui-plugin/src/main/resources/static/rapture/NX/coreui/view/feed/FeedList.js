@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.feed.FeedList', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
       iconName: function () {

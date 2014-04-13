@@ -23,7 +23,7 @@ Ext.define('NX.view.dev.Messages', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       text: 'icon',
       dataIndex: 'type',
       width: 48,

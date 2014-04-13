@@ -23,7 +23,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       dataIndex: 'type',
       width: 36,
       iconVariant: 'x16',
