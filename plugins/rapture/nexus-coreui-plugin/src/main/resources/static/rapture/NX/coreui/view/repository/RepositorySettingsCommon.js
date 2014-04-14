@@ -28,19 +28,22 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsCommon', {
     {
       name: 'id',
       itemId: 'id',
-      fieldLabel: 'Id',
+      fieldLabel: 'ID',
+      helpText: 'The unique id for the repository. This id will become part of the url so it should not contain spaces.',
       emptyText: 'enter a repository id',
       readOnly: true
     },
     {
       name: 'name',
       fieldLabel: 'Name',
+      helpText: 'The Repository Name which is referenced in the UI and Logs.',
       emptyText: 'enter a repository name'
     },
     {
       name: 'providerName',
       itemId: 'providerName',
       fieldLabel: 'Provider',
+      helpText: 'The content provider of the repository.',
       readOnly: true,
       submitValue: false,
       allowBlank: true
@@ -49,6 +52,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsCommon', {
       name: 'formatName',
       itemId: 'formatName',
       fieldLabel: 'Format',
+      helpText: 'Repository format.',
       readOnly: true,
       submitValue: false,
       allowBlank: true

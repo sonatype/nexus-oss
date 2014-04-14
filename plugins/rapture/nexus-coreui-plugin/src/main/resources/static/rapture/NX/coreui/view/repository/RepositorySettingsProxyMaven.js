@@ -39,6 +39,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         name: 'repositoryPolicy',
         itemId: 'repositoryPolicy',
         fieldLabel: 'Repository Policy',
+        helpText: 'Repositories can store either all Release artifacts or all Snapshot artifacts.',
         emptyText: 'select a policy',
         editable: false,
         store: [
@@ -54,30 +55,35 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         xtype: 'nx-url',
         name: 'remoteStorageUrl',
         fieldLabel: 'Remote Storage Location',
+        helpText: 'This is the location of the remote repository being proxied. Only HTTP/HTTPs urls are currently supported.',
         emptyText: 'enter an URL'
       },
       {
         xtype: 'checkbox',
         name: 'downloadRemoteIndexes',
         fieldLabel: 'Download Remote Indexes',
+        helpText: 'Indicates if the index stored on the remote repository should be downloaded and used for local searches.',
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'autoBlockActive',
         fieldLabel: 'Auto Blocking Enabled',
+        helpText: 'Flag to enable Auto Blocking for this proxy repository. If enabled, Nexus will auto-block outbound connections on this repository if remote peer is detected as unreachable/unresponsive. Auto-blocked repositories will still try to detect remote peer availability, and will auto-unblock the proxy if remote peer detected as reachable/healthy. Auto-blocked repositories behaves exactly the same as user blocked proxy repositories, except they will auto-unblock themselves too.',
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'fileTypeValidation',
         fieldLabel: 'File Content Validation',
+        helpText: 'Flag to check the remote file\'s content to see if it is valid. (e.g. not html error page), handy when you cannot enable strict checksum checking.',
         value: true
       },
       {
         xtype: 'combo',
         name: 'checksumPolicy',
         fieldLabel: 'Checksum Policy',
+        helpText: 'The checksum policy for this repository: Ignore: Don\'t check remote checksums. Warn: Log a warning if the checksum is bad but serve the artifact anyway. (Default...there are currently known checksum errors on Central). StrictIfExists: Do not serve the artifact if the checksum exists but is invalid. Strict: Require that a checksum exists on the remote repository and that it is valid.',
         emptyText: 'select a policy',
         editable: false,
         store: [
@@ -92,36 +98,42 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         xtype: 'checkbox',
         name: 'browseable',
         fieldLabel: 'Allow file browsing',
+        helpText: 'This controls if users can browse the contents of the repository via their web browser.',
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'exposed',
         fieldLabel: 'Publish URL',
+        helpText: 'This controls if the repository is published on a URL, if this field is false you will not be able to access this repository remotely.',
         value: true
       },
       {
         xtype: 'numberfield',
         name: 'notFoundCacheTTL',
         fieldLabel: 'Not Found Cache TTL',
+        helpText: 'This controls how long to cache the fact that a file was not found in the repository.',
         allowBlank: true
       },
       {
         xtype: 'numberfield',
         name: 'artifactMaxAge',
         fieldLabel: 'Artifact Max Age',
+        helpText: 'This controls how long to cache the artifacts in the repository before rechecking the remote repository. In a release repository, this value should be -1 (infinite) as release artifacts shouldn\'t change.',
         allowBlank: true
       },
       {
         xtype: 'numberfield',
         name: 'metadataMaxAge',
         fieldLabel: 'Metadata Max Age',
+        helpText: 'This controls how long to cache the metadata in the repository before rechecking the remote repository. Unlike artifact max age, this value should not be infinite or Maven won\'t discover new artifact releases.',
         allowBlank: true
       },
       {
         xtype: 'numberfield',
         name: 'itemMaxAge',
         fieldLabel: 'Item Max Age',
+        helpText: 'Repositories may contain resources that are neither artifacts identified by GAV coordinates or metadata. This value controls how long to cache such items in the repository before rechecking the remote repository.',
         allowBlank: true
       },
       {
