@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline.internal;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +45,8 @@ import io.kazuki.v0.store.keyvalue.KeyValueStoreIteration.SortDirection;
 import io.kazuki.v0.store.lifecycle.Lifecycle;
 import io.kazuki.v0.store.schema.SchemaStore;
 import io.kazuki.v0.store.schema.TypeValidation;
+import io.kazuki.v0.store.schema.model.Attribute.Type;
+import io.kazuki.v0.store.schema.model.Schema;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -80,7 +82,7 @@ public class DefaultTimeline
   // EBus handlers
 
   @Subscribe
-  public void on(final NexusInitializedEvent evt) {
+  public void on(final NexusInitializedEvent event) {
     try {
       start();
     }
@@ -90,7 +92,7 @@ public class DefaultTimeline
   }
 
   @Subscribe
-  public void on(final NexusStoppedEvent evt) {
+  public void on(final NexusStoppedEvent event) {
     try {
       stop();
     }
@@ -102,34 +104,29 @@ public class DefaultTimeline
   // LifecycleSupport
 
   @Override
-  public void doStart()
-      throws IOException
-  {
-    log.debug("Starting Timeline");
-    try {
-      lifecycle.init();
-      lifecycle.start();
+  public void doStart() throws Exception {
+    lifecycle.init();
+    lifecycle.start();
 
-      // create schema if needed
-      if (schemaStore.retrieveSchema(EntryRecord.SCHEMA_NAME) == null) {
-        log.info("Creating schema for {} type", EntryRecord.SCHEMA_NAME);
-        schemaStore.createSchema(EntryRecord.SCHEMA_NAME, EntryRecord.SCHEMA);
-      }
-      log.info("Started Timeline");
-    }
-    catch (KazukiException e) {
-      throw new IOException("Could not start Timeline", e);
+    // create schema if needed
+    if (schemaStore.retrieveSchema(EntryRecord.SCHEMA_NAME) == null) {
+      log.info("Creating schema for {} type", EntryRecord.SCHEMA_NAME);
+
+      Schema schema = new Schema.Builder().
+          addAttribute("timestamp", Type.U64, false).
+          addAttribute("type", Type.UTF8_SMALLSTRING, false).
+          addAttribute("subType", Type.UTF8_SMALLSTRING, false).
+          addAttribute("data", Type.MAP, false).
+          build();
+
+      schemaStore.createSchema(EntryRecord.SCHEMA_NAME, schema);
     }
   }
 
   @Override
-  public void doStop()
-      throws IOException
-  {
-    log.debug("Stopping Timeline");
+  public void doStop() throws Exception {
     lifecycle.stop();
     lifecycle.shutdown();
-    log.info("Stopped Timeline");
   }
 
   // API
