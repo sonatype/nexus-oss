@@ -10,11 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global define,NX*/
-define('nexus-logging-plugin-boot', [
-  'Nexus/logging/controller/Logging'
-], function () {
-  NX.log.debug('Main nexus-logging-plugin modules loaded');
 
-  NX.create('Nexus.logging.controller.Logging').init();
-});
+package org.sonatype.nexus.logging.internal.ui
+
+import groovy.transform.ToString
+import org.apache.bval.constraints.NotEmpty
+import org.sonatype.nexus.log.LoggerLevel
+
+import javax.validation.constraints.NotNull
+
+/**
+ * Logger exchange object.
+ *
+ * @since 3.0
+ */
+@ToString(includePackage = false, includeNames = true)
+class LoggerXO
+{
+  @NotNull
+  @NotEmpty
+  String name
+
+  @NotNull
+  @NotEmpty
+  LoggerLevel level
+}

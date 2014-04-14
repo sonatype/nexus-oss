@@ -10,28 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.logging.internal;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+package org.sonatype.nexus.logging.internal.ui
 
-import org.sonatype.nexus.logging.LoggingPlugin;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
+import groovy.transform.ToString
+import org.apache.bval.constraints.NotEmpty
+
+import javax.validation.constraints.NotNull
 
 /**
- * Logging plugin {@link UiContributor}.
+ * Marker exchange object.
  *
- * @since 2.7
+ * @since 3.0
  */
-@Named
-@Singleton
-public class LoggingUiContributor
-    extends UiContributorSupport
+@ToString(includePackage = false, includeNames = true)
+class MarkerXO
 {
-  @Inject
-  public LoggingUiContributor(final LoggingPlugin owner) {
-    super(owner);
-  }
+  @NotNull
+  @NotEmpty
+  String message
 }
