@@ -39,12 +39,14 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
         {
           xtype: 'nx-email',
           name: 'systemEmail',
-          fieldLabel: 'Email address used as the FROM address for all email notifications'
+          fieldLabel: 'System email address',
+          helpText: 'Email address used as the FROM address for all email notifications.'
         },
         {
           xtype: 'combo',
           name: 'connectionType',
           fieldLabel: 'SMTP server type',
+          helpText: 'Connection level security to be used with SMTP server. Use any of the SSL/TLS provided solutions for greater security.',
           emptyText: 'select a connection type',
           editable: false,
           store: [
@@ -68,13 +70,15 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
         {
           name: 'host',
           itemId: 'host',
-          fieldLabel: 'SMTP server hostname'
+          fieldLabel: 'Hostname',
+          helpText: 'The host name of an SMTP server.',
         },
         {
           xtype: 'numberfield',
           name: 'port',
           itemId: 'port',
           fieldLabel: 'SMTP server port',
+          helpText: 'The port the SMTP server is listening on.',
           minValue: 1,
           maxValue: 65536,
           allowDecimals: false,
@@ -83,12 +87,14 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
         {
           name: 'username',
           allowBlank: true,
-          fieldLabel: 'SMTP username to authenticate'
+          fieldLabel: 'Username',
+          helpText: 'The username used to access the SMTP server.',
         },
         {
           xtype: 'nx-password',
           name: 'password',
           fieldLabel: 'SMTP password',
+          helpText: 'The password used to access the SMTP server.',
           allowBlank: true
         }
       ]

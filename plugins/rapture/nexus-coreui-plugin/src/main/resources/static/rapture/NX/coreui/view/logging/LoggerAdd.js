@@ -30,12 +30,14 @@ Ext.define('NX.coreui.view.search.LoggerAdd', {
         name: 'name',
         itemId: 'name',
         fieldLabel: 'Name',
+        helpText: 'Logger name.',
         emptyText: 'enter a logger name'
       },
       {
         xtype: 'combo',
         name: 'level',
         fieldLabel: 'Level',
+        helpText: 'Select logger level.',
         editable: false,
         value: 'INFO',
         store: [
