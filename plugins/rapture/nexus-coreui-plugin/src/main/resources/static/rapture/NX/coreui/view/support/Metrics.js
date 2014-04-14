@@ -32,7 +32,9 @@ Ext.define('NX.coreui.view.support.Metrics', {
       height: 300,
       animate: false,
 
-      store: 'MetricsMemory',
+      store: Ext.create('Ext.data.ArrayStore', {
+        fields: ['name', 'data']
+      }),
       series: [
         {
           type: 'pie',

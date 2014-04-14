@@ -22,12 +22,6 @@ Ext.define('NX.coreui.controller.Metrics', {
     logAware: 'NX.LogAware'
   },
 
-  stores: [
-    'MetricsMemory'
-  ],
-  models: [
-    'MetricsMemory'
-  ],
   views: [
     'support.Metrics'
   ],
@@ -88,7 +82,17 @@ Ext.define('NX.coreui.controller.Metrics', {
         panel = me.getMetrics();
 
     if (panel) {
-      me.getMetricsMemoryStore().load();
+      panel.getEl().mask('Loading...');
+      NX.direct.coreui_Metrics.memory(function (response) {
+        panel.getEl().unmask();
+        if (Ext.isDefined(response) && response.success) {
+          var data = [];
+          Ext.Object.each(response.data, function (key, value) {
+            data.push({ name: key, data: value });
+          });
+          panel.down('chart').getStore().loadData(data);
+        }
+      });
     }
   }
 
