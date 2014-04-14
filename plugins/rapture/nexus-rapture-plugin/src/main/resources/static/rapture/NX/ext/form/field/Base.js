@@ -19,6 +19,7 @@ Ext.define('NX.ext.form.field.Base', {
   override: 'Ext.form.field.Base',
 
   width: 600,
+  labelAlign: 'top',
   labelStyle: 'font-weight: bold;',
   msgTarget: 'under',
 

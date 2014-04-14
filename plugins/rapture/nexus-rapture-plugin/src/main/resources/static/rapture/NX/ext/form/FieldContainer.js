@@ -18,6 +18,7 @@
 Ext.define('NX.ext.form.FieldContainer', {
   override: 'Ext.form.FieldContainer',
 
+  labelAlign: 'top',
   labelStyle: 'font-weight: bold;',
   msgTarget: 'under',
 
