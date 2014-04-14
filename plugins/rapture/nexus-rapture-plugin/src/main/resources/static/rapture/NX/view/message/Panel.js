@@ -37,7 +37,7 @@ Ext.define('NX.view.message.Panel', {
       store: 'Message',
       columns: [
         {
-          xtype: 'iconcolumn',
+          xtype: 'nx-iconcolumn',
           dataIndex: 'type',
           width: 25,
           iconNamePrefix: 'message-',

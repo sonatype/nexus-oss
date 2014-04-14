@@ -60,12 +60,14 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
               xtype: 'textfield',
               name: 'httpHost',
               fieldLabel: 'Host',
+              helpText: 'This is the host name of the HTTP proxy used for remote connections. (no HTTP required...just the host or ip)',
               allowBlank: false
             },
             {
               xtype: 'numberfield',
               name: 'httpPort',
               fieldLabel: 'Port',
+              helpText: 'This is the port number of the HTTP proxy used for remote connections.',
               minValue: 1,
               maxValue: 65535,
               allowDecimals: false,
@@ -87,6 +89,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
               xtype: 'nx-valueset',
               name: 'nonProxyHosts',
               fieldLabel: 'Non Proxy Hosts',
+              helpText: 'List of host names to exclude from http proxy. Regular expressions are supported, e.g. \'.*\\.somecompany\\.com\'.',
               emptyText: 'enter a hostname',
               sorted: true
             }
@@ -109,12 +112,14 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
               xtype: 'textfield',
               name: 'httpsHost',
               fieldLabel: 'Host',
+              helpText: 'This is the host name of the HTTPS proxy used for remote connections. (no HTTPS required...just the host or ip)',
               allowBlank: false
             },
             {
               xtype: 'numberfield',
               name: 'httpsPort',
               fieldLabel: 'Port',
+              helpText: 'This is the port number of the HTTPS proxy used for remote connections.',
               minValue: 1,
               maxValue: 65535,
               allowDecimals: false,

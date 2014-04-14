@@ -43,43 +43,37 @@ Ext.define('NX.coreui.view.support.SupportZip', {
           {
             xtype: 'checkbox',
             name: 'systemInformation',
-            boxLabel: 'System Information',
-            helpText: 'Includes system information report',
+            boxLabel: 'Includes system information report',
             checked: true
           },
           {
             xtype: 'checkbox',
             name: 'threadDump',
-            boxLabel: 'Thread Dump',
-            helpText: 'Include a JVM thread-dump',
+            boxLabel: 'Include a JVM thread-dump',
             checked: true
           },
           {
             xtype: 'checkbox',
             name: 'configuration',
-            boxLabel: 'Configuration',
-            helpText: 'Include configuration files',
+            boxLabel: 'Include configuration files',
             checked: true
           },
           {
             xtype: 'checkbox',
             name: 'security',
-            boxLabel: 'Security Configuration',
-            helpText: 'Include security configuration files',
+            boxLabel: 'Include security configuration files',
             checked: true
           },
           {
             xtype: 'checkbox',
             name: 'log',
-            boxLabel: 'Log',
-            helpText: 'Include log files',
+            boxLabel: 'Include log files',
             checked: true
           },
           {
             xtype: 'checkbox',
             name: 'metrics',
-            boxLabel: 'Metrics',
-            helpText: 'Includes system and component metrics',
+            boxLabel: 'Includes system and component metrics',
             checked: true
           }
         ]
@@ -87,20 +81,19 @@ Ext.define('NX.coreui.view.support.SupportZip', {
       {
         xtype: 'checkboxgroup',
         fieldLabel: 'Options',
+        allowBlank: true,
         columns: 1,
         items: [
           {
             xtype: 'checkbox',
             name: 'limitFileSizes',
-            boxLabel: 'Limit Included File Sizes',
-            helpText: 'Limit the size of files included in the support ZIP to no more than 30 MB each.',
+            boxLabel: 'Limit the size of files included in the support ZIP to no more than 30 MB each.',
             checked: true
           },
           {
             xtype: 'checkbox',
             name: 'limitZipSize',
-            boxLabel: 'Limit Maximum ZIP File Size',
-            helpText: 'Limit the maximum size of the support ZIP file to no more than 20 MB.',
+            boxLabel: 'Limit the maximum size of the support ZIP file to no more than 20 MB.',
             checked: true
           }
         ]

@@ -45,11 +45,11 @@ Ext.define('NX.coreui.controller.SmtpSettings', {
 
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
-      path: '/System/SMTP',
-      description: 'Manage SMTP configuration',
+      path: '/System/Email Server',
+      description: 'Manage email server SMTP configuration',
       view: { xtype: 'nx-coreui-system-smtp-settings' },
       iconConfig: {
-        file: 'emails.png',
+        file: 'email.png',
         variants: ['x16', 'x32']
       },
       visible: function () {

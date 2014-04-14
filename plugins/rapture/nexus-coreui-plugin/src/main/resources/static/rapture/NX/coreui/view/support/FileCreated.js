@@ -33,7 +33,7 @@ Ext.define('NX.coreui.view.support.FileCreated', {
   autoShow: true,
   constrain: true,
   resizable: false,
-  width: 500,
+  width: 630,
   border: false,
   modal: true,
 
@@ -50,9 +50,6 @@ Ext.define('NX.coreui.view.support.FileCreated', {
           xtype: 'form',
           bodyPadding: 10,
           defaults: {
-            labelSeparator: '',
-            labelWidth: 40,
-            labelAlign: 'right',
             anchor: '100%'
           },
           items: [
@@ -66,7 +63,7 @@ Ext.define('NX.coreui.view.support.FileCreated', {
               items: [
                 { xtype: 'component', html: me.fileIcon },
                 { xtype: 'component', html: me.fileType + ' has been created.' +
-                    '<br/><br/>You can reference this file on the filesystem or download the file from your browser.',
+                    '<br/>You can reference this file on the filesystem or download the file from your browser.',
                   margin: '0 0 0 5'
                 }
               ]
@@ -101,6 +98,7 @@ Ext.define('NX.coreui.view.support.FileCreated', {
             }
           ],
 
+          buttonAlign: 'left',
           buttons: [
             {
               text: 'Download',

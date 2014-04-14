@@ -33,18 +33,21 @@ Ext.define('NX.coreui.view.system.NotificationSettings', {
       items: [
         {
           xtype: 'label',
-          html: '<p>E-mail notifications.</p>'
+          html: '<p>Nexus can send notifications when system events occur.</p>' +
+              '<p>Email addresses or email addresses of users in specific roles can be used.</p>'
         },
         {
           xtype: 'checkbox',
           name: 'enabled',
-          fieldLabel: 'Enable E-mail notifications'
+          fieldLabel: 'Enable system notifications',
+          helpText: 'Enable the system to send notification messages to the recipients defined below.'
         },
         {
           xtype: 'nx-valueset',
           name: 'notifyEmails',
           fieldLabel: 'Notify email addresses',
-          emptyText: 'enter an email',
+          helpText: 'Enter an email address to be notified and click "Add" to add it to the list.',
+          emptyText: 'enter an email address',
           input: {
             xtype: 'nx-email'
           },
@@ -52,20 +55,18 @@ Ext.define('NX.coreui.view.system.NotificationSettings', {
           allowBlank: true
         },
         {
-          xtype: 'label',
-          html: '<p>Notify users in roles.</p>'
-        },
-        {
           xtype: 'nx-itemselector',
           name: 'notifyRoles',
+          fieldLabel: 'Notify users who are in notify roles',
+          helpText: 'Select the roles to be notified.',
           buttons: ['add', 'remove'],
-          fromTitle: 'Roles',
-          toTitle: 'Notify users in roles',
+          fromTitle: 'Available Roles',
+          toTitle: 'Notify Roles',
           store: 'Role',
           valueField: 'id',
           displayField: 'name',
           delimiter: null,
-          allowBlank: true
+          allowBlank: true,
         }
       ]
     }

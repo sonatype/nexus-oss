@@ -33,18 +33,21 @@ Ext.define('NX.coreui.view.upload.UploadArtifact', {
       name: 'group',
       itemId: 'group',
       fieldLabel: 'Group',
+      helpText: 'Maven group id of uploaded artifacts.',
       emptyText: 'enter a group name'
     },
     {
       name: 'artifact',
       itemId: 'artifact',
       fieldLabel: 'Artifact',
+      helpText: 'Maven artifact id of uploaded artifacts.',
       emptyText: 'enter an artifact name'
     },
     {
       name: 'version',
       itemId: 'version',
       fieldLabel: 'Version',
+      helpText: 'Maven version of uploaded artifacts.',
       emptyText: 'enter a version'
     },
     {
@@ -52,6 +55,7 @@ Ext.define('NX.coreui.view.upload.UploadArtifact', {
       name: 'packaging',
       itemId: 'packaging',
       fieldLabel: 'Packaging',
+      helpText: 'Maven packaging.',
       emptyText: 'select or enter packaging',
       queryMode: 'local',
       displayField: 'name',

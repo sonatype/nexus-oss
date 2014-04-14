@@ -21,7 +21,7 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseManagedList', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
       iconName: function () {
@@ -40,7 +40,9 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseManagedList', {
 
   emptyText: 'No managed repositories defined',
 
-  plugins: ['gridfilterbox'],
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: 'No managed repository matched criteria "$filter"' }
+  ],
 
   initComponent: function () {
     var me = this;

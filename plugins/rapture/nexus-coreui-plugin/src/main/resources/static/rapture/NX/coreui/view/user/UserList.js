@@ -23,7 +23,7 @@ Ext.define('NX.coreui.view.user.UserList', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
       iconName: function () {
@@ -46,5 +46,8 @@ Ext.define('NX.coreui.view.user.UserList', {
     { xtype: 'button', text: 'Default', action: 'filter', menu: [] },
   ],
 
-  plugins: ['gridfilterbox']
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: 'No user matched criteria "$filter"' }
+  ]
+
 });

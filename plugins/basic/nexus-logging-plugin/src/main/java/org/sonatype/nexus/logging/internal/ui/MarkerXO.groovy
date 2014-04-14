@@ -10,12 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global define,NX*/
-define('nexus-atlas-plugin-boot', [
-  'Nexus/atlas/controller/Atlas'
-],
-function () {
-  NX.log.debug('Module loaded: nexus-atlas-plugin-boot');
 
-  NX.create('Nexus.atlas.controller.Atlas').init();
-});
+package org.sonatype.nexus.logging.internal.ui
+
+import groovy.transform.ToString
+import org.apache.bval.constraints.NotEmpty
+
+import javax.validation.constraints.NotNull
+
+/**
+ * Marker exchange object.
+ *
+ * @since 3.0
+ */
+@ToString(includePackage = false, includeNames = true)
+class MarkerXO
+{
+  @NotNull
+  @NotEmpty
+  String message
+}

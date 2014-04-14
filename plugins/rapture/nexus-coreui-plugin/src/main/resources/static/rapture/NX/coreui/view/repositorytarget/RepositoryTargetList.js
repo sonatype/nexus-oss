@@ -23,7 +23,7 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetList', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
       iconName: function () {
@@ -42,5 +42,8 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetList', {
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ],
 
-  plugins: [ 'gridfilterbox' ]
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: 'No repository target matched criteria "$filter"' }
+  ]
+
 });

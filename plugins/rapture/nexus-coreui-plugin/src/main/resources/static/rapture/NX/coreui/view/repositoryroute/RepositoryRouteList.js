@@ -23,7 +23,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteList', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
       iconName: function () {
@@ -49,5 +49,6 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteList', {
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ],
 
-  plugins: ['gridfilterbox']
+  plugins: [{ ptype: 'gridfilterbox', emptyText: 'No repository route matched criteria "$filter"' }]
+
 });

@@ -37,8 +37,6 @@ Ext.define('NX.app.Application', {
     'NX.ext.form.field.Display',
     'NX.ext.form.FieldContainer',
 
-    // require custom extensions so we don't need to requirement explicitly everywhere
-    'NX.ext.grid.IconColumn',
     'NX.ext.SearchBox'
   ],
 
@@ -53,6 +51,7 @@ Ext.define('NX.app.Application', {
     'NX.ext.form.field.Url',
     'NX.ext.form.field.ValueSet',
     'NX.ext.form.field.Timestamp',
+    'NX.ext.grid.column.Icon',
     'NX.ext.grid.column.Link',
     'NX.ext.grid.column.Timestamp',
     'NX.Conditions'

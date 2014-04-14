@@ -23,7 +23,7 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
       iconName: function () {
@@ -83,7 +83,7 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
 
   plugins: [
     { pluginId: 'editor', ptype: 'rowediting', clicksToEdit: 1, errorSummary: false },
-    'gridfilterbox'
+    { ptype: 'gridfilterbox', emptyText: 'No logger matched criteria "$filter"' }
   ]
 
 });

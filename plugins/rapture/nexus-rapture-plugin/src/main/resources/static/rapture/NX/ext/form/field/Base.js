@@ -18,7 +18,19 @@
 Ext.define('NX.ext.form.field.Base', {
   override: 'Ext.form.field.Base',
 
-  labelWidth: 180,
-  width: 600
+  width: 600,
+  labelAlign: 'top',
+  labelStyle: 'font-weight: bold;',
+  msgTarget: 'under',
+
+  initComponent: function () {
+    var me = this;
+
+    if (me.helpText) {
+      me.afterLabelTpl = '<span style="font-size: 10px;">' + me.helpText + '</span>';
+    }
+
+    me.callParent(arguments);
+  }
 
 });

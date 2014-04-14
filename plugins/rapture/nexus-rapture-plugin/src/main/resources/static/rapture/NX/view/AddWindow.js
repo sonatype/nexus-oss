@@ -23,7 +23,7 @@ Ext.define('NX.view.AddWindow', {
   autoShow: true,
   modal: true,
   constrain: true,
-  width: 640,
+  width: 630,
 
   initComponent: function () {
     var me = this;
@@ -38,6 +38,8 @@ Ext.define('NX.view.AddWindow', {
         ];
       }
     }
+
+    me.maxHeight = Ext.getBody().getViewSize().height - 100;
 
     me.callParent(arguments);
   }

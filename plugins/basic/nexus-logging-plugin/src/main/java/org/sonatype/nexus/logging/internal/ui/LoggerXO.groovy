@@ -10,28 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.atlas.internal;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+package org.sonatype.nexus.logging.internal.ui
 
-import org.sonatype.nexus.atlas.AtlasPlugin;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
-import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
+import groovy.transform.ToString
+import org.apache.bval.constraints.NotEmpty
+import org.sonatype.nexus.log.LoggerLevel
+
+import javax.validation.constraints.NotNull
 
 /**
- * Atlas {@link UiContributor}.
+ * Logger exchange object.
  *
- * @since 2.7
+ * @since 3.0
  */
-@Named
-@Singleton
-public class UiContributorImpl
-    extends UiContributorSupport
+@ToString(includePackage = false, includeNames = true)
+class LoggerXO
 {
-  @Inject
-  public UiContributorImpl(final AtlasPlugin owner) {
-    super(owner);
-  }
+  @NotNull
+  @NotEmpty
+  String name
+
+  @NotNull
+  @NotEmpty
+  LoggerLevel level
 }

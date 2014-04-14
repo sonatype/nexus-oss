@@ -26,7 +26,8 @@ Ext.define('NX.coreui.view.upload.UploadArtifactFile', {
       {
         xtype: 'panel',
         layout: {
-          type: 'hbox'
+          type: 'hbox',
+          align: 'bottom'
         },
         style: {
           borderTop: '1px solid #F0F0F0'
@@ -39,6 +40,7 @@ Ext.define('NX.coreui.view.upload.UploadArtifactFile', {
           me.uploader = {
             xtype: 'fileuploadfield',
             fieldLabel: 'File',
+            helpText: 'Path of the artifact to be uploaded.',
             name: me.name,
             allowBlank: false,
             clearOnSubmit: false,
@@ -52,11 +54,13 @@ Ext.define('NX.coreui.view.upload.UploadArtifactFile', {
       {
         xtype: 'textfield',
         fieldLabel: 'Classifier',
+        helpText: 'Classifier of the uploaded artifact. If not supplied, no classifier will be appended to the artifact.',
         name: me.name + '.classifier'
       },
       {
         xtype: 'textfield',
         fieldLabel: 'Extension',
+        helpText: 'Extension of the uploaded artifact. If not supplied, the default extension (derived from the packaging type) will be used.',
         name: me.name + '.extension',
         allowBlank: false
       }

@@ -44,7 +44,7 @@ Ext.define('NX.coreui.controller.NotificationSettings', {
       description: 'Manage notification configuration',
       view: { xtype: 'nx-coreui-system-notification-settings' },
       iconConfig: {
-        file: 'emails.png',
+        file: 'note.png',
         variants: ['x16', 'x32']
       },
       visible: function () {

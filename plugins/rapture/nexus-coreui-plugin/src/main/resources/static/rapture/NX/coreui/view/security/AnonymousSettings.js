@@ -64,6 +64,7 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
                 xtype: 'textfield',
                 name: 'username',
                 fieldLabel: 'Username',
+                helpText: 'The username that will be used to authenticate anonymous users against the security realm.',
                 emptyText: 'anonymous',
                 allowBlank: false
               },
@@ -71,6 +72,7 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
                 xtype: 'nx-password',
                 name: 'password',
                 fieldLabel: 'Password',
+                helpText: 'The password that will be used to authenticate anonymous users against the security realm.',
                 emptyText: 'password',
                 allowBlank: false
               }

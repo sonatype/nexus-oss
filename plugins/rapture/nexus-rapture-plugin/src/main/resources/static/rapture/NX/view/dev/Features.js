@@ -27,13 +27,13 @@ Ext.define('NX.view.dev.Features', {
     { text: 'iconName', dataIndex: 'iconName', editor: 'textfield' },
     { text: 'description', dataIndex: 'description', editor: 'textfield' },
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       dataIndex: 'iconName',
       width: 48,
       iconVariant: 'x16'
     },
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       dataIndex: 'iconName',
       width: 48,
       iconVariant: 'x32'
