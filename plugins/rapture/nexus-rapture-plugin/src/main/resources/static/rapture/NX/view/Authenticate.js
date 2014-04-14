@@ -83,6 +83,7 @@ Ext.define('NX.view.Authenticate', {
           }
         ],
 
+        buttonAlign: 'left',
         buttons: [
           { text: 'Authenticate', action: 'authenticate', formBind: true, bindToEnter: true, ui: 'primary' },
           { text: 'Cancel', handler: me.close, scope: me }
