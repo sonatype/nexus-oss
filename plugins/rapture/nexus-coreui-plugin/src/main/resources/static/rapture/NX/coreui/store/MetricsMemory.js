@@ -16,38 +16,51 @@
  *
  * @since 3.0
  */
+  //Ext.define('NX.coreui.store.MetricsMemory', {
+  //  extend: 'Ext.data.JsonStore',
+  //  fields: [ 'name', 'data' ],
+  //  data: [
+  //    { 'name': 'metric one',   'data': 10 },
+  //    { 'name': 'metric two',   'data':  7 },
+  //    { 'name': 'metric three', 'data':  5 },
+  //    { 'name': 'metric four',  'data':  2 },
+  //    { 'name': 'metric five',  'data': 27 }
+  //  ]
+  //});
+
 Ext.define('NX.coreui.store.MetricsMemory', {
-  extend: 'Ext.data.JsonStore',
-  fields: [ 'name', 'data' ],
-  data: [
-    { 'name': 'metric one',   'data': 10 },
-    { 'name': 'metric two',   'data':  7 },
-    { 'name': 'metric three', 'data':  5 },
-    { 'name': 'metric four',  'data':  2 },
-    { 'name': 'metric five',  'data': 27 }
-  ]
+  extend: 'Ext.data.Store',
+  fields: ['name', 'data'],
+
+  proxy: {
+    type: 'direct',
+    paramsAsHash: false,
+    api: {
+      read: 'NX.direct.coreui_Metrics.memory'
+    },
+
+    reader: Ext.create('Ext.data.reader.Json', {
+      root: 'data',
+      successProperty: 'success'
+    })
+  },
+
+  constructor: function (config) {
+    var me = this;
+
+    this.callParent(arguments);
+
+    Ext.override(me.getProxy().getReader(), {
+      readRecords: function (data) {
+        var arrayData = [];
+
+        Ext.Object.each(data.data, function (key, value) {
+          arrayData.push({ name: key, data: value });
+        });
+
+        return this.callParent([arrayData]);
+      }
+    });
+  }
+
 });
-
-
-/*
- Ext.define('NX.coreui.store.MetricsMemory', {
- extend: 'Ext.data.Store',
- model: 'NX.coreui.model.MetricsMemory',
-
- proxy: {
- type: 'direct',
- paramsAsHash: false,
- api: {
- read: 'NX.direct.coreui_Metrics.memory'
- },
-
- reader: {
- type: 'json',
- root: 'data',
- successProperty: 'success'
- }
- }
-
- });
-
- */

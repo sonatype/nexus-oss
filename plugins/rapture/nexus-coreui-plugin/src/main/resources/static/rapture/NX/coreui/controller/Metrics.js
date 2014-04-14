@@ -58,7 +58,6 @@ Ext.define('NX.coreui.controller.Metrics', {
       }
     });
 
-    /*
     me.listen({
       controller: {
         '#Refresh': {
@@ -66,40 +65,31 @@ Ext.define('NX.coreui.controller.Metrics', {
         }
       },
       component: {
-        'nx-coreui-support-sysinfo': {
+        'nx-coreui-support-metrics': {
           afterrender: me.load
         },
-        'nx-coreui-support-sysinfo button[action=download]': {
-          'click': me.download
-        },
-        'nx-coreui-support-sysinfo button[action=print]': {
-          'click': me.print
-        }
+        //'nx-coreui-support-sysinfo button[action=download]': {
+        //  'click': me.download
+        //},
+        //'nx-coreui-support-sysinfo button[action=print]': {
+        //  'click': me.print
+        //}
       }
     });
-    */
   },
 
-  ///**
-  // * Load system information panel.
-  // *
-  // * @private
-  // */
-  //load: function () {
-  //  var me = this,
-  //      panel = me.getSysInfo();
-  //
-  //  if (panel) {
-  //    me.logDebug('Refreshing sysinfo');
-  //
-  //    panel.getEl().mask('Loading...');
-  //    NX.direct.atlas_SystemInformation.read(function (response) {
-  //      panel.getEl().unmask();
-  //      if (Ext.isDefined(response) && response.success) {
-  //        panel.setInfo(response.data);
-  //      }
-  //    });
-  //  }
-  //}
+  /**
+  * Load system information panel.
+  *
+  * @private
+  */
+  load: function () {
+    var me = this,
+        panel = me.getMetrics();
+
+    if (panel) {
+      me.getMetricsMemoryStore().load();
+    }
+  }
 
 });
