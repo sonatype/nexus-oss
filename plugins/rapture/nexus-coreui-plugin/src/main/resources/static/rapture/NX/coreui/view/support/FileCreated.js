@@ -50,9 +50,6 @@ Ext.define('NX.coreui.view.support.FileCreated', {
           xtype: 'form',
           bodyPadding: 10,
           defaults: {
-            labelSeparator: '',
-            labelWidth: 40,
-            labelAlign: 'right',
             anchor: '100%'
           },
           items: [
