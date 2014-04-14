@@ -14,48 +14,42 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-oss</artifactId>
+    <groupId>org.sonatype.nexus.assemblies</groupId>
+    <artifactId>nexus-assemblies</artifactId>
     <version>3.0.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.assemblies</groupId>
-  <artifactId>nexus-assemblies</artifactId>
+  <artifactId>nexus-base-feature</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>pom</packaging>
+  <packaging>feature</packaging>
 
-  <modules>
-    <module>nexus-base-feature</module>
-    <module>nexus-bundle-template</module>
-    <module>nexus-karaf-template</module>
-  </modules>
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-core</artifactId>
+    </dependency>
 
-  <dependencyManagement>
-    <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-extender</artifactId>
+    </dependency>
 
-      <!-- IMPORTS -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+    </dependency>
+  </dependencies>
 
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-components</artifactId>
-        <type>pom</type>
-        <version>3.0.0-SNAPSHOT</version>
-        <scope>import</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-plugins</artifactId>
-        <type>pom</type>
-        <version>3.0.0-SNAPSHOT</version>
-        <scope>import</scope>
-      </dependency>
-
-    </dependencies>
-  </dependencyManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
