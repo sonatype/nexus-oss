@@ -29,8 +29,6 @@ public class EventDataBuilder
 {
   private final EventData data = new EventData();
 
-  private final long started;
-
   public EventDataBuilder(final String type) {
     data.setType(type);
     data.setTimestamp(System.nanoTime());
@@ -48,8 +46,6 @@ public class EventDataBuilder
         data.setSessionId(session.getId().toString());
       }
     }
-
-    this.started = System.nanoTime();
   }
 
   public EventDataBuilder set(final String name, final @Nullable Object value) {
@@ -58,11 +54,8 @@ public class EventDataBuilder
     return this;
   }
 
-  public EventDataBuilder setDuration(final String name) {
-    return set(name, System.nanoTime() - started);
-  }
-
   public EventData build() {
+    set("duration", System.nanoTime() - data.getTimestamp());
     return data;
   }
 }

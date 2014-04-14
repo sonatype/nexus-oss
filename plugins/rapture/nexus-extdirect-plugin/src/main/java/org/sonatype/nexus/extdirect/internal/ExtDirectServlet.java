@@ -216,7 +216,6 @@ public class ExtDirectServlet
             if (response != null) {
               builder.set("success", response.isSuccess());
             }
-            builder.setDuration("duration");
             eventRecorder.record(builder.build());
           }
 
