@@ -55,7 +55,7 @@ public class EventDataBuilder
   }
 
   public EventData build() {
-    set("duration", System.nanoTime() - data.getTimestamp());
+    data.setDuration(System.nanoTime() - data.getTimestamp());
     return data;
   }
 }

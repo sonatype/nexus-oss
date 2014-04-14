@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.analytics;
 
 import java.util.Map;
@@ -27,11 +28,13 @@ public class EventData
 
   private Long timestamp;
 
+  private Long duration;
+
   private String userId;
 
   private String sessionId;
 
-  private final Map<String,Object> attributes = Maps.newHashMap();
+  private final Map<String, Object> attributes = Maps.newHashMap();
 
   public String getType() {
     return type;
@@ -47,6 +50,14 @@ public class EventData
 
   public void setTimestamp(final Long timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public Long getDuration() {
+    return duration;
+  }
+
+  public void setDuration(final Long duration) {
+    this.duration = duration;
   }
 
   public String getUserId() {
@@ -74,6 +85,7 @@ public class EventData
     return getClass().getSimpleName() + "{" +
         "type='" + type + '\'' +
         ", timestamp=" + timestamp +
+        ", duration=" + duration +
         ", userId='" + userId + '\'' +
         ", sessionId='" + sessionId + '\'' +
         ", attributes=" + attributes +
