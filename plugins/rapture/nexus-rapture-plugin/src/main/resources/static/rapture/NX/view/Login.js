@@ -40,6 +40,7 @@ Ext.define('NX.view.Login', {
         bodyPadding: 10,
         defaultType: 'textfield',
         defaults: {
+          labelAlign: 'left',
           labelWidth: 100,
           anchor: '100%'
         },

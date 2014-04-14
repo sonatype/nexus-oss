@@ -49,6 +49,7 @@ Ext.define('NX.view.Authenticate', {
         bodyPadding: 10,
         defaultType: 'textfield',
         defaults: {
+          labelAlign: 'left',
           labelWidth: 100,
           anchor: '100%'
         },
