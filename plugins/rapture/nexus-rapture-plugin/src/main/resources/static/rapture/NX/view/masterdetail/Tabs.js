@@ -58,6 +58,7 @@ Ext.define('NX.view.masterdetail.Tabs', {
       xtype: 'tabpanel',
       activeTab: 0,
       layoutOnTabChange: true,
+      plain: true,
       items: items
     };
   },
