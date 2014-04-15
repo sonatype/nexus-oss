@@ -34,7 +34,7 @@ Ext.define('NX.coreui.controller.HttpSettings', {
       description: 'Manage outbound HTTP/HTTPS configuration',
       view: { xtype: 'nx-coreui-system-http-settings' },
       iconConfig: {
-        file: 'transmit.png',
+        file: 'lorry.png',
         variants: ['x16', 'x32']
       },
       visible: function () {
