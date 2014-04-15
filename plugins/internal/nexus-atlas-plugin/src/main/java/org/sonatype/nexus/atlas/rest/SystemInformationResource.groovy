@@ -31,6 +31,8 @@ import static com.google.common.base.Preconditions.checkNotNull
 /**
  * Renders system information.
  *
+ * This is required for download of the report from the UI.
+ *
  * @since 2.7
  */
 @Named
@@ -48,10 +50,6 @@ class SystemInformationResource
   SystemInformationResource(final SystemInformationGenerator systemInformationGenerator) {
     this.systemInformationGenerator = checkNotNull(systemInformationGenerator)
   }
-
-  //
-  // NOTE: This is required for download of the report from the UI
-  //
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
