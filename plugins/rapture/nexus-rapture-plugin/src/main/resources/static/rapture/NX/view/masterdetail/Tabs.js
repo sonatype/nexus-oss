@@ -22,15 +22,6 @@ Ext.define('NX.view.masterdetail.Tabs', {
   // HACK: For now make all detail panels light themed while we sort out the overall look of rapture
   ui: 'feature-detail',
 
-  warningTpl: new Ext.XTemplate(
-      '<div class="nx-masterdetail-warning">',
-      '  <div>{icon}{text}</div>',
-      '</div>',
-      {
-        compiled: true
-      }
-  ),
-
   initComponent: function () {
     var me = this,
         content = me.tabs;
@@ -39,8 +30,17 @@ Ext.define('NX.view.masterdetail.Tabs', {
       content = me.getTabsConfig(content);
     }
     else {
-      content = Ext.apply({}, content, {title: undefined});
+      content = Ext.apply({}, content, { title: undefined });
     }
+    content = Ext.Array.from(content);
+    Ext.Array.insert(content, 0, [
+      {
+        xtype: 'panel',
+        itemId: 'warning',
+        iconCls: NX.Icons.cls('masterdetail-warning', 'x16'),
+        hidden: true
+      }
+    ]);
 
     Ext.apply(me, {
       items: content
@@ -65,28 +65,22 @@ Ext.define('NX.view.masterdetail.Tabs', {
 
   setDescription: function (description) {
     this.description = description;
-    this.showTitle();
+    this.setTitle(description);
   },
 
   showWarning: function (message) {
-    this.warning = message;
-    this.showTitle();
+    var me = this,
+        warningPanel = me.down('>#warning');
+
+    warningPanel.setTitle(message);
+    warningPanel.show();
   },
 
   clearWarning: function () {
-    this.warning = undefined;
-    this.showTitle();
-  },
+    var me = this,
+        warningPanel = me.down('>#warning');
 
-  showTitle: function () {
-    var title = this.description;
-    if (Ext.isDefined(this.warning)) {
-      // TODO icon
-      title += this.warningTpl.apply({
-        text: this.warning
-      });
-    }
-    this.setTitle(title);
+    warningPanel.hide();
   },
 
   addTab: function (tab) {
@@ -111,7 +105,7 @@ Ext.define('NX.view.masterdetail.Tabs', {
    */
   getBookmarkOfSelectedTab: function () {
     var me = this,
-        content = me.items.get(0),
+        content = me.items.get(1),
         selectedItem = content;
 
     if (content.isXType('tabpanel')) {
@@ -141,7 +135,7 @@ Ext.define('NX.view.masterdetail.Tabs', {
    */
   calculateBookmarks: function () {
     var me = this,
-        content = me.items.get(0);
+        content = me.items.get(1);
 
     if (content.isXType('tabpanel')) {
       content.items.each(function (tab) {
