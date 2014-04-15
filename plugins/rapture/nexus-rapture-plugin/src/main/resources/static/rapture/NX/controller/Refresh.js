@@ -31,13 +31,6 @@ Ext.define('NX.controller.Refresh', {
   init: function () {
     var me = this;
 
-    me.getApplication().getIconController().addIcons({
-      'refresh': {
-        file: 'arrow_refresh.png',
-        variants: ['x16', 'x32']
-      }
-    });
-
     me.listen({
       component: {
         'nx-header-refresh': {
