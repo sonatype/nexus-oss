@@ -19,6 +19,8 @@ Ext.define('NX.coreui.view.upload.UploadArtifact', {
   extend: 'Ext.form.Panel',
   alias: 'widget.nx-coreui-upload-artifact',
 
+  bodyPadding: 10,
+
   defaults: {
     xtype: 'textfield',
     allowBlank: false
