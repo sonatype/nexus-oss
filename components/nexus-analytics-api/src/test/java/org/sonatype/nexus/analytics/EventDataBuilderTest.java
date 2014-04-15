@@ -70,6 +70,7 @@ public class EventDataBuilderTest
     assertThat(event.getTimestamp(), notNullValue());
     assertThat(event.getUserId(), is("foo"));
     assertThat(event.getSessionId(), is("1234"));
+    assertThat(event.getDuration(), notNullValue());
   }
 
   @Test
