@@ -102,15 +102,16 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
 
   /**
    * Exports form as a capability.
-   * @param form to be exported
    * @returns {Object} capability
    */
-  exportCapability: function (form) {
+  exportCapability: function () {
     var me = this,
+        form = me.up('form').getForm(),
         values = form.getFieldValues(),
         value,
         capability = {
           id: values.id,
+          notes: values.notes,
           typeId: me.capabilityType.get('id'),
           enabled: values.enabled,
           properties: {}
@@ -119,7 +120,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
     if (me.capabilityType && me.capabilityType.get('formFields')) {
       Ext.each(me.capabilityType.get('formFields'), function (formField) {
         value = values['property.' + formField.id];
-        if (Ext.isDefined(value)) {
+        if (value) {
           capability.properties[formField.id] = String(value);
         }
       });
@@ -129,14 +130,14 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
   },
 
   /**
-   * Imports capability into a form.
-   * @param form to set values into
+   * Imports capability.
    * @param {NX.model.Capability} capabilityModel to import
    * @param {NX.model.CapabilityType} capabilityTypeModel
    */
-  importCapability: function (form, capabilityModel, capabilityTypeModel) {
+  importCapability: function (capabilityModel, capabilityTypeModel) {
     var me = this,
-        data = Ext.apply({}, {enabled: capabilityModel.data.enabled});
+        form = me.up('form').getForm(),
+        data = Ext.apply({}, { enabled: capabilityModel.get('enabled') });
 
     me.setCapabilityType(capabilityTypeModel);
 
@@ -146,8 +147,8 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
       });
     }
 
-    if (capabilityModel.data.properties) {
-      Ext.Object.each(capabilityModel.data.properties, function (key, value) {
+    if (capabilityModel.get('properties')) {
+      Ext.Object.each(capabilityModel.get('properties'), function (key, value) {
         data['property.' + key] = value;
       });
     }
@@ -155,8 +156,16 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
     form.setValues(data);
   },
 
-  markInvalid: function (form, errors) {
-    var remainingMessages = [],
+  /**
+   * Mark fields in this form invalid in bulk.
+   * @param {Object/Object[]/Ext.data.Errors} errors
+   * Either an array in the form `[{id:'fieldId', msg:'The message'}, ...]`,
+   * an object hash of `{id: msg, id2: msg2}`, or a {@link Ext.data.Errors} object.
+   */
+  markInvalid: function (errors) {
+    var me = this,
+        form = me.up('form').getForm(),
+        remainingMessages = [],
         key, marked, field;
 
     if (Ext.isDefined(errors)) {
@@ -181,10 +190,8 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
     }
 
     if (remainingMessages.length > 0) {
-      return remainingMessages.join('\n');
+      NX.Messages.add({ text: remainingMessages.join('\n'), type: 'warning' });
     }
-
-    return undefined;
   }
 
 });
