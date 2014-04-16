@@ -577,6 +577,16 @@
         </plugin>
 
         <!--
+        Generate Karaf feature XML.
+        -->
+        <plugin>
+          <groupId>org.apache.karaf.tooling</groupId>
+          <artifactId>karaf-maven-plugin</artifactId>
+          <version>3.0.0</version>
+          <extensions>true</extensions>
+        </plugin>
+
+        <!--
         Generate sisu index metadata.
         -->
         <plugin>
