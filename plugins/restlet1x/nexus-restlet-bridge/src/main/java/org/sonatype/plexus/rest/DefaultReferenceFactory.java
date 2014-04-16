@@ -60,17 +60,32 @@ public class DefaultReferenceFactory
     return reference;
   }
 
-  public Reference createThisReference(Request request) {
-    String uriPart =
-        request.getResourceRef().getTargetRef().toString().substring(
-            getContextRoot(request).getTargetRef().toString().length());
-
-    // trim leading slash
-    if (uriPart.startsWith("/")) {
-      uriPart = uriPart.substring(1);
+  /**
+   * Returns the resource-path for the given request, does not include "service/local" prefix.
+   * Should never start with "/".
+   */
+  private String getResourcePath(final Request request) {
+    // do not use getContentRoot() here, we do not want force base-url messing up resource path extraction
+    String rootUri = request.getRootRef().getTargetRef().toString();
+    if (!rootUri.endsWith("/")) {
+      rootUri += "/";
     }
+    String resourceUri = request.getResourceRef().getTargetRef().toString();
+    String path = resourceUri.substring(rootUri.length());
+    if (path.startsWith("/")) {
+      path = path.substring(1, path.length());
+    }
+    return path;
+  }
 
-    return updateBaseRefPath(new Reference(getContextRoot(request), uriPart));
+  public Reference createThisReference(final Request request) {
+    // normalized root-ref which respects force base-url
+    Reference rootRef = getContextRoot(request);
+
+    // normalized reference to resource relative to root-ref
+    Reference thisRef = new Reference(rootRef, "service/local/" + getResourcePath(request));
+
+    return updateBaseRefPath(thisRef);
   }
 
   public Reference createChildReference(Request request, String childPath) {
