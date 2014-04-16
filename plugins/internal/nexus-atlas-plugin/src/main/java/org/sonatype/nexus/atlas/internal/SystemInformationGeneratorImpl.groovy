@@ -209,6 +209,14 @@ class SystemInformationGeneratorImpl
               'contactCountry': license.contactCountry
           ]
         }
+
+        // Add license fingerprint details if we can resolve the license fingerprinter
+        def fp = lookupComponent('org.sonatype.licensing.product.util.LicenseFingerprinter')
+        if (fp) {
+          data += [
+              'fingerprint': fp.calculate()
+          ]
+        }
       }
 
       return data
