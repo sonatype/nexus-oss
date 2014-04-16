@@ -33,7 +33,8 @@ Ext.define('NX.controller.SettingsForm', {
       },
       component: {
         'form[settingsForm=true]': {
-          afterrender: me.loadForm
+          afterrender: me.loadForm,
+          load: me.loadForm
         },
         'form[settingsForm=true][editableCondition]': {
           afterrender: me.bindEditableCondition
