@@ -57,11 +57,7 @@ Ext.define('NX.controller.SettingsForm', {
 
     if (forms) {
       Ext.each(forms, function (form) {
-        me.loadForm(form, {
-          success: function (basicForm, action) {
-            form.fireEvent('loaded', form, action);
-          }
-        });
+        me.loadForm(form);
       });
     }
   },
@@ -75,9 +71,16 @@ Ext.define('NX.controller.SettingsForm', {
       form.load(Ext.applyIf(options || {}, {
         waitMsg: form.settingsFormLoadMessage,
         success: function (basicForm, action) {
+          form.isValid();
           form.fireEvent('loaded', form, action);
+        },
+        failure: function (basicForm, action) {
+          form.isValid();
         }
       }));
+    }
+    else {
+      form.isValid();
     }
   },
 
