@@ -85,7 +85,7 @@ Ext.define('NX.view.masterdetail.Tabs', {
 
   addTab: function (tab) {
     var me = this,
-        content = me.items.get(0);
+        content = me.items.get(1);
 
     if (content.isXType('tabpanel')) {
       me.tabs.push(tab);
