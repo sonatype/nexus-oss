@@ -24,22 +24,14 @@ import org.restlet.data.Request;
 public class DefaultReferenceFactory
     implements ReferenceFactory
 {
-
   /**
    * Centralized, since this is the only "dependent" stuff that relies on knowledge where restlet.Application is
    * mounted (we had a /service => / move).
+   *
+   * This implementation is still used by tests.
    */
   public Reference getContextRoot(Request request) {
-    Reference result;
-
-    // if ( getNexus().isForceBaseUrl() && getNexus().getBaseUrl() != null )
-    // {
-    // result = new Reference( getNexus().getBaseUrl() );
-    // }
-    // else
-    // {
-    result = request.getRootRef();
-    // }
+    Reference result = request.getRootRef();
 
     // fix for when restlet is at webapp root
     if (StringUtils.isEmpty(result.getPath())) {
@@ -49,7 +41,7 @@ public class DefaultReferenceFactory
     return result;
   }
 
-  private Reference updateBaseRefPath(Reference reference) {
+  protected Reference updateBaseRefPath(Reference reference) {
     if (reference.getBaseRef().getPath() == null) {
       reference.getBaseRef().setPath("/");
     }
@@ -61,31 +53,20 @@ public class DefaultReferenceFactory
   }
 
   /**
-   * Returns the resource-path for the given request, does not include "service/local" prefix.
-   * Should never start with "/".
+   * See NexusReferenceFactory impl which provides real behavior for this at runtime
+   * this impl here mainly for legacy test support.
    */
-  private String getResourcePath(final Request request) {
-    // do not use getContentRoot() here, we do not want force base-url messing up resource path extraction
-    String rootUri = request.getRootRef().getTargetRef().toString();
-    if (!rootUri.endsWith("/")) {
-      rootUri += "/";
+  public Reference createThisReference(Request request) {
+    String uriPart =
+        request.getResourceRef().getTargetRef().toString().substring(
+            request.getRootRef().getTargetRef().toString().length());
+
+    // trim leading slash
+    if (uriPart.startsWith("/")) {
+      uriPart = uriPart.substring(1);
     }
-    String resourceUri = request.getResourceRef().getTargetRef().toString();
-    String path = resourceUri.substring(rootUri.length());
-    if (path.startsWith("/")) {
-      path = path.substring(1, path.length());
-    }
-    return path;
-  }
 
-  public Reference createThisReference(final Request request) {
-    // normalized root-ref which respects force base-url
-    Reference rootRef = getContextRoot(request);
-
-    // normalized reference to resource relative to root-ref
-    Reference thisRef = new Reference(rootRef, "service/local/" + getResourcePath(request));
-
-    return updateBaseRefPath(thisRef);
+    return updateBaseRefPath(new Reference(getContextRoot(request), uriPart));
   }
 
   public Reference createChildReference(Request request, String childPath) {
