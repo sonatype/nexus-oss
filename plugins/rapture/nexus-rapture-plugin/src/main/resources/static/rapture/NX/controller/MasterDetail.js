@@ -42,6 +42,16 @@ Ext.define('NX.controller.MasterDetail', {
    */
   deleteModel: undefined,
 
+  onLaunch: function () {
+    var me = this;
+    me.getApplication().getIconController().addIcons({
+      'masterdetail-warning': {
+        file: 'warning.png',
+        variants: ['x16', 'x32']
+      },
+    });
+  },
+
   init: function () {
     var me = this,
         componentListener = {};
