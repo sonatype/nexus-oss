@@ -120,7 +120,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
     if (me.capabilityType && me.capabilityType.get('formFields')) {
       Ext.each(me.capabilityType.get('formFields'), function (formField) {
         value = values['property.' + formField.id];
-        if (value) {
+        if (Ext.isDefined(value)) {
           capability.properties[formField.id] = String(value);
         }
       });
