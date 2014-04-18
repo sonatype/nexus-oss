@@ -767,6 +767,25 @@
           </executions>
         </plugin>
 
+        <plugin>
+          <groupId>org.apache.karaf.tooling</groupId>
+          <artifactId>karaf-maven-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>plugin-feature</id>
+              <goals>
+                <goal>features-generate-descriptor</goal>
+              </goals>
+              <configuration>
+                <!--
+                Standard template for nexus plugin feature (relative path from plugin projects)
+                -->
+                <inputFile>${project.basedir}/../../feature.xml</inputFile>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
       </plugins>
     </pluginManagement>
   </build>

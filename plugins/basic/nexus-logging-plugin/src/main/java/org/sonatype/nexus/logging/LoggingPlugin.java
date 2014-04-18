@@ -58,7 +58,7 @@ public class LoggingPlugin
   /**
    * Prefix for permissions related to log.
    */
-  public static final String PERMISSION_PREFIX_LOG = "nexus:log:";
+  public static final String PERMISSION_PREFIX_LOG = "nexus:logs:";
 
   @Inject
   public LoggingPlugin()

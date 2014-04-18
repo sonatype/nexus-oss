@@ -19,15 +19,19 @@ Ext.define('NX.coreui.view.capability.CapabilityStatus', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-capability-status',
 
-  title: 'Status',
-
   autoScroll: true,
   html: '',
+  bodyPadding: 10,
 
-  showStatus: function (status) {
-    this.html = status;
+  /**
+   * @public
+   * Shows capability status text.
+   * @param {String} text status text
+   */
+  showStatus: function (text) {
+    this.html = text ? text : 'Capability does not provide any status.';
     if (this.body) {
-      this.body.update(status);
+      this.update(this.html);
     }
   }
 

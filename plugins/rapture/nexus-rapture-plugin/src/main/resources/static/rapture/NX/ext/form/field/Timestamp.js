@@ -11,18 +11,16 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * An read only **{@link Ext.form.field.Text}** that shows a timestamp as a formatted date.
+ * An **{@link Ext.form.field.Display}** that shows a timestamp as a formatted date.
  *
  * @since 3.0
  */
 Ext.define('NX.ext.form.field.Timestamp', {
-  extend: 'Ext.form.field.Text',
+  extend: 'Ext.form.field.Display',
   alias: 'widget.nx-timestamp',
   requires: [
     'NX.util.DateFormat'
   ],
-
-  readOnly: true,
 
   /**
    * @cfg {String} [format=NX.util.DateFormat.forName('datetime')['long']]
@@ -42,7 +40,7 @@ Ext.define('NX.ext.form.field.Timestamp', {
     me.callParent(arguments);
   },
 
-  valueToRaw: function(value) {
+  valueToRaw: function (value) {
     return NX.util.DateFormat.timestamp(value, this.format);
   }
 

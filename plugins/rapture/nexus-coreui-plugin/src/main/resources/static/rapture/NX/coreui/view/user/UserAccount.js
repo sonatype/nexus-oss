@@ -39,23 +39,27 @@ Ext.define('NX.coreui.view.user.UserAccount', {
             name: 'id',
             itemId: 'id',
             readOnly: true,
-            fieldLabel: 'User Id',
+            fieldLabel: 'ID',
+            helpText: 'The ID assigned to you, used as the username.',
             emptyText: 'enter a user id'
           },
           {
             name: 'firstName',
             fieldLabel: 'First Name',
+            helpText: 'Your first name.',
             emptyText: 'enter first name'
           },
           {
             name: 'lastName',
             fieldLabel: 'Last Name',
+            helpText: 'Your last name.',
             emptyText: 'enter last name'
           },
           {
             xtype: 'nx-email',
             name: 'email',
             fieldLabel: 'Email',
+            helpText: 'Your email address, to notify you when necessary.',
             emptyText: 'enter an email address'
           }
         ]

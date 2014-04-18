@@ -26,13 +26,13 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
       xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
-      iconName: function () {
-        return 'capability-default';
-      }
+      iconNamePrefix: 'capability-',
+      dataIndex: 'state',
+      hideable: false
     },
-    { header: 'Type', dataIndex: 'typeName', flex: 1 },
-    { header: 'Description', dataIndex: 'description', flex: 1 },
-    { header: 'Notes', dataIndex: 'notes', flex: 1 }
+    { text: 'Type', dataIndex: 'typeName', flex: 1 },
+    { text: 'Description', dataIndex: 'description', flex: 1, groupable: false },
+    { text: 'Notes', dataIndex: 'notes', flex: 1 }
   ],
 
   emptyText: 'No capabilities defined',
@@ -46,12 +46,57 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   },
 
   tbar: [
-    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
-    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+    {
+      xtype: 'button',
+      text: 'New',
+      action: 'new',
+      disabled: true,
+      glyph: 'xf055@FontAwesome' /* fa-plus-circle */
+    },
+    {
+      xtype: 'button',
+      text: 'Delete',
+      action: 'delete',
+      disabled: true,
+      glyph: 'xf056@FontAwesome' /* fa-minus-circle */
+    },
+    '-',
+    {
+      xtype: 'button',
+      text: 'Enable',
+      action: 'enable',
+      disabled: true,
+      glyph: 'xf04b@FontAwesome' /* fa-play */
+    },
+    {
+      xtype: 'button',
+      text: 'Disable',
+      action: 'disable',
+      disabled: true,
+      glyph: 'xf04d@FontAwesome' /* fa-stop */
+    }
+  ],
+
+  features: [
+    {
+      ftype: 'grouping',
+      groupHeaderTpl: '{[values.name === "" ? "No " + values.columnName : values.name + " " + values.columnName]}'
+    }
   ],
 
   plugins: [
     { ptype: 'gridfilterbox', emptyText: 'No capability matched criteria "$filter"' }
-  ]
+  ],
+
+  /**
+   * @override
+   */
+  initComponent: function (config) {
+    var me = this;
+
+    me.originalColumns = me.columns;
+
+    me.callParent(arguments);
+  }
 
 });

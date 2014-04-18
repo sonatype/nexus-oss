@@ -36,29 +36,34 @@ Ext.define('NX.coreui.view.user.UserSettings', {
         name: 'id',
         itemId: 'id',
         readOnly: true,
-        fieldLabel: 'User Id',
+        fieldLabel: 'ID',
+        helpText: 'The ID assigned to this user, will be used as the username.',
         emptyText: 'enter a user id'
       },
       {
         name: 'firstName',
         fieldLabel: 'First Name',
+        helpText: 'The first name of the user.',
         emptyText: 'enter first name'
       },
       {
         name: 'lastName',
         fieldLabel: 'Last Name',
+        helpText: 'The last name of the user.',
         emptyText: 'enter last name'
       },
       {
         xtype: 'nx-email',
         name: 'email',
         fieldLabel: 'Email',
+        helpText: 'Email address, to notify user when necessary.',
         emptyText: 'enter an email address'
       },
       {
         xtype: 'combo',
         name: 'status',
         fieldLabel: 'Status',
+        helpText: 'The current status of the user.',
         emptyText: 'select status',
         allowBlank: false,
         editable: false,
@@ -72,6 +77,8 @@ Ext.define('NX.coreui.view.user.UserSettings', {
         xtype: 'nx-itemselector',
         name: 'roles',
         itemId: 'roles',
+        fieldLabel: 'Roles',
+        helpText: 'The roles assigned to this user.',
         buttons: ['add', 'remove'],
         fromTitle: 'Roles',
         toTitle: 'Given',

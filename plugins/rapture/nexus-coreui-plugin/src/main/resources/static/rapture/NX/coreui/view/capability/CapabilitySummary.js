@@ -30,42 +30,64 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
           columnWidth: 1
         },
         {
-          html: 'Status',
-          width: 50
+          margin: '10 20 0 10',
+          items: [
+            { itemId: 'stateImage' },
+            { itemId: 'stateLabel', margin: '5 0 0 0' }
+          ]
         }
       ]
     },
     {
-      xtype: 'form',
-      items: {
-        xtype: 'fieldset',
-        title: 'Notes',
-        autoScroll: true,
-        collapsed: false,
-        hideLabels: true,
-        items: {
+      xtype: 'nx-settingsform',
+      api: {
+        submit: 'NX.direct.capability_Capability.updateNotes'
+      },
+      settingsFormSuccessMessage: function (data) {
+        var description = 'Capability updated: ' + data['typeName'];
+        if (data['description']) {
+          description += ' - ' + data['description'];
+        }
+        return description;
+      },
+      editableCondition: NX.Conditions.isPermitted('nexus:capabilities', 'update'),
+      editableMarker: 'You do not have permission to update capabilities',
+      items: [
+        {
+          xtype: 'hiddenfield',
+          name: 'id'
+        },
+        {
           xtype: 'textarea',
-          helpText: "Optional notes about configured capability",
+          fieldLabel: 'Notes',
+          helpText: "Optional notes about configured capability.",
           name: 'notes',
           allowBlank: true,
           anchor: '100%'
-        }
-      },
-      buttonAlign: 'left',
-      buttons: [
-        { text: 'Save', action: 'save', ui: 'primary' },
-        { text: 'Discard',
-          handler: function () {
-            var form = this.up('form');
-            form.loadRecord(form.getRecord());
-          }
         }
       ]
     }
   ],
 
+  /**
+   * @public
+   * Shows capability info.
+   * @param {Object} info capability info object
+   */
   showInfo: function (info) {
     this.down('nx-info').showInfo(info);
+  },
+
+  /**
+   * @public
+   * Shows state image and text.
+   * @param {String} state capability state
+   */
+  showState: function (state) {
+    var me = this;
+
+    me.down('#stateImage').update(NX.Icons.img('capability-' + state, 'x32'));
+    me.down('#stateLabel').update('<b>' + Ext.String.capitalize(state) + '</b>');
   }
 
 });

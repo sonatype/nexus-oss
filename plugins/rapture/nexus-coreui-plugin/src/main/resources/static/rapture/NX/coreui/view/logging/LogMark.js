@@ -37,6 +37,7 @@ Ext.define('NX.coreui.view.search.LogMark', {
         name: 'message',
         itemId: 'message',
         fieldLabel: 'Message',
+        helpText: 'Message to be included in the log',
         emptyText: 'enter a marker text'
       }
     ]

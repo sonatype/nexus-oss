@@ -20,7 +20,7 @@ import org.sonatype.nexus.validation.Update
 import javax.validation.constraints.NotNull
 
 /**
- * Capability status exchange object.
+ * Capability exchange object.
  *
  * @since 3.0
  */
@@ -45,6 +45,7 @@ class CapabilityXO
   Boolean active
   Boolean error
   String description
+  String state
   String stateDescription
   String status
   String typeName

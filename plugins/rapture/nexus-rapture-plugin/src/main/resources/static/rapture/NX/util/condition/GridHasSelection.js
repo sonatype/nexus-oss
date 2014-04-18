@@ -54,10 +54,10 @@ Ext.define('NX.util.condition.GridHasSelection', {
     return me;
   },
 
-  evaluate: function (grid) {
+  evaluate: function (grid, model) {
     var me = this,
         satisfied = false,
-        selectionModel, selection, model;
+        selectionModel, selection;
 
     if (me.bounded) {
       if (Ext.isDefined(grid) && grid.isXType('grid')) {
@@ -67,7 +67,9 @@ Ext.define('NX.util.condition.GridHasSelection', {
         }
         selection = selectionModel.getSelection();
         if (selection.length) {
-          model = selection[0];
+          if (!model) {
+            model = selection[0];
+          }
           if (model) {
             satisfied = true;
             if (Ext.isFunction(me.fn)) {

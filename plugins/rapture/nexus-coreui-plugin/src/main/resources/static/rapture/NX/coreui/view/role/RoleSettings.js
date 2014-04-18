@@ -46,6 +46,7 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
         name: 'id',
         itemId: 'id',
         fieldLabel: 'Mapped Role',
+        helpText: 'The mapped role.',
         emptyText: 'select a role',
         editable: false,
         store: 'RoleBySource',
@@ -59,7 +60,8 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
         name: 'id',
         itemId: 'id',
         readOnly: true,
-        fieldLabel: 'Role Id',
+        fieldLabel: 'ID',
+        helpText: 'The id of this role.',
         emptyText: 'enter a role id'
       };
     }
@@ -74,18 +76,22 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
       {
         name: 'name',
         fieldLabel: 'Name',
+        helpText: 'The name of this role.',
         emptyText: 'enter a name'
       },
       {
         name: 'description',
         allowBlank: true,
         fieldLabel: 'Description',
+        helpText: 'The description of this role.',
         emptyText: 'enter a description'
       },
       {
         xtype: 'nx-itemselector',
         name: 'privileges',
         itemId: 'privileges',
+        fieldLabel: 'Privileges',
+        helpText: 'Privileges contained in this Role.',
         allowBlank: true,
         buttons: ['add', 'remove'],
         fromTitle: 'Privileges',
@@ -99,6 +105,8 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
         xtype: 'nx-itemselector',
         name: 'roles',
         itemId: 'roles',
+        fieldLabel: 'Roles',
+        helpText: 'Roles contained in this Role.',
         allowBlank: true,
         buttons: ['add', 'remove'],
         fromTitle: 'Roles',

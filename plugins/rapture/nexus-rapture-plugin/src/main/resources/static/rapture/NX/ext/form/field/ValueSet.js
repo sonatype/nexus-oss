@@ -171,7 +171,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
             width: 25,
             items: [
               {
-                iconCls: NX.Icons.cls('permission-denied', 'x16'),
+                icon: NX.Icons.url('cross', 'x16'),
                 tooltip: 'Delete',
                 handler: function (grid, rowIndex) {
                   me.removeValue(rowIndex);

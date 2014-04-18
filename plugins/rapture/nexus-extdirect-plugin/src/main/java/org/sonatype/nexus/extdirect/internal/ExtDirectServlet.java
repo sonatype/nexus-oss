@@ -39,6 +39,8 @@ import javax.validation.ConstraintViolationException;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.analytics.EventDataBuilder;
+import org.sonatype.nexus.analytics.EventRecorder;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.ExtDirectPlugin;
@@ -64,6 +66,7 @@ import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.inject.BeanLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.extdirect.model.Responses.error;
@@ -87,12 +90,16 @@ public class ExtDirectServlet
 
   private final BeanLocator beanLocator;
 
+  private final EventRecorder eventRecorder;
+
   @Inject
   public ExtDirectServlet(final ApplicationDirectories directories,
-                          final BeanLocator beanLocator)
+                          final BeanLocator beanLocator,
+                          final @Nullable EventRecorder eventRecorder)
   {
     this.directories = checkNotNull(directories);
     this.beanLocator = checkNotNull(beanLocator);
+    this.eventRecorder = eventRecorder; // null okay
   }
 
   @Override
@@ -123,8 +130,9 @@ public class ExtDirectServlet
   protected List<ApiConfiguration> createApiConfigurationsFromServletConfigurationApi(
       final ServletConfig configuration)
   {
-    Iterable<? extends BeanEntry<Annotation, DirectComponent>> entries = beanLocator
-        .locate(Key.get(DirectComponent.class));
+    Iterable<? extends BeanEntry<Annotation, DirectComponent>> entries =
+        beanLocator.locate(Key.get(DirectComponent.class));
+
     List<Class<?>> apiClasses = Lists.newArrayList(
         Iterables.transform(entries, new Function<BeanEntry<Annotation, DirectComponent>, Class<?>>()
         {
@@ -176,21 +184,49 @@ public class ExtDirectServlet
       protected Object invokeMethod(final RegisteredMethod method, final Object actionInstance,
                                     final Object[] parameters) throws Exception
       {
-        // TODO: Add analytics event capture here
+        if (log.isDebugEnabled()) {
+          log.debug("Invoking action method: {}, java-method: {}", method.getFullName(), method.getFullJavaMethodName());
+        }
+
+        Response response = null;
+        EventDataBuilder builder = null;
+
+        // Maybe record analytics events
+        if (eventRecorder != null && eventRecorder.isEnabled()) {
+          builder = new EventDataBuilder("Ext.Direct")
+              .set("type", method.getType().name())
+              .set("name", method.getName())
+              .set("action", method.getActionName());
+        }
+
+        MDC.put(getClass().getName(), method.getFullName());
 
         try {
-          return asResponse(super.invokeMethod(method, actionInstance, parameters));
+          response = asResponse(super.invokeMethod(method, actionInstance, parameters));
         }
         catch (InvocationTargetException e) {
-          return handleException(method, e.getTargetException());
+          response = handleException(method, e.getTargetException());
         }
         catch (Throwable e) {
-          return handleException(method, e);
+          response = handleException(method, e);
         }
+        finally {
+          // Record analytics event
+          if (builder != null) {
+            if (response != null) {
+              builder.set("success", response.isSuccess());
+            }
+            eventRecorder.record(builder.build());
+          }
+
+          MDC.remove(getClass().getName());
+        }
+
+        return response;
       }
 
-      private Object handleException(final RegisteredMethod method, final Throwable e) {
-        log.error("Failed to invoke action method {}", method.getFullJavaMethodName(), e);
+      private Response handleException(final RegisteredMethod method, final Throwable e) {
+        log.error("Failed to invoke action method: {}, java-method: {}", method.getFullName(), method.getFullJavaMethodName(), e);
 
         if (e instanceof InvalidConfigurationException) {
           InvalidConfigurationException cause = (InvalidConfigurationException) e;

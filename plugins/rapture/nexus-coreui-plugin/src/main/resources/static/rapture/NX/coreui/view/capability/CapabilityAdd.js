@@ -21,6 +21,9 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
 
   title: 'Create new capability',
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this;
 
@@ -28,28 +31,21 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
       xtype: 'nx-settingsform',
       items: [
         {
-          xtype: 'fieldset',
-          autoHeight: true,
-          collapsed: false,
-          border: false,
-          items: {
-            xtype: 'combo',
-            fieldLabel: 'Type',
-            itemCls: 'required-field',
-            helpText: "Type of configured capability",
-            name: 'typeId',
-            store: me.capabilityTypeStore,
-            displayField: 'name',
-            valueField: 'id',
-            forceSelection: true,
-            editable: false,
-            mode: 'local',
-            triggerAction: 'all',
-            emptyText: 'Select...',
-            selectOnFocus: false,
-            allowBlank: false,
-            anchor: '96%'
-          }
+          xtype: 'combo',
+          fieldLabel: 'Type',
+          itemCls: 'required-field',
+          helpText: "Type of configured capability.",
+          name: 'typeId',
+          store: me.capabilityTypeStore,
+          displayField: 'name',
+          valueField: 'id',
+          forceSelection: true,
+          editable: false,
+          mode: 'local',
+          triggerAction: 'all',
+          emptyText: 'Select...',
+          selectOnFocus: false,
+          allowBlank: false
         },
         {
           xtype: 'fieldset',
@@ -58,23 +54,23 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
           autoScroll: true,
           collapsible: true,
           collapsed: false,
+          border: '1 0 1 0',
           items: {
             xtype: 'nx-coreui-capability-about',
-            title: undefined
+            bodyPadding: '0 0 5 0'
           }
         },
         {
-          xtype: 'nx-coreui-capability-settingsfieldset',
-          title: 'Settings'
+          xtype: 'nx-coreui-capability-settingsfieldset'
         }
       ],
 
       getValues: function () {
-        return me.down('nx-coreui-capability-settingsfieldset').exportCapability(this.getForm())
+        return me.down('nx-coreui-capability-settingsfieldset').exportCapability();
       },
 
       markInvalid: function (errors) {
-        return me.down('nx-coreui-capability-settingsfieldset').markInvalid(this.getForm(), errors)
+        return me.down('nx-coreui-capability-settingsfieldset').markInvalid(errors);
       }
 
     };

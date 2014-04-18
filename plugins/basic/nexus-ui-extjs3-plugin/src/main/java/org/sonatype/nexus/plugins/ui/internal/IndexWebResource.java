@@ -45,7 +45,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Extjs-3 UI {@code index.html} resource.
+ * Extjs-3 UI {@code legacy.html} resource.
  *
  * @since 2.8
  */
@@ -81,7 +81,7 @@ public class IndexWebResource
 
   @Override
   public String getPath() {
-    return "/index.html";
+    return "/legacy.html";
   }
 
   @Nullable

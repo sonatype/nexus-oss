@@ -57,7 +57,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
         rootVisible: false,
         lines: false,
         width: '50%',
-        padding: 5,
+        padding: '0 1 0 0',
         store: me.privilegeTreeStore,
         listeners: {
           select: me.buildRoleTree,
@@ -80,7 +80,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
         lines: false,
         region: 'center',
         width: '50%',
-        padding: 5,
+        padding: '0 0 0 1',
         store: me.roleTreeStore
       }
     ];

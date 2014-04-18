@@ -45,13 +45,21 @@ Ext.define('NX.util.Url', {
 
   /**
    * @public
+   * Creates a link.
+   * @param {String} url to link to
+   * @param {String} [text] link text. If omitted, defaults to url value.
+   * @param {String} [target] link target. If omitted, defaults to '_blank'
+   * @param {String} [id] link id
    */
-  asLink: function (url, text, target) {
+  asLink: function (url, text, target, id) {
     target = target || '_blank';
     if (Ext.isEmpty(text)) {
       text = url;
     }
-    return '<a href="' + url + '" target="' + target + '">' + text + '</a>';
+    if (id) {
+      id = ' id="' + id + '"';
+    }
+    return '<a href="' + url + '" target="' + target + '"' + id + '>' + text + '</a>';
   }
 
 });

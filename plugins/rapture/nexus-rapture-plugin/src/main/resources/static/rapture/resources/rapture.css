@@ -105,6 +105,7 @@
   height: 42px;
   margin: 5px;
   padding: 5px;
+  cursor: pointer;
 }
 
 .nx-feature-group img {

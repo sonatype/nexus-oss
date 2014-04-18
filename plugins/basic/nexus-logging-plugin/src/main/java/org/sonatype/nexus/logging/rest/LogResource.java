@@ -10,14 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.logging.rest;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -25,22 +24,16 @@ import javax.ws.rs.core.Response;
 
 import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.log.LogManager;
-import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.logging.LoggingPlugin;
-import org.sonatype.nexus.logging.model.MarkerXO;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.siesta.common.Resource;
 import org.sonatype.sisu.siesta.common.error.ObjectNotFoundException;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 /**
@@ -57,8 +50,6 @@ public class LogResource
 {
 
   public static final String RESOURCE_URI = LoggingPlugin.REST_PREFIX + "/log";
-
-  private static final Logger log = LoggerFactory.getLogger(LogResource.class);
 
   private final LogManager logManager;
 
@@ -98,35 +89,6 @@ public class LogResource
     return Response.ok(streamResponse.getInputStream())
         .header("Content-Disposition", "attachment; filename=\"nexus.log\"")
         .build();
-  }
-
-  /**
-   * Logs a message at INFO level.
-   *
-   * @param marker message to be logger (cannot be null/empty)
-   * @throws NullPointerException     If marker is null
-   * @throws IllegalArgumentException If marker message is null or empty
-   */
-  @PUT
-  @Path("/mark")
-  @Consumes({APPLICATION_JSON, APPLICATION_XML})
-  @Produces({APPLICATION_XML, APPLICATION_JSON})
-  @RequiresPermissions(LoggingPlugin.PERMISSION_PREFIX_LOGGERS + "update")
-  public void put(final MarkerXO marker)
-      throws Exception
-  {
-    checkNotNull(marker);
-    checkArgument(StringUtils.isNotEmpty(marker.getMessage()));
-
-    // ensure that level for marking logger is enabled
-    logManager.setLoggerLevel(log.getName(), LoggerLevel.INFO);
-
-    String asterixes = StringUtils.repeat("*", marker.getMessage().length() + 4);
-    log.info("\n"
-        + asterixes + "\n"
-        + "* " + marker.getMessage() + " *" + "\n"
-        + asterixes
-    );
   }
 
 }

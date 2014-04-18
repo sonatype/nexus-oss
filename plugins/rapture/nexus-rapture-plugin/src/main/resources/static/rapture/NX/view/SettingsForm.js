@@ -72,10 +72,6 @@ Ext.define('NX.view.SettingsForm', {
     allowBlank: false
   },
 
-  fieldDefaults: {
-    labelAlign: 'top'
-  },
-
   buttonAlign: 'left',
 
   buttons: [
@@ -87,12 +83,14 @@ Ext.define('NX.view.SettingsForm', {
 
         if (record) {
           form.loadRecord(record);
+          form.isValid();
         }
         else if (form.api && form.api.load) {
-          form.load();
+          form.fireEvent('load', form);
         }
         else {
           form.getForm().reset();
+          form.isValid();
         }
       }
     }

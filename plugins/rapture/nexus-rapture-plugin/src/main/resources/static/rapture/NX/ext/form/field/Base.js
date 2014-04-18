@@ -19,8 +19,15 @@ Ext.define('NX.ext.form.field.Base', {
   override: 'Ext.form.field.Base',
 
   width: 600,
+  labelAlign: 'top',
   labelStyle: 'font-weight: bold;',
   msgTarget: 'under',
+
+  /**
+   * @cfg {boolean} [hideIfUndefined=false]
+   * If field should auto hide in case it has no value. Functionality applies only for read only field.
+   */
+  hideIfUndefined: false,
 
   initComponent: function () {
     var me = this;
@@ -30,6 +37,19 @@ Ext.define('NX.ext.form.field.Base', {
     }
 
     me.callParent(arguments);
+  },
+
+  setValue: function (value) {
+    var me = this;
+    me.callParent(arguments);
+    if (me.readOnly && me.hideIfUndefined) {
+      if (value) {
+        me.show();
+      }
+      else {
+        me.hide();
+      }
+    }
   }
 
 });

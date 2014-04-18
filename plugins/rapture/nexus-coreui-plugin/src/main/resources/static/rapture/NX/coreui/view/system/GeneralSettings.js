@@ -40,6 +40,7 @@ Ext.define('NX.coreui.view.system.GeneralSettings', {
           name: 'baseUrl',
           itemId: 'baseUrl',
           fieldLabel: 'Base URL',
+          helpText: 'This is the Base URL of the Nexus web application.  i.e. http://localhost:8081/nexus',
           allowBlank: true,
           vtype: 'url',
           emptyText: NX.util.Url.baseUrl
