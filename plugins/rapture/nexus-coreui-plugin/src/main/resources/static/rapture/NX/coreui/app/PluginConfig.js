@@ -38,6 +38,12 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.Feeds',
     'NX.coreui.controller.HttpSettings',
     'NX.coreui.controller.GeneralSettings',
+    { id: 'NX.proui.controller.HealthCheckRepositorySettings',
+      active: function () {
+        return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-healthcheck-oss-plugin')
+            || NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-clm-plugin');
+      }
+    },
     { id: 'NX.coreui.controller.Log',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-logging-plugin');
