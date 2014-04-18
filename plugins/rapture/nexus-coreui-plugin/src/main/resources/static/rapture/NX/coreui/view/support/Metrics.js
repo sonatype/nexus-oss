@@ -24,12 +24,21 @@ Ext.define('NX.coreui.view.support.Metrics', {
     'Ext.chart.Chart'
   ],
 
-  bodyPadding: 10,
+  layout: {
+    type: 'table',
+    columns: 2
+  },
+
+  bodyPadding: 20,
+  defaults: {
+    style: {
+      margin: '0px 20px 20px 0px'
+    }
+  },
 
   items: [
     {
       xtype: 'panel',
-
       title: 'Memory Usage',
       frame: true,
       height: 300,
@@ -39,26 +48,93 @@ Ext.define('NX.coreui.view.support.Metrics', {
       items: [
         {
           xtype: 'chart',
+          itemId: 'memoryUsage',
+
           animate: false,
           insetPadding: 20,
           theme: 'Green',
-          legend: {
-            position: 'right'
-          },
 
           store: Ext.create('Ext.data.ArrayStore', {
             fields: ['name', 'data']
           }),
+
           series: [
             {
               type: 'pie',
               angleField: 'data',
-              showInLegend: true
+              showInLegend: true,
+
+              tips: {
+                trackMouse: true,
+                renderer: function(storeItem, item) {
+                  this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data') + ' bytes');
+                }
+              }
             }
-          ]
+          ],
+
+          legend: {
+            position: 'right'
+          }
+        }
+      ]
+    },
+
+    {
+      xtype: 'panel',
+      title: 'Heap Usage',
+      frame: true,
+      height: 300,
+      width: 400,
+      layout: 'fit',
+
+      items: [
+        {
+          xtype: 'chart',
+          itemId: 'heapUsage',
+          animate: false,
+          insetPadding: 20,
+          theme: 'Yellow',
+
+          store: Ext.create('Ext.data.ArrayStore', {
+            fields: ['name', 'data']
+          }),
+
+          series: [
+            {
+              type: 'pie',
+              angleField: 'data',
+              showInLegend: true,
+
+              tips: {
+                trackMouse: true,
+                renderer: function(storeItem, item) {
+                  this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data') + ' bytes');
+                }
+              }
+            }
+          ],
+
+          legend: {
+            position: 'right'
+          }
         }
       ]
     }
-  ]
+  ],
+
+  /**
+   * @public
+   */
+  setTotalData: function (data) {
+    this.down('panel #memoryUsage').getStore().loadData(data);
+  },
+
+  /**
+   * @public
+   */
+  setHeapData: function (data) {
+    this.down('panel #heapUsage').getStore().loadData(data);
+  }
 
 });

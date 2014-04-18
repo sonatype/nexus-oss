@@ -73,19 +73,31 @@ Ext.define('NX.coreui.controller.Metrics', {
   */
   load: function () {
     var me = this,
-        panel = me.getMetrics();
+        metrics = me.getMetrics();
 
-    if (panel) {
-      panel.getEl().mask('Loading...');
-      NX.direct.coreui_Metrics.memory(function (response) {
-        if (Ext.isDefined(response) && response.success) {
-          var data = [];
-          Ext.Object.each(response.data, function (key, value) {
-            data.push({ name: key, data: value });
-          });
-          panel.down('chart').getStore().loadData(data);
+    if (metrics) {
+      metrics.getEl().mask('Loading...');
+
+      NX.direct.coreui_Metrics.memory(function (response)
+      {
+        if (!Ext.isDefined(response) || !response.success) {
+          return;
         }
-        panel.getEl().unmask();
+        var memory = response.data;
+
+        // update total memory data chart
+        metrics.setTotalData([
+          { name: 'Used', data: memory.totalUsed },
+          { name: 'Available', data: memory.totalMax - memory.totalUsed }
+        ]);
+
+        //update heap memory data chart
+        metrics.setHeapData([
+          { name: 'Used', data: memory.heapUsed },
+          { name: 'Available', data: memory.heapMax - memory.heapUsed }
+        ]);
+
+        metrics.getEl().unmask();
       });
     }
   }
