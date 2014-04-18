@@ -61,13 +61,7 @@ Ext.define('NX.coreui.controller.Metrics', {
       component: {
         'nx-coreui-support-metrics': {
           afterrender: me.load
-        },
-        //'nx-coreui-support-sysinfo button[action=download]': {
-        //  'click': me.download
-        //},
-        //'nx-coreui-support-sysinfo button[action=print]': {
-        //  'click': me.print
-        //}
+        }
       }
     });
   },
@@ -84,7 +78,6 @@ Ext.define('NX.coreui.controller.Metrics', {
     if (panel) {
       panel.getEl().mask('Loading...');
       NX.direct.coreui_Metrics.memory(function (response) {
-        panel.getEl().unmask();
         if (Ext.isDefined(response) && response.success) {
           var data = [];
           Ext.Object.each(response.data, function (key, value) {
@@ -92,6 +85,7 @@ Ext.define('NX.coreui.controller.Metrics', {
           });
           panel.down('chart').getStore().loadData(data);
         }
+        panel.getEl().unmask();
       });
     }
   }

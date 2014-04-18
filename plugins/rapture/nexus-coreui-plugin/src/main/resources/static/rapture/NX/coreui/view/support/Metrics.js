@@ -24,28 +24,38 @@ Ext.define('NX.coreui.view.support.Metrics', {
     'Ext.chart.Chart'
   ],
 
+  bodyPadding: 10,
+
   items: [
     {
-      xtype: 'chart',
+      xtype: 'panel',
 
-      width: 300,
+      title: 'Memory Usage',
+      frame: true,
       height: 300,
-      animate: false,
+      width: 400,
+      layout: 'fit',
 
-      store: Ext.create('Ext.data.ArrayStore', {
-        fields: ['name', 'data']
-      }),
-      series: [
+      items: [
         {
-          type: 'pie',
-          angleField: 'data',
-          showInLegend: true,
-          label: {
-            field: 'name',
-            display: 'rotate',
-            contrast: true,
-            font: '18px Arial'
-          }
+          xtype: 'chart',
+          animate: false,
+          insetPadding: 20,
+          theme: 'Green',
+          legend: {
+            position: 'right'
+          },
+
+          store: Ext.create('Ext.data.ArrayStore', {
+            fields: ['name', 'data']
+          }),
+          series: [
+            {
+              type: 'pie',
+              angleField: 'data',
+              showInLegend: true
+            }
+          ]
         }
       ]
     }
