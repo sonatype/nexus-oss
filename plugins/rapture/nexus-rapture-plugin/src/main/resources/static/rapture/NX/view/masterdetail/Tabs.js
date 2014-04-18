@@ -99,6 +99,22 @@ Ext.define('NX.view.masterdetail.Tabs', {
     me.calculateBookmarks();
   },
 
+  removeTab: function (tab) {
+    var me = this,
+        content = me.items.get(1);
+
+    if (content.isXType('tabpanel')) {
+      Ext.Array.remove(me.tabs, tab);
+      content.remove(tab);
+    }
+    if (me.tabs.length === 1) {
+      me.tabs = me.tabs[0];
+      me.remove(content);
+      me.add(me.tab);
+    }
+    me.calculateBookmarks();
+  },
+
   /**
    * @public
    * @returns {String} bookmark token of selected tab
