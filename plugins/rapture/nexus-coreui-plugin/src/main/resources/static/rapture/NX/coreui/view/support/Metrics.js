@@ -144,7 +144,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
       title: 'Thread States',
       frame: true,
       height: 340,
-      width: 400,
+      width: 420,
 
       layout: 'fit',
       colspan: 2,
