@@ -64,7 +64,7 @@ Ext.define('NX.coreui.view.capability.factory.CapabilityComboFactory', {
           triggerAction: 'all',
           emptyText: 'Select...',
           selectOnFocus: false,
-          allowBlank: formField.required ? false : true
+          allowBlank: !formField.required
         });
 
     if (formField.initialValue) {
