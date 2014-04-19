@@ -123,7 +123,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
 
     {
       xtype: 'panel',
-      title: 'Threads',
+      title: 'Thread States',
       frame: true,
       height: 340,
       width: 400,
@@ -134,10 +134,10 @@ Ext.define('NX.coreui.view.support.Metrics', {
       items: [
         {
           xtype: 'chart',
-          itemId: 'threads',
+          itemId: 'threadStates',
           animate: false,
           insetPadding: 20,
-          //theme: 'Blue',
+          theme: 'Base',
 
           store: Ext.create('Ext.data.ArrayStore', {
             fields: ['name', 'data']
@@ -176,8 +176,8 @@ Ext.define('NX.coreui.view.support.Metrics', {
   /**
    * @public
    */
-  setThreadsData: function (data) {
-    this.down('panel #threads').getStore().loadData(data);
+  setThreadStatesData: function (data) {
+    this.down('panel #threadStates').getStore().loadData(data);
   }
 
 });

@@ -103,10 +103,6 @@ Ext.define('NX.coreui.controller.Metrics', {
 
         // update memory charts
         var memory = data.jvm.memory;
-        console.log(memory.totalUsed);
-        console.log(memory.totalMax);
-        console.log((memory.totalUsed / memory.totalMax) * 100);
-
         panel.setTotalData([
           { value: Math.round((memory.totalUsed / memory.totalMax) * 100) }
         ]);
@@ -117,7 +113,7 @@ Ext.define('NX.coreui.controller.Metrics', {
 
         // update threads charts
         var threads = data.jvm['thread-states'];
-        panel.setThreadsData([
+        panel.setThreadStatesData([
           { name: 'New', data: threads.new },
           { name: 'Terminated', data: threads.terminated },
           { name: 'Blocked', data: threads.blocked },
