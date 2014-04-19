@@ -96,7 +96,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadCapabilityType
+          refresh: me.onRefresh
         }
       },
       store: {
@@ -110,7 +110,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
       },
       component: {
         'nx-coreui-capability-list': {
-          beforerender: me.loadCapabilityType
+          beforerender: me.onRefresh
         },
         'nx-coreui-capability-list button[action=new]': {
           click: me.showAddWindow
@@ -264,14 +264,15 @@ Ext.define('NX.coreui.controller.Capabilities', {
 
   /**
    * @private
-   * (Re)load capability type store.
+   * (Re)load capability type store && reset all cached combo stores.
    */
-  loadCapabilityType: function () {
+  onRefresh: function () {
     var me = this,
         list = me.getList();
 
     if (list) {
       me.getCapabilityTypeStore().load();
+      NX.coreui.view.capability.factory.CapabilityComboFactory.evictCache();
     }
   },
 
