@@ -29,6 +29,24 @@ Ext.define('NX.coreui.view.support.Metrics', {
     columns: 2
   },
 
+  tbar: [
+    {
+      xtype: 'button',
+      text: 'Download',
+      tooltip: 'Download metrics data',
+      glyph: 'xf019@FontAwesome' /* fa-download */,
+      action: 'download'
+    },
+    '-',
+    {
+      xtype: 'button',
+      text: 'Thread Dump',
+      tooltip: 'Download thread dump',
+      glyph: 'xf019@FontAwesome' /* fa-download */,
+      action: 'threads'
+    }
+  ],
+
   bodyPadding: 20,
   defaults: {
     style: {

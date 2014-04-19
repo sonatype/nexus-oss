@@ -61,6 +61,12 @@ Ext.define('NX.coreui.controller.Metrics', {
       component: {
         'nx-coreui-support-metrics': {
           afterrender: me.load
+        },
+        'nx-coreui-support-metrics button[action=download]': {
+          'click': me.downloadMetrics
+        },
+        'nx-coreui-support-metrics button[action=threads]': {
+          'click': me.downloadThreads
         }
       }
     });
@@ -123,6 +129,22 @@ Ext.define('NX.coreui.controller.Metrics', {
         ]);
       }
     });
+  },
+
+  /**
+   * @private
+   * Download metrics data.
+   */
+  downloadMetrics: function () {
+    NX.util.DownloadHelper.downloadUrl(NX.util.Url.urlOf('internal/metrics?pretty=true&download=true'));
+  },
+
+  /**
+   * @private
+   * Download thread dump.
+   */
+  downloadThreads: function () {
+    NX.util.DownloadHelper.downloadUrl(NX.util.Url.urlOf('internal/threads?download=true'));
   }
 
 });
