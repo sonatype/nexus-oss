@@ -147,14 +147,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
             {
               type: 'pie',
               angleField: 'data',
-              showInLegend: true,
-
-              tips: {
-                trackMouse: true,
-                renderer: function (storeItem, item) {
-                  this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data') + ' bytes');
-                }
-              }
+              showInLegend: true
             }
           ],
 
