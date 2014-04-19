@@ -37,7 +37,7 @@ Ext.define('NX.coreui.view.capability.factory.CapabilityTextFieldFactory', {
       fieldLabel: formField.label,
       itemCls: formField.required ? 'required-field' : '',
       helpText: formField.helpText,
-      allowBlank: formField.required ? false : true,
+      allowBlank: !formField.required,
       regex: formField.regexValidation ? new RegExp(formField.regexValidation) : null
     };
     if (formField.type === 'password') {
