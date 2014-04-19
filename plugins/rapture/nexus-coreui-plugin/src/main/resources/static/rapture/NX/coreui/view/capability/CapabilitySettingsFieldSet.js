@@ -86,13 +86,6 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
               name: 'property.' + formField.id,
               factory: factory
             });
-            if (item.xtype === 'combo' && item.store) {
-              item.store.on('load', function () {
-                if (item.store) {
-                  item.setValue(item.getValue());
-                }
-              }, me, {single: true});
-            }
             me.add(item);
           }
         });

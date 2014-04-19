@@ -49,8 +49,8 @@ Ext.define('NX.coreui.view.capability.factory.CapabilityComboFactory', {
   create: function (formField) {
     var me = this,
         ST = Ext.data.SortTypes,
-        store,
-        item = Ext.create('Ext.form.ComboBox', {
+        store, item,
+        itemConfig = {
           xtype: 'combo',
           fieldLabel: formField.label,
           itemCls: formField.required ? 'required-field' : '',
@@ -65,10 +65,10 @@ Ext.define('NX.coreui.view.capability.factory.CapabilityComboFactory', {
           emptyText: 'Select...',
           selectOnFocus: false,
           allowBlank: !formField.required
-        });
+        };
 
     if (formField.initialValue) {
-      item.value = formField.initialValue;
+      itemConfig.value = formField.initialValue;
     }
     if (formField.storePath) {
       store = me.stores[formField.storePath];
@@ -103,8 +103,21 @@ Ext.define('NX.coreui.view.capability.factory.CapabilityComboFactory', {
         me.stores[formField.storePath] = store;
         me.logDebug("Caching store for " + store.proxy.url);
       }
-      item.store = store;
+      itemConfig.store = store;
     }
+    item = Ext.create('Ext.form.ComboBox', itemConfig);
+    Ext.override(item, {
+      /**
+       * Avoid value being set to null by combobox in case that store was not already loaded.
+       */
+      setValue: function (value) {
+        var me = this;
+        me.callParent(arguments);
+        if (me.getValue() === null) {
+          me.value = value;
+        }
+      }
+    });
     return item;
   },
 
