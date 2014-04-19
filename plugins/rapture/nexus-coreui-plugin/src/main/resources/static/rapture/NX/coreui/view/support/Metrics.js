@@ -41,8 +41,8 @@ Ext.define('NX.coreui.view.support.Metrics', {
       xtype: 'panel',
       title: 'Memory Usage',
       frame: true,
-      height: 300,
-      width: 400,
+      height: 240,
+      width: 300,
       layout: 'fit',
 
       items: [
@@ -50,6 +50,47 @@ Ext.define('NX.coreui.view.support.Metrics', {
           xtype: 'chart',
           itemId: 'memoryUsage',
 
+          animate: false,
+          insetPadding: 40,
+
+          store: Ext.create('Ext.data.ArrayStore', {
+            fields: ['value']
+          }),
+
+          axes: [
+            {
+              type: 'gauge',
+              position: 'gauge',
+              minimum: 0,
+              maximum: 100,
+              steps: 10
+            }
+          ],
+
+          series: [
+            {
+              type: 'gauge',
+              field: 'value',
+              donut: 30,
+              colorSet: ['#F49D10', '#ddd']
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      xtype: 'panel',
+      title: 'Heap Usage',
+      frame: true,
+      height: 240,
+      width: 300,
+      layout: 'fit',
+
+      items: [
+        {
+          xtype: 'chart',
+          itemId: 'heapUsage',
           animate: false,
           insetPadding: 20,
           theme: 'Green',
@@ -66,7 +107,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
 
               tips: {
                 trackMouse: true,
-                renderer: function(storeItem, item) {
+                renderer: function (storeItem, item) {
                   this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data') + ' bytes');
                 }
               }
@@ -82,19 +123,21 @@ Ext.define('NX.coreui.view.support.Metrics', {
 
     {
       xtype: 'panel',
-      title: 'Heap Usage',
+      title: 'Threads',
       frame: true,
-      height: 300,
+      height: 340,
       width: 400,
+
       layout: 'fit',
+      colspan: 2,
 
       items: [
         {
           xtype: 'chart',
-          itemId: 'heapUsage',
+          itemId: 'threads',
           animate: false,
           insetPadding: 20,
-          theme: 'Yellow',
+          //theme: 'Blue',
 
           store: Ext.create('Ext.data.ArrayStore', {
             fields: ['name', 'data']
@@ -108,7 +151,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
 
               tips: {
                 trackMouse: true,
-                renderer: function(storeItem, item) {
+                renderer: function (storeItem, item) {
                   this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data') + ' bytes');
                 }
               }
@@ -135,6 +178,13 @@ Ext.define('NX.coreui.view.support.Metrics', {
    */
   setHeapData: function (data) {
     this.down('panel #heapUsage').getStore().loadData(data);
+  },
+
+  /**
+   * @public
+   */
+  setThreadsData: function (data) {
+    this.down('panel #threads').getStore().loadData(data);
   }
 
 });

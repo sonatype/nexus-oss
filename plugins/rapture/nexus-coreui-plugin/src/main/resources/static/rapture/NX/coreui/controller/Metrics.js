@@ -67,39 +67,66 @@ Ext.define('NX.coreui.controller.Metrics', {
   },
 
   /**
-  * Load system information panel.
-  *
-  * @private
-  */
+   * Load metrics information and update charts.
+   *
+   * @private
+   */
   load: function () {
     var me = this,
-        metrics = me.getMetrics();
+        panel = me.getMetrics();
 
-    if (metrics) {
-      metrics.getEl().mask('Loading...');
+    if (!panel) {
+      return;
+    }
 
-      NX.direct.coreui_Metrics.memory(function (response)
-      {
-        if (!Ext.isDefined(response) || !response.success) {
-          return;
-        }
-        var memory = response.data;
+    panel.getEl().mask('Loading...');
 
-        // update total memory data chart
-        metrics.setTotalData([
-          { name: 'Used', data: memory.totalUsed },
-          { name: 'Available', data: memory.totalMax - memory.totalUsed }
+    Ext.Ajax.request({
+      url: NX.util.Url.urlOf('internal/metrics'),
+      method: 'GET',
+      headers: {
+        'accept': 'application/json'
+      },
+      scope: me,
+      suppressStatus: true,
+
+      callback: function (response) {
+        panel.getEl().unmask();
+      },
+
+      failure: function (response) {
+        NX.Messages.add({ type: 'warning', text: 'Failed to refresh metrics data' });
+      },
+
+      success: function (response) {
+        var data = Ext.decode(response.responseText);
+
+        // update memory charts
+        var memory = data.jvm.memory;
+        console.log(memory.totalUsed);
+        console.log(memory.totalMax);
+        console.log((memory.totalUsed / memory.totalMax) * 100);
+
+        panel.setTotalData([
+          { value: Math.round((memory.totalUsed / memory.totalMax) * 100) }
         ]);
-
-        //update heap memory data chart
-        metrics.setHeapData([
+        panel.setHeapData([
           { name: 'Used', data: memory.heapUsed },
           { name: 'Available', data: memory.heapMax - memory.heapUsed }
         ]);
 
-        metrics.getEl().unmask();
-      });
-    }
+        // update threads charts
+        var threads = data.jvm['thread-states'];
+        panel.setThreadsData([
+          { name: 'New', data: threads.new },
+          { name: 'Terminated', data: threads.terminated },
+          { name: 'Blocked', data: threads.blocked },
+          { name: 'Runnable', data: threads.runnable },
+          { name: 'Timed Waiting', data: threads.timed_waiting },
+          { name: 'Waiting', data: threads.waiting }
+        ]);
+      }
+    });
   }
 
 });
