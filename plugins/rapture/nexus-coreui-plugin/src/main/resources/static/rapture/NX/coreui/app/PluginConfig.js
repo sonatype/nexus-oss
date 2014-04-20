@@ -22,6 +22,16 @@ Ext.define('NX.coreui.app.PluginConfig', {
   ],
 
   controllers: [
+    { id: 'NX.coreui.controller.AnalyticsSettings',
+      active: function () {
+        return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-analytics-plugin');
+      }
+    },
+    { id: 'NX.coreui.controller.AnalyticsEvents',
+      active: function () {
+        return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-analytics-plugin');
+      }
+    },
     'NX.coreui.controller.AnonymousSettings',
     { id: 'NX.coreui.controller.Capabilities',
       active: function () {
