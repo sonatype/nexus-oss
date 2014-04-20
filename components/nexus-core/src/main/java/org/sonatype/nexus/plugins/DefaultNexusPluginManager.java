@@ -30,7 +30,6 @@ import org.sonatype.aether.version.InvalidVersionSpecificationException;
 import org.sonatype.aether.version.Version;
 import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.nexus.events.Event;
-import org.sonatype.nexus.guice.AbstractInterceptorModule;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
 import org.sonatype.nexus.plugins.repository.NexusPluginRepository;
@@ -43,9 +42,6 @@ import org.sonatype.plugins.model.PluginMetadata;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.yammer.metrics.annotation.Timed;
-import org.eclipse.sisu.Parameters;
-import org.eclipse.sisu.bean.BeanManager;
-import org.eclipse.sisu.inject.MutableBeanLocator;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 
@@ -65,14 +61,6 @@ public class DefaultNexusPluginManager
 
   private final NexusPluginRepository repositoryManager;
 
-  private final Map<String, String> variables;
-
-  private final List<AbstractInterceptorModule> interceptorModules;
-
-  private final MutableBeanLocator beanLocator;
-
-  private final BeanManager beanManager;
-
   private final Provider<Bundle> systemBundleProvider;
 
   private final Map<GAVCoordinate, PluginDescriptor> activePlugins = new HashMap<GAVCoordinate, PluginDescriptor>();
@@ -84,18 +72,10 @@ public class DefaultNexusPluginManager
   @Inject
   public DefaultNexusPluginManager(final EventBus eventBus,
                                    final NexusPluginRepository repositoryManager,
-                                   final @Parameters Map<String, String> variables,
-                                   final List<AbstractInterceptorModule> interceptorModules,
-                                   final MutableBeanLocator beanLocator,
-                                   final BeanManager beanManager,
                                    final Provider<Bundle> systemBundleProvider)
   {
     this.eventBus = checkNotNull(eventBus);
     this.repositoryManager = checkNotNull(repositoryManager);
-    this.variables = checkNotNull(variables);
-    this.interceptorModules = checkNotNull(interceptorModules);
-    this.beanLocator = checkNotNull(beanLocator);
-    this.beanManager = checkNotNull(beanManager);
     this.systemBundleProvider = checkNotNull(systemBundleProvider);
   }
 

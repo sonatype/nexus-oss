@@ -85,6 +85,14 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-analytics-api</artifactId>
     </dependency>
+
+    <!--
+    To be removed once all plugins are migrated off the Plexus API
+    -->
+    <dependency>
+      <groupId>org.eclipse.sisu</groupId>
+      <artifactId>org.eclipse.sisu.plexus</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

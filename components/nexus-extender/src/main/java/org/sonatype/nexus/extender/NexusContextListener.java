@@ -29,14 +29,13 @@ import org.sonatype.nexus.web.internal.NexusGuiceFilter;
 import com.google.common.base.Throwables;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.servlet.GuiceServletContextListener;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.context.Context;
-import org.eclipse.sisu.plexus.PlexusSpaceModule;
+import org.eclipse.sisu.inject.BeanLocator;
 import org.eclipse.sisu.space.BeanScanning;
 import org.eclipse.sisu.space.BundleClassSpace;
 import org.eclipse.sisu.space.ClassSpace;
+import org.eclipse.sisu.space.SpaceModule;
 import org.eclipse.sisu.wire.WireModule;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -62,8 +61,6 @@ public class NexusContextListener
   private ServletContext servletContext;
 
   private Injector injector;
-
-  private PlexusContainer container;
 
   private LogManager logManager;
 
@@ -91,24 +88,19 @@ public class NexusContextListener
     injector = Guice.createInjector(
         new WireModule(
             new CoreModule(servletContext, variables, systemBundle),
-            new PlexusSpaceModule(coreSpace, BeanScanning.INDEX)));
+            new SpaceModule(coreSpace, BeanScanning.INDEX)));
     log.debug("Injector: {}", injector);
 
     super.contextInitialized(event);
 
-    container = injector.getInstance(PlexusContainer.class);
-    servletContext.setAttribute(PlexusConstants.PLEXUS_KEY, container);
-    injector.getInstance(Context.class).put(PlexusConstants.PLEXUS_KEY, container);
-    log.debug("Container: {}", container);
-
     extender.doStart(); // start tracking nexus bundles
 
     try {
-      logManager = container.lookup(LogManager.class);
+      logManager = lookup(LogManager.class);
       log.debug("Log manager: {}", logManager);
       logManager.configure();
 
-      application = container.lookup(NxApplication.class);
+      application = lookup(NxApplication.class);
       log.debug("Application: {}", application);
       application.start();
     }
@@ -149,13 +141,7 @@ public class NexusContextListener
 
     extender.doStop(); // stop tracking bundles
 
-    if (container != null) {
-      container.dispose();
-      container = null;
-    }
-
     if (servletContext != null) {
-      servletContext.removeAttribute(PlexusConstants.PLEXUS_KEY);
       super.contextDestroyed(new ServletContextEvent(servletContext));
       servletContext = null;
     }
@@ -167,5 +153,9 @@ public class NexusContextListener
   protected Injector getInjector() {
     checkState(injector != null, "Missing injector reference");
     return injector;
+  }
+
+  private <T> T lookup(final Class<T> clazz) {
+    return injector.getInstance(BeanLocator.class).locate(Key.get(clazz)).iterator().next().getValue();
   }
 }
