@@ -97,6 +97,7 @@ Ext.define('NX.controller.User', {
          * @param {Object} user
          */
         'login',
+
         /**
          * @event logout
          * Fires when a user had been successfully logged out.
@@ -112,11 +113,11 @@ Ext.define('NX.controller.User', {
     var me = this;
 
     if (user && !oldUser) {
-      NX.Messages.add({text: 'User logged in: ' + user.id, type: 'default' });
+      NX.Messages.add({text: 'User signed in: ' + user.id, type: 'default' });
       me.fireEvent('login', user);
     }
     else if (!user && oldUser) {
-      NX.Messages.add({text: 'User logged out', type: 'default' });
+      NX.Messages.add({text: 'User signed out', type: 'default' });
       me.fireEvent('logout');
     }
 

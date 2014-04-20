@@ -19,7 +19,7 @@ Ext.define('NX.view.Login', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-login',
 
-  title: 'Login',
+  title: 'Sign In',
 
   layout: 'fit',
   autoShow: true,
@@ -71,7 +71,7 @@ Ext.define('NX.view.Login', {
 
         buttonAlign: 'left',
         buttons: [
-          { text: 'Login', action: 'login', formBind: true, bindToEnter: true, ui: 'primary' },
+          { text: 'Sign In', action: 'login', formBind: true, bindToEnter: true, ui: 'primary' },
           { text: 'Cancel', handler: me.close, scope: me }
         ]
       }
