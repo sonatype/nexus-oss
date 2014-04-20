@@ -112,9 +112,10 @@ Ext.define('NX.coreui.controller.Metrics', {
         panel.setTotalData([
           { value: Math.round((memory.totalUsed / memory.totalMax) * 100) }
         ]);
-        panel.setHeapData([
-          { name: 'Used', data: memory.heapUsed },
-          { name: 'Available', data: memory.heapMax - memory.heapUsed }
+        panel.setMemoryDistData([
+          { name: 'Heap', data: memory.heapUsed },
+          { name: 'Non-Heap', data: memory.totalUsed - memory.heapUsed },
+          { name: 'Available', data: memory.totalMax - memory.totalUsed }
         ]);
 
         // update threads charts

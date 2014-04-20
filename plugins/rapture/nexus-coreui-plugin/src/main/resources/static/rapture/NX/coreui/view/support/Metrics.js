@@ -90,7 +90,14 @@ Ext.define('NX.coreui.view.support.Metrics', {
               type: 'gauge',
               field: 'value',
               donut: 30,
-              colorSet: ['#F49D10', '#ddd']
+              colorSet: ['#F49D10', '#ddd'],
+
+              tips: {
+                trackMouse: true,
+                renderer: function (storeItem, item) {
+                  this.setTitle(storeItem.get('value') + '%');
+                }
+              }
             }
           ]
         }
@@ -99,7 +106,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
 
     {
       xtype: 'panel',
-      title: 'Heap Usage',
+      title: 'Memory Distribution',
       frame: true,
       height: 240,
       width: 300,
@@ -108,7 +115,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
       items: [
         {
           xtype: 'chart',
-          itemId: 'heapUsage',
+          itemId: 'memoryDist',
           animate: false,
           insetPadding: 20,
           theme: 'Green',
@@ -187,8 +194,8 @@ Ext.define('NX.coreui.view.support.Metrics', {
   /**
    * @public
    */
-  setHeapData: function (data) {
-    this.down('panel #heapUsage').getStore().loadData(data);
+  setMemoryDistData: function (data) {
+    this.down('panel #memoryDist').getStore().loadData(data);
   },
 
   /**
