@@ -24,6 +24,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
     'Ext.chart.Chart'
   ],
 
+  autoScroll: true,
   layout: {
     type: 'table',
     columns: 2
