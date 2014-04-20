@@ -15,7 +15,7 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.usertoken.AnalyticsSettings', {
+Ext.define('NX.coreui.view.analytics.AnalyticsSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-analytics-settings',
 

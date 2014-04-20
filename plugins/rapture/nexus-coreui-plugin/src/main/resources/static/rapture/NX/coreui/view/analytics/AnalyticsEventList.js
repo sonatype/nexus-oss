@@ -15,7 +15,7 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.licensing.AnalyticsEventList', {
+Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-coreui-analytics-event-list',
 
@@ -96,7 +96,7 @@ Ext.define('NX.coreui.view.licensing.AnalyticsEventList', {
       xtype: 'button',
       text: 'Submit',
       tooltip: 'Submit event data to Sonatype',
-      glyph: 'xf023@FontAwesome' /* fa-lock */,
+      glyph: 'xf0ee@FontAwesome' /* fa-cloud-upload */,
       action: 'submit',
       disabled: true
     }
