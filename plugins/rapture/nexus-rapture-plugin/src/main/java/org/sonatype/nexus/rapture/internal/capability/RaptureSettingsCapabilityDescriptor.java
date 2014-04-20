@@ -149,6 +149,7 @@ public class RaptureSettingsCapabilityDescriptor
     return validators().logical().and(
         validators().capability().uniquePer(TYPE),
         validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_AUTHENTICATED),
+        validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_ANONYMOUS),
         validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.SESSION_TIMEOUT)
     );
   }
@@ -158,6 +159,7 @@ public class RaptureSettingsCapabilityDescriptor
     return validators().logical().and(
         validators().capability().uniquePerExcluding(id, TYPE),
         validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_AUTHENTICATED),
+        validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_ANONYMOUS),
         validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.SESSION_TIMEOUT)
     );
   }
