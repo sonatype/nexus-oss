@@ -95,7 +95,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
               tips: {
                 trackMouse: true,
                 renderer: function (storeItem, item) {
-                  this.setTitle(storeItem.get('value') + '%');
+                  this.setTitle('Memory used: ' + storeItem.get('value') + '%');
                 }
               }
             }
@@ -172,7 +172,15 @@ Ext.define('NX.coreui.view.support.Metrics', {
             {
               type: 'pie',
               angleField: 'data',
-              showInLegend: true
+              showInLegend: true,
+
+              tips: {
+                trackMouse: true,
+                renderer: function (storeItem, item) {
+                  var p = Math.round(storeItem.get('data') * 100);
+                  this.setTitle(storeItem.get('name') + ': ' + p + '%');
+                }
+              }
             }
           ],
 
