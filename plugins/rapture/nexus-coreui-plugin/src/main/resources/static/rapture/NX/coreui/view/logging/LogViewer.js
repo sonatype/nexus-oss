@@ -25,7 +25,10 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
     xtype: 'textarea',
     readOnly: true,
     hideLabel: true,
-    emptyText: 'Refresh to display log'
+    emptyText: 'Refresh to display log',
+
+    // HACK: Set style of log content
+    cls: 'nx-coreui-log-viewer'
   },
 
   tbar: [

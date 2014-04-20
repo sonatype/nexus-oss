@@ -113,3 +113,12 @@
   width: 32px;
   margin-right: 5px;
 }
+
+/* HACK: Set log style of logviewer textarea */
+.nx-coreui-log-viewer textarea {
+  font-family: monospace;
+  font-size: 10px;
+  white-space: pre;
+  word-wrap: normal;
+  overflow-x: scroll;
+}
