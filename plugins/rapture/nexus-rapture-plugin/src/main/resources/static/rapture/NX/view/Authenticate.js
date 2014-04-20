@@ -79,7 +79,8 @@ Ext.define('NX.view.Authenticate', {
             fieldLabel: 'Password',
             inputType: 'password',
             emptyText: 'enter your password',
-            allowBlank: false
+            allowBlank: false,
+            validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
           }
         ],
 
