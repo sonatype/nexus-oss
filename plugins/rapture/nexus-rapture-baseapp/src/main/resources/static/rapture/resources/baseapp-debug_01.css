@@ -67,6 +67,9 @@
 /**
  * @class Ext.Component
  */
+/**
+ * @class Ext.tip.QuickTip
+ */
 /* including package ext-theme-neptune */
 /** @class Global_CSS */
 /** @class Ext.LoadMask */
@@ -12760,7 +12763,7 @@ a.x-tab {
   width: 10px;
   border-style: solid;
   border-width: 5px;
-  border-color: #e1e1e1;
+  border-color: #ffeaae;
   zoom: 1;
 }
 /* line 194, ../../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tip/Tip.scss */
@@ -12823,12 +12826,12 @@ a.x-tab {
   padding: 2px 2px 2px 2px;
   border-width: 1px;
   border-style: solid;
-  background-color: #eeeeee;
+  background-color: #fffdf6;
 }
 
 /* line 187, ../../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-tip-default-mc {
-  background-color: #eeeeee;
+  background-color: #fffdf6;
 }
 
 /* line 234, ../../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -12956,12 +12959,12 @@ a.x-tab {
 /* */
 /* line 112, ../../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tip/Tip.scss */
 .x-tip-default {
-  border-color: #e1e1e1;
+  border-color: #ffeaae;
 }
 /* line 121, ../../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tip/Tip.scss */
 .x-tip-default .x-tool-img {
   background-image: url(images/tools/tool-sprites-dark.png);
-  background-color: #eeeeee;
+  background-color: #fffdf6;
 }
 
 /* line 136, ../../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tip/Tip.scss */
@@ -13007,12 +13010,12 @@ a.x-tab {
   padding: 2px 2px 2px 2px;
   border-width: 1px;
   border-style: solid;
-  background-color: #eeeeee;
+  background-color: #fffdf6;
 }
 
 /* line 187, ../../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-tip-form-invalid-mc {
-  background-color: #eeeeee;
+  background-color: #fffdf6;
 }
 
 /* line 234, ../../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -13140,12 +13143,12 @@ a.x-tab {
 /* */
 /* line 112, ../../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tip/Tip.scss */
 .x-tip-form-invalid {
-  border-color: #e1e1e1;
+  border-color: #ffeaae;
 }
 /* line 121, ../../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tip/Tip.scss */
 .x-tip-form-invalid .x-tool-img {
   background-image: url(images/tools/tool-sprites-dark.png);
-  background-color: #eeeeee;
+  background-color: #fffdf6;
 }
 
 /* line 136, ../../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tip/Tip.scss */
