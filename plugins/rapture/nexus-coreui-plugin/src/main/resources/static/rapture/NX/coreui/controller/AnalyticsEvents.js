@@ -122,7 +122,7 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
 
     NX.Dialogs.askConfirmation('Clear events', 'Clear analytics event data?', function () {
       NX.direct.analytics_Events.clear(function (response) {
-        me.loadStore();
+        me.load();
         if (Ext.isDefined(response) && response.success) {
           NX.Messages.add({ text: 'Event data has been cleared', type: 'success' });
         }
