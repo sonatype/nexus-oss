@@ -423,8 +423,8 @@ Ext.define('NX.controller.Menu', {
     Ext.suspendLayouts();
 
     modeButton = me.getHeaderPanel().down('button[mode=' + me.mode + ']');
-    if (modeButton && modeButton.tooltip) {
-      menuTitle = modeButton.tooltip;
+    if (modeButton && modeButton.title) {
+      menuTitle = modeButton.title;
     }
     me.getFeatureMenu().setTitle(menuTitle);
 

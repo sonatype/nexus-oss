@@ -19,8 +19,9 @@ Ext.define('NX.view.header.SearchMode', {
   extend: 'NX.view.header.Mode',
   alias: 'widget.nx-header-search-mode',
 
-  tooltip: 'Search for components',
   mode: 'search',
+  title: 'Search',
+  tooltip: 'Search for components',
   glyph: 'xf002@FontAwesome' /* fa-search */
 
 });

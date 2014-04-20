@@ -19,8 +19,9 @@ Ext.define('NX.view.header.DashboardMode', {
   extend: 'NX.view.header.Mode',
   alias: 'widget.nx-header-dashboard-mode',
 
-  tooltip: 'Server dashboard',
   mode: 'dashboard',
+  title: 'Dashboard',
+  tooltip: 'Server dashboard',
   glyph: 'xf0e4@FontAwesome' /* fa-dashboard */
 
 });
