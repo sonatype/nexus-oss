@@ -19,7 +19,7 @@ Ext.define('NX.view.header.AdminMode', {
   extend: 'NX.view.header.Mode',
   alias: 'widget.nx-header-admin-mode',
 
-  tooltip: 'Administration',
+  tooltip: 'Server administration and configuration',
   mode: 'admin',
   glyph: 'xf013@FontAwesome', /* fa-gear */
 

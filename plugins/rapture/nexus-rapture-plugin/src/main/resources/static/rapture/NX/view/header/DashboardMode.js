@@ -19,7 +19,7 @@ Ext.define('NX.view.header.DashboardMode', {
   extend: 'NX.view.header.Mode',
   alias: 'widget.nx-header-dashboard-mode',
 
-  tooltip: 'Dashboard',
+  tooltip: 'Server dashboard',
   mode: 'dashboard',
   glyph: 'xf0e4@FontAwesome' /* fa-dashboard */
 
