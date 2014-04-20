@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rapture.internal.capability;
 
 import java.util.Map;
@@ -35,7 +36,10 @@ public class RaptureSettingsCapabilityConfiguration
   public static final String DEBUG_ALLOWED = "debugAllowed";
 
   @NonNls
-  public static final String STATUS_INTERVAL = "statusInterval";
+  public static final String STATUS_INTERVAL_AUTHENTICATED = "statusIntervalAuthenticated";
+
+  @NonNls
+  public static final String STATUS_INTERVAL_ANONYMOUS = "statusIntervalAnonymous";
 
   @NonNls
   public static final String SESSION_TIMEOUT = "sessionTimeout";
@@ -50,7 +54,12 @@ public class RaptureSettingsCapabilityConfiguration
   public RaptureSettingsCapabilityConfiguration(final Map<String, String> properties) {
     checkNotNull(properties);
     setDebugAllowed(parseBoolean(properties.get(DEBUG_ALLOWED), DEFAULT_DEBUG_ALLOWED));
-    setStatusInterval(parseInteger(properties.get(STATUS_INTERVAL), DEFAULT_STATUS_INTERVAL));
+    setStatusIntervalAuthenticated(
+        parseInteger(properties.get(STATUS_INTERVAL_AUTHENTICATED), DEFAULT_STATUS_INTERVAL_AUTHENTICATED)
+    );
+    setStatusIntervalAnonymous(
+        parseInteger(properties.get(STATUS_INTERVAL_ANONYMOUS), DEFAULT_STATUS_INTERVAL_ANONYMOUS)
+    );
     setSessionTimeout(parseInteger(properties.get(SESSION_TIMEOUT), DEFAULT_SESSION_TIMEOUT));
     setTitle(parseString(properties.get(TITLE), DEFAULT_TITLE));
   }
@@ -58,7 +67,8 @@ public class RaptureSettingsCapabilityConfiguration
   public Map<String, String> asMap() {
     final Map<String, String> props = Maps.newHashMap();
     props.put(DEBUG_ALLOWED, Boolean.toString(isDebugAllowed()));
-    props.put(STATUS_INTERVAL, Integer.toString(getStatusInterval()));
+    props.put(STATUS_INTERVAL_AUTHENTICATED, Integer.toString(getStatusIntervalAuthenticated()));
+    props.put(STATUS_INTERVAL_ANONYMOUS, Integer.toString(getStatusIntervalAnonymous()));
     props.put(SESSION_TIMEOUT, Integer.toString(getSessionTimeout()));
     props.put(TITLE, getTitle());
     return props;
@@ -95,7 +105,8 @@ public class RaptureSettingsCapabilityConfiguration
         + "{"
         + "title=" + getTitle()
         + ", debugAllowed=" + isDebugAllowed()
-        + ", statusInterval=" + getStatusInterval()
+        + ", statusIntervalAuthenticated=" + getStatusIntervalAuthenticated()
+        + ", statusIntervalAnonymous=" + getStatusIntervalAnonymous()
         + ", sessionTimeout=" + getSessionTimeout()
         + "}";
   }

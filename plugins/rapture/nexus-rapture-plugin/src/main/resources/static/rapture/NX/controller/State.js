@@ -56,6 +56,7 @@ Ext.define('NX.controller.State', {
     me.listen({
       controller: {
         '#State': {
+          userchanged: me.onUserChanged,
           uisettingschanged: me.onUiSettingsChanged,
           licensechanged: me.onLicenseChanged,
           serveridchanged: me.reloadWhenServerIdChanged
@@ -196,17 +197,10 @@ Ext.define('NX.controller.State', {
   /**
    * @private
    * Reset state pooling when uiSettings.statusInterval changes.
-   * @param {Object} uiSettings
-   * @param {Number} uiSettings.statusInterval
-   * @param {Boolean} uiSettings.debugAllowed
-   * @param {String} uiSettings.title
-   * @param {Object} oldUiSettings
-   * @param {Number} oldUiSettings.statusInterval
-   * @param {Boolean} oldUiSettings.debugAllowed
-   * @param {String} oldUiSettings.title
    */
   onUiSettingsChanged: function (uiSettings, oldUiSettings) {
-    var me = this;
+    var me = this,
+        newStatusInterval, oldStatusInterval;
 
     uiSettings = uiSettings || {};
     oldUiSettings = oldUiSettings || {};
@@ -219,8 +213,17 @@ Ext.define('NX.controller.State', {
       document.title = document.title.replace(oldUiSettings.title, uiSettings.title);
     }
 
-    if (uiSettings.statusInterval > 0) {
-      if (!oldUiSettings || (uiSettings.statusInterval !== oldUiSettings.statusInterval)) {
+    if (me.statusProvider) {
+      oldStatusInterval = me.statusProvider.interval;
+    }
+
+    newStatusInterval = uiSettings.statusIntervalAnonymous;
+    if (NX.State.getUser()) {
+      newStatusInterval = uiSettings.statusIntervalAuthenticated;
+    }
+
+    if (newStatusInterval > 0) {
+      if (newStatusInterval !== oldStatusInterval) {
         if (me.statusProvider) {
           me.statusProvider.disconnect();
           me.receiving = false;
@@ -228,7 +231,7 @@ Ext.define('NX.controller.State', {
         me.statusProvider = Ext.Direct.addProvider({
           type: 'polling',
           url: NX.direct.api.POLLING_URLS.rapture_State_get,
-          interval: uiSettings.statusInterval * 1000,
+          interval: newStatusInterval * 1000,
           baseParams: {
           },
           listeners: {
@@ -236,7 +239,7 @@ Ext.define('NX.controller.State', {
             scope: me
           }
         });
-        me.logDebug('State pooling configured for ' + (uiSettings.statusInterval) + ' seconds');
+        me.logDebug('State pooling configured for ' + newStatusInterval + ' seconds');
       }
     }
     else {
@@ -244,6 +247,20 @@ Ext.define('NX.controller.State', {
         me.statusProvider.disconnect();
       }
       me.logDebug('State pooling disabled');
+    }
+  },
+
+  /**
+   * @private
+   * On login/logout update status interval.
+   */
+  onUserChanged: function (user, oldUser) {
+    var me = this,
+        uiSettings;
+
+    if (Ext.isDefined(user) !== Ext.isDefined(oldUser)) {
+      uiSettings = NX.State.getValue('uiSettings');
+      me.onUiSettingsChanged(uiSettings, uiSettings);
     }
   },
 
