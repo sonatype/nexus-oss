@@ -41,27 +41,32 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
     {
       header: 'Type',
       dataIndex: 'type',
-      flex: 1
+      flex: 1,
+      tooltip: 'Event type'
     },
     {
       header: 'Timestamp',
       dataIndex: 'timestamp',
-      flex: 1
+      flex: 1,
+      tooltip: 'Event timestamp in nanoseconds'
     },
     {
       header: 'Duration',
       dataIndex: 'duration',
-      flex: 1
+      flex: 1,
+      tooltip: 'Event duration in nanoseconds'
     },
     {
       header: 'User',
       dataIndex: 'userId',
-      flex: 1
+      flex: 1,
+      tooltip: 'Event user identifier.  This value is anonymized when exporting and submitting'
     },
     {
       header: 'Attributes',
       dataIndex: 'attributes',
       flex: 3,
+      tooltip: 'Event attributes specific to the event type',
       renderer: function (value) {
         var text = '';
         Ext.Object.each(value, function (name, value) {
