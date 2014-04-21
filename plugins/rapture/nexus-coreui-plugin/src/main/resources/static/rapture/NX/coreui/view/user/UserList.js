@@ -41,9 +41,11 @@ Ext.define('NX.coreui.view.user.UserList', {
   emptyText: 'No users defined',
 
   tbar: [
+    '<b>Source:</b>',
+    { xtype: 'button', text: 'Default', action: 'filter', menu: [] },
+    '-',
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
-    { xtype: 'button', text: 'Default', action: 'filter', menu: [] },
   ],
 
   plugins: [
