@@ -28,10 +28,16 @@ Ext.define('NX.view.dashboard.Welcome', {
 
   items: [
     {
+      xtype: 'image',
+      cls: 'nx-icon-nexus-x100',
+      style: {
+        margin: '100px 0 0 0'
+      }
+    },
+    {
       xtype: 'label',
-      html: 'Sonatype Nexus: ' +
-          '<code>' +
-          '<em>' + NX.State.getValue('status')['edition'] + '</em> ' +
+      html: '<code>' +
+          'Nexus <em>' + NX.State.getValue('status')['edition'] + '</em> ' +
           NX.State.getValue('status')['version'] +
           '</code>',
 
@@ -42,10 +48,6 @@ Ext.define('NX.view.dashboard.Welcome', {
         'text-align': 'center',
         'padding': '20px'
       }
-    },
-    {
-      xtype: 'image',
-      cls: 'nx-icon-nexus-x100'
     }
   ]
 });
