@@ -10,16 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 /**
- * Dashboard uber mode panel.
+ * Welcome dashboard.
  *
  * @since 3.0
  */
-Ext.define('NX.view.dashboard.Feature', {
+Ext.define('NX.view.dashboard.Welcome', {
   extend: 'Ext.Panel',
-  alias: 'widget.nx-dashboard-feature',
-
-  // HACK: Adding something a bit more substantial for sanity, will revisit later
+  alias: 'widget.nx-dashboard-welcome',
 
   layout: {
     type: 'vbox',
@@ -30,7 +29,12 @@ Ext.define('NX.view.dashboard.Feature', {
   items: [
     {
       xtype: 'label',
-      text: 'Welcome',
+      html: 'Sonatype Nexus: ' +
+          '<code>' +
+          '<em>' + NX.State.getValue('status')['edition'] + '</em> ' +
+          NX.State.getValue('status')['version'] +
+          '</code>',
+
       style: {
         'color': '#000000',
         'font-size': '20px',
@@ -42,14 +46,6 @@ Ext.define('NX.view.dashboard.Feature', {
     {
       xtype: 'image',
       cls: 'nx-icon-nexus-x100'
-    },
-    {
-      xtype: 'label',
-      text: 'Something more useful to be placed here in the future',
-      style: {
-        'text-align': 'center',
-        'padding': '20px'
-      }
     }
   ]
 });
