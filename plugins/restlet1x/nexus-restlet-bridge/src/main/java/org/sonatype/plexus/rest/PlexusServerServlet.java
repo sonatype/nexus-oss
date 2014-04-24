@@ -12,13 +12,15 @@
  */
 package org.sonatype.plexus.rest;
 
+import java.util.Arrays;
 import java.util.Enumeration;
 
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import com.noelios.restlet.ext.servlet.ServerServlet;
 import com.noelios.restlet.ext.servlet.ServletContextAdapter;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.eclipse.sisu.inject.BeanLocator;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.service.TaskService;
@@ -27,10 +29,6 @@ public class PlexusServerServlet
     extends ServerServlet
 {
   private static final long serialVersionUID = 2636935931764462049L;
-
-  public PlexusContainer getPlexusContainer() {
-    return (PlexusContainer) getServletContext().getAttribute(PlexusConstants.PLEXUS_KEY);
-  }
 
   @Override
   public void destroy() {
@@ -72,13 +70,13 @@ public class PlexusServerServlet
     // Load the application class using the given class name
     try {
       if (applicationRoleHint != null) {
-        application = (Application) getPlexusContainer().lookup(applicationRole, applicationRoleHint);
+        application = (Application) lookup(applicationRole, applicationRoleHint);
       }
       else {
-        application = (Application) getPlexusContainer().lookup(applicationRole);
+        application = (Application) lookup(applicationRole);
       }
     }
-    catch (ComponentLookupException e) {
+    catch (Exception e) {
       throw new IllegalStateException("The PlexusServerServlet couldn't lookup the target component (role='"
           + applicationRole + "', hint='" + applicationRoleHint + "')", e);
     }
@@ -134,5 +132,18 @@ public class PlexusServerServlet
     }
 
     return result;
+  }
+
+  private Object lookup(String role, String... hints) throws ClassNotFoundException {
+    Class<?> roleType = getClass().getClassLoader().loadClass(role);
+    Key<?> key;
+    if (hints != null && hints.length > 0) {
+      key = Key.get(roleType, Names.named(hints[0]));
+    }
+    else {
+      key = Key.get(roleType);
+    }
+    Injector injector = (Injector) getServletContext().getAttribute(Injector.class.getName());
+    return injector.getInstance(BeanLocator.class).locate(key).iterator().next().getValue();
   }
 }

@@ -30,10 +30,9 @@ import org.sonatype.nexus.proxy.maven.gav.M2ArtifactRecognizer;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.slf4j.Logger;
 
@@ -280,9 +279,7 @@ abstract public class AbstractMetadataHelper
           ZipEntry entry;
           while ((entry = zip.getNextEntry()) != null) {
             if (!entry.isDirectory() && entry.getName().equals("META-INF/maven/plugin.xml")) {
-              PlexusConfiguration plexusConfig =
-                  new XmlPlexusConfiguration(Xpp3DomBuilder.build(new InputStreamReader(zip)));
-
+              Xpp3Dom plexusConfig = Xpp3DomBuilder.build(new InputStreamReader(zip));
               prefix = plexusConfig.getChild("goalPrefix").getValue();
               zip.closeEntry();
               break;

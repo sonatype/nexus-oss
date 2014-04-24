@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -31,8 +32,6 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.velocity.app.VelocityEngine;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.context.ContextException;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.Route;
@@ -72,11 +71,9 @@ public abstract class PlexusRestletApplicationBridge
    */
   public static final String PLEXUS_DISCOVER_RESOURCES = "plexus.discoverResources";
 
-  private static final String ENABLE_ENCODER_KEY = "enable-restlet-encoder";
-
   protected final Logger logger = Loggers.getLogger(getClass());
 
-  private PlexusContainer plexusContainer;
+  private boolean enableCompression;
 
   private Map<String, PlexusResource> plexusResources;
 
@@ -109,12 +106,12 @@ public abstract class PlexusRestletApplicationBridge
   }
 
   @Inject
-  public void installComponents(final PlexusContainer plexusContainer,
+  public void installComponents(@Named("${enable-restlet-encoder:-false}") final boolean enableCompression,
                                 final Map<String, PlexusResource> plexusResources,
                                 final Provider<VelocityEngine> velocityEngineProvider,
                                 final ClassLoader uberClassLoader)
   {
-    this.plexusContainer = plexusContainer;
+    this.enableCompression = enableCompression;
     this.plexusResources = plexusResources;
     this.velocityEngineProvider = velocityEngineProvider;
     this.uberClassLoader = uberClassLoader;
@@ -236,17 +233,8 @@ public abstract class PlexusRestletApplicationBridge
 
       doCreateRoot(rootRouter, isStarted);
 
-      // check if we want to compress stuff
-      boolean enableCompression = false;
-      try {
-        if (this.plexusContainer.getContext().contains(ENABLE_ENCODER_KEY)
-            && Boolean.parseBoolean(this.plexusContainer.getContext().get(ENABLE_ENCODER_KEY).toString())) {
-          enableCompression = true;
-          logger.debug("Restlet Encoder will compress output");
-        }
-      }
-      catch (ContextException e) {
-        logger.warn("Failed to get plexus property: {}, this property was found in the context", ENABLE_ENCODER_KEY, e);
+      if (enableCompression) {
+        logger.debug("Restlet Encoder will compress output");
       }
 
       // encoding support

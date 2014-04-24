@@ -13,11 +13,9 @@
 package org.sonatype.nexus.plugins;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.sonatype.nexus.guice.AbstractInterceptorModule;
 import org.sonatype.nexus.plugins.repository.NexusPluginRepository;
 import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactException;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
@@ -28,8 +26,6 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.inject.util.Providers;
-import org.eclipse.sisu.bean.BeanManager;
-import org.eclipse.sisu.inject.MutableBeanLocator;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.osgi.framework.Bundle;
@@ -57,12 +53,6 @@ public class DefaultNexusPluginManagerTest
   @Mock
   private NexusPluginRepository nexusPluginRepository;
 
-  @Mock
-  private MutableBeanLocator beanLocator;
-
-  @Mock
-  private BeanManager beanManager;
-
   @Test
   public void pluginDependenciesAreActivatedByGA()
       throws Exception
@@ -70,10 +60,6 @@ public class DefaultNexusPluginManagerTest
     final DefaultNexusPluginManager underTest = new DefaultNexusPluginManager(
         eventBus,
         pluginRepositoryManager,
-        new HashMap<String, String>(),
-        Collections.<AbstractInterceptorModule>emptyList(),
-        beanLocator,
-        beanManager,
         Providers.<Bundle> of(null)
     )
     {

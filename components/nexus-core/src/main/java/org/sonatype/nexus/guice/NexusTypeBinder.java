@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.guice;
 
-import org.sonatype.gossip.Level;
 import org.sonatype.nexus.plugins.DefaultNexusPluginManager;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
@@ -21,17 +20,12 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import com.google.inject.Binder;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
-import org.eclipse.sisu.inject.DeferredClass;
-import org.eclipse.sisu.plexus.ComponentImpl;
-import org.eclipse.sisu.plexus.PlexusTypeBinder;
-import org.eclipse.sisu.plexus.PlexusTypeListener;
-import org.eclipse.sisu.plexus.PlexusTypeVisitor;
+import org.eclipse.sisu.space.QualifiedTypeBinder;
+import org.eclipse.sisu.space.QualifiedTypeListener;
+import org.eclipse.sisu.space.QualifiedTypeVisitor;
 import org.eclipse.sisu.space.SpaceModule;
 import org.eclipse.sisu.space.SpaceVisitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Adapts the usual Plexus binding process to handle Nexus {@link RepositoryType} semantics.
@@ -39,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @since 2.8
  */
 public final class NexusTypeBinder
-    implements PlexusTypeListener
+    implements QualifiedTypeListener
 {
   // ----------------------------------------------------------------------
   // Constants
@@ -48,7 +42,7 @@ public final class NexusTypeBinder
   public static final SpaceModule.Strategy STRATEGY = new SpaceModule.Strategy()
   {
     public SpaceVisitor visitor(final Binder binder) {
-      return new PlexusTypeVisitor(new NexusTypeBinder(binder, new PlexusTypeBinder(binder)));
+      return new QualifiedTypeVisitor(new NexusTypeBinder(binder, new QualifiedTypeBinder(binder)));
     }
   };
 
@@ -56,11 +50,9 @@ public final class NexusTypeBinder
   // Implementation fields
   // ----------------------------------------------------------------------
 
-  private static final Logger log = LoggerFactory.getLogger(NexusTypeBinder.class);
-
   private final Binder binder;
 
-  private final PlexusTypeListener delegate;
+  private final QualifiedTypeListener delegate;
 
   // ----------------------------------------------------------------------
   // Constructors
@@ -70,7 +62,7 @@ public final class NexusTypeBinder
    * @param binder Guice binder
    * @param delegate Original Plexus listener
    */
-  NexusTypeBinder(final Binder binder, final PlexusTypeListener delegate) {
+  NexusTypeBinder(final Binder binder, final QualifiedTypeListener delegate) {
     this.binder = binder;
     this.delegate = delegate;
   }
@@ -98,34 +90,6 @@ public final class NexusTypeBinder
     else {
       delegate.hear(implementation, source);
     }
-  }
-
-  /**
-   * Adds {@link RepositoryType} semantics on top of Plexus semantics.
-   */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  public void hear(Component component, final DeferredClass<?> implementation, final Object source) {
-    Class role = getRepositoryRole(implementation.load());
-    if (role != null) {
-      if (StringUtils.isBlank(component.hint())) {
-        // if someone forgot to set the repository's hint then use the fully-qualified classname
-        component = new ComponentImpl(component.role(), getRepositoryHint(implementation.load()),
-            component.instantiationStrategy(), component.description());
-      }
-      addRepositoryTypeDescriptor(role, component.hint());
-    }
-
-    // log a warning if a plexus component is found. special handling for org.apache.maven.{index|model}
-    // ... which are required plexus components we can not effectively port to jsr-330 ATM.
-    // log these as debug to avoid warnings which users can not do anything about.
-    String implName = implementation.getName();
-    Level level = Level.WARN;
-    if (implName.startsWith("org.apache.maven.model") || implName.startsWith("org.apache.maven.index")) {
-      level = Level.DEBUG;
-    }
-    level.log(log, "Found legacy plexus component: {}", log.isDebugEnabled() ? implementation : implName);
-
-    delegate.hear(component, implementation, source);
   }
 
   // ----------------------------------------------------------------------
