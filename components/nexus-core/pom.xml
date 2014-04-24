@@ -193,11 +193,6 @@
       <artifactId>aether-spi</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-impl</artifactId>
-    </dependency>
-
     <!-- Security -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
