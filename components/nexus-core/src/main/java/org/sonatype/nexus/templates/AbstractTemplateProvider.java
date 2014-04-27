@@ -35,6 +35,14 @@ public abstract class AbstractTemplateProvider<T extends Template>
     return applicationConfiguration;
   }
 
+  public TemplateSet getTemplates(Object filter) {
+    return getTemplates().getTemplates(filter);
+  }
+
+  public TemplateSet getTemplates(Object... filters) {
+    return getTemplates().getTemplates(filters);
+  }
+
   public Template getTemplateById(String id)
       throws NoSuchTemplateIdException
   {
@@ -48,5 +56,4 @@ public abstract class AbstractTemplateProvider<T extends Template>
 
     throw new NoSuchTemplateIdException("Template for Id='" + id + "' not found!");
   }
-
 }
