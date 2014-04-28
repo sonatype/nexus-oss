@@ -111,6 +111,8 @@ public class ConfigurationBuilder
 
   /**
    * Override any existing properties with values from the given set of overrides.
+   *
+   * @since 2.8.1
    */
   public ConfigurationBuilder override(final Map<String,String> overrides) {
     if (overrides == null) {
@@ -129,6 +131,8 @@ public class ConfigurationBuilder
 
   /**
    * @see #override(Map)
+   *
+   * @since 2.8.1
    */
   public ConfigurationBuilder override(final Properties overrides) {
     return override(new PropertyMap(overrides));

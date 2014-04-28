@@ -40,6 +40,9 @@ public class PropertyMap
     super(map);
   }
 
+  /**
+   * @since 2.8.1
+   */
   public PropertyMap(final Properties properties) {
     putAll(properties);
   }
