@@ -61,7 +61,7 @@ public class ConfigurationBuilderTest
   }
 
   @Test
-  public void properties() throws Exception {
+  public void properties_withMap() throws Exception {
     Map<String,String> properties = ImmutableMap.of(
         "foo", "bar",
         "a", "b"
