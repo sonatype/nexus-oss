@@ -70,14 +70,6 @@ public abstract class AbstractRepositoryTemplateProvider
     return remoteProviderHintFactory;
   }
 
-  public TemplateSet getTemplates(Object filter) {
-    return getTemplates().getTemplates(filter);
-  }
-
-  public TemplateSet getTemplates(Object... filters) {
-    return getTemplates().getTemplates(filters);
-  }
-
   public ManuallyConfiguredRepositoryTemplate createManuallyTemplate(CRepositoryCoreConfiguration configuration)
       throws ConfigurationException
   {
