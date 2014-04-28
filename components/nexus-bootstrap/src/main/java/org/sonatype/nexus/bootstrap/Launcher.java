@@ -74,6 +74,7 @@ public class Launcher
         .override(System.getProperties());
 
     if (overrides != null) {
+      // using properties() instead of override() so we get all values added, not just those with existing entries
       builder.properties(overrides);
     }
 
