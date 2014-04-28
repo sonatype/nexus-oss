@@ -100,6 +100,7 @@ public class ConfigurationBuilderTest
 
     assertThat(config.entrySet(), hasSize(1));
     assertThat(config.get("foo"), is("baz"));
+    // ^^^ implies config.containsKey("a") is false
   }
 
   @Test
