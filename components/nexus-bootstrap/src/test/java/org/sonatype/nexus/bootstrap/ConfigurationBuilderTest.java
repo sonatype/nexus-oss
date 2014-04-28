@@ -41,6 +41,12 @@ public class ConfigurationBuilderTest
     this.underTest = new ConfigurationBuilder();
   }
 
+  @Test(expected = IllegalStateException.class)
+  public void build_notConfigured() throws Exception {
+    // at least 1 property must be configured before calling build()
+    underTest.build();
+  }
+
   @Test
   public void set_withNulls() throws Exception {
     try {
