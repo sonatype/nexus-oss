@@ -37,7 +37,7 @@ public class ConfigurationBuilder
 
   private final PropertyMap properties = new PropertyMap();
 
-  public ConfigurationBuilder properties(final Map<String, String> props) throws IOException {
+  public ConfigurationBuilder properties(final Map<String, String> props) {
     if (props == null) {
       throw new NullPointerException();
     }
