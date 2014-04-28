@@ -61,6 +61,17 @@ public class ConfigurationBuilderTest
   }
 
   @Test
+  public void set_overridesPrevious() throws Exception {
+    underTest.set("foo", "bar");
+    underTest.set("foo", "baz");
+
+    Map<String, String> config = underTest.build();
+
+    assertThat(config.entrySet(), hasSize(1));
+    assertThat(config.get("foo"), is("baz"));
+  }
+
+  @Test
   public void properties_withMap() throws Exception {
     Map<String,String> properties = ImmutableMap.of(
         "foo", "bar",
