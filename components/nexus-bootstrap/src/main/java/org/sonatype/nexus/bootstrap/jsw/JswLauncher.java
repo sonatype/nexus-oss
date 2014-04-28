@@ -17,6 +17,7 @@ import org.sonatype.nexus.bootstrap.ShutdownHelper;
 
 import org.slf4j.MDC;
 import org.tanukisoftware.wrapper.WrapperManager;
+import org.tanukisoftware.wrapper.WrapperUser;
 
 import static org.sonatype.nexus.bootstrap.Launcher.SYSTEM_USERID;
 import static org.tanukisoftware.wrapper.WrapperManager.WRAPPER_CTRL_LOGOFF_EVENT;
@@ -34,9 +35,22 @@ public class JswLauncher
   @Override
   protected Integer doStart(final String[] args) throws Exception {
     if (WrapperManager.isControlledByNativeWrapper()) {
+
+      // WrapperManager.getUser(boolean) may return null if native library did not initialize
+      String username = "*UNKNOWN";
+      WrapperUser user = WrapperManager.getUser(false);
+      if (user != null) {
+        username = user.getUser();
+      }
+      else {
+        log.warn("Failed to query native user details, local environment may have problems using JSW functionality");
+      }
+
       log.info("JVM ID: {}, JVM PID: {}, Wrapper PID: {}, User: {}",
-          WrapperManager.getJVMId(), WrapperManager.getJavaPID(), WrapperManager.getWrapperPID(),
-          WrapperManager.getUser(false).getUser());
+          WrapperManager.getJVMId(),
+          WrapperManager.getJavaPID(),
+          WrapperManager.getWrapperPID(),
+          username);
     }
 
     this.launcher = new Launcher(null, null, args)
