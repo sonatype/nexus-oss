@@ -40,6 +40,10 @@ public class PropertyMap
     super(map);
   }
 
+  public PropertyMap(final Properties properties) {
+    putAll(properties);
+  }
+
   public void putAll(final Properties props) {
     for (Object key : props.keySet()) {
       put(key.toString(), String.valueOf(props.get(key)));

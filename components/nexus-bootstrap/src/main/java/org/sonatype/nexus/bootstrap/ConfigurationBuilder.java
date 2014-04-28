@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.interpolation.Interpolator;
@@ -106,6 +107,25 @@ public class ConfigurationBuilder
     log.debug("Customizing: {}", customizer);
     customizer.apply(this);
     return this;
+  }
+
+  public ConfigurationBuilder override(final Map<String,String> overrides) {
+    if (overrides == null) {
+      throw new NullPointerException();
+    }
+    for (Entry<String,String> entry : overrides.entrySet()) {
+      String name = entry.getKey();
+      if (properties.containsKey(name)) {
+        String value = entry.getValue();
+        log.debug("Override: {}={}", name, value);
+        properties.put(name, value);
+      }
+    }
+    return this;
+  }
+
+  public ConfigurationBuilder override(final Properties overrides) {
+    return override(new PropertyMap(overrides));
   }
 
   private void canonicalize(final String name) throws IOException {
