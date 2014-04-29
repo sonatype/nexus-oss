@@ -43,13 +43,12 @@ public class RequestContext
 
   /**
    * Context flag to mark a request local only. For {@link ProxyRepository} instances: do not attempt remote access
-   * at
-   * all, else: no effect.
+   * at all, else: no effect.
    */
   public static final String CTX_LOCAL_ONLY_FLAG = "request.localOnly";
 
   /**
-   * Context flag to mark a request local only. For {@link ProxyRepository} instances: force remote access -- might
+   * Context flag to mark a request remote only. For {@link ProxyRepository} instances: force remote access -- might
    * still serve local if cache is fresh, else: no effect.
    */
   public static final String CTX_REMOTE_ONLY_FLAG = "request.remoteOnly";
