@@ -53,8 +53,8 @@ public class Restlet1xModule
     @Inject
     public TargetRepositoryFilterProvider(final NexusTargetMappingAuthorizationFilter filter) {
       super(filter);
-      filter.setPathPrefix("/service/local/repositories/(.*)/content(.*)");
-      filter.setPathReplacement("/repositories/@1@2");
+      filter.setPathPrefix("/service/local/repositories/([^/]*)/content/(.*)");
+      filter.setPathReplacement("/repositories/@1/@2");
     }
   }
 
@@ -65,8 +65,8 @@ public class Restlet1xModule
     @Inject
     public TargetRepositoryIndexFilterProvider(final NexusTargetMappingAuthorizationFilter filter) {
       super(filter);
-      filter.setPathPrefix("/service/local/repositories/(.*)/index_content(.*)");
-      filter.setPathReplacement("/repositories/@1@2");
+      filter.setPathPrefix("/service/local/repositories/([^/]*)/index_content(.*)");
+      filter.setPathReplacement("/repositories/@1/@2");
     }
   }
 
@@ -77,8 +77,8 @@ public class Restlet1xModule
     @Inject
     public TargetGroupFilterProvider(final NexusTargetMappingAuthorizationFilter filter) {
       super(filter);
-      filter.setPathPrefix("/service/local/repo_groups/(.*)/content(.*)");
-      filter.setPathReplacement("/groups/@1@2");
+      filter.setPathPrefix("/service/local/repo_groups/([^/]*)/content(.*)");
+      filter.setPathReplacement("/groups/@1/@2");
     }
   }
 
@@ -89,8 +89,8 @@ public class Restlet1xModule
     @Inject
     public TargetGroupIndexFilterProvider(final NexusTargetMappingAuthorizationFilter filter) {
       super(filter);
-      filter.setPathPrefix("/service/local/repo_groups/(.*)/index_content(.*)");
-      filter.setPathReplacement("/groups/@1@2");
+      filter.setPathPrefix("/service/local/repo_groups/([^/]*)/index_content(.*)");
+      filter.setPathReplacement("/groups/@1/@2");
     }
   }
 }
