@@ -49,7 +49,7 @@ public interface AccessManager
   String REQUEST_AUTHORIZED = "request.authorized";
 
   /**
-   * Key used for authenticated user agent in request.
+   * Key to store 'User-Agent' header in request context.
    */
   String REQUEST_AGENT = "request.agent";
 
