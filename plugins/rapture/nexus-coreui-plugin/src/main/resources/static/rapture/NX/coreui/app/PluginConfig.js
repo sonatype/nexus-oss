@@ -77,6 +77,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.RepositoryRoutes',
     'NX.coreui.controller.Privileges',
     'NX.coreui.controller.RealmSettings',
+    'NX.coreui.controller.RoutingRepositorySettings',
     'NX.coreui.controller.Roles',
     'NX.coreui.controller.Search',
     'NX.coreui.controller.SmtpSettings',
