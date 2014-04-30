@@ -54,7 +54,7 @@ extends DirectComponentSupport
 
   /**
    * Retrieve routing repository settings.
-   * @retrun routing repository settings
+   * @return routing repository settings
    */
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
@@ -136,9 +136,6 @@ extends DirectComponentSupport
   @Validate
   RoutingRepositorySettingsXO updatePrefixFile(final @NotNull(message = '[repositoryId] may not be null') String repositoryId) {
     MavenRepository mavenRepository = getMavenRepository(repositoryId, MavenRepository.class)
-    if (!manager.isMavenRepositorySupported(mavenRepository)) {
-      throw new Exception("Repository with ID='${repositoryId}' unsupported!")
-    }
     manager.updatePrefixFile(mavenRepository)
     return read(repositoryId)
   }
