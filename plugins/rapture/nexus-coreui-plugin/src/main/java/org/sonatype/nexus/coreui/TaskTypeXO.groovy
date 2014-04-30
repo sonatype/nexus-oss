@@ -10,10 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
-import org.sonatype.scheduling.TaskState
 
 /**
  * Task type exchange object.
@@ -24,6 +24,6 @@ import org.sonatype.scheduling.TaskState
 class TaskTypeXO
 {
   String id
-
   String name
+  List<FormFieldXO> formFields
 }

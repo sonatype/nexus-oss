@@ -24,7 +24,7 @@ Ext.define('NX.coreui.store.TaskType', {
     paramsAsHash: false,
 
     api: {
-      read: 'NX.direct.coreui_Task.types'
+      read: 'NX.direct.coreui_Task.readTypes'
     },
 
     reader: {

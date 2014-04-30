@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
@@ -18,8 +19,10 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.formfields.Selectable
 import org.sonatype.nexus.rest.schedules.ScheduledServiceBaseResourceConverter
 import org.sonatype.nexus.scheduling.NexusScheduler
+import org.sonatype.nexus.scheduling.TaskUtils
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor
 import org.sonatype.scheduling.ScheduledTask
 import org.sonatype.scheduling.TaskState
@@ -54,21 +57,59 @@ extends DirectComponentSupport
   @RequiresPermissions('nexus:tasks:read')
   List<TaskXO> read() {
     def descriptors = this.descriptors
-    return nexusScheduler.getAllTasks().values().flatten().collect { input ->
+    return nexusScheduler.getAllTasks().values().flatten().collect { ScheduledTask task ->
       def result = new TaskXO(
-          id: input.id,
-          enabled: input.enabled,
-          name: input.name,
-          typeId: input.type,
-          typeName: (descriptors.find { it.id == input.type })?.name,
-          status: input.taskState,
-          statusDescription: getStatusDescription(input.taskState),
-          schedule: getSchedule(input.schedule),
-          lastRun: input.lastRun?.time,
-          lastRunResult: getLastRunResult(input),
-          nextRun: getNextRun(input)?.time,
-          runnable: input.taskState in [TaskState.SUBMITTED, TaskState.WAITING],
-          stoppable: input.taskState in [TaskState.RUNNING, TaskState.SLEEPING]
+          id: task.id,
+          enabled: task.enabled,
+          name: task.name,
+          typeId: task.type,
+          typeName: (descriptors.find { it.id == task.type })?.name,
+          status: task.taskState,
+          statusDescription: getStatusDescription(task.taskState),
+          schedule: getSchedule(task.schedule),
+          lastRun: task.lastRun?.time,
+          lastRunResult: getLastRunResult(task),
+          nextRun: getNextRun(task)?.time,
+          runnable: task.taskState in [TaskState.SUBMITTED, TaskState.WAITING],
+          stoppable: task.taskState in [TaskState.RUNNING, TaskState.SLEEPING],
+          alertEmail: TaskUtils.getAlertEmail(task),
+          properties: task.taskParams
+      )
+      return result
+    }
+  }
+
+  /**
+   * Retrieve available task types.
+   * @return a list of task types
+   */
+  @DirectMethod
+  @RequiresPermissions('nexus:tasktypes:read')
+  List<TaskTypeXO> readTypes() {
+    return descriptors.findAll { descriptor ->
+      descriptor.exposed ? descriptor : null
+    }.collect { descriptor ->
+      def result = new TaskTypeXO(
+          id: descriptor.id,
+          name: descriptor.name,
+          formFields: descriptor.formFields()?.collect { formField ->
+            def formFieldXO = new FormFieldXO(
+                id: formField.id,
+                type: formField.type,
+                label: formField.label,
+                helpText: formField.helpText,
+                required: formField.required,
+                regexValidation: formField.regexValidation,
+                initialValue: formField.initialValue
+            )
+            if (formField instanceof Selectable) {
+              formFieldXO.storePath = formField.storePath
+              formFieldXO.storeRoot = formField.storeRoot
+              formFieldXO.idMapping = formField.idMapping
+              formFieldXO.nameMapping = formField.nameMapping
+            }
+            return formFieldXO
+          }
       )
       return result
     }
@@ -93,21 +134,6 @@ extends DirectComponentSupport
   @RequiresPermissions('nexus:tasksrun:delete')
   void stop(final String id) {
     nexusScheduler.getTaskById(id)?.cancelOnly()
-  }
-
-  /**
-   * Retrieve a list of scheduled tasks types.
-   */
-  @DirectMethod
-  @RequiresPermissions('nexus:tasktypes:read')
-  List<TaskTypeXO> types() {
-    return descriptors.collect { input ->
-      def result = new TaskTypeXO(
-          id: input.id,
-          name: input.name
-      )
-      return result
-    }
   }
 
   private static String getStatusDescription(final TaskState taskState) {
