@@ -22,7 +22,6 @@ Ext.define('NX.app.Application', {
     'Ext.Error',
     'Ext.Direct',
     'Ext.state.Manager',
-    'Ext.state.CookieProvider',
     'Ext.state.LocalStorageProvider',
     'Ext.util.LocalStorage',
     'NX.view.Viewport',
@@ -212,27 +211,21 @@ Ext.define('NX.app.Application', {
    * Initialize state manager.
    */
   initState: function () {
-    var me = this, provider;
+    var me = this;
 
-    // prefer local storage if its supported
+    // If local storage is supported install state provider
     if (Ext.util.LocalStorage.supported) {
-      provider = Ext.create('Ext.state.LocalStorageProvider');
+      Ext.state.Manager.setProvider(Ext.create('Ext.state.LocalStorageProvider'));
       me.logDebug('Configured state provider: local');
     }
     else {
-      // FIXME: We may want to either not support state, or implement remoting to used
-      // FIXME: The remote session of the user to store state
-      // FIXME: Cookie impl will create too many cookies and could cause lots of weird things to break
-      provider = Ext.create('Ext.state.CookieProvider');
-      me.logDebug('Configured state provider: cookie');
+      me.logWarn('Local storage not supported; state management not supported');
     }
 
     // HACK: for debugging
     //provider.on('statechange', function (provider, key, value, opts) {
     //  me.logDebug('State changed: ' + key + '=' + value);
     //});
-
-    Ext.state.Manager.setProvider(provider);
   },
 
   /**
