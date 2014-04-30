@@ -19,6 +19,7 @@ Ext.define('NX.app.Application', {
   extend: 'Ext.app.Application',
 
   requires: [
+    'Ext.Ajax',
     'Ext.Error',
     'Ext.Direct',
     'Ext.state.Manager',
@@ -134,6 +135,12 @@ Ext.define('NX.app.Application', {
 
     // Configure blank image URL
     Ext.BLANK_IMAGE_URL = NX.util.Url.baseUrl + '/static/rapture/resources/images/s.gif';
+
+    Ext.Ajax.defaultHeaders = {
+      // HACK: Setting request header to allow analytics to tell if the request came from the UI or not
+      // HACK: This has some issues, will only catch ajax requests, etc... but may be fine for now
+      'X-Nexus-UI': 'true'
+    };
 
     app.initErrorHandler();
     app.initDirect();
