@@ -644,6 +644,9 @@ public class DefaultNexusBundle
         jswConfig.addJavaSystemProperties(jmxProps);
       }
 
+      jswConfig.addJavaStartupParameters(getConfiguration().getJavaOptions());
+      jswConfig.addJavaStartupParameters(getJavaAgentOptions());
+      jswConfig.addJavaStartupParameter("-XX:+HeapDumpOnOutOfMemoryError");
     }
   }
 

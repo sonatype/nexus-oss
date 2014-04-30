@@ -116,6 +116,9 @@
     <it.nexus.bundle.artifactId>nexus-bundle-template</it.nexus.bundle.artifactId>
     <it.nexus.bundle.version>${nexus.version}</it.nexus.bundle.version>
 
+    <!-- Used to allow the jacoco plugin to define its agent argument for failsafe -->
+    <it.failsafe.extraArgs></it.failsafe.extraArgs>
+
     <!--
       compiler plugin configuration, we are Java7
       but some child modules will override these properties to remain on Java6
@@ -439,6 +442,7 @@
               -XX:MaxPermSize=192m
               -XX:+HeapDumpOnOutOfMemoryError
               -XX:HeapDumpPath=${project.build.directory}/failsafe-reports
+              ${it.failsafe.extraArgs}
             </argLine>
             <excludes>
               <exclude>**/Abstract*</exclude>
@@ -1185,6 +1189,64 @@
         </pluginManagement>
       </build>
     </profile>
+
+    <!--
+      Prepares a property consumed by failsafe that directs jacoco output to a common location.
+    -->
+    <profile>
+      <id>coverage</id>
+      <activation>
+        <property>
+          <name>coverage</name>
+        </property>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+
+            <version>0.7.0.201403182114</version>
+            <configuration>
+              <propertyName>it.failsafe.extraArgs</propertyName>
+              <destFile>${sonar.jacoco.itReportPath}</destFile>
+              <append>true</append>
+            </configuration>
+            <executions>
+              <execution>
+                <id>agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+
+      <properties>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.jacoco.reportPath>target/jacoco-ut.exec</sonar.jacoco.reportPath>
+        <sonar.jacoco.itReportPath>target/jacoco-it.exec</sonar.jacoco.itReportPath>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>sonar</id>
+      <activation>
+        <property>
+          <name>sonar</name>
+        </property>
+      </activation>
+
+      <properties>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.jacoco.reportPath>target/jacoco-ut.exec</sonar.jacoco.reportPath>
+        <sonar.jacoco.itReportPath>target/jacoco-it.exec</sonar.jacoco.itReportPath>
+      </properties>
+    </profile>
+
   </profiles>
 
 </project>

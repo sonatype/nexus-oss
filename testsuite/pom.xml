@@ -83,6 +83,7 @@
               -XX:MaxPermSize=192m
               -XX:+HeapDumpOnOutOfMemoryError
               -XX:HeapDumpPath=${project.build.directory}/failsafe-reports
+              ${it.failsafe.extraArgs}
             </argLine>
           </configuration>
         </plugin>

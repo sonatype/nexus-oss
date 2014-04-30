@@ -274,6 +274,49 @@
         </plugins>
       </build>
     </profile>
+
+    <!--
+    Generates jacoco coverage data from failsafe-spawned VMs for later collection by sonar.
+    -->
+    <profile>
+      <id>coverage</id>
+      <activation>
+        <property>
+          <name>coverage</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <systemPropertyVariables combine.children="append">
+                  <it.test.jacoco.enable>true</it.test.jacoco.enable>
+                  <it.test.jacoco.outputfile>../../target/jacoco-it.exec</it.test.jacoco.outputfile>
+                </systemPropertyVariables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+    <profile>
+      <id>sonar</id>
+      <activation>
+        <property>
+          <name>sonar</name>
+        </property>
+      </activation>
+      <properties>
+        <sonar.dynamicAnalysis>reuse</sonar.dynamicAnalysis>
+        <sonar.jacoco.reportPath>../../target/jacoco-ut.exec</sonar.jacoco.reportPath>
+        <sonar.jacoco.itReportPath>../../target/jacoco-it.exec</sonar.jacoco.itReportPath>
+      </properties>
+    </profile>
+
   </profiles>
 
 </project>

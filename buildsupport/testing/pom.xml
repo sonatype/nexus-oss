@@ -37,7 +37,14 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-bundle-launcher</artifactId>
-        <version>1.8</version>
+        <version>1.9-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jacoco</groupId>
+        <artifactId>org.jacoco.agent</artifactId>
+        <version>0.6.5.201403032054</version>
+        <classifier>runtime</classifier>
       </dependency>
 
       <dependency>
