@@ -10,16 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global NX, Ext, Nexus*/
-
 /**
- * Capability Settings FieldSet.
+ * Settings FieldSet.
  *
- * @since 2.7
+ * @since 3.0
  */
-Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
+Ext.define('NX.coreui.view.formfield.SettingsFieldSet', {
   extend: 'Ext.form.FieldContainer',
-  alias: 'widget.nx-coreui-capability-settingsfieldset',
+  alias: 'widget.nx-coreui-formfield-settingsfieldset',
 
   requires: [
     'NX.coreui.view.formfield.factory.FormfieldCheckboxFactory',
@@ -49,99 +47,81 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
   /**
    * @property
    */
-  capabilityType: undefined,
+  formFields: undefined,
 
   /**
-   * Renders fields for a capability type.
-   * @param capabilityTypeModel capability type to rendered
+   * Renders form fields.
+   * @param {Array} formFields form fields to rendered
    */
-  setCapabilityType: function (capabilityTypeModel) {
+  setFormFields: function (formFields) {
     var me = this,
         item;
 
-    me.capabilityType = capabilityTypeModel;
+    me.formFields = formFields;
 
     me.removeAll();
 
-    if (me.capabilityType) {
-      me.add({
-        xtype: 'checkbox',
-        fieldLabel: 'Enabled',
-        helpText: 'This flag determines if the capability is currently enabled. To disable this capability for a period of time, de-select this checkbox.',
-        name: 'enabled',
-        allowBlank: false,
-        checked: true,
-        editable: true
+    if (me.formFields) {
+      Ext.Array.each(me.formFields, function (formField) {
+        var factory = Ext.ClassManager.getByAlias('nx.formfield.factory.' + formField.type);
+        if (!factory) {
+          factory = Ext.ClassManager.getByAlias('nx.formfield.factory.string');
+        }
+        if (factory) {
+          item = Ext.apply(factory.create(formField), {
+            requiresPermission: true,
+            name: 'property.' + formField.id,
+            factory: factory
+          });
+          me.add(item);
+        }
       });
-
-      if (me.capabilityType.get('formFields')) {
-        Ext.each(me.capabilityType.get('formFields'), function (formField) {
-          var factory = Ext.ClassManager.getByAlias('nx.formfield.factory.' + formField.type);
-          if (!factory) {
-            factory = Ext.ClassManager.getByAlias('nx.formfield.factory.string');
-          }
-          if (factory) {
-            item = Ext.apply(factory.create(formField), {
-              requiresPermission: true,
-              name: 'property.' + formField.id,
-              factory: factory
-            });
-            me.add(item);
-          }
-        });
-      }
     }
   },
 
   /**
-   * Exports form as a capability.
-   * @returns {Object} capability
+   * Exports form as properties.
+   * @returns {Object} properties object
    */
-  exportCapability: function () {
+  exportProperties: function () {
     var me = this,
         form = me.up('form').getForm(),
         values = form.getFieldValues(),
-        value,
-        capability = {
-          id: values.id,
-          notes: values.notes,
-          typeId: me.capabilityType.get('id'),
-          enabled: values.enabled,
-          properties: {}
-        };
+        properties = {},
+        value;
 
-    if (me.capabilityType && me.capabilityType.get('formFields')) {
-      Ext.each(me.capabilityType.get('formFields'), function (formField) {
+    if (me.formFields) {
+      Ext.Array.each(me.formFields, function (formField) {
         value = values['property.' + formField.id];
         if (Ext.isDefined(value)) {
-          capability.properties[formField.id] = String(value);
+          properties[formField.id] = String(value);
         }
       });
     }
 
-    return capability;
+    return properties;
   },
 
   /**
    * Imports capability.
-   * @param {NX.model.Capability} capabilityModel to import
-   * @param {NX.model.CapabilityType} capabilityTypeModel
+   * @param {Object} properties to import
+   * @param {Array} formFields to import
    */
-  importCapability: function (capabilityModel, capabilityTypeModel) {
+  importProperties: function (properties, formFields) {
     var me = this,
         form = me.up('form').getForm(),
-        data = Ext.apply({}, { enabled: capabilityModel.get('enabled') });
+        data = {};
 
-    me.setCapabilityType(capabilityTypeModel);
+    me.setFormFields(formFields);
 
-    if (me.capabilityType && me.capabilityType.get('formFields')) {
-      Ext.each(me.capabilityType.get('formFields'), function (formField) {
+    if (me.formFields) {
+      Ext.Array.each(me.formFields, function (formField) {
         data['property.' + formField.id] = '';
       });
     }
 
-    if (capabilityModel.get('properties')) {
-      Ext.Object.each(capabilityModel.get('properties'), function (key, value) {
+    if (properties) {
+      Ext.Object.each(properties, function (key, value) {
         data['property.' + key] = value;
       });
     }

@@ -38,7 +38,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     'capability.CapabilitySettings',
     'capability.CapabilityStatus',
     'capability.CapabilityAbout',
-    'capability.CapabilitySettingsFieldSet'
+    'formfield.SettingsFieldSet'
   ],
   refs: [
     { ref: 'feature', selector: 'nx-coreui-capability-feature' },
@@ -259,7 +259,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
 
     capabilityTypeModel = this.getCapabilityTypeStore().getById(combobox.value);
     win.down('nx-coreui-capability-about').showAbout(capabilityTypeModel.get('about'));
-    win.down('nx-coreui-capability-settingsfieldset').setCapabilityType(capabilityTypeModel);
+    win.down('nx-coreui-formfield-settingsfieldset').setFormFields(capabilityTypeModel.get('formFields'));
   },
 
   /**

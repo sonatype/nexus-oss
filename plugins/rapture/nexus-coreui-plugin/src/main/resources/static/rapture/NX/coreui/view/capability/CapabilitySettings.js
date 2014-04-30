@@ -28,7 +28,16 @@ Ext.define('NX.coreui.view.capability.CapabilitySettings', {
       xtype: 'hiddenfield',
       name: 'notes'
     },
-    { xtype: 'nx-coreui-capability-settingsfieldset' }
+    {
+      xtype: 'checkbox',
+      fieldLabel: 'Enabled',
+      helpText: 'This flag determines if the capability is currently enabled. To disable this capability for a period of time, de-select this checkbox.',
+      name: 'enabled',
+      allowBlank: false,
+      checked: true,
+      editable: true
+    },
+    { xtype: 'nx-coreui-formfield-settingsfieldset' }
   ],
 
   /**
@@ -39,10 +48,12 @@ Ext.define('NX.coreui.view.capability.CapabilitySettings', {
   loadRecord: function (model) {
     var me = this,
         capabilityTypeModel = NX.getApplication().getStore('CapabilityType').getById(model.get('typeId')),
-        settingsFieldSet = me.down('nx-coreui-capability-settingsfieldset');
+        settingsFieldSet = me.down('nx-coreui-formfield-settingsfieldset');
 
     me.callParent(arguments);
-    settingsFieldSet.importCapability(model, capabilityTypeModel);
+    if (capabilityTypeModel) {
+      settingsFieldSet.importProperties(model.get('properties'), capabilityTypeModel.get('formFields'));
+    }
   },
 
   /**
@@ -51,7 +62,17 @@ Ext.define('NX.coreui.view.capability.CapabilitySettings', {
    * @returns {Object} form values
    */
   getValues: function () {
-    return this.down('nx-coreui-capability-settingsfieldset').exportCapability();
+    var me = this,
+        values = me.getForm().getFieldValues(),
+        capability = {
+          id: values.id,
+          notes: values.notes,
+          enabled: values.enabled,
+          properties: {}
+        };
+
+    Ext.apply(capability.properties, me.down('nx-coreui-formfield-settingsfieldset').exportProperties());
+    return capability;
   },
 
   /**
@@ -61,7 +82,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySettings', {
    * an object hash of `{id: msg, id2: msg2}`, or a {@link Ext.data.Errors} object.
    */
   markInvalid: function (errors) {
-    this.down('nx-coreui-capability-settingsfieldset').markInvalid(errors);
+    this.down('nx-coreui-formfield-settingsfieldset').markInvalid(errors);
   }
 
 });
