@@ -77,6 +77,7 @@ Ext.define('NX.coreui.view.formfield.SettingsFieldSet', {
         }
       });
     }
+    me.up('form').isValid();
   },
 
   /**
