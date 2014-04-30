@@ -84,6 +84,11 @@ final class LocalResourceLock
   }
 
   @Override
+  protected boolean tryAcquire(final int permits) {
+    return sem.tryAcquire(permits);
+  }
+
+  @Override
   protected void release(final int permits) {
     sem.release(permits);
   }

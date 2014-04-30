@@ -28,6 +28,12 @@ public interface ResourceLock
   void lockExclusive(Thread thread);
 
   /**
+   * Attempts to take an exclusive resource lock for the given thread without blocking.
+   * @return {@code true} if a lock was obtained, {@code false} otherwise.
+   */
+  boolean tryExclusive(Thread thread);
+
+  /**
    * Drops an exclusive resource lock for the given thread.
    */
   void unlockExclusive(Thread thread);

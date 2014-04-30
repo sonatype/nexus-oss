@@ -183,6 +183,11 @@ final class HazelcastResourceLock
   }
 
   @Override
+  protected boolean tryAcquire(final int permits) {
+    return sem.tryAcquire(permits);
+  }
+
+  @Override
   protected void release(final int permits) {
     sem.releaseDetach(permits);
   }

@@ -72,6 +72,39 @@ public abstract class AbstractSemaphoreResourceLock
     counters[EXCLUSIVE]++;
   }
 
+  @Override
+  public boolean tryExclusive(final Thread thread) {
+    int[] counters = map.get(thread);
+    if (null == counters) {
+      counters = new int[]{0, 0};
+      map.put(thread, counters);
+      final boolean acquired = tryAcquire(Integer.MAX_VALUE);
+      if (acquired) {
+        counters[EXCLUSIVE]++;
+        return true;
+      }
+    }
+    else if (counters[EXCLUSIVE] == 0) {
+      final int shared = counters[SHARED];
+      // Must drop shared lock before upgrading to exclusive lock
+      release(1);
+      counters[SHARED] = 0;
+      final boolean acquired = tryAcquire(Integer.MAX_VALUE);
+      if (acquired) {
+        counters[EXCLUSIVE]++;
+      }
+      else {
+        // Since exclusive lock unavailable, reacquire the shared lock we had before
+        acquire(1);
+      }
+      counters[SHARED] = shared;
+      return acquired;
+    }
+    // An exclusive lock was already held
+    counters[EXCLUSIVE]++;
+    return true;
+  }
+
   public final void unlockExclusive(final Thread thread) {
     final int[] counters = map.get(thread);
     if (null != counters && counters[EXCLUSIVE] > 0) {
@@ -156,6 +189,11 @@ public abstract class AbstractSemaphoreResourceLock
    * @param permits Number of permits to acquire
    */
   protected abstract void acquire(int permits);
+
+  /**
+   * @param permits Number of permits to attempt to acquire
+   */
+  protected abstract boolean tryAcquire(int permits);
 
   /**
    * @param permits Number of permits to release
