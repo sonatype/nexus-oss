@@ -22,12 +22,12 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
   alias: 'widget.nx-coreui-capability-settingsfieldset',
 
   requires: [
-    'NX.coreui.view.capability.factory.CapabilityCheckboxFactory',
-    'NX.coreui.view.capability.factory.CapabilityComboFactory',
-    'NX.coreui.view.capability.factory.CapabilityDateFieldFactory',
-    'NX.coreui.view.capability.factory.CapabilityNumberFieldFactory',
-    'NX.coreui.view.capability.factory.CapabilityTextAreaFactory',
-    'NX.coreui.view.capability.factory.CapabilityTextFieldFactory'
+    'NX.coreui.view.formfield.factory.FormfieldCheckboxFactory',
+    'NX.coreui.view.formfield.factory.FormfieldComboFactory',
+    'NX.coreui.view.formfield.factory.FormfieldDateFieldFactory',
+    'NX.coreui.view.formfield.factory.FormfieldNumberFieldFactory',
+    'NX.coreui.view.formfield.factory.FormfieldTextAreaFactory',
+    'NX.coreui.view.formfield.factory.FormfieldTextFieldFactory'
   ],
 
   /**
@@ -76,9 +76,9 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsFieldSet', {
 
       if (me.capabilityType.get('formFields')) {
         Ext.each(me.capabilityType.get('formFields'), function (formField) {
-          var factory = Ext.ClassManager.getByAlias('nx.capability.factory.' + formField.type);
+          var factory = Ext.ClassManager.getByAlias('nx.formfield.factory.' + formField.type);
           if (!factory) {
-            factory = Ext.ClassManager.getByAlias('nx.capability.factory.string');
+            factory = Ext.ClassManager.getByAlias('nx.formfield.factory.string');
           }
           if (factory) {
             item = Ext.apply(factory.create(formField), {

@@ -13,34 +13,35 @@
 /*global NX*/
 
 /**
- * 'textarea' factory.
+ * 'datefield' factory.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.capability.factory.CapabilityTextAreaFactory', {
+Ext.define('NX.coreui.view.formfield.factory.FormfieldDateFieldFactory', {
   singleton: true,
   alias: [
-    'nx.capability.factory.textarea',
-    'nx.capability.factory.text-area'
+    'nx.formfield.factory.datefield',
+    'nx.formfield.factory.date'
   ],
 
   /**
-   * Creates a textarea.
-   * @param formField capability type form field to create textarea for
-   * @returns {*} created textarea (never null)
+   * Creates a datefield.
+   * @param formField form field to create datefield for
+   * @returns {*} created datefield (never null)
    */
   create: function (formField) {
     var item = {
-      xtype: 'textarea',
+      xtype: 'datefield',
       htmlDecode: true,
       fieldLabel: formField.label,
       itemCls: formField.required ? 'required-field' : '',
       helpText: formField.helpText,
       allowBlank: !formField.required,
-      regex: formField.regexValidation ? new RegExp(formField.regexValidation) : null
+      regex: formField.regexValidation ? new RegExp(formField.regexValidation) : null,
+      value: new Date()
     };
     if (formField.initialValue) {
-      item.value = formField.initialValue;
+      item.value = new Date(Number(formField.initialValue));
     }
     return item;
   }

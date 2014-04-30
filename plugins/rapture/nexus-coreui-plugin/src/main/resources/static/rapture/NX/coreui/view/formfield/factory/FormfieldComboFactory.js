@@ -17,14 +17,14 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.capability.factory.CapabilityComboFactory', {
+Ext.define('NX.coreui.view.formfield.factory.FormfieldComboFactory', {
   singleton: true,
   alias: [
-    'nx.capability.factory.combo',
-    'nx.capability.factory.combobox',
-    'nx.capability.factory.repo',
-    'nx.capability.factory.repo-or-group',
-    'nx.capability.factory.repo-target'
+    'nx.formfield.factory.combo',
+    'nx.formfield.factory.combobox',
+    'nx.formfield.factory.repo',
+    'nx.formfield.factory.repo-or-group',
+    'nx.formfield.factory.repo-target'
   ],
 
   mixins: {
@@ -43,7 +43,7 @@ Ext.define('NX.coreui.view.capability.factory.CapabilityComboFactory', {
 
   /**
    * Creates a combo.
-   * @param formField capability type form field to create combo for
+   * @param formField form field to create combo for
    * @returns {*} created combo (never null)
    */
   create: function (formField) {
