@@ -92,5 +92,5 @@ public interface BlobStore
    * Returns whatever BlobStoreListener has been installed, or {@code null}.
    */
   @Nullable
-  void getBlobStoreListener();
+  BlobStoreListener getBlobStoreListener();
 }
