@@ -30,7 +30,6 @@
   <modules>
     <module>base-configuration</module>
     <module>nexus-analytics-api</module>
-    <module>nexus-blobstore-api</module>
     <module>nexus-bootstrap</module>
     <module>nexus-client-core</module>
     <module>nexus-configuration-model</module>
