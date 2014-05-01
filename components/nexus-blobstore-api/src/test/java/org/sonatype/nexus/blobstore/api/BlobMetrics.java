@@ -17,7 +17,7 @@ import java.util.Date;
 
 /**
  * Metrics pertaining to a blob within the BlobStore.  Any methods in this interface may throw
- * {@link BlobStoreException}
+ * {@link BlobStoreException} if the Blob is deleted.
  *
  * @since 3.0
  */
