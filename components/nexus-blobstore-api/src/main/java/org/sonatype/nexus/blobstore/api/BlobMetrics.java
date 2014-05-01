@@ -13,7 +13,7 @@
 package org.sonatype.nexus.blobstore.api;
 
 
-import java.util.Date;
+import org.joda.time.DateTime;
 
 /**
  * Metrics pertaining to a blob within the BlobStore.  Any methods in this interface may throw
@@ -23,7 +23,7 @@ import java.util.Date;
  */
 public interface BlobMetrics
 {
-  Date getCreationTime();
+  DateTime getCreationTime();
 
   /**
    * A SHA1 hash of the content bytes (not the headers).
