@@ -12,20 +12,49 @@
  */
 package org.sonatype.nexus.blobstore.api;
 
+import javax.annotation.Nullable;
+
 /**
  * @since 3.0
  */
 public class BlobStoreException extends RuntimeException
 {
-  public BlobStoreException(final String message) {
+  private String blobStoreName;
+
+  private BlobId blobId;
+
+  public BlobStoreException(final String message, final String blobStoreName, final BlobId blobId) {
     super(message);
+    this.blobStoreName = blobStoreName;
+    this.blobId = blobId;
   }
 
-  public BlobStoreException(final String message, final Throwable cause) {
+  public BlobStoreException(final String message, final Throwable cause, final String blobStoreName,
+                            final BlobId blobId)
+  {
     super(message, cause);
+    this.blobStoreName = blobStoreName;
+    this.blobId = blobId;
   }
 
-  public BlobStoreException(final Throwable cause) {
+  public BlobStoreException(final Throwable cause, final String blobStoreName, final BlobId blobId) {
     super(cause);
+    this.blobStoreName = blobStoreName;
+    this.blobId = blobId;
+  }
+
+  /**
+   * The {@link BlobStore#getName() name} of the BlobStore that generated this exception.
+   */
+  public String getBlobStoreName() {
+    return blobStoreName;
+  }
+
+  /**
+   * The BlobId of the blob related to this exception, or {@code null} if there is none.
+   */
+  @Nullable
+  public BlobId getBlobId() {
+    return blobId;
   }
 }

@@ -18,6 +18,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A unique identifier for a blob within a specific BlobStore.
+ *
+ * @since 3.0
  */
 public class BlobId
 {
@@ -49,6 +51,6 @@ public class BlobId
 
   @Override
   public int hashCode() {
-    return id != null ? id.hashCode() : 0;
+    return id.hashCode();
   }
 }

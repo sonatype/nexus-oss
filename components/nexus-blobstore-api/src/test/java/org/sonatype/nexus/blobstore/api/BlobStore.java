@@ -18,10 +18,10 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 /**
- * <p>A generic storage bin for binary objects of all sizes.</p>
+ * A generic storage bin for binary objects of all sizes.
  *
- * <p>In general, most methods can throw BlobStoreException for conditions such as network connectivity problems, or
- * file IO issues, blob store misconfiguration, or internal corruption.</p>
+ * In general, most methods can throw BlobStoreException for conditions such as network connectivity problems, or
+ * file IO issues, blob store misconfiguration, or internal corruption.
  *
  * @since 3.0
  */
@@ -50,6 +50,10 @@ public interface BlobStore
    */
   Blob create(InputStream blobData, Map<String, String> headers);
 
+  /**
+   * Returns the corresponding {@link Blob}, or {@code null} if the  blob does not exist or has been {@link #delete
+   * deleted}.
+   */
   @Nullable
   Blob get(BlobId blobId);
 
@@ -74,10 +78,19 @@ public interface BlobStore
    */
   String getName();
 
+  /**
+   * Provides metrics about the BlobStore's usage.
+   */
   BlobStoreMetrics getMetrics();
 
   /**
    * Installs a listener to receive blob store events. Subsequent calls replace the listener.
    */
   void setBlobStoreListener(@Nullable BlobStoreListener listener);
+
+  /**
+   * Returns whatever BlobStoreListener has been installed, or {@code null}.
+   */
+  @Nullable
+  void getBlobStoreListener();
 }

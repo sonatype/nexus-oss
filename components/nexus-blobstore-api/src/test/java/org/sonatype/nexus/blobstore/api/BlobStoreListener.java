@@ -40,7 +40,15 @@ public interface BlobStoreListener
   void blobAccessed(Blob blob, @Nullable String message);
 
   /**
-   * Fired after the blob store {@link BlobStore#delete(BlobId) deletes} of a blob.
+   * Fired after the blob store {@link BlobStore#delete(BlobId) marks a blob for deletion}.
+   *
+   * @param message an implementation-specific message (e.g. which file was queued for deletion)
+   */
+  void blobDeleteRequested(BlobId blobId, @Nullable String message);
+
+  /**
+   * Fired after the blob store removes a blob's bytes from the underlying storage mechanism, whether by an internal
+   * cleanup process or by a {@link BlobStore#deleteHard(BlobId) hard delete}.
    *
    * @param message an implementation-specific message (e.g. which file was deleted)
    */

@@ -16,6 +16,9 @@ package org.sonatype.nexus.blobstore.api;
 import java.util.Date;
 
 /**
+ * Metrics pertaining to a blob within the BlobStore.  Any methods in this interface may throw
+ * {@link BlobStoreException}
+ *
  * @since 3.0
  */
 public interface BlobMetrics
