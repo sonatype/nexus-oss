@@ -13,6 +13,7 @@
 package org.sonatype.nexus.extender;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,6 +31,7 @@ import org.eclipse.sisu.inject.DefaultRankingFunction;
 import org.eclipse.sisu.inject.InjectorPublisher;
 import org.eclipse.sisu.inject.MutableBeanLocator;
 import org.eclipse.sisu.inject.RankingFunction;
+import org.eclipse.sisu.launch.BundlePlan;
 import org.eclipse.sisu.launch.SisuTracker;
 import org.eclipse.sisu.plexus.PlexusSpaceModule;
 import org.eclipse.sisu.space.BeanScanning;
@@ -79,6 +81,11 @@ public class NexusBundleTracker
     return super.prepare(bundle);
   }
 
+  @Override
+  protected List<BundlePlan> discoverPlans() {
+    return Collections.emptyList();
+  }
+
   private BindingPublisher prepareNexusPlugin(final Bundle bundle) {
     log.info("ACTIVATING " + bundle);
     try {
@@ -89,10 +96,10 @@ public class NexusBundleTracker
       modules.add(new PluginModule());
       modules.addAll(interceptorModules);
       if (bundle.getResource("META-INF/plexus/components.xml") == null) {
-        modules.add(new SpaceModule(pluginSpace, BeanScanning.INDEX).with(NexusTypeBinder.STRATEGY));
+        modules.add(new SpaceModule(pluginSpace, BeanScanning.GLOBAL_INDEX).with(NexusTypeBinder.STRATEGY));
       }
       else {
-        modules.add(new PlexusSpaceModule(pluginSpace, BeanScanning.INDEX));
+        modules.add(new PlexusSpaceModule(pluginSpace, BeanScanning.GLOBAL_INDEX));
       }
       modules.add(new AbstractModule()
       {

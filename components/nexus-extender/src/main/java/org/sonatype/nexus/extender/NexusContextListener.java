@@ -91,7 +91,7 @@ public class NexusContextListener
     injector = Guice.createInjector(
         new WireModule(
             new CoreModule(servletContext, variables, systemBundle),
-            new SpaceModule(coreSpace, BeanScanning.INDEX)));
+            new SpaceModule(coreSpace, BeanScanning.GLOBAL_INDEX)));
     log.debug("Injector: {}", injector);
 
     super.contextInitialized(event);
