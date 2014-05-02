@@ -12,21 +12,20 @@
  */
 package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 
-import org.sonatype.nexus.util.WrappingInputStream;
-
 import org.apache.http.client.methods.AbortableHttpRequest;
 
 /**
- * Best-effort interruptable InputStream wrapper. The wrapper checks for Thread.isInterrupred before delegating to the
+ * Best-effort interruptable InputStream wrapper. The wrapper checks for Thread.isInterrupted before delegating to the
  * actual stream. If the thread is interrupted, the wrapper calls AbortableHttpRequest.abort() and throws
  * InterruptedIOException.
  */
 class InterruptableInputStream
-    extends WrappingInputStream
+    extends FilterInputStream
 {
   private AbortableHttpRequest request;
 

@@ -12,12 +12,12 @@
  */
 package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.sonatype.nexus.proxy.RemoteStorageEOFException;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.util.WrappingInputStream;
 
 import org.apache.http.ConnectionClosedException;
 
@@ -28,7 +28,7 @@ import org.apache.http.ConnectionClosedException;
  * @since 2.4
  */
 class Hc4InputStream
-    extends WrappingInputStream
+    extends FilterInputStream
 {
   private final ProxyRepository proxyRepository;
 
