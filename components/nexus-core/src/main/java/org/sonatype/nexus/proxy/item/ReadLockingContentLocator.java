@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.util.WrappingInputStream;
 
 import org.slf4j.LoggerFactory;
 
