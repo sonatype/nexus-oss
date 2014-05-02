@@ -31,6 +31,7 @@ import org.sonatype.eclipse.bridge.EclipseInstance;
 import org.sonatype.eclipse.bridge.EclipseLocation;
 import org.sonatype.eclipse.bridge.EclipseLocationFactory;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.plugin.metadata.GAVCoordinate;
@@ -65,13 +66,13 @@ class P2Runtime
 
   @Inject
   public P2Runtime(final EclipseBridge eclipseBridge, final EclipseLocationFactory eclipseLocationFactory,
-                   final @Named("${nexus-app}/plugin-repository") File pluginRepositoryDir,
+                   final ApplicationDirectories applicationDirectories,
                    final ApplicationConfiguration applicationConfiguration,
                    final @Named("zip") UnArchiver unArchiver)
   {
     this.eclipseBridge = eclipseBridge;
     this.eclipseLocationFactory = eclipseLocationFactory;
-    this.pluginRepositoryDir = pluginRepositoryDir;
+    this.pluginRepositoryDir = applicationDirectories.getAppDirectory("plugin-repository");
     this.applicationConfiguration = applicationConfiguration;
     this.unArchiver = unArchiver;
   }
