@@ -87,7 +87,7 @@ public class NexusBundleTracker
   }
 
   private BindingPublisher prepareNexusPlugin(final Bundle bundle) {
-    log.info("ACTIVATING " + bundle);
+    log.info("ACTIVATING {}", bundle);
     try {
       final ClassSpace pluginSpace = new BundleClassSpace(bundle);
 
@@ -113,11 +113,11 @@ public class NexusBundleTracker
 
       final BindingPublisher publisher = new InjectorPublisher(Guice.createInjector(new WireModule(modules)));
 
-      log.info("ACTIVATED " + bundle);
+      log.info("ACTIVATED {}", bundle);
       return publisher;
     }
     catch (Exception e) {
-      log.warn("BROKEN " + bundle);
+      log.warn("BROKEN {}", bundle);
       throw e;
     }
   }
@@ -144,7 +144,7 @@ public class NexusBundleTracker
           }
         }
         catch (Exception e) {
-          log.warn("MISSING " + wire, e);
+          log.warn("MISSING {}", wire, e);
         }
       }
     }
