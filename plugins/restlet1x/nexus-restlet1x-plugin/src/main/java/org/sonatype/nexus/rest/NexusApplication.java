@@ -32,6 +32,7 @@ import com.thoughtworks.xstream.XStream;
 import org.apache.shiro.util.AntPathMatcher;
 import org.restlet.Router;
 import org.restlet.service.StatusService;
+import org.restlet.util.Template;
 
 /**
  * Legacy restlet application support.
@@ -102,6 +103,8 @@ public class NexusApplication
 
   @Override
   protected Router initializeRouter(Router root, boolean isStarted) {
+    root.setDefaultMatchQuery(false);
+    root.setDefaultMatchingMode(Template.MODE_EQUALS);
     return root;
   }
 
