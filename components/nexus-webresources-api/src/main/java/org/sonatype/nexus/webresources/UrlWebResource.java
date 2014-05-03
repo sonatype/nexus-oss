@@ -21,8 +21,6 @@ import com.google.common.base.Strings;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-// FIXME: Unify with StaticWebResource impl
-
 /**
  * URL-based {@link WebResource} implementation.
  *
