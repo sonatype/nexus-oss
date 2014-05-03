@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -41,6 +42,14 @@ public class GeneratedWebResourceTest
         return PLAIN;
       }
     };
+  }
+
+  @Test
+  public void nonPrepared_basicDetails() throws Exception {
+    assertThat(underTest.getPath(), is("/test"));
+    assertThat(underTest.isCacheable(), is(false));
+    assertThat(underTest.getContentType(), is(WebResource.PLAIN));
+    assertThat(underTest.getLastModified(), not(WebResource.UNKNOWN_LAST_MODIFIED));
   }
 
   @Test
