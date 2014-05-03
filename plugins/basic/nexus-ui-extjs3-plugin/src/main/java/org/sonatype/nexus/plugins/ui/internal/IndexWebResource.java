@@ -32,9 +32,9 @@ import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor.UiContribution;
 import org.sonatype.nexus.web.BaseUrlHolder;
-import org.sonatype.nexus.web.DelegatingWebResource;
-import org.sonatype.nexus.web.WebResource;
-import org.sonatype.nexus.web.WebResource.Prepareable;
+import org.sonatype.nexus.webresources.DelegatingWebResource;
+import org.sonatype.nexus.webresources.WebResource;
+import org.sonatype.nexus.webresources.WebResource.Prepareable;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 

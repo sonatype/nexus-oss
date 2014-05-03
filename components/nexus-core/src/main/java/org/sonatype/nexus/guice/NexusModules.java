@@ -19,7 +19,7 @@ import javax.validation.ValidationProviderResolver;
 import javax.validation.spi.BootstrapState;
 
 import org.sonatype.nexus.web.TemplateRenderer;
-import org.sonatype.nexus.web.WebResourceBundle;
+import org.sonatype.nexus.webresources.WebResourceBundle;
 import org.sonatype.nexus.web.internal.BaseUrlHolderFilter;
 import org.sonatype.nexus.web.internal.CommonHeadersFilter;
 import org.sonatype.nexus.web.internal.ErrorPageFilter;

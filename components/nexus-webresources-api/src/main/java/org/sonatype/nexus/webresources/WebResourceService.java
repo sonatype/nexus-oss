@@ -16,8 +16,6 @@ import java.util.Collection;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.web.WebResource;
-
 /**
  * Provides access to {@link WebResource} instances.
  *

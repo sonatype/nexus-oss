@@ -10,14 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.web;
+package org.sonatype.nexus.webresources;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.nexus.web.WebResource.Prepareable;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.nexus.webresources.WebResource.Prepareable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -27,9 +29,10 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 2.8
  */
 public abstract class GeneratedWebResource
-    extends ComponentSupport
     implements WebResource, Prepareable
 {
+  protected final Logger log = LoggerFactory.getLogger(getClass());
+
   @Override
   public boolean isCacheable() {
     return false;

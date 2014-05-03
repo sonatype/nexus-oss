@@ -10,15 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugin.support;
+package org.sonatype.nexus.webresources;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.sonatype.nexus.web.WebResource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -77,7 +75,7 @@ public class FileWebResource
 
   @Override
   public String toString() {
-    return "FileWebResource{" +
+    return getClass().getSimpleName() + "{" +
         "path='" + path + '\'' +
         ", contentType='" + contentType + '\'' +
         ", file=" + file +
