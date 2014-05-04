@@ -41,7 +41,7 @@ public class StaticWebResourceBundle
     for (Enumeration<URL> e = space.findEntries("static", "*", true); e.hasMoreElements();) {
       final URL url = e.nextElement();
       final String path = getPublishedPath(url);
-      if (path != null) {
+      if (path != null && !path.endsWith("/")) {
         staticResources.add(new StaticWebResource(url, path, mimeSupport.guessMimeTypeFromPath(path)));
       }
     }

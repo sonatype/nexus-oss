@@ -37,6 +37,22 @@ public interface ApplicationDirectories
   File getTemporaryDirectory();
 
   /**
+   * Application directory.
+   * 
+   * WEB-INF/ for WAR-based deployments.
+   * 
+   * @since 3.0
+   */
+  File getAppDirectory();
+
+  /**
+   * Application sub-directory.
+   * 
+   * @since 3.0
+   */
+  File getAppDirectory(String path);
+
+  /**
    * Work directory.
    */
   File getWorkDirectory();

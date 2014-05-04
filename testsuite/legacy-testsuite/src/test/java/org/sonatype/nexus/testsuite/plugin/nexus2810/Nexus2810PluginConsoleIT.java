@@ -22,6 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.hasItems;
@@ -43,6 +44,7 @@ public class Nexus2810PluginConsoleIT
     FileUtils.copyDirectory(source, desti);
   }
 
+  @Ignore("FIXME: replace plugin console")
   @Test
   public void testListPluginInfos()
       throws Exception
