@@ -37,6 +37,7 @@
     <module>nexus-core</module>
     <module>nexus-ehcache</module>
     <module>nexus-extender</module>
+    <module>nexus-formfields-api</module>
     <module>nexus-jettyapp</module>
     <module>nexus-launcher</module>
     <module>nexus-ldap-common</module>
