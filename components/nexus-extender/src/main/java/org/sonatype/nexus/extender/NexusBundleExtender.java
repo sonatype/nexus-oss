@@ -17,22 +17,21 @@ import java.util.Hashtable;
 
 import javax.servlet.ServletContextListener;
 
-import org.eclipse.sisu.space.BeanScanning;
-
 import org.eclipse.sisu.inject.MutableBeanLocator;
 import org.eclipse.sisu.launch.SisuExtender;
 import org.eclipse.sisu.launch.SisuTracker;
+import org.eclipse.sisu.space.BeanScanning;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 import static java.util.Collections.singletonMap;
 
 /**
- * Extender {@link Bundle} that tracks and binds bundles with Nexus components.
+ * {@link Bundle} extender that manages bundles with Nexus components.
  * 
  * @since 3.0
  */
-public class NexusExtender
+public class NexusBundleExtender
     extends SisuExtender
 {
   static {
@@ -85,7 +84,7 @@ public class NexusExtender
 
   @Override
   protected SisuTracker createTracker(final BundleContext ctx) {
-    return new SisuTracker(ctx, bundleStateMask(), createLocator(ctx));
+    return new NexusBundleTracker(ctx, createLocator(ctx));
   }
 
   @Override

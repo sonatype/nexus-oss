@@ -20,7 +20,7 @@ import java.nio.file.FileSystems
 import org.sonatype.nexus.ApplicationStatusSource
 import org.sonatype.nexus.atlas.SystemInformationGenerator
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration
-import org.sonatype.nexus.plugins.NexusPluginManager
+import org.sonatype.nexus.plugin.PluginIdentity
 import org.sonatype.sisu.goodies.common.ComponentSupport
 import org.sonatype.sisu.goodies.common.Iso8601Date
 
@@ -49,20 +49,20 @@ class SystemInformationGeneratorImpl
 
   private final Map<String, String> parameters;
 
-  private final NexusPluginManager pluginManager
+  private final List<PluginIdentity> pluginIdentities
 
   @Inject
   SystemInformationGeneratorImpl(final BeanLocator beanLocator,
                                  final ApplicationConfiguration applicationConfiguration,
                                  final ApplicationStatusSource applicationStatusSource,
                                  final @Parameters Map<String, String> parameters,
-                                 final NexusPluginManager pluginManager)
+                                 final List<PluginIdentity> pluginIdentities)
   {
     this.beanLocator = checkNotNull(beanLocator)
     this.applicationConfiguration = checkNotNull(applicationConfiguration)
     this.applicationStatusSource = checkNotNull(applicationStatusSource)
     this.parameters = checkNotNull(parameters);
-    this.pluginManager = checkNotNull(pluginManager)
+    this.pluginIdentities = checkNotNull(pluginIdentities)
   }
 
   @Override
@@ -74,7 +74,7 @@ class SystemInformationGeneratorImpl
     def applicationConfiguration = this.applicationConfiguration
     def systemStatus = this.applicationStatusSource.systemStatus
     def parameters = this.parameters
-    def pluginManager = this.pluginManager
+    def pluginIdentities = this.pluginIdentities
 
     def fileref = { File file ->
       if (file) {
@@ -232,23 +232,25 @@ class SystemInformationGeneratorImpl
 
     def reportNexusPlugins = {
       def data = [:]
-      pluginManager.pluginResponses.each { gav, response ->
-        def item = data[gav.artifactId] = [
-            'groupId': gav.groupId,
-            'artifactId': gav.artifactId,
-            'version': gav.version,
-            'successful': response.successful
+      pluginIdentities.each { coordinates, response ->
+        def item = data[coordinates.artifactId] = [
+            'groupId': coordinates.groupId,
+            'artifactId': coordinates.artifactId,
+            'version': coordinates.version,
+            'successful': 'true'
         ]
 
         // include dependency plugins
-        if (!response.pluginDescriptor.importedPlugins.empty) {
-          item.importedPlugins = response.pluginDescriptor.importedPlugins.collect { it.toString() }.join(',')
-        }
+// TODO: populate with OSGi info?
+//        if (!response.pluginDescriptor.importedPlugins.empty) {
+//          item.importedPlugins = response.pluginDescriptor.importedPlugins.collect { it.toString() }.join(',')
+//        }
 
         // include error
-        if (response.throwable) {
-          item.throwable = response.throwable.toString()
-        }
+// TODO: log/diagnose OSGi issues?
+//        if (response.throwable) {
+//          item.throwable = response.throwable.toString()
+//        }
       }
       return data
     }

@@ -33,6 +33,8 @@ public class ApplicationDirectoriesImplTest
 {
   private File installDir;
 
+  private File appDir;
+
   private File workDir;
 
   private File tempDir;
@@ -42,9 +44,13 @@ public class ApplicationDirectoriesImplTest
   @Before
   public void setUp() throws Exception {
     installDir = util.createTempDir("install");
+    appDir = util.createTempDir("app");
     workDir = util.createTempDir("work");
     tempDir = util.createTempDir("temp");
-    underTest = new ApplicationDirectoriesImpl(installDir, workDir, tempDir);
+    underTest = new ApplicationDirectoriesImpl(installDir, appDir, workDir, tempDir);
+    File childAppDir = new File(appDir, "child");
+    childAppDir.createNewFile();
+    childAppDir.deleteOnExit();
   }
 
   @Test
@@ -52,6 +58,28 @@ public class ApplicationDirectoriesImplTest
     File dir = underTest.getTemporaryDirectory();
     assertThat(dir, notNullValue());
     assertThat(dir, is(tempDir));
+  }
+
+  @Test
+  public void ensureAppDir_exists() throws Exception {
+    File dir = underTest.getAppDirectory();
+    assertThat(dir, notNullValue());
+    assertThat(dir, is(appDir));
+    assertThat(dir, FileMatchers.exists());
+  }
+
+  @Test
+  public void ensureAppDir_childExists() throws Exception {
+    File dir = underTest.getAppDirectory("child");
+    assertThat(dir, notNullValue());
+    assertThat(dir, FileMatchers.exists());
+  }
+
+  @Test
+  public void ensureAppDir_childNotExists() throws Exception {
+    File dir = underTest.getAppDirectory("missing");
+    assertThat(dir, notNullValue());
+    assertThat(dir, not(FileMatchers.exists()));
   }
 
   @Test

@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.guice;
 
-import org.sonatype.nexus.plugins.DefaultNexusPluginManager;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -124,8 +123,6 @@ public final class NexusTypeBinder
 
   /**
    * Records a descriptor for the given repository role+hint.
-   * 
-   * @see {@link DefaultNexusPluginManager#createPluginInjector}
    */
   private void addRepositoryTypeDescriptor(final Class<? extends Repository> role, final String hint) {
     RepositoryType rt = role.getAnnotation(RepositoryType.class);
