@@ -103,9 +103,14 @@ public class NexusTargetMappingAuthorizationFilter
     if (resourceStorePath == null) {
       return null;
     }
-    final ResourceStoreRequest rsr = new ResourceStoreRequest(resourceStorePath, localOnly, false);
-    rsr.getRequestContext().put(RequestContext.CTX_AUTH_CHECK_ONLY, true);
-    return rsr;
+    try {
+      final ResourceStoreRequest rsr = new ResourceStoreRequest(resourceStorePath, localOnly, false);
+      rsr.getRequestContext().put(RequestContext.CTX_AUTH_CHECK_ONLY, true);
+      return rsr;
+    } catch (IllegalArgumentException e) {
+      log.warn("Could not construct store request for path '{}'", resourceStorePath);
+      return null;
+    }
   }
 
   @Override
