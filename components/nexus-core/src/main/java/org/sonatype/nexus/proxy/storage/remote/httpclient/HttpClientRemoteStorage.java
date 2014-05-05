@@ -181,7 +181,7 @@ public class HttpClientRemoteStorage
       URI.create(request.getRequestPath());
     }
     catch (IllegalArgumentException e) {
-      log.warn("Remote HTTP request with malformed path attempted: repository {}, path {}", repository,
+      log.warn("Remote HTTP request with malformed path attempted: repository {}, path '{}'", repository,
           request.getRequestPath());
       throw new ItemNotFoundException(
           ItemNotFoundException
