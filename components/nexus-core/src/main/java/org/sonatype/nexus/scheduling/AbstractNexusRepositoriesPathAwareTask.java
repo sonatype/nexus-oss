@@ -12,19 +12,28 @@
  */
 package org.sonatype.nexus.scheduling;
 
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+
+import com.google.common.base.Strings;
+
 public abstract class AbstractNexusRepositoriesPathAwareTask<T>
     extends AbstractNexusRepositoriesTask<T>
 {
+  private static final String ROOT = RepositoryItemUid.PATH_ROOT;
+
   protected abstract String getRepositoryPathFieldId();
 
   public String getResourceStorePath() {
-    String id = getRepositoryPathFieldId();
-
-    if (id == null) {
-      return null;
+    final String id = getRepositoryPathFieldId();
+    if (Strings.isNullOrEmpty(id)) {
+      return ROOT;
     }
-
-    return getParameters().get(id);
+    final String path = getParameters().get(id);
+    if (Strings.isNullOrEmpty(path)) {
+      return ROOT;
+    } else {
+      return path;
+    }
   }
 
   public void setResourceStorePath(String resourceStorePath) {

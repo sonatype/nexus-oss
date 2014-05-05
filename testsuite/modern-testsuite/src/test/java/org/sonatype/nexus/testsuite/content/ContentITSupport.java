@@ -52,8 +52,7 @@ public class ContentITSupport
 
   @Override
   protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
-    return configuration
-.setLogLevel("org.sonatype.nexus.web", "TRACE").setLogLevel("org.sonatype.nexus", "DEBUG");
+    return configuration.setLogLevel("org.sonatype.nexus.web", "TRACE").setLogLevel("org.sonatype.nexus", "DEBUG");
   }
 
   protected Content content() {
