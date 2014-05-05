@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,6 +66,7 @@ public class ResourceStoreRequest
    * @param remoteOnly  See {@link RequestContext#CTX_REMOTE_ONLY_FLAG}.
    */
   public ResourceStoreRequest(String requestPath, boolean localOnly, boolean remoteOnly) {
+    validateRequestPath(requestPath);
     this.requestPath = requestPath;
     this.pathStack = new Stack<String>();
     this.processedRepositories = new ArrayList<String>();
@@ -72,6 +74,13 @@ public class ResourceStoreRequest
     this.requestContext = new RequestContext();
     this.requestContext.setRequestLocalOnly(localOnly);
     this.requestContext.setRequestRemoteOnly(remoteOnly);
+  }
+
+  /**
+   * Validates request path for sanity. If path found illegal, {@link IllegalArgumentException} is thrown.
+   */
+  private void validateRequestPath(final String requestPath) throws IllegalArgumentException {
+    URI.create(requestPath); // NEXUS-6501: early validation of path, as we do know what this path should be
   }
 
   /**
