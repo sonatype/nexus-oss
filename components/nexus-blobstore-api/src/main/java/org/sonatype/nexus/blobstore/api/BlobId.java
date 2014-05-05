@@ -10,26 +10,47 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.repository;
+package org.sonatype.nexus.blobstore.api;
 
-import org.sonatype.plugin.metadata.GAVCoordinate;
+import com.google.common.base.Preconditions;
 
-@Deprecated
-public final class NoSuchPluginRepositoryArtifactException
-    extends Exception
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * A unique identifier for a blob within a specific BlobStore.
+ *
+ * @since 3.0
+ */
+public class BlobId
 {
-  private static final long serialVersionUID = 1L;
+  private final String id;
 
-  private final GAVCoordinate gav;
-
-  public NoSuchPluginRepositoryArtifactException(final NexusPluginRepository repo, final GAVCoordinate gav) {
-    super("Plugin artifact \"" + gav + "\" not found"
-        + (repo == null ? "!" : " in repository \"" + repo.getId() + "\"!"));
-
-    this.gav = gav;
+  public BlobId(final String id) {
+    checkNotNull(id);
+    this.id = id;
   }
 
-  public GAVCoordinate getCoordinate() {
-    return gav;
+  @Override
+  public String toString() {
+    return "BlobId[" + id + "]";
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    BlobId blobId = (BlobId) o;
+
+    return id.equals(blobId.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return id.hashCode();
   }
 }

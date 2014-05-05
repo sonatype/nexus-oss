@@ -12,8 +12,11 @@
  */
 package org.sonatype.nexus.extender;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Filter;
@@ -56,7 +59,7 @@ public class NexusContextListener
 {
   private static final Logger log = LoggerFactory.getLogger(NexusContextListener.class);
 
-  private final NexusExtender extender;
+  private final NexusBundleExtender extender;
 
   private ServletContext servletContext;
 
@@ -68,7 +71,7 @@ public class NexusContextListener
 
   private ServiceRegistration<Filter> registration;
 
-  public NexusContextListener(final NexusExtender extender) {
+  public NexusContextListener(final NexusBundleExtender extender) {
     this.extender = extender;
   }
 
@@ -88,7 +91,7 @@ public class NexusContextListener
     injector = Guice.createInjector(
         new WireModule(
             new CoreModule(servletContext, variables, systemBundle),
-            new SpaceModule(coreSpace, BeanScanning.INDEX)));
+            new SpaceModule(coreSpace, BeanScanning.GLOBAL_INDEX)));
     log.debug("Injector: {}", injector);
 
     super.contextInitialized(event);
@@ -102,6 +105,12 @@ public class NexusContextListener
 
       application = lookup(NxApplication.class);
       log.debug("Application: {}", application);
+
+      log.info("Activating locally installed plugins...");
+
+      startNexusPlugins(ctx, new File(variables.get("nexus-app") + "/plugin-repository"));
+      startNexusPlugins(ctx, new File(variables.get("nexus-work") + "/plugin-repository"));
+
       application.start();
     }
     catch (final Exception e) {
@@ -157,5 +166,28 @@ public class NexusContextListener
 
   private <T> T lookup(final Class<T> clazz) {
     return injector.getInstance(BeanLocator.class).locate(Key.get(clazz)).iterator().next().getValue();
+  }
+
+  private static void startNexusPlugins(final BundleContext ctx, File pluginRepository) {
+    File[] pluginFiles = pluginRepository.listFiles();
+    if (pluginFiles != null && pluginFiles.length > 0) {
+      List<Bundle> plugins = new ArrayList<>();
+      for (File file : pluginFiles) {
+        try {
+          plugins.add(ctx.installBundle("reference:" + file.toURI()));
+        }
+        catch (Exception e) {
+          log.warn("Problem installing: {}", file, e);
+        }
+      }
+      for (Bundle plugin : plugins) {
+        try {
+          plugin.start();
+        }
+        catch (Exception e) {
+          log.warn("Problem starting: {}", plugin, e);
+        }
+      }
+    }
   }
 }

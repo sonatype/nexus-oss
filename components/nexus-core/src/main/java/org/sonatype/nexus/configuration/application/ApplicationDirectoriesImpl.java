@@ -39,6 +39,8 @@ public class ApplicationDirectoriesImpl
 {
   private final File installDir;
 
+  private final File appDir;
+
   private final File workDir;
 
   private final File tempDir;
@@ -49,6 +51,7 @@ public class ApplicationDirectoriesImpl
 
   @Inject
   public ApplicationDirectoriesImpl(final @Named("${bundleBasedir}") @Nullable File installDir,
+                                    final @Named("${nexus-app}") File appDir,
                                     final @Named("${nexus-work}") File workDir,
                                     final @Named("${java.io.tmpdir}") @Nullable File tempDir)
   {
@@ -60,6 +63,9 @@ public class ApplicationDirectoriesImpl
       this.installDir = null;
       log.debug("Install dir not available");
     }
+
+    this.appDir = resolve(appDir, false);
+    log.debug("App dir: {}", this.appDir);
 
     this.workDir = resolve(workDir, true);
     log.debug("Work dir: {}", this.workDir);
@@ -83,6 +89,18 @@ public class ApplicationDirectoriesImpl
   @Override
   public File getTemporaryDirectory() {
     return tempDir;
+  }
+
+  @Override
+  public File getAppDirectory() {
+    return appDir;
+  }
+
+  @Override
+  public File getAppDirectory(final String path) {
+    checkNotNull(path);
+    File dir = new File(appDir, path);
+    return resolve(dir, false);
   }
 
   @Override
