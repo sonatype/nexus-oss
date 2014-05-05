@@ -1430,10 +1430,12 @@ public abstract class AbstractProxyRepository
               }
 
               log.error(
-                  String.format(
-                      "Got LocalStorageException in proxy repository %s while caching retrieved artifact \"%s\" got from URL %s, will attempt next mirror, cause: %s: %s",
-                      RepositoryStringUtils.getHumanizedNameString(this), request.toString(),
-                      remoteUrl, t.getClass().getName(), t.getMessage()));
+                  "Got LocalStorageException in proxy repository {} while caching retrieved artifact \"{}\" got from URL {}, will attempt next mirror",
+                  RepositoryStringUtils.getHumanizedNameString(this),
+                  request,
+                  remoteUrl,
+                  t
+              );
             }
             // do not switch url yet, obey the retries
             // TODO: IOException _might_ be actually a fatal error (like Nx process have no perms to write to disk)
