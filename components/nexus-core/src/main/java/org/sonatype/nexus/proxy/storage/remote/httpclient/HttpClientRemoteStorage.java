@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
 import java.io.IOException;
@@ -167,11 +168,34 @@ public class HttpClientRemoteStorage
    */
   public static final String CONTENT_RETRIEVAL_MARKER_KEY = HttpClientRemoteStorage.class.getName() + "#retrieveItem";
 
+  /**
+   * Verifies that path carried by {@link ResourceStoreRequest} is a valid HTTP path segment candidate. If not,
+   * {@link ItemNotFoundException} is thrown along with proper log message.
+   *
+   * @since 3.0
+   */
+  private void validatePath(final ProxyRepository repository, final ResourceStoreRequest request)
+      throws ItemNotFoundException
+  {
+    try {
+      URI.create(request.getRequestPath());
+    }
+    catch (IllegalArgumentException e) {
+      log.warn("Remote HTTP request with malformed path attempted: repository {}, path {}", repository,
+          request.getRequestPath());
+      throw new ItemNotFoundException(
+          ItemNotFoundException
+              .reasonFor(request, repository, "Malformed HTTP request path '{}'", request.getRequestPath()),
+          e);
+    }
+  }
+
   @Override
   public AbstractStorageItem retrieveItem(final ProxyRepository repository, final ResourceStoreRequest request,
                                           final String baseUrl)
       throws ItemNotFoundException, RemoteStorageException
   {
+    validatePath(repository, request);
     final URL remoteURL =
         appendQueryString(repository, request, getAbsoluteUrlFromBase(baseUrl, request.getRequestPath()));
 
@@ -252,10 +276,16 @@ public class HttpClientRemoteStorage
     if (!(item instanceof StorageFileItem)) {
       throw new UnsupportedStorageOperationException("Storing of non-files remotely is not supported!");
     }
-
     final StorageFileItem fileItem = (StorageFileItem) item;
 
     final ResourceStoreRequest request = new ResourceStoreRequest(item);
+
+    try {
+      validatePath(repository, request);
+    }
+    catch (ItemNotFoundException e) {
+      throw new RemoteStorageException("Invalid path to store", e);
+    }
 
     final URL remoteUrl = appendQueryString(repository, request, getAbsoluteUrlFromBase(repository, request));
 
@@ -291,6 +321,7 @@ public class HttpClientRemoteStorage
   public void deleteItem(final ProxyRepository repository, final ResourceStoreRequest request)
       throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteStorageException
   {
+    validatePath(repository, request);
     final URL remoteUrl = appendQueryString(repository, request, getAbsoluteUrlFromBase(repository, request));
 
     final HttpDelete method = new HttpDelete(remoteUrl.toExternalForm());
@@ -312,6 +343,12 @@ public class HttpClientRemoteStorage
                                             final ResourceStoreRequest request, final boolean isStrict)
       throws RemoteStorageException
   {
+    try {
+      validatePath(repository, request);
+    }
+    catch (ItemNotFoundException e) {
+      return false;
+    }
     final URL remoteUrl = appendQueryString(repository, request, getAbsoluteUrlFromBase(repository, request));
 
     HttpRequestBase method;

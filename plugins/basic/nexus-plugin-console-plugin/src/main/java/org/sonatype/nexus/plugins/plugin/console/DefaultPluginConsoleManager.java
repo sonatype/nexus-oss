@@ -15,19 +15,16 @@ package org.sonatype.nexus.plugins.plugin.console;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.plugin.PluginIdentity;
 import org.sonatype.nexus.plugin.support.DocumentationBundle;
-import org.sonatype.nexus.plugins.NexusPluginManager;
-import org.sonatype.nexus.plugins.PluginResponse;
 import org.sonatype.nexus.plugins.plugin.console.model.DocumentationLink;
 import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
 import org.sonatype.nexus.web.WebResourceBundle;
-import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.LinkedHashMultimap;
@@ -44,17 +41,17 @@ public class DefaultPluginConsoleManager
     extends ComponentSupport
     implements PluginConsoleManager
 {
-  private final NexusPluginManager pluginManager;
+  private final List<PluginIdentity> pluginIdentities;
 
   private final List<WebResourceBundle> resourceBundles;
 
   private final Multimap<String, DocumentationBundle> docBundles;
 
   @Inject
-  public DefaultPluginConsoleManager(final NexusPluginManager pluginManager,
+  public DefaultPluginConsoleManager(final List<PluginIdentity> pluginIdentities,
                                      final List<WebResourceBundle> resourceBundles)
   {
-    this.pluginManager = checkNotNull(pluginManager);
+    this.pluginIdentities = checkNotNull(pluginIdentities);
     this.resourceBundles = checkNotNull(resourceBundles);
 
     this.docBundles = LinkedHashMultimap.create();
@@ -70,34 +67,33 @@ public class DefaultPluginConsoleManager
   public List<PluginInfo> listPluginInfo() {
     List<PluginInfo> result = new ArrayList<PluginInfo>();
 
-    Map<GAVCoordinate, PluginResponse> pluginResponses = pluginManager.getPluginResponses();
-
-    for (PluginResponse pluginResponse : pluginResponses.values()) {
-      result.add(buildPluginInfo(pluginResponse));
+    for (PluginIdentity plugin : pluginIdentities) {
+      result.add(buildPluginInfo(plugin));
     }
 
     return result;
   }
 
-  private PluginInfo buildPluginInfo(PluginResponse pluginResponse) {
+  private PluginInfo buildPluginInfo(PluginIdentity plugin) {
     PluginInfo result = new PluginInfo();
 
-    result.setStatus(pluginResponse.getAchievedGoal().name());
-    result.setVersion(pluginResponse.getPluginCoordinates().getVersion());
-    if (pluginResponse.getPluginDescriptor() != null) {
-      result.setName(pluginResponse.getPluginDescriptor().getPluginMetadata().getName());
-      result.setDescription(pluginResponse.getPluginDescriptor().getPluginMetadata().getDescription());
-      result.setScmVersion(pluginResponse.getPluginDescriptor().getPluginMetadata().getScmVersion());
-      result.setScmTimestamp(pluginResponse.getPluginDescriptor().getPluginMetadata().getScmTimestamp());
-      result.setSite(pluginResponse.getPluginDescriptor().getPluginMetadata().getPluginSite());
-    }
-    else {
-      result.setName(pluginResponse.getPluginCoordinates().getGroupId() + ":"
-          + pluginResponse.getPluginCoordinates().getArtifactId());
-    }
+    result.setStatus("ACTIVATED");
+    result.setVersion(plugin.getCoordinates().getVersion());
+// TODO: populate with OSGi info?
+//    if (pluginResponse.getPluginDescriptor() != null) {
+//      result.setName(pluginResponse.getPluginDescriptor().getPluginMetadata().getName());
+//      result.setDescription(pluginResponse.getPluginDescriptor().getPluginMetadata().getDescription());
+//      result.setScmVersion(pluginResponse.getPluginDescriptor().getPluginMetadata().getScmVersion());
+//      result.setScmTimestamp(pluginResponse.getPluginDescriptor().getPluginMetadata().getScmTimestamp());
+//      result.setSite(pluginResponse.getPluginDescriptor().getPluginMetadata().getPluginSite());
+//    }
+//    else {
+      result.setName(plugin.getCoordinates().getGroupId() + ":"
+          + plugin.getCoordinates().getArtifactId());
+//    }
 
     Collection<DocumentationBundle> docs =
-        docBundles.get(pluginResponse.getPluginCoordinates().getArtifactId());
+        docBundles.get(plugin.getCoordinates().getArtifactId());
     if (docs != null && !docs.isEmpty()) {
       for (DocumentationBundle bundle : docs) {
         // here, we (mis)use the documentation field, to store path segments only, the REST resource will create
@@ -109,9 +105,10 @@ public class DefaultPluginConsoleManager
       }
     }
 
-    if (!pluginResponse.isSuccessful()) {
-      result.setFailureReason(pluginResponse.formatAsString(false));
-    }
+// TODO: log/diagnose OSGi issues?
+//    if (!pluginResponse.isSuccessful()) {
+//      result.setFailureReason(pluginResponse.formatAsString(false));
+//    }
 
     return result;
   }

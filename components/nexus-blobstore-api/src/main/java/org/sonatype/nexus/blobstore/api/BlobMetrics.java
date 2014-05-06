@@ -10,26 +10,38 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.repository;
+package org.sonatype.nexus.blobstore.api;
 
-import javax.inject.Inject;
 
-import org.junit.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
+import org.joda.time.DateTime;
 
 /**
- * Tests for {@link AbstractFileNexusPluginRepository}
+ * Metrics pertaining to a blob within the BlobStore.  Any methods in this interface may throw
+ * {@link BlobStoreException} if the Blob is deleted.
  *
- * @author plynch
+ * @since 3.0
  */
-public class AbstractFileNexusPluginRepositoryTest
+public interface BlobMetrics
 {
+  DateTime getCreationTime();
 
-  @Test
-  public void packagingMapperIsInjectableNEXUS4434() throws NoSuchFieldException {
-    assertThat(AbstractFileNexusPluginRepository.class.getDeclaredField("packagingMapper").getAnnotation(Inject.class),
-        notNullValue());
-  }
+  /**
+   * A SHA1 hash of the content bytes (not the headers).
+   */
+  String getSHA1Hash();
+
+  /**
+   * The length, in bytes, of the headers.  This ignores storage considerations like block size.
+   */
+  long getHeaderSize();
+
+  /**
+   * The byte length of the raw content blob, excluding storage considerations like block size.
+   */
+  long getContentSize();
+
+  /**
+   * The length of the header plus content, in bytes.
+   */
+  long getTotalSize();
 }

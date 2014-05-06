@@ -10,26 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.repository;
-
-import java.util.Comparator;
+package org.sonatype.nexus.blobstore.api;
 
 /**
- * {@link Comparator} that places two {@link NexusPluginRepository} in order of priority; smallest number first.
+ * Provides usage metrics for the blob store.
+ *
+ * @since 3.0
  */
-@Deprecated
-final class NexusPluginRepositoryComparator
-    implements Comparator<NexusPluginRepository>
+public interface BlobStoreMetrics
 {
-  // ----------------------------------------------------------------------
-  // Public methods
-  // ----------------------------------------------------------------------
+  /**
+   * Get an approximate count of the number of blobs in the blob store.
+   */
+  long getBlobCount();
 
-  public int compare(final NexusPluginRepository o1, final NexusPluginRepository o2) {
-    final int order = o1.getPriority() - o2.getPriority();
-    if (0 == order) {
-      return o1.getId().compareTo(o2.getId());
-    }
-    return order;
-  }
+  /**
+   * Get the approximate total storage space consumed by this blob store in bytes, including blobs, headers, and any
+   * other metadata required by the store.
+   */
+  long getTotalSize();
+
+  /**
+   * An estimate of the remaining space available in the blob store, in bytes. For certain blob stores like S3, this
+   * may return a value set by a policy rather than some hard storage limit.
+   */
+  long getAvailableSpace();
+
 }
