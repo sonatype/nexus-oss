@@ -226,7 +226,7 @@ public abstract class PlexusRestletApplicationBridge
         for (Map.Entry<String, PlexusResource> entry : plexusResources.entrySet()) {
           try {
             PlexusResource resource = entry.getValue();
-            attach(applicationRouter, false, resource);
+            attach(applicationRouter, resource);
           }
           catch (Exception e) {
             logger.warn("Failed to attach resource: {}", entry.getKey(), e);
@@ -307,9 +307,9 @@ public abstract class PlexusRestletApplicationBridge
     }
   }
 
-  protected void attach(Router router, boolean strict, PlexusResource resource) {
+  protected void attach(Router router, PlexusResource resource) {
     handlePlexusResourceSecurity(resource);
-    attach(router, strict || resource.requireStrictChecking(), resource.getResourceUri(), new PlexusResourceFinder(getContext(), resource));
+    attach(router, resource.requireStrictChecking(), resource.getResourceUri(), new PlexusResourceFinder(getContext(), resource));
   }
 
   protected void handlePlexusResourceSecurity(PlexusResource resource) {

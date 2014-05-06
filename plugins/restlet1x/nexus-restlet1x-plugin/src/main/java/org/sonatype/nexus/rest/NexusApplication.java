@@ -30,6 +30,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.Subscribe;
 import com.thoughtworks.xstream.XStream;
 import org.apache.shiro.util.AntPathMatcher;
+import org.restlet.Restlet;
 import org.restlet.Router;
 import org.restlet.service.StatusService;
 import org.restlet.util.Template;
@@ -50,6 +51,8 @@ public class NexusApplication
 
   private final StatusService statusService;
 
+  private final boolean useStrictChecking;
+
   @Inject
   public NexusApplication(final EventBus eventBus,
                           final ProtectedPathManager protectedPathManager,
@@ -60,6 +63,7 @@ public class NexusApplication
     this.protectedPathManager = protectedPathManager;
     this.statusPlexusResource = statusPlexusResource;
     this.statusService = statusService;
+    useStrictChecking = System.getProperty("strict-uri-matching", "true").equals("true");
   }
 
   // HACK: Too many places were using new NexusApplication() ... fuck it
@@ -103,8 +107,10 @@ public class NexusApplication
 
   @Override
   protected Router initializeRouter(Router root, boolean isStarted) {
-    root.setDefaultMatchQuery(false);
-    root.setDefaultMatchingMode(Template.MODE_EQUALS);
+    if(useStrictChecking) {
+      root.setDefaultMatchQuery(false);
+      root.setDefaultMatchingMode(Template.MODE_EQUALS);
+    }
     return root;
   }
 
@@ -116,11 +122,16 @@ public class NexusApplication
 
     setStatusService(statusService);
 
-    attach(getApplicationRouter(), false, statusPlexusResource);
+    attach(getApplicationRouter(), statusPlexusResource);
 
     // protecting service resources with "wall" permission
     this.protectedPathManager.addProtectedResource("/service/local/**",
         "noSessionCreation,authcBasic,perms[nexus:permToCatchAllUnprotecteds]");
+  }
+
+  @Override
+  protected void attach(Router router, boolean strict, String uriPattern, Restlet target) {
+    super.attach(router, useStrictChecking && strict, uriPattern, target);
   }
 
   private final AntPathMatcher shiroAntPathMatcher = new AntPathMatcher();
@@ -150,8 +161,8 @@ public class NexusApplication
   }
 
   @Override
-  protected void attach(Router router, boolean strict, PlexusResource resource) {
+  protected void attach(Router router, PlexusResource resource) {
     handlePlexusResourceSecurity(resource);
-    attach(router, strict || resource.requireStrictChecking(), resource.getResourceUri(), new NexusPlexusResourceFinder(getContext(), resource));
+    attach(router, resource.requireStrictChecking(), resource.getResourceUri(), new NexusPlexusResourceFinder(getContext(), resource));
   }
 }
