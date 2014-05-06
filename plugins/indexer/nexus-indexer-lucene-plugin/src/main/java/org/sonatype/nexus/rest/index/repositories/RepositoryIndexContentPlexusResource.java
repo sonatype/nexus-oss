@@ -46,6 +46,10 @@ public class RepositoryIndexContentPlexusResource
 
   public static final String RESOURCE_URI = "/repositories/{" + REPOSITORY_ID_KEY + "}/index_content";
 
+  public RepositoryIndexContentPlexusResource() {
+    setRequireStrictChecking(false);
+  }
+
   @Override
   public String getResourceUri() {
     return RESOURCE_URI;

@@ -60,6 +60,7 @@ public class VersionedResource
   @Inject
   public VersionedResource(final YumRegistry yumRegistry) {
     this.yumRegistry = checkNotNull(yumRegistry);
+    setRequireStrictChecking(false);
   }
 
   @Override

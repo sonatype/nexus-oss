@@ -302,12 +302,14 @@ public abstract class PlexusRestletApplicationBridge
 
     if (strict) {
       route.getTemplate().setMatchingMode(Template.MODE_EQUALS);
+    } else {
+      route.getTemplate().setMatchingMode(Template.MODE_STARTS_WITH);
     }
   }
 
   protected void attach(Router router, boolean strict, PlexusResource resource) {
     handlePlexusResourceSecurity(resource);
-    attach(router, strict, resource.getResourceUri(), new PlexusResourceFinder(getContext(), resource));
+    attach(router, strict || resource.requireStrictChecking(), resource.getResourceUri(), new PlexusResourceFinder(getContext(), resource));
   }
 
   protected void handlePlexusResourceSecurity(PlexusResource resource) {
