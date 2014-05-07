@@ -137,7 +137,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-formfields</artifactId>
-    </dependency
+    </dependency>
     
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
