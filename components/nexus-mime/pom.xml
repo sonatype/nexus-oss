@@ -40,11 +40,13 @@
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
