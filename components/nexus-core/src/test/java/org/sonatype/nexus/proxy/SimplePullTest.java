@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy;
 
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,7 +42,6 @@ import org.sonatype.nexus.proxy.repository.GroupItemNotFoundException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.util.WrappingInputStream;
 import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Server;
 
@@ -52,8 +52,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -469,7 +472,7 @@ public class SimplePullTest
         new ResourceStoreRequest("/activemq/activemq-core/1.2/activemq-core-1.2.jar", true);
 
     try {
-      repository.storeItem(request, new WrappingInputStream(new ByteArrayInputStream(
+      repository.storeItem(request, new FilterInputStream(new ByteArrayInputStream(
           "123456789012345678901234567890".getBytes()))
       {
         @Override
