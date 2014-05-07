@@ -136,7 +136,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-formfields-api</artifactId>
+      <artifactId>nexus-formfields</artifactId>
     </dependency>
 
     <!-- Plexus et al -->
