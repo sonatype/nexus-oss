@@ -81,21 +81,20 @@ Ext.define('NX.coreui.view.formfield.SettingsFieldSet', {
   },
 
   /**
-   * Exports form as properties.
+   * Exports properties.
    * @returns {Object} properties object
    */
-  exportProperties: function () {
+  exportProperties: function (values) {
     var me = this,
-        form = me.up('form').getForm(),
-        values = form.getFieldValues(),
         properties = {},
         value;
 
     if (me.formFields) {
       Ext.Array.each(me.formFields, function (formField) {
         value = values['property.' + formField.id];
-        if (Ext.isDefined(value)) {
+        if (Ext.isDefined(value) && value !== null) {
           properties[formField.id] = String(value);
+          delete values['property.' + formField.id];
         }
       });
     }
@@ -104,7 +103,7 @@ Ext.define('NX.coreui.view.formfield.SettingsFieldSet', {
   },
 
   /**
-   * Imports capability.
+   * Imports properties.
    * @param {Object} properties to import
    * @param {Array} formFields to import
    */

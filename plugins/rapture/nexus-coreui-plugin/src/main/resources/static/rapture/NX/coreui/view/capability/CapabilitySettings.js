@@ -71,7 +71,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySettings', {
           properties: {}
         };
 
-    Ext.apply(capability.properties, me.down('nx-coreui-formfield-settingsfieldset').exportProperties());
+    Ext.apply(capability.properties, me.down('nx-coreui-formfield-settingsfieldset').exportProperties(values));
     return capability;
   },
 
