@@ -28,12 +28,22 @@ Ext.define('NX.coreui.controller.Tasks', {
     'task.TaskAdd',
     'task.TaskFeature',
     'task.TaskList',
+    'task.TaskSchedule',
+    'task.TaskScheduleFieldSet',
+    'task.TaskScheduleAdvanced',
+    'task.TaskScheduleDaily',
+    'task.TaskScheduleHourly',
+    'task.TaskScheduleManual',
+    'task.TaskScheduleMonthly',
+    'task.TaskScheduleOnce',
+    'task.TaskScheduleWeekly',
     'task.TaskSettings',
     'formfield.SettingsFieldSet'
   ],
   refs: [
     { ref: 'list', selector: 'nx-coreui-task-list' },
     { ref: 'info', selector: 'nx-coreui-task-feature nx-info-panel' },
+    { ref: 'schedule', selector: 'nx-coreui-task-schedule' },
     { ref: 'settings', selector: 'nx-coreui-task-settings' }
   ],
   icons: {
@@ -78,6 +88,15 @@ Ext.define('NX.coreui.controller.Tasks', {
         'nx-coreui-task-list button[action=new]': {
           click: me.showAddWindow
         },
+        'nx-coreui-task-add form': {
+          submitted: me.onSettingsSubmitted
+        },
+        'nx-coreui-task-settings': {
+          submitted: me.onSettingsSubmitted
+        },
+        'nx-coreui-task-schedule': {
+          submitted: me.onSettingsSubmitted
+        },
         'nx-coreui-task-list button[action=run]': {
           click: me.runTask,
           afterrender: me.bindRunButton
@@ -120,6 +139,7 @@ Ext.define('NX.coreui.controller.Tasks', {
     if (Ext.isDefined(model)) {
       me.showSummary(model);
       me.showSettings(model);
+      me.showSchedule(model);
     }
   },
 
@@ -148,6 +168,15 @@ Ext.define('NX.coreui.controller.Tasks', {
    */
   showSettings: function (model) {
     this.getSettings().loadRecord(model);
+  },
+
+  /**
+   * @private
+   * Displays task schedule.
+   * @param {NX.coreui.model.Task} model task model
+   */
+  showSchedule: function (model) {
+    this.getSchedule().loadRecord(model);
   },
 
   /**
@@ -193,6 +222,22 @@ Ext.define('NX.coreui.controller.Tasks', {
   onTaskTypeLoad: function () {
     var me = this;
     me.reselect();
+  },
+
+  /**
+   * @private
+   */
+  onSettingsSubmitted: function (form, action) {
+    var me = this,
+        win = form.up('nx-coreui-task-add');
+
+    if (win) {
+      win.close();
+      me.loadStoreAndSelect(action.result.data.id);
+    }
+    else {
+      me.loadStore();
+    }
   },
 
   /**

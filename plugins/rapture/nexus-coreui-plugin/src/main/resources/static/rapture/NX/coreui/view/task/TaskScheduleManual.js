@@ -11,22 +11,17 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Task feature panel.
+ * Task Schedule Manual field set.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.task.TaskFeature', {
-  extend: 'NX.view.masterdetail.Panel',
-  alias: 'widget.nx-coreui-task-feature',
+Ext.define('NX.coreui.view.task.TaskScheduleManual', {
+  extend: 'Ext.form.FieldContainer',
+  alias: 'widget.nx-coreui-task-schedule-manual',
 
-  list: 'nx-coreui-task-list',
-
-  iconName: 'task-default',
-
-  tabs: [
-    { xtype: 'nx-info-panel' },
-    { xtype: 'nx-coreui-task-settings', title: 'Settings' },
-    { xtype: 'nx-coreui-task-schedule', title: 'Schedule' }
-  ]
+  items: {
+    xtype: 'label',
+    text: 'Without recurrence, this service can only be run manually.'
+  }
 
 });

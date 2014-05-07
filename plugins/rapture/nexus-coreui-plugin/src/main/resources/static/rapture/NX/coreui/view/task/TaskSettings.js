@@ -19,6 +19,15 @@ Ext.define('NX.coreui.view.task.TaskSettings', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-task-settings',
 
+  api: {
+    submit: 'NX.direct.coreui_Task.update'
+  },
+  settingsFormSuccessMessage: function (data) {
+    return 'Task updated: ' + data['name'] + ' (' + data['typeName'] + ')';
+  },
+  editableCondition: NX.Conditions.isPermitted('nexus:tasks', 'update'),
+  editableMarker: 'You do not have permission to update tasks',
+
   items: [
     {
       xtype: 'hiddenfield',
@@ -51,48 +60,48 @@ Ext.define('NX.coreui.view.task.TaskSettings', {
 
   /**
    * @override
-   * Imports task into settings field set.
-   * @param {NX.model.Task} model task model
    */
-  loadRecord: function (model) {
-    var me = this,
-        taskTypeModel = NX.getApplication().getStore('TaskType').getById(model.get('typeId')),
-        settingsFieldSet = me.down('nx-coreui-formfield-settingsfieldset');
+  initComponent: function () {
+    var me = this;
 
     me.callParent(arguments);
-    if (taskTypeModel) {
-      settingsFieldSet.importProperties(model.get('properties'), taskTypeModel.get('formFields'));
-    }
-  },
 
-  /**
-   * @override
-   * Exports task from settings field set.
-   * @returns {Object} form values
-   */
-  getValues: function () {
-    var me = this,
-        values = me.getForm().getFieldValues(),
-        task = {
-          id: values.id,
-          enabled: values.enabled,
-          name: values.name,
-          alertEmail: values.alertEmail,
-          properties: {}
-        };
+    Ext.override(me.getForm(), {
+      /**
+       * @override
+       * Additionally, gets value of properties.
+       */
+      getValues: function () {
+        var values = this.callParent(arguments);
 
-    Ext.apply(task.properties, me.down('nx-coreui-formfield-settingsfieldset').exportProperties());
-    return task;
-  },
+        values.properties = me.down('nx-coreui-formfield-settingsfieldset').exportProperties(values);
+        return values;
+      },
 
-  /**
-   * Mark fields in this form invalid in bulk.
-   * @param {Object/Object[]/Ext.data.Errors} errors
-   * Either an array in the form `[{id:'fieldId', msg:'The message'}, ...]`,
-   * an object hash of `{id: msg, id2: msg2}`, or a {@link Ext.data.Errors} object.
-   */
-  markInvalid: function (errors) {
-    this.down('nx-coreui-formfield-settingsfieldset').markInvalid(errors);
+      /**
+       * @override
+       * Additionally, sets properties values.
+       */
+      loadRecord: function (model) {
+        var taskTypeModel = NX.getApplication().getStore('TaskType').getById(model.get('typeId')),
+            settingsFieldSet = me.down('nx-coreui-formfield-settingsfieldset');
+
+        this.callParent(arguments);
+
+        if (taskTypeModel) {
+          settingsFieldSet.importProperties(model.get('properties'), taskTypeModel.get('formFields'));
+        }
+      },
+
+      /**
+       * @override
+       * Additionally, marks invalid properties.
+       */
+      markInvalid: function (errors) {
+        this.callParent(arguments);
+        me.down('nx-coreui-formfield-settingsfieldset').markInvalid(errors);
+      }
+    });
   }
 
 });

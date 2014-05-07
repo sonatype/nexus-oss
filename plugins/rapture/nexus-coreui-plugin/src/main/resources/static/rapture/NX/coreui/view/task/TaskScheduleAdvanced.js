@@ -11,22 +11,28 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Task feature panel.
+ * Task Schedule Advanced field set.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.task.TaskFeature', {
-  extend: 'NX.view.masterdetail.Panel',
-  alias: 'widget.nx-coreui-task-feature',
+Ext.define('NX.coreui.view.task.TaskScheduleAdvanced', {
+  extend: 'Ext.form.FieldContainer',
+  alias: 'widget.nx-coreui-task-schedule-advanced',
 
-  list: 'nx-coreui-task-list',
+  initComponent: function () {
+    var me = this;
 
-  iconName: 'task-default',
+    me.items = [
+      {
+        xtype: 'textfield',
+        name: 'cronExpression',
+        fieldLabel: 'CRON expression',
+        helpText: 'A cron expression that will control the running of the task.',
+        allowBlank: false
+      }
+    ];
 
-  tabs: [
-    { xtype: 'nx-info-panel' },
-    { xtype: 'nx-coreui-task-settings', title: 'Settings' },
-    { xtype: 'nx-coreui-task-schedule', title: 'Schedule' }
-  ]
+    me.callParent(arguments);
+  }
 
 });

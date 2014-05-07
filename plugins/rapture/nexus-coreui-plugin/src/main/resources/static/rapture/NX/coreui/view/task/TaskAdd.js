@@ -29,72 +29,102 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
 
     me.items = {
       xtype: 'nx-settingsform',
-      items: [
-        {
-          xtype: 'combo',
-          fieldLabel: 'Type',
-          itemCls: 'required-field',
-          helpText: "The type of service that will be scheduled to run.",
-          name: 'typeId',
-          store: me.taskTypeStore,
-          displayField: 'name',
-          valueField: 'id',
-          forceSelection: true,
-          editable: false,
-          mode: 'local',
-          triggerAction: 'all',
-          emptyText: 'Select...',
-          selectOnFocus: false,
-          allowBlank: false
-        },
-        {
-          xtype: 'checkbox',
-          fieldLabel: 'Enabled',
-          helpText: 'This flag determines if the task is currently active. To disable this task for a period of time, de-select this checkbox.',
-          name: 'enabled',
-          allowBlank: false,
-          checked: true,
-          editable: true
-        },
-        {
-          name: 'name',
-          fieldLabel: 'Name',
-          helpText: 'A name for the scheduled task.',
-          emptyText: 'enter a name'
-        },
-        {
-          xtype: 'nx-email',
-          name: 'alertEmail',
-          fieldLabel: 'Alert Email',
-          helpText: 'The email address where an email will be sent in case that task execution will fail.',
-          allowBlank: true
-        },
-        {
-          xtype: 'nx-coreui-formfield-settingsfieldset'
-        }
-      ],
-
-      getValues: function () {
-        var values = me.down('form').getForm().getFieldValues(),
-            task = {
-              typeId: values.typeId,
-              enabled: values.enabled,
-              name: values.name,
-              alertEmail: values.alertEmail,
-              properties: {}
-            };
-
-        Ext.apply(task.properties, me.down('nx-coreui-formfield-settingsfieldset').exportProperties());
-        return task;
+      api: {
+        submit: 'NX.direct.coreui_Task.create'
       },
-
-      markInvalid: function (errors) {
-        return me.down('nx-coreui-formfield-settingsfieldset').markInvalid(errors);
+      settingsFormSuccessMessage: function (data) {
+        return 'Task created: ' + data['name'] + ' (' + data['typeName'] + ')';
+      },
+      editableCondition: NX.Conditions.isPermitted('nexus:tasks', 'create'),
+      editableMarker: 'You do not have permission to create tasks',
+      items: {
+        xtype: 'tabpanel',
+        plain: true,
+        items: [
+          {
+            xtype: 'panel',
+            title: 'Settings',
+            defaults: {
+              xtype: 'textfield',
+              allowBlank: false
+            },
+            items: [
+              {
+                xtype: 'combo',
+                fieldLabel: 'Type',
+                itemCls: 'required-field',
+                helpText: "The type of service that will be scheduled to run.",
+                name: 'typeId',
+                store: me.taskTypeStore,
+                displayField: 'name',
+                valueField: 'id',
+                forceSelection: true,
+                editable: false,
+                mode: 'local',
+                triggerAction: 'all',
+                emptyText: 'Select...',
+                selectOnFocus: false,
+              },
+              {
+                xtype: 'checkbox',
+                fieldLabel: 'Enabled',
+                helpText: 'This flag determines if the task is currently active. To disable this task for a period of time, de-select this checkbox.',
+                name: 'enabled',
+                checked: true,
+                editable: true
+              },
+              {
+                name: 'name',
+                fieldLabel: 'Name',
+                helpText: 'A name for the scheduled task.',
+                emptyText: 'enter a name'
+              },
+              {
+                xtype: 'nx-email',
+                name: 'alertEmail',
+                fieldLabel: 'Alert Email',
+                helpText: 'The email address where an email will be sent in case that task execution will fail.',
+                allowBlank: true
+              },
+              {
+                xtype: 'nx-coreui-formfield-settingsfieldset'
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+            title: 'Schedule',
+            items: { xtype: 'nx-coreui-task-schedulefieldset' }
+          }
+        ]
       }
-
     };
 
     me.callParent(arguments);
+
+    Ext.override(me.down('form').getForm(), {
+      /**
+       * @override
+       * Additionally, gets value of properties, start timestamp and recurring days checkboxes (if any).
+       */
+      getValues: function () {
+        var values = this.callParent(arguments);
+
+        values.properties = me.down('nx-coreui-formfield-settingsfieldset').exportProperties(values);
+        values.recurringDays = me.down('nx-coreui-task-schedulefieldset').getRecurringDays();
+        values.startTimestamp = me.down('nx-coreui-task-schedulefieldset').getStartTimestamp();
+        return values;
+      },
+
+      /**
+       * @override
+       * Additionally, marks invalid properties.
+       */
+      markInvalid: function (errors) {
+        this.callParent(arguments);
+        me.down('nx-coreui-formfield-settingsfieldset').markInvalid(errors);
+      }
+    });
   }
 
 });
