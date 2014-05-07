@@ -33,6 +33,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
@@ -128,7 +129,7 @@ public class DefaultMimeSupport
 
   @Override
   public List<String> guessMimeTypesListFromPath(final String path) {
-    final String pathExtension = getExtension(path);
+    final String pathExtension = Files.getFileExtension(path);
     try {
       return extensionToMimeTypeCache.get(pathExtension);
     }
@@ -170,17 +171,5 @@ public class DefaultMimeSupport
     else {
       return detected.get(0);
     }
-  }
-
-  /**
-   * Copied and sanitized from MimeUtil2 to retain same behaviour for extension discovery, needed not only here,
-   * but also in {@link NexusMimeTypes} class.
-   */
-  public static String getExtension(final String fileName) {
-    if (fileName == null || fileName.length() == 0) {
-      return "";
-    }
-    int index = fileName.indexOf(".");
-    return index < 0 ? "" : fileName.substring(index + 1);
   }
 }

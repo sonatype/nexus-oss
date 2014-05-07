@@ -26,6 +26,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,7 +131,7 @@ public class NexusMimeTypes
       if (extensions.containsKey(extension)) {
         return extensions.get(extension);
       }
-      extension = DefaultMimeSupport.getExtension(extension);
+      extension = Files.getFileExtension(extension);
     }
     return null;
   }
