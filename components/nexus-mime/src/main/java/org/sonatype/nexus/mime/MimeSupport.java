@@ -18,9 +18,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.proxy.item.ContentLocator;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
-
 /**
  * A utility component for working with MIME type detection, either "without touching" (the content), that is
  * "best effort guess" based, or doing proper MIME type detection based on MIME magic database.
@@ -61,7 +58,14 @@ public interface MimeSupport
    */
   List<String> guessMimeTypesListFromPath(final String path);
 
+  /**
+   * @since 3.0
+   */
   List<String> detectMimeTypes(InputStream input, @Nullable String fileName) throws IOException;
 
+  /**
+   * @since 3.0
+   * @see #detectMimeTypes(InputStream, String)
+   */
   String detectMimeType(InputStream input, @Nullable String fileName) throws IOException;
 }

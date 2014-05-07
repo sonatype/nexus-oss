@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;

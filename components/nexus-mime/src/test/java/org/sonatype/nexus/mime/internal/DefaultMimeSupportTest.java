@@ -10,10 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.mime;
+package org.sonatype.nexus.mime.internal;
 
 import java.util.List;
 
+import org.sonatype.nexus.mime.MimeRulesSource;
+import org.sonatype.nexus.mime.NexusMimeTypes;
+import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Lists;
@@ -57,10 +60,8 @@ public class DefaultMimeSupportTest
   @Test
   public void testGuessMimeTypeFromPath() {
     assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/artifact.pom"), equalTo("application/xml"));
-    assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/artifact.jar"),
-        equalTo("application/java-archive"));
-    assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/artifact-sources.jar"),
-        equalTo("application/java-archive"));
+    assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/artifact.jar"), equalTo("application/java-archive"));
+    assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/artifact-sources.jar"), equalTo("application/java-archive"));
     assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/maven-metadata.xml"), equalTo("application/xml"));
     assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/some.xml"), equalTo("application/xml"));
     assertThat(mimeSupport.guessMimeTypeFromPath("/some/path/some.tar.gz"), equalTo("application/x-gzip"));
@@ -86,28 +87,17 @@ public class DefaultMimeSupportTest
       }
     };
 
-    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/artifact.pom"),
-        equalTo("foo/bar"));
-    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/artifact.jar"),
-        equalTo("foo/bar"));
-    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/artifact-sources.jar"),
-        equalTo("foo/bar"));
-    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/maven-metadata.xml"),
-        equalTo("foo/bar"));
-    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/some.xml"),
-        equalTo("foo/bar"));
-    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/some.tar.gz"),
-        equalTo("foo/bar"));
-    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/some.tar.bz2"),
-        equalTo("foo/bar"));
-    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/some.zip"),
-        equalTo("foo/bar"));
-    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/some.war"),
-        equalTo("foo/bar"));
-    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/some.ear"),
-        equalTo("foo/bar"));
-    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/some.ejb"),
-        equalTo("foo/bar"));
+    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/artifact.pom"), equalTo("foo/bar"));
+    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/artifact.jar"), equalTo("foo/bar"));
+    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/artifact-sources.jar"), equalTo("foo/bar"));
+    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/maven-metadata.xml"), equalTo("foo/bar"));
+    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/some.xml"), equalTo("foo/bar"));
+    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/some.tar.gz"), equalTo("foo/bar"));
+    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/some.tar.bz2"), equalTo("foo/bar"));
+    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/some.zip"), equalTo("foo/bar"));
+    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/some.war"), equalTo("foo/bar"));
+    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/some.ear"), equalTo("foo/bar"));
+    assertThat(mimeSupport.guessMimeTypeFromPath(fakeMimeRulesSource, "/some/path/some.ejb"), equalTo("foo/bar"));
   }
 
   @Test

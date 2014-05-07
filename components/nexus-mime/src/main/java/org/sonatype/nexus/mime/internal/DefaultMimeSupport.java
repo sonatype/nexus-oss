@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.mime;
+package org.sonatype.nexus.mime.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +22,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.nexus.mime.MimeRulesSource;
+import org.sonatype.nexus.mime.MimeSupport;
+import org.sonatype.nexus.mime.NexusMimeTypes;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -42,15 +44,13 @@ import org.apache.tika.mime.MimeTypes;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Default implementation of {@link MimeSupport} component using MimeUtil2 library and the
- * {@link NexusMimeTypes}.
+ * Default {@link MimeSupport} implementation based on Apache Tika.
  *
  * @since 2.0
  */
 @Named
 @Singleton
 public class DefaultMimeSupport
-    extends ComponentSupport
     implements MimeSupport
 {
   /**
