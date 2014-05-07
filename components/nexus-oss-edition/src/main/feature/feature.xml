@@ -12,9 +12,9 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<features name="nexus">
-  <feature name="${project.artifactId}" description="Nexus base installation">
-    <feature>eventadmin</feature>
-    <feature>jetty</feature>
+<features>
+  <feature name="${project.artifactId}" description="Nexus OSS edition">
+    <bundle>mvn:${project.groupId}/${project.artifactId}/${project.version}</bundle>
+    <feature>nexus-base-feature</feature>
   </feature>
 </features>

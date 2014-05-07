@@ -29,6 +29,8 @@
 
   <properties>
     <osgi-spec.version>4.3.1</osgi-spec.version>
+    <felix.version>4.4.0</felix.version>
+    <karaf.version>3.0.0</karaf.version>
   </properties>
 
   <dependencyManagement>
@@ -48,8 +50,38 @@
       <dependency>
         <groupId>org.apache.felix</groupId>
         <artifactId>org.apache.felix.framework</artifactId>
-        <version>4.4.0</version>
+        <version>${felix.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>org.apache.karaf.features</groupId>
+        <artifactId>framework</artifactId>
+        <version>${karaf.version}</version>
+        <type>kar</type>
+        <exclusions>
+          <exclusion>
+            <groupId>org.eclipse</groupId>
+            <artifactId>org.eclipse.osgi</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.karaf.features</groupId>
+        <artifactId>standard</artifactId>
+        <version>${karaf.version}</version>
+        <classifier>features</classifier>
+        <type>xml</type>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 

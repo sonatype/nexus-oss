@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Dictionary;
 import java.util.Map;
+import java.util.Properties;
 
 import org.sonatype.nexus.bootstrap.ConfigurationBuilder;
 import org.sonatype.nexus.bootstrap.ConfigurationHolder;
@@ -99,7 +101,10 @@ public class JettyAppBootstrap
       // pass bootstrap properties to embedded servlet listener
       handler.setAttribute("nexus.properties", properties);
 
-      ctx.registerService(ContextHandler.class, handler, null);
+      Dictionary dict = new Properties();
+      // Workaround for issue where jetty-osgi-boot prefers a file URL (will be fixed by reworking bootstrap code)
+      dict.put("Jetty-bundleInstall", "file:tmp/nexus-jettyapp.jar");
+      ctx.registerService(ContextHandler.class, handler, dict);
 
       listenerTracker = new ListenerTracker(ctx, "nexus", handler.getServletContext());
       listenerTracker.open();

@@ -781,6 +781,8 @@
                 Standard template for nexus plugin feature (relative path from plugin projects)
                 -->
                 <inputFile>${project.basedir}/../../feature.xml</inputFile>
+                <includeTransitiveDependency>false</includeTransitiveDependency>
+                <addBundlesToPrimaryFeature>false</addBundlesToPrimaryFeature>
               </configuration>
             </execution>
           </executions>
