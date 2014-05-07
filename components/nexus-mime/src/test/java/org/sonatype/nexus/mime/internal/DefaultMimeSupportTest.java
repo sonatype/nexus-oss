@@ -50,6 +50,7 @@ public class DefaultMimeSupportTest
     mimeSupport = new DefaultMimeSupport();
   }
 
+  // FIXME: This is pretty stupid, remove this
   private void mock() {
     this.mimeSupport = new DefaultMimeSupport(mimeTypes);
   }
