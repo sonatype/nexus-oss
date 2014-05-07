@@ -28,7 +28,14 @@
     <tika:link>http://en.wikipedia.org/wiki/ZIP_(file_format)</tika:link>
     <tika:uti>com.pkware.zip-archive</tika:uti>
     <alias type="application/x-zip-compressed"/>
-    <magic priority="40">
+
+    <!--
+    HACK: Using higher priority than default (which is 40) due to problem with type="text/html" configuration
+    which is also at the same priority (40) and is causing uncompressed zips with html-entries to be detected
+    as text/html instead of as zip or sub-types (ie jars).
+    Recorded to Tika project as issue https://issues.apache.org/jira/browse/TIKA-1292
+    -->
+    <magic priority="41">
       <match value="PK\003\004" type="string" offset="0"/>
       <match value="PK\005\006" type="string" offset="0"/>
       <match value="PK\x07\x08" type="string" offset="0"/>

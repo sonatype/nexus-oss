@@ -15,7 +15,6 @@ package org.sonatype.nexus.mime;
 /**
  * Interface to provide "hints" what a given source thinks about MIME type of some items.
  *
- * @author cstamas
  * @since 2.0
  */
 public interface MimeRulesSource

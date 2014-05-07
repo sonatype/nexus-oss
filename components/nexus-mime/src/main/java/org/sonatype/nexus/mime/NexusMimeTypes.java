@@ -20,10 +20,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +61,6 @@ public class NexusMimeTypes
   public static final String MIMETYPES_FILENAME = "nexus.mimetypes";
 
   private Map<String, NexusMimeType> extensions = Maps.newHashMap();
-
 
   public NexusMimeTypes() {
     load(BUILTIN_MIMETYPES_FILENAME);
@@ -129,14 +131,13 @@ public class NexusMimeTypes
       if (extensions.containsKey(extension)) {
         return extensions.get(extension);
       }
-      extension = DefaultMimeSupport.getExtension(extension);
+      extension = Files.getFileExtension(extension);
     }
     return null;
   }
 
   public class NexusMimeType
   {
-
     private boolean override;
 
     private String extension;

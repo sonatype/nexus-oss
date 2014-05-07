@@ -10,19 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.mime;
+package org.sonatype.nexus.mime.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.item.ContentLocator;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.nexus.mime.MimeRulesSource;
+import org.sonatype.nexus.mime.MimeSupport;
+import org.sonatype.nexus.mime.NexusMimeTypes;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -31,6 +33,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
@@ -39,19 +42,18 @@ import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MediaTypeRegistry;
 import org.apache.tika.mime.MimeTypes;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * Default implementation of {@link MimeSupport} component using MimeUtil2 library and the
- * {@link NexusMimeTypes}.
+ * Default {@link MimeSupport} implementation based on Apache Tika.
  *
  * @since 2.0
  */
 @Named
 @Singleton
 public class DefaultMimeSupport
-    extends ComponentSupport
     implements MimeSupport
 {
-
   /**
    * "Low" level Tika detector, as {@link org.apache.tika.Tika} hides too much.
    */
@@ -127,7 +129,7 @@ public class DefaultMimeSupport
 
   @Override
   public List<String> guessMimeTypesListFromPath(final String path) {
-    final String pathExtension = getExtension(path);
+    final String pathExtension = Files.getFileExtension(path);
     try {
       return extensionToMimeTypeCache.get(pathExtension);
     }
@@ -137,66 +139,37 @@ public class DefaultMimeSupport
   }
 
   @Override
-  public String detectMimeTypesFromContent(final StorageFileItem fileItem)
-      throws IOException
-  {
-    final List<String> mimeTypes = detectMimeTypesListFromContent(fileItem);
-    if (mimeTypes.isEmpty()) {
-      // what here?
+  public List<String> detectMimeTypes(final InputStream input, @Nullable final String fileName) throws IOException {
+    checkNotNull(input);
+
+    List<String> detected = Lists.newArrayList();
+    Metadata metadata = new Metadata();
+    if (fileName != null) {
+      metadata.set(Metadata.RESOURCE_NAME_KEY, fileName);
+    }
+
+    MediaType mediaType;
+    try (final TikaInputStream tis = TikaInputStream.get(input)) {
+      mediaType = detector.detect(tis, metadata);
+    }
+
+    // unravel to least specific
+    while (mediaType != null) {
+      detected.add(mediaType.getBaseType().toString());
+      mediaType = MediaTypeRegistry.getDefaultRegistry().getSupertype(mediaType);
+    }
+
+    return detected;
+  }
+
+  @Override
+  public String detectMimeType(final InputStream input, @Nullable final String fileName) throws IOException {
+    List<String> detected = detectMimeTypes(input, fileName);
+    if (detected.isEmpty()) {
       return MimeTypes.OCTET_STREAM;
     }
     else {
-      return mimeTypes.get(0);
+      return detected.get(0);
     }
-  }
-
-  @Override
-  public List<String> detectMimeTypesListFromContent(final ContentLocator content)
-      throws IOException
-  {
-    final List<String> detected = Lists.newArrayList();
-    MediaType mediaType;
-    try (final TikaInputStream tis = TikaInputStream.get(content.getContent())) {
-      mediaType = detector.detect(tis, new Metadata());
-    }
-    // unravel to least specific
-    while (mediaType != null) {
-      detected.add(mediaType.getBaseType().toString());
-      mediaType = MediaTypeRegistry.getDefaultRegistry().getSupertype(mediaType);
-    }
-    return detected;
-  }
-
-  @Override
-  public List<String> detectMimeTypesListFromContent(final StorageFileItem fileItem)
-      throws IOException
-  {
-    final List<String> detected = Lists.newArrayList();
-    final Metadata metadata = new Metadata();
-    metadata.set(Metadata.RESOURCE_NAME_KEY, fileItem.getName());
-    MediaType mediaType;
-    try (final TikaInputStream tis = TikaInputStream.get(fileItem.getInputStream())) {
-      mediaType = detector.detect(tis, metadata);
-    }
-    // unravel to least specific
-    while (mediaType != null) {
-      detected.add(mediaType.getBaseType().toString());
-      mediaType = MediaTypeRegistry.getDefaultRegistry().getSupertype(mediaType);
-    }
-    return detected;
-  }
-
-  // ==
-
-  /**
-   * Copied and sanitized from MimeUtil2 to retain same behaviour for extension discovery, needed not only here,
-   * but also in {@link NexusMimeTypes} class.
-   */
-  public static String getExtension(final String fileName) {
-    if (fileName == null || fileName.length() == 0) {
-      return "";
-    }
-    int index = fileName.indexOf(".");
-    return index < 0 ? "" : fileName.substring(index + 1);
   }
 }
