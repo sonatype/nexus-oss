@@ -16,30 +16,23 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A simple handy implementation of MimeRulesSource that uses an ordered map of regexp Patterns to match path again,
- * and
- * in case of match the mapping value is returned. The order how Regexp/type is registered is important, since first
- * matched "wins". Meaning, you'd need to register the most specific ones first, and then the "usua" ones (if needed,
- * or
- * just leave them to "global MIME type handling" if enough).
+ * Ordered regular-expression {@link MimeRulesSource} implementation.
  *
- * @author cstamas
  * @since 2.0
  */
 public class RegexpMimeRulesSource
     implements MimeRulesSource
 {
-  private final LinkedHashMap<Pattern, String> rules;
+  private final LinkedHashMap<Pattern, String> rules = Maps.newLinkedHashMap();
 
-  public RegexpMimeRulesSource() {
-    this.rules = new LinkedHashMap<Pattern, String>();
-  }
-
-  public void addRule(final String regexpString, final String mimeType) {
-    addRule(Pattern.compile(regexpString), mimeType);
+  public void addRule(final String pattern, final String mimeType) {
+    addRule(Pattern.compile(pattern), mimeType);
   }
 
   public void addRule(final Pattern pattern, final String mimeType) {
@@ -56,5 +49,4 @@ public class RegexpMimeRulesSource
 
     return null;
   }
-
 }

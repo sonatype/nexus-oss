@@ -59,7 +59,6 @@ public class NexusMimeTypes
 
   private Map<String, NexusMimeType> extensions = Maps.newHashMap();
 
-
   public NexusMimeTypes() {
     load(BUILTIN_MIMETYPES_FILENAME);
     load(MIMETYPES_FILENAME);
@@ -136,7 +135,6 @@ public class NexusMimeTypes
 
   public class NexusMimeType
   {
-
     private boolean override;
 
     private String extension;

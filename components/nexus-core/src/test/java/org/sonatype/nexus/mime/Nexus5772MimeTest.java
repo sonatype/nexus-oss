@@ -50,7 +50,7 @@ public class Nexus5772MimeTest
                                 String expectedMimeType)
       throws IOException
   {
-    final List<String> mimeTypes = mimeSupport.detectMimeTypesListFromContent(contentLocator);
+    final List<String> mimeTypes = mimeSupport.detectMimeTypes(contentLocator.getContent(), null);
     assertThat("Expected MIME type not returned for content:", mimeTypes, hasItem(expectedMimeType));
   }
 
@@ -80,7 +80,7 @@ public class Nexus5772MimeTest
       try (final InputStream is = new FileInputStream(file)) {
         when(fileItem.getInputStream()).thenReturn(is);
         when(fileItem.getName()).thenReturn(file.getName());
-        assertThat(mimeSupport.detectMimeTypesFromContent(fileItem), equalTo("image/gif"));
+        assertThat(mimeSupport.detectMimeType(fileItem.getInputStream(), fileItem.getName()), equalTo("image/gif"));
       }
     }
     {
@@ -89,7 +89,7 @@ public class Nexus5772MimeTest
       try (final InputStream is = new FileInputStream(file)) {
         when(fileItem.getInputStream()).thenReturn(is);
         when(fileItem.getName()).thenReturn(file.getName());
-        assertThat(mimeSupport.detectMimeTypesFromContent(fileItem), equalTo("application/zip"));
+        assertThat(mimeSupport.detectMimeType(fileItem.getInputStream(), fileItem.getName()), equalTo("application/zip"));
       }
     }
     {
@@ -98,7 +98,7 @@ public class Nexus5772MimeTest
       try (final InputStream is = new FileInputStream(file)) {
         when(fileItem.getInputStream()).thenReturn(is);
         when(fileItem.getName()).thenReturn(file.getName());
-        assertThat(mimeSupport.detectMimeTypesFromContent(fileItem), equalTo("application/zip"));
+        assertThat(mimeSupport.detectMimeType(fileItem.getInputStream(), fileItem.getName()), equalTo("application/zip"));
       }
     }
     {
@@ -109,7 +109,7 @@ public class Nexus5772MimeTest
         when(fileItem.getName()).thenReturn(file.getName());
         // NOTE: by content, this is application/zip (JAR file is a Zip file with some extra spice)
         // But here, as we provide file, MimeSupport uses content AND filename to guess
-        assertThat(mimeSupport.detectMimeTypesFromContent(fileItem), equalTo("application/java-archive"));
+        assertThat(mimeSupport.detectMimeType(fileItem.getInputStream(), fileItem.getName()), equalTo("application/java-archive"));
       }
     }
   }
