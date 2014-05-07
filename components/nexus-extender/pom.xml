@@ -41,6 +41,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <scope>provided</scope>
@@ -80,6 +85,19 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-core</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-analytics-api</artifactId>
+    </dependency>
+
+    <!--
+    To be removed once all plugins are migrated off the Plexus API
+    -->
+    <dependency>
+      <groupId>org.eclipse.sisu</groupId>
+      <artifactId>org.eclipse.sisu.plexus</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -110,7 +128,7 @@
         <configuration>
           <instructions>
             <Bundle-Activator>
-              org.sonatype.nexus.extender.NexusExtender
+              org.sonatype.nexus.extender.NexusBundleExtender
             </Bundle-Activator>
             <Embed-Dependency>
               *;scope=compile

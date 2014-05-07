@@ -166,6 +166,12 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-analytics-api</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-bootstrap</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
@@ -204,6 +210,12 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-extender</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-formfields</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
@@ -568,6 +580,16 @@
               </_removeheaders>
             </instructions>
           </configuration>
+        </plugin>
+
+        <!--
+        Generate Karaf feature XML.
+        -->
+        <plugin>
+          <groupId>org.apache.karaf.tooling</groupId>
+          <artifactId>karaf-maven-plugin</artifactId>
+          <version>3.0.0</version>
+          <extensions>true</extensions>
         </plugin>
 
         <!--

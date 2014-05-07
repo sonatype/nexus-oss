@@ -49,7 +49,7 @@ Ext.define('NX.view.dev.Permissions', {
     // Add columns for each major permission
     Ext.each(['CREATE', 'READ', 'UPDATE', 'DELETE'], function (perm) {
       me.columns.push({
-        xtype: 'iconcolumn',
+        xtype: 'nx-iconcolumn',
         text: perm,
         dataIndex: perm.toLowerCase(),
         width: 80,

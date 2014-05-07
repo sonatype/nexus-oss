@@ -158,6 +158,11 @@
           <assemblyDescriptor>${project.basedir}/src/main/assemble/bundle.xml</assemblyDescriptor>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
+      </plugin>
     </plugins>
   </build>
 

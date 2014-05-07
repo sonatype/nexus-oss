@@ -47,11 +47,13 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
           name: 'name',
           itemId: 'name',
           fieldLabel: 'Name',
+          helpText: 'The name of this privilege.',
           emptyText: 'enter a name'
         },
         {
           name: 'description',
           fieldLabel: 'Description',
+          helpText: 'The description of this privilege.',
           emptyText: 'enter a description'
         },
         {
@@ -59,6 +61,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
           name: 'repositoryId',
           itemId: 'repositoryId',
           fieldLabel: 'Repository',
+          helpText: 'The repository or repository group this privilege will be associated with.',
           emptyText: 'select a repository',
           editable: false,
           store: me.repositoryStore,
@@ -71,6 +74,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
           name: 'repositoryTargetId',
           itemId: 'repositoryTargetId',
           fieldLabel: 'Repository Target',
+          helpText: 'The Repository Target that will be applied with this privilege.',
           emptyText: 'select a target',
           editable: false,
           store: me.targetStore,

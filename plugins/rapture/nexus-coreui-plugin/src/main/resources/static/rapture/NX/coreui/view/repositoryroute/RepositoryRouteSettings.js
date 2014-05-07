@@ -50,9 +50,10 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
         name: 'id'
       },
       {
-        xtype: 'textfield',
+        xtype: 'nx-regexp',
         name: 'pattern',
         fieldLabel: 'URL pattern',
+        helpText: 'A regular expression used to match the artifact path. The path is everything after /nexus/content/ so it will include the group or repository name. .* is used to specify all paths. \'.*/com/some/company/.*\' will match any artifact with \'com.some.company\' as the group id or artifact id.',
         emptyText: 'enter a pattern'
       },
       {
@@ -60,6 +61,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
         name: 'mappingType',
         itemId: 'mappingType',
         fieldLabel: 'Rule Type',
+        helpText: 'There are three types of rules: Inclusive (if the pattern matches, only use the repositories listed below), Exclusive (exclude the repositories listed below) and Blocking (block URLs matching the pattern).',
         emptyText: 'select a type',
         editable: false,
         store: [
@@ -74,6 +76,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
         name: 'groupId',
         itemId: 'groupId',
         fieldLabel: 'Repository Group',
+        helpText: 'A repository group this route applies to.',
         emptyText: 'select a group',
         editable: false,
         store: me.groupStore,
@@ -85,6 +88,8 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
         xtype: 'nx-itemselector',
         name: 'mappedRepositoriesIds',
         itemId: 'mappedRepositoriesIds',
+        fieldLabel: 'Repositories',
+        helpText: 'Ordered list of repositories which will be searched to locate a particular artifact.',
         buttons: ['up', 'add', 'remove', 'down'],
         fromTitle: 'Available Repositories',
         toTitle: 'Ordered Route Repositories',

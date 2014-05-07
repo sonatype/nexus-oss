@@ -27,17 +27,32 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseIndexTree', {
    * @override
    */
   initComponent: function () {
-    var me = this;
+    var me = this,
+        icons = NX.getApplication().getIconController();
 
     me.store = Ext.create('Ext.data.TreeStore', {
-      root: {
-        expanded: true,
-        text: 'Repository',
-        children: [
-          { text: 'foo.jar', leaf: true },
-          { text: 'bar.jar', leaf: true }
-        ]
-      }
+      fields: [
+        'repositoryId',
+        'path',
+        'text',
+        'name',
+        'type',
+        {
+          name: 'iconCls',
+          convert: function (val, row) {
+            var iconCls;
+            if (row.data.type) {
+              if (icons.findIcon('repository-item-type-' + row.data.type, 'x16')) {
+                iconCls = NX.Icons.cls('repository-item-type-' + row.data.type, 'x16');
+              }
+              else {
+                iconCls = NX.Icons.cls('repository-item-type-default', 'x16');
+              }
+            }
+            return iconCls
+          }
+        }
+      ]
     });
 
     me.callParent(arguments);

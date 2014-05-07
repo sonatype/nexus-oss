@@ -53,10 +53,21 @@ Ext.define('NX.view.feature.Content', {
       },
 
       // HACK: Testing what tool-like buttons look like in custom header
-      '->',
-      { xtype: 'button', ui: 'plain', scale: 'medium', glyph: 'xf013@FontAwesome' /* fa-gear */},
-      { xtype: 'button', ui: 'plain', scale: 'medium', glyph: 'xf059@FontAwesome' /* fa-question-circle */}
+      //'->',
+      //{ xtype: 'button', ui: 'plain', scale: 'medium', glyph: 'xf013@FontAwesome' /* fa-gear */},
+      //{ xtype: 'button', ui: 'plain', scale: 'medium', glyph: 'xf059@FontAwesome' /* fa-question-circle */}
     ]
+  },
+
+  listeners: {
+    afterRender: function(){
+      var me = this,
+          title = me.down('#title'),
+          description = me.down('#description');
+
+      me.setTitle(title.text);
+      me.setDescription(description.text);
+    }
   },
 
   /**
@@ -67,7 +78,7 @@ Ext.define('NX.view.feature.Content', {
    */
   setTitle: function(text) {
     var me = this,
-        label = me.down('label[itemId=title]');
+        label = me.down('#title');
 
     me.callParent(arguments);
 
@@ -82,7 +93,7 @@ Ext.define('NX.view.feature.Content', {
    */
   setDescription: function(text) {
     var me = this,
-        label = me.down('label[itemId=description]');
+        label = me.down('#description');
 
     label.setText(text);
   },

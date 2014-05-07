@@ -23,7 +23,7 @@ Ext.define('NX.coreui.view.role.RoleList', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
       iconName: function () {
@@ -35,6 +35,8 @@ Ext.define('NX.coreui.view.role.RoleList', {
     {header: 'Description', dataIndex: 'description', flex: 1}
   ],
 
+  emptyText: 'No roles defined',
+
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
       menu: [
@@ -44,5 +46,8 @@ Ext.define('NX.coreui.view.role.RoleList', {
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ],
 
-  plugins: ['gridfilterbox']
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: 'No role matched criteria "$filter"' }
+  ]
+
 });

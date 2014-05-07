@@ -23,7 +23,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteList', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
       iconName: function () {
@@ -42,10 +42,13 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteList', {
     { header: 'Repositories', dataIndex: 'mappedRepositoriesNames', flex: 1 }
   ],
 
+  emptyText: 'No repository routes defined',
+
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ],
 
-  plugins: ['gridfilterbox']
+  plugins: [{ ptype: 'gridfilterbox', emptyText: 'No repository route matched criteria "$filter"' }]
+
 });

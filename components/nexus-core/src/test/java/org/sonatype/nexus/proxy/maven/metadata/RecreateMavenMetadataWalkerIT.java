@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -49,15 +48,16 @@ import org.codehaus.plexus.util.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Juven Xu
  */
 public class RecreateMavenMetadataWalkerIT
     extends AbstractProxyTestEnvironment
 {
-
-  private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
-
   private Repository inhouseRelease;
 
   private Repository inhouseSnapshot;
@@ -70,11 +70,7 @@ public class RecreateMavenMetadataWalkerIT
   protected EnvironmentBuilder getEnvironmentBuilder()
       throws Exception
   {
-    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
-
-    this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder(ss);
-
-    return jettyTestsuiteEnvironmentBuilder;
+    return new M2TestsuiteEnvironmentBuilder("repo1");
   }
 
   @Override

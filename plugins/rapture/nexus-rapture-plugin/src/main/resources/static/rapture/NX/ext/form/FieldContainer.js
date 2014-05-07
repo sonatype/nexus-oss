@@ -18,6 +18,18 @@
 Ext.define('NX.ext.form.FieldContainer', {
   override: 'Ext.form.FieldContainer',
 
-  labelWidth: 180
+  labelAlign: 'top',
+  labelStyle: 'font-weight: bold;',
+  msgTarget: 'under',
+
+  initComponent: function () {
+    var me = this;
+
+    if (me.helpText) {
+      me.afterLabelTpl = '<span style="font-size: 10px;">' + me.helpText + '</span>';
+    }
+
+    me.callParent(arguments);
+  }
 
 });

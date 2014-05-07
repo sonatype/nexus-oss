@@ -23,6 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 
+import static com.google.common.base.Preconditions.checkState;
+
 @Named
 @Singleton
 public class NexusReferenceFactory
@@ -56,4 +58,41 @@ public class NexusReferenceFactory
     return result;
   }
 
+  /**
+   * Returns the resource-path for the given request, does not include "service/local" prefix.
+   * Should never start with "/".
+   */
+  private String getResourcePath(final Request request) {
+    // do not use getContentRoot() here, we do not want force base-url messing up resource path extraction
+    String rootUri = request.getRootRef().getTargetRef().toString();
+    if (!rootUri.endsWith("/")) {
+      rootUri += "/";
+    }
+
+    String resourceUri = request.getResourceRef().getTargetRef().toString();
+    String path = resourceUri.substring(rootUri.length());
+    if (path.startsWith("/")) {
+      path = path.substring(1, path.length());
+    }
+
+    // in a runtime instance the root-ref will include service/local since restlet is no longer mounted at root
+    // so this should be stripped off as part of substring above
+    checkState(!path.startsWith("service/local"));
+
+    return path;
+  }
+
+  /**
+   * Override to cope with changing base-url when forced and service/local location wrt to root ref.
+   */
+  @Override
+  public Reference createThisReference(final Request request) {
+    // normalized root-ref which respects force base-url
+    Reference rootRef = getContextRoot(request);
+
+    // normalized reference to resource relative to root-ref
+    Reference thisRef = new Reference(rootRef, "service/local/" + getResourcePath(request));
+
+    return updateBaseRefPath(thisRef);
+  }
 }

@@ -16,11 +16,8 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.role.RoleTree', {
-  extend: 'Ext.tree.Panel',
+  extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-role-tree',
-
-  rootVisible: false,
-  lines: false,
 
   /**
    * @override
@@ -45,6 +42,38 @@ Ext.define('NX.coreui.view.role.RoleTree', {
       }
     });
 
+    me.items = {
+      xtype: 'treepanel',
+      itemId: 'roleTree',
+      title: 'Role Containment',
+      tools: [
+        { type: 'collapse', tooltip: 'Collapse all', callback: function(panel) {
+          panel.collapseAll();
+        }},
+        { type: 'expand', tooltip: 'Expand all', callback: function(panel) {
+          panel.expandAll();
+        }}
+      ],
+      rootVisible: false,
+      lines: false,
+      store: me.store,
+      listeners: {
+        beforeitemexpand: function (node) {
+          if (!node.processed) {
+            Ext.suspendLayouts();
+            me.addRoles(node, node.get('roles'));
+            me.addPrivileges(node, node.get('privileges'));
+            me.store.sort([
+              { property: 'weight', direction: 'ASC' },
+              { property: 'text', direction: 'ASC' }
+            ]);
+            node.processed = true;
+            Ext.resumeLayouts(true);
+          }
+        }
+      },
+    };
+
     me.callParent(arguments);
   },
 
@@ -57,20 +86,6 @@ Ext.define('NX.coreui.view.role.RoleTree', {
     deactivate: function () {
       var me = this;
       me.active = false;
-    },
-    beforeitemexpand: function (node) {
-      var me = this;
-      if (!node.processed) {
-        Ext.suspendLayouts();
-        me.addRoles(node, node.get('roles'));
-        me.addPrivileges(node, node.get('privileges'));
-        me.getStore().sort([
-          { property: 'weight', direction: 'ASC' },
-          { property: 'text', direction: 'ASC' }
-        ]);
-        node.processed = true;
-        Ext.resumeLayouts(true);
-      }
     }
   },
 
@@ -97,11 +112,11 @@ Ext.define('NX.coreui.view.role.RoleTree', {
 
     if (me.active) {
       Ext.suspendLayouts();
-      me.getStore().getRootNode().removeAll();
+      me.store.getRootNode().removeAll();
       if (Ext.isDefined(me.model) && (me.roleStore.getCount() || me.privilegeStore.getCount())) {
-        me.addRoles(me.getStore().getRootNode(), me.model.roles);
-        me.addPrivileges(me.getStore().getRootNode(), me.model.privileges);
-        me.getStore().sort([
+        me.addRoles(me.store.getRootNode(), me.model.roles);
+        me.addPrivileges(me.store.getRootNode(), me.model.privileges);
+        me.store.sort([
           { property: 'weight', direction: 'ASC' },
           { property: 'text', direction: 'ASC' }
         ]);

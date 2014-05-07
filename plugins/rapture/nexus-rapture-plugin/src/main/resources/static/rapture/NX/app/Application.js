@@ -19,14 +19,15 @@ Ext.define('NX.app.Application', {
   extend: 'Ext.app.Application',
 
   requires: [
+    'Ext.Ajax',
     'Ext.Error',
     'Ext.Direct',
     'Ext.state.Manager',
-    'Ext.state.CookieProvider',
     'Ext.state.LocalStorageProvider',
     'Ext.util.LocalStorage',
     'NX.view.Viewport',
     'NX.util.Url',
+    'NX.util.DownloadHelper',
     'NX.State',
 
     // Ext overrides
@@ -36,8 +37,6 @@ Ext.define('NX.app.Application', {
     'NX.ext.form.field.Display',
     'NX.ext.form.FieldContainer',
 
-    // require custom extensions so we don't need to requirement explicitly everywhere
-    'NX.ext.grid.IconColumn',
     'NX.ext.SearchBox'
   ],
 
@@ -48,8 +47,12 @@ Ext.define('NX.app.Application', {
     'NX.ext.form.field.ClearableComboBox',
     'NX.ext.form.field.Email',
     'NX.ext.form.field.Password',
+    'NX.ext.form.field.RegExp',
     'NX.ext.form.field.Url',
     'NX.ext.form.field.ValueSet',
+    'NX.ext.form.field.Timestamp',
+    'NX.ext.grid.column.Icon',
+    'NX.ext.grid.column.Link',
     'NX.ext.grid.column.Timestamp',
     'NX.Conditions'
   ],
@@ -83,6 +86,7 @@ Ext.define('NX.app.Application', {
     'ExtDirect',
     'Features',
     'Icon',
+    'KeyNav',
     'Message',
     'Permissions'
   ],
@@ -114,6 +118,9 @@ Ext.define('NX.app.Application', {
     },
     debugMode: function () {
       return NX.State.getValue('debug') === true;
+    },
+    pluginActive: function (coordinates) {
+      return NX.State.getValue('plugins').indexOf(coordinates) > -1;
     }
   },
 
@@ -128,6 +135,12 @@ Ext.define('NX.app.Application', {
 
     // Configure blank image URL
     Ext.BLANK_IMAGE_URL = NX.util.Url.baseUrl + '/static/rapture/resources/images/s.gif';
+
+    Ext.Ajax.defaultHeaders = {
+      // HACK: Setting request header to allow analytics to tell if the request came from the UI or not
+      // HACK: This has some issues, will only catch ajax requests, etc... but may be fine for now
+      'X-Nexus-UI': 'true'
+    };
 
     app.initErrorHandler();
     app.initDirect();
@@ -205,27 +218,21 @@ Ext.define('NX.app.Application', {
    * Initialize state manager.
    */
   initState: function () {
-    var me = this, provider;
+    var me = this;
 
-    // prefer local storage if its supported
+    // If local storage is supported install state provider
     if (Ext.util.LocalStorage.supported) {
-      provider = Ext.create('Ext.state.LocalStorageProvider');
+      Ext.state.Manager.setProvider(Ext.create('Ext.state.LocalStorageProvider'));
       me.logDebug('Configured state provider: local');
     }
     else {
-      // FIXME: We may want to either not support state, or implement remoting to used
-      // FIXME: The remote session of the user to store state
-      // FIXME: Cookie impl will create too many cookies and could cause lots of weird things to break
-      provider = Ext.create('Ext.state.CookieProvider');
-      me.logDebug('Configured state provider: cookie');
+      me.logWarn('Local storage not supported; state management not supported');
     }
 
     // HACK: for debugging
     //provider.on('statechange', function (provider, key, value, opts) {
     //  me.logDebug('State changed: ' + key + '=' + value);
     //});
-
-    Ext.state.Manager.setProvider(provider);
   },
 
   /**

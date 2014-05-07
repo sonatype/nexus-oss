@@ -17,7 +17,6 @@ import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
@@ -28,7 +27,6 @@ import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -74,9 +72,7 @@ public class ScheduledServiceRunPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(pathParams = {@PathParam(AbstractScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY)},
-      output = ScheduledServiceResourceStatusResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public ScheduledServiceResourceStatusResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     ScheduledServiceResourceStatusResponse result = null;
@@ -132,7 +128,6 @@ public class ScheduledServiceRunPlexusResource
    */
   @Override
   @DELETE
-  @ResourceMethodSignature(pathParams = {@PathParam(ScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY)})
   public void delete(Context context, Request request, Response response)
       throws ResourceException
   {

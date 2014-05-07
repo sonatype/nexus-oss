@@ -36,7 +36,6 @@ import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeM
 import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.security.rest.privileges.AbstractPrivilegePlexusResource;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -82,8 +81,7 @@ public class TargetPrivilegePlexusResource
    */
   @Override
   @POST
-  @ResourceMethodSignature(input = PrivilegeResourceRequest.class, output = PrivilegeListResourceResponse.class)
-  public Object post(Context context, Request request, Response response, Object payload)
+  public PrivilegeListResourceResponse post(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     PrivilegeResourceRequest resourceRequest = (PrivilegeResourceRequest) payload;

@@ -19,7 +19,8 @@ Ext.define('NX.view.header.Login', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-login',
 
-  text: 'Login',
+  text: 'Sign In',
+  tooltip: 'Have an account?',
   glyph: 'xf090@FontAwesome' // fa-sign-in
 
 });

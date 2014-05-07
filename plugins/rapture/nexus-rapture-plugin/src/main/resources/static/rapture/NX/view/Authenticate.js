@@ -49,6 +49,7 @@ Ext.define('NX.view.Authenticate', {
         bodyPadding: 10,
         defaultType: 'textfield',
         defaults: {
+          labelAlign: 'left',
           labelWidth: 100,
           anchor: '100%'
         },
@@ -78,12 +79,14 @@ Ext.define('NX.view.Authenticate', {
             fieldLabel: 'Password',
             inputType: 'password',
             emptyText: 'enter your password',
-            allowBlank: false
+            allowBlank: false,
+            validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
           }
         ],
 
+        buttonAlign: 'left',
         buttons: [
-          { text: 'Authenticate', action: 'authenticate', formBind: true, ui: 'primary' },
+          { text: 'Authenticate', action: 'authenticate', formBind: true, bindToEnter: true, ui: 'primary' },
           { text: 'Cancel', handler: me.close, scope: me }
         ]
       }

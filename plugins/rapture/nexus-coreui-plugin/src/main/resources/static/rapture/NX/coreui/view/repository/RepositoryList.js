@@ -23,7 +23,7 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
       iconName: function () {
@@ -40,13 +40,19 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
     { header: 'Provider', dataIndex: 'providerName' }
   ],
 
+  emptyText: 'No repositories defined',
+
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
       menu: []
     },
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
+    '-',
     { xtype: 'button', text: 'Browse', glyph: 'xf0e8@FontAwesome' /* fa-sitemap */, action: 'browse', disabled: true }
   ],
 
-  plugins: ['gridfilterbox']
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: 'No repositories matched criteria "$filter"' }
+  ]
+
 });

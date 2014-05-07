@@ -33,6 +33,7 @@ public class ExtDirectLogConfigurationCustomizer
   public void customize(final Configuration configuration) {
     // Useful loggers (level will be calculated as effective level)
     configuration.setLoggerLevel("org.sonatype.nexus.extdirect", LoggerLevel.DEFAULT);
+    configuration.setLoggerLevel("com.softwarementors.extjs.djn", LoggerLevel.DEFAULT);
   }
 
 }

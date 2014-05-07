@@ -10,13 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
-
-import java.io.IOException;
-
-import org.sonatype.configuration.ConfigurationException;
-
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * The Interface Environment.
@@ -26,9 +21,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 public interface EnvironmentBuilder
 {
   public void buildEnvironment(AbstractProxyTestEnvironment abstractProxyTestEnvironment)
-      throws ConfigurationException,
-             IOException,
-             ComponentLookupException;
+      throws Exception;
 
   void startService()
       throws Exception;

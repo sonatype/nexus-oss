@@ -39,63 +39,88 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- JournalStore backing Timeline -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-restlet1x-plugin</artifactId>
+      <artifactId>nexus-kazuki-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
-    <!--
-    FIXME: Use DM.
-    -->
-    <dependency>
-      <groupId>com.google.protobuf</groupId>
-      <artifactId>protobuf-java</artifactId>
-      <version>2.3.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-core</artifactId>
-      <version>3.6.2</version>
-    </dependency>
-
+    <!-- For RRS/Atom feed support, using Rome -->
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
-      <version>0.9</version>
     </dependency>
 
+    <!-- Feed resources, XO -->
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-testsupport</artifactId>
-      <scope>test</scope>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <scope>provided</scope>
     </dependency>
 
+    <!-- Feed resources, Siesta -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-siesta-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Legacy UI -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ui-extjs3-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-groovy-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-extdirect-plugin</artifactId>
+      <type>${nexus-plugin.type}</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Test -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-testsupport</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <compilerId>groovy-eclipse-compiler</compilerId>
+        </configuration>
+      </plugin>
+
+      <plugin>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-        <configuration>
-          <sharedDependencies>
-            <sharedDependencies>rome:rome</sharedDependencies>
-          </sharedDependencies>
-        </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

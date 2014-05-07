@@ -19,22 +19,20 @@ Ext.define('NX.controller.Dashboard', {
   extend: 'Ext.app.Controller',
 
   views: [
-    'dashboard.Feature'
+    'dashboard.Welcome'
   ],
 
   init: function () {
     var me = this;
 
-    me.getApplication().getIconController().addIcon({
-      name: 'feature-dashboard',
-      file: 'dashboard.png',
-      variants: ['x16', 'x32']
-    });
-
     me.getApplication().getFeaturesController().registerFeature({
-      path: '/Dashboard',
+      path: '/Welcome',
       mode: 'dashboard',
-      view: 'NX.view.dashboard.Feature',
+      view: 'NX.view.dashboard.Welcome',
+      iconConfig: {
+        file: 'dashboard.png',
+        variants: ['x16', 'x32']
+      },
       weight: 10,
       authenticationRequired: false
     });

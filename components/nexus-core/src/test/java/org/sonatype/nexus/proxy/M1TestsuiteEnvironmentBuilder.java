@@ -10,15 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.jettytestsuite.WebappContext;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -32,8 +29,6 @@ import org.sonatype.nexus.proxy.maven.maven1.M1RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
@@ -44,35 +39,32 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class M1TestsuiteEnvironmentBuilder
     extends AbstractJettyEnvironmentBuilder
 {
-
-  public M1TestsuiteEnvironmentBuilder(ServletServer servletServer) {
-    super(servletServer);
+  public M1TestsuiteEnvironmentBuilder(final List<String> reposes) {
+    super(reposes);
   }
 
   @Override
   public void buildEnvironment(AbstractProxyTestEnvironment env)
-      throws ConfigurationException,
-             IOException,
-             ComponentLookupException
+      throws Exception
   {
-    PlexusContainer container = env.getPlexusContainer();
-
     List<String> reposes = new ArrayList<String>();
-    for (WebappContext remoteRepo : getServletServer().getWebappContexts()) {
-      M1Repository repo = (M1Repository) container.lookup(Repository.class, "maven1");
+    for (String remoteRepoId : repoIds()) {
 
+      // create proxy for remote
+      M1Repository repo = (M1Repository) env.lookup(Repository.class, "maven1");
       CRepository repoConf = new DefaultCRepository();
-
       repoConf.setProviderRole(Repository.class.getName());
       repoConf.setProviderHint("maven1");
-      repoConf.setId(remoteRepo.getName());
+      repoConf.setId(remoteRepoId);
+      repoConf.setName(remoteRepoId);
 
       repoConf.setLocalStorage(new CLocalStorage());
       repoConf.getLocalStorage().setProvider("file");
       repoConf.getLocalStorage().setUrl(
           env
-              .getApplicationConfiguration().getWorkingDirectory("proxy/store/" + remoteRepo.getName()).toURI()
-              .toURL().toString());
+              .getApplicationConfiguration().getWorkingDirectory("proxy/store/" + remoteRepoId).toURI()
+              .toURL().toString()
+      );
 
       Xpp3Dom ex = new Xpp3Dom("externalConfiguration");
       repoConf.setExternalConfiguration(ex);
@@ -82,7 +74,7 @@ public class M1TestsuiteEnvironmentBuilder
 
       repoConf.setRemoteStorage(new CRemoteStorage());
       repoConf.getRemoteStorage().setProvider(env.getRemoteProviderHintFactory().getDefaultHttpRoleHint());
-      repoConf.getRemoteStorage().setUrl(getServletServer().getUrl(remoteRepo.getName()));
+      repoConf.getRemoteStorage().setUrl(server().getUrl() + "/" + remoteRepoId);
       repoConf.setIndexable(false);
 
       repo.configure(repoConf);
@@ -96,7 +88,7 @@ public class M1TestsuiteEnvironmentBuilder
     }
 
     // ading one hosted only
-    M1Repository repo = (M1Repository) container.lookup(Repository.class, "maven1");
+    M1Repository repo = (M1Repository) env.lookup(Repository.class, "maven1");
 
     CRepository repoConf = new DefaultCRepository();
 
@@ -125,7 +117,7 @@ public class M1TestsuiteEnvironmentBuilder
     env.getRepositoryRegistry().addRepository(repo);
 
     // add a hosted snapshot repo
-    M1Repository repoSnapshot = (M1Repository) container.lookup(Repository.class, "maven1");
+    M1Repository repoSnapshot = (M1Repository) env.lookup(Repository.class, "maven1");
 
     CRepository repoSnapshotConf = new DefaultCRepository();
 
@@ -139,7 +131,8 @@ public class M1TestsuiteEnvironmentBuilder
     repoSnapshotConf.getLocalStorage().setUrl(
         env
             .getApplicationConfiguration().getWorkingDirectory("proxy/store/inhouse-snapshot").toURI().toURL()
-            .toString());
+            .toString()
+    );
 
     Xpp3Dom exSnapRepo = new Xpp3Dom("externalConfiguration");
     repoSnapshotConf.setExternalConfiguration(exSnapRepo);
@@ -156,7 +149,7 @@ public class M1TestsuiteEnvironmentBuilder
     env.getRepositoryRegistry().addRepository(repoSnapshot);
 
     // add a group
-    M1GroupRepository group = (M1GroupRepository) container.lookup(GroupRepository.class, "maven1");
+    M1GroupRepository group = (M1GroupRepository) env.lookup(GroupRepository.class, "maven1");
 
     CRepository repoGroupConf = new DefaultCRepository();
 

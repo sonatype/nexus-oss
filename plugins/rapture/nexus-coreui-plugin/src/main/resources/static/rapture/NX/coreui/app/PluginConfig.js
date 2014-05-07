@@ -22,21 +22,75 @@ Ext.define('NX.coreui.app.PluginConfig', {
   ],
 
   controllers: [
-    'NX.coreui.controller.Capabilities',
+    { id: 'NX.coreui.controller.AnalyticsSettings',
+      active: function () {
+        return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-analytics-plugin');
+      }
+    },
+    { id: 'NX.coreui.controller.AnalyticsEvents',
+      active: function () {
+        return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-analytics-plugin');
+      }
+    },
+    'NX.coreui.controller.AnonymousSettings',
+    { id: 'NX.coreui.controller.Capabilities',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-capabilities-plugin');
+      }
+    },
     'NX.coreui.controller.BrowseRepositories',
-    'NX.coreui.controller.BrowseRepositoryItemInfo',
-    'NX.coreui.controller.BrowseRepositoryItemClm',
     'NX.coreui.controller.BrowseStorage',
     'NX.coreui.controller.BrowseIndex',
+    'NX.coreui.controller.ComponentSummary',
+    'NX.coreui.controller.ComponentLicense',
+    'NX.coreui.controller.ComponentSecurity',
+    'NX.coreui.controller.FeatureGroups',
+    'NX.coreui.controller.Feeds',
+    'NX.coreui.controller.HttpSettings',
+    'NX.coreui.controller.GeneralSettings',
+    { id: 'NX.coreui.controller.HealthCheckRepositorySettings',
+      active: function () {
+        return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-healthcheck-oss-plugin')
+            || NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-clm-plugin');
+      }
+    },
+    { id: 'NX.coreui.controller.Log',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-logging-plugin');
+      }
+    },
+    { id: 'NX.coreui.controller.Loggers',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-logging-plugin');
+      }
+    },
     'NX.coreui.controller.MavenUpload',
-    'NX.coreui.controller.PluginConsole',
+    'NX.coreui.controller.Metrics',
+    'NX.coreui.controller.NotificationSettings',
+    { id: 'NX.coreui.controller.PluginConsole',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-plugin-console-plugin');
+      }
+    },
     'NX.coreui.controller.Repositories',
     'NX.coreui.controller.RepositoryTargets',
     'NX.coreui.controller.RepositoryRoutes',
     'NX.coreui.controller.Privileges',
+    'NX.coreui.controller.RealmSettings',
+    'NX.coreui.controller.RoutingRepositorySettings',
     'NX.coreui.controller.Roles',
-    'NX.coreui.controller.Security',
-    'NX.coreui.controller.System',
+    'NX.coreui.controller.Search',
+    'NX.coreui.controller.SmtpSettings',
+    { id: 'NX.coreui.controller.SupportZip',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-atlas-plugin');
+      }
+    },
+    { id: 'NX.coreui.controller.SysInfo',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-atlas-plugin');
+      }
+    },
     'NX.coreui.controller.Tasks',
     'NX.coreui.controller.UploadArtifact',
     'NX.coreui.controller.Users'

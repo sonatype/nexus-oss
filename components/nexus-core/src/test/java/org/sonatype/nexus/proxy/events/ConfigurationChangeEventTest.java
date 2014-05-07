@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.proxy.events;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.ConfigurationCommitEvent;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
@@ -24,6 +23,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class ConfigurationChangeEventTest
     extends AbstractProxyTestEnvironment
 {
@@ -31,9 +33,7 @@ public class ConfigurationChangeEventTest
   protected EnvironmentBuilder getEnvironmentBuilder()
       throws Exception
   {
-    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
-
-    return new M2TestsuiteEnvironmentBuilder(ss);
+    return new M2TestsuiteEnvironmentBuilder("repo1", "repo2", "repo3");
   }
 
   @Test

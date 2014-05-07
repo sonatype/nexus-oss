@@ -66,6 +66,7 @@ public class JettyAppBootstrap
             .properties("/nexus.properties", true)
             .properties("/nexus-test.properties", false)
             .custom(new EnvironmentVariables())
+            .override(System.getProperties())
             .build();
 
         System.getProperties().putAll(properties);

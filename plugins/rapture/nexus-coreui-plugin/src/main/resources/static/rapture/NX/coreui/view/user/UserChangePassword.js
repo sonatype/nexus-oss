@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
 
   items: {
     xtype: 'nx-settingsform',
-    editableCondition: NX.Conditions.isPermitted('security:userschangepw', 'update'),
+    editableCondition: NX.Conditions.isPermitted('security:userschangepw', 'create'),
     editableMarker: 'You do not have permission to change your password',
 
     items: [
@@ -33,12 +33,14 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
         name: 'password',
         itemId: 'password',
         fieldLabel: 'Password',
+        helpText: 'The new password required to you into the system.',
         emptyText: 'enter a password'
       },
       {
         xtype: 'nx-password',
         allowBlank: true,
         fieldLabel: 'Confirm Password',
+        helpText: 'Re-enter the password to validate entry.',
         emptyText: 'confirm above password',
         submitValue: false,
         validator: function () {

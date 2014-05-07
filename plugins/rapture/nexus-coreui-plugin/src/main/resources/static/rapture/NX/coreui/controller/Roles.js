@@ -55,10 +55,6 @@ Ext.define('NX.coreui.controller.Roles', {
     }
   ],
   icons: {
-    'feature-security-roles': {
-      file: 'user_policeman.png',
-      variants: ['x16', 'x32']
-    },
     'role-default': {
       file: 'user_policeman.png',
       variants: ['x16', 'x32']
@@ -69,11 +65,18 @@ Ext.define('NX.coreui.controller.Roles', {
     }
   },
   features: {
+    mode: 'admin',
     path: '/Security/Roles',
+    description: 'Manage roles',
     view: { xtype: 'nx-coreui-role-feature' },
+    iconConfig: {
+      file: 'user_policeman.png',
+      variants: ['x16', 'x32']
+    },
     visible: function () {
       return NX.Permissions.check('security:roles', 'read');
-    }
+    },
+    weight: 20
   },
   permission: 'security:roles',
 

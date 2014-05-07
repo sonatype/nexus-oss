@@ -59,7 +59,7 @@ Ext.define('NX.controller.Bookmarking', {
    * @returns {NX.Bookmark} current bookmark
    */
   getBookmark: function () {
-    return NX.Bookmarks.fromToken(Ext.History.getToken());
+    return NX.Bookmarks.fromToken(Ext.History.bookmark || Ext.History.getToken());
   },
 
   /**

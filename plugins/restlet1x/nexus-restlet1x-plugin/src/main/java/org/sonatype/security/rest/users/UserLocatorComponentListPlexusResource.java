@@ -29,7 +29,6 @@ import org.sonatype.security.rest.model.PlexusComponentListResourceResponse;
 import org.sonatype.security.usermanagement.UserManager;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.eclipse.sisu.BeanEntry;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -77,8 +76,7 @@ public class UserLocatorComponentListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = PlexusComponentListResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public PlexusComponentListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     PlexusComponentListResourceResponse result = new PlexusComponentListResourceResponse();

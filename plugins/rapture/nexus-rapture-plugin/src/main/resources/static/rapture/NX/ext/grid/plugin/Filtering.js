@@ -94,17 +94,33 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
    * Filters on current filter value.
    */
   applyFilter: function () {
-    var me = this;
+    var me = this,
+        remoteFilter = me.filteredStore.remoteFilter,
+        filters = me.filteredStore.filters.items;
 
+    // HACK: when remote filter is on store will not be locally filtered, so we have to trick ExtJS into doing local
+    // filtering by setting remoteFilter to false and temporary remove the other filters (will add them back after local
+    // filtering is performed)
+    if (remoteFilter) {
+      me.filteredStore.filters.clear();
+      me.filteredStore.remoteFilter = false;
+    }
     if (me.filterValue) {
       me.logDebug(
-          'Filtering ' + me.filteredStore.storeId + ' on [' + me.filterValue + '] using fields: ' + me.filteredFields
+          'Filtering ' + me.filteredStore.self.getName() + ' on [' + me.filterValue
+              + '] using fields: ' + me.filteredFields
       );
       me.filteredStore.filter(me.filteringFilter);
     }
     else {
       me.filteredStore.removeFilter(me.filteringFilter);
-      me.logDebug('Filtering cleared on ' + me.filteredStore.storeId);
+      me.logDebug('Filtering cleared on ' + me.filteredStore.self.getName());
+    }
+    if (remoteFilter) {
+      me.filteredStore.remoteFilter = remoteFilter;
+      if (filters) {
+        me.filteredStore.filters.add(filters);
+      }
     }
   },
 
@@ -221,7 +237,7 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
     var me = this;
     me.filteredStore = store;
     if (store) {
-      me.logDebug('Binding to store ' + me.filteredStore.storeId);
+      me.logDebug('Binding to store ' + me.filteredStore.self.getName());
       me.grid.mon(store, 'load', me.applyFilter, me);
       me.grid.mon(store, 'filterchange', me.syncFilterValue, me);
     }
@@ -235,7 +251,7 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
   unbindFromStore: function (store) {
     var me = this;
     if (store) {
-      me.logDebug('Unbinding from store ' + me.filteredStore.storeId);
+      me.logDebug('Unbinding from store ' + me.filteredStore.self.getName());
       me.grid.mun(store, 'load', me.applyFilter, me);
       me.grid.mun(store, 'filterchange', me.syncFilterValue, me);
     }

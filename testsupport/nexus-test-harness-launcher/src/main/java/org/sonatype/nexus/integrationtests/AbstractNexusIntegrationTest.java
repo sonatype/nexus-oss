@@ -702,7 +702,7 @@ public abstract class AbstractNexusIntegrationTest
   {
     // the test can override the test config.
     File testConfigFile = getOverridableFile(configFile);
-    if (testConfigFile == null) {
+    if (testConfigFile == null || !testConfigFile.exists()) {
       return;
     }
 
@@ -767,9 +767,9 @@ public abstract class AbstractNexusIntegrationTest
     File rootDir = new File(TestProperties.getString("test.resources.folder"));
     File file = new File(rootDir, resource);
 
-    if (!file.exists()) {
-      return null;
-    }
+    //if (!file.exists()) {
+    //  return null;
+    //}
     return file;
   }
 

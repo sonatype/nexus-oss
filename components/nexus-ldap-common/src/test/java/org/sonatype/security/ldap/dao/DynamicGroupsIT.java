@@ -24,6 +24,8 @@ import org.sonatype.security.ldap.LdapTestSupport;
 
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 public class DynamicGroupsIT
     extends LdapTestSupport
 {

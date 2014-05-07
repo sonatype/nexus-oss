@@ -31,6 +31,8 @@ import static com.google.common.base.Preconditions.checkNotNull
 /**
  * Renders system information.
  *
+ * This is required for download of the report from the UI.
+ *
  * @since 2.7
  */
 @Named

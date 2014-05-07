@@ -56,14 +56,6 @@ Ext.define('NX.coreui.controller.Users', {
     }
   ],
   icons: {
-    'feature-security-users': {
-      file: 'group.png',
-      variants: ['x16', 'x32']
-    },
-    'feature-account': {
-      file: 'user.png',
-      variants: ['x16', 'x32']
-    },
     'user-default': {
       file: 'user.png',
       variants: ['x16', 'x32']
@@ -81,17 +73,28 @@ Ext.define('NX.coreui.controller.Users', {
     {
       mode: 'admin',
       path: '/Security/Users',
+      description: 'Manage users',
       view: { xtype: 'nx-coreui-user-feature' },
+      iconConfig: {
+        file: 'group.png',
+        variants: ['x16', 'x32']
+      },
       visible: function () {
         return NX.Permissions.check('security:users', 'read');
-      }
+      },
+      weight: 30
     },
     {
       mode: 'user',
       path: '/Account',
+      description: 'Manage your account',
       view: { xtype: 'nx-coreui-user-account' },
+      iconConfig: {
+        file: 'user.png',
+        variants: ['x16', 'x32']
+      },
       visible: function () {
-        return NX.Permissions.check('security:users', 'read');
+        return NX.Security.hasUser();
       }
     }
   ],
@@ -359,12 +362,12 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @override
    * @private
-   * Enable 'Change Password' when user has 'security:userschangepw:update' permission.
+   * Enable 'Change Password' when user has 'security:userschangepw:create' permission.
    */
   bindChangePasswordButton: function (button) {
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('security:userschangepw', 'update')
+            NX.Conditions.isPermitted('security:userschangepw', 'create')
         ),
         {
           satisfied: button.enable,

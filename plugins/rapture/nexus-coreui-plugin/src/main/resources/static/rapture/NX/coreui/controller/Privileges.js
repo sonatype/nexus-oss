@@ -31,6 +31,10 @@ Ext.define('NX.coreui.controller.Privileges', {
   ],
   refs: [
     {
+      ref: 'feature',
+      selector: 'nx-coreui-privilege-feature'
+    },
+    {
       ref: 'list',
       selector: 'nx-coreui-privilege-list'
     },
@@ -40,10 +44,6 @@ Ext.define('NX.coreui.controller.Privileges', {
     }
   ],
   icons: {
-    'feature-security-privileges': {
-      file: 'medal_gold_1.png',
-      variants: ['x16', 'x32']
-    },
     'privilege-default': {
       file: 'medal_gold_1.png',
       variants: ['x16', 'x32']
@@ -62,11 +62,18 @@ Ext.define('NX.coreui.controller.Privileges', {
     }
   },
   features: {
+    mode: 'admin',
     path: '/Security/Privileges',
+    description: 'Manage privileges',
     view: { xtype: 'nx-coreui-privilege-feature' },
+    iconConfig: {
+      file: 'medal_gold_1.png',
+      variants: ['x16', 'x32']
+    },
     visible: function () {
       return NX.Permissions.check('security:privileges', 'read');
-    }
+    },
+    weight: 10
   },
   permission: 'security:privileges',
 
@@ -102,6 +109,7 @@ Ext.define('NX.coreui.controller.Privileges', {
         info;
 
     if (Ext.isDefined(model)) {
+      me.getFeature().setDescriptionIconName('privilege-' + model.get('type'));
       info = {
         'Id': model.get('id'),
         'Name': model.get('name'),

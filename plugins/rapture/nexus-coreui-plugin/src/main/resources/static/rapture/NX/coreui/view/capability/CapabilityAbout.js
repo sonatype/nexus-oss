@@ -19,15 +19,19 @@ Ext.define('NX.coreui.view.capability.CapabilityAbout', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-capability-about',
 
-  title: 'About',
-
   autoScroll: true,
   html: '',
+  bodyPadding: 10,
 
-  showAbout: function (about) {
-    this.html = about;
+  /**
+   * @public
+   * Shows capability about text.
+   * @param {String} text about text
+   */
+  showAbout: function (text) {
+    this.html = text;
     if (this.body) {
-      this.update(about);
+      this.update(this.html);
     }
   }
 

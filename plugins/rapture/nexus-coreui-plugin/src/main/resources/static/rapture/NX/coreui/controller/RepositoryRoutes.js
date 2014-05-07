@@ -47,18 +47,20 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
     }
   ],
   icons: {
-    'feature-repository-routing': {
-      file: 'arrow_branch.png',
-      variants: ['x16', 'x32']
-    },
     'repositoryroute-default': {
       file: 'arrow_branch.png',
       variants: ['x16', 'x32']
     }
   },
   features: {
+    mode: 'admin',
     path: '/Repository/Routing',
+    description: 'Manage repository routes',
     view: { xtype: 'nx-coreui-repositoryroute-feature' },
+    iconConfig: {
+      file: 'arrow_branch.png',
+      variants: ['x16', 'x32']
+    },
     visible: function () {
       return NX.Permissions.check('nexus:routes', 'read');
     }
@@ -141,9 +143,11 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
 
     if (newValue === 'BLOCKING') {
       mappedRepositories.hide();
+      mappedRepositories.disable(); // so is not validated/sent
       mappedRepositories.setValue(undefined);
     }
     else {
+      mappedRepositories.enable();
       mappedRepositories.show();
     }
   },

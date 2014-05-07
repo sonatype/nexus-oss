@@ -60,18 +60,20 @@ Ext.define('NX.coreui.controller.Repositories', {
     }
   ],
   icons: {
-    'feature-repository-repositories': {
-      file: 'database.png',
-      variants: ['x16', 'x32']
-    },
     'repository-default': {
       file: 'database.png',
       variants: ['x16', 'x32']
     }
   },
   features: {
+    mode: 'admin',
     path: '/Repository/Repositories',
+    description: 'Manage repositories',
     view: { xtype: 'nx-coreui-repository-feature' },
+    iconConfig: {
+      file: 'database.png',
+      variants: ['x16', 'x32']
+    },
     visible: function () {
       return NX.Permissions.check('nexus:repositories', 'read');
     }
@@ -304,6 +306,10 @@ Ext.define('NX.coreui.controller.Repositories', {
     );
   },
 
+  /**
+   * @private
+   * Navigate to same repository in browse mode.
+   */
   navigateToBrowseMode: function () {
     var me = this,
         list = me.getList();

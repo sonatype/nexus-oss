@@ -80,7 +80,7 @@ Ext.define('NX.controller.Content', {
     content.setIconCls(NX.Icons.cls(iconName, 'x32'));
 
     // set browser title
-    document.title = NX.State.getValue('uiSettings').title + ' (' + text + ')';
+    document.title = text + ' - ' + NX.State.getValue('uiSettings').title;
 
     // update description
     if (description === undefined) {

@@ -137,7 +137,7 @@ public abstract class AbstractScraper
               final ArrayListPrefixSource prefixSource = new ArrayListPrefixSource(entries);
               context.stop(prefixSource,
                   "Remote recognized as " + detectionResult.getRemoteDetectedServer() + " (harvested "
-                      + String.valueOf(entries.size()) + " entries, " + context.getScrapeDepth()
+                      + entries.size() + " entries, " + context.getScrapeDepth()
                       + " levels deep).");
             }
             else {

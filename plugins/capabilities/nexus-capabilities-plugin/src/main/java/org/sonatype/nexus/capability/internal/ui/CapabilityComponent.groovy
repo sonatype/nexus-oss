@@ -141,6 +141,25 @@ extends DirectComponentSupport
   }
 
   /**
+   * Updates capability notes.
+   * @param capabilityNotesXO to be updated
+   * @return updated capability
+   */
+  @DirectMethod
+  @RequiresAuthentication
+  @RequiresPermissions('nexus:capabilities:update')
+  @Validate(groups = [Update.class, Default.class])
+  CapabilityXO updateNotes(final @NotNull(message = '[capabilityNotesXO] may not be null') @Valid CapabilityNotesXO capabilityNotesXO) {
+    def reference = capabilityRegistry.get(capabilityIdentity(capabilityNotesXO.id))
+    return asCapability(capabilityRegistry.update(
+        reference.context().id(),
+        reference.context().enabled,
+        capabilityNotesXO.notes,
+        reference.context().properties()
+    ))
+  }
+
+  /**
    * Deletes a capability.
    * @param id of capability to be deleted
    */
@@ -186,9 +205,20 @@ extends DirectComponentSupport
         enabled: reference.context().enabled,
         active: reference.context().active,
         error: reference.context().hasFailure(),
+        state: 'disabled',
         stateDescription: reference.context().stateDescription(),
         properties: reference.context().properties()
     )
+
+    if (capabilityXO.enabled && capabilityXO.error) {
+      capabilityXO.state = 'error'
+    }
+    else if (capabilityXO.enabled && capabilityXO.active) {
+      capabilityXO.state = 'active'
+    }
+    else if (capabilityXO.enabled && !capabilityXO.active) {
+      capabilityXO.state = 'passive';
+    }
 
     try {
       capabilityXO.description = capability.description()

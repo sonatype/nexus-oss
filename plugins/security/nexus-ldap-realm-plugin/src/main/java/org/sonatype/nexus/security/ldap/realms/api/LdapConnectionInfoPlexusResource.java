@@ -29,7 +29,6 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.ldap.realms.persist.InvalidConfigurationException;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -74,8 +73,7 @@ public class LdapConnectionInfoPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = LdapConnectionInfoResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public LdapConnectionInfoResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     // this could be null, if so do we want to return defaults? I would guess no...
@@ -93,8 +91,7 @@ public class LdapConnectionInfoPlexusResource
    */
   @Override
   @PUT
-  @ResourceMethodSignature(input = LdapConnectionInfoResponse.class, output = LdapConnectionInfoResponse.class)
-  public Object put(Context context, Request request, Response response, Object payload)
+  public LdapConnectionInfoResponse put(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     LdapConnectionInfoResponse connResponse = (LdapConnectionInfoResponse) payload;

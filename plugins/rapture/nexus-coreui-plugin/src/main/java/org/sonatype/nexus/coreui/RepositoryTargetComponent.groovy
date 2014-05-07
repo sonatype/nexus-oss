@@ -14,7 +14,7 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.commons.lang.StringUtils
+import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.configuration.validation.InvalidConfigurationException
@@ -26,10 +26,17 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry
 import org.sonatype.nexus.proxy.targets.Target
 import org.sonatype.nexus.proxy.targets.TargetRegistry
+import org.sonatype.nexus.validation.Create
+import org.sonatype.nexus.validation.Update
 
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
+import javax.validation.groups.Default
+import java.util.regex.Pattern
+import java.util.regex.PatternSyntaxException
 
 /**
  * Repository Target {@link DirectComponent}.
@@ -51,6 +58,10 @@ extends DirectComponentSupport
   @Inject
   NexusConfiguration nexusConfiguration
 
+  /**
+   * Retrieves repository targets.
+   * @return a list of repository targets
+   */
   @DirectMethod
   @RequiresPermissions('nexus:targets:read')
   List<RepositoryTargetXO> read() {
@@ -59,10 +70,16 @@ extends DirectComponentSupport
     }
   }
 
+  /**
+   * Creates a repository target.
+   * @param target to be created
+   * @return created target
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:targets:create')
-  RepositoryTargetXO create(final RepositoryTargetXO target) {
+  @Validate(groups = [Create.class, Default.class])
+  RepositoryTargetXO create(final @NotNull(message = '[target] may not be null') @Valid RepositoryTargetXO target) {
     validate(target)
     target.id = Long.toHexString(System.nanoTime())
     def result = new Target(
@@ -73,28 +90,34 @@ extends DirectComponentSupport
     return asRepositoryTarget(result)
   }
 
+  /**
+   * Updates a repository target.
+   * @param target to be updated
+   * @return updated target
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:targets:update')
-  RepositoryTargetXO update(final RepositoryTargetXO target) {
+  @Validate(groups = [Update.class, Default.class])
+  RepositoryTargetXO update(final @NotNull(message = '[target] may not be null') @Valid RepositoryTargetXO target) {
     validate(target)
-    // TODO validate id and that id exists
-    if (target.id) {
-      def result = new Target(
-          target.id, target.name, repositoryTypeRegistry.contentClasses[target.format], target.patterns
-      )
-      targetRegistry.addRepositoryTarget(result)
-      nexusConfiguration.saveConfiguration()
-      return asRepositoryTarget(result)
-    }
-    // TODO throw exception
-    return null
+    def result = new Target(
+        target.id, target.name, repositoryTypeRegistry.contentClasses[target.format], target.patterns
+    )
+    targetRegistry.addRepositoryTarget(result)
+    nexusConfiguration.saveConfiguration()
+    return asRepositoryTarget(result)
   }
 
+  /**
+   * Deletes a repository target.
+   * @param id of target to be deleted
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:targets:delete')
-  void delete(final String id) {
+  @Validate
+  void delete(final @NotNull(message = '[id] may not be null') String id) {
     targetRegistry.removeRepositoryTarget(id)
     nexusConfiguration.saveConfiguration()
   }
@@ -111,20 +134,24 @@ extends DirectComponentSupport
   private void validate(final RepositoryTargetXO target) {
     def validations = new ValidationResponse()
 
-    if (StringUtils.isBlank(target.name)) {
-      validations.addValidationError(new ValidationMessage('name', 'Name cannot be empty'))
+    def contentClass = repositoryTypeRegistry.contentClasses[target.format]
+    if (!contentClass) {
+      validations.addValidationError(new ValidationMessage('format', 'Repository type does not exist'))
     }
-    if (StringUtils.isBlank(target.format)) {
-      validations.addValidationError(new ValidationMessage('repositoryFormat', 'Repository type cannot be empty'))
-    }
-    else {
-      def contentClass = repositoryTypeRegistry.contentClasses[target.format]
-      if (!contentClass) {
-        validations.addValidationError(new ValidationMessage('repositoryFormat', 'Repository type does not exist'))
+
+    def invalidPatterns = []
+    target.patterns.each { pattern ->
+      try {
+        Pattern.compile(pattern)
+      }
+      catch (PatternSyntaxException e) {
+        invalidPatterns << pattern
       }
     }
-    if (!target.patterns || target.patterns.empty) {
-      validations.addValidationError(new ValidationMessage('patterns', 'The target should have at least one pattern'))
+    if (invalidPatterns.size() > 0) {
+      validations.addValidationError(new ValidationMessage(
+          'patterns', 'The following are not valid regular expressions: ' + invalidPatterns.join(','))
+      )
     }
 
     if (!validations.valid) {

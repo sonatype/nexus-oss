@@ -70,9 +70,11 @@ public class Launcher
         .set("bundleBasedir", new File(".").getCanonicalPath())
         .properties("/nexus.properties", true)
         .properties("/nexus-test.properties", false)
-        .custom(new EnvironmentVariables());
+        .custom(new EnvironmentVariables())
+        .override(System.getProperties());
 
     if (overrides != null) {
+      // using properties() instead of override() so we get all values added, not just those with existing entries
       builder.properties(overrides);
     }
 

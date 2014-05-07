@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
 import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
@@ -38,8 +37,7 @@ public class Nexus4423Maven3MetadataTest
   protected EnvironmentBuilder getEnvironmentBuilder()
       throws Exception
   {
-    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
-    return new M2TestsuiteEnvironmentBuilder(ss);
+    return new M2TestsuiteEnvironmentBuilder("nexus4423-snapshot");
   }
 
   @Test

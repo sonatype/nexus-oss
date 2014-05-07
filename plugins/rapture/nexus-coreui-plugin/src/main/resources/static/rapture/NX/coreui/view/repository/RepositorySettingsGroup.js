@@ -30,18 +30,24 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsGroup', {
     var me = this;
 
     me.repositoryStore = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
-    me.repositoryStore.filter({ property: 'format', value: me.template.format });
+    me.repositoryStore.filter([
+      { property: 'format', value: me.template.format },
+      { property: 'includeNexusManaged', value: 'true' }
+    ]);
 
     me.items = [
       {
         xtype: 'checkbox',
         name: 'exposed',
         fieldLabel: 'Publish URL',
+        helpText: 'This controls if the group is published on a URL, if this field is false you will not be able to access this group remotely.',
         value: true
       },
       {
         xtype: 'nx-itemselector',
         name: 'memberRepositoryIds',
+        fieldLabel: 'Member Repositories',
+        helpText: 'Select the repositories that are member of this group.',
         buttons: ['up', 'add', 'remove', 'down'],
         fromTitle: 'Available Repositories',
         toTitle: 'Ordered Member Repositories',

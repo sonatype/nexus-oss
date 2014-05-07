@@ -52,8 +52,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty-testsuite</artifactId>
+      <groupId>org.sonatype.http-testing-harness</groupId>
+      <artifactId>junit-runner</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -86,6 +86,11 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

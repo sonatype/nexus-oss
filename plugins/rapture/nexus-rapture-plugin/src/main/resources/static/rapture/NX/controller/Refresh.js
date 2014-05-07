@@ -31,13 +31,6 @@ Ext.define('NX.controller.Refresh', {
   init: function () {
     var me = this;
 
-    me.getApplication().getIconController().addIcons({
-      'refresh': {
-        file: 'arrow_refresh.png',
-        variants: ['x16', 'x32']
-      }
-    });
-
     me.listen({
       component: {
         'nx-header-refresh': {
@@ -63,6 +56,10 @@ Ext.define('NX.controller.Refresh', {
     var me = this;
 
     me.fireEvent('refresh');
+
+    // Show a message here, so that if the current view doesn't actually support
+    // request that users don't think the feature is broken and spam-click the refresh button
+    NX.Messages.add({ text: 'Refreshed', type: 'default' });
   }
 
 });

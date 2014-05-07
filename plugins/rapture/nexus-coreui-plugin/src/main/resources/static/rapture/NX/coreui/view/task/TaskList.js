@@ -23,7 +23,7 @@ Ext.define('NX.coreui.view.task.TaskList', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
       iconName: function () {
@@ -34,10 +34,12 @@ Ext.define('NX.coreui.view.task.TaskList', {
     { header: 'Type', dataIndex: 'typeName', flex: 1 },
     { header: 'Status', dataIndex: 'statusDescription' },
     { header: 'Schedule', dataIndex: 'schedule' },
-    { header: 'Next Run', dataIndex: 'nextRun', xtype: 'timestampcolumn', flex: 1 },
-    { header: 'Last Run', dataIndex: 'lastRun', xtype: 'timestampcolumn', flex: 1 },
+    { header: 'Next Run', dataIndex: 'nextRun', xtype: 'nx-timestampcolumn', flex: 1 },
+    { header: 'Last Run', dataIndex: 'lastRun', xtype: 'nx-timestampcolumn', flex: 1 },
     { header: 'Last Result', dataIndex: 'lastRunResult' }
   ],
+
+  emptyText: 'No scheduled tasks defined',
 
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
@@ -46,5 +48,8 @@ Ext.define('NX.coreui.view.task.TaskList', {
     { xtype: 'button', text: 'Stop', glyph: 'xf04d@FontAwesome' /* fa-stop */, action: 'stop', disabled: true }
   ],
 
-  plugins: ['gridfilterbox']
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: 'No scheduled task matched criteria "$filter"' }
+  ]
+
 });

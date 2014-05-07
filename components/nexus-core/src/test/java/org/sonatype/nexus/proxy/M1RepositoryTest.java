@@ -10,13 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.Attributes;
@@ -34,6 +35,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 public class M1RepositoryTest
     extends M1ResourceStoreTest
 {
@@ -47,9 +50,7 @@ public class M1RepositoryTest
   protected EnvironmentBuilder getEnvironmentBuilder()
       throws Exception
   {
-    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
-
-    return new M1TestsuiteEnvironmentBuilder(ss);
+    return new M1TestsuiteEnvironmentBuilder(Collections.singletonList("repo1-m1"));
   }
 
   @Override
@@ -152,14 +153,14 @@ public class M1RepositoryTest
     repository.getCurrentCoreConfiguration().commitChanges();
 
     item = new DefaultStorageFileItem(
-        repository, new ResourceStoreRequest(SPOOF_SNAPSHOT), true, true,new StringContentLocator(SPOOF_SNAPSHOT)
+        repository, new ResourceStoreRequest(SPOOF_SNAPSHOT), true, true, new StringContentLocator(SPOOF_SNAPSHOT)
     );
 
     repository.storeItem(false, item);
 
     try {
       item = new DefaultStorageFileItem(
-          repository, new ResourceStoreRequest(SPOOF_RELEASE), true, true,new StringContentLocator(SPOOF_RELEASE)
+          repository, new ResourceStoreRequest(SPOOF_RELEASE), true, true, new StringContentLocator(SPOOF_RELEASE)
       );
 
       repository.storeItem(false, item);
@@ -200,7 +201,8 @@ public class M1RepositoryTest
     M1Repository repository = (M1Repository) this.getRepositoryRegistry().getRepository("inhouse");
     File inhouseLocalStorageDir = new File(new URL(
         ((CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration()).getConfiguration(false)
-            .getLocalStorage().getUrl()).getFile());
+            .getLocalStorage().getUrl()
+    ).getFile());
 
     File artifactFile = new File(inhouseLocalStorageDir, itemPath);
     artifactFile.getParentFile().mkdirs();

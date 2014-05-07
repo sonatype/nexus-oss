@@ -63,8 +63,6 @@ import org.sonatype.p2.bridge.Publisher;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.eclipse.sisu.Description;
@@ -643,10 +641,9 @@ public class UpdateSiteProxyRepositoryImpl
         siteItem = (StorageFileItem) getRemoteStorage().retrieveItem(this, siteRequest, getRemoteUrl());
       }
 
-      final PlexusConfiguration plexusConfig =
-          new XmlPlexusConfiguration(Xpp3DomBuilder.build(new InputStreamReader(siteItem.getInputStream())));
+      final Xpp3Dom config = Xpp3DomBuilder.build(new InputStreamReader(siteItem.getInputStream()));
 
-      overwriteRemoteUrl = plexusConfig.getAttribute("url");
+      overwriteRemoteUrl = config.getAttribute("url");
       log.debug("Remote update site does overwrite the remote url " + overwriteRemoteUrl);
     }
     catch (final Exception e) {

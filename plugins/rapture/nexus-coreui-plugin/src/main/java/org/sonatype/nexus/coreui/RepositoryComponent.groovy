@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
@@ -30,7 +31,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfigu
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry
 import org.sonatype.nexus.proxy.repository.*
-import org.sonatype.nexus.rapture.TrustStore
+import org.sonatype.nexus.rapture.TrustStoreKeys
 import org.sonatype.nexus.rest.RepositoryURLBuilder
 import org.sonatype.nexus.templates.TemplateManager
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider
@@ -77,7 +78,7 @@ extends DirectComponentSupport
 
   @Inject
   @Nullable
-  TrustStore trustStore
+  TrustStoreKeys trustStoreKeys
 
   private def typesToClass = [
       'proxy': ProxyRepository.class,
@@ -91,9 +92,11 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
-  List<RepositoryXO> read() {
+  List<RepositoryXO> read(final @Nullable StoreLoadParameters parameters) {
     def templates = readTemplates(null)
-    return repositoryRegistry.repositories.collect { asRepositoryXO(it, templates) }
+    return filter(parameters).collect { repository ->
+      asRepositoryXO(repository, templates)
+    }
   }
 
   /**
@@ -102,29 +105,12 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
   List<RepositoryReferenceXO> readReferences(final @Nullable StoreLoadParameters parameters) {
-    def List<Repository> repositories = repositoryRegistry.repositories
-    if (parameters) {
-      def typeFilter = parameters.getFilter('type')
-      if (typeFilter) {
-        def clazz = typesToClass[typeFilter]
-        if (!clazz) {
-          throw new IllegalArgumentException('Repository type not supported: ' + typeFilter)
-        }
-        repositories = repositoryRegistry.getRepositoriesWithFacet(clazz)
-      }
-      def formatFilter = parameters.getFilter('format')
-      if (formatFilter) {
-        repositories = repositories.findResults {
-          it.repositoryContentClass.id == formatFilter ? it : null
-        }
-      }
-    }
-    repositories.collect {
+    return filter(parameters).collect { repository ->
       new RepositoryReferenceXO(
-          id: it.id,
-          name: it.name,
-          type: typeOf(it),
-          format: it.repositoryContentClass.id
+          id: repository.id,
+          name: repository.name,
+          type: typeOf(repository),
+          format: repository.repositoryContentClass.id
       )
     }
   }
@@ -355,11 +341,11 @@ extends DirectComponentSupport
       repo.remoteConnectionSettings = new DefaultRemoteConnectionSettings(
           userAgentCustomizationString: repositoryXO.userAgentCustomisation,
           queryString: repositoryXO.urlParameters,
-          connectionTimeout: repositoryXO.timeout,
+          connectionTimeout: repositoryXO.timeout * 1000,
           retrievalRetryCount: repositoryXO.retries
       )
     }
-    trustStore?.setEnabled(TRUST_STORE_TYPE, repo.id, repositoryXO.useTrustStoreForRemoteStorageUrl)
+    trustStoreKeys?.setEnabled(TRUST_STORE_TYPE, repo.id, repositoryXO.useTrustStoreForRemoteStorageUrl)
   }
 
   def static doUpdateProxyMaven = { MavenProxyRepository repo, RepositoryProxyMavenXO repositoryXO ->
@@ -449,12 +435,12 @@ extends DirectComponentSupport
         def rcs = rsc?.remoteConnectionSettings
         proxyMode = repo.proxyMode
         remoteStorageUrl = repo.remoteUrl
-        useTrustStoreForRemoteStorageUrl = trustStore?.isEnabled(TRUST_STORE_TYPE, repo.id)
+        useTrustStoreForRemoteStorageUrl = trustStoreKeys?.isEnabled(TRUST_STORE_TYPE, repo.id)
         autoBlockActive = repo.autoBlockActive
         fileTypeValidation = repo.fileTypeValidation
         userAgentCustomisation = rcs?.userAgentCustomizationString
         urlParameters = rcs?.queryString
-        timeout = rcs?.connectionTimeout
+        timeout = rcs?.connectionTimeout == 0 ? 0 : rcs?.connectionTimeout / 1000
         retries = rcs?.retrievalRetryCount
         httpRequestSettings = userAgentCustomisation || urlParameters || timeout || retries
         notFoundCacheTTL = repo.notFoundCacheTimeToLive
@@ -561,6 +547,47 @@ extends DirectComponentSupport
       return settings.password
     }
     return null
+  }
+
+  List<Repository> filter(final @Nullable StoreLoadParameters parameters) {
+    List<Repository> repositories = repositoryRegistry.repositories
+    boolean includeUserManaged = true
+    boolean includeNexusManaged = false
+    if (parameters) {
+      def typeFilter = parameters.getFilter('type')
+      if (typeFilter) {
+        def clazz = typesToClass[typeFilter]
+        if (!clazz) {
+          throw new IllegalArgumentException('Repository type not supported: ' + typeFilter)
+        }
+        repositories = repositoryRegistry.getRepositoriesWithFacet(clazz)
+      }
+      def formatFilter = parameters.getFilter('format')
+      if (formatFilter) {
+        repositories = repositories.findResults { Repository repository ->
+          repository.repositoryContentClass.id == formatFilter ? repository : null
+        }
+      }
+      def includeUserManagedFilter = parameters.getFilter('includeUserManaged')
+      if (includeUserManagedFilter != null) {
+        includeUserManaged = Boolean.valueOf(includeUserManagedFilter)
+      }
+      def includeNexusManagedFilter = parameters.getFilter('includeNexusManaged')
+      if (includeNexusManagedFilter != null) {
+        includeNexusManaged = Boolean.valueOf(includeNexusManagedFilter)
+      }
+    }
+    if (!includeUserManaged) {
+      repositories = repositories.findResults { Repository repository ->
+        return repository.userManaged ? null : repository
+      }
+    }
+    if (!includeNexusManaged) {
+      repositories = repositories.findResults { Repository repository ->
+        return repository.userManaged ? repository : null
+      }
+    }
+    return repositories
   }
 
 }

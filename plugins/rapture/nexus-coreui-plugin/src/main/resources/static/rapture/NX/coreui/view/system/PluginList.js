@@ -23,15 +23,20 @@ Ext.define('NX.coreui.view.system.PluginList', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
-      iconName: function() { return 'plugin-default'; }
+      iconName: function () {
+        return 'plugin-default';
+      }
     },
     {header: 'Name', dataIndex: 'name', flex: 1},
     {header: 'Version', dataIndex: 'version', flex: 1},
     {header: 'Description', dataIndex: 'description', flex: 1}
   ],
 
-  plugins: [ 'gridfilterbox' ]
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: 'No plugin matched criteria "$filter"' }
+  ]
+
 });

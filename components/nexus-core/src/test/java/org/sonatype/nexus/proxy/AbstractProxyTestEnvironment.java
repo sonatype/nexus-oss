@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 import java.io.File;
@@ -39,8 +40,10 @@ import com.google.common.eventbus.Subscribe;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.codehaus.plexus.PlexusContainer;
 import org.slf4j.Logger;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * The Class AbstractProxyTestEnvironment.
@@ -142,13 +145,13 @@ public abstract class AbstractProxyTestEnvironment
 
     rootRouter = lookup(RepositoryRouter.class);
 
-    getEnvironmentBuilder().buildEnvironment(this);
+    environmentBuilder().startService();
+
+    environmentBuilder().buildEnvironment(this);
 
     eventBus().post(new ConfigurationChangeEvent(applicationConfiguration, null, null));
 
     eventBus().post(new NexusStartedEvent(null));
-
-    getEnvironmentBuilder().startService();
   }
 
   /*
@@ -160,20 +163,48 @@ public abstract class AbstractProxyTestEnvironment
       throws Exception
   {
     try {
-      getEnvironmentBuilder().stopService();
+      environmentBuilder().stopService();
     }
     finally {
       super.tearDown();
     }
   }
 
+  private EnvironmentBuilder environmentBuilder;
+
   /**
-   * Gets the environment builder.
+   * Caches the {@link EnvironmentBuilder} to use same instance throughtout the test.
+   */
+  protected EnvironmentBuilder environmentBuilder() throws Exception {
+    if (environmentBuilder == null) {
+      environmentBuilder = getEnvironmentBuilder();
+    }
+    return environmentBuilder;
+  }
+
+  /**
+   * Creates the environment builder instance, every time a NEW one.
    *
    * @return the environment builder
    */
   protected abstract EnvironmentBuilder getEnvironmentBuilder()
       throws Exception;
+
+  /**
+   * Made public to reach it from {@link EnvironmentBuilder}.
+   */
+  @Override
+  public <T> T lookup(final Class<T> componentClass) throws Exception {
+    return super.lookup(componentClass);
+  }
+
+  /**
+   * Made public to reach it from {@link EnvironmentBuilder}.
+   */
+  @Override
+  public <T> T lookup(final Class<T> componentClass, final String roleHint) throws Exception {
+    return super.lookup(componentClass, roleHint);
+  }
 
   /**
    * Check for file and match contents.
@@ -256,10 +287,6 @@ public abstract class AbstractProxyTestEnvironment
       IOUtils.copy(is, fos);
       fos.flush();
     }
-  }
-
-  public PlexusContainer getPlexusContainer() {
-    return this.getContainer();
   }
 
   protected class TestItemEventListener

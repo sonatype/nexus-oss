@@ -24,15 +24,44 @@ Ext.define('NX.coreui.view.capability.CapabilitySettings', {
       xtype: 'hiddenfield',
       name: 'id'
     },
+    {
+      xtype: 'hiddenfield',
+      name: 'notes'
+    },
     { xtype: 'nx-coreui-capability-settingsfieldset' }
   ],
 
-  getValues: function () {
-    return this.down('nx-coreui-capability-settingsfieldset').exportCapability(this.getForm());
+  /**
+   * @override
+   * Imports capability into settings field set.
+   * @param {NX.model.Capability} model capability model
+   */
+  loadRecord: function (model) {
+    var me = this,
+        capabilityTypeModel = NX.getApplication().getStore('CapabilityType').getById(model.get('typeId')),
+        settingsFieldSet = me.down('nx-coreui-capability-settingsfieldset');
+
+    me.callParent(arguments);
+    settingsFieldSet.importCapability(model, capabilityTypeModel);
   },
 
+  /**
+   * @override
+   * Exports capability from settings field set.
+   * @returns {Object} form values
+   */
+  getValues: function () {
+    return this.down('nx-coreui-capability-settingsfieldset').exportCapability();
+  },
+
+  /**
+   * Mark fields in this form invalid in bulk.
+   * @param {Object/Object[]/Ext.data.Errors} errors
+   * Either an array in the form `[{id:'fieldId', msg:'The message'}, ...]`,
+   * an object hash of `{id: msg, id2: msg2}`, or a {@link Ext.data.Errors} object.
+   */
   markInvalid: function (errors) {
-    return this.down('nx-coreui-capability-settingsfieldset').markInvalid(this.getForm(), errors);
+    this.down('nx-coreui-capability-settingsfieldset').markInvalid(errors);
   }
 
 });

@@ -27,9 +27,10 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.osgi.impl.bundle.obr.resource.BundleInfo;
 import org.osgi.service.obr.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,9 +40,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named(DefaultObrMetadataSource.NAME)
 @Singleton
 public class DefaultObrMetadataSource
-    extends AbstractLogEnabled
     implements ObrMetadataSource
 {
+  private static final Logger log = LoggerFactory.getLogger(DefaultObrMetadataSource.class);
+
   public static final String NAME = "obr-bindex";
 
   private final ObrPluginConfiguration obrConfiguration;
@@ -86,7 +88,7 @@ public class DefaultObrMetadataSource
       }
     }
     catch (final Exception e) {
-      getLogger().warn("Unable to generate OBR metadata for item " + item.getRepositoryItemUid(), e);
+      log.warn("Unable to generate OBR metadata for item {}", item.getRepositoryItemUid(), e);
     }
 
     return null;

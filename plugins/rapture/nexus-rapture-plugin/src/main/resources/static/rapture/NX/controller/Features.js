@@ -29,7 +29,7 @@ Ext.define('NX.controller.Features', {
     'FeatureMenu'
   ],
 
-  statics:{
+  statics: {
     alwaysVisible: function () {
       return true;
     },
@@ -45,7 +45,7 @@ Ext.define('NX.controller.Features', {
    */
   registerFeature: function (features) {
     var me = this,
-        mode, path;
+        path;
 
     if (features) {
       Ext.each(Ext.Array.from(features), function (feature) {
@@ -57,9 +57,17 @@ Ext.define('NX.controller.Features', {
           feature.mode = 'admin';
         }
 
-        if (!feature.view) {
+        if (!feature.view && feature.group === true) {
+          feature.view = 'NX.view.feature.Group';
+        }
+
+        if (!feature.view && !feature.href) {
           me.logWarn('Using default view for feature at path: ' + feature.path);
           feature.view = 'NX.view.feature.TODO';
+        }
+
+        if (feature.href && !feature.hrefTarget) {
+          feature.hrefTarget = feature.href;
         }
 
         path = feature.path;
@@ -97,12 +105,41 @@ Ext.define('NX.controller.Features', {
   },
 
   /**
+   * Un-registers features.
+   * @param {Object[]/Object} features to be unregistered
+   */
+  unregisterFeature: function (features) {
+    var me = this;
+
+    if (features) {
+      Ext.each(Ext.Array.from(features), function (feature) {
+        var path, model;
+
+        if (!feature.mode) {
+          feature.mode = 'admin';
+        }
+        path = feature.path;
+        if (path.charAt(0) === '/') {
+          path = path.substr(1, path.length);
+        }
+        path = feature.mode + '/' + path;
+        feature.path = '/' + path;
+
+        model = me.getFeatureStore().getById(feature.path);
+        if (model) {
+          me.getFeatureStore().remove(model);
+        }
+      });
+    }
+  },
+
+  /**
    * @private
    * @param feature
    */
   configureIcon: function (path, feature) {
     var me = this,
-        defaultIconName = 'feature-' + path.toLowerCase().replace(/\//g, '-').replace(/\s/g, '');
+        defaultIconName = 'feature-' + feature.mode + '-' + path.toLowerCase().replace(/\//g, '-').replace(/\s/g, '');
 
     // inline icon registration for feature
     if (feature.iconConfig) {

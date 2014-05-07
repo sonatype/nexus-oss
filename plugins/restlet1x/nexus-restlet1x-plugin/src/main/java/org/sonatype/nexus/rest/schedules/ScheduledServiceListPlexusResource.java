@@ -43,7 +43,6 @@ import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
@@ -107,8 +106,7 @@ public class ScheduledServiceListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = ScheduledServiceListResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public ScheduledServiceListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     boolean allTasks = isAllTasks(request);
@@ -173,9 +171,7 @@ public class ScheduledServiceListPlexusResource
    */
   @Override
   @POST
-  @ResourceMethodSignature(input = ScheduledServiceResourceResponse.class,
-      output = ScheduledServiceResourceStatusResponse.class)
-  public Object post(Context context, Request request, Response response, Object payload)
+  public ScheduledServiceResourceStatusResponse post(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {
     ScheduledServiceResourceResponse serviceRequest = (ScheduledServiceResourceResponse) payload;

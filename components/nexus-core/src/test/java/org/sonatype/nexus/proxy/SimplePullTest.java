@@ -10,10 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,7 +24,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -41,7 +42,6 @@ import org.sonatype.nexus.proxy.repository.GroupItemNotFoundException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.util.WrappingInputStream;
 import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Server;
 
@@ -57,20 +57,18 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SimplePullTest
     extends AbstractProxyTestEnvironment
 {
 
-  private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
-
   @Override
   protected EnvironmentBuilder getEnvironmentBuilder()
       throws Exception
   {
-    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
-    this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder(ss);
-    return jettyTestsuiteEnvironmentBuilder;
+    return new M2TestsuiteEnvironmentBuilder("repo1", "repo2", "repo3");
   }
 
   @Before
@@ -88,9 +86,10 @@ public class SimplePullTest
       item =
           getRootRouter().retrieveItem(
               new ResourceStoreRequest(
-                  "/repositories/repo1/activemq/activemq-core/1.2/broken/activemq-core-1.2", false));
+                  "/repositories/repo1/activemq/activemq-core/1.2/broken/activemq-core-1.2", false)
+          );
 
-      Assert.fail("We should not be able to pull this path!");
+      fail("We should not be able to pull this path!");
     }
     catch (ItemNotFoundException e) {
       // good, the layout says this is not a file!
@@ -306,7 +305,8 @@ public class SimplePullTest
         getFile(getRepositoryRegistry().getRepository("repo1"),
             "/activemq/activemq-core/1.2/activemq-core-1.2.jar"),
         getFile(getRepositoryRegistry().getRepository("inhouse"),
-            "/activemq/activemq-core/1.2/activemq-core-1.2.jar")));
+            "/activemq/activemq-core/1.2/activemq-core-1.2.jar")
+    ));
   }
 
   @Test
@@ -316,7 +316,8 @@ public class SimplePullTest
     try {
       getRootRouter().retrieveItem(
           new ResourceStoreRequest(
-              "/groups/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar-there-is-no-such", false));
+              "/groups/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar-there-is-no-such", false)
+      );
       fail();
     }
     catch (ItemNotFoundException e) {
@@ -348,7 +349,8 @@ public class SimplePullTest
     try {
       getRootRouter().retrieveItem(
           new ResourceStoreRequest("/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar/",
-              false));
+              false)
+      );
 
       fail("The path ends with slash '/'!");
     }
@@ -372,7 +374,8 @@ public class SimplePullTest
     try {
       getRootRouter().retrieveItem(
           new ResourceStoreRequest(
-              "/groups/test/classworlds/classworlds/1.1-alpha-2/classworlds-1.1-alpha-2-nonexistent.pom", false));
+              "/groups/test/classworlds/classworlds/1.1-alpha-2/classworlds-1.1-alpha-2-nonexistent.pom", false)
+      );
       fail("We should not find this!");
     }
     catch (ItemNotFoundException e) {
@@ -433,7 +436,7 @@ public class SimplePullTest
     try {
       group.retrieveItem(new ResourceStoreRequest("/some/path/that/we/know/is/not/existing/123456/12.foo"));
       // anything else should fail
-      Assert.fail("We expected an exception here!");
+      fail("We expected an exception here!");
     }
     catch (GroupItemNotFoundException e) {
       final String dumpStr = dumpNotFoundReasoning(e, 0);
@@ -469,7 +472,7 @@ public class SimplePullTest
         new ResourceStoreRequest("/activemq/activemq-core/1.2/activemq-core-1.2.jar", true);
 
     try {
-      repository.storeItem(request, new WrappingInputStream(new ByteArrayInputStream(
+      repository.storeItem(request, new FilterInputStream(new ByteArrayInputStream(
           "123456789012345678901234567890".getBytes()))
       {
         @Override
@@ -497,7 +500,7 @@ public class SimplePullTest
         }
       }, null);
 
-      Assert.fail("We expected a LocalStorageEofException to be thrown");
+      fail("We expected a LocalStorageEofException to be thrown");
     }
     catch (LocalStorageEOFException e) {
       // good, we expected this
@@ -520,8 +523,8 @@ public class SimplePullTest
   public void testNXCM4852EofFromRemote()
       throws Exception
   {
-    final int port = jettyTestsuiteEnvironmentBuilder.getServletServer().getPort();
-    jettyTestsuiteEnvironmentBuilder.stopService();
+    final int port = ((M2TestsuiteEnvironmentBuilder)environmentBuilder()).server().getPort();
+    environmentBuilder().stopService();
 
     final Server server = Server.withPort(port);
     server.serve("/*").withBehaviours(new DropConnection()).start();
@@ -532,7 +535,7 @@ public class SimplePullTest
 
       try {
         final StorageItem item = repository.retrieveItem(request);
-        Assert.fail("We expected a LocalStorageEofException to be thrown");
+        fail("We expected a LocalStorageEofException to be thrown");
       }
       catch (LocalStorageEOFException e) {
         // good, we expected this

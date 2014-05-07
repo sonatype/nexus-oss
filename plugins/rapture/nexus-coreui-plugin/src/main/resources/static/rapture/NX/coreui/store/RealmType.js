@@ -24,7 +24,7 @@ Ext.define('NX.coreui.store.RealmType', {
     paramsAsHash: false,
 
     api: {
-      read: 'NX.direct.coreui_SecurityRealm.realmTypes'
+      read: 'NX.direct.coreui_RealmSettings.readRealmTypes'
     },
 
     reader: {

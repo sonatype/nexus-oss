@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline;
 
 import javax.inject.Inject;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.NonNls;
 /**
  * Timeline plugin.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @EagerSingleton
@@ -47,6 +48,12 @@ public class TimelinePlugin
    */
   @NonNls
   public static final String ARTIFACT_ID = "nexus-" + ID_PREFIX + "-plugin";
+
+  /**
+   * REST path prefix.
+   */
+  @NonNls
+  public static final String SERVICE_PREFIX = "/" + ID_PREFIX;
 
   @Inject
   public TimelinePlugin() throws Exception {

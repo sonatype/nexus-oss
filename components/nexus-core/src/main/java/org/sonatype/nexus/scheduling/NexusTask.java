@@ -57,6 +57,9 @@ public interface NexusTask<T>
    */
   String getName();
 
+  /**
+   * Is this task visible on UI?
+   */
   boolean isExposed();
 
   /**

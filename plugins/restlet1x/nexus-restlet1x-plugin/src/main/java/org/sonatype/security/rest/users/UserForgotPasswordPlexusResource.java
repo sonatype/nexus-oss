@@ -27,7 +27,6 @@ import org.sonatype.security.rest.model.UserForgotPasswordRequest;
 import org.sonatype.security.rest.model.UserForgotPasswordResource;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -75,7 +74,6 @@ public class UserForgotPasswordPlexusResource
    */
   @Override
   @POST
-  @ResourceMethodSignature(input = UserForgotPasswordRequest.class)
   public Object post(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {

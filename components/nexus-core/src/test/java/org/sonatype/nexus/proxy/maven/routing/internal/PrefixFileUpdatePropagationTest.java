@@ -10,16 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -42,14 +41,11 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 public class PrefixFileUpdatePropagationTest
     extends AbstractRoutingProxyTest
@@ -91,13 +87,12 @@ public class PrefixFileUpdatePropagationTest
 
       @Override
       public void buildEnvironment(AbstractProxyTestEnvironment env)
-          throws ConfigurationException, IOException, ComponentLookupException
+          throws Exception
       {
-        final PlexusContainer container = env.getPlexusContainer();
         final List<String> reposes = new ArrayList<String>();
         {
           // adding one proxy
-          final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+          final M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
           CRepository repoConf = new DefaultCRepository();
           repoConf.setProviderRole(Repository.class.getName());
           repoConf.setProviderHint("maven2");
@@ -108,7 +103,8 @@ public class PrefixFileUpdatePropagationTest
           repoConf.getLocalStorage().setProvider("file");
           repoConf.getLocalStorage().setUrl(
               env.getApplicationConfiguration().getWorkingDirectory("proxy/store/" + PROXY_REPO_ID).toURI().toURL()
-                  .toString());
+                  .toString()
+          );
           Xpp3Dom ex = new Xpp3Dom("externalConfiguration");
           repoConf.setExternalConfiguration(ex);
           M2RepositoryConfiguration exConf = new M2RepositoryConfiguration(ex);
@@ -126,7 +122,7 @@ public class PrefixFileUpdatePropagationTest
         }
         {
           // adding one hosted
-          final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+          final M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
           CRepository repoConf = new DefaultCRepository();
           repoConf.setProviderRole(Repository.class.getName());
           repoConf.setProviderHint("maven2");
@@ -136,7 +132,8 @@ public class PrefixFileUpdatePropagationTest
           repoConf.getLocalStorage().setProvider("file");
           repoConf.getLocalStorage().setUrl(
               env.getApplicationConfiguration().getWorkingDirectory("proxy/store/" + HOSTED_REPO_ID).toURI().toURL()
-                  .toString());
+                  .toString()
+          );
           Xpp3Dom exRepo = new Xpp3Dom("externalConfiguration");
           repoConf.setExternalConfiguration(exRepo);
           M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration(exRepo);
@@ -150,7 +147,7 @@ public class PrefixFileUpdatePropagationTest
         {
           // add a group
           final M2GroupRepository group =
-              (M2GroupRepository) container.lookup(GroupRepository.class, "maven2");
+              (M2GroupRepository) env.lookup(GroupRepository.class, "maven2");
           CRepository repoGroupConf = new DefaultCRepository();
           repoGroupConf.setProviderRole(GroupRepository.class.getName());
           repoGroupConf.setProviderHint("maven2");

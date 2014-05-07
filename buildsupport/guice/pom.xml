@@ -28,8 +28,8 @@
   <packaging>pom</packaging>
 
   <properties>
-    <eclipse-sisu.version>0.2.0</eclipse-sisu.version>
-    <sisu-guice.version>3.2.0</sisu-guice.version>
+    <eclipse-sisu.version>0.2.1</eclipse-sisu.version>
+    <sisu-guice.version>3.2.1</sisu-guice.version>
   </properties>
 
   <dependencyManagement>

@@ -20,5 +20,5 @@ Ext.define('NX.view.header.Messages', {
   alias: 'widget.nx-header-messages',
 
   glyph: 'xf0f3@FontAwesome',
-  tooltip: 'Toggle messages'
+  tooltip: 'Toggle messages display'
 });

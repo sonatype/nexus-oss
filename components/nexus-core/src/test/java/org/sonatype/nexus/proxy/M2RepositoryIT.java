@@ -58,6 +58,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+import static org.junit.Assert.*;
 
 @Category(Slow.class) // ~25s
 public class M2RepositoryIT
@@ -68,6 +69,11 @@ public class M2RepositoryIT
   protected static final String SPOOF_RELEASE = "/spoof/spoof/1.0/spoof-1.0.txt";
 
   protected static final String SPOOF_SNAPSHOT = "/spoof/spoof/1.0-SNAPSHOT/spoof-1.0-SNAPSHOT.txt";
+
+  @Override
+  protected EnvironmentBuilder getEnvironmentBuilder() throws Exception {
+    return new M2TestsuiteEnvironmentBuilder("repo1");
+  }
 
   @Override
   protected String getItemPath() {

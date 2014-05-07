@@ -10,11 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.p2;
 
-import org.sonatype.jettytestsuite.ServletServer;
-
-import org.junit.Before;
+import org.sonatype.tests.http.server.api.ServerProvider;
 
 public abstract class AbstractNexusProxyP2SecureIT
     extends AbstractNexusProxyP2IT
@@ -24,12 +23,12 @@ public abstract class AbstractNexusProxyP2SecureIT
     super(testRepositoryId);
   }
 
-  @Before
-  public void startProxy() throws Exception {
-    if (proxyServer == null) {
-      proxyServer = this.lookup(ServletServer.class, "secure");
-      proxyServer.start();
-    }
+  @Override
+  protected ServerProvider buildServerProvider() {
+    ServerProvider serverProvider = super.buildServerProvider();
+    serverProvider.addAuthentication("/*", "BASIC");
+    serverProvider.addUser("admin", "admin");
+    return serverProvider;
   }
 
 }

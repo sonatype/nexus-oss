@@ -86,12 +86,6 @@ Ext.define('NX.controller.User', {
         },
         'nx-authenticate button[action=authenticate]': {
           click: me.doAuthenticateAction
-        },
-        'nx-login form': {
-          afterrender: me.installLoginEnterKey
-        },
-        'nx-authenticate form': {
-          afterrender: me.installAuthenticateEnterKey
         }
       }
     });
@@ -103,6 +97,7 @@ Ext.define('NX.controller.User', {
          * @param {Object} user
          */
         'login',
+
         /**
          * @event logout
          * Fires when a user had been successfully logged out.
@@ -118,11 +113,11 @@ Ext.define('NX.controller.User', {
     var me = this;
 
     if (user && !oldUser) {
-      NX.Messages.add({text: 'User logged in: ' + user.id, type: 'default' });
+      NX.Messages.add({text: 'User signed in: ' + user.id, type: 'default' });
       me.fireEvent('login', user);
     }
     else if (!user && oldUser) {
-      NX.Messages.add({text: 'User logged out', type: 'default' });
+      NX.Messages.add({text: 'User signed out', type: 'default' });
       me.fireEvent('logout');
     }
 
@@ -201,38 +196,6 @@ Ext.define('NX.controller.User', {
         win.down('#password').focus();
       }
     }
-  },
-
-  /**
-   * @private
-   */
-  installLoginEnterKey: function (form) {
-    var me = this;
-
-    me.keyNav = Ext.create('Ext.util.KeyNav', form.el, {
-      enter: function () {
-        if (form.isValid()) {
-          me.login(form.down('button[action=login]'));
-        }
-      },
-      scope: this
-    });
-  },
-
-  /**
-   * @private
-   */
-  installAuthenticateEnterKey: function (form) {
-    var me = this;
-
-    me.keyNav = Ext.create('Ext.util.KeyNav', form.el, {
-      enter: function () {
-        if (form.isValid()) {
-          me.doAuthenticateAction(form.down('button[action=authenticate]'));
-        }
-      },
-      scope: this
-    });
   },
 
   /**

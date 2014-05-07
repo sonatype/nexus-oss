@@ -34,7 +34,6 @@ import org.sonatype.nexus.rest.model.AliasingListConverter;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 import com.thoughtworks.xstream.XStream;
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -95,8 +94,7 @@ public class PluginInfoListPlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = PluginInfoListResponseDTO.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public PluginInfoListResponseDTO get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     PluginInfoListResponseDTO result = new PluginInfoListResponseDTO();

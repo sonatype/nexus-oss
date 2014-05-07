@@ -26,6 +26,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class EvictUnusedProxiedItemsTaskTest
     extends AbstractMavenRepoContentTests

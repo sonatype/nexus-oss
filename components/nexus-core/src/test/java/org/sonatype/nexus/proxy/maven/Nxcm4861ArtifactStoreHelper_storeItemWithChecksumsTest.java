@@ -71,11 +71,10 @@ public class Nxcm4861ArtifactStoreHelper_storeItemWithChecksumsTest
 
       @Override
       public void buildEnvironment(AbstractProxyTestEnvironment env)
-          throws ConfigurationException, IOException, ComponentLookupException
+          throws Exception
       {
-        final PlexusContainer container = env.getPlexusContainer();
         // ading one hosted only
-        final M2Repository repo = (M2Repository) container.lookup(Repository.class, "maven2");
+        final M2Repository repo = (M2Repository) env.lookup(Repository.class, "maven2");
         CRepository repoConf = new DefaultCRepository();
         repoConf.setProviderRole(Repository.class.getName());
         repoConf.setProviderHint("maven2");

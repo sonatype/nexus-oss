@@ -27,6 +27,7 @@ Ext.define('NX.coreui.model.Capability', {
     'active',
     'error',
     'description',
+    'state',
     'stateDescription',
     'status',
     'typeName',

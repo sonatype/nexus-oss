@@ -24,13 +24,17 @@ public class RaptureSettings
 
   public static final boolean DEFAULT_DEBUG_ALLOWED = true;
 
-  public static final int DEFAULT_STATUS_INTERVAL = 5; // seconds
+  public static final int DEFAULT_STATUS_INTERVAL_AUTHENTICATED = 5; // seconds
+
+  public static final int DEFAULT_STATUS_INTERVAL_ANONYMOUS = 60; // seconds
 
   public static final int DEFAULT_SESSION_TIMEOUT = 30; // minutes
 
   private boolean debugAllowed = DEFAULT_DEBUG_ALLOWED;
 
-  private int statusInterval = DEFAULT_STATUS_INTERVAL;
+  private int statusIntervalAuthenticated = DEFAULT_STATUS_INTERVAL_AUTHENTICATED;
+
+  private int statusIntervalAnonymous = DEFAULT_STATUS_INTERVAL_ANONYMOUS;
 
   private int sessionTimeout = DEFAULT_SESSION_TIMEOUT;
 
@@ -44,12 +48,20 @@ public class RaptureSettings
     this.debugAllowed = debugAllowed;
   }
 
-  public int getStatusInterval() {
-    return statusInterval;
+  public int getStatusIntervalAuthenticated() {
+    return statusIntervalAuthenticated;
   }
 
-  public void setStatusInterval(final int statusInterval) {
-    this.statusInterval = statusInterval;
+  public void setStatusIntervalAuthenticated(final int statusInterval) {
+    this.statusIntervalAuthenticated = statusInterval;
+  }
+
+  public int getStatusIntervalAnonymous() {
+    return statusIntervalAnonymous;
+  }
+
+  public void setStatusIntervalAnonymous(final int statusInterval) {
+    this.statusIntervalAnonymous = statusInterval;
   }
 
   public int getSessionTimeout() {

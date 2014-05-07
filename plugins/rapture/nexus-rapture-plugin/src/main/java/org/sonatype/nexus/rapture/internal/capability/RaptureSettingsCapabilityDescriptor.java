@@ -63,11 +63,17 @@ public class RaptureSettingsCapabilityDescriptor
     @DefaultMessage("Allow developer debugging")
     String debugAllowedHelp();
 
-    @DefaultMessage("Status interval")
-    String statusIntervalLabel();
+    @DefaultMessage("Authenticated user status interval")
+    String statusIntervalAuthenticatedLabel();
 
-    @DefaultMessage("Interval between status requests (seconds)")
-    String statusIntervalHelp();
+    @DefaultMessage("Interval between status requests for authenticated users(seconds)")
+    String statusIntervalAuthenticatedHelp();
+
+    @DefaultMessage("Anonymous user status interval")
+    String statusIntervalAnonymousLabel();
+
+    @DefaultMessage("Interval between status requests for anonymous user (seconds)")
+    String statusIntervalAnonymousHelp();
 
     @DefaultMessage("Session timeout")
     String sessionTimeoutLabel();
@@ -103,11 +109,17 @@ public class RaptureSettingsCapabilityDescriptor
             FormField.OPTIONAL
         ).withInitialValue(RaptureSettings.DEFAULT_DEBUG_ALLOWED),
         new NumberTextFormField(
-            RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL,
-            messages.statusIntervalLabel(),
-            messages.statusIntervalHelp(),
+            RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_AUTHENTICATED,
+            messages.statusIntervalAuthenticatedLabel(),
+            messages.statusIntervalAuthenticatedHelp(),
             FormField.MANDATORY
-        ).withInitialValue(RaptureSettings.DEFAULT_STATUS_INTERVAL),
+        ).withInitialValue(RaptureSettings.DEFAULT_STATUS_INTERVAL_AUTHENTICATED),
+        new NumberTextFormField(
+            RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_ANONYMOUS,
+            messages.statusIntervalAnonymousLabel(),
+            messages.statusIntervalAnonymousHelp(),
+            FormField.MANDATORY
+        ).withInitialValue(RaptureSettings.DEFAULT_STATUS_INTERVAL_ANONYMOUS),
         new NumberTextFormField(
             RaptureSettingsCapabilityConfiguration.SESSION_TIMEOUT,
             messages.sessionTimeoutLabel(),
@@ -136,7 +148,8 @@ public class RaptureSettingsCapabilityDescriptor
   public Validator validator() {
     return validators().logical().and(
         validators().capability().uniquePer(TYPE),
-        validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL),
+        validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_AUTHENTICATED),
+        validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_ANONYMOUS),
         validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.SESSION_TIMEOUT)
     );
   }
@@ -145,7 +158,8 @@ public class RaptureSettingsCapabilityDescriptor
   public Validator validator(final CapabilityIdentity id) {
     return validators().logical().and(
         validators().capability().uniquePerExcluding(id, TYPE),
-        validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL),
+        validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_AUTHENTICATED),
+        validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_ANONYMOUS),
         validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.SESSION_TIMEOUT)
     );
   }

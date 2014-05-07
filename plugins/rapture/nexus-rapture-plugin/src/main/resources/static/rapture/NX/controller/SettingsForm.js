@@ -33,7 +33,8 @@ Ext.define('NX.controller.SettingsForm', {
       },
       component: {
         'form[settingsForm=true]': {
-          beforerender: me.loadForm
+          afterrender: me.loadForm,
+          load: me.loadForm
         },
         'form[settingsForm=true][editableCondition]': {
           afterrender: me.bindEditableCondition
@@ -57,14 +58,7 @@ Ext.define('NX.controller.SettingsForm', {
 
     if (forms) {
       Ext.each(forms, function (form) {
-        me.loadForm(form, {
-          success: function (basicForm, action) {
-            var title = me.getSettingsFormSuccessMessage(form, action);
-            if (title) {
-              NX.Messages.add({ text: title, type: 'default' });
-            }
-          }
-        });
+        me.loadForm(form);
       });
     }
   },
@@ -74,8 +68,22 @@ Ext.define('NX.controller.SettingsForm', {
    * Loads the form if form's api load function is defined.
    */
   loadForm: function (form, options) {
-    if (form.api && form.api.load) {
-      form.load(options);
+    if (!form.isDestroyed && form.rendered) {
+      if (form.api && form.api.load) {
+        form.load(Ext.applyIf(options || {}, {
+          waitMsg: form.settingsFormLoadMessage,
+          success: function (basicForm, action) {
+            form.isValid();
+            form.fireEvent('loaded', form, action);
+          },
+          failure: function (basicForm, action) {
+            form.isValid();
+          }
+        }));
+      }
+      else {
+        form.isValid();
+      }
     }
   },
 
@@ -88,7 +96,8 @@ Ext.define('NX.controller.SettingsForm', {
         form = button.up('form');
 
     if (form.api && form.api.submit) {
-      form.getForm().submit({
+      form.submit({
+        waitMsg: form.settingsFormSubmitMessage,
         success: function (basicForm, action) {
           var title = me.getSettingsFormSuccessMessage(form, action);
           if (title) {

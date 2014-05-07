@@ -19,8 +19,9 @@ Ext.define('NX.view.header.BrowseMode', {
   extend: 'NX.view.header.Mode',
   alias: 'widget.nx-header-browse-mode',
 
-  tooltip: 'Browse',
   mode: 'browse',
+  title: 'Browse',
+  tooltip: 'Browse server contents',
   glyph: 'xf0e8@FontAwesome' /* fa-sitemap */
 
 });

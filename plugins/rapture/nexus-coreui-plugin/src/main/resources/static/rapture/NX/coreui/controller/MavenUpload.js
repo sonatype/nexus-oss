@@ -31,18 +31,15 @@ Ext.define('NX.coreui.controller.MavenUpload', {
   init: function () {
     var me = this;
 
-    me.getApplication().getIconController().addIcons({
-      'feature-upload-maven': {
-        file: 'upload.png',
-        variants: ['x16', 'x32']
-      }
-    });
-
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'browse',
       path: '/Upload/Maven',
       description: 'Upload artifacts to Maven Hosted Repositories',
       view: { xtype: 'nx-coreui-maven-upload' },
+      iconConfig: {
+        file: 'upload.png',
+        variants: ['x16', 'x32']
+      },
       visible: function () {
         return NX.Permissions.check('nexus:artifact', 'create');
       }

@@ -21,7 +21,6 @@ Ext.define('NX.coreui.store.Repository', {
 
   proxy: {
     type: 'direct',
-    paramsAsHash: false,
 
     api: {
       read: 'NX.direct.coreui_Repository.read'

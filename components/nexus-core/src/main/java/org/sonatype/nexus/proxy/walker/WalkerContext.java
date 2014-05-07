@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -27,6 +28,28 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public interface WalkerContext
 {
+  enum TraversalType {
+    DEPTH_FIRST, // default
+    BREADTH_FIRST;
+  }
+
+  /**
+   * Returns the traversal type, never {@code null}. Default is {@link TraversalType#DEPTH_FIRST} unless set differently.
+   * The traversal type affects how local storage items are processed, and in what order the {@link WalkerProcessor}
+   * methods are invoked.
+   *
+   * @since 2.8.1 // TODO
+   */
+  TraversalType getTraversalType();
+
+  /**
+   * Returns {@code true} if invocations of {@link WalkerProcessor#processItem(WalkerContext, StorageItem)} is
+   * needed to happen with {@link StorageCollectionItem}s too. Default is {@code false}.
+   *
+   * @since 2.8.1  // TODO
+   */
+  boolean isProcessCollections();
+
   /**
    * Gets the resource store request that initiated this walk.
    */

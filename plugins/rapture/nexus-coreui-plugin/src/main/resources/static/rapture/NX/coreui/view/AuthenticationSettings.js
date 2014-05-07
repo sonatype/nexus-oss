@@ -33,20 +33,24 @@ Ext.define('NX.coreui.view.AuthenticationSettings', {
       {
         name: namePrefix + 'uthUsername',
         fieldLabel: 'Username',
+        helpText: 'The username used for authentication.',
         allowBlank: false
       },
       {
         xtype: 'nx-password',
         name: namePrefix + 'uthPassword',
-        fieldLabel: 'Password'
+        fieldLabel: 'Password',
+        helpText: 'The password used for authentication.'
       },
       {
         name: namePrefix + 'uthNtlmHost',
-        fieldLabel: 'NT LAN Host'
+        fieldLabel: 'NT LAN Host',
+        helpText: 'The Windows NT Lan Manager for authentication.'
       },
       {
         name: namePrefix + 'uthNtlmDomain',
-        fieldLabel: 'NT LAN Manager Domain'
+        fieldLabel: 'NT LAN Manager Domain',
+        helpText: 'The Windows NT Lan Manager domain for authentication.'
       }
     ];
 

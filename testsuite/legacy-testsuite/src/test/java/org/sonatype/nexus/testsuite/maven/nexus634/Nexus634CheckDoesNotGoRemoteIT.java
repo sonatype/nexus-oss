@@ -14,21 +14,26 @@ package org.sonatype.nexus.testsuite.maven.nexus634;
 
 import java.io.File;
 
-import org.sonatype.jettytestsuite.BlockingServer;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.tests.http.runner.junit.ServerResource;
+import org.sonatype.tests.http.server.api.ServerProvider;
+import org.sonatype.tests.http.server.fluent.Behaviours;
+import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.jetty.behaviour.Record;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.jetty.server.Server;
-import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.restlet.data.MediaType;
+
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Tests SnapshotRemoverTask to not go remote when checking for release existence.
@@ -38,13 +43,14 @@ import org.restlet.data.MediaType;
 public class Nexus634CheckDoesNotGoRemoteIT
     extends AbstractSnapshotRemoverIT
 {
+  @Rule
+  public ServerResource serverResource = new ServerResource(buildServerProvider());
+
+  private Record record;
+
   protected String localStorageDir = null;
 
   protected Integer proxyPort;
-
-  protected Server server = null;
-
-  protected TouchTrackingHandler touchTrackingHandler;
 
   protected RepositoryMessageUtil repositoryMessageUtil;
 
@@ -56,6 +62,13 @@ public class Nexus634CheckDoesNotGoRemoteIT
     this.localStorageDir = TestProperties.getString("proxy.repo.base.dir");
     this.proxyPort = TestProperties.getInteger("proxy.server.port");
     this.repositoryMessageUtil = new RepositoryMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
+  }
+
+  protected ServerProvider buildServerProvider() {
+    this.record = Behaviours.record();
+    return Server.withPort(TestProperties.getInteger("proxy.server.port"))
+        .serve("/*").withBehaviours(record)
+        .getServerProvider();
   }
 
   @Before
@@ -71,27 +84,6 @@ public class Nexus634CheckDoesNotGoRemoteIT
 
     // update indexes?
     // RepositoryMessageUtil.updateIndexes( "nexus-test-harness-snapshot-repo" );
-  }
-
-  @Before
-  public void startProxy()
-      throws Exception
-  {
-    touchTrackingHandler = new TouchTrackingHandler();
-    server = new BlockingServer(proxyPort);
-    server.setHandler(touchTrackingHandler);
-    server.start();
-  }
-
-  @After
-  public void stopProxy()
-      throws Exception
-  {
-    if (server != null) {
-      server.stop();
-      server = null;
-      touchTrackingHandler = null;
-    }
   }
 
   @Test
@@ -114,8 +106,6 @@ public class Nexus634CheckDoesNotGoRemoteIT
     runSnapshotRemover("nexus-test-harness-snapshot-repo", 0, 0, true);
 
     // check is proxy touched
-    Assert.assertEquals("Proxy should not be touched! It was asked for " + touchTrackingHandler.getTouchedTargets(),
-        touchTrackingHandler.getTouchedTargets().size(),
-        0);
+    assertThat(record.getRequests(), empty());
   }
 }

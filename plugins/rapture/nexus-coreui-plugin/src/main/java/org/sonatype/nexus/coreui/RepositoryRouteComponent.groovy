@@ -14,7 +14,7 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.commons.lang.StringUtils
+import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.configuration.validation.InvalidConfigurationException
@@ -23,15 +23,21 @@ import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.configuration.application.NexusConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.proxy.NoSuchRepositoryException
 import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException
+import org.sonatype.nexus.validation.Create
+import org.sonatype.nexus.validation.Update
 
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
+import javax.validation.groups.Default
+import java.util.regex.Pattern
+import java.util.regex.PatternSyntaxException
 
 /**
  * Repository Route {@link DirectComponent}.
@@ -55,46 +61,70 @@ extends DirectComponentSupport
   RepositoryRegistry repositoryRegistry
 
   /**
-   * Retrieve a list of available repository routes.
+   * Retrieve repository routes.
+   * @return a list of repository routes
    */
   @DirectMethod
   @RequiresPermissions('nexus:routes:read')
   List<RepositoryRouteXO> read() {
-    return repositoryMapper.mappings.values().findResults { input ->
+    return repositoryMapper.mappings.values().findResults { RepositoryPathMapping input ->
       try {
-        return asRepositoryRoute(input)
+        // access group/mapped repositories to ensure user has access to them
+        if (input.groupId != '*') {
+          repositoryRegistry.getRepository(input.groupId)
+        }
+        input.mappedRepositories?.each { repositoryId ->
+          repositoryRegistry.getRepository(repositoryId)
+        }
+        return input
       }
-      catch (NoSuchRepositoryException e) {
+      catch (NoSuchRepositoryAccessException ignore) {
         return null
       }
+    }.collect { input ->
+      asRepositoryRoute(input)
     }
   }
 
+  /**
+   * Creates a repository route.
+   * @param routeXO to be created
+   * @return created repository route
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:routes:create')
-  RepositoryRouteXO create(final RepositoryRouteXO routeXO) {
+  @Validate(groups = [Create.class, Default.class])
+  RepositoryRouteXO create(final @NotNull(message = '[route] may not be null') @Valid RepositoryRouteXO routeXO) {
     routeXO.id = Long.toHexString(System.nanoTime())
     return addToMapper(routeXO)
   }
 
+  /**
+   * Updates a repository route.
+   * @param routeXO to be updated
+   * @return updated repository route
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:routes:update')
-  RepositoryRouteXO update(final RepositoryRouteXO routeXO) {
-    if (routeXO.id) {
-      if (repositoryMapper.mappings[routeXO.id]) {
-        return addToMapper(routeXO)
-      }
-      throw new IllegalArgumentException('Route with id "' + routeXO.id + '" not found')
+  @Validate(groups = [Update.class, Default.class])
+  RepositoryRouteXO update(final @NotNull(message = '[route] may not be null') @Valid RepositoryRouteXO routeXO) {
+    if (repositoryMapper.mappings[routeXO.id]) {
+      return addToMapper(routeXO)
     }
-    throw new IllegalArgumentException('Missing id for route to be updated')
+    throw new IllegalArgumentException('Route with id "' + routeXO.id + '" not found')
   }
 
+  /**
+   * Deletes a repository route.
+   * @param id of repository route to be deleted
+   */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:routes:delete')
-  void delete(final String id) {
+  @Validate
+  void delete(final @NotNull(message = '[id] may not be null') String id) {
     if (repositoryMapper.removeMapping(id)) {
       nexusConfiguration.saveConfiguration()
     }
@@ -103,35 +133,21 @@ extends DirectComponentSupport
     }
   }
 
-  def asRepositoryRoute(final RepositoryPathMapping input) {
+  RepositoryRouteXO asRepositoryRoute(final RepositoryPathMapping input) {
     return new RepositoryRouteXO(
         id: input.id,
         pattern: input.patterns[0],
         mappingType: input.mappingType,
         groupId: input.groupId,
-        groupName: input.groupId != '*' ? repositoryName(input.id, input.groupId) : input.groupId,
+        groupName: input.groupId == '*' ? '*' : repositoryRegistry.getRepository(input.groupId).name,
         mappedRepositoriesIds: input.mappedRepositories,
         mappedRepositoriesNames: input.mappedRepositories.collect { repositoryId ->
-          return repositoryName(input.id, repositoryId)
+          return repositoryRegistry.getRepository(repositoryId).name
         }
     )
   }
 
-  def repositoryName(final String routeId, final String repositoryId) {
-    try {
-      return repositoryRegistry.getRepository(repositoryId).name
-    }
-    catch (NoSuchRepositoryAccessException e) {
-      log.debug("Access Denied to group '{}' contained within route: '{}", repositoryId, routeId)
-      throw e
-    }
-    catch (NoSuchRepositoryException e) {
-      log.debug("Cannot find repository '{}' contained within route: '{}", repositoryId, routeId)
-      throw e
-    }
-  }
-
-  def addToMapper(final RepositoryRouteXO routeXO) {
+  RepositoryRouteXO addToMapper(final RepositoryRouteXO routeXO) {
     validate(routeXO)
     def route = new RepositoryPathMapping(
         routeXO.id, routeXO.mappingType, routeXO.groupId, [routeXO.pattern], routeXO.mappedRepositoriesIds
@@ -141,15 +157,16 @@ extends DirectComponentSupport
     return asRepositoryRoute(route)
   }
 
-  static validate(final RepositoryRouteXO routeXO) {
+  private static void validate(final RepositoryRouteXO routeXO) {
     def validations = new ValidationResponse()
 
-    if (StringUtils.isBlank(routeXO.pattern)) {
-      validations.addValidationError(new ValidationMessage('pattern', 'Pattern cannot be empty'))
+    try {
+      Pattern.compile(routeXO.pattern)
     }
-    if (StringUtils.isBlank(routeXO.groupId)) {
-      validations.addValidationError(new ValidationMessage('groupId', 'Group cannot be empty'))
+    catch (PatternSyntaxException e) {
+      validations.addValidationError(new ValidationMessage('pattern', 'Not a valid regular expression'))
     }
+
     if (routeXO.mappingType == RepositoryPathMapping.MappingType.BLOCKING) {
       if (routeXO.mappedRepositoriesIds && !routeXO.mappedRepositoriesIds.empty) {
         validations.addValidationError(new ValidationMessage(

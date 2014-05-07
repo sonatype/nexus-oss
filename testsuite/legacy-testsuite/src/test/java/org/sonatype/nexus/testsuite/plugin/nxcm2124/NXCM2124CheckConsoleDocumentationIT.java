@@ -21,6 +21,7 @@ import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.sonatype.nexus.testsuite.plugin.nexus2810.AbstractPluginConsoleIT;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -39,6 +40,7 @@ import static org.sonatype.nexus.test.utils.StatusMatchers.isSuccess;
 public class NXCM2124CheckConsoleDocumentationIT
     extends AbstractPluginConsoleIT
 {
+  @Ignore("FIXME: replace plugin console")
   @Test
   public void checkDoc()
       throws IOException
@@ -49,6 +51,10 @@ public class NXCM2124CheckConsoleDocumentationIT
 
     assertThat(getPluginsNames(pluginInfos), hasItem(pluginName));
 
+    // TODO: Since NX-364 Enunciate documentation is removed, hence the
+    // part of this IT that checks for it is also disabled until we provide
+    // some alternative solution for doco.
+    /*
     PluginInfoDTO pluginConsolePlugin =
         this.getPluginInfoByName(pluginInfos, pluginName);
     Assert.assertNotNull(pluginConsolePlugin.getDocumentation());
@@ -65,5 +71,6 @@ public class NXCM2124CheckConsoleDocumentationIT
     finally {
       RequestFacade.releaseResponse(r);
     }
+    */
   }
 }

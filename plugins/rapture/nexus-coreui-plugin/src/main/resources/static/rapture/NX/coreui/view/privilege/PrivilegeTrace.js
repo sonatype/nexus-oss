@@ -57,7 +57,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
         rootVisible: false,
         lines: false,
         width: '50%',
-        padding: 5,
+        padding: '0 1 0 0',
         store: me.privilegeTreeStore,
         listeners: {
           select: me.buildRoleTree,
@@ -68,11 +68,19 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
         xtype: 'treepanel',
         itemId: 'roleTree',
         title: 'Role Containment',
+        tools: [
+          { type: 'collapse', tooltip: 'Collapse all', callback: function(panel) {
+            panel.collapseAll();
+          }},
+          { type: 'expand', tooltip: 'Expand all', callback: function(panel) {
+            panel.expandAll();
+          }}
+        ],
         rootVisible: false,
         lines: false,
         region: 'center',
         width: '50%',
-        padding: 5,
+        padding: '0 0 0 1',
         store: me.roleTreeStore
       }
     ];

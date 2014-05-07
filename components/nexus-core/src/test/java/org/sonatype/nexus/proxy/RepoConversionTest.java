@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
@@ -25,11 +25,13 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class RepoConversionTest
     extends AbstractProxyTestEnvironment
 {
-  private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
-
   private RemoteRepositoryStorage remoteRepositoryStorage;
 
   public void setUp()
@@ -45,9 +47,7 @@ public class RepoConversionTest
   protected EnvironmentBuilder getEnvironmentBuilder()
       throws Exception
   {
-    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
-    this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder(ss);
-    return jettyTestsuiteEnvironmentBuilder;
+    return new M2TestsuiteEnvironmentBuilder("repo1", "repo2", "repo3");
   }
 
   // WARNING!
@@ -95,7 +95,8 @@ public class RepoConversionTest
 
     assertEquals("Config should state the same as object is", afterTreatment.getRemoteUrl(),
         (((CRepositoryCoreConfiguration) afterTreatment.getCurrentCoreConfiguration())
-            .getConfiguration(false)).getRemoteStorage().getUrl());
+            .getConfiguration(false)).getRemoteStorage().getUrl()
+    );
   }
 
   protected void convertProxy2Hosted(MavenProxyRepository patient)

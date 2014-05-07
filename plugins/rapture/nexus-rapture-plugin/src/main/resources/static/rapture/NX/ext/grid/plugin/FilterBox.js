@@ -20,6 +20,11 @@ Ext.define('NX.ext.grid.plugin.FilterBox', {
   alias: 'plugin.gridfilterbox',
 
   /**
+   * @cfg {String} emptyText Text to be used as grid empty text when no records are matching the filter. If text
+   * contains "${filter}" it will be replaced with filter value.
+   */
+
+  /**
    * @override
    */
   init: function (grid) {
@@ -64,6 +69,9 @@ Ext.define('NX.ext.grid.plugin.FilterBox', {
   onSearch: function (searchbox, value) {
     var me = this;
 
+    if (me.emptyText) {
+      me.grid.getView().emptyText = '<div class="x-grid-empty">' + me.emptyText.replace(/\$filter/, value) + '</div>';
+    }
     me.filter(value);
   },
 
@@ -74,6 +82,9 @@ Ext.define('NX.ext.grid.plugin.FilterBox', {
   onSearchCleared: function () {
     var me = this;
 
+    if (me.grid.emptyText) {
+      me.grid.getView().emptyText = '<div class="x-grid-empty">' + me.grid.emptyText + '</div>';
+    }
     me.clearFilter();
   },
 

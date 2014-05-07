@@ -22,7 +22,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.jettytestsuite.BlockingServer;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
@@ -39,6 +38,7 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.nio.BlockingChannelConnector;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -124,7 +124,8 @@ public class MavenRepositoryReaderIT
       }
     };
 
-    server = new BlockingServer(0); // We choose an arbitrary server port
+    server = new Server();// We choose an arbitrary server port
+    server.addConnector(new BlockingChannelConnector());
     server.setHandler(handler); // Assign the handler of incoming requests
     server.start();
 

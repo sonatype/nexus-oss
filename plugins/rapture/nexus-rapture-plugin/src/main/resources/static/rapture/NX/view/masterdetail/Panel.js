@@ -77,6 +77,10 @@ Ext.define('NX.view.masterdetail.Panel', {
 
   addTab: function (tab) {
     this.down('nx-masterdetail-tabs').addTab(tab);
+  },
+
+  removeTab: function (tab) {
+    this.down('nx-masterdetail-tabs').removeTab(tab);
   }
 
 });

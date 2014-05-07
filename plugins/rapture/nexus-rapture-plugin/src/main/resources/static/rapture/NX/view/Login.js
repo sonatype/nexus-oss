@@ -19,7 +19,7 @@ Ext.define('NX.view.Login', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-login',
 
-  title: 'Login',
+  title: 'Sign In',
 
   layout: 'fit',
   autoShow: true,
@@ -40,6 +40,7 @@ Ext.define('NX.view.Login', {
         bodyPadding: 10,
         defaultType: 'textfield',
         defaults: {
+          labelAlign: 'left',
           labelWidth: 100,
           anchor: '100%'
         },
@@ -49,7 +50,8 @@ Ext.define('NX.view.Login', {
             itemId: 'username',
             fieldLabel: 'Username',
             emptyText: 'enter your username',
-            allowBlank: false
+            allowBlank: false,
+            validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
           },
           {
             name: 'password',
@@ -57,7 +59,8 @@ Ext.define('NX.view.Login', {
             fieldLabel: 'Password',
             inputType: 'password',
             emptyText: 'enter your password',
-            allowBlank: false
+            allowBlank: false,
+            validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
           },
           {
             xtype: 'checkbox',
@@ -66,8 +69,9 @@ Ext.define('NX.view.Login', {
           }
         ],
 
+        buttonAlign: 'left',
         buttons: [
-          { text: 'Login', action: 'login', formBind: true, ui: 'primary' },
+          { text: 'Sign In', action: 'login', formBind: true, bindToEnter: true, ui: 'primary' },
           { text: 'Cancel', handler: me.close, scope: me }
         ]
       }

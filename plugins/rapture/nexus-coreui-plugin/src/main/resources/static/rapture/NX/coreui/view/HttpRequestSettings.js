@@ -23,22 +23,34 @@ Ext.define('NX.coreui.view.HttpRequestSettings', {
     {
       xtype: 'textfield',
       name: 'userAgentCustomisation',
-      fieldLabel: 'User-agent customization'
+      fieldLabel: 'User-agent customization',
+      helpText: 'A custom fragment to add to the "user-agent" string used in HTTP requests.'
     },
     {
       xtype: 'textfield',
       name: 'urlParameters',
-      fieldLabel: 'URL parameters'
+      fieldLabel: 'URL parameters',
+      helpText: 'These are additional parameters sent along with the HTTP request. They are appended to the url along with a \'?\'. So \'foo=bar&foo2=bar2\' becomes \'HTTP://myurl?foo=bar&foo2=bar2\''
     },
     {
       xtype: 'numberfield',
       name: 'timeout',
-      fieldLabel: 'Timeout seconds'
+      fieldLabel: 'Timeout',
+      helpText: 'Number of seconds Nexus will wait for a successful connection before retrying.',
+      allowDecimals: false,
+      allowExponential: false,
+      minValue: 0,
+      maxValue: 3600
     },
     {
       xtype: 'numberfield',
       name: 'retries',
-      fieldLabel: 'Retry attempts'
+      fieldLabel: 'Retry attempts',
+      helpText: 'Number of connection attempts Nexus will make before giving up.',
+      allowDecimals: false,
+      allowExponential: false,
+      minValue: 0,
+      maxValue: 10
     }
   ]
 

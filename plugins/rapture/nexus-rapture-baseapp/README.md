@@ -33,5 +33,6 @@ If the content has changed, then the result needs to be committed:
 
 ## Watching
 
-  mvn clean install -Pwatch
+    mvn clean install -Pwatch
+
 

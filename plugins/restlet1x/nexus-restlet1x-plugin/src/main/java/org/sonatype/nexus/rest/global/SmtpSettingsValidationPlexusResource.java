@@ -35,7 +35,6 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 import com.thoughtworks.xstream.XStream;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -86,7 +85,6 @@ public class SmtpSettingsValidationPlexusResource
    */
   @Override
   @PUT
-  @ResourceMethodSignature(input = SmtpSettingsResourceRequest.class)
   public Object put(Context context, Request request, Response response, Object payload)
       throws ResourceException
   {

@@ -17,10 +17,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.index.DefaultIndexerManager;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
+import org.sonatype.tests.http.runner.junit.ServerResource;
+import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Get;
+import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Head;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -37,7 +40,9 @@ import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.packer.IndexPacker;
 import org.apache.maven.index.packer.IndexPackingRequest;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.Rule;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 // This is an IT just because it runs longer then 15 seconds
 public class ReindexIT
@@ -45,9 +50,18 @@ public class ReindexIT
 {
   public static final long A_DAY_MILLIS = 24 * 60 * 60 * 1000;
 
-  private IndexerManager indexerManager;
+  @Rule
+  public ServerResource serverResource = new ServerResource(Server.server()
+      .serve("/central/*").withBehaviours(new Get(util.resolvePath("target/test-classes/reposes-remote/central")), new Head(util.resolveFile("target/test-classes/reposes-remote/central")))
+      .serve("/central-inc1/*").withBehaviours(new Get(util.resolvePath("target/test-classes/reposes-remote/central-inc1")), new Head(util.resolveFile("target/test-classes/reposes-remote/central-inc1")))
+      .serve("/central-inc2/*").withBehaviours(new Get(util.resolvePath("target/test-classes/reposes-remote/central-inc2")), new Head(util.resolveFile("target/test-classes/reposes-remote/central-inc2")))
+      .serve("/central-inc3/*").withBehaviours(new Get(util.resolvePath("target/test-classes/reposes-remote/central-inc3")), new Head(util.resolveFile("target/test-classes/reposes-remote/central-inc3")))
+      .serve("/central-inc1-v1/*").withBehaviours(new Get(util.resolvePath("target/test-classes/reposes-remote/central-inc1-v1")), new Head(util.resolveFile("target/test-classes/reposes-remote/central-inc1-v1")))
+      .serve("/central-inc2-v1/*").withBehaviours(new Get(util.resolvePath("target/test-classes/reposes-remote/central-inc2-v1")), new Head(util.resolveFile("target/test-classes/reposes-remote/central-inc2-v1")))
+      .serve("/central-inc3-v1/*").withBehaviours(new Get(util.resolvePath("target/test-classes/reposes-remote/central-inc3-v1")), new Head(util.resolveFile("target/test-classes/reposes-remote/central-inc3-v1")))
+      .getServerProvider());
 
-  private ServletServer servletServer;
+  private IndexerManager indexerManager;
 
   private NexusIndexer nexusIndexer;
 
@@ -64,29 +78,16 @@ public class ReindexIT
     nexusIndexer = lookup(NexusIndexer.class);
 
     indexPacker = lookup(IndexPacker.class);
-
-    servletServer = lookup(ServletServer.class);
-
-    servletServer.start();
   }
 
-  @Override
-  protected void tearDown()
-      throws Exception
-  {
-    servletServer.stop();
-
-    super.tearDown();
-  }
-
-  protected void makeCentralPointTo(String url)
+  protected void makeCentralPointTo(String repoId)
       throws Exception
   {
     MavenProxyRepository central =
         repositoryRegistry.getRepositoryWithFacet("central", MavenProxyRepository.class);
 
     // redirect it to our "sppof" jetty (see ReindexTest.xml in src/test/resources....
-    central.setRemoteUrl(url);
+    central.setRemoteUrl(serverResource.getServerProvider().getUrl() + "/" + repoId + "/");
 
     // make the central download the remote indexes is found
     central.setDownloadRemoteIndexes(true);
@@ -234,8 +235,7 @@ public class ReindexIT
 
     reindexRemoteRepositoryAndPublish(getRemoteRepositoryRoot("central"), "central", true, 0);
 
-    makeCentralPointTo("http://localhost:" + super.getContainer().getContext().get(PROXY_SERVER_PORT)
-        + "/central/");
+    makeCentralPointTo("central");
 
     indexerManager.reindexRepository(null, "central", true);
 
@@ -250,8 +250,7 @@ public class ReindexIT
 
     reindexRemoteRepositoryAndPublish(getRemoteRepositoryRoot("central"), "central", true, 0);
 
-    makeCentralPointTo("http://localhost:" + super.getContainer().getContext().get(PROXY_SERVER_PORT)
-        + "/central/");
+    makeCentralPointTo("central");
 
     // central is member of public group
     indexerManager.reindexRepository(null, "public", true);
@@ -266,8 +265,7 @@ public class ReindexIT
     // day 1
     reindexRemoteRepositoryAndPublish(getRemoteRepositoryRoot("central-inc1"), "central", false, 0);
 
-    makeCentralPointTo("http://localhost:" + super.getContainer().getContext().get(PROXY_SERVER_PORT)
-        + "/central-inc1/");
+    makeCentralPointTo("central-inc1");
 
     indexerManager.reindexRepository(null, "central", true);
 
@@ -283,8 +281,7 @@ public class ReindexIT
     reindexRemoteRepositoryAndPublish(getRemoteRepositoryRoot("central-inc2"), "central", false, -1);
     shiftContextInTime(((DefaultIndexerManager) indexerManager).getRepositoryIndexContext("central"), -1);
 
-    makeCentralPointTo("http://localhost:" + super.getContainer().getContext().get(PROXY_SERVER_PORT)
-        + "/central-inc2/");
+    makeCentralPointTo("central-inc2");
 
     indexerManager.reindexRepository(null, "central", false);
 
@@ -300,8 +297,7 @@ public class ReindexIT
     reindexRemoteRepositoryAndPublish(getRemoteRepositoryRoot("central-inc3"), "central", false, -1);
     shiftContextInTime(((DefaultIndexerManager) indexerManager).getRepositoryIndexContext("central"), -1);
 
-    makeCentralPointTo("http://localhost:" + super.getContainer().getContext().get(PROXY_SERVER_PORT)
-        + "/central-inc3/");
+    makeCentralPointTo("central-inc3");
 
     indexerManager.reindexRepository(null, "central", false);
 
@@ -319,8 +315,7 @@ public class ReindexIT
       throws Exception
   {
     // day 1
-    makeCentralPointTo("http://localhost:" + super.getContainer().getContext().get(PROXY_SERVER_PORT)
-        + "/central-inc1-v1/");
+    makeCentralPointTo("central-inc1-v1");
 
     indexerManager.reindexRepository(null, "central", true);
 
@@ -333,8 +328,7 @@ public class ReindexIT
     validateIndexWithIdentify(false, "f0a0d2e29ed910808c33135a3a5a51bba6358f7b", "log4j", "log4j", "1.2.15");
 
     // day 2
-    makeCentralPointTo("http://localhost:" + super.getContainer().getContext().get(PROXY_SERVER_PORT)
-        + "/central-inc2-v1/");
+    makeCentralPointTo("central-inc2-v1");
 
     indexerManager.reindexRepository(null, "central", false);
 
@@ -347,8 +341,7 @@ public class ReindexIT
     validateIndexWithIdentify(false, "f0a0d2e29ed910808c33135a3a5a51bba6358f7b", "log4j", "log4j", "1.2.15");
 
     // day 3
-    makeCentralPointTo("http://localhost:" + super.getContainer().getContext().get(PROXY_SERVER_PORT)
-        + "/central-inc3-v1/");
+    makeCentralPointTo("central-inc3-v1");
 
     indexerManager.reindexRepository(null, "central", false);
 

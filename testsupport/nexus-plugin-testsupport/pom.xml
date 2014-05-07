@@ -42,12 +42,7 @@
 
     <dependency>
       <groupId>org.sonatype.http-testing-harness</groupId>
-      <artifactId>server-provider</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty-testsuite</artifactId>
+      <artifactId>junit-runner</artifactId>
     </dependency>
 
     <!--

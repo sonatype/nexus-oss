@@ -68,7 +68,8 @@ extends DirectComponentSupport
   BeanLocator beanLocator
 
   /**
-   * Retrieve a list of available users.
+   * Retrieve users.
+   * @return a list of users
    */
   @DirectMethod
   @RequiresPermissions('security:users:read')
@@ -83,6 +84,7 @@ extends DirectComponentSupport
   }
 
   /**
+   * Retrieves available user sources.
    * @return a list of available user sources (user managers)
    */
   @DirectMethod
@@ -97,10 +99,10 @@ extends DirectComponentSupport
   }
 
   /**
+   * Retrieves user account (logged in user info).
    * @return current logged in user account.
    */
   @DirectMethod
-  @RequiresPermissions('security:users:read')
   @RequiresUser
   UserAccountXO readAccount() {
     String currentUserId = securitySystem.getSubject().getPrincipal().toString()
@@ -114,6 +116,7 @@ extends DirectComponentSupport
   }
 
   /**
+   * Creates a user.
    * @param userXO to be created
    * @return created user
    */
@@ -121,7 +124,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:users:create')
   @Validate(groups = [Create.class, Default.class])
-  UserXO create(final @NotNull(message = 'UserXO may not be null') @Valid UserXO userXO) {
+  UserXO create(final @NotNull(message = '[userXO] may not be null') @Valid UserXO userXO) {
     asUserXO(securitySystem.addUser(new DefaultUser(
         userId: userXO.id,
         source: DEFAULT_SOURCE,
@@ -136,14 +139,15 @@ extends DirectComponentSupport
   }
 
   /**
+   * Update a user.
    * @param userXO to be updated
    * @return updated user
    */
   @DirectMethod
   @RequiresAuthentication
-  @RequiresPermissions('security:users:create')
+  @RequiresPermissions('security:users:update')
   @Validate(groups = [Update.class, Default.class])
-  UserXO update(final @NotNull(message = 'UserXO may not be null') @Valid UserXO userXO) {
+  UserXO update(final @NotNull(message = '[userXO] may not be null') @Valid UserXO userXO) {
     asUserXO(securitySystem.updateUser(securitySystem.getUser(userXO.id).with {
       firstName = userXO.firstName
       lastName = userXO.lastName
@@ -157,15 +161,15 @@ extends DirectComponentSupport
   }
 
   /**
+   * Update user account (logged in user info).
    * @param userAccountXO to be updated
    * @return current logged in user account
    */
   @DirectMethod
   @RequiresUser
   @RequiresAuthentication
-  @RequiresPermissions('security:users:create')
   @Validate
-  UserAccountXO updateAccount(final @NotNull(message = 'UserAccountXO may not be null') @Valid UserAccountXO userAccountXO) {
+  UserAccountXO updateAccount(final @NotNull(message = '[userAccountXO] may not be null') @Valid UserAccountXO userAccountXO) {
     String currentUserId = securitySystem.getSubject().getPrincipal().toString()
     userAccountManager.updateAccount(userAccountManager.readAccount(currentUserId).with {
       firstName = userAccountXO.firstName
@@ -176,13 +180,18 @@ extends DirectComponentSupport
     return readAccount()
   }
 
+  /**
+   * Change password of logged in user.
+   * @param authToken authentication token
+   * @param password new password
+   */
   @DirectMethod
   @RequiresUser
   @RequiresAuthentication
   @RequiresPermissions('security:userschangepw:update')
   @Validate
-  void changePassword(final @NotNull(message = 'AuthToken may not be null') String authToken,
-                      final @NotNull(message = 'Password may not be null') String password)
+  void changePassword(final @NotNull(message = '[authToken] may not be null') String authToken,
+                      final @NotNull(message = '[password] may not be null') String password)
   {
     if (authTickets.redeemTicket(authToken)) {
       String currentUserId = securitySystem.getSubject().getPrincipal().toString()
@@ -196,16 +205,17 @@ extends DirectComponentSupport
   /**
    * Deletes a user.
    * @param id of user to be deleted
-   * @param realm of user to be deleted
+   * @param source of user to be deleted
    */
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('security:users:delete')
   @Validate
-  void delete(final @NotNull(message = 'ID may not be null') String id,
-              final @NotNull(message = 'Realm may not be null') String realm)
+  void delete(final @NotNull(message = '[id] may not be null') String id,
+              final @NotNull(message = '[source] may not be null') String source)
   {
-    securitySystem.deleteUser(id, realm)
+    // TODO check if source is required or we always delete from default realm
+    securitySystem.deleteUser(id, source)
   }
 
   private static asUserXO(final User user) {

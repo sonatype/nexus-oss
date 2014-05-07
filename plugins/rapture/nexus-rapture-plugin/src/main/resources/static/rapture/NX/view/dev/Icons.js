@@ -31,7 +31,7 @@ Ext.define('NX.view.dev.Icons', {
     { text: 'url', xtype: 'templatecolumn', tpl: '<a href="{url}" target="_blank">{url}</a>', flex: 1 },
     { text: 'img src', xtype: 'templatecolumn', tpl: '<img src="{url}"/>' },
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       text: 'img class',
       dataIndex: 'cls',
       iconCls: function(value) {

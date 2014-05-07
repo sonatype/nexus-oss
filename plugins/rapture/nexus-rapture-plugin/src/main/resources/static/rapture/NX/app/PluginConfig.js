@@ -25,7 +25,6 @@ Ext.define('NX.app.PluginConfig', {
     'Menu',
     'MenuGroup',
     'Refresh',
-    'Search',
     'SettingsForm',
     'UiSessionTimeout',
     'User',

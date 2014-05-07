@@ -10,12 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.proxy;
 
 import java.io.IOException;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -30,6 +30,8 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class M1LayoutedM2ShadowRepositoryTest
     extends AbstractShadowRepositoryTest
 {
@@ -37,9 +39,7 @@ public class M1LayoutedM2ShadowRepositoryTest
   protected EnvironmentBuilder getEnvironmentBuilder()
       throws Exception
   {
-    ServletServer ss = (ServletServer) lookup(ServletServer.ROLE);
-
-    return new M2TestsuiteEnvironmentBuilder(ss);
+    return new M2TestsuiteEnvironmentBuilder("repo1", "repo2", "repo3");
   }
 
   private void addShadowReposes()
@@ -87,7 +87,8 @@ public class M1LayoutedM2ShadowRepositoryTest
         getRootRouter()
             .retrieveItem(
                 new ResourceStoreRequest("/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar",
-                    false));
+                    false)
+            );
     checkForFileAndMatchContents(item);
 
     item =
@@ -141,7 +142,8 @@ public class M1LayoutedM2ShadowRepositoryTest
         getRootRouter()
             .retrieveItem(
                 new ResourceStoreRequest("/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar",
-                    false));
+                    false)
+            );
     checkForFileAndMatchContents(item);
 
     item =

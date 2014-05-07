@@ -23,7 +23,7 @@ Ext.define('NX.coreui.view.user.UserList', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
       iconName: function () {
@@ -38,11 +38,18 @@ Ext.define('NX.coreui.view.user.UserList', {
     {header: 'Status', dataIndex: 'status'}
   ],
 
+  emptyText: 'No users defined',
+
   tbar: [
+    '<b>Source:</b>',
+    { xtype: 'button', text: 'Default', action: 'filter', menu: [] },
+    '-',
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
-    { xtype: 'button', text: 'Default', action: 'filter', menu: [] },
   ],
 
-  plugins: ['gridfilterbox']
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: 'No user matched criteria "$filter"' }
+  ]
+
 });

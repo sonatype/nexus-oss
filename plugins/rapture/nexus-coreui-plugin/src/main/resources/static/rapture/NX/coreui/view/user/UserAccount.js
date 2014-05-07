@@ -25,35 +25,41 @@ Ext.define('NX.coreui.view.user.UserAccount', {
     me.items = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'User settings $action',
+        settingsFormSuccessMessage: 'User account settings $action',
         api: {
           load: 'NX.direct.coreui_User.readAccount',
           submit: 'NX.direct.coreui_User.updateAccount'
         },
-        editableCondition: NX.Conditions.isPermitted('security:users', 'update'),
-        editableMarker: 'You do not have permission to update your account',
         items: [
+          {
+            xtype: 'label',
+            html: '<p>Manage your account settings.</p>'
+          },
           {
             name: 'id',
             itemId: 'id',
             readOnly: true,
-            fieldLabel: 'User Id',
+            fieldLabel: 'ID',
+            helpText: 'The ID assigned to you, used as the username.',
             emptyText: 'enter a user id'
           },
           {
             name: 'firstName',
             fieldLabel: 'First Name',
+            helpText: 'Your first name.',
             emptyText: 'enter first name'
           },
           {
             name: 'lastName',
             fieldLabel: 'Last Name',
+            helpText: 'Your last name.',
             emptyText: 'enter last name'
           },
           {
             xtype: 'nx-email',
             name: 'email',
             fieldLabel: 'Email',
+            helpText: 'Your email address, to notify you when necessary.',
             emptyText: 'enter an email address'
           }
         ]

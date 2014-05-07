@@ -1,5 +1,6 @@
 <component-set>
   <components>
+<!--
     <component>
       <role>org.sonatype.jettytestsuite.ServletServer</role>
       <implementation>org.sonatype.jettytestsuite.ServletServer</implementation>
@@ -81,7 +82,7 @@
         </webappContexts>
       </configuration>
     </component>
-
+-->
     <component>
       <role>org.sonatype.ldaptestsuite.LdapServer</role>
       <implementation>org.sonatype.ldaptestsuite.LdapServer</implementation>

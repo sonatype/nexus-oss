@@ -17,7 +17,6 @@ import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -32,7 +31,6 @@ import org.sonatype.nexus.rest.restore.AbstractRestorePlexusResource;
 import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -74,11 +72,7 @@ public class CachePlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(pathParams = {
-      @PathParam(AbstractRestorePlexusResource.DOMAIN), @PathParam(AbstractRestorePlexusResource.TARGET_ID)
-  },
-      output = NFCResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public NFCResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     try {
@@ -142,9 +136,6 @@ public class CachePlexusResource
    */
   @Override
   @DELETE
-  @ResourceMethodSignature(pathParams = {
-      @PathParam(AbstractRestorePlexusResource.DOMAIN), @PathParam(AbstractRestorePlexusResource.TARGET_ID)
-  })
   public void delete(Context context, Request request, Response response)
       throws ResourceException
   {

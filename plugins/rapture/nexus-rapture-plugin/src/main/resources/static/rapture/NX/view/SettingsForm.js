@@ -32,11 +32,26 @@ Ext.define('NX.view.SettingsForm', {
   settingsFormSubmit: true,
 
   /**
+   * @cfg {boolean} [settingsFormSubmitOnEnter=false] True if form should be submitted on Enter.
+   */
+  settingsFormSubmitOnEnter: false,
+
+  /**
    * @cfg {string/function} Text to be used when displaying submit/load messages. If is a function it will be called
    * with submit/load response data as parameter and it should return a String.
    * If text contains "${action}", it will be replaced with performed action.
    */
   settingsFormSuccessMessage: undefined,
+
+  /**
+   * @cfg {string/function} [settingsFormLoadMessage: 'Loading...'] Text to be used as mask while loading data.
+   */
+  settingsFormLoadMessage: 'Loading...',
+
+  /**
+   * @cfg {string/function} [settingsFormSubmitMessage: 'Saving...'] Text to be used as mask while submitting data.
+   */
+  settingsFormSubmitMessage: 'Saving...',
 
   /**
    * @cfg {NX.util.condition.Condition} The condition to be satisfied in order for this form to be editable.
@@ -50,6 +65,7 @@ Ext.define('NX.view.SettingsForm', {
 
   bodyPadding: 10,
   autoScroll: true,
+  waitMsgTarget: true,
 
   defaults: {
     xtype: 'textfield',
@@ -59,7 +75,7 @@ Ext.define('NX.view.SettingsForm', {
   buttonAlign: 'left',
 
   buttons: [
-    { text: 'Save', formBind: true, action: 'save', ui: 'primary' },
+    { text: 'Save', formBind: true, action: 'save', ui: 'primary', bindToEnter: false },
     { text: 'Discard',
       handler: function () {
         var form = this.up('form'),
@@ -67,12 +83,14 @@ Ext.define('NX.view.SettingsForm', {
 
         if (record) {
           form.loadRecord(record);
+          form.isValid();
         }
         else if (form.api && form.api.load) {
-          form.load();
+          form.fireEvent('load', form);
         }
         else {
           form.getForm().reset();
+          form.isValid();
         }
       }
     }
@@ -84,6 +102,10 @@ Ext.define('NX.view.SettingsForm', {
   initComponent: function () {
     var me = this;
 
+    if (me.buttons && Ext.isArray(me.buttons) && me.buttons[0] && Ext.isDefined(me.buttons[0].bindToEnter)) {
+      me.buttons[0].bindToEnter = me.settingsFormSubmitOnEnter;
+    }
+
     me.callParent(arguments);
 
     me.addEvents(
@@ -91,9 +113,23 @@ Ext.define('NX.view.SettingsForm', {
          * @event recordloaded
          * Fires when a record is loaded via {@link Ext.form.Panel#loadRecord}.
          * @param {Ext.form.Panel} this form
-         * @param { Ext.data.Model} loaded record
+         * @param {Ext.data.Model} loaded record
          */
-        'recordloaded'
+        'recordloaded',
+        /**
+         * @event loaded
+         * Fires after form was loaded via configured api.
+         * @param {Ext.form.Panel} this form
+         * @param {Ext.form.action.Action} load action
+         */
+        'loaded',
+        /**
+         * @event submitted
+         * Fires after form was submitted via configured api.
+         * @param {Ext.form.Panel} this form
+         * @param {Ext.form.action.Action} submit action
+         */
+        'submitted'
     );
   },
 
@@ -112,19 +148,59 @@ Ext.define('NX.view.SettingsForm', {
    * @public
    * Sets the read only state for all fields of this form.
    * @param {boolean} editable
-   * @param {string} [markerText] text to be shown as a marker in case that form is not editable
    */
   setEditable: function (editable) {
     var me = this,
+        itemsToDisable = me.getChildItemsToDisable(),
         bottomBar;
 
-    // TODO Can we do something about how form looks like when is disabled?
-
     if (editable) {
-      me.enable();
+      Ext.Array.each(itemsToDisable, function (item) {
+        var enable = true,
+            form;
+
+        if (item.resetEditable) {
+          if (Ext.isFunction(item.setReadOnly)) {
+            item.setReadOnly(false);
+          }
+          else {
+            if (Ext.isDefined(item.resetFormBind)) {
+              item.formBind = item.resetFormBind;
+            }
+            if (item.formBind) {
+              form = item.up('form');
+              if (form && !form.isValid()) {
+                enable = false;
+              }
+            }
+            if (enable) {
+              item.enable();
+            }
+          }
+        }
+        if (Ext.isDefined(item.resetEditable)) {
+          delete item.resetEditable;
+          delete item.resetFormBind;
+        }
+      });
     }
     else {
-      me.disable();
+      Ext.Array.each(itemsToDisable, function (item) {
+        if (Ext.isFunction(item.setReadOnly)) {
+          if (item.resetEditable !== false && !item.readOnly) {
+            item.setReadOnly(true);
+            item.resetEditable = true;
+          }
+        }
+        else {
+          if (item.resetEditable !== false && !item.disabled) {
+            item.disable();
+            item.resetFormBind = item.formBind;
+            delete item.formBind;
+            item.resetEditable = true;
+          }
+        }
+      });
     }
 
     bottomBar = me.getDockedItems('toolbar[dock="bottom"]')[0];

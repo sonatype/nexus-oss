@@ -35,7 +35,6 @@ import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -79,8 +78,7 @@ public class UserRoleTreePlexusResource
    */
   @Override
   @GET
-  @ResourceMethodSignature(output = RoleTreeResourceResponse.class)
-  public Object get(Context context, Request request, Response response, Variant variant)
+  public RoleTreeResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
     String userId = getUserId(request);

@@ -23,7 +23,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
 
   columns: [
     {
-      xtype: 'iconcolumn',
+      xtype: 'nx-iconcolumn',
       dataIndex: 'type',
       width: 36,
       iconVariant: 'x16',
@@ -37,14 +37,20 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
     { header: 'Method', dataIndex: 'method', flex: 1 }
   ],
 
+  emptyText: 'No privileges defined',
+
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
       menu: [
-        { text: 'Repository Target Privilege', action: 'newrepositorytarget', iconCls: NX.Icons.cls('privilege-target', 'x16') }
+        { text: 'Repository Target Privilege', action: 'newrepositorytarget', iconCls: NX.Icons.cls('privilege-target',
+            'x16') }
       ]
     },
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ],
 
-  plugins: ['gridfilterbox']
+  plugins: [
+    { ptype: 'gridfilterbox', emptyText: 'No privilege matched criteria "$filter"' }
+  ]
+
 });

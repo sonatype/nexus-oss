@@ -23,7 +23,7 @@ Ext.define('NX.view.AddWindow', {
   autoShow: true,
   modal: true,
   constrain: true,
-  width: 640,
+  width: 630,
 
   initComponent: function () {
     var me = this;
@@ -31,13 +31,15 @@ Ext.define('NX.view.AddWindow', {
     if (Ext.isDefined(me.items) && !Ext.isArray(me.items)) {
       if (!me.items.buttons) {
         me.items.buttons = [
-          { text: 'Add', action: 'add', formBind: true, ui: 'primary' },
+          { text: 'Add', action: 'add', formBind: true, ui: 'primary', bindToEnter:  me.items.settingsFormSubmitOnEnter },
           { text: 'Cancel', handler: function () {
             this.up('window').close();
           }}
         ];
       }
     }
+
+    me.maxHeight = Ext.getBody().getViewSize().height - 100;
 
     me.callParent(arguments);
   }
