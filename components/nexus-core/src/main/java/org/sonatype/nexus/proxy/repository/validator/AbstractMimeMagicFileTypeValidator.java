@@ -97,10 +97,10 @@ public abstract class AbstractMimeMagicFileTypeValidator
 
     final List<String> magicMimeTypes;
     if (contentOnly) {
-      magicMimeTypes = mimeSupport.detectMimeTypesListFromContent(file.getContentLocator());
+      magicMimeTypes = mimeSupport.detectMimeTypes(file.getContentLocator().getContent(), null);
     }
     else {
-      magicMimeTypes = mimeSupport.detectMimeTypesListFromContent(file);
+      magicMimeTypes = mimeSupport.detectMimeTypes(file.getInputStream(), file.getName());
     }
 
     if (log.isDebugEnabled()) {

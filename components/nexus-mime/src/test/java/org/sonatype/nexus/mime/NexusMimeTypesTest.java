@@ -14,9 +14,11 @@ package org.sonatype.nexus.mime;
 
 import java.util.Properties;
 
+import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.base.Joiner;
+import com.google.common.io.Files;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -28,13 +30,12 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 /**
- * Tests for {@link NexusMimeTypes}
+ * Tests for {@link NexusMimeTypes}.
  */
 public class NexusMimeTypesTest
     extends TestSupport
 {
-
-  NexusMimeTypes underTest = new NexusMimeTypes();
+  private NexusMimeTypes underTest = new NexusMimeTypes();
 
   private Properties addMimeType(final Properties properties, final String extension, final String... types) {
     properties.setProperty(extension, Joiner.on(",").join(types));
@@ -76,8 +77,6 @@ public class NexusMimeTypesTest
     assertThat(underTest.getMimeTypes("test"), is(notNullValue()));
     assertThat(underTest.getMimeTypes("test"), hasProperty("extension", is("test")));
     assertThat(underTest.getMimeTypes("test"), hasProperty("override", is(true)));
-    assertThat(underTest.getMimeTypes("test").getMimetypes(), hasItems("application/octet-stream",
-        "text/plain"));
+    assertThat(underTest.getMimeTypes("test").getMimetypes(), hasItems("application/octet-stream", "text/plain"));
   }
-
 }

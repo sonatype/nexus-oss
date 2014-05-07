@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
-import org.sonatype.nexus.mime.DefaultMimeSupport;
+import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
 import org.sonatype.nexus.mime.NexusMimeTypes;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;

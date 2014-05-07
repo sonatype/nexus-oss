@@ -277,8 +277,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-core</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-mime</artifactId>
     </dependency>
 
     <dependency>

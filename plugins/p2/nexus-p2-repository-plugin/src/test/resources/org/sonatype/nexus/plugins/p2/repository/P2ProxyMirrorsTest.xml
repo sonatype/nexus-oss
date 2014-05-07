@@ -27,7 +27,7 @@
           <field-name>applicationStatusSource</field-name>
         </requirement>
         <requirement>
-          <role>org.sonatype.nexus.mime.MimeUtil</role>
+          <role>org.sonatype.nexus.resources.mime.MimeUtil</role>
           <role-hint>default</role-hint>
           <field-name>mimeUtil</field-name>
         </requirement>
