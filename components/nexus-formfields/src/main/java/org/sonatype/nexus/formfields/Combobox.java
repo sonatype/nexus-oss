@@ -45,7 +45,7 @@ public abstract class Combobox<V>
                   final String label,
                   final String helpText)
   {
-    this(id, label, helpText, FormField.OPTIONAL);
+    this(id, label, helpText, OPTIONAL);
   }
 
   public Combobox(final String id,
@@ -100,11 +100,11 @@ public abstract class Combobox<V>
   }
 
   public Combobox<V> optional() {
-    return withRequired(FormField.OPTIONAL);
+    return withRequired(OPTIONAL);
   }
 
   public Combobox<V> mandatory() {
-    return withRequired(FormField.MANDATORY);
+    return withRequired(MANDATORY);
   }
 
   public Combobox<V> withInitialValue(final V value) {
