@@ -54,7 +54,7 @@ public class ComboboxFormField<V>
                            final String label,
                            final String helpText)
   {
-    this(id, label, helpText, FormField.OPTIONAL);
+    this(id, label, helpText, OPTIONAL);
   }
 
   public ComboboxFormField(final String id,

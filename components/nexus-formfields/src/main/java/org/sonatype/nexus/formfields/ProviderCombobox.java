@@ -15,8 +15,8 @@ package org.sonatype.nexus.formfields;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -49,7 +49,7 @@ public class ProviderCombobox
    * Name of provider.
    */
   public ProviderCombobox named(final String name) {
-    checkArgument(StringUtils.isNotEmpty(name), "name cannot be empty");
+    checkArgument(!Strings.isNullOrEmpty(name), "name cannot be empty");
     checkArgument(!name.trim().startsWith("/"), "name cannot start with '/'");
     this.name = name.trim();
     return this;
@@ -59,8 +59,8 @@ public class ProviderCombobox
    * Adds a query parameter that will be forwarded to provider.
    */
   public ProviderCombobox withParam(final String name, final String value) {
-    checkArgument(StringUtils.isNotEmpty(name), "name cannot be empty");
-    checkArgument(StringUtils.isNotEmpty(value), "value cannot be empty");
+    checkArgument(!Strings.isNullOrEmpty(name), "name cannot be empty");
+    checkArgument(!Strings.isNullOrEmpty(value), "value cannot be empty");
     this.params.put(name, value);
     return this;
   }
