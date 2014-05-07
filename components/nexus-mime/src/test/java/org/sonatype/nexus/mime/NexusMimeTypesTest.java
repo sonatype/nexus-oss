@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 /**
- * Tests for {@link NexusMimeTypes}
+ * Tests for {@link NexusMimeTypes}.
  */
 public class NexusMimeTypesTest
     extends TestSupport

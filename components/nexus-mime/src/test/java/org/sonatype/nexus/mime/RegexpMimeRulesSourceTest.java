@@ -21,42 +21,35 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 
 /**
- * Testing RegexpMimeRulesSource, a handy class for it's wanted behavior. While everyone is free to reimplement the
- * MimeRulesSource as they want, this class is just a general utility since probably it fits almost always.
+ * Tests for {@link RegexpMimeRulesSource}.
  */
 public class RegexpMimeRulesSourceTest
     extends TestSupport
 {
   @Test
   public void testRegectMimeRulesSourceTest() {
-    final RegexpMimeRulesSource mimeRulesSource = new RegexpMimeRulesSource();
+    final RegexpMimeRulesSource underTest = new RegexpMimeRulesSource();
 
-    mimeRulesSource.addRule(".*\\.foo\\z", "foo/bar");
-    mimeRulesSource.addRule(".*\\.pom\\z", "application/x-pom");
-    mimeRulesSource.addRule("(.*/maven-metadata.xml\\z)|(maven-metadata.xml\\z)", "application/x-maven-metadata");
+    underTest.addRule(".*\\.foo\\z", "foo/bar");
+    underTest.addRule(".*\\.pom\\z", "application/x-pom");
+    underTest.addRule("(.*/maven-metadata.xml\\z)|(maven-metadata.xml\\z)", "application/x-maven-metadata");
 
     // "more specific" one
-    mimeRulesSource.addRule("\\A/atom-service/.*\\.xml\\z", "application/atom+xml");
+    underTest.addRule("\\A/atom-service/.*\\.xml\\z", "application/atom+xml");
+
     // and now the "general one"
-    mimeRulesSource.addRule(".*\\.xml\\z", "application/xml");
+    underTest.addRule(".*\\.xml\\z", "application/xml");
 
-    assertThat(mimeRulesSource.getRuleForPath("/some/repo/path/content.foo"), equalTo("foo/bar"));
-    assertThat(mimeRulesSource.getRuleForPath("/some/repo/path/content.foo.bar"), nullValue());
-    assertThat(mimeRulesSource.getRuleForPath("/log4j/log4j/1.2.12/log4j-1.2.12.pom"),
-        equalTo("application/x-pom"));
-    assertThat(mimeRulesSource.getRuleForPath("maven-metadata.xml"), equalTo("application/x-maven-metadata"));
-    assertThat(mimeRulesSource.getRuleForPath("/maven-metadata.xml"), equalTo("application/x-maven-metadata"));
-    assertThat(mimeRulesSource.getRuleForPath("/org/sonatype/nexus/maven-metadata.xml"),
-        equalTo("application/x-maven-metadata"));
-    assertThat(mimeRulesSource.getRuleForPath("/org/sonatype/nexus/maven-metadata.xml.bar"), nullValue());
-    assertThat(mimeRulesSource.getRuleForPath("/org/sonatype/nexus/maven-metadata.xml/tricky/path.pom"),
-        equalTo("application/x-pom"));
+    assertThat(underTest.getRuleForPath("/some/repo/path/content.foo"), equalTo("foo/bar"));
+    assertThat(underTest.getRuleForPath("/some/repo/path/content.foo.bar"), nullValue());
+    assertThat(underTest.getRuleForPath("/log4j/log4j/1.2.12/log4j-1.2.12.pom"), equalTo("application/x-pom"));
+    assertThat(underTest.getRuleForPath("maven-metadata.xml"), equalTo("application/x-maven-metadata"));
+    assertThat(underTest.getRuleForPath("/maven-metadata.xml"), equalTo("application/x-maven-metadata"));
+    assertThat(underTest.getRuleForPath("/org/sonatype/nexus/maven-metadata.xml"), equalTo("application/x-maven-metadata"));
+    assertThat(underTest.getRuleForPath("/org/sonatype/nexus/maven-metadata.xml.bar"), nullValue());
+    assertThat(underTest.getRuleForPath("/org/sonatype/nexus/maven-metadata.xml/tricky/path.pom"), equalTo("application/x-pom"));
 
-    assertThat(mimeRulesSource.getRuleForPath("/org/sonatype/nexus/maven-metadata1.xml"),
-        equalTo("application/xml"));
-    assertThat(mimeRulesSource.getRuleForPath("/atom-service//org/sonatype/nexus/maven-metadata1.xml"),
-        equalTo("application/atom+xml"));
-
+    assertThat(underTest.getRuleForPath("/org/sonatype/nexus/maven-metadata1.xml"), equalTo("application/xml"));
+    assertThat(underTest.getRuleForPath("/atom-service//org/sonatype/nexus/maven-metadata1.xml"), equalTo("application/atom+xml"));
   }
-
 }
