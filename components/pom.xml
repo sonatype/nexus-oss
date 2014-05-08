@@ -51,6 +51,7 @@
     <module>nexus-security</module>
     <module>nexus-security-realms</module>
     <module>nexus-webapp</module>
+    <module>nexus-webresources-api</module>
   </modules>
 
   <dependencyManagement>

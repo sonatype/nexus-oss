@@ -24,7 +24,7 @@ import org.sonatype.nexus.plugin.PluginIdentity;
 import org.sonatype.nexus.plugin.support.DocumentationBundle;
 import org.sonatype.nexus.plugins.plugin.console.model.DocumentationLink;
 import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
-import org.sonatype.nexus.web.WebResourceBundle;
+import org.sonatype.nexus.webresources.WebResourceBundle;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.LinkedHashMultimap;

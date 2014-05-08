@@ -10,20 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugin.support;
+package org.sonatype.nexus.webresources;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.sonatype.nexus.web.WebResource;
-
 import com.google.common.base.Strings;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
-// FIXME: Unify with StaticWebResource impl
 
 /**
  * URL-based {@link WebResource} implementation.
@@ -117,11 +113,13 @@ public class UrlWebResource
 
   @Override
   public String toString() {
-    return "UrlWebResource{" +
+    return getClass().getSimpleName() + "{" +
         "url=" + url +
         ", path='" + path + '\'' +
-        ", isCacheable=" + cacheable +
+        ", cacheable=" + cacheable +
         ", contentType='" + contentType + '\'' +
+        ", size=" + size +
+        ", lastModified=" + lastModified +
         '}';
   }
 }

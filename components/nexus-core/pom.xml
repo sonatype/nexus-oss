@@ -138,6 +138,11 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-formfields</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-webresources-api</artifactId>
+    </dependency>
 
     <!-- Plexus et al -->
     <dependency>
