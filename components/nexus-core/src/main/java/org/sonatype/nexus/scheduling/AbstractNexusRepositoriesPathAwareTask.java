@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.scheduling;
 
+@Deprecated
 public abstract class AbstractNexusRepositoriesPathAwareTask<T>
     extends AbstractNexusRepositoriesTask<T>
 {

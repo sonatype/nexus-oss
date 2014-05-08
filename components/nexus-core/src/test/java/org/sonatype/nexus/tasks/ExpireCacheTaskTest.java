@@ -46,7 +46,7 @@ public class ExpireCacheTaskTest
   {
     fillInRepo();
 
-    while (scheduler.getActiveTasks().size() > 0) {
+    while (scheduler.getRunningTaskCount() > 0) {
       Thread.sleep(100);
     }
 

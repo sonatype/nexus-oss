@@ -39,4 +39,15 @@ public interface QuartzSupport
    * Helper method to ease scheduling of a {@link Job}.
    */
   <T extends Job> JobKey scheduleJob(final Class<T> clazz, final Trigger trigger);
+
+  /**
+   * Returns {@code true} if job with given key exists and is currently running.
+   */
+  boolean isRunning(JobKey jobKey);
+
+  /**
+   * Cancels (if running) and removes the job. Returns {@code true} if job with given key
+   * existed and was removed.
+   */
+  boolean removeJob(JobKey jobKey);
 }

@@ -13,6 +13,7 @@
 package org.sonatype.nexus.plugins.p2.repository.updatesite;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import javax.inject.Named;
 
@@ -22,7 +23,6 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.scheduling.ScheduledTask;
 
 import com.google.common.collect.Lists;
 
@@ -36,13 +36,14 @@ public class UpdateSiteMirrorTask
 
   public static final String ROLE_HINT = "UpdateSiteMirrorTask";
 
-  public static ScheduledTask<?> submit(final NexusScheduler scheduler, final UpdateSiteProxyRepository updateSite,
+  public static UpdateSiteMirrorTask submit(final NexusScheduler scheduler, final UpdateSiteProxyRepository updateSite,
                                         final boolean force)
   {
     final UpdateSiteMirrorTask task = scheduler.createTaskInstance(UpdateSiteMirrorTask.class);
     task.setRepositoryId(updateSite.getId());
     task.setForce(force);
-    return scheduler.submit("Eclipse Update Site Mirror (" + updateSite.getId() + ")", task);
+    scheduler.submit("Eclipse Update Site Mirror (" + updateSite.getId() + ")", task);
+    return task;
   }
 
   @Override

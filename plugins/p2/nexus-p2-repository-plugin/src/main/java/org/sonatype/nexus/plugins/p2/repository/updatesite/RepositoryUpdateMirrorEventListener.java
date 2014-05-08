@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2.repository.updatesite;
 
 import javax.inject.Inject;
@@ -23,7 +24,6 @@ import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireNotFoundCaches;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -63,7 +63,7 @@ public class RepositoryUpdateMirrorEventListener
     if (updateSite != null
         && (evt instanceof RepositoryEventExpireNotFoundCaches ||
         ((RepositoryConfigurationUpdatedEvent) evt).isRemoteUrlChanged())) {
-      final ScheduledTask<?> mirrorTask = UpdateSiteMirrorTask.submit(scheduler, updateSite, false);
+      final UpdateSiteMirrorTask mirrorTask = UpdateSiteMirrorTask.submit(scheduler, updateSite, false);
       log.debug("Submitted " + mirrorTask.getName());
     }
   }

@@ -11,23 +11,19 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.scheduling;
+package org.sonatype.nexus.scheduling.internal;
 
 import java.util.concurrent.Future;
 
-import com.google.common.annotations.VisibleForTesting;
+import org.sonatype.nexus.scheduling.NexusTask;
 
-/**
- * Scheduler facade component of Nexus, responsible for task scheduling. This is like a "SPI" pattern,
- * as actual scheduling might (and probably is) provided by some plugin. You can look at this component
- * as some "simplified" short-hand component to quickly issue background jobs.
- */
-public interface NexusScheduler
+public interface NexusSchedulerSPI
 {
   /**
-   * Issues a NexusTask for immediate execution, giving control over it with returned {@link Future} instance.
+   * Submits a task for immediate execution. Returns {@link Future} to be able to cancel or wait for the result when
+   * task is done.
    */
-  <T> Future<T> submit(String name, NexusTask<T> nexusTask);
+  <T> Future<T> submit(NexusTask<T> nexusTask);
 
   /**
    * Returns the count of currently running tasks. To be used only as advisory value, like in tests.
@@ -37,18 +33,5 @@ public interface NexusScheduler
   /**
    * Kills all running tasks if possible.
    */
-  @VisibleForTesting
   void killAll();
-
-  /**
-   * A factory for tasks (by actual type).
-   */
-  <T> T createTaskInstance(Class<T> taskType)
-      throws IllegalArgumentException;
-
-  /**
-   * A factory for tasks (by FQCN).
-   */
-  NexusTask<?> createTaskInstanceByFQCN(String taskFQCN)
-      throws IllegalArgumentException;
 }

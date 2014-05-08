@@ -28,6 +28,7 @@ import org.sonatype.nexus.quartz.internal.store.KVJobStore;
 import org.sonatype.nexus.quartz.internal.store.KazukiJobDao;
 import org.sonatype.nexus.quartz.internal.store.TriggerRecord;
 import org.sonatype.nexus.quartz.internal.store.TypedSchema;
+import org.sonatype.nexus.scheduling.NexusTaskFactory;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -180,7 +181,7 @@ public class QuartzImplIT
     jobs.add(job2be);
     jobs.add(job3be);
     jobs.add(persistingJobBe);
-    this.quartz = new QuartzSupportImpl(jobs, kvJobStore);
+    this.quartz = new QuartzSupportImpl(jobs, mock(NexusTaskFactory.class), kvJobStore);
     this.quartz.start();
   }
 

@@ -10,42 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.coreui
 
-import groovy.transform.ToString
-import org.sonatype.scheduling.TaskState
+package org.sonatype.nexus.scheduling;
 
 /**
- * Task exchange object.
- *
- * @since 3.0
+ * The factory for {@link NexusTask} instances.
  */
-@ToString(includePackage = false, includeNames = true)
-class TaskXO
+public interface NexusTaskFactory
 {
-  String id
+  /**
+   * A factory for tasks.
+   */
+  <T> T createTaskInstance(Class<T> taskType)
+      throws IllegalArgumentException;
 
-  boolean enabled
+  /**
+   * A factory for tasks (by FQCN as string). This is internal method, should not be used!
+   */
+  NexusTask<?> createTaskInstanceByFQCN(String taskFQCN)
+      throws IllegalArgumentException;
 
-  String name
-
-  String typeId
-
-  String typeName
-
-  TaskState status
-
-  String statusDescription
-
-  String schedule
-
-  Long nextRun
-
-  Long lastRun
-
-  String lastRunResult
-
-  boolean runnable
-
-  boolean stoppable
+  /**
+   * A factory for tasks. This is the "old fashioned" lookup, that uses "role hint" of the component.
+   */
+  @Deprecated
+  NexusTask<?> createTaskInstance(String taskType)
+      throws IllegalArgumentException;
 }

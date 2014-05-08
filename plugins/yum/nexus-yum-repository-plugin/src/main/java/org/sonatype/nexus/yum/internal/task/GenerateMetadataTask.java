@@ -188,7 +188,7 @@ public class GenerateMetadataTask
             routingManager.forceUpdatePrefixFile(mavenRepository);
           }
           catch (Exception e) {
-            logger.warn("Could not update Whitelist for repository '{}'", mavenRepository, e);
+            log.warn("Could not update Whitelist for repository '{}'", mavenRepository, e);
           }
         }
       }

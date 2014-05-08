@@ -57,8 +57,8 @@ import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerContext.TraversalType;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
+import org.sonatype.nexus.scheduling.TaskUtil;
 import org.sonatype.nexus.util.PathUtils;
-import org.sonatype.scheduling.TaskUtil;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;

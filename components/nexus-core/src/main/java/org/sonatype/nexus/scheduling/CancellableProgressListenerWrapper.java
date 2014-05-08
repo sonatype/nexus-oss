@@ -10,20 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.coreui
+package org.sonatype.nexus.scheduling;
 
-import groovy.transform.ToString
-import org.sonatype.scheduling.TaskState
-
-/**
- * Task type exchange object.
- *
- * @since 3.0
- */
-@ToString(includePackage = false, includeNames = true)
-class TaskTypeXO
+public class CancellableProgressListenerWrapper
+    extends ProgressListenerWrapper
 {
-  String id
+  private volatile boolean cancelled;
 
-  String name
+  public CancellableProgressListenerWrapper(final ProgressListener wrapped) {
+    super(wrapped);
+  }
+
+  public boolean isCanceled() {
+    return cancelled || super.isCanceled();
+  }
+
+  public void cancel() {
+    super.cancel();
+
+    cancelled = true;
+  }
 }

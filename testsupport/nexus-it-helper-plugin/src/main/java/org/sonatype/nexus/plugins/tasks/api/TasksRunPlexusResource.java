@@ -10,9 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.tasks.api;
 
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -22,7 +24,6 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.scheduling.ScheduledTask;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -78,14 +79,14 @@ public class TasksRunPlexusResource
     final String taskType = request.getAttributes().get("taskType").toString();
 
     if (taskType != null) {
-      final NexusTask<?> taskInstance = nexusScheduler.createTaskInstance(taskType);
+      final NexusTask<?> taskInstance = nexusScheduler.createTaskInstanceByFQCN(taskType);
       final Map<String, String> valuesMap = request.getResourceRef().getQueryAsForm().getValuesMap();
       if (valuesMap != null && !valuesMap.isEmpty()) {
         for (Map.Entry<String, String> entry : valuesMap.entrySet()) {
           taskInstance.addParameter(entry.getKey(), entry.getValue());
         }
       }
-      final ScheduledTask<?> scheduledTask = nexusScheduler.submit(taskType, taskInstance);
+      final Future<?> scheduledTask = nexusScheduler.submit(taskType, taskInstance);
       try {
         scheduledTask.get();
       }

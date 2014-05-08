@@ -12,22 +12,32 @@
  */
 package org.sonatype.nexus.scheduling;
 
-public class ExceptionerNexusTask
-    extends DummyWaitingNexusTask
+/**
+ * Runtime exception thrown in cases when thread is interrupted. Semantically meaning is almost same as
+ * {@link InterruptedException} except this one is unchecked exception.
+ *
+ * @since 3.0
+ */
+public class TaskInterruptedException
+    extends RuntimeException
 {
+  private static final long serialVersionUID = 5758132070000732555L;
 
-  @Override
-  public Object call()
-      throws Exception
-  {
-    super.call();
+  private final boolean cancelled;
 
-    throw new RuntimeException("Error");
+  public TaskInterruptedException(String message, boolean cancelled) {
+    super(message);
+
+    this.cancelled = cancelled;
   }
 
-  @Override
-  public String getId() {
-    return "exceptionId";
+  public TaskInterruptedException(Throwable cause) {
+    super(cause);
+
+    this.cancelled = false;
   }
 
+  public boolean isCancelled() {
+    return cancelled;
+  }
 }

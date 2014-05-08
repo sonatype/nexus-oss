@@ -19,6 +19,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -238,7 +239,7 @@ public class YumHostedImpl
     return yumRepository;
   }
 
-  private ScheduledTask<YumRepository> submitTask(GenerateMetadataTask task) {
+  private Future<YumRepository> submitTask(GenerateMetadataTask task) {
     try {
       return nexusScheduler.submit(ID, task);
     }
@@ -258,7 +259,7 @@ public class YumHostedImpl
   }
 
   @Override
-  public ScheduledTask<YumRepository> addRpmAndRegenerate(@Nullable String filePath) {
+  public Future<YumRepository> addRpmAndRegenerate(@Nullable String filePath) {
     try {
       LOG.debug("Processing added rpm {}:{}", repository.getId(), filePath);
       final File rpmBaseDir = RepositoryUtils.getBaseDir(repository);

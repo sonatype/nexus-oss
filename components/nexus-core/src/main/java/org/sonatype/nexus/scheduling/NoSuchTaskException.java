@@ -12,37 +12,12 @@
  */
 package org.sonatype.nexus.scheduling;
 
-public class DummyWaitingNexusRepositoriesTask
-    extends AbstractNexusRepositoriesTask<Object>
+public class NoSuchTaskException
+    extends Exception
 {
+  private static final long serialVersionUID = 9212575645497920481L;
 
-  private long sleepTime = 10000;
-
-  @Override
-  protected String getRepositoryFieldId() {
-    return null;
+  public NoSuchTaskException(String id) {
+    super("There is no running/active task with ID=" + id);
   }
-
-  public long getSleepTime() {
-    return sleepTime;
-  }
-
-  public Object doRun()
-      throws Exception
-  {
-    System.out.println("BEFORE SLEEP");
-    Thread.sleep(getSleepTime());
-    System.out.println("AFTER SLEEP");
-
-    return null;
-  }
-
-  protected String getAction() {
-    return "DUMMY";
-  }
-
-  protected String getMessage() {
-    return "A Dummy task, waits for some time";
-  }
-
 }

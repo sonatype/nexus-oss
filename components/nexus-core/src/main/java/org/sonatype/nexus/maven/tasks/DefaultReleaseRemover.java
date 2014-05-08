@@ -54,7 +54,7 @@ import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
 import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
-import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.nexus.scheduling.TaskUtil;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;

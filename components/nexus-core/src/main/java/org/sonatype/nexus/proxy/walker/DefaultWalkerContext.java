@@ -22,8 +22,8 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.scheduling.TaskInterruptedException;
-import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.nexus.scheduling.TaskInterruptedException;
+import org.sonatype.nexus.scheduling.TaskUtil;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

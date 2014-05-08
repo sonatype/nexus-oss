@@ -13,12 +13,15 @@
 
 package org.sonatype.nexus.quartz.internal;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.nexus.quartz.internal.store.KVJobStore;
+import org.sonatype.nexus.scheduling.NexusTaskFactory;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.base.Throwables;
@@ -26,13 +29,14 @@ import org.eclipse.sisu.BeanEntry;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.quartz.UnableToInterruptJobException;
 import org.quartz.impl.DirectSchedulerFactory;
-import org.quartz.simpl.SimpleThreadPool;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 
@@ -51,6 +55,8 @@ public class QuartzSupportImpl
 {
   private final Iterable<BeanEntry<Named, Job>> jobEntries;
 
+  private final NexusTaskFactory nexusTaskFactory;
+
   private final KVJobStore kazukiJobStore;
 
   private Scheduler scheduler;
@@ -61,10 +67,12 @@ public class QuartzSupportImpl
 
   @Inject
   public QuartzSupportImpl(final Iterable<BeanEntry<Named, Job>> jobEntries,
+                           final NexusTaskFactory nexusTaskFactory,
                            final KVJobStore kazukiJobStore)
       throws Exception
   {
     this.jobEntries = checkNotNull(jobEntries);
+    this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
     this.kazukiJobStore = checkNotNull(kazukiJobStore);
     this.active = true;
     this.threadPoolSize = 20;
@@ -148,7 +156,13 @@ public class QuartzSupportImpl
   public Job newJob(final TriggerFiredBundle bundle, final Scheduler scheduler) throws SchedulerException {
     final BeanEntry<Named, Job> jobEntry = locate(bundle.getJobDetail().getJobClass());
     if (jobEntry != null) {
-      return jobEntry.getProvider().get(); // to support not-singletons
+      final Job job = jobEntry.getProvider().get(); // to support not-singletons
+      if (job instanceof NexusTaskJobSupport) {
+        final NexusTaskJobSupport nxJob = (NexusTaskJobSupport) job;
+        nxJob.setNexusTask(nexusTaskFactory.createTaskInstanceByFQCN(
+            bundle.getJobDetail().getJobDataMap().getString(NexusTaskJobSupport.NX_TASK_FQCN)));
+      }
+      return job;
     }
     throw new SchedulerException("Cannot create new instance of Job: " + bundle.getJobDetail().getJobClass().getName());
   }
@@ -183,10 +197,47 @@ public class QuartzSupportImpl
         jobEntry.getDescription()).build();
     try {
       scheduler.scheduleJob(jobDetail, trigger);
+      return jobDetail.getKey();
     }
     catch (SchedulerException e) {
-      Throwables.propagate(e);
+      throw Throwables.propagate(e);
     }
-    return jobDetail.getKey();
+  }
+
+  @Override
+  public boolean isRunning(final JobKey jobKey) {
+    checkNotNull(jobKey);
+    try {
+      final List<JobExecutionContext> currentlyRunning = scheduler.getCurrentlyExecutingJobs();
+      for (JobExecutionContext context : currentlyRunning) {
+        if (context.getJobDetail().getKey().equals(jobKey)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    catch (SchedulerException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  @Override
+  public boolean removeJob(final JobKey jobKey) {
+    checkNotNull(jobKey);
+    try {
+      if (isRunning(jobKey)) {
+        try {
+          scheduler.interrupt(jobKey);
+        }
+        catch (UnableToInterruptJobException e) {
+          log.info("Unable to interrupt job with key {}", jobKey, e);
+        }
+      }
+      log.debug("Removing job with key {}", jobKey);
+      return scheduler.deleteJob(jobKey);
+    }
+    catch (SchedulerException e) {
+      throw Throwables.propagate(e);
+    }
   }
 }

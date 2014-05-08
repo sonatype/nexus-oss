@@ -24,10 +24,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.TaskState;
-import org.sonatype.scheduling.schedules.ManualRunSchedule;
-import org.sonatype.scheduling.schedules.RunNowSchedule;
 
 import org.restlet.Context;
 import org.restlet.data.Form;
@@ -78,7 +74,7 @@ public class TasksWaitForPlexusResource
     final String taskType = form.getFirstValue("taskType");
     final long window = Long.parseLong(form.getFirstValue("window", "10000"));
     final long timeout = Long.parseLong(form.getFirstValue("timeout", "60000"));
-
+/*
     final ScheduledTask<?> namedTask = getTaskByName(nexusScheduler, name);
 
     if (name != null && namedTask == null) {
@@ -102,11 +98,11 @@ public class TasksWaitForPlexusResource
         lastTimeTasksWereStillRunning = System.currentTimeMillis();
       }
     }
-
+*/
     response.setStatus(Status.SUCCESS_ACCEPTED);
     return "Tasks Not Finished";
   }
-
+/*
   static boolean isTaskCompleted(final NexusScheduler nexusScheduler,
                                  final String taskType,
                                  final ScheduledTask<?> namedTask)
@@ -193,5 +189,5 @@ public class TasksWaitForPlexusResource
 
     return tasks;
   }
-
+*/
 }

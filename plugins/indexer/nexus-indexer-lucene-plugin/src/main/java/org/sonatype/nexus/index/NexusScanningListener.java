@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.nexus.scheduling.TaskUtil;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.commons.lang.time.DurationFormatUtils;
