@@ -63,7 +63,8 @@ public class NexusApplication
     this.protectedPathManager = protectedPathManager;
     this.statusPlexusResource = statusPlexusResource;
     this.statusService = statusService;
-    useStrictChecking = System.getProperty("strict-uri-matching", "true").equals("true");
+    useStrictChecking = System.getProperty("nexus.restlet.strict-uri-matching", "true").equals("true");
+    logger.debug("Strict URI matching: {}", useStrictChecking);
   }
 
   // HACK: Too many places were using new NexusApplication() ... fuck it
