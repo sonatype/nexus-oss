@@ -21,7 +21,7 @@ import org.quartz.Trigger;
 /**
  * Component managing Quartz {@link Scheduler}.
  *
- * @since 2.8
+ * @since 3.0
  */
 public interface QuartzSupport
 {

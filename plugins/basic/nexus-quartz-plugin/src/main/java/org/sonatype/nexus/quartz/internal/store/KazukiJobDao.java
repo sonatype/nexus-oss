@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.quartz.QuartzPlugin;
 import org.sonatype.nexus.quartz.internal.store.TriggerWrapper.State;
 import org.sonatype.nexus.util.NexusUberClassloader;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
@@ -53,7 +54,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Kazuki backed DAO implementation. This class merely handles CRUD operations, and transformation of the persisted
  * data into entities.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Singleton
 @Named
@@ -71,9 +72,9 @@ public class KazukiJobDao
   private final ObjectMapper mapper;
 
   @Inject
-  public KazukiJobDao(final @Named("nexusquartz") KeyValueStore store,
-                      final @Named("nexusquartz") SchemaStore schemaStore,
-                      final @Named("nexusquartz") Lifecycle lifecycle,
+  public KazukiJobDao(final @Named(QuartzPlugin.STORE_NAME) KeyValueStore store,
+                      final @Named(QuartzPlugin.STORE_NAME) SchemaStore schemaStore,
+                      final @Named(QuartzPlugin.STORE_NAME) Lifecycle lifecycle,
                       final NexusUberClassloader nexusUberClassloader)
       throws Exception
   {

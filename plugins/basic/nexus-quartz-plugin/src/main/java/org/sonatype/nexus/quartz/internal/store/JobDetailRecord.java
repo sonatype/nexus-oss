@@ -18,17 +18,17 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
+import io.kazuki.v0.store.schema.TypeValidation;
 import io.kazuki.v0.store.schema.model.Attribute;
 import io.kazuki.v0.store.schema.model.Attribute.Type;
 import io.kazuki.v0.store.schema.model.Schema;
-import io.kazuki.v0.store.schema.TypeValidation;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * JobDetail record.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class JobDetailRecord
 {
@@ -42,7 +42,7 @@ public class JobDetailRecord
           new Attribute("quartzType", Type.UTF8_SMALLSTRING, null, false),
           new Attribute("jobClass", Type.UTF8_SMALLSTRING, null, false),
           new Attribute("data", Type.MAP, null, false)
-      ))
+      ), null)
   );
 
   private final String name;

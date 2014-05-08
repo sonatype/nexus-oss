@@ -75,7 +75,7 @@ import static org.sonatype.nexus.quartz.internal.store.Predicates.single;
  * KV backed {@link JobStore} implementation. It uses {@link KazukiJobDao} to implement {@link JobStore}, and all the
  * logical constraints and relations are handled in this class.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Singleton
 @Named

@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Static helper for common predicates.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class Predicates
 {

@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Quartz Scheduler capability.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named(SchedulerCapabilityDescriptor.TYPE_ID)
 public class SchedulerCapability

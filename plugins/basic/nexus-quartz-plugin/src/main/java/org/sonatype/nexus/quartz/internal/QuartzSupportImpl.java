@@ -41,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Implementation of {@link QuartzSupport}.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Singleton
 @Named

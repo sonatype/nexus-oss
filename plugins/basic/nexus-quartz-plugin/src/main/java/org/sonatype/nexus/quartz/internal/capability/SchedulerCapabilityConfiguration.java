@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * {@link SchedulerCapability} configuration.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class SchedulerCapabilityConfiguration
     extends CapabilityConfigurationSupport

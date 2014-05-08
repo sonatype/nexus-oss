@@ -42,7 +42,7 @@ import static org.sonatype.nexus.quartz.QuartzPlugin.CAPABILITY_CATEGORY_TAG;
 /**
  * {@link SchedulerCapability} descriptor.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named(SchedulerCapabilityDescriptor.TYPE_ID)
 @Singleton

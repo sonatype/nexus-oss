@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.quartz.QuartzPlugin;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
@@ -35,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Quartz guice module setting up Kazuki.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 public class QuartzModule
@@ -44,10 +45,10 @@ public class QuartzModule
   @Override
   protected void configure() {
     // Kazuki
-    install(new LifecycleModule("nexusquartz"));
-    bind(JdbiDataSourceConfiguration.class).annotatedWith(Names.named("nexusquartz"))
+    install(new LifecycleModule(QuartzPlugin.STORE_NAME));
+    bind(JdbiDataSourceConfiguration.class).annotatedWith(Names.named(QuartzPlugin.STORE_NAME))
         .toProvider(JdbiConfigurationProvider.class).in(Scopes.SINGLETON);
-    final EasyKeyValueStoreModule keyValueStoreModule = new EasyKeyValueStoreModule("nexusquartz", null);
+    final EasyKeyValueStoreModule keyValueStoreModule = new EasyKeyValueStoreModule(QuartzPlugin.STORE_NAME, null);
     keyValueStoreModule.withSequenceConfig(getSequenceServiceConfiguration());
     keyValueStoreModule.withKeyValueStoreConfig(getKeyValueStoreConfiguration());
     install(keyValueStoreModule);

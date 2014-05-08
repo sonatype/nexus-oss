@@ -23,17 +23,17 @@ import org.sonatype.nexus.quartz.internal.store.TriggerWrapper.State;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
+import io.kazuki.v0.store.schema.TypeValidation;
 import io.kazuki.v0.store.schema.model.Attribute;
 import io.kazuki.v0.store.schema.model.Attribute.Type;
 import io.kazuki.v0.store.schema.model.Schema;
-import io.kazuki.v0.store.schema.TypeValidation;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * OperableTrigger record.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class TriggerRecord
 {
@@ -50,7 +50,7 @@ public class TriggerRecord
           new Attribute("jobName", Type.UTF8_SMALLSTRING, null, true),
           new Attribute("jobGroup", Type.UTF8_SMALLSTRING, null, true),
           new Attribute("calendarName", Type.UTF8_SMALLSTRING, null, true)
-      ))
+      ), null)
   );
 
   private final String name;

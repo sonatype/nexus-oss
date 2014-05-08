@@ -20,7 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Wrapper for OperableTrigger that holds state too.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class TriggerWrapper
 {

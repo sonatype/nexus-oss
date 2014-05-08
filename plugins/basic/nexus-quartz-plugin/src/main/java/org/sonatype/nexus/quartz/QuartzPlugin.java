@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NonNls;
 /**
  * Quartz plugin.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @EagerSingleton
@@ -58,6 +58,11 @@ public class QuartzPlugin
    * Capabilities tag.
    */
   public static final String CAPABILITY_CATEGORY_TAG = "Quartz";
+
+  /**
+   * Name of the KV store used by plugin.
+   */
+  public static final String STORE_NAME = "nexusquartz";
 
   @Inject
   public QuartzPlugin() throws Exception {

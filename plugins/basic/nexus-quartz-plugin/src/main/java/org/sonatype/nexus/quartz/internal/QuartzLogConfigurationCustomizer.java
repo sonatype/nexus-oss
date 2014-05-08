@@ -23,7 +23,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 /**
  * Quartz {@link LogConfigurationCustomizer}.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @Singleton

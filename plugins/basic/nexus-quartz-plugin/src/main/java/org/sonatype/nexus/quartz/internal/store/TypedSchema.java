@@ -23,7 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Simple helper that holds triplet of KZ Schema name, related Java class and KZ Schema.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class TypedSchema<T>
 {

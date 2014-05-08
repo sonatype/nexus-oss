@@ -21,7 +21,7 @@ import org.quartz.UnableToInterruptJobException;
 /**
  * Job support class.
  *
- * @since 2.8
+ * @since 3.0
  */
 public abstract class JobSupport
     extends ComponentSupport

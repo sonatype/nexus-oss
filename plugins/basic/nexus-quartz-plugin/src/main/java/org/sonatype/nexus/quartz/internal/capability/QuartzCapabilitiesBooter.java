@@ -24,7 +24,7 @@ import org.eclipse.sisu.EagerSingleton;
 /**
  * Automatically creates Quartz Scheduler capabilities on startup.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @EagerSingleton
