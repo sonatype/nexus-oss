@@ -88,16 +88,16 @@
           <role-hint></role-hint>
           <field-name>walker</field-name>
         </requirement>
-        <requirement>
-          <role>org.sonatype.nexus.mime.MimeUtil</role>
-          <role-hint></role-hint>
-          <field-name>mimeUtil</field-name>
-        </requirement>
-        <requirement>
-          <role>org.sonatype.nexus.mime.MimeSupport</role>
-          <role-hint></role-hint>
-          <field-name>mimeSupport</field-name>
-        </requirement>
+        <!--<requirement>-->
+          <!--<role>org.sonatype.nexus.resources.mime.MimeUtil</role>-->
+          <!--<role-hint></role-hint>-->
+          <!--<field-name>mimeUtil</field-name>-->
+        <!--</requirement>-->
+        <!--<requirement>-->
+          <!--<role>org.sonatype.nexus.resources.mime.MimeSupport</role>-->
+          <!--<role-hint></role-hint>-->
+          <!--<field-name>mimeSupport</field-name>-->
+        <!--</requirement>-->
         <requirement>
           <role>org.sonatype.nexus.proxy.item.ContentGenerator</role>
           <field-name>contentGenerators</field-name>

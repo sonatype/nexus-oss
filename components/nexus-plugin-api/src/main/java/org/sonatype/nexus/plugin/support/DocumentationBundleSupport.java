@@ -20,7 +20,8 @@ import java.util.List;
 
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugin.PluginIdentity;
-import org.sonatype.nexus.web.WebResource;
+import org.sonatype.nexus.webresources.UrlWebResource;
+import org.sonatype.nexus.webresources.WebResource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.eclipse.sisu.space.ClassSpace;

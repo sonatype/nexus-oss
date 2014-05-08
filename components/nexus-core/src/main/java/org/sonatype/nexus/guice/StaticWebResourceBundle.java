@@ -21,8 +21,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.web.WebResource;
-import org.sonatype.nexus.web.WebResourceBundle;
+import org.sonatype.nexus.webresources.UrlWebResource;
+import org.sonatype.nexus.webresources.WebResource;
+import org.sonatype.nexus.webresources.WebResourceBundle;
 
 import org.eclipse.sisu.space.ClassSpace;
 
@@ -42,7 +43,7 @@ public class StaticWebResourceBundle
       final URL url = e.nextElement();
       final String path = getPublishedPath(url);
       if (path != null && !path.endsWith("/")) {
-        staticResources.add(new StaticWebResource(url, path, mimeSupport.guessMimeTypeFromPath(path)));
+        staticResources.add(new UrlWebResource(url, path, mimeSupport.guessMimeTypeFromPath(path)));
       }
     }
   }
