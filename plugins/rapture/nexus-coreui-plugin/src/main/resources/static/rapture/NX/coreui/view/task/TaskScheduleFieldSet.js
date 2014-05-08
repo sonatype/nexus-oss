@@ -96,7 +96,6 @@ Ext.define('NX.coreui.view.task.TaskScheduleFieldSet', {
         timestamp = startDate.getTime() + (startTime.getHours() * 60 + startTime.getMinutes()) * 60 * 1000;
       }
     }
-    console.log('Timestamp: ' + timestamp);
     return timestamp;
   }
 

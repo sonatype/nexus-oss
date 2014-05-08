@@ -40,8 +40,6 @@ import javax.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 
 /**
  * Task {@link DirectComponent}.
@@ -54,10 +52,6 @@ import java.text.SimpleDateFormat
 class TaskComponent
 extends DirectComponentSupport
 {
-
-  static DateFormat dateFormat = new SimpleDateFormat('MM/dd/yyyy')
-
-  static DateFormat timeFormat = new SimpleDateFormat('HH:mm')
 
   @Inject
   NexusScheduler nexusScheduler
@@ -323,8 +317,6 @@ extends DirectComponentSupport
     def schedule = task.schedule
     if (schedule instanceof AbstractSchedule) {
       result.startTimestamp = schedule.startDate.time
-      result.startDate = dateFormat.format(schedule.startDate)
-      result.startTime = timeFormat.format(schedule.startDate)
     }
     if (schedule instanceof WeeklySchedule) {
       result.recurringDays = schedule.daysToRun

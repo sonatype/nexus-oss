@@ -62,6 +62,9 @@ Ext.define('NX.coreui.view.task.TaskSchedule', {
        * Additionally, sets values of recurring days checkboxes (if any).
        */
       setValues: function (values) {
+        if (values['startTimestamp']) {
+          values.startDate = values.startTime = new Date(values['startTimestamp']);
+        }
         this.callParent(arguments);
         if (values['recurringDays']) {
           Ext.Array.each(values['recurringDays'], function (day) {

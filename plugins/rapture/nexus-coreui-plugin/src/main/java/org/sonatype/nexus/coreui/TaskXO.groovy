@@ -61,8 +61,6 @@ class TaskXO
 
   Map<String, String> properties
   Long startTimestamp
-  String startDate
-  String startTime
   Integer[] recurringDays
   String cronExpression
 }
