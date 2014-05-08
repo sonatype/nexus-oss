@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.plugin.support;
 
-import org.sonatype.nexus.web.WebResourceBundle;
+import org.sonatype.nexus.webresources.WebResourceBundle;
 
 /**
  * A special resource bundle that holds static (preferably static HTML) documentation.

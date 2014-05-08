@@ -16,7 +16,7 @@ package org.sonatype.nexus.plugins.rest;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import org.sonatype.nexus.mime.DefaultMimeSupport;
+import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
 import org.sonatype.nexus.plugin.PluginIdentity;
 import org.sonatype.nexus.plugin.support.DocumentationBundleSupport;
 

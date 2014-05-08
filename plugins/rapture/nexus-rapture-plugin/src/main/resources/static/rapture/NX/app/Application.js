@@ -54,6 +54,7 @@ Ext.define('NX.app.Application', {
     'NX.ext.grid.column.Icon',
     'NX.ext.grid.column.Link',
     'NX.ext.grid.column.Timestamp',
+    'NX.ext.tree.View',
     'NX.Conditions'
   ],
 

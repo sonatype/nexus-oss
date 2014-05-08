@@ -42,6 +42,7 @@
     <module>nexus-launcher</module>
     <module>nexus-ldap-common</module>
     <module>nexus-locks</module>
+    <module>nexus-mime</module>
     <module>nexus-oss-edition</module>
     <module>nexus-plugin-api</module>
     <module>nexus-repository-metadata-api</module>
@@ -50,6 +51,7 @@
     <module>nexus-security</module>
     <module>nexus-security-realms</module>
     <module>nexus-webapp</module>
+    <module>nexus-webresources-api</module>
   </modules>
 
   <dependencyManagement>

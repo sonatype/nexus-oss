@@ -245,6 +245,12 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-mime</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-oss-edition</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
@@ -295,6 +301,12 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webapp</artifactId>
         <type>war</type>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-webresources-api</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 

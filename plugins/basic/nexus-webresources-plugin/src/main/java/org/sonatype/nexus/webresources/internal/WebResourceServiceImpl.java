@@ -28,10 +28,10 @@ import javax.servlet.ServletContext;
 
 import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.plugin.support.FileWebResource;
-import org.sonatype.nexus.plugin.support.UrlWebResource;
-import org.sonatype.nexus.web.WebResource;
-import org.sonatype.nexus.web.WebResourceBundle;
+import org.sonatype.nexus.webresources.FileWebResource;
+import org.sonatype.nexus.webresources.UrlWebResource;
+import org.sonatype.nexus.webresources.WebResource;
+import org.sonatype.nexus.webresources.WebResourceBundle;
 import org.sonatype.nexus.webresources.WebResourceService;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
