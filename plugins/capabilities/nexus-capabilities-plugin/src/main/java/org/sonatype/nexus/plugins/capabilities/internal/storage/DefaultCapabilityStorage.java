@@ -94,7 +94,7 @@ public class DefaultCapabilityStorage
   public CapabilityIdentity add(final CapabilityStorageItem item) throws IOException {
     try {
       return asCapabilityIdentity(
-          keyValueStore.create(CAPABILITY_SCHEMA, CapabilityStorageItem.class, item, TypeValidation.STRICT)
+          keyValueStore.create(CAPABILITY_SCHEMA, CapabilityStorageItem.class, item, TypeValidation.STRICT).getKey()
       );
     }
     catch (KazukiException e) {
