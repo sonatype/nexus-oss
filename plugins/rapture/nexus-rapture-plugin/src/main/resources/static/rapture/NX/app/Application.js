@@ -31,6 +31,7 @@ Ext.define('NX.app.Application', {
     'NX.State',
 
     // Ext overrides
+    'NX.ext.form.action.DirectLoad',
     'NX.ext.form.action.DirectSubmit',
     'NX.ext.form.field.Base',
     'NX.ext.form.field.Checkbox',
