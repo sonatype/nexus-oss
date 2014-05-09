@@ -18,6 +18,9 @@
 Ext.define('NX.ext.grid.column.Link', {
   extend: 'Ext.grid.column.Column',
   alias: ['widget.nx-linkcolumn'],
+  requires: [
+    'NX.util.Url'
+  ],
 
   /**
    * Renders value as a link.
@@ -25,7 +28,8 @@ Ext.define('NX.ext.grid.column.Link', {
   defaultRenderer: function (value) {
     var me = this;
     if (value) {
-      return '<a href="' + value + '" target="' + me.target(value) + '">' + me.label(value) + '</a>';
+      value = value.replace(/\$baseUrl/, NX.util.Url.baseUrl);
+      return NX.util.Url.asLink(value, me.label(value), me.target(value));
     }
     return undefined;
   },
