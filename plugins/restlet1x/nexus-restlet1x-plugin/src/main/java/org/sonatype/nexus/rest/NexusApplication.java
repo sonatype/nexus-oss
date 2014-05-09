@@ -63,7 +63,7 @@ public class NexusApplication
     this.protectedPathManager = protectedPathManager;
     this.statusPlexusResource = statusPlexusResource;
     this.statusService = statusService;
-    useStrictChecking = System.getProperty("nexus.restlet.strict-uri-matching", "false").equals("true");
+    useStrictChecking = System.getProperty("nexus.restlet.strict-uri-matching", "true").equals("true");
     logger.debug("Strict URI matching: {}", useStrictChecking);
   }
 
