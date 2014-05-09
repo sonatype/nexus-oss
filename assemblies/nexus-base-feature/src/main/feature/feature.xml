@@ -14,5 +14,7 @@
 -->
 <features name="nexus">
   <feature name="${project.artifactId}" description="Nexus base installation">
+    <feature>eventadmin</feature>
+    <feature>jetty</feature>
   </feature>
 </features>
