@@ -63,6 +63,7 @@ public class UnpackPlexusResource
 
   public UnpackPlexusResource() {
     this.setModifiable(true);
+    this.setRequireStrictChecking(false);
   }
 
   @Override

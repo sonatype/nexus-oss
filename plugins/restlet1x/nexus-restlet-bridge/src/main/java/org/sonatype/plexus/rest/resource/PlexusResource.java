@@ -87,6 +87,11 @@ public interface PlexusResource
   boolean acceptsUpload();
 
   /**
+   * If true, strict (exact) checking should be used for resource URI matching
+   */
+  boolean requireStrictChecking();
+
+  /**
    * Method invoked on incoming GET request. The method may return: Representation (will be passed unchanged to
    * restlet engine), InputStream (will be wrapped into InputStreamRepresentation), String (will be wrapped into
    * StringRepresentation) and Object. If Object is none of those previously listed, an XStream serialization is
