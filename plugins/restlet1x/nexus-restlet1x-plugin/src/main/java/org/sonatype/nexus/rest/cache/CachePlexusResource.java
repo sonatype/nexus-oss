@@ -49,6 +49,10 @@ public class CachePlexusResource
 {
   public static final String RESOURCE_URI = "/data_cache/{" + DOMAIN + "}/{" + TARGET_ID + "}/content";
 
+  public CachePlexusResource() {
+    setRequireStrictChecking(false);
+  }
+
   @Override
   public Object getPayloadInstance() {
     return null;

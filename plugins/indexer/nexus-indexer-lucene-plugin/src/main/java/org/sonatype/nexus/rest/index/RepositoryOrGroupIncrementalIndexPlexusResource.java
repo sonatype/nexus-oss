@@ -34,6 +34,10 @@ public class RepositoryOrGroupIncrementalIndexPlexusResource
 {
   public static final String RESOURCE_URI = "/data_incremental_index/{" + DOMAIN + "}/{" + TARGET_ID + "}";
 
+  public RepositoryOrGroupIncrementalIndexPlexusResource() {
+    setRequireStrictChecking(false);
+  }
+
   @Override
   public String getResourceUri() {
     return RESOURCE_URI;

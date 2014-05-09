@@ -63,6 +63,7 @@ public class UserSearchPlexusResource
 
   public UserSearchPlexusResource() {
     setModifiable(true);
+    setRequireStrictChecking(false);
   }
 
   @Override
