@@ -13,18 +13,25 @@
 
 package org.sonatype.nexus.quartz.internal;
 
+import java.io.File;
+import java.sql.Connection;
 import java.util.List;
+import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.quartz.QuartzPlugin;
 import org.sonatype.nexus.quartz.QuartzSupport;
-import org.sonatype.nexus.quartz.internal.store.KVJobStore;
 import org.sonatype.nexus.scheduling.NexusTaskFactory;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
+import com.google.common.io.Resources;
+import io.kazuki.v0.internal.helper.JDBIHelper;
 import org.eclipse.sisu.BeanEntry;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
@@ -37,8 +44,12 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.impl.DirectSchedulerFactory;
+import org.quartz.impl.jdbcjobstore.JobStoreTX;
+import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
+import org.quartz.utils.DBConnectionManager;
+import org.quartz.utils.PoolingConnectionProvider;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -53,11 +64,11 @@ public class QuartzSupportImpl
     extends LifecycleSupport
     implements QuartzSupport, JobFactory
 {
+  private final ApplicationDirectories directories;
+
   private final Iterable<BeanEntry<Named, Job>> jobEntries;
 
   private final NexusTaskFactory nexusTaskFactory;
-
-  private final KVJobStore kazukiJobStore;
 
   private Scheduler scheduler;
 
@@ -66,23 +77,47 @@ public class QuartzSupportImpl
   private int threadPoolSize;
 
   @Inject
-  public QuartzSupportImpl(final Iterable<BeanEntry<Named, Job>> jobEntries,
-                           final NexusTaskFactory nexusTaskFactory,
-                           final KVJobStore kazukiJobStore)
+  public QuartzSupportImpl(final ApplicationDirectories directories,
+                           final Iterable<BeanEntry<Named, Job>> jobEntries,
+                           final NexusTaskFactory nexusTaskFactory)
       throws Exception
   {
+    this.directories = checkNotNull(directories);
     this.jobEntries = checkNotNull(jobEntries);
     this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
-    this.kazukiJobStore = checkNotNull(kazukiJobStore);
     this.active = true;
     this.threadPoolSize = 20;
   }
 
   @Override
   protected void doStart() throws Exception {
+    // create JDBC JobStore
+    final JobStoreTX jobStoreTX = new JobStoreTX();
+    jobStoreTX.setDriverDelegateClass(StdJDBCDelegate.class.getName());
+    jobStoreTX.setUseProperties(Boolean.FALSE.toString());
+    jobStoreTX.setDataSource(QuartzPlugin.STORE_NAME);
+    jobStoreTX.setTablePrefix("QRTZ_");
+    jobStoreTX.setIsClustered(false);
+
+    final File dir = directories.getWorkDirectory("db/quartz");
+    final File file = new File(dir, dir.getName());
+    final Properties dbProperties = new Properties();
+    dbProperties.setProperty(PoolingConnectionProvider.DB_DRIVER, "org.h2.Driver");
+    dbProperties.setProperty(PoolingConnectionProvider.DB_URL, "jdbc:h2:" + file.getAbsolutePath() + ";MVCC=true");
+    dbProperties.setProperty(PoolingConnectionProvider.DB_USER, "root");
+    dbProperties.setProperty(PoolingConnectionProvider.DB_PASSWORD, "not_really_used");
+    dbProperties.setProperty(PoolingConnectionProvider.DB_MAX_CONNECTIONS, "25");
+    final PoolingConnectionProvider connectionProvider = new PoolingConnectionProvider(dbProperties);
+
+    // create schema if needed
+    mayCreateDBSchema(connectionProvider.getConnection());
+
+    // register ConnectionProvider
+    DBConnectionManager.getInstance().addConnectionProvider(QuartzPlugin.STORE_NAME, connectionProvider);
+
     // create Scheduler
     DirectSchedulerFactory.getInstance()
-        .createScheduler(new NexusThreadPool(threadPoolSize), kazukiJobStore);
+        .createScheduler(new NexusThreadPool(threadPoolSize), jobStoreTX);
     scheduler = DirectSchedulerFactory.getInstance().getScheduler();
     scheduler.setJobFactory(this);
     if (active) {
@@ -92,6 +127,13 @@ public class QuartzSupportImpl
     else {
       log.info("Quartz Scheduler created.");
     }
+  }
+
+  private void mayCreateDBSchema(final Connection connection) throws Exception {
+    final String sqlScript = Resources.toString(Resources.getResource("tables_h2.sql"), Charsets.UTF_8);
+    connection.createStatement().execute(sqlScript);
+    connection.commit();
+    connection.close();
   }
 
   @Override
