@@ -17,7 +17,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireNotFoundCaches;
-import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.nexus.scheduling.TaskUtil;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;

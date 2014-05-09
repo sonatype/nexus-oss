@@ -266,11 +266,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-scheduler</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-mailer</artifactId>
     </dependency>

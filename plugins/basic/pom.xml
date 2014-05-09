@@ -44,6 +44,7 @@
     <module>nexus-ui-extjs3-plugin</module>
     <module>nexus-unpack-plugin</module>
     <module>nexus-webresources-plugin</module>
+    <module>nexus-quartz-plugin</module>
   </modules>
 
 </project>

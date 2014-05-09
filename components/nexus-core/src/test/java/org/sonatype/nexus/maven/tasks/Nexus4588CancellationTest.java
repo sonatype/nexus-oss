@@ -15,9 +15,9 @@ package org.sonatype.nexus.maven.tasks;
 
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.scheduling.CancellableProgressListenerWrapper;
-import org.sonatype.scheduling.TaskInterruptedException;
-import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.nexus.scheduling.CancellableProgressListenerWrapper;
+import org.sonatype.nexus.scheduling.TaskInterruptedException;
+import org.sonatype.nexus.scheduling.TaskUtil;
 import org.sonatype.tests.http.runner.junit.ServerResource;
 import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.behaviour.filesystem.Get;

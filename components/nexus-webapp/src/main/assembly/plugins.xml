@@ -59,6 +59,7 @@
         <include>*:nexus-capabilities-plugin</include>
         <include>*:nexus-atlas-plugin</include>
         <include>*:nexus-wonderland-plugin</include>
+        <include>*:nexus-quartz-plugin</include>
         <!-- rapture -->
         <include>*:nexus-rapture-plugin</include>
         <include>*:nexus-extdirect-plugin</include>

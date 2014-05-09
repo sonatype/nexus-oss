@@ -10,24 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.index.tasks;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.TaskState;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.fail;
 
 public class DownloadIndexesTaskTest
     extends NexusAppTestSupport
@@ -64,7 +63,7 @@ public class DownloadIndexesTaskTest
     MockedIndexerManager.returnError = true;
 
     DownloadIndexesTask task = nexusScheduler.createTaskInstance(DownloadIndexesTask.class);
-    ScheduledTask<Object> handle = nexusScheduler.submit("task", task);
+    Future<Object> handle = nexusScheduler.submit("task", task);
     // block until it finishes
     try {
       handle.get();
@@ -75,7 +74,6 @@ public class DownloadIndexesTaskTest
     }
 
     assertThat("Mock was not invoked", MockedIndexerManager.mockInvoked);
-    assertThat(handle.getTaskState(), equalTo(TaskState.BROKEN));
   }
 
   @Test
@@ -85,12 +83,11 @@ public class DownloadIndexesTaskTest
     MockedIndexerManager.returnError = false;
 
     DownloadIndexesTask task = nexusScheduler.createTaskInstance(DownloadIndexesTask.class);
-    ScheduledTask<Object> handle = nexusScheduler.submit("task", task);
+    Future<Object> handle = nexusScheduler.submit("task", task);
     // block until it finishes
     handle.get();
 
     assertThat("Mock was not invoked", MockedIndexerManager.mockInvoked);
-    assertThat(handle.getTaskState(), equalTo(TaskState.FINISHED));
   }
 
 }

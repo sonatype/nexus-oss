@@ -10,52 +10,79 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.scheduling;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
-import org.sonatype.scheduling.AbstractSchedulerTask;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.TaskInterruptedException;
-import org.sonatype.scheduling.TaskState;
-import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
+import org.slf4j.Logger;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Base class for all Nexus tasks.
  */
 public abstract class AbstractNexusTask<T>
-    extends AbstractSchedulerTask<T>
+    extends ComponentSupport
     implements NexusTask<T>
 {
+  /**
+   * Prefix for private properties keys.
+   */
+  static final String PRIVATE_PROP_PREFIX = ".";
+
+  /**
+   * Key of id property (private).
+   */
+  static final String ID_KEY = PRIVATE_PROP_PREFIX + "id";
+
+  /**
+   * Key of name property (private).
+   */
+  static final String NAME_KEY = PRIVATE_PROP_PREFIX + "name";
+
+  /**
+   * Key of enabled property (private).
+   */
+  static final String ENABLED_KEY = PRIVATE_PROP_PREFIX + "enabled";
+
+  /**
+   * Key of alert email property (private).
+   */
+  static final String ALERT_EMAIL_KEY = PRIVATE_PROP_PREFIX + "alertEmail";
+
   public static final long A_DAY = 24L * 60L * 60L * 1000L;
 
   private EventBus eventBus;
+
+  private Map<String, String> parameters;
 
   protected AbstractNexusTask() {
     this(null);
   }
 
   protected AbstractNexusTask(final String name) {
-    if (name == null || name.trim().length() == 0) {
-      TaskUtils.setName(this, getClass().getSimpleName());
+    this.parameters = Maps.newHashMap();
+    if (Strings.isNullOrEmpty(name)) {
+      setName(getClass().getSimpleName());
     }
     else {
-      TaskUtils.setName(this, name);
+      setName(name);
     }
   }
 
@@ -78,61 +105,116 @@ public abstract class AbstractNexusTask<T>
     eventBus.post(event);
   }
 
+  @Deprecated
+  protected final Logger getLogger() {
+    return log;
+  }
+
+  @Override
+  public void addParameter(String key, String value) {
+    checkNotNull(key);
+    if (!Strings.isNullOrEmpty(value)) {
+      parameters.put(key, value);
+    }
+    else {
+      parameters.remove(key);
+    }
+  }
+
+  @Override
+  public String getParameter(String key) {
+    checkNotNull(key);
+    return parameters.get(key);
+  }
+
+  @Override
+  public Map<String, String> getParameters() {
+    return parameters;
+  }
+
+  @Override
+  public Map<String, String> getPublicParameters() {
+    final Map<String, String> result = Maps.newHashMap();
+    for (Map.Entry<String, String> entry : getParameters().entrySet()) {
+      if (!entry.getKey().startsWith(PRIVATE_PROP_PREFIX)) {
+        result.put(entry.getKey(), entry.getValue());
+      }
+    }
+    return result;
+  }
+
+  @Override
   public boolean isExposed() {
     // override to hide it
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public String getId() {
     return getParameter(ID_KEY);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
+  public void setId(String id) {
+    checkNotNull(id);
+    addParameter(ID_KEY, id);
+  }
+
+  @Override
   public String getName() {
     return getParameter(NAME_KEY);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
+  public void setName(String name) {
+    checkNotNull(name);
+    addParameter(NAME_KEY, name);
+  }
+
+  @Override
+  public boolean isEnabled() {
+    final String val = getParameter(ENABLED_KEY);
+    if (Strings.isNullOrEmpty(val)) {
+      return true;
+    }
+    else {
+      return Boolean.valueOf(val);
+    }
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    if (!enabled) {
+      addParameter(ENABLED_KEY, Boolean.FALSE.toString());
+    }
+    else {
+      addParameter(ENABLED_KEY, null);
+    }
+  }
+
+  @Override
   public boolean shouldSendAlertEmail() {
     final String alertEmail = getAlertEmail();
     return alertEmail != null && alertEmail.trim().length() > 0;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public String getAlertEmail() {
     return getParameter(ALERT_EMAIL_KEY);
   }
 
-  public boolean allowConcurrentSubmission(Map<String, List<ScheduledTask<?>>> activeTasks) {
-    // concurrent execution will stop us if needed, but user may freely submit
-    return true;
+  @Override
+  public void setAlertEmail(String alertEmail) {
+    addParameter(ALERT_EMAIL_KEY, alertEmail);
   }
 
-  public boolean allowConcurrentExecution(Map<String, List<ScheduledTask<?>>> activeTasks) {
-    // most basic check: simply not allowing multiple execution of instances of this class
-    // override if needed
-    if (activeTasks.containsKey(this.getClass().getSimpleName())) {
-      for (ScheduledTask<?> task : activeTasks.get(this.getClass().getSimpleName())) {
-        if (TaskState.RUNNING.equals(task.getTaskState())) {
-          return false;
-        }
-      }
-      return true;
-    }
-    else {
-      return true;
-    }
+  protected void checkInterruption()
+      throws TaskInterruptedException
+  {
+    TaskUtil.checkInterruption();
   }
-
+  
+  @Override
   public final T call()
       throws Exception
   {

@@ -10,9 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.scheduling;
 
-import org.sonatype.scheduling.SchedulerTask;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * The base interface for all Tasks used in Nexus.
@@ -20,60 +22,77 @@ import org.sonatype.scheduling.SchedulerTask;
  * @author cstamas
  */
 public interface NexusTask<T>
-    extends SchedulerTask<T>
+    extends Callable<T>
 {
-
-  /**
-   * Prefix for rpivate properties keys.
-   */
-  static final String PRIVATE_PROP_PREFIX = ".";
-
-  /**
-   * Key of id property (private).
-   */
-  static final String ID_KEY = PRIVATE_PROP_PREFIX + "id";
-
-  /**
-   * Key of name property (private).
-   */
-  static final String NAME_KEY = PRIVATE_PROP_PREFIX + "name";
-
-  /**
-   * Key of alert email property (private).
-   */
-  static final String ALERT_EMAIL_KEY = PRIVATE_PROP_PREFIX + "alertEmail";
-
   /**
    * Returns a unique ID of the task.
-   *
-   * @return task id (or null if not available)
    */
   String getId();
 
   /**
+   * Sets the unique ID of the task.
+   */
+  void setId(String id);
+
+  /**
    * Returns a name of the task.
-   *
-   * @return task name (or null if not available)
    */
   String getName();
 
   /**
-   * Is this task visible on UI?
+   * Sets the name of the task.
+   */
+  void setName(String name);
+
+  /**
+   * Is task enabled?
+   */
+  boolean isEnabled();
+
+  /**
+   * Sets the enabled flag of task.
+   */
+  void setEnabled(boolean enabled);
+
+  /**
+   * Is this task visible on UI? This is decided by implementation, is not dynamic.
    */
   boolean isExposed();
 
   /**
    * Should an alert email be sent?
-   *
-   * @return true if alert email is set (not null and not empty), false otherwise
    */
   boolean shouldSendAlertEmail();
 
   /**
    * Returns the email address to which an email should be sent in case of task failure.<br/>
    * If the alert email is not set (null or empty) no email should be sent.
-   *
-   * @return alert email
    */
   String getAlertEmail();
+
+  /**
+   * Sets the email address to which an email should be sent in case of task failure.
+   */
+  void setAlertEmail(String alertEmail);
+
+  /**
+   * "Raw" parameter setter. If value is {@code null} the key mapping is removed from parameters map.
+   */
+  void addParameter(String key, String value);
+
+  /**
+   * "Raw" parameter getter.
+   */
+  String getParameter(String key);
+
+  /**
+   * Returns the parameter backing map, any change done here is reflected in task parameters.
+   */
+  Map<String, String> getParameters();
+
+  /**
+   * Returns a view (copy) of task "public" (non-private) parameters. Changes done here are not reflected in task
+   * parameters.
+   */
+  Map<String, String> getPublicParameters();
 }

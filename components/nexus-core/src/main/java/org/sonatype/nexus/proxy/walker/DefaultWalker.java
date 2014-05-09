@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.proxy.walker;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +28,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.WalkerContext.TraversalType;
-import org.sonatype.scheduling.TaskInterruptedException;
+import org.sonatype.nexus.scheduling.TaskInterruptedException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;

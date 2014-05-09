@@ -39,5 +39,6 @@ public class MDCAwareRunnable
   public void run() {
     MDCUtils.setContextMap(mdcContext);
     delegate.run();
+    MDCUtils.setContextMap(null);
   }
 }

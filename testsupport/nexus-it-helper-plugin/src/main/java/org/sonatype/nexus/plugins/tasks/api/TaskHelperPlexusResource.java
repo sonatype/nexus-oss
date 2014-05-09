@@ -19,7 +19,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.scheduling.ScheduledTask;
 
 import org.restlet.Context;
 import org.restlet.data.Form;
@@ -29,9 +28,9 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
-import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.getTaskByName;
-import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.isTaskCompleted;
-import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.sleep;
+//import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.getTaskByName;
+//import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.isTaskCompleted;
+//import static org.sonatype.nexus.plugins.tasks.api.TasksWaitForPlexusResource.sleep;
 
 @Singleton
 @Named
@@ -79,7 +78,7 @@ public class TaskHelperPlexusResource
         // ignore, will use default of 300
       }
     }
-
+/*
     final ScheduledTask<?> namedTask = getTaskByName(nexusScheduler, name);
 
     if (name != null && namedTask == null) {
@@ -96,7 +95,7 @@ public class TaskHelperPlexusResource
         return "OK";
       }
     }
-
+*/
     response.setStatus(Status.SUCCESS_NO_CONTENT);
     return "Tasks Not Finished";
   }

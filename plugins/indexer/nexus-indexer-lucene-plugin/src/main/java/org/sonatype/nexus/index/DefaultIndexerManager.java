@@ -69,9 +69,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.scheduling.TaskInterruptedException;
+import org.sonatype.nexus.scheduling.TaskUtil;
 import org.sonatype.nexus.util.file.DirSupport;
-import org.sonatype.scheduling.TaskInterruptedException;
-import org.sonatype.scheduling.TaskUtil;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.Throwables2;
 

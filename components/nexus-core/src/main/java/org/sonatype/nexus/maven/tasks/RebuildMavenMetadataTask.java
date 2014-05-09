@@ -22,7 +22,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
-import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.nexus.scheduling.TaskUtil;
 
 import org.codehaus.plexus.util.StringUtils;
 

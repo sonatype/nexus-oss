@@ -10,21 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.maven.tasks;
 
 import java.io.File;
+import java.util.concurrent.Future;
 
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.junit.Assert.assertTrue;
 
 public class RebuildMavenMetadataTaskTest
     extends AbstractMavenRepoContentTests
@@ -79,7 +80,7 @@ public class RebuildMavenMetadataTaskTest
 
     task.setRepositoryId(snapshots.getId());
 
-    ScheduledTask<Object> handle = nexusScheduler.submit("task", task);
+    Future<Object> handle = nexusScheduler.submit("task", task);
 
     // block until it finishes
     handle.get();
@@ -118,7 +119,7 @@ public class RebuildMavenMetadataTaskTest
     task.setRepositoryId(snapshots.getId());
     task.setResourceStorePath("/org/sonatype");
 
-    ScheduledTask<Object> handle = nexusScheduler.submit("task", task);
+    Future<Object> handle = nexusScheduler.submit("task", task);
 
     // block until it finishes
     handle.get();
@@ -139,15 +140,18 @@ public class RebuildMavenMetadataTaskTest
         "We should have more md's after rebuilding them, since we have some of them missing! (%s, %s)",
         new Object[]{countTotalBefore, countTotalAfter}), countTotalBefore < countTotalAfter);
     assertTrue(String.format(
-        "We should have same count of md's after rebuilding them for non-processed ones! (%s, %s)", new Object[]{
-        countNonProcessedSubBefore, countNonProcessedSubAfter
-    }),
-        countNonProcessedSubBefore == countNonProcessedSubAfter);
+            "We should have same count of md's after rebuilding them for non-processed ones! (%s, %s)", new Object[]{
+                countNonProcessedSubBefore, countNonProcessedSubAfter
+            }
+        ),
+        countNonProcessedSubBefore == countNonProcessedSubAfter
+    );
     assertTrue(
         String.format(
             "We should have more md's after rebuilding them for processed ones, since we have some of them missing! (%s, %s)",
             new Object[]{countProcessedSubBefore, countProcessedSubAfter}),
-        countProcessedSubBefore < countProcessedSubAfter);
+        countProcessedSubBefore < countProcessedSubAfter
+    );
 
     // the total change has to equals to processed change
     assertTrue(

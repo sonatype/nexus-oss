@@ -10,82 +10,45 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.scheduling;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.Future;
 
-import org.sonatype.scheduling.NoSuchTaskException;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.schedules.Schedule;
+import com.google.common.annotations.VisibleForTesting;
 
 /**
- * Scheduler component of Nexus, responsible for task management (their schedule, running, and configuration
- * persistence).
- *
- * @author cstamas
+ * Scheduler facade component of Nexus, responsible for task scheduling. This is like a "SPI" pattern,
+ * as actual scheduling might (and probably is) provided by some plugin. You can look at this component
+ * as some "simplified" short-hand component to quickly issue background jobs.
  */
 public interface NexusScheduler
 {
   /**
-   * Initializes Nexus scheduler, but loading up tasks from persisted configuration and instantiating them.
+   * Issues a NexusTask for immediate execution, giving control over it with returned {@link Future} instance.
    */
-  void initializeTasks();
+  <T> Future<T> submit(String name, NexusTask<T> nexusTask);
 
   /**
-   * Performs a clean shutdown of the Nexus Scheduler.
+   * Returns the count of currently running tasks. To be used only as advisory value, like in tests.
    */
-  void shutdown();
+  int getRunningTaskCount();
 
   /**
-   * Issue a NexusTask for immediate execution, but have a control over it.
+   * Kills all running tasks if possible.
    */
-  <T> ScheduledTask<T> submit(String name, NexusTask<T> nexusTask)
-      throws RejectedExecutionException, NullPointerException;
+  @VisibleForTesting
+  void killAll();
 
   /**
-   * Issue a NexusTask for scheduled execution.
+   * A factory for tasks (by actual type).
    */
-  <T> ScheduledTask<T> schedule(String name, NexusTask<T> nexusTask, Schedule schedule)
-      throws RejectedExecutionException, NullPointerException;
-
-  /**
-   * Update parameters of a scheduled task
-   */
-  <T> ScheduledTask<T> updateSchedule(ScheduledTask<T> task)
-      throws RejectedExecutionException, NullPointerException;
-
-  /**
-   * Returns the map of currently active tasks. The resturned collection is an unmodifiable snapshot. It may differ
-   * from current one (if some thread finishes for example during processing of the returned list).
-   */
-  Map<String, List<ScheduledTask<?>>> getActiveTasks();
-
-  /**
-   * Returns the map of all tasks. The resturned collection is an unmodifiable snapshot. It may differ from current
-   * one (if some thread finishes for example during processing of the returned list).
-   */
-  Map<String, List<ScheduledTask<?>>> getAllTasks();
-
-  /**
-   * Returns an active task by it's ID.
-   */
-  ScheduledTask<?> getTaskById(String id)
-      throws NoSuchTaskException;
-
-  /**
-   * A factory for tasks.
-   *
-   * @deprecated prefer the createTaskInstance(Class<T> type) method instead.
-   */
-  @Deprecated
-  NexusTask<?> createTaskInstance(String taskType)
+  <T> T createTaskInstance(Class<T> taskType)
       throws IllegalArgumentException;
 
   /**
-   * A factory for tasks.
+   * A factory for tasks (by FQCN).
    */
-  <T> T createTaskInstance(Class<T> taskType)
+  NexusTask<?> createTaskInstanceByFQCN(String taskFQCN)
       throws IllegalArgumentException;
 }

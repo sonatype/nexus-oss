@@ -119,7 +119,6 @@ public class NxApplication
       securitySystem.start();
       securitySystem.getAnonymousUsername();
       nexusConfiguration.createInternals();
-      nexusScheduler.initializeTasks();
 
       // notify about start other components participating in configuration framework
       eventBus.post(new ConfigurationChangeEvent(nexusConfiguration, null, null));
@@ -137,8 +136,6 @@ public class NxApplication
 
       applicationStatusSource.getSystemStatus().setState(SystemState.STARTED);
       applicationStatusSource.getSystemStatus().setStartedAt(new Date());
-
-      synchronizeShadowsAtStartup();
 
       if (log.isInfoEnabled()) {
         final File workDir = nexusConfiguration.getWorkingDirectory();
@@ -168,6 +165,9 @@ public class NxApplication
       log.error("Could not start Nexus, user configuration exception!", e);
       throw Throwables.propagate(e);
     }
+
+    // Only after started, as scheduler might not be ready yet
+    synchronizeShadowsAtStartup();
   }
 
   @Override
@@ -175,8 +175,6 @@ public class NxApplication
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPING);
     // Due to no dependency mechanism in NX for components, we need to fire off a hint about shutdown first
     eventBus.post(new NexusStoppingEvent(this));
-    // kill services + notify
-    nexusScheduler.shutdown();
     eventBus.post(new NexusStoppedEvent(this));
     eventSubscriberHost.shutdown();
     nexusConfiguration.dropInternals();

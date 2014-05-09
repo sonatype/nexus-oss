@@ -10,11 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.internal.task;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -23,8 +22,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.internal.RpmScanner;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.TaskState;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -38,8 +35,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RepositoryScanningTask
     extends AbstractNexusTask<Object>
 {
-
-  private static final int MAXIMAL_PARALLEL_RUNS = 3;
 
   public static final String ID = "RepositoryScanningTask";
 
@@ -68,22 +63,6 @@ public class RepositoryScanningTask
     }
 
     return null;
-  }
-
-  @Override
-  public boolean allowConcurrentExecution(Map<String, List<ScheduledTask<?>>> activeTasks) {
-    if (activeTasks.containsKey(ID)) {
-      int activeRunningTasks = 0;
-      for (ScheduledTask<?> task : activeTasks.get(ID)) {
-        if (TaskState.RUNNING.equals(task.getTaskState())) {
-          activeRunningTasks++;
-        }
-      }
-      return activeRunningTasks < MAXIMAL_PARALLEL_RUNS;
-    }
-    else {
-      return true;
-    }
   }
 
   @Override
