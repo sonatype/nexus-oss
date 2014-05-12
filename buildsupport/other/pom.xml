@@ -139,6 +139,27 @@
 
       <dependency>
         <groupId>org.apache.bval</groupId>
+        <artifactId>bval-core</artifactId>
+        <version>0.5</version>
+        <exclusions>
+          <!--
+          Exclude older beanutils, latest 1.9+ has different GA (commons-beanutils:commons-beanutils)
+          -->
+          <exclusion>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils-core</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.bval</groupId>
+        <artifactId>bval-jsr303</artifactId>
+        <version>0.5</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.bval</groupId>
         <artifactId>bval-guice</artifactId>
         <version>0.5</version>
         <exclusions>
@@ -147,11 +168,6 @@
             <artifactId>org.apache.bval.bundle</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.bval</groupId>
-        <artifactId>bval-jsr303</artifactId>
-        <version>0.5</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
