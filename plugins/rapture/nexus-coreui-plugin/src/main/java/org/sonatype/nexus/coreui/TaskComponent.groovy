@@ -10,17 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.sonatype.configuration.validation.InvalidConfigurationException
+import org.sonatype.configuration.validation.ValidationMessage
+import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.rest.schedules.ScheduledServiceBaseResourceConverter
+import org.sonatype.nexus.formfields.Selectable
 import org.sonatype.nexus.scheduling.NexusScheduler
+import org.sonatype.nexus.scheduling.NexusTask
+import org.sonatype.nexus.scheduling.TaskUtils
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor
+import org.sonatype.nexus.validation.Create
+import org.sonatype.nexus.validation.Update
 import org.sonatype.scheduling.ScheduledTask
 import org.sonatype.scheduling.TaskState
 import org.sonatype.scheduling.schedules.*
@@ -28,6 +37,9 @@ import org.sonatype.scheduling.schedules.*
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
+import javax.validation.groups.Default
 
 /**
  * Task {@link DirectComponent}.
@@ -42,10 +54,10 @@ extends DirectComponentSupport
 {
 
   @Inject
-  private NexusScheduler nexusScheduler
+  NexusScheduler nexusScheduler
 
   @Inject
-  private Set<ScheduledTaskDescriptor> descriptors
+  Set<ScheduledTaskDescriptor> descriptors
 
   /**
    * Retrieve a list of scheduled tasks.
@@ -53,25 +65,124 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('nexus:tasks:read')
   List<TaskXO> read() {
-    def descriptors = this.descriptors
-    return nexusScheduler.getAllTasks().values().flatten().collect { input ->
-      def result = new TaskXO(
-          id: input.id,
-          enabled: input.enabled,
-          name: input.name,
-          typeId: input.type,
-          typeName: (descriptors.find { it.id == input.type })?.name,
-          status: input.taskState,
-          statusDescription: getStatusDescription(input.taskState),
-          schedule: getSchedule(input.schedule),
-          lastRun: input.lastRun?.time,
-          lastRunResult: getLastRunResult(input),
-          nextRun: getNextRun(input)?.time,
-          runnable: input.taskState in [TaskState.SUBMITTED, TaskState.WAITING],
-          stoppable: input.taskState in [TaskState.RUNNING, TaskState.SLEEPING]
+    return nexusScheduler.getAllTasks().values().flatten().findAll { ScheduledTask task ->
+      def exposed = true
+      def schedulerTask = task.schedulerTask
+      if (schedulerTask instanceof NexusTask) {
+        exposed = schedulerTask.exposed
+      }
+      return exposed ? task : null
+    }.collect { ScheduledTask task ->
+      TaskXO result = asTaskXO(task)
+      return result
+    }
+  }
+
+  /**
+   * Retrieve available task types.
+   * @return a list of task types
+   */
+  @DirectMethod
+  @RequiresPermissions('nexus:tasktypes:read')
+  List<TaskTypeXO> readTypes() {
+    return descriptors.findAll { descriptor ->
+      descriptor.exposed ? descriptor : null
+    }.collect { descriptor ->
+      def result = new TaskTypeXO(
+          id: descriptor.id,
+          name: descriptor.name,
+          formFields: descriptor.formFields()?.collect { formField ->
+            def formFieldXO = new FormFieldXO(
+                id: formField.id,
+                type: formField.type,
+                label: formField.label,
+                helpText: formField.helpText,
+                required: formField.required,
+                regexValidation: formField.regexValidation,
+                initialValue: formField.initialValue
+            )
+            if (formField instanceof Selectable) {
+              formFieldXO.storePath = formField.storePath
+              formFieldXO.storeRoot = formField.storeRoot
+              formFieldXO.idMapping = formField.idMapping
+              formFieldXO.nameMapping = formField.nameMapping
+            }
+            return formFieldXO
+          }
       )
       return result
     }
+  }
+
+  /**
+   * Creates a task.
+   * @param taskXO to be created
+   * @return created task
+   */
+  @DirectMethod
+  @RequiresAuthentication
+  @RequiresPermissions('nexus:tasks:create')
+  @Validate(groups = [Create.class, Default.class])
+  TaskXO create(final @NotNull(message = '[taskXO] may not be null') @Valid TaskXO taskXO) {
+    Schedule schedule = asSchedule(taskXO)
+
+    NexusTask nexusTask = nexusScheduler.createTaskInstance(taskXO.typeId)
+    taskXO.properties.each { key, value ->
+      nexusTask.addParameter(key, value)
+    }
+    TaskUtils.setAlertEmail(nexusTask, taskXO.alertEmail)
+    TaskUtils.setId(nexusTask, taskXO.id)
+    TaskUtils.setName(nexusTask, taskXO.name)
+
+    ScheduledTask task = nexusScheduler.schedule(taskXO.name, nexusTask, schedule)
+    task.enabled = taskXO.enabled
+    nexusScheduler.updateSchedule(task)
+
+    log.debug "Created task with type '${nexusTask.class}': ${nexusTask.name} (${nexusTask.id})"
+    return asTaskXO(task)
+  }
+
+  /**
+   * Updates a task.
+   * @param taskXO to be updated
+   * @return updated task
+   */
+  @DirectMethod
+  @RequiresAuthentication
+  @RequiresPermissions('nexus:tasks:update')
+  @Validate(groups = [Update.class, Default.class])
+  TaskXO update(final @NotNull(message = '[taskXO] may not be null') @Valid TaskXO taskXO) {
+    ScheduledTask task = nexusScheduler.getTaskById(taskXO.id);
+    validateState(task)
+    task.enabled = taskXO.enabled
+    task.name = taskXO.name
+    task.taskParams.putAll(taskXO.properties)
+    TaskUtils.setAlertEmail(task, taskXO.alertEmail)
+    TaskUtils.setId(task, taskXO.id)
+    TaskUtils.setName(task, taskXO.name)
+    task.reset()
+    nexusScheduler.updateSchedule(task)
+
+    return asTaskXO(task)
+  }
+
+  /**
+   * Updates a task schedule.
+   * @param taskXO to be updated
+   * @return updated task
+   */
+  @DirectMethod
+  @RequiresAuthentication
+  @RequiresPermissions('nexus:tasks:update')
+  @Validate(groups = [Update.class, Default.class])
+  TaskXO updateSchedule(final @NotNull(message = '[taskXO] may not be null') @Valid TaskXO taskXO) {
+    ScheduledTask task = nexusScheduler.getTaskById(taskXO.id);
+    validateState(task)
+    task.schedule = asSchedule(taskXO)
+    task.reset()
+    nexusScheduler.updateSchedule(task)
+
+    return asTaskXO(task)
   }
 
   @DirectMethod
@@ -95,22 +206,7 @@ extends DirectComponentSupport
     nexusScheduler.getTaskById(id)?.cancelOnly()
   }
 
-  /**
-   * Retrieve a list of scheduled tasks types.
-   */
-  @DirectMethod
-  @RequiresPermissions('nexus:tasktypes:read')
-  List<TaskTypeXO> types() {
-    return descriptors.collect { input ->
-      def result = new TaskTypeXO(
-          id: input.id,
-          name: input.name
-      )
-      return result
-    }
-  }
-
-  private static String getStatusDescription(final TaskState taskState) {
+  static String getStatusDescription(final TaskState taskState) {
     switch (taskState) {
       case TaskState.SUBMITTED:
       case TaskState.WAITING:
@@ -130,37 +226,37 @@ extends DirectComponentSupport
     }
   }
 
-  private static String getSchedule(final Schedule schedule) {
+  static String getSchedule(final Schedule schedule) {
     if (ManualRunSchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_MANUAL
+      return 'manual'
     }
     else if (RunNowSchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_RUN_NOW
+      return 'internal'
     }
     else if (OnceSchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_ONCE
+      return 'once'
     }
     else if (HourlySchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_HOURLY
+      return 'hourly'
     }
     else if (DailySchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_DAILY
+      return 'daily'
     }
     else if (WeeklySchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_WEEKLY
+      return 'weekly'
     }
     else if (MonthlySchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_MONTHLY
+      return 'monthly'
     }
     else if (CronSchedule.class.isAssignableFrom(schedule.class)) {
-      return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_ADVANCED
+      return 'advanced'
     }
     else {
       return schedule.getClass().getName()
     }
   }
 
-  private static Date getNextRun(final ScheduledTask<?> task) {
+  static Date getNextRun(final ScheduledTask<?> task) {
     Date nextRunTime = null
 
     // Run now type tasks should never have a next run time
@@ -171,7 +267,7 @@ extends DirectComponentSupport
     return nextRunTime
   }
 
-  protected static String getLastRunResult(final ScheduledTask<?> task) {
+  static String getLastRunResult(final ScheduledTask<?> task) {
     String lastRunResult = null
 
     if (task.lastStatus != null) {
@@ -198,6 +294,94 @@ extends DirectComponentSupport
       }
     }
     return lastRunResult
+  }
+
+  TaskXO asTaskXO(final ScheduledTask task) {
+    def result = new TaskXO(
+        id: task.id,
+        enabled: task.enabled,
+        name: task.name,
+        typeId: task.type,
+        typeName: (descriptors.find { it.id == task.type })?.name,
+        status: task.taskState,
+        statusDescription: getStatusDescription(task.taskState),
+        schedule: getSchedule(task.schedule),
+        lastRun: task.lastRun?.time,
+        lastRunResult: getLastRunResult(task),
+        nextRun: getNextRun(task)?.time,
+        runnable: task.taskState in [TaskState.SUBMITTED, TaskState.WAITING],
+        stoppable: task.taskState in [TaskState.RUNNING, TaskState.SLEEPING],
+        alertEmail: TaskUtils.getAlertEmail(task),
+        properties: task.taskParams
+    )
+    def schedule = task.schedule
+    if (schedule instanceof AbstractSchedule) {
+      result.startTimestamp = schedule.startDate.time
+    }
+    if (schedule instanceof WeeklySchedule) {
+      result.recurringDays = schedule.daysToRun
+    }
+    if (schedule instanceof MonthlySchedule) {
+      result.recurringDays = schedule.daysToRun
+    }
+    if (schedule instanceof CronSchedule) {
+      result.cronExpression = schedule.cronString
+    }
+    result
+  }
+
+  static Schedule asSchedule(final TaskXO taskXO) {
+    switch (taskXO.schedule) {
+      case 'once':
+        def date = Calendar.instance
+        date.setTimeInMillis(taskXO.startTimestamp)
+        date.set(Calendar.SECOND, 0)
+        date.set(Calendar.MILLISECOND, 0)
+        def currentDate = Calendar.instance
+        if (currentDate.after(date)) {
+          def response = new ValidationResponse()
+          if (currentDate.get(Calendar.YEAR) == date.get(Calendar.YEAR)
+              && currentDate.get(Calendar.MONTH) == date.get(Calendar.MONTH)
+              && currentDate.get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR)) {
+            response.addValidationError(new ValidationMessage('startTime', 'Time is in the past'))
+          }
+          else {
+            response.addValidationError(new ValidationMessage('startDate', 'Date is in the past'))
+          }
+          throw new InvalidConfigurationException(response)
+        }
+        return new OnceSchedule(date.getTime())
+      case 'hourly':
+        def date = new Date(taskXO.startTimestamp)
+        return new HourlySchedule(date, null)
+      case 'daily':
+        def date = new Date(taskXO.startTimestamp)
+        return new DailySchedule(date, null)
+      case 'weekly':
+        def date = new Date(taskXO.startTimestamp)
+        return new WeeklySchedule(date, null, taskXO.recurringDays as Set<Integer>)
+      case 'monthly':
+        def date = new Date(taskXO.startTimestamp)
+        return new MonthlySchedule(date, null, taskXO.recurringDays as Set<Integer>)
+      case 'advanced':
+        try {
+          return new CronSchedule(taskXO.cronExpression)
+        }
+        catch (Exception e) {
+          def response = new ValidationResponse()
+          response.addValidationError(new ValidationMessage('cronExpression', e.getMessage()))
+          throw new InvalidConfigurationException(response)
+        }
+      default:
+        return new ManualRunSchedule()
+    }
+  }
+
+  private static void validateState(final ScheduledTask<?> task) {
+    TaskState state = task.taskState;
+    if (TaskState.RUNNING == state || TaskState.CANCELLING == state || TaskState.SLEEPING == state) {
+      throw new Exception('Task can\'t be edited while it is being executed or it is in line to be executed');
+    }
   }
 
 }

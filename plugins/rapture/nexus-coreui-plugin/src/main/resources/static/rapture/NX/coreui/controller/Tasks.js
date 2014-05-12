@@ -25,18 +25,26 @@ Ext.define('NX.coreui.controller.Tasks', {
     'TaskType'
   ],
   views: [
+    'task.TaskAdd',
     'task.TaskFeature',
-    'task.TaskList'
+    'task.TaskList',
+    'task.TaskSchedule',
+    'task.TaskScheduleFieldSet',
+    'task.TaskScheduleAdvanced',
+    'task.TaskScheduleDaily',
+    'task.TaskScheduleHourly',
+    'task.TaskScheduleManual',
+    'task.TaskScheduleMonthly',
+    'task.TaskScheduleOnce',
+    'task.TaskScheduleWeekly',
+    'task.TaskSettings',
+    'formfield.SettingsFieldSet'
   ],
   refs: [
-    {
-      ref: 'list',
-      selector: 'nx-coreui-task-list'
-    },
-    {
-      ref: 'info',
-      selector: 'nx-coreui-task-feature nx-info-panel'
-    }
+    { ref: 'list', selector: 'nx-coreui-task-list' },
+    { ref: 'info', selector: 'nx-coreui-task-feature nx-info-panel' },
+    { ref: 'schedule', selector: 'nx-coreui-task-schedule' },
+    { ref: 'settings', selector: 'nx-coreui-task-settings' }
   ],
   icons: {
     'task-default': {
@@ -59,6 +67,9 @@ Ext.define('NX.coreui.controller.Tasks', {
   },
   permission: 'nexus:tasks',
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -67,12 +78,24 @@ Ext.define('NX.coreui.controller.Tasks', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadTaskType
+          refresh: me.onRefresh
         }
       },
       component: {
         'nx-coreui-task-list': {
-          beforerender: me.loadTaskType
+          beforerender: me.onRefresh
+        },
+        'nx-coreui-task-list button[action=new]': {
+          click: me.showAddWindow
+        },
+        'nx-coreui-task-add form': {
+          submitted: me.onSettingsSubmitted
+        },
+        'nx-coreui-task-settings': {
+          submitted: me.onSettingsSubmitted
+        },
+        'nx-coreui-task-schedule': {
+          submitted: me.onSettingsSubmitted
         },
         'nx-coreui-task-list button[action=run]': {
           click: me.runTask,
@@ -81,6 +104,9 @@ Ext.define('NX.coreui.controller.Tasks', {
         'nx-coreui-task-list button[action=stop]': {
           click: me.stopTask,
           afterrender: me.bindStopButton
+        },
+        'nx-coreui-task-add combo[name=typeId]': {
+          select: me.changeTaskType
         }
       },
       store: {
@@ -92,38 +118,126 @@ Ext.define('NX.coreui.controller.Tasks', {
     });
   },
 
+  /**
+   * @override
+   * Returns a description of task suitable to be displayed.
+   * @param {NX.coreui.model.Task} model selected model
+   */
   getDescription: function (model) {
     return model.get('name') + ' (' + model.get('typeName') + ')';
   },
 
+  /**
+   * @override
+   * Load task model into detail tabs.
+   * @param {NX.coreui.view.task.TaskList} list task grid
+   * @param {NX.coreui.model.Task} model selected model
+   */
   onSelection: function (list, model) {
     var me = this;
 
     if (Ext.isDefined(model)) {
-      me.getInfo().showInfo({
-        'Id': model.get('id'),
-        'Name': model.get('name'),
-        'Type': model.get('typeName'),
-        'Status': model.get('statusDescription'),
-        'Next Run': NX.util.DateFormat.timestamp(model.get('nextRun')),
-        'Last Run': NX.util.DateFormat.timestamp(model.get('lastRun')),
-        'Last Result': model.get('lastRunResult')
-      });
+      me.showSummary(model);
+      me.showSettings(model);
+      me.showSchedule(model);
     }
   },
 
-  loadTaskType: function () {
+  /**
+   * @private
+   * Displays task summary.
+   * @param {NX.coreui.model.Task} model task model
+   */
+  showSummary: function (model) {
+    var me = this;
+    me.getInfo().showInfo({
+      'Id': model.get('id'),
+      'Name': model.get('name'),
+      'Type': model.get('typeName'),
+      'Status': model.get('statusDescription'),
+      'Next Run': NX.util.DateFormat.timestamp(model.get('nextRun')),
+      'Last Run': NX.util.DateFormat.timestamp(model.get('lastRun')),
+      'Last Result': model.get('lastRunResult')
+    });
+  },
+
+  /**
+   * @private
+   * Displays task settings.
+   * @param {NX.coreui.model.Task} model task model
+   */
+  showSettings: function (model) {
+    this.getSettings().loadRecord(model);
+  },
+
+  /**
+   * @private
+   * Displays task schedule.
+   * @param {NX.coreui.model.Task} model task model
+   */
+  showSchedule: function (model) {
+    this.getSchedule().loadRecord(model);
+  },
+
+  /**
+   * @private
+   */
+  showAddWindow: function () {
+    Ext.widget('nx-coreui-task-add', {
+      taskTypeStore: this.getTaskTypeStore()
+    });
+  },
+
+  /**
+   * @private
+   * Change settings according to selected task type (in add window).
+   * @combo {Ext.form.field.ComboBox} combobox task type combobox
+   */
+  changeTaskType: function (combobox) {
+    var win = combobox.up('window'),
+        taskTypeModel;
+
+    taskTypeModel = this.getTaskTypeStore().getById(combobox.value);
+    win.down('nx-coreui-formfield-settingsfieldset').setFormFields(taskTypeModel.get('formFields'));
+  },
+
+  /**
+   * @private
+   * (Re)load task type store && reset all cached combo stores.
+   */
+  onRefresh: function () {
     var me = this,
         list = me.getList();
 
     if (list) {
       me.getTaskTypeStore().load();
+      NX.coreui.view.formfield.factory.FormfieldComboFactory.evictCache();
     }
   },
 
+  /**
+   * @private
+   * When task type store re-loads, reselect current selected task if any.
+   */
   onTaskTypeLoad: function () {
     var me = this;
     me.reselect();
+  },
+
+  /**
+   * @private
+   */
+  onSettingsSubmitted: function (form, action) {
+    var me = this,
+        win = form.up('nx-coreui-task-add');
+
+    if (win) {
+      win.close();
+      me.loadStoreAndSelect(action.result.data.id);
+    }
+    else {
+      me.loadStore();
+    }
   },
 
   /**

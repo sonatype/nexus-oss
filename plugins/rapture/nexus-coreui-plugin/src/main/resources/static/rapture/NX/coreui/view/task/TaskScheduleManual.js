@@ -11,15 +11,17 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Task type model.
+ * Task Schedule Manual field set.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.model.TaskType', {
-  extend: 'Ext.data.Model',
-  fields: [
-    'id',
-    'name',
-    'formFields'
-  ]
+Ext.define('NX.coreui.view.task.TaskScheduleManual', {
+  extend: 'Ext.form.FieldContainer',
+  alias: 'widget.nx-coreui-task-schedule-manual',
+
+  items: {
+    xtype: 'label',
+    text: 'Without recurrence, this service can only be run manually.'
+  }
+
 });

@@ -11,15 +11,28 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Task type model.
+ * Task Schedule Advanced field set.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.model.TaskType', {
-  extend: 'Ext.data.Model',
-  fields: [
-    'id',
-    'name',
-    'formFields'
-  ]
+Ext.define('NX.coreui.view.task.TaskScheduleAdvanced', {
+  extend: 'Ext.form.FieldContainer',
+  alias: 'widget.nx-coreui-task-schedule-advanced',
+
+  initComponent: function () {
+    var me = this;
+
+    me.items = [
+      {
+        xtype: 'textfield',
+        name: 'cronExpression',
+        fieldLabel: 'CRON expression',
+        helpText: 'A cron expression that will control the running of the task.',
+        allowBlank: false
+      }
+    ];
+
+    me.callParent(arguments);
+  }
+
 });

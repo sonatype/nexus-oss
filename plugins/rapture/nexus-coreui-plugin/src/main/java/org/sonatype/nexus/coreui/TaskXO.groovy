@@ -10,10 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.apache.bval.constraints.NotEmpty
+import org.sonatype.nexus.validation.Create
+import org.sonatype.nexus.validation.Update
 import org.sonatype.scheduling.TaskState
+
+import javax.validation.constraints.NotNull
 
 /**
  * Task exchange object.
@@ -23,29 +29,38 @@ import org.sonatype.scheduling.TaskState
 @ToString(includePackage = false, includeNames = true)
 class TaskXO
 {
+  @NotNull(groups = Update.class)
+  @NotEmpty(groups = Update.class)
   String id
 
-  boolean enabled
+  Boolean enabled
 
+  @NotNull
+  @NotEmpty
   String name
 
+  @NotNull(groups = Create.class)
+  @NotEmpty(groups = Create.class)
   String typeId
 
   String typeName
-
   TaskState status
-
   String statusDescription
 
+  @NotNull
+  @NotEmpty
   String schedule
 
   Long nextRun
-
   Long lastRun
-
   String lastRunResult
+  Boolean runnable
+  Boolean stoppable
 
-  boolean runnable
+  String alertEmail
 
-  boolean stoppable
+  Map<String, String> properties
+  Long startTimestamp
+  Integer[] recurringDays
+  String cronExpression
 }

@@ -13,25 +13,26 @@
 /*global NX*/
 
 /**
- * 'numberfield' factory.
+ * 'textarea' factory.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.capability.factory.CapabilityNumberFieldFactory', {
+Ext.define('NX.coreui.view.formfield.factory.FormfieldTextAreaFactory', {
   singleton: true,
   alias: [
-    'nx.capability.factory.numberfield',
-    'nx.capability.factory.number'
+    'nx.formfield.factory.textarea',
+    'nx.formfield.factory.text-area'
   ],
 
   /**
-   * Creates a numberfield.
-   * @param formField capability type form field to create numberfield for
-   * @returns {*} created numberfield (never null)
+   * Creates a textarea.
+   * @param formField form field to create textarea for
+   * @returns {*} created textarea (never null)
    */
   create: function (formField) {
     var item = {
-      xtype: 'numberfield',
+      xtype: 'textarea',
+      htmlDecode: true,
       fieldLabel: formField.label,
       itemCls: formField.required ? 'required-field' : '',
       helpText: formField.helpText,
@@ -39,7 +40,7 @@ Ext.define('NX.coreui.view.capability.factory.CapabilityNumberFieldFactory', {
       regex: formField.regexValidation ? new RegExp(formField.regexValidation) : null
     };
     if (formField.initialValue) {
-      item.value = Number(formField.initialValue);
+      item.value = formField.initialValue;
     }
     return item;
   }
