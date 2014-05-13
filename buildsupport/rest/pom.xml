@@ -141,6 +141,12 @@
         <version>${jackson2.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>com.fasterxml.jackson.datatype</groupId>
+        <artifactId>jackson-datatype-joda</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+
       <!--
       Siesta 1.x (for legacy REST client based on Jersey 1.x)
       -->
