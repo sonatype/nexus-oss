@@ -46,7 +46,7 @@ import org.sonatype.nexus.plugins.capabilities.Tag;
 import org.sonatype.nexus.plugins.capabilities.Taggable;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-import org.sonatype.sisu.siesta.common.Resource;
+import org.sonatype.siesta.Resource;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;

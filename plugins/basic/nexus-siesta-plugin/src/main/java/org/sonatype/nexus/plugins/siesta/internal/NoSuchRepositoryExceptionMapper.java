@@ -10,30 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.siesta;
+
+package org.sonatype.nexus.plugins.siesta.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.sisu.siesta.common.error.ErrorXO;
-import org.sonatype.sisu.siesta.server.ErrorExceptionMapperSupport;
+import org.sonatype.siesta.ExceptionMapperSupport;
 
 /**
- * Maps {@link NoSuchRepositoryException} to 404 with a {@link ErrorXO} body.
+ * Maps {@link NoSuchRepositoryException} to {@link Status#NOT_FOUND}.
  *
  * @since 2.4
  */
 @Named
 @Singleton
 public class NoSuchRepositoryExceptionMapper
-    extends ErrorExceptionMapperSupport<NoSuchRepositoryException>
+    extends ExceptionMapperSupport<NoSuchRepositoryException>
 {
-
   @Override
-  protected int getStatusCode(final NoSuchRepositoryException exception) {
-    return Response.Status.NOT_FOUND.getStatusCode();
+  protected Response convert(final NoSuchRepositoryException exception, final String id) {
+    return Response.status(Status.NOT_FOUND).build();
   }
-
 }

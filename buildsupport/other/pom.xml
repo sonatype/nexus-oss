@@ -131,10 +131,28 @@
         <version>0.9</version>
       </dependency>
 
+      <!--
+      Hibernate validator supports 1.1 but we need to do a bit more work before we can use it.
+      -->
+      <!--<dependency>-->
+      <!--<groupId>javax.validation</groupId>-->
+      <!--<artifactId>validation-api</artifactId>-->
+      <!--<version>1.1.0.Final</version>-->
+      <!--</dependency>-->
+
+      <!--<dependency>-->
+      <!--<groupId>org.hibernate</groupId>-->
+      <!--<artifactId>hibernate-validator</artifactId>-->
+      <!--<version>5.1.1.Final</version>-->
+      <!--</dependency>-->
+
+      <!--
+      Apache BVal only supports 1.0 spec.
+      -->
       <dependency>
         <groupId>javax.validation</groupId>
         <artifactId>validation-api</artifactId>
-        <version>1.1.0.Final</version>
+        <version>1.0.0.GA</version>
       </dependency>
 
       <dependency>
@@ -148,6 +166,7 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
         <groupId>org.apache.bval</groupId>
         <artifactId>bval-jsr303</artifactId>

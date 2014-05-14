@@ -10,29 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.siesta.internal;
+package org.sonatype.nexus.plugins.siesta;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.log.LogConfigurationCustomizer;
-
-import static org.sonatype.nexus.log.LoggerLevel.DEFAULT;
+import org.sonatype.siesta.Resource;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
- * Siesta {@link LogConfigurationCustomizer}.
+ * Support for {@link Resource} implementations.
  *
- * @since 2.7
+ * @since 3.0
  */
-@Named
-@Singleton
-public class LogConfigurationCustomizerImpl
-    implements LogConfigurationCustomizer
+public class ResourceSupport
+  extends ComponentSupport
+  implements Resource
 {
-  @Override
-  public void customize(final Configuration configuration) {
-    configuration.setLoggerLevel("org.sonatype.siesta", DEFAULT);
-    configuration.setLoggerLevel("org.jboss.resteasy", DEFAULT);
-    configuration.setLoggerLevel("org.sonatype.nexus.plugins.siesta", DEFAULT);
-  }
+  // empty
 }

@@ -28,8 +28,10 @@
   <packaging>pom</packaging>
 
   <properties>
-    <siesta.version>1.7</siesta.version>
-    <jackson.version>2.3.1</jackson.version>
+    <siesta1.version>1.7</siesta1.version>
+    <siesta2.version>2.0-SNAPSHOT</siesta2.version>
+    <jersey1.version>1.17.1</jersey1.version>
+    <jackson2.version>2.3.3</jackson2.version>
   </properties>
 
   <dependencyManagement>
@@ -65,28 +67,94 @@
         <version>1.1.4c</version>
       </dependency>
 
+      <!--
+      Siesta 2.x
+      -->
+
       <dependency>
-        <groupId>org.sonatype.sisu.siesta</groupId>
-        <artifactId>siesta-common</artifactId>
-        <version>${siesta.version}</version>
+        <groupId>org.sonatype.siesta</groupId>
+        <artifactId>siesta-api</artifactId>
+        <version>${siesta2.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.sisu.siesta</groupId>
+        <groupId>org.sonatype.siesta</groupId>
         <artifactId>siesta-server</artifactId>
-        <version>${siesta.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>${siesta2.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.siesta</groupId>
+        <artifactId>siesta-jackson2</artifactId>
+        <version>${siesta2.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.siesta</groupId>
+        <artifactId>siesta-client</artifactId>
+        <version>${siesta2.version}</version>
+      </dependency>
+
+      <!--
+      Jackson 2.x
+      -->
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson2.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${jackson2.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson2.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.jaxrs</groupId>
+        <artifactId>jackson-jaxrs-json-provider</artifactId>
+        <version>${jackson2.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.jaxrs</groupId>
+        <artifactId>jackson-jaxrs-base</artifactId>
+        <version>${jackson2.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.module</groupId>
+        <artifactId>jackson-module-jaxb-annotations</artifactId>
+        <version>${jackson2.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-smile</artifactId>
+        <version>${jackson2.version}</version>
+      </dependency>
+
+      <!--
+      Siesta 1.x (for legacy REST client based on Jersey 1.x)
+      -->
+
+      <dependency>
+        <groupId>org.sonatype.sisu.siesta</groupId>
+        <artifactId>siesta-common</artifactId>
+        <version>${siesta1.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.sonatype.sisu.siesta</groupId>
         <artifactId>siesta-client</artifactId>
-        <version>${siesta.version}</version>
+        <version>${siesta1.version}</version>
         <exclusions>
           <exclusion>
             <groupId>javax.xml.bind</groupId>
@@ -98,8 +166,12 @@
       <dependency>
         <groupId>org.sonatype.sisu.siesta</groupId>
         <artifactId>siesta-jackson</artifactId>
-        <version>${siesta.version}</version>
+        <version>${siesta1.version}</version>
       </dependency>
+
+      <!--
+      Jacksbee (for legacy REST models)
+      -->
 
       <dependency>
         <groupId>org.sonatype.sisu.jacksbee</groupId>
@@ -117,24 +189,6 @@
         <groupId>org.sonatype.sisu.jacksbee</groupId>
         <artifactId>jacksbee-xjc</artifactId>
         <version>1.3</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${jackson.version}</version>
       </dependency>
 
     </dependencies>

@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -29,7 +30,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.sonatype.nexus.ApplicationStatusSource;
@@ -37,9 +37,8 @@ import org.sonatype.nexus.timeline.TimelinePlugin;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedSource;
 import org.sonatype.nexus.web.BaseUrlHolder;
+import org.sonatype.siesta.Resource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-import org.sonatype.sisu.siesta.common.Resource;
-import org.sonatype.sisu.siesta.common.error.WebApplicationMessageException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -102,7 +101,7 @@ public class FeedResource
   {
     final FeedSource feedSource = feeds.get(feedKey);
     if (feedSource == null) {
-      throw new WebApplicationMessageException(Status.NOT_FOUND, "Feed " + feedKey + " not found!");
+      throw new NotFoundException("Feed " + feedKey + " not found!");
     }
 
     try {

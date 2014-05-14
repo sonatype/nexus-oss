@@ -16,13 +16,16 @@ import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.security.SecuritySystem
 import org.sonatype.security.authorization.NoSuchPrivilegeException
 import org.sonatype.security.authorization.NoSuchRoleException
+import org.sonatype.security.usermanagement.User
+import org.sonatype.security.usermanagement.UserNotFoundException
+import org.sonatype.siesta.Resource
 import org.sonatype.sisu.goodies.common.ComponentSupport
-import org.sonatype.sisu.siesta.common.Resource
 
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 import javax.ws.rs.GET
+import javax.ws.rs.NotFoundException
 import javax.ws.rs.Path
 import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
@@ -123,7 +126,14 @@ class SecurityDiagnosticResource
     }
 
     // look the user up
-    def user = securitySystem.getUser(userId)
+    User user
+    try {
+      user = securitySystem.getUser(userId)
+    }
+    catch (UserNotFoundException e) {
+      log.debug('User not found: {}', userId, e)
+      throw new NotFoundException('User not found')
+    }
 
     // explain user+role+priv details
     def data = [:]

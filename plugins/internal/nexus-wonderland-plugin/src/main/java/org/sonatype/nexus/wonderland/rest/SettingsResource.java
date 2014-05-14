@@ -24,7 +24,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.wonderland.WonderlandPlugin;
 import org.sonatype.nexus.wonderland.model.PropertyXO;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-import org.sonatype.sisu.siesta.common.Resource;
+import org.sonatype.siesta.Resource;
 
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NonNls;

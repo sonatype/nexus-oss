@@ -15,28 +15,21 @@ package org.sonatype.nexus.guice;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
-import javax.validation.ValidationProviderResolver;
-import javax.validation.spi.BootstrapState;
 
 import org.sonatype.nexus.web.TemplateRenderer;
-import org.sonatype.nexus.webresources.WebResourceBundle;
 import org.sonatype.nexus.web.internal.BaseUrlHolderFilter;
 import org.sonatype.nexus.web.internal.CommonHeadersFilter;
 import org.sonatype.nexus.web.internal.ErrorPageFilter;
 import org.sonatype.nexus.web.internal.ErrorPageServlet;
 import org.sonatype.nexus.web.metrics.MetricsModule;
+import org.sonatype.nexus.webresources.WebResourceBundle;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.web.guice.SecurityWebModule;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
 import com.yammer.metrics.guice.InstrumentationModule;
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
-import org.apache.bval.guice.Validate;
-import org.apache.bval.guice.ValidationModule;
 import org.apache.shiro.guice.aop.ShiroAopModule;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.eclipse.sisu.inject.DefaultRankingFunction;
@@ -64,7 +57,7 @@ public class NexusModules
     protected void configure() {
       install(new ShiroAopModule());
       install(new InstrumentationModule());
-      install(new ValidatorModule());
+      install(new BvalModule());
     }
   }
 
@@ -131,47 +124,8 @@ public class NexusModules
       requireBinding(TemplateRenderer.class);
 
       // eagerly initialize list of static web resources as soon as plugin starts (rather than on first request)
-      bind(WebResourceBundle.class).annotatedWith(Names.named("static")).to(StaticWebResourceBundle.class).asEagerSingleton();
-    }
-  }
-
-  public static class ValidatorModule
-      extends AbstractModule
-  {
-    @Override
-    protected void configure() {
-      // HACK: BootstrapState should not be bounded as it is marked as optional in ConfigurationStateProvider
-      bind(BootstrapState.class).toInstance(new BootstrapState()
-      {
-        @Override
-        public ValidationProviderResolver getValidationProviderResolver() {
-          return null;
-        }
-
-        @Override
-        public ValidationProviderResolver getDefaultValidationProviderResolver() {
-          return null;
-        }
-      });
-
-      // TCCL workaround for Apache/BVal visibility issue
-      binder().bindInterceptor(Matchers.any(), Matchers.annotatedWith(Validate.class), new MethodInterceptor()
-      {
-        public Object invoke(MethodInvocation mi) throws Throwable {
-          Thread self = Thread.currentThread();
-          ClassLoader tccl = self.getContextClassLoader();
-          try {
-            // continue validation using our classloader as context
-            self.setContextClassLoader(getClass().getClassLoader());
-            return mi.proceed();
-          }
-          finally {
-            self.setContextClassLoader(tccl);
-          }
-        }
-      });
-
-      binder().install(new ValidationModule());
+      bind(WebResourceBundle.class).annotatedWith(Names.named("static")).to(
+          StaticWebResourceBundle.class).asEagerSingleton();
     }
   }
 }

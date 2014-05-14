@@ -15,7 +15,7 @@ package org.sonatype.nexus.atlas.rest
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.nexus.atlas.SystemInformationGenerator
 import org.sonatype.sisu.goodies.common.ComponentSupport
-import org.sonatype.sisu.siesta.common.Resource
+import org.sonatype.siesta.Resource
 
 import javax.inject.Inject
 import javax.inject.Named

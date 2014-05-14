@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.siesta;
+package org.sonatype.nexus.plugins.siesta.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -18,57 +18,54 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
-import org.sonatype.sisu.siesta.common.error.ErrorXO;
-import org.sonatype.sisu.siesta.server.ErrorExceptionMapperSupport;
+import org.sonatype.siesta.ExceptionMapperSupport;
 
 import org.apache.shiro.authz.AuthorizationException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * Maps {@link AuthorizationException} to 403 with a {@link ErrorXO} body in case that a user is logged in or to an
- * 401 in case that no user is authenticated.
+ * Maps {@link AuthorizationException} to {@link Status#UNAUTHORIZED} in case that a user is logged in
+ * or to an {@link Status#FORBIDDEN} in case that no user is authenticated.
  *
  * @since 2.4
  */
 @Named
 @Singleton
 public class AuthorizationExceptionMapper
-    extends ErrorExceptionMapperSupport<AuthorizationException>
+    extends ExceptionMapperSupport<AuthorizationException>
 {
-
   private static final String AUTH_SCHEME_KEY = "auth.scheme";
 
-  public static final String AUTH_REALM_KEY = "auth.realm";
+  private static final String AUTH_REALM_KEY = "auth.realm";
 
   private static final String ANONYMOUS_LOGIN = "nexus.anonymous";
 
   private static final String AUTHENTICATE_HEADER = "WWW-Authenticate";
 
-  @Inject
-  private Provider<HttpServletRequest> httpServletRequestProvider;
+  private final Provider<HttpServletRequest> httpRequestProvider;
 
-  /**
-   * @since 2.5.0
-   */
+  @Inject
+  public AuthorizationExceptionMapper(final Provider<HttpServletRequest> httpRequestProvider) {
+    this.httpRequestProvider = checkNotNull(httpRequestProvider);
+  }
+
   @Override
   protected Response convert(final AuthorizationException exception, final String id) {
-    final Response.ResponseBuilder builder = Response.fromResponse(super.convert(exception, id));
+    HttpServletRequest httpRequest = httpRequestProvider.get();
 
-    final HttpServletRequest servletRequest = httpServletRequestProvider.get();
-    if (servletRequest.getAttribute(ANONYMOUS_LOGIN) != null) {
-      String scheme = (String) servletRequest.getAttribute(AUTH_SCHEME_KEY);
-      String realm = (String) servletRequest.getAttribute(AUTH_REALM_KEY);
+    if (httpRequest.getAttribute(ANONYMOUS_LOGIN) != null) {
+      // user is authenticated
+      String scheme = (String) httpRequest.getAttribute(AUTH_SCHEME_KEY);
+      String realm = (String) httpRequest.getAttribute(AUTH_REALM_KEY);
 
-      builder
-          .status(Response.Status.UNAUTHORIZED)
-          .header(AUTHENTICATE_HEADER, String.format("%s realm=\"%s\"", scheme, realm));
+      return Response.status(Status.UNAUTHORIZED)
+          .header(AUTHENTICATE_HEADER, String.format("%s realm=\"%s\"", scheme, realm))
+          .build();
     }
-    return builder.build();
-  }
 
-  @Override
-  protected int getStatusCode(final AuthorizationException exception) {
-    return Response.Status.FORBIDDEN.getStatusCode();
+    return Response.status(Status.FORBIDDEN).build();
   }
-
 }

@@ -19,6 +19,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
@@ -29,8 +30,7 @@ import org.sonatype.nexus.wonderland.model.AuthTicketXO;
 import org.sonatype.nexus.wonderland.model.AuthTokenXO;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-import org.sonatype.sisu.siesta.common.Resource;
-import org.sonatype.sisu.siesta.common.error.WebApplicationMessageException;
+import org.sonatype.siesta.Resource;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -94,7 +94,7 @@ public class AuthenticateResource
     // Require current user to be the requested user to authenticate
     Subject subject = security.getSubject();
     if (!subject.getPrincipal().toString().equals(username)) {
-      throw new WebApplicationMessageException(Status.BAD_REQUEST, "Username mismatch");
+      throw new WebApplicationException("Username mismatch", Status.BAD_REQUEST);
     }
 
     // Ask the sec-manager to authenticate, this won't alter the current subject
@@ -104,7 +104,7 @@ public class AuthenticateResource
     }
     catch (AuthenticationException e) {
       log.trace("Authentication failed", e);
-      throw new WebApplicationMessageException(Status.FORBIDDEN, "Authentication failed");
+      throw new WebApplicationException("Authentication failed", Status.FORBIDDEN);
     }
 
     // At this point we should be authenticated, return a new ticket

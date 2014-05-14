@@ -27,6 +27,12 @@
   <artifactId>nexus-client-core</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
+  <properties>
+    <!-- compiler plugin configuration, we are Java6 -->
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
+  </properties>
+
   <dependencies>
     <!--
     FIXME: Should not be dependent on a plugin here.
@@ -94,6 +100,11 @@
 
     <dependency>
       <groupId>org.sonatype.sisu.siesta</groupId>
+      <artifactId>siesta-common</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.siesta</groupId>
       <artifactId>siesta-client</artifactId>
     </dependency>
 
@@ -102,7 +113,6 @@
       <artifactId>siesta-jackson</artifactId>
     </dependency>
 
-    <!-- For Jersey client: complete HC4 stack + logger -->
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
@@ -136,12 +146,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <properties>
-    <!-- compiler plugin configuration, we are Java6 -->
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
-  </properties>
 
   <build>
     <pluginManagement>

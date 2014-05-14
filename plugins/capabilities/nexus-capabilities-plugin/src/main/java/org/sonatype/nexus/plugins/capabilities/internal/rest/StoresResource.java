@@ -40,7 +40,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
-import org.sonatype.sisu.siesta.common.Resource;
+import org.sonatype.siesta.Resource;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;

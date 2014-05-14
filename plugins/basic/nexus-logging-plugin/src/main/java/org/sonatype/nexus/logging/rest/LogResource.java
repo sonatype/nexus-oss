@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -25,13 +26,10 @@ import javax.ws.rs.core.Response;
 import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.logging.LoggingPlugin;
+import org.sonatype.siesta.Resource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-import org.sonatype.sisu.siesta.common.Resource;
-import org.sonatype.sisu.siesta.common.error.ObjectNotFoundException;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
@@ -84,7 +82,7 @@ public class LogResource
     }
     NexusStreamResponse streamResponse = logManager.getApplicationLogAsStream("nexus.log", from, count);
     if (streamResponse == null) {
-      throw new ObjectNotFoundException("nexus.log not found");
+      throw new NotFoundException("nexus.log not found");
     }
     return Response.ok(streamResponse.getInputStream())
         .header("Content-Disposition", "attachment; filename=\"nexus.log\"")

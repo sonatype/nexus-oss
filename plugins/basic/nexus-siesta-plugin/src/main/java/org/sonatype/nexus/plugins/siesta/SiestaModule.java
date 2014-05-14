@@ -13,18 +13,13 @@
 package org.sonatype.nexus.plugins.siesta;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.sonatype.nexus.guice.FilterChainModule;
 import org.sonatype.nexus.web.internal.SecurityFilter;
-import org.sonatype.sisu.siesta.common.Resource;
-import org.sonatype.sisu.siesta.jackson.SiestaJacksonModule;
-import org.sonatype.sisu.siesta.server.internal.ComponentDiscoveryApplication;
-import org.sonatype.sisu.siesta.server.internal.ComponentDiscoveryReporter;
-import org.sonatype.sisu.siesta.server.internal.ComponentDiscoveryReporterImpl;
-import org.sonatype.sisu.siesta.server.internal.SiestaServlet;
-import org.sonatype.sisu.siesta.server.internal.jersey.SiestaJerseyModule;
+import org.sonatype.siesta.server.SiestaServlet;
+import org.sonatype.siesta.server.internal.resteasy.ResteasyModule;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
 import org.slf4j.Logger;
@@ -56,31 +51,17 @@ public class SiestaModule
   }
 
   private void doConfigure() {
-    install(new org.sonatype.sisu.siesta.server.internal.SiestaModule());
-    install(new SiestaJerseyModule());
-    install(new SiestaJacksonModule());
-
-    // Dynamically discover JAX-RS components
-    bind(javax.ws.rs.core.Application.class).to(ComponentDiscoveryApplication.class).in(Singleton.class);
-
-    // Customize the report to include the MOUNT_POINT
-    bind(ComponentDiscoveryReporter.class).toInstance(new ComponentDiscoveryReporterImpl(log)
-    {
-      @Override
-      protected String pathOf(final Class<Resource> type) {
-        String path = super.pathOf(type);
-        if (!path.startsWith("/")) {
-          path = "/" + path;
-        }
-        return MOUNT_POINT + path;
-      }
-    });
+    install(new ResteasyModule());
 
     install(new ServletModule()
     {
       @Override
       protected void configureServlets() {
-        serve(MOUNT_POINT + "/*").with(SiestaServlet.class);
+        log.debug("Mount point: {}", MOUNT_POINT);
+
+        serve(MOUNT_POINT + "/*").with(SiestaServlet.class, ImmutableMap.of(
+            "resteasy.servlet.mapping.prefix", MOUNT_POINT
+        ));
         filter(MOUNT_POINT + "/*").through(SecurityFilter.class);
       }
     });
