@@ -162,6 +162,7 @@ public final class ObrUtils
     final ResourceStoreRequest request = new ResourceStoreRequest(OBR_PATH);
 
     try {
+      // caller is already trusted at this point, so side-step security
       @SuppressWarnings("deprecation")
       final StorageItem item = repository.retrieveItem(false, request);
       if (item instanceof StorageFileItem) {
