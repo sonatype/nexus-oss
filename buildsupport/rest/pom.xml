@@ -144,7 +144,7 @@
       <dependency>
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-joda</artifactId>
-        <version>${jackson.version}</version>
+        <version>${jackson2.version}</version>
       </dependency>
 
       <!--
