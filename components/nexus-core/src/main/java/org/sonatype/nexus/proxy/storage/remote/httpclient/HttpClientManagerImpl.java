@@ -27,7 +27,6 @@ import org.sonatype.nexus.internal.httpclient.RemoteStorageContextCustomizer;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.http.Header;
@@ -57,18 +56,9 @@ public class HttpClientManagerImpl
 {
   private final Hc4Provider hc4Provider;
 
-  private final UserAgentBuilder userAgentBuilder;
-
-  /**
-   * Constructor.
-   *
-   * @param hc4Provider      the {@link HttpClient} provider to be used with this manager.
-   * @param userAgentBuilder the {@link UserAgentBuilder} component.
-   */
   @Inject
-  public HttpClientManagerImpl(final Hc4Provider hc4Provider, final UserAgentBuilder userAgentBuilder) {
+  public HttpClientManagerImpl(final Hc4Provider hc4Provider) {
     this.hc4Provider = checkNotNull(hc4Provider);
-    this.userAgentBuilder = checkNotNull(userAgentBuilder);
   }
 
   @Override
@@ -91,12 +81,10 @@ public class HttpClientManagerImpl
    * Configures the fresh instance of HttpClient for given proxy repository specific needs. Right now it sets
    * appropriate redirect strategy only.
    */
-  protected void configure(final ProxyRepository proxyRepository, final RemoteStorageContext ctx,
+  protected void configure(final ProxyRepository proxyRepository,
+                           final RemoteStorageContext ctx,
                            final Builder builder)
   {
-    // set UA, as Proxy reposes have different than the "generic" one set by Hc4Provider
-    builder.getHttpClientBuilder().setUserAgent(userAgentBuilder.formatRemoteRepositoryStorageUserAgentString(proxyRepository, ctx));
-
     // set proxy redirect strategy
     builder.getHttpClientBuilder().setRedirectStrategy(getProxyRepositoryRedirectStrategy(proxyRepository, ctx));
   }

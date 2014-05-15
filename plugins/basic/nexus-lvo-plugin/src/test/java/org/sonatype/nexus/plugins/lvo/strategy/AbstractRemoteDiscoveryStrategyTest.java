@@ -15,6 +15,7 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.internal.httpclient.Hc4ProviderImpl;
 import org.sonatype.nexus.internal.httpclient.PoolingClientConnectionManagerMBeanInstaller;
@@ -60,6 +61,9 @@ public class AbstractRemoteDiscoveryStrategyTest
   private AbstractRemoteDiscoveryStrategy.RequestResult result;
 
   @Mock
+  private SystemStatus systemStatus;
+
+  @Mock
   private RemoteStorageContext remoteStorageContext;
 
   @Mock
@@ -94,7 +98,13 @@ public class AbstractRemoteDiscoveryStrategyTest
   }
 
   private AbstractRemoteDiscoveryStrategy create() {
-    final Hc4Provider provider = new Hc4ProviderImpl(Providers.of(remoteStorageContext), eventBus, jmxInstaller, null);
+    final Hc4Provider provider = new Hc4ProviderImpl(
+        Providers.of(systemStatus),
+        Providers.of(remoteStorageContext),
+        eventBus,
+        jmxInstaller,
+        null);
+
     return new AbstractRemoteDiscoveryStrategy(provider)
     {
       @Override

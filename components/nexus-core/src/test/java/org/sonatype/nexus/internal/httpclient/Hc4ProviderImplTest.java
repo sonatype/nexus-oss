@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.internal.httpclient;
 
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
@@ -48,6 +49,9 @@ public class Hc4ProviderImplTest
   private EventBus eventBus;
 
   @Mock
+  private SystemStatus systemStatus;
+
+  @Mock
   private RemoteStorageContext globalRemoteStorageContext;
 
   @Mock
@@ -69,7 +73,12 @@ public class Hc4ProviderImplTest
   public void sharedInstanceConfigurationTest() {
     setParameters();
     try {
-      testSubject = new Hc4ProviderImpl(Providers.of(globalRemoteStorageContext), eventBus, jmxInstaller, null);
+      testSubject = new Hc4ProviderImpl(
+          Providers.of(systemStatus),
+          Providers.of(globalRemoteStorageContext),
+          eventBus,
+          jmxInstaller,
+          null);
 
       final HttpClient client = testSubject.createHttpClient();
       // Note: shared instance is shared across Nexus instance. It does not features connection pooling as
@@ -111,7 +120,12 @@ public class Hc4ProviderImplTest
   public void createdInstanceConfigurationTest() {
     setParameters();
     try {
-      testSubject = new Hc4ProviderImpl(Providers.of(globalRemoteStorageContext), eventBus, jmxInstaller, null);
+      testSubject = new Hc4ProviderImpl(
+          Providers.of(systemStatus),
+          Providers.of(globalRemoteStorageContext),
+          eventBus,
+          jmxInstaller,
+          null);
 
       // Note: explicitly created instance (like in case of proxies), it does pool and
       // returns customized client
@@ -154,7 +168,12 @@ public class Hc4ProviderImplTest
 
   @Test
   public void NEXUS6220_connectionReuse() {
-    testSubject = new Hc4ProviderImpl(Providers.of(globalRemoteStorageContext), eventBus, jmxInstaller, null);
+    testSubject = new Hc4ProviderImpl(
+        Providers.of(systemStatus),
+        Providers.of(globalRemoteStorageContext),
+        eventBus,
+        jmxInstaller,
+        null);
 
     // nothing NTLM related present
     {
@@ -176,8 +195,7 @@ public class Hc4ProviderImplTest
       final RemoteHttpProxySettings https = new DefaultRemoteHttpProxySettings();
       when(remoteProxySettings.getHttpProxySettings()).thenReturn(http);
       when(remoteProxySettings.getHttpsProxySettings()).thenReturn(https);
-      Assert
-          .assertTrue("NTLM HTTP proxy auth-proxy set",
+      Assert.assertTrue("NTLM HTTP proxy auth-proxy set",
               testSubject.reuseConnectionsNeeded(globalRemoteStorageContext));
     }
 
@@ -188,8 +206,7 @@ public class Hc4ProviderImplTest
       https.setProxyAuthentication(new NtlmRemoteAuthenticationSettings("a", "b", "c", "d"));
       when(remoteProxySettings.getHttpProxySettings()).thenReturn(http);
       when(remoteProxySettings.getHttpsProxySettings()).thenReturn(https);
-      Assert
-          .assertTrue("NTLM HTTPS proxy auth-proxy set",
+      Assert.assertTrue("NTLM HTTPS proxy auth-proxy set",
               testSubject.reuseConnectionsNeeded(globalRemoteStorageContext));
     }
   }

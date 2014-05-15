@@ -21,6 +21,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.apachehttpclient.Hc4Provider;
 import org.sonatype.nexus.apachehttpclient.SSLContextSelector;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
@@ -116,6 +117,8 @@ public class Hc4ProviderImpl
 
   // ==
 
+  private final Provider<SystemStatus> systemStatusProvider;
+  
   private final Provider<RemoteStorageContext> globalRemoteStorageContextProvider;
 
   /**
@@ -159,11 +162,13 @@ public class Hc4ProviderImpl
   private final PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
 
   @Inject
-  public Hc4ProviderImpl(final @Named("global") Provider<RemoteStorageContext> globalRemoteStorageContextProvider,
+  public Hc4ProviderImpl(final Provider<SystemStatus> systemStatusProvider,
+                         final @Named("global") Provider<RemoteStorageContext> globalRemoteStorageContextProvider,
                          final EventBus eventBus,
                          final PoolingClientConnectionManagerMBeanInstaller jmxInstaller,
                          final List<SSLContextSelector> selectors)
   {
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.globalRemoteStorageContextProvider = checkNotNull(globalRemoteStorageContextProvider);
     this.jmxInstaller = checkNotNull(jmxInstaller);
     this.sharedConnectionManager = createClientConnectionManager(selectors);
@@ -178,9 +183,7 @@ public class Hc4ProviderImpl
     this.jmxInstaller.register(sharedConnectionManager);
   }
 
-  private ManagedClientConnectionManager createClientConnectionManager(final List<SSLContextSelector> selectors)
-      throws IllegalStateException
-  {
+  private ManagedClientConnectionManager createClientConnectionManager(final List<SSLContextSelector> selectors) {
     final Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
         .register("http", PlainConnectionSocketFactory.getSocketFactory())
         .register("https", new NexusSSLConnectionSocketFactory(
@@ -290,8 +293,36 @@ public class Hc4ProviderImpl
     builder.getRequestConfigBuilder().setExpectContinueEnabled(false);
     builder.getRequestConfigBuilder().setStaleConnectionCheckEnabled(false);
 
+    // Apply default user-agent
+    builder.setUserAgent(getUserAgent());
+    
     customizer.customize(builder);
 
     return builder;
+  }
+
+  private String userAgent;
+
+  private String platformEditionShort;
+  
+  private synchronized String getUserAgent() {
+    SystemStatus status = systemStatusProvider.get();
+
+    // Cache platform details or re-cache if the edition has changed
+    if (userAgent == null || !status.getEditionShort().equals(platformEditionShort)) {
+      // track edition for cache invalidation
+      platformEditionShort = status.getEditionShort();
+
+      userAgent =
+          String.format("Nexus/%s (%s; %s; %s; %s; %s)",
+              status.getVersion(),
+              platformEditionShort,
+              System.getProperty("os.name"),
+              System.getProperty("os.version"),
+              System.getProperty("os.arch"),
+              System.getProperty("java.version"));
+    }
+
+    return userAgent;
   }
 }

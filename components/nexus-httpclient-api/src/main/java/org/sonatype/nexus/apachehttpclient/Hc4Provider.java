@@ -81,6 +81,8 @@ public interface Hc4Provider
 
     private final CredentialsProvider credentialsProvider;
 
+    private String userAgent;
+
     private boolean credentialsProviderAltered;
 
     public Builder() {
@@ -147,6 +149,16 @@ public interface Hc4Provider
       return requestConfigBuilder;
     }
 
+    // User-Agent is read-only in HttpClientBuilder so we expose this for r/w here to allow for customization
+
+    public String getUserAgent() {
+      return userAgent;
+    }
+
+    public void setUserAgent(final String userAgent) {
+      this.userAgent = userAgent;
+    }
+
     /**
      * Builds the {@link HttpClient} from current state of this builder. Once client is built and returned, it is
      * immutable and thread safe (unless explicitly configured with non-thread safe client connection manager).
@@ -160,6 +172,11 @@ public interface Hc4Provider
       if (credentialsProviderAltered) {
         httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
       }
+
+      if (userAgent != null) {
+        httpClientBuilder.setUserAgent(userAgent);
+      }
+
       return httpClientBuilder.build();
     }
   }

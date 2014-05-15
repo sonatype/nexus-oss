@@ -12,20 +12,14 @@
  */
 package org.sonatype.nexus.proxy.utils;
 
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 /**
  * Component building proper UserAgent string describing this instance of Nexus.
  */
+@Deprecated
 public interface UserAgentBuilder
 {
-  /**
-   * Builds a user agent string to be used with RemoteRepositoryStorages.
-   */
-  String formatRemoteRepositoryStorageUserAgentString(ProxyRepository repository,
-                                                      RemoteStorageContext ctx);
-
   /**
    * Builds a user agent string to be used for the specified remote storage context.
    *

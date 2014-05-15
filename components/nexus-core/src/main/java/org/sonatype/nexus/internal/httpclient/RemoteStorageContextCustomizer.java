@@ -32,6 +32,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
@@ -77,8 +78,13 @@ public class RemoteStorageContextCustomizer
     applyAuthenticationConfig(builder, context.getRemoteAuthenticationSettings(), null);
     applyProxyConfig(builder, context.getRemoteProxySettings());
 
-    // FIXME: How to replace this?
-    //builder.getHttpClientBuilder().setUserAgent(userAgentBuilder.formatUserAgentString(context));
+    // Apply optional context-specific user-agent suffix
+    if (context.getRemoteConnectionSettings() != null) {
+      String userAgentSuffix = context.getRemoteConnectionSettings().getUserAgentCustomizationString();
+      if (!StringUtils.isEmpty(userAgentSuffix)) {
+        builder.setUserAgent(builder.getUserAgent() + " " + userAgentSuffix);
+      }
+    }
   }
 
   private void applyAuthenticationConfig(final Builder builder,
@@ -142,9 +148,7 @@ public class RemoteStorageContextCustomizer
           builder, remoteProxySettings.getHttpProxySettings().getProxyAuthentication(), httpProxy
       );
 
-      log.debug(
-          "http proxy setup with host '{}'", remoteProxySettings.getHttpProxySettings().getHostname()
-      );
+      log.debug("http proxy setup with host '{}'", remoteProxySettings.getHttpProxySettings().getHostname());
       proxies.put("http", httpProxy);
       proxies.put("https", httpProxy);
 
@@ -157,9 +161,7 @@ public class RemoteStorageContextCustomizer
         applyAuthenticationConfig(
             builder, remoteProxySettings.getHttpsProxySettings().getProxyAuthentication(), httpsProxy
         );
-        log.debug(
-            "https proxy setup with host '{}'", remoteProxySettings.getHttpsProxySettings().getHostname()
-        );
+        log.debug("https proxy setup with host '{}'", remoteProxySettings.getHttpsProxySettings().getHostname());
         proxies.put("https", httpsProxy);
       }
 

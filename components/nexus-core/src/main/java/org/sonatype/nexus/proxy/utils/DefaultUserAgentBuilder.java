@@ -13,17 +13,13 @@
 
 package org.sonatype.nexus.proxy.utils;
 
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
-import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -33,12 +29,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named
 @Singleton
+@Deprecated
 public class DefaultUserAgentBuilder
     implements UserAgentBuilder
 {
   private final Provider<SystemStatus> systemStatusProvider;
-
-  private final List<UserAgentContributor> contributors;
 
   /**
    * The edition, that will tell us is there some change happened with installation.
@@ -51,19 +46,8 @@ public class DefaultUserAgentBuilder
   private String userAgentPlatformInfo;
 
   @Inject
-  public DefaultUserAgentBuilder(final Provider<SystemStatus> systemStatusProvider,
-                                 final List<UserAgentContributor> contributors)
-  {
+  public DefaultUserAgentBuilder(final Provider<SystemStatus> systemStatusProvider) {
     this.systemStatusProvider = checkNotNull(systemStatusProvider);
-    this.contributors = contributors;
-  }
-
-  @Override
-  public String formatRemoteRepositoryStorageUserAgentString(final ProxyRepository repository,
-                                                             final RemoteStorageContext ctx)
-  {
-
-    return ua(ctx, repository).toString();
   }
 
   @Override
@@ -73,43 +57,25 @@ public class DefaultUserAgentBuilder
 
   // ==
 
-  private StringBuilder ua(final RemoteStorageContext ctx) {
-    return ua(ctx, null);
-  }
-
   @VisibleForTesting
-  StringBuilder ua(final RemoteStorageContext ctx, final ProxyRepository repository) {
-    final StringBuilder buf = new StringBuilder(getUserAgentPlatformInfo());
-
-    if (repository != null) {
-      final RemoteRepositoryStorage rrs = repository.getRemoteStorage();
-      buf.append(" ").append(rrs.getProviderId()).append("/").append(rrs.getVersion());
-    }
+  StringBuilder ua(final RemoteStorageContext ctx) {
+    final StringBuilder buff = new StringBuilder(getUserAgentPlatformInfo());
 
     // user customization
     RemoteConnectionSettings remoteConnectionSettings = ctx.getRemoteConnectionSettings();
 
     if (!StringUtils.isEmpty(remoteConnectionSettings.getUserAgentCustomizationString())) {
-      buf.append(" ").append(remoteConnectionSettings.getUserAgentCustomizationString());
+      buff.append(" ").append(remoteConnectionSettings.getUserAgentCustomizationString());
     }
 
-    // plugin customization
-    // FIXME: There are no longer any impls of this, consider dropping to simplify
-    for (UserAgentContributor contributor : contributors) {
-      final String contribution = contributor.getUserAgent(ctx, repository);
-      if (!StringUtils.isEmpty(contribution)) {
-        buf.append(" ").append(contribution);
-      }
-    }
-
-    return buf;
+    return buff;
   }
 
   private synchronized String getUserAgentPlatformInfo() {
     SystemStatus status = systemStatusProvider.get();
 
     // Cache platform details or re-cache if the edition has changed
-    if (userAgentPlatformInfo == null || status.getEditionShort().equals(platformEditionShort)) {
+    if (userAgentPlatformInfo == null || !status.getEditionShort().equals(platformEditionShort)) {
       // track edition for cache invalidation
       platformEditionShort = status.getEditionShort();
 
