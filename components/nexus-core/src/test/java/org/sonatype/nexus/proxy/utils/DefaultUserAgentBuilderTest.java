@@ -14,7 +14,6 @@ package org.sonatype.nexus.proxy.utils;
 
 import java.util.List;
 
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
@@ -23,6 +22,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Lists;
+import com.google.inject.util.Providers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -42,9 +42,6 @@ public class DefaultUserAgentBuilderTest
    * Properties we want to see in the UA.
    */
   private static List<String> sysProps = Lists.newArrayList("os.name", "os.arch", "os.version", "java.version");
-
-  @Mock
-  private ApplicationStatusSource statusSource;
 
   @Mock
   private RemoteStorageContext ctx;
@@ -70,9 +67,8 @@ public class DefaultUserAgentBuilderTest
 
   @Before
   public void setup() {
-    this.underTest = new DefaultUserAgentBuilder(statusSource, contributors);
+    this.underTest = new DefaultUserAgentBuilder(Providers.of(status), contributors);
 
-    when(statusSource.getSystemStatus()).thenReturn(status);
     when(status.getVersion()).thenReturn("2.1-FAKE");
     when(status.getEditionShort()).thenReturn("FAKENEXUS");
 
@@ -84,12 +80,6 @@ public class DefaultUserAgentBuilderTest
     when(storage.getVersion()).thenReturn("RRS_VERSION");
 
     when(contributor.getUserAgent(ctx, repository)).thenReturn("PLUGIN_CONTRIBUTED");
-  }
-
-  @Test
-  public void testGenericUA() {
-    final String ua = underTest.formatGenericUserAgentString();
-    assertGenericUAParts(ua);
   }
 
   @Test
