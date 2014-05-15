@@ -12,21 +12,21 @@
  */
 package org.sonatype.nexus.atlas.internal
 
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
-import java.nio.file.FileSystems
-
-import org.sonatype.nexus.ApplicationStatusSource
+import com.google.inject.Key
+import org.eclipse.sisu.Parameters
+import org.eclipse.sisu.inject.BeanLocator
+import org.sonatype.nexus.SystemStatus
 import org.sonatype.nexus.atlas.SystemInformationGenerator
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration
+import org.sonatype.nexus.configuration.application.ApplicationDirectories
 import org.sonatype.nexus.plugin.PluginIdentity
 import org.sonatype.sisu.goodies.common.ComponentSupport
 import org.sonatype.sisu.goodies.common.Iso8601Date
 
-import com.google.inject.Key
-import org.eclipse.sisu.Parameters
-import org.eclipse.sisu.inject.BeanLocator;
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Provider
+import javax.inject.Singleton
+import java.nio.file.FileSystems
 
 import static com.google.common.base.Preconditions.checkNotNull
 
@@ -43,9 +43,9 @@ class SystemInformationGeneratorImpl
 {
   private final BeanLocator beanLocator
 
-  private final ApplicationConfiguration applicationConfiguration
+  private final ApplicationDirectories applicationDirectories
 
-  private final ApplicationStatusSource applicationStatusSource
+  private final Provider<SystemStatus> systemStatusProvider
 
   private final Map<String, String> parameters;
 
@@ -53,14 +53,14 @@ class SystemInformationGeneratorImpl
 
   @Inject
   SystemInformationGeneratorImpl(final BeanLocator beanLocator,
-                                 final ApplicationConfiguration applicationConfiguration,
-                                 final ApplicationStatusSource applicationStatusSource,
+                                 final ApplicationDirectories applicationDirectories,
+                                 final Provider<SystemStatus> systemStatusProvider,
                                  final @Parameters Map<String, String> parameters,
                                  final List<PluginIdentity> pluginIdentities)
   {
     this.beanLocator = checkNotNull(beanLocator)
-    this.applicationConfiguration = checkNotNull(applicationConfiguration)
-    this.applicationStatusSource = checkNotNull(applicationStatusSource)
+    this.applicationDirectories = checkNotNull(applicationDirectories)
+    this.systemStatusProvider = checkNotNull(systemStatusProvider)
     this.parameters = checkNotNull(parameters);
     this.pluginIdentities = checkNotNull(pluginIdentities)
   }
@@ -71,8 +71,8 @@ class SystemInformationGeneratorImpl
 
     // HACK: provide local references to prevent problems with Groovy BUG accessing private fields
     def beanLocator = this.beanLocator
-    def applicationConfiguration = this.applicationConfiguration
-    def systemStatus = this.applicationStatusSource.systemStatus
+    def applicationDirectories = this.applicationDirectories
+    def systemStatus = this.systemStatusProvider.get()
     def parameters = this.parameters
     def pluginIdentities = this.pluginIdentities
 
@@ -224,33 +224,22 @@ class SystemInformationGeneratorImpl
 
     def reportNexusConfiguration = {
       return [
-          'installDirectory': fileref(applicationConfiguration.installDirectory),
-          'workingDirectory': fileref(applicationConfiguration.workingDirectory),
-          'temporaryDirectory': fileref(applicationConfiguration.temporaryDirectory)
+          'installDirectory': fileref(applicationDirectories.installDirectory),
+          'workingDirectory': fileref(applicationDirectories.workDirectory),
+          'temporaryDirectory': fileref(applicationDirectories.temporaryDirectory)
       ]
     }
 
     def reportNexusPlugins = {
       def data = [:]
-      pluginIdentities.each { coordinates, response ->
+      pluginIdentities.each {
+        def coordinates = it.coordinates
         def item = data[coordinates.artifactId] = [
             'groupId': coordinates.groupId,
             'artifactId': coordinates.artifactId,
             'version': coordinates.version,
             'successful': 'true'
         ]
-
-        // include dependency plugins
-// TODO: populate with OSGi info?
-//        if (!response.pluginDescriptor.importedPlugins.empty) {
-//          item.importedPlugins = response.pluginDescriptor.importedPlugins.collect { it.toString() }.join(',')
-//        }
-
-        // include error
-// TODO: log/diagnose OSGi issues?
-//        if (response.throwable) {
-//          item.throwable = response.throwable.toString()
-//        }
       }
       return data
     }

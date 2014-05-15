@@ -22,14 +22,14 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.extdirect.ExtDirectPlugin;
-import org.sonatype.nexus.plugin.support.FileWebResource;
-import org.sonatype.nexus.web.WebResource;
-import org.sonatype.nexus.web.WebResourceBundle;
+import org.sonatype.nexus.webresources.FileWebResource;
+import org.sonatype.nexus.webresources.WebResource;
+import org.sonatype.nexus.webresources.WebResourceBundle;
 
 import com.google.common.collect.ImmutableList;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.web.WebResource.JAVASCRIPT;
+import static org.sonatype.nexus.webresources.WebResource.JAVASCRIPT;
 
 /**
  * Ext.Direct web-resources.

@@ -67,7 +67,7 @@ public class SettingsMessageUtil
     SmtpSettingsResourceRequest configResponse = wrapData(smtpSettings);
     XStreamRepresentation representation = new XStreamRepresentation(xstream, "", MediaType.APPLICATION_XML);
     representation.setPayload(configResponse);
-    return RequestFacade.doPutForStatus("service/local/check_smtp_settings/", representation, null);
+    return RequestFacade.doPutForStatus("service/local/check_smtp_settings", representation, null);
   }
 
   /**

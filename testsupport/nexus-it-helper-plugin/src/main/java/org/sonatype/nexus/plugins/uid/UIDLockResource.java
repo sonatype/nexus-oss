@@ -81,6 +81,7 @@ public class UIDLockResource
   public UIDLockResource(final RepositoryRegistry repositoryRegistry) {
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.lockThreads = Maps.newHashMap();
+    setRequireStrictChecking(false);
   }
 
   @Override

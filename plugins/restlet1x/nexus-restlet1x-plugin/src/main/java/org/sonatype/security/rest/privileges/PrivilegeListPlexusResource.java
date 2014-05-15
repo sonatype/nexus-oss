@@ -51,6 +51,10 @@ public class PrivilegeListPlexusResource
 
   public static final String RESOURCE_URI = "/privileges";
 
+  public PrivilegeListPlexusResource() {
+    setRequireStrictChecking(false);
+  }
+
   @Override
   public Object getPayloadInstance() {
     return null;

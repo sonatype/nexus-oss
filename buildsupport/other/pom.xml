@@ -131,10 +131,49 @@
         <version>0.9</version>
       </dependency>
 
+      <!--
+      Hibernate validator supports 1.1 but we need to do a bit more work before we can use it.
+      -->
+      <!--<dependency>-->
+      <!--<groupId>javax.validation</groupId>-->
+      <!--<artifactId>validation-api</artifactId>-->
+      <!--<version>1.1.0.Final</version>-->
+      <!--</dependency>-->
+
+      <!--<dependency>-->
+      <!--<groupId>org.hibernate</groupId>-->
+      <!--<artifactId>hibernate-validator</artifactId>-->
+      <!--<version>5.1.1.Final</version>-->
+      <!--</dependency>-->
+
+      <!--
+      Apache BVal only supports 1.0 spec.
+      -->
       <dependency>
         <groupId>javax.validation</groupId>
         <artifactId>validation-api</artifactId>
-        <version>1.1.0.Final</version>
+        <version>1.0.0.GA</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.bval</groupId>
+        <artifactId>bval-core</artifactId>
+        <version>0.5</version>
+        <exclusions>
+          <!--
+          Exclude older beanutils, latest 1.9+ has different GA (commons-beanutils:commons-beanutils)
+          -->
+          <exclusion>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils-core</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.bval</groupId>
+        <artifactId>bval-jsr303</artifactId>
+        <version>0.5</version>
       </dependency>
 
       <dependency>
@@ -147,11 +186,6 @@
             <artifactId>org.apache.bval.bundle</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.bval</groupId>
-        <artifactId>bval-jsr303</artifactId>
-        <version>0.5</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

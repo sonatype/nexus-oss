@@ -34,6 +34,10 @@ public class RepositoryGroupContentPlexusResource
 {
   public static final String GROUP_ID_KEY = "groupId";
 
+  public RepositoryGroupContentPlexusResource() {
+    setRequireStrictChecking(false);
+  }
+
   @Override
   public Object getPayloadInstance() {
     // group content is read only

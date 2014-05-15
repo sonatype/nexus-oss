@@ -28,8 +28,8 @@ import org.sonatype.nexus.timeline.feeds.FeedSource;
 import org.sonatype.nexus.timeline.feeds.rest.model.FeedEntriesXO;
 import org.sonatype.nexus.timeline.feeds.rest.model.FeedEntryXO;
 import org.sonatype.nexus.web.BaseUrlHolder;
+import org.sonatype.siesta.Resource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-import org.sonatype.sisu.siesta.common.Resource;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 

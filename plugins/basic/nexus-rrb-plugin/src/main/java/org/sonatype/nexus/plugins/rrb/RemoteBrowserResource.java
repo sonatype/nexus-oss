@@ -77,6 +77,7 @@ public class RemoteBrowserResource
   {
     this.queryStringBuilder = checkNotNull(queryStringBuilder);
     this.httpClientProvider = checkNotNull(httpClientProvider);
+    setRequireStrictChecking(false);
   }
 
   @Override

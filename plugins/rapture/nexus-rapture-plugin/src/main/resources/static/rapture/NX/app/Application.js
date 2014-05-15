@@ -31,6 +31,7 @@ Ext.define('NX.app.Application', {
     'NX.State',
 
     // Ext overrides
+    'NX.ext.form.action.DirectLoad',
     'NX.ext.form.action.DirectSubmit',
     'NX.ext.form.field.Base',
     'NX.ext.form.field.Checkbox',
@@ -54,6 +55,7 @@ Ext.define('NX.app.Application', {
     'NX.ext.grid.column.Icon',
     'NX.ext.grid.column.Link',
     'NX.ext.grid.column.Timestamp',
+    'NX.ext.tree.View',
     'NX.Conditions'
   ],
 

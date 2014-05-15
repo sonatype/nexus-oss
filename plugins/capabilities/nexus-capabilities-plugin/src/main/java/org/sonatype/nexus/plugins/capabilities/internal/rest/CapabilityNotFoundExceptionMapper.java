@@ -14,27 +14,24 @@ package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityNotFoundException;
-import org.sonatype.sisu.siesta.common.error.ErrorXO;
-import org.sonatype.sisu.siesta.common.error.ObjectNotFoundException;
-import org.sonatype.sisu.siesta.server.ErrorExceptionMapperSupport;
+import org.sonatype.siesta.FaultExceptionMapperSupport;
+import org.sonatype.siesta.FaultXO;
 
 /**
- * Maps {@link CapabilityNotFoundException} to 404 with a {@link ErrorXO} body.
+ * Maps {@link CapabilityNotFoundException} to {@link Status#NOT_FOUND} with {@link FaultXO} body.
  *
  * @since 2.7
  */
 @Named
 @Singleton
 public class CapabilityNotFoundExceptionMapper
-    extends ErrorExceptionMapperSupport<CapabilityNotFoundException>
+    extends FaultExceptionMapperSupport<CapabilityNotFoundException>
 {
-
   @Override
-  protected int getStatusCode(final CapabilityNotFoundException exception) {
-    return Response.Status.NOT_FOUND.getStatusCode();
+  protected Status getStatus(final CapabilityNotFoundException exception) {
+    return Status.NOT_FOUND;
   }
-
 }

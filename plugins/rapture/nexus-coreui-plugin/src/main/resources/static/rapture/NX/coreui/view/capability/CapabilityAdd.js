@@ -61,16 +61,33 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
           }
         },
         {
-          xtype: 'nx-coreui-capability-settingsfieldset'
+          xtype: 'checkbox',
+          fieldLabel: 'Enabled',
+          helpText: 'This flag determines if the capability is currently enabled. To disable this capability for a period of time, de-select this checkbox.',
+          name: 'enabled',
+          allowBlank: false,
+          checked: true,
+          editable: true
+        },
+        {
+          xtype: 'nx-coreui-formfield-settingsfieldset'
         }
       ],
 
       getValues: function () {
-        return me.down('nx-coreui-capability-settingsfieldset').exportCapability();
+        var values = me.down('form').getForm().getFieldValues(),
+            capability = {
+              typeId: values.typeId,
+              enabled: values.enabled,
+              properties: {}
+            };
+
+        Ext.apply(capability.properties, me.down('nx-coreui-formfield-settingsfieldset').exportProperties(values));
+        return capability;
       },
 
       markInvalid: function (errors) {
-        return me.down('nx-coreui-capability-settingsfieldset').markInvalid(errors);
+        return me.down('nx-coreui-formfield-settingsfieldset').markInvalid(errors);
       }
 
     };

@@ -44,6 +44,10 @@ public class GroupIndexContentPlexusResource
 
   public static final String RESOURCE_URI = "/repo_groups/{" + GROUP_ID_KEY + "}/index_content";
 
+  public GroupIndexContentPlexusResource() {
+    setRequireStrictChecking(false);
+  }
+
   @Override
   public String getResourceUri() {
     return RESOURCE_URI;

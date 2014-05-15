@@ -12,11 +12,11 @@
  */
 package org.sonatype.nexus.proxy.item;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.util.WrappingInputStream;
 
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +63,7 @@ public class ReadLockingContentLocator
   // ==
 
   private static class ReadLockingInputStream
-      extends WrappingInputStream
+      extends FilterInputStream
   {
     private final RepositoryItemUid uid;
 

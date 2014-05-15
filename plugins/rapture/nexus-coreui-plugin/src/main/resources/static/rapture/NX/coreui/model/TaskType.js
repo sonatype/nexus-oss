@@ -19,6 +19,7 @@ Ext.define('NX.coreui.model.TaskType', {
   extend: 'Ext.data.Model',
   fields: [
     'id',
-    'name'
+    'name',
+    'formFields'
   ]
 });

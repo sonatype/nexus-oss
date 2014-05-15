@@ -51,6 +51,15 @@ def scanner = new TestSourcesScanner(
 )
 
 /**
+ * Convert a source ref (.java or .groovy, etc) to a .class ref.
+ */
+def sourceToClass = { filename ->
+  def i = filename.lastIndexOf('.')
+  def prefix = filename.substring(0, i)
+  return "${prefix}.class"
+}
+
+/**
  * Mode 'custom', generates a single shard configuration.
  *
  * Special handling for empty selection to keep failsafe configuration happy; creates configuration with dummy source file.
@@ -78,9 +87,10 @@ def customMode = {
     def iter = scanner.iterator()
     def tests = []
     while (iter.hasNext()) {
-        def file = iter.next()
-        println "    $file"
-        tests << file
+        String classref = iter.next()
+        classref = sourceToClass(classref)
+        println "    $classref"
+        tests << classref
     }
 
     println "Creating shard configuration: $outputFile"
@@ -138,8 +148,9 @@ def normalMode = {
         def file = new File(outputDir, "shard-${shardId}.txt")
         file.withPrintWriter { writer ->
             sources.each {
-                println "    $it"
-                writer.println "$it"
+                classref = sourceToClass(it)
+                println "    $classref"
+                writer.println "$classref"
             }
         }
     }

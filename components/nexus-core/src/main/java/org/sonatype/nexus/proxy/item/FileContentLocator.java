@@ -15,11 +15,11 @@ package org.sonatype.nexus.proxy.item;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.sonatype.nexus.util.WrappingInputStream;
 import org.sonatype.nexus.util.file.DirSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -109,7 +109,7 @@ public class FileContentLocator
   // ==
 
   public static class DeleteOnCloseFileInputStream
-      extends WrappingInputStream
+      extends FilterInputStream
   {
     private final File file;
 

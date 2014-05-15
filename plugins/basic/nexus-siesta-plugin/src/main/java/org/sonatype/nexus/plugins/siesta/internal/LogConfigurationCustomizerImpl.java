@@ -18,7 +18,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.log.LogConfigurationCustomizer;
 
 import static org.sonatype.nexus.log.LoggerLevel.DEFAULT;
-import static org.sonatype.nexus.log.LoggerLevel.WARN;
 
 /**
  * Siesta {@link LogConfigurationCustomizer}.
@@ -32,15 +31,8 @@ public class LogConfigurationCustomizerImpl
 {
   @Override
   public void customize(final Configuration configuration) {
-    configuration.setLoggerLevel("org.sonatype.sisu.siesta", DEFAULT);
+    configuration.setLoggerLevel("org.sonatype.siesta", DEFAULT);
+    configuration.setLoggerLevel("org.jboss.resteasy", DEFAULT);
     configuration.setLoggerLevel("org.sonatype.nexus.plugins.siesta", DEFAULT);
-
-    // This will prevent duplicate 'Initiating Jersey application' messages, though won't omit them all... not sure why ATM.
-    configuration.setLoggerLevel("com.sun.jersey.server.impl.application.WebApplicationImpl", WARN);
-
-    // Jersey support (cdi,jmx) spits out exceptions at INFO when DEBUG is enabled; limit these to WARN to avoid this noise.
-    configuration.setLoggerLevel("com.sun.jersey.server.impl.cdi.CDIComponentProviderFactoryInitializer", WARN);
-    configuration.setLoggerLevel("com.sun.jersey.server.impl.ejb.EJBComponentProviderFactoryInitilizer", WARN);
-    configuration.setLoggerLevel("com.sun.jersey.server.impl.managedbeans.ManagedBeanComponentProviderFactoryInitilizer", WARN);
   }
 }

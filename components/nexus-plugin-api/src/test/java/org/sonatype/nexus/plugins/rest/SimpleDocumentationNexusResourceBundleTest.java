@@ -14,8 +14,8 @@ package org.sonatype.nexus.plugins.rest;
 
 import java.util.List;
 
-import org.sonatype.nexus.web.WebResource;
-import org.sonatype.nexus.web.WebResourceBundle;
+import org.sonatype.nexus.webresources.WebResource;
+import org.sonatype.nexus.webresources.WebResourceBundle;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Assert;

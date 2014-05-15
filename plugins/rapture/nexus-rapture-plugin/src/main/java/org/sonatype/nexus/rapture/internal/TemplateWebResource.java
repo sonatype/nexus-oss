@@ -17,8 +17,8 @@ import java.net.URL;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.web.GeneratedWebResource;
-import org.sonatype.nexus.web.WebResource;
+import org.sonatype.nexus.webresources.GeneratedWebResource;
+import org.sonatype.nexus.webresources.WebResource;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 

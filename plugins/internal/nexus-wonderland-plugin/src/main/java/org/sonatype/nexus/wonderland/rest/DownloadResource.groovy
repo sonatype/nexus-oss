@@ -16,8 +16,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.nexus.util.Tokens
 import org.sonatype.nexus.wonderland.DownloadService
 import org.sonatype.sisu.goodies.common.ComponentSupport
-import org.sonatype.sisu.siesta.common.Resource
-import org.sonatype.sisu.siesta.common.error.WebApplicationMessageException
+import org.sonatype.siesta.Resource
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -29,6 +28,7 @@ import javax.ws.rs.Path
 import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
+import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Response
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST
@@ -84,7 +84,7 @@ class DownloadResource
 
     // handle one-time auth
     if (!authTicket) {
-      throw new WebApplicationMessageException(BAD_REQUEST, 'Missing authentication ticket')
+      throw new WebApplicationException('Missing authentication ticket', BAD_REQUEST)
     }
 
     try {
@@ -100,7 +100,7 @@ class DownloadResource
           .build()
     }
     catch (IllegalAccessException e) {
-      throw new WebApplicationMessageException(FORBIDDEN, e.toString())
+      throw new WebApplicationException(e.toString(), FORBIDDEN)
     }
   }
 }
