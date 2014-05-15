@@ -10,32 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global NX*/
+
+package org.sonatype.nexus.plugins.siesta.internal;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.siesta.ExceptionMapperSupport;
 
 /**
- * 'checkbox' factory.
+ * Maps {@link NoSuchRepositoryException} to {@link Status#NOT_FOUND}.
  *
- * @since 3.0
+ * @since 2.4
  */
-Ext.define('NX.coreui.view.capability.factory.CapabilityCheckboxFactory', {
-  singleton: true,
-  alias: 'nx.capability.factory.checkbox',
-
-  /**
-   * Creates a checkbox.
-   * @param formField capability type form field to create checkbox for
-   * @returns {*} created checkbox (never null)
-   */
-  create: function (formField) {
-    var item = {
-      xtype: 'checkbox',
-      fieldLabel: formField.label,
-      helpText: formField.helpText
-    };
-    if (formField.initialValue) {
-      item.checked = Boolean('true' === formField.initialValue);
-    }
-    return item;
+@Named
+@Singleton
+public class NoSuchRepositoryExceptionMapper
+    extends ExceptionMapperSupport<NoSuchRepositoryException>
+{
+  @Override
+  protected Response convert(final NoSuchRepositoryException exception, final String id) {
+    return Response.status(Status.NOT_FOUND).build();
   }
-
-});
+}

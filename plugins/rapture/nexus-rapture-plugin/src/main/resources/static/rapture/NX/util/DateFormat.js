@@ -92,6 +92,21 @@ Ext.define('NX.util.DateFormat', {
     return function (value) {
       return NX.util.DateFormat.timestamp(value, format);
     }
+  },
+
+  /**
+   * @public
+   * @returns {String} time zone
+   */
+  getTimeZone: function () {
+    var me = this;
+
+    if (!me.timeZone) {
+      me.timeZone = new Date().toTimeString();
+      me.timeZone = me.timeZone.substring(me.timeZone.indexOf(" "));
+    }
+
+    return me.timeZone;
   }
 
 });

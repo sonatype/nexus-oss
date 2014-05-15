@@ -53,12 +53,6 @@
 
       <dependency>
         <groupId>com.yammer.metrics</groupId>
-        <artifactId>metrics-jersey</artifactId>
-        <version>${yammer-metrics.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.yammer.metrics</groupId>
         <artifactId>metrics-jetty</artifactId>
         <version>${yammer-metrics.version}</version>
       </dependency>

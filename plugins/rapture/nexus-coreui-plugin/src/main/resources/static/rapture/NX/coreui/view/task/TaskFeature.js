@@ -21,6 +21,12 @@ Ext.define('NX.coreui.view.task.TaskFeature', {
 
   list: 'nx-coreui-task-list',
 
-  iconName: 'task-default'
+  iconName: 'task-default',
+
+  tabs: [
+    { xtype: 'nx-info-panel' },
+    { xtype: 'nx-coreui-task-settings', title: 'Settings' },
+    { xtype: 'nx-coreui-task-schedule', title: 'Schedule' }
+  ]
 
 });

@@ -357,7 +357,7 @@
           </bootFeatures>
           <installedFeatures>
             <feature>nexus-base-feature</feature>
-            <feature>nexus-osgi-edition</feature>
+            <feature>nexus-oss-edition</feature>
             <feature>nexus-content-plugin</feature>
             <feature>nexus-webresources-plugin</feature>
             <feature>nexus-crypto-plugin</feature>

@@ -13,35 +13,33 @@
 /*global NX*/
 
 /**
- * 'datefield' factory.
+ * 'numberfield' factory.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.capability.factory.CapabilityDateFieldFactory', {
+Ext.define('NX.coreui.view.formfield.factory.FormfieldNumberFieldFactory', {
   singleton: true,
   alias: [
-    'nx.capability.factory.datefield',
-    'nx.capability.factory.date'
+    'nx.formfield.factory.numberfield',
+    'nx.formfield.factory.number'
   ],
 
   /**
-   * Creates a datefield.
-   * @param formField capability type form field to create datefield for
-   * @returns {*} created datefield (never null)
+   * Creates a numberfield.
+   * @param formField form field to create numberfield for
+   * @returns {*} created numberfield (never null)
    */
   create: function (formField) {
     var item = {
-      xtype: 'datefield',
-      htmlDecode: true,
+      xtype: 'numberfield',
       fieldLabel: formField.label,
       itemCls: formField.required ? 'required-field' : '',
       helpText: formField.helpText,
       allowBlank: !formField.required,
-      regex: formField.regexValidation ? new RegExp(formField.regexValidation) : null,
-      value: new Date()
+      regex: formField.regexValidation ? new RegExp(formField.regexValidation) : null
     };
     if (formField.initialValue) {
-      item.value = new Date(Number(formField.initialValue));
+      item.value = Number(formField.initialValue);
     }
     return item;
   }

@@ -104,20 +104,16 @@ public abstract class NexusAppTestSupport
   // NxApplication
 
   @Override
-  protected Module[] getTestCustomModules() {
-    Module[] modules = super.getTestCustomModules();
-    if (modules == null) {
-      modules = new Module[0];
-    }
-    modules = ObjectArrays.concat(modules, new SecurityModule());
-    modules = ObjectArrays.concat(modules, new Module()
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new SecurityModule());
+    modules.add(new Module()
     {
       @Override
       public void configure(final Binder binder) {
         binder.bind(Config.class).toInstance(new ConfigImpl(enableAutomaticRoutingFeature()));
       }
     });
-    return modules;
   }
 
   protected boolean enableAutomaticRoutingFeature() {

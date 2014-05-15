@@ -13,25 +13,26 @@
 /*global NX*/
 
 /**
- * 'textarea' factory.
+ * 'textfield' factory.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.capability.factory.CapabilityTextAreaFactory', {
+Ext.define('NX.coreui.view.formfield.factory.FormfieldTextFieldFactory', {
   singleton: true,
   alias: [
-    'nx.capability.factory.textarea',
-    'nx.capability.factory.text-area'
+    'nx.formfield.factory.textfield',
+    'nx.formfield.factory.string',
+    'nx.formfield.factory.password'
   ],
 
   /**
-   * Creates a textarea.
-   * @param formField capability type form field to create textarea for
-   * @returns {*} created textarea (never null)
+   * Creates a textfield.
+   * @param formField form field to create textfield for
+   * @returns {*} created textfield (never null)
    */
   create: function (formField) {
     var item = {
-      xtype: 'textarea',
+      xtype: 'textfield',
       htmlDecode: true,
       fieldLabel: formField.label,
       itemCls: formField.required ? 'required-field' : '',
@@ -39,6 +40,9 @@ Ext.define('NX.coreui.view.capability.factory.CapabilityTextAreaFactory', {
       allowBlank: !formField.required,
       regex: formField.regexValidation ? new RegExp(formField.regexValidation) : null
     };
+    if (formField.type === 'password') {
+      item.inputType = 'password';
+    }
     if (formField.initialValue) {
       item.value = formField.initialValue;
     }

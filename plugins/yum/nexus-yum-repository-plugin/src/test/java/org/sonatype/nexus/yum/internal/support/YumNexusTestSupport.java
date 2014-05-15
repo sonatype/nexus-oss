@@ -146,14 +146,10 @@ public class YumNexusTestSupport
     super.customizeContainerConfiguration(configuration);
     configuration.setClassPathScanning(PlexusConstants.SCANNING_ON);
   }
-
   @Override
-  protected Module[] getTestCustomModules() {
-    Module[] modules = super.getTestCustomModules();
-    if (modules == null) {
-      modules = new Module[0];
-    }
-    modules = ObjectArrays.concat(modules, new Module()
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add( new Module()
     {
       @Override
       public void configure(final Binder binder) {
@@ -167,7 +163,6 @@ public class YumNexusTestSupport
         });
       }
     });
-    return modules;
   }
 
   @Override

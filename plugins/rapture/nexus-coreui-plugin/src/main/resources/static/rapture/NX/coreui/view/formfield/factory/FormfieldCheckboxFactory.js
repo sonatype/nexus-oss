@@ -13,38 +13,27 @@
 /*global NX*/
 
 /**
- * 'textfield' factory.
+ * 'checkbox' factory.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.capability.factory.CapabilityTextFieldFactory', {
+Ext.define('NX.coreui.view.formfield.factory.FormfieldCheckboxFactory', {
   singleton: true,
-  alias: [
-    'nx.capability.factory.textfield',
-    'nx.capability.factory.string',
-    'nx.capability.factory.password'
-  ],
+  alias: 'nx.formfield.factory.checkbox',
 
   /**
-   * Creates a textfield.
-   * @param formField capability type form field to create textfield for
-   * @returns {*} created textfield (never null)
+   * Creates a checkbox.
+   * @param formField form field to create checkbox for
+   * @returns {*} created checkbox (never null)
    */
   create: function (formField) {
     var item = {
-      xtype: 'textfield',
-      htmlDecode: true,
+      xtype: 'checkbox',
       fieldLabel: formField.label,
-      itemCls: formField.required ? 'required-field' : '',
-      helpText: formField.helpText,
-      allowBlank: !formField.required,
-      regex: formField.regexValidation ? new RegExp(formField.regexValidation) : null
+      helpText: formField.helpText
     };
-    if (formField.type === 'password') {
-      item.inputType = 'password';
-    }
     if (formField.initialValue) {
-      item.value = formField.initialValue;
+      item.checked = Boolean('true' === formField.initialValue);
     }
     return item;
   }

@@ -29,7 +29,7 @@
 
   <properties>
     <pluginName>Nexus Siesta Plugin</pluginName>
-    <pluginDescription>Support for Siesta (Jersey) REST API.</pluginDescription>
+    <pluginDescription>Support for JAX-RS REST API.</pluginDescription>
   </properties>
 
   <dependencies>
@@ -40,54 +40,13 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu.siesta</groupId>
-      <artifactId>siesta-common</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu.siesta</groupId>
+      <groupId>org.sonatype.siesta</groupId>
       <artifactId>siesta-server</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.sonatype.sisu.inject</groupId>
-          <artifactId>guice-servlet</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu.siesta</groupId>
-      <artifactId>siesta-client</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>jcl-over-slf4j</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpclient</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <!--
-    TODO: Sort out what to do about jackson here, and in NX core.
-    -->
-
-    <dependency>
-      <groupId>org.sonatype.sisu.siesta</groupId>
-      <artifactId>siesta-jackson</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu.jacksbee</groupId>
-      <artifactId>jacksbee-runtime</artifactId>
+      <groupId>org.sonatype.siesta</groupId>
+      <artifactId>siesta-jackson2</artifactId>
     </dependency>
 
     <dependency>
@@ -103,22 +62,6 @@
       <plugin>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-        <configuration>
-          <sharedDependencies>
-            <sharedDependency>javax.ws.rs:jsr311-api</sharedDependency>
-            <sharedDependency>org.sonatype.sisu.siesta:siesta-common</sharedDependency>
-            <sharedDependency>org.sonatype.sisu.siesta:siesta-server</sharedDependency>
-            <sharedDependency>org.sonatype.sisu.siesta:siesta-client</sharedDependency>
-            <sharedDependency>org.sonatype.sisu.siesta:siesta-jackson</sharedDependency>
-            <sharedDependency>com.sun.jersey:jersey-core</sharedDependency>
-            <sharedDependency>com.sun.jersey:jersey-server</sharedDependency>
-            <sharedDependency>com.sun.jersey:jersey-servlet</sharedDependency>
-            <sharedDependency>com.sun.jersey:jersey-client</sharedDependency>
-            <sharedDependency>com.sun.jersey.contribs:jersey-multipart</sharedDependency>
-            <sharedDependency>com.sun.jersey.contribs:jersey-apache-client4</sharedDependency>
-            <sharedDependency>org.sonatype.sisu.jacksbee:jacksbee-runtime</sharedDependency>
-          </sharedDependencies>
-        </configuration>
       </plugin>
 
       <plugin>

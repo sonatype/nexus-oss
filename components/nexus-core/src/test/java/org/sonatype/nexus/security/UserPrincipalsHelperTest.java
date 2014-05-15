@@ -65,9 +65,9 @@ public class UserPrincipalsHelperTest
   }
 
   @Override
-  protected Module[] getTestCustomModules() {
-    Module[] modules = super.getTestCustomModules();
-    modules = ObjectArrays.concat(modules, new AbstractModule()
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add( new AbstractModule()
     {
       @Override
       protected void configure() {
@@ -75,7 +75,6 @@ public class UserPrincipalsHelperTest
         bind(UserManager.class).annotatedWith(Names.named("TestPrincipalsUserManager")).to(TestUserManager.class);
       }
     });
-    return modules;
   }
 
   @Override

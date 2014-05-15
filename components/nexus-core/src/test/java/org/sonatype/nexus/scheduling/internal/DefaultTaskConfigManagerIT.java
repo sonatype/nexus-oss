@@ -101,6 +101,7 @@ public class DefaultTaskConfigManagerIT
 
   @Override
   protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
     modules.add(new AbstractModule()
     {
       @Override

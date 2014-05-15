@@ -30,6 +30,11 @@ Ext.define('NX.coreui.model.Task', {
     'lastRun',
     'lastRunResult',
     'runnable',
-    'stoppable'
+    'stoppable',
+    'alertEmail',
+    'properties',
+    'startTimestamp',
+    'recurringDays',
+    'cronExpression'
   ]
 });

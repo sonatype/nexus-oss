@@ -10,30 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.siesta;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.ws.rs.core.Response;
+package org.sonatype.nexus.coreui
 
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.sisu.siesta.common.error.ErrorXO;
-import org.sonatype.sisu.siesta.server.ErrorExceptionMapperSupport;
+import groovy.transform.ToString
 
 /**
- * Maps {@link NoSuchRepositoryException} to 404 with a {@link ErrorXO} body.
+ * Form field exchange object.
  *
- * @since 2.4
+ * @since 3.0
  */
-@Named
-@Singleton
-public class NoSuchRepositoryExceptionMapper
-    extends ErrorExceptionMapperSupport<NoSuchRepositoryException>
+@ToString(includePackage = false, includeNames = true)
+class FormFieldXO
 {
-
-  @Override
-  protected int getStatusCode(final NoSuchRepositoryException exception) {
-    return Response.Status.NOT_FOUND.getStatusCode();
-  }
-
+  String id
+  String type
+  String label
+  String helpText
+  Boolean required
+  String regexValidation
+  String initialValue
+  String storePath
+  String storeRoot
+  String idMapping
+  String nameMapping
 }

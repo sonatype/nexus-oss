@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.maven.tasks;
 
+import java.util.List;
+
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.scheduling.CancellableProgressListenerWrapper;
@@ -49,19 +51,15 @@ public class Nexus4588CancellationTest
 
 
   @Override
-  protected Module[] getTestCustomModules() {
-    Module[] modules = super.getTestCustomModules();
-    if (modules == null) {
-      modules = new Module[0];
-    }
-    modules = ObjectArrays.concat(modules, new Module()
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new Module()
     {
       @Override
       public void configure(final Binder binder) {
         binder.bind(Nexus4588CancellationEventInspector.class);
       }
     });
-    return modules;
   }
 
   @Before
