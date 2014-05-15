@@ -29,6 +29,7 @@ import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationS
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -87,7 +88,8 @@ public class RemoteStorageContextCustomizer
     }
   }
 
-  private void applyAuthenticationConfig(final Builder builder,
+  @VisibleForTesting
+  void applyAuthenticationConfig(final Builder builder,
                                          final RemoteAuthenticationSettings ras,
                                          final HttpHost proxyHost)
   {
@@ -134,7 +136,8 @@ public class RemoteStorageContextCustomizer
     }
   }
 
-  private void applyProxyConfig(final Builder builder, final RemoteProxySettings remoteProxySettings) {
+  @VisibleForTesting
+  void applyProxyConfig(final Builder builder, final RemoteProxySettings remoteProxySettings) {
     if (remoteProxySettings != null
         && remoteProxySettings.getHttpProxySettings() != null
         && remoteProxySettings.getHttpProxySettings().isEnabled()) {

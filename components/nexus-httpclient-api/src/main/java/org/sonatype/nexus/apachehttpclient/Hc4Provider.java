@@ -36,6 +36,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public interface Hc4Provider
 {
+  // FIXME: Move repository specific semantics out of this class
+
   /**
    * HTTP context key of (usually proxy) repository on who's behalf request is made. To be used with
    * {@link HttpClient#execute(HttpUriRequest, HttpContext)} method of {@link HttpClient} instance got from this
@@ -133,7 +135,7 @@ public interface Hc4Provider
     }
 
     @VisibleForTesting
-    CredentialsProvider getCredentialsProvider() {
+    public CredentialsProvider getCredentialsProvider() {
       return credentialsProvider;
     }
 
