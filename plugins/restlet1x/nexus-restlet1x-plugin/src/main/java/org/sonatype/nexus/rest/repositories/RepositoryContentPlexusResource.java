@@ -38,6 +38,7 @@ public class RepositoryContentPlexusResource
 
   public RepositoryContentPlexusResource() {
     this.setModifiable(true);
+    this.setRequireStrictChecking(false);
   }
 
   @Override
