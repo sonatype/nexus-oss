@@ -19,6 +19,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.RepoComboFormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
@@ -27,6 +28,7 @@ import static org.sonatype.nexus.formfields.FormField.MANDATORY;
 import static org.sonatype.nexus.formfields.FormField.OPTIONAL;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_REPO_DIR;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_REPO_ID;
+import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_SINGLE_RPM_PER_DIR;
 
 /**
  * @since yum 3.0
@@ -53,6 +55,13 @@ public class GenerateMetadataTaskDescriptor
       OPTIONAL
   );
 
+  private final CheckboxFormField singleRpmPerDir = new CheckboxFormField(
+      PARAM_SINGLE_RPM_PER_DIR,
+      "Single RPM per directory",
+      "Only process one RPM per directory",
+      OPTIONAL
+  ).withInitialValue(true);
+
   @Override
   public String getId() {
     return GenerateMetadataTask.ID;
@@ -65,7 +74,7 @@ public class GenerateMetadataTaskDescriptor
 
   @Override
   public List<FormField> formFields() {
-    return Arrays.<FormField>asList(repoField, outputField);
+    return Arrays.<FormField>asList(repoField, outputField, singleRpmPerDir);
   }
 
 }
