@@ -106,7 +106,7 @@ public class Launcher
         System.getProperty("user.home")
     );
     log.info("CWD: {}", System.getProperty("user.dir"));
-    log.info("TMP: {}", System.getProperty("java.io.tmpdir"));
+    log.info("TMP: {}", System.getProperty(TemporaryDirectory.PROPERTY));
 
     if (args == null) {
       throw new NullPointerException();
