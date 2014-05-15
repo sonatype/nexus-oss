@@ -26,7 +26,6 @@ import org.sonatype.nexus.apachehttpclient.SSLContextSelector;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -120,11 +119,6 @@ public class Hc4ProviderImpl
   private final Provider<RemoteStorageContext> globalRemoteStorageContextProvider;
 
   /**
-   * UA builder component.
-   */
-  private final UserAgentBuilder userAgentBuilder;
-
-  /**
    * The low level core event bus.
    */
   private final EventBus eventBus;
@@ -166,13 +160,11 @@ public class Hc4ProviderImpl
 
   @Inject
   public Hc4ProviderImpl(final @Named("global") Provider<RemoteStorageContext> globalRemoteStorageContextProvider,
-                         final UserAgentBuilder userAgentBuilder,
                          final EventBus eventBus,
                          final PoolingClientConnectionManagerMBeanInstaller jmxInstaller,
                          final List<SSLContextSelector> selectors)
   {
     this.globalRemoteStorageContextProvider = checkNotNull(globalRemoteStorageContextProvider);
-    this.userAgentBuilder = checkNotNull(userAgentBuilder);
     this.jmxInstaller = checkNotNull(jmxInstaller);
     this.sharedConnectionManager = createClientConnectionManager(selectors);
 

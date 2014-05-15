@@ -180,7 +180,6 @@ public class HttpClientRemoteStorageTest
 
       // real provider and initializing it with NexusStarted event
       hc4Provider = new Hc4ProviderImpl(Providers.of(globalRemoteStorageContext),
-          mock(UserAgentBuilder.class),
           mock(EventBus.class),
           mock(PoolingClientConnectionManagerMBeanInstaller.class),
           null

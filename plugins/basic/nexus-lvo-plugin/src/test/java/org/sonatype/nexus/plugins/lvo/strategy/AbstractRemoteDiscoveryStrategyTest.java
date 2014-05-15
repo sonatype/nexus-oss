@@ -25,7 +25,6 @@ import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.fluent.Proxy;
@@ -67,9 +66,6 @@ public class AbstractRemoteDiscoveryStrategyTest
   private RemoteProxySettings remoteProxySettings;
 
   @Mock
-  private UserAgentBuilder userAgentBuilder;
-
-  @Mock
   private EventBus eventBus;
 
   @Mock
@@ -98,7 +94,7 @@ public class AbstractRemoteDiscoveryStrategyTest
   }
 
   private AbstractRemoteDiscoveryStrategy create() {
-    final Hc4Provider provider = new Hc4ProviderImpl(Providers.of(remoteStorageContext), userAgentBuilder, eventBus, jmxInstaller, null);
+    final Hc4Provider provider = new Hc4ProviderImpl(Providers.of(remoteStorageContext), eventBus, jmxInstaller, null);
     return new AbstractRemoteDiscoveryStrategy(provider)
     {
       @Override

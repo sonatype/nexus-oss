@@ -19,7 +19,6 @@ import org.sonatype.nexus.proxy.repository.RemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -38,17 +37,12 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.when;
 
 public class Hc4ProviderImplTest
     extends TestSupport
 {
   private Hc4ProviderImpl testSubject;
-
-  @Mock
-  private UserAgentBuilder userAgentBuilder;
 
   @Mock
   private EventBus eventBus;
@@ -75,7 +69,7 @@ public class Hc4ProviderImplTest
   public void sharedInstanceConfigurationTest() {
     setParameters();
     try {
-      testSubject = new Hc4ProviderImpl(Providers.of(globalRemoteStorageContext), userAgentBuilder, eventBus, jmxInstaller, null);
+      testSubject = new Hc4ProviderImpl(Providers.of(globalRemoteStorageContext), eventBus, jmxInstaller, null);
 
       final HttpClient client = testSubject.createHttpClient();
       // Note: shared instance is shared across Nexus instance. It does not features connection pooling as
@@ -117,7 +111,7 @@ public class Hc4ProviderImplTest
   public void createdInstanceConfigurationTest() {
     setParameters();
     try {
-      testSubject = new Hc4ProviderImpl(Providers.of(globalRemoteStorageContext), userAgentBuilder, eventBus, jmxInstaller, null);
+      testSubject = new Hc4ProviderImpl(Providers.of(globalRemoteStorageContext), eventBus, jmxInstaller, null);
 
       // Note: explicitly created instance (like in case of proxies), it does pool and
       // returns customized client
@@ -160,7 +154,7 @@ public class Hc4ProviderImplTest
 
   @Test
   public void NEXUS6220_connectionReuse() {
-    testSubject = new Hc4ProviderImpl(Providers.of(globalRemoteStorageContext), userAgentBuilder, eventBus, jmxInstaller, null);
+    testSubject = new Hc4ProviderImpl(Providers.of(globalRemoteStorageContext), eventBus, jmxInstaller, null);
 
     // nothing NTLM related present
     {
@@ -200,7 +194,7 @@ public class Hc4ProviderImplTest
     }
   }
 
-
+  // FIXME: Figure out how what to do about this
   //@Test
   //public void credentialsProviderReplaced() {
   //  testSubject = new Hc4ProviderImpl(Providers.of(globalRemoteStorageContext), userAgentBuilder, eventBus, jmxInstaller, null);
