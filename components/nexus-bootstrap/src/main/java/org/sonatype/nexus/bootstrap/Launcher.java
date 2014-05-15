@@ -43,6 +43,10 @@ import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_TI
  */
 public class Launcher
 {
+  static {
+    System.out.println("Initial tmp dir: " + System.getProperty(TemporaryDirectory.PROPERTY));
+  }
+
   // FIXME: Move this to CommandMonitorThread
   public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
 
@@ -72,6 +76,11 @@ public class Launcher
         .properties("/nexus-test.properties", false)
         .custom(new EnvironmentVariables())
         .override(System.getProperties());
+
+    // maybe force the java.io.tmpdir location unless asked specifically not to do this
+    if (!"false".equals(System.getProperty("nexus.tmpdir.override"))) {
+      builder.set(TemporaryDirectory.PROPERTY, "${nexus-work}/tmp");
+    }
 
     if (overrides != null) {
       // using properties() instead of override() so we get all values added, not just those with existing entries
