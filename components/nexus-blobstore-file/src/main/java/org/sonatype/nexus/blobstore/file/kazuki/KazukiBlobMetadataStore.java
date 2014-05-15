@@ -259,10 +259,7 @@ public class KazukiBlobMetadataStore
     if (metrics != null) {
       flat.setSha1Hash(metrics.getSHA1Hash());
       flat.setContentSize(metrics.getContentSize());
-
-      // TODO: Uncomment this once the kazuki bug for date handling is fixed
-      // c.f. https://github.com/kazukidb/kazuki/issues/12
-      //flat.setCreationTime(metrics.getCreationTime());
+      flat.setCreationTime(metrics.getCreationTime());
     }
     flat.setHeaders(metadata.getHeaders());
     return flat;
