@@ -34,6 +34,7 @@ import org.restlet.Restlet;
 import org.restlet.Router;
 import org.restlet.service.StatusService;
 import org.restlet.util.Template;
+import org.slf4j.LoggerFactory;
 
 /**
  * Legacy restlet application support.
@@ -64,7 +65,7 @@ public class NexusApplication
     this.statusPlexusResource = statusPlexusResource;
     this.statusService = statusService;
     useStrictChecking = System.getProperty("nexus.restlet.strict-uri-matching", "true").equals("true");
-    logger.debug("Strict URI matching: {}", useStrictChecking);
+    LoggerFactory.getLogger(getClass().getName() + "_UriMatching").info("Strict URI matching: {}", useStrictChecking);
   }
 
   // HACK: Too many places were using new NexusApplication() ... fuck it
