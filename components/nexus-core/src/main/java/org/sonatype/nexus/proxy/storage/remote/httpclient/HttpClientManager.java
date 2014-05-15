@@ -38,9 +38,8 @@ public interface HttpClientManager
   HttpClient create(final ProxyRepository proxyRepository, final RemoteStorageContext ctx);
 
   /**
-   * Releases the {@link HttpClient} for given {@link ProxyRepository}. To be called whenever the instance needs to
-   * be
-   * dropped or recreated.
+   * Releases the {@link HttpClient} for given {@link ProxyRepository}.
+   * To be called whenever the instance needs to be dropped or recreated.
    */
   void release(final ProxyRepository proxyRepository, final RemoteStorageContext ctx);
 }
