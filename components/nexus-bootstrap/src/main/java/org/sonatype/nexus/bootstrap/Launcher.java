@@ -43,10 +43,6 @@ import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_TI
  */
 public class Launcher
 {
-  static {
-    System.out.println("Initial tmp dir: " + System.getProperty(TemporaryDirectory.PROPERTY));
-  }
-
   // FIXME: Move this to CommandMonitorThread
   public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
 
