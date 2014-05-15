@@ -19,12 +19,14 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.RepoComboFormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 
 import static org.sonatype.nexus.formfields.FormField.MANDATORY;
 import static org.sonatype.nexus.formfields.FormField.OPTIONAL;
+import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_FORCE_FULL_SCAN;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_REPO_DIR;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_REPO_ID;
 
@@ -53,6 +55,13 @@ public class GenerateMetadataTaskDescriptor
       OPTIONAL
   );
 
+  private final CheckboxFormField forceFullScan = new CheckboxFormField(
+      PARAM_FORCE_FULL_SCAN,
+      "Force Full Scan",
+      "Forces a full scan and does not use the cached RPM file list.",
+      OPTIONAL
+  ).withInitialValue(false);
+
   @Override
   public String getId() {
     return GenerateMetadataTask.ID;
@@ -65,7 +74,7 @@ public class GenerateMetadataTaskDescriptor
 
   @Override
   public List<FormField> formFields() {
-    return Arrays.<FormField>asList(repoField, outputField);
+    return Arrays.<FormField>asList(repoField, outputField, forceFullScan);
   }
 
 }
