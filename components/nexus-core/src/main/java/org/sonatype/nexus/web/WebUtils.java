@@ -64,6 +64,7 @@ public class WebUtils
    */
   public void equipResponseWithStandardHeaders(final HttpServletResponse response) {
     response.setHeader("Server", serverString);
+    response.setHeader("X-Frame-Options", "SAMEORIGIN");
   }
 
   /**

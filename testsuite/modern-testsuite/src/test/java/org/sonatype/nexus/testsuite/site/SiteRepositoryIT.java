@@ -163,6 +163,9 @@ public class SiteRepositoryIT
       assertThat(clientResponse.getStatus(), is(200));
       assertThat(clientResponse.getType(), is(MediaType.TEXT_HTML_TYPE));
       assertThat(clientResponse.getEntity(String.class), containsString("<html"));
+
+      String xFrameOptions = clientResponse.getHeaders().getFirst("X-Frame-Options");
+      assertThat(xFrameOptions, equals("SAMEORIGIN"));
     }
     finally {
       if (clientResponse != null) {
