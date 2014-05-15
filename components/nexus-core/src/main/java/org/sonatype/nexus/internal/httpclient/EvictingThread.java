@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2.2
  */
-public class EvictingThread
+class EvictingThread
     extends Thread
 {
   private static final Logger LOGGER = LoggerFactory.getLogger(EvictingThread.class);
