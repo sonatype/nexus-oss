@@ -132,7 +132,7 @@ public class KazukiBlobMetadataStore
     final FlatBlobMetadata flat = flatten(metadata);
     Key key = null;
     try {
-      key = kvStore.create(METADATA_TYPE, FlatBlobMetadata.class, flat, TypeValidation.STRICT);
+      key = kvStore.create(METADATA_TYPE, FlatBlobMetadata.class, flat, TypeValidation.STRICT).getKey();
       log.debug("Adding metadata for blob {}", asBlobId(key));
       return asBlobId(key);
     }
