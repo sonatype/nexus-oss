@@ -28,6 +28,9 @@ NX.define('Nexus.atlas.view.Panel', {
     'Nexus.atlas.view.SupportZip',
     'Nexus.atlas.view.SupportRequest'
   ],
+  requirejs: [
+      'Sonatype/utils'
+  ],
 
   xtype: 'nx-atlas-view-panel',
   title: 'Support Tools',
@@ -44,7 +47,17 @@ NX.define('Nexus.atlas.view.Panel', {
    */
   initComponent: function() {
     var me = this,
-        icons = Nexus.atlas.Icons;
+        icons = Nexus.atlas.Icons, tabs;
+
+    tabs = [
+      { xtype: 'nx-atlas-view-sysinfo' },
+      { xtype: 'nx-atlas-view-supportzip' }
+    ];
+
+    // Only add supportrequest tab if we are not running in OSS edition (ie. PRO or trial)
+    if (Sonatype.utils.editionShort !== "OSS") {
+      tabs.push({ xtype: 'nx-atlas-view-supportrequest' });
+    }
 
     Ext.apply(me, {
       items: [
@@ -63,11 +76,7 @@ NX.define('Nexus.atlas.view.Panel', {
           border: false,
           plain: true,
           layoutOnTabChange: true,
-          items: [
-            { xtype: 'nx-atlas-view-sysinfo' },
-            { xtype: 'nx-atlas-view-supportzip' },
-            { xtype: 'nx-atlas-view-supportrequest' }
-          ],
+          items: tabs,
           activeTab: 0
         }
       ]
