@@ -74,7 +74,7 @@ public class Launcher
         .override(System.getProperties());
 
     // maybe force the java.io.tmpdir location unless asked specifically not to do this
-    if (!"false".equals(System.getProperty("nexus.tmpdir.override"))) {
+    if (TemporaryDirectory.allowOverride()) {
       builder.set(TemporaryDirectory.PROPERTY, "${nexus-work}/tmp");
     }
 
