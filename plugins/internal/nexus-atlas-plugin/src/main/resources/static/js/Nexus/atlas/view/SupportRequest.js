@@ -48,7 +48,7 @@ NX.define('Nexus.atlas.view.SupportRequest', {
                   '<div>' +
                   '<p>Submit a support request to Sonatype.</p>' +
                   '<br/>' +
-                  '<p>Please include a complete description of your problem and reproduce steps (if available).</p>' +
+                  '<p>Please include a complete description of your problem and steps to allow us to reproduce the problem (if available).</p>' +
                   '<br/>' +
                   '<p>Attaching a "Support ZIP" to your request will help our engineers give you a faster response.</p>' +
                   '</div>'
