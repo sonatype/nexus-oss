@@ -32,6 +32,10 @@ public class RepositoryOrGroupIndexPlexusResource
 {
   public static final String RESOURCE_URI = "/data_index/{" + DOMAIN + "}/{" + TARGET_ID + "}";
 
+  public RepositoryOrGroupIndexPlexusResource() {
+    setRequireStrictChecking(false);
+  }
+
   @Override
   public String getResourceUri() {
     return RESOURCE_URI;

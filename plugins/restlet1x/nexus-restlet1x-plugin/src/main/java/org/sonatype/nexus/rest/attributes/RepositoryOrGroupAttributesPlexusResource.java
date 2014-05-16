@@ -33,6 +33,10 @@ public class RepositoryOrGroupAttributesPlexusResource
   public static final String RESOURCE_URI = "/attributes/{" + AbstractAttributesPlexusResource.DOMAIN + "}/{"
       + AbstractAttributesPlexusResource.TARGET_ID + "}/content";
 
+  public RepositoryOrGroupAttributesPlexusResource() {
+    setRequireStrictChecking(false);
+  }
+
   @Override
   public String getResourceUri() {
     return RESOURCE_URI;

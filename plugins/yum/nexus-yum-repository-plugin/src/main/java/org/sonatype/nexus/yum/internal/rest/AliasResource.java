@@ -92,6 +92,7 @@ public class AliasResource
     this.yumRegistry = checkNotNull(yumRegistry);
     this.capabilityRegistry = checkNotNull(capabilityRegistry);
     setModifiable(true);
+    setRequireStrictChecking(false);
   }
 
   @Override
