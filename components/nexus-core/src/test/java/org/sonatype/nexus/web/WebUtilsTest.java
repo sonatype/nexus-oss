@@ -51,7 +51,7 @@ public class WebUtilsTest
     underTest.equipResponseWithStandardHeaders(response);
 
     verify(response).setHeader("Server", "Nexus/version");
-    verify(response).setHeader("X-Frame-Options", "SAMEEORIGIN");
+    verify(response).setHeader("X-Frame-Options", "SAMEORIGIN");
     verifyNoMoreInteractions(response);
   }
 }
