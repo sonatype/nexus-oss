@@ -72,7 +72,8 @@
   padding-left: 10px;
 }
 
-.nx-atlas-view-supportzip-description {
+.nx-atlas-view-supportzip-description,
+.nx-atlas-view-supportrequest-description {
   font: normal 11px arial, tahoma, verdana, helvetica;
   padding: 10px;
 }
@@ -82,7 +83,8 @@
   padding: 10px;
 }
 
-.nx-atlas-view-supportzip-form {
+.nx-atlas-view-supportzip-form,
+.nx-atlas-view-supportrequest-form {
   font: normal 11px arial, tahoma, verdana, helvetica;
   padding-left: 20px;
 }

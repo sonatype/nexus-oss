@@ -25,7 +25,8 @@ NX.define('Nexus.atlas.view.Panel', {
   requires: [
     'Nexus.atlas.Icons',
     'Nexus.atlas.view.SysInfo',
-    'Nexus.atlas.view.SupportZip'
+    'Nexus.atlas.view.SupportZip',
+    'Nexus.atlas.view.SupportRequest'
   ],
 
   xtype: 'nx-atlas-view-panel',
@@ -64,7 +65,8 @@ NX.define('Nexus.atlas.view.Panel', {
           layoutOnTabChange: true,
           items: [
             { xtype: 'nx-atlas-view-sysinfo' },
-            { xtype: 'nx-atlas-view-supportzip' }
+            { xtype: 'nx-atlas-view-supportzip' },
+            { xtype: 'nx-atlas-view-supportrequest' }
           ],
           activeTab: 0
         }
