@@ -27,7 +27,7 @@ Ext.define('NX.coreui.view.support.SupportRequest', {
         html: '<div>' +
             '<p>Submit a support request to Sonatype.</p>' +
             '<p>Please include a complete description of your problem and steps to allow us to reproduce the problem (if available).</p>' +
-            '<p>Attaching a "Support ZIP" to your request will help our engineers give you a faster response.</p>' +
+            '<p>Attaching a <strong>Support ZIP</strong> to your request will help our engineers give you a faster response.</p>' +
             '</div>'
       }
     ],
