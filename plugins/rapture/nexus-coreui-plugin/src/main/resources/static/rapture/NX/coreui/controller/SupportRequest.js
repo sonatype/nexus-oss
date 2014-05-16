@@ -37,7 +37,7 @@ Ext.define('NX.coreui.controller.SupportRequest', {
       description: 'Submit a support request',
       view: { xtype: 'nx-coreui-support-supportrequest' },
       iconConfig: {
-        file: 'support.png',
+        file: 'premium_support.png',
         variants: ['x16', 'x32']
       },
       visible: function () {
