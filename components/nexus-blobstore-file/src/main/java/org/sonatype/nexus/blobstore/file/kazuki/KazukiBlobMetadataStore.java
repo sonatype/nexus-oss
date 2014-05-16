@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.blobstore.file.kazuki;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -97,21 +98,16 @@ public class KazukiBlobMetadataStore
 
     if (schemaStore.retrieveSchema(METADATA_TYPE) == null) {
       Schema schema = new Schema.Builder()
-          // TODO: Unravel this once https://github.com/kazukidb/kazuki/issues/15 is fixed
-          //.addAttribute("state", Type.ENUM,
-          //    Arrays.asList((Object) State.CREATING, State.ALIVE, State.MARKED_FOR_DELETION), false)
-          .addAttribute("stateAsString", Type.UTF8_SMALLSTRING, false)
+          .addAttribute("state", Type.ENUM,
+              Arrays.asList((Object) State.CREATING, State.ALIVE, State.MARKED_FOR_DELETION), false)
 
           .addAttribute("headers", Type.MAP, false)
           .addAttribute("creationTime", Type.UTC_DATE_SECS, true)
           .addAttribute("sha1Hash", Type.UTF8_SMALLSTRING, true)
           .addAttribute("contentSize", Type.I64, false)
 
-              // TODO: Unravel this too, same cause
-              //.addIndex(STATE_INDEX,
-              //    asList(new IndexAttribute("state", SortDirection.ASCENDING, AttributeTransform.NONE)), false)
           .addIndex(STATE_INDEX,
-              asList(new IndexAttribute("stateAsString", SortDirection.ASCENDING, AttributeTransform.NONE)), false)
+              asList(new IndexAttribute("state", SortDirection.ASCENDING, AttributeTransform.NONE)), false)
           .build();
 
       log.info("Creating schema for file blob metadata");
@@ -183,7 +179,7 @@ public class KazukiBlobMetadataStore
   @Override
   public synchronized Iterator<BlobId> findWithState(State state) {
     final List<QueryTerm> queryTerms = new QueryBuilder()
-        .andMatchesSingle("stateAsString", QueryOperator.EQ, ValueType.STRING, State.MARKED_FOR_DELETION.toString())
+        .andMatchesSingle("state", QueryOperator.EQ, ValueType.STRING, state.toString())
         .build();
     final KeyValueIterable<Key> keys = secondaryIndexStore
         .queryWithoutPagination(METADATA_TYPE, FlatBlobMetadata.class, STATE_INDEX, queryTerms, SortDirection.ASCENDING,

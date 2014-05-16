@@ -45,16 +45,6 @@ class FlatBlobMetadata
     this.state = state;
   }
 
-  @Deprecated
-  public String getStateAsString() {
-    return state.toString();
-  }
-
-  @Deprecated
-  public void setStateAsString(String stateString) {
-    this.state = State.valueOf(stateString);
-  }
-
   public Map<String, String> getHeaders() {
     return headers;
   }
