@@ -39,7 +39,8 @@ Ext.define('NX.coreui.view.support.SupportRequest', {
         text: 'Submit Request',
         glyph: 'xf08e@FontAwesome' /* fa-external-link */,
         action: 'makerequest',
-        ui: 'primary'
+        ui: 'primary',
+        tooltip: 'Submit a support request in the Sonatype support portal'
       }
     ]
   }
