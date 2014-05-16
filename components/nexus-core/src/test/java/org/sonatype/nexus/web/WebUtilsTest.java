@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
  * Tests for {@link WebUtils}.
  */
 public class WebUtilsTest
+  extends TestSupport
 {
   private WebUtils underTest;
 
@@ -52,6 +54,8 @@ public class WebUtilsTest
 
     verify(response).setHeader("Server", "Nexus/version");
     verify(response).setHeader("X-Frame-Options", "SAMEORIGIN");
+    verify(response).setHeader("X-Content-Options", "NOSNIFF");
+
     verifyNoMoreInteractions(response);
   }
 }
