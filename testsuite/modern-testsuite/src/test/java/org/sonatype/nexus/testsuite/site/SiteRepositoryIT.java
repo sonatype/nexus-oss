@@ -33,6 +33,7 @@ import org.junit.Test;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -165,7 +166,7 @@ public class SiteRepositoryIT
       assertThat(clientResponse.getEntity(String.class), containsString("<html"));
 
       String xFrameOptions = clientResponse.getHeaders().getFirst("X-Frame-Options");
-      assertThat(xFrameOptions, equals("SAMEORIGIN"));
+      assertThat(xFrameOptions, equalTo("SAMEORIGIN"));
     }
     finally {
       if (clientResponse != null) {
