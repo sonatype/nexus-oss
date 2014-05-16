@@ -50,6 +50,7 @@ NX.define('Nexus.atlas.Icons', {
         globe_place:        iconConfig('globe_place.png'),
         printer:            iconConfig('printer.png'),
         server_information: iconConfig('server_information.png'),
+        support:            iconConfig('support.png'),
 
         atlas:            '@globe_place',
         print:            '@printer',

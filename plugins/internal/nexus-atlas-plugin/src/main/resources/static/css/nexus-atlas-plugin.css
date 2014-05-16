@@ -78,7 +78,8 @@
   padding: 10px;
 }
 
-.nx-atlas-view-supportzip-description img {
+.nx-atlas-view-supportzip-description img,
+.nx-atlas-view-supportrequest-description img {
   float: right;
   padding: 10px;
 }

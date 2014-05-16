@@ -17,6 +17,9 @@
  */
 NX.define('Nexus.atlas.view.SupportRequest', {
   extend: 'Ext.Panel',
+  requires: [
+    'Nexus.atlas.Icons'
+  ],
 
   xtype: 'nx-atlas-view-supportrequest',
   title: 'Support Request',
@@ -30,7 +33,8 @@ NX.define('Nexus.atlas.view.SupportRequest', {
    * @override
    */
   initComponent: function () {
-    var me = this;
+    var me = this,
+        icons = Nexus.atlas.Icons;
 
     Ext.apply(me, {
       items: [
@@ -40,7 +44,14 @@ NX.define('Nexus.atlas.view.SupportRequest', {
             {
               cls: 'nx-atlas-view-supportrequest-description',
               border: false,
-              html: '<div>TODO: Pick up the phone and call Rich!</div>'
+              html: icons.get('support').variant('x32').img +
+                  '<div>' +
+                  '<p>Make a support request and a Sonatype support engineer will be happy to assist you.</p>' +
+                  '<br/>' +
+                  '<p>Please include as much detail as possible to help us understand the situation.</p>' +
+                  '<br/>' +
+                  '<p>You will be redirected to the Sonatype support portal.</p>' +
+                  '</div>'
             },
             {
               xtype: 'form',
