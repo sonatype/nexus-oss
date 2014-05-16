@@ -46,11 +46,11 @@ NX.define('Nexus.atlas.view.SupportRequest', {
               border: false,
               html: icons.get('support').variant('x32').img +
                   '<div>' +
-                  '<p>Make a support request and a Sonatype support engineer will be happy to assist you.</p>' +
+                  '<p>Submit a support request to Sonatype.</p>' +
                   '<br/>' +
-                  '<p>Please include as much detail as possible to help us understand the situation.</p>' +
+                  '<p>Please include a complete description of your problem and reproduce steps (if available).</p>' +
                   '<br/>' +
-                  '<p>You will be redirected to the Sonatype support portal.</p>' +
+                  '<p>Attaching a "Support ZIP" to your request will help our engineers give you a faster response.</p>' +
                   '</div>'
             },
             {
@@ -59,7 +59,7 @@ NX.define('Nexus.atlas.view.SupportRequest', {
               cls: 'nx-atlas-view-supportrequest-form',
               border: false,
               buttons: [
-                { text: 'Make a Request', id: 'nx-atlas-button-supportrequest-makerequest' }
+                { text: 'Submit Request', id: 'nx-atlas-button-supportrequest-makerequest' }
               ],
               buttonAlign: 'left'
             }
