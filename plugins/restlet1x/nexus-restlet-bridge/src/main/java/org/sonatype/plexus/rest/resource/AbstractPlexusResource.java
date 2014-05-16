@@ -42,6 +42,8 @@ public abstract class AbstractPlexusResource
 
   private boolean negotiateContent = true;
 
+  private boolean requireStrictChecking = true;
+
   protected Logger getLogger() {
     return logger;
   }
@@ -103,6 +105,14 @@ public abstract class AbstractPlexusResource
   public boolean acceptsUpload() {
     // since this property will not change during the lifetime of a resource, it is needed to be overrided
     return false;
+  }
+
+  public boolean requireStrictChecking() {
+    return requireStrictChecking;
+  }
+
+  public void setRequireStrictChecking(boolean requireStrictChecking) {
+    this.requireStrictChecking = requireStrictChecking;
   }
 
   public void configureXStream(XStream xstream) {

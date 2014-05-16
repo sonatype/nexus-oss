@@ -25,7 +25,6 @@ import org.sonatype.nexus.obr.metadata.ObrMetadataSource;
 import org.sonatype.nexus.obr.metadata.ObrResourceReader;
 import org.sonatype.nexus.obr.metadata.ObrResourceWriter;
 import org.sonatype.nexus.obr.shadow.ObrShadowRepository;
-import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -163,7 +162,9 @@ public final class ObrUtils
     final ResourceStoreRequest request = new ResourceStoreRequest(OBR_PATH);
 
     try {
-      final StorageItem item = repository.retrieveItem(request);
+      // caller is already trusted at this point, so side-step security
+      @SuppressWarnings("deprecation")
+      final StorageItem item = repository.retrieveItem(false, request);
       if (item instanceof StorageFileItem) {
         return (StorageFileItem) item;
       }
@@ -172,9 +173,6 @@ public final class ObrUtils
       // OBR metadata is missing, so drop through and provide blank repository
     }
     catch (final IllegalOperationException e) {
-      throw new StorageException(e);
-    }
-    catch (final AccessDeniedException e) {
       throw new StorageException(e);
     }
 

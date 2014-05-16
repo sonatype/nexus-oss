@@ -35,6 +35,10 @@ public class RepositoryOrGroupMetadataPlexusResource
 {
   public static final String RESOURCE_URI = "/metadata/{" + DOMAIN + "}/{" + TARGET_ID + "}/content";
 
+  public RepositoryOrGroupMetadataPlexusResource() {
+    setRequireStrictChecking(false);
+  }
+
   @Override
   public PathProtectionDescriptor getResourceProtection() {
     return new PathProtectionDescriptor("/metadata/*/**", "authcBasic,perms[nexus:metadata]");
