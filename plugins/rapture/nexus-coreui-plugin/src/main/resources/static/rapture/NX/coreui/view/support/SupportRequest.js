@@ -24,7 +24,11 @@ Ext.define('NX.coreui.view.support.SupportRequest', {
     items: [
       {
         xtype: 'label',
-        html: '<div>TODO: Pick up the phone and call Rich!</div>'
+        html: '<div>' +
+            '<p>Submit a support request to Sonatype.</p>' +
+            '<p>Please include a complete description of your problem and steps to allow us to reproduce the problem (if available).</p>' +
+            '<p>Attaching a "Support ZIP" to your request will help our engineers give you a faster response.</p>' +
+            '</div>'
       }
     ],
 
@@ -32,8 +36,8 @@ Ext.define('NX.coreui.view.support.SupportRequest', {
 
     buttons: [
       {
-        text: 'Make Request',
-        glyph: 'xf095@FontAwesome' /* fa-phone */,
+        text: 'Submit Request',
+        glyph: 'xf08e@FontAwesome' /* fa-external-link */,
         action: 'makerequest',
         ui: 'primary'
       }

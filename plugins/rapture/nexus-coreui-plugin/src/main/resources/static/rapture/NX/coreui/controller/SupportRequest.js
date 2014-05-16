@@ -17,6 +17,9 @@
  */
 Ext.define('NX.coreui.controller.SupportRequest', {
   extend: 'Ext.app.Controller',
+  requires: [
+      'NX.State'
+  ],
 
   views: [
     'support.SupportRequest'
@@ -31,11 +34,16 @@ Ext.define('NX.coreui.controller.SupportRequest', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Support Request',
-      description: 'Make a support request',
+      description: 'Submit a support request',
       view: { xtype: 'nx-coreui-support-supportrequest' },
       iconConfig: {
         file: 'support.png',
         variants: ['x16', 'x32']
+      },
+      visible: function () {
+        // only show if edition is not OSS (ie. PRO or trial) and we have perms
+        return NX.State.getValue('status')['edition'] !== 'OSS' &&
+            NX.Permissions.check('nexus:atlas', 'create');
       }
     });
 
