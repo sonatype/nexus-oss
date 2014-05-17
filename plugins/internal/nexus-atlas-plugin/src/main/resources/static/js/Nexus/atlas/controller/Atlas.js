@@ -219,9 +219,9 @@ NX.define('Nexus.atlas.controller.Atlas', {
    * @private
    */
   makeSupportRequest: function() {
-    var win = NX.global.open('https://support.sonatype.com/anonymous_requests/new');
+    var win = NX.global.open('http://links.sonatype.com/products/nexus/pro/support-request');
     if (win == null) {
-      alert('Window pop-up are blocked!');
+      alert('Window pop-up was blocked!');
     }
   }
 });
