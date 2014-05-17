@@ -61,9 +61,9 @@ Ext.define('NX.coreui.controller.SupportRequest', {
    * Open sonatype support in a new browser window/tab.
    */
   makeRequest: function () {
-    var win = window.open('https://support.sonatype.com/anonymous_requests/new');
+    var win = window.open('http://links.sonatype.com/products/nexus/pro/support-request');
     if (win == null) {
-      alert('Window pop-up are blocked!');
+      alert('Window pop-up was blocked!');
     }
   }
 
