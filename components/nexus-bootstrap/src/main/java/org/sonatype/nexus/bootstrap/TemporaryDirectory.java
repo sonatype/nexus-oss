@@ -47,7 +47,7 @@ public class TemporaryDirectory
     catch (FileAlreadyExistsException e) {
       // handle symlink case
       if (!Files.isDirectory(dir.toPath())) {
-        throw e;
+        throw new IOException("Unable to create java.io.tmpdir: " + dir, e);
       }
     }
   }
