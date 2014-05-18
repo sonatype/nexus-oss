@@ -48,6 +48,9 @@ NX.define('Nexus.atlas.controller.Atlas', {
       },
       '#nx-atlas-button-supportzip-download': {
         'authenticated': me.downloadSupportZip
+      },
+      '#nx-atlas-button-supportrequest-makerequest': {
+        'click': me.makeSupportRequest
       }
     });
 
@@ -207,6 +210,18 @@ NX.define('Nexus.atlas.controller.Atlas', {
     {
       // if download was initated close the window
       win.close();
+    }
+  },
+
+  /**
+   * Open sonatype support in a new browser window/tab.
+   *
+   * @private
+   */
+  makeSupportRequest: function() {
+    var win = NX.global.open('http://links.sonatype.com/products/nexus/pro/support-request');
+    if (win == null) {
+      alert('Window pop-up was blocked!');
     }
   }
 });
