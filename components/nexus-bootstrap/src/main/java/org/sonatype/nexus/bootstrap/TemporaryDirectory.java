@@ -51,4 +51,13 @@ public class TemporaryDirectory
       }
     }
   }
+
+  /**
+   * Helper to determine if we are allowed to override the value of {@code java.io.tmpdir}.
+   *
+   * @since 2.8.1
+   */
+  public static boolean allowOverride() {
+    return "false".equals(System.getProperty("nexus.tmpdir.override"));
+  }
 }

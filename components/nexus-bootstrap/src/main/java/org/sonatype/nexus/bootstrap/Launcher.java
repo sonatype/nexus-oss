@@ -73,6 +73,11 @@ public class Launcher
         .custom(new EnvironmentVariables())
         .override(System.getProperties());
 
+    // maybe force the java.io.tmpdir location unless asked specifically not to do this
+    if (TemporaryDirectory.allowOverride()) {
+      builder.set(TemporaryDirectory.PROPERTY, "${nexus-work}/tmp");
+    }
+
     if (overrides != null) {
       // using properties() instead of override() so we get all values added, not just those with existing entries
       builder.properties(overrides);
@@ -101,7 +106,7 @@ public class Launcher
         System.getProperty("user.home")
     );
     log.info("CWD: {}", System.getProperty("user.dir"));
-    log.info("TMP: {}", System.getProperty("java.io.tmpdir"));
+    log.info("TMP: {}", System.getProperty(TemporaryDirectory.PROPERTY));
 
     if (args == null) {
       throw new NullPointerException();
