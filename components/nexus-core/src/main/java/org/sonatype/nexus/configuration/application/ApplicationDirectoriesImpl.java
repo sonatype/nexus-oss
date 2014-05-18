@@ -63,6 +63,12 @@ public class ApplicationDirectoriesImpl
     this.workDir = resolve(workDir, true);
     log.debug("Work dir: {}", this.workDir);
 
+    // TODO: May want to consider having the application tmp dir as a well known sub-directory under java.io.tmpdir
+    // TODO: similar to how jetty does this with "jetty-<addr>-<port>-<context>".  If we normalize on a nexus
+    // TODO: instance/node identifiers then this could be "nexus-<node-id>".  This however would still be
+    // TODO: prefixed in the java.io.tmpdir location
+
+    // Resolve the tmp dir from system properties.
     String tmplocation = System.getProperty("java.io.tmpdir", "tmp");
     this.tempDir = resolve(new File(tmplocation), true);
     log.debug("Temp dir: {}", this.tempDir);
