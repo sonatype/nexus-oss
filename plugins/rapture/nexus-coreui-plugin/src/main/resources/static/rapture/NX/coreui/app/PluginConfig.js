@@ -81,6 +81,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.Roles',
     'NX.coreui.controller.Search',
     'NX.coreui.controller.SmtpSettings',
+    'NX.coreui.controller.SupportRequest',
     { id: 'NX.coreui.controller.SupportZip',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-atlas-plugin');
