@@ -144,8 +144,6 @@ public class WebResourceServlet
       response.setStatus(SC_NOT_MODIFIED);
     }
     else {
-      // NEXUS-5023 disable IE for sniffing into response content
-      response.setHeader("X-Content-Type-Options", "nosniff");
       // send the content only if needed (this method will be called for HEAD requests too)
       if ("GET".equalsIgnoreCase(request.getMethod())) {
         try (InputStream in = resource.getInputStream()) {
