@@ -37,8 +37,6 @@ public class ApplicationDirectoriesImplTest
 
   private File workDir;
 
-  private File tempDir;
-
   private ApplicationDirectoriesImpl underTest;
 
   @Before
@@ -46,8 +44,7 @@ public class ApplicationDirectoriesImplTest
     installDir = util.createTempDir("install");
     appDir = util.createTempDir("app");
     workDir = util.createTempDir("work");
-    tempDir = util.createTempDir("temp");
-    underTest = new ApplicationDirectoriesImpl(installDir, appDir, workDir, tempDir);
+    underTest = new ApplicationDirectoriesImpl(installDir, appDir, workDir);
     File childAppDir = new File(appDir, "child");
     childAppDir.createNewFile();
     childAppDir.deleteOnExit();
@@ -57,7 +54,6 @@ public class ApplicationDirectoriesImplTest
   public void ensureTempDir_exists() throws Exception {
     File dir = underTest.getTemporaryDirectory();
     assertThat(dir, notNullValue());
-    assertThat(dir, is(tempDir));
   }
 
   @Test
