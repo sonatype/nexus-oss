@@ -10,24 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.apachehttpclient;
+package org.sonatype.nexus.internal.httpclient;
 
-import java.util.List;
-
-import javax.net.ssl.SSLContext;
-
-import org.apache.http.protocol.HttpContext;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 /**
- * Selects SSLContext to be used for given HTTP context.
+ * MBean which exposes details about a {@link PoolingHttpClientConnectionManager}.
  *
- * @since 2.8
+ * @since 2.2
  */
-public interface SSLContextSelector
+public interface PoolingClientConnectionManagerMBean
 {
-  /**
-   * Returns the desired {@link SSLContext} to be used or {@code null} if no selection possible (or available). In this
-   * case, HTTP client will use the "default" SSL context, see {@link Hc4ProviderImpl#createClientConnectionManager(List)}.
-   */
-  SSLContext select(HttpContext context);
+
+  int getMaxTotal();
+
+  int getDefaultMaxPerRoute();
+
+  int getLeased();
+
+  int getPending();
+
+  int getAvailable();
+
+  int getMax();
+
+  void closeIdleConnections(long idleTimeoutInMillis);
+
+  void closeExpiredConnections();
+
+  void setMaxTotal(int max);
+
+  void setDefaultMaxPerRoute(int max);
+
 }

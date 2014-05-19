@@ -10,12 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.apachehttpclient.page;
+package org.sonatype.nexus.httpclient;
 
 import java.net.SocketException;
 
-import org.sonatype.nexus.apachehttpclient.page.Page.PageContext;
-import org.sonatype.nexus.apachehttpclient.page.Page.UnexpectedPageResponse;
+import org.sonatype.nexus.httpclient.Page.PageContext;
+import org.sonatype.nexus.httpclient.Page.UnexpectedPageResponse;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
@@ -23,16 +23,18 @@ import org.sonatype.tests.http.server.fluent.Server;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
+/**
+ * Tests for {@link Page}.
+ */
 public class PageTest
     extends TestSupport
 {
   @Test
-  public void simpleCase()
-      throws Exception
-  {
+  public void simpleCase() throws Exception {
     final Server server =
         Server.withPort(0).serve("/foo/bar/").withBehaviours(Behaviours.content("<html></html>"));
     server.start();
@@ -50,9 +52,7 @@ public class PageTest
   }
 
   @Test
-  public void error404WithBody()
-      throws Exception
-  {
+  public void error404WithBody() throws Exception {
     final Server server = Server.withPort(0).serve("/foo/bar/").withBehaviours(Behaviours.error(404));
     server.start();
     try {
@@ -69,9 +69,7 @@ public class PageTest
   }
 
   @Test(expected = UnexpectedPageResponse.class)
-  public void error500IsException()
-      throws Exception
-  {
+  public void error500IsException() throws Exception {
     final Server server = Server.withPort(0).serve("/*").withBehaviours(Behaviours.error(500));
     server.start();
     try {
@@ -85,9 +83,7 @@ public class PageTest
   }
 
   @Test(expected = SocketException.class)
-  public void errorConnectionRefusedException()
-      throws Exception
-  {
+  public void errorConnectionRefusedException() throws Exception {
     final String repoRootUrl;
     final Server server = Server.withPort(0).serve("/*").withBehaviours(Behaviours.error(500));
     server.start();

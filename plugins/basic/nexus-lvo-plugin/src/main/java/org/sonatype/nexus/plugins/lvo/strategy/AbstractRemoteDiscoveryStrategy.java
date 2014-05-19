@@ -15,7 +15,7 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 
 import com.google.common.base.Preconditions;
@@ -28,14 +28,14 @@ import org.apache.http.client.methods.HttpGet;
 public abstract class AbstractRemoteDiscoveryStrategy
     extends AbstractDiscoveryStrategy
 {
-  private final Hc4Provider hc4Provider;
+  private final HttpClientFactory httpClientFactory;
 
-  public AbstractRemoteDiscoveryStrategy(final Hc4Provider hc4Provider) {
-    this.hc4Provider = Preconditions.checkNotNull(hc4Provider);
+  public AbstractRemoteDiscoveryStrategy(final HttpClientFactory httpClientFactory) {
+    this.httpClientFactory = Preconditions.checkNotNull(httpClientFactory);
   }
 
   protected RequestResult handleRequest(String url) {
-    final HttpClient client = hc4Provider.createHttpClient();
+    final HttpClient client = httpClientFactory.create();
     final HttpGet method = new HttpGet(url);
 
     RequestResult result = null;

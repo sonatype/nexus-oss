@@ -12,7 +12,7 @@
  */
 package org.sonatype.security.realms.kenai;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
 
 import junit.framework.Assert;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -34,9 +34,9 @@ public class KenaiRealmTest
   private KenaiRealm getRealm()
       throws Exception
   {
-    final Hc4Provider mockHc4Provider = Mockito.mock(Hc4Provider.class);
-    Mockito.when(mockHc4Provider.createHttpClient()).thenReturn(new DefaultHttpClient());
-    return new KenaiRealm(getKenaiRealmConfiguration(), mockHc4Provider);
+    final HttpClientFactory mockHttpClientFactory = Mockito.mock(HttpClientFactory.class);
+    Mockito.when(mockHttpClientFactory.create()).thenReturn(new DefaultHttpClient());
+    return new KenaiRealm(getKenaiRealmConfiguration(), mockHttpClientFactory);
   }
 
   @Test

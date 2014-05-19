@@ -21,15 +21,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
-import org.sonatype.nexus.apachehttpclient.Hc4Provider.Builder;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.HttpClientFactory.Builder;
+import org.sonatype.nexus.internal.httpclient.RemoteStorageContextCustomizer;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Preconditions;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -55,27 +54,18 @@ public class HttpClientManagerImpl
     extends ComponentSupport
     implements HttpClientManager
 {
-  private final Hc4Provider hc4Provider;
+  private final HttpClientFactory httpClientFactory;
 
-  private final UserAgentBuilder userAgentBuilder;
-
-  /**
-   * Constructor.
-   *
-   * @param hc4Provider      the {@link HttpClient} provider to be used with this manager.
-   * @param userAgentBuilder the {@link UserAgentBuilder} component.
-   */
   @Inject
-  public HttpClientManagerImpl(final Hc4Provider hc4Provider, final UserAgentBuilder userAgentBuilder) {
-    this.hc4Provider = checkNotNull(hc4Provider);
-    this.userAgentBuilder = checkNotNull(userAgentBuilder);
+  public HttpClientManagerImpl(final HttpClientFactory httpClientFactory) {
+    this.httpClientFactory = checkNotNull(httpClientFactory);
   }
 
   @Override
   public HttpClient create(final ProxyRepository proxyRepository, final RemoteStorageContext ctx) {
     checkNotNull(proxyRepository);
     checkNotNull(ctx);
-    final Builder builder = hc4Provider.prepareHttpClient(ctx);
+    final Builder builder = httpClientFactory.prepare(new RemoteStorageContextCustomizer(ctx));
     configure(proxyRepository, ctx, builder);
     return builder.build();
   }
@@ -91,12 +81,10 @@ public class HttpClientManagerImpl
    * Configures the fresh instance of HttpClient for given proxy repository specific needs. Right now it sets
    * appropriate redirect strategy only.
    */
-  protected void configure(final ProxyRepository proxyRepository, final RemoteStorageContext ctx,
+  protected void configure(final ProxyRepository proxyRepository,
+                           final RemoteStorageContext ctx,
                            final Builder builder)
   {
-    // set UA, as Proxy reposes have different than the "generic" one set by Hc4Provider
-    builder.getHttpClientBuilder().setUserAgent(userAgentBuilder.formatRemoteRepositoryStorageUserAgentString(proxyRepository, ctx));
-
     // set proxy redirect strategy
     builder.getHttpClientBuilder().setRedirectStrategy(getProxyRepositoryRedirectStrategy(proxyRepository, ctx));
   }

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.apachehttpclient;
+package org.sonatype.nexus.internal.httpclient;
 
 import java.lang.management.ManagementFactory;
 
@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An wrapper {@link Hc4Provider} that automatically registers / unregisters JMX MBeans for each created
+ * Automatically registers / unregisters JMX MBeans for each created
  * {@link HttpClient}s and {@link PoolingHttpClientConnectionManager}.
  *
  * @since 2.2
@@ -44,7 +44,7 @@ public class PoolingClientConnectionManagerMBeanInstaller
   /**
    * Registers the connection manager to JMX.
    */
-  public synchronized void register(final PoolingHttpClientConnectionManager connectionManager) {
+  synchronized void register(final PoolingHttpClientConnectionManager connectionManager) {
     if (jmxName == null) {
       try {
         jmxName =
@@ -67,7 +67,7 @@ public class PoolingClientConnectionManagerMBeanInstaller
   /**
    * Unregisters the connection manager from JMX.
    */
-  public synchronized void unregister() {
+  synchronized void unregister() {
     if (jmxName != null) {
       try {
         final MBeanServer server = ManagementFactory.getPlatformMBeanServer();

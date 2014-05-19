@@ -10,178 +10,88 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.apachehttpclient;
+
+package org.sonatype.nexus.internal.httpclient;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider.Builder;
+import org.sonatype.nexus.httpclient.HttpClientFactory.Builder;
+import org.sonatype.nexus.httpclient.HttpClientFactory.Customizer;
 import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.AuthSchemes;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.protocol.ResponseContentEncoding;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.impl.conn.DefaultSchemePortResolver;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Support class for implementation of {@link Hc4Provider}.
+ * RemoteStorageContext {@link Customizer}.
  *
- * @author cstamas
- * @since 2.2
+ * @since 3.0
  */
-public class Hc4ProviderBase
+public class RemoteStorageContextCustomizer
     extends ComponentSupport
+    implements Customizer
 {
+  private final RemoteStorageContext context;
 
-  /**
-   * Key for customizing default (and max) keep alive duration when remote server does not state anything, or states
-   * some unreal high value. Value is milliseconds.
-   */
-  private static final String KEEP_ALIVE_MAX_DURATION_KEY = "nexus.apacheHttpClient4x.keepAliveMaxDuration";
-
-  /**
-   * Default keep alive max duration: 30 seconds.
-   */
-  private static final long KEEP_ALIVE_MAX_DURATION_DEFAULT = TimeUnit.SECONDS.toMillis(30);
-
-  /**
-   * UA builder component.
-   */
-  private final UserAgentBuilder userAgentBuilder;
-
-  /**
-   * @param userAgentBuilder UA builder component, must not be {@code null}.
-   */
-  public Hc4ProviderBase(final UserAgentBuilder userAgentBuilder) {
-    this.userAgentBuilder = checkNotNull(userAgentBuilder);
+  public RemoteStorageContextCustomizer(final RemoteStorageContext context) {
+    this.context = checkNotNull(context);
   }
 
-  // configuration
+  @Override
+  public void customize(final Builder builder) {
+    // connection/socket timeouts
+    int timeout = 1000;
+    if (context.getRemoteConnectionSettings() != null) {
+      timeout = context.getRemoteConnectionSettings().getConnectionTimeout();
+    }
+    builder.getSocketConfigBuilder().setSoTimeout(timeout);
+    builder.getRequestConfigBuilder().setConnectTimeout(timeout);
+    builder.getRequestConfigBuilder().setSocketTimeout(timeout);
 
-  // ==
+    // obey the given retries count and apply it to client.
+    int retries = context.getRemoteConnectionSettings() != null ? context.getRemoteConnectionSettings()
+        .getRetrievalRetryCount() : 0;
+    builder.getHttpClientBuilder().setRetryHandler(new StandardHttpRequestRetryHandler(retries, false));
 
-  protected Builder prepareHttpClient(final RemoteStorageContext context,
-                                     final HttpClientConnectionManager httpClientConnectionManager)
-  {
-    final Builder builder = new Builder();
-    builder.getHttpClientBuilder().setConnectionManager(httpClientConnectionManager);
-    builder.getHttpClientBuilder().addInterceptorFirst(new ResponseContentEncoding());
-    applyConfig(builder, context);
     applyAuthenticationConfig(builder, context.getRemoteAuthenticationSettings(), null);
     applyProxyConfig(builder, context.getRemoteProxySettings());
-    // obey the given retries count and apply it to client.
-    final int retries =
-        context.getRemoteConnectionSettings() != null
-            ? context.getRemoteConnectionSettings().getRetrievalRetryCount()
-            : 0;
-    builder.getHttpClientBuilder().setRetryHandler(new StandardHttpRequestRetryHandler(retries, false));
-    builder.getHttpClientBuilder().setKeepAliveStrategy(new NexusConnectionKeepAliveStrategy(getKeepAliveMaxDuration()));
-    return builder;
-  }
 
-  protected void applyConfig(final Builder builder, final RemoteStorageContext context) {
-    builder.getSocketConfigBuilder().setSoTimeout(getSoTimeout(context));
-
-    builder.getConnectionConfigBuilder().setBufferSize(8 * 1024);
-
-    builder.getRequestConfigBuilder().setCookieSpec(CookieSpecs.IGNORE_COOKIES);
-    builder.getRequestConfigBuilder().setExpectContinueEnabled(false);
-    builder.getRequestConfigBuilder().setStaleConnectionCheckEnabled(false);
-    builder.getRequestConfigBuilder().setConnectTimeout(getConnectionTimeout(context));
-    builder.getRequestConfigBuilder().setSocketTimeout(getSoTimeout(context));
-
-    builder.getHttpClientBuilder().setUserAgent(userAgentBuilder.formatUserAgentString(context));
-  }
-
-  /**
-   * Returns the maximum Keep-Alive duration in milliseconds.
-   */
-  protected long getKeepAliveMaxDuration() {
-    return SystemPropertiesHelper.getLong(KEEP_ALIVE_MAX_DURATION_KEY, KEEP_ALIVE_MAX_DURATION_DEFAULT);
-  }
-
-  /**
-   * Returns the connection timeout in milliseconds. The timeout until connection is established.
-   */
-  protected int getConnectionTimeout(final RemoteStorageContext context) {
+    // Apply optional context-specific user-agent suffix
     if (context.getRemoteConnectionSettings() != null) {
-      return context.getRemoteConnectionSettings().getConnectionTimeout();
-    }
-    else {
-      // see DefaultRemoteConnectionSetting
-      return 1000;
-    }
-  }
-
-  /**
-   * Returns the SO_SOCKET timeout in milliseconds. The timeout for waiting for data on established connection.
-   */
-  protected int getSoTimeout(final RemoteStorageContext context) {
-    // this parameter is actually set from #getConnectionTimeout
-    return getConnectionTimeout(context);
-  }
-
-  // ==
-
-  /**
-   * Returns {@code true} if passed in {@link RemoteStorageContext} contains some configuration element that
-   * does require connection reuse (typically remote NTLM authentication or proxy with NTLM authentication set).
-   *
-   * @param context the remote storage context to test for need of reused connections.
-   * @return {@code true} if connection reuse is required according to remote storage context.
-   * @since 2.7.2
-   */
-  protected boolean reuseConnectionsNeeded(final RemoteStorageContext context) {
-    // return true if any of the auth is NTLM based, as NTLM must have keep-alive to work
-    if (context != null) {
-      if (context.getRemoteAuthenticationSettings() instanceof NtlmRemoteAuthenticationSettings) {
-        return true;
-      }
-      if (context.getRemoteProxySettings() != null) {
-        if (context.getRemoteProxySettings().getHttpProxySettings() != null &&
-            context.getRemoteProxySettings().getHttpProxySettings()
-                .getProxyAuthentication() instanceof NtlmRemoteAuthenticationSettings) {
-          return true;
-        }
-        if (context.getRemoteProxySettings().getHttpsProxySettings() != null &&
-            context.getRemoteProxySettings().getHttpsProxySettings()
-                .getProxyAuthentication() instanceof NtlmRemoteAuthenticationSettings) {
-          return true;
-        }
+      String userAgentSuffix = context.getRemoteConnectionSettings().getUserAgentCustomizationString();
+      if (!StringUtils.isEmpty(userAgentSuffix)) {
+        builder.setUserAgent(builder.getUserAgent() + " " + userAgentSuffix);
       }
     }
-    return false;
   }
 
-  protected void applyAuthenticationConfig(final Builder builder,
-                                           final RemoteAuthenticationSettings ras,
-                                           final HttpHost proxyHost)
+  @VisibleForTesting
+  void applyAuthenticationConfig(final Builder builder,
+                                 final RemoteAuthenticationSettings ras,
+                                 final HttpHost proxyHost)
   {
     if (ras != null) {
       String authScope = "target";
@@ -226,12 +136,8 @@ public class Hc4ProviderBase
     }
   }
 
-  /**
-   * @since 2.6
-   */
-  protected void applyProxyConfig(final Builder builder,
-                                  final RemoteProxySettings remoteProxySettings)
-  {
+  @VisibleForTesting
+  void applyProxyConfig(final Builder builder, final RemoteProxySettings remoteProxySettings) {
     if (remoteProxySettings != null
         && remoteProxySettings.getHttpProxySettings() != null
         && remoteProxySettings.getHttpProxySettings().isEnabled()) {
@@ -245,9 +151,7 @@ public class Hc4ProviderBase
           builder, remoteProxySettings.getHttpProxySettings().getProxyAuthentication(), httpProxy
       );
 
-      log.debug(
-          "http proxy setup with host '{}'", remoteProxySettings.getHttpProxySettings().getHostname()
-      );
+      log.debug("http proxy setup with host '{}'", remoteProxySettings.getHttpProxySettings().getHostname());
       proxies.put("http", httpProxy);
       proxies.put("https", httpProxy);
 
@@ -260,9 +164,7 @@ public class Hc4ProviderBase
         applyAuthenticationConfig(
             builder, remoteProxySettings.getHttpsProxySettings().getProxyAuthentication(), httpsProxy
         );
-        log.debug(
-            "https proxy setup with host '{}'", remoteProxySettings.getHttpsProxySettings().getHostname()
-        );
+        log.debug("https proxy setup with host '{}'", remoteProxySettings.getHttpsProxySettings().getHostname());
         proxies.put("https", httpsProxy);
       }
 

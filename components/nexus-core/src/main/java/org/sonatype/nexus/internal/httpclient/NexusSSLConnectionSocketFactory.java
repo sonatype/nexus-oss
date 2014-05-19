@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.apachehttpclient;
+package org.sonatype.nexus.internal.httpclient;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -20,6 +20,8 @@ import java.util.List;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+
+import org.sonatype.nexus.httpclient.SSLContextSelector;
 
 import com.google.common.io.Closeables;
 import org.apache.http.HttpHost;
@@ -43,7 +45,7 @@ public class NexusSSLConnectionSocketFactory
 
   private final X509HostnameVerifier hostnameVerifier;
 
-  public NexusSSLConnectionSocketFactory(
+  NexusSSLConnectionSocketFactory(
       final SSLSocketFactory defaultSocketFactory,
       final X509HostnameVerifier hostnameVerifier,
       final List<SSLContextSelector> selectors)

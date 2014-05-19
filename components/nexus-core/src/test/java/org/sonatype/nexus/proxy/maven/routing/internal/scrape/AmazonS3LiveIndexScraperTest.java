@@ -15,16 +15,12 @@ package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 import java.io.IOException;
 import java.util.List;
 
-import org.sonatype.nexus.apachehttpclient.page.Page;
+import org.sonatype.nexus.httpclient.Page;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;

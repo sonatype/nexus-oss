@@ -10,30 +10,37 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.utils;
+package org.sonatype.nexus.internal;
 
-import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * Classes implementing this interface are injected into the {@link UserAgentBuilder} and asked
- * for a custom string to append to the user agent.
+ * Global {@link RemoteStorageContext} provider.
  *
- * @since 2.1
+ * @since 3.0
  */
-public interface UserAgentContributor
+@Named("global")
+@Singleton
+public class GlobalRemoteStorageContextProvider
+  implements Provider<RemoteStorageContext>
 {
+  private final ApplicationConfiguration configuration;
 
-  /**
-   * Return a string to append to the user agent.
-   *
-   * @param ctx        The remote storage settings.
-   * @param repository The proxy repository that the user agent will be used for. May be null if the user agent is
-   *                   built in a global context.
-   * @return The string to append to the user agent.
-   */
-  String getUserAgent(RemoteStorageContext ctx, @Nullable ProxyRepository repository);
+  @Inject
+  public GlobalRemoteStorageContextProvider(final ApplicationConfiguration configuration) {
+    this.configuration = checkNotNull(configuration);
+  }
 
+  @Override
+  public RemoteStorageContext get() {
+    return configuration.getGlobalRemoteStorageContext();
+  }
 }

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.apachehttpclient;
+package org.sonatype.nexus.internal.httpclient;
 
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2.6
  */
-class NexusHttpRoutePlanner
+public class NexusHttpRoutePlanner
     extends DefaultRoutePlanner
 {
 

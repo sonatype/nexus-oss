@@ -10,10 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.apachehttpclient;
+package org.sonatype.nexus.internal.httpclient;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider.Builder;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.httpclient.HttpClientFactory.Builder;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
@@ -24,10 +24,10 @@ import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import com.google.inject.util.Providers;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
@@ -46,23 +46,21 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
-public class Hc4ProviderImplTest
+public class HttpClientFactoryImplTest
     extends TestSupport
 {
-  private Hc4ProviderImpl testSubject;
-
-  @Mock
-  private ApplicationConfiguration applicationConfiguration;
-
-  @Mock
-  private UserAgentBuilder userAgentBuilder;
+  private HttpClientFactoryImpl testSubject;
 
   @Mock
   private EventBus eventBus;
+
+  @Mock
+  private SystemStatus systemStatus;
 
   @Mock
   private RemoteStorageContext globalRemoteStorageContext;
@@ -79,7 +77,6 @@ public class Hc4ProviderImplTest
     rcs.setConnectionTimeout(1234);
     when(globalRemoteStorageContext.getRemoteConnectionSettings()).thenReturn(rcs);
     when(globalRemoteStorageContext.getRemoteProxySettings()).thenReturn(remoteProxySettings);
-    when(applicationConfiguration.getGlobalRemoteStorageContext()).thenReturn(globalRemoteStorageContext);
   }
 
   @Test
@@ -87,9 +84,14 @@ public class Hc4ProviderImplTest
   public void sharedInstanceConfigurationTest() {
     setParameters();
     try {
-      testSubject = new Hc4ProviderImpl(applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller, null);
+      testSubject = new HttpClientFactoryImpl(
+          Providers.of(systemStatus),
+          Providers.of(globalRemoteStorageContext),
+          eventBus,
+          jmxInstaller,
+          null);
 
-      final HttpClient client = testSubject.createHttpClient();
+      final HttpClient client = testSubject.create();
       // Note: shared instance is shared across Nexus instance. It does not features connection pooling as
       // connections are
       // never reused intentionally
@@ -129,14 +131,19 @@ public class Hc4ProviderImplTest
   public void createdInstanceConfigurationTest() {
     setParameters();
     try {
-      testSubject = new Hc4ProviderImpl(applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller, null);
+      testSubject = new HttpClientFactoryImpl(
+          Providers.of(systemStatus),
+          Providers.of(globalRemoteStorageContext),
+          eventBus,
+          jmxInstaller,
+          null);
 
       // Note: explicitly created instance (like in case of proxies), it does pool and
       // returns customized client
 
-      // we will reuse the "global" one, but this case is treated differently anyway by Hc4Provider
+      // we will reuse the "global" one, but this case is treated differently anyway by factory
       final HttpClient client =
-          testSubject.createHttpClient(applicationConfiguration.getGlobalRemoteStorageContext());
+          testSubject.create(new RemoteStorageContextCustomizer(globalRemoteStorageContext));
       // shared client does reuse connections (does pool)
       Assert.assertTrue(
           ((DefaultHttpClient) client).getConnectionReuseStrategy() instanceof DefaultConnectionReuseStrategy);
@@ -172,7 +179,12 @@ public class Hc4ProviderImplTest
 
   @Test
   public void NEXUS6220_connectionReuse() {
-    testSubject = new Hc4ProviderImpl(applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller, null);
+    testSubject = new HttpClientFactoryImpl(
+        Providers.of(systemStatus),
+        Providers.of(globalRemoteStorageContext),
+        eventBus,
+        jmxInstaller,
+        null);
 
     // nothing NTLM related present
     {
@@ -194,9 +206,8 @@ public class Hc4ProviderImplTest
       final RemoteHttpProxySettings https = new DefaultRemoteHttpProxySettings();
       when(remoteProxySettings.getHttpProxySettings()).thenReturn(http);
       when(remoteProxySettings.getHttpsProxySettings()).thenReturn(https);
-      Assert
-          .assertTrue("NTLM HTTP proxy auth-proxy set",
-              testSubject.reuseConnectionsNeeded(applicationConfiguration.getGlobalRemoteStorageContext()));
+      Assert.assertTrue("NTLM HTTP proxy auth-proxy set",
+              testSubject.reuseConnectionsNeeded(globalRemoteStorageContext));
     }
 
     // HTTPS proxy is NTLM
@@ -206,36 +217,42 @@ public class Hc4ProviderImplTest
       https.setProxyAuthentication(new NtlmRemoteAuthenticationSettings("a", "b", "c", "d"));
       when(remoteProxySettings.getHttpProxySettings()).thenReturn(http);
       when(remoteProxySettings.getHttpsProxySettings()).thenReturn(https);
-      Assert
-          .assertTrue("NTLM HTTPS proxy auth-proxy set",
-              testSubject.reuseConnectionsNeeded(applicationConfiguration.getGlobalRemoteStorageContext()));
+      Assert.assertTrue("NTLM HTTPS proxy auth-proxy set",
+              testSubject.reuseConnectionsNeeded(globalRemoteStorageContext));
     }
   }
 
-
   @Test
   public void credentialsProviderReplaced() {
-    testSubject = new Hc4ProviderImpl(applicationConfiguration, userAgentBuilder, eventBus, jmxInstaller, null);
+    testSubject = new HttpClientFactoryImpl(
+        Providers.of(systemStatus),
+        Providers.of(globalRemoteStorageContext),
+        eventBus,
+        jmxInstaller,
+        null);
 
-    final Builder builder = testSubject.prepareHttpClient(applicationConfiguration.getGlobalRemoteStorageContext());
+    RemoteStorageContextCustomizer customizer = new RemoteStorageContextCustomizer(globalRemoteStorageContext);
+    final Builder builder = testSubject.prepare(customizer);
 
-    final RemoteAuthenticationSettings remoteAuthenticationSettings = new UsernamePasswordRemoteAuthenticationSettings(
-        "user", "pass");
-    testSubject.applyAuthenticationConfig(builder, remoteAuthenticationSettings, null);
+    final RemoteAuthenticationSettings remoteAuthenticationSettings =
+        new UsernamePasswordRemoteAuthenticationSettings("user", "pass");
+    customizer.applyAuthenticationConfig(builder, remoteAuthenticationSettings, null);
 
     final DefaultRemoteHttpProxySettings httpProxy = new DefaultRemoteHttpProxySettings();
     httpProxy.setHostname("http-proxy");
     httpProxy.setPort(8080);
     httpProxy.setProxyAuthentication(new UsernamePasswordRemoteAuthenticationSettings("http-proxy", "http-pass"));
+
     final DefaultRemoteHttpProxySettings httpsProxy = new DefaultRemoteHttpProxySettings();
     httpsProxy.setHostname("https-proxy");
     httpsProxy.setPort(9090);
     httpsProxy.setProxyAuthentication(new UsernamePasswordRemoteAuthenticationSettings("https-proxy", "https-pass"));
+
     final DefaultRemoteProxySettings remoteProxySettings = new DefaultRemoteProxySettings();
     remoteProxySettings.setHttpProxySettings(httpProxy);
     remoteProxySettings.setHttpsProxySettings(httpsProxy);
 
-    testSubject.applyProxyConfig(builder, remoteProxySettings);
+    customizer.applyProxyConfig(builder, remoteProxySettings);
 
     final CredentialsProvider credentialsProvider = builder.getCredentialsProvider();
 

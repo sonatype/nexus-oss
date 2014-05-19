@@ -10,29 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
+package org.sonatype.nexus.httpclient;
 
-import org.sonatype.nexus.httpclient.Page;
-import org.sonatype.nexus.proxy.maven.routing.discovery.Prioritized;
+import javax.net.ssl.SSLContext;
+
+import org.apache.http.protocol.HttpContext;
 
 /**
- * Scraper component, implementations should "specialize" for some remote target, like Nexus or Apache HTTPD.
+ * Selects SSLContext to be used for given HTTP context.
  *
- * @author cstamas
- * @since 2.4
+ * @since 2.8
  */
-public interface Scraper
-    extends Prioritized
+public interface SSLContextSelector
 {
   /**
-   * Returns the unique ID of the scraper, never {@code null}.
+   * Returns the desired {@link SSLContext} to be used or {@code null} if no selection possible (or available).
    *
-   * @return the ID of the scraper.
+   * In this case, HTTP client will use the "default" SSL context.
    */
-  String getId();
-
-  /**
-   * Tries to scrape. Scraper should flag the {@link ScrapeContext} as stopped if it wants to stop the processing.
-   */
-  void scrape(ScrapeContext context, Page page);
+  SSLContext select(HttpContext context);
 }

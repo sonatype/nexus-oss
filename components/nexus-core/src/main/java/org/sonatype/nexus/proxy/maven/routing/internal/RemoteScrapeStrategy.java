@@ -22,7 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.apachehttpclient.page.Page;
+import org.sonatype.nexus.httpclient.Page;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;

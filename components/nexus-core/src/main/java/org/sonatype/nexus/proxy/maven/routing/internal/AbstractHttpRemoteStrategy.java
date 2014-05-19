@@ -17,7 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyFailedException;
@@ -25,19 +25,18 @@ import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyResult;
 import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientManager;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Abstract class for {@link RemoteStrategy} implementations that is using HC4, see {@link Hc4Provider}.
+ * Abstract class for {@link RemoteStrategy} implementations that is using HC4, see {@link HttpClientFactory}.
  * 
  * @author cstamas
  * @since 2.7.0
@@ -95,7 +94,7 @@ public abstract class AbstractHttpRemoteStrategy
       // it's group
       final HttpGet get = new HttpGet(remoteUrl);
       final BasicHttpContext httpContext = new BasicHttpContext();
-      httpContext.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, mavenProxyRepository);
+      httpContext.setAttribute(HttpClientFactory.HTTP_CTX_KEY_REPOSITORY, mavenProxyRepository);
       final HttpResponse response  = httpClient.execute(get, httpContext);
 
       try {

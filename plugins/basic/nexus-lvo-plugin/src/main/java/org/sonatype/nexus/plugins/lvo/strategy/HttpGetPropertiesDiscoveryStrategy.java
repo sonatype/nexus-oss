@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
@@ -40,8 +40,8 @@ public class HttpGetPropertiesDiscoveryStrategy
     extends AbstractRemoteDiscoveryStrategy
 {
   @Inject
-  public HttpGetPropertiesDiscoveryStrategy(final Hc4Provider hc4Provider) {
-    super(hc4Provider);
+  public HttpGetPropertiesDiscoveryStrategy(final HttpClientFactory httpClientFactory) {
+    super(httpClientFactory);
   }
 
   public DiscoveryResponse discoverLatestVersion(DiscoveryRequest request)

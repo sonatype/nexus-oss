@@ -18,7 +18,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.apache.http.client.HttpClient;
 
 /**
- * Component responsible for maintaining HTTP CLient instances for Proxy repositories, used by singleton
+ * Component responsible for maintaining HTTP Client instances for Proxy repositories, used by singleton
  * {@link HttpClientRemoteStorage}.
  *
  * @author cstamas
@@ -38,9 +38,8 @@ public interface HttpClientManager
   HttpClient create(final ProxyRepository proxyRepository, final RemoteStorageContext ctx);
 
   /**
-   * Releases the {@link HttpClient} for given {@link ProxyRepository}. To be called whenever the instance needs to
-   * be
-   * dropped or recreated.
+   * Releases the {@link HttpClient} for given {@link ProxyRepository}.
+   * To be called whenever the instance needs to be dropped or recreated.
    */
   void release(final ProxyRepository proxyRepository, final RemoteStorageContext ctx);
 }

@@ -15,11 +15,12 @@ package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.httpclient.Page;
+
 import org.apache.http.Header;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.sonatype.nexus.apachehttpclient.page.Page;
 
 /**
  * Scraper for remote Nginx hosted repositories.

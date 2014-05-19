@@ -10,12 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.apachehttpclient.page;
+package org.sonatype.nexus.httpclient;
 
 import java.io.IOException;
-
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -203,36 +200,6 @@ public class Page
      */
     public boolean isExpectedResponse(final HttpResponse response) {
       return response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() <= 499;
-    }
-  }
-
-  /**
-   * A context of page requests made on behalf of a Repository.
-   */
-  public static class RepositoryPageContext
-      extends PageContext
-  {
-    private final ProxyRepository proxyRepository;
-
-    public RepositoryPageContext(final HttpClient httpClient, final ProxyRepository proxyRepository) {
-      super(httpClient);
-      this.proxyRepository = checkNotNull(proxyRepository);
-    }
-
-    protected ProxyRepository getProxyRepository() {
-      return proxyRepository;
-    }
-
-    /**
-     * Equips context with repository.
-     */
-    @Override
-    public HttpContext createHttpContext(final HttpUriRequest httpRequest)
-        throws IOException
-    {
-      final HttpContext httpContext = super.createHttpContext(httpRequest);
-      httpContext.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, getProxyRepository());
-      return httpContext;
     }
   }
 

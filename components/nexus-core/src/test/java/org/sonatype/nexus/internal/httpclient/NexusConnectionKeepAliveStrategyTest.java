@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.apachehttpclient;
+package org.sonatype.nexus.internal.httpclient;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +31,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
- * Test for NexusConnectionKeepAliveStrategy.
+ * Test for {@link NexusConnectionKeepAliveStrategy}.
  */
 public class NexusConnectionKeepAliveStrategyTest
     extends TestSupport

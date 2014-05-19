@@ -10,29 +10,38 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
+package org.sonatype.nexus.internal.httpclient;
 
-import org.sonatype.nexus.httpclient.Page;
-import org.sonatype.nexus.proxy.maven.routing.discovery.Prioritized;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.httpclient.HttpClientFactory;
+
+import org.apache.http.client.HttpClient;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Scraper component, implementations should "specialize" for some remote target, like Nexus or Apache HTTPD.
+ * {@link HttpClient} provider via {@link HttpClientFactory}.
  *
- * @author cstamas
- * @since 2.4
+ * @since 3.0
  */
-public interface Scraper
-    extends Prioritized
+@Named
+@Singleton
+public class HttpClientProvider
+    implements Provider<HttpClient>
 {
-  /**
-   * Returns the unique ID of the scraper, never {@code null}.
-   *
-   * @return the ID of the scraper.
-   */
-  String getId();
+  private final HttpClientFactory factory;
 
-  /**
-   * Tries to scrape. Scraper should flag the {@link ScrapeContext} as stopped if it wants to stop the processing.
-   */
-  void scrape(ScrapeContext context, Page page);
+  @Inject
+  public HttpClientProvider(final HttpClientFactory factory) {
+    this.factory = checkNotNull(factory);
+  }
+
+  @Override
+  public HttpClient get() {
+    return factory.create();
+  }
 }
