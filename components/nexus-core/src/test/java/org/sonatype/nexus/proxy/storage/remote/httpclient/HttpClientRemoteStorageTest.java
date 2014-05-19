@@ -169,7 +169,7 @@ public class HttpClientRemoteStorageTest
       throws Exception
   {
     setParameters();
-    HttpClientFactoryImpl hc4Provider = null;
+    HttpClientFactoryImpl httpClientFactory = null;
     try {
       // the foreplay: setting up
       final RemoteStorageContext globalRemoteStorageContext = new DefaultRemoteStorageContext(null);
@@ -179,7 +179,7 @@ public class HttpClientRemoteStorageTest
       globalRemoteStorageContext.setRemoteProxySettings(mock(RemoteProxySettings.class));
 
       // real provider and initializing it with NexusStarted event
-      hc4Provider = new HttpClientFactoryImpl(
+      httpClientFactory = new HttpClientFactoryImpl(
           Providers.of(mock(SystemStatus.class)),
           Providers.of(globalRemoteStorageContext),
           mock(EventBus.class),
@@ -190,7 +190,7 @@ public class HttpClientRemoteStorageTest
       // the RRS instance we test
       final HttpClientRemoteStorage underTest =
           new HttpClientRemoteStorage(mock(ApplicationStatusSource.class),
-              mock(MimeSupport.class), mock(QueryStringBuilder.class), new HttpClientManagerImpl(hc4Provider));
+              mock(MimeSupport.class), mock(QueryStringBuilder.class), new HttpClientManagerImpl(httpClientFactory));
 
       // a mock proxy repository with some mocks to make RRS work
       final RemoteStorageContext proxyContext = new DefaultRemoteStorageContext(globalRemoteStorageContext);
@@ -237,8 +237,8 @@ public class HttpClientRemoteStorageTest
       }
     }
     finally {
-      if (hc4Provider != null) {
-        hc4Provider.shutdown();
+      if (httpClientFactory != null) {
+        httpClientFactory.shutdown();
       }
       unsetParameters();
     }

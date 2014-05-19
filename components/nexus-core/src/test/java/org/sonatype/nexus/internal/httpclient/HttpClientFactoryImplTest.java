@@ -141,7 +141,7 @@ public class HttpClientFactoryImplTest
       // Note: explicitly created instance (like in case of proxies), it does pool and
       // returns customized client
 
-      // we will reuse the "global" one, but this case is treated differently anyway by Hc4Provider
+      // we will reuse the "global" one, but this case is treated differently anyway by factory
       final HttpClient client =
           testSubject.create(new RemoteStorageContextCustomizer(globalRemoteStorageContext));
       // shared client does reuse connections (does pool)

@@ -229,8 +229,6 @@ public class HttpClientFactoryImpl
     }
   }
 
-  // == Hc4Provider API
-
   @Override
   public HttpClient create() {
     RemoteStorageContext context = globalRemoteStorageContextProvider.get();

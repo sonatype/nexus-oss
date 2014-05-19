@@ -41,13 +41,13 @@ public class HttpGetPropertiesDiscoveryStrategyTest
     extends TestSupport
 {
   @Mock
-  private HttpClientFactory hc4provider;
+  private HttpClientFactory httpClientFactory;
 
   @Test
   public void translateProperties()
       throws IOException, NoSuchRepositoryException
   {
-    HttpGetPropertiesDiscoveryStrategy underTest = new HttpGetPropertiesDiscoveryStrategy(hc4provider)
+    HttpGetPropertiesDiscoveryStrategy underTest = new HttpGetPropertiesDiscoveryStrategy(httpClientFactory)
     {
       @Override
       protected RequestResult handleRequest(final String url) {
@@ -76,7 +76,7 @@ public class HttpGetPropertiesDiscoveryStrategyTest
   public void translatePropertiesFail()
       throws IOException, NoSuchRepositoryException
   {
-    HttpGetPropertiesDiscoveryStrategy underTest = new HttpGetPropertiesDiscoveryStrategy(hc4provider)
+    HttpGetPropertiesDiscoveryStrategy underTest = new HttpGetPropertiesDiscoveryStrategy(httpClientFactory)
     {
       @Override
       protected RequestResult handleRequest(final String url) {
