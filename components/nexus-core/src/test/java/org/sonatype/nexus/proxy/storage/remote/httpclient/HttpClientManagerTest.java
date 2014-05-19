@@ -13,8 +13,8 @@
 package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
-import org.sonatype.nexus.internal.httpclient.Hc4ProviderImpl;
+import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
+import org.sonatype.nexus.internal.httpclient.HttpClientFactoryImpl;
 import org.sonatype.nexus.internal.httpclient.PoolingClientConnectionManagerMBeanInstaller;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -77,7 +77,7 @@ public class HttpClientManagerTest
 
   private HttpGet request;
 
-  private Hc4Provider hc4Provider;
+  private HttpClientFactory httpClientFactory;
 
   private HttpClientManagerImpl httpClientManager;
 
@@ -88,7 +88,7 @@ public class HttpClientManagerTest
     when(globalRemoteStorageContext.getRemoteConnectionSettings()).thenReturn(rcs);
     when(globalRemoteStorageContext.getRemoteProxySettings()).thenReturn(remoteProxySettings);
 
-    hc4Provider = new Hc4ProviderImpl(
+    httpClientFactory = new HttpClientFactoryImpl(
         Providers.of(systemStatus),
         Providers.of(globalRemoteStorageContext),
         eventBus,
@@ -98,7 +98,7 @@ public class HttpClientManagerTest
     when(proxyRepository.getId()).thenReturn("central");
     when(response.getStatusLine()).thenReturn(statusLine);
 
-    httpClientManager = new HttpClientManagerImpl(hc4Provider);
+    httpClientManager = new HttpClientManagerImpl(httpClientFactory);
   }
 
   @Test
@@ -159,7 +159,7 @@ public class HttpClientManagerTest
   @Ignore("Hc4Provider does not deliver DefaultHttpClient deprecated instances anymore")
   public void doNotHandleRetries() {
     final DefaultHttpClient client = (DefaultHttpClient)
-        new HttpClientManagerImpl(hc4Provider).create(proxyRepository,globalRemoteStorageContext);
+        new HttpClientManagerImpl(httpClientFactory).create(proxyRepository,globalRemoteStorageContext);
     // check is all set as needed: retries should be not attempted, as it is manually handled in proxy repo
     Assert.assertTrue(
         ((DefaultHttpClient) client).getHttpRequestRetryHandler() instanceof StandardHttpRequestRetryHandler);

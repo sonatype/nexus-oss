@@ -14,7 +14,7 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
@@ -41,7 +41,7 @@ public class HttpGetPropertiesDiscoveryStrategyTest
     extends TestSupport
 {
   @Mock
-  private Hc4Provider hc4provider;
+  private HttpClientFactory hc4provider;
 
   @Test
   public void translateProperties()

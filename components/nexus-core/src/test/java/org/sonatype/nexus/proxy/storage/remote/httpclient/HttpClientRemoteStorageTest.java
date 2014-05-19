@@ -14,7 +14,7 @@ package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.internal.httpclient.Hc4ProviderImpl;
+import org.sonatype.nexus.internal.httpclient.HttpClientFactoryImpl;
 import org.sonatype.nexus.internal.httpclient.PoolingClientConnectionManagerMBeanInstaller;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.RemoteStorageException;
@@ -169,7 +169,7 @@ public class HttpClientRemoteStorageTest
       throws Exception
   {
     setParameters();
-    Hc4ProviderImpl hc4Provider = null;
+    HttpClientFactoryImpl hc4Provider = null;
     try {
       // the foreplay: setting up
       final RemoteStorageContext globalRemoteStorageContext = new DefaultRemoteStorageContext(null);
@@ -179,7 +179,7 @@ public class HttpClientRemoteStorageTest
       globalRemoteStorageContext.setRemoteProxySettings(mock(RemoteProxySettings.class));
 
       // real provider and initializing it with NexusStarted event
-      hc4Provider = new Hc4ProviderImpl(
+      hc4Provider = new HttpClientFactoryImpl(
           Providers.of(mock(SystemStatus.class)),
           Providers.of(globalRemoteStorageContext),
           mock(EventBus.class),

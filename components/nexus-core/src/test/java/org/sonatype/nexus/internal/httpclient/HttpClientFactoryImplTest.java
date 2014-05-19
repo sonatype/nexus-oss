@@ -13,7 +13,7 @@
 package org.sonatype.nexus.internal.httpclient;
 
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.apachehttpclient.Hc4Provider.Builder;
+import org.sonatype.nexus.apachehttpclient.HttpClientFactory.Builder;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
@@ -51,10 +51,10 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
-public class Hc4ProviderImplTest
+public class HttpClientFactoryImplTest
     extends TestSupport
 {
-  private Hc4ProviderImpl testSubject;
+  private HttpClientFactoryImpl testSubject;
 
   @Mock
   private EventBus eventBus;
@@ -84,14 +84,14 @@ public class Hc4ProviderImplTest
   public void sharedInstanceConfigurationTest() {
     setParameters();
     try {
-      testSubject = new Hc4ProviderImpl(
+      testSubject = new HttpClientFactoryImpl(
           Providers.of(systemStatus),
           Providers.of(globalRemoteStorageContext),
           eventBus,
           jmxInstaller,
           null);
 
-      final HttpClient client = testSubject.createHttpClient();
+      final HttpClient client = testSubject.create();
       // Note: shared instance is shared across Nexus instance. It does not features connection pooling as
       // connections are
       // never reused intentionally
@@ -131,7 +131,7 @@ public class Hc4ProviderImplTest
   public void createdInstanceConfigurationTest() {
     setParameters();
     try {
-      testSubject = new Hc4ProviderImpl(
+      testSubject = new HttpClientFactoryImpl(
           Providers.of(systemStatus),
           Providers.of(globalRemoteStorageContext),
           eventBus,
@@ -143,7 +143,7 @@ public class Hc4ProviderImplTest
 
       // we will reuse the "global" one, but this case is treated differently anyway by Hc4Provider
       final HttpClient client =
-          testSubject.createHttpClient(new RemoteStorageContextCustomizer(globalRemoteStorageContext));
+          testSubject.create(new RemoteStorageContextCustomizer(globalRemoteStorageContext));
       // shared client does reuse connections (does pool)
       Assert.assertTrue(
           ((DefaultHttpClient) client).getConnectionReuseStrategy() instanceof DefaultConnectionReuseStrategy);
@@ -179,7 +179,7 @@ public class Hc4ProviderImplTest
 
   @Test
   public void NEXUS6220_connectionReuse() {
-    testSubject = new Hc4ProviderImpl(
+    testSubject = new HttpClientFactoryImpl(
         Providers.of(systemStatus),
         Providers.of(globalRemoteStorageContext),
         eventBus,
@@ -224,7 +224,7 @@ public class Hc4ProviderImplTest
 
   @Test
   public void credentialsProviderReplaced() {
-    testSubject = new Hc4ProviderImpl(
+    testSubject = new HttpClientFactoryImpl(
         Providers.of(systemStatus),
         Providers.of(globalRemoteStorageContext),
         eventBus,
@@ -232,7 +232,7 @@ public class Hc4ProviderImplTest
         null);
 
     RemoteStorageContextCustomizer customizer = new RemoteStorageContextCustomizer(globalRemoteStorageContext);
-    final Builder builder = testSubject.prepareHttpClient(customizer);
+    final Builder builder = testSubject.prepare(customizer);
 
     final RemoteAuthenticationSettings remoteAuthenticationSettings =
         new UsernamePasswordRemoteAuthenticationSettings("user", "pass");

@@ -27,14 +27,12 @@ import org.apache.http.protocol.HttpContext;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-// FIXME: Rename to HttpClientFactory
-
 /**
  * Component for creating pre-configured Apache HttpClient4x instances in Nexus.
  *
  * @since 2.2
  */
-public interface Hc4Provider
+public interface HttpClientFactory
 {
   // FIXME: Move repository specific semantics out of this class
 
@@ -52,25 +50,31 @@ public interface Hc4Provider
    *
    * @since 2.4
    */
-  String HTTP_CTX_KEY_REPOSITORY = Hc4Provider.class.getName() + ".repository";
+  String HTTP_CTX_KEY_REPOSITORY = HttpClientFactory.class.getName() + ".repository";
 
-  // TODO: Rename: create();
+  HttpClient create();
 
-  HttpClient createHttpClient();
-
-  // TODO: rename: create(Customizer)
-
-  HttpClient createHttpClient(Customizer customizer);
-
-  // TODO: rename: prepare(Customizer)
-
-  Builder prepareHttpClient(Customizer customizer);
-
+  /**
+   * Allows customization of {@link HttpClient} via {@link Builder}.
+   */
   public static interface Customizer
   {
     void customize(Builder builder);
   }
 
+  /**
+   * Create a new customized client.
+   */
+  HttpClient create(Customizer customizer);
+
+  /**
+   * Apply customization and return client builder.
+   */
+  Builder prepare(Customizer customizer);
+
+  /**
+   * Helper to build new {@link HttpClient} instances.
+   */
   public static class Builder
   {
     private final HttpClientBuilder httpClientBuilder;
@@ -125,7 +129,7 @@ public interface Hc4Provider
      * method, once invoked, will replace any credentials provider set on {@link HttpClientBuilder} when {@link
      * #build()} method is called to build the client.
      *
-     * @since 2.8.0
+     * @since 2.8
      */
     public Builder setCredentials(AuthScope authscope, Credentials credentials) {
       checkNotNull(authscope);

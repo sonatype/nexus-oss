@@ -21,8 +21,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
-import org.sonatype.nexus.apachehttpclient.Hc4Provider.Builder;
+import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
+import org.sonatype.nexus.apachehttpclient.HttpClientFactory.Builder;
 import org.sonatype.nexus.internal.httpclient.RemoteStorageContextCustomizer;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
@@ -54,18 +54,18 @@ public class HttpClientManagerImpl
     extends ComponentSupport
     implements HttpClientManager
 {
-  private final Hc4Provider hc4Provider;
+  private final HttpClientFactory httpClientFactory;
 
   @Inject
-  public HttpClientManagerImpl(final Hc4Provider hc4Provider) {
-    this.hc4Provider = checkNotNull(hc4Provider);
+  public HttpClientManagerImpl(final HttpClientFactory httpClientFactory) {
+    this.httpClientFactory = checkNotNull(httpClientFactory);
   }
 
   @Override
   public HttpClient create(final ProxyRepository proxyRepository, final RemoteStorageContext ctx) {
     checkNotNull(proxyRepository);
     checkNotNull(ctx);
-    final Builder builder = hc4Provider.prepareHttpClient(new RemoteStorageContextCustomizer(ctx));
+    final Builder builder = httpClientFactory.prepare(new RemoteStorageContextCustomizer(ctx));
     configure(proxyRepository, ctx, builder);
     return builder.build();
   }

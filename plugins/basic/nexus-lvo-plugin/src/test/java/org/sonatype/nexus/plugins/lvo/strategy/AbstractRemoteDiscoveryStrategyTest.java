@@ -16,8 +16,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
-import org.sonatype.nexus.internal.httpclient.Hc4ProviderImpl;
+import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
+import org.sonatype.nexus.internal.httpclient.HttpClientFactoryImpl;
 import org.sonatype.nexus.internal.httpclient.PoolingClientConnectionManagerMBeanInstaller;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
@@ -98,7 +98,7 @@ public class AbstractRemoteDiscoveryStrategyTest
   }
 
   private AbstractRemoteDiscoveryStrategy create() {
-    final Hc4Provider provider = new Hc4ProviderImpl(
+    final HttpClientFactory provider = new HttpClientFactoryImpl(
         Providers.of(systemStatus),
         Providers.of(remoteStorageContext),
         eventBus,

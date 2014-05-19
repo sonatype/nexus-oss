@@ -14,7 +14,7 @@ package org.sonatype.nexus.internal.httpclient;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
 import org.sonatype.nexus.apachehttpclient.Page.PageContext;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
@@ -49,7 +49,7 @@ public class RepositoryPageContext
       throws IOException
   {
     final HttpContext httpContext = super.createHttpContext(httpRequest);
-    httpContext.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, getProxyRepository());
+    httpContext.setAttribute(HttpClientFactory.HTTP_CTX_KEY_REPOSITORY, getProxyRepository());
     return httpContext;
   }
 }

@@ -24,7 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
 import org.sonatype.nexus.apachehttpclient.Page;
 import org.sonatype.nexus.apachehttpclient.Page.PageContext;
 import org.sonatype.nexus.internal.httpclient.RepositoryPageContext;
@@ -534,7 +534,7 @@ public class HttpClientRemoteStorage
     HttpResponse httpResponse = null;
     try {
       final BasicHttpContext httpContext = new BasicHttpContext();
-      httpContext.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, repository);
+      httpContext.setAttribute(HttpClientFactory.HTTP_CTX_KEY_REPOSITORY, repository);
       if (contentRequest) {
         httpContext.setAttribute(CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
       }

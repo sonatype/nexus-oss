@@ -23,7 +23,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
 import org.sonatype.nexus.internal.httpclient.RemoteStorageContextCustomizer;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -69,11 +69,11 @@ public class RemoteBrowserResource
 
   private final QueryStringBuilder queryStringBuilder;
 
-  private final Hc4Provider httpClientProvider;
+  private final HttpClientFactory httpClientProvider;
 
   @Inject
   public RemoteBrowserResource(final QueryStringBuilder queryStringBuilder,
-                               final Hc4Provider httpClientProvider)
+                               final HttpClientFactory httpClientProvider)
   {
     this.queryStringBuilder = checkNotNull(queryStringBuilder);
     this.httpClientProvider = checkNotNull(httpClientProvider);
@@ -128,7 +128,7 @@ public class RemoteBrowserResource
     try {
       ProxyRepository proxyRepository = getUnprotectedRepositoryRegistry().getRepositoryWithFacet(id,
           ProxyRepository.class);
-      HttpClient client = httpClientProvider.createHttpClient(
+      HttpClient client = httpClientProvider.create(
           new RemoteStorageContextCustomizer(proxyRepository.getRemoteStorageContext()));
 
       MavenRepositoryReader mr = new MavenRepositoryReader(client, queryStringBuilder);

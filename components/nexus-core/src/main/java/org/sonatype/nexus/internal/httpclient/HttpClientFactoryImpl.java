@@ -22,7 +22,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
 import org.sonatype.nexus.apachehttpclient.SSLContextSelector;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
@@ -47,15 +47,15 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Default implementation of {@link Hc4Provider}.
+ * Default implementation of {@link HttpClientFactory}.
  *
  * @since 2.2
  */
 @Singleton
 @Named
-public class Hc4ProviderImpl
+public class HttpClientFactoryImpl
     extends ComponentSupport
-    implements Hc4Provider
+    implements HttpClientFactory
 {
   /**
    * Key for customizing default (and max) keep alive duration when remote server does not state anything, or states
@@ -162,11 +162,11 @@ public class Hc4ProviderImpl
   private final PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
 
   @Inject
-  public Hc4ProviderImpl(final Provider<SystemStatus> systemStatusProvider,
-                         final @Named("global") Provider<RemoteStorageContext> globalRemoteStorageContextProvider,
-                         final EventBus eventBus,
-                         final PoolingClientConnectionManagerMBeanInstaller jmxInstaller,
-                         final List<SSLContextSelector> selectors)
+  public HttpClientFactoryImpl(final Provider<SystemStatus> systemStatusProvider,
+                               final @Named("global") Provider<RemoteStorageContext> globalRemoteStorageContextProvider,
+                               final EventBus eventBus,
+                               final PoolingClientConnectionManagerMBeanInstaller jmxInstaller,
+                               final List<SSLContextSelector> selectors)
   {
     this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.globalRemoteStorageContextProvider = checkNotNull(globalRemoteStorageContextProvider);
@@ -232,9 +232,9 @@ public class Hc4ProviderImpl
   // == Hc4Provider API
 
   @Override
-  public HttpClient createHttpClient() {
+  public HttpClient create() {
     RemoteStorageContext context = globalRemoteStorageContextProvider.get();
-    Builder builder = prepareHttpClient(new RemoteStorageContextCustomizer(context));
+    Builder builder = prepare(new RemoteStorageContextCustomizer(context));
 
     // FIXME: Why is this here and not general?
     boolean reuseConnections = reuseConnectionsNeeded(context);
@@ -269,12 +269,12 @@ public class Hc4ProviderImpl
   }
 
   @Override
-  public HttpClient createHttpClient(final Customizer customizer) {
-    return prepareHttpClient(customizer).build();
+  public HttpClient create(final Customizer customizer) {
+    return prepare(customizer).build();
   }
 
   @Override
-  public Builder prepareHttpClient(final Customizer customizer) {
+  public Builder prepare(final Customizer customizer) {
     final Builder builder = new Builder();
 
     // dependencies

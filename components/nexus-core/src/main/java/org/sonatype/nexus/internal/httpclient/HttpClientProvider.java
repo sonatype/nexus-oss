@@ -17,14 +17,14 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
 
 import org.apache.http.client.HttpClient;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * {@link HttpClient} provider via {@link Hc4Provider}.
+ * {@link HttpClient} provider via {@link HttpClientFactory}.
  *
  * @since 3.0
  */
@@ -33,15 +33,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class HttpClientProvider
     implements Provider<HttpClient>
 {
-  private final Hc4Provider factory;
+  private final HttpClientFactory factory;
 
   @Inject
-  public HttpClientProvider(final Hc4Provider factory) {
+  public HttpClientProvider(final HttpClientFactory factory) {
     this.factory = checkNotNull(factory);
   }
 
   @Override
   public HttpClient get() {
-    return factory.createHttpClient();
+    return factory.create();
   }
 }
