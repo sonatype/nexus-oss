@@ -64,8 +64,10 @@ public class WebUtils
    */
   public void equipResponseWithStandardHeaders(final HttpServletResponse response) {
     response.setHeader("Server", serverString);
+    // NEXUS-6569 Add X-Frame-Options header
     response.setHeader("X-Frame-Options", "SAMEORIGIN");
-    response.setHeader("X-Content-Options", "NOSNIFF");
+    // NEXUS-5023 disable IE for sniffing into response content
+    response.setHeader("X-Content-Type-Options", "nosniff");
   }
 
   /**

@@ -511,9 +511,6 @@ public class ContentServlet
       response.setStatus(SC_NOT_MODIFIED);
     }
     else {
-      // NEXUS-5023 disable IE for sniffing into response content
-      response.setHeader("X-Content-Type-Options", "nosniff");
-
       final List<Range<Long>> ranges = getRequestedRanges(request, file.getLength());
 
       // pour the content, but only if needed (this method will be called even for HEAD reqs, but with content tossed
