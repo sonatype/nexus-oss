@@ -59,6 +59,13 @@ public class Launcher
                   final String[] args)
       throws Exception
   {
+    if (args == null) {
+      throw new NullPointerException();
+    }
+    if (args.length == 0) {
+      throw new IllegalArgumentException("Missing args");
+    }
+
     // install JUL bridge
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();
@@ -101,17 +108,10 @@ public class Launcher
         System.getProperty("user.home")
     );
     log.info("CWD: {}", System.getProperty("user.dir"));
-    log.info("TMP: {}", System.getProperty("java.io.tmpdir"));
-
-    if (args == null) {
-      throw new NullPointerException();
-    }
-    if (args.length == 0) {
-      throw new IllegalArgumentException("Missing args");
-    }
 
     // ensure the temporary directory is sane
-    TemporaryDirectory.get();
+    File tmpdir = TemporaryDirectory.get();
+    log.info("TMP: {}", tmpdir);
 
     this.server = new JettyServer(cl, props, args);
   }

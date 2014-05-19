@@ -49,8 +49,7 @@ public class ApplicationDirectoriesImpl
 
   @Inject
   public ApplicationDirectoriesImpl(final @Named("${bundleBasedir}") @Nullable File installDir,
-                                    final @Named("${nexus-work}") File workDir,
-                                    final @Named("${java.io.tmpdir}") @Nullable File tempDir)
+                                    final @Named("${nexus-work}") File workDir)
   {
     if (installDir != null) {
       this.installDir = resolve(installDir, false);
@@ -64,13 +63,14 @@ public class ApplicationDirectoriesImpl
     this.workDir = resolve(workDir, true);
     log.debug("Work dir: {}", this.workDir);
 
-    if (tempDir != null) {
-      this.tempDir = resolve(tempDir, true);
-    }
-    else {
-      // edge-case for injected-tests which do not have java.io.tmpdir set
-      this.tempDir = resolve(new File(workDir, "tmp"), true);
-    }
+    // TODO: May want to consider having the application tmp dir as a well known sub-directory under java.io.tmpdir
+    // TODO: similar to how jetty does this with "jetty-<addr>-<port>-<context>".  If we normalize on a nexus
+    // TODO: instance/node identifiers then this could be "nexus-<node-id>".  This however would still be
+    // TODO: prefixed in the java.io.tmpdir location
+
+    // Resolve the tmp dir from system properties.
+    String tmplocation = System.getProperty("java.io.tmpdir", "tmp");
+    this.tempDir = resolve(new File(tmplocation), true);
     log.debug("Temp dir: {}", this.tempDir);
   }
 
