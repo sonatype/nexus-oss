@@ -13,7 +13,7 @@
 package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.nexus.internal.httpclient.HttpClientFactoryImpl;
 import org.sonatype.nexus.internal.httpclient.PoolingClientConnectionManagerMBeanInstaller;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;

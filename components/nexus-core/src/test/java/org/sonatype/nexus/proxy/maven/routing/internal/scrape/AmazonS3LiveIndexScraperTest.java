@@ -15,7 +15,7 @@ package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 import java.io.IOException;
 import java.util.List;
 
-import org.sonatype.nexus.apachehttpclient.Page;
+import org.sonatype.nexus.httpclient.Page;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 

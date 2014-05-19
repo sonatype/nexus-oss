@@ -24,9 +24,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
-import org.sonatype.nexus.apachehttpclient.Page;
-import org.sonatype.nexus.apachehttpclient.Page.PageContext;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.Page;
+import org.sonatype.nexus.httpclient.Page.PageContext;
 import org.sonatype.nexus.internal.httpclient.RepositoryPageContext;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;

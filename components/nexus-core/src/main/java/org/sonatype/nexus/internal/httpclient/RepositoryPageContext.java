@@ -14,8 +14,8 @@ package org.sonatype.nexus.internal.httpclient;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
-import org.sonatype.nexus.apachehttpclient.Page.PageContext;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.Page.PageContext;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 import org.apache.http.client.HttpClient;

@@ -23,7 +23,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.nexus.internal.httpclient.RemoteStorageContextCustomizer;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;

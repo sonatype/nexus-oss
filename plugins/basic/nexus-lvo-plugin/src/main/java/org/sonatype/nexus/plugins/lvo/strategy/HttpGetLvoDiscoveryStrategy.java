@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;

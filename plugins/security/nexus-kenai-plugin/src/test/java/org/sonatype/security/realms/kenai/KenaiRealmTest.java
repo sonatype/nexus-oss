@@ -12,7 +12,7 @@
  */
 package org.sonatype.security.realms.kenai;
 
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
 
 import junit.framework.Assert;
 import org.apache.http.impl.client.DefaultHttpClient;

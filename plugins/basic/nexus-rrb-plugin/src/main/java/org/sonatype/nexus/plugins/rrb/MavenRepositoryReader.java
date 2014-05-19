@@ -19,7 +19,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.nexus.plugins.rrb.parsers.ArtifactoryRemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.HtmlRemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.RemoteRepositoryParser;

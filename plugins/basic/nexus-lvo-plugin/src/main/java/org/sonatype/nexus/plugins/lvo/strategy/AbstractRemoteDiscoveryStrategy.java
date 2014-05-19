@@ -15,7 +15,7 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 
 import com.google.common.base.Preconditions;

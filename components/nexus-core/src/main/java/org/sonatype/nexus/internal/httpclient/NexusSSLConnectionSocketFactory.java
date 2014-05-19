@@ -21,7 +21,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.sonatype.nexus.apachehttpclient.SSLContextSelector;
+import org.sonatype.nexus.httpclient.SSLContextSelector;
 
 import com.google.common.io.Closeables;
 import org.apache.http.HttpHost;

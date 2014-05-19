@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.apachehttpclient;
+package org.sonatype.nexus.httpclient;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.http.auth.AuthScope;
@@ -28,7 +28,7 @@ import org.apache.http.protocol.HttpContext;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Component for creating pre-configured Apache HttpClient4x instances in Nexus.
+ * Apache {@link HttpClient} factory.
  *
  * @since 2.2
  */
@@ -114,6 +114,7 @@ public interface HttpClientFactory
 
     /**
      * Returns the {@link HttpClientBuilder}.
+     *
      * <p/>Word of warning about method {@link HttpClientBuilder#setDefaultCredentialsProvider(CredentialsProvider)}:
      * by design, this method replaces any previously set credentials provider, and, there is no getter for it to
      * inspect any existing previously set value. Hence, be careful when using this method! Recommended way to
@@ -124,10 +125,11 @@ public interface HttpClientFactory
     }
 
     /**
-     * Sets the {@link Credentials credentials} for the given authentication scope. Any previous credentials for the
-     * given scope will be overwritten. See {@link CredentialsProvider#setCredentials(AuthScope, Credentials)}. This
-     * method, once invoked, will replace any credentials provider set on {@link HttpClientBuilder} when {@link
-     * #build()} method is called to build the client.
+     * Sets the {@link Credentials credentials} for the given authentication scope.
+     *
+     * Any previous credentials for the given scope will be overwritten. See
+     * {@link CredentialsProvider#setCredentials(AuthScope, Credentials)}. This method, once invoked, will replace any
+     * credentials provider set on {@link HttpClientBuilder} when {@link #build()} method is called to build the client.
      *
      * @since 2.8
      */
@@ -166,10 +168,11 @@ public interface HttpClientFactory
     }
 
     /**
-     * Builds the {@link HttpClient} from current state of this builder. Once client is built and returned, it is
-     * immutable and thread safe (unless explicitly configured with non-thread safe client connection manager).
-     * This instance might be re-used to create multiple clients, as the configuration state once client is built, is
-     * detached from it.
+     * Builds the {@link HttpClient} from current state of this builder.
+     *
+     * Once client is built and returned, it is immutable and thread safe (unless explicitly configured with non-thread
+     * safe client connection manager). This instance might be re-used to create multiple clients, as the configuration
+     * state once client is built, is detached from it.
      */
     public HttpClient build() {
       httpClientBuilder.setDefaultConnectionConfig(connectionConfigBuilder.build());

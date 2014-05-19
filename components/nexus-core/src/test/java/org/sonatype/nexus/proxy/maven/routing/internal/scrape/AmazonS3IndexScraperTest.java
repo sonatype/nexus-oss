@@ -15,9 +15,9 @@ package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 import java.util.List;
 import java.util.Map;
 
-import org.sonatype.nexus.apachehttpclient.Page;
-import org.sonatype.nexus.apachehttpclient.Page.PageContext;
-import org.sonatype.nexus.apachehttpclient.Page.UnexpectedPageResponse;
+import org.sonatype.nexus.httpclient.Page;
+import org.sonatype.nexus.httpclient.Page.PageContext;
+import org.sonatype.nexus.httpclient.Page.UnexpectedPageResponse;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.fluent.Server;

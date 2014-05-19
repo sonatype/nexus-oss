@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
 
 import com.google.common.collect.Lists;

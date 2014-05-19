@@ -16,8 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.management.StandardMBean;
 
-import org.sonatype.nexus.apachehttpclient.PoolingClientConnectionManagerMBean;
-
 import com.google.common.base.Preconditions;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 

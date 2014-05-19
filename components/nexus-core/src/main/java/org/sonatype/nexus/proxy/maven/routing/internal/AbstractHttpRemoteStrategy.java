@@ -17,7 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.discovery.RemoteStrategy;
 import org.sonatype.nexus.proxy.maven.routing.discovery.StrategyFailedException;

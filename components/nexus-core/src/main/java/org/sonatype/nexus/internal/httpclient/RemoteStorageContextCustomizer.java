@@ -19,8 +19,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory.Builder;
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory.Customizer;
+import org.sonatype.nexus.httpclient.HttpClientFactory.Builder;
+import org.sonatype.nexus.httpclient.HttpClientFactory.Customizer;
 import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;

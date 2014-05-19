@@ -21,8 +21,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory.Builder;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.HttpClientFactory.Builder;
 import org.sonatype.nexus.internal.httpclient.RemoteStorageContextCustomizer;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;

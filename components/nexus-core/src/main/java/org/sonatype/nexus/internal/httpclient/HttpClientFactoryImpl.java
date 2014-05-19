@@ -22,8 +22,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.apachehttpclient.HttpClientFactory;
-import org.sonatype.nexus.apachehttpclient.SSLContextSelector;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.SSLContextSelector;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
