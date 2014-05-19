@@ -64,8 +64,8 @@ public class CommonHeadersFilter
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
       throws IOException, ServletException
   {
-    chain.doFilter(request, response);
-    // do it AFTER, as
+    // do it Before, as doFilter might commit response (and this even allows some code to customise std headers if needed)
     webUtils.equipResponseWithStandardHeaders((HttpServletResponse) response);
+    chain.doFilter(request, response);
   }
 }
