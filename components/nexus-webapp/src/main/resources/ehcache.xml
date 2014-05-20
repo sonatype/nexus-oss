@@ -26,8 +26,7 @@
             user.home - User's home directory
             user.dir - User's current working directory
             java.io.tmpdir - Default temp file path
-
-         We use java.io.tmpdir that will point into sonatype-work/nexus/tmp by default -->
+     -->
     <diskStore path="java.io.tmpdir/nexus-ehcache"/>
     
     <!-- all created caches shares these defaults
