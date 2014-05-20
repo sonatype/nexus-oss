@@ -98,7 +98,7 @@ public class KazukiBlobMetadataStore
 
     if (schemaStore.retrieveSchema(METADATA_TYPE) == null) {
       Schema schema = new Schema.Builder()
-          .addAttribute("state", Type.ENUM,
+          .addAttribute("blobState", Type.ENUM,
               Arrays.asList((Object) BlobState.CREATING, BlobState.ALIVE, BlobState.MARKED_FOR_DELETION), false)
 
           .addAttribute("headers", Type.MAP, false)
@@ -107,7 +107,7 @@ public class KazukiBlobMetadataStore
           .addAttribute("contentSize", Type.I64, false)
 
           .addIndex(STATE_INDEX,
-              asList(new IndexAttribute("state", SortDirection.ASCENDING, AttributeTransform.NONE)), false)
+              asList(new IndexAttribute("blobState", SortDirection.ASCENDING, AttributeTransform.NONE)), false)
           .build();
 
       log.info("Creating schema for file blob metadata");
@@ -179,7 +179,7 @@ public class KazukiBlobMetadataStore
   @Override
   public synchronized Iterator<BlobId> findWithState(BlobState blobState) {
     final List<QueryTerm> queryTerms = new QueryBuilder()
-        .andMatchesSingle("state", QueryOperator.EQ, ValueType.STRING, blobState.toString())
+        .andMatchesSingle("blobState", QueryOperator.EQ, ValueType.STRING, blobState.toString())
         .build();
     final KeyValueIterable<Key> keys = secondaryIndexStore
         .queryWithoutPagination(METADATA_TYPE, FlatBlobMetadata.class, STATE_INDEX, queryTerms, SortDirection.ASCENDING,
