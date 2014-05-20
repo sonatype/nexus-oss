@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -65,7 +66,7 @@ public abstract class AbstractArtifactPlexusResource
 {
   private SecuritySystem securitySystem;
 
-  private String VALID_INPUT_PATTERN = "^[a-zA-Z0-9_\\-\\.]*$";
+  private Pattern validInputPattern = Pattern.compile("^[a-zA-Z0-9_\\-\\.]*$");
 
   @Inject
   public void setSecuritySystem(final SecuritySystem securitySystem) {
@@ -298,7 +299,7 @@ public abstract class AbstractArtifactPlexusResource
       for (FileItem fi : files) {
         if (fi.isFormField()) {
           // Ensure valid characters in field
-          if(!fi.getString().matches(VALID_INPUT_PATTERN)) {
+          if(!validInputPattern.matcher(fi.getString()).matches()) {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed");
           }
 
