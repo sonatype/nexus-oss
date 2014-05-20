@@ -54,7 +54,7 @@ public class WebUtilsTest
 
     verify(response).setHeader("Server", "Nexus/version");
     verify(response).setHeader("X-Frame-Options", "SAMEORIGIN");
-    verify(response).setHeader("X-Content-Options", "NOSNIFF");
+    verify(response).setHeader("X-Content-Type-Options", "nosniff");
 
     verifyNoMoreInteractions(response);
   }
