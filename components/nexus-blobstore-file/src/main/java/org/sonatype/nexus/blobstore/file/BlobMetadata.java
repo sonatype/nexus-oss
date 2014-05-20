@@ -25,27 +25,27 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class BlobMetadata
 {
-  private State state;
+  private BlobState blobState;
 
   private final Map<String, String> headers;
 
   private BlobMetrics metrics;
 
-  public BlobMetadata(State state, final Map<String, String> headers) {
-    this.state = checkNotNull(state);
+  public BlobMetadata(BlobState blobState, final Map<String, String> headers) {
+    this.blobState = checkNotNull(blobState);
     this.headers = checkNotNull(headers);
   }
 
-  public State getState() {
-    return state;
+  public BlobState getBlobState() {
+    return blobState;
   }
 
-  public void setState(final State state) {
-    this.state = state;
+  public void setBlobState(final BlobState blobState) {
+    this.blobState = blobState;
   }
 
   public boolean isAlive() {
-    return State.ALIVE.equals(state);
+    return BlobState.ALIVE.equals(blobState);
   }
 
   public Map<String, String> getHeaders() {
@@ -63,7 +63,7 @@ public class BlobMetadata
   @Override
   public String toString() {
     return "BlobMetadata{" +
-        ", state=" + state +
+        ", state=" + blobState +
         ", headers=" + headers +
         ", metrics=" + metrics +
         '}';

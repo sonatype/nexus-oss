@@ -75,13 +75,13 @@ public class FileBlobStore
     checkNotNull(headers);
 
     Preconditions.checkArgument(headers.containsKey(BLOB_NAME_HEADER));
-    Preconditions.checkArgument(headers.containsKey(AUDIT_INFO_HEADER));
+    Preconditions.checkArgument(headers.containsKey(CREATED_BY_HEADER));
 
     BlobId blobId = null;
 
     try {
       // If the storing of bytes fails, we record a reminder to clean up afterwards
-      final BlobMetadata metadata = new BlobMetadata(State.CREATING, headers);
+      final BlobMetadata metadata = new BlobMetadata(BlobState.CREATING, headers);
       blobId = metadataStore.add(metadata);
 
       logger.debug("Writing blob {} to {}", blobId, paths.forContent(blobId));
@@ -97,7 +97,7 @@ public class FileBlobStore
 
       metadata.setMetrics(metrics);
       // Storing the content went fine, so we can now unmark this for deletion
-      metadata.setState(State.ALIVE);
+      metadata.setBlobState(BlobState.ALIVE);
       metadataStore.update(blobId, metadata);
 
       return blob;
@@ -126,7 +126,7 @@ public class FileBlobStore
     }
 
     if (!metadata.isAlive()) {
-      logger.debug("Attempt to access blob {} in state {}", blobId, metadata.getState());
+      logger.debug("Attempt to access blob {} in state {}", blobId, metadata.getBlobState());
       return null;
     }
 
@@ -154,11 +154,11 @@ public class FileBlobStore
       return false;
     }
     else if (!metadata.isAlive()) {
-      logger.debug("Attempt to delete blob {} in state {}", blobId, metadata.getState());
+      logger.debug("Attempt to delete blob {} in state {}", blobId, metadata.getBlobState());
       return false;
     }
 
-    metadata.setState(State.MARKED_FOR_DELETION);
+    metadata.setBlobState(BlobState.MARKED_FOR_DELETION);
     // TODO: Handle concurrent modification of metadata, potentially with kazuki's upcoming optimistic locking
     metadataStore.update(blobId, metadata);
     return true;
@@ -244,7 +244,7 @@ public class FileBlobStore
 
   @Override
   public void compact() {
-    final Iterator<BlobId> withState = metadataStore.findWithState(State.MARKED_FOR_DELETION);
+    final Iterator<BlobId> withState = metadataStore.findWithState(BlobState.MARKED_FOR_DELETION);
     while (withState.hasNext()) {
       final BlobId blobId = withState.next();
       // This iterator can occasionally return null

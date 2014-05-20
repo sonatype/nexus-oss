@@ -40,7 +40,7 @@ public interface BlobMetadataStore
   /**
    * This iterator may produce nulls.
    */
-  Iterator<BlobId> findWithState(State state);
+  Iterator<BlobId> findWithState(BlobState blobState);
 
   MetadataMetrics getMetadataMetrics();
 }

@@ -39,7 +39,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.sonatype.nexus.blobstore.api.BlobStore.AUDIT_INFO_HEADER;
+import static org.sonatype.nexus.blobstore.api.BlobStore.CREATED_BY_HEADER;
 import static org.sonatype.nexus.blobstore.api.BlobStore.BLOB_NAME_HEADER;
 
 
@@ -52,7 +52,7 @@ public class FileBlobStoreIT
   public static final int TEST_DATA_LENGTH = 10_000;
 
   public static final ImmutableMap<String, String> TEST_HEADERS = ImmutableMap
-      .of(AUDIT_INFO_HEADER, "test", BLOB_NAME_HEADER, "test/randomData.bin");
+      .of(CREATED_BY_HEADER, "test", BLOB_NAME_HEADER, "test/randomData.bin");
 
   private Injector injector;
 

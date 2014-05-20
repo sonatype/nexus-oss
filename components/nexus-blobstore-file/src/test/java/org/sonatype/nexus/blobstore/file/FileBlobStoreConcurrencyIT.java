@@ -48,7 +48,7 @@ import org.junit.Test;
 
 import static com.google.common.io.ByteStreams.nullOutputStream;
 import static org.junit.Assert.fail;
-import static org.sonatype.nexus.blobstore.api.BlobStore.AUDIT_INFO_HEADER;
+import static org.sonatype.nexus.blobstore.api.BlobStore.CREATED_BY_HEADER;
 import static org.sonatype.nexus.blobstore.api.BlobStore.BLOB_NAME_HEADER;
 
 /**
@@ -60,7 +60,7 @@ public class FileBlobStoreConcurrencyIT
   public static final int TEST_DATA_LENGTH = 10_000;
 
   public static final ImmutableMap<String, String> TEST_HEADERS = ImmutableMap
-      .of(AUDIT_INFO_HEADER, "test", BLOB_NAME_HEADER, "test/randomData.bin");
+      .of(CREATED_BY_HEADER, "test", BLOB_NAME_HEADER, "test/randomData.bin");
 
   public static final int BLOB_MAX_SIZE_BYTES = 5_000_000;
 

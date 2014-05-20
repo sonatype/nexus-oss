@@ -14,7 +14,7 @@ package org.sonatype.nexus.blobstore.file.kazuki;
 
 import java.util.Map;
 
-import org.sonatype.nexus.blobstore.file.State;
+import org.sonatype.nexus.blobstore.file.BlobState;
 
 import org.joda.time.DateTime;
 
@@ -27,7 +27,7 @@ import org.joda.time.DateTime;
  */
 class FlatBlobMetadata
 {
-  private State state;
+  private BlobState blobState;
 
   private Map<String, String> headers;
 
@@ -37,12 +37,12 @@ class FlatBlobMetadata
 
   private long contentSize;
 
-  public State getState() {
-    return state;
+  public BlobState getBlobState() {
+    return blobState;
   }
 
-  public void setState(final State state) {
-    this.state = state;
+  public void setBlobState(final BlobState blobState) {
+    this.blobState = blobState;
   }
 
   public Map<String, String> getHeaders() {
@@ -80,7 +80,7 @@ class FlatBlobMetadata
   @Override
   public String toString() {
     return "FlatBlobMetadata{" +
-        ", state=" + state +
+        ", state=" + blobState +
         ", headers=" + headers +
         ", creationTime=" + creationTime +
         ", sha1Hash='" + sha1Hash + '\'' +

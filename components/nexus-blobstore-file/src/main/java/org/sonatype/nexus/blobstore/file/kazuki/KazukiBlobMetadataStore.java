@@ -26,7 +26,7 @@ import org.sonatype.nexus.blobstore.api.BlobStoreException;
 import org.sonatype.nexus.blobstore.file.BlobMetadata;
 import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.MetadataMetrics;
-import org.sonatype.nexus.blobstore.file.State;
+import org.sonatype.nexus.blobstore.file.BlobState;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import io.kazuki.v0.store.KazukiException;
@@ -99,7 +99,7 @@ public class KazukiBlobMetadataStore
     if (schemaStore.retrieveSchema(METADATA_TYPE) == null) {
       Schema schema = new Schema.Builder()
           .addAttribute("state", Type.ENUM,
-              Arrays.asList((Object) State.CREATING, State.ALIVE, State.MARKED_FOR_DELETION), false)
+              Arrays.asList((Object) BlobState.CREATING, BlobState.ALIVE, BlobState.MARKED_FOR_DELETION), false)
 
           .addAttribute("headers", Type.MAP, false)
           .addAttribute("creationTime", Type.UTC_DATE_SECS, true)
@@ -177,9 +177,9 @@ public class KazukiBlobMetadataStore
   }
 
   @Override
-  public synchronized Iterator<BlobId> findWithState(State state) {
+  public synchronized Iterator<BlobId> findWithState(BlobState blobState) {
     final List<QueryTerm> queryTerms = new QueryBuilder()
-        .andMatchesSingle("state", QueryOperator.EQ, ValueType.STRING, state.toString())
+        .andMatchesSingle("state", QueryOperator.EQ, ValueType.STRING, blobState.toString())
         .build();
     final KeyValueIterable<Key> keys = secondaryIndexStore
         .queryWithoutPagination(METADATA_TYPE, FlatBlobMetadata.class, STATE_INDEX, queryTerms, SortDirection.ASCENDING,
@@ -212,7 +212,7 @@ public class KazukiBlobMetadataStore
 
   /**
    * Provides metrics about the blobs in the blob store. The {@link MetadataMetrics#getBlobCount() blob count} only
-   * considers blobs that are currently in {@link State#ALIVE}, but {@link MetadataMetrics#getTotalSize() total size}
+   * considers blobs that are currently in {@link BlobState#ALIVE}, but {@link MetadataMetrics#getTotalSize() total size}
    * includes blobs that are marked for deletion.
    */
   @Override
@@ -232,7 +232,7 @@ public class KazukiBlobMetadataStore
       }
 
 
-      if (State.ALIVE.equals(metadata.getState())) {
+      if (BlobState.ALIVE.equals(metadata.getBlobState())) {
         blobCount++;
       }
 
@@ -250,7 +250,7 @@ public class KazukiBlobMetadataStore
   private FlatBlobMetadata flatten(final BlobMetadata metadata) {
     final FlatBlobMetadata flat = new FlatBlobMetadata();
 
-    flat.setState(metadata.getState());
+    flat.setBlobState(metadata.getBlobState());
     final BlobMetrics metrics = metadata.getMetrics();
     if (metrics != null) {
       flat.setSha1Hash(metrics.getSHA1Hash());
@@ -262,7 +262,7 @@ public class KazukiBlobMetadataStore
   }
 
   private BlobMetadata expand(final FlatBlobMetadata flat) {
-    final BlobMetadata metadata = new BlobMetadata(flat.getState(), flat.getHeaders());
+    final BlobMetadata metadata = new BlobMetadata(flat.getBlobState(), flat.getHeaders());
     metadata.setMetrics(new BlobMetrics(flat.getCreationTime(), flat.getSha1Hash(), flat.getContentSize()));
     return metadata;
   }

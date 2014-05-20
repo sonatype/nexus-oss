@@ -72,7 +72,7 @@ public class FileBlobStoreTest
     final String fakeSHA1 = "3757y5abc234cfgg";
     final InputStream inputStream = mock(InputStream.class);
     final ImmutableMap<String, String> headers = ImmutableMap
-        .of(BlobStore.BLOB_NAME_HEADER, "my blob", BlobStore.AUDIT_INFO_HEADER, "John did this");
+        .of(BlobStore.BLOB_NAME_HEADER, "my blob", BlobStore.CREATED_BY_HEADER, "John did this");
 
     when(metadataStore.add(any(BlobMetadata.class))).thenReturn(fakeId);
     when(pathPolicy.forContent(fakeId)).thenReturn(fakePath);
@@ -120,7 +120,7 @@ public class FileBlobStoreTest
     final boolean deleted = fileBlobStore.delete(fakeId);
     assertThat(deleted, is(equalTo(true)));
 
-    verify(metadata).setState(State.MARKED_FOR_DELETION);
+    verify(metadata).setBlobState(BlobState.MARKED_FOR_DELETION);
   }
 
   @Test
