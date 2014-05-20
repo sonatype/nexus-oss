@@ -13,9 +13,9 @@
 package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.apachehttpclient.Hc4ProviderImpl;
-import org.sonatype.nexus.apachehttpclient.PoolingClientConnectionManagerMBeanInstaller;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.internal.httpclient.HttpClientFactoryImpl;
+import org.sonatype.nexus.internal.httpclient.PoolingClientConnectionManagerMBeanInstaller;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.RemoteStorageTransportOverloadedException;
@@ -27,13 +27,13 @@ import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.sisu.goodies.common.Time;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
+import com.google.inject.util.Providers;
 import junit.framework.Assert;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -169,7 +169,7 @@ public class HttpClientRemoteStorageTest
       throws Exception
   {
     setParameters();
-    Hc4ProviderImpl hc4Provider = null;
+    HttpClientFactoryImpl httpClientFactory = null;
     try {
       // the foreplay: setting up
       final RemoteStorageContext globalRemoteStorageContext = new DefaultRemoteStorageContext(null);
@@ -177,21 +177,20 @@ public class HttpClientRemoteStorageTest
       rcs.setConnectionTimeout(86400000);
       globalRemoteStorageContext.setRemoteConnectionSettings(new DefaultRemoteConnectionSettings());
       globalRemoteStorageContext.setRemoteProxySettings(mock(RemoteProxySettings.class));
-      final ApplicationConfiguration applicationConfiguration = mock(ApplicationConfiguration.class);
-      when(applicationConfiguration.getGlobalRemoteStorageContext()).thenReturn(globalRemoteStorageContext);
 
       // real provider and initializing it with NexusStarted event
-      hc4Provider =
-          new Hc4ProviderImpl(applicationConfiguration, mock(UserAgentBuilder.class),
-              mock(EventBus.class),
-              mock(PoolingClientConnectionManagerMBeanInstaller.class),
-              null);
+      httpClientFactory = new HttpClientFactoryImpl(
+          Providers.of(mock(SystemStatus.class)),
+          Providers.of(globalRemoteStorageContext),
+          mock(EventBus.class),
+          mock(PoolingClientConnectionManagerMBeanInstaller.class),
+          null
+      );
 
       // the RRS instance we test
       final HttpClientRemoteStorage underTest =
           new HttpClientRemoteStorage(mock(ApplicationStatusSource.class),
-              mock(MimeSupport.class), mock(QueryStringBuilder.class), new HttpClientManagerImpl(
-              hc4Provider, mock(UserAgentBuilder.class)));
+              mock(MimeSupport.class), mock(QueryStringBuilder.class), new HttpClientManagerImpl(httpClientFactory));
 
       // a mock proxy repository with some mocks to make RRS work
       final RemoteStorageContext proxyContext = new DefaultRemoteStorageContext(globalRemoteStorageContext);
@@ -238,8 +237,8 @@ public class HttpClientRemoteStorageTest
       }
     }
     finally {
-      if (hc4Provider != null) {
-        hc4Provider.shutdown();
+      if (httpClientFactory != null) {
+        httpClientFactory.shutdown();
       }
       unsetParameters();
     }

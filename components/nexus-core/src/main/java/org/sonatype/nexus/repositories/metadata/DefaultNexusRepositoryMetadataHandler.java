@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -37,23 +37,23 @@ public class DefaultNexusRepositoryMetadataHandler
 
   private final RepositoryMetadataHandler repositoryMetadataHandler;
 
-  private final Hc4Provider hc4Provider;
+  private final HttpClientFactory httpClientFactory;
 
   @Inject
   public DefaultNexusRepositoryMetadataHandler(final RepositoryRegistry repositoryRegistry,
                                                final RepositoryMetadataHandler repositoryMetadataHandler,
-                                               final Hc4Provider hc4Provider)
+                                               final HttpClientFactory httpClientFactory)
   {
     this.repositoryRegistry = repositoryRegistry;
     this.repositoryMetadataHandler = repositoryMetadataHandler;
-    this.hc4Provider = hc4Provider;
+    this.httpClientFactory = httpClientFactory;
   }
 
   public RepositoryMetadata readRemoteRepositoryMetadata(final String url)
       throws MetadataHandlerException,
              IOException
   {
-    final Hc4RawTransport hc4RawTransport = new Hc4RawTransport(hc4Provider.createHttpClient(), url);
+    final Hc4RawTransport hc4RawTransport = new Hc4RawTransport(httpClientFactory.create(), url);
     return repositoryMetadataHandler.readRepositoryMetadata(hc4RawTransport);
   }
 

@@ -15,8 +15,8 @@ package org.sonatype.nexus.proxy.maven.routing.internal.scrape;
 import java.io.IOException;
 import java.util.List;
 
-import org.sonatype.nexus.apachehttpclient.page.Page;
-import org.sonatype.nexus.apachehttpclient.page.Page.UnexpectedPageResponse;
+import org.sonatype.nexus.httpclient.Page;
+import org.sonatype.nexus.httpclient.Page.UnexpectedPageResponse;
 import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableUtil;
 import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.ParentOMatic.Payload;

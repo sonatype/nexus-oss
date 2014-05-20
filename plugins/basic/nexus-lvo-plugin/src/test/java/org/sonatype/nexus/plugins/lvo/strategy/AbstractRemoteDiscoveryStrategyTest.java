@@ -15,10 +15,10 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
-import org.sonatype.nexus.apachehttpclient.Hc4ProviderImpl;
-import org.sonatype.nexus.apachehttpclient.PoolingClientConnectionManagerMBeanInstaller;
-import org.sonatype.nexus.configuration.application.DefaultNexusConfiguration;
+import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
+import org.sonatype.nexus.internal.httpclient.HttpClientFactoryImpl;
+import org.sonatype.nexus.internal.httpclient.PoolingClientConnectionManagerMBeanInstaller;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -26,12 +26,12 @@ import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.fluent.Proxy;
 import org.sonatype.tests.http.server.fluent.Server;
 
+import com.google.inject.util.Providers;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -61,16 +61,13 @@ public class AbstractRemoteDiscoveryStrategyTest
   private AbstractRemoteDiscoveryStrategy.RequestResult result;
 
   @Mock
-  private DefaultNexusConfiguration cfg;
+  private SystemStatus systemStatus;
 
   @Mock
   private RemoteStorageContext remoteStorageContext;
 
   @Mock
   private RemoteProxySettings remoteProxySettings;
-
-  @Mock
-  private UserAgentBuilder userAgentBuilder;
 
   @Mock
   private EventBus eventBus;
@@ -83,8 +80,6 @@ public class AbstractRemoteDiscoveryStrategyTest
       throws Exception
   {
     content = "nexus-oss.version=2.0\nnexus-oss.url=http://some.url\n";
-
-    when(cfg.getGlobalRemoteStorageContext()).thenReturn(remoteStorageContext);
     when(remoteStorageContext.getRemoteProxySettings()).thenReturn(remoteProxySettings);
     when(remoteStorageContext.getRemoteConnectionSettings()).thenReturn(new DefaultRemoteConnectionSettings());
   }
@@ -103,7 +98,13 @@ public class AbstractRemoteDiscoveryStrategyTest
   }
 
   private AbstractRemoteDiscoveryStrategy create() {
-    final Hc4Provider provider = new Hc4ProviderImpl(cfg, userAgentBuilder, eventBus, jmxInstaller, null);
+    final HttpClientFactory provider = new HttpClientFactoryImpl(
+        Providers.of(systemStatus),
+        Providers.of(remoteStorageContext),
+        eventBus,
+        jmxInstaller,
+        null);
+
     return new AbstractRemoteDiscoveryStrategy(provider)
     {
       @Override

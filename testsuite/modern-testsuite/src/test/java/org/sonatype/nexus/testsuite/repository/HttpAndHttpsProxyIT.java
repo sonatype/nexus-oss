@@ -85,7 +85,7 @@ public class HttpAndHttpsProxyIT
   @Override
   protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
     return super.configureNexus(configuration)
-        .setLogLevel("org.sonatype.nexus.apachehttpclient.NexusHttpRoutePlanner", "TRACE")
+        .setLogLevel("org.sonatype.nexus.internal.httpclient.NexusHttpRoutePlanner", "TRACE")
         .setSystemProperty("javax.net.ssl.trustStore", testData().resolveFile("trustStore").getAbsolutePath())
         .setSystemProperty("javax.net.ssl.trustStorePassword", "changeit");
   }

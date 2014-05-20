@@ -10,32 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.utils;
 
-import java.util.List;
+package org.sonatype.nexus.proxy.utils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
-import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.codehaus.plexus.util.StringUtils;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 @Named
 @Singleton
+@Deprecated
 public class DefaultUserAgentBuilder
     implements UserAgentBuilder
 {
-  private final ApplicationStatusSource applicationStatusSource;
-
-  private final List<UserAgentContributor> contributors;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   /**
    * The edition, that will tell us is there some change happened with installation.
@@ -48,24 +46,8 @@ public class DefaultUserAgentBuilder
   private String userAgentPlatformInfo;
 
   @Inject
-  public DefaultUserAgentBuilder(final ApplicationStatusSource applicationStatusSource,
-                                 final List<UserAgentContributor> contributors)
-  {
-    this.applicationStatusSource = applicationStatusSource;
-    this.contributors = contributors;
-  }
-
-  @Override
-  public String formatGenericUserAgentString() {
-    return getUserAgentPlatformInfo();
-  }
-
-  @Override
-  public String formatRemoteRepositoryStorageUserAgentString(final ProxyRepository repository,
-                                                             final RemoteStorageContext ctx)
-  {
-
-    return ua(ctx, repository).toString();
+  public DefaultUserAgentBuilder(final Provider<SystemStatus> systemStatusProvider) {
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
   }
 
   @Override
@@ -75,50 +57,36 @@ public class DefaultUserAgentBuilder
 
   // ==
 
-  private StringBuilder ua(final RemoteStorageContext ctx) {
-    return ua(ctx, null);
-  }
-
   @VisibleForTesting
-  StringBuilder ua(final RemoteStorageContext ctx, final ProxyRepository repository) {
-    final StringBuilder buf = new StringBuilder(getUserAgentPlatformInfo());
-
-    if (repository != null) {
-      final RemoteRepositoryStorage rrs = repository.getRemoteStorage();
-      buf.append(" ").append(rrs.getProviderId()).append("/").append(rrs.getVersion());
-    }
+  StringBuilder ua(final RemoteStorageContext ctx) {
+    final StringBuilder buff = new StringBuilder(getUserAgentPlatformInfo());
 
     // user customization
     RemoteConnectionSettings remoteConnectionSettings = ctx.getRemoteConnectionSettings();
 
     if (!StringUtils.isEmpty(remoteConnectionSettings.getUserAgentCustomizationString())) {
-      buf.append(" ").append(remoteConnectionSettings.getUserAgentCustomizationString());
+      buff.append(" ").append(remoteConnectionSettings.getUserAgentCustomizationString());
     }
 
-    // plugin customization
-    for (UserAgentContributor contributor : contributors) {
-      final String contribution = contributor.getUserAgent(ctx, repository);
-      if (!StringUtils.isEmpty(contribution)) {
-        buf.append(" ").append(contribution);
-      }
-    }
-
-    return buf;
+    return buff;
   }
 
-  protected synchronized String getUserAgentPlatformInfo() {
-    // TODO: this is a workaround, see NXCM-363
-    SystemStatus status = applicationStatusSource.getSystemStatus();
+  private synchronized String getUserAgentPlatformInfo() {
+    SystemStatus status = systemStatusProvider.get();
 
-    if (platformEditionShort == null || !platformEditionShort.equals(status.getEditionShort())
-        || userAgentPlatformInfo == null) {
+    // Cache platform details or re-cache if the edition has changed
+    if (userAgentPlatformInfo == null || !status.getEditionShort().equals(platformEditionShort)) {
+      // track edition for cache invalidation
       platformEditionShort = status.getEditionShort();
 
       userAgentPlatformInfo =
-          new StringBuilder("Nexus/").append(status.getVersion()).append(" (").append(
-              status.getEditionShort()).append("; ").append(System.getProperty("os.name")).append("; ").append(
-              System.getProperty("os.version")).append("; ").append(System.getProperty("os.arch")).append(
-              "; ").append(System.getProperty("java.version")).append(")").toString();
+          String.format("Nexus/%s (%s; %s; %s; %s; %s)",
+              status.getVersion(),
+              platformEditionShort,
+              System.getProperty("os.name"),
+              System.getProperty("os.version"),
+              System.getProperty("os.arch"),
+              System.getProperty("java.version"));
     }
 
     return userAgentPlatformInfo;

@@ -21,17 +21,12 @@ import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.io.StreamSupport;
-import org.sonatype.plexus.rest.resource.RestletResponseCustomizer;
 
 import org.restlet.data.MediaType;
-import org.restlet.data.Response;
 import org.restlet.data.Tag;
-
-import static org.sonatype.plexus.rest.resource.AbstractPlexusResource.addHttpResponseHeader;
 
 public class StorageFileItemRepresentation
     extends StorageItemRepresentation
-    implements RestletResponseCustomizer
 {
   private static final int OUTPUT_BUFFER_SIZE = SystemPropertiesHelper.getInteger("org.sonatype.nexus.rest.StorageFileItemRepresentation.outputBufferSize", 4096);
 
@@ -87,16 +82,4 @@ public class StorageFileItemRepresentation
       }
     }
   }
-
-  /**
-   * Adds "X-Content-Type-Options: nosniff" HTTP response header to disable IE for sniffing into response content to
-   * determine content type (see NEXUS-5023).
-   *
-   * @param response Restlet response
-   */
-  @Override
-  public void customize(final Response response) {
-    addHttpResponseHeader(response, "X-Content-Type-Options", "nosniff");
-  }
-
 }

@@ -19,7 +19,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.nexus.apachehttpclient.Hc4Provider;
+import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.nexus.plugins.rrb.parsers.ArtifactoryRemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.HtmlRemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.RemoteRepositoryParser;
@@ -226,7 +226,7 @@ public class MavenRepositoryReader
       logger.debug("Requesting: {}", method);
 
       final BasicHttpContext httpContext = new BasicHttpContext();
-      httpContext.setAttribute(Hc4Provider.HTTP_CTX_KEY_REPOSITORY, proxyRepository);
+      httpContext.setAttribute(HttpClientFactory.HTTP_CTX_KEY_REPOSITORY, proxyRepository);
 
       HttpResponse response = client.execute(method, httpContext);
 
