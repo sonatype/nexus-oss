@@ -65,6 +65,8 @@ public abstract class AbstractArtifactPlexusResource
 {
   private SecuritySystem securitySystem;
 
+  private String VALID_INPUT_PATTERN = "^[a-zA-Z0-9_\\-\\.]*$";
+
   @Inject
   public void setSecuritySystem(final SecuritySystem securitySystem) {
     this.securitySystem = securitySystem;
@@ -295,6 +297,11 @@ public abstract class AbstractArtifactPlexusResource
     try {
       for (FileItem fi : files) {
         if (fi.isFormField()) {
+          // Ensure valid characters in field
+          if(!fi.getString().matches(VALID_INPUT_PATTERN)) {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed");
+          }
+
           // parameters are first in "nibble"
           processFormField(request, uploadContext, fi);
         }
