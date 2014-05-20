@@ -31,7 +31,7 @@ public class TempDirectoryModule
 
   @Provides
   public ApplicationDirectories applicationDirectories() {
-    return new ApplicationDirectoriesImpl(null, Files.createTempDir(), Files.createTempDir(), Files.createTempDir());
+    return new ApplicationDirectoriesImpl(Files.createTempDir(), Files.createTempDir(), Files.createTempDir());
   }
 
   @Provides
