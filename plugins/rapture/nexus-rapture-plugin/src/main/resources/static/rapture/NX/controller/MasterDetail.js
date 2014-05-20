@@ -126,14 +126,10 @@ Ext.define('NX.controller.MasterDetail', {
 
   reselect: function () {
     var me = this,
-        list = me.getList(),
-        selected;
+        list = me.getList();
 
     if (list) {
-      selected = list.getSelectionModel().getSelection();
-      if (selected.length) {
-        me.onModelChanged(selected[0]);
-      }
+      me.navigateTo(NX.Bookmarks.getBookmark());
     }
   },
 
