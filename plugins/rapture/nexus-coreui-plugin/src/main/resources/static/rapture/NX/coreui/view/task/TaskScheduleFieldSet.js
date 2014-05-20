@@ -46,7 +46,8 @@ Ext.define('NX.coreui.view.task.TaskScheduleFieldSet', {
       queryMode: 'local',
       listeners: {
         change: function (combo, newValue, oldValue) {
-          var oldCmp;
+          var form = combo.up('form'),
+              oldCmp;
 
           if (oldValue) {
             oldCmp = combo.ownerCt.down('nx-coreui-task-schedule-' + oldValue);
@@ -55,7 +56,8 @@ Ext.define('NX.coreui.view.task.TaskScheduleFieldSet', {
             }
           }
           combo.ownerCt.add({ xtype: 'nx-coreui-task-schedule-' + newValue });
-          combo.up('form').isValid();
+          form.getForm().checkValidity();
+          form.isValid();
         }
       }
     }
