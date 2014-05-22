@@ -34,6 +34,9 @@ class ReceiverImpl
     super(classLoader, contextStorageSeed)
   }
 
+  /**
+   * Wrap command-invoker so we can provide exception details in the server log stream.
+   */
   @Override
   protected Object createInvoker(final ClassLoader classLoader, final CommandChain commandChain) {
     return new CommandChainInvoker(classLoader, commandChain) {
