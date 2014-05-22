@@ -12,36 +12,36 @@
  */
 package org.sonatype.nexus.blobstore.api;
 
-
 import org.joda.time.DateTime;
 
 /**
- * Metrics pertaining to a blob within the BlobStore.  Any methods in this interface may throw
- * {@link BlobStoreException} if the Blob is deleted.
+ * A simple POJO implementation of BlobMetrics.
  *
  * @since 3.0
  */
-public interface BlobMetrics
+public class BlobMetrics
 {
-  DateTime getCreationTime();
+  private final DateTime creationTime;
 
-  /**
-   * A SHA1 hash of the content bytes (not the headers).
-   */
-  String getSHA1Hash();
+  private final String SHA1Hash;
 
-  /**
-   * The length, in bytes, of the headers.  This ignores storage considerations like block size.
-   */
-  long getHeaderSize();
+  private final long contentSize;
 
-  /**
-   * The byte length of the raw content blob, excluding storage considerations like block size.
-   */
-  long getContentSize();
+  public BlobMetrics(final DateTime creationTime, final String SHA1Hash, final long contentSize) {
+    this.creationTime = creationTime;
+    this.SHA1Hash = SHA1Hash;
+    this.contentSize = contentSize;
+  }
 
-  /**
-   * The length of the header plus content, in bytes.
-   */
-  long getTotalSize();
+  public DateTime getCreationTime() {
+    return creationTime;
+  }
+
+  public String getSHA1Hash() {
+    return SHA1Hash;
+  }
+
+  public long getContentSize() {
+    return contentSize;
+  }
 }

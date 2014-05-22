@@ -35,18 +35,18 @@ public interface BlobStore
   /**
    * Audit information (e.g. the name of a principal that created the blob)
    */
-  public static final String AUDIT_INFO_HEADER = "BlobStore.audit-info";
+  public static final String CREATED_BY_HEADER = "BlobStore.created-by";
 
   /**
    * Creates a new blob. The header map must contain at least two keys:
    *
    * <ul>
    * <li>{@link #BLOB_NAME_HEADER}</li>
-   * <li>{@link #AUDIT_INFO_HEADER}</li>
+   * <li>{@link #CREATED_BY_HEADER}</li>
    * </ul>
    *
-   * @throws BlobStoreException (or a subclass) if the input stream can't be read correctly, if mandatory headers are
-   *                            missing.
+   * @throws BlobStoreException       (or a subclass) if the input stream can't be read correctly
+   * @throws IllegalArgumentException if mandatory headers are missing
    */
   Blob create(InputStream blobData, Map<String, String> headers);
 
@@ -93,4 +93,10 @@ public interface BlobStore
    */
   @Nullable
   BlobStoreListener getBlobStoreListener();
+
+  /**
+   * Perform garbage collection, purging blobs marked for deletion or whatever other periodic, implementation-specific
+   * tasks need doing.
+   */
+  public void compact();
 }

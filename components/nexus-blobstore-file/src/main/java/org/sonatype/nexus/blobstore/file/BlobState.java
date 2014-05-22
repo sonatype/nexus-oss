@@ -10,49 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.blobstore.api;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.blobstore.file;
 
 /**
- * A unique identifier for a blob within a specific BlobStore.
+ * A representation of the lifecycle of blobs in the store.
  *
  * @since 3.0
  */
-public class BlobId
+public enum BlobState
 {
-  private final String id;
-
-  public BlobId(final String id) {
-    checkNotNull(id);
-    this.id = id;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  @Override
-  public String toString() {
-    return "BlobId[" + id + "]";
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    BlobId blobId = (BlobId) o;
-
-    return id.equals(blobId.id);
-  }
-
-  @Override
-  public int hashCode() {
-    return id.hashCode();
-  }
+  CREATING, ALIVE, MARKED_FOR_DELETION
 }

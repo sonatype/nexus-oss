@@ -10,49 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.blobstore.api;
+package org.sonatype.nexus.blobstore.file;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.configuration.application.ApplicationDirectoriesImpl;
+
+import com.google.common.io.Files;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 
 /**
- * A unique identifier for a blob within a specific BlobStore.
- *
- * @since 3.0
+ * A simple Guice module that hooks the test up to temp directories.
  */
-public class BlobId
+public class TempDirectoryModule
+    extends AbstractModule
 {
-  private final String id;
-
-  public BlobId(final String id) {
-    checkNotNull(id);
-    this.id = id;
-  }
-
-  public String getId() {
-    return id;
-  }
-
   @Override
-  public String toString() {
-    return "BlobId[" + id + "]";
+  protected void configure() {
   }
 
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    BlobId blobId = (BlobId) o;
-
-    return id.equals(blobId.id);
+  @Provides
+  public ApplicationDirectories applicationDirectories() {
+    return new ApplicationDirectoriesImpl(Files.createTempDir(), Files.createTempDir(), Files.createTempDir());
   }
 
-  @Override
-  public int hashCode() {
-    return id.hashCode();
+  @Provides
+  public FilePathPolicy filePathPolicy() {
+    return new HashingSubdirFileLocationPolicy(Files.createTempDir().toPath());
   }
 }

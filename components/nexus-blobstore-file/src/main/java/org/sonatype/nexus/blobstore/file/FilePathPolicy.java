@@ -10,49 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.blobstore.api;
+package org.sonatype.nexus.blobstore.file;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.nio.file.Path;
+
+import org.sonatype.nexus.blobstore.api.BlobId;
 
 /**
- * A unique identifier for a blob within a specific BlobStore.
+ * Indicates where a blob with a given blob ID should be stored, relative to a blob store root. Implementations might
+ * use algorithms to divide files up into multiple directories for easier management.
  *
  * @since 3.0
  */
-public class BlobId
+public interface FilePathPolicy
 {
-  private final String id;
+  /**
+   * Returns the root directory that holds all of the content files.
+   */
+  Path getRoot();
 
-  public BlobId(final String id) {
-    checkNotNull(id);
-    this.id = id;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  @Override
-  public String toString() {
-    return "BlobId[" + id + "]";
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    BlobId blobId = (BlobId) o;
-
-    return id.equals(blobId.id);
-  }
-
-  @Override
-  public int hashCode() {
-    return id.hashCode();
-  }
+  /**
+   * Returns a path to a file where the blob's content should be stored.
+   */
+  Path forContent(BlobId blobId);
 }
