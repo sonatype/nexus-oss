@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 import org.sonatype.sisu.goodies.common.Throwables2
 
 /**
- * Custom {@link Receiver} to include exception details in server log stream.
+ * Custom {@link Receiver} to customize groovy-remote execution behavior.
  *
  * @since 3.0
  */
@@ -36,10 +36,10 @@ class ReceiverImpl
               log.warn("Request failed", thrown)
             }
             else {
-              log.warn("Request failed: " + Throwables2.explain(thrown))
+              log.warn("Request failed: {}", Throwables2.explain(thrown))
             }
 
-            return super.resultForThrown(thrown);
+            return super.resultForThrown(thrown)
           }
         };
       }
