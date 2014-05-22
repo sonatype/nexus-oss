@@ -26,7 +26,6 @@ import javax.inject.Named;
 
 import org.sonatype.gossip.support.DC;
 import org.sonatype.nexus.threads.FakeAlmightySubject;
-import org.sonatype.sisu.goodies.common.Throwables2;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.base.Throwables;
@@ -36,11 +35,6 @@ import com.google.inject.name.Names;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import groovyx.remote.Command;
-import groovyx.remote.CommandChain;
-import groovyx.remote.Result;
-import groovyx.remote.server.CommandChainInvoker;
-import groovyx.remote.server.CommandInvoker;
 import groovyx.remote.server.Receiver;
 import groovyx.remote.transport.http.RemoteControlHttpHandler;
 import org.apache.shiro.SecurityUtils;
