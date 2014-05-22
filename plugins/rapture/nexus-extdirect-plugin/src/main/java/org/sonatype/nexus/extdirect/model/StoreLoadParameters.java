@@ -14,12 +14,12 @@ package org.sonatype.nexus.extdirect.model;
 
 import java.util.List;
 
-import com.google.common.base.Preconditions;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Ext Store load parameters.
+ *
+ * @see <a href="http://docs.sencha.com/extjs/4.2.2/#!/api/Ext.toolbar.Paging">Ext.toolbar.Paging</a>
  *
  * @since 3.0
  */
