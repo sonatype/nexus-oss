@@ -37,7 +37,7 @@ def mode = property('autoshard.mode')
 def sourceDir = property('autoshard.sourceDir', project.build.testSourceDirectory) as File
 def outputDir = property('autoshard.outputDir') as File
 def includes = property('autoshard.includes', '**/*IT.class')
-def excludes = property('autoshard.excludes')
+def excludes = property('autoshard.excludes', 'defaults')
 
 def scanner = new TestSourcesScanner(
     basedir: sourceDir,
