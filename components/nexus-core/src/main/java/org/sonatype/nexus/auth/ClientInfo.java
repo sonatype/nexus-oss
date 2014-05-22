@@ -91,4 +91,13 @@ public class ClientInfo
     }
     return true;
   }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "userid='" + userid + '\'' +
+        ", remoteIP='" + remoteIP + '\'' +
+        ", userAgent='" + userAgent + '\'' +
+        '}';
+  }
 }
