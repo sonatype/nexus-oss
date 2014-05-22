@@ -28,6 +28,7 @@ import groovy.lang.Closure;
 import groovy.lang.GroovyCodeSource;
 import groovy.lang.GroovyShell;
 import groovyx.remote.client.RemoteControl;
+import groovyx.remote.client.RemoteException;
 import groovyx.remote.transport.http.HttpTransport;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.slf4j.Logger;
@@ -168,20 +169,29 @@ public class GroovyRemoteClient
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T call(final Closure... commands) {
+  public <T> T call(final Closure... commands) throws Exception {
     checkNotNull(commands);
-    return (T) remote.call(commands);
+
+    try {
+      return (T) remote.call(commands);
+    }
+    catch (RemoteException e) {
+      // decode cause of remote exception
+      Throwable cause = e.getCause();
+      Throwables.propagateIfPossible(cause, Exception.class);
+      throw Throwables.propagate(cause);
+    }
   }
 
-  public <T> T call(final String... script) {
+  public <T> T call(final String... script) throws Exception {
     return call(compile(script));
   }
 
-  public <T> T call(final URL script) {
+  public <T> T call(final URL script) throws Exception {
     return call(compile(script));
   }
 
-  public <T> T call(final File script) {
+  public <T> T call(final File script) throws Exception {
     return call(compile(script));
   }
 

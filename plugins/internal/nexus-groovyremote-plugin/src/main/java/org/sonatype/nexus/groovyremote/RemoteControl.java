@@ -18,12 +18,14 @@ import java.net.InetSocketAddress;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.gossip.support.DC;
+import org.sonatype.nexus.threads.FakeAlmightySubject;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.base.Throwables;
@@ -35,10 +37,14 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import groovyx.remote.server.Receiver;
 import groovyx.remote.transport.http.RemoteControlHttpHandler;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.EagerSingleton;
 import org.eclipse.sisu.inject.BeanLocator;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -88,7 +94,7 @@ public class RemoteControl
     InetSocketAddress addr = new InetSocketAddress(port);
     this.server = HttpServer.create(addr, 0);
 
-    Receiver receiver = new Receiver(uberClassLoader, createContext());
+    Receiver receiver = new ReceiverImpl(uberClassLoader, createContext());
     final RemoteControlHttpHandler handler = new RemoteControlHttpHandler(receiver);
 
     server.createContext("/", new HttpHandler()
@@ -110,8 +116,7 @@ public class RemoteControl
             return;
           }
 
-          log.debug("Request failed", failure);
-
+          log.error("Handle failed", failure);
           Throwables.propagateIfPossible(failure, IOException.class);
           throw Throwables.propagate(failure);
         }
@@ -141,7 +146,10 @@ public class RemoteControl
    */
   private final class ContainerHelper
   {
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
     public <T> T lookup(final Key<T> key) {
+      log.debug("Lookup: {}", key);
       final Iterator<? extends Entry<Annotation, T>> i = beanLocator.locate(key).iterator();
       return i.hasNext() ? i.next().getValue() : null;
     }
@@ -165,6 +173,7 @@ public class RemoteControl
     // String type-name helpers to avoid needing const class ref in closure
 
     public Class<?> type(final String typeName) throws ClassNotFoundException {
+      log.debug("Lookup type: {}", typeName);
       return uberClassLoader.loadClass(typeName);
     }
 
@@ -177,18 +186,78 @@ public class RemoteControl
     }
 
     public <Q extends Annotation, T> Iterable<? extends BeanEntry<Q, T>> locate(final Key<T> key) {
+      log.debug("Locate: {}", key);
       return beanLocator.locate(key);
     }
 
     public <Q extends Annotation, T> Iterable<? extends BeanEntry<Q, T>> locate(final Class<T> type) {
+      log.debug("Locate: {}", type);
       return beanLocator.locate(Key.get(type));
     }
   }
 
+  /**
+   * Security helpers for executing closure.
+   */
+  private final class SecurityHelper
+  {
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    /**
+     * Get the current subject.
+     */
+    public Subject getSubject() {
+      return SecurityUtils.getSubject();
+    }
+
+    /**
+     * Login a user.
+     */
+    public void login(final String username, final String password) {
+      log.debug("Login; username: {}, password: {}", username, password);
+      getSubject().login(new UsernamePasswordToken(username, password));
+    }
+
+    /**
+     * Logout user.
+     */
+    public void logout() {
+      log.debug("Logout");
+      getSubject().logout();
+    }
+
+    /**
+     * Run a {@link Callable} as a specific user.
+     */
+    public Object asUser(final String username, final String password, final Callable callable) throws Exception {
+      log.debug("Running as user: {}", username);
+      login(username, password);
+      try {
+        return callable.call();
+      }
+      finally {
+        logout();
+      }
+    }
+
+    /**
+     * Run a {@link Callable} as system user.
+     */
+    public Object asSystem(final Callable callable) {
+      log.debug("Running as system");
+      return FakeAlmightySubject.forUserId("*SYSTEM").execute(callable);
+    }
+  }
+
+  /**
+   * Creates the context of the executing closure.
+   */
   private Map<String, Object> createContext() {
     Map<String, Object> context = Maps.newHashMap();
     context.put("container", new ContainerHelper());
+    context.put("security", new SecurityHelper());
     context.put("logger", LoggerFactory.getLogger(RemoteScript.class));
+    context.put("classLoader", uberClassLoader);
 
     // TODO: Expose json marshalling so we can get back objects that aren't serializable w/o having to rebuild structures around them
     // TODO: Make some simple closure helpers: log() and json() ?
