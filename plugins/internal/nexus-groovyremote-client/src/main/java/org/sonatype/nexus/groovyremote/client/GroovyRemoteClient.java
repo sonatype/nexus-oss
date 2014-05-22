@@ -177,8 +177,9 @@ public class GroovyRemoteClient
     }
     catch (RemoteException e) {
       // decode cause of remote exception
-      Throwables.propagateIfPossible(e, Exception.class);
-      throw Throwables.propagate(e);
+      Throwable cause = e.getCause();
+      Throwables.propagateIfPossible(cause, Exception.class);
+      throw Throwables.propagate(cause);
     }
   }
 
