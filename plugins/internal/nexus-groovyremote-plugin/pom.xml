@@ -81,9 +81,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <!--
-          This module has Groovy sources; enable Groovy compiler.
-          -->
           <compilerId>groovy-eclipse-compiler</compilerId>
         </configuration>
       </plugin>

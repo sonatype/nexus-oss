@@ -16,6 +16,8 @@ import java.util.List;
 
 import com.google.common.base.Preconditions;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Ext Store load parameters.
  *
@@ -23,7 +25,6 @@ import com.google.common.base.Preconditions;
  */
 public class StoreLoadParameters
 {
-
   private Integer page;
 
   private Integer start;
@@ -57,7 +58,7 @@ public class StoreLoadParameters
   }
 
   public String getFilter(String property) {
-    Preconditions.checkNotNull(property, "property");
+    checkNotNull(property, "property");
     if (filter != null) {
       for (Filter item : filter) {
         if (property.equals(item.getProperty())) {
@@ -70,7 +71,6 @@ public class StoreLoadParameters
 
   public static class Filter
   {
-
     private String property;
 
     private String value;
@@ -90,8 +90,5 @@ public class StoreLoadParameters
     public void setValue(final String value) {
       this.value = value;
     }
-
   }
-
-
 }
