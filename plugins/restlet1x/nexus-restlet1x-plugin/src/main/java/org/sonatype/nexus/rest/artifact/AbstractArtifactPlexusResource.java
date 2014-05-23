@@ -298,11 +298,6 @@ public abstract class AbstractArtifactPlexusResource
     try {
       for (FileItem fi : files) {
         if (fi.isFormField()) {
-          // Ensure valid characters in field
-          if(!validInputPattern.matcher(fi.getString()).matches()) {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed");
-          }
-
           // parameters are first in "nibble"
           processFormField(request, uploadContext, fi);
         }
@@ -515,6 +510,11 @@ public abstract class AbstractArtifactPlexusResource
   protected void processFormField(final Request request, final UploadContext uploadContext, final FileItem fi)
       throws ResourceException
   {
+    // Ensure valid characters in field
+    if(!validInputPattern.matcher(fi.getString()).matches()) {
+      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed");
+    }
+
     if ("r".equals(fi.getFieldName())) {
       uploadContext.setRepositoryId(fi.getString());
     }
