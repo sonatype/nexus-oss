@@ -42,7 +42,7 @@
 <div id="loading-mask"></div>
 <div id="loading">
   <div class="loading-indicator">
-    <img id="loading-image" src="$raptureUrl/resources/images/loading.jpg"/>
+    <img id="loading-image" src="$raptureUrl/resources/images/loading.png"/>
     <br/>
     <div style="text-align: center;">
       <img id="loading-spinner" src="$raptureUrl/resources/images/loading-spinner.gif"/>
