@@ -34,8 +34,8 @@ Ext.define('NX.coreui.view.task.TaskList', {
     { header: 'Type', dataIndex: 'typeName', flex: 1 },
     { header: 'Status', dataIndex: 'statusDescription' },
     { header: 'Schedule', dataIndex: 'schedule' },
-    { header: 'Next Run', dataIndex: 'nextRun', xtype: 'nx-timestampcolumn', flex: 1 },
-    { header: 'Last Run', dataIndex: 'lastRun', xtype: 'nx-timestampcolumn', flex: 1 },
+    { header: 'Next Run', dataIndex: 'nextRun', flex: 1 },
+    { header: 'Last Run', dataIndex: 'lastRun', flex: 1 },
     { header: 'Last Result', dataIndex: 'lastRunResult' }
   ],
 

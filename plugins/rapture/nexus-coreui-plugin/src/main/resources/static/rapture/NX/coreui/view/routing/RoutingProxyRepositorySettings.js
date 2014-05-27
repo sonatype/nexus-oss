@@ -96,7 +96,7 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
           hidden: true
         },
         {
-          xtype: 'nx-timestamp',
+          xtype: 'nx-datedisplayfield',
           name: 'publishTimestamp',
           fieldLabel: 'Published On',
           helpText: 'Time when routing data was published.',
@@ -135,7 +135,7 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
           hidden: true
         },
         {
-          xtype: 'nx-timestamp',
+          xtype: 'nx-datedisplayfield',
           name: 'discoveryTimestamp',
           fieldLabel: 'Last Run',
           helpText: 'Time when discovery process was last run.',

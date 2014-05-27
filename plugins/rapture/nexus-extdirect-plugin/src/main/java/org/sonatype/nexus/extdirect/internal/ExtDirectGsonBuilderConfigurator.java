@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.extdirect.internal;
 
 import java.lang.reflect.Type;
@@ -40,7 +41,13 @@ public class ExtDirectGsonBuilderConfigurator
 
   @Override
   public void configure(final GsonBuilder builder, final GlobalConfiguration configuration) {
-    super.configure(builder, configuration);
+    if (configuration.getDebug()) {
+      builder.setPrettyPrinting();
+    }
+    builder.serializeNulls();
+    builder.disableHtmlEscaping();
+
+    builder.setDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 
     builder.registerTypeAdapter(Base64String.class, new Base64StringSerializer());
     builder.registerTypeAdapter(Password.class, new PasswordSerializer());

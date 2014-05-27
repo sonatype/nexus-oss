@@ -11,37 +11,22 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * An **{@link Ext.form.field.Display}** that shows a timestamp as a formatted date.
+ * An **{@link Ext.form.field.Display}** that converts a date in ISO-8601 format to a date before display.
  *
  * @since 3.0
  */
 Ext.define('NX.ext.form.field.Timestamp', {
   extend: 'Ext.form.field.Display',
-  alias: 'widget.nx-timestamp',
-  requires: [
-    'NX.util.DateFormat'
-  ],
-
-  /**
-   * @cfg {String} [format=NX.util.DateFormat.forName('datetime')['long']]
-   * A formatting string as used by {@link Ext.Date#format} to format a Date.
-   */
+  alias: 'widget.nx-datedisplayfield',
 
   /**
    * @override
    */
-  initComponent: function () {
-    var me = this;
-
-    if (!me.format) {
-      me.format = NX.util.DateFormat.forName('datetime')['long'];
+  setValue: function (value) {
+    if (value) {
+      arguments[0] = Ext.Date.parse(value, 'c');
     }
-
-    me.callParent(arguments);
-  },
-
-  valueToRaw: function (value) {
-    return NX.util.DateFormat.timestamp(value, this.format);
+    this.callParent(arguments);
   }
 
 });
