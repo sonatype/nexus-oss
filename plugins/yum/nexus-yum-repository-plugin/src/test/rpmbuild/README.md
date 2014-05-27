@@ -16,6 +16,8 @@
 
 Specs to build RPM components used for testing.
 
+RPM components contain > 1 files to avoid problems with RPM > 4.8
+
 ## Building
 
      rpmbuild -bb ./SPECS/*.spec --target=noarch
