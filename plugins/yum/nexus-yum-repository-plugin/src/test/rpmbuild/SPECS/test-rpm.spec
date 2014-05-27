@@ -10,7 +10,7 @@ BuildArch:  noarch
 BuildRoot: %{_tmppath}/%{name}-root
 
 %description
-Test artifact
+Test RPM
 
 %prep
 %setup -c
