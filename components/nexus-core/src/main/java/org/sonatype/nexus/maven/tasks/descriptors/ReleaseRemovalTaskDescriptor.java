@@ -49,7 +49,7 @@ public class ReleaseRemovalTaskDescriptor
       new RepositoryCombobox(
           REPOSITORY_FIELD_ID,
           "Repository",
-          "Select Maven repository to remove releases",
+          "Select Maven repository to remove releases.",
           FormField.MANDATORY
       ).includingAnyOfContentClasses(Maven2ContentClass.ID)
           .excludingAnyOfFacets(GroupRepository.class),

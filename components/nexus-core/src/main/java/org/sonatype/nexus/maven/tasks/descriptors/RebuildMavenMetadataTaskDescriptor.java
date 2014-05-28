@@ -39,7 +39,7 @@ public class RebuildMavenMetadataTaskDescriptor
   private final FormField repoField = new RepositoryCombobox(
       REPO_OR_GROUP_FIELD_ID,
       "Repository",
-      "Select the Maven repository to rebuild metadata",
+      "Select the Maven repository to rebuild metadata.",
       FormField.MANDATORY
   ).includeAnEntryForAllRepositories()
       .includingAnyOfFacets(MavenRepository.class);
