@@ -35,7 +35,7 @@ public class SynchronizeShadowTaskDescriptor
   private final FormField repoField = new RepositoryCombobox(
       REPO_FIELD_ID,
       "Shadow Repository",
-      "Select the repository shadow to assign to this task.",
+      "Select the shadow repository to synchronize.",
       FormField.MANDATORY
   ).includingAnyOfFacets(ShadowRepository.class);
 

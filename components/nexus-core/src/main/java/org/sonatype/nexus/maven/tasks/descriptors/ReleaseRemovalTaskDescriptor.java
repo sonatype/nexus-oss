@@ -22,7 +22,6 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepoTargetComboFormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
@@ -47,10 +46,13 @@ public class ReleaseRemovalTaskDescriptor
   public static final String REPOSITORY_TARGET_FIELD_ID = "repositoryTarget";
 
   private final List<FormField> formFields = ImmutableList.<FormField>of(
-      new RepositoryCombobox(REPOSITORY_FIELD_ID, FormField.MANDATORY)
-          .includingAnyOfFacets(MavenRepository.class)
-          .excludingAnyOfFacets(GroupRepository.class)
-          .includingAnyOfContentClasses(Maven2ContentClass.ID),
+      new RepositoryCombobox(
+          REPOSITORY_FIELD_ID,
+          "Repository",
+          "Select Maven repository to remove releases",
+          FormField.MANDATORY
+      ).includingAnyOfContentClasses(Maven2ContentClass.ID)
+          .excludingAnyOfFacets(GroupRepository.class),
       new NumberTextFormField(
           NUMBER_OF_VERSIONS_TO_KEEP_FIELD_ID, "Number to keep", "The number of versions for each GA to keep",
           FormField.MANDATORY),
