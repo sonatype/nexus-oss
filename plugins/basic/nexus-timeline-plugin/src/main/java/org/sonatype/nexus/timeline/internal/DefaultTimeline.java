@@ -72,7 +72,7 @@ public class DefaultTimeline
 
   private final SchemaStore schemaStore;
 
-  private Object runningDayMonitor = new Object();
+  private final Object runningDayMonitor = new Object();
 
   private Long runningDay;
 
