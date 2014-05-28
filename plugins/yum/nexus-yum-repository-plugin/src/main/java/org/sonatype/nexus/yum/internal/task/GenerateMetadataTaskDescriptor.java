@@ -21,8 +21,10 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.formfields.RepoComboFormField;
+import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 
 import static org.sonatype.nexus.formfields.FormField.MANDATORY;
@@ -43,11 +45,12 @@ public class GenerateMetadataTaskDescriptor
 
   public static final String NAME = "Yum: Generate Metadata";
 
-  private final RepoComboFormField repoField = new RepoComboFormField(
-      PARAM_REPO_ID, "Repository for createrepo",
+  private final FormField repoField = new RepositoryCombobox(
+      PARAM_REPO_ID,
+      "Repository for createrepo",
       "Maven Repository for which the yum metadata is generated via createrepo.",
       MANDATORY
-  );
+  ).includingAnyOfFacets(MavenRepository.class).excludingAnyOfFacets(GroupRepository.class);
 
   private final StringTextFormField outputField = new StringTextFormField(
       PARAM_REPO_DIR,

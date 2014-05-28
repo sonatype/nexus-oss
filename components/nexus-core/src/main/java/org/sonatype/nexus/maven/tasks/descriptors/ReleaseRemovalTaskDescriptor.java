@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.maven.tasks.descriptors;
 
 import java.util.List;
@@ -19,8 +20,11 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
-import org.sonatype.nexus.formfields.RepoComboFormField;
 import org.sonatype.nexus.formfields.RepoTargetComboFormField;
+import org.sonatype.nexus.formfields.RepositoryCombobox;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 
 import com.google.common.collect.ImmutableList;
@@ -43,7 +47,10 @@ public class ReleaseRemovalTaskDescriptor
   public static final String REPOSITORY_TARGET_FIELD_ID = "repositoryTarget";
 
   private final List<FormField> formFields = ImmutableList.<FormField>of(
-      new RepoComboFormField(REPOSITORY_FIELD_ID, FormField.MANDATORY),
+      new RepositoryCombobox(REPOSITORY_FIELD_ID, FormField.MANDATORY)
+          .includingAnyOfFacets(MavenRepository.class)
+          .excludingAnyOfFacets(GroupRepository.class)
+          .includingAnyOfContentClasses(Maven2ContentClass.ID),
       new NumberTextFormField(
           NUMBER_OF_VERSIONS_TO_KEEP_FIELD_ID, "Number to keep", "The number of versions for each GA to keep",
           FormField.MANDATORY),
