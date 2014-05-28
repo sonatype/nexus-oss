@@ -177,6 +177,7 @@ public class DefaultCapabilityRegistry
 
       final Map<String, String> encryptedProps = encryptValuesIfNeeded(reference.descriptor(), props);
 
+      // FIXME: Handle false return for error
       capabilityStorage.update(id, new CapabilityStorageItem(
           reference.descriptor().version(), reference.type().toString(), enabled, notes, encryptedProps)
       );
@@ -350,6 +351,8 @@ public class DefaultCapabilityRegistry
           );
           continue;
         }
+
+        // FIXME: Handle false return for error
         capabilityStorage.update(id, new CapabilityStorageItem(
             descriptor.version(), item.getType(), item.isEnabled(), item.getNotes(), properties)
         );
