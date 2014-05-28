@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.p2.repository.internal.tasks;
 
 import java.util.Arrays;
@@ -19,8 +20,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
@@ -37,8 +39,13 @@ public class P2RepositoryAggregatorTaskDescriptor
 
   public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
 
-  private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField(REPO_OR_GROUP_FIELD_ID,
-      FormField.MANDATORY);
+  private final FormField repoField = new RepositoryCombobox(
+      REPO_OR_GROUP_FIELD_ID,
+      "Repository",
+      "Select the repository to generate P2 repository.",
+      FormField.MANDATORY
+  ).includeAnEntryForAllRepositories()
+      .excludingAnyOfFacets(GroupRepository.class);
 
   private final StringTextFormField resourceStorePathField = new StringTextFormField(RESOURCE_STORE_PATH_FIELD_ID,
       "Repository path",
