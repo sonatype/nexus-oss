@@ -63,7 +63,7 @@ Ext.define('NX.ext.form.action.DirectSubmit', {
       formEl = me.getParams(true);
       Ext.Object.each(formEl, function (key, value) {
         if (Ext.typeOf(value) === 'date') {
-          formEl[key] = Ext.Date.format(value, 'c');
+          formEl[key] = Ext.Date.format(value, 'Y-m-d\\TH:i:s.uP');
         }
       });
     }

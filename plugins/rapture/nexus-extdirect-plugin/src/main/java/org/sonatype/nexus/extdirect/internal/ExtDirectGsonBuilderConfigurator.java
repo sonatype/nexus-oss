@@ -47,7 +47,7 @@ public class ExtDirectGsonBuilderConfigurator
     builder.serializeNulls();
     builder.disableHtmlEscaping();
 
-    builder.setDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+    builder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
     builder.registerTypeAdapter(Base64String.class, new Base64StringSerializer());
     builder.registerTypeAdapter(Password.class, new PasswordSerializer());
