@@ -38,13 +38,13 @@
       <dependency>
         <groupId>io.kazuki</groupId>
         <artifactId>kazuki-api</artifactId>
-        <version>0.5.9</version>
+        <version>0.5.10</version>
       </dependency>
 
       <dependency>
         <groupId>io.kazuki</groupId>
         <artifactId>kazuki-impl</artifactId>
-        <version>0.5.9</version>
+        <version>0.5.10</version>
       </dependency>
 
       <dependency>
