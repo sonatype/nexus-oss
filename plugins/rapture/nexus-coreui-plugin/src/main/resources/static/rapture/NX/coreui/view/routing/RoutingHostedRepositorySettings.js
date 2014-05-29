@@ -59,7 +59,7 @@ Ext.define('NX.coreui.view.routing.RoutingHostedRepositorySettings', {
           hidden: true
         },
         {
-          xtype: 'nx-timestamp',
+          xtype: 'nx-datedisplayfield',
           name: 'publishTimestamp',
           fieldLabel: 'Published On',
           helpText: 'Time when routing data was published.',

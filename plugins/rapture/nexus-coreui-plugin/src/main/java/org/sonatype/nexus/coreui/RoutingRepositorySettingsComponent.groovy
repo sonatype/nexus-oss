@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import com.google.common.primitives.Ints
@@ -85,7 +86,7 @@ extends DirectComponentSupport
 
     repositorySettingsXO.publishMessage = pstatus.lastPublishedMessage
     if (PublishingStatus.PStatus.PUBLISHED == pstatus.status) {
-      repositorySettingsXO.publishTimestamp = pstatus.lastPublishedTimestamp
+      repositorySettingsXO.publishTimestamp = pstatus.lastPublishedTimestamp ? new Date(pstatus.lastPublishedTimestamp) : null
       if (mavenRepository.exposed && pstatus.lastPublishedFilePath) {
         String repositoryUrl = repositoryURLBuilder.getExposedRepositoryContentUrl(mavenRepository)
         if (repositoryUrl) {
@@ -106,7 +107,7 @@ extends DirectComponentSupport
       else {
         repositorySettingsXO.discoveryStatus = DiscoveryStatus.DStatus.SUCCESSFUL == dstatus.status ? 'Successful.' : 'Unsuccessful.'
         repositorySettingsXO.discoveryMessage = dstatus.lastDiscoveryMessage
-        repositorySettingsXO.discoveryTimestamp = dstatus.lastDiscoveryTimestamp
+        repositorySettingsXO.discoveryTimestamp = dstatus.lastDiscoveryTimestamp ? new Date(dstatus.lastDiscoveryTimestamp) : null
       }
     }
 

@@ -30,7 +30,7 @@ Ext.define('NX.coreui.view.feed.FeedEntryList', {
 
   columns: [
     { header: 'Title', dataIndex: 'title', flex: 2 },
-    { header: 'Date', dataIndex: 'timestamp', flex: 1, xtype: 'nx-timestampcolumn' }
+    { header: 'Date', dataIndex: 'published', flex: 1 }
   ],
 
   dockedItems: [
