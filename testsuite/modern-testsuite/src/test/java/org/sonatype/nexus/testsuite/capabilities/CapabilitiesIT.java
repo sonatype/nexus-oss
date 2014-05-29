@@ -332,7 +332,7 @@ public class CapabilitiesIT
   @Test
   public void failIfMandatoryPropertyNotPresent() {
     thrown.expect(ValidationErrorsException.class);
-    thrown.expectMessage("Repository/Group is required");
+    thrown.expectMessage("Repository is required");
     capabilities().create("[message]")
         .save();
   }
