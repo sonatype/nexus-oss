@@ -34,12 +34,11 @@ import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.name.Names;
-import io.kazuki.v0.store.easy.EasyKeyValueStoreModule;
+import io.kazuki.v0.store.guice.KazukiModule;
 import io.kazuki.v0.store.index.SecondaryIndexStore;
 import io.kazuki.v0.store.jdbi.JdbiDataSourceConfiguration;
 import io.kazuki.v0.store.keyvalue.KeyValueStore;
 import io.kazuki.v0.store.keyvalue.KeyValueStoreConfiguration;
-import io.kazuki.v0.store.lifecycle.LifecycleModule;
 import io.kazuki.v0.store.schema.SchemaStore;
 import io.kazuki.v0.store.sequence.SequenceServiceConfiguration;
 import org.slf4j.Logger;
@@ -100,11 +99,11 @@ public class FileBlobStoreModule
     bind(JdbiDataSourceConfiguration.class).annotatedWith(Names.named(name)).toProvider(
         JdbiDsConfigProvider.class).in(Scopes.SINGLETON);
 
-    install(new LifecycleModule(name));
-
-    install(new EasyKeyValueStoreModule(name, null)
-        .withSequenceConfig(getSequenceServiceConfiguration())
-        .withKeyValueStoreConfig(getKeyValueStoreConfiguration()));
+    install(new KazukiModule.Builder(name)
+        .withJdbiConfiguration(name, Key.get(JdbiDataSourceConfiguration.class, Names.named(name)))
+        .withSequenceServiceConfiguration(name, getSequenceServiceConfiguration())
+        .withKeyValueStoreConfiguration(name, getKeyValueStoreConfiguration())
+        .build());
 
     bindKazukiBlobMetadataStoreDependency(io.kazuki.v0.store.lifecycle.Lifecycle.class);
     bindKazukiBlobMetadataStoreDependency(KeyValueStore.class);

@@ -23,14 +23,14 @@ import org.sonatype.nexus.plugins.capabilities.internal.ValidityConditionHandler
 import org.sonatype.nexus.plugins.capabilities.internal.validator.ValidatorFactory;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
-import io.kazuki.v0.store.easy.EasyKeyValueStoreModule;
+import io.kazuki.v0.store.guice.KazukiModule;
 import io.kazuki.v0.store.jdbi.JdbiDataSourceConfiguration;
 import io.kazuki.v0.store.keyvalue.KeyValueStoreConfiguration;
-import io.kazuki.v0.store.lifecycle.LifecycleModule;
 import io.kazuki.v0.store.sequence.SequenceServiceConfiguration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -52,15 +52,14 @@ public class GuiceModule
     install(new FactoryModuleBuilder().build(ValidityConditionHandlerFactory.class));
     install(new FactoryModuleBuilder().build(ValidatorFactory.class));
 
-    install(new LifecycleModule("nexuscapability"));
-
     bind(JdbiDataSourceConfiguration.class).annotatedWith(Names.named("nexuscapability"))
         .toProvider(JdbiConfigurationProvider.class).in(Scopes.SINGLETON);
 
-    install(new EasyKeyValueStoreModule("nexuscapability", null)
-        .withSequenceConfig(getSequenceServiceConfiguration())
-        .withKeyValueStoreConfig(getKeyValueStoreConfiguration())
-    );
+    install(new KazukiModule.Builder("nexuscapability")
+        .withJdbiConfiguration("nexuscapability", Key.get(JdbiDataSourceConfiguration.class, Names.named("nexuscapability")))
+        .withSequenceServiceConfiguration("nexuscapability", getSequenceServiceConfiguration())
+        .withKeyValueStoreConfiguration("nexuscapability", getKeyValueStoreConfiguration())
+        .build());
   }
 
   private SequenceServiceConfiguration getSequenceServiceConfiguration() {

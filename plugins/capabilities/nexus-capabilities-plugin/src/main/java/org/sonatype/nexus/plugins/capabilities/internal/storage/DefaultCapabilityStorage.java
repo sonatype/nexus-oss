@@ -138,7 +138,11 @@ public class DefaultCapabilityStorage
   }
 
   private Key asKey(final CapabilityIdentity id) {
-    return keyValueStore.toKey("@" + CAPABILITY_SCHEMA + ":" + id.toString());
+    try {
+      return keyValueStore.parseKey("@" + CAPABILITY_SCHEMA + ":" + id.toString());
+    } catch (KazukiException e) {
+      return null;
+    }
   }
 
   private CapabilityIdentity asCapabilityIdentity(final Key key) {

@@ -32,7 +32,7 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import io.kazuki.v0.store.KazukiException;
 import io.kazuki.v0.store.Key;
-import io.kazuki.v0.store.easy.EasyKeyValueStoreModule;
+import io.kazuki.v0.store.guice.KazukiModule;
 import io.kazuki.v0.store.index.SecondaryIndexStore;
 import io.kazuki.v0.store.index.query.QueryBuilder;
 import io.kazuki.v0.store.index.query.QueryOperator;
@@ -82,7 +82,7 @@ public class KazukiBlobMetadataStore
   private final SecondaryIndexStore secondaryIndexStore;
 
   /**
-   * Kazuki's {@link EasyKeyValueStoreModule} creates this class's dependencies under a specific, dynamic name. The
+   * Kazuki's {@link KazukiModule} creates this class's dependencies under a specific, dynamic name. The
    * {@code @Named(DYNAMIC_KZ_NAME)} annotations on the constructor allow the {@link FileBlobStoreModule} to
    * associate this private {@link KazukiBlobMetadataStore} instance with the correct set of kazuki components.
    */
