@@ -30,12 +30,6 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-model</artifactId>
-        <version>${nexus-plugin-bundle.version}</version>
-      </dependency>
-
-      <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>16.0.1</version>
@@ -66,9 +60,9 @@
       </dependency>
 
       <dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache-core</artifactId>
-        <version>2.5.1</version>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.ehcache</artifactId>
+        <version>2.5.1_2</version>
       </dependency>
 
       <dependency>
@@ -150,9 +144,9 @@
       Apache BVal only supports 1.0 spec.
       -->
       <dependency>
-        <groupId>javax.validation</groupId>
-        <artifactId>validation-api</artifactId>
-        <version>1.0.0.GA</version>
+        <groupId>org.apache.servicemix.specs</groupId>
+        <artifactId>org.apache.servicemix.specs.jsr303-api-1.0.0</artifactId>
+        <version>2.4.0</version>
       </dependency>
 
       <dependency>

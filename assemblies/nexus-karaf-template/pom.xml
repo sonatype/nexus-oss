@@ -335,12 +335,10 @@
                 <echo append="true" file="${project.build.directory}/assembly/etc/system.properties">
                   jetty.home.bundle=org.eclipse.jetty.osgi.boot
                 </echo>
+                <replace file="${project.build.directory}/assembly/etc/config.properties"
+                  token="packages.extra=" value="packages.extra= sun.misc," />
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg"
                   token=",management" value=",nexus-oss-edition" />
-                <unzip dest="${project.build.directory}/assembly/plugin-repository">
-                  <fileset dir="${project.build.directory}/assembly/system" includes="**/*-bundle.zip" />
-                </unzip>
-                <delete dir="${project.build.directory}/assembly/system" includes="**/*-bundle.zip" />
               </target>
             </configuration>
           </execution>
@@ -354,8 +352,6 @@
         <configuration>
           <bootFeatures>
             <feature>standard</feature>
-          </bootFeatures>
-          <installedFeatures>
             <feature>nexus-base-feature</feature>
             <feature>nexus-oss-edition</feature>
             <feature>nexus-content-plugin</feature>
@@ -382,7 +378,7 @@
             <feature>nexus-rapture-plugin</feature>
             <feature>nexus-extdirect-plugin</feature>
             <feature>nexus-coreui-plugin</feature>
-          </installedFeatures>
+          </bootFeatures>
         </configuration>
       </plugin>
     </plugins>

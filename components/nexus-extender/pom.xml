@@ -102,54 +102,14 @@
 
   <build>
     <plugins>
-      <!--
-      Generate Sisu index.
-      -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>sisu-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>index-extender</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>index</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <!--
-      Generate OSGi metadata.
-      -->
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
         <configuration>
           <instructions>
             <Bundle-Activator>
               org.sonatype.nexus.extender.NexusBundleExtender
             </Bundle-Activator>
-            <Embed-Dependency>
-              *;scope=compile
-            </Embed-Dependency>
-            <Embed-Directory>lib</Embed-Directory>
-            <Embed-Transitive>true</Embed-Transitive>
-            <_exportcontents>
-              !lib.*,
-              !com.google.inject.internal.*,
-              javax.servlet;provider=nexus;mandatory:=provider,
-              javax.servlet.http;provider=nexus;mandatory:=provider,
-              com.*|eu.*|javax.*|net.*|org.*;-noimport:=true
-            </_exportcontents>
-            <Require-Bundle>
-              system.bundle;visibility:=reexport,
-              org.sonatype.nexus.jettyapp;visibility:=reexport;resolution:=optional
-            </Require-Bundle>
-            <Import-Package>
-              javax.servlet;provider=!,
-              javax.servlet.http;provider=!
-            </Import-Package>
           </instructions>
         </configuration>
       </plugin>

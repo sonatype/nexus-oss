@@ -16,7 +16,7 @@ import java.util.Map;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.web.internal.SecurityFilter;
+import org.sonatype.nexus.web.SecurityFilter;
 
 import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;

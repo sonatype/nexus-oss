@@ -98,7 +98,7 @@ public class NexusITArtifactResolver
   public File resolvePluginFromDependencyManagement(final String groupId, final String artifactId)
       throws RuntimeException
   {
-    return resolveFromDependencyManagement(groupId, artifactId, "nexus-plugin", null, "zip", "bundle");
+    return resolveFromDependencyManagement(groupId, artifactId, null, null, null, null);
   }
 
   /**
@@ -113,9 +113,7 @@ public class NexusITArtifactResolver
    *                           not
    *                           considered while finding the dependency in dependency management
    * @param overrideType       an optional type to be used to override the type specified in dependency management
-   *                           (e.g nexus-plugin -> zip)
    * @param overrideClassifier an optional classifier to override the classifier specified in dependency management
-   *                           (e.g (not specified) -> bundle)
    * @return resolved artifact file
    */
   public File resolveFromDependencyManagement(final String groupId,

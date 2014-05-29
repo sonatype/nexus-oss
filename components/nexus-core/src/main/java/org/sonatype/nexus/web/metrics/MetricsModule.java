@@ -13,7 +13,7 @@
 package org.sonatype.nexus.web.metrics;
 
 import org.sonatype.nexus.guice.FilterChainModule;
-import org.sonatype.nexus.web.internal.SecurityFilter;
+import org.sonatype.nexus.web.SecurityFilter;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;

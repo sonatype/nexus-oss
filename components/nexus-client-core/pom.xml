@@ -26,6 +26,7 @@
 
   <artifactId>nexus-client-core</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
+  <packaging>bundle</packaging>
 
   <properties>
     <!-- compiler plugin configuration, we are Java6 -->

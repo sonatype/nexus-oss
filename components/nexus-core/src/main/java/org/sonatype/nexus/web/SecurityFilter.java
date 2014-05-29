@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.web.internal;
+package org.sonatype.nexus.web;
 
 import java.io.IOException;
 
@@ -23,7 +23,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.internal.UserIdMdcHelper;
+import org.sonatype.security.UserIdMdcHelper;
 
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.mgt.WebSecurityManager;

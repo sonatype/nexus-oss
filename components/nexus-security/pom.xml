@@ -26,6 +26,7 @@
 
   <artifactId>nexus-security</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -79,8 +80,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-guice</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-shiro-guice</artifactId>
     </dependency>
 
     <dependency>

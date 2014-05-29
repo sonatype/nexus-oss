@@ -22,6 +22,8 @@ import org.sonatype.nexus.guice.AbstractInterceptorModule;
 import org.sonatype.nexus.guice.NexusModules.PluginModule;
 import org.sonatype.nexus.guice.NexusTypeBinder;
 
+import org.osgi.framework.Constants;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Key;
@@ -127,7 +129,8 @@ public class NexusBundleTracker
   }
 
   private static boolean isNexusPlugin(final Bundle bundle) {
-    return bundle.getResource("META-INF/nexus/plugin.xml") != null;
+    final String requiredBundles = bundle.getHeaders().get(Constants.REQUIRE_BUNDLE);
+    return requiredBundles != null && requiredBundles.contains("org.sonatype.nexus.plugin-api");
   }
 
   private void prepareRequiredNexusPlugins(final Bundle bundle) {

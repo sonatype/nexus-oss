@@ -25,6 +25,7 @@
 
   <artifactId>nexus-core</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
+  <packaging>bundle</packaging>
 
   <dependencies>
 
@@ -225,8 +226,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-guice</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-shiro-guice</artifactId>
     </dependency>
 
     <dependency>
@@ -292,11 +293,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-bundle-model</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
     </dependency>
@@ -354,8 +350,8 @@
 
     <!--JSR-303 Validation-->
     <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
+      <groupId>org.apache.servicemix.specs</groupId>
+      <artifactId>org.apache.servicemix.specs.jsr303-api-1.0.0</artifactId>
     </dependency>
 
     <dependency>
@@ -403,6 +399,16 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <!-- model classes will be merged in as a fragment at runtime -->
+          <excludeDependencies>nexus-configuration-model</excludeDependencies>
+<instructions><Export-Package>{local-packages},org.sonatype.nexus.web.internal</Export-Package></instructions>
+        </configuration>
       </plugin>
     </plugins>
   </build>

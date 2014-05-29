@@ -44,6 +44,11 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-shiro-guice</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-extender</artifactId>
     </dependency>
 
@@ -58,9 +63,6 @@
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
-        <configuration>
-          <includeTransitiveDependency>false</includeTransitiveDependency>
-        </configuration>
       </plugin>
     </plugins>
   </build>
