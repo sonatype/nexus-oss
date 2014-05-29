@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks.descriptors;
 
 import java.util.ArrayList;
@@ -20,7 +21,9 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
-import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.RepositoryCombobox;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 @Named("EvictUnusedItems")
 @Singleton
@@ -33,8 +36,13 @@ public class EvictUnusedItemsTaskDescriptor
 
   public static final String OLDER_THAN_FIELD_ID = "evictOlderCacheItemsThen";
 
-  private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField(REPO_OR_GROUP_FIELD_ID,
-      FormField.MANDATORY);
+  private final FormField repoField = new RepositoryCombobox(
+      REPO_OR_GROUP_FIELD_ID,
+      "Repository",
+      "Select the proxy repository to evict unused items.",
+      FormField.MANDATORY
+  ).includeAnEntryForAllRepositories()
+      .includingAnyOfFacets(ProxyRepository.class, GroupRepository.class);
 
   private final NumberTextFormField olderThanField =
       new NumberTextFormField(

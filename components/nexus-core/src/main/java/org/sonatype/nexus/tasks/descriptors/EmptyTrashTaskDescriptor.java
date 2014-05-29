@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.tasks.descriptors;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
-import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.RepositoryCombobox;
 
 @Named("EmptyTrash")
 @Singleton
@@ -40,8 +41,12 @@ public class EmptyTrashTaskDescriptor
           "Set the number of days, to purge all items that were trashed before the given number of days.",
           FormField.OPTIONAL);
 
-  private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField(REPO_OR_GROUP_FIELD_ID,
-      FormField.MANDATORY);
+  private final FormField repoField = new RepositoryCombobox(
+      REPO_OR_GROUP_FIELD_ID,
+      "Repository",
+      "Select the repository to empty the trash.",
+      FormField.MANDATORY
+  ).includeAnEntryForAllRepositories();
 
   public String getId() {
     return ID;
