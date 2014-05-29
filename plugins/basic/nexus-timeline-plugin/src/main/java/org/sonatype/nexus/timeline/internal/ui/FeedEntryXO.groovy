@@ -24,6 +24,6 @@ import groovy.transform.ToString
 class FeedEntryXO
 {
   String title
-  Long timestamp
+  Date published
   String content
 }

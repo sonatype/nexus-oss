@@ -51,10 +51,9 @@ Ext.define('NX.app.Application', {
     'NX.ext.form.field.RegExp',
     'NX.ext.form.field.Url',
     'NX.ext.form.field.ValueSet',
-    'NX.ext.form.field.Timestamp',
+    'NX.ext.form.field.DateDisplayField',
     'NX.ext.grid.column.Icon',
     'NX.ext.grid.column.Link',
-    'NX.ext.grid.column.Timestamp',
     'NX.ext.tree.View',
     'NX.Conditions'
   ],

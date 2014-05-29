@@ -51,10 +51,10 @@ public class RepositoryCombobox
       extends MessageBundle
   {
 
-    @DefaultMessage("Staging Profile")
+    @DefaultMessage("Repository")
     String label();
 
-    @DefaultMessage("Select a staging profile")
+    @DefaultMessage("Select the repository.")
     String helpText();
 
   }

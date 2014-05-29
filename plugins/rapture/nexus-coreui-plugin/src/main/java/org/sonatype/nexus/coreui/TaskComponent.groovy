@@ -306,9 +306,9 @@ extends DirectComponentSupport
         status: task.taskState,
         statusDescription: getStatusDescription(task.taskState),
         schedule: getSchedule(task.schedule),
-        lastRun: task.lastRun?.time,
+        lastRun: task.lastRun,
         lastRunResult: getLastRunResult(task),
-        nextRun: getNextRun(task)?.time,
+        nextRun: getNextRun(task),
         runnable: task.taskState in [TaskState.SUBMITTED, TaskState.WAITING],
         stoppable: task.taskState in [TaskState.RUNNING, TaskState.SLEEPING],
         alertEmail: TaskUtils.getAlertEmail(task),
@@ -316,7 +316,7 @@ extends DirectComponentSupport
     )
     def schedule = task.schedule
     if (schedule instanceof AbstractSchedule) {
-      result.startTimestamp = schedule.startDate.time
+      result.startDate = schedule.startDate
     }
     if (schedule instanceof WeeklySchedule) {
       result.recurringDays = schedule.daysToRun
@@ -331,50 +331,53 @@ extends DirectComponentSupport
   }
 
   static Schedule asSchedule(final TaskXO taskXO) {
-    switch (taskXO.schedule) {
-      case 'once':
-        def date = Calendar.instance
-        date.setTimeInMillis(taskXO.startTimestamp)
-        date.set(Calendar.SECOND, 0)
-        date.set(Calendar.MILLISECOND, 0)
-        def currentDate = Calendar.instance
-        if (currentDate.after(date)) {
-          def response = new ValidationResponse()
-          if (currentDate.get(Calendar.YEAR) == date.get(Calendar.YEAR)
-              && currentDate.get(Calendar.MONTH) == date.get(Calendar.MONTH)
-              && currentDate.get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR)) {
-            response.addValidationError(new ValidationMessage('startTime', 'Time is in the past'))
-          }
-          else {
-            response.addValidationError(new ValidationMessage('startDate', 'Date is in the past'))
-          }
-          throw new InvalidConfigurationException(response)
-        }
-        return new OnceSchedule(date.getTime())
-      case 'hourly':
-        def date = new Date(taskXO.startTimestamp)
-        return new HourlySchedule(date, null)
-      case 'daily':
-        def date = new Date(taskXO.startTimestamp)
-        return new DailySchedule(date, null)
-      case 'weekly':
-        def date = new Date(taskXO.startTimestamp)
-        return new WeeklySchedule(date, null, taskXO.recurringDays as Set<Integer>)
-      case 'monthly':
-        def date = new Date(taskXO.startTimestamp)
-        return new MonthlySchedule(date, null, taskXO.recurringDays as Set<Integer>)
-      case 'advanced':
-        try {
-          return new CronSchedule(taskXO.cronExpression)
-        }
-        catch (Exception e) {
-          def response = new ValidationResponse()
-          response.addValidationError(new ValidationMessage('cronExpression', e.getMessage()))
-          throw new InvalidConfigurationException(response)
-        }
-      default:
-        return new ManualRunSchedule()
+    if (taskXO.schedule == 'advanced') {
+      try {
+        return new CronSchedule(taskXO.cronExpression)
+      }
+      catch (Exception e) {
+        def response = new ValidationResponse()
+        response.addValidationError(new ValidationMessage('cronExpression', e.getMessage()))
+        throw new InvalidConfigurationException(response)
+      }
     }
+    if (taskXO.schedule != 'manual') {
+      if (!taskXO.startDate) {
+        def response = new ValidationResponse()
+        response.addValidationError(new ValidationMessage('startDate', 'May not be null'))
+        throw new InvalidConfigurationException(response)
+      }
+      def date = Calendar.instance
+      date.setTimeInMillis(taskXO.startDate.time)
+      date.set(Calendar.SECOND, 0)
+      date.set(Calendar.MILLISECOND, 0)
+      switch (taskXO.schedule) {
+        case 'once':
+          def currentDate = Calendar.instance
+          if (currentDate.after(date)) {
+            def response = new ValidationResponse()
+            if (currentDate.get(Calendar.YEAR) == date.get(Calendar.YEAR)
+                && currentDate.get(Calendar.MONTH) == date.get(Calendar.MONTH)
+                && currentDate.get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR)) {
+              response.addValidationError(new ValidationMessage('startTime', 'Time is in the past'))
+            }
+            else {
+              response.addValidationError(new ValidationMessage('startDate', 'Date is in the past'))
+            }
+            throw new InvalidConfigurationException(response)
+          }
+          return new OnceSchedule(date.time)
+        case 'hourly':
+          return new HourlySchedule(date.time, null)
+        case 'daily':
+          return new DailySchedule(date.time, null)
+        case 'weekly':
+          return new WeeklySchedule(date.time, null, taskXO.recurringDays as Set<Integer>)
+        case 'monthly':
+          return new MonthlySchedule(date.time, null, taskXO.recurringDays as Set<Integer>)
+      }
+    }
+    return new ManualRunSchedule()
   }
 
   private static void validateState(final ScheduledTask<?> task) {

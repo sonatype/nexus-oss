@@ -112,7 +112,7 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
 
         values.properties = me.down('nx-coreui-formfield-settingsfieldset').exportProperties(values);
         values.recurringDays = me.down('nx-coreui-task-schedulefieldset').getRecurringDays();
-        values.startTimestamp = me.down('nx-coreui-task-schedulefieldset').getStartTimestamp();
+        values.startDate = me.down('nx-coreui-task-schedulefieldset').getStartDate();
         return values;
       },
 

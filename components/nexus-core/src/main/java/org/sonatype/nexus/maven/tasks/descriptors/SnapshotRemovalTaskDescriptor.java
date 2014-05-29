@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.maven.tasks.descriptors;
 
 import java.util.ArrayList;
@@ -21,7 +22,9 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
-import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.RepositoryCombobox;
+import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 
 @Named("SnapshotRemoval")
@@ -43,8 +46,14 @@ public class SnapshotRemovalTaskDescriptor
 
   public static final String DELETE_IMMEDIATELY = "deleteImmediately";
 
-  private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField(REPO_OR_GROUP_FIELD_ID,
-      FormField.MANDATORY);
+  private final FormField repoField = new RepositoryCombobox(
+      REPO_OR_GROUP_FIELD_ID,
+      "Repository",
+      "Select the Maven repository to remove snapshots.",
+      FormField.MANDATORY
+  ).includeAnEntryForAllRepositories()
+      .includingAnyOfContentClasses(Maven2ContentClass.ID)
+      .excludingAnyOfFacets(ProxyRepository.class);
 
   private final NumberTextFormField minToKeepField =
       new NumberTextFormField(MIN_TO_KEEP_FIELD_ID, "Minimum snapshot count",

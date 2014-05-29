@@ -44,7 +44,7 @@ public class Nexus810PackageNamesInRestMessagesIT
   public void checkForPackageNamesInResponse()
       throws IOException
   {
-    Matcher<Response> matcher = allOf(isSuccessful(), not(responseText(containsString("org.sonatype."))));
+    Matcher<Response> matcher = allOf(isSuccessful(), not(responseText(containsString("<id>org.sonatype."))));
     RequestFacade.doGet("service/local/schedule_types", matcher);
   }
 }

@@ -53,7 +53,7 @@ Ext.define('NX.coreui.view.task.TaskSchedule', {
         var values = this.callParent(arguments);
 
         values.recurringDays = me.down('nx-coreui-task-schedulefieldset').getRecurringDays();
-        values.startTimestamp = me.down('nx-coreui-task-schedulefieldset').getStartTimestamp();
+        values.startDate = me.down('nx-coreui-task-schedulefieldset').getStartDate();
         return values;
       },
 
@@ -62,9 +62,7 @@ Ext.define('NX.coreui.view.task.TaskSchedule', {
        * Additionally, sets values of recurring days checkboxes (if any).
        */
       setValues: function (values) {
-        if (values['startTimestamp']) {
-          values.startDate = values.startTime = new Date(values['startTimestamp']);
-        }
+        values.startTime = values['startDate'];
         this.callParent(arguments);
         if (values['recurringDays']) {
           Ext.Array.each(values['recurringDays'], function (day) {

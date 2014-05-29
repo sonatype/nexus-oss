@@ -51,8 +51,8 @@ class TaskXO
   @NotEmpty
   String schedule
 
-  Long nextRun
-  Long lastRun
+  Date nextRun
+  Date lastRun
   String lastRunResult
   Boolean runnable
   Boolean stoppable
@@ -60,7 +60,7 @@ class TaskXO
   String alertEmail
 
   Map<String, String> properties
-  Long startTimestamp
+  Date startDate
   Integer[] recurringDays
   String cronExpression
 }

@@ -86,14 +86,18 @@ public class StoresResource
 
   private final NexusItemAuthorizer nexusItemAuthorizer;
 
+  private final ClassLoader uberClassLoader;
+
   @Inject
   public StoresResource(final RepositoryRegistry repositoryRegistry,
                         final NexusItemAuthorizer nexusItemAuthorizer,
-                        final Map<String, SelectableEntryProvider> namedProviders)
+                        final Map<String, SelectableEntryProvider> namedProviders,
+                        final @Named("nexus-uber") ClassLoader uberClassLoader)
   {
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.nexusItemAuthorizer = checkNotNull(nexusItemAuthorizer);
     this.namedProviders = checkNotNull(namedProviders);
+    this.uberClassLoader = checkNotNull(uberClassLoader);
   }
 
   /**
@@ -212,7 +216,7 @@ public class StoresResource
       for (String facet : facets) {
         if (StringUtils.isNotEmpty(facet) && !facet.startsWith("!")) {
           try {
-            final Class<?> facetClass = getClass().getClassLoader().loadClass(facet);
+            final Class<?> facetClass = uberClassLoader.loadClass(facet);
             predicates.add(new Predicate<Repository>()
             {
               @Override
@@ -243,7 +247,7 @@ public class StoresResource
         if (StringUtils.isNotEmpty(facet) && facet.startsWith("!")) {
           String actualFacet = facet.substring(1);
           try {
-            final Class<?> facetClass = getClass().getClassLoader().loadClass(actualFacet);
+            final Class<?> facetClass = uberClassLoader.loadClass(actualFacet);
             predicates.add(new Predicate<Repository>()
             {
               @Override

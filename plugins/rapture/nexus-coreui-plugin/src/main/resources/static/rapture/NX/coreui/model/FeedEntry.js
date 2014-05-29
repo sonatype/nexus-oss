@@ -19,7 +19,7 @@ Ext.define('NX.coreui.model.FeedEntry', {
   extend: 'Ext.data.Model',
   fields: [
     'title',
-    'timestamp',
+    { name: 'published', type: Ext.data.Types.DATE, dateFormat: 'c' },
     'content'
   ]
 });
