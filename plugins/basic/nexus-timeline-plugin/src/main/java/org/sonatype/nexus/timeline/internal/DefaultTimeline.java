@@ -175,7 +175,7 @@ public class DefaultTimeline
         // Long and not primitive, to avoid NPE due to auto-unboxing, since runningDay is null initially
         final Long currentEntryRunningDay = record.getTimestamp() / A_DAY_IN_MILLIS;
         synchronized (runningDayMonitor) {
-          if (runningDay != currentEntryRunningDay) {
+          if (runningDay == null || runningDay < currentEntryRunningDay) {
             if (runningDay != null) {
               journalStore.closeActivePartition();
             }
@@ -247,15 +247,18 @@ public class DefaultTimeline
       }
       final Stack<String> partitionIds = new Stack<>();
       try (KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
-        // gather all closed partitions
+        // gather all partitions
         for (PartitionInfo partition : partitions) {
-          if (partition.isClosed()) {
-            partitionIds.push(partition.getPartitionId());
-          }
+          // KZ can have only one non-closed "active" partition, and it is the last one returned
+          // This means that we will put current active last partition that is possible okay
+          // but, if we want to DELETE active one, it cannot be open, as at line above we
+          // check for days==0, and we would close it. If days != 0, we will pop it anyway
+          // without close, so is fine.
+          partitionIds.push(partition.getPartitionId());
         }
       }
       // keep "days" partition
-      for (int i = 0; i > days; i++) {
+      for (int i = 0; i < days; i++) {
         partitionIds.pop();
       }
       // drop others
