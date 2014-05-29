@@ -31,13 +31,13 @@ class RoutingRepositorySettingsXO
 
   String publishStatus
   String publishMessage
-  Long publishTimestamp
+  Date publishTimestamp
   String publishUrl
 
   Boolean discoveryEnabled = false
   Integer discoveryInterval
   String discoveryStatus
   String discoveryMessage
-  Long discoveryTimestamp
+  Date discoveryTimestamp
 
 }

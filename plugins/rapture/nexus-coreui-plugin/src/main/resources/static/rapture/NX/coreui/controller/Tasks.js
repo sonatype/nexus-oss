@@ -155,8 +155,8 @@ Ext.define('NX.coreui.controller.Tasks', {
       'Name': model.get('name'),
       'Type': model.get('typeName'),
       'Status': model.get('statusDescription'),
-      'Next Run': NX.util.DateFormat.timestamp(model.get('nextRun')),
-      'Last Run': NX.util.DateFormat.timestamp(model.get('lastRun')),
+      'Next Run': model.get('nextRun'),
+      'Last Run': model.get('lastRun'),
       'Last Result': model.get('lastRunResult')
     });
   },

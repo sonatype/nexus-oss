@@ -29,7 +29,7 @@ Ext.define('NX.ext.form.action.DirectSubmit', {
         fn = api.submit,
         callback = Ext.Function.bind(me.onComplete, me),
         formInfo = me.buildForm(),
-        options;
+        options, formEl;
 
     if (!Ext.isFunction(fn)) {
       //<debug>
@@ -56,7 +56,18 @@ Ext.define('NX.ext.form.action.DirectSubmit', {
 
     //<override> call using field values if direct function formHandler = false
     //fn.call(window, formInfo.formEl, callback, me, options);
-    fn.call(window, fn.directCfg.method.formHandler ? formInfo.formEl : me.getParams(true), callback, me, options);
+    if (fn.directCfg.method.formHandler) {
+      formEl = formInfo.formEl;
+    }
+    else {
+      formEl = me.getParams(true);
+      Ext.Object.each(formEl, function (key, value) {
+        if (Ext.typeOf(value) === 'date') {
+          formEl[key] = Ext.Date.format(value, 'Y-m-d\\TH:i:s.uP');
+        }
+      });
+    }
+    fn.call(window, formEl, callback, me, options);
     //</override>
     me.cleanup(formInfo);
   }

@@ -82,23 +82,22 @@ Ext.define('NX.coreui.view.task.TaskScheduleFieldSet', {
   },
 
   /**
-   * Returns start timestamp out of start date/time.
-   * @returns {Number} timestamp
+   * Returns start date out of start date/time.
+   * @returns {Date} start date
    */
-  getStartTimestamp: function () {
+  getStartDate: function () {
     var me = this,
         startDate = me.down('#startDate'),
-        startTime = me.down('#startTime'),
-        timestamp;
+        startTime = me.down('#startTime');
 
     if (startDate && startTime) {
       startDate = startDate.getValue();
       startTime = startTime.getValue();
       if (startDate && startTime) {
-        timestamp = startDate.getTime() + (startTime.getHours() * 60 + startTime.getMinutes()) * 60 * 1000;
+        startDate.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0);
       }
     }
-    return timestamp;
+    return startDate;
   }
 
 });

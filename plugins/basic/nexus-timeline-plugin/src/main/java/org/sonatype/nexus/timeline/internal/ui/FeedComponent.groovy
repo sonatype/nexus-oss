@@ -80,7 +80,7 @@ extends DirectComponentSupport
             feedSource.getFeed(parameters.start, parameters.limit - parameters.start, Collections.emptyMap()).collect { entry ->
               new FeedEntryXO(
                   title: feedContentRenderer.getTitle(entry),
-                  timestamp: entry.getPublished().time,
+                  published: entry.getPublished(),
                   content: feedContentRenderer.getContent(entry)
               )
             }
