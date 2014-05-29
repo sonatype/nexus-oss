@@ -16,6 +16,7 @@ import java.io.File;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
@@ -30,7 +31,6 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 import com.google.inject.Key;
 import com.google.inject.PrivateModule;
-import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.name.Names;
@@ -98,7 +98,7 @@ public class FileBlobStoreModule
 
     // Create the Kazuki database the metadata store needs
     bind(JdbiDataSourceConfiguration.class).annotatedWith(Names.named(name)).toProvider(
-        JdbiDsConfigProvider.class);
+        JdbiDsConfigProvider.class).in(Scopes.SINGLETON);
 
     install(new LifecycleModule(name));
 
