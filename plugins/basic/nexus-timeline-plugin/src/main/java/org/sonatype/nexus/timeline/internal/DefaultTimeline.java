@@ -15,7 +15,6 @@ package org.sonatype.nexus.timeline.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -266,9 +265,6 @@ public class DefaultTimeline
       while (!partitionIds.isEmpty()) {
         journalStore.dropPartition(partitionIds.remove(0));
       }
-    }
-    catch (EmptyStackException e) {
-      // we wanted to keep more than we have, so it's fine
     }
     catch (KazukiException e) {
       log.warn("Failed to purge Timeline store", e);
