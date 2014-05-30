@@ -211,7 +211,6 @@ Ext.define('NX.coreui.controller.Tasks', {
 
     if (list) {
       me.getTaskTypeStore().load();
-      NX.coreui.view.formfield.factory.FormfieldComboFactory.evictCache();
     }
   },
 

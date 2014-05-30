@@ -36,20 +36,13 @@ Ext.define('NX.coreui.view.formfield.factory.FormfieldComboFactory', {
   ],
 
   /**
-   * Map of stores / store url.
-   * @private
-   */
-  stores: {},
-
-  /**
    * Creates a combo.
    * @param formField form field to create combo for
    * @returns {*} created combo (never null)
    */
   create: function (formField) {
-    var me = this,
-        ST = Ext.data.SortTypes,
-        store, item,
+    var ST = Ext.data.SortTypes,
+        item, filters,
         itemConfig = {
           xtype: 'combo',
           fieldLabel: formField.label,
@@ -70,40 +63,38 @@ Ext.define('NX.coreui.view.formfield.factory.FormfieldComboFactory', {
     if (formField.initialValue) {
       itemConfig.value = formField.initialValue;
     }
-    if (formField.storePath) {
-      store = me.stores[formField.storePath];
-      if (!store) {
-        store = Ext.create('Ext.data.Store', {
-
-          proxy: {
-            type: 'ajax',
-            url: NX.util.Url.urlOf(formField.storePath),
-            headers: {
-              'accept': 'application/json'
-            },
-            reader: {
-              type: 'json',
-              root: formField.storeRoot,
-              idProperty: formField.idMapping || 'id'
-            }
-          },
-
-          fields: [
-            { name: 'id', mapping: formField.idMapping || 'id' },
-            { name: 'name', mapping: formField.nameMapping || 'name', sortType: ST.asUCString }
-          ],
-
-          sortInfo: {
-            field: 'name',
-            direction: 'ASC'
-          },
-
-          autoLoad: true
+    if (formField['storeApi']) {
+      if (formField['storeFilters']) {
+        filters = [];
+        Ext.Object.each(formField['storeFilters'], function (key, value) {
+          filters.push({ property: key, value: value });
         });
-        me.stores[formField.storePath] = store;
-        me.logDebug("Caching store for " + store.proxy.url);
       }
-      itemConfig.store = store;
+      itemConfig.store = Ext.create('Ext.data.Store', {
+        proxy: {
+          type: 'direct',
+          api: {
+            read: 'NX.direct.' + formField['storeApi']
+          },
+          reader: {
+            type: 'json',
+            root: 'data',
+            idProperty: formField['idMapping'] || 'id',
+            successProperty: 'success'
+          }
+        },
+
+        fields: [
+          { name: 'id', mapping: formField['idMapping'] || 'id' },
+          { name: 'name', mapping: formField['nameMapping'] || 'name', sortType: ST.asUCString }
+        ],
+
+        filters: filters,
+        sortOnLoad: true,
+        sorters: { property: 'name', direction: 'ASC' },
+        remoteFilter: true,
+        autoLoad: true
+      });
     }
     item = Ext.create('Ext.form.ComboBox', itemConfig);
     Ext.override(item, {
@@ -119,16 +110,6 @@ Ext.define('NX.coreui.view.formfield.factory.FormfieldComboFactory', {
       }
     });
     return item;
-  },
-
-  /**
-   * Evicts all cached stores (they will be recreated on demand).
-   */
-  evictCache: function () {
-    var me = this;
-
-    me.logDebug('Evicted all cached stores');
-    me.stores = {};
   }
 
 });
