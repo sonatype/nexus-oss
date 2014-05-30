@@ -19,7 +19,6 @@ import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -245,25 +244,27 @@ public class DefaultTimeline
         // today included, close current partition too, so that any new events are separate from those that exist already
         journalStore.closeActivePartition();
       }
-      final Stack<String> partitionIds = new Stack<>();
+      final List<String> partitionIds = Lists.newArrayList();
       try (KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
-        // gather all partitions
+        // gather all partitions, KZ returns them in creation order (oldest first)
         for (PartitionInfo partition : partitions) {
           // KZ can have only one non-closed "active" partition, and it is the last one returned
           // This means that we will put current active last partition that is possible okay
           // but, if we want to DELETE active one, it cannot be open, as at line above we
           // check for days==0, and we would close it. If days != 0, we will pop it anyway
           // without close, so is fine.
-          partitionIds.push(partition.getPartitionId());
+          partitionIds.add(partition.getPartitionId());
         }
       }
-      // keep "days" partition
+      // reverse the list, to have latest first, usually first "days" we want to keep
+      Collections.reverse(partitionIds);
+      // keep "days" partition by removing them from list
       for (int i = 0; i < days; i++) {
-        partitionIds.pop();
+        partitionIds.remove(0);
       }
-      // drop others
+      // drop others on the list
       while (!partitionIds.isEmpty()) {
-        journalStore.dropPartition(partitionIds.pop());
+        journalStore.dropPartition(partitionIds.remove(0));
       }
     }
     catch (EmptyStackException e) {

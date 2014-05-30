@@ -14,6 +14,7 @@
 package org.sonatype.nexus.timeline.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
 import org.sonatype.nexus.timeline.Timeline;
+import org.sonatype.nexus.timeline.TimelineCallback;
 import org.sonatype.nexus.timeline.TimelinePlugin;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.Time;
@@ -45,6 +47,7 @@ import com.google.inject.name.Names;
 import io.kazuki.v0.store.journal.JournalStore;
 import io.kazuki.v0.store.journal.PartitionInfoSnapshot;
 import io.kazuki.v0.store.keyvalue.KeyValueIterable;
+import org.hamcrest.MatcherAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -216,6 +219,16 @@ public class DefaultTimelineTest
 
     assertThat(journalStore.approximateSize(), equalTo(6L));
     defaultNexusTimeline.purgeOlderThan(2);
+    // ensure 1st returned entry is the latest (and still exists on timeline)
+    defaultNexusTimeline.retrieve(0, 1, null, null, null, new TimelineCallback()
+    {
+      public boolean processNext(final Entry rec) throws IOException {
+        assertThat(rec.getType(), equalTo("TEST"));
+        assertThat(rec.getSubType(), equalTo("2"));
+        assertThat(rec.getData().get("day"), equalTo("3"));
+        return false;
+      }
+    });
 
     try (final KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
       partitionsPostPurge1 = Lists
@@ -230,6 +243,16 @@ public class DefaultTimelineTest
 
     assertThat(journalStore.approximateSize(), equalTo(4L));
     defaultNexusTimeline.purgeOlderThan(1);
+    // ensure 1st returned entry is the latest (and still exists on timeline)
+    defaultNexusTimeline.retrieve(0, 1, null, null, null, new TimelineCallback()
+    {
+      public boolean processNext(final Entry rec) throws IOException {
+        assertThat(rec.getType(), equalTo("TEST"));
+        assertThat(rec.getSubType(), equalTo("2"));
+        assertThat(rec.getData().get("day"), equalTo("3"));
+        return false;
+      }
+    });
 
     try (final KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
       partitionsPostPurge2 = Lists
@@ -244,6 +267,14 @@ public class DefaultTimelineTest
 
     assertThat(journalStore.approximateSize(), equalTo(2L));
     defaultNexusTimeline.purgeOlderThan(0);
+    // ensure that timeline is empty, callback should not be called
+    defaultNexusTimeline.retrieve(0, 1, null, null, null, new TimelineCallback()
+    {
+      public boolean processNext(final Entry rec) throws IOException {
+        assertThat("Timeline should be empty. callback should not be invoked!", false);
+        return false;
+      }
+    });
 
     try (final KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
       partitionsPostPurge3 = Lists
