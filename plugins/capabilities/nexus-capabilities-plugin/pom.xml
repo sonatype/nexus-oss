@@ -32,8 +32,6 @@
   <properties>
     <pluginName>Nexus Capabilities Plugin</pluginName>
     <pluginDescription>Allows Nexus to define and manage capabilities.</pluginDescription>
-
-    <debug-js>false</debug-js>
   </properties>
 
   <dependencies>
