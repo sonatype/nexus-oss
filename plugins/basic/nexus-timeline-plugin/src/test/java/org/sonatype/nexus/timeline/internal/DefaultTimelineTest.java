@@ -10,28 +10,44 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
 import org.sonatype.nexus.timeline.Timeline;
+import org.sonatype.nexus.timeline.TimelineCallback;
+import org.sonatype.nexus.timeline.TimelinePlugin;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.Time;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Module;
+import com.google.inject.name.Names;
+import io.kazuki.v0.store.journal.JournalStore;
+import io.kazuki.v0.store.journal.PartitionInfoSnapshot;
+import io.kazuki.v0.store.keyvalue.KeyValueIterable;
+import org.hamcrest.MatcherAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +69,8 @@ public class DefaultTimelineTest
 
   private DefaultTimeline defaultNexusTimeline;
 
+  private JournalStore journalStore;
+
   @Before
   public void prepare() throws Exception {
     final File timelineWorkdir = util.resolveFile("target/workdir");
@@ -69,8 +87,9 @@ public class DefaultTimelineTest
         bind(Timeline.class).to(DefaultTimeline.class).asEagerSingleton();
       }
     };
-    defaultNexusTimeline = (DefaultTimeline) Guice.createInjector(testModule, new TimelineModule())
-        .getInstance(Timeline.class);
+    final Injector injector = Guice.createInjector(testModule, new TimelineModule());
+    defaultNexusTimeline = (DefaultTimeline) injector.getInstance(Timeline.class);
+    journalStore = injector.getInstance(Key.get(JournalStore.class, Names.named(TimelinePlugin.ARTIFACT_ID)));
     defaultNexusTimeline.start();
   }
 
@@ -167,6 +186,112 @@ public class DefaultTimelineTest
     assertThat(res, hasSize(2));
     assertThat(res.get(0).getData(), hasEntry("place", "1st"));
     assertThat(res.get(1).getData(), hasEntry("place", "2nd"));
+  }
+
+  @Test
+  public void partitioningByDay() throws Exception {
+    final long now = System.currentTimeMillis();
+    defaultNexusTimeline.add(new EntryRecord(now, "TEST", "1", ImmutableMap.of("day", "1")));
+    defaultNexusTimeline.add(new EntryRecord(now, "TEST", "2", ImmutableMap.of("day", "1")));
+    defaultNexusTimeline.add(new EntryRecord(now + TimeUnit.DAYS.toMillis(1), "TEST", "1",
+        ImmutableMap.of("day", "2")));
+    defaultNexusTimeline.add(new EntryRecord(now + TimeUnit.DAYS.toMillis(1), "TEST", "2",
+        ImmutableMap.of("day", "2")));
+    defaultNexusTimeline.add(new EntryRecord(now + TimeUnit.DAYS.toMillis(2), "TEST", "1",
+        ImmutableMap.of("day", "3")));
+    defaultNexusTimeline.add(new EntryRecord(now + TimeUnit.DAYS.toMillis(2), "TEST", "2",
+        ImmutableMap.of("day", "3")));
+
+    List<String> partitionsPostAppend;
+    List<String> partitionsPostPurge1;
+    List<String> partitionsPostPurge2;
+    List<String> partitionsPostPurge3;
+    try (final KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
+      partitionsPostAppend = Lists
+          .newArrayList(Iterables.transform(partitions, new Function<PartitionInfoSnapshot, String>()
+          {
+            @Override
+            public String apply(final PartitionInfoSnapshot input) {
+              return input.getPartitionId();
+            }
+          }));
+    }
+
+    assertThat(journalStore.approximateSize(), equalTo(6L));
+    defaultNexusTimeline.purgeOlderThan(2);
+    // ensure 1st returned entry is the latest (and still exists on timeline)
+    defaultNexusTimeline.retrieve(0, 1, null, null, null, new TimelineCallback()
+    {
+      public boolean processNext(final Entry rec) throws IOException {
+        assertThat(rec.getType(), equalTo("TEST"));
+        assertThat(rec.getSubType(), equalTo("2"));
+        assertThat(rec.getData().get("day"), equalTo("3"));
+        return false;
+      }
+    });
+
+    try (final KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
+      partitionsPostPurge1 = Lists
+          .newArrayList(Iterables.transform(partitions, new Function<PartitionInfoSnapshot, String>()
+          {
+            @Override
+            public String apply(final PartitionInfoSnapshot input) {
+              return input.getPartitionId();
+            }
+          }));
+    }
+
+    assertThat(journalStore.approximateSize(), equalTo(4L));
+    defaultNexusTimeline.purgeOlderThan(1);
+    // ensure 1st returned entry is the latest (and still exists on timeline)
+    defaultNexusTimeline.retrieve(0, 1, null, null, null, new TimelineCallback()
+    {
+      public boolean processNext(final Entry rec) throws IOException {
+        assertThat(rec.getType(), equalTo("TEST"));
+        assertThat(rec.getSubType(), equalTo("2"));
+        assertThat(rec.getData().get("day"), equalTo("3"));
+        return false;
+      }
+    });
+
+    try (final KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
+      partitionsPostPurge2 = Lists
+          .newArrayList(Iterables.transform(partitions, new Function<PartitionInfoSnapshot, String>()
+          {
+            @Override
+            public String apply(final PartitionInfoSnapshot input) {
+              return input.getPartitionId();
+            }
+          }));
+    }
+
+    assertThat(journalStore.approximateSize(), equalTo(2L));
+    defaultNexusTimeline.purgeOlderThan(0);
+    // ensure that timeline is empty, callback should not be called
+    defaultNexusTimeline.retrieve(0, 1, null, null, null, new TimelineCallback()
+    {
+      public boolean processNext(final Entry rec) throws IOException {
+        assertThat("Timeline should be empty. callback should not be invoked!", false);
+        return false;
+      }
+    });
+
+    try (final KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
+      partitionsPostPurge3 = Lists
+          .newArrayList(Iterables.transform(partitions, new Function<PartitionInfoSnapshot, String>()
+          {
+            @Override
+            public String apply(final PartitionInfoSnapshot input) {
+              return input.getPartitionId();
+            }
+          }));
+    }
+
+    assertThat(journalStore.approximateSize(), equalTo(0L));
+    assertThat(partitionsPostAppend, hasSize(3));
+    assertThat(partitionsPostPurge1, hasSize(2));
+    assertThat(partitionsPostPurge2, hasSize(1));
+    assertThat(partitionsPostPurge3, hasSize(0)); // this is true in test, but KZ would add part on any incoming append!
   }
 
   // ==

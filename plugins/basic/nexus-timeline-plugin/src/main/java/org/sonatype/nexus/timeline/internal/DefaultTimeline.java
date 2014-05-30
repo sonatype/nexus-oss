@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -61,11 +62,17 @@ public class DefaultTimeline
     extends LifecycleSupport
     implements Timeline
 {
+  private static final long A_DAY_IN_MILLIS = TimeUnit.DAYS.toMillis(1);
+
   private final Lifecycle lifecycle;
 
   private final JournalStore journalStore;
 
   private final SchemaStore schemaStore;
+
+  private final Object runningDayMonitor = new Object();
+
+  private Long runningDay;
 
   @Inject
   public DefaultTimeline(final EventBus eventBus,
@@ -113,7 +120,7 @@ public class DefaultTimeline
       log.info("Creating schema for {} type", EntryRecord.SCHEMA_NAME);
 
       Schema schema = new Schema.Builder().
-          addAttribute("timestamp", Type.U64, false).
+          addAttribute("timestamp", Type.I64, false).
           addAttribute("type", Type.UTF8_SMALLSTRING, false).
           addAttribute("subType", Type.UTF8_SMALLSTRING, false).
           addAttribute("data", Type.MAP, false).
@@ -163,6 +170,16 @@ public class DefaultTimeline
   private void addEntryRecord(final List<EntryRecord> records) {
     try {
       for (EntryRecord record : records) {
+        // Long and not primitive, to avoid NPE due to auto-unboxing, since runningDay is null initially
+        final Long currentEntryRunningDay = record.getTimestamp() / A_DAY_IN_MILLIS;
+        synchronized (runningDayMonitor) {
+          if (runningDay == null || runningDay < currentEntryRunningDay) {
+            if (runningDay != null) {
+              journalStore.closeActivePartition();
+            }
+            runningDay = currentEntryRunningDay;
+          }
+        }
         journalStore.append(EntryRecord.SCHEMA_NAME, EntryRecord.class, record, TypeValidation.STRICT);
       }
     }
@@ -191,6 +208,7 @@ public class DefaultTimeline
               null)) {
         for (KeyValuePair<EntryRecord> kv : kvs) {
           final EntryRecord record = kv.getValue();
+          // TODO: secondary indexes for types and subTypes?
           if (types != null && !types.contains(record.getType())) {
             continue; // skip it
           }
@@ -204,7 +222,9 @@ public class DefaultTimeline
           if (count < currentCount) {
             break;
           }
-          callback.processNext(record);
+          if (!callback.processNext(record)) {
+            break;
+          }
         }
       }
     }
@@ -218,21 +238,32 @@ public class DefaultTimeline
     if (!isStarted()) {
       return;
     }
-    // NOTE: This is merely a hack, we need to come up with some general partitioning strategy
-    // Could we partition per-day? Or just modify the semantics of the input maybe, as purge
-    // was painfully needed for Lucene backed Timeline, but with Kazuki it might get non-issue?
     try {
       if (days == 0) {
-        // today included, lose the current partition, so that any new events are separate from those that exist already
+        // today included, close current partition too, so that any new events are separate from those that exist already
         journalStore.closeActivePartition();
       }
+      final List<String> partitionIds = Lists.newArrayList();
       try (KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
+        // gather all partitions, KZ returns them in creation order (oldest first)
         for (PartitionInfo partition : partitions) {
-          if (!partition.isClosed()) {
-            continue;
-          }
-          journalStore.dropPartition(partition.getPartitionId());
+          // KZ can have only one non-closed "active" partition, and it is the last one returned
+          // This means that we will put current active last partition that is possible okay
+          // but, if we want to DELETE active one, it cannot be open, as at line above we
+          // check for days==0, and we would close it. If days != 0, we will pop it anyway
+          // without close, so is fine.
+          partitionIds.add(partition.getPartitionId());
         }
+      }
+      // reverse the list, to have latest first, usually first "days" we want to keep
+      Collections.reverse(partitionIds);
+      // keep "days" partition by removing them from list
+      for (int i = 0; i < days; i++) {
+        partitionIds.remove(0);
+      }
+      // drop others on the list
+      while (!partitionIds.isEmpty()) {
+        journalStore.dropPartition(partitionIds.remove(0));
       }
     }
     catch (KazukiException e) {

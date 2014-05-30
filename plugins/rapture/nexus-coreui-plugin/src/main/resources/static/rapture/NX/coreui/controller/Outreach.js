@@ -70,7 +70,7 @@ Ext.define('NX.coreui.controller.Outreach', {
             frame: false,
             autoEl: {
               tag: 'iframe',
-              src: NX.util.Url.urlOf('service/local/outreach/welcome/')
+              src: NX.util.Url.urlOf('service/outreach/')
             }
           });
         }
