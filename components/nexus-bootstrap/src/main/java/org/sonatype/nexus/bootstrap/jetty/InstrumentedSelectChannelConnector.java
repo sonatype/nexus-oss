@@ -15,18 +15,21 @@ package org.sonatype.nexus.bootstrap.jetty;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Counter;
-import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Timer;
+import com.codahale.metrics.Clock;
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.SharedMetricRegistries;
+import com.codahale.metrics.Timer;
 import org.eclipse.jetty.io.Connection;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 /**
- * Custom re-implementation of {@link com.yammer.metrics.jetty.InstrumentedSelectChannelConnector}
+ * Custom re-implementation of {@link com.codahale.metrics.jetty8.InstrumentedSelectChannelConnector}
  * which sets up metrics collection on {@link #doStart()} instead of in CTOR.
  *
  * @since 2.5
@@ -36,7 +39,9 @@ public final class InstrumentedSelectChannelConnector
 {
   private static final Logger log = LoggerFactory.getLogger(InstrumentedSelectChannelConnector.class);
 
-  private final MetricsRegistry registry;
+  private final MetricRegistry registry;
+
+  private final Clock clock;
 
   private Timer duration;
 
@@ -45,40 +50,23 @@ public final class InstrumentedSelectChannelConnector
   private Counter connections;
 
   public InstrumentedSelectChannelConnector() {
-    registry = Metrics.defaultRegistry();
+    registry = SharedMetricRegistries.getOrCreate("nexus");
+    clock = Clock.defaultClock();
   }
 
   @Override
   protected void doStart() throws Exception {
     String port = String.valueOf(getPort());
 
-    this.duration = registry.newTimer(SelectChannelConnector.class,
-        "connection-duration",
-        port,
-        TimeUnit.MILLISECONDS,
-        TimeUnit.SECONDS);
+    this.duration = registry.timer(name(SelectChannelConnector.class, port, "connection-duration"));
 
-    this.accepts = registry.newMeter(SelectChannelConnector.class,
-        "accepts",
-        port,
-        "connections",
-        TimeUnit.SECONDS);
+    this.accepts = registry.meter(name(SelectChannelConnector.class, port, "accepts"));
 
-    this.connects = registry.newMeter(SelectChannelConnector.class,
-        "connects",
-        port,
-        "connections",
-        TimeUnit.SECONDS);
+    this.connects = registry.meter(name(SelectChannelConnector.class, port, "connects"));
 
-    this.disconnects = registry.newMeter(SelectChannelConnector.class,
-        "disconnects",
-        port,
-        "connections",
-        TimeUnit.SECONDS);
+    this.disconnects = registry.meter(name(SelectChannelConnector.class, port, "disconnects"));
 
-    this.connections = registry.newCounter(SelectChannelConnector.class,
-        "active-connections",
-        port);
+    this.connections = registry.counter(name(SelectChannelConnector.class, port, "active-connections"));
 
     log.info("Metrics enabled");
 
@@ -104,7 +92,7 @@ public final class InstrumentedSelectChannelConnector
   protected void connectionClosed(final Connection connection) {
     super.connectionClosed(connection);
     disconnects.mark();
-    final long duration = System.currentTimeMillis() - connection.getTimeStamp();
+    final long duration = clock.getTime() - connection.getTimeStamp();
     this.duration.update(duration, TimeUnit.MILLISECONDS);
     connections.dec();
   }

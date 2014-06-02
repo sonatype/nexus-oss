@@ -15,19 +15,22 @@ package org.sonatype.nexus.bootstrap.jetty;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Counter;
-import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Timer;
+import com.codahale.metrics.Clock;
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.SharedMetricRegistries;
+import com.codahale.metrics.Timer;
 import org.eclipse.jetty.io.Connection;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 /**
- * Custom re-implementation of {@link com.yammer.metrics.jetty.InstrumentedSslSelectChannelConnector}
+ * Custom re-implementation of {@link com.codahale.metrics.jetty8.InstrumentedSslSelectChannelConnector}
  * which sets up metrics collection on {@link #doStart()} instead of in CTOR.
  *
  * @since 2.7
@@ -37,7 +40,9 @@ public final class InstrumentedSslSelectChannelConnector
 {
   private static final Logger log = LoggerFactory.getLogger(InstrumentedSslSelectChannelConnector.class);
 
-  private final MetricsRegistry registry;
+  private final MetricRegistry registry;
+
+  private final Clock clock;
 
   private Timer duration;
 
@@ -46,45 +51,29 @@ public final class InstrumentedSslSelectChannelConnector
   private Counter connections;
 
   public InstrumentedSslSelectChannelConnector() {
-    registry = Metrics.defaultRegistry();
+    registry = SharedMetricRegistries.getOrCreate("nexus");
+    clock = Clock.defaultClock();
   }
 
   public InstrumentedSslSelectChannelConnector(final SslContextFactory sslContextFactory) {
     super(sslContextFactory);
-    registry = Metrics.defaultRegistry();
+    registry = SharedMetricRegistries.getOrCreate("nexus");
+    clock = Clock.defaultClock();
   }
 
   @Override
   protected void doStart() throws Exception {
     String port = String.valueOf(getPort());
 
-    this.duration = registry.newTimer(SslSelectChannelConnector.class,
-        "connection-duration",
-        port,
-        TimeUnit.MILLISECONDS,
-        TimeUnit.SECONDS);
+    this.duration = registry.timer(name(SslSelectChannelConnector.class, port, "connection-duration"));
 
-    this.accepts = registry.newMeter(SslSelectChannelConnector.class,
-        "accepts",
-        port,
-        "connections",
-        TimeUnit.SECONDS);
+    this.accepts = registry.meter(name(SslSelectChannelConnector.class, port, "accepts"));
 
-    this.connects = registry.newMeter(SslSelectChannelConnector.class,
-        "connects",
-        port,
-        "connections",
-        TimeUnit.SECONDS);
+    this.connects = registry.meter(name(SslSelectChannelConnector.class, port, "connects"));
 
-    this.disconnects = registry.newMeter(SslSelectChannelConnector.class,
-        "disconnects",
-        port,
-        "connections",
-        TimeUnit.SECONDS);
+    this.disconnects = registry.meter(name(SslSelectChannelConnector.class, port, "disconnects"));
 
-    this.connections = registry.newCounter(SslSelectChannelConnector.class,
-        "active-connections",
-        port);
+    this.connections = registry.counter(name(SslSelectChannelConnector.class, port, "active-connections"));
 
     log.info("Metrics enabled");
 
@@ -110,7 +99,7 @@ public final class InstrumentedSslSelectChannelConnector
   protected void connectionClosed(final Connection connection) {
     super.connectionClosed(connection);
     disconnects.mark();
-    final long duration = System.currentTimeMillis() - connection.getTimeStamp();
+    final long duration = clock.getTime() - connection.getTimeStamp();
     this.duration.update(duration, TimeUnit.MILLISECONDS);
     connections.dec();
   }

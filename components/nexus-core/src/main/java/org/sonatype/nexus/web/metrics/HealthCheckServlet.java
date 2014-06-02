@@ -12,29 +12,22 @@
  */
 package org.sonatype.nexus.web.metrics;
 
-import java.io.IOException;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.codahale.metrics.health.HealthCheckRegistry;
 
 /**
- * Customized {@link com.codahale.metrics.servlets.ThreadDumpServlet} to support download.
+ * Customized {@link com.codahale.metrics.servlets.HealthCheckServlet} to support injection.
  *
  * @since 3.0
  */
-public class ThreadDumpServlet
-  extends com.codahale.metrics.servlets.ThreadDumpServlet
+@Singleton
+public class HealthCheckServlet
+  extends com.codahale.metrics.servlets.HealthCheckServlet
 {
-  @Override
-  protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
-      throws ServletException, IOException
-  {
-    boolean download = Boolean.parseBoolean(req.getParameter("download"));
-    if (download) {
-      resp.addHeader("Content-Disposition", "attachment; filename='threads.txt'");
-    }
-
-    super.doGet(req, resp);
+  @Inject
+  public HealthCheckServlet(HealthCheckRegistry registry) {
+    super(registry);
   }
 }

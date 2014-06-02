@@ -66,13 +66,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.yammer.metrics</groupId>
+      <groupId>com.codahale.metrics</groupId>
       <artifactId>metrics-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.yammer.metrics</groupId>
-      <artifactId>metrics-logback</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>

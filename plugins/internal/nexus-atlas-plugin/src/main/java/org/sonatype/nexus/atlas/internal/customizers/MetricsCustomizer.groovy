@@ -12,17 +12,19 @@
  */
 package org.sonatype.nexus.atlas.internal.customizers
 
-import com.yammer.metrics.core.Clock
-import com.yammer.metrics.core.HealthCheckRegistry
-import com.yammer.metrics.core.MetricPredicate
-import com.yammer.metrics.core.MetricsRegistry
-import com.yammer.metrics.core.VirtualMachineMetrics
-import com.yammer.metrics.reporting.ConsoleReporter
+import com.codahale.metrics.Clock
+import com.codahale.metrics.ConsoleReporter
+import com.codahale.metrics.MetricFilter
+import com.codahale.metrics.MetricRegistry
+import com.codahale.metrics.health.HealthCheckRegistry
+import com.codahale.metrics.jvm.ThreadDump
 import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
 import org.sonatype.nexus.atlas.SupportBundle
 import org.sonatype.nexus.atlas.SupportBundleCustomizer
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
+import java.lang.management.ManagementFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -47,22 +49,21 @@ class MetricsCustomizer
 {
   private final Clock clock
 
-  private final VirtualMachineMetrics virtualMachineMetrics
-
-  private final MetricsRegistry metricsRegistry
+  private final MetricRegistry metricRegistry
 
   private final HealthCheckRegistry healthCheckRegistry
 
+  private final ThreadDump threadDump
+
   @Inject
   MetricsCustomizer(final Clock clock,
-                    final VirtualMachineMetrics virtualMachineMetrics,
-                    final MetricsRegistry metricsRegistry,
+                    final MetricRegistry metricRegistry,
                     final HealthCheckRegistry healthCheckRegistry)
   {
     this.clock = checkNotNull(clock)
-    this.virtualMachineMetrics = checkNotNull(virtualMachineMetrics)
-    this.metricsRegistry = checkNotNull(metricsRegistry)
+    this.metricRegistry = checkNotNull(metricRegistry)
     this.healthCheckRegistry = checkNotNull(healthCheckRegistry)
+    this.threadDump = new ThreadDump(ManagementFactory.getThreadMXBean())
   }
 
   @Override
@@ -76,7 +77,7 @@ class MetricsCustomizer
       @Override
       protected void generate(final File file) {
         file.withOutputStream {
-          virtualMachineMetrics.threadDump(it)
+          threadDump.dump(it)
         }
       }
     }
@@ -118,13 +119,16 @@ class MetricsCustomizer
         file.withOutputStream {
           // NOTE: there is no easy way to get out json report, so using the console reporter for now
           def reporter = new ConsoleReporter(
-              metricsRegistry,
+              metricRegistry,
               new PrintStream(it),
-              MetricPredicate.ALL,
+              Locale.US,
               clock,
-              TimeZone.getDefault()
+              TimeZone.getDefault(),
+              TimeUnit.SECONDS,
+              TimeUnit.MILLISECONDS,
+              MetricFilter.ALL
           )
-          reporter.run()
+          reporter.report()
         }
       }
     }

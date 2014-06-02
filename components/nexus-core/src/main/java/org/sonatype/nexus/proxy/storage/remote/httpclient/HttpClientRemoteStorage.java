@@ -51,12 +51,11 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.SharedMetricRegistries;
+import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -127,7 +126,7 @@ public class HttpClientRemoteStorage
    */
   private static final boolean CAN_WRITE = true;
 
-  private final MetricsRegistry metricsRegistry;
+  private final MetricRegistry metricRegistry;
 
   private final QueryStringBuilder queryStringBuilder;
 
@@ -144,7 +143,7 @@ public class HttpClientRemoteStorage
                           final HttpClientManager httpClientManager)
   {
     super(applicationStatusSource, mimeSupport);
-    this.metricsRegistry = Metrics.defaultRegistry();
+    this.metricRegistry = SharedMetricRegistries.getOrCreate("nexus");
     this.queryStringBuilder = queryStringBuilder;
     this.httpClientManager = httpClientManager;
   }
@@ -492,7 +491,7 @@ public class HttpClientRemoteStorage
                               final HttpUriRequest httpRequest, final String baseUrl, final boolean contentRequest) throws RemoteStorageException
   {
     final Timer timer = timer(repository, httpRequest, baseUrl);
-    final TimerContext timerContext = timer.time();
+    final Timer.Context timerContext = timer.time();
     Stopwatch stopwatch = null;
     if (outboundRequestLog.isDebugEnabled()) {
       stopwatch = new Stopwatch().start();
@@ -509,7 +508,7 @@ public class HttpClientRemoteStorage
   }
 
   private Timer timer(final ProxyRepository repository, final HttpUriRequest httpRequest, final String baseUrl) {
-    return metricsRegistry.newTimer(HttpClientRemoteStorage.class, baseUrl, httpRequest.getMethod());
+    return metricRegistry.timer(MetricRegistry.name(HttpClientRemoteStorage.class, baseUrl, httpRequest.getMethod()));
   }
 
   private HttpResponse doExecuteRequest(final ProxyRepository repository, final ResourceStoreRequest request,

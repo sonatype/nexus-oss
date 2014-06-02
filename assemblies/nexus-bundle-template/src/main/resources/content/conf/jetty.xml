@@ -25,7 +25,7 @@
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
   <Set name="threadPool">
-    <New class="com.yammer.metrics.jetty.InstrumentedQueuedThreadPool"/>
+    <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedQueuedThreadPool"/>
   </Set>
 
   <Call name="addConnector">
@@ -38,7 +38,7 @@
     </Arg>
   </Call>
 
-  <New id="NexusHandler" class="com.yammer.metrics.jetty.InstrumentedHandler">
+  <New id="NexusHandler" class="org.sonatype.nexus.bootstrap.jetty.InstrumentedHandler">
     <Arg>
       <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
         <Arg><Property name="nexus-webapp"/></Arg>
