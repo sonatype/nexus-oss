@@ -21,8 +21,6 @@ import org.sonatype.nexus.web.internal.BaseUrlHolderFilter;
 import org.sonatype.nexus.web.internal.CommonHeadersFilter;
 import org.sonatype.nexus.web.internal.ErrorPageFilter;
 import org.sonatype.nexus.web.internal.ErrorPageServlet;
-import org.sonatype.nexus.web.internal.NexusGuiceFilter;
-import org.sonatype.nexus.web.internal.SecurityFilter;
 import org.sonatype.nexus.web.metrics.MetricsModule;
 import org.sonatype.nexus.webresources.WebResourceBundle;
 import org.sonatype.security.SecuritySystem;
@@ -57,7 +55,6 @@ public class NexusModules
   {
     @Override
     protected void configure() {
-      bind(SecurityFilter.class);
       install(new ShiroAopModule());
       install(new InstrumentationModule());
       install(new BvalModule());
@@ -84,9 +81,6 @@ public class NexusModules
 
     @Override
     protected void configure() {
-      binder().requireExplicitBindings();
-      bind(NexusGuiceFilter.class);
-
       // HACK: Re-bind servlet-context instance with a name to avoid backwards-compat warnings from guice-servlet
       bind(ServletContext.class).annotatedWith(named("nexus")).toInstance(servletContext);
       bind(ParameterKeys.PROPERTIES).toInstance(properties);

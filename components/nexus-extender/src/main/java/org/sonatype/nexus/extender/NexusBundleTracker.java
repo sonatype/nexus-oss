@@ -91,13 +91,11 @@ public class NexusBundleTracker
     try {
       final ClassSpace pluginSpace = new BundleClassSpace(bundle);
 
-      final boolean hasPlexus = bundle.getResource("META-INF/plexus/components.xml") != null;
-
       // Assemble plugin components and resources
       final List<Module> modules = new ArrayList<Module>();
       modules.add(new PluginModule());
       modules.addAll(interceptorModules);
-      if (!hasPlexus) {
+      if (bundle.getResource("META-INF/plexus/components.xml") == null) {
         modules.add(new SpaceModule(pluginSpace, BeanScanning.GLOBAL_INDEX).with(NexusTypeBinder.STRATEGY));
       }
       else {
@@ -107,9 +105,6 @@ public class NexusBundleTracker
       {
         @Override
         protected void configure() {
-          if (!hasPlexus) {
-            binder().requireExplicitBindings();
-          }
           bind(MutableBeanLocator.class).toInstance(locator);
           bind(RankingFunction.class).toInstance(new DefaultRankingFunction(pluginRank.incrementAndGet()));
           bind(ParameterKeys.PROPERTIES).toInstance(variables);

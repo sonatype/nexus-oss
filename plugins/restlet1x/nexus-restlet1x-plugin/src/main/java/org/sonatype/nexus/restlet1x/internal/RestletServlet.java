@@ -16,7 +16,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.Enumeration;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -40,7 +39,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author adreghiciu
  */
-@Named
 @Singleton
 class RestletServlet
     extends PlexusServerServlet
