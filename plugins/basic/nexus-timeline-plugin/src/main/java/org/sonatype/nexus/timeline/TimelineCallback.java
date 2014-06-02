@@ -10,22 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.timeline;
 
-import java.util.Map;
+import java.io.IOException;
 
 /**
- * Timeline entry.
+ * Callback to receive and process timeline records.
  *
  * @since 3.0
  */
-public interface Entry
+public interface TimelineCallback
 {
-  long getTimestamp();
-
-  String getType();
-
-  String getSubType();
-
-  Map<String, String> getData();
+  /**
+   * Method to process next constructed {@link Entry}. Should return {@code false} if no more records are
+   * needed and the processing should stop.
+   */
+  boolean processNext(Entry rec)
+      throws IOException;
 }

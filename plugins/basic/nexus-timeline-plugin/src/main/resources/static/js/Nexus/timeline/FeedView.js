@@ -18,7 +18,10 @@
  */
 NX.define('Nexus.timeline.FeedView', {
   extend : 'Ext.Panel',
-  requires : ['Nexus.timeline.FeedGrid'],
+  requires : [
+    'Nexus.siesta',
+    'Nexus.timeline.FeedGrid'
+  ],
 
   /*
    * config object: { feedUrl ; required title }
@@ -42,7 +45,7 @@ NX.define('Nexus.timeline.FeedView', {
     ]);
 
     self.feedReader = new Ext.data.JsonReader({
-      root : 'data',
+      root : 'feedEntries',
       id : 'resourceURI'
     }, self.feedRecordConstructor);
 
@@ -159,7 +162,7 @@ NX.define('Nexus.timeline.FeedView', {
   }
 
 }, function() {
-  Sonatype.config.repos.urls.feeds = Sonatype.config.servicePath + '/feeds';
+  Sonatype.config.repos.urls.feeds = Nexus.siesta.basePath + '/timeline/feeds';
   Sonatype.Events.addListener('nexusNavigationInit', function(panel) {
     var sp = Sonatype.lib.Permissions;
     panel.add({

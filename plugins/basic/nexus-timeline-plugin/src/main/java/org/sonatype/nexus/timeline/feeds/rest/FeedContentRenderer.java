@@ -10,22 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.timeline;
 
-import java.util.Map;
+package org.sonatype.nexus.timeline.feeds.rest;
+
+import org.sonatype.nexus.timeline.feeds.FeedEvent;
+
+import com.sun.syndication.feed.synd.SyndContent;
+import com.sun.syndication.feed.synd.SyndEntry;
 
 /**
- * Timeline entry.
+ * Feed content renderer renders the feed entry content and title. Usually it performs some templating, but
+ * does not have to.
  *
  * @since 3.0
  */
-public interface Entry
+public interface FeedContentRenderer
 {
-  long getTimestamp();
+  /**
+   * Used to set content type (mime) that this entry will be rendered. See {@link SyndContent#setType(String)}.
+   */
+  String getContentType(FeedEvent evt);
 
-  String getType();
+  /**
+   * Returns the title of entry. See {@link SyndEntry#setTitle(String)}.
+   */
+  String getTitle(FeedEvent evt);
 
-  String getSubType();
-
-  Map<String, String> getData();
+  /**
+   * Returns the content of the entry. See {@link SyndContent#setValue(String)}.
+   */
+  String getContent(FeedEvent evt);
 }

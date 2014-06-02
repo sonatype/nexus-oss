@@ -10,32 +10,38 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.timeline;
 
-import java.io.IOException;
-import java.util.List;
+package org.sonatype.nexus.timeline.feeds;
 
-import com.google.common.collect.Lists;
+import java.util.Set;
+
+import org.sonatype.nexus.timeline.Entry;
+
+import com.google.common.base.Predicate;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Handy {@link TimelineCallback} that gathers all the found entries into list.
+ * Predicate for {@link Entry} filtering that implements "key" associated value is in set of. When the values set has
+ * one value, it's basically reduces to "equals" predicate.
  *
  * @since 3.0
  */
-public class EntryListCallback
-    implements TimelineCallback
+public class AnyOfFilter
+    implements Predicate<Entry>
 {
-  private final List<Entry> entries = Lists.newArrayList();
+  private final String key;
 
-  @Override
-  public boolean processNext(Entry rec)
-      throws IOException
-  {
-    entries.add(0, rec);
-    return true;
+  private final Set<String> values;
+
+  public AnyOfFilter(final String key, final Set<String> values) {
+    this.key = checkNotNull(key);
+    this.values = checkNotNull(values);
   }
 
-  public List<Entry> getEntries() {
-    return entries;
+  @Override
+  public boolean apply(final Entry hit) {
+    return (hit.getData().containsKey(key)
+        && values.contains(hit.getData().get(key)));
   }
 }

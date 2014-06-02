@@ -10,22 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.timeline;
 
-import java.util.Map;
+package org.sonatype.nexus.timeline.internal;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.log.LogConfigurationCustomizer;
+import org.sonatype.nexus.log.LoggerLevel;
 
 /**
- * Timeline entry.
+ * Configures Timeline loggers.
  *
  * @since 3.0
  */
-public interface Entry
+@Singleton
+@Named
+public class TimelineLogConfigurationCustomizer
+    implements LogConfigurationCustomizer
 {
-  long getTimestamp();
-
-  String getType();
-
-  String getSubType();
-
-  Map<String, String> getData();
+  @Override
+  public void customize(final Configuration configuration) {
+    // Useful loggers (level will be calculated as effective level)
+    configuration.setLoggerLevel("org.sonatype.nexus.timeline", LoggerLevel.DEFAULT);
+  }
 }

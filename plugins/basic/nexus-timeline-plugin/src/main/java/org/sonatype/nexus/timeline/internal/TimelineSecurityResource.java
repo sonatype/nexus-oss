@@ -10,22 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.timeline;
 
-import java.util.Map;
+package org.sonatype.nexus.timeline.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.plugin.support.StaticSecurityResourceSupport;
+import org.sonatype.nexus.timeline.TimelinePlugin;
+import org.sonatype.security.realms.tools.StaticSecurityResource;
 
 /**
- * Timeline entry.
+ * Timeline {@link StaticSecurityResource}.
  *
  * @since 3.0
  */
-public interface Entry
+@Named
+@Singleton
+public class TimelineSecurityResource
+    extends StaticSecurityResourceSupport
 {
-  long getTimestamp();
-
-  String getType();
-
-  String getSubType();
-
-  Map<String, String> getData();
+  @Inject
+  public TimelineSecurityResource(final TimelinePlugin plugin) {
+    super(plugin);
+  }
 }

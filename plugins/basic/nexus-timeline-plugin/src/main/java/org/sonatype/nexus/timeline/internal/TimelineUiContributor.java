@@ -10,22 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.timeline;
 
-import java.util.Map;
+package org.sonatype.nexus.timeline.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.plugins.ui.contribution.UiContributorSupport;
+import org.sonatype.nexus.timeline.TimelinePlugin;
 
 /**
- * Timeline entry.
+ * UI contribution for the timeline plugin.
  *
- * @since 3.0
+ * @since 2.5
  */
-public interface Entry
+@Named
+@Singleton
+public class TimelineUiContributor
+    extends UiContributorSupport
 {
-  long getTimestamp();
-
-  String getType();
-
-  String getSubType();
-
-  Map<String, String> getData();
+  @Inject
+  public TimelineUiContributor(final TimelinePlugin owner) {
+    super(owner);
+  }
 }
