@@ -14,30 +14,26 @@ package org.sonatype.nexus.web.metrics;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.yammer.metrics.core.Clock;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.VirtualMachineMetrics;
+import com.codahale.metrics.MetricRegistry;
 
 /**
- * Customized {@link com.yammer.metrics.reporting.MetricsServlet} to support download.
+ * Customized {@link com.codahale.metrics.servlets.MetricsServlet} to support injection and download.
  *
  * @since 3.0
  */
+@Singleton
 public class MetricsServlet
-  extends com.yammer.metrics.reporting.MetricsServlet
+  extends com.codahale.metrics.servlets.MetricsServlet
 {
-  public MetricsServlet(final Clock clock,
-                        final VirtualMachineMetrics vm,
-                        final MetricsRegistry registry,
-                        final JsonFactory factory,
-                        final boolean showJvmMetrics)
-  {
-    super(clock, vm, registry, factory, showJvmMetrics);
+  @Inject
+  public MetricsServlet(MetricRegistry registry) {
+    super(registry);
   }
 
   @Override

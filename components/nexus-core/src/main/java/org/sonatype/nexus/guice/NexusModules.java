@@ -26,10 +26,13 @@ import org.sonatype.nexus.webresources.WebResourceBundle;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.web.guice.SecurityWebModule;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.SharedMetricRegistries;
+import com.codahale.metrics.health.HealthCheckRegistry;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
-import com.yammer.metrics.guice.InstrumentationModule;
+import com.palominolabs.metrics.guice.InstrumentationModule;
 import org.apache.shiro.guice.aop.ShiroAopModule;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.eclipse.sisu.inject.DefaultRankingFunction;
@@ -53,10 +56,23 @@ public class NexusModules
   public static class CommonModule
       extends AbstractModule
   {
+    static final HealthCheckRegistry sharedHealthCheckRegistry = new HealthCheckRegistry();
+
     @Override
     protected void configure() {
       install(new ShiroAopModule());
-      install(new InstrumentationModule());
+      install(new InstrumentationModule()
+      {
+        @Override
+        protected MetricRegistry createMetricRegistry() {
+          return SharedMetricRegistries.getOrCreate("nexus");
+        }
+
+        @Override
+        protected HealthCheckRegistry createHealthCheckRegistry() {
+          return sharedHealthCheckRegistry;
+        }
+      });
       install(new BvalModule());
     }
   }
