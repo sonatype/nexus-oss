@@ -31,7 +31,7 @@ public class EntryListCallback
   public boolean processNext(Entry rec)
       throws IOException
   {
-    entries.add(0, rec);
+    entries.add(rec);
     return true;
   }
 
