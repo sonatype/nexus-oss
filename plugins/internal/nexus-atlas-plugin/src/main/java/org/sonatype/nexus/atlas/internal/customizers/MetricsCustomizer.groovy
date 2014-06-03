@@ -13,21 +13,22 @@
 package org.sonatype.nexus.atlas.internal.customizers
 
 import com.codahale.metrics.Clock
-import com.codahale.metrics.ConsoleReporter
-import com.codahale.metrics.MetricFilter
 import com.codahale.metrics.MetricRegistry
 import com.codahale.metrics.health.HealthCheckRegistry
+import com.codahale.metrics.json.HealthCheckModule
+import com.codahale.metrics.json.MetricsModule
 import com.codahale.metrics.jvm.ThreadDump
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
 import org.sonatype.nexus.atlas.SupportBundle
 import org.sonatype.nexus.atlas.SupportBundleCustomizer
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
-import java.lang.management.ManagementFactory
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import java.lang.management.ManagementFactory
+import java.util.concurrent.TimeUnit
 
 import static com.google.common.base.Preconditions.checkNotNull
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.HIGH
@@ -83,52 +84,36 @@ class MetricsCustomizer
     }
 
     // add healthchecks
-    supportBundle << new GeneratedContentSourceSupport(SYSINFO, 'healthcheck.txt') {
+    supportBundle << new GeneratedContentSourceSupport(SYSINFO, 'healthcheck.json') {
       {
         this.priority = OPTIONAL
       }
 
       @Override
       protected void generate(final File file) {
-        file.withPrintWriter { out ->
-          healthCheckRegistry.runHealthChecks().each { key, result ->
-            def token = result.healthy ? '*' : '!'
-            def state = result.healthy ? 'OK' : 'ERROR'
-            out.println "$token $key: $state"
-            if (result.message) {
-              out.println "  ${result.message}"
-            }
-            if (result.error) {
-              out.println()
-              result.error.printStackTrace out
-              out.println()
-            }
-          }
+        def results = healthCheckRegistry.runHealthChecks()
+        def mapper = new ObjectMapper().registerModule(new HealthCheckModule())
+        file.withOutputStream { out ->
+          mapper.writerWithDefaultPrettyPrinter().writeValue(out, results)
         }
       }
     }
 
     // add metrics
-    supportBundle << new GeneratedContentSourceSupport(METRICS, 'metrics.txt') {
+    supportBundle << new GeneratedContentSourceSupport(METRICS, 'metrics.json') {
       {
         this.priority = OPTIONAL
       }
 
       @Override
       protected void generate(final File file) {
-        file.withOutputStream {
-          // NOTE: there is no easy way to get out json report, so using the console reporter for now
-          def reporter = new ConsoleReporter(
-              metricRegistry,
-              new PrintStream(it),
-              Locale.US,
-              clock,
-              TimeZone.getDefault(),
-              TimeUnit.SECONDS,
-              TimeUnit.MILLISECONDS,
-              MetricFilter.ALL
-          )
-          reporter.report()
+        def mapper = new ObjectMapper().registerModule(new MetricsModule(
+            TimeUnit.SECONDS, // rate-unit
+            TimeUnit.SECONDS, // duration-unit
+            false // show-samples
+        ))
+        file.withOutputStream { out ->
+          mapper.writerWithDefaultPrettyPrinter().writeValue(out, metricRegistry)
         }
       }
     }
