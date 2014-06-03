@@ -13,6 +13,7 @@
 package org.sonatype.nexus.web.metrics;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -20,7 +21,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.codahale.metrics.JvmAttributeGaugeSet;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.jvm.BufferPoolMetricSet;
+import com.codahale.metrics.jvm.FileDescriptorRatioGauge;
+import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
+import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
+import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * Customized {@link com.codahale.metrics.servlets.MetricsServlet} to support injection and download.
@@ -34,6 +43,14 @@ public class MetricsServlet
   @Inject
   public MetricsServlet(MetricRegistry registry) {
     super(registry);
+
+    // JVM metrics are no longer automatically added in codahale-metrics
+    registry.register(name("jvm", "vm"), new JvmAttributeGaugeSet());
+    registry.register(name("jvm", "memory"), new MemoryUsageGaugeSet());
+    registry.register(name("jvm", "buffers"), new BufferPoolMetricSet(ManagementFactory.getPlatformMBeanServer()));
+    registry.register(name("jvm", "fd_usage"), new FileDescriptorRatioGauge());
+    registry.register(name("jvm", "thread-states"), new ThreadStatesGaugeSet());
+    registry.register(name("jvm", "garbage-collectors"), new GarbageCollectorMetricSet());
   }
 
   @Override
