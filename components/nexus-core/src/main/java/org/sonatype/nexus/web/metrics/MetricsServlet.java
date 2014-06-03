@@ -14,9 +14,11 @@ package org.sonatype.nexus.web.metrics;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +43,7 @@ public class MetricsServlet
   extends com.codahale.metrics.servlets.MetricsServlet
 {
   @Inject
-  public MetricsServlet(MetricRegistry registry) {
+  public MetricsServlet(final MetricRegistry registry) {
     super(registry);
 
     // JVM metrics are no longer automatically added in codahale-metrics
@@ -51,6 +53,12 @@ public class MetricsServlet
     registry.register(name("jvm", "fd_usage"), new FileDescriptorRatioGauge());
     registry.register(name("jvm", "thread-states"), new ThreadStatesGaugeSet());
     registry.register(name("jvm", "garbage-collectors"), new GarbageCollectorMetricSet());
+  }
+
+  @Override
+  public void init(final ServletConfig config) throws ServletException {
+    config.getServletContext().setInitParameter(DURATION_UNIT, TimeUnit.MILLISECONDS.name());
+    super.init(config);
   }
 
   @Override
