@@ -20,6 +20,7 @@ Ext.define('NX.ext.SearchBox', {
   alias: 'widget.nx-searchbox',
 
   emptyText: 'search',
+  submitValue: false,
 
   /**
    * @cfg {int} number of milliseconds to trigger searching (defaults to 200)
