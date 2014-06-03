@@ -32,8 +32,6 @@
   <properties>
     <pluginName>Nexus Capabilities Plugin</pluginName>
     <pluginDescription>Allows Nexus to define and manage capabilities.</pluginDescription>
-
-    <debug-js>false</debug-js>
   </properties>
 
   <dependencies>
@@ -51,13 +49,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-siesta-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-ui-extjs3-plugin</artifactId>
       <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
@@ -147,11 +138,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
       </plugin>
 
       <plugin>

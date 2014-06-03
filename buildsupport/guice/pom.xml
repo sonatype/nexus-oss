@@ -29,7 +29,7 @@
 
   <properties>
     <eclipse-sisu.version>0.2.1</eclipse-sisu.version>
-    <sisu-guice.version>3.2.1</sisu-guice.version>
+    <sisu-guice.version>3.2.2</sisu-guice.version>
   </properties>
 
   <dependencyManagement>
