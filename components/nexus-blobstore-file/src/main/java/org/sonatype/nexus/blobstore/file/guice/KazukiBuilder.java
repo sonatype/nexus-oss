@@ -2,10 +2,10 @@ package org.sonatype.nexus.blobstore.file.guice;
 
 import java.io.File;
 
-import javax.inject.Provider;
-
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import io.kazuki.v0.store.guice.KazukiModule.Builder;
 import io.kazuki.v0.store.index.SecondaryIndexStore;
 import io.kazuki.v0.store.jdbi.JdbiDataSourceConfiguration;
@@ -21,7 +21,6 @@ import static org.sonatype.nexus.blobstore.file.kazuki.KazukiBlobMetadataStore.M
  * @since 3.0
  */
 public class KazukiBuilder
-    implements Provider<KazukiHolder>
 {
   private final String name;
 
@@ -32,20 +31,23 @@ public class KazukiBuilder
     this.dbDirectory = dbDirectory;
   }
 
-  @Override
-  public KazukiHolder get() {
+  public KazukiHolder build() {
     final Injector injector = Guice.createInjector(new Builder(name)
         .withJdbiConfiguration(name, getJdbiDataSourceConfiguration())
         .withSequenceServiceConfiguration(name, getSequenceServiceConfiguration())
         .withKeyValueStoreConfiguration(name, getKeyValueStoreConfiguration())
         .build());
 
-    final Lifecycle lifecycle = injector.getInstance(Lifecycle.class);
-    final KeyValueStore keyValueStore = injector.getInstance(KeyValueStore.class);
-    final SchemaStore schemaStore = injector.getInstance(SchemaStore.class);
-    final SecondaryIndexStore secondaryIndexStore = injector.getInstance(SecondaryIndexStore.class);
+    final Lifecycle lifecycle = getInstance(Lifecycle.class, injector);
+    final KeyValueStore keyValueStore = getInstance(KeyValueStore.class, injector);
+    final SchemaStore schemaStore = getInstance(SchemaStore.class, injector);
+    final SecondaryIndexStore secondaryIndexStore = getInstance(SecondaryIndexStore.class, injector);
 
     return new KazukiHolder(lifecycle, keyValueStore, schemaStore, secondaryIndexStore);
+  }
+
+  private <T> T getInstance(final Class<T> clazz, final Injector injector) {
+    return injector.getInstance(Key.get(clazz, Names.named(name)));
   }
 
   private JdbiDataSourceConfiguration getJdbiDataSourceConfiguration() {
