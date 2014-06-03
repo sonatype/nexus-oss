@@ -22,8 +22,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
-import javax.inject.Named;
-
 import org.sonatype.nexus.blobstore.file.utils.DigesterUtils;
 import org.sonatype.nexus.util.file.DirSupport;
 
@@ -35,6 +33,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.blobstore.file.MetricsInputStream.metricsInputStream;
 
 /**
+ * A straightforward java.nio implementation of {@link SimpleFileOperations}.
+ *
  * @since 3.0
  */
 public class SimpleFileOperations

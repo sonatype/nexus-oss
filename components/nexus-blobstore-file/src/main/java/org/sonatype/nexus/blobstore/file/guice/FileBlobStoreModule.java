@@ -65,7 +65,6 @@ public class FileBlobStoreModule
   /**
    * The {@code name} parameter must be unique across all of Nexus.
    */
-  @Inject
   public FileBlobStoreModule(final String name) {
     this.name = checkNotNull(name, "name");
   }

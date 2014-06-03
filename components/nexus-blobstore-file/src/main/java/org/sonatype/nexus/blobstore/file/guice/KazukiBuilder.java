@@ -18,6 +18,9 @@ import io.kazuki.v0.store.sequence.SequenceServiceConfiguration;
 import static org.sonatype.nexus.blobstore.file.kazuki.KazukiBlobMetadataStore.METADATA_TYPE;
 
 /**
+ * Encapsulates construction of a Kazuki key value store in a separate Injector to eliminate interactions with the rest
+ * of Nexus' guice wiring.
+ *
  * @since 3.0
  */
 public class KazukiBuilder
