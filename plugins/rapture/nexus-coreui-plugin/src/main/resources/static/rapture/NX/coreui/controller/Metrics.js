@@ -107,27 +107,29 @@ Ext.define('NX.coreui.controller.Metrics', {
       success: function (response) {
         var data = Ext.decode(response.responseText);
 
+        // return gauge value
+        function gv(name) {
+          return data.gauges[name].value
+        }
+
         // update memory charts
         panel.setTotalData([
-          { value: Math.round((data.gauges['jvm.memory.total.used'].value /
-              data.gauges['jvm.memory.total.max'].value) * 100) }
+          { value: Math.round((gv('jvm.memory.total.used') / gv('jvm.memory.total.max')) * 100) }
         ]);
         panel.setMemoryDistData([
-          { name: 'Heap', data: data.gauges['jvm.memory.heap.used'].value },
-          { name: 'Non-Heap', data: data.gauges['jvm.memory.total.used'].value -
-              data.gauges['jvm.memory.heap.used'].value },
-          { name: 'Available', data: data.gauges['jvm.memory.total.max'].value -
-              data.gauges['jvm.memory.total.used'].value }
+          { name: 'Heap', data: gv('jvm.memory.heap.used') },
+          { name: 'Non-Heap', data: gv('jvm.memory.total.used') - gv('jvm.memory.heap.used') },
+          { name: 'Available', data: gv('jvm.memory.total.max') - gv('jvm.memory.total.used') }
         ]);
 
         // update threads charts
         panel.setThreadStatesData([
-          { name: 'New', data: data.gauges['jvm.thread-states.new.count'].value },
-          { name: 'Terminated', data: data.gauges['jvm.thread-states.terminated.count'].value },
-          { name: 'Blocked', data: data.gauges['jvm.thread-states.blocked.count'].value },
-          { name: 'Runnable', data: data.gauges['jvm.thread-states.runnable.count'].value },
-          { name: 'Timed Waiting', data: data.gauges['jvm.thread-states.timed_waiting.count'].value },
-          { name: 'Waiting', data: data.gauges['jvm.thread-states.waiting.count'].value }
+          { name: 'New', data: gv('jvm.thread-states.new.count') },
+          { name: 'Terminated', data: gv('jvm.thread-states.terminated.count') },
+          { name: 'Blocked', data: gv('jvm.thread-states.blocked.count') },
+          { name: 'Runnable', data: gv('jvm.thread-states.runnable.count') },
+          { name: 'Timed Waiting', data: gv('jvm.thread-states.timed_waiting.count') },
+          { name: 'Waiting', data: gv('jvm.thread-states.waiting.count') }
         ]);
       }
     });
