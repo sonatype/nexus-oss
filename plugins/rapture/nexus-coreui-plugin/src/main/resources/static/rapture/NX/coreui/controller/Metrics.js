@@ -108,25 +108,26 @@ Ext.define('NX.coreui.controller.Metrics', {
         var data = Ext.decode(response.responseText);
 
         // update memory charts
-        var memory = data.jvm.memory;
         panel.setTotalData([
-          { value: Math.round((memory.totalUsed / memory.totalMax) * 100) }
+          { value: Math.round((data.gauges['jvm.memory.total.used'].value /
+              data.gauges['jvm.memory.total.max'].value) * 100) }
         ]);
         panel.setMemoryDistData([
-          { name: 'Heap', data: memory.heapUsed },
-          { name: 'Non-Heap', data: memory.totalUsed - memory.heapUsed },
-          { name: 'Available', data: memory.totalMax - memory.totalUsed }
+          { name: 'Heap', data: data.gauges['jvm.memory.heap.used'].value },
+          { name: 'Non-Heap', data: data.gauges['jvm.memory.total.used'].value -
+              data.gauges['jvm.memory.heap.used'].value },
+          { name: 'Available', data: data.gauges['jvm.memory.total.max'].value -
+              data.gauges['jvm.memory.total.used'].value }
         ]);
 
         // update threads charts
-        var threads = data.jvm['thread-states'];
         panel.setThreadStatesData([
-          { name: 'New', data: threads.new },
-          { name: 'Terminated', data: threads.terminated },
-          { name: 'Blocked', data: threads.blocked },
-          { name: 'Runnable', data: threads.runnable },
-          { name: 'Timed Waiting', data: threads.timed_waiting },
-          { name: 'Waiting', data: threads.waiting }
+          { name: 'New', data: data.gauges['jvm.thread-states.new.count'].value },
+          { name: 'Terminated', data: data.gauges['jvm.thread-states.terminated.count'].value },
+          { name: 'Blocked', data: data.gauges['jvm.thread-states.blocked.count'].value },
+          { name: 'Runnable', data: data.gauges['jvm.thread-states.runnable.count'].value },
+          { name: 'Timed Waiting', data: data.gauges['jvm.thread-states.timed_waiting.count'].value },
+          { name: 'Waiting', data: data.gauges['jvm.thread-states.waiting.count'].value }
         ]);
       }
     });
