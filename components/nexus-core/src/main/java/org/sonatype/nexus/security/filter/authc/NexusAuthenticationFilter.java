@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.filter.authc;
 
 import java.util.List;
@@ -18,6 +19,9 @@ import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import org.sonatype.nexus.csrfguard.CsrfGuardFilter;
+
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
@@ -41,6 +45,22 @@ public class NexusAuthenticationFilter
   @Inject
   public void install(List<AuthenticationTokenFactory> factories) {
     this.factories = checkNotNull(factories);
+  }
+
+  @Override
+  protected boolean isAccessAllowed(final ServletRequest request, final ServletResponse response,
+                                    final Object mappedValue)
+  {
+    if (isLoginAttempt(request, response)) {
+      request.setAttribute(CsrfGuardFilter.SKIP_VALIDATION, Boolean.TRUE);
+      try {
+        return executeLogin(request, response) && super.isAccessAllowed(request, response, mappedValue);
+      }
+      catch (Exception e) {
+        throw Throwables.propagate(e);
+      }
+    }
+    return super.isAccessAllowed(request, response, mappedValue);
   }
 
   /**
