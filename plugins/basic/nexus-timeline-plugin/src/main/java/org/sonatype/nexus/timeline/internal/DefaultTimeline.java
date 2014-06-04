@@ -44,6 +44,7 @@ import io.kazuki.v0.store.journal.PartitionInfo;
 import io.kazuki.v0.store.journal.PartitionInfoSnapshot;
 import io.kazuki.v0.store.keyvalue.KeyValueIterable;
 import io.kazuki.v0.store.keyvalue.KeyValuePair;
+import io.kazuki.v0.store.keyvalue.KeyValueStoreIteration.SortDirection;
 import io.kazuki.v0.store.lifecycle.Lifecycle;
 import io.kazuki.v0.store.schema.SchemaStore;
 import io.kazuki.v0.store.schema.TypeValidation;
@@ -203,7 +204,7 @@ public class DefaultTimeline
       // We do manual filtering here, so not passing in limit and limiting manually
       int currentCount = 0;
       try (final KeyValueIterable<KeyValuePair<EntryRecord>> kvs = journalStore
-          .entriesRelative(EntryRecord.SCHEMA_NAME, EntryRecord.class, (long) fromItem,
+          .entriesRelative(EntryRecord.SCHEMA_NAME, EntryRecord.class, SortDirection.DESCENDING,  (long) fromItem,
               null)) {
         for (KeyValuePair<EntryRecord> kv : kvs) {
           final EntryRecord record = kv.getValue();
