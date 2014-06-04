@@ -75,7 +75,7 @@ public class Nexus4038DeleteSystemFeedIT
     Assert.assertTrue("Expected more than 2 entries, but got " + entries.size() + " - "
         + entries, entries.size() >= 2);
 
-    final String expected = "deleted.Action was initiated by user \"" + TEST_USER_NAME + "\"";
+    final String expected = "Deleted by " + TEST_USER_NAME;;
     boolean foundExpected = false;
     List<String> desc = new ArrayList<String>();
     for (SyndEntry entry : entries) {

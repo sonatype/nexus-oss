@@ -51,7 +51,6 @@
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
-      <version>0.9</version>
     </dependency>
 
     <!-- Feed resources, XO -->
