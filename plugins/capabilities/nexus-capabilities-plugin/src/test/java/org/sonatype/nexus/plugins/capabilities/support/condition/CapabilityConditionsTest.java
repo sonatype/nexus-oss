@@ -15,9 +15,9 @@ package org.sonatype.nexus.plugins.capabilities.support.condition;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.CapabilityOfTypeActiveCondition;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.CapabilityOfTypeExistsCondition;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.PassivateCapabilityDuringUpdateCondition;
+import org.sonatype.nexus.plugins.capabilities.condition.CapabilityOfTypeActiveCondition;
+import org.sonatype.nexus.plugins.capabilities.condition.CapabilityOfTypeExistsCondition;
+import org.sonatype.nexus.plugins.capabilities.condition.PassivateCapabilityDuringUpdateCondition;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
