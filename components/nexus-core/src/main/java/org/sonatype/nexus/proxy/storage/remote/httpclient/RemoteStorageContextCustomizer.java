@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.internal.httpclient;
+package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
 import java.util.List;
 import java.util.Map;
@@ -89,9 +89,9 @@ public class RemoteStorageContextCustomizer
   }
 
   @VisibleForTesting
-  void applyAuthenticationConfig(final Builder builder,
-                                 final RemoteAuthenticationSettings ras,
-                                 final HttpHost proxyHost)
+  public void applyAuthenticationConfig(final Builder builder,
+                                        final RemoteAuthenticationSettings ras,
+                                        final HttpHost proxyHost)
   {
     if (ras != null) {
       String authScope = "target";
@@ -137,7 +137,7 @@ public class RemoteStorageContextCustomizer
   }
 
   @VisibleForTesting
-  void applyProxyConfig(final Builder builder, final RemoteProxySettings remoteProxySettings) {
+  public void applyProxyConfig(final Builder builder, final RemoteProxySettings remoteProxySettings) {
     if (remoteProxySettings != null
         && remoteProxySettings.getHttpProxySettings() != null
         && remoteProxySettings.getHttpProxySettings().isEnabled()) {
