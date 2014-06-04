@@ -15,7 +15,7 @@ package org.sonatype.nexus.timeline.feeds.subscribers;
 
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
+import org.sonatype.nexus.proxy.attributes.DefaultAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;

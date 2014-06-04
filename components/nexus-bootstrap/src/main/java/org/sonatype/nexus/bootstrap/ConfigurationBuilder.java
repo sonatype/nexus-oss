@@ -61,12 +61,19 @@ public class ConfigurationBuilder
     return properties(props);
   }
 
-  private URL getResource(final String name) {
-    return ConfigurationBuilder.class.getResource(name);
+  private URL getResource(final Class<?> clazz, final String name) {
+    return clazz.getResource(name);
   }
 
   public ConfigurationBuilder properties(final String resource, final boolean required) throws IOException {
-    URL url = getResource(resource);
+    return properties(getClass(), resource, required);
+  }
+
+  /**
+   * @since 3.0
+   */
+  public ConfigurationBuilder properties(final Class<?> clazz, final String resource, final boolean required) throws IOException {
+    URL url = getResource(clazz, resource);
     if (url == null) {
       if (required) {
         throw new IllegalStateException("Missing required resource: " + resource);

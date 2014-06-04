@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 // don't use @Named, keep as implicit JIT-binding
-final class DynamicFilterPipeline
+public final class DynamicFilterPipeline
     extends AbstractFilterPipeline
 {
   private static final String NL = System.getProperty("line.separator");

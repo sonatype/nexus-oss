@@ -20,7 +20,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.plugins.capabilities.internal.ActivationConditionHandlerFactory;
 import org.sonatype.nexus.plugins.capabilities.internal.ValidityConditionHandlerFactory;
-import org.sonatype.nexus.plugins.capabilities.internal.validator.ValidatorFactory;
+import org.sonatype.nexus.plugins.capabilities.validator.ValidatorFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;

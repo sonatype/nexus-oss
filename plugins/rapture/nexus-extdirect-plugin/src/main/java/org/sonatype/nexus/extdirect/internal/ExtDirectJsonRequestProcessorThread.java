@@ -14,7 +14,7 @@ package org.sonatype.nexus.extdirect.internal;
 
 import javax.inject.Named;
 
-import org.sonatype.security.internal.UserIdMdcHelper;
+import org.sonatype.security.UserIdMdcHelper;
 
 import com.softwarementors.extjs.djn.servlet.ssm.SsmJsonRequestProcessorThread;
 import org.apache.shiro.SecurityUtils;

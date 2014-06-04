@@ -15,7 +15,7 @@ package org.sonatype.nexus.plugins.siesta;
 import javax.inject.Named;
 
 import org.sonatype.nexus.guice.FilterChainModule;
-import org.sonatype.nexus.web.internal.SecurityFilter;
+import org.sonatype.nexus.web.SecurityFilter;
 import org.sonatype.siesta.server.SiestaServlet;
 import org.sonatype.siesta.server.internal.resteasy.ResteasyModule;
 

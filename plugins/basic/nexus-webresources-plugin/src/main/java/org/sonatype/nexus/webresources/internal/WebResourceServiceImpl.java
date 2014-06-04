@@ -26,7 +26,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.ServletContext;
 
-import org.sonatype.nexus.internal.DevModeResources;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.webresources.FileWebResource;
 import org.sonatype.nexus.webresources.UrlWebResource;

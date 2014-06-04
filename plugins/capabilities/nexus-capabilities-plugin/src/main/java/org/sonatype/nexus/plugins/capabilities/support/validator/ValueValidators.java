@@ -18,7 +18,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Validator;
-import org.sonatype.nexus.plugins.capabilities.internal.validator.ValidatorFactory;
+import org.sonatype.nexus.plugins.capabilities.validator.ValidatorFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

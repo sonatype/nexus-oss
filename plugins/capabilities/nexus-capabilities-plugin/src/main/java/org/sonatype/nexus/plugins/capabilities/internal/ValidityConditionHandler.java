@@ -18,7 +18,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityContextAware;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.SatisfiedCondition;
+import org.sonatype.nexus.plugins.capabilities.condition.SatisfiedCondition;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
