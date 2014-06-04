@@ -10,15 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.internal;
+package org.sonatype.nexus.webresources.internal;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import com.google.common.collect.Lists;
 
@@ -27,8 +24,6 @@ import com.google.common.collect.Lists;
  *
  * @since 2.7
  */
-@Named
-@Singleton
 public class DevModeResources
 {
 
