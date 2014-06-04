@@ -15,7 +15,7 @@ package org.sonatype.nexus.restlet1x.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.sonatype.nexus.web.internal.SecurityFilter;
+import org.sonatype.nexus.web.SecurityFilter;
 
 import com.google.inject.servlet.ServletModule;
 

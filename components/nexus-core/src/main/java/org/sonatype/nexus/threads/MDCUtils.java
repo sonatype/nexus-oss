@@ -14,7 +14,7 @@ package org.sonatype.nexus.threads;
 
 import java.util.Map;
 
-import org.sonatype.security.internal.UserIdMdcHelper;
+import org.sonatype.security.UserIdMdcHelper;
 
 import com.google.common.collect.Maps;
 import org.slf4j.MDC;

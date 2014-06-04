@@ -19,7 +19,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
+import org.sonatype.nexus.proxy.attributes.DefaultAttributes;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

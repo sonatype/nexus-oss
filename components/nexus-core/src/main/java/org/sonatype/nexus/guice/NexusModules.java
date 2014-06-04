@@ -38,7 +38,6 @@ import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.eclipse.sisu.inject.DefaultRankingFunction;
 import org.eclipse.sisu.inject.RankingFunction;
 import org.eclipse.sisu.wire.ParameterKeys;
-import org.osgi.framework.Bundle;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.inject.name.Names.named;
@@ -87,12 +86,9 @@ public class NexusModules
 
     private final Map<?, ?> properties;
 
-    private final Bundle systemBundle;
-
-    public CoreModule(final ServletContext servletContext, final Map<?, ?> properties, final Bundle systemBundle) {
+    public CoreModule(final ServletContext servletContext, final Map<?, ?> properties) {
       this.servletContext = checkNotNull(servletContext);
       this.properties = checkNotNull(properties);
-      this.systemBundle = checkNotNull(systemBundle);
     }
 
     @Override
@@ -100,7 +96,6 @@ public class NexusModules
       // HACK: Re-bind servlet-context instance with a name to avoid backwards-compat warnings from guice-servlet
       bind(ServletContext.class).annotatedWith(named("nexus")).toInstance(servletContext);
       bind(ParameterKeys.PROPERTIES).toInstance(properties);
-      bind(Bundle.class).toInstance(systemBundle);
 
       install(new CommonModule());
       install(new ServletModule()
