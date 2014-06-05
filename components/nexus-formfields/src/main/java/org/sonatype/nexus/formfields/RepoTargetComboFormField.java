@@ -66,14 +66,4 @@ public class RepoTargetComboFormField
     return null;
   }
 
-  @Override
-  public String getStorePath() {
-    return restlet1xStore("/repo_targets");
-  }
-
-  @Override
-  public String getStoreRoot() {
-    return "data";
-  }
-
 }
