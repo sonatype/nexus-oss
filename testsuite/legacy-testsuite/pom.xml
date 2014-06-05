@@ -361,23 +361,20 @@
                 <groupId>${it.nexus.bundle.groupId}</groupId>
                 <artifactId>${it.nexus.bundle.artifactId}</artifactId>
                 <version>${it.nexus.bundle.version}</version>
-                <type>zip</type>
                 <classifier>bundle</classifier>
+                <type>zip</type>
               </nexusBundleArtifact>
               <nexusPluginsArtifacts>
                 <plugin>
                   <groupId>org.sonatype.nexus</groupId>
                   <artifactId>nexus-it-helper-plugin</artifactId>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
                 </plugin>
+<!--
                 <plugin>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-p2-repository-plugin</artifactId>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                  <version>${nexus.version}</version>
                 </plugin>
+-->
               </nexusPluginsArtifacts>
             </configuration>
           </plugin>

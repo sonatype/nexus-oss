@@ -26,7 +26,7 @@
 
   <artifactId>nexus-p2-bridge-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
+  <packaging>bundle</packaging>
 
   <properties>
     <pluginName>Nexus P2 Bridge Plugin</pluginName>
@@ -152,10 +152,31 @@
       </plugin>
 
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
-          <assemblyDescriptor>${project.basedir}/src/main/assemble/bundle.xml</assemblyDescriptor>
+          <instructions>
+            <Embed-Dependency>
+              plexus-io,
+              eclipse-bridge,
+              org.sonatype.p2.bridge.model,
+              org.sonatype.p2.bridge.api,
+              commons-compress,
+              org.eclipse.osgi,
+              plexus-archiver,
+              xz
+            </Embed-Dependency>
+            <Include-Resource>
+              /p2-runtime/bridge/org.sonatype.p2.bridge.api.manifest=
+                ${project.build.directory}/dependency/org.sonatype.p2.bridge.api/META-INF/MANIFEST.MF,
+              /p2-runtime/bridge/org.sonatype.p2.bridge.model.manifest=
+                ${project.build.directory}/dependency/org.sonatype.p2.bridge.model/META-INF/MANIFEST.MF,
+              /p2-runtime/eclipse.zip=${project.build.directory}/dependency/p2-runtime.zip,
+              /p2-runtime/bundles=${project.build.directory}/dependency/bundles,
+              /=${project.build.outputDirectory},
+              {maven-resources}
+            </Include-Resource>
+          </instructions>
         </configuration>
       </plugin>
 

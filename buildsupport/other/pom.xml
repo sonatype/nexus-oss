@@ -30,12 +30,6 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-model</artifactId>
-        <version>${nexus-plugin-bundle.version}</version>
-      </dependency>
-
-      <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>16.0.1</version>

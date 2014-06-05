@@ -36,7 +36,6 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
       <scope>provided</scope>
-      <unpack>true</unpack>
       <includes>
         <include>*:nexus-content-plugin</include>
         <include>*:nexus-webresources-plugin</include>
@@ -76,7 +75,6 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
       <scope>provided</scope>
-      <unpack>false</unpack>
       <includes>
         <include>*:nexus-oss-edition</include>
         <include>*:nexus-plugin-api</include>

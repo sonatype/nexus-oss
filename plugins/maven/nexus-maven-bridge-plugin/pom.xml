@@ -26,7 +26,7 @@
 
   <artifactId>nexus-maven-bridge-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
+  <packaging>bundle</packaging>
 
   <properties>
     <pluginName>Nexus Maven Bridge Plugin</pluginName>
@@ -77,13 +77,26 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
-          <sharedDependencies>
-            <sharedDependency>org.sonatype.sisu:sisu-maven-bridge</sharedDependency>
-            <sharedDependency>org.apache.maven:maven-model-builder</sharedDependency>
-          </sharedDependencies>
+          <instructions>
+            <Embed-Dependency>
+              maven-settings,
+              wagon-http-shared4,
+              maven-aether-provider,
+              wagon-provider-api,
+              maven-settings-builder,
+              wagon-file,
+              wagon-http,
+              aether-impl,
+              plexus-sec-dispatcher,
+              aether-connector-wagon,
+              maven-model-builder,
+              wagon-http-lightweight,
+              sisu-maven-bridge
+            </Embed-Dependency>
+          </instructions>
         </configuration>
       </plugin>
 

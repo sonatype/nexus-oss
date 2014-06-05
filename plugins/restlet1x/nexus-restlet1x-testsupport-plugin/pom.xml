@@ -25,7 +25,7 @@
 
   <artifactId>nexus-restlet1x-testsupport-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
+  <packaging>bundle</packaging>
 
   <properties>
     <pluginName>Nexus Restlet 1.x Test Support Plugin</pluginName>
@@ -54,8 +54,15 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Embed-Dependency>
+              nexus-restlet1x-model
+            </Embed-Dependency>
+          </instructions>
+        </configuration>
       </plugin>
 
       <plugin>

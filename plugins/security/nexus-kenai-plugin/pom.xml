@@ -26,7 +26,7 @@
 
   <artifactId>nexus-kenai-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
+  <packaging>bundle</packaging>
 
   <properties>
     <pluginName>Nexus Kenai Realm Plugin</pluginName>
@@ -61,11 +61,6 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-      </plugin>
-
-      <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <executions>
@@ -86,6 +81,18 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Embed-Dependency>
+              org.json
+            </Embed-Dependency>
+          </instructions>
+        </configuration>
       </plugin>
 
       <plugin>

@@ -337,10 +337,9 @@
                 </echo>
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg"
                   token=",management" value=",nexus-oss-edition" />
-                <unzip dest="${project.build.directory}/assembly/plugin-repository">
-                  <fileset dir="${project.build.directory}/assembly/system" includes="**/*-bundle.zip" />
-                </unzip>
-                <delete dir="${project.build.directory}/assembly/system" includes="**/*-bundle.zip" />
+                <move todir="${project.build.directory}/assembly/plugin-repository" flatten="true">
+                  <fileset dir="${project.build.directory}/assembly/system" includes="**/nexus-*-plugin-*.jar" />
+                </move>
               </target>
             </configuration>
           </execution>
@@ -350,7 +349,6 @@
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
-        <extensions>true</extensions>
         <configuration>
           <bootFeatures>
             <feature>standard</feature>

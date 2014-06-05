@@ -25,7 +25,7 @@
 
   <artifactId>nexus-testsuite-ui-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
+  <packaging>bundle</packaging>
 
   <properties>
     <pluginName>Nexus UI Test Helper Plugin</pluginName>
@@ -42,7 +42,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ui-extjs3-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -50,7 +49,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-rapture-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -59,8 +57,23 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api,
+              org.sonatype.nexus.plugins.nexus-ui-extjs3-plugin,
+              org.sonatype.nexus.plugins.nexus-rapture-plugin
+            </Require-Bundle>
+            <Import-Package>!*</Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

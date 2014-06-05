@@ -26,7 +26,7 @@
 
   <artifactId>nexus-p2-repository-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
+  <packaging>bundle</packaging>
 
   <properties>
     <pluginName>Nexus P2 Repository Plugin</pluginName>
@@ -43,14 +43,12 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-p2-bridge-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
@@ -74,9 +72,22 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+       <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api,
+              org.sonatype.nexus.plugins.nexus-capabilities-plugin,
+              org.sonatype.nexus.plugins.nexus-p2-bridge-plugin
+            </Require-Bundle>
+            <Embed-Dependency>
+              decentxml,
+              tycho-metadata-model
+            </Embed-Dependency>
+          </instructions>
+        </configuration>
       </plugin>
 
       <plugin>
