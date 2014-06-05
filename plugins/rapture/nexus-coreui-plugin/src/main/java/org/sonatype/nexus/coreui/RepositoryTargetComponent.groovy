@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
@@ -23,12 +24,14 @@ import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.configuration.application.NexusConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.extdirect.model.StoreLoadParameters
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry
 import org.sonatype.nexus.proxy.targets.Target
 import org.sonatype.nexus.proxy.targets.TargetRegistry
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 
+import javax.annotation.Nullable
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -64,10 +67,15 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @RequiresPermissions('nexus:targets:read')
-  List<RepositoryTargetXO> read() {
-    return targetRegistry.repositoryTargets.collect { input ->
-      asRepositoryTarget(input)
+  List<RepositoryTargetXO> read(final @Nullable StoreLoadParameters parameters) {
+    Collection<Target> targets = targetRegistry.repositoryTargets
+    def formatFilter = parameters?.getFilter('format')
+    if (formatFilter) {
+      targets = targets.findResults { Target target ->
+        return formatFilter == target.contentClass.id ? target : null
+      }
     }
+    return targets.collect { asRepositoryTarget(it) }
   }
 
   /**

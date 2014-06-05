@@ -10,31 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.web.metrics;
+package org.sonatype.nexus.bootstrap.log;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.codahale.metrics.SharedMetricRegistries;
 
 /**
- * Customized {@link com.codahale.metrics.servlets.ThreadDumpServlet} to support download.
- *
+ * Extension of {@link com.codahale.metrics.logback.InstrumentedAppender} that restores the default constructor.
+ * 
  * @since 3.0
  */
-public class ThreadDumpServlet
-  extends com.codahale.metrics.servlets.ThreadDumpServlet
+public final class InstrumentedAppender
+    extends com.codahale.metrics.logback.InstrumentedAppender
 {
-  @Override
-  protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
-      throws ServletException, IOException
-  {
-    boolean download = Boolean.parseBoolean(req.getParameter("download"));
-    if (download) {
-      resp.addHeader("Content-Disposition", "attachment; filename='threads.txt'");
-    }
-
-    super.doGet(req, resp);
+  public InstrumentedAppender() {
+    super(SharedMetricRegistries.getOrCreate("nexus"));
   }
 }

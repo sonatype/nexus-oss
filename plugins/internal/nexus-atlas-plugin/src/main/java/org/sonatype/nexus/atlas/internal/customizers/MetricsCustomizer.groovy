@@ -12,12 +12,13 @@
  */
 package org.sonatype.nexus.atlas.internal.customizers
 
-import com.yammer.metrics.core.Clock
-import com.yammer.metrics.core.HealthCheckRegistry
-import com.yammer.metrics.core.MetricPredicate
-import com.yammer.metrics.core.MetricsRegistry
-import com.yammer.metrics.core.VirtualMachineMetrics
-import com.yammer.metrics.reporting.ConsoleReporter
+import com.codahale.metrics.Clock
+import com.codahale.metrics.MetricRegistry
+import com.codahale.metrics.health.HealthCheckRegistry
+import com.codahale.metrics.json.HealthCheckModule
+import com.codahale.metrics.json.MetricsModule
+import com.codahale.metrics.jvm.ThreadDump
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
 import org.sonatype.nexus.atlas.SupportBundle
 import org.sonatype.nexus.atlas.SupportBundleCustomizer
@@ -26,6 +27,8 @@ import org.sonatype.sisu.goodies.common.ComponentSupport
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import java.lang.management.ManagementFactory
+import java.util.concurrent.TimeUnit
 
 import static com.google.common.base.Preconditions.checkNotNull
 import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.HIGH
@@ -47,22 +50,21 @@ class MetricsCustomizer
 {
   private final Clock clock
 
-  private final VirtualMachineMetrics virtualMachineMetrics
-
-  private final MetricsRegistry metricsRegistry
+  private final MetricRegistry metricRegistry
 
   private final HealthCheckRegistry healthCheckRegistry
 
+  private final ThreadDump threadDump
+
   @Inject
   MetricsCustomizer(final Clock clock,
-                    final VirtualMachineMetrics virtualMachineMetrics,
-                    final MetricsRegistry metricsRegistry,
+                    final MetricRegistry metricRegistry,
                     final HealthCheckRegistry healthCheckRegistry)
   {
     this.clock = checkNotNull(clock)
-    this.virtualMachineMetrics = checkNotNull(virtualMachineMetrics)
-    this.metricsRegistry = checkNotNull(metricsRegistry)
+    this.metricRegistry = checkNotNull(metricRegistry)
     this.healthCheckRegistry = checkNotNull(healthCheckRegistry)
+    this.threadDump = new ThreadDump(ManagementFactory.getThreadMXBean())
   }
 
   @Override
@@ -76,55 +78,42 @@ class MetricsCustomizer
       @Override
       protected void generate(final File file) {
         file.withOutputStream {
-          virtualMachineMetrics.threadDump(it)
+          threadDump.dump(it)
         }
       }
     }
 
     // add healthchecks
-    supportBundle << new GeneratedContentSourceSupport(SYSINFO, 'healthcheck.txt') {
+    supportBundle << new GeneratedContentSourceSupport(SYSINFO, 'healthcheck.json') {
       {
         this.priority = OPTIONAL
       }
 
       @Override
       protected void generate(final File file) {
-        file.withPrintWriter { out ->
-          healthCheckRegistry.runHealthChecks().each { key, result ->
-            def token = result.healthy ? '*' : '!'
-            def state = result.healthy ? 'OK' : 'ERROR'
-            out.println "$token $key: $state"
-            if (result.message) {
-              out.println "  ${result.message}"
-            }
-            if (result.error) {
-              out.println()
-              result.error.printStackTrace out
-              out.println()
-            }
-          }
+        def results = healthCheckRegistry.runHealthChecks()
+        def mapper = new ObjectMapper().registerModule(new HealthCheckModule())
+        file.withOutputStream { out ->
+          mapper.writerWithDefaultPrettyPrinter().writeValue(out, results)
         }
       }
     }
 
     // add metrics
-    supportBundle << new GeneratedContentSourceSupport(METRICS, 'metrics.txt') {
+    supportBundle << new GeneratedContentSourceSupport(METRICS, 'metrics.json') {
       {
         this.priority = OPTIONAL
       }
 
       @Override
       protected void generate(final File file) {
-        file.withOutputStream {
-          // NOTE: there is no easy way to get out json report, so using the console reporter for now
-          def reporter = new ConsoleReporter(
-              metricsRegistry,
-              new PrintStream(it),
-              MetricPredicate.ALL,
-              clock,
-              TimeZone.getDefault()
-          )
-          reporter.run()
+        def mapper = new ObjectMapper().registerModule(new MetricsModule(
+            TimeUnit.SECONDS, // rate-unit
+            TimeUnit.SECONDS, // duration-unit
+            false // show-samples
+        ))
+        file.withOutputStream { out ->
+          mapper.writerWithDefaultPrettyPrinter().writeValue(out, metricRegistry)
         }
       }
     }
