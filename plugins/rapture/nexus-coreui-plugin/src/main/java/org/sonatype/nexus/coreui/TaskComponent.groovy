@@ -260,7 +260,7 @@ extends DirectComponentSupport
     Date nextRunTime = null
 
     // Run now type tasks should never have a next run time
-    if (!task.schedule.class.isAssignableFrom(RunNowSchedule.class) && task.nextRun) {
+    if (task.enabled && !task.schedule.class.isAssignableFrom(RunNowSchedule.class) && task.nextRun) {
       nextRunTime = task.nextRun
     }
 
