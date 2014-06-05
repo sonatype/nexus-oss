@@ -90,7 +90,6 @@
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
-      <version>0.9</version>
     </dependency>
 
     <!-- XPP, is left out since we _import_ (yuck) deeps and loose transitive deeps! -->
