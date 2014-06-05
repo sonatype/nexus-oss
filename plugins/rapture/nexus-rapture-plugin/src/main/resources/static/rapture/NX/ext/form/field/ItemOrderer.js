@@ -249,29 +249,7 @@ Ext.define('NX.ext.form.field.ItemOrderer', {
   },
 
   setValue: function (value) {
-    var me = this,
-        orderField = me.orderField,
-        orderStore = orderField.store;
-
-    if (!me.storePopulated) {
-      orderField.store.on({
-        load: Ext.Function.bind(me.setValue, me, [value]),
-        single: true
-      });
-      return;
-    }
-
-    value = me.setupValue(value);
-    me.mixins.field.setValue.call(me, value);
-
-    orderStore.suspendEvents();
-    me.populateStore(me.store);
-    orderStore.resumeEvents();
-
-    // Refresh both sides and then update the app layout
-    Ext.suspendLayouts();
-    orderField.boundList.refresh();
-    Ext.resumeLayouts(true);
+    // do nothing as we always show all records, unselected
   },
 
   onBindStore: function (store) {
@@ -295,6 +273,7 @@ Ext.define('NX.ext.form.field.ItemOrderer', {
 
     orderStore.removeAll();
     orderStore.add(store.getRange());
+    me.syncValue();
 
     orderStore.fireEvent('load', orderStore);
   },
