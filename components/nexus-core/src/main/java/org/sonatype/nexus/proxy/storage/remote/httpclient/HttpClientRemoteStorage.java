@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.UnsupportedCharsetException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -59,6 +60,7 @@ import com.google.common.base.Stopwatch;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
@@ -158,7 +160,8 @@ public class HttpClientRemoteStorage
   }
 
   /**
-   * Key used in HttpGet method parameters in {@link #retrieveItem(ProxyRepository, ResourceStoreRequest, String)} method
+   * Key used in HttpGet method parameters in {@link #retrieveItem(ProxyRepository, ResourceStoreRequest, String)}
+   * method
    * that this request is about content retrieval, hence, the special redirection strategy set up in
    * {@link HttpClientManagerImpl#getProxyRepositoryRedirectStrategy(ProxyRepository, RemoteStorageContext)} should
    * be applied. See that method for more.
@@ -219,7 +222,13 @@ public class HttpClientRemoteStorage
         is = new Hc4InputStream(repository,
             new InterruptableInputStream(method, httpResponse.getEntity().getContent()));
 
-        String mimeType = ContentType.getOrDefault(httpResponse.getEntity()).getMimeType();
+        String mimeType = null;
+        try {
+          mimeType = ContentType.getOrDefault(httpResponse.getEntity()).getMimeType();
+        }
+        catch (ParseException | UnsupportedCharsetException e) {
+          // NEXUS-6622: Java/HC4 gave up, let's ask mime support instead then
+        }
         if (mimeType == null) {
           mimeType =
               getMimeSupport().guessMimeTypeFromPath(repository.getMimeRulesSource(),
@@ -488,7 +497,8 @@ public class HttpClientRemoteStorage
    */
   @VisibleForTesting
   HttpResponse executeRequest(final ProxyRepository repository, final ResourceStoreRequest request,
-                              final HttpUriRequest httpRequest, final String baseUrl, final boolean contentRequest) throws RemoteStorageException
+                              final HttpUriRequest httpRequest, final String baseUrl, final boolean contentRequest)
+      throws RemoteStorageException
   {
     final Timer timer = timer(repository, httpRequest, baseUrl);
     final Timer.Context timerContext = timer.time();
@@ -502,7 +512,8 @@ public class HttpClientRemoteStorage
     finally {
       timerContext.stop();
       if (stopwatch != null) {
-        outboundRequestLog.debug("[{}] {} {} - {}", repository.getId(), httpRequest.getMethod(), httpRequest.getURI(), stopwatch);
+        outboundRequestLog
+            .debug("[{}] {} {} - {}", repository.getId(), httpRequest.getMethod(), httpRequest.getURI(), stopwatch);
       }
     }
   }
@@ -634,8 +645,8 @@ public class HttpClientRemoteStorage
    * Appends repository configured additional query string to provided URL.
    *
    * @param repository that may contain additional query string
-   * @param request the current request
-   * @param url the URL of the remote target to append to
+   * @param request    the current request
+   * @param url        the URL of the remote target to append to
    * @return URL with appended query string or original URL if repository does not have an configured query string
    * @throws RemoteStorageException if query string could not be appended (resulted in an Malformed URL exception)
    */
