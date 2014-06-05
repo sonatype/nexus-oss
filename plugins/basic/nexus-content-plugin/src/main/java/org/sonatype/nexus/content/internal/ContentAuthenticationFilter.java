@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import org.sonatype.nexus.content.ContentRestrictedToken;
 import org.sonatype.nexus.content.ContentRestrictionConstituent;
 import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 
