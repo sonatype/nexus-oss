@@ -272,7 +272,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
 
     if (list) {
       me.getCapabilityTypeStore().load();
-      NX.coreui.view.formfield.factory.FormfieldComboFactory.evictCache();
     }
   },
 

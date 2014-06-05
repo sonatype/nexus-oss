@@ -10,13 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.formfields;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
+
+import com.google.common.collect.Maps;
 
 /**
  * A repository combo box {@link FormField}.
@@ -123,6 +127,63 @@ public class RepositoryCombobox
   public RepositoryCombobox includeAnEntryForAllRepositories() {
     this.generateAllRepositoriesEntry = true;
     return this;
+  }
+
+  /**
+   * @since 3.0
+   */
+  @Override
+  public String getStoreApi() {
+    return "coreui_Repository." + (generateAllRepositoriesEntry ? "readReferencesAddingEntryForAll" : "readReferences");
+  }
+
+  /**
+   * @since 3.0
+   */
+  @Override
+  public Map<String, String> getStoreFilters() {
+    Map<String, String> storeFilters = Maps.newHashMap();
+    StringBuilder types = new StringBuilder();
+    if (includingFacets != null) {
+      for (Class<?> facet : includingFacets) {
+        if (types.length() > 0) {
+          types.append(',');
+        }
+        types.append(facet.getName());
+      }
+    }
+    if (excludingFacets != null) {
+      for (Class<?> facet : excludingFacets) {
+        if (types.length() > 0) {
+          types.append(',');
+        }
+        types.append('!').append(facet.getName());
+      }
+    }
+    if (types.length() > 0) {
+      storeFilters.put("type", types.toString());
+    }
+    StringBuilder contentClasses = new StringBuilder();
+    if (includingContentClasses != null) {
+      for (String contentClass : includingContentClasses) {
+        if (contentClasses.length() > 0) {
+          contentClasses.append(',');
+        }
+        contentClasses.append(contentClass);
+      }
+    }
+    if (excludingContentClasses != null) {
+      for (String contentClass : excludingContentClasses) {
+        if (contentClasses.length() > 0) {
+          contentClasses.append(',');
+        }
+        contentClasses.append("!").append(contentClass);
+      }
+    }
+    if (contentClasses.length() > 0) {
+      storeFilters.put("format", contentClasses.toString());
+    }
+    return storeFilters.isEmpty() ? null : storeFilters;
   }
 
   @Override

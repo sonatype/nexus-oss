@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.formfields;
 
 import java.util.Map;
@@ -25,7 +26,9 @@ import static com.google.common.base.Preconditions.checkState;
  * A combo box {@link FormField} that delegates retrieval of id/name entries to a named provider.
  *
  * @since 2.7
+ * @deprecated Will be removed once legacy UI is removed
  */
+@Deprecated
 public class ProviderCombobox
     extends Combobox<String>
 {
@@ -63,6 +66,22 @@ public class ProviderCombobox
     checkArgument(!Strings.isNullOrEmpty(value), "value cannot be empty");
     this.params.put(name, value);
     return this;
+  }
+
+  /**
+   * @since 3.0
+   */
+  @Override
+  public String getStoreApi() {
+    return null;
+  }
+
+  /**
+   * @since 3.0
+   */
+  @Override
+  public Map<String, String> getStoreFilters() {
+    return params;
   }
 
   @Override
