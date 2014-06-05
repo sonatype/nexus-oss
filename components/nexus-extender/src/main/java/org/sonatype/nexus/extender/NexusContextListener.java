@@ -27,8 +27,9 @@ import javax.servlet.ServletContextListener;
 import org.sonatype.nexus.NxApplication;
 import org.sonatype.nexus.guice.NexusModules.CoreModule;
 import org.sonatype.nexus.log.LogManager;
-import org.sonatype.nexus.web.internal.NexusGuiceFilter;
+import org.sonatype.nexus.web.NexusGuiceFilter;
 
+import com.codahale.metrics.SharedMetricRegistries;
 import com.google.common.base.Throwables;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -77,6 +78,8 @@ public class NexusContextListener
 
   @Override
   public void contextInitialized(final ServletContextEvent event) {
+    SharedMetricRegistries.getOrCreate("nexus");
+
     final BundleContext ctx = extender.getBundleContext();
 
     servletContext = event.getServletContext();
@@ -85,12 +88,10 @@ public class NexusContextListener
       variables = System.getProperties();
     }
 
-    final Bundle systemBundle = ctx.getBundle(0);
-
     final ClassSpace coreSpace = new BundleClassSpace(ctx.getBundle());
     injector = Guice.createInjector(
         new WireModule(
-            new CoreModule(servletContext, variables, systemBundle),
+            new CoreModule(servletContext, variables),
             new SpaceModule(coreSpace, BeanScanning.GLOBAL_INDEX)));
     log.debug("Injector: {}", injector);
 
@@ -156,6 +157,8 @@ public class NexusContextListener
     }
 
     injector = null;
+
+    SharedMetricRegistries.remove("nexus");
   }
 
   @Override

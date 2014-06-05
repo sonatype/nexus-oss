@@ -17,9 +17,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.CipherKeyHighStrengthCondition;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.CipherKeyUnlimitedStrengthCondition;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.CipherRequiredCondition;
+import org.sonatype.nexus.plugins.capabilities.condition.CipherKeyHighStrengthCondition;
+import org.sonatype.nexus.plugins.capabilities.condition.CipherKeyUnlimitedStrengthCondition;
+import org.sonatype.nexus.plugins.capabilities.condition.CipherRequiredCondition;
 import org.sonatype.sisu.goodies.crypto.CryptoHelper;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

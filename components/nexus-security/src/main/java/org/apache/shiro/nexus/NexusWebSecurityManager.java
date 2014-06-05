@@ -12,7 +12,7 @@
  */
 package org.apache.shiro.nexus;
 
-import org.sonatype.security.internal.UserIdMdcHelper;
+import org.sonatype.security.UserIdMdcHelper;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;

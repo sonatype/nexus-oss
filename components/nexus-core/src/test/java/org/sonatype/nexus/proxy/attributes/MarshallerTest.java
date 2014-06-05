@@ -16,7 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
+import org.sonatype.nexus.proxy.attributes.DefaultAttributes;
 
 import org.junit.Test;
 

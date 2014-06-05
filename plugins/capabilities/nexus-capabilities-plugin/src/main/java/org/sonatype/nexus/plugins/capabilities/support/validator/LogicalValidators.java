@@ -16,9 +16,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.Validator;
-import org.sonatype.nexus.plugins.capabilities.internal.validator.ConjunctionValidator;
-import org.sonatype.nexus.plugins.capabilities.internal.validator.DisjunctionValidator;
-import org.sonatype.nexus.plugins.capabilities.internal.validator.InversionValidator;
+import org.sonatype.nexus.plugins.capabilities.validator.ConjunctionValidator;
+import org.sonatype.nexus.plugins.capabilities.validator.DisjunctionValidator;
+import org.sonatype.nexus.plugins.capabilities.validator.InversionValidator;
 
 /**
  * Factory of logical {@link Validator}s combinations.

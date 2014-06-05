@@ -13,31 +13,44 @@
 package org.sonatype.nexus.web.metrics;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.yammer.metrics.core.Clock;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.VirtualMachineMetrics;
+import com.codahale.metrics.JvmAttributeGaugeSet;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.jvm.BufferPoolMetricSet;
+import com.codahale.metrics.jvm.FileDescriptorRatioGauge;
+import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
+import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
+import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
- * Customized {@link com.yammer.metrics.reporting.MetricsServlet} to support download.
+ * Customized {@link com.codahale.metrics.servlets.MetricsServlet} to support injection and download.
  *
  * @since 3.0
  */
+@Singleton
 public class MetricsServlet
-  extends com.yammer.metrics.reporting.MetricsServlet
+  extends com.codahale.metrics.servlets.MetricsServlet
 {
-  public MetricsServlet(final Clock clock,
-                        final VirtualMachineMetrics vm,
-                        final MetricsRegistry registry,
-                        final JsonFactory factory,
-                        final boolean showJvmMetrics)
-  {
-    super(clock, vm, registry, factory, showJvmMetrics);
+  @Inject
+  public MetricsServlet(final MetricRegistry registry) {
+    super(registry);
+
+    // JVM metrics are no longer automatically added in codahale-metrics
+    registry.register(name("jvm", "vm"), new JvmAttributeGaugeSet());
+    registry.register(name("jvm", "memory"), new MemoryUsageGaugeSet());
+    registry.register(name("jvm", "buffers"), new BufferPoolMetricSet(ManagementFactory.getPlatformMBeanServer()));
+    registry.register(name("jvm", "fd_usage"), new FileDescriptorRatioGauge());
+    registry.register(name("jvm", "thread-states"), new ThreadStatesGaugeSet());
+    registry.register(name("jvm", "garbage-collectors"), new GarbageCollectorMetricSet());
   }
 
   @Override

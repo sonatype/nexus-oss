@@ -18,23 +18,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.yammer.metrics.core.Clock;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.VirtualMachineMetrics;
-
 /**
- * Customized {@link com.yammer.metrics.reporting.ThreadDumpServlet} to support download.
+ * Customized {@link com.codahale.metrics.servlets.ThreadDumpServlet} to support download.
  *
  * @since 3.0
  */
 public class ThreadDumpServlet
-  extends com.yammer.metrics.reporting.ThreadDumpServlet
+  extends com.codahale.metrics.servlets.ThreadDumpServlet
 {
-  public ThreadDumpServlet(final VirtualMachineMetrics vm) {
-    super(vm);
-  }
-
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException

@@ -35,7 +35,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundReason;
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.Attributes;
-import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
+import org.sonatype.nexus.proxy.attributes.DefaultAttributes;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageCompositeItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;

@@ -13,10 +13,13 @@
 
 package org.sonatype.nexus.coreui
 
+import com.google.common.base.Predicate
+import com.google.common.base.Predicates
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.codehaus.plexus.util.StringUtils
 import org.codehaus.plexus.util.xml.Xpp3Dom
 import org.sonatype.nexus.configuration.application.NexusConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
@@ -77,10 +80,14 @@ extends DirectComponentSupport
   DefaultRepositoryTemplateProvider repositoryTemplateProvider
 
   @Inject
+  @Named('nexus-uber')
+  ClassLoader uberClassLoader
+
+  @Inject
   @Nullable
   TrustStoreKeys trustStoreKeys
 
-  private def typesToClass = [
+  def typesToClass = [
       'proxy': ProxyRepository.class,
       'hosted': HostedRepository.class,
       'shadow': ShadowRepository.class,
@@ -113,6 +120,18 @@ extends DirectComponentSupport
           format: repository.repositoryContentClass.id
       )
     }
+  }
+
+  /**
+   * Retrieve a list of available repositories references and adds an entry for all repositories with id '*'.
+   */
+  @DirectMethod
+  List<RepositoryReferenceXO> readReferencesAddingEntryForAll(final @Nullable StoreLoadParameters parameters) {
+    List<RepositoryReferenceXO> references = readReferences(parameters)
+    references << new RepositoryReferenceXO(
+        id: '*',
+        name: '(All Repositories)'
+    )
   }
 
   /**
@@ -554,24 +573,20 @@ extends DirectComponentSupport
     boolean includeUserManaged = true
     boolean includeNexusManaged = false
     if (parameters) {
-      def typeFilter = parameters.getFilter('type')
-      if (typeFilter) {
-        def clazz = typesToClass[typeFilter]
-        if (!clazz) {
-          throw new IllegalArgumentException('Repository type not supported: ' + typeFilter)
-        }
-        repositories = repositoryRegistry.getRepositoriesWithFacet(clazz)
-      }
-      def formatFilter = parameters.getFilter('format')
-      if (formatFilter) {
+      def filter = { predicate ->
         repositories = repositories.findResults { Repository repository ->
-          repository.repositoryContentClass.id == formatFilter ? repository : null
+          predicate.apply(repository) ? repository : null
         }
       }
-      def includeUserManagedFilter = parameters.getFilter('includeUserManaged')
-      if (includeUserManagedFilter != null) {
-        includeUserManaged = Boolean.valueOf(includeUserManagedFilter)
-      }
+
+      String[] types = parameters.getFilter('type')?.split(',')
+      hasAnyOfFacets(types)?.with(filter)
+      hasNoneOfFacets(types)?.with(filter)
+
+      String[] contentClasses = parameters.getFilter('format')?.split(',')
+      hasAnyOfContentClasses(contentClasses)?.with(filter)
+      hasNoneOfContentClasses(contentClasses)?.with(filter)
+
       def includeNexusManagedFilter = parameters.getFilter('includeNexusManaged')
       if (includeNexusManagedFilter != null) {
         includeNexusManaged = Boolean.valueOf(includeNexusManagedFilter)
@@ -588,6 +603,117 @@ extends DirectComponentSupport
       }
     }
     return repositories
+  }
+
+  Predicate<Repository> hasAnyOfFacets(@Nullable final String[] facets) {
+    if (facets) {
+      List<Predicate<Repository>> predicates = []
+      facets.each { String facet ->
+        if (StringUtils.isNotEmpty(facet) && !facet.startsWith('!')) {
+          try {
+            Class<?> facetClass = typesToClass[facet]
+            if (!facetClass) {
+              facetClass = uberClassLoader.loadClass(facet)
+            }
+            predicates << new Predicate<Repository>() {
+              @Override
+              public boolean apply(@Nullable final Repository input) {
+                return input && input.repositoryKind.isFacetAvailable(facetClass)
+              }
+            }
+          }
+          catch (ClassNotFoundException e) {
+            log.warn('Repositories will not be filtered by facet {} as it could not be loaded', facet)
+          }
+        }
+      }
+      if (!predicates.empty) {
+        if (predicates.size() == 1) {
+          return predicates[0]
+        }
+        return Predicates.or(predicates)
+      }
+    }
+    return null
+  }
+
+  Predicate<Repository> hasNoneOfFacets(@Nullable final String[] facets) {
+    if (facets) {
+      List<Predicate<Repository>> predicates = []
+      facets.each { String facet ->
+        if (StringUtils.isNotEmpty(facet) && facet.startsWith('!')) {
+          String actualFacet = facet.substring(1)
+          try {
+            Class<?> facetClass = typesToClass[actualFacet]
+            if (!facetClass) {
+              facetClass = uberClassLoader.loadClass(actualFacet)
+            }
+            predicates << new Predicate<Repository>() {
+              @Override
+              public boolean apply(@Nullable final Repository input) {
+                return input && !input.repositoryKind.isFacetAvailable(facetClass)
+              }
+            }
+          }
+          catch (ClassNotFoundException e) {
+            log.warn('Repositories will not be filtered by facet {} as it could not be loaded', actualFacet)
+          }
+        }
+      }
+      if (!predicates.empty) {
+        if (predicates.size() == 1) {
+          return predicates[0]
+        }
+        return Predicates.and(predicates)
+      }
+    }
+    return null
+  }
+
+  private static Predicate<Repository> hasAnyOfContentClasses(final String[] contentClasses) {
+    if (contentClasses) {
+      List<Predicate<Repository>> predicates = []
+      contentClasses.each { String contentClass ->
+        if (StringUtils.isNotEmpty(contentClass) && !contentClass.startsWith('!')) {
+          predicates << new Predicate<Repository>() {
+            @Override
+            public boolean apply(@Nullable final Repository input) {
+              return input && (input.repositoryContentClass.id == contentClass)
+            }
+          }
+        }
+      }
+      if (!predicates.empty) {
+        if (predicates.size() == 1) {
+          return predicates[0]
+        }
+        return Predicates.or(predicates)
+      }
+    }
+    return null
+  }
+
+  private static Predicate<Repository> hasNoneOfContentClasses(final String[] contentClasses) {
+    if (contentClasses) {
+      List<Predicate<Repository>> predicates = []
+      contentClasses.each { String contentClass ->
+        if (StringUtils.isNotEmpty(contentClass) && contentClass.startsWith('!')) {
+          predicates << new Predicate<Repository>() {
+            @Override
+            public boolean apply(@Nullable final Repository input) {
+              return input != null && !(input.repositoryContentClass.id == contentClass.substring(1))
+            }
+          }
+        }
+      }
+      if (!predicates.empty) {
+        if (predicates.size() == 1) {
+          return predicates[0]
+        }
+        return Predicates.or(predicates)
+      }
+    }
+    return null
   }
 
 }

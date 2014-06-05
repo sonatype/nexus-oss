@@ -102,8 +102,8 @@ extends DirectComponentSupport
                 initialValue: formField.initialValue
             )
             if (formField instanceof Selectable) {
-              formFieldXO.storePath = formField.storePath
-              formFieldXO.storeRoot = formField.storeRoot
+              formFieldXO.storeApi = formField.storeApi
+              formFieldXO.storeFilters = formField.storeFilters
               formFieldXO.idMapping = formField.idMapping
               formFieldXO.nameMapping = formField.nameMapping
             }
@@ -260,7 +260,7 @@ extends DirectComponentSupport
     Date nextRunTime = null
 
     // Run now type tasks should never have a next run time
-    if (!task.schedule.class.isAssignableFrom(RunNowSchedule.class) && task.nextRun) {
+    if (task.enabled && !task.schedule.class.isAssignableFrom(RunNowSchedule.class) && task.nextRun) {
       nextRunTime = task.nextRun
     }
 

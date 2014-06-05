@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.UnsupportedCharsetException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -51,15 +52,15 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.SharedMetricRegistries;
+import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
@@ -127,7 +128,7 @@ public class HttpClientRemoteStorage
    */
   private static final boolean CAN_WRITE = true;
 
-  private final MetricsRegistry metricsRegistry;
+  private final MetricRegistry metricRegistry;
 
   private final QueryStringBuilder queryStringBuilder;
 
@@ -144,7 +145,7 @@ public class HttpClientRemoteStorage
                           final HttpClientManager httpClientManager)
   {
     super(applicationStatusSource, mimeSupport);
-    this.metricsRegistry = Metrics.defaultRegistry();
+    this.metricRegistry = SharedMetricRegistries.getOrCreate("nexus");
     this.queryStringBuilder = queryStringBuilder;
     this.httpClientManager = httpClientManager;
   }
@@ -159,7 +160,8 @@ public class HttpClientRemoteStorage
   }
 
   /**
-   * Key used in HttpGet method parameters in {@link #retrieveItem(ProxyRepository, ResourceStoreRequest, String)} method
+   * Key used in HttpGet method parameters in {@link #retrieveItem(ProxyRepository, ResourceStoreRequest, String)}
+   * method
    * that this request is about content retrieval, hence, the special redirection strategy set up in
    * {@link HttpClientManagerImpl#getProxyRepositoryRedirectStrategy(ProxyRepository, RemoteStorageContext)} should
    * be applied. See that method for more.
@@ -220,7 +222,13 @@ public class HttpClientRemoteStorage
         is = new Hc4InputStream(repository,
             new InterruptableInputStream(method, httpResponse.getEntity().getContent()));
 
-        String mimeType = ContentType.getOrDefault(httpResponse.getEntity()).getMimeType();
+        String mimeType = null;
+        try {
+          mimeType = ContentType.getOrDefault(httpResponse.getEntity()).getMimeType();
+        }
+        catch (ParseException | UnsupportedCharsetException e) {
+          // NEXUS-6622: Java/HC4 gave up, let's ask mime support instead then
+        }
         if (mimeType == null) {
           mimeType =
               getMimeSupport().guessMimeTypeFromPath(repository.getMimeRulesSource(),
@@ -489,10 +497,11 @@ public class HttpClientRemoteStorage
    */
   @VisibleForTesting
   HttpResponse executeRequest(final ProxyRepository repository, final ResourceStoreRequest request,
-                              final HttpUriRequest httpRequest, final String baseUrl, final boolean contentRequest) throws RemoteStorageException
+                              final HttpUriRequest httpRequest, final String baseUrl, final boolean contentRequest)
+      throws RemoteStorageException
   {
     final Timer timer = timer(repository, httpRequest, baseUrl);
-    final TimerContext timerContext = timer.time();
+    final Timer.Context timerContext = timer.time();
     Stopwatch stopwatch = null;
     if (outboundRequestLog.isDebugEnabled()) {
       stopwatch = new Stopwatch().start();
@@ -503,13 +512,14 @@ public class HttpClientRemoteStorage
     finally {
       timerContext.stop();
       if (stopwatch != null) {
-        outboundRequestLog.debug("[{}] {} {} - {}", repository.getId(), httpRequest.getMethod(), httpRequest.getURI(), stopwatch);
+        outboundRequestLog
+            .debug("[{}] {} {} - {}", repository.getId(), httpRequest.getMethod(), httpRequest.getURI(), stopwatch);
       }
     }
   }
 
   private Timer timer(final ProxyRepository repository, final HttpUriRequest httpRequest, final String baseUrl) {
-    return metricsRegistry.newTimer(HttpClientRemoteStorage.class, baseUrl, httpRequest.getMethod());
+    return metricRegistry.timer(MetricRegistry.name(HttpClientRemoteStorage.class, baseUrl, httpRequest.getMethod()));
   }
 
   private HttpResponse doExecuteRequest(final ProxyRepository repository, final ResourceStoreRequest request,
@@ -635,8 +645,8 @@ public class HttpClientRemoteStorage
    * Appends repository configured additional query string to provided URL.
    *
    * @param repository that may contain additional query string
-   * @param request the current request
-   * @param url the URL of the remote target to append to
+   * @param request    the current request
+   * @param url        the URL of the remote target to append to
    * @return URL with appended query string or original URL if repository does not have an configured query string
    * @throws RemoteStorageException if query string could not be appended (resulted in an Malformed URL exception)
    */

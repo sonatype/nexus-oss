@@ -19,7 +19,7 @@ import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.Attributes;
-import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
+import org.sonatype.nexus.proxy.attributes.DefaultAttributes;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.util.PathUtils;

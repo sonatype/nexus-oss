@@ -65,8 +65,8 @@ public class JettyAppBootstrap
         properties = new ConfigurationBuilder()
             .defaults()
             .set("bundleBasedir", new File(baseDir).getCanonicalPath())
-            .properties("/nexus.properties", true)
-            .properties("/nexus-test.properties", false)
+            .properties(getClass(), "/nexus.properties", true)
+            .properties(getClass(), "/nexus-test.properties", false)
             .custom(new EnvironmentVariables())
             .override(System.getProperties())
             .build();
