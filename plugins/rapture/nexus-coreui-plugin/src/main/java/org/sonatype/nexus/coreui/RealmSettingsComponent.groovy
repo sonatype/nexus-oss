@@ -23,7 +23,6 @@ import org.apache.shiro.realm.Realm
 import org.eclipse.sisu.inject.BeanLocator
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.rapture.ReferenceXO
 import org.sonatype.security.SecuritySystem
 
 import javax.inject.Inject

@@ -14,7 +14,6 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
-import org.sonatype.nexus.rapture.ReferenceXO
 
 /**
  * Repository reference exchange object.

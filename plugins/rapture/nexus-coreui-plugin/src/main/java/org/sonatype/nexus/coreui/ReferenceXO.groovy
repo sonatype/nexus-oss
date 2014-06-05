@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.rapture
+package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
 
@@ -24,6 +24,5 @@ import groovy.transform.ToString
 class ReferenceXO
 {
   String id
-
   String name
 }

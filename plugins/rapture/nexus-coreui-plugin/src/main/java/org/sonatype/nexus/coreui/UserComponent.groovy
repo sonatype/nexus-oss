@@ -25,7 +25,6 @@ import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
-import org.sonatype.nexus.rapture.ReferenceXO
 import org.sonatype.nexus.user.UserAccountManager
 import org.sonatype.nexus.util.Tokens
 import org.sonatype.nexus.validation.Create
