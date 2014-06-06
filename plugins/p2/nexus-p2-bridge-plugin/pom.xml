@@ -167,12 +167,12 @@
               xz
             </Embed-Dependency>
             <Include-Resource>
-              /p2-runtime/bridge/org.sonatype.p2.bridge.api.manifest=
+              /p2-bridge/org.sonatype.p2.bridge.api.manifest=
                 ${project.build.directory}/dependency/org.sonatype.p2.bridge.api/META-INF/MANIFEST.MF,
-              /p2-runtime/bridge/org.sonatype.p2.bridge.model.manifest=
+              /p2-bridge/org.sonatype.p2.bridge.model.manifest=
                 ${project.build.directory}/dependency/org.sonatype.p2.bridge.model/META-INF/MANIFEST.MF,
-              /p2-runtime/eclipse.zip=${project.build.directory}/dependency/p2-runtime.zip,
-              /p2-runtime/bundles=${project.build.directory}/dependency/bundles,
+              /p2-bridge/eclipse.zip=${project.build.directory}/dependency/p2-runtime.zip,
+              /p2-bridge/bundles=${project.build.directory}/dependency/bundles,
               /=${project.build.outputDirectory},
               {maven-resources}
             </Include-Resource>

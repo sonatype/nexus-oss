@@ -369,12 +369,10 @@
                   <groupId>org.sonatype.nexus</groupId>
                   <artifactId>nexus-it-helper-plugin</artifactId>
                 </plugin>
-<!--
                 <plugin>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-p2-repository-plugin</artifactId>
                 </plugin>
--->
               </nexusPluginsArtifacts>
             </configuration>
           </plugin>
