@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.formfields;
 
-import static com.google.common.base.Preconditions.checkArgument;
+package org.sonatype.nexus.formfields;
 
 /**
  * Combo box {@link FormField} support.
@@ -57,11 +56,6 @@ public abstract class Combobox<V>
   @Override
   public String getType() {
     return "combobox";
-  }
-
-  @Override
-  public String getStoreRoot() {
-    return null;
   }
 
   @Override
@@ -110,24 +104,6 @@ public abstract class Combobox<V>
   public Combobox<V> withInitialValue(final V value) {
     setInitialValue(value);
     return this;
-  }
-
-  protected String defaultStorePath() {
-    return null;
-  }
-
-  protected String defaultStoreRoot() {
-    return null;
-  }
-
-  public static String siestaStore(final String path) {
-    checkArgument(path.startsWith("/"), "Path '%s' must start with slash ('/')", path);
-    return "/service/siesta" + path;
-  }
-
-  public static String restlet1xStore(final String path) {
-    checkArgument(path.startsWith("/"), "Path '%s' must start with slash ('/')", path);
-    return "/service/local" + path;
   }
 
 }

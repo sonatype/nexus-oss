@@ -41,26 +41,6 @@ public interface Selectable
   Map<String, String> getStoreFilters();
 
   /**
-   * Returns resource path to an id/name rest store resource.
-   * E.g.
-   * "/service/local/repositories"
-   * "/service/siesta/capabilities"
-   *
-   * @deprecated Will be removed once legacy UI is removed
-   */
-  @Deprecated
-  String getStorePath();
-
-  /**
-   * Returns the name of the property which contains the collation of objects.
-   * E.g. For restlet1x resources this should be in most of teh cases equal to "data".
-   *
-   * @deprecated Will be removed once legacy UI is removed
-   */
-  @Deprecated
-  String getStoreRoot();
-
-  /**
    * Returns the name of the property that should be considered as an record id. Defaults to "id";
    */
   String getIdMapping();
