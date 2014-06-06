@@ -22,7 +22,6 @@ define('Nexus/all',
         'Nexus/navigation',
         'Nexus/panels',
         'Nexus/grid',
-        'Nexus/profile',
         'Nexus/util'
       ],
       function() {});
