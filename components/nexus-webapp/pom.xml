@@ -353,9 +353,6 @@
                 <_exportcontents>
                   javax.*|ch.*|com.*|org.*
                 </_exportcontents>
-                <_removeheaders>
-                  Embed*,Import-Package,Include-Resource,Private-Package
-                </_removeheaders>
               </instructions>
             </configuration>
           </execution>

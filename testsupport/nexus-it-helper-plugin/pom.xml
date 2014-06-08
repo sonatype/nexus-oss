@@ -76,7 +76,6 @@
               org.sonatype.nexus.plugins.nexus-restlet1x-plugin,
               org.sonatype.nexus.plugins.nexus-extdirect-plugin
             </Require-Bundle>
-            <Import-Package>!*</Import-Package>
           </instructions>
         </configuration>
       </plugin>

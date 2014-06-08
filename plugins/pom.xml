@@ -567,7 +567,6 @@
               <_exportcontents>
                 ![A-Z]*|lib*|static*|docs*|*-*|.*,*;-noimport:=true
               </_exportcontents>
-              <Import-Package>!*</Import-Package>
             </instructions>
           </configuration>
         </plugin>

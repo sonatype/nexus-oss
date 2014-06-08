@@ -45,7 +45,6 @@
         <configuration>
           <instructions>
             <Fragment-Host>org.sonatype.nexus.extender</Fragment-Host>
-            <_removeheaders>Import-Package,Include-Resource,Private-Package</_removeheaders>
           </instructions>
         </configuration>
       </plugin>

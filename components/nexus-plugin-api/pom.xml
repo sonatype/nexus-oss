@@ -127,7 +127,6 @@
             Re-export core packages to plugins (which in turn require this bundle)
             -->
             <Require-Bundle>org.sonatype.nexus.extender;visibility:=reexport</Require-Bundle>
-            <_removeheaders>Import-Package,Private-Package</_removeheaders>
           </instructions>
         </configuration>
       </plugin>

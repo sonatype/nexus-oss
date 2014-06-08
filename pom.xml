@@ -597,6 +597,7 @@
               <!--
               Defaults while plugins use Require-Bundle.
               -->
+              <Import-Package>!*</Import-Package>
               <_nouses>true</_nouses>
               <_nodefaultversion>true</_nodefaultversion>
               <_removeheaders>
