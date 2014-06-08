@@ -127,9 +127,6 @@
               org.sonatype.nexus.plugins.nexus-restlet1x-plugin,
               org.sonatype.nexus.plugins.nexus-ui-extjs3-plugin
             </Require-Bundle>
-            <Embed-Dependency>
-              org.osgi.service.obr
-            </Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>

@@ -77,30 +77,6 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Embed-Dependency>
-              maven-settings,
-              wagon-http-shared4,
-              maven-aether-provider,
-              wagon-provider-api,
-              maven-settings-builder,
-              wagon-file,
-              wagon-http,
-              aether-impl,
-              plexus-sec-dispatcher,
-              aether-connector-wagon,
-              maven-model-builder,
-              wagon-http-lightweight,
-              sisu-maven-bridge
-            </Embed-Dependency>
-          </instructions>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
       </plugin>

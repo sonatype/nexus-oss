@@ -106,9 +106,6 @@
               org.sonatype.nexus.plugins.nexus-capabilities-plugin,
               org.sonatype.nexus.plugins.nexus-kazuki-plugin
             </Require-Bundle>
-            <Embed-Dependency>
-              commons-exec
-            </Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>

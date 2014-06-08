@@ -136,9 +136,6 @@
               org.sonatype.nexus.plugins.nexus-extdirect-plugin,
               org.sonatype.nexus.plugins.nexus-kazuki-plugin
             </Require-Bundle>
-            <Embed-Dependency>
-              nexus-capabilities-model
-            </Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>

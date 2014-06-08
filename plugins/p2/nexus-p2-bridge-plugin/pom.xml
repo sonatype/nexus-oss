@@ -156,16 +156,6 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Embed-Dependency>
-              plexus-io,
-              eclipse-bridge,
-              org.sonatype.p2.bridge.model,
-              org.sonatype.p2.bridge.api,
-              commons-compress,
-              org.eclipse.osgi,
-              plexus-archiver,
-              xz
-            </Embed-Dependency>
             <Include-Resource>
               /p2-bridge/org.sonatype.p2.bridge.api.manifest=
                 ${project.build.directory}/dependency/org.sonatype.p2.bridge.api/META-INF/MANIFEST.MF,

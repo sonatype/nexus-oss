@@ -131,16 +131,6 @@
               org.sonatype.nexus.plugins.nexus-restlet1x-plugin,
               org.sonatype.nexus.plugins.nexus-ui-extjs3-plugin
             </Require-Bundle>
-            <Embed-Dependency>
-              lucene-memory,
-              lucene-highlighter,
-              indexer-core,
-              indexer-artifact,
-              nexus-indexer-lucene-model,
-              lucene-core,
-              jakarta-regexp,
-              lucene-queries
-            </Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>

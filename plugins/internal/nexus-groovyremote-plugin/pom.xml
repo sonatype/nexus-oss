@@ -88,11 +88,6 @@
               org.sonatype.nexus.plugin-api,
               org.sonatype.nexus.plugins.nexus-groovy-plugin
             </Require-Bundle>
-            <Embed-Dependency>
-              remote-core,
-              remote-transport-http,
-              animal-sniffer-annotations
-            </Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>

@@ -114,15 +114,6 @@
               org.sonatype.nexus.plugins.nexus-crypto-plugin,
               org.sonatype.nexus.plugins.nexus-h2-plugin
             </Require-Bundle>
-            <Embed-Dependency>
-              jdbi,
-              kazuki-impl,
-              airline,
-              antlr,
-              stringtemplate,
-              jackson-dataformat-smile,
-              kazuki-api
-            </Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>

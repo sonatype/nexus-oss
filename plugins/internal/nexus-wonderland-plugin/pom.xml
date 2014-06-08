@@ -102,9 +102,6 @@
               org.sonatype.nexus.plugins.nexus-crypto-plugin,
               org.sonatype.nexus.plugins.nexus-ui-extjs3-plugin
             </Require-Bundle>
-            <Embed-Dependency>
-              nexus-wonderland-model
-            </Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>

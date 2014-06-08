@@ -478,10 +478,89 @@
               <!--
               Nexus plugin default instructions (based on Require-Bundle model)
               -->
-	      <Bundle-Name>${pluginName}</Bundle-Name>
-	      <Bundle-Description>${pluginDescription}</Bundle-Description>
-	      <Bundle-DocURL>http://links.sonatype.com/products/nexus/oss/home</Bundle-DocURL>
+              <Bundle-Name>${pluginName}</Bundle-Name>
+              <Bundle-Description>${pluginDescription}</Bundle-Description>
+              <Bundle-DocURL>http://links.sonatype.com/products/nexus/oss/home</Bundle-DocURL>
               <Require-Bundle>org.sonatype.nexus.plugin-api</Require-Bundle>
+              <!--
+              Global ban on embedded dependencies already in core
+              -->
+              <Embed-Dependency>
+                *;scope=compile|runtime;artifactId=!
+                  aether-api|
+                  aether-spi|
+                  aether-util|
+                  annotations|
+                  aopalliance|
+                  bval-core|
+                  bval-guice|
+                  bval-jsr303|
+                  cdi-api|
+                  commons-beanutils|
+                  commons-codec|
+                  commons-collections|
+                  commons-fileupload|
+                  commons-io|
+                  commons-lang|
+                  commons-lang3|
+                  goodies-common|
+                  goodies-eventbus|
+                  goodies-i18n|
+                  goodies-inject|
+                  goodies-lifecycle|
+                  goodies-template|
+                  gossip-bootstrap|
+                  gossip-support|
+                  guava|
+                  guice-assistedinject|
+                  guice-multibindings|
+                  guice-servlet|
+                  httpclient|
+                  httpcore|
+                  jackson-annotations|
+                  jackson-core|
+                  jackson-databind|
+                  javax.annotation-api|
+                  javax.inject|
+                  javax.servlet|
+                  jcl-over-slf4j|
+                  joda-time|
+                  jsoup|
+                  jsr250-api|
+                  jsr305|
+                  jul-to-slf4j|
+                  log4j-over-slf4j|
+                  logback-access|
+                  logback-classic|
+                  logback-core|
+                  mail|
+                  maven-model|
+                  maven-repository-metadata|
+                  org.eclipse.sisu.inject|
+                  org.eclipse.sisu.plexus|
+                  org.osgi.compendium|
+                  org.osgi.core|
+                  plexus-cipher|
+                  plexus-classworlds|
+                  plexus-component-annotations|
+                  plexus-interpolation|
+                  plexus-slf4j-logging|
+                  plexus-utils|
+                  shiro-core|
+                  shiro-ehcache|
+                  shiro-guice|
+                  shiro-web|
+                  sisu-guice|
+                  sisu-mailer|
+                  sisu-resource-scanner|
+                  slf4j-api|
+                  tika-core|
+                  validation-api|
+                  velocity|
+                  xmlpull|
+                  xpp3_min|
+                  xstream
+              </Embed-Dependency>
               <Embed-Directory>lib</Embed-Directory>
               <Embed-Transitive>true</Embed-Transitive>
               <Private-Package>!*;-split-package:=first</Private-Package>

@@ -96,9 +96,6 @@
               org.sonatype.nexus.plugins.nexus-ui-extjs3-plugin,
               org.sonatype.nexus.plugins.nexus-crypto-plugin
             </Require-Bundle>
-            <Embed-Dependency>
-              nexus-ldap-common
-            </Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>

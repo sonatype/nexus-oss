@@ -82,10 +82,6 @@
               org.sonatype.nexus.plugins.nexus-capabilities-plugin,
               org.sonatype.nexus.plugins.nexus-p2-bridge-plugin
             </Require-Bundle>
-            <Embed-Dependency>
-              decentxml,
-              tycho-metadata-model
-            </Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>

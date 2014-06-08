@@ -91,18 +91,6 @@
               org.sonatype.nexus.plugin-api,
               org.sonatype.nexus.plugins.nexus-content-plugin
             </Require-Bundle>
-            <Embed-Dependency>
-              org.restlet.ext.jaxrs,
-              org.json,
-              org.restlet,
-              com.noelios.restlet,
-              com.noelios.restlet.ext.servlet,
-              nexus-restlet-bridge,
-              nexus-restlet1x-model,
-              org.restlet.ext.fileupload,
-              org.restlet.ext.velocity,
-              javax.ws.rs
-            </Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>

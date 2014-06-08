@@ -77,12 +77,6 @@
               org.sonatype.nexus.plugin-api,
               bcprov
             </Require-Bundle>
-            <Embed-Dependency>
-              bcprov-jdk15on,
-              bcpg-jdk15on,
-              bcpkix-jdk15on,
-              goodies-crypto
-            </Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>
