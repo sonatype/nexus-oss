@@ -32,10 +32,6 @@ public class ComboboxFormField<V>
 
   private final Map<String, String> storeFilters;
 
-  private String storePath;
-
-  private String storeRoot;
-
   private String idMapping;
 
   private String nameMapping;
@@ -47,8 +43,6 @@ public class ComboboxFormField<V>
                            final V initialValue)
   {
     super(id, label, helpText, required, initialValue);
-    this.storePath = defaultStorePath();
-    this.storeRoot = defaultStoreRoot();
     this.storeFilters = Maps.newHashMap();
   }
 
@@ -90,16 +84,6 @@ public class ComboboxFormField<V>
   }
 
   @Override
-  public String getStorePath() {
-    return storePath;
-  }
-
-  @Override
-  public String getStoreRoot() {
-    return storeRoot;
-  }
-
-  @Override
   public String getIdMapping() {
     return idMapping;
   }
@@ -129,16 +113,6 @@ public class ComboboxFormField<V>
     return this;
   }
 
-  public ComboboxFormField<V> withStorePath(final String storePath) {
-    this.storePath = checkNotNull(storePath);
-    return this;
-  }
-
-  public ComboboxFormField<V> withStoreRoot(final String storeRoot) {
-    this.storeRoot = storeRoot;
-    return this;
-  }
-
   public ComboboxFormField<V> withIdMapping(final String idMapping) {
     this.idMapping = idMapping;
     return this;
@@ -148,14 +122,5 @@ public class ComboboxFormField<V>
     this.nameMapping = nameMapping;
     return this;
   }
-
-  protected String defaultStorePath() {
-    return null;
-  }
-
-  protected String defaultStoreRoot() {
-    return null;
-  }
-
 
 }
