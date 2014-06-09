@@ -23,6 +23,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobId;
@@ -47,6 +48,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class FileBlobStore
     implements BlobStore
 {
+  /**
+   * Used to provide the name of the blob store from the guice module.
+   */
+  public static final String FILE_BLOB_STORE_NAME_BINDING = "FileBlobStore.name";
+
   private static final Logger logger = LoggerFactory.getLogger(FileBlobStore.class);
 
   private final String name;
@@ -60,8 +66,8 @@ public class FileBlobStore
   private final BlobMetadataStore metadataStore;
 
   @Inject
-  public FileBlobStore(final String name, final FilePathPolicy paths, final FileOperations fileOperations,
-                       final BlobMetadataStore metadataStore)
+  public FileBlobStore(@Named(FILE_BLOB_STORE_NAME_BINDING) final String name, final FilePathPolicy paths,
+                       final FileOperations fileOperations, final BlobMetadataStore metadataStore)
   {
     this.name = checkNotNull(name);
     this.paths = checkNotNull(paths);

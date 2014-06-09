@@ -33,9 +33,4 @@ public class TempDirectoryModule
   public ApplicationDirectories applicationDirectories() {
     return new ApplicationDirectoriesImpl(Files.createTempDir(), Files.createTempDir(), Files.createTempDir());
   }
-
-  @Provides
-  public FilePathPolicy filePathPolicy() {
-    return new HashingSubdirFileLocationPolicy(Files.createTempDir().toPath());
-  }
 }
