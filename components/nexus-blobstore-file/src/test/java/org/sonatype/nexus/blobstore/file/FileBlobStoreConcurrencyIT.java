@@ -29,12 +29,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
+import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreException;
 import org.sonatype.nexus.blobstore.file.guice.FileBlobStoreModule;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.base.Objects;
@@ -48,8 +51,8 @@ import org.junit.Test;
 
 import static com.google.common.io.ByteStreams.nullOutputStream;
 import static org.junit.Assert.fail;
-import static org.sonatype.nexus.blobstore.api.BlobStore.CREATED_BY_HEADER;
 import static org.sonatype.nexus.blobstore.api.BlobStore.BLOB_NAME_HEADER;
+import static org.sonatype.nexus.blobstore.api.BlobStore.CREATED_BY_HEADER;
 
 /**
  * @since 3.0
@@ -57,33 +60,33 @@ import static org.sonatype.nexus.blobstore.api.BlobStore.BLOB_NAME_HEADER;
 public class FileBlobStoreConcurrencyIT
     extends TestSupport
 {
-  public static final int TEST_DATA_LENGTH = 10_000;
-
   public static final ImmutableMap<String, String> TEST_HEADERS = ImmutableMap
       .of(CREATED_BY_HEADER, "test", BLOB_NAME_HEADER, "test/randomData.bin");
 
   public static final int BLOB_MAX_SIZE_BYTES = 5_000_000;
 
-  @Inject
-  private FileBlobStore blobStore;
+  public static final String STORE_NAME = "concurrencyTestStore";
 
   @Inject
-  private BlobMetadataStore metadataStore;
+  @Named(STORE_NAME)
+  private BlobStore blobStore;
+
+  @Inject
+  @Named(STORE_NAME)
+  private Lifecycle lifecycle;
 
   @Before
   public void init() throws Exception {
-    Injector injector = Guice
-        .createInjector(new FileBlobStoreModule(), new TempDirectoryModule());
-
+    Injector injector = Guice.createInjector(new FileBlobStoreModule(STORE_NAME), new TempDirectoryModule());
     injector.injectMembers(this);
 
-    metadataStore.start();
+    lifecycle.start();
   }
 
   @After
   public void shutdown() throws Exception {
-    if (metadataStore != null) {
-      metadataStore.stop();
+    if (lifecycle != null) {
+      lifecycle.stop();
     }
   }
 

@@ -13,130 +13,126 @@
 package org.sonatype.nexus.blobstore.file.guice;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
+import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
+import org.sonatype.nexus.blobstore.file.FileBlobStore;
 import org.sonatype.nexus.blobstore.file.FileOperations;
+import org.sonatype.nexus.blobstore.file.FilePathPolicy;
+import org.sonatype.nexus.blobstore.file.HashingSubdirFileLocationPolicy;
 import org.sonatype.nexus.blobstore.file.SimpleFileOperations;
 import org.sonatype.nexus.blobstore.file.kazuki.KazukiBlobMetadataStore;
-import org.sonatype.nexus.blobstore.id.BlobIdFactory;
-import org.sonatype.nexus.blobstore.id.UuidBlobIdFactory;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
+import com.google.inject.PrivateModule;
+import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.name.Names;
-import io.kazuki.v0.store.easy.EasyKeyValueStoreModule;
-import io.kazuki.v0.store.jdbi.JdbiDataSourceConfiguration;
-import io.kazuki.v0.store.keyvalue.KeyValueStoreConfiguration;
-import io.kazuki.v0.store.lifecycle.LifecycleModule;
-import io.kazuki.v0.store.sequence.SequenceServiceConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.blobstore.file.kazuki.KazukiBlobMetadataStore.METADATA_TYPE;
 
 /**
- * File blob store Guice module.
+ * A Guice module for creating filesystem-based {@link BlobStore} instances. The name provided to the constructor must
+ * be unique across an instance of Nexus, and is used to locate the Kazuki database and the blob store's content
+ * directory.
+ *
+ * This private module exposes two beans:
+ *
+ * <ul>
+ * <li>a {@link BlobStore} {@code @Named(<name constructor parameter>)} </li>
+ * <li>a {@link Lifecycle} {@code @Named(<name constructor parameter>)} </li>
+ * </ul>
  *
  * @since 3.0
  */
-@Named
 public class FileBlobStoreModule
-    extends AbstractModule
+    extends PrivateModule
 {
-  public static final String FILE_BLOB_STORE = "fileblobstore";
+  private final String name;
+
+  private final Logger log = LoggerFactory.getLogger(FileBlobStoreModule.class);
+
+  /**
+   * The {@code name} parameter must be unique across all of Nexus.
+   */
+  public FileBlobStoreModule(final String name) {
+    this.name = checkNotNull(name, "name");
+  }
 
   @Override
   protected void configure() {
-    bind(BlobMetadataStore.class).to(KazukiBlobMetadataStore.class).in(Scopes.SINGLETON);
+    // Create and expose blob store itself
+    bind(String.class).annotatedWith(Names.named("FileBlobStoreModule.name-key")).toInstance(name);
+    bind(BlobStore.class).annotatedWith(Names.named(name)).toProvider(BlobStoreProvider.class);
     bind(FileOperations.class).to(SimpleFileOperations.class).in(Scopes.SINGLETON);
-    bind(BlobIdFactory.class).to(UuidBlobIdFactory.class).in(Scopes.SINGLETON);
+    expose(BlobStore.class).annotatedWith(Names.named(name));
 
-    bind(JdbiDataSourceConfiguration.class).annotatedWith(Names.named(FILE_BLOB_STORE))
-        .toProvider(JdbiConfigurationProvider.class).in(Scopes.SINGLETON);
-
-    // Kazuki lifecycle management
-    install(new LifecycleModule(FILE_BLOB_STORE));
-
-    // Kazuki key-value store
-    install(new EasyKeyValueStoreModule(FILE_BLOB_STORE, null)
-            .withSequenceConfig(getSequenceServiceConfiguration())
-            .withKeyValueStoreConfig(getKeyValueStoreConfiguration())
-    );
+    // Expose the metadata store's lifecycle
+    bind(Lifecycle.class).annotatedWith(Names.named(name))
+        .to(BlobMetadataStore.class);
+    expose(Lifecycle.class).annotatedWith(Names.named(name));
   }
 
-  private SequenceServiceConfiguration getSequenceServiceConfiguration() {
-    SequenceServiceConfiguration.Builder builder = new SequenceServiceConfiguration.Builder();
-
-    builder.withDbType("h2");
-    builder.withGroupName("nexus");
-    builder.withStoreName(FILE_BLOB_STORE);
-    builder.withStrictTypeCreation(true);
-
-    return builder.build();
+  @Provides
+  @Singleton
+  BlobMetadataStore getKazukiBlobMetadataStore(@Named("fileblobstore-internal") final KazukiHolder holder) {
+    return new KazukiBlobMetadataStore(holder.getLifecycle(), holder.getKvStore(), holder.getSchemaStore(),
+        holder.getSecondaryIndexStore());
   }
 
-  private KeyValueStoreConfiguration getKeyValueStoreConfiguration() {
-    KeyValueStoreConfiguration.Builder builder = new KeyValueStoreConfiguration.Builder();
-
-    builder.withDbType("h2");
-    builder.withGroupName("nexus");
-    builder.withStoreName(FILE_BLOB_STORE);
-    builder.withPartitionName("default");
-    builder.withPartitionSize(100_000L); // TODO: Confirm this is sensible
-    builder.withStrictTypeCreation(true);
-    builder.withDataType(METADATA_TYPE);
-    builder.withSecondaryIndex(true);
-
-    return builder.build();
-  }
-
-  // TODO: Extract helper for jdbi config, as the location for databases will be normalized
-
-  private static class KazukiBlobMetadataStoreProvider
-      implements Provider<KazukiBlobMetadataStore>
+  static class BlobStoreProvider
+      implements Provider<BlobStore>
   {
-    private String blobStoreName;
+    private final String name;
 
-    private KazukiBlobMetadataStoreProvider(final String blobStoreName) {
-      this.blobStoreName = checkNotNull(blobStoreName, "blob store name");
-    }
+    private final FilePathPolicy paths;
 
-    @Override
-    public KazukiBlobMetadataStore get() {
-      return null;
-    }
-  }
+    private final FileOperations fileOperations;
 
-  private static class JdbiConfigurationProvider
-      implements Provider<JdbiDataSourceConfiguration>
-  {
-    private ApplicationDirectories directories;
+    private final BlobMetadataStore metadataStore;
 
     @Inject
-    private JdbiConfigurationProvider(final ApplicationDirectories directories) {
-      this.directories = checkNotNull(directories);
+    BlobStoreProvider(@Named("FileBlobStoreModule.name-key") final String name, final FilePathPolicy paths,
+                      final FileOperations fileOperations,
+                      final BlobMetadataStore metadataStore)
+    {
+      this.name = name;
+      this.paths = paths;
+      this.fileOperations = fileOperations;
+      this.metadataStore = metadataStore;
     }
 
     @Override
-    public JdbiDataSourceConfiguration get() {
-      JdbiDataSourceConfiguration.Builder builder = new JdbiDataSourceConfiguration.Builder();
-
-      builder.withJdbcDriver("org.h2.Driver");
-
-      File dir = directories.getWorkDirectory("db/" + FILE_BLOB_STORE);
-      File file = new File(dir, dir.getName());
-      builder.withJdbcUrl("jdbc:h2:" + file.getAbsolutePath());
-
-      builder.withJdbcUser("root");
-      builder.withJdbcPassword("not_really_used");
-      builder.withPoolMinConnections(25);
-      builder.withPoolMaxConnections(25);
-
-      return builder.build();
+    public BlobStore get() {
+      return new FileBlobStore(name, paths, fileOperations, metadataStore);
     }
+  }
+
+  @Provides
+  FilePathPolicy provideFilePathPolicy(final ApplicationDirectories applicationDirectories) {
+    final File workDirectory = applicationDirectories.getWorkDirectory("fileblobstore/" + name + "/content");
+    return new HashingSubdirFileLocationPolicy(workDirectory.toPath());
+  }
+
+  @Provides
+  @Singleton
+  @Named("fileblobstore-internal")
+  KazukiHolder getKazukiHolder(final ApplicationDirectories applicationDirectories) throws IOException {
+    File dir = applicationDirectories.getWorkDirectory("fileblobstore/" + name + "/db");
+    log.info("File blob store {} metadata stored in Kazuki db: {}", name, dir);
+    DirSupport.mkdir(dir);
+    File file = new File(dir, dir.getName());
+
+    return new KazukiBuilder(name, file.getAbsoluteFile()).build();
   }
 }

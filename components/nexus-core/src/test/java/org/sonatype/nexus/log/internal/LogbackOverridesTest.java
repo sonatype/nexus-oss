@@ -54,7 +54,7 @@ public class LogbackOverridesTest
     LogbackOverrides.write(logbackXml, loggers);
 
     String expected = IOUtils.toString(getClass().getResourceAsStream("logback-expected.xml"));
-    String actual = FileUtils.readFileToString(logbackXml);
+    String actual = FileUtils.readFileToString(logbackXml).replace("\r\n", "\n");
     assertThat(actual, DiffMatchers.equalTo(expected));
   }
 

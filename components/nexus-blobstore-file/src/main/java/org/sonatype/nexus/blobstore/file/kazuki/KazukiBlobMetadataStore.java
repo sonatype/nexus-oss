@@ -25,12 +25,14 @@ import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.api.BlobStoreException;
 import org.sonatype.nexus.blobstore.file.BlobMetadata;
 import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
-import org.sonatype.nexus.blobstore.file.MetadataMetrics;
 import org.sonatype.nexus.blobstore.file.BlobState;
+import org.sonatype.nexus.blobstore.file.MetadataMetrics;
+import org.sonatype.nexus.blobstore.file.guice.FileBlobStoreModule;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import io.kazuki.v0.store.KazukiException;
 import io.kazuki.v0.store.Key;
+import io.kazuki.v0.store.guice.KazukiModule;
 import io.kazuki.v0.store.index.SecondaryIndexStore;
 import io.kazuki.v0.store.index.query.QueryBuilder;
 import io.kazuki.v0.store.index.query.QueryOperator;
@@ -55,8 +57,6 @@ import static java.util.Arrays.asList;
 /**
  * A Kazuki-backed implementation of the {@link BlobMetadataStore}.
  *
- * TODO: Consider using Kazuki's metadata keys as the blob IDs, as that would really, really simplify searching.
- *
  * @since 3.0
  */
 public class KazukiBlobMetadataStore
@@ -70,6 +70,9 @@ public class KazukiBlobMetadataStore
 
   public static final String METADATA_TYPE = "blobdata";
 
+
+  public static final String DYNAMIC_KZ_NAME = "kazuki-dynamic-name";
+
   private final Lifecycle lifecycle;
 
   private final KeyValueStore kvStore;
@@ -78,12 +81,16 @@ public class KazukiBlobMetadataStore
 
   private final SecondaryIndexStore secondaryIndexStore;
 
-  // TODO: These injections imply that there is only one metadata store
+  /**
+   * Kazuki's {@link KazukiModule} creates this class's dependencies under a specific, dynamic name. The
+   * {@code @Named(DYNAMIC_KZ_NAME)} annotations on the constructor allow the {@link FileBlobStoreModule} to
+   * associate this private {@link KazukiBlobMetadataStore} instance with the correct set of kazuki components.
+   */
   @Inject
-  public KazukiBlobMetadataStore(final @Named("fileblobstore") Lifecycle lifecycle,
-                                 @Named("fileblobstore") final KeyValueStore kvStore,
-                                 @Named("fileblobstore") final SchemaStore schemaStore,
-                                 @Named("fileblobstore") final SecondaryIndexStore secondaryIndexStore)
+  public KazukiBlobMetadataStore(@Named(DYNAMIC_KZ_NAME) Lifecycle lifecycle,
+                                 @Named(DYNAMIC_KZ_NAME) final KeyValueStore kvStore,
+                                 @Named(DYNAMIC_KZ_NAME) final SchemaStore schemaStore,
+                                 @Named(DYNAMIC_KZ_NAME) final SecondaryIndexStore secondaryIndexStore)
   {
     this.lifecycle = checkNotNull(lifecycle, "lifecycle");
     this.kvStore = checkNotNull(kvStore, "key value store");
@@ -212,7 +219,8 @@ public class KazukiBlobMetadataStore
 
   /**
    * Provides metrics about the blobs in the blob store. The {@link MetadataMetrics#getBlobCount() blob count} only
-   * considers blobs that are currently in {@link BlobState#ALIVE}, but {@link MetadataMetrics#getTotalSize() total size}
+   * considers blobs that are currently in {@link BlobState#ALIVE}, but {@link MetadataMetrics#getTotalSize() total
+   * size}
    * includes blobs that are marked for deletion.
    */
   @Override
@@ -230,7 +238,6 @@ public class KazukiBlobMetadataStore
         // Concurrent modification can cause objects in an iterator to return null.
         continue;
       }
-
 
       if (BlobState.ALIVE.equals(metadata.getBlobState())) {
         blobCount++;
