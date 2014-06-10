@@ -231,19 +231,11 @@ public class DefaultNexusBundleConfiguration
     final List<FileTask> overlays = Lists.newArrayList(super.getOverlays());
 
     for (final File plugin : getPlugins()) {
-      if (plugin.isDirectory()) {
-        overlays.add(
-            fileTaskBuilder.copy()
-                .directory(file(plugin))
-                .to().directory(path("sonatype-work/nexus/plugin-repository"))
-        );
-      }
-      else {
-        overlays.add(
-            fileTaskBuilder.expand(file(plugin))
-                .to().directory(path("sonatype-work/nexus/plugin-repository"))
-        );
-      }
+      overlays.add(
+          fileTaskBuilder.copy()
+              .file(file(plugin))
+              .to().directory(path("sonatype-work/nexus/plugin-repository"))
+      );
     }
 
     // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=357318#c62

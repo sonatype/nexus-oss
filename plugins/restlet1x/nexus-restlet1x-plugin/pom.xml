@@ -25,7 +25,7 @@
 
   <artifactId>nexus-restlet1x-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
+  <packaging>bundle</packaging>
 
   <properties>
     <pluginName>Nexus Core API (Restlet 1.x Plugin)</pluginName>
@@ -41,19 +41,18 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-content-plugin</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet1x-model</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-restlet-bridge</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-content-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -72,27 +71,6 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-        <configuration>
-          <sharedDependencies>
-            <!-- Legacy REST API model -->
-            <sharedDependency>org.sonatype.nexus.plugins:nexus-restlet1x-model</sharedDependency>
-            <!-- Restlet 1.x bridge -->
-            <sharedDependency>org.sonatype.nexus.plugins:nexus-restlet-bridge</sharedDependency>
-            <!-- Restlet API and impl -->
-            <sharedDependency>org.restlet:org.restlet</sharedDependency>
-            <sharedDependency>com.noelios.restlet:com.noelios.restlet</sharedDependency>
-            <sharedDependency>com.noelios.restlet:com.noelios.restlet.ext.servlet</sharedDependency>
-            <!-- Used by org.sonatype.nexus.rest.ResourceSupport -->
-            <sharedDependency>javax.ws.rs:javax.ws.rs</sharedDependency>
-            <!-- For RSS feed support -->
-            <sharedDependency>rome:rome</sharedDependency>
-          </sharedDependencies>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
@@ -102,6 +80,19 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api,
+              org.sonatype.nexus.plugins.nexus-content-plugin
+            </Require-Bundle>
+          </instructions>
+        </configuration>
       </plugin>
 
       <plugin>

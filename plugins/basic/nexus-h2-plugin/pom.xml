@@ -25,7 +25,7 @@
 
   <artifactId>nexus-h2-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
+  <packaging>bundle</packaging>
 
   <properties>
     <pluginName>Nexus H2 Provider Plugin</pluginName>
@@ -53,16 +53,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-        <configuration>
-          <sharedDependencies>
-            <sharedDependency>com.h2database:h2</sharedDependency>
-          </sharedDependencies>
-        </configuration>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
