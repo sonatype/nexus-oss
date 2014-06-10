@@ -90,14 +90,6 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Require-Bundle>
-              org.sonatype.nexus.plugin-api,
-              org.sonatype.nexus.plugins.nexus-extdirect-plugin,
-              org.sonatype.nexus.plugins.nexus-groovy-plugin,
-              org.sonatype.nexus.plugins.nexus-webresources-plugin,
-              org.sonatype.nexus.plugins.nexus-capabilities-plugin,
-              org.sonatype.nexus.plugins.nexus-wonderland-plugin
-            </Require-Bundle>
             <Embed-Dependency>
               nexus-rapture-baseapp;inline=true
             </Embed-Dependency>

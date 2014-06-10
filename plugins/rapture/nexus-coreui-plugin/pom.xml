@@ -93,24 +93,6 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Require-Bundle>
-              org.sonatype.nexus.plugin-api,
-              org.sonatype.nexus.plugins.nexus-groovy-plugin,
-              org.sonatype.nexus.plugins.nexus-rapture-plugin,
-              org.sonatype.nexus.plugins.nexus-extdirect-plugin,
-              org.sonatype.nexus.plugins.nexus-wonderland-plugin,
-              org.sonatype.nexus.plugins.nexus-restlet1x-plugin,
-              org.sonatype.nexus.plugins.nexus-indexer-lucene-plugin
-            </Require-Bundle>
-          </instructions>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
       </plugin>

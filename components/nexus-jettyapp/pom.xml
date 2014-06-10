@@ -111,13 +111,8 @@
             <Embed-Directory>lib</Embed-Directory>
             <Embed-Transitive>true</Embed-Transitive>
             <_exportcontents>
-              !lib.*,
-              org.slf4j;provider=nexus;mandatory:=provider,
-              ch.*|com.*|org.*;-noimport:=true
+              ch.*|com.*|org.*
             </_exportcontents>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
           </instructions>
         </configuration>
       </plugin>

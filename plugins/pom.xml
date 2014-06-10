@@ -460,22 +460,23 @@
           <configuration>
             <instructions>
               <!--
-              Nexus plugin default instructions (based on Require-Bundle model)
+              Nexus plugin default instructions
               -->
               <Bundle-Name>${pluginName}</Bundle-Name>
               <Bundle-Description>${pluginDescription}</Bundle-Description>
               <Bundle-DocURL>http://links.sonatype.com/products/nexus/oss/home</Bundle-DocURL>
-              <Require-Bundle>org.sonatype.nexus.plugin-api</Require-Bundle>
               <!--
               Global ban on embedded dependencies already in core
               -->
               <Embed-Dependency>
                 *;scope=compile|runtime;artifactId=!
+                  activation|
                   aether-api|
                   aether-spi|
                   aether-util|
                   annotations|
                   aopalliance|
+                  bcprov-jdk15on|
                   bval-core|
                   bval-guice|
                   bval-jsr303|
@@ -487,6 +488,7 @@
                   commons-io|
                   commons-lang|
                   commons-lang3|
+                  geronimo-jta_1.0.1B_spec|
                   goodies-common|
                   goodies-eventbus|
                   goodies-i18n|
@@ -507,9 +509,13 @@
                   javax.annotation-api|
                   javax.inject|
                   javax.servlet|
+                  javax.ws.rs|
+                  jaxb-api|
+                  jboss-annotations-api_1.1_spec|
                   jcl-over-slf4j|
                   joda-time|
                   jsoup|
+                  jsr173_api|
                   jsr250-api|
                   jsr305|
                   jul-to-slf4j|
@@ -549,7 +555,7 @@
               <Embed-Transitive>true</Embed-Transitive>
               <Private-Package>!*;-split-package:=first</Private-Package>
               <_exportcontents>
-                ![A-Z]*|lib*|static*|docs*|*-*|.*,*;-noimport:=true
+                ![A-Z]*|lib*|static*|docs*|*-*|.*,*
               </_exportcontents>
             </instructions>
           </configuration>

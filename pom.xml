@@ -593,16 +593,13 @@
               <Include-Resource>
                 /=${project.build.outputDirectory},{maven-resources}
               </Include-Resource>
-
-              <!--
-              Defaults while plugins use Require-Bundle.
-              -->
-              <Import-Package>!*</Import-Package>
-              <_nouses>true</_nouses>
-              <_nodefaultversion>true</_nodefaultversion>
+              <!-- remove build-only headers from final manifest -->
               <_removeheaders>
                 Embed*,Include-Resource,Private-Package
               </_removeheaders>
+              <Import-Package>
+                *;resolution:=optional
+              </Import-Package>
             </instructions>
           </configuration>
         </plugin>

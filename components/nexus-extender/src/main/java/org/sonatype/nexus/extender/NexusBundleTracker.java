@@ -77,7 +77,7 @@ public class NexusBundleTracker
   @Override
   public BindingPublisher prepare(final Bundle bundle) {
     if (isNexusPlugin(bundle)) {
-      prepareRequiredNexusPlugins(bundle);
+      preparePluginDependencies(bundle);
       return prepareNexusPlugin(bundle);
     }
     return super.prepare(bundle);
@@ -129,21 +129,24 @@ public class NexusBundleTracker
   }
 
   private static boolean isNexusPlugin(final Bundle bundle) {
-    final String requiredBundles = bundle.getHeaders().get(Constants.REQUIRE_BUNDLE);
-    return requiredBundles != null && requiredBundles.contains("org.sonatype.nexus.plugin-api");
+    if (null == bundle.getHeaders().get(Constants.FRAGMENT_HOST)) {
+      final String symbolicName = bundle.getSymbolicName();
+      return null != symbolicName && (symbolicName.endsWith("-plugin") || symbolicName.endsWith("-helper"));
+    }
+    return false;
   }
 
-  private void prepareRequiredNexusPlugins(final Bundle bundle) {
+  private void preparePluginDependencies(final Bundle bundle) {
     final BundleWiring wiring = bundle.adapt(BundleWiring.class);
-    final List<BundleWire> requiredBundles = wiring.getRequiredWires(BundleRevision.BUNDLE_NAMESPACE);
-    if (requiredBundles != null) {
-      for (BundleWire wire : requiredBundles) {
+    final List<BundleWire> wires = wiring.getRequiredWires(BundleRevision.PACKAGE_NAMESPACE);
+    if (wires != null) {
+      for (BundleWire wire : wires) {
         try {
-          final Bundle requiredBundle = wire.getCapability().getRevision().getBundle();
-          if (isNexusPlugin(requiredBundle)) {
-            requiredBundle.start();
+          final Bundle dependency = wire.getCapability().getRevision().getBundle();
+          if ((dependency.getState() & (Bundle.STARTING | Bundle.ACTIVE)) == 0 && isNexusPlugin(dependency)) {
+            dependency.start();
             // pseudo-event to trigger bundle activation
-            addingBundle(requiredBundle, null /* unused */);
+            addingBundle(dependency, null /* unused */);
           }
         }
         catch (Exception e) {

@@ -130,20 +130,9 @@
             <Embed-Directory>lib</Embed-Directory>
             <Embed-Transitive>true</Embed-Transitive>
             <_exportcontents>
-              !lib.*,
               !com.google.inject.internal.*,
-              javax.servlet;provider=nexus;mandatory:=provider,
-              javax.servlet.http;provider=nexus;mandatory:=provider,
-              com.*|eu.*|javax.*|net.*|org.*|io.*;-noimport:=true
+              com.*|eu.*|javax.*|net.*|org.*|io.*
             </_exportcontents>
-            <Require-Bundle>
-              system.bundle;visibility:=reexport,
-              org.sonatype.nexus.jettyapp;visibility:=reexport;resolution:=optional
-            </Require-Bundle>
-            <Import-Package>
-              javax.servlet;provider=!,
-              javax.servlet.http;provider=!
-            </Import-Package>
           </instructions>
         </configuration>
       </plugin>

@@ -83,19 +83,6 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Require-Bundle>
-              org.sonatype.nexus.plugin-api,
-              org.sonatype.nexus.plugins.nexus-content-plugin
-            </Require-Bundle>
-          </instructions>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
       </plugin>
