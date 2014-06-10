@@ -30,6 +30,8 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest
 import org.sonatype.nexus.proxy.item.RepositoryItemUid
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository
+import org.sonatype.nexus.proxy.maven.MavenRepository
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry
@@ -39,6 +41,7 @@ import org.sonatype.nexus.rest.RepositoryURLBuilder
 import org.sonatype.nexus.templates.TemplateManager
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider
 import org.sonatype.nexus.templates.repository.RepositoryTemplate
+import org.sonatype.nexus.templates.repository.maven.AbstractMavenRepositoryTemplate
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -140,21 +143,16 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('nexus:componentsrepotypes:read')
   List<RepositoryTemplateXO> readTemplates(final @Nullable StoreLoadParameters parameters) {
-    def providers = []
-    def asProvider = { template, type, masterFormat ->
-      new RepositoryTemplateXO(
-          id: template.id,
-          type: type,
-          provider: template.repositoryProviderHint,
-          providerName: template.description,
-          format: template.contentClass.id,
-          formatName: template.contentClass.name,
-          masterFormat: masterFormat
-      )
+    def templates = []
+    def typeFilter = parameters?.getFilter('type')
+    def formatFilter = parameters?.getFilter('format')
+    def policyFilter = parameters?.getFilter('policy')
+    RepositoryPolicy policy = null
+    if (policyFilter && !policyFilter.trim().isEmpty()) {
+      policy = RepositoryPolicy.valueOf(policyFilter)
     }
     def types = typesToClass
-    templateManager.templates.getTemplates(RepositoryTemplate.class).templatesList.each {
-      def template = it as RepositoryTemplate
+    templateManager.templates.getTemplates(RepositoryTemplate.class).templatesList.each { RepositoryTemplate template ->
       types.each {
         if (template.targetFits(it.value)) {
           def masterFormat = null,
@@ -164,16 +162,25 @@ extends DirectComponentSupport
           if (type == 'virtual' && template.contentClass.id.startsWith('maven')) {
             masterFormat = template.contentClass.id == 'maven1' ? 'maven2' : 'maven1'
           }
-
-          def typeFilter = parameters?.getFilter('type')
-          def formatFilter = parameters?.getFilter('format')
-          if ((type == (typeFilter ?: type) && (format == (formatFilter ?: format)))) {
-            providers.add(asProvider(template, type, masterFormat))
+          if (type == (typeFilter ?: type)
+              && format == (formatFilter ?: format)
+              && (!policy || !(template instanceof AbstractMavenRepositoryTemplate) || policy == template.repositoryPolicy)) {
+            templates.add(
+                new RepositoryTemplateXO(
+                    id: template.id,
+                    type: type,
+                    provider: template.repositoryProviderHint,
+                    providerName: template.description,
+                    format: template.contentClass.id,
+                    formatName: template.contentClass.name,
+                    masterFormat: masterFormat
+                )
+            )
           }
         }
       }
     }
-    return providers
+    return templates
   }
 
   /**
@@ -600,6 +607,16 @@ extends DirectComponentSupport
     if (!includeNexusManaged) {
       repositories = repositories.findResults { Repository repository ->
         return repository.userManaged ? repository : null
+      }
+    }
+    String policyFilter = parameters.getFilter('policy')
+    if (policyFilter && !policyFilter.trim().isEmpty()) {
+      RepositoryPolicy policy = RepositoryPolicy.valueOf(policyFilter)
+      repositories = repositories.findResults { Repository repository ->
+        if (repository instanceof MavenRepository && repository.repositoryPolicy != policy) {
+          return null
+        }
+        return repository
       }
     }
     return repositories
