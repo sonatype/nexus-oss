@@ -26,8 +26,7 @@
 
   <artifactId>nexus-capabilities-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-
-  <packaging>nexus-plugin</packaging>
+  <packaging>bundle</packaging>
 
   <properties>
     <pluginName>Nexus Capabilities Plugin</pluginName>
@@ -35,11 +34,6 @@
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-capabilities-model</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
@@ -49,43 +43,42 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-siesta-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-crypto-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-atlas-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-groovy-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-extdirect-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-kazuki-plugin</artifactId>
-      <type>${nexus-plugin.type}</type>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-capabilities-model</artifactId>
     </dependency>
 
     <dependency>
@@ -102,17 +95,6 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <compilerId>groovy-eclipse-compiler</compilerId>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-        <configuration>
-          <sharedDependencies>
-            <sharedDependency>org.sonatype.sisu.goodies:goodies-eventbus</sharedDependency>
-            <sharedDependency>org.sonatype.nexus.plugins:nexus-capabilities-model</sharedDependency>
-          </sharedDependencies>
         </configuration>
       </plugin>
 
@@ -138,6 +120,24 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api,
+              org.sonatype.nexus.plugins.nexus-siesta-plugin,
+              org.sonatype.nexus.plugins.nexus-crypto-plugin,
+              org.sonatype.nexus.plugins.nexus-atlas-plugin,
+              org.sonatype.nexus.plugins.nexus-groovy-plugin,
+              org.sonatype.nexus.plugins.nexus-extdirect-plugin,
+              org.sonatype.nexus.plugins.nexus-kazuki-plugin
+            </Require-Bundle>
+          </instructions>
+        </configuration>
       </plugin>
 
       <plugin>

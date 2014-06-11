@@ -21,11 +21,11 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.Evaluable;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.CapabilityHasNoFailures;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.CapabilityOfTypeActiveCondition;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.CapabilityOfTypeExistsCondition;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.EvaluableCondition;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.PassivateCapabilityDuringUpdateCondition;
+import org.sonatype.nexus.plugins.capabilities.condition.CapabilityHasNoFailures;
+import org.sonatype.nexus.plugins.capabilities.condition.CapabilityOfTypeActiveCondition;
+import org.sonatype.nexus.plugins.capabilities.condition.CapabilityOfTypeExistsCondition;
+import org.sonatype.nexus.plugins.capabilities.condition.EvaluableCondition;
+import org.sonatype.nexus.plugins.capabilities.condition.PassivateCapabilityDuringUpdateCondition;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;

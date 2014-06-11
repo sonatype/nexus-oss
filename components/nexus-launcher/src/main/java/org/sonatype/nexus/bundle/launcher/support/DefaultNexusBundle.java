@@ -443,7 +443,7 @@ public class DefaultNexusBundle
               "{} ({}) removing plugin '{}' already present in extracted bundle", getName(), getConfiguration().getId(),
               entry.getValue().getName()
           );
-          fileTaskBuilder.delete().directory(file(entry.getValue())).run();
+          fileTaskBuilder.delete().file(file(entry.getValue())).run();
         }
       }
     }
@@ -455,26 +455,23 @@ public class DefaultNexusBundle
     {
       @Override
       public boolean accept(final File file) {
-        return file.isDirectory();
+        return file.getName().endsWith(".jar");
       }
     });
     if (foundPlugins != null && foundPlugins.length > 0) {
       for (final File plugin : foundPlugins) {
-        final Optional<File> mainJar = getPluginMainJar(plugin);
-        if (mainJar.isPresent()) {
-          final Optional<String> gaCoordinates = getPluginGACoordinates(mainJar.get());
-          if (gaCoordinates.isPresent()) {
-            plugins.put(gaCoordinates.get(), plugin);
-          }
+        final Optional<String> gaCoordinates = getPluginGACoordinates(plugin);
+        if (gaCoordinates.isPresent()) {
+          plugins.put(gaCoordinates.get(), plugin);
         }
       }
     }
     return plugins;
   }
 
-  private Optional<String> getPluginGACoordinates(final File mainJar) {
+  private Optional<String> getPluginGACoordinates(final File plugin) {
     try {
-      final ZipFile jarFile = new ZipFile(mainJar);
+      final ZipFile jarFile = new ZipFile(plugin);
       final Enumeration<? extends ZipEntry> entries = jarFile.entries();
       if (entries != null) {
         while (entries.hasMoreElements()) {
@@ -490,27 +487,6 @@ public class DefaultNexusBundle
     }
     catch (IOException e) {
       throw Throwables.propagate(e);
-    }
-    return Optional.absent();
-  }
-
-  private Optional<File> getPluginMainJar(final File plugin) {
-    final String[] mainJars = plugin.list(new FilenameFilter()
-    {
-      @Override
-      public boolean accept(final File dir, final String name) {
-        return name.endsWith(".jar");
-      }
-    });
-    if (mainJars != null && mainJars.length > 0) {
-      if (mainJars.length > 1) {
-        throw new IllegalStateException(
-            "Plugin '" + plugin.getAbsolutePath() + "' contains more then one jar"
-        );
-      }
-      else {
-        return Optional.of(new File(plugin, mainJars[0]));
-      }
     }
     return Optional.absent();
   }

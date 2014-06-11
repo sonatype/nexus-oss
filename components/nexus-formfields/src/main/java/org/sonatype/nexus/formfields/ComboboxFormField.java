@@ -10,7 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.formfields;
+
+import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -23,9 +28,9 @@ public class ComboboxFormField<V>
     extends Combobox<V>
 {
 
-  private String storePath;
+  private String storeApi;
 
-  private String storeRoot;
+  private final Map<String, String> storeFilters;
 
   private String idMapping;
 
@@ -38,8 +43,7 @@ public class ComboboxFormField<V>
                            final V initialValue)
   {
     super(id, label, helpText, required, initialValue);
-    this.storePath = defaultStorePath();
-    this.storeRoot = defaultStoreRoot();
+    this.storeFilters = Maps.newHashMap();
   }
 
   public ComboboxFormField(final String id,
@@ -63,14 +67,20 @@ public class ComboboxFormField<V>
     this(id, label, null);
   }
 
+  /**
+   * @since 3.0
+   */
   @Override
-  public String getStorePath() {
-    return storePath;
+  public String getStoreApi() {
+    return storeApi;
   }
 
+  /**
+   * @since 3.0
+   */
   @Override
-  public String getStoreRoot() {
-    return storeRoot;
+  public Map<String, String> getStoreFilters() {
+    return storeFilters.isEmpty() ? null : storeFilters;
   }
 
   @Override
@@ -83,13 +93,23 @@ public class ComboboxFormField<V>
     return nameMapping;
   }
 
-  public ComboboxFormField<V> withStorePath(final String storePath) {
-    this.storePath = checkNotNull(storePath);
+  /**
+   * @since 3.0
+   */
+  public ComboboxFormField<V> withStoreApi(final String storeApi) {
+    this.storeApi = checkNotNull(storeApi);
     return this;
   }
 
-  public ComboboxFormField<V> withStoreRoot(final String storeRoot) {
-    this.storeRoot = storeRoot;
+  /**
+   * Adds a store filter.
+   *
+   * @param property filter property
+   * @param value    filter value
+   * @since 3.0
+   */
+  public Combobox<V> withStoreFilter(final String property, final String value) {
+    storeFilters.put(checkNotNull(property, "property"), checkNotNull(value, "value"));
     return this;
   }
 
@@ -102,14 +122,5 @@ public class ComboboxFormField<V>
     this.nameMapping = nameMapping;
     return this;
   }
-
-  protected String defaultStorePath() {
-    return null;
-  }
-
-  protected String defaultStoreRoot() {
-    return null;
-  }
-
 
 }

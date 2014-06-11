@@ -88,16 +88,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-
-    <plugins>
-      <!--
-      Need to know about 'nexus-plugin' packaging for integration-tests.
-      -->
-      <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
   </build>
 
   <profiles>

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.util.file;
 
 import java.io.File;
@@ -319,12 +320,19 @@ public final class DirSupport
   // MOVE: recursive copy of whole directory tree and then deleting it
 
   /**
-   * Performs a move operation, but as a sequence of "copy" and then "delete" (not a real move!). This method accepts
+   * Performs a move operation. It will attempt a real move (if source and target are on same file store), but will
+   * fallback to a sequence of "copy" and then "delete" (not a real move!). This method accepts
    * existing Paths that might denote a regular file or a directory.
    */
   public static void move(final Path from, final Path to) throws IOException {
-    copy(from, to);
-    delete(from);
+    try {
+      Files.move(from, to, StandardCopyOption.REPLACE_EXISTING);
+    }
+    catch (IOException e) {
+      // give up, do copy+delete
+      copy(from, to);
+      delete(from);
+    }
   }
 
   /**

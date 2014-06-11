@@ -10,7 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.formfields;
+
+import java.util.Map;
 
 /**
  * Implemented by {@link FormField}s whose value should be selected from a data store (combobox).
@@ -22,18 +25,20 @@ public interface Selectable
 {
 
   /**
-   * Returns resource path to an id/name rest store resource.
+   * Returns Ext.Direct API name used to configure Ext proxy.
    * E.g.
-   * "/service/local/repositories"
-   * "/service/siesta/capabilities"
+   * "coreui_Repository.readReferences"
+   * "coreui_RepositoryTarget.read"
+   *
+   * @since 3.0
    */
-  String getStorePath();
+  String getStoreApi();
 
   /**
-   * Returns the name of the property which contains the collation of objects.
-   * E.g. For restlet1x resources this should be in most of teh cases equal to "data".
+   * @return Filters to be applied to store
+   * @since 3.0
    */
-  String getStoreRoot();
+  Map<String, String> getStoreFilters();
 
   /**
    * Returns the name of the property that should be considered as an record id. Defaults to "id";

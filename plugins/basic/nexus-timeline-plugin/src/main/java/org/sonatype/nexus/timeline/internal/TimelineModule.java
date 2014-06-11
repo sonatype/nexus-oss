@@ -22,13 +22,13 @@ import org.sonatype.nexus.timeline.TimelinePlugin;
 import org.sonatype.nexus.timeline.internal.EntryRecord;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.google.inject.name.Names;
-import io.kazuki.v0.store.easy.EasyPartitionedJournalStoreModule;
+import io.kazuki.v0.store.guice.KazukiModule;
 import io.kazuki.v0.store.jdbi.JdbiDataSourceConfiguration;
 import io.kazuki.v0.store.keyvalue.KeyValueStoreConfiguration;
-import io.kazuki.v0.store.lifecycle.LifecycleModule;
 import io.kazuki.v0.store.sequence.SequenceServiceConfiguration;
 
 /**
@@ -42,15 +42,14 @@ public class TimelineModule
 {
   @Override
   protected void configure() {
-    install(new LifecycleModule(TimelinePlugin.ARTIFACT_ID));
-
     bind(JdbiDataSourceConfiguration.class).annotatedWith(Names.named(TimelinePlugin.ARTIFACT_ID))
         .toProvider(JdbiConfigurationProvider.class).in(Scopes.SINGLETON);
 
-    install(new EasyPartitionedJournalStoreModule(TimelinePlugin.ARTIFACT_ID, null)
-        .withSequenceConfig(getSequenceServiceConfiguration())
-        .withKeyValueStoreConfig(getKeyValueStoreConfiguration())
-    );
+    install(new KazukiModule.Builder(TimelinePlugin.ARTIFACT_ID)
+        .withJdbiConfiguration(TimelinePlugin.ARTIFACT_ID, Key.get(JdbiDataSourceConfiguration.class, Names.named(TimelinePlugin.ARTIFACT_ID)))
+        .withSequenceServiceConfiguration(TimelinePlugin.ARTIFACT_ID, getSequenceServiceConfiguration())
+        .withJournalStoreConfiguration(TimelinePlugin.ARTIFACT_ID, getKeyValueStoreConfiguration())
+        .build());
   }
 
   private SequenceServiceConfiguration getSequenceServiceConfiguration() {

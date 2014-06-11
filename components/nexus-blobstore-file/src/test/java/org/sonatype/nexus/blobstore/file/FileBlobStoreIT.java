@@ -18,17 +18,19 @@ import java.io.InputStream;
 import java.util.Random;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
+import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreMetrics;
 import org.sonatype.nexus.blobstore.file.guice.FileBlobStoreModule;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Module;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -39,8 +41,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.sonatype.nexus.blobstore.api.BlobStore.CREATED_BY_HEADER;
 import static org.sonatype.nexus.blobstore.api.BlobStore.BLOB_NAME_HEADER;
+import static org.sonatype.nexus.blobstore.api.BlobStore.CREATED_BY_HEADER;
 
 
 /**
@@ -51,31 +53,31 @@ public class FileBlobStoreIT
 {
   public static final int TEST_DATA_LENGTH = 10_000;
 
+  private static final String KZ_INSTANCE_NAME = "testfileblobstore";
+
   public static final ImmutableMap<String, String> TEST_HEADERS = ImmutableMap
       .of(CREATED_BY_HEADER, "test", BLOB_NAME_HEADER, "test/randomData.bin");
 
-  private Injector injector;
+  @Inject
+  @Named(KZ_INSTANCE_NAME)
+  private BlobStore blobStore;
 
   @Inject
-  private FileBlobStore blobStore;
-
-  @Inject
-  private BlobMetadataStore metadataStore;
+  @Named(KZ_INSTANCE_NAME)
+  private Lifecycle lifecycle;
 
   @Before
   public void init() throws Exception {
-    injector = Guice
-        .createInjector((Module) new FileBlobStoreModule(), new TempDirectoryModule());
-
+    Injector injector = Guice.createInjector(new FileBlobStoreModule(KZ_INSTANCE_NAME), new TempDirectoryModule());
     injector.injectMembers(this);
 
-    metadataStore.start();
+    lifecycle.start();
   }
 
   @After
   public void shutdown() throws Exception {
-    if (metadataStore != null) {
-      metadataStore.stop();
+    if (lifecycle != null) {
+      lifecycle.stop();
     }
   }
 

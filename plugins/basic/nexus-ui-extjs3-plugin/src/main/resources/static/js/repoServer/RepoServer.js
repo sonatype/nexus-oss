@@ -277,16 +277,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
                     tabId : 'view-repositories',
                     tabCode : Sonatype.repoServer.RepositoryPanel,
                     tabTitle : 'Repositories'
-                  }, {
-                    enabled : sp.checkPermission('nexus:targets', sp.READ) && (sp.checkPermission('nexus:targets', sp.CREATE) || sp.checkPermission('nexus:targets', sp.DELETE) || sp.checkPermission('nexus:targets', sp.EDIT)),
-                    title : 'Repository Targets',
-                    tabId : 'targets-config',
-                    tabCode : Sonatype.repoServer.RepoTargetEditPanel
-                  }, {
-                    enabled : sp.checkPermission('nexus:routes', sp.READ) && (sp.checkPermission('nexus:routes', sp.CREATE) || sp.checkPermission('nexus:routes', sp.DELETE) || sp.checkPermission('nexus:routes', sp.EDIT)),
-                    title : 'Routing',
-                    tabId : 'routes-config',
-                    tabCode : Sonatype.repoServer.RoutesEditPanel
                   }]
             });
 
@@ -294,30 +284,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
         nexusPanel.add({
               title : 'Enterprise',
               id : 'st-nexus-enterprise'
-            });
-
-        // Security Group **************************************************
-        nexusPanel.add({
-              title : 'Security',
-              id : 'st-nexus-security',
-              collapsed : true,
-              items : [
-                  {
-                    enabled : sp.checkPermission('security:users', sp.READ) && (sp.checkPermission('security:users', sp.CREATE) || sp.checkPermission('security:users', sp.DELETE) || sp.checkPermission('security:users', sp.EDIT)),
-                    title : 'Users',
-                    tabId : 'security-users',
-                    tabCode : Sonatype.repoServer.UserEditPanel
-                  }, {
-                    enabled : sp.checkPermission('security:roles', sp.READ) && (sp.checkPermission('security:roles', sp.CREATE) || sp.checkPermission('security:roles', sp.DELETE) || sp.checkPermission('security:roles', sp.EDIT)),
-                    title : 'Roles',
-                    tabId : 'security-roles',
-                    tabCode : Sonatype.repoServer.RoleEditPanel
-                  }, {
-                    enabled : sp.checkPermission('security:privileges', sp.READ) && (sp.checkPermission('security:privileges', sp.CREATE) || sp.checkPermission('security:privileges', sp.DELETE) || sp.checkPermission('security:privileges', sp.EDIT)),
-                    title : 'Privileges',
-                    tabId : 'security-privileges',
-                    tabCode : Sonatype.repoServer.PrivilegeEditPanel
-                  }]
             });
 
         // Config Group **************************************************
@@ -331,11 +297,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
                     tabId : 'nexus-config',
                     tabCode : Sonatype.repoServer.ServerEditPanel,
                     tabTitle : 'nexus'
-                  }, {
-                    enabled : sp.checkPermission('nexus:tasks', sp.READ),
-                    title : 'Scheduled Tasks',
-                    tabId : 'schedules-config',
-                    tabCode : Sonatype.repoServer.SchedulesEditPanel
                   }]
             });
 
@@ -353,9 +314,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
                     title : 'About Nexus',
                     tabId : 'AboutNexus',
                     tabCode : Sonatype.repoServer.HelpAboutPanel
-                  }, {
-                    title : 'Browse Issue Tracker',
-                    href : 'http://links.sonatype.com/products/nexus/oss/issues'
                   }, {
                     title : 'Documentation',
                     tabId : 'Documentation',
@@ -404,17 +362,6 @@ define('repoServer/RepoServer',['extjs', 'sonatype', 'Sonatype/lib', 'Nexus/conf
         cls : 'user-profile-menu',
         shadow: false,
         items : [
-          {
-            text : 'Profile',
-            handler : function() {
-              Sonatype.view.mainTabPanel.addOrShowTab('profile', Nexus.profile.UserProfile);
-            },
-            listeners : {
-              render : function(cmp) {
-                cmp.setVisible(Sonatype.utils.editionShort === "OSS" || ( Sonatype.utils.licenseInstalled && !Sonatype.utils.licenseExpired));
-              }
-            }
-          },
           {
             text : 'Logout',
             handler : function() {

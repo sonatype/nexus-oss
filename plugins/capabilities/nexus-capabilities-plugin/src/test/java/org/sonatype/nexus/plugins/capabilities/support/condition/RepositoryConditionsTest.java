@@ -13,9 +13,9 @@
 package org.sonatype.nexus.plugins.capabilities.support.condition;
 
 import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.RepositoryExistsCondition;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.RepositoryLocalStatusCondition;
-import org.sonatype.nexus.plugins.capabilities.internal.condition.RepositoryProxyModeCondition;
+import org.sonatype.nexus.plugins.capabilities.condition.RepositoryExistsCondition;
+import org.sonatype.nexus.plugins.capabilities.condition.RepositoryLocalStatusCondition;
+import org.sonatype.nexus.plugins.capabilities.condition.RepositoryProxyModeCondition;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;

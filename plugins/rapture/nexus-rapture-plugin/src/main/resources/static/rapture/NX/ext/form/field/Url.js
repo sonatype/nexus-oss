@@ -19,7 +19,14 @@ Ext.define('NX.ext.form.field.Url', {
   extend: 'Ext.form.field.Text',
   alias: 'widget.nx-url',
 
-  vtype: 'url',
+  urlRegEx: /(((^https?)|(^ftp)):\/\/((([\-\w]+\.)+\w{1,3}(\/[%\-\w]+(\.\w{1,})?)*(([\w\-\.\?\\\/+@&#;`~=%!]*)(\.\w{1,})?)*)|(localhost|LOCALHOST))\/?)/i,
+
+  validator: function (value) {
+    if (this.urlRegEx.test(value)) {
+      return true;
+    }
+    return 'This field should be a URL in the format "http:/' + '/www.example.com"';
+  },
 
   useTrustStore: function (field) {
     if (Ext.String.startsWith(field.getValue(), 'https://')) {

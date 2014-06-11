@@ -14,11 +14,11 @@
 // Helper to [re]install a plugin bundle into a nexus installation.
 
 CliBuilder cli = new CliBuilder(
-    usage: 'groovy installplugin.groovy -i <nexus-install-directory> -p <nexus-plugin-bundle-zip>',
+    usage: 'groovy installplugin.groovy -i <nexus-install-directory> -p <nexus-plugin-jar>',
     header: 'A utility to install a plugin for development purposes'
 )
 cli.with {
-  p longOpt: 'plugin', args: 1, 'Path to <nexus-plugin-bundle-zip>', required: true
+  p longOpt: 'plugin', args: 1, 'Path to <nexus-plugin-jar>', required: true
   i longOpt: 'install', args: 1, 'Path to <nexus-install-directory>', required: true
 }
 def options = cli.parse(args)
@@ -36,15 +36,4 @@ def repoDir = new File(installDir, 'nexus/WEB-INF/plugin-repository')
 
 def ant = new AntBuilder()
 
-// strip off -bundle.zip
-assert pluginFile.name.endsWith('-bundle.zip')
-def pluginPrefix = pluginFile.name[0..-12]
-
-// delete the plugin dir, if it exists
-def pluginDir = new File(repoDir, pluginPrefix)
-if (pluginDir.exists()) {
-  ant.delete(dir: pluginDir)
-}
-
-// unzip the new plugin
-ant.unzip(src: pluginFile, dest: repoDir)
+ant.copy(file: pluginFile, todir: repoDir, overwrite:true)

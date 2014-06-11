@@ -26,7 +26,7 @@
 
   <artifactId>nexus-maven-bridge-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
+  <packaging>bundle</packaging>
 
   <properties>
     <pluginName>Nexus Maven Bridge Plugin</pluginName>
@@ -76,17 +76,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-        <configuration>
-          <sharedDependencies>
-            <sharedDependency>org.sonatype.sisu:sisu-maven-bridge</sharedDependency>
-            <sharedDependency>org.apache.maven:maven-model-builder</sharedDependency>
-          </sharedDependencies>
-        </configuration>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>

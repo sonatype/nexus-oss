@@ -10,7 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.formfields;
+
+import java.util.Map;
 
 /**
  * The model for a combo field allowing for selection of Repository Targets.
@@ -47,14 +50,20 @@ public class RepoTargetComboFormField
     return "repo-target";
   }
 
+  /**
+   * @since 3.0
+   */
   @Override
-  public String getStorePath() {
-    return restlet1xStore("/repo_targets");
+  public String getStoreApi() {
+    return "coreui_RepositoryTarget.read";
   }
 
+  /**
+   * @since 3.0
+   */
   @Override
-  public String getStoreRoot() {
-    return "data";
+  public Map<String, String> getStoreFilters() {
+    return null;
   }
 
 }

@@ -19,9 +19,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
-import org.sonatype.sisu.goodies.template.internal.VelocityTemplateEngine;
-
-import org.apache.velocity.app.VelocityEngine;
 
 /**
  * Creates shared {@link TemplateEngine}.
@@ -37,8 +34,8 @@ public class SharedTemplateEngineProvider
   private final TemplateEngine engine;
 
   @Inject
-  public SharedTemplateEngineProvider(final Provider<VelocityEngine> velocityProvider) {
-    this.engine = new VelocityTemplateEngine(velocityProvider);
+  public SharedTemplateEngineProvider(@Named("velocity") final TemplateEngine engine) {
+    this.engine = engine;
   }
 
   @Override

@@ -25,7 +25,7 @@
 
   <artifactId>nexus-extdirect-plugin</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>nexus-plugin</packaging>
+  <packaging>bundle</packaging>
 
   <properties>
     <pluginName>Nexus Ext.Direct Plugin</pluginName>
@@ -52,17 +52,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
-        <configuration>
-          <sharedDependencies>
-            <sharedDependency>com.softwarementors.extjs:directjngine</sharedDependency>
-            <sharedDependency>com.google.code.gson:gson</sharedDependency>
-          </sharedDependencies>
-        </configuration>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>

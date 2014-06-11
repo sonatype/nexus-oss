@@ -52,6 +52,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -60,12 +61,11 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.shared.artifact.filter.StrictPatternIncludesArtifactFilter;
 import org.apache.maven.shared.artifact.filter.collection.ArtifactFilterException;
-import org.apache.maven.shared.artifact.filter.collection.ArtifactIdFilter;
+import org.apache.maven.shared.artifact.filter.collection.ArtifactsFilter;
 import org.apache.maven.shared.artifact.filter.collection.ClassifierFilter;
 import org.apache.maven.shared.artifact.filter.collection.FilterArtifacts;
-import org.apache.maven.shared.artifact.filter.collection.GroupIdFilter;
-import org.apache.maven.shared.artifact.filter.collection.TypeFilter;
 import org.apache.maven.shared.filtering.MavenFileFilter;
 import org.apache.maven.shared.filtering.MavenFilteringException;
 import org.codehaus.plexus.PlexusConstants;
@@ -805,7 +805,8 @@ public class AbstractEnvironmentMojo
       else if (plugin.getOutputProperty() != null) {
         dest = new File(project.getProperties().getProperty(plugin.getOutputProperty()));
       }
-      else if ("bundle".equals(pluginArtifact.getClassifier()) && "zip".equals(pluginArtifact.getType())) {
+      else if (pluginArtifact.getArtifactId().endsWith("-plugin") ||
+          pluginArtifact.getArtifactId().endsWith("-helper")) {
         dest = pluginsFolder;
       }
       else {
@@ -815,20 +816,7 @@ public class AbstractEnvironmentMojo
       String type = pluginArtifact.getType();
 
       if ("jar".equals(type)) {
-        // System.out.println( "copying jar: "+ pluginArtifact.getFile().getAbsolutePath() + " to: "+
-        // dest.getAbsolutePath() );
         copy(pluginArtifact.getFile(), dest);
-      }
-      else if ("zip".equals(type) || "tar.gz".equals(type)) {
-        File file = pluginArtifact.getFile();
-        if (file == null || !file.isFile()) {
-          throw new MojoFailureException("Could not properly resolve artifact " + pluginArtifact + ", got "
-              + file);
-        }
-        final String pluginKey = pluginArtifact.getGroupId() + ":" + pluginArtifact.getArtifactId();
-        if (!useBundlePluginsIfPresent || !bundlePlugins.containsKey(pluginKey)) {
-          unpack(file, dest, type);
-        }
       }
       else {
         throw new MojoFailureException("Invalid plugin type: " + type);
@@ -917,12 +905,6 @@ public class AbstractEnvironmentMojo
       artifact = projectArtifacts.iterator().next();
     }
 
-    if ("nexus-plugin".equals(mavenArtifact.getType())) {
-      artifact =
-          artifactFactory.createArtifactWithClassifier(artifact.getGroupId(), artifact.getArtifactId(),
-              artifact.getVersion(), "zip", "bundle");
-    }
-
     return resolve(artifact);
   }
 
@@ -958,17 +940,32 @@ public class AbstractEnvironmentMojo
   private FilterArtifacts getFilters(String groupId, String artifactId, String type, String classifier) {
     FilterArtifacts filter = new FilterArtifacts();
 
-    if (type != null) {
-      filter.addFilter(new TypeFilter(type, null));
-    }
+    StringBuilder pattern = new StringBuilder();
+    pattern.append(groupId != null ? groupId : "*").append(':');
+    pattern.append(artifactId != null ? artifactId : "*").append(':');
+    pattern.append(type != null ? type : "*").append(':');
+
+    final ArtifactFilter patternFilter =
+        new StrictPatternIncludesArtifactFilter(Arrays.asList(pattern.toString()));
+
+    filter.addFilter(new ArtifactsFilter() {
+      public Set filter(Set artifacts) {
+        Set result = new LinkedHashSet();
+        for (Object a : artifacts) {
+          if (isArtifactIncluded((Artifact)a)) {
+	    result.add(a);
+          }
+        }
+        return result;
+      }
+
+      public boolean isArtifactIncluded(Artifact artifact) {
+        return patternFilter.include(artifact);
+      }
+    });
+
     if (classifier != null) {
       filter.addFilter(new ClassifierFilter(classifier, null));
-    }
-    if (groupId != null) {
-      filter.addFilter(new GroupIdFilter(groupId, null));
-    }
-    if (artifactId != null) {
-      filter.addFilter(new ArtifactIdFilter(artifactId, null));
     }
 
     if (excludeTestDependencies) {
@@ -997,8 +994,8 @@ public class AbstractEnvironmentMojo
   {
 
     Set<Artifact> projectArtifacts = new LinkedHashSet<Artifact>();
-    projectArtifacts.addAll(getFilteredArtifacts(null, null, "zip", "bundle"));
-    projectArtifacts.addAll(getFilteredArtifacts(null, null, "nexus-plugin", null));
+    projectArtifacts.addAll(getFilteredArtifacts(null, "*-plugin", "jar", null));
+    projectArtifacts.addAll(getFilteredArtifacts(null, "*-helper", "jar", null));
     projectArtifacts.addAll(getNonTransitivePlugins(projectArtifacts));
 
     List<Artifact> resolvedArtifacts = new ArrayList<Artifact>();
@@ -1022,8 +1019,8 @@ public class AbstractEnvironmentMojo
 
     for (Artifact artifact : projectArtifacts) {
       Artifact pomArtifact =
-          artifactFactory.createArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
-              artifact.getClassifier(), "pom");
+          artifactFactory.createArtifactWithClassifier(artifact.getGroupId(), artifact.getArtifactId(),
+              artifact.getVersion(), "pom", artifact.getClassifier());
       Set<Artifact> result;
       try {
         MavenProject pomProject =
@@ -1041,8 +1038,8 @@ public class AbstractEnvironmentMojo
       }
 
       LinkedHashSet<Artifact> plugins = new LinkedHashSet<Artifact>();
-      plugins.addAll(filtterArtifacts(result, getFilters(null, null, "nexus-plugin", null)));
-      plugins.addAll(filtterArtifacts(result, getFilters(null, null, "zip", "bundle")));
+      plugins.addAll(filtterArtifacts(result, getFilters(null, "*-plugin", "jar", null)));
+      plugins.addAll(filtterArtifacts(result, getFilters(null, "*-helper", "jar", null)));
 
       plugins.addAll(getNonTransitivePlugins(plugins));
 

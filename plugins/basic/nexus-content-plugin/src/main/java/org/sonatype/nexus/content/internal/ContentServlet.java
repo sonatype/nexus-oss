@@ -56,7 +56,6 @@ import org.sonatype.nexus.web.Constants;
 import org.sonatype.nexus.web.ErrorStatusException;
 import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.nexus.web.WebUtils;
-import org.sonatype.nexus.web.internal.ErrorPageFilter;
 import org.sonatype.sisu.goodies.common.Throwables2;
 
 import com.google.common.base.Stopwatch;
@@ -254,7 +253,7 @@ public class ContentServlet
 
   /**
    * This method converts various exceptions into {@link ErrorStatusException} preparing those to be shown
-   * by {@link ErrorPageFilter}. Still, there are some special case (see access denied handling and IO exception
+   * by the core ErrorPageFilter. Still, there are some special case (see access denied handling and IO exception
    * handling) where only a request attribute is set, signaling for security filters that a challenge is needed to
    * elevate permissions.
    */

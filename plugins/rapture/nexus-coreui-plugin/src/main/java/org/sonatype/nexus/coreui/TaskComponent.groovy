@@ -32,7 +32,16 @@ import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.scheduling.ScheduledTask
 import org.sonatype.scheduling.TaskState
-import org.sonatype.scheduling.schedules.*
+import org.sonatype.scheduling.schedules.AbstractSchedule
+import org.sonatype.scheduling.schedules.CronSchedule
+import org.sonatype.scheduling.schedules.DailySchedule
+import org.sonatype.scheduling.schedules.HourlySchedule
+import org.sonatype.scheduling.schedules.ManualRunSchedule
+import org.sonatype.scheduling.schedules.MonthlySchedule
+import org.sonatype.scheduling.schedules.OnceSchedule
+import org.sonatype.scheduling.schedules.RunNowSchedule
+import org.sonatype.scheduling.schedules.Schedule
+import org.sonatype.scheduling.schedules.WeeklySchedule
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -102,8 +111,8 @@ extends DirectComponentSupport
                 initialValue: formField.initialValue
             )
             if (formField instanceof Selectable) {
-              formFieldXO.storePath = formField.storePath
-              formFieldXO.storeRoot = formField.storeRoot
+              formFieldXO.storeApi = formField.storeApi
+              formFieldXO.storeFilters = formField.storeFilters
               formFieldXO.idMapping = formField.idMapping
               formFieldXO.nameMapping = formField.nameMapping
             }
@@ -260,7 +269,7 @@ extends DirectComponentSupport
     Date nextRunTime = null
 
     // Run now type tasks should never have a next run time
-    if (!task.schedule.class.isAssignableFrom(RunNowSchedule.class) && task.nextRun) {
+    if (task.enabled && !task.schedule.class.isAssignableFrom(RunNowSchedule.class) && task.nextRun) {
       nextRunTime = task.nextRun
     }
 
@@ -304,7 +313,7 @@ extends DirectComponentSupport
         typeId: task.type,
         typeName: (descriptors.find { it.id == task.type })?.name,
         status: task.taskState,
-        statusDescription: getStatusDescription(task.taskState),
+        statusDescription: task.enabled ? getStatusDescription(task.taskState) : 'Disabled',
         schedule: getSchedule(task.schedule),
         lastRun: task.lastRun,
         lastRunResult: getLastRunResult(task),

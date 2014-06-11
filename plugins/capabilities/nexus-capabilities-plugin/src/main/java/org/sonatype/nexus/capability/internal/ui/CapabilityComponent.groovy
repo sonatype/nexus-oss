@@ -93,8 +93,8 @@ extends DirectComponentSupport
                 initialValue: formField.initialValue
             )
             if (formField instanceof Selectable) {
-              formFieldXO.storePath = formField.storePath
-              formFieldXO.storeRoot = formField.storeRoot
+              formFieldXO.storeApi = formField.storeApi
+              formFieldXO.storeFilters = formField.storeFilters
               formFieldXO.idMapping = formField.idMapping
               formFieldXO.nameMapping = formField.nameMapping
             }

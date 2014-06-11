@@ -30,8 +30,9 @@ class FormFieldXO
   Boolean required
   String regexValidation
   String initialValue
-  String storePath
-  String storeRoot
+
+  String storeApi
+  Map<String, String> storeFilters
   String idMapping
   String nameMapping
 }
