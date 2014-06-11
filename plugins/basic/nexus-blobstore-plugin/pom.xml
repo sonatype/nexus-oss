@@ -41,21 +41,34 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-testsupport</artifactId>
-      <scope>test</scope>
+      <artifactId>nexus-blobstore-api</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-kazuki-plugin</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-testsupport</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-plugin-bundle-maven-plugin</artifactId>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Require-Bundle>
+              org.sonatype.nexus.plugin-api,
+              org.sonatype.nexus.plugins.nexus-kazuki-plugin
+            </Require-Bundle>
+          </instructions>
+        </configuration>
       </plugin>
 
       <plugin>
