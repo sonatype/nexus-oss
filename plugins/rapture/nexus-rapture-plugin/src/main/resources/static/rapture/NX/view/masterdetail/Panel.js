@@ -67,6 +67,14 @@ Ext.define('NX.view.masterdetail.Panel', {
     this.down('nx-masterdetail-tabs').setIconCls(NX.Icons.cls(iconName, 'x16'));
   },
 
+  showInfo: function (message) {
+    this.down('nx-masterdetail-tabs').showInfo(message);
+  },
+
+  clearInfo: function () {
+    this.down('nx-masterdetail-tabs').clearInfo();
+  },
+
   showWarning: function (message) {
     this.down('nx-masterdetail-tabs').showWarning(message);
   },
