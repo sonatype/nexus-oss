@@ -16,7 +16,7 @@ import org.sonatype.nexus.atlas.FileContentSourceSupport
 import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
 import org.sonatype.nexus.atlas.SupportBundle
 import org.sonatype.nexus.atlas.SupportBundleCustomizer
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration
+import org.sonatype.nexus.configuration.application.ApplicationDirectories
 import org.sonatype.nexus.log.LogManager
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
@@ -43,14 +43,14 @@ class LogCustomizer
 {
   private final LogManager logManager
 
-  private final ApplicationConfiguration applicationConfiguration
+  private final ApplicationDirectories applicationDirectories
 
   @Inject
   LogCustomizer(final LogManager logManager,
-                final ApplicationConfiguration applicationConfiguration)
+                final ApplicationDirectories applicationDirectories)
   {
     this.logManager = checkNotNull(logManager)
-    this.applicationConfiguration = checkNotNull(applicationConfiguration)
+    this.applicationDirectories = checkNotNull(applicationDirectories)
   }
 
   @Override
@@ -73,28 +73,31 @@ class LogCustomizer
     }
 
     // helper to include a file
-    def maybeIncludeFile = { File file, String prefix ->
+    def maybeIncludeFile = { SupportBundle.ContentSource.Type type, File file, String prefix ->
       if (file.exists()) {
         log.debug 'Including file: {}', file
-        supportBundle << new FileContentSourceSupport(CONFIG, "$prefix/${file.name}", file)
+        supportBundle << new FileContentSourceSupport(type, "$prefix/${file.name}", file)
       }
       else {
         log.debug 'Skipping non-existent file: {}', file
       }
     }
 
+    // include request.log
+    maybeIncludeFile LOG, new File(applicationDirectories.workDirectory, 'logs/request.log'), 'work/logs'
+
     // include installation configuration
-    def installDir = applicationConfiguration.installDirectory
+    def installDir = applicationDirectories.installDirectory
     if (installDir) {
       // could be null
-      maybeIncludeFile new File(installDir, 'conf/logback.xml'), 'install/conf'
+      maybeIncludeFile CONFIG, new File(installDir, 'conf/logback.xml'), 'install/conf'
     }
 
     // include runtime configuration
-    def configDir = applicationConfiguration.configurationDirectory
+    def configDir = applicationDirectories.getWorkDirectory('conf')
     assert configDir.exists()
     configDir.eachFileMatch FILES, ~/logback.*/, {
-      maybeIncludeFile it, 'work/conf'
+      maybeIncludeFile CONFIG, it, 'work/conf'
     }
   }
 }
