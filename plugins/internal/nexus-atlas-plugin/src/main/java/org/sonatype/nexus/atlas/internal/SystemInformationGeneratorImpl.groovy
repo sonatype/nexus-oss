@@ -253,16 +253,28 @@ class SystemInformationGeneratorImpl
       return data
     }
 
+    def reportObfuscatedProperties = { properties ->
+      def obfuscatedProperties = [:]
+      def pattern = ~/(?i)password/
+      properties.each { key, value ->
+        if (key =~ pattern) {
+          value = '***'
+        }
+        obfuscatedProperties[key] = value
+      }
+      return obfuscatedProperties.sort()
+    }
+
     def sections = [
         'system-time': reportTime(),
-        'system-properties': System.properties.sort(),
+        'system-properties': reportObfuscatedProperties(System.properties),
         'system-environment': System.getenv().sort(),
         'system-runtime': reportRuntime(),
         'system-network': reportNetwork(),
         'system-filestores': reportFileStores(),
         'nexus-status': reportNexusStatus(),
         'nexus-license': reportNexusLicense(),
-        'nexus-properties': parameters.sort(),
+        'nexus-properties': reportObfuscatedProperties(parameters),
         'nexus-configuration': reportNexusConfiguration(),
         'nexus-plugins': reportNexusPlugins()
     ]
