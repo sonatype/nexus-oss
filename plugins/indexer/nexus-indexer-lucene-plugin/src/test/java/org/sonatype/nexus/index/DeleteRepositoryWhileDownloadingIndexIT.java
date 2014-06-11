@@ -14,7 +14,6 @@ package org.sonatype.nexus.index;
 
 import java.util.concurrent.Semaphore;
 
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
