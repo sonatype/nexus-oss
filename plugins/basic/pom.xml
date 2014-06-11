@@ -32,7 +32,6 @@
     <module>nexus-content-plugin</module>
     <module>nexus-crypto-plugin</module>
     <module>nexus-groovy-plugin</module>
-    <module>nexus-h2-plugin</module>
     <module>nexus-logging-plugin</module>
     <module>nexus-lvo-plugin</module>
     <module>nexus-plugin-console-plugin</module>
