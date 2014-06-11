@@ -16,9 +16,9 @@ import java.util.HashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
@@ -48,18 +48,18 @@ import org.restlet.service.StatusService;
 public class NexusStatusService
     extends StatusService
 {
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   @Inject
-  public NexusStatusService(final ApplicationStatusSource applicationStatusSource)
+  public NexusStatusService(final Provider<SystemStatus> systemStatusProvider)
   {
-    this.applicationStatusSource = applicationStatusSource;
+    this.systemStatusProvider = systemStatusProvider;
   }
 
   public Representation getRepresentation(final Status status, final Request request, final Response response) {
     final HashMap<String, Object> dataModel = new HashMap<String, Object>();
 
-    final SystemStatus systemStatus = applicationStatusSource.getSystemStatus();
+    final SystemStatus systemStatus = systemStatusProvider.get();
     dataModel.put("request", request);
     dataModel.put("nexusVersion", systemStatus.getVersion());
     dataModel.put("nexusRoot", BaseUrlHolder.get());

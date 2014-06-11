@@ -24,11 +24,12 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundReason;
@@ -69,10 +70,10 @@ public class VelocityContentRenderer
 
   @Inject
   public VelocityContentRenderer(final TemplateRenderer templateRenderer,
-                                 final ApplicationStatusSource applicationStatusSource)
+                                 final Provider<SystemStatus> systemStatusProvider)
   {
     this.templateRenderer = checkNotNull(templateRenderer);
-    this.applicationVersion = checkNotNull(applicationStatusSource).getSystemStatus().getVersion();
+    this.applicationVersion = checkNotNull(systemStatusProvider).get().getVersion();
   }
 
   @Override

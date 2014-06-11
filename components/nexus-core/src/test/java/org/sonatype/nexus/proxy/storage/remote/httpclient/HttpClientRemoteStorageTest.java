@@ -12,7 +12,8 @@
  */
 package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import javax.inject.Provider;
+
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.internal.httpclient.HttpClientFactoryImpl;
 import org.sonatype.nexus.internal.httpclient.PoolingClientConnectionManagerMBeanInstaller;
@@ -69,7 +70,7 @@ public class HttpClientRemoteStorageTest
       throws Exception
   {
     final HttpClientRemoteStorage underTest =
-        new HttpClientRemoteStorage(mock(ApplicationStatusSource.class),
+        new HttpClientRemoteStorage((Provider<SystemStatus>)mock(Provider.class),
             mock(MimeSupport.class), mock(QueryStringBuilder.class), mock(HttpClientManager.class));
     final ProxyRepository proxyMock = mock(ProxyRepository.class);
     when(proxyMock.getId()).thenReturn("id");
@@ -90,7 +91,7 @@ public class HttpClientRemoteStorageTest
       throws Exception
   {
     final HttpClientRemoteStorage underTest =
-        new HttpClientRemoteStorage(mock(ApplicationStatusSource.class),
+        new HttpClientRemoteStorage((Provider<SystemStatus>)mock(Provider.class),
             mock(MimeSupport.class), mock(QueryStringBuilder.class), mock(HttpClientManager.class));
     final ProxyRepository proxyMock = mock(ProxyRepository.class);
     when(proxyMock.getId()).thenReturn("id");
@@ -112,7 +113,7 @@ public class HttpClientRemoteStorageTest
       throws Exception
   {
     final HttpClientRemoteStorage underTest =
-        new HttpClientRemoteStorage(mock(ApplicationStatusSource.class),
+        new HttpClientRemoteStorage((Provider<SystemStatus>)mock(Provider.class),
             mock(MimeSupport.class), mock(QueryStringBuilder.class), mock(HttpClientManager.class));
     final ProxyRepository proxyMock = mock(ProxyRepository.class);
     when(proxyMock.getId()).thenReturn("id");
@@ -135,7 +136,7 @@ public class HttpClientRemoteStorageTest
       throws Exception
   {
     final HttpClientRemoteStorage underTest =
-        new HttpClientRemoteStorage(mock(ApplicationStatusSource.class),
+        new HttpClientRemoteStorage((Provider<SystemStatus>)mock(Provider.class),
             mock(MimeSupport.class), mock(QueryStringBuilder.class), mock(HttpClientManager.class))
         {
           @Override
@@ -189,7 +190,7 @@ public class HttpClientRemoteStorageTest
 
       // the RRS instance we test
       final HttpClientRemoteStorage underTest =
-          new HttpClientRemoteStorage(mock(ApplicationStatusSource.class),
+          new HttpClientRemoteStorage((Provider<SystemStatus>)mock(Provider.class),
               mock(MimeSupport.class), mock(QueryStringBuilder.class), new HttpClientManagerImpl(httpClientFactory));
 
       // a mock proxy repository with some mocks to make RRS work

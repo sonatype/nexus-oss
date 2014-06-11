@@ -14,9 +14,10 @@ package org.sonatype.nexus.index.events;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
@@ -55,16 +56,16 @@ public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
 
   private final NexusScheduler nexusScheduler;
 
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   @Inject
   public IndexingRepositoryRegistryRepositoryAsyncEventInspector(final RepositoryRegistry repoRegistry,
                                                                  final NexusScheduler nexusScheduler,
-                                                                 final ApplicationStatusSource applicationStatusSource)
+                                                                 final Provider<SystemStatus> systemStatusProvider)
   {
     this.repoRegistry = repoRegistry;
     this.nexusScheduler = nexusScheduler;
-    this.applicationStatusSource = applicationStatusSource;
+    this.systemStatusProvider = systemStatusProvider;
   }
 
   @Subscribe
@@ -80,7 +81,7 @@ public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
   }
 
   protected void inspect(Event<?> evt) {
-    if (!applicationStatusSource.getSystemStatus().isNexusStarted()) {
+    if (!systemStatusProvider.get().isNexusStarted()) {
       return;
     }
 

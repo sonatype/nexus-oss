@@ -16,11 +16,11 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
@@ -46,7 +46,7 @@ public class SecurityUpgradeEventInspector
 {
   private final EventBus eventBus;
 
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   private final  SecurityModelConfigurationSource realmConfigSource;
 
@@ -60,13 +60,13 @@ public class SecurityUpgradeEventInspector
 
   @Inject
   public SecurityUpgradeEventInspector(final EventBus eventBus, 
-                                       final ApplicationStatusSource applicationStatusSource,
+                                       final Provider<SystemStatus> systemStatusProvider,
                                        final @Named("file") SecurityModelConfigurationSource realmConfigSource,
                                        final SecurityConfigurationManager systemConfigManager, 
                                        final @Named("2.0.1") SecurityDataUpgrader upgrader)
   {
     this.eventBus = checkNotNull(eventBus);
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.realmConfigSource = checkNotNull(realmConfigSource);
     this.systemConfigManager = checkNotNull(systemConfigManager);
     this.upgrader = checkNotNull(upgrader);
@@ -74,7 +74,7 @@ public class SecurityUpgradeEventInspector
 
   @Subscribe
   public void inspect(final NexusStartedEvent startedEvent) {
-    final SystemStatus systemStatus = applicationStatusSource.getSystemStatus();
+    final SystemStatus systemStatus = systemStatusProvider.get();
 
     if (systemStatus.isConfigurationUpgraded() || systemStatus.isInstanceUpgraded()) {
       try {

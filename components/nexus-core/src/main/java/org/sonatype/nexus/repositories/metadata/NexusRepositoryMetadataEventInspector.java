@@ -19,9 +19,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -63,20 +64,20 @@ public class NexusRepositoryMetadataEventInspector
 
   private final RepositoryRegistry repositoryRegistry;
 
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   @Inject
   public NexusRepositoryMetadataEventInspector(final @Named("maven1") ContentClass maven1ContentClass,
                                                final @Named("maven2") ContentClass maven2ContentClass,
                                                final RepositoryMetadataHandler repositoryMetadataHandler,
                                                final RepositoryRegistry repositoryRegistry,
-                                               final ApplicationStatusSource applicationStatusSource)
+                                               final Provider<SystemStatus> systemStatusProvider)
   {
     this.maven1ContentClass = maven1ContentClass;
     this.maven2ContentClass = maven2ContentClass;
     this.repositoryMetadataHandler = repositoryMetadataHandler;
     this.repositoryRegistry = repositoryRegistry;
-    this.applicationStatusSource = applicationStatusSource;
+    this.systemStatusProvider = systemStatusProvider;
   }
 
   @Subscribe
@@ -107,7 +108,7 @@ public class NexusRepositoryMetadataEventInspector
     }
 
     // stuff below should happen only if this is a RUNNING instance!
-    if (!applicationStatusSource.getSystemStatus().isNexusStarted()) {
+    if (!systemStatusProvider.get().isNexusStarted()) {
       return;
     }
 

@@ -14,9 +14,10 @@ package org.sonatype.nexus.plugins.p2.repository.updatesite;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -35,22 +36,22 @@ public class RepositoryCreationEventListener
     extends ComponentSupport
     implements EventSubscriber
 {
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   private final NexusScheduler scheduler;
 
   @Inject
-  public RepositoryCreationEventListener(final ApplicationStatusSource applicationStatusSource,
+  public RepositoryCreationEventListener(final Provider<SystemStatus> systemStatusProvider,
                                          final NexusScheduler scheduler)
   {
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.scheduler = checkNotNull(scheduler);
   }
 
   @Subscribe
   @AllowConcurrentEvents
   public void inspect(final RepositoryRegistryEventAdd evt) {
-    if (!applicationStatusSource.getSystemStatus().isNexusStarted()) {
+    if (!systemStatusProvider.get().isNexusStarted()) {
       return;
     }
     final UpdateSiteProxyRepository updateSite =
