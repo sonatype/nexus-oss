@@ -45,10 +45,14 @@ Ext.define('NX.controller.MasterDetail', {
   onLaunch: function () {
     var me = this;
     me.getApplication().getIconController().addIcons({
+      'masterdetail-info': {
+        file: 'information.png',
+        variants: ['x16', 'x32']
+      },
       'masterdetail-warning': {
         file: 'warning.png',
         variants: ['x16', 'x32']
-      },
+      }
     });
   },
 

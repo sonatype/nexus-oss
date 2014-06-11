@@ -36,6 +36,12 @@ Ext.define('NX.view.masterdetail.Tabs', {
     Ext.Array.insert(content, 0, [
       {
         xtype: 'panel',
+        itemId: 'info',
+        iconCls: NX.Icons.cls('masterdetail-info', 'x16'),
+        hidden: true
+      },
+      {
+        xtype: 'panel',
         itemId: 'warning',
         iconCls: NX.Icons.cls('masterdetail-warning', 'x16'),
         hidden: true
@@ -66,6 +72,21 @@ Ext.define('NX.view.masterdetail.Tabs', {
   setDescription: function (description) {
     this.description = description;
     this.setTitle(description);
+  },
+
+  showInfo: function (message) {
+    var me = this,
+        infoPanel = me.down('>#info');
+
+    infoPanel.setTitle(message);
+    infoPanel.show();
+  },
+
+  clearInfo: function () {
+    var me = this,
+        infoPanel = me.down('>#info');
+
+    infoPanel.hide();
   },
 
   showWarning: function (message) {
