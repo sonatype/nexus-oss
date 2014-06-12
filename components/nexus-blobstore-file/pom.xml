@@ -91,6 +91,11 @@
       <groupId>org.json</groupId>
       <artifactId>org.json</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-scheduler</artifactId>
+    </dependency>
   </dependencies>
 
 </project>
