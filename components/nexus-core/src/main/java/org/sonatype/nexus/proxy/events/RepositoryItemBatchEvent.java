@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.proxy.events;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * The event fired in case of some content changes in Nexus related to multiple item/file (a batch), and is being
@@ -26,36 +26,22 @@ import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
  * events are NOT about deploys (or deletion, caching etc), and a (series of) deploys or deletions will be emitted
  * before this event. Single {@link RepositoryItemEventStore} will be fired for each deploy always.
  *
- * @author cstamas
  * @since 2.3
  */
 public abstract class RepositoryItemBatchEvent
     extends RepositoryEvent
 {
-  private final List<String> itemPaths;
+  private final List<StorageItem> items;
 
   /**
    * Constructor.
    */
-  public RepositoryItemBatchEvent(final Repository repository, final Collection<String> itemPaths) {
+  public RepositoryItemBatchEvent(final Repository repository, final Collection<StorageItem> items) {
     super(repository);
-    this.itemPaths = Collections.unmodifiableList(new ArrayList<String>(itemPaths));
+    this.items = ImmutableList.copyOf(items);
   }
 
-  /**
-   * Gets the involved item.
-   *
-   * @return list of items in this batch.
-   */
-  public List<String> getItemPaths() {
-    return itemPaths;
-  }
-
-  // ==
-
-  @Override
-  public String toString() {
-    return String.format("%s(sender=%s, %s)", getClass().getSimpleName(),
-        RepositoryStringUtils.getHumanizedNameString(getRepository()), getItemPaths());
+  public List<StorageItem> getItems() {
+    return items;
   }
 }

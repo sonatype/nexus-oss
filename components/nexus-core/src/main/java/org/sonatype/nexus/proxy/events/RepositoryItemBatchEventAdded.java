@@ -14,21 +14,18 @@ package org.sonatype.nexus.proxy.events;
 
 import java.util.Collection;
 
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * Event fired when addition of a batch of items is to be announced.
  *
- * @author cstamas
  * @since 2.3
  */
 public class RepositoryItemBatchEventAdded
     extends RepositoryItemBatchEvent
 {
-  /**
-   * Constructor.
-   */
-  public RepositoryItemBatchEventAdded(final Repository repository, final Collection<String> itemPaths) {
-    super(repository, itemPaths);
+  public RepositoryItemBatchEventAdded(final Repository repository, final Collection<StorageItem> items) {
+    super(repository, items);
   }
 }
