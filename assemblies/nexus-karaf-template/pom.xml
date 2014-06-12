@@ -357,6 +357,7 @@
             <feature>nexus-base-feature</feature>
             <feature>nexus-oss-edition</feature>
             <feature>nexus-content-plugin</feature>
+            <feature>nexus-blobstore-plugin</feature>
             <feature>nexus-webresources-plugin</feature>
             <feature>nexus-crypto-plugin</feature>
             <feature>nexus-groovy-plugin</feature>

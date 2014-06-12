@@ -128,6 +128,13 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-blobstore-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-webresources-plugin</artifactId>
       <version>${nexus.version}</version>
       <scope>provided</scope>

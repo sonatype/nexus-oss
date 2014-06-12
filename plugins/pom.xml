@@ -176,6 +176,13 @@
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
+      <!-- blob store -->
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-blobstore-plugin</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
       <!-- kazuki -->
 
       <dependency>
