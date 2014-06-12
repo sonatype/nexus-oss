@@ -29,12 +29,13 @@
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-core</artifactId>
+      <artifactId>nexus-blobstore-api</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-blobstore-api</artifactId>
+      <artifactId>nexus-core</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
