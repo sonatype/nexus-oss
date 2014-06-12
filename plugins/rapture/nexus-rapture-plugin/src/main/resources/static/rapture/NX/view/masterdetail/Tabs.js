@@ -106,7 +106,7 @@ Ext.define('NX.view.masterdetail.Tabs', {
 
   addTab: function (tab) {
     var me = this,
-        content = me.items.get(1);
+        content = me.items.get(2);
 
     if (content.isXType('tabpanel')) {
       me.tabs.push(tab);
@@ -122,7 +122,7 @@ Ext.define('NX.view.masterdetail.Tabs', {
 
   removeTab: function (tab) {
     var me = this,
-        content = me.items.get(1);
+        content = me.items.get(2);
 
     if (content.isXType('tabpanel')) {
       Ext.Array.remove(me.tabs, tab);
@@ -142,7 +142,7 @@ Ext.define('NX.view.masterdetail.Tabs', {
    */
   getBookmarkOfSelectedTab: function () {
     var me = this,
-        content = me.items.get(1),
+        content = me.items.get(2),
         selectedItem = content;
 
     if (content.isXType('tabpanel')) {
@@ -172,7 +172,7 @@ Ext.define('NX.view.masterdetail.Tabs', {
    */
   calculateBookmarks: function () {
     var me = this,
-        content = me.items.get(1);
+        content = me.items.get(2);
 
     if (content.isXType('tabpanel')) {
       content.items.each(function (tab) {
