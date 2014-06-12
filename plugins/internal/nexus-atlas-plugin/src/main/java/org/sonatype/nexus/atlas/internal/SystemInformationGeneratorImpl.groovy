@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.atlas.internal
 
+import org.sonatype.nexus.util.Tokens
+
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -253,16 +255,26 @@ class SystemInformationGeneratorImpl
       return data
     }
 
+    // masks the value of any properties that look like passwords
+    def reportObfuscatedProperties = { properties ->
+      return properties.collectEntries { key, value ->
+        if (key.toLowerCase(Locale.US).contains('password')) {
+          value = Tokens.mask(value)
+        }
+        return [key, value]
+      }.sort()
+    }
+
     def sections = [
         'system-time': reportTime(),
-        'system-properties': System.properties.sort(),
+        'system-properties': reportObfuscatedProperties(System.properties),
         'system-environment': System.getenv().sort(),
         'system-runtime': reportRuntime(),
         'system-network': reportNetwork(),
         'system-filestores': reportFileStores(),
         'nexus-status': reportNexusStatus(),
         'nexus-license': reportNexusLicense(),
-        'nexus-properties': parameters.sort(),
+        'nexus-properties': reportObfuscatedProperties(parameters),
         'nexus-configuration': reportNexusConfiguration(),
         'nexus-plugins': reportNexusPlugins()
     ]
