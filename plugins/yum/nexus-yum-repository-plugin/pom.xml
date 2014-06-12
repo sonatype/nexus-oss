@@ -53,12 +53,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-kazuki-plugin</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
@@ -103,8 +97,7 @@
             <Require-Bundle>
               org.sonatype.nexus.plugin-api,
               org.sonatype.nexus.plugins.nexus-restlet1x-plugin,
-              org.sonatype.nexus.plugins.nexus-capabilities-plugin,
-              org.sonatype.nexus.plugins.nexus-kazuki-plugin
+              org.sonatype.nexus.plugins.nexus-capabilities-plugin
             </Require-Bundle>
           </instructions>
         </configuration>

@@ -27,69 +27,21 @@
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-blobstore-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-core</artifactId>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.kazuki</groupId>
-      <artifactId>kazuki-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.kazuki</groupId>
-      <artifactId>kazuki-impl</artifactId>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.inject</groupId>
-          <artifactId>guice</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>jsr305</artifactId>
-      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
       <scope>test</scope>
-    </dependency>
-
-    <!-- Integration Test dependencies -->
-    <dependency>
-      <groupId>org.jdbi</groupId>
-      <artifactId>jdbi</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>stringtemplate</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>org.json</artifactId>
     </dependency>
   </dependencies>
 

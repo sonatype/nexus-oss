@@ -134,7 +134,7 @@
               !com.google.inject.internal.*,
               javax.servlet;provider=nexus;mandatory:=provider,
               javax.servlet.http;provider=nexus;mandatory:=provider,
-              com.*|eu.*|javax.*|net.*|org.*;-noimport:=true
+              com.*|eu.*|javax.*|net.*|org.*|io.*;-noimport:=true
             </_exportcontents>
             <Require-Bundle>
               system.bundle;visibility:=reexport,

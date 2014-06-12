@@ -39,13 +39,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- JournalStore backing Timeline -->
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-kazuki-plugin</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <!-- For RRS/Atom feed support, using Rome -->
     <dependency>
       <groupId>rome</groupId>
@@ -103,7 +96,6 @@
           <instructions>
             <Require-Bundle>
               org.sonatype.nexus.plugin-api,
-              org.sonatype.nexus.plugins.nexus-kazuki-plugin,
               org.sonatype.nexus.plugins.nexus-siesta-plugin,
               org.sonatype.nexus.plugins.nexus-groovy-plugin,
               org.sonatype.nexus.plugins.nexus-extdirect-plugin

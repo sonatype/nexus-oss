@@ -72,12 +72,6 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-kazuki-plugin</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-model</artifactId>
     </dependency>
 
@@ -133,8 +127,7 @@
               org.sonatype.nexus.plugins.nexus-crypto-plugin,
               org.sonatype.nexus.plugins.nexus-atlas-plugin,
               org.sonatype.nexus.plugins.nexus-groovy-plugin,
-              org.sonatype.nexus.plugins.nexus-extdirect-plugin,
-              org.sonatype.nexus.plugins.nexus-kazuki-plugin
+              org.sonatype.nexus.plugins.nexus-extdirect-plugin
             </Require-Bundle>
           </instructions>
         </configuration>

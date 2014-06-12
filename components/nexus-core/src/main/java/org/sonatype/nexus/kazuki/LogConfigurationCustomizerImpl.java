@@ -22,7 +22,7 @@ import static org.sonatype.nexus.log.LoggerLevel.DEFAULT;
 /**
  * Kazuki {@link LogConfigurationCustomizer}.
  *
- * @since 2.8
+ * @since 3.0
  */
 @Named
 @Singleton
