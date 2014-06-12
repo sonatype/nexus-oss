@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.atlas.internal
 
+import org.sonatype.nexus.util.Tokens
+
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -253,16 +255,14 @@ class SystemInformationGeneratorImpl
       return data
     }
 
+    // masks the value of any properties that look like passwords
     def reportObfuscatedProperties = { properties ->
-      def obfuscatedProperties = [:]
-      def pattern = ~/(?i)password/
-      properties.each { key, value ->
-        if (key =~ pattern) {
-          value = '***'
+      return properties.collectEntries { key, value ->
+        if (key.toLowerCase(Locale.US).contains('password')) {
+          value = Tokens.mask(value)
         }
-        obfuscatedProperties[key] = value
-      }
-      return obfuscatedProperties.sort()
+        return [key, value]
+      }.sort()
     }
 
     def sections = [
