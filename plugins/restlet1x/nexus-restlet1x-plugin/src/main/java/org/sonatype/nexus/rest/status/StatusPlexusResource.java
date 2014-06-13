@@ -18,12 +18,12 @@ import java.io.StringWriter;
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.rest.model.NexusAuthenticationClientPermissions;
 import org.sonatype.nexus.rest.model.StatusResource;
@@ -53,11 +53,11 @@ public class StatusPlexusResource
 {
   public static final String RESOURCE_URI = "/status";
 
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   @Inject
-  public StatusPlexusResource(final ApplicationStatusSource applicationStatusSource) {
-    this.applicationStatusSource = applicationStatusSource;
+  public StatusPlexusResource(final Provider<SystemStatus> systemStatusProvider) {
+    this.systemStatusProvider = systemStatusProvider;
   }
 
   @Override
@@ -87,7 +87,7 @@ public class StatusPlexusResource
   public StatusResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
-    final SystemStatus status = applicationStatusSource.getSystemStatus();
+    final SystemStatus status = systemStatusProvider.get();
 
     final StatusResource resource = new StatusResource();
 

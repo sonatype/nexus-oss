@@ -19,9 +19,10 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
@@ -49,8 +50,8 @@ public class MockRemoteStorage
   private final List<MockRequestRecord> requests = new LinkedList<MockRequestRecord>();
 
   @Inject
-  protected MockRemoteStorage(final ApplicationStatusSource applicationStatusSource, final MimeSupport mimeSupport) {
-    super(applicationStatusSource, mimeSupport);
+  protected MockRemoteStorage(final Provider<SystemStatus> systemStatusProvider, final MimeSupport mimeSupport) {
+    super(systemStatusProvider, mimeSupport);
   }
 
   @Override

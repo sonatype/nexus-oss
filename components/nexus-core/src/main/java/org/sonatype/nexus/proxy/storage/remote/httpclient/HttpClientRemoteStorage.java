@@ -22,9 +22,10 @@ import java.nio.charset.UnsupportedCharsetException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.nexus.httpclient.Page;
 import org.sonatype.nexus.httpclient.Page.PageContext;
@@ -139,12 +140,12 @@ public class HttpClientRemoteStorage
   // ----------------------------------------------------------------------
 
   @Inject
-  HttpClientRemoteStorage(final ApplicationStatusSource applicationStatusSource,
+  HttpClientRemoteStorage(final Provider<SystemStatus> systemStatusProvider,
                           final MimeSupport mimeSupport,
                           final QueryStringBuilder queryStringBuilder,
                           final HttpClientManager httpClientManager)
   {
-    super(applicationStatusSource, mimeSupport);
+    super(systemStatusProvider, mimeSupport);
     this.metricRegistry = SharedMetricRegistries.getOrCreate("nexus");
     this.queryStringBuilder = queryStringBuilder;
     this.httpClientManager = httpClientManager;

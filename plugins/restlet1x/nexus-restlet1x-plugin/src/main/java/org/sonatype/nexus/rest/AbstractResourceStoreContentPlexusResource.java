@@ -26,9 +26,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -62,7 +63,6 @@ import org.sonatype.nexus.rest.model.NotFoundReasoning;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 import org.sonatype.nexus.web.BaseUrlHolder;
-import org.sonatype.nexus.web.Constants;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.security.SecuritySystem;
 
@@ -108,7 +108,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
   private SecuritySystem securitySystem;
 
-  private ApplicationStatusSource applicationStatusSource;
+  private Provider<SystemStatus> systemStatusProvider;
 
   public Map<String, ArtifactViewProvider> viewProviders;
   
@@ -122,22 +122,17 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
   @VisibleForTesting
   AbstractResourceStoreContentPlexusResource(final SecuritySystem securitySystem,
-                                             final ApplicationStatusSource applicationStatusSource,
+                                             final Provider<SystemStatus> systemStatusProvider,
                                              final Map<String, ArtifactViewProvider> viewProviders)
   {
     this.securitySystem = securitySystem;
-    this.applicationStatusSource = applicationStatusSource;
+    this.systemStatusProvider = systemStatusProvider;
     this.viewProviders = viewProviders;
   }
 
   @Inject
   public void setSecuritySystem(final SecuritySystem securitySystem) {
     this.securitySystem = securitySystem;
-  }
-
-  @Inject
-  public void setApplicationStatusSource(final ApplicationStatusSource applicationStatusSource) {
-    this.applicationStatusSource = applicationStatusSource;
   }
 
   @Inject
@@ -541,7 +536,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
       dataModel.put("listItems", sortContentListResource(((ContentListResourceResponse) payload).getData()));
       dataModel.put("request", req);
-      dataModel.put("nexusVersion", applicationStatusSource.getSystemStatus().getVersion());
+      dataModel.put("nexusVersion", systemStatusProvider.get().getVersion());
       dataModel.put("nexusRoot", BaseUrlHolder.get());
 
       final VelocityRepresentation representation =

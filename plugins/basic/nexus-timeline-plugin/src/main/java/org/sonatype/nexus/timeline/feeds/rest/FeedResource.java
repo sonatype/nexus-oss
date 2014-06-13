@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -32,7 +33,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.timeline.TimelinePlugin;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedSource;
@@ -69,18 +70,18 @@ public class FeedResource
 {
   public static final String FEED_KEY = "feedKey";
 
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   private final Map<String, FeedSource> feeds;
 
   private final FeedContentRenderer feedContentRenderer;
 
   @Inject
-  public FeedResource(final ApplicationStatusSource applicationStatusSource,
+  public FeedResource(final Provider<SystemStatus> systemStatusProvider,
                       final Map<String, FeedSource> feeds,
                       final FeedContentRenderer feedContentRenderer)
   {
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.feeds = checkNotNull(feeds);
     this.feedContentRenderer = checkNotNull(feedContentRenderer);
   }
@@ -111,7 +112,7 @@ public class FeedResource
       final SyndFeed feed = new SyndFeedImpl();
       feed.setTitle(feedSource.getFeedName());
       feed.setDescription(feedSource.getFeedDescription());
-      feed.setAuthor("Nexus " + applicationStatusSource.getSystemStatus().getVersion());
+      feed.setAuthor("Nexus " + systemStatusProvider.get().getVersion());
       feed.setPublishedDate(new Date());
       feed.setLink(BaseUrlHolder.get() + "/service/siesta/feeds/" + feedSource.getFeedKey());
 

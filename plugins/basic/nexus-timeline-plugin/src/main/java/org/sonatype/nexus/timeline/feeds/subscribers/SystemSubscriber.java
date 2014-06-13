@@ -18,9 +18,10 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.events.EventSubscriber;
@@ -45,22 +46,22 @@ public class SystemSubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber
 {
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   @Inject
   public SystemSubscriber(final FeedRecorder feedRecorder,
-                          final ApplicationStatusSource applicationStatusSource)
+                          final Provider<SystemStatus> systemStatusProvider)
   {
     super(feedRecorder);
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
   }
 
   @Subscribe
   public void on(final NexusStartedEvent e) {
     final Map<String, String> data = Maps.newHashMap();
     putIfNotNull(data, "bootAction", "started");
-    putIfNotNull(data, "nxVersion", applicationStatusSource.getSystemStatus().getVersion());
-    putIfNotNull(data, "nxEdition", applicationStatusSource.getSystemStatus().getEditionShort());
+    putIfNotNull(data, "nxVersion", systemStatusProvider.get().getVersion());
+    putIfNotNull(data, "nxEdition", systemStatusProvider.get().getEditionShort());
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_SYSTEM,
         FeedRecorder.SYSTEM_BOOT,
@@ -76,8 +77,8 @@ public class SystemSubscriber
   public void on(final NexusStoppedEvent e) {
     final Map<String, String> data = Maps.newHashMap();
     putIfNotNull(data, "bootAction", "stopped");
-    putIfNotNull(data, "nxVersion", applicationStatusSource.getSystemStatus().getVersion());
-    putIfNotNull(data, "nxEdition", applicationStatusSource.getSystemStatus().getEditionShort());
+    putIfNotNull(data, "nxVersion", systemStatusProvider.get().getVersion());
+    putIfNotNull(data, "nxEdition", systemStatusProvider.get().getEditionShort());
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_SYSTEM,
         FeedRecorder.SYSTEM_BOOT,

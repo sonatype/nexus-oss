@@ -21,8 +21,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -80,7 +81,7 @@ public class P2CompositeGroupRepositoryImpl
 
   private final CompositeRepository compositeRepository;
 
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   private RepositoryKind repositoryKind;
 
@@ -88,12 +89,12 @@ public class P2CompositeGroupRepositoryImpl
   public P2CompositeGroupRepositoryImpl(final @Named(P2ContentClass.ID) ContentClass contentClass,
                                         final P2GroupRepositoryConfigurator p2GroupRepositoryConfigurator,
                                         final CompositeRepository compositeRepository,
-                                        final ApplicationStatusSource applicationStatusSource)
+                                        final Provider<SystemStatus> systemStatusProvider)
   {
     this.contentClass = checkNotNull(contentClass);
     this.p2GroupRepositoryConfigurator = checkNotNull(p2GroupRepositoryConfigurator);
     this.compositeRepository = checkNotNull(compositeRepository);
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
   }
 
   @Override
@@ -193,7 +194,7 @@ public class P2CompositeGroupRepositoryImpl
                                      final boolean forced)
   {
     if (!getLocalStatus().shouldServiceRequest()
-        || !applicationStatusSource.getSystemStatus().isNexusStarted()) {
+        || !systemStatusProvider.get().isNexusStarted()) {
       return;
     }
     if (!forced) {

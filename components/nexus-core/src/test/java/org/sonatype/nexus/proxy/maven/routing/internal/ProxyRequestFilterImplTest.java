@@ -14,7 +14,8 @@ package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.util.Arrays;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import javax.inject.Provider;
+
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
@@ -41,7 +42,7 @@ public class ProxyRequestFilterImplTest
   private SystemStatus systemStatus;
 
   @Mock
-  private ApplicationStatusSource applicationStatusSource;
+  private Provider<SystemStatus> systemStatusProvider;
 
   @Mock
   private Manager wlManager;
@@ -52,7 +53,7 @@ public class ProxyRequestFilterImplTest
   @Before
   public void prepare() {
     Mockito.when(systemStatus.isNexusStarted()).thenReturn(true);
-    Mockito.when(applicationStatusSource.getSystemStatus()).thenReturn(systemStatus);
+    Mockito.when(systemStatusProvider.get()).thenReturn(systemStatus);
     Mockito.when(mavenProxyRepository.getId()).thenReturn("central");
     Mockito.when(mavenProxyRepository.getName()).thenReturn("Central Repository");
   }
@@ -69,7 +70,7 @@ public class ProxyRequestFilterImplTest
   public void smoke() {
     // no WL exists at all, we must pass all
     final ProxyRequestFilterImpl filter =
-        new ProxyRequestFilterImpl(eventBus, applicationStatusSource, wlManager);
+        new ProxyRequestFilterImpl(eventBus, systemStatusProvider, wlManager);
 
     doTestAllowed(filter, "/some/path/and/file/at/the/end.txt", true);
     doTestAllowed(filter, "/foo/bar", true);
@@ -84,7 +85,7 @@ public class ProxyRequestFilterImplTest
 
     // WL will be built, not every request should be allowed
     final ProxyRequestFilterImpl filter =
-        new ProxyRequestFilterImpl(eventBus, applicationStatusSource, wlManager);
+        new ProxyRequestFilterImpl(eventBus, systemStatusProvider, wlManager);
 
     // ping (this would happen on event)
     filter.buildPathMatcherFor(mavenProxyRepository);

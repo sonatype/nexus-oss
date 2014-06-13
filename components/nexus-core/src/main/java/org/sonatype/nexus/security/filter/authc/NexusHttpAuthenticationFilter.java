@@ -16,12 +16,13 @@ import java.io.IOException;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.web.BaseUrlHolder;
@@ -83,8 +84,8 @@ public class NexusHttpAuthenticationFilter
   private String nexusVersion;
   
   @Inject
-  public void setApplicationVersion(final ApplicationStatusSource applicationStatusSource) {
-    this.nexusVersion = applicationStatusSource.getSystemStatus().getVersion();
+  public void setApplicationVersion(final Provider<SystemStatus> systemStatusProvider) {
+    this.nexusVersion = systemStatusProvider.get().getVersion();
   }
   
   // ==

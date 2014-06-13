@@ -17,9 +17,10 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
@@ -48,14 +49,14 @@ public class RepositorySubscriber
     extends AbstractFeedEventSubscriber
     implements EventSubscriber, Asynchronous
 {
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   @Inject
   public RepositorySubscriber(final FeedRecorder feedRecorder,
-                              final ApplicationStatusSource applicationStatusSource)
+                              final Provider<SystemStatus> systemStatusProvider)
   {
     super(feedRecorder);
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
   }
 
   @Subscribe
@@ -173,6 +174,6 @@ public class RepositorySubscriber
   }
 
   private boolean isNexusStarted() {
-    return applicationStatusSource.getSystemStatus().isNexusStarted();
+    return systemStatusProvider.get().isNexusStarted();
   }
 }

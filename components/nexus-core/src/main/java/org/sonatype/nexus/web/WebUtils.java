@@ -18,10 +18,11 @@ import java.io.OutputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.io.StreamSupport;
 
@@ -46,8 +47,8 @@ public class WebUtils
   private final String serverString;
 
   @Inject
-  public WebUtils(final ApplicationStatusSource applicationStatusSource) {
-    this.serverString = "Nexus/" + checkNotNull(applicationStatusSource).getSystemStatus().getVersion();
+  public WebUtils(final Provider<SystemStatus> systemStatusProvider) {
+    this.serverString = "Nexus/" + checkNotNull(systemStatusProvider).get().getVersion();
   }
 
   /**

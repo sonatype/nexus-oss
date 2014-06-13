@@ -12,9 +12,9 @@
  */
 package org.sonatype.nexus.web;
 
+import javax.inject.Provider;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -40,10 +40,10 @@ public class WebUtilsTest
     SystemStatus systemStatus = mock(SystemStatus.class);
     doReturn("version").when(systemStatus).getVersion();
 
-    ApplicationStatusSource applicationStatusSource = mock(ApplicationStatusSource.class);
-    doReturn(systemStatus).when(applicationStatusSource).getSystemStatus();
+    Provider<SystemStatus> systemStatusProvider = (Provider<SystemStatus>)mock(Provider.class);
+    doReturn(systemStatus).when(systemStatusProvider).get();
 
-    underTest = new WebUtils(applicationStatusSource);
+    underTest = new WebUtils(systemStatusProvider);
   }
 
   @Test
