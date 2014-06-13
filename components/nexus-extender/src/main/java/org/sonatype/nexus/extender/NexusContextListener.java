@@ -14,6 +14,7 @@ package org.sonatype.nexus.extender;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -174,6 +175,7 @@ public class NexusContextListener
   private static void startNexusPlugins(final BundleContext ctx, File pluginRepository) {
     File[] pluginFiles = pluginRepository.listFiles();
     if (pluginFiles != null && pluginFiles.length > 0) {
+      Arrays.sort(pluginFiles); // TEMP: provide deterministic start ordering during transition
       List<Bundle> plugins = new ArrayList<>();
       for (File file : pluginFiles) {
         try {
