@@ -30,12 +30,12 @@ public interface BlobStore
   /**
    * An identifying name for disaster recovery purposes (which isn't required to be strictly unique)
    */
-  public static final String BLOB_NAME_HEADER = "BlobStore.blob-name";
+  String BLOB_NAME_HEADER = "BlobStore.blob-name";
 
   /**
    * Audit information (e.g. the name of a principal that created the blob)
    */
-  public static final String CREATED_BY_HEADER = "BlobStore.created-by";
+  String CREATED_BY_HEADER = "BlobStore.created-by";
 
   /**
    * Creates a new blob. The header map must contain at least two keys:
@@ -98,5 +98,5 @@ public interface BlobStore
    * Perform garbage collection, purging blobs marked for deletion or whatever other periodic, implementation-specific
    * tasks need doing.
    */
-  public void compact();
+  void compact();
 }
