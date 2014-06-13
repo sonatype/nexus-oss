@@ -29,7 +29,6 @@ import org.sonatype.nexus.blobstore.file.HashingSubdirFileLocationPolicy;
 import org.sonatype.nexus.blobstore.file.SimpleFileOperations;
 import org.sonatype.nexus.blobstore.file.kazuki.KazukiBlobMetadataStore;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
-import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 import com.google.inject.PrivateModule;
@@ -130,7 +129,6 @@ public class FileBlobStoreModule
   KazukiHolder getKazukiHolder(final ApplicationDirectories applicationDirectories) throws IOException {
     File dir = applicationDirectories.getWorkDirectory("fileblobstore/" + name + "/db");
     log.info("File blob store {} metadata stored in Kazuki db: {}", name, dir);
-    DirSupport.mkdir(dir);
     File file = new File(dir, dir.getName());
 
     return new KazukiBuilder(name, file.getAbsoluteFile()).build();
