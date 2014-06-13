@@ -27,7 +27,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor;
 import org.sonatype.nexus.plugins.ui.contribution.UiContributor.UiContribution;
@@ -57,7 +56,7 @@ public class IndexWebResource
 {
   private final Provider<HttpServletRequest> requestProvider;
 
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   private final TemplateEngine templateEngine;
 
@@ -67,13 +66,13 @@ public class IndexWebResource
 
   @Inject
   public IndexWebResource(final Provider<HttpServletRequest> requestProvider,
-                          final ApplicationStatusSource applicationStatusSource,
+                          final Provider<SystemStatus> systemStatusProvider,
                           final TemplateEngine templateEngine,
                           final BuildNumberService buildNumberService,
                           final Set<UiContributor> uiContributors)
   {
     this.requestProvider = checkNotNull(requestProvider);
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.templateEngine = checkNotNull(templateEngine);
     this.buildNumberService = checkNotNull(buildNumberService);
     this.uiContributors = checkNotNull(uiContributors);
@@ -111,7 +110,7 @@ public class IndexWebResource
   }
 
   private byte[] renderTemplate(final String templateName) throws IOException {
-    SystemStatus systemStatus = applicationStatusSource.getSystemStatus();
+    SystemStatus systemStatus = systemStatusProvider.get();
 
     Map<String, Object> params = Maps.newHashMap();
     params.put("serviceBase", "service/local");

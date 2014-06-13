@@ -16,7 +16,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import javax.inject.Provider;
+
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.RemoteStorageException;
@@ -40,12 +41,12 @@ public abstract class AbstractRemoteRepositoryStorage
 {
   private final MimeSupport mimeSupport;
 
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
-  protected AbstractRemoteRepositoryStorage(final ApplicationStatusSource applicationStatusSource,
+  protected AbstractRemoteRepositoryStorage(final Provider<SystemStatus> systemStatusProvider,
                                             final MimeSupport mimeSupport)
   {
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.mimeSupport = checkNotNull(mimeSupport);
   }
 
@@ -124,7 +125,7 @@ public abstract class AbstractRemoteRepositoryStorage
   }
 
   public String getVersion() {
-    final SystemStatus status = applicationStatusSource.getSystemStatus();
+    final SystemStatus status = systemStatusProvider.get();
 
     return status.getVersion();
   }

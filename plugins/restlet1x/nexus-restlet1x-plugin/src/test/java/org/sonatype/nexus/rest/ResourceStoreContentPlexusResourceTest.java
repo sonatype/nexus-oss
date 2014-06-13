@@ -37,6 +37,7 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Maps;
+import com.google.inject.util.Providers;
 import com.noelios.restlet.http.HttpResponse;
 import com.noelios.restlet.http.HttpServerCall;
 import org.junit.Before;
@@ -75,6 +76,8 @@ public class ResourceStoreContentPlexusResourceTest
   private Map<String, ArtifactViewProvider> views = Maps.newHashMap();
 
   private AbstractResourceStoreContentPlexusResource underTest;
+
+  private BuildApplicationStatusSource applicationStatusSource;
 
   @Mock
   private SecuritySystem security;
@@ -124,7 +127,9 @@ public class ResourceStoreContentPlexusResourceTest
   @Before
   public void setup() {
 
-    underTest = new AbstractResourceStoreContentPlexusResource(security, new BuildApplicationStatusSource(), views)
+    applicationStatusSource = new BuildApplicationStatusSource();
+
+    underTest = new AbstractResourceStoreContentPlexusResource(security, Providers.of(applicationStatusSource.getSystemStatus()), views)
     {
       @Override
       protected ResourceStore getResourceStore(final Request request)

@@ -22,6 +22,7 @@ import java.nio.file.StandardCopyOption;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -29,7 +30,7 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.application.upgrade.ApplicationConfigurationUpgrader;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.ConfigurationHelper;
@@ -59,7 +60,7 @@ public class FileConfigurationSource
 
   private final EventBus eventBus;
 
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   /**
    * The configuration file.
@@ -91,7 +92,7 @@ public class FileConfigurationSource
   @Inject
   public FileConfigurationSource(final ApplicationInterpolatorProvider interpolatorProvider,
                                  final EventBus eventBus,
-                                 final ApplicationStatusSource applicationStatusSource,
+                                 final Provider<SystemStatus> systemStatusProvider,
                                  final @Named("${nexus-work}/conf/nexus.xml") File configurationFile,
                                  final ApplicationConfigurationValidator configurationValidator,
                                  final ApplicationConfigurationUpgrader configurationUpgrader,
@@ -100,7 +101,7 @@ public class FileConfigurationSource
   {
     super(interpolatorProvider);
     this.eventBus = checkNotNull(eventBus);
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.configurationFile = checkNotNull(configurationFile);
     this.configurationValidator = checkNotNull(configurationValidator);
     this.configurationUpgrader = checkNotNull(configurationUpgrader);
@@ -235,7 +236,7 @@ public class FileConfigurationSource
   protected void upgradeNexusVersion()
       throws IOException
   {
-    final String currentVersion = checkNotNull(applicationStatusSource.getSystemStatus().getVersion());
+    final String currentVersion = checkNotNull(systemStatusProvider.get().getVersion());
     final String previousVersion = getConfiguration().getNexusVersion();
     if (currentVersion.equals(previousVersion)) {
       setInstanceUpgraded(false);

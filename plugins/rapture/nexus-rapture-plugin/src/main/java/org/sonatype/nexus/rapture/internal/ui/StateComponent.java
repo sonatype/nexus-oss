@@ -24,14 +24,12 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpSession;
 
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
 import org.sonatype.nexus.plugin.PluginIdentity;
 import org.sonatype.nexus.rapture.Rapture;
 import org.sonatype.nexus.rapture.StateContributor;
 import org.sonatype.nexus.util.DigesterUtils;
-import org.sonatype.plugin.metadata.GAVCoordinate;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -59,7 +57,7 @@ public class StateComponent
 
   private final Rapture rapture;
 
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   private final List<PluginIdentity> pluginIdentities;
 
@@ -71,12 +69,12 @@ public class StateComponent
 
   @Inject
   public StateComponent(final Rapture rapture,
-                        final ApplicationStatusSource applicationStatusSource,
+                        final Provider<SystemStatus> systemStatusProvider,
                         final List<PluginIdentity> pluginIdentities,
                         final List<Provider<StateContributor>> stateContributors)
   {
     this.rapture = checkNotNull(rapture, "rapture");
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.pluginIdentities = checkNotNull(pluginIdentities);
     this.stateContributors = checkNotNull(stateContributors);
   }
@@ -123,7 +121,7 @@ public class StateComponent
   }
 
   private StatusXO getStatus() {
-    SystemStatus systemStatus = applicationStatusSource.getSystemStatus();
+    SystemStatus systemStatus = systemStatusProvider.get();
     StatusXO status = new StatusXO();
     status.setEdition(systemStatus.getEditionShort());
     status.setVersion(systemStatus.getVersion());
@@ -210,7 +208,7 @@ public class StateComponent
 
   public LicenseXO getLicense() {
     LicenseXO licenseXO = new LicenseXO();
-    SystemStatus status = applicationStatusSource.getSystemStatus();
+    SystemStatus status = systemStatusProvider.get();
 
     licenseXO.setRequired(!"OSS".equals(status.getEditionShort()));
     licenseXO.setInstalled(status.isLicenseInstalled());

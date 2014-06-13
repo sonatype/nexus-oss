@@ -14,7 +14,9 @@ package org.sonatype.nexus.proxy.maven.routing.internal;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import javax.inject.Provider;
+
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.routing.internal.task.CancelableRunnableSupport;
 import org.sonatype.nexus.proxy.maven.routing.internal.task.ProgressListener;
@@ -32,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class UpdateRepositoryRunnable
     extends CancelableRunnableSupport
 {
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   private final ManagerImpl manager;
 
@@ -42,18 +44,18 @@ public class UpdateRepositoryRunnable
    * Constructor.
    */
   public UpdateRepositoryRunnable(final ProgressListener progressListener,
-                                  final ApplicationStatusSource applicationStatusSource,
+                                  final Provider<SystemStatus> systemStatusProvider,
                                   final ManagerImpl manager, final MavenRepository mavenRepository)
   {
     super(progressListener, mavenRepository.getId() + " AR-Updater");
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.manager = checkNotNull(manager);
     this.mavenRepository = checkNotNull(mavenRepository);
   }
 
   @Override
   protected void doRun() {
-    if (!applicationStatusSource.getSystemStatus().isNexusStarted()) {
+    if (!systemStatusProvider.get().isNexusStarted()) {
       log.warn("Nexus stopped during background prefix file updates for {}, bailing out.", mavenRepository);
       return;
     }

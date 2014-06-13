@@ -17,9 +17,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
@@ -46,7 +47,7 @@ public class ProxyRequestFilterImpl
     extends ComponentSupport
     implements ProxyRequestFilter
 {
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   private final Manager manager;
 
@@ -54,11 +55,11 @@ public class ProxyRequestFilterImpl
    * Constructor.
    */
   @Inject
-  public ProxyRequestFilterImpl(final EventBus eventBus, final ApplicationStatusSource applicationStatusSource,
+  public ProxyRequestFilterImpl(final EventBus eventBus, final Provider<SystemStatus> systemStatusProvider,
                                 final Manager manager)
   {
     checkNotNull(eventBus);
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.manager = checkNotNull(manager);
     eventBus.register(this);
   }
@@ -114,7 +115,7 @@ public class ProxyRequestFilterImpl
   // == Events
 
   protected boolean isRepositoryHandled(final Repository repository) {
-    return applicationStatusSource.getSystemStatus().isNexusStarted() && repository != null
+    return systemStatusProvider.get().isNexusStarted() && repository != null
         && repository.getRepositoryKind().isFacetAvailable(MavenProxyRepository.class);
   }
 

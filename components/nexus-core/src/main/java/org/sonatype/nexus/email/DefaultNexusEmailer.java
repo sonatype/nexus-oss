@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
@@ -26,7 +27,6 @@ import org.sonatype.micromailer.MailRequest;
 import org.sonatype.micromailer.MailRequestStatus;
 import org.sonatype.micromailer.MailType;
 import org.sonatype.micromailer.imp.DefaultMailType;
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.AbstractLastingConfigurable;
 import org.sonatype.nexus.configuration.CoreConfiguration;
@@ -65,7 +65,7 @@ public class DefaultNexusEmailer
 
   private final GlobalRestApiSettings globalRestApiSettings;
 
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   private final EMailer eMailer;
 
@@ -75,13 +75,13 @@ public class DefaultNexusEmailer
   public DefaultNexusEmailer(final EventBus eventBus,
                              final ApplicationConfiguration applicationConfiguration,
                              final GlobalRestApiSettings globalRestApiSettings,
-                             final ApplicationStatusSource applicationStatusSource,
+                             final Provider<SystemStatus> systemStatusProvider,
                              final EMailer eMailer,
                              final List<SmtpSessionParametersCustomizer> customizers)
   {
     super("SMTP Client", eventBus, applicationConfiguration);
     this.globalRestApiSettings = checkNotNull(globalRestApiSettings);
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.eMailer = checkNotNull(eMailer);
     this.customizers = checkNotNull(customizers);
   }
@@ -337,7 +337,7 @@ public class DefaultNexusEmailer
   private String userAgentPlatformInfo;
 
   protected String getSenderId() {
-    SystemStatus status = applicationStatusSource.getSystemStatus();
+    SystemStatus status = systemStatusProvider.get();
 
     if (platformEditionShort == null || !platformEditionShort.equals(status.getEditionShort())
         || userAgentPlatformInfo == null) {

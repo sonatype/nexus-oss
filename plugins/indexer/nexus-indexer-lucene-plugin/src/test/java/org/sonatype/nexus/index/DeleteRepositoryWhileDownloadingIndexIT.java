@@ -14,7 +14,7 @@ package org.sonatype.nexus.index;
 
 import java.util.concurrent.Semaphore;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
@@ -29,6 +29,7 @@ import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
+import com.google.inject.util.Providers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
@@ -47,7 +48,7 @@ public class DeleteRepositoryWhileDownloadingIndexIT
     protected StuckRemoteStorage()
         throws Exception
     {
-      super(lookup(ApplicationStatusSource.class), lookup(MimeSupport.class));
+      super(Providers.of(lookup(SystemStatus.class)), lookup(MimeSupport.class));
     }
 
     @Override

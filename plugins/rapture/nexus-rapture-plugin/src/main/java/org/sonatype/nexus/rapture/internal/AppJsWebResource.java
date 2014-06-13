@@ -21,7 +21,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.rapture.internal.ui.StateComponent;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.webresources.WebResourceService;
@@ -49,7 +49,7 @@ public class AppJsWebResource
 
   private static final String PLUGIN_CONFIG_SUFFIX = "/app/PluginConfig.js";
 
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   private final StateComponent stateComponent;
 
@@ -58,11 +58,11 @@ public class AppJsWebResource
   private final Gson gson;
 
   @Inject
-  public AppJsWebResource(final ApplicationStatusSource applicationStatusSource,
+  public AppJsWebResource(final Provider<SystemStatus> systemStatusProvider,
                           final StateComponent stateComponent,
                           final Provider<WebResourceService> webResourceServiceProvider)
   {
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.stateComponent = checkNotNull(stateComponent);
     this.webResourceServiceProvider = checkNotNull(webResourceServiceProvider);
 
@@ -92,7 +92,7 @@ public class AppJsWebResource
     return render("app.vm", new TemplateParameters()
         .set("pluginConfigClassNames", join(classNames))
         .set("baseUrl", BaseUrlHolder.get())
-        .set("status", applicationStatusSource.getSystemStatus())
+        .set("status", systemStatusProvider.get())
         .set("state", gson.toJson(stateComponent.getValues(Maps.<String, String>newHashMap())))
     );
   }

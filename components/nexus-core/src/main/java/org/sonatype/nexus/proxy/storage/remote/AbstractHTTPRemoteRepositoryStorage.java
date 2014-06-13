@@ -15,7 +15,9 @@ package org.sonatype.nexus.proxy.storage.remote;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import javax.inject.Provider;
+
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
@@ -34,10 +36,10 @@ public abstract class AbstractHTTPRemoteRepositoryStorage
     implements RemoteRepositoryStorage
 {
 
-  protected AbstractHTTPRemoteRepositoryStorage(final ApplicationStatusSource applicationStatusSource,
+  protected AbstractHTTPRemoteRepositoryStorage(final Provider<SystemStatus> systemStatusProvider,
                                                 final MimeSupport mimeSupport)
   {
-    super(applicationStatusSource, mimeSupport);
+    super(systemStatusProvider, mimeSupport);
   }
 
   @Override

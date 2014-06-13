@@ -24,9 +24,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
@@ -122,7 +123,7 @@ public class ManagerImpl
 {
   private final EventBus eventBus;
 
-  private final ApplicationStatusSource applicationStatusSource;
+  private final Provider<SystemStatus> systemStatusProvider;
 
   private final ApplicationConfiguration applicationConfiguration;
 
@@ -157,7 +158,7 @@ public class ManagerImpl
    * Da constructor.
    */
   @Inject
-  public ManagerImpl(final EventBus eventBus, final ApplicationStatusSource applicationStatusSource,
+  public ManagerImpl(final EventBus eventBus, final Provider<SystemStatus> systemStatusProvider,
                      final ApplicationConfiguration applicationConfiguration,
                      final RepositoryRegistry repositoryRegistry, final Config config,
                      final LocalContentDiscoverer localContentDiscoverer,
@@ -165,7 +166,7 @@ public class ManagerImpl
                      @Named(RemotePrefixFileStrategy.ID) final RemoteStrategy quickRemoteStrategy)
   {
     this.eventBus = checkNotNull(eventBus);
-    this.applicationStatusSource = checkNotNull(applicationStatusSource);
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.applicationConfiguration = checkNotNull(applicationConfiguration);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.config = checkNotNull(config);
@@ -209,7 +210,7 @@ public class ManagerImpl
       {
         @Override
         public void run() {
-          if (!applicationStatusSource.getSystemStatus().isNexusStarted()) {
+          if (!systemStatusProvider.get().isNexusStarted()) {
             // this might happen on periodic call AFTER nexus shutdown was commenced
             // or BEFORE nexus booted, if some other plugin/subsystem delays boot for some
             // reason.
@@ -462,7 +463,7 @@ public class ManagerImpl
    */
   protected boolean doUpdatePrefixFileAsync(final boolean forced, final MavenRepository mavenRepository) {
     final UpdateRepositoryRunnable updateRepositoryJob =
-        new UpdateRepositoryRunnable(new LoggingProgressListener(log), applicationStatusSource, this,
+        new UpdateRepositoryRunnable(new LoggingProgressListener(log), systemStatusProvider, this,
             mavenRepository);
     if (forced) {
       final boolean canceledPreviousJob =
