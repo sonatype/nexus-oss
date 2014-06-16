@@ -14,6 +14,7 @@ package org.sonatype.nexus.bootstrap;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Handler;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -29,7 +30,6 @@ import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
 import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_PING_INTERVAL;
@@ -43,6 +43,17 @@ import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_TI
  */
 public class Launcher
 {
+  static {
+    boolean hasJULBridge;
+    try {
+      hasJULBridge = Handler.class.isAssignableFrom(org.slf4j.bridge.SLF4JBridgeHandler.class);
+    }
+    catch (final LinkageError e) {
+      hasJULBridge = false;
+    }
+    HAS_JUL_BRIDGE = hasJULBridge;
+  }
+
   // FIXME: Move this to CommandMonitorThread
   public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
 
@@ -51,6 +62,8 @@ public class Launcher
   private static final String FIVE_SECONDS = "5000";
 
   private static final String ONE_SECOND = "1000";
+
+  private static final boolean HAS_JUL_BRIDGE;
 
   private final JettyServer server;
 
@@ -67,8 +80,10 @@ public class Launcher
     }
 
     // install JUL bridge
-    SLF4JBridgeHandler.removeHandlersForRootLogger();
-    SLF4JBridgeHandler.install();
+    if (HAS_JUL_BRIDGE) {
+      org.slf4j.bridge.SLF4JBridgeHandler.removeHandlersForRootLogger();
+      org.slf4j.bridge.SLF4JBridgeHandler.install();
+    }
 
     ClassLoader cl = (classLoader == null) ? getClass().getClassLoader() : classLoader;
 

@@ -593,13 +593,6 @@
               <Include-Resource>
                 /=${project.build.outputDirectory},{maven-resources}
               </Include-Resource>
-              <!-- remove build-only headers from final manifest -->
-              <_removeheaders>
-                Embed*,Include-Resource,Private-Package
-              </_removeheaders>
-              <Import-Package>
-                *;resolution:=optional
-              </Import-Package>
             </instructions>
           </configuration>
         </plugin>
@@ -612,6 +605,45 @@
           <artifactId>karaf-maven-plugin</artifactId>
           <version>3.0.1</version>
           <extensions>true</extensions>
+          <configuration>
+            <excludedArtifactIds>
+              <!--
+              Included in platform
+              -->
+              <id>org.osgi.core</id>
+              <id>org.osgi.compendium</id>
+              <id>javax.annotation-api</id>
+              <id>javax.servlet</id>
+              <id>jsr250-api</id>
+              <id>jsr305</id>
+              <id>slf4j-api</id>
+              <id>jul-to-slf4j</id>
+              <id>jcl-over-slf4j</id>
+              <id>log4j-over-slf4j</id>
+              <id>org.eclipse.osgi</id>
+              <id>mail</id>
+              <!--
+              Need special wrapping
+              -->
+              <id>bval-guice</id>
+              <id>jaxb-core</id>
+              <id>jaxb-impl</id>
+              <id>kazuki-api</id>
+              <id>kazuki-impl</id>
+              <id>lucene-core</id>
+              <id>lucene-queries</id>
+              <id>maven-model</id>
+              <id>maven-model-builder</id>
+              <id>resteasy-atom-provider</id>
+              <id>resteasy-multipart-provider</id>
+              <id>resteasy-jaxrs</id>
+              <id>shiro-ehcache</id>
+              <id>shiro-guice</id>
+              <id>xmlpull</id>
+              <id>xpp3_min</id>
+              <id>xstream</id>
+            </excludedArtifactIds>
+          </configuration>
         </plugin>
 
         <plugin>

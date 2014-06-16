@@ -94,9 +94,6 @@
 
   <build>
     <plugins>
-      <!--
-      Generate OSGi metadata.
-      -->
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -105,14 +102,6 @@
             <Bundle-Activator>
               org.sonatype.nexus.jettyapp.JettyAppBootstrap
             </Bundle-Activator>
-            <Embed-Dependency>
-              *;scope=compile
-            </Embed-Dependency>
-            <Embed-Directory>lib</Embed-Directory>
-            <Embed-Transitive>true</Embed-Transitive>
-            <_exportcontents>
-              ch.*|com.*|org.*
-            </_exportcontents>
           </instructions>
         </configuration>
       </plugin>

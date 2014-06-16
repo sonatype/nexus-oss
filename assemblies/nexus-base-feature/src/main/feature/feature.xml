@@ -14,7 +14,33 @@
 -->
 <features name="nexus">
   <feature name="${project.artifactId}" description="Nexus base installation">
+    <!--
+    Platform features supplied by Karaf
+    -->
     <feature>eventadmin</feature>
     <feature>jetty</feature>
+    <!--
+    Wrappers that require use of fragments
+    -->
+    <bundle>wrap:${mvn:jaxb-core}$Bundle-SymbolicName=jaxb-core</bundle>
+    <bundle>wrap:${mvn:jaxb-impl}$Bundle-SymbolicName=jaxb-impl&amp;Fragment-Host=jaxb-core</bundle>
+    <bundle>wrap:${mvn:kazuki-api}$Bundle-SymbolicName=kazuki-api</bundle>
+    <bundle>wrap:${mvn:kazuki-impl}$Bundle-SymbolicName=kazuki-impl&amp;Fragment-Host=kazuki-api</bundle>
+    <bundle>wrap:${mvn:lucene-core}$Bundle-SymbolicName=lucene-core</bundle>
+    <bundle>wrap:${mvn:lucene-queries}$Bundle-SymbolicName=lucene-queries&amp;Fragment-Host=lucene-core</bundle>
+    <bundle>wrap:${mvn:maven-model}$Bundle-SymbolicName=maven-model</bundle>
+    <bundle>wrap:${mvn:maven-model-builder}$Bundle-SymbolicName=maven-model-builder&amp;Fragment-Host=maven-model</bundle>
+    <bundle>wrap:${mvn:resteasy-jaxrs}$Bundle-SymbolicName=resteasy-jaxrs</bundle>
+    <bundle>wrap:${mvn:resteasy-atom-provider}$Bundle-SymbolicName=resteasy-atom-provider&amp;Fragment-Host=resteasy-jaxrs</bundle>
+    <bundle>wrap:${mvn:resteasy-multipart-provider}$Bundle-SymbolicName=resteasy-multipart-provider&amp;Fragment-Host=resteasy-jaxrs</bundle>
+    <bundle>wrap:${mvn:xmlpull}$Bundle-SymbolicName=xmlpull</bundle>
+    <bundle>wrap:${mvn:xpp3_min}$Bundle-SymbolicName=xpp3_min&amp;Fragment-Host=xmlpull</bundle>
+    <!--
+    Re-wrap these bundles to fix exports/imports
+    -->
+    <bundle>wrap:${mvn:bval-guice}$overwrite=merge&amp;Import-Package=*</bundle>
+    <bundle>wrap:${mvn:shiro-ehcache}$overwrite=merge&amp;Import-Package=*</bundle>
+    <bundle>wrap:${mvn:shiro-guice}$overwrite=merge&amp;Import-Package=*</bundle>
+    <bundle>wrap:${mvn:xstream}$overwrite=merge&amp;-exportcontents=*</bundle>
   </feature>
 </features>

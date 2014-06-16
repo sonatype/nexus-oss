@@ -25,6 +25,7 @@
 
   <artifactId>nexus-indexer-lucene-model</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -80,6 +81,17 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <!-- merge model classes with the indexer plugin at runtime -->
+            <Fragment-Host>org.sonatype.nexus.plugins.nexus-indexer-lucene-plugin</Fragment-Host>
+          </instructions>
+        </configuration>
       </plugin>
     </plugins>
   </build>
