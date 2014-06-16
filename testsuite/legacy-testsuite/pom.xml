@@ -131,6 +131,18 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-ssl-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-ldap-plugin</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <!-- nexus3860/* (cargo) tests -->
     <dependency>
       <groupId>org.codehaus.cargo</groupId>
