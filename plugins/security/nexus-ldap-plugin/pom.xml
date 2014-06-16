@@ -97,6 +97,16 @@
       <scope>provided</scope>
     </dependency>
 
+    <!--
+    FIXME: If this is promoted to DM in nexus/pom.xml, then tests will start to fail with JCE exceptions.
+    -->
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>1.48</version>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-testsupport</artifactId>
