@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ldapConfiguration>
+  <version>2.0.1</version>
+  <servers>
+        
+    <server>
+      <id>backup</id>
+      <name>ldap://localhost:${main-ldap-port}</name>
+      <connectionInfo>
+        <searchBase>o=sonatype</searchBase>
+        <systemUsername>uid=admin,ou=system</systemUsername>
+        <systemPassword>secret</systemPassword>
+        <authScheme>simple</authScheme>
+        <protocol>ldap</protocol>
+        <host>localhost</host>
+        <!--<port>${main-ldap-port}</port>
+        --><port>12345</port>
+        
+        <backupMirrorHost>localhost</backupMirrorHost>
+        <backupMirrorProtocol>ldap</backupMirrorProtocol>
+        <!--<backupMirrorPort>${backup-ldap-port}</backupMirrorPort>
+        --><backupMirrorPort>12345</backupMirrorPort>
+        
+        <connectionRetryDelay>10</connectionRetryDelay>
+        <cacheTimeout>-1</cacheTimeout>
+      </connectionInfo>
+      
+      <userAndGroupConfig>
+        <groupMemberFormat>uid=${username},ou=people,o=sonatype</groupMemberFormat>
+        <groupObjectClass>groupOfUniqueNames</groupObjectClass>
+        <groupBaseDn>ou=groups</groupBaseDn>
+        <groupIdAttribute>cn</groupIdAttribute>
+        <groupMemberAttribute>uniqueMember</groupMemberAttribute>
+        <userObjectClass>inetOrgPerson</userObjectClass>
+        <userBaseDn>ou=people</userBaseDn>
+        <userIdAttribute>uid</userIdAttribute>
+        <userPasswordAttribute>userPassword</userPasswordAttribute>
+        <userRealNameAttribute>sn</userRealNameAttribute>
+        <emailAddressAttribute>mail</emailAddressAttribute>
+        <preferredPasswordEncoding>clear</preferredPasswordEncoding>
+        <userSubtree>false</userSubtree>
+        <ldapGroupsAsRoles>true</ldapGroupsAsRoles>
+      </userAndGroupConfig>
+    </server>
+    
+  </servers>
+</ldapConfiguration>

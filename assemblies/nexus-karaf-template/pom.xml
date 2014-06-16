@@ -145,7 +145,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-ldap-realm-plugin</artifactId>
+      <artifactId>nexus-ldap-plugin</artifactId>
       <version>${nexus.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -346,7 +346,7 @@
             <feature>nexus-siesta-plugin</feature>
             <feature>nexus-lvo-plugin</feature>
             <feature>nexus-plugin-console-plugin</feature>
-            <feature>nexus-ldap-realm-plugin</feature>
+            <feature>nexus-ldap-plugin</feature>
             <feature>nexus-maven-bridge-plugin</feature>
             <feature>nexus-rrb-plugin</feature>
             <feature>nexus-indexer-lucene-plugin</feature>

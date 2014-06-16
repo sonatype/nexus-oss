@@ -240,12 +240,6 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-ldap-common</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-locks</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
@@ -541,6 +535,32 @@
         </plugin>
 
         <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>jaxb2-maven-plugin</artifactId>
+          <version>1.6</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.sonatype.sisu.jacksbee</groupId>
+              <artifactId>jacksbee-xjc</artifactId>
+              <version>1.3</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <extension>true</extension>
+            <schemaDirectory>src/main/schema</schemaDirectory>
+            <bindingDirectory>src/main/schema</bindingDirectory>
+            <arguments>-Xsetters -Xfluent-api -Xgenerated -Xannotate -XjsonProperty</arguments>
+            <plugins>
+              <plugin>
+                <groupId>org.sonatype.sisu.jacksbee</groupId>
+                <artifactId>jacksbee-xjc</artifactId>
+                <version>1.3</version>
+              </plugin>
+            </plugins>
+          </configuration>
+        </plugin>
+
+        <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>provided-dependencies-maven-plugin</artifactId>
           <version>1.6</version>
@@ -643,7 +663,6 @@
               <!--
               Excludes for specific classes which have compatible, yet different licences.
               -->
-              <exclude>**/nexus-ldap-common/**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
               <exclude>**/nexus-extdirect-plugin/**/com/softwarementors/**</exclude>
             </excludes>
           </configuration>

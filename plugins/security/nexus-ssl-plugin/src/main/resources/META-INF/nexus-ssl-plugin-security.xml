@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2014 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<security>
+  <version>2.0.1</version>
+  <roles>
+    <role>
+      <id>ssl-truststore-view</id>
+      <name>Nexus SSL: Trust Store View</name>
+      <description>Gives access to view Nexus SSL Trust Store</description>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>ssl-truststore-read</privilege>
+        <privilege>ssl-certificates-read</privilege>
+      </privileges>
+    </role>
+    <role>
+      <id>ssl-truststore-admin</id>
+      <name>Nexus SSL: Trust Store Administration</name>
+      <description>Gives access to manage Nexus SSL Trust Store</description>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>ssl-truststore-create</privilege>
+        <privilege>ssl-truststore-update</privilege>
+        <privilege>ssl-truststore-delete</privilege>
+      </privileges>
+    </role>
+  </roles>
+  <privileges>
+    <privilege>
+      <id>ssl-truststore-read</id>
+      <type>method</type>
+      <name>Nexus SSL Trust Store - (read)</name>
+      <description>Give permission to read certificates from Nexus SSL Trust Store.</description>
+      <properties>
+        <property>
+          <key>method</key>
+          <value>read</value>
+        </property>
+        <property>
+          <key>permission</key>
+          <value>nexus:ssl:truststore</value>
+        </property>
+      </properties>
+    </privilege>
+    <privilege>
+      <id>ssl-truststore-create</id>
+      <type>method</type>
+      <name>Nexus SSL Trust Store - (create,read)</name>
+      <description>Give permission to create,read certificates from Nexus SSL Trust Store.</description>
+      <properties>
+        <property>
+          <key>method</key>
+          <value>create,read</value>
+        </property>
+        <property>
+          <key>permission</key>
+          <value>nexus:ssl:truststore</value>
+        </property>
+      </properties>
+    </privilege>
+    <privilege>
+      <id>ssl-truststore-update</id>
+      <type>method</type>
+      <name>Nexus SSL Trust Store - (create,read)</name>
+      <description>Give permission to update,read certificates from Nexus SSL Trust Store.</description>
+      <properties>
+        <property>
+          <key>method</key>
+          <value>update,read</value>
+        </property>
+        <property>
+          <key>permission</key>
+          <value>nexus:ssl:truststore</value>
+        </property>
+      </properties>
+    </privilege>
+    <privilege>
+      <id>ssl-truststore-delete</id>
+      <type>method</type>
+      <name>Nexus SSL Trust Store - (delete,read)</name>
+      <description>Give permission to delete,read certificates from Nexus SSL Trust Store.</description>
+      <properties>
+        <property>
+          <key>method</key>
+          <value>delete,read</value>
+        </property>
+        <property>
+          <key>permission</key>
+          <value>nexus:ssl:truststore</value>
+        </property>
+      </properties>
+    </privilege>
+  </privileges>
+</security>
