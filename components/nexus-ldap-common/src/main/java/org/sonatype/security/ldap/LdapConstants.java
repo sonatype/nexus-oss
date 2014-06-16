@@ -10,26 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.security.ldap.realms;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+package org.sonatype.security.ldap;
 
-import org.sonatype.security.ldap.LdapConstants;
-import org.sonatype.security.ldap.realms.AbstractLdapAuthenticatingRealm;
-import org.sonatype.security.ldap.realms.LdapManager;
-
-import org.eclipse.sisu.Description;
-
-@Singleton
-@Named(LdapConstants.REALM_NAME)
-@Description("OSS LDAP Authentication Realm")
-public class NexusLdapAuthenticationRealm
-    extends AbstractLdapAuthenticatingRealm
+/**
+ * Common constants shared across three LDAP related modules/plugins.
+ *
+ * @since 2.9
+ */
+public final class LdapConstants
 {
-  @Inject
-  public NexusLdapAuthenticationRealm(final LdapManager ldapManager) {
-    super(ldapManager);
+  private LdapConstants() {
+    // no instance
   }
+
+  /**
+   * The LDAP realm name. Shiro will consider this string as only and solely to perform authorization
+   * using LDAP realm, so any principal should use this string when constructing principals.
+   */
+  public static final String REALM_NAME = "NexusLdapAuthenticationRealm";
+
+  /**
+   * String marking the source of users when looked up thru user manager that uses LDAP.
+   */
+  public static final String USER_SOURCE = "LDAP";
 }

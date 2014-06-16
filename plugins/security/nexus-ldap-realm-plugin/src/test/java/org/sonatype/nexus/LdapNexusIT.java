@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus;
 
+import org.sonatype.nexus.security.ldap.realms.LdapPlugin;
 import org.sonatype.nexus.security.ldap.realms.NexusLdapAuthenticationRealm;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
@@ -58,7 +59,7 @@ public class LdapNexusIT
     security.start();
 
     SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    principals.add("cstamas", NexusLdapAuthenticationRealm.NAME);
+    principals.add("cstamas", LdapPlugin.REALM_NAME);
 
     Assert.assertTrue(security.hasRole(principals, "developer"));
     Assert.assertFalse(security.hasRole(principals, "JUNK"));
@@ -72,7 +73,7 @@ public class LdapNexusIT
     security.start();
 
     SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    principals.add("cstamas", NexusLdapAuthenticationRealm.NAME);
+    principals.add("cstamas", LdapPlugin.REALM_NAME);
 
     Assert.assertTrue(security.isPermitted(principals, "security:usersforgotpw:create"));
     Assert.assertFalse(security.isPermitted(principals, "security:usersforgotpw:delete"));

@@ -15,7 +15,7 @@ package org.sonatype.nexus;
 import java.io.File;
 import java.io.IOException;
 
-import org.sonatype.nexus.security.ldap.realms.NexusLdapAuthenticationRealm;
+import org.sonatype.nexus.security.ldap.realms.LdapPlugin;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.realms.XmlAuthenticatingRealm;
@@ -63,7 +63,7 @@ public class MultipleRealmsLdapNotConfiguredIT
 
     // LDAP should fail
     SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    principals.add("cstamas", NexusLdapAuthenticationRealm.NAME);
+    principals.add("cstamas", LdapPlugin.REALM_NAME);
 
     // if realm is not configured, the user should not be able to be authorized
     Assert.assertFalse(security.hasRole(principals, "nx-developer"));
@@ -88,7 +88,7 @@ public class MultipleRealmsLdapNotConfiguredIT
 
     // LDAP
     SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    principals.add("cstamas", NexusLdapAuthenticationRealm.NAME);
+    principals.add("cstamas", LdapPlugin.REALM_NAME);
 
     // if realm is not configured, the user should not be able to be authorized
     Assert.assertFalse(security.isPermitted(principals, "security:usersforgotpw:create"));

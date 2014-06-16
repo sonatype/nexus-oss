@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.security.ldap.LdapConstants;
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.LdapUser;
 import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
@@ -36,14 +37,10 @@ import org.sonatype.security.usermanagement.UserStatus;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
-@Named("LDAP")
+@Named(LdapConstants.USER_SOURCE)
 public class LdapUserManager
     extends AbstractReadOnlyUserManager
 {
-  public static final String LDAP_REALM_KEY = "LdapAuthenticatingRealm";
-
-  private static final String USER_SOURCE = "LDAP";
-
   private final LdapManager ldapManager;
 
   @Inject
@@ -108,12 +105,12 @@ public class LdapUserManager
 
     user.setName(ldapUser.getRealName());
     user.setUserId(ldapUser.getUsername());
-    user.setSource(USER_SOURCE);
+    user.setSource(LdapConstants.USER_SOURCE);
     user.setStatus(UserStatus.active);
 
 
     for (String roleId : ldapUser.getMembership()) {
-      RoleIdentifier role = new RoleIdentifier(USER_SOURCE, roleId);
+      RoleIdentifier role = new RoleIdentifier(LdapConstants.USER_SOURCE, roleId);
       user.addRole(role);
     }
 
@@ -127,7 +124,7 @@ public class LdapUserManager
 
   @Override
   public String getSource() {
-    return USER_SOURCE;
+    return LdapConstants.USER_SOURCE;
   }
 
   @Override
@@ -158,7 +155,7 @@ public class LdapUserManager
 
   @Override
   public String getAuthenticationRealmName() {
-    return LDAP_REALM_KEY;
+    return LdapConstants.REALM_NAME;
   }
 
 }
