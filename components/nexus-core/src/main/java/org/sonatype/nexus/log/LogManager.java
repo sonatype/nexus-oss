@@ -14,12 +14,11 @@ package org.sonatype.nexus.log;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-
-import org.sonatype.nexus.util.io.NexusStreamResponse;
 
 /**
  * LogManager.
@@ -34,8 +33,8 @@ public interface LogManager
 
   File getLogFile(String filename);
 
-  NexusStreamResponse getApplicationLogAsStream(String logFile, long fromByte, long bytesCount)
-      throws IOException;
+  @Nullable
+  InputStream getApplicationLogAsStream(String logFile, long fromByte, long bytesCount) throws IOException;
 
   LogConfiguration getConfiguration()
       throws IOException;

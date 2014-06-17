@@ -64,7 +64,7 @@ class LogCustomizer
       @Override
       protected void generate(final File file) {
         def log = logManager.getApplicationLogAsStream('nexus.log', 0, Long.MAX_VALUE)
-        log.inputStream.withStream { input ->
+        log.withStream { input ->
           file.withOutputStream { output ->
             output << input
           }

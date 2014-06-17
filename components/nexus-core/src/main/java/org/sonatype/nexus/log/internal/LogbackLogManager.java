@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.log.internal;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,7 +46,6 @@ import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.util.file.FileSupport;
 import org.sonatype.nexus.util.io.LimitedInputStream;
-import org.sonatype.nexus.util.io.NexusStreamResponse;
 import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
@@ -315,52 +315,31 @@ public class LogbackLogManager
    * prevent browsing of the file system.
    *
    * @param logFile path of the file to retrieve
-   * @returns InputStream to the file or null if the file is not allowed or doesn't exist.
+   * @return InputStream to the file or null if the file is not allowed or doesn't exist.
    */
   @Override
-  public NexusStreamResponse getApplicationLogAsStream(String logFile, long from, long count)
-      throws IOException
-  {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Retrieving " + logFile + " log file.");
-    }
+  @Nullable
+  public InputStream getApplicationLogAsStream(String logFile, long from, long count) throws IOException {
+    logger.debug("Retrieving log file: {}", logFile);
 
     if (logFile.contains(File.pathSeparator)) {
       logger.warn("Nexus refuses to retrieve log files with path separators in its name.");
-
       return null;
     }
 
     File log = getLogFile(logFile);
-
     if (log == null || !log.exists()) {
-      logger.warn("Log file does not exist: [" + logFile + "]");
-
+      logger.warn("Log file does not exist: {}", logFile);
       return null;
     }
 
-    NexusStreamResponse response = new NexusStreamResponse();
-
-    response.setName(logFile);
-
-    response.setMimeType("text/plain");
-
-    response.setSize(log.length());
-
+    InputStream input = new BufferedInputStream(new FileInputStream(log));
     if (count >= 0) {
-      response.setFromByte(from);
-      response.setBytesCount(count);
+      return new LimitedInputStream(input, from, count);
     }
     else {
-      response.setBytesCount(Math.abs(count));
-      response.setFromByte(Math.max(0, response.getSize() - response.getBytesCount()));
+      return input;
     }
-
-    response.setInputStream(
-        new LimitedInputStream(new FileInputStream(log), response.getFromByte(), response.getBytesCount())
-    );
-
-    return response;
   }
 
   private Properties loadConfigurationProperties()
