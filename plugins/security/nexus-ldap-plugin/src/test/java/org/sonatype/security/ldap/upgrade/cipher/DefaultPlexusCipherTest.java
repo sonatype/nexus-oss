@@ -10,16 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.upgrade.cipher;
 
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.codehaus.plexus.PlexusConstants;
-
-import org.codehaus.plexus.ContainerConfiguration;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test the Plexus Cipher container
@@ -28,7 +30,7 @@ import org.junit.Test;
  * @version $Id$
  */
 public class DefaultPlexusCipherTest
-    extends PlexusTestCaseSupport
+    extends TestSupport
 {
   private String passPhrase = "foofoo";
 
@@ -36,32 +38,24 @@ public class DefaultPlexusCipherTest
 
   String encStr = "CFUju8n8eKQHj8u0HI9uQMRmKQALtoXH7lY=";
 
-  PlexusCipher pc;
+  DefaultPlexusCipher pc;
 
-  // -------------------------------------------------------------
-  @Override
-  protected void customizeContainerConfiguration(final ContainerConfiguration containerConfiguration) {
-    super.customizeContainerConfiguration(containerConfiguration);
-    containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
-  }
-
-  @Override
-  protected void setUp()
+  @Before
+  public void before()
       throws Exception
   {
-    super.setUp();
-
-    pc = lookup(PlexusCipher.class);
+    pc = new DefaultPlexusCipher();
   }
 
   // -------------------------------------------------------------
 
-  // intentionally not a test?
-  public void stestFindDefaultAlgorithm()
+  @Test
+  @Ignore("This is not a test, it dumps Ciphers only")
+  public void testFindDefaultAlgorithm()
       throws Exception
   {
     String[] res = CryptoUtils.getServiceTypes();
-    Assert.assertNotNull("No Cipher providers found in the current environment", res);
+    assertNotNull("No Cipher providers found in the current environment", res);
 
     for (String provider : CryptoUtils.getCryptoImpls("Cipher")) {
       try {
@@ -81,7 +75,7 @@ public class DefaultPlexusCipherTest
       throws Exception
   {
     String res = pc.decrypt(encStr, passPhrase);
-    Assert.assertEquals("Decryption did not produce desired result", str, res);
+    assertEquals("Decryption did not produce desired result", str, res);
   }
 
   @Test
@@ -90,7 +84,7 @@ public class DefaultPlexusCipherTest
   {
     String xRes = pc.encrypt(str, passPhrase);
     String res = pc.decrypt(xRes, passPhrase);
-    Assert.assertEquals("Encryption/Decryption did not produce desired result", str, res);
+    assertEquals("Encryption/Decryption did not produce desired result", str, res);
   }
 
   @Test
@@ -98,7 +92,7 @@ public class DefaultPlexusCipherTest
       throws Exception
   {
     String res = pc.decorate("aaa");
-    Assert.assertEquals("Decoration failed", PlexusCipher.ENCRYPTED_STRING_DECORATION_START + "aaa"
+    assertEquals("Decoration failed", PlexusCipher.ENCRYPTED_STRING_DECORATION_START + "aaa"
         + PlexusCipher.ENCRYPTED_STRING_DECORATION_STOP, res);
   }
 
@@ -109,6 +103,6 @@ public class DefaultPlexusCipherTest
     String res =
         pc.unDecorate(PlexusCipher.ENCRYPTED_STRING_DECORATION_START + "aaa"
             + PlexusCipher.ENCRYPTED_STRING_DECORATION_STOP);
-    Assert.assertEquals("Decoration failed", "aaa", res);
+    assertEquals("Decoration failed", "aaa", res);
   }
 }

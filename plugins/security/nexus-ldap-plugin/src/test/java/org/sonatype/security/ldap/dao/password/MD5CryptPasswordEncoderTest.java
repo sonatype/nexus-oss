@@ -10,31 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.dao.password;
 
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.ldap.dao.password.hash.MD5Crypt;
-
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import junit.framework.Assert;
 import org.junit.Test;
 
 public class MD5CryptPasswordEncoderTest
-    extends PlexusTestCaseSupport
+    extends TestSupport
 {
-  @Override
-  protected void customizeContainerConfiguration(final ContainerConfiguration containerConfiguration) {
-    super.customizeContainerConfiguration(containerConfiguration);
-    containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
-  }
-
   @Test
   public void testEncryptAndVerify()
       throws Exception
   {
-    PasswordEncoder encoder = lookup(PasswordEncoder.class, "crypt");
+    PasswordEncoder encoder = new MD5CryptPasswordEncoder();
 
     String crypted = encoder.encodePassword("test", null);
 

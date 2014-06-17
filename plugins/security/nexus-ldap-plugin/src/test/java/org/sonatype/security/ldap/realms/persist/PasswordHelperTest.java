@@ -10,31 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.realms.persist;
 
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
+import org.sonatype.security.ldap.upgrade.cipher.DefaultPlexusCipher;
 import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
-
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import junit.framework.Assert;
 import org.junit.Test;
 
-public class PasswordHelperTest
-    extends PlexusTestCaseSupport
-{
+import static junit.framework.Assert.*;
 
-  @Override
-  protected void customizeContainerConfiguration(final ContainerConfiguration containerConfiguration) {
-    super.customizeContainerConfiguration(containerConfiguration);
-    containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
-  }
+public class PasswordHelperTest
+    extends TestSupport
+{
 
   public PasswordHelper getPasswordHelper()
       throws Exception
   {
-    return (PasswordHelper) this.lookup(PasswordHelper.class);
+    return new DefaultPasswordHelper(new DefaultPlexusCipher());
   }
 
   @Test
@@ -45,7 +40,7 @@ public class PasswordHelperTest
 
     String password = "PASSWORD";
     String encodedPass = ph.encrypt(password);
-    Assert.assertEquals(password, ph.decrypt(encodedPass));
+    assertEquals(password, ph.decrypt(encodedPass));
   }
 
   @Test
@@ -53,7 +48,7 @@ public class PasswordHelperTest
       throws Exception
   {
     PasswordHelper ph = this.getPasswordHelper();
-    Assert.assertNull(ph.encrypt(null));
+    assertNull(ph.encrypt(null));
   }
 
   @Test
@@ -61,7 +56,7 @@ public class PasswordHelperTest
       throws Exception
   {
     PasswordHelper ph = this.getPasswordHelper();
-    Assert.assertNull(ph.decrypt(null));
+    assertNull(ph.decrypt(null));
   }
 
   @Test
@@ -72,7 +67,7 @@ public class PasswordHelperTest
 
     try {
       ph.decrypt("clear-text-password");
-      Assert.fail("Expected: PlexusCipherException");
+      fail("Expected: PlexusCipherException");
     }
     catch (PlexusCipherException e) {
       // expected
