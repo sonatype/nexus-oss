@@ -1196,6 +1196,7 @@
                         <versionRange>[3.0.0,)</versionRange>
                         <goals>
                           <goal>features-generate-descriptor</goal>
+                          <goal>install-kars</goal>
                         </goals>
                       </pluginExecutionFilter>
                       <action>
