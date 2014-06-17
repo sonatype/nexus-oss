@@ -17,7 +17,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.guice.FilterChainModule;
 import org.sonatype.nexus.web.SecurityFilter;
 import org.sonatype.siesta.server.SiestaServlet;
-import org.sonatype.siesta.server.internal.resteasy.ResteasyModule;
+import org.sonatype.siesta.server.resteasy.ResteasyModule;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
