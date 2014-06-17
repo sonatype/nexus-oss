@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
-@Named("LDAP")
+@Named(LdapConstants.USER_SOURCE)
 public class LdapAuthorizationManager
     extends AbstractReadOnlyAuthorizationManager
 {
