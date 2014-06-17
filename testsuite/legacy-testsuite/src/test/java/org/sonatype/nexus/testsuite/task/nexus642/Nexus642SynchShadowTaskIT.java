@@ -19,7 +19,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.SynchronizeShadowTaskDescriptor;
+import org.sonatype.nexus.tasks.SynchronizeShadowTaskDescriptor;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;

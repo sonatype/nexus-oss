@@ -66,7 +66,7 @@ import org.sonatype.nexus.proxy.storage.local.DefaultLocalStorageContext;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
+import org.sonatype.nexus.tasks.ScheduledTaskDescriptor;
 import org.sonatype.nexus.util.io.NexusStreamResponse;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;

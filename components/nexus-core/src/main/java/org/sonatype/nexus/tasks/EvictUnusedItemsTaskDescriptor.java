@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.tasks.descriptors;
+package org.sonatype.nexus.tasks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,38 +22,41 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
-@Named("EmptyTrash")
+@Named("EvictUnusedItems")
 @Singleton
-public class EmptyTrashTaskDescriptor
+public class EvictUnusedItemsTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
-  public static final String ID = "EmptyTrashTask";
-
-  public static final String OLDER_THAN_FIELD_ID = "EmptyTrashItemsOlderThan";
+  public static final String ID = "EvictUnusedProxiedItemsTask";
 
   public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
-  private final NumberTextFormField olderThanField =
-      new NumberTextFormField(
-          OLDER_THAN_FIELD_ID,
-          "Purge items older than (days)",
-          "Set the number of days, to purge all items that were trashed before the given number of days.",
-          FormField.OPTIONAL);
+  public static final String OLDER_THAN_FIELD_ID = "evictOlderCacheItemsThen";
 
   private final FormField repoField = new RepositoryCombobox(
       REPO_OR_GROUP_FIELD_ID,
       "Repository",
-      "Select the repository to empty the trash.",
+      "Select the proxy repository to evict unused items.",
       FormField.MANDATORY
-  ).includeAnEntryForAllRepositories();
+  ).includeAnEntryForAllRepositories()
+      .includingAnyOfFacets(ProxyRepository.class, GroupRepository.class);
+
+  private final NumberTextFormField olderThanField =
+      new NumberTextFormField(
+          OLDER_THAN_FIELD_ID,
+          "Evict items older than (days)",
+          "Set the number of days, to evict all unused proxied items that were not used the given number of days.",
+          FormField.MANDATORY);
 
   public String getId() {
     return ID;
   }
 
   public String getName() {
-    return "Empty Trash";
+    return "Evict Unused Proxied Items From Repository Caches";
   }
 
   public List<FormField> formFields() {

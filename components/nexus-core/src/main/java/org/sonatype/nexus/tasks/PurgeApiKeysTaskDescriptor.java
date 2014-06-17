@@ -10,21 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.tasks.descriptors;
+package org.sonatype.nexus.tasks;
 
-import java.util.Collections;
-import java.util.List;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.sonatype.nexus.formfields.FormField;
-
-public abstract class AbstractScheduledTaskDescriptor
-    implements ScheduledTaskDescriptor
+@Named("PurgeApiKeys")
+@Singleton
+public class PurgeApiKeysTaskDescriptor
+    extends AbstractScheduledTaskDescriptor
 {
-  public boolean isExposed() {
-    return true;
+  public static final String ID = "PurgeApiKeysTask";
+
+  public String getId() {
+    return ID;
   }
 
-  public List<FormField> formFields() {
-    return Collections.emptyList();
+  public String getName() {
+    return "Purge Orphaned API Keys";
   }
 }

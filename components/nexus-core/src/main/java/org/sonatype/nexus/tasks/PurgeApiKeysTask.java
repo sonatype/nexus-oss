@@ -15,7 +15,6 @@ package org.sonatype.nexus.tasks;
 import javax.inject.Named;
 
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
-import org.sonatype.nexus.tasks.descriptors.PurgeApiKeysTaskDescriptor;
 import org.sonatype.security.events.AuthorizationConfigurationChanged;
 
 @Named(PurgeApiKeysTaskDescriptor.ID)

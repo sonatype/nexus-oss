@@ -23,7 +23,7 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
+import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
 
 @Named("RebuildMavenMetadata")
 @Singleton

@@ -24,7 +24,7 @@ import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
+import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
 
 import com.google.common.collect.Lists;
 

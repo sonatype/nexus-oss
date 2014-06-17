@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.tasks.descriptors;
+package org.sonatype.nexus.tasks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,50 +20,50 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
+import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
-@Named("EvictUnusedItems")
+@Named("ExpireCache")
 @Singleton
-public class EvictUnusedItemsTaskDescriptor
+public class ExpireCacheTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
-  public static final String ID = "EvictUnusedProxiedItemsTask";
+  public static final String ID = "ExpireCacheTask";
 
   public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
-  public static final String OLDER_THAN_FIELD_ID = "evictOlderCacheItemsThen";
+  public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
 
   private final FormField repoField = new RepositoryCombobox(
       REPO_OR_GROUP_FIELD_ID,
       "Repository",
-      "Select the proxy repository to evict unused items.",
+      "Select the proxy repository to expire cache.",
       FormField.MANDATORY
   ).includeAnEntryForAllRepositories()
       .includingAnyOfFacets(ProxyRepository.class, GroupRepository.class);
 
-  private final NumberTextFormField olderThanField =
-      new NumberTextFormField(
-          OLDER_THAN_FIELD_ID,
-          "Evict items older than (days)",
-          "Set the number of days, to evict all unused proxied items that were not used the given number of days.",
-          FormField.MANDATORY);
+  private final StringTextFormField resourceStorePathField =
+      new StringTextFormField(
+          RESOURCE_STORE_PATH_FIELD_ID,
+          "Repository path",
+          "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+          FormField.OPTIONAL);
 
   public String getId() {
     return ID;
   }
 
   public String getName() {
-    return "Evict Unused Proxied Items From Repository Caches";
+    return "Expire Repository Caches";
   }
 
   public List<FormField> formFields() {
     List<FormField> fields = new ArrayList<FormField>();
 
     fields.add(repoField);
-    fields.add(olderThanField);
+    fields.add(resourceStorePathField);
 
     return fields;
   }

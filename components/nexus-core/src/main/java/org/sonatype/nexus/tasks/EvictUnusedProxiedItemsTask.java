@@ -20,7 +20,6 @@ import javax.inject.Named;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
-import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
 
 /**
  * Evicts unused proxied items.

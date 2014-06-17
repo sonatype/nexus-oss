@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.tasks.descriptors;
+package org.sonatype.nexus.tasks;
 
 import java.util.ArrayList;
 import java.util.List;

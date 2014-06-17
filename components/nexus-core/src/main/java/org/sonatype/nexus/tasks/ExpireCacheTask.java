@@ -17,7 +17,6 @@ import javax.inject.Named;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
-import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 
 /**
  * Clear caches task.

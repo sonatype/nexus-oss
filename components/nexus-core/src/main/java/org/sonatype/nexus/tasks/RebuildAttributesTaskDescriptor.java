@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.tasks.descriptors;
+package org.sonatype.nexus.tasks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 
 @Named("RebuildAttributes")
 @Singleton

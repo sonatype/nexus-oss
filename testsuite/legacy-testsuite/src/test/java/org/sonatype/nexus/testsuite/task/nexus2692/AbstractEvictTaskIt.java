@@ -36,7 +36,7 @@ import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.attributes.JacksonJSONMarshaller;
 import org.sonatype.nexus.proxy.attributes.Marshaller;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
+import org.sonatype.nexus.tasks.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import com.google.common.collect.Lists;
