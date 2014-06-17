@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.nexus.log.DefaultLogConfiguration;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogManager;
 

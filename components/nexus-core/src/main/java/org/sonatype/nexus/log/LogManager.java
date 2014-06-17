@@ -19,7 +19,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.NexusStreamResponse;
+import org.sonatype.nexus.util.io.NexusStreamResponse;
 
 /**
  * LogManager.

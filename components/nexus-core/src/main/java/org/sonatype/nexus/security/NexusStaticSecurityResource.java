@@ -10,37 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.jsecurity.realms;
+package org.sonatype.nexus.security;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
+import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
+import org.sonatype.security.realms.tools.StaticSecurityResource;
 
+@Named
 @Singleton
-@Named("TargetPrivilegeGroupPropertyDescriptor")
-public class TargetPrivilegeGroupPropertyDescriptor
-    implements PrivilegePropertyDescriptor
+public class NexusStaticSecurityResource
+    extends AbstractStaticSecurityResource
+    implements StaticSecurityResource
 {
-  public static final String ID = "repositoryGroupId";
-
   @Override
-  public String getHelpText() {
-    return "The repository group associated with this privilege.";
-  }
-
-  @Override
-  public String getId() {
-    return ID;
-  }
-
-  @Override
-  public String getName() {
-    return "Repository Group";
-  }
-
-  @Override
-  public String getType() {
-    return "repogroup";
+  public String getResourcePath() {
+    return "/META-INF/nexus/static-security.xml";
   }
 }

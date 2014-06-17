@@ -21,12 +21,12 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.TargetRegistryEventRemove;
+import org.sonatype.nexus.security.targets.TargetPrivilegeDescriptor;
+import org.sonatype.nexus.security.targets.TargetPrivilegeGroupPropertyDescriptor;
+import org.sonatype.nexus.security.targets.TargetPrivilegeRepositoryPropertyDescriptor;
+import org.sonatype.nexus.security.targets.TargetPrivilegeRepositoryTargetPropertyDescriptor;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;

@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
+import org.sonatype.nexus.util.io.NexusStreamResponse;
 
 /**
  * A component responsible for configuration management.

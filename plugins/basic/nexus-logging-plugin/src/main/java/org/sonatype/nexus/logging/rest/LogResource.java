@@ -23,9 +23,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.logging.LoggingPlugin;
+import org.sonatype.nexus.util.io.NexusStreamResponse;
 import org.sonatype.siesta.Resource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 

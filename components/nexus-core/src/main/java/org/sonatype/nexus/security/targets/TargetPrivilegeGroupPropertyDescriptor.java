@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.jsecurity.realms;
+package org.sonatype.nexus.security.targets;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -18,15 +18,15 @@ import javax.inject.Singleton;
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 
 @Singleton
-@Named("TargetPrivilegeRepositoryPropertyDescriptor")
-public class TargetPrivilegeRepositoryPropertyDescriptor
+@Named("TargetPrivilegeGroupPropertyDescriptor")
+public class TargetPrivilegeGroupPropertyDescriptor
     implements PrivilegePropertyDescriptor
 {
-  public static final String ID = "repositoryId";
+  public static final String ID = "repositoryGroupId";
 
   @Override
   public String getHelpText() {
-    return "The repository associated with this privilege.";
+    return "The repository group associated with this privilege.";
   }
 
   @Override
@@ -36,11 +36,11 @@ public class TargetPrivilegeRepositoryPropertyDescriptor
 
   @Override
   public String getName() {
-    return "Repository";
+    return "Repository Group";
   }
 
   @Override
   public String getType() {
-    return "repository";
+    return "repogroup";
   }
 }
