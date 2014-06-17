@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
-import com.sonatype.security.ldap.api.XStreamInitalizer;
+import com.sonatype.security.ldap.api.dto.XStreamInitalizer;
 import com.sonatype.security.ldap.api.dto.LdapConnectionInfoDTO;
 import com.sonatype.security.ldap.api.dto.LdapServerConfigurationDTO;
 import com.sonatype.security.ldap.api.dto.LdapServerRequest;
