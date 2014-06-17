@@ -15,7 +15,6 @@ package org.sonatype.nexus.maven.tasks;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.maven.tasks.descriptors.ReleaseRemovalTaskDescriptor;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
 import static com.google.common.base.Preconditions.checkNotNull;

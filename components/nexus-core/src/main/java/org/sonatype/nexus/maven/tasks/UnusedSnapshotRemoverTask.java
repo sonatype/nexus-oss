@@ -15,12 +15,11 @@ package org.sonatype.nexus.maven.tasks;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.maven.tasks.descriptors.UnusedSnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.maven.tasks.descriptors.UnusedSnapshotRemovalTaskDescriptor.DAYS_SINCE_LAST_REQUESTED_FIELD_ID;
-import static org.sonatype.nexus.maven.tasks.descriptors.UnusedSnapshotRemovalTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+import static org.sonatype.nexus.maven.tasks.UnusedSnapshotRemovalTaskDescriptor.DAYS_SINCE_LAST_REQUESTED_FIELD_ID;
+import static org.sonatype.nexus.maven.tasks.UnusedSnapshotRemovalTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
 
 /**
  * Unused Snapshot Remover Task.

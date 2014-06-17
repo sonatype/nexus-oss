@@ -15,7 +15,6 @@ package org.sonatype.nexus.maven.tasks;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
 import org.codehaus.plexus.util.StringUtils;
