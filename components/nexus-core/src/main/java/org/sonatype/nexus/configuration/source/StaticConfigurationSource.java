@@ -20,8 +20,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.ApplicationInterpolatorProvider;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
 
 /**
  * A special "static" configuration source, that always return a factory provided defaults for Nexus configuration. It

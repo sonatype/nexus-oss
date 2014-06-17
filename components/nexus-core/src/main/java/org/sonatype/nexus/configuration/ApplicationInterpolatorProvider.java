@@ -10,27 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.util;
+package org.sonatype.nexus.configuration;
 
-import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.interpolation.Interpolator;
 
-public class ExternalConfigUtil
+/**
+ * A simple component to centralize Plexus context access for interpolation needs.
+ *
+ * @author cstamas
+ */
+public interface ApplicationInterpolatorProvider
 {
-  public static void setNodeValue(Xpp3Dom parent, String name, String value) {
-    // if we do not have a current value, then just return without setting the node;
-    if (value == null) {
-      return;
-    }
-
-    Xpp3Dom node = parent.getChild(name);
-
-    if (node == null) {
-      node = new Xpp3Dom(name);
-
-      parent.addChild(node);
-    }
-
-    node.setValue(value);
-  }
-
+  /**
+   * Returns the interpolator.
+   */
+  Interpolator getInterpolator();
 }
