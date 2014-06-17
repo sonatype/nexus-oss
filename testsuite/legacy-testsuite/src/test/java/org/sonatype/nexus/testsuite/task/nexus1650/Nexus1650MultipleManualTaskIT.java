@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
+import org.sonatype.nexus.maven.tasks.SnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
