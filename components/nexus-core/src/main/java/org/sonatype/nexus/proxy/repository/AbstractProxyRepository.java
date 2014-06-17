@@ -1554,7 +1554,7 @@ public abstract class AbstractProxyRepository
 
     // If entire proxy cache has been invalidated, lazily expire item
     String itemInvalidationToken = item.getRepositoryItemAttributes().get(PROXY_CACHE_INVALIDATION_TOKEN_KEY);
-    if (!StringUtils.equals(proxyCacheInvalidationToken, itemInvalidationToken)) {
+    if (proxyCacheInvalidationToken != null && !proxyCacheInvalidationToken.equals(itemInvalidationToken)) {
       log.debug("Item treated as expired due to proxy-cache invalidation token mismatch: {} != {}; item: {}",
           proxyCacheInvalidationToken, itemInvalidationToken, item);
       // if item does not carry the current proxy cache invalidation token, then treat it as expired
