@@ -10,22 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package com.sonatype.security.ldap.api;
+
+package com.sonatype.security.ldap.api.dto;
 
 
-import com.sonatype.security.ldap.api.dto.LdapAuthenticationTestRequest;
-import com.sonatype.security.ldap.api.dto.LdapConnectionInfoDTO;
-import com.sonatype.security.ldap.api.dto.LdapSchemaTemplateDTO;
-import com.sonatype.security.ldap.api.dto.LdapSchemaTemplateListResponse;
-import com.sonatype.security.ldap.api.dto.LdapServerListResponse;
-import com.sonatype.security.ldap.api.dto.LdapServerLoginTestRequest;
-import com.sonatype.security.ldap.api.dto.LdapServerOrderRequest;
-import com.sonatype.security.ldap.api.dto.LdapServerRequest;
-import com.sonatype.security.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
-import com.sonatype.security.ldap.api.dto.LdapUserListResponse;
-
+import org.sonatype.nexus.rest.model.AliasingListConverter;
 import org.sonatype.nexus.rest.model.HtmlUnescapeStringConverter;
-import org.sonatype.plexus.rest.xstream.AliasingListConverter;
 
 import com.thoughtworks.xstream.XStream;
 

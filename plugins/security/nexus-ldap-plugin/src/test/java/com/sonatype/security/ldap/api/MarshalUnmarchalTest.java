@@ -20,6 +20,7 @@ import com.sonatype.security.ldap.api.dto.LdapServerConfigurationDTO;
 import com.sonatype.security.ldap.api.dto.LdapServerOrderRequest;
 import com.sonatype.security.ldap.api.dto.LdapServerRequest;
 import com.sonatype.security.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
+import com.sonatype.security.ldap.api.dto.XStreamInitalizer;
 
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
