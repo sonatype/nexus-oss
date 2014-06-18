@@ -53,8 +53,34 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <!--
+            Add directjngine to local classpath
+            -->
+            <Embed-Directory>lib</Embed-Directory>
+            <Embed-Dependency>
+              directjngine,gson
+            </Embed-Dependency>
+            <Private-Package/>
+            <_exportcontents>
+              !lib,*;-split-package:=first
+            </_exportcontents>
+            <Import-Package>
+              !com.yahoo.*|org.mozilla.*,*
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
+        <configuration>
+          <addBundlesToPrimaryFeature>false</addBundlesToPrimaryFeature>
+        </configuration>
       </plugin>
     </plugins>
   </build>

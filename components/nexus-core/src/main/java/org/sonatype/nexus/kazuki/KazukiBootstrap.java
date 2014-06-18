@@ -19,7 +19,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import io.kazuki.v0.PackageVersion;
 import org.eclipse.sisu.EagerSingleton;
-import org.h2.engine.Constants;
 
 /**
  * Helper to log Kazuki version on boot.
@@ -34,6 +33,5 @@ public class KazukiBootstrap
   @Inject
   public KazukiBootstrap() throws Exception {
     log.info("Kazuki version: {}", PackageVersion.VERSION);
-    log.info("H2 version: {}", Constants.getVersion());
   }
 }
