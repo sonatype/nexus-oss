@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.client.core.condition;
 
 import org.sonatype.nexus.client.core.Condition;
@@ -93,5 +94,37 @@ public abstract class NexusStatusConditions
 
   public static Condition any27AndLaterPro() {
     return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.any27AndLaterVersion());
+  }
+
+  public static Condition any28AndLater() {
+    return LogicalConditions.and(EditionConditions.anyEdition(), VersionConditions.any28AndLaterVersion());
+  }
+
+  public static Condition any28AndLaterPro() {
+    return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.any28AndLaterVersion());
+  }
+
+  public static Condition any29AndLater() {
+    return LogicalConditions.and(EditionConditions.anyEdition(), VersionConditions.any29AndLaterVersion());
+  }
+
+  public static Condition any29AndLaterPro() {
+    return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.any29AndLaterVersion());
+  }
+
+  public static Condition any210AndLater() {
+    return LogicalConditions.and(EditionConditions.anyEdition(), VersionConditions.any210AndLaterVersion());
+  }
+
+  public static Condition any210AndLaterPro() {
+    return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.any210AndLaterVersion());
+  }
+
+  public static Condition any30AndLater() {
+    return LogicalConditions.and(EditionConditions.anyEdition(), VersionConditions.any30AndLaterVersion());
+  }
+
+  public static Condition any30AndLaterPro() {
+    return LogicalConditions.and(EditionConditions.anyProEdition(), VersionConditions.any30AndLaterVersion());
   }
 }
