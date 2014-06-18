@@ -29,7 +29,7 @@ import org.sonatype.sisu.goodies.ssl.keystore.KeyStoreManagerConfiguration;
 @Named(SSLPlugin.ID_PREFIX)
 @Singleton
 public class KeyStoreManagerImpl
-    extends org.sonatype.sisu.goodies.ssl.keystore.internal.KeyStoreManagerImpl
+    extends org.sonatype.sisu.goodies.ssl.keystore.KeyStoreManagerImpl
 {
   @Inject
   public KeyStoreManagerImpl(final CryptoHelper crypto,

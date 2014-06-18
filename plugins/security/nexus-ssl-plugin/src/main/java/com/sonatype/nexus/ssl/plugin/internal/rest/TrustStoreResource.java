@@ -44,7 +44,7 @@ import org.sonatype.siesta.Resource;
 import org.sonatype.siesta.ValidationErrorsException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.ssl.keystore.CertificateUtil;
-import org.sonatype.sisu.goodies.ssl.keystore.internal.geronimo.KeyNotFoundException;
+import org.sonatype.sisu.goodies.ssl.keystore.KeyNotFoundException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
