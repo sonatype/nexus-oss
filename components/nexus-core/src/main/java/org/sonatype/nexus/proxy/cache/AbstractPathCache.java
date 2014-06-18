@@ -18,22 +18,32 @@ package org.sonatype.nexus.proxy.cache;
 public abstract class AbstractPathCache
     implements PathCache
 {
+  @Override
   public final boolean contains(final String path) {
     return doContains(makeKeyFromPath(path));
   }
 
+  @Override
   public final boolean isExpired(final String path) {
     return doIsExpired(makeKeyFromPath(path));
   }
 
+  @Override
+  public final long getExpirationTime(final String path) {
+    return doGetExpirationTime(makeKeyFromPath(path));
+  }
+
+  @Override
   public final void put(final String path, final Object element) {
     doPut(makeKeyFromPath(path), element, -1);
   }
 
+  @Override
   public final void put(final String path, final Object element, final int expiration) {
     doPut(makeKeyFromPath(path), element, expiration);
   }
 
+  @Override
   public final boolean remove(final String path) {
     if (contains(path)) {
       return doRemove(makeKeyFromPath(path));
@@ -43,6 +53,7 @@ public abstract class AbstractPathCache
     }
   }
 
+  @Override
   public final boolean removeWithParents(String path) {
     boolean result = remove(path);
     int lastSlash = path.lastIndexOf("/");
@@ -55,8 +66,10 @@ public abstract class AbstractPathCache
     return result;
   }
 
+  @Override
   public abstract boolean removeWithChildren(final String path);
 
+  @Override
   public final boolean purge() {
     return doPurge();
   }
@@ -78,6 +91,8 @@ public abstract class AbstractPathCache
   protected abstract boolean doContains(String key);
 
   protected abstract boolean doIsExpired(String key);
+
+  protected abstract long doGetExpirationTime(String key);
 
   protected abstract void doPut(String key, Object element, int expiration);
 

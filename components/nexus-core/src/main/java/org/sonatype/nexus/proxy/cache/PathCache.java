@@ -25,6 +25,8 @@ public interface PathCache
 
   boolean isExpired(String path);
 
+  long getExpirationTime(String path);
+
   boolean remove(String path);
 
   boolean removeWithParents(String path);

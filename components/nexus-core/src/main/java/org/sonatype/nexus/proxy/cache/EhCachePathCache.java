@@ -56,10 +56,12 @@ public class EhCachePathCache
     return _ec;
   }
 
+  @Override
   public boolean doContains(final String key) {
     return getEHCache().get(key) != null;
   }
 
+  @Override
   public boolean doIsExpired(final String key) {
     if (getEHCache().isKeyInCache(key)) {
       Element el = getEHCache().get(key);
@@ -75,6 +77,18 @@ public class EhCachePathCache
     }
   }
 
+  @Override
+  public long doGetExpirationTime(final String key) {
+    final Element el = getEHCache().get(key);
+    if (el != null) {
+      return el.getExpirationTime();
+    }
+    else {
+      return -1;
+    }
+  }
+
+  @Override
   public void doPut(final String key, final Object element, final int expiration) {
     Element el = new Element(key, element);
     if (expiration > -1) {
@@ -83,10 +97,12 @@ public class EhCachePathCache
     getEHCache().put(el);
   }
 
+  @Override
   public boolean doRemove(String key) {
     return getEHCache().remove(key);
   }
 
+  @Override
   public boolean removeWithChildren(String path) {
     @SuppressWarnings("unchecked")
     List<String> keys = getEHCache().getKeys();
@@ -102,6 +118,7 @@ public class EhCachePathCache
     return removed;
   }
 
+  @Override
   public boolean doPurge() {
     // getEHCache().removeAll();
     // getEHCache().flush();
@@ -111,6 +128,7 @@ public class EhCachePathCache
     return removeWithChildren(RepositoryItemUid.PATH_ROOT);
   }
 
+  @Override
   public CacheStatistics getStatistics() {
     Statistics stats = getEHCache().getStatistics();
 
@@ -118,6 +136,7 @@ public class EhCachePathCache
   }
 
   @SuppressWarnings("unchecked")
+  @Override
   public Collection<String> listKeysInCache() {
     getEHCache().evictExpiredElements();
 

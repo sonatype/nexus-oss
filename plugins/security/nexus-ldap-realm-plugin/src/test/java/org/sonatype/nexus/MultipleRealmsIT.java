@@ -15,8 +15,8 @@ package org.sonatype.nexus;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.sonatype.nexus.security.ldap.realms.NexusLdapAuthenticationRealm;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.ldap.LdapConstants;
 import org.sonatype.security.realms.XmlAuthenticatingRealm;
 
 import org.apache.commons.io.IOUtils;
@@ -52,7 +52,7 @@ public class MultipleRealmsIT
 
     // LDAP user
     SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    principals.add("cstamas", NexusLdapAuthenticationRealm.NAME);
+    principals.add("cstamas", LdapConstants.REALM_NAME);
 
     Assert.assertTrue(security.hasRole(principals, "nx-developer"));
     Assert.assertFalse(security.hasRole(principals, "JUNK"));
@@ -78,7 +78,7 @@ public class MultipleRealmsIT
 
     // LDAP
     SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    principals.add("cstamas", NexusLdapAuthenticationRealm.NAME);
+    principals.add("cstamas", LdapConstants.REALM_NAME);
 
     Assert.assertTrue(security.isPermitted(principals, "security:usersforgotpw:create"));
     Assert.assertFalse(security.isPermitted(principals, "security:usersforgotpw:delete"));

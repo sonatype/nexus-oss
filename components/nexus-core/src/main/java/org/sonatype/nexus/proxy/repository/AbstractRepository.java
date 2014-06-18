@@ -79,6 +79,7 @@ import org.sonatype.nexus.proxy.walker.WalkerFilter;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.StringUtils;
+import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
@@ -1102,14 +1103,15 @@ public abstract class AbstractRepository
           removeFromNotFoundCache(request);
         }
         else {
-          if (log.isDebugEnabled()) {
-            log.debug(
-                "The path " + request.getRequestPath()
-                    + " is in NFC and still active, throwing ItemNotFoundException.");
+          StringBuilder sb = new StringBuilder("The path ").append(request.getRequestPath()).append(" is cached ");
+          long expirationTime = getNotFoundCache().getExpirationTime(request.getRequestPath());
+          if (expirationTime > 0) {
+            sb.append("until ").append(new DateTime(expirationTime)).append(" ");
           }
+          final String message = sb.append("as not found in repository ").append(this).toString();
 
-          throw new ItemNotFoundException(reasonFor(request, this,
-              "The path %s is still cached as not found for repository %s", request.getRequestPath(), this));
+          log.debug(message);
+          throw new ItemNotFoundException(reasonFor(request, this, message));
         }
       }
     }

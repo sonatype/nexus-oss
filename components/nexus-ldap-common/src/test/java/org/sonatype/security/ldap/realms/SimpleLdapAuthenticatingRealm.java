@@ -16,25 +16,19 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.security.ldap.LdapConstants;
+
 import org.eclipse.sisu.Description;
 
 @Singleton
-@Named(SimpleLdapAuthenticatingRealm.ROLE)
+@Named(LdapConstants.REALM_NAME)
 @Description("Test Authentication LDAP Realm")
 public class SimpleLdapAuthenticatingRealm
-    extends AbstractLdapAuthenticatingRealm
+    extends AbstractLdapAuthenticationRealm
 {
-
-  public static final String ROLE = "LdapAuthenticatingRealm";
-
   @Inject
   public SimpleLdapAuthenticatingRealm(final LdapManager ldapManager) {
     super(ldapManager);
+    setName(LdapConstants.REALM_NAME);
   }
-
-  @Override
-  public String getName() {
-    return ROLE;
-  }
-
 }

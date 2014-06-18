@@ -21,6 +21,7 @@ import java.util.Set;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.guice.SecurityModule;
+import org.sonatype.security.ldap.LdapConstants;
 import org.sonatype.security.ldap.LdapTestSupport;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -60,7 +61,7 @@ public class LdapUserManagerIT
   private UserManager getUserManager()
       throws Exception
   {
-    return this.lookup(UserManager.class, "LDAP");
+    return this.lookup(UserManager.class, LdapConstants.USER_SOURCE);
   }
 
   @Test
@@ -202,7 +203,7 @@ public class LdapUserManagerIT
 
     List<String> realms = new ArrayList<String>();
     realms.add("XmlAuthenticatingRealm");
-    realms.add("LdapAuthenticatingRealm");
+    realms.add(LdapConstants.REALM_NAME);
 
     securitySystem.setRealms(realms);
 
@@ -211,7 +212,7 @@ public class LdapUserManagerIT
     Assert.assertEquals("default", user.getSource());
 
     realms.clear();
-    realms.add("LdapAuthenticatingRealm");
+    realms.add(LdapConstants.REALM_NAME);
     realms.add("XmlAuthenticatingRealm");
     securitySystem.setRealms(realms);
 
