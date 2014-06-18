@@ -16,7 +16,6 @@ package org.sonatype.nexus.coreui
 import com.google.inject.Key
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.apache.shiro.authz.annotation.RequiresUser
@@ -25,6 +24,7 @@ import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
+import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.security.UserAccountManager
 import org.sonatype.nexus.util.Tokens
 import org.sonatype.nexus.validation.Create

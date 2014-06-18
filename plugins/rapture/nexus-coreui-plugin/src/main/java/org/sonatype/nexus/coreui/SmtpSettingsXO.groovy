@@ -14,7 +14,7 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
-import org.apache.bval.constraints.Email
+import org.hibernate.validator.constraints.Email
 import org.sonatype.nexus.extdirect.model.Password
 
 import javax.validation.constraints.NotNull

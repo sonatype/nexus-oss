@@ -15,7 +15,6 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.configuration.validation.InvalidConfigurationException
@@ -24,6 +23,7 @@ import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.formfields.Selectable
+import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.scheduling.NexusScheduler
 import org.sonatype.nexus.scheduling.NexusTask
 import org.sonatype.nexus.scheduling.TaskUtils
