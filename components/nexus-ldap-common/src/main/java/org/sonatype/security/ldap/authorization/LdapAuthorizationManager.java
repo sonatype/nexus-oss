@@ -24,6 +24,7 @@ import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
+import org.sonatype.security.ldap.LdapConstants;
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.NoSuchLdapGroupException;
 import org.sonatype.security.ldap.realms.LdapManager;
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
-@Named("LDAP")
+@Named(LdapConstants.USER_SOURCE)
 public class LdapAuthorizationManager
     extends AbstractReadOnlyAuthorizationManager
 {
@@ -50,7 +51,7 @@ public class LdapAuthorizationManager
 
   @Override
   public String getSource() {
-    return "LDAP";
+    return LdapConstants.USER_SOURCE;
   }
 
   public Set<String> listRoleIds() {

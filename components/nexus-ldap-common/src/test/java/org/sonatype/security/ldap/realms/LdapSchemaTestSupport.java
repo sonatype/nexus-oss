@@ -15,6 +15,7 @@ package org.sonatype.security.ldap.realms;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.sonatype.security.ldap.LdapConstants;
 import org.sonatype.security.ldap.LdapTestSupport;
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.LdapUser;
@@ -56,7 +57,7 @@ public abstract class LdapSchemaTestSupport
   {
     super.setUp();
     assertNotNull(lookup(LdapConfiguration.class));
-    this.realm = this.lookup(Realm.class, "LdapAuthenticatingRealm");
+    this.realm = this.lookup(Realm.class, LdapConstants.REALM_NAME);
     this.ldapManager = this.lookup(LdapManager.class);
   }
 

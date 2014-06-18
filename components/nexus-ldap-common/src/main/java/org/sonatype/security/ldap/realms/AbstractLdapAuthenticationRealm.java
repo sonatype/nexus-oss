@@ -17,6 +17,7 @@ import java.util.Set;
 
 import javax.naming.NamingException;
 
+import org.sonatype.security.ldap.LdapConstants;
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.NoLdapUserRolesFoundException;
 import org.sonatype.sisu.goodies.common.Loggers;
@@ -38,17 +39,15 @@ import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class AbstractLdapAuthenticatingRealm
+public abstract class AbstractLdapAuthenticationRealm
     extends AbstractLdapRealm
 {
-  public static final String NAME = "LdapAuthenticatingRealm";
-
   private final Logger logger = Loggers.getLogger(getClass());
 
   private final LdapManager ldapManager;
 
-  public AbstractLdapAuthenticatingRealm(final LdapManager ldapManager) {
-    setName(NAME);
+  public AbstractLdapAuthenticationRealm(final LdapManager ldapManager) {
+    setName(LdapConstants.REALM_NAME);
     this.ldapManager = checkNotNull(ldapManager);
   }
 
@@ -83,8 +82,8 @@ public abstract class AbstractLdapAuthenticatingRealm
                                                         LdapContextFactory ldapContextFactory)
       throws NamingException
   {
-    // only authorize users from this realm
-    if (principals.getRealmNames().contains(this.getName())) {
+    // only authorize users from this realm or this realm's user manager
+    if (principals.getRealmNames().contains(getName())) {
 
       Set<String> roles = new HashSet<String>();
       String username = principals.getPrimaryPrincipal().toString();
