@@ -22,7 +22,7 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.siesta.ValidationErrorXO;
-import org.sonatype.siesta.server.internal.validation.ValidationExceptionMapperSupport;
+import org.sonatype.siesta.server.validation.ValidationExceptionMapperSupport;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
