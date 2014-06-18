@@ -17,8 +17,7 @@ import org.codehaus.plexus.util.StringUtils;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * GAV coordinate fully describes the coordinates, it's "full detail". Is used as key in plugin descriptor, but also as
- * coordinates for plugin dependencies.
+ * Maven GAV coordinates.
  */
 @Deprecated
 public final class GAVCoordinate
