@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.log.internal;
+package org.sonatype.nexus.internal.log;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.inject.Named;
@@ -21,36 +20,20 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.log.LogConfigurationParticipant;
 
 /**
- * Contributes "logback-nexus" to logback configuration.
- *
- * @author adreghiciu@gmail.com
+ * Contributes {@code logback-nexus.xml} configuration.
  */
-
 @Singleton
 @Named
 public class LogbackNexusLogConfigurationParticipant
     implements LogConfigurationParticipant
 {
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return "logback-nexus.xml";
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public InputStream getConfiguration() {
-    try {
-      return this.getClass().getResource("/META-INF/log/logback-nexus.xml").openStream();
-    }
-    catch (IOException e) {
-      throw new IllegalStateException("Could not access logback-nexus.xml", e);
-    }
+    return getClass().getResourceAsStream(getName());
   }
-
 }

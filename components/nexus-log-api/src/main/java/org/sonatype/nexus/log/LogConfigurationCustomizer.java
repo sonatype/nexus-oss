@@ -19,7 +19,6 @@ package org.sonatype.nexus.log;
  */
 public interface LogConfigurationCustomizer
 {
-
   /**
    * Callback allowing setting of loggers levels.
    */
@@ -36,5 +35,4 @@ public interface LogConfigurationCustomizer
      */
     void setLoggerLevel(String name, LoggerLevel level);
   }
-
 }

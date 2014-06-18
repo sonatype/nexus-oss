@@ -10,17 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.log.internal;
+package org.sonatype.nexus.internal.log;
 
 import org.sonatype.nexus.log.LogConfiguration;
 
 /**
- * @author adreghiciu@gmail.com
+ * Default {@link LogConfiguration}.
  */
 public class DefaultLogConfiguration
     implements LogConfiguration
 {
-
   private String rootLoggerLevel;
 
   private String rootLoggerAppenders;
@@ -73,5 +72,4 @@ public class DefaultLogConfiguration
   public void setFileAppenderLocation(String fileAppenderLocation) {
     this.fileAppenderLocation = fileAppenderLocation;
   }
-
 }

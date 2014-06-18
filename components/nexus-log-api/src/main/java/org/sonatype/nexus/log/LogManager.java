@@ -36,11 +36,9 @@ public interface LogManager
   @Nullable
   InputStream getApplicationLogAsStream(String logFile, long fromByte, long bytesCount) throws IOException;
 
-  LogConfiguration getConfiguration()
-      throws IOException;
+  LogConfiguration getConfiguration() throws IOException;
 
-  void setConfiguration(LogConfiguration configuration)
-      throws IOException;
+  void setConfiguration(LogConfiguration configuration) throws IOException;
 
   void configure();
 

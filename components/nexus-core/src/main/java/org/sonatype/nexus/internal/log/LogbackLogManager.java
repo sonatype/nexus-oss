@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.log.internal;
+package org.sonatype.nexus.internal.log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -75,9 +75,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 //TODO configuration operations should be locking
 
 /**
- * @author cstamas
- * @author juven
- * @author adreghiciu@gmail.com
+ * Logback {@link LogManager}.
  */
 @Singleton
 @Named
@@ -97,8 +95,6 @@ public class LogbackLogManager
   private static final String LOG_CONF = "logback.xml";
 
   private static final String LOG_CONF_PROPS = "logback.properties";
-
-  private static final String LOG_CONF_PROPS_RESOURCE = "/META-INF/log/" + LOG_CONF_PROPS;
 
   private final Logger logger = LoggerFactory.getLogger(LogbackLogManager.class);
 
@@ -300,12 +296,8 @@ public class LogbackLogManager
       throws IOException
   {
     Properties properties = new Properties();
-    final InputStream stream = this.getClass().getResourceAsStream(LOG_CONF_PROPS_RESOURCE);
-    try {
+    try (InputStream stream = this.getClass().getResourceAsStream(LOG_CONF_PROPS)) {
       properties.load(stream);
-    }
-    finally {
-      stream.close();
     }
     return properties;
   }
@@ -392,7 +384,7 @@ public class LogbackLogManager
     File logConfigPropsFile = new File(logConfigDir, LOG_CONF_PROPS);
     if (!logConfigPropsFile.exists()) {
       try {
-        URL configUrl = this.getClass().getResource(LOG_CONF_PROPS_RESOURCE);
+        URL configUrl = getClass().getResource(LOG_CONF_PROPS);
         try (final InputStream is = configUrl.openStream()) {
           FileSupport.copy(is, logConfigPropsFile.toPath());
         }
