@@ -32,9 +32,9 @@ import org.sonatype.eclipse.bridge.EclipseLocation;
 import org.sonatype.eclipse.bridge.EclipseLocationFactory;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.util.GAVCoordinate;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.file.DirSupport;
-import org.sonatype.plugin.metadata.GAVCoordinate;
 
 import com.google.common.base.Strings;
 import org.codehaus.plexus.archiver.UnArchiver;
