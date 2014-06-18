@@ -573,7 +573,8 @@ public class M2RepositoryTest
       // good, we expected this
     }
 
-    m2Repo.getRepositoryMetadataManager().expireMetadataCaches(new ResourceStoreRequest("/"));
+    // expire sub-tree to use walking method to update all item attributes to expired=true
+    m2Repo.getRepositoryMetadataManager().expireMetadataCaches(new ResourceStoreRequest("/org/"));
 
     // the GA metadata should be removed from NFC, so we have no known entry in NFC
     assertThat(m2Repo.getNotFoundCache().listKeysInCache().size(), equalTo(0));
