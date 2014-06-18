@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap;
 
 import java.io.File;
@@ -21,12 +22,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.List;
 
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.security.guice.SecurityModule;
 
-import com.google.common.collect.ObjectArrays;
 import com.google.inject.Module;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.io.IOUtils;
@@ -42,13 +43,9 @@ public abstract class LdapTestSupport
   private File ldapRealmConfig;
 
   @Override
-  protected Module[] getTestCustomModules() {
-    Module[] modules = super.getTestCustomModules();
-    if (modules == null) {
-      modules = new Module[0];
-    }
-    modules = ObjectArrays.concat(modules, new SecurityModule());
-    return modules;
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new SecurityModule());
   }
 
   protected LdapServer getLdapServer() {

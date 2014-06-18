@@ -16,27 +16,22 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.sonatype.nexus.ldap.LdapPlugin;
+
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.eclipse.sisu.Description;
 
 @Singleton
-@Named(SimpleLdapAuthenticatingRealm.ROLE)
+@Named(LdapPlugin.REALM_NAME)
 @Description("Test Authentication LDAP Realm")
 public class SimpleLdapAuthenticatingRealm
     extends AbstractLdapAuthenticatingRealm
 {
 
-  public static final String ROLE = "LdapAuthenticatingRealm";
-
   @Inject
   public SimpleLdapAuthenticatingRealm(final EventBus eventBus, final LdapManager ldapManager) {
     super(eventBus, ldapManager);
+    setName(LdapPlugin.REALM_NAME);
   }
-
-  @Override
-  public String getName() {
-    return ROLE;
-  }
-
 }

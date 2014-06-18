@@ -18,20 +18,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.sonatype.nexus.ldap.LdapPlugin;
+
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.security.ldap.LdapTestSupport;
-import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 import com.google.inject.Module;
-import junit.framework.Assert;
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Test;
+
+import static junit.framework.Assert.*;
 
 public class LdapUserManagerIT
     extends LdapTestSupport
@@ -46,7 +49,6 @@ public class LdapUserManagerIT
       throws Exception
   {
     super.setUp();
-
     copyResourceToFile("/test-conf/conf/security-users-in-both-realms.xml", getNexusSecurityConfiguration());
     copyResourceToFile("/test-conf/conf/security-configuration.xml", getSecurityConfiguration());
   }
@@ -60,7 +62,7 @@ public class LdapUserManagerIT
   private UserManager getUserManager()
       throws Exception
   {
-    return this.lookup(UserManager.class, "LDAP");
+    return this.lookup(UserManager.class, LdapPlugin.USER_SOURCE);
   }
 
   @Test
@@ -77,10 +79,10 @@ public class LdapUserManagerIT
     Assert.assertEquals("Tamas Cservenak", user.getName());
 
     Set<String> roleIds = this.getUserRoleIds(user);
-    Assert.assertTrue(roleIds.contains("repoconsumer")); // from LDAP
-    Assert.assertTrue(roleIds.contains("developer")); // FROM LDAP and XML
-    Assert.assertTrue(roleIds.contains("anonymous")); // FROM XML
-    Assert.assertTrue(roleIds.contains("nx-developer"));
+    assertTrue(roleIds.contains("repoconsumer")); // from LDAP
+    assertTrue(roleIds.contains("developer")); // FROM LDAP and XML
+    assertTrue(roleIds.contains("anonymous")); // FROM XML
+    assertTrue(roleIds.contains("nx-developer"));
     Assert.assertEquals("Expected 4 roles; found " + roleIds.size() + ": " + roleIds, 4, roleIds.size());
   }
 
@@ -88,11 +90,9 @@ public class LdapUserManagerIT
   public void testGetUserFromLocator()
       throws Exception
   {
-    Assert.assertNotNull(this.lookup(LdapConfiguration.class));
-
     UserManager userLocator = this.getUserManager();
     User user = userLocator.getUser("cstamas");
-    Assert.assertNotNull(user);
+    assertNotNull(user);
     Assert.assertEquals("cstamas", user.getUserId());
     Assert.assertEquals("cstamas@sonatype.com", user.getEmailAddress());
     Assert.assertEquals("Tamas Cservenak", user.getName());
@@ -104,10 +104,10 @@ public class LdapUserManagerIT
   {
     UserManager userLocator = this.getUserManager();
     Set<String> userIds = userLocator.listUserIds();
-    Assert.assertTrue(userIds.contains("cstamas"));
-    Assert.assertTrue(userIds.contains("brianf"));
-    Assert.assertTrue(userIds.contains("jvanzyl"));
-    Assert.assertTrue(userIds.contains("jdcasey"));
+    assertTrue(userIds.contains("cstamas"));
+    assertTrue(userIds.contains("brianf"));
+    assertTrue(userIds.contains("jvanzyl"));
+    assertTrue(userIds.contains("jdcasey"));
     Assert.assertEquals("Ids: " + userIds, 4, userIds.size());
   }
 
@@ -118,8 +118,8 @@ public class LdapUserManagerIT
     UserManager userLocator = this.getUserManager();
     Set<User> users = userLocator.searchUsers(new UserSearchCriteria("j"));
 
-    Assert.assertNotNull(this.getById(users, "jvanzyl"));
-    Assert.assertNotNull(this.getById(users, "jdcasey"));
+    assertNotNull(this.getById(users, "jvanzyl"));
+    assertNotNull(this.getById(users, "jdcasey"));
     Assert.assertEquals("Users: " + users, 2, users.size());
   }
 
@@ -138,7 +138,7 @@ public class LdapUserManagerIT
 
     Set<User> users = userLocator.searchUsers(criteria);
 
-    Assert.assertNotNull(this.getById(users, "jvanzyl"));
+    assertNotNull(this.getById(users, "jvanzyl"));
     Assert.assertEquals("Users: " + users, 1, users.size());
   }
 
@@ -178,7 +178,7 @@ public class LdapUserManagerIT
         return User;
       }
     }
-    Assert.fail("Failed to find user: " + userId + " in list.");
+    fail("Failed to find user: " + userId + " in list.");
     return null;
   }
 
@@ -202,7 +202,7 @@ public class LdapUserManagerIT
 
     List<String> realms = new ArrayList<String>();
     realms.add("XmlAuthenticatingRealm");
-    realms.add("LdapAuthenticatingRealm");
+    realms.add(LdapPlugin.REALM_NAME);
 
     securitySystem.setRealms(realms);
 
@@ -211,7 +211,7 @@ public class LdapUserManagerIT
     Assert.assertEquals("default", user.getSource());
 
     realms.clear();
-    realms.add("LdapAuthenticatingRealm");
+    realms.add(LdapPlugin.REALM_NAME);
     realms.add("XmlAuthenticatingRealm");
     securitySystem.setRealms(realms);
 

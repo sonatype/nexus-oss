@@ -10,26 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.realms;
 
 import java.util.Set;
 import java.util.SortedSet;
+
+import com.sonatype.nexus.ldap.LdapPlugin;
 
 import org.sonatype.security.ldap.LdapTestSupport;
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.LdapUser;
 import org.sonatype.security.ldap.dao.NoSuchLdapGroupException;
 import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
-import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 
-import junit.framework.Assert;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
 import org.codehaus.plexus.context.Context;
+import org.junit.Assert;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public abstract class LdapSchemaTestSupport
     extends LdapTestSupport
@@ -56,9 +62,8 @@ public abstract class LdapSchemaTestSupport
       throws Exception
   {
     super.setUp();
-    assertNotNull(lookup(LdapConfiguration.class));
-    this.realm = this.lookup(Realm.class, "LdapAuthenticatingRealm");
     this.ldapManager = this.lookup(LdapManager.class);
+    this.realm = this.lookup(Realm.class, LdapPlugin.REALM_NAME);
   }
 
   @Test
@@ -127,7 +132,7 @@ public abstract class LdapSchemaTestSupport
   {
     UsernamePasswordToken upToken = new UsernamePasswordToken("brianf", "JUNK");
     try {
-      Assert.assertNull(realm.getAuthenticationInfo(upToken));
+      assertNull(realm.getAuthenticationInfo(upToken));
     }
     catch (AuthenticationException e) {
       // expected
@@ -140,7 +145,7 @@ public abstract class LdapSchemaTestSupport
     UsernamePasswordToken upToken = new UsernamePasswordToken("username", "password");
     try {
       realm.getAuthenticationInfo(upToken);
-      Assert.fail("Expected AuthenticationException exception.");
+      fail("Expected AuthenticationException exception.");
     }
     catch (AuthenticationException e) {
       // expected

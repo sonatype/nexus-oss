@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 
 import org.sonatype.security.ldap.LdapTestSupport;
 import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserNotFoundTransientException;
 
 import junit.framework.Assert;
@@ -54,7 +55,9 @@ public class LdapUserManagerNotConfiguredIT
 
       Assert.fail("Expected UserNotFoundTransientException");
     }
-    catch (UserNotFoundTransientException e) {
+    catch (UserNotFoundException e) {
+    // OSS LDAP did throw transient when not configured, but Pro does not, it thrown only on error
+    // catch (UserNotFoundTransientException e) {
       // expect transient error due to misconfiguration
     }
   }
