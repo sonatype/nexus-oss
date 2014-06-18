@@ -10,33 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.auth;
+package org.sonatype.nexus.security.auth;
 
 /**
- * Event fired when authentication validation is performed (someone tries to log in).
+ * Manages and provides {@link ClientInfo} instances.
  *
  * @author cstamas
+ * @since 2.1
  */
-public class NexusAuthenticationEvent
-    extends AbstractSecurityEvent
+public interface ClientInfoProvider
 {
-  private final boolean successful;
-
-  public NexusAuthenticationEvent(final Object sender, final ClientInfo info, final boolean successful) {
-    super(sender, info);
-    this.successful = successful;
-  }
-
-  public boolean isSuccessful() {
-    return successful;
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "userId='" + getClientInfo().getUserid() + "'," +
-        "remoteIp='" + getClientInfo().getRemoteIP() + "'," +
-        "successful=" + successful +
-        '}';
-  }
+  /**
+   * Returns the {@link ClientInfo} for current thread. It will be non-null if this thread is a REST (or better HTTP)
+   * Request processing thread, and {@code null} if this is a non REST Request processing thread (like a scheduled
+   * task threads are).
+   *
+   * @return the current thread's {@link ClientInfo} or {@code null} if none available.
+   */
+  ClientInfo getCurrentThreadClientInfo();
 }
