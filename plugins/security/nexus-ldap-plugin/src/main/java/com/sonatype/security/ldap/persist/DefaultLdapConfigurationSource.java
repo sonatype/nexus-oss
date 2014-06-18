@@ -221,7 +221,7 @@ public class DefaultLdapConfigurationSource
       newUserAndGroup.setUserObjectClass(old.getUserObjectClass());
       newUserAndGroup.setUserPasswordAttribute(old.getUserPasswordAttribute());
       newUserAndGroup.setUserRealNameAttribute(old.getUserRealNameAttribute());
-      newUserAndGroup.setUserSubtree(old.isGroupSubtree());
+      newUserAndGroup.setUserSubtree(old.isUserSubtree());
       return newUserAndGroup;
     }
 
