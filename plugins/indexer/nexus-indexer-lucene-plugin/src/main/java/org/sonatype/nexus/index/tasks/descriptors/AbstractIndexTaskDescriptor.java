@@ -20,7 +20,7 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
+import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
 
 public abstract class AbstractIndexTaskDescriptor
     extends AbstractScheduledTaskDescriptor

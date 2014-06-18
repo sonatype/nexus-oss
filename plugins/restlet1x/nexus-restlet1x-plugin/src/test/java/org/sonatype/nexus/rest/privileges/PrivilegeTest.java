@@ -12,9 +12,9 @@
  */
 package org.sonatype.nexus.rest.privileges;
 
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.rest.AbstractRestTestCase;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
+import org.sonatype.nexus.security.targets.TargetPrivilegeDescriptor;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import org.junit.Test;

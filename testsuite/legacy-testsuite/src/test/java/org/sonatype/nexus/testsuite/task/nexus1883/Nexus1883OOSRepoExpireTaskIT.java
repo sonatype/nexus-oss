@@ -14,7 +14,7 @@ package org.sonatype.nexus.testsuite.task.nexus1883;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
+import org.sonatype.nexus.tasks.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryStatusMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 

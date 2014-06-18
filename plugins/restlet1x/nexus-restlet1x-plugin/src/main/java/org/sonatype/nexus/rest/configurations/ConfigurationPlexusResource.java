@@ -21,7 +21,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.sonatype.nexus.NexusStreamResponse;
+import org.sonatype.nexus.configuration.NexusStreamResponse;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.global.GlobalConfigurationPlexusResource;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;

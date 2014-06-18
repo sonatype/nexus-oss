@@ -20,7 +20,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
+import org.sonatype.nexus.tasks.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 

@@ -17,9 +17,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
+import org.sonatype.nexus.security.targets.TargetPrivilegeDescriptor;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;

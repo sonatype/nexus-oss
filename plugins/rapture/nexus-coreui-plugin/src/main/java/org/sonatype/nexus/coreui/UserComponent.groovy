@@ -25,13 +25,17 @@ import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
-import org.sonatype.nexus.user.UserAccountManager
+import org.sonatype.nexus.security.UserAccountManager
 import org.sonatype.nexus.util.Tokens
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.nexus.wonderland.AuthTicketService
 import org.sonatype.security.SecuritySystem
-import org.sonatype.security.usermanagement.*
+import org.sonatype.security.usermanagement.DefaultUser
+import org.sonatype.security.usermanagement.RoleIdentifier
+import org.sonatype.security.usermanagement.User
+import org.sonatype.security.usermanagement.UserManager
+import org.sonatype.security.usermanagement.UserSearchCriteria
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager
 
 import javax.annotation.Nullable

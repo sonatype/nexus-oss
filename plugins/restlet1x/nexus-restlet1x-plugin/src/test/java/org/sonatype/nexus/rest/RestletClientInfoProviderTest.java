@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.rest;
 
-import org.sonatype.nexus.auth.ClientInfo;
+import org.sonatype.nexus.security.auth.ClientInfo;
 
 import junit.framework.Assert;
 import org.apache.shiro.UnavailableSecurityManagerException;

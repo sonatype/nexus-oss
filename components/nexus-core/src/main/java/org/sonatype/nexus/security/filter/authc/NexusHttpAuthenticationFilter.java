@@ -23,8 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.auth.ClientInfo;
-import org.sonatype.nexus.auth.NexusAuthenticationEvent;
+import org.sonatype.nexus.security.auth.ClientInfo;
+import org.sonatype.nexus.security.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.nexus.web.TemplateRenderer;

@@ -15,8 +15,8 @@ package org.sonatype.nexus.rest;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.auth.ClientInfo;
-import org.sonatype.nexus.auth.ClientInfoProvider;
+import org.sonatype.nexus.security.auth.ClientInfo;
+import org.sonatype.nexus.security.auth.ClientInfoProvider;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.shiro.SecurityUtils;

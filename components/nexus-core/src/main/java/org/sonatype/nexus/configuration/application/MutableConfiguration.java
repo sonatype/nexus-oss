@@ -22,7 +22,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
+import org.sonatype.nexus.tasks.ScheduledTaskDescriptor;
 
 public interface MutableConfiguration
 {

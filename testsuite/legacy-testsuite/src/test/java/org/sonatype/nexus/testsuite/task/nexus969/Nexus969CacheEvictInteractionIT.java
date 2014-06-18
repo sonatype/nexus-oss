@@ -16,7 +16,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
+import org.sonatype.nexus.tasks.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import org.junit.Assert;
