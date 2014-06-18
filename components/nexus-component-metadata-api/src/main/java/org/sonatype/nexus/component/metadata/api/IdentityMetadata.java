@@ -1,0 +1,122 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2007-2014 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+package org.sonatype.nexus.component.metadata.api;
+
+import javax.annotation.Nullable;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@JsonDeserialize(builder = IdentityMetadata.Builder.class)
+public class IdentityMetadata
+{
+  public static final MetadataType type = new MetadataType.Builder()
+      .withName("identity")
+      .withPojoClass(IdentityMetadata.class)
+      .withIndexes(
+          new MetadataType.Index.Builder()
+              .withColumns("format", "group", "artifact")
+              .unique()
+              .build(),
+          new MetadataType.Index.Builder()
+              .withColumns("format", "artifact")
+              .build())
+      .build();
+
+  private final String format;
+
+  private final String group;
+
+  private final String artifact;
+
+  private final String version;
+
+  private IdentityMetadata(String format,
+                           @Nullable String group,
+                           String artifact,
+                           @Nullable String version) {
+    this.format = checkNotNull(format);
+    this.group = group;
+    this.artifact = checkNotNull(artifact);
+    this.version = version;
+  }
+
+  public String getFormat() {
+    return format;
+  }
+
+  @Nullable
+  public String getGroup() {
+    return group;
+  }
+
+  public String getArtifact() {
+    return artifact;
+  }
+
+  @Nullable
+  public String getVersion() {
+    return version;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "format=" + format +
+        ", group=" + group +
+        ", artifact=" + artifact +
+        ", version=" + version +
+        "}";
+  }
+
+  public static class Builder {
+    private String format;
+    private String group;
+    private String artifact;
+    private String version;
+
+    public Builder() { }
+
+    public Builder(IdentityMetadata md) {
+      format = md.getFormat();
+      group = md.getGroup();
+      artifact = md.getArtifact();
+      version = md.getVersion();
+    }
+
+    public Builder withFormat(String format) {
+      this.format = format;
+      return this;
+    }
+
+    public Builder withGroup(String group) {
+      this.group = group;
+      return this;
+    }
+
+    public Builder withArtifact(String artifact) {
+      this.artifact = artifact;
+      return this;
+    }
+
+    public Builder withVersion(String version) {
+      this.version = version;
+      return this;
+    }
+
+    public IdentityMetadata build() {
+      return new IdentityMetadata(format, group, artifact, version);
+    }
+  }
+}
