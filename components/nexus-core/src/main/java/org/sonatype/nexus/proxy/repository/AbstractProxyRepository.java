@@ -211,6 +211,20 @@ public abstract class AbstractProxyRepository
   }
 
   /**
+   * Allows proxy cache invalidation to be disabled by system property.
+   *
+   * @since 2.9
+   */
+  private static final boolean PROXY_CACHE_INVALIDATION_TOKEN_DISABLED = SystemPropertiesHelper.getBoolean(
+      AbstractProxyRepository.class.getName() + ".proxyCacheInvalidationToken.disabled", false);
+
+  static {
+    if (PROXY_CACHE_INVALIDATION_TOKEN_DISABLED) {
+      LoggerFactory.getLogger(AbstractProxyRepository.class).info("Proxy-cache invalidation-token support disabled");
+    }
+  }
+
+  /**
    * Token set when expire proxy caches is done for entire collection.
    *
    * @since 2.9
@@ -242,8 +256,8 @@ public abstract class AbstractProxyRepository
     // flag to indicate if cache was altered or not
     boolean cacheAltered;
 
-    // special handling for expiration for entire collection
-    if (RepositoryItemUid.PATH_ROOT.equals(request.getRequestPath())) {
+    // special handling for expiration for entire collection, unless disabled by system property
+    if (!PROXY_CACHE_INVALIDATION_TOKEN_DISABLED && RepositoryItemUid.PATH_ROOT.equals(request.getRequestPath())) {
       // generate a unique token for this invalidation request
       proxyCacheInvalidationToken = String.valueOf(System.nanoTime());
       log.debug("Proxy cache marked as invalid for repository {}, token: {}", this, proxyCacheInvalidationToken);
