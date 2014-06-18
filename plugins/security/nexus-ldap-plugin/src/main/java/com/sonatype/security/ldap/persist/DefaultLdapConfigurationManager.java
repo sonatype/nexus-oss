@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package com.sonatype.security.ldap.persist;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.sonatype.nexus.ldap.LdapPlugin;
 import com.sonatype.security.ldap.persist.validation.LdapConfigurationValidator;
 import com.sonatype.security.ldap.realms.EnterpriseLdapAuthenticatingRealm;
 import com.sonatype.security.ldap.realms.persist.model.CLdapConfiguration;
@@ -189,8 +191,8 @@ public class DefaultLdapConfigurationManager
    */
   private void mayActivateLdapRealm() throws InvalidConfigurationException {
     final List<String> activeRealms = securitySystem.getRealms();
-    if (!activeRealms.contains(EnterpriseLdapAuthenticatingRealm.ID)) {
-      activeRealms.add(EnterpriseLdapAuthenticatingRealm.ID);
+    if (!activeRealms.contains(LdapPlugin.REALM_NAME)) {
+      activeRealms.add(LdapPlugin.REALM_NAME);
       securitySystem.setRealms(activeRealms);
     }
   }
@@ -202,8 +204,8 @@ public class DefaultLdapConfigurationManager
    */
   private void mayDeactivateLdapRealm() throws InvalidConfigurationException {
     final List<String> activeRealms = securitySystem.getRealms();
-    if (activeRealms.contains(EnterpriseLdapAuthenticatingRealm.ID)) {
-      activeRealms.remove(EnterpriseLdapAuthenticatingRealm.ID);
+    if (activeRealms.contains(LdapPlugin.REALM_NAME)) {
+      activeRealms.remove(LdapPlugin.REALM_NAME);
       securitySystem.setRealms(activeRealms);
     }
   }

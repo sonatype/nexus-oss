@@ -19,6 +19,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.sonatype.nexus.ldap.LdapPlugin;
+
 import org.sonatype.security.authorization.AbstractReadOnlyAuthorizationManager;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
@@ -34,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
-@Named("LDAP")
+@Named(LdapPlugin.USER_SOURCE)
 public class LdapAuthorizationManager
     extends AbstractReadOnlyAuthorizationManager
 {
@@ -50,7 +52,7 @@ public class LdapAuthorizationManager
 
   @Override
   public String getSource() {
-    return "LDAP";
+    return LdapPlugin.USER_SOURCE;
   }
 
   public Set<String> listRoleIds() {

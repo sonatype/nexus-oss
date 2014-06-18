@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.ldap.realms;
 
 import java.util.HashSet;
@@ -17,6 +18,8 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.naming.NamingException;
+
+import com.sonatype.nexus.ldap.LdapPlugin;
 
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.NoLdapUserRolesFoundException;
@@ -46,15 +49,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class AbstractLdapAuthenticatingRealm
     extends AbstractLdapRealm
 {
-  public static final String NAME = "LdapAuthenticatingRealm";
-
   private final Logger logger = Loggers.getLogger(getClass());
 
   private final LdapManager ldapManager;
 
   public AbstractLdapAuthenticatingRealm(final EventBus eventBus, final LdapManager ldapManager) {
     this.ldapManager = checkNotNull(ldapManager);
-    setName(NAME);
+    setName(LdapPlugin.REALM_NAME);
     setAuthenticationCachingEnabled(true);
     setAuthorizationCachingEnabled(true);
     // using simple credentials matcher

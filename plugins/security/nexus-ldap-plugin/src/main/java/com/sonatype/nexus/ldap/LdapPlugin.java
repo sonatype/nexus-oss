@@ -60,6 +60,16 @@ public class LdapPlugin
    */
   public static final String PERMISSION_PREFIX = "nexus:" + ID_PREFIX + ":";
 
+  /**
+   * LDAP realm name.
+   */
+  public static final String REALM_NAME = "NexusLdapAuthenticationRealm";
+
+  /**
+   * LDAP user source name.
+   */
+  public static final String USER_SOURCE = "LDAP";
+
   @Inject
   public LdapPlugin()
       throws Exception

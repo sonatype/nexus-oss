@@ -16,20 +16,20 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.sonatype.nexus.ldap.LdapPlugin;
+
 import org.sonatype.security.ldap.realms.AbstractLdapAuthenticatingRealm;
 import org.sonatype.security.ldap.realms.LdapManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.eclipse.sisu.Description;
 
-@Named(EnterpriseLdapAuthenticatingRealm.ID)
+@Named(LdapPlugin.REALM_NAME)
 @Singleton
 @Description("Enterprise LDAP Authentication Realm")
 public class EnterpriseLdapAuthenticatingRealm
     extends AbstractLdapAuthenticatingRealm
 {
-  public static final String ID = "NexusLdapAuthenticationRealm";
-
   @Inject
   public EnterpriseLdapAuthenticatingRealm(final EventBus eventBus,
                                            final LdapManager ldapManager)
