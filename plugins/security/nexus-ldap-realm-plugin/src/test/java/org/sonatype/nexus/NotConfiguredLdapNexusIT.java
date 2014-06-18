@@ -16,7 +16,7 @@ import java.io.File;
 
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
-import org.sonatype.security.ldap.realms.AbstractLdapAuthenticatingRealm;
+import org.sonatype.security.ldap.realms.AbstractLdapAuthenticationRealm;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.SimplePrincipalCollection;
@@ -52,7 +52,7 @@ public class NotConfiguredLdapNexusIT
     security.start();
 
     SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    principals.add("cstamas", AbstractLdapAuthenticatingRealm.class.getName());
+    principals.add("cstamas", AbstractLdapAuthenticationRealm.class.getName());
 
     // if realm is not configured, the user should not be able to be authorized
 
@@ -68,7 +68,7 @@ public class NotConfiguredLdapNexusIT
     security.start();
 
     SimplePrincipalCollection principals = new SimplePrincipalCollection();
-    principals.add("cstamas", AbstractLdapAuthenticatingRealm.class.getName());
+    principals.add("cstamas", AbstractLdapAuthenticationRealm.class.getName());
 
     // if realm is not configured, the user should not be able to be authorized
     Assert.assertFalse(security.isPermitted(principals, "nexus:usersforgotpw:create"));

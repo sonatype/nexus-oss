@@ -17,7 +17,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.security.ldap.LdapConstants;
-import org.sonatype.security.ldap.realms.AbstractLdapAuthenticatingRealm;
+import org.sonatype.security.ldap.realms.AbstractLdapAuthenticationRealm;
 import org.sonatype.security.ldap.realms.LdapManager;
 
 import org.eclipse.sisu.Description;
@@ -26,7 +26,7 @@ import org.eclipse.sisu.Description;
 @Named(LdapConstants.REALM_NAME)
 @Description("OSS LDAP Authentication Realm")
 public class NexusLdapAuthenticationRealm
-    extends AbstractLdapAuthenticatingRealm
+    extends AbstractLdapAuthenticationRealm
 {
   @Inject
   public NexusLdapAuthenticationRealm(final LdapManager ldapManager) {

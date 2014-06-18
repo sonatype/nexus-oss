@@ -39,14 +39,14 @@ import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class AbstractLdapAuthenticatingRealm
+public abstract class AbstractLdapAuthenticationRealm
     extends AbstractLdapRealm
 {
   private final Logger logger = Loggers.getLogger(getClass());
 
   private final LdapManager ldapManager;
 
-  public AbstractLdapAuthenticatingRealm(final LdapManager ldapManager) {
+  public AbstractLdapAuthenticationRealm(final LdapManager ldapManager) {
     setName(LdapConstants.REALM_NAME);
     this.ldapManager = checkNotNull(ldapManager);
   }

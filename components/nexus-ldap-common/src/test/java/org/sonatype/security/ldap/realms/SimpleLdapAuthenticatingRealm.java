@@ -24,7 +24,7 @@ import org.eclipse.sisu.Description;
 @Named(LdapConstants.REALM_NAME)
 @Description("Test Authentication LDAP Realm")
 public class SimpleLdapAuthenticatingRealm
-    extends AbstractLdapAuthenticatingRealm
+    extends AbstractLdapAuthenticationRealm
 {
   @Inject
   public SimpleLdapAuthenticatingRealm(final LdapManager ldapManager) {
