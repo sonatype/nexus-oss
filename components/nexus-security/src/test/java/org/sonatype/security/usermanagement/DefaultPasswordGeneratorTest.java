@@ -10,50 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.jsecurity;
 
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
-import org.sonatype.security.usermanagement.DefaultPasswordGenerator;
-import org.sonatype.security.usermanagement.PasswordGenerator;
+package org.sonatype.security.usermanagement;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * Tests for {@link DefaultPasswordGenerator}.
+ */
 public class DefaultPasswordGeneratorTest
-    extends PlexusTestCaseSupport
+    extends TestSupport
 {
+  protected DefaultPasswordGenerator underTest;
 
-  @Override
-  protected void customizeContainerConfiguration(ContainerConfiguration configuration) {
-    configuration.setAutoWiring(true);
-    configuration.setClassPathScanning(PlexusConstants.SCANNING_CACHE);
-  }
-
-  protected DefaultPasswordGenerator pwGenerator;
-
-  @Override
-  protected void setUp()
-      throws Exception
-  {
-    super.setUp();
-
-    pwGenerator = (DefaultPasswordGenerator) this.lookup(PasswordGenerator.class);
+  @Before
+  public void setUp() throws Exception {
+    this.underTest = new DefaultPasswordGenerator();
   }
 
   @Test
-  public void testGeneratePassword()
-      throws Exception
-  {
-    String pw = pwGenerator.generatePassword(10, 10);
+  public void testGeneratePassword() throws Exception {
+    String pw = underTest.generatePassword(10, 10);
 
     assertTrue(pw != null);
     assertTrue(pw.length() == 10);
 
-    String encrypted = pwGenerator.hashPassword(pw);
-    String encrypted2 = pwGenerator.hashPassword(pw);
+    String encrypted = underTest.hashPassword(pw);
+    String encrypted2 = underTest.hashPassword(pw);
 
     assertTrue(encrypted != null);
     assertTrue(encrypted2 != null);
@@ -61,14 +50,14 @@ public class DefaultPasswordGeneratorTest
     assertFalse(pw.equals(encrypted2));
     assertTrue(encrypted.equals(encrypted2));
 
-    String newPw = pwGenerator.generatePassword(10, 10);
+    String newPw = underTest.generatePassword(10, 10);
 
     assertTrue(newPw != null);
     assertTrue(newPw.length() == 10);
     assertFalse(pw.equals(newPw));
 
-    String newEncrypted = pwGenerator.hashPassword(newPw);
-    String newEncrypted2 = pwGenerator.hashPassword(newPw);
+    String newEncrypted = underTest.hashPassword(newPw);
+    String newEncrypted2 = underTest.hashPassword(newPw);
 
     assertTrue(newEncrypted != null);
     assertTrue(newEncrypted2 != null);
