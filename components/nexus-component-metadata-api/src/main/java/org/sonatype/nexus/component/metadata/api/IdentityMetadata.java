@@ -23,13 +23,13 @@ public class IdentityMetadata
 {
   public static final MetadataType type = new MetadataType.Builder()
       .withName("identity")
-      .withPojoClass(IdentityMetadata.class)
+      .withMetadataClass(IdentityMetadata.class)
       .withIndexes(
-          new MetadataType.Index.Builder()
+          new MetadataIndex.Builder()
               .withColumns("format", "group", "artifact")
               .unique()
               .build(),
-          new MetadataType.Index.Builder()
+          new MetadataIndex.Builder()
               .withColumns("format", "artifact")
               .build())
       .build();

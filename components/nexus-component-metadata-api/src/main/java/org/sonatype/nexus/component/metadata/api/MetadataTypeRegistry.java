@@ -25,7 +25,7 @@ public abstract class MetadataTypeRegistry
 {
   protected final Map<String, MetadataType> byName = new HashMap<>();
 
-  protected final Map<Class, MetadataType> byClass = new HashMap<>();
+  protected final Map<Class, MetadataType> byMetadataClass = new HashMap<>();
 
   public void registerType(MetadataType type) {
     checkNotNull(type);
@@ -42,27 +42,27 @@ public abstract class MetadataTypeRegistry
   }
 
   @Nullable
-  public MetadataType getType(Class pojoClass) {
-    checkNotNull(pojoClass);
-    return byClass.get(pojoClass);
+  public MetadataType getType(Class metadataClass) {
+    checkNotNull(metadataClass);
+    return byMetadataClass.get(metadataClass);
   }
 
   @Override
   public Iterator<MetadataType> iterator() {
-    return byClass.values().iterator();
+    return byMetadataClass.values().iterator();
   }
 
   private void bindType(MetadataType type) {
     if (byName.containsKey(type.getName())) {
-      Class boundClass = byName.get(type.getName()).getPojoClass();
-      throw new IllegalStateException("Type name '" + type.getName() + "' is already bound to " + boundClass);
+      Class metadataClass = byName.get(type.getName()).getMetadataClass();
+      throw new IllegalStateException("'" + type.getName() + "' is already bound to class " + metadataClass);
     }
-    if (byClass.containsKey(type.getPojoClass())) {
-      String boundName = byClass.get(type.getPojoClass()).getName();
-      throw new IllegalStateException("Type class " + type.getPojoClass() + " is already bound to '" + boundName + "'");
+    if (byMetadataClass.containsKey(type.getMetadataClass())) {
+      String name = byMetadataClass.get(type.getMetadataClass()).getName();
+      throw new IllegalStateException("Class " + type.getMetadataClass() + " is already bound to '" + name + "'");
     }
     byName.put(type.getName(), type);
-    byClass.put(type.getPojoClass(), type);
+    byMetadataClass.put(type.getMetadataClass(), type);
   }
 
   protected abstract void configureType(MetadataType type);

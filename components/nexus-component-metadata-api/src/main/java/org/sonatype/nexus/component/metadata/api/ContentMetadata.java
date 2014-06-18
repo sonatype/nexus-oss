@@ -25,9 +25,9 @@ public class ContentMetadata
 {
   public static final MetadataType type = new MetadataType.Builder()
       .withName("content")
-      .withPojoClass(ContentMetadata.class)
+      .withMetadataClass(ContentMetadata.class)
       .withIndexes(
-          new MetadataType.Index.Builder()
+          new MetadataIndex.Builder()
               .withColumns("identityKey")
               .build())
       .build();

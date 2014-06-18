@@ -13,7 +13,6 @@
 package org.sonatype.nexus.component.metadata.api;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +25,6 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.component.metadata.api.MetadataType.Attribute.Type;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
@@ -38,21 +36,21 @@ public class MetadataType
 
   private final String name;
 
-  private final Class pojoClass;
+  private final Class metadataClass;
 
   private final Map<String, Attribute> attributes;
 
-  private final Set<Index> indexes;
+  private final Set<MetadataIndex> indexes;
 
-  private MetadataType(String name, Class pojoClass, Set<String> textAttributes, Set<Index> indexes) {
+  private MetadataType(String name, Class metadataClass, Set<String> textAttributes, Set<MetadataIndex> indexes) {
     this.name = checkName(name);
-    this.pojoClass = checkPojoClass(pojoClass);
+    this.metadataClass = checkMetadataClass(metadataClass);
     this.attributes = checkAttributes(textAttributes);
     this.indexes = checkIndexes(indexes);
   }
 
   // Must be 1 or more chars long and may only consist of alphanum and underscore characters
-  private static String checkName(String name) {
+  protected static String checkName(String name) {
     checkNotNull(name);
     if (!NAME_PATTERN.matcher(name).matches()) {
       throw new IllegalArgumentException("Invalid name: " + name +
@@ -62,16 +60,16 @@ public class MetadataType
   }
 
   // Must be IdentityMetadata or implement SecondaryMetadata
-  private static Class checkPojoClass(Class pojoClass) {
-    checkNotNull(pojoClass);
-    if (pojoClass != IdentityMetadata.class) {
-      for (Class iface: pojoClass.getInterfaces()) {
+  private static Class checkMetadataClass(Class metadataClass) {
+    checkNotNull(metadataClass);
+    if (metadataClass != IdentityMetadata.class) {
+      for (Class iface: metadataClass.getInterfaces()) {
         if (iface == SecondaryMetadata.class) {
-          throw new IllegalArgumentException(pojoClass.getName() + " does not implement SecondaryMetadata");
+          throw new IllegalArgumentException(metadataClass.getName() + " does not implement SecondaryMetadata");
         }
       }
     }
-    return pojoClass;
+    return metadataClass;
   }
 
   // Getters (parameterless methods starting with "get" or "is") are assumed to be attributes.
@@ -81,7 +79,7 @@ public class MetadataType
   // At least one attribute must exist among all methods of the class.
   private Map<String, Attribute> checkAttributes(Set<String> textAttributes) {
     Map<String, Attribute> attributes = new HashMap<>();
-    for (Method method: pojoClass.getMethods()) {
+    for (Method method: metadataClass.getMethods()) {
       String name = getAttributeName(method);
       if (name != null) {
         Type type = Type.forClass(method.getReturnType(), textAttributes.contains(name));
@@ -90,11 +88,11 @@ public class MetadataType
       }
     }
     if (attributes.size() == 0) {
-      throw new IllegalArgumentException(pojoClass.getName() + " does not implement any getters");
+      throw new IllegalArgumentException(metadataClass.getName() + " does not implement any getters");
     }
     for (String textAttribute: textAttributes) {
       if (!attributes.containsKey(textAttribute)) {
-        throw new IllegalArgumentException("No such attribute in " + pojoClass.getName() + ": " + textAttribute);
+        throw new IllegalArgumentException("No such attribute in " + metadataClass.getName() + ": " + textAttribute);
       }
     }
     return attributes;
@@ -117,11 +115,11 @@ public class MetadataType
   // Duplicate indexes are not allowed
   // All index columns must refer to existing attributes with indexable types
   // Multiple unique indexes are not allowed
-  private Set<Index> checkIndexes(Set<Index> indexes) {
+  private Set<MetadataIndex> checkIndexes(Set<MetadataIndex> indexes) {
     checkNotNull(indexes);
     boolean sawUnique = false;
     Set<List<String>> sawColumns = new HashSet<>();
-    for (Index index: indexes) {
+    for (MetadataIndex index: indexes) {
       List<String> columns = index.getColumns();
       if (sawColumns.contains(columns)) {
         throw new IllegalArgumentException("Duplicate index specified: " + columns);
@@ -152,15 +150,15 @@ public class MetadataType
     return name;
   }
 
-  public Class getPojoClass() {
-    return pojoClass;
+  public Class getMetadataClass() {
+    return metadataClass;
   }
 
   public Map<String, Attribute> getAttributes() {
     return attributes;
   }
 
-  public Set<Index> getIndexes() {
+  public Set<MetadataIndex> getIndexes() {
     return indexes;
   }
 
@@ -168,7 +166,7 @@ public class MetadataType
   public String toString() {
     return getClass().getSimpleName() + "{" +
         "name=" + name +
-        ", pojoClass=" + pojoClass +
+        ", metadataClass=" + metadataClass +
         ", indexes=" + indexes +
         "}";
   }
@@ -252,94 +250,19 @@ public class MetadataType
     }
   }
 
-  public static class Index
-  {
-    private final List<String> columns;
-    private final boolean unique;
-    private final boolean descending;
-
-    private Index(List<String> columns, boolean unique, boolean descending) {
-      this.columns = ImmutableList.copyOf(checkNotNull(columns));
-      this.unique = unique;
-      this.descending = descending;
-    }
-
-    private static List<String> checkColumns(List<String> columns) {
-      checkNotNull(columns);
-      if (columns.size() == 0) {
-        throw new IllegalArgumentException("Index does not specify any columns");
-      }
-      Set<String> checkedColumns = new HashSet<>();
-      for (String column: columns) {
-        checkName(column);
-        if (checkedColumns.contains(column)) {
-          throw new IllegalArgumentException("Index specifies multiple columns with the same name: " + column);
-        }
-        checkedColumns.add(column);
-      }
-      return columns;
-    }
-
-    public List<String> getColumns() {
-      return columns;
-    }
-
-    public boolean isUnique() {
-      return unique;
-    }
-
-    public boolean isDescending() {
-      return descending;
-    }
-
-    @Override
-    public String toString() {
-      return getClass().getSimpleName() + "{" +
-          "columns=" + columns +
-          ", unique=" + unique +
-          ", descending=" + descending +
-          "}";
-    }
-
-    public static class Builder {
-      private List<String> columns = new ArrayList<>();
-      private boolean unique;
-      private boolean descending;
-
-      public Builder withColumns(String... columns) {
-        Collections.addAll(this.columns, columns);
-        return this;
-      }
-
-      public Builder unique() {
-        unique = true;
-        return this;
-      }
-
-      public Builder descending() {
-        descending = true;
-        return this;
-      }
-
-      public Index build() {
-        return new Index(columns, unique, descending);
-      }
-    }
-  }
-
   public static class Builder {
     private String name;
-    private Class pojoClass;
+    private Class metadataClass;
     private Set<String> textAttributes = new HashSet<>();
-    private Set<Index> indexes = new HashSet<>();
+    private Set<MetadataIndex> indexes = new HashSet<>();
 
     public Builder withName(String name) {
       this.name = name;
       return this;
     }
 
-    public Builder withPojoClass(Class pojoClass) {
-      this.pojoClass = pojoClass;
+    public Builder withMetadataClass(Class metadataClass) {
+      this.metadataClass = metadataClass;
       return this;
     }
 
@@ -348,13 +271,13 @@ public class MetadataType
       return this;
     }
 
-    public Builder withIndexes(Index... indexes) {
+    public Builder withIndexes(MetadataIndex... indexes) {
       Collections.addAll(this.indexes, indexes);
       return this;
     }
 
     public MetadataType build() {
-      return new MetadataType(name, pojoClass, textAttributes, indexes);
+      return new MetadataType(name, metadataClass, textAttributes, indexes);
     }
   }
 }

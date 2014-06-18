@@ -12,19 +12,21 @@
  */
 package org.sonatype.nexus.component.metadata.api;
 
+import com.google.common.base.Predicate;
+
 public interface ComponentMetadataService
 {
-  String create(Object metadata);
+  <T> MetadataHandle<T> create(T metadata);
 
-  <T> T retrieve(String key);
+  <T> MetadataHandle<T> retrieve(String key);
 
-  void update(String key, Object metadata);
+  <T> MetadataHandle<T> update(String key, String version, T metadata);
 
-  <T> void delete(String key);
+  <T> boolean delete(String key, String version);
 
-  KeyIterator find(Object builder);
+  <T> MetadataKeyIterator find(Predicate<T> filter, MetadataIndex index);
 
-  String findFirst(Object builder);
+  <T> String findFirst(Predicate<T> filter, MetadataIndex index);
 
-  MetadataTypeRegistry getMetadataTypeRegistry();
+  MetadataTypeRegistry getTypeRegistry();
 }
