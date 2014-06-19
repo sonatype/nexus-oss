@@ -177,6 +177,13 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-ssl-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ldap-plugin</artifactId>
       <version>${nexus.version}</version>
       <scope>provided</scope>

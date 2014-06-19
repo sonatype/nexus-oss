@@ -145,6 +145,15 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-ssl-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-ldap-plugin</artifactId>
       <version>${nexus.version}</version>
       <classifier>features</classifier>
@@ -346,6 +355,7 @@
             <feature>nexus-siesta-plugin</feature>
             <feature>nexus-lvo-plugin</feature>
             <feature>nexus-plugin-console-plugin</feature>
+            <feature>nexus-ssl-plugin</feature>
             <feature>nexus-ldap-plugin</feature>
             <feature>nexus-maven-bridge-plugin</feature>
             <feature>nexus-rrb-plugin</feature>
