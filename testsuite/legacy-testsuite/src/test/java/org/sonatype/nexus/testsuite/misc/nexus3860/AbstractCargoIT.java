@@ -121,7 +121,7 @@ public abstract class AbstractCargoIT
     // get the default logback.properties that will be deployed on 1st startup
     File file = new File(getITNexusWorkDirPath() + "/conf/logback.properties");
     try {
-      URL configUrl = getClass().getResource("/META-INF/log/logback.properties");
+      URL configUrl = getClass().getResource("/org/sonatype/nexus/internal/log/logback.properties");
       FileUtils.copyURLToFile(configUrl, file);
     }
     catch (IOException e) {

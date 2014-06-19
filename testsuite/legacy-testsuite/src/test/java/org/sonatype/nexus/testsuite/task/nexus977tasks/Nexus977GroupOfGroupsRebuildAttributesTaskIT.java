@@ -16,7 +16,7 @@ import java.io.File;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
+import org.sonatype.nexus.tasks.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import org.apache.commons.io.FileUtils;

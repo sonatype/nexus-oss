@@ -16,7 +16,7 @@ import java.io.File;
 import java.net.URL;
 
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
+import org.sonatype.nexus.tasks.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;

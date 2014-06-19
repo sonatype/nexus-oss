@@ -22,12 +22,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
+import org.sonatype.nexus.security.targets.TargetPrivilegeDescriptor;
+import org.sonatype.nexus.security.targets.TargetPrivilegeGroupPropertyDescriptor;
+import org.sonatype.nexus.security.targets.TargetPrivilegeRepositoryPropertyDescriptor;
+import org.sonatype.nexus.security.targets.TargetPrivilegeRepositoryTargetPropertyDescriptor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;

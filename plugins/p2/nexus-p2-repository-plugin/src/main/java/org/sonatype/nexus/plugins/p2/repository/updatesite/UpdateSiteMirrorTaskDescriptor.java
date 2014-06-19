@@ -24,7 +24,7 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
+import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
 
 @Named(UpdateSiteMirrorTask.ROLE_HINT)
 @Singleton

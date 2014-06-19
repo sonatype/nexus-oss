@@ -16,7 +16,7 @@ import java.io.File;
 
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
+import org.sonatype.nexus.tasks.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
@@ -32,8 +32,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 
 /**
  * Tests SnapshotRemoverTask to not go remote when checking for release existence.

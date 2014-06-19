@@ -14,7 +14,6 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.configuration.validation.InvalidConfigurationException
@@ -23,6 +22,7 @@ import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.configuration.application.NexusConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry

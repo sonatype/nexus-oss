@@ -16,7 +16,7 @@ import java.io.File;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
+import org.sonatype.nexus.tasks.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 

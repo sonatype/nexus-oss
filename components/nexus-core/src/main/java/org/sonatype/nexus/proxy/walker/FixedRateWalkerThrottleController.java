@@ -14,7 +14,7 @@ package org.sonatype.nexus.proxy.walker;
 
 import java.util.concurrent.TimeUnit;
 
-import org.sonatype.nexus.util.NumberSequence;
+import org.sonatype.nexus.util.sequence.NumberSequence;
 
 import com.google.common.base.Preconditions;
 

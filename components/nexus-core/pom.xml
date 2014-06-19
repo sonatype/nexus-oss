@@ -120,6 +120,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
@@ -342,6 +347,11 @@
       <artifactId>UserAgentUtils</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-log-api</artifactId>
+    </dependency>
+
     <!--JSR-303 Validation-->
     <dependency>
       <groupId>javax.validation</groupId>
@@ -349,13 +359,13 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.bval</groupId>
-      <artifactId>bval-guice</artifactId>
+      <groupId>org.glassfish.web</groupId>
+      <artifactId>javax.el</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.bval</groupId>
-      <artifactId>bval-jsr303</artifactId>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-validator</artifactId>
     </dependency>
 
     <!-- Kazuki -->

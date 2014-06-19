@@ -91,92 +91,6 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
         {
           xtype : 'fieldset',
           checkboxToggle : false,
-          title : 'SMTP Settings',
-          name : 'smtp-settings',
-          anchor : Sonatype.view.FIELDSET_OFFSET,
-          collapsible : true,
-          autoHeight : true,
-          layoutConfig : {
-            labelSeparator : ''
-          },
-
-          items : [
-            {
-              xtype : 'textfield',
-              fieldLabel : 'Hostname',
-              helpText : ht.smtphost,
-              name : 'smtpSettings.host',
-              anchor : Sonatype.view.FIELD_OFFSET,
-              allowBlank : false,
-              itemCls : 'required-field'
-            },
-            {
-              xtype : 'numberfield',
-              fieldLabel : 'Port',
-              helpText : ht.smtpport,
-              name : 'smtpSettings.port',
-              anchor : Sonatype.view.FIELD_OFFSET,
-              allowBlank : false,
-              itemCls : 'required-field'
-            },
-            {
-              xtype : 'textfield',
-              fieldLabel : 'Username',
-              helpText : ht.smtpuser,
-              name : 'smtpSettings.username',
-              anchor : Sonatype.view.FIELD_OFFSET,
-              allowBlank : true
-            },
-            {
-              xtype : 'textfield',
-              inputType : 'password',
-              fieldLabel : 'Password',
-              helpText : ht.smtppass,
-              name : 'smtpSettings.password',
-              anchor : Sonatype.view.FIELD_OFFSET,
-              allowBlank : true
-            },
-            {
-              xtype : 'combo',
-              fieldLabel : 'Connection',
-              helpText : ht.connection,
-              width : 210,
-              store : smtpConnectionSettings,
-              valueField : 'value',
-              displayField : 'display',
-              editable : false,
-              forceSelection : true,
-              mode : 'local',
-              triggerAction : 'all',
-              emptyText : 'Select...',
-              selectOnFocus : true,
-              allowBlank : false,
-              name : 'smtpSettings.connection',
-              value : 'plain'
-            },
-            {
-              xtype : 'textfield',
-              fieldLabel : 'System Email',
-              helpText : ht.smtpsysemail,
-              name : 'smtpSettings.systemEmailAddress',
-              anchor : Sonatype.view.FIELD_OFFSET,
-              allowBlank : false,
-              itemCls : 'required-field'
-            }
-          ],
-          buttons : [
-            {
-              xtype : 'button',
-              scope : this,
-              text : 'Test SMTP settings',
-              handler : this.testSmtpBtnHandler
-            }
-          ],
-          buttonAlign : 'left'
-        },
-        {
-          xtype : 'fieldset',
-          checkboxToggle : false,
           title : 'HTTP Request Settings',
           anchor : Sonatype.view.FIELDSET_OFFSET,
           collapsible : true,
@@ -654,64 +568,8 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               ]
             } // end auth fieldset
           ]
-        },
+        }
         // end https proxy settings
-        {
-          xtype : 'fieldset',
-          checkboxToggle : false,
-          collapsed : false,
-          collapsible : true,
-          id : formId + '_' + 'systemNotificationSettings',
-          name : 'systemNotificationSettings',
-          title : 'System Notification Settings',
-          anchor : Sonatype.view.FIELDSET_OFFSET,
-          autoHeight : true,
-          layoutConfig : {
-            labelSeparator : ''
-          },
-          listeners : {
-            'expand' : {
-              fn : this.optionalFieldsetExpandHandler,
-              scope : this
-            },
-            'collapse' : {
-              fn : this.optionalFieldsetCollapseHandler,
-              scope : this,
-              delay : 100
-            }
-          },
-
-          items : [
-            {
-              xtype : 'panel',
-              layout : 'fit',
-              html : '<div style="padding-bottom:10px">' + ht.systemNotification + '</div>'
-            },
-            {
-              xtype : 'checkbox',
-              fieldLabel : 'Enabled',
-              helpText : ht.notificationsEnabled,
-              name : 'systemNotificationSettings.enabled'
-            },
-            {
-              xtype : 'textfield',
-              fieldLabel : 'Email Addresses',
-              helpText : ht.notificationEmailAddresses,
-              name : 'systemNotificationSettings.emailAddresses',
-              anchor : Sonatype.view.FIELD_OFFSET,
-              allowBlank : true
-            },
-            {
-              xtype : 'rolemanager',
-              name : 'systemNotificationRoleManager',
-              height : 200,
-              width : 505,
-              usePrivileges : false,
-              doValidation : false,
-              style : 'margin-top: 10px;border: 1px solid #B5B8C8;'
-            }
-          ]
-        } // end notification settings
       ],
       buttons : [
         {
@@ -796,9 +654,6 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
         "securityRealms" : function(val, fpanel) {
           return fpanel.find('name', 'securityRealms')[0].getValue();
         },
-        "systemNotificationSettings.roles" : function(val, fpanel) {
-          return fpanel.find('name', 'systemNotificationRoleManager')[0].getSelectedRoleIds();
-        },
         "securityAnonymousAccessEnabled" : function(val, fpanel) {
           return fpanel.isSecurityAnonymousAccessEnabled;
         },
@@ -869,10 +724,6 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
         "securityRealms" : function(arr, srcObj, fpanel) {
           fpanel.find('name', 'securityRealms')[0].setValue(arr);
           return arr; // return arr, even if empty to comply with sonatypeLoad data modifier requirement
-        },
-        "systemNotificationSettings.roles" : function(arr, srcObj, fpanel) {
-          fpanel.find('name', 'systemNotificationRoleManager')[0].setSelectedRoleIds(arr, true);
-          return arr;
         },
         "securityAnonymousAccessEnabled" : function(arr, srcObj, fpanel) {
           fpanel.isSecurityAnonymousAccessEnabled = arr;

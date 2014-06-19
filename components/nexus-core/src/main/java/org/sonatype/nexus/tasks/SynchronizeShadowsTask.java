@@ -16,7 +16,6 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
-import org.sonatype.nexus.tasks.descriptors.SynchronizeShadowTaskDescriptor;
 
 import org.codehaus.plexus.util.StringUtils;
 

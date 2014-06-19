@@ -18,7 +18,7 @@ import java.io.IOException;
 import org.sonatype.nexus.index.tasks.UpdateIndexTask;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.ITGroups.INDEX;
-import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
+import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.FileTestingUtils;

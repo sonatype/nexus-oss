@@ -18,7 +18,7 @@ import java.net.URL;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
-import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
+import org.sonatype.nexus.maven.tasks.SnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 

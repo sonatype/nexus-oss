@@ -18,9 +18,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.ApplicationInterpolatorProvider;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
-import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
 
 import org.codehaus.plexus.interpolation.InterpolatorFilterReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;

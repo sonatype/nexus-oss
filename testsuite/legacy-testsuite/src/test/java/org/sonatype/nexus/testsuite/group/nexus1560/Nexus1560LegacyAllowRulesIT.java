@@ -18,7 +18,7 @@ import java.io.FileReader;
 import java.net.URL;
 
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
+import org.sonatype.nexus.security.targets.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.test.utils.ResponseMatchers;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;

@@ -15,7 +15,6 @@ package org.sonatype.nexus.capability.internal.ui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.slf4j.Logger
@@ -23,6 +22,7 @@ import org.slf4j.LoggerFactory
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.formfields.Selectable
+import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.plugins.capabilities.*
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder
 import org.sonatype.nexus.validation.Create

@@ -29,7 +29,7 @@ import org.sonatype.nexus.configuration.model.v2_7_0.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v2_7_0.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.v2_7_0.Configuration;
 import org.sonatype.nexus.configuration.model.v2_7_0.upgrade.BasicVersionUpgrade;
-import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
+import org.sonatype.nexus.tasks.EmptyTrashTaskDescriptor;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;

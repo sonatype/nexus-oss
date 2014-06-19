@@ -13,6 +13,8 @@
 
 package org.sonatype.nexus.logging.rest;
 
+import java.io.InputStream;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -23,7 +25,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.logging.LoggingPlugin;
 import org.sonatype.siesta.Resource;
@@ -80,11 +81,11 @@ public class LogResource
     if (count == null) {
       count = Long.MAX_VALUE;
     }
-    NexusStreamResponse streamResponse = logManager.getApplicationLogAsStream("nexus.log", from, count);
-    if (streamResponse == null) {
+    InputStream log = logManager.getApplicationLogAsStream("nexus.log", from, count);
+    if (log == null) {
       throw new NotFoundException("nexus.log not found");
     }
-    return Response.ok(streamResponse.getInputStream())
+    return Response.ok(log)
         .header("Content-Disposition", "attachment; filename=\"nexus.log\"")
         .build();
   }

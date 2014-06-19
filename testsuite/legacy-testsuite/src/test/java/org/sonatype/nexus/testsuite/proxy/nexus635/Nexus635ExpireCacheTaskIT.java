@@ -17,7 +17,7 @@ import java.io.File;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
+import org.sonatype.nexus.tasks.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
