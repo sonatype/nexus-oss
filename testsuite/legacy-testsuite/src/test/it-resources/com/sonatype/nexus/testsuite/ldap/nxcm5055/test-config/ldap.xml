@@ -16,7 +16,7 @@
     <authScheme>simple</authScheme>
     <protocol>ldaps</protocol>
     <host>localhost</host>
-    <port>${default-ldap-port}</port>
+    <port>${port}</port>
   </connectionInfo>
   <userAndGroupConfig>
     <emailAddressAttribute>mail</emailAddressAttribute>

@@ -71,10 +71,10 @@ public abstract class AbstractLdapIT
         Assert.fail("Could not start or lookup ldap server ");
       }
 
-      map.put("default-ldap-port", Integer.toString(ldapServer.getPort()));
+      map.put("port", Integer.toString(ldapServer.getPort()));
     }
     else {
-      map.put("default-ldap-port", Integer.toString(12345));
+      map.put("port", Integer.toString(12345));
     }
 
     // copy ldap.xml to work dir
