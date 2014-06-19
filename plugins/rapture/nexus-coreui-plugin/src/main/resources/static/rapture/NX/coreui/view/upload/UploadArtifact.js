@@ -29,41 +29,9 @@ Ext.define('NX.coreui.view.upload.UploadArtifact', {
   items: [
     {
       xtype: 'label',
-      html: '<p>Enter the following details, or leave them empty to be automatically detected based on selected artifacts.</p>'
+      html: '<p>Select the artifacts you wish to upload.</p>'
     },
-    {
-      name: 'group',
-      itemId: 'group',
-      fieldLabel: 'Group',
-      helpText: 'Maven group id of uploaded artifacts.',
-      emptyText: 'enter a group name'
-    },
-    {
-      name: 'artifact',
-      itemId: 'artifact',
-      fieldLabel: 'Artifact',
-      helpText: 'Maven artifact id of uploaded artifacts.',
-      emptyText: 'enter an artifact name'
-    },
-    {
-      name: 'version',
-      itemId: 'version',
-      fieldLabel: 'Version',
-      helpText: 'Maven version of uploaded artifacts.',
-      emptyText: 'enter a version'
-    },
-    {
-      xtype: 'combo',
-      name: 'packaging',
-      itemId: 'packaging',
-      fieldLabel: 'Packaging',
-      helpText: 'Maven packaging.',
-      emptyText: 'select or enter packaging',
-      queryMode: 'local',
-      displayField: 'name',
-      valueField: 'id',
-      store: ['pom', 'jar', 'ejb', 'war', 'ear', 'rar', 'par', 'maven-archetype', 'maven-plugin']
-    }
+    { xtype: 'nx-coreui-upload-artifact-coordinates', hidden: true, disabled: true }
   ],
 
   buttonAlign: 'left',
