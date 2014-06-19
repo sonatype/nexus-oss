@@ -17,14 +17,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.inject.Qualifier;
-
 /**
  * Identifies methods whose arguments and return value require validation.
  * 
  * @since 3.0
  */
-@Qualifier
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
 public @interface Validate
