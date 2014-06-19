@@ -46,6 +46,10 @@
           <groupId>org.sonatype.nexus.plugins</groupId>
           <artifactId>nexus-ssl-model</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.sonatype.nexus.plugins</groupId>
+          <artifactId>nexus-restlet1x-model</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 

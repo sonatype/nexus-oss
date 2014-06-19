@@ -48,6 +48,12 @@
     <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-ssl</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.sonatype.sisu.goodies</groupId>
+          <artifactId>goodies-crypto</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
