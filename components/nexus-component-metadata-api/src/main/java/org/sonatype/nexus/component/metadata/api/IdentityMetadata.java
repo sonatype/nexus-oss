@@ -77,6 +77,22 @@ public class IdentityMetadata
         "}";
   }
 
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof IdentityMetadata && o.toString().equals(toString());
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((format == null) ? 0 : format.hashCode());
+    result = prime * result + ((group == null) ? 0 : group.hashCode());
+    result = prime * result + ((artifact == null) ? 0 : artifact.hashCode());
+    result = prime * result + ((version == null) ? 0 : version.hashCode());
+    return result;
+  }
+
   public static class Builder {
     private String format;
     private String group;

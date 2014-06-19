@@ -31,14 +31,6 @@ public abstract class MetadataTypeRegistry
     configureType(type);
   }
 
-  public MetadataType getType(Object object) {
-    MetadataType type = getType(object.getClass());
-    if (type == null) {
-      throw new IllegalArgumentException(object.getClass() + " is not associated with any registered MetadataType");
-    }
-    return type;
-  }
-
   public MetadataType getType(Class metadataClass) {
     checkNotNull(metadataClass);
     MetadataType type = byMetadataClass.get(metadataClass);

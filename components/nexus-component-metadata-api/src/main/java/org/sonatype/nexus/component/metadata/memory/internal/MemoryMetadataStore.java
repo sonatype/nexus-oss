@@ -12,8 +12,12 @@
  */
 package org.sonatype.nexus.component.metadata.memory.internal;
 
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
@@ -21,18 +25,19 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.component.metadata.api.AbstractMetadataStore;
 import org.sonatype.nexus.component.metadata.api.MetadataHandle;
 import org.sonatype.nexus.component.metadata.api.MetadataIndex;
-import org.sonatype.nexus.component.metadata.api.MetadataKeyIterator;
+import org.sonatype.nexus.component.metadata.api.MetadataKeyIterable;
 import org.sonatype.nexus.component.metadata.api.MetadataType;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterators;
+import org.apache.commons.lang.StringUtils;
 
 public class MemoryMetadataStore<T>
     extends AbstractMetadataStore<T>
 {
   private final Map<String, MetadataHandle<T>> map = new ConcurrentHashMap<>();
 
-  private final Map<Object[], MetadataHandle<T>> uniqueIndexMap = new ConcurrentHashMap<>();
-
-  // if a unique index exists, this will be defined so uniqueIndexMap can be maintained
-  private List<String> uniqueIndexColumns;
+  private final Set<UniqueEnforcer> uniqueEnforcers = new HashSet<>();
 
   private long sequence;
 
@@ -40,7 +45,7 @@ public class MemoryMetadataStore<T>
     super(type, clazz);
     for (MetadataIndex index: type.getIndexes()) {
       if (index.isUnique()) {
-        uniqueIndexColumns = index.getColumns();
+        uniqueEnforcers.add(new UniqueEnforcer(index.getColumns()));
       }
     }
   }
@@ -50,6 +55,9 @@ public class MemoryMetadataStore<T>
     String key = generateKey();
     MetadataHandle<T> handle = new MetadataHandle<>(key, generateVersion(), metadata);
     synchronized (map) {
+      for (UniqueEnforcer enforcer: uniqueEnforcers) {
+        enforcer.add(metadata);
+      }
       map.put(key, handle);
     }
     return handle;
@@ -64,14 +72,15 @@ public class MemoryMetadataStore<T>
   @Override
   public MetadataHandle<T> update(final String key, @Nullable final String version, final T metadata) {
     synchronized (map) {
-      MetadataHandle<T> handle = retrieve(key);
+      MetadataHandle<T> handle = getHandleOrNull(key, version);
       if (handle == null) {
-        throw new IllegalStateException("Key not found in store: " + key);
-      }
-      if (version != null && !handle.getVersion().equals(version)) {
         return null;
       }
       MetadataHandle<T> newHandle = new MetadataHandle<>(key, generateVersion(), metadata);
+      for (UniqueEnforcer enforcer: uniqueEnforcers) {
+        enforcer.delete(handle.getMetadata());
+        enforcer.add(metadata);
+      }
       map.put(key, newHandle);
       return newHandle;
     }
@@ -79,14 +88,59 @@ public class MemoryMetadataStore<T>
 
   @Override
   public boolean delete(final String key, @Nullable final String version) {
-    // TODO: Impl
-    return false;
+    synchronized (map) {
+      MetadataHandle<T> handle = getHandleOrNull(key, version);
+      if (handle == null) {
+        return false;
+      }
+      map.remove(key);
+      for (UniqueEnforcer enforcer: uniqueEnforcers) {
+        enforcer.delete(handle.getMetadata());
+      }
+      return true;
+    }
+  }
+
+  @Nullable
+  private MetadataHandle<T> getHandleOrNull(String key, @Nullable String version) {
+    MetadataHandle<T> handle = retrieve(key);
+    if (handle == null) {
+      return null;
+    }
+    if (version != null && !handle.getVersion().equals(version)) {
+      return null;
+    }
+    return handle;
   }
 
   @Override
-  protected MetadataKeyIterator find(final Map<String, Object> filter, final String index) {
-    // TODO: Impl
-    return null;
+  protected MetadataKeyIterable find(final Map<String, Object> filter, final MetadataIndex index) {
+    return new MetadataKeyIterable() {
+      @Override
+      public void close() throws Exception {
+        // nothing to do
+      }
+
+      @Override
+      public Iterator<String> iterator() {
+        return Iterators.filter(map.keySet().iterator(), new Predicate<String>() {
+          @Override
+          public boolean apply(@Nullable final String key) {
+            return matches(map.get(key).getMetadata(), filter);
+          }
+        });
+      }
+    };
+  }
+
+  private boolean matches(T metadata, Map<String, Object> filter) {
+    for (String attribute: filter.keySet()) {
+      Object value = invokeGetter(metadata, attribute);
+      if (value == null || !value.equals(filter.get(attribute))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private synchronized String generateKey() {
@@ -95,5 +149,67 @@ public class MemoryMetadataStore<T>
 
   private synchronized String generateVersion() {
     return type.getName() + ":version:" + sequence++;
+  }
+
+  private static Object invokeGetter(Object metadata, String attribute) {
+    String suffix = StringUtils.capitalize(attribute);
+    Method method = null;
+    try {
+      method = metadata.getClass().getMethod("get" + suffix);
+    }
+    catch (NoSuchMethodException e) {
+      try {
+        method = metadata.getClass().getMethod("is" + suffix);
+      }
+      catch (NoSuchMethodException e2) {
+        throw new IllegalArgumentException("No getter defined for attribute " + attribute +
+            " in class " + metadata.getClass());
+      }
+    }
+    try {
+      return method.invoke(metadata);
+    }
+    catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static class UniqueEnforcer
+  {
+    private final List<String> attributes;
+
+    private final Set<String> values = new HashSet<>();
+
+    public UniqueEnforcer(List<String> attributes) {
+      this.attributes = attributes;
+    }
+
+    public void add(Object metadata) {
+      String value = getAttributesAsString(metadata);
+      synchronized (values) {
+        if (values.contains(value)) {
+          throw new IllegalArgumentException("Unique constraint violated");
+        }
+        values.add(value);
+      }
+    }
+
+    public void delete(Object metadata) {
+      String value = getAttributesAsString(metadata);
+      synchronized (values) {
+        values.remove(value);
+      }
+    }
+
+    private String getAttributesAsString(Object metadata) {
+      StringBuilder builder = new StringBuilder(metadata.getClass().getSimpleName());
+      for (String attribute: attributes) {
+        builder.append("\n");
+        builder.append(attribute);
+        builder.append("=");
+        builder.append(invokeGetter(metadata, attribute));
+      }
+      return builder.toString();
+    }
   }
 }

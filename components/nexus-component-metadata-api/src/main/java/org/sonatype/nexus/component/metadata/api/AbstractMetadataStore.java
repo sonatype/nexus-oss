@@ -14,6 +14,7 @@ package org.sonatype.nexus.component.metadata.api;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -31,11 +32,13 @@ public abstract class AbstractMetadataStore<T>
   }
 
   @Override
-  public MetadataKeyIterator find(final MetadataBuilder<T> filter, final MetadataIndex index) {
-    return find(toMap(checkNotNull(filter)), type.getIndexName(checkNotNull(index)));
+  public MetadataKeyIterable find(final MetadataBuilder<T> filter, final MetadataIndex index) {
+    checkNotNull(filter);
+    checkNotNull(index);
+    return find(toMap(filter), index);
   }
 
-  protected abstract MetadataKeyIterator find(Map<String, Object> filter, String index);
+  protected abstract MetadataKeyIterable find(Map<String, Object> filter, MetadataIndex index);
 
   private Map<String, Object> toMap(MetadataBuilder<T> filter) {
     Map<String, Object> map = new HashMap<>();
@@ -57,9 +60,12 @@ public abstract class AbstractMetadataStore<T>
 
   @Override
   public String findFirst(final MetadataBuilder<T> filter, final MetadataIndex index) {
-    try (MetadataKeyIterator iterator = find(filter, index)) {
-      if (iterator.hasNext()) {
-        return iterator.next();
+    checkNotNull(filter);
+    checkNotNull(index);
+    try (MetadataKeyIterable result = find(filter, index)) {
+      Iterator<String> keys = result.iterator();
+      if (keys.hasNext()) {
+        return keys.next();
       }
       return null;
     } catch (Exception e) {

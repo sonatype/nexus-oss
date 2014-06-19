@@ -46,7 +46,7 @@ public interface MetadataStore<T>
 
   boolean delete(String key, @Nullable String version);
 
-  MetadataKeyIterator find(MetadataBuilder<T> filter, MetadataIndex index);
+  MetadataKeyIterable find(MetadataBuilder<T> filter, MetadataIndex index);
 
   @Nullable
   String findFirst(MetadataBuilder<T> filter, MetadataIndex index);

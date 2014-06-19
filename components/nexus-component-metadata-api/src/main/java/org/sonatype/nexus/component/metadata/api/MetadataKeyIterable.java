@@ -12,9 +12,7 @@
  */
 package org.sonatype.nexus.component.metadata.api;
 
-import java.util.Iterator;
-
-public interface MetadataKeyIterator
-  extends Iterator<String>, AutoCloseable
+public interface MetadataKeyIterable
+  extends Iterable<String>, AutoCloseable
 {
 }

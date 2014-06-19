@@ -27,7 +27,7 @@ public class ContentMetadata
       .withColumns("identityKey")
       .build();
 
-  public static final MetadataType type = new MetadataType.Builder()
+  public static final MetadataType TYPE = new MetadataType.Builder()
       .withName("content")
       .withMetadataClass(ContentMetadata.class)
       .withIndexes(INDEX_IDENTITYKEY)
@@ -39,7 +39,7 @@ public class ContentMetadata
 
   private final String mimeType;
 
-  private final long size;
+  private final Long size;
 
   private final Map<String, String> checksums;
 
@@ -48,15 +48,15 @@ public class ContentMetadata
   private ContentMetadata(String identityKey,
                           List<String> blobRefs,
                           String mimeType,
-                          long size,
+                          Long size,
                           Map<String, String> checksums,
                           String path) {
     this.identityKey = checkNotNull(identityKey);
     this.blobRefs = checkNotNull(blobRefs);
     this.mimeType = checkNotNull(mimeType);
-    this.size = size;
-    this.checksums = checksums;
-    this.path = path;
+    this.size = checkNotNull(size);
+    this.checksums = checkNotNull(checksums);
+    this.path = checkNotNull(path);
   }
 
   @Override
@@ -72,7 +72,7 @@ public class ContentMetadata
     return mimeType;
   }
 
-  public long getSize() {
+  public Long getSize() {
     return size;
   }
 
@@ -96,7 +96,25 @@ public class ContentMetadata
         "}";
   }
 
-  public static class Builder {
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof ContentMetadata && o.toString().equals(toString());
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((identityKey == null) ? 0 : identityKey.hashCode());
+    result = prime * result + ((blobRefs == null) ? 0 : blobRefs.hashCode());
+    result = prime * result + ((mimeType == null) ? 0 : mimeType.hashCode());
+    result = prime * result + ((size == null) ? 0 : size.hashCode());
+    result = prime * result + ((checksums == null) ? 0 : checksums.hashCode());
+    result = prime * result + ((path == null) ? 0 : path.hashCode());
+    return result;
+  }
+
+  public static class Builder implements MetadataBuilder<ContentMetadata> {
     private String identityKey;
     private List<String> blobRefs;
     private String mimeType;
@@ -145,6 +163,7 @@ public class ContentMetadata
       return this;
     }
 
+    @Override
     public ContentMetadata build() {
       return new ContentMetadata(identityKey, blobRefs, mimeType, size, checksums, path);
     }
