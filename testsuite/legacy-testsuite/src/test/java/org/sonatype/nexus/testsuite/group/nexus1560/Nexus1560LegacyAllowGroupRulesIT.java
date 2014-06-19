@@ -13,7 +13,7 @@
 package org.sonatype.nexus.testsuite.group.nexus1560;
 
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
+import org.sonatype.nexus.security.targets.TargetPrivilegeDescriptor;
 
 import org.junit.Before;
 import org.junit.BeforeClass;

@@ -20,7 +20,7 @@ import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.rest.component.AbstractComponentListPlexusResource;
 import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
-import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
+import org.sonatype.nexus.tasks.ScheduledTaskDescriptor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 import org.restlet.Context;

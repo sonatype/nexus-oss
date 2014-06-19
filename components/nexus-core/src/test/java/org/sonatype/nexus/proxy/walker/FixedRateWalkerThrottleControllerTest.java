@@ -13,9 +13,9 @@
 package org.sonatype.nexus.proxy.walker;
 
 import org.sonatype.nexus.proxy.walker.WalkerThrottleController.ThrottleInfo;
-import org.sonatype.nexus.util.ConstantNumberSequence;
-import org.sonatype.nexus.util.FibonacciNumberSequence;
-import org.sonatype.nexus.util.NumberSequence;
+import org.sonatype.nexus.util.sequence.ConstantNumberSequence;
+import org.sonatype.nexus.util.sequence.FibonacciNumberSequence;
+import org.sonatype.nexus.util.sequence.NumberSequence;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;

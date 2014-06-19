@@ -27,7 +27,7 @@ import org.sonatype.nexus.formfields.Selectable
 import org.sonatype.nexus.scheduling.NexusScheduler
 import org.sonatype.nexus.scheduling.NexusTask
 import org.sonatype.nexus.scheduling.TaskUtils
-import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor
+import org.sonatype.nexus.tasks.ScheduledTaskDescriptor
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.scheduling.ScheduledTask

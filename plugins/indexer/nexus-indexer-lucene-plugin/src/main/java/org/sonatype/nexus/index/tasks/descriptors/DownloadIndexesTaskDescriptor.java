@@ -24,7 +24,7 @@ import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
+import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
 
 @Named("DownloadIndexes")
 @Singleton

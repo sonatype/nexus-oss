@@ -17,7 +17,6 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
-import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
 
 import org.codehaus.plexus.util.StringUtils;
 

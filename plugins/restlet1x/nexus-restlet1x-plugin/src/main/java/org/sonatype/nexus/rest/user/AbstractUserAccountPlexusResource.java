@@ -16,7 +16,7 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.rest.model.UserAccount;
 import org.sonatype.nexus.rest.model.UserAccountRequestResponseWrapper;
-import org.sonatype.nexus.user.UserAccountManager;
+import org.sonatype.nexus.security.UserAccountManager;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.User;

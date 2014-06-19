@@ -13,9 +13,9 @@
 
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
-import org.sonatype.nexus.auth.ClientInfo;
-import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.security.auth.ClientInfo;
+import org.sonatype.nexus.security.auth.NexusAuthenticationEvent;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 
 /**

@@ -19,13 +19,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.auth.ClientInfo;
-import org.sonatype.nexus.auth.NexusAuthenticationEvent;
-import org.sonatype.nexus.auth.NexusAuthorizationEvent;
-import org.sonatype.nexus.auth.ResourceInfo;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
+import org.sonatype.nexus.security.auth.ClientInfo;
+import org.sonatype.nexus.security.auth.NexusAuthenticationEvent;
+import org.sonatype.nexus.security.auth.NexusAuthorizationEvent;
+import org.sonatype.nexus.security.auth.ResourceInfo;
 import org.sonatype.nexus.timeline.feeds.FeedEvent;
 import org.sonatype.nexus.timeline.feeds.FeedRecorder;
 
