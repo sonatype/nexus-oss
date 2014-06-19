@@ -13,7 +13,6 @@
 package org.sonatype.nexus.rest.global;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -37,9 +36,6 @@ import org.sonatype.nexus.configuration.model.CRemoteProxySettings;
 import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
-import org.sonatype.nexus.notification.NotificationCheat;
-import org.sonatype.nexus.notification.NotificationManager;
-import org.sonatype.nexus.notification.NotificationTarget;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
@@ -94,18 +90,14 @@ public class GlobalConfigurationPlexusResource
    */
   public static final String DEFAULT_CONFIG_NAME = "default";
 
-  private final NotificationManager notificationManager;
-
   private final SecurityConfigurationSource defaultSecurityConfigurationSource;
 
   private final ApplicationConfigurationSource configurationSource;
 
   @Inject
-  public GlobalConfigurationPlexusResource(final NotificationManager notificationManager,
-                                           final @Named("static") SecurityConfigurationSource defaultSecurityConfigurationSource,
+  public GlobalConfigurationPlexusResource(final @Named("static") SecurityConfigurationSource defaultSecurityConfigurationSource,
                                            final @Named("static") ApplicationConfigurationSource configurationSource)
   {
-    this.notificationManager = notificationManager;
     this.defaultSecurityConfigurationSource = defaultSecurityConfigurationSource;
     this.configurationSource = configurationSource;
 
@@ -307,32 +299,6 @@ public class GlobalConfigurationPlexusResource
             getGlobalRestApiSettings().disable();
           }
 
-          if (resource.getSystemNotificationSettings() != null) {
-            notificationManager.setEnabled(resource.getSystemNotificationSettings().isEnabled());
-
-            NotificationTarget target =
-                notificationManager.readNotificationTarget(NotificationCheat.AUTO_BLOCK_NOTIFICATION_GROUP_ID);
-
-            if (target == null) {
-              target = new NotificationTarget();
-              target.setTargetId(NotificationCheat.AUTO_BLOCK_NOTIFICATION_GROUP_ID);
-            }
-
-            target.getTargetRoles().clear();
-            target.getTargetRoles().addAll(resource.getSystemNotificationSettings().getRoles());
-
-            target.getExternalTargets().clear();
-
-            if (StringUtils.isNotEmpty(resource.getSystemNotificationSettings().getEmailAddresses())) {
-              target.getExternalTargets().addAll(
-                  Arrays.asList(resource.getSystemNotificationSettings().getEmailAddresses().split(",")));
-            }
-
-            target.getTargetUsers().clear();
-
-            notificationManager.updateNotificationTarget(target);
-          }
-
           // NEXUS-3064: to "inform" global remote storage context (and hence, all affected proxy
           // repositories) about the change, but only if config is saved okay
           // TODO: this is wrong, the config framework should "tell" this changed, but we have some
@@ -485,8 +451,6 @@ public class GlobalConfigurationPlexusResource
     resource.setGlobalRestApiSettings(restApiSettings);
 
     resource.setSmtpSettings(convert(getNexusEmailer()));
-
-    resource.setSystemNotificationSettings(convert(notificationManager));
   }
 
   protected String getSecurityConfiguration(boolean enabled, String authSourceType) {

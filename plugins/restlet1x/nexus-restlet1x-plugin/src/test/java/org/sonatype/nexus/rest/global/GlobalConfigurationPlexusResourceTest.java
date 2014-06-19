@@ -13,7 +13,6 @@
 package org.sonatype.nexus.rest.global;
 
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
-import org.sonatype.nexus.notification.NotificationManager;
 import org.sonatype.nexus.rest.model.SmtpSettings;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -34,7 +33,6 @@ public class GlobalConfigurationPlexusResourceTest
 
   // FIXME: This should be done in setup
   private GlobalConfigurationPlexusResource testSubject = new GlobalConfigurationPlexusResource(
-      mock(NotificationManager.class),
       mock(SecurityConfigurationSource.class),
       mock(ApplicationConfigurationSource.class)
   );
