@@ -503,9 +503,6 @@
                   annotations|
                   aopalliance|
                   bcprov-jdk15on|
-                  bval-core|
-                  bval-guice|
-                  bval-jsr303|
                   cdi-api|
                   commons-beanutils|
                   commons-codec|
@@ -527,12 +524,15 @@
                   guice-assistedinject|
                   guice-multibindings|
                   guice-servlet|
+                  hibernate-validator|
                   httpclient|
                   httpcore|
                   jackson-annotations|
                   jackson-core|
                   jackson-databind|
                   javax.annotation-api|
+                  javax.el-api|
+                  javax.el|
                   javax.inject|
                   javax.servlet|
                   javax.ws.rs|

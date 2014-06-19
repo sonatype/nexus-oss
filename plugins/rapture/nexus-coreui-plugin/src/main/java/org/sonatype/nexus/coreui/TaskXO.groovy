@@ -14,7 +14,7 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
-import org.apache.bval.constraints.NotEmpty
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.scheduling.TaskState

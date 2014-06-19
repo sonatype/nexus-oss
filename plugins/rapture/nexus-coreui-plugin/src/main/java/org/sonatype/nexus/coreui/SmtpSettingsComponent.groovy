@@ -15,10 +15,9 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import org.apache.bval.constraints.Email
-import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.Email
 import org.sonatype.micromailer.Address
 import org.sonatype.nexus.configuration.application.NexusConfiguration
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration
@@ -28,6 +27,7 @@ import org.sonatype.nexus.email.SmtpSettingsValidator
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
+import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.rapture.TrustStoreKeys
 
 import javax.annotation.Nullable
