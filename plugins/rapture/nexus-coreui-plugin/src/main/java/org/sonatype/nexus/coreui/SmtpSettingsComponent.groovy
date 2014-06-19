@@ -21,9 +21,9 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.micromailer.Address
 import org.sonatype.nexus.configuration.application.NexusConfiguration
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration
 import org.sonatype.nexus.email.EmailerException
 import org.sonatype.nexus.email.NexusEmailer
+import org.sonatype.nexus.email.SmtpConfiguration
 import org.sonatype.nexus.email.SmtpSettingsValidator
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
@@ -123,7 +123,7 @@ extends DirectComponentSupport
   {
     try {
       smtpSettingsValidator.sendSmtpConfigurationTest(
-          new CSmtpConfiguration(
+          new SmtpConfiguration(
               hostname: smtpSettingsXO.host,
               port: smtpSettingsXO.port,
               username: smtpSettingsXO.username,
