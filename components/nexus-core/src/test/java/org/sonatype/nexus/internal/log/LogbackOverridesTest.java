@@ -10,13 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.log.internal;
+package org.sonatype.nexus.internal.log;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.sonatype.nexus.internal.log.LogbackOverrides;
 import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.DiffMatchers;
@@ -31,11 +32,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
 /**
- * {@link LogbackOverrides} UTs.
- *
- * @since 2.7
+ * Tests for {@link LogbackOverrides}.
  */
-
 public class LogbackOverridesTest
     extends TestSupport
 {

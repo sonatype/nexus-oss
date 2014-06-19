@@ -12,44 +12,27 @@
  */
 package org.sonatype.nexus.log;
 
-import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * LogManager MBean interface (intentionally narrowed to same as UI supports, as this is the only thing proven useful
- * and used).
- *
- * @author cstamas
- * @since 2.1
+ * A component contract that wants to provide extra logging configuration, participate in configuration of logging in
+ * Nexus.
  */
-public interface LogManagerMBean
+public interface LogConfigurationParticipant
 {
-  String getRootLoggerLevel()
-      throws IOException;
+  String getName();
+
+  InputStream getConfiguration();
 
   /**
-   * @since 2.7
+   * Marker interface to be implemented by {@link LogConfigurationParticipant} instances that provide configurations
+   * which should not be tampered with, changed by users. These participant configurations will be written out
+   * (probably overwriting existing file) always, at every boot.
+   *
+   * @since 2.2
    */
-  void makeRootLoggerLevelOff()
-      throws IOException;
-
-  void makeRootLoggerLevelTrace()
-      throws IOException;
-
-  void makeRootLoggerLevelDebug()
-      throws IOException;
-
-  void makeRootLoggerLevelInfo()
-      throws IOException;
-
-  void makeRootLoggerLevelWarn()
-      throws IOException;
-
-  /**
-   * @since 2.7
-   */
-  void makeRootLoggerLevelError()
-      throws IOException;
-
-  void makeRootLoggerLevelDefault()
-      throws IOException;
+  public interface NonEditable
+  {
+    // empty
+  }
 }

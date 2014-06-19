@@ -72,7 +72,7 @@ public class NexusModules
           return sharedHealthCheckRegistry;
         }
       });
-      install(new BvalModule());
+      install(new ValidationModule());
     }
   }
 

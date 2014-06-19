@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.log.internal;
+package org.sonatype.nexus.internal.log;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Utility class for reading/writing logback-overrides.xml.
+ * Utility class for reading/writing {@code logback-overrides.xml}.
  *
  * @since 2.7
  */
@@ -99,8 +99,7 @@ public class LogbackOverrides
             out.println("<?xml version='1.0' encoding='UTF-8'?>");
             out.println();
             out.println("<!--");
-            out.println(
-                "    DO NOT EDIT - This file includes user customised loggers and is automatically generated.");
+            out.println("DO NOT EDIT - This file includes user customised loggers and is automatically generated.");
             out.println("-->");
             out.println();
             out.println("<included>");

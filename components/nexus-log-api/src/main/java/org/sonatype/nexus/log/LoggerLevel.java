@@ -13,28 +13,31 @@
 package org.sonatype.nexus.log;
 
 /**
- * Allows participation to logging configuration.
+ * Logger levels supported.
  *
- * @since 2.7
+ * @since 2.1
  */
-public interface LogConfigurationCustomizer
+public enum LoggerLevel
 {
+  /**
+   * @since 2.7
+   */
+  OFF,
+
+  TRACE,
+  DEBUG,
+  INFO,
+  WARN,
 
   /**
-   * Callback allowing setting of loggers levels.
+   * @since 2.7
    */
-  void customize(Configuration configuration);
+  ERROR,
 
-  interface Configuration
-  {
-    /**
-     * Sets logger level to specified value. If logger level is {@link LoggerLevel#DEFAULT} level will be calculated as
-     * effective level.
-     *
-     * @param name  logger name
-     * @param level logger level
-     */
-    void setLoggerLevel(String name, LoggerLevel level);
-  }
-
+  /**
+   * Level will be calculated as effective level.
+   *
+   * @since 2.7
+   */
+  DEFAULT
 }

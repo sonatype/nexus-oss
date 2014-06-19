@@ -12,19 +12,27 @@
  */
 package org.sonatype.nexus.log;
 
-
 /**
- * @author adreghiciu@gmail.com
+ * Allows participation to logging configuration.
+ *
+ * @since 2.7
  */
-public interface LogConfiguration
+public interface LogConfigurationCustomizer
 {
+  /**
+   * Callback allowing setting of loggers levels.
+   */
+  void customize(Configuration configuration);
 
-  public String getRootLoggerLevel();
-
-  public String getRootLoggerAppenders();
-
-  public String getFileAppenderPattern();
-
-  public String getFileAppenderLocation();
-
+  interface Configuration
+  {
+    /**
+     * Sets logger level to specified value. If logger level is {@link LoggerLevel#DEFAULT} level will be calculated as
+     * effective level.
+     *
+     * @param name  logger name
+     * @param level logger level
+     */
+    void setLoggerLevel(String name, LoggerLevel level);
+  }
 }

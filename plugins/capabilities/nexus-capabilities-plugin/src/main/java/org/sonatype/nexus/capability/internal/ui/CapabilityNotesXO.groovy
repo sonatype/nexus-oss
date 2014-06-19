@@ -14,7 +14,7 @@
 package org.sonatype.nexus.capability.internal.ui
 
 import groovy.transform.ToString
-import org.apache.bval.constraints.NotEmpty
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.validation.Update
 
 import javax.validation.constraints.NotNull

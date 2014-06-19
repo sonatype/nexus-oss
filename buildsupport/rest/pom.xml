@@ -81,6 +81,16 @@
         <groupId>org.sonatype.siesta</groupId>
         <artifactId>siesta-server</artifactId>
         <version>${siesta2.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.bval</groupId>
+            <artifactId>bval-guice</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.bval</groupId>
+            <artifactId>bval-jsr303</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>

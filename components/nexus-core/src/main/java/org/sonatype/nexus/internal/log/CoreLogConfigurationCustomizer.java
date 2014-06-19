@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.log.internal;
+package org.sonatype.nexus.internal.log;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -28,10 +28,8 @@ import org.sonatype.nexus.log.LoggerLevel;
 public class CoreLogConfigurationCustomizer
     implements LogConfigurationCustomizer
 {
-
   @Override
   public void customize(final Configuration configuration) {
-
     // non Nexus loggers
     configuration.setLoggerLevel("org.restlet", LoggerLevel.INFO);
     configuration.setLoggerLevel("org.apache.commons", LoggerLevel.WARN);
@@ -56,13 +54,12 @@ public class CoreLogConfigurationCustomizer
 
     // Useful loggers (level will be calculated as effective level)
     configuration.setLoggerLevel("org.sonatype.nexus", LoggerLevel.DEFAULT);
-    configuration.setLoggerLevel("org.sonatype.nexus.log", LoggerLevel.DEFAULT);
-    configuration.setLoggerLevel("org.sonatype.nexus.httpclient", LoggerLevel.DEFAULT);
+    configuration.setLoggerLevel("org.sonatype.nexus.internal.log", LoggerLevel.DEFAULT);
+    configuration.setLoggerLevel("org.sonatype.nexus.internal.httpclient", LoggerLevel.DEFAULT);
     configuration.setLoggerLevel("org.sonatype.nexus.configuration", LoggerLevel.DEFAULT);
     configuration.setLoggerLevel("org.sonatype.nexus.plugins", LoggerLevel.DEFAULT);
     configuration.setLoggerLevel("org.sonatype.nexus.proxy", LoggerLevel.DEFAULT);
     configuration.setLoggerLevel("org.sonatype.nexus.tasks", LoggerLevel.DEFAULT);
     configuration.setLoggerLevel("org.sonatype.nexus.threads", LoggerLevel.DEFAULT);
   }
-
 }

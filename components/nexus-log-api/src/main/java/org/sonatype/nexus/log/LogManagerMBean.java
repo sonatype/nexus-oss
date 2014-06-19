@@ -10,45 +10,37 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.coreui
+package org.sonatype.nexus.log;
 
-import groovy.transform.ToString
-import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.validation.Update
-
-import javax.validation.constraints.NotNull
-
-import static org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType
+import java.io.IOException;
 
 /**
- * Repository Route exchange object.
+ * LogManager MBean interface (intentionally narrowed to same as UI supports, as this is the only thing proven useful
+ * and used).
  *
- * @since 3.0
+ * @since 2.1
  */
-@ToString(includePackage = false, includeNames = true)
-class RepositoryRouteXO
+public interface LogManagerMBean
 {
+  String getRootLoggerLevel() throws IOException;
 
-  @NotNull(groups = Update.class)
-  @NotEmpty(groups = Update.class)
-  String id
+  /**
+   * @since 2.7
+   */
+  void makeRootLoggerLevelOff() throws IOException;
 
-  @NotNull
-  @NotEmpty
-  String pattern
+  void makeRootLoggerLevelTrace() throws IOException;
 
-  @NotNull
-  @NotEmpty
-  MappingType mappingType
+  void makeRootLoggerLevelDebug() throws IOException;
 
-  @NotNull
-  @NotEmpty
-  String groupId
+  void makeRootLoggerLevelInfo() throws IOException;
 
-  String groupName
+  void makeRootLoggerLevelWarn() throws IOException;
 
-  List<String> mappedRepositoriesIds
+  /**
+   * @since 2.7
+   */
+  void makeRootLoggerLevelError() throws IOException;
 
-  List<String> mappedRepositoriesNames
-
+  void makeRootLoggerLevelDefault() throws IOException;
 }

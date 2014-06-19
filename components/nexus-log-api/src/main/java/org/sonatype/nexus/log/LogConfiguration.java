@@ -12,30 +12,16 @@
  */
 package org.sonatype.nexus.log;
 
-import java.io.InputStream;
-
 /**
- * A component contract that wants to provide extra logging configuration, participate in configuration of logging in
- * Nexus.
- *
- * @author adreghiciu
+ * {@link LogManager} configuration.
  */
-public interface LogConfigurationParticipant
+public interface LogConfiguration
 {
-  String getName();
+  String getRootLoggerLevel();
 
-  InputStream getConfiguration();
+  String getRootLoggerAppenders();
 
-  /**
-   * Marker interface to be implemented by {@link LogConfigurationParticipant} instances that provide configurations
-   * which should not be tampered with, changed by users. These participant configurations will be written out
-   * (probably overwriting existing file) always, at every boot.
-   *
-   * @author cstamas
-   * @since 2.2
-   */
-  public interface NonEditable
-  {
+  String getFileAppenderPattern();
 
-  }
+  String getFileAppenderLocation();
 }
