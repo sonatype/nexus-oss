@@ -15,7 +15,6 @@ package org.sonatype.nexus.proxy.repository;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +67,7 @@ import org.sonatype.nexus.util.FibonacciNumberSequence;
 import org.sonatype.nexus.util.NumberSequence;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
@@ -262,14 +262,64 @@ public abstract class AbstractProxyRepository
     return doExpireProxyCaches(request, filter);
   }
 
+  /**
+   * Allows proxy cache invalidation to be disabled by system property.
+   *
+   * @since 2.9
+   */
+  private static final boolean PROXY_CACHE_INVALIDATION_TOKEN_DISABLED = SystemPropertiesHelper.getBoolean(
+      AbstractProxyRepository.class.getName() + ".proxyCacheInvalidationToken.disabled", false);
+
+  static {
+    if (PROXY_CACHE_INVALIDATION_TOKEN_DISABLED) {
+      LoggerFactory.getLogger(AbstractProxyRepository.class).info("Proxy-cache invalidation-token support disabled");
+    }
+  }
+
+  /**
+   * Token set when expire proxy caches is done for entire collection.
+   *
+   * @since 2.9
+   *
+   * @see #doExpireProxyCaches(ResourceStoreRequest, WalkerFilter)
+   */
+  protected volatile String proxyCacheInvalidationToken;
+
+  /**
+   * Key for storage-item invalidation token attribute.
+   *
+   * @since 2.9
+   *
+   * @see #isOld(int, StorageItem, boolean)
+   */
+  public static final String PROXY_CACHE_INVALIDATION_TOKEN_KEY = "proxyRepository-invalidationToken";
+
   protected boolean doExpireProxyCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
-    // do this only if we ARE a proxy
-    // crawl the local storage (which is in this case proxy cache)
-    // and flip the isExpired attribute bits to true
-    if (getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
-      if (StringUtils.isEmpty(request.getRequestPath())) {
-        request.setRequestPath(RepositoryItemUid.PATH_ROOT);
-      }
+    // skip unless this is a proxy repository
+    if (!getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
+      return false;
+    }
+
+    // normalize request path
+    if (StringUtils.isEmpty(request.getRequestPath())) {
+      request.setRequestPath(RepositoryItemUid.PATH_ROOT);
+    }
+
+    // flag to indicate if cache was altered or not
+    boolean cacheAltered;
+
+    // special handling for expiration for entire collection, unless disabled by system property
+    if (!PROXY_CACHE_INVALIDATION_TOKEN_DISABLED && RepositoryItemUid.PATH_ROOT.equals(request.getRequestPath())) {
+      // generate a unique token for this invalidation request
+      proxyCacheInvalidationToken = String.valueOf(System.nanoTime());
+      log.debug("Proxy cache marked as invalid for repository {}, token: {}", this, proxyCacheInvalidationToken);
+
+      // assume the cache will alter, we can not know for sure w/o expensive walking operation
+      cacheAltered = true;
+    }
+    else {
+      // crawl the local storage (which is in this case proxy cache)
+      // and flip the isExpired attribute bits to true
       request.setRequestLocalOnly(true);
       // 1st, expire all the files below path
       final DefaultWalkerContext ctx = new DefaultWalkerContext(this, request, filter);
@@ -285,26 +335,22 @@ public abstract class AbstractProxyRepository
           throw e;
         }
       }
+      cacheAltered = expireCacheWalkerProcessor.isCacheAltered();
+    }
 
-      if (log.isDebugEnabled()) {
-        if (expireCacheWalkerProcessor.isCacheAltered()) {
-          log.info("Proxy cache was expired for repository {} from path='{}'", this, request.getRequestPath());
-        }
-        else {
-          log.debug("Proxy cache not altered for repository {} from path='{}'", this, request.getRequestPath());
-        }
+    if (log.isDebugEnabled()) {
+      if (cacheAltered) {
+        log.info("Proxy cache was expired for repository {} from path='{}'", this, request.getRequestPath());
       }
-
-      // fire off the new event if crawling did end, so we did flip all the bits
-      eventBus().post(
-          new RepositoryEventExpireProxyCaches(this, request.getRequestPath(),
-              request.getRequestContext().flatten(), expireCacheWalkerProcessor.isCacheAltered()));
-
-      return expireCacheWalkerProcessor.isCacheAltered();
+      else {
+        log.debug("Proxy cache not altered for repository {} from path='{}'", this, request.getRequestPath());
+      }
     }
-    else {
-      return false;
-    }
+
+    eventBus().post(new RepositoryEventExpireProxyCaches(
+        this, request.getRequestPath(), request.getRequestContext().flatten(), cacheAltered));
+
+    return cacheAltered;
   }
 
   protected boolean doExpireCaches(final ResourceStoreRequest request, final WalkerFilter filter) {
@@ -1517,6 +1563,25 @@ public abstract class AbstractProxyRepository
   protected boolean isOld(int maxAge, StorageItem item, boolean shouldCalculate) {
     if (!shouldCalculate) {
       // simply say "is old" always
+      return true;
+    }
+
+    // If entire proxy cache has been invalidated, lazily expire item
+    String itemInvalidationToken = item.getRepositoryItemAttributes().get(PROXY_CACHE_INVALIDATION_TOKEN_KEY);
+    if (proxyCacheInvalidationToken != null && !proxyCacheInvalidationToken.equals(itemInvalidationToken)) {
+      log.debug("Item treated as expired due to proxy-cache invalidation token mismatch: {} != {}; item: {}",
+          proxyCacheInvalidationToken, itemInvalidationToken, item);
+      // if item does not carry the current proxy cache invalidation token, then treat it as expired
+      item.setExpired(true);
+      item.getRepositoryItemAttributes().put(PROXY_CACHE_INVALIDATION_TOKEN_KEY, proxyCacheInvalidationToken);
+
+      // save attributes, surrounding usage of item reloads attributes (over and over for some reason)
+      try {
+        getAttributesHandler().storeAttributes(item);
+      }
+      catch (IOException e) {
+        throw Throwables.propagate(e);
+      }
       return true;
     }
 
