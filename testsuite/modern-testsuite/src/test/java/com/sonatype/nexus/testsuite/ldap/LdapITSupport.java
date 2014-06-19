@@ -72,10 +72,10 @@ public class LdapITSupport
         .setLogLevel("com.sonatype.security.ldap", "DEBUG")
         .addPlugins(
             artifactResolver().resolvePluginFromDependencyManagement(
-                "com.sonatype.nexus.plugins", "nexus-ssl-plugin"
+                "org.sonatype.nexus.plugins", "nexus-ssl-plugin"
             ),
             artifactResolver().resolvePluginFromDependencyManagement(
-                "com.sonatype.nexus.plugins", "nexus-ldap-plugin"
+                "org.sonatype.nexus.plugins", "nexus-ldap-plugin"
             )
         );
   }

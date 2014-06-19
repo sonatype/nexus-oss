@@ -73,7 +73,7 @@ public class SSLITSupport
         .setLogLevel("org.sonatype.licensing", "TRACE")
         .addPlugins(
             artifactResolver().resolvePluginFromDependencyManagement(
-                "com.sonatype.nexus.plugins", "nexus-ssl-plugin"
+                "org.sonatype.nexus.plugins", "nexus-ssl-plugin"
             )
         );
   }
