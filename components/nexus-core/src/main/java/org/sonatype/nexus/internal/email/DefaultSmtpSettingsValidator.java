@@ -60,10 +60,10 @@ public class DefaultSmtpSettingsValidator
     emailerConfiguration.setDebug(config.isDebugMode());
     emailerConfiguration.setMailHost(config.getHostname());
     emailerConfiguration.setMailPort(config.getPort());
+    emailerConfiguration.setUsername(config.getUsername());
     emailerConfiguration.setPassword(config.getPassword());
     emailerConfiguration.setSsl(config.isSslEnabled());
     emailerConfiguration.setTls(config.isTlsEnabled());
-    emailerConfiguration.setUsername(emailerConfiguration.getUsername());
 
     emailer.configure(emailerConfiguration);
 
