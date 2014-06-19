@@ -654,64 +654,8 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
               ]
             } // end auth fieldset
           ]
-        },
+        }
         // end https proxy settings
-        {
-          xtype : 'fieldset',
-          checkboxToggle : false,
-          collapsed : false,
-          collapsible : true,
-          id : formId + '_' + 'systemNotificationSettings',
-          name : 'systemNotificationSettings',
-          title : 'System Notification Settings',
-          anchor : Sonatype.view.FIELDSET_OFFSET,
-          autoHeight : true,
-          layoutConfig : {
-            labelSeparator : ''
-          },
-          listeners : {
-            'expand' : {
-              fn : this.optionalFieldsetExpandHandler,
-              scope : this
-            },
-            'collapse' : {
-              fn : this.optionalFieldsetCollapseHandler,
-              scope : this,
-              delay : 100
-            }
-          },
-
-          items : [
-            {
-              xtype : 'panel',
-              layout : 'fit',
-              html : '<div style="padding-bottom:10px">' + ht.systemNotification + '</div>'
-            },
-            {
-              xtype : 'checkbox',
-              fieldLabel : 'Enabled',
-              helpText : ht.notificationsEnabled,
-              name : 'systemNotificationSettings.enabled'
-            },
-            {
-              xtype : 'textfield',
-              fieldLabel : 'Email Addresses',
-              helpText : ht.notificationEmailAddresses,
-              name : 'systemNotificationSettings.emailAddresses',
-              anchor : Sonatype.view.FIELD_OFFSET,
-              allowBlank : true
-            },
-            {
-              xtype : 'rolemanager',
-              name : 'systemNotificationRoleManager',
-              height : 200,
-              width : 505,
-              usePrivileges : false,
-              doValidation : false,
-              style : 'margin-top: 10px;border: 1px solid #B5B8C8;'
-            }
-          ]
-        } // end notification settings
       ],
       buttons : [
         {
@@ -796,9 +740,6 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
         "securityRealms" : function(val, fpanel) {
           return fpanel.find('name', 'securityRealms')[0].getValue();
         },
-        "systemNotificationSettings.roles" : function(val, fpanel) {
-          return fpanel.find('name', 'systemNotificationRoleManager')[0].getSelectedRoleIds();
-        },
         "securityAnonymousAccessEnabled" : function(val, fpanel) {
           return fpanel.isSecurityAnonymousAccessEnabled;
         },
@@ -869,10 +810,6 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
         "securityRealms" : function(arr, srcObj, fpanel) {
           fpanel.find('name', 'securityRealms')[0].setValue(arr);
           return arr; // return arr, even if empty to comply with sonatypeLoad data modifier requirement
-        },
-        "systemNotificationSettings.roles" : function(arr, srcObj, fpanel) {
-          fpanel.find('name', 'systemNotificationRoleManager')[0].setSelectedRoleIds(arr, true);
-          return arr;
         },
         "securityAnonymousAccessEnabled" : function(arr, srcObj, fpanel) {
           fpanel.isSecurityAnonymousAccessEnabled = arr;
