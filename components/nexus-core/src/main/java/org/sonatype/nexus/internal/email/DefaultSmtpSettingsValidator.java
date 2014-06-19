@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.email;
+package org.sonatype.nexus.internal.email;
 
 import java.util.List;
 
@@ -24,13 +24,16 @@ import org.sonatype.micromailer.EmailerConfiguration;
 import org.sonatype.micromailer.MailRequest;
 import org.sonatype.micromailer.MailRequestStatus;
 import org.sonatype.micromailer.imp.DefaultMailType;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.email.EmailerException;
+import org.sonatype.nexus.email.SmtpConfiguration;
+import org.sonatype.nexus.email.SmtpSessionParametersCustomizer;
+import org.sonatype.nexus.email.SmtpSettingsValidator;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * @author velo
+ * Default {@link SmtpSettingsValidator}.
  */
 @Named
 @Singleton
@@ -52,22 +55,20 @@ public class DefaultSmtpSettingsValidator
     this.customizers = checkNotNull(customizers);
   }
 
-  public boolean sendSmtpConfigurationTest(CSmtpConfiguration smtp, String email)
-      throws EmailerException
-  {
-    final EmailerConfiguration config = new NexusEmailerConfiguration(customizers);
-    config.setDebug(smtp.isDebugMode());
-    config.setMailHost(smtp.getHostname());
-    config.setMailPort(smtp.getPort());
-    config.setPassword(smtp.getPassword());
-    config.setSsl(smtp.isSslEnabled());
-    config.setTls(smtp.isTlsEnabled());
-    config.setUsername(smtp.getUsername());
+  public boolean sendSmtpConfigurationTest(final SmtpConfiguration config, final String email) throws EmailerException {
+    final EmailerConfiguration emailerConfiguration = new NexusEmailerConfiguration(customizers);
+    emailerConfiguration.setDebug(config.isDebugMode());
+    emailerConfiguration.setMailHost(config.getHostname());
+    emailerConfiguration.setMailPort(config.getPort());
+    emailerConfiguration.setUsername(config.getUsername());
+    emailerConfiguration.setPassword(config.getPassword());
+    emailerConfiguration.setSsl(config.isSslEnabled());
+    emailerConfiguration.setTls(config.isTlsEnabled());
 
-    emailer.configure(config);
+    emailer.configure(emailerConfiguration);
 
     MailRequest request = new MailRequest(NEXUS_MAIL_ID, DefaultMailType.DEFAULT_TYPE_ID);
-    request.setFrom(new Address(smtp.getSystemEmailAddress(), "Nexus Repository Manager"));
+    request.setFrom(new Address(config.getSystemEmailAddress(), "Nexus Repository Manager"));
     request.getToAddresses().add(new Address(email));
     request.getBodyContext().put(DefaultMailType.SUBJECT_KEY, "Nexus: SMTP Configuration validation.");
 

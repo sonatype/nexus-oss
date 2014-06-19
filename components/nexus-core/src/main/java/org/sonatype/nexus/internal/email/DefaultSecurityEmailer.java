@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.email;
+package org.sonatype.nexus.internal.email;
 
 import java.util.List;
 
@@ -20,6 +20,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.MailRequest;
+import org.sonatype.nexus.email.NexusEmailer;
 import org.sonatype.security.email.SecurityEmailer;
 
 import static com.google.common.base.Preconditions.checkNotNull;

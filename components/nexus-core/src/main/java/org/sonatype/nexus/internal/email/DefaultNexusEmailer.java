@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.email;
+package org.sonatype.nexus.internal.email;
 
 import java.util.List;
 
@@ -34,6 +34,9 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.CSmtpConfigurationCoreConfiguration;
+import org.sonatype.nexus.email.EmailerException;
+import org.sonatype.nexus.email.NexusEmailer;
+import org.sonatype.nexus.email.SmtpSessionParametersCustomizer;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.common.SimpleFormat;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
