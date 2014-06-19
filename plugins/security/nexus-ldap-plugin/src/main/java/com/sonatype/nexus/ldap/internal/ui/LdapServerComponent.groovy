@@ -25,13 +25,13 @@ import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration
 import com.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration
 import com.sonatype.security.ldap.templates.LdapSchemaTemplate
 import com.sonatype.security.ldap.templates.LdapSchemaTemplateManager
-import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.apache.shiro.realm.ldap.LdapContextFactory
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
+import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.rapture.TrustStoreKeys
 import org.sonatype.nexus.util.Tokens
 import org.sonatype.nexus.validation.Create

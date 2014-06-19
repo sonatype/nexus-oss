@@ -13,7 +13,7 @@
 package com.sonatype.nexus.ldap.internal.ui
 
 import groovy.transform.ToString
-import org.apache.bval.constraints.NotEmpty
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.validation.Update
 

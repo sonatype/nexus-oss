@@ -17,7 +17,7 @@ import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import com.sonatype.nexus.ssl.model.CertificatePemXO
 import com.sonatype.nexus.ssl.model.CertificateXO
 import com.sonatype.nexus.ssl.plugin.internal.rest.CertificatesResource
-import org.apache.bval.guice.Validate
+import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 

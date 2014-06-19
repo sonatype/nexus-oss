@@ -17,11 +17,11 @@ import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import com.sonatype.nexus.ssl.model.CertificatePemXO
 import com.sonatype.nexus.ssl.model.CertificateXO
 import com.sonatype.nexus.ssl.plugin.internal.rest.TrustStoreResource
-import org.apache.bval.guice.Validate
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.validation.Create
+import org.sonatype.nexus.guice.Validate
 
 import javax.inject.Inject
 import javax.inject.Named
