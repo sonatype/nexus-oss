@@ -40,7 +40,7 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
     me.listen({
       component: {
         'nx-coreui-upload-artifact': {
-          afterrender: me.refreshAddButton
+          afterrender: me.afterRender
         },
         'nx-coreui-upload-artifact button[action=upload]': {
           click: me.upload
@@ -59,6 +59,16 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
         }
       }
     });
+  },
+
+  /**
+   * @private
+   */
+  afterRender: function (form) {
+    var me = this;
+
+    me.refreshAddButton(form);
+    form.isValid();
   },
 
   /**
