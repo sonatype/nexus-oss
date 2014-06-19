@@ -17,8 +17,6 @@ import java.io.InputStream;
 /**
  * A component contract that wants to provide extra logging configuration, participate in configuration of logging in
  * Nexus.
- *
- * @author adreghiciu
  */
 public interface LogConfigurationParticipant
 {
@@ -31,11 +29,10 @@ public interface LogConfigurationParticipant
    * which should not be tampered with, changed by users. These participant configurations will be written out
    * (probably overwriting existing file) always, at every boot.
    *
-   * @author cstamas
    * @since 2.2
    */
   public interface NonEditable
   {
-
+    // empty
   }
 }

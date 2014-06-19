@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.log.internal;
+package org.sonatype.nexus.internal.log;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,8 +29,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 /**
- * @author juven
- * @author adreghiciu@gmail.com
+ * Tests for {@link LogbackLogManager}.
  */
 @SuppressWarnings("unused")
 public class LogbackLogManagerTest
@@ -38,17 +37,12 @@ public class LogbackLogManagerTest
 {
   private LogManager manager;
 
-  private org.codehaus.plexus.logging.Logger logger;
-
   @Override
-  public void setUp()
-      throws Exception
-  {
+  public void setUp() throws Exception {
     super.setUp();
 
     manager = lookup(LogManager.class);
     manager.configure();
-    logger = this.getLoggerManager().getLoggerForComponent(LogbackLogManagerTest.class.getName());
   }
 
   @Override
@@ -64,9 +58,7 @@ public class LogbackLogManagerTest
   }
 
   @Test
-  public void testLogConfig()
-      throws Exception
-  {
+  public void testLogConfig() throws Exception {
     LogConfiguration config1 = manager.getConfiguration();
     assertThat(config1.getRootLoggerLevel(), is("INFO"));
 
@@ -82,22 +74,17 @@ public class LogbackLogManagerTest
   }
 
   @Test
-  public void testGetLogFiles()
-      throws Exception
-  {
+  public void testGetLogFiles() throws Exception {
     Set<File> logFiles = manager.getLogFiles();
     assertThat("Logfiles set is not null", logFiles, is(notNullValue()));
     assertThat("Logfiles set contains elements", logFiles.size(), is(equalTo(1)));
   }
 
   @Test
-  public void testConfigDefaultAppender()
-      throws IOException
-  {
+  public void testConfigDefaultAppender() throws Exception {
     final DefaultLogConfiguration configuration = (DefaultLogConfiguration) manager.getConfiguration();
     configuration.setFileAppenderPattern(null);
     manager.setConfiguration(configuration);
     assertThat(manager.getConfiguration().getFileAppenderPattern(), notNullValue());
   }
-
 }

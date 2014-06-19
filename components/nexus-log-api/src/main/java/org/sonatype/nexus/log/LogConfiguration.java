@@ -12,19 +12,16 @@
  */
 package org.sonatype.nexus.log;
 
-
 /**
- * @author adreghiciu@gmail.com
+ * {@link LogManager} configuration.
  */
 public interface LogConfiguration
 {
+  String getRootLoggerLevel();
 
-  public String getRootLoggerLevel();
+  String getRootLoggerAppenders();
 
-  public String getRootLoggerAppenders();
+  String getFileAppenderPattern();
 
-  public String getFileAppenderPattern();
-
-  public String getFileAppenderLocation();
-
+  String getFileAppenderLocation();
 }
