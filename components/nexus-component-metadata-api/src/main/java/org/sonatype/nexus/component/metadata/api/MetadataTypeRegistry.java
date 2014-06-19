@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class MetadataTypeRegistry
@@ -41,10 +39,13 @@ public abstract class MetadataTypeRegistry
     return type;
   }
 
-  @Nullable
   public MetadataType getType(Class metadataClass) {
     checkNotNull(metadataClass);
-    return byMetadataClass.get(metadataClass);
+    MetadataType type = byMetadataClass.get(metadataClass);
+    if (type == null) {
+      throw new IllegalArgumentException(metadataClass + " is not associated with any registered MetadataType");
+    }
+    return type;
   }
 
   @Override

@@ -39,4 +39,13 @@ public class MetadataHandle<T>
   public T getMetadata() {
     return metadata;
   }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "key=" + key +
+        ", version=" + version +
+        ", metadata=" + metadata +
+        "}";
+  }
 }

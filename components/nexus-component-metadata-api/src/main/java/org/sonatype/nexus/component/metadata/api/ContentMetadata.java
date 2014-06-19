@@ -23,13 +23,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ContentMetadata
     implements SecondaryMetadata
 {
+  public static final MetadataIndex INDEX_IDENTITYKEY = new MetadataIndex.Builder()
+      .withColumns("identityKey")
+      .build();
+
   public static final MetadataType type = new MetadataType.Builder()
       .withName("content")
       .withMetadataClass(ContentMetadata.class)
-      .withIndexes(
-          new MetadataIndex.Builder()
-              .withColumns("identityKey")
-              .build())
+      .withIndexes(INDEX_IDENTITYKEY)
       .build();
 
   private final String identityKey;

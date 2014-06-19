@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.component.metadata.api.MetadataType.Attribute.Type;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
@@ -38,6 +39,8 @@ public class MetadataType
 
   private final Class metadataClass;
 
+  private final Class metadataBuilderClass;
+
   private final Map<String, Attribute> attributes;
 
   private final Set<MetadataIndex> indexes;
@@ -45,6 +48,7 @@ public class MetadataType
   private MetadataType(String name, Class metadataClass, Set<String> textAttributes, Set<MetadataIndex> indexes) {
     this.name = checkName(name);
     this.metadataClass = checkMetadataClass(metadataClass);
+    this.metadataBuilderClass = checkMetadataBuilderClass(metadataClass);
     this.attributes = checkAttributes(textAttributes);
     this.indexes = checkIndexes(indexes);
   }
@@ -63,13 +67,32 @@ public class MetadataType
   private static Class checkMetadataClass(Class metadataClass) {
     checkNotNull(metadataClass);
     if (metadataClass != IdentityMetadata.class) {
-      for (Class iface: metadataClass.getInterfaces()) {
-        if (iface == SecondaryMetadata.class) {
-          throw new IllegalArgumentException(metadataClass.getName() + " does not implement SecondaryMetadata");
-        }
-      }
+      checkInterface(metadataClass, SecondaryMetadata.class);
     }
     return metadataClass;
+  }
+
+  private static void checkInterface(Class theClass, Class theInterface) {
+    for (Class hasInterface: theClass.getInterfaces()) {
+      if (hasInterface == theInterface) {
+        return;
+      }
+    }
+    throw new IllegalArgumentException(theClass + " does not implement " + theInterface);
+  }
+
+  // Metadata class must have @JsonDeserialize annotation specifying a builder that is a MetadataBuilder
+  private static Class checkMetadataBuilderClass(Class metadataClass) {
+    JsonDeserialize jsonDeserialize = (JsonDeserialize)metadataClass.getAnnotation(JsonDeserialize.class);
+    if (jsonDeserialize == null) {
+      throw new IllegalArgumentException(metadataClass + " does not have a @JsonDeserialize annotation");
+    }
+    if (jsonDeserialize.builder() == null) {
+      throw new IllegalArgumentException(metadataClass + "'s @JsonDeserialize annotation does not specify a builder");
+    }
+    Class metadataBuilderClass = jsonDeserialize.builder().getClass();
+    checkInterface(metadataBuilderClass, MetadataBuilder.class);
+    return metadataBuilderClass;
   }
 
   // Getters (parameterless methods starting with "get" or "is") are assumed to be attributes.
@@ -150,8 +173,24 @@ public class MetadataType
     return name;
   }
 
+  public String getIndexName(MetadataIndex index) {
+    if (!indexes.contains(index)) {
+      throw new IllegalArgumentException("Not a '" + name + "' index: " + index);
+    }
+    StringBuilder builder = new StringBuilder(name);
+    for (String column: index.getColumns()) {
+      builder.append("-");
+      builder.append(column);
+    }
+    return builder.toString();
+  }
+
   public Class getMetadataClass() {
     return metadataClass;
+  }
+
+  public Class getMetadataBuilderClass() {
+    return metadataBuilderClass;
   }
 
   public Map<String, Attribute> getAttributes() {
@@ -167,6 +206,8 @@ public class MetadataType
     return getClass().getSimpleName() + "{" +
         "name=" + name +
         ", metadataClass=" + metadataClass +
+        ", metadataBuilderClass=" + metadataBuilderClass +
+        ", attributes=" + attributes +
         ", indexes=" + indexes +
         "}";
   }

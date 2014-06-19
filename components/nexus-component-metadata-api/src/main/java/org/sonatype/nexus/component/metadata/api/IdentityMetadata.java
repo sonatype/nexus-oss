@@ -21,17 +21,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @JsonDeserialize(builder = IdentityMetadata.Builder.class)
 public class IdentityMetadata
 {
-  public static final MetadataType type = new MetadataType.Builder()
+  public static final MetadataIndex INDEX_ARTIFACT = new MetadataIndex.Builder()
+      .withColumns("artifact")
+      .build();
+
+  public static final MetadataType TYPE = new MetadataType.Builder()
       .withName("identity")
       .withMetadataClass(IdentityMetadata.class)
-      .withIndexes(
-          new MetadataIndex.Builder()
-              .withColumns("format", "group", "artifact")
-              .unique()
-              .build(),
-          new MetadataIndex.Builder()
-              .withColumns("format", "artifact")
-              .build())
+      .withIndexes(INDEX_ARTIFACT)
       .build();
 
   private final String format;
