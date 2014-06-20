@@ -17,8 +17,6 @@ import java.io.IOException;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
-import org.sonatype.nexus.rest.model.SmtpSettingsResource;
-import org.sonatype.nexus.rest.model.SmtpSettingsResourceRequest;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.google.common.base.Preconditions;
@@ -70,13 +68,6 @@ public class SettingsMessageUtil
   public static GlobalConfigurationResourceResponse wrapData(final GlobalConfigurationResource resource) {
     Preconditions.checkNotNull(resource);
     final GlobalConfigurationResourceResponse wrapper = new GlobalConfigurationResourceResponse();
-    wrapper.setData(resource);
-    return wrapper;
-  }
-
-  public static SmtpSettingsResourceRequest wrapData(final SmtpSettingsResource resource) {
-    Preconditions.checkNotNull(resource);
-    final SmtpSettingsResourceRequest wrapper = new SmtpSettingsResourceRequest();
     wrapper.setData(resource);
     return wrapper;
   }
