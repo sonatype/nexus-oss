@@ -17,6 +17,7 @@ import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.configuration.validation.InvalidConfigurationException
 import org.sonatype.configuration.validation.ValidationMessage
 import org.sonatype.configuration.validation.ValidationResponse
@@ -32,16 +33,7 @@ import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.scheduling.ScheduledTask
 import org.sonatype.scheduling.TaskState
-import org.sonatype.scheduling.schedules.AbstractSchedule
-import org.sonatype.scheduling.schedules.CronSchedule
-import org.sonatype.scheduling.schedules.DailySchedule
-import org.sonatype.scheduling.schedules.HourlySchedule
-import org.sonatype.scheduling.schedules.ManualRunSchedule
-import org.sonatype.scheduling.schedules.MonthlySchedule
-import org.sonatype.scheduling.schedules.OnceSchedule
-import org.sonatype.scheduling.schedules.RunNowSchedule
-import org.sonatype.scheduling.schedules.Schedule
-import org.sonatype.scheduling.schedules.WeeklySchedule
+import org.sonatype.scheduling.schedules.*
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -197,21 +189,24 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasks:delete')
-  void delete(final String id) {
+  @Validate
+  void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
     nexusScheduler.getTaskById(id)?.cancel()
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasksrun:get')
-  void run(final String id) {
+  @Validate
+  void run(final @NotEmpty(message = '[id] may not be empty') String id) {
     nexusScheduler.getTaskById(id)?.runNow()
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasksrun:delete')
-  void stop(final String id) {
+  @Validate
+  void stop(final @NotEmpty(message = '[id] may not be empty') String id) {
     nexusScheduler.getTaskById(id)?.cancelOnly()
   }
 

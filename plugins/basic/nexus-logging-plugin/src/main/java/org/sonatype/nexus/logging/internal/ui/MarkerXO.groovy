@@ -16,8 +16,6 @@ package org.sonatype.nexus.logging.internal.ui
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
 
-import javax.validation.constraints.NotNull
-
 /**
  * Marker exchange object.
  *
@@ -26,7 +24,6 @@ import javax.validation.constraints.NotNull
 @ToString(includePackage = false, includeNames = true)
 class MarkerXO
 {
-  @NotNull
   @NotEmpty
   String message
 }

@@ -10,13 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.validation.Update
-
-import javax.validation.constraints.NotNull
 
 import static org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType
 
@@ -29,19 +28,15 @@ import static org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType
 class RepositoryRouteXO
 {
 
-  @NotNull(groups = Update.class)
   @NotEmpty(groups = Update.class)
   String id
 
-  @NotNull
   @NotEmpty
   String pattern
 
-  @NotNull
   @NotEmpty
   MappingType mappingType
 
-  @NotNull
   @NotEmpty
   String groupId
 

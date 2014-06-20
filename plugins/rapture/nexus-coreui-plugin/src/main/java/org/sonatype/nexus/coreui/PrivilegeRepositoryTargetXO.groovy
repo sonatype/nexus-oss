@@ -10,12 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
-
-import javax.validation.constraints.NotNull
 
 /**
  * Privilege exchange object.
@@ -25,18 +24,15 @@ import javax.validation.constraints.NotNull
 @ToString(includePackage = false, includeNames = true)
 class PrivilegeRepositoryTargetXO
 {
-  @NotNull
   @NotEmpty
   String name
 
-  @NotNull
   @NotEmpty
   String description
 
-  @NotNull
   @NotEmpty
   String repositoryTargetId
 
-  @NotNull
+  @NotEmpty
   String repositoryId
 }

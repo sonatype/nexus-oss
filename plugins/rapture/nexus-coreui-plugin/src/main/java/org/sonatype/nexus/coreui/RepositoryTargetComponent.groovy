@@ -17,6 +17,7 @@ import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.configuration.validation.InvalidConfigurationException
 import org.sonatype.configuration.validation.ValidationMessage
 import org.sonatype.configuration.validation.ValidationResponse
@@ -125,7 +126,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:targets:delete')
   @Validate
-  void delete(final @NotNull(message = '[id] may not be null') String id) {
+  void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
     targetRegistry.removeRepositoryTarget(id)
     nexusConfiguration.saveConfiguration()
   }

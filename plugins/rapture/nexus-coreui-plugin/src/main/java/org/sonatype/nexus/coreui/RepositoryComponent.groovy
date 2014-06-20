@@ -21,11 +21,13 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.codehaus.plexus.util.StringUtils
 import org.codehaus.plexus.util.xml.Xpp3Dom
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.configuration.application.NexusConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
+import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.proxy.ResourceStoreRequest
 import org.sonatype.nexus.proxy.item.RepositoryItemUid
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository
@@ -284,7 +286,8 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:delete')
-  void delete(final String id) {
+  @Validate
+  void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
     repositoryRegistry.removeRepository(id)
   }
 

@@ -17,6 +17,7 @@ import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.guice.Validate
@@ -104,7 +105,7 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('security:roles:read')
   @Validate
-  List<RoleXO> readFromSource(final @NotNull(message = '[source] may not be null') String source) {
+  List<RoleXO> readFromSource(final @NotEmpty(message = '[source] may not be empty') String source) {
     return securitySystem.listRoles(source).collect { input ->
       return asRoleXO(input, input.source)
     }
@@ -164,7 +165,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:roles:delete')
   @Validate
-  void delete(final @NotNull(message = '[id] may not be null') String id) {
+  void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
     securitySystem.getAuthorizationManager(DEFAULT_SOURCE).deleteRole(id)
   }
 

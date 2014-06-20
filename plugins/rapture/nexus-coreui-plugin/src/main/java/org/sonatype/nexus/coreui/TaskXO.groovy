@@ -19,8 +19,6 @@ import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.scheduling.TaskState
 
-import javax.validation.constraints.NotNull
-
 /**
  * Task exchange object.
  *
@@ -29,17 +27,14 @@ import javax.validation.constraints.NotNull
 @ToString(includePackage = false, includeNames = true)
 class TaskXO
 {
-  @NotNull(groups = Update.class)
   @NotEmpty(groups = Update.class)
   String id
 
   Boolean enabled
 
-  @NotNull
   @NotEmpty
   String name
 
-  @NotNull(groups = Create.class)
   @NotEmpty(groups = Create.class)
   String typeId
 
@@ -47,7 +42,6 @@ class TaskXO
   TaskState status
   String statusDescription
 
-  @NotNull
   @NotEmpty
   String schedule
 
