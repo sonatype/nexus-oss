@@ -46,20 +46,44 @@ public class OrientDbTrial
 
   public static class Person
   {
-    public String firstName;
-    public String lastName;
+    private String firstName;
+
+    private String lastName;
+
+    public Person() {
+    }
+
+    public String getFirstName() {
+      return firstName;
+    }
+
+    public void setFirstName(final String firstName) {
+      this.firstName = firstName;
+    }
+
+    public String getLastName() {
+      return lastName;
+    }
+
+    public void setLastName(final String lastName) {
+      this.lastName = lastName;
+    }
   }
 
   @Test
   public void objectTxTest() throws Exception {
     File dir = util.createTempDir("testdb");
     OObjectDatabaseTx db = new OObjectDatabaseTx("plocal:" + dir.getPath()).create();
-    db.getEntityManager().registerEntityClass(Person.class);
     try {
-      Person person = new Person();
-      person.firstName = "James";
-      person.lastName = "Bond";
-      db.save(person);
+      db.getEntityManager().registerEntityClass(Person.class);
+      Person newPerson = db.newInstance(Person.class);
+      newPerson.setFirstName("James");
+      newPerson.setLastName("Bond");
+      db.save(newPerson);
+
+      for (Person person : db.browseClass(Person.class)) {
+        log("{} {}", person.getFirstName(), person.getLastName());
+      }
     }
     finally {
       db.close();
