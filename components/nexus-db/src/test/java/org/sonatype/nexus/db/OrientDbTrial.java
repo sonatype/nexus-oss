@@ -19,7 +19,7 @@ public class OrientDbTrial
     extends TestSupport
 {
   @Test
-  public void embeddedServerTest() throws Exception {
+  public void embeddedServer() throws Exception {
     OServer server = OServerMain.create();
     URL config = getClass().getResource("server-config.xml");
     log(config);
@@ -28,8 +28,32 @@ public class OrientDbTrial
     server.shutdown();
   }
 
+  //@Test
+  //public void embeddedDatabaseAccess() throws Exception {
+  //  OServer server = OServerMain.create();
+  //  URL config = getClass().getResource("server-config.xml");
+  //  log(config);
+  //  server.startup(config.openStream());
+  //  server.activate();
+  //
+  //  try {
+  //    ODatabaseDocumentTx db = (ODatabaseDocumentTx) server.openDatabase("document", "test", null, null);
+  //    try {
+  //      ODocument doc = db.newInstance("Test");
+  //      doc.field("foo", "bar");
+  //      doc.save();
+  //    }
+  //    finally {
+  //      db.close();
+  //    }
+  //  }
+  //  finally {
+  //    server.shutdown();
+  //  }
+  //}
+
   @Test
-  public void documentTxTest() throws Exception {
+  public void documentTx() throws Exception {
     File dir = util.createTempDir("testdb");
     ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:" + dir.getPath()).create();
     try {
@@ -70,7 +94,7 @@ public class OrientDbTrial
   }
 
   @Test
-  public void objectTxTest() throws Exception {
+  public void objectTx() throws Exception {
     File dir = util.createTempDir("testdb");
     OObjectDatabaseTx db = new OObjectDatabaseTx("plocal:" + dir.getPath()).create();
     try {
