@@ -53,6 +53,8 @@ public class OrientDbTrial
             .field("name", "Rome")
             .field("country", "Italy"));
         doc.save();
+        log(doc.getIdentity());
+        log(doc.getVersion());
         log(doc);
       }
       finally {

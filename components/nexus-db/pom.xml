@@ -32,6 +32,9 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
+    <!--
+    NOTE: Some dependencies of orientdb use commons-logging, but orientdb itself is JUL-based
+    -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
