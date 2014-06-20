@@ -16,6 +16,8 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.sonatype.nexus.web.NexusGuiceFilter;
+import org.sonatype.nexus.web.SecurityFilter;
 import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.nexus.web.internal.BaseUrlHolderFilter;
 import org.sonatype.nexus.web.internal.CommonHeadersFilter;
@@ -59,6 +61,8 @@ public class NexusModules
 
     @Override
     protected void configure() {
+      bind(SecurityFilter.class);
+
       install(new ShiroAopModule());
       install(new InstrumentationModule()
       {
@@ -93,6 +97,10 @@ public class NexusModules
 
     @Override
     protected void configure() {
+      binder().requireExplicitBindings();
+
+      bind(NexusGuiceFilter.class);
+
       // HACK: Re-bind servlet-context instance with a name to avoid backwards-compat warnings from guice-servlet
       bind(ServletContext.class).annotatedWith(named("nexus")).toInstance(servletContext);
       bind(ParameterKeys.PROPERTIES).toInstance(properties);
