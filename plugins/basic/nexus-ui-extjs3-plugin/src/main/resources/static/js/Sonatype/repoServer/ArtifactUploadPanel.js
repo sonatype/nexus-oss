@@ -925,7 +925,7 @@ NX.define('Sonatype.repoServer.ArtifactUploadPanel', {
     }
 
     Ext.Ajax.request({
-      url : Sonatype.config.repos.urls.upload,
+      url: Sonatype.config.repos.urls.upload,
       form : tmpForm,
       isUpload : true,
       cbPassThru : {

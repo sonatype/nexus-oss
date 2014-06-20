@@ -40,6 +40,8 @@
 
   <script src="js/$buildQualifier/sonatype-lib.js" type="text/javascript" charset="utf-8"></script>
 
+  <script src="csrfguard.js" type="text/javascript" charset="utf-8"></script>
+
   <script type="text/javascript" charset="utf-8">
     requirejs.config({
       baseUrl: 'static/js',

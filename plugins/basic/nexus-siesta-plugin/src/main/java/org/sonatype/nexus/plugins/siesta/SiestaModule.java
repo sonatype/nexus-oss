@@ -10,11 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.plugins.siesta;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.csrfguard.CsrfGuardFilter;
 import org.sonatype.nexus.guice.FilterChainModule;
 import org.sonatype.nexus.web.internal.SecurityFilter;
 import org.sonatype.sisu.siesta.common.Resource;
@@ -89,7 +91,7 @@ public class SiestaModule
     {
       @Override
       protected void configure() {
-        addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic");
+        addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic,csrfToken");
       }
 
     });

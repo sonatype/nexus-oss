@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest;
 
 import javax.inject.Inject;
@@ -109,7 +110,7 @@ public class NexusApplication
 
   @Override
   protected Router initializeRouter(Router root, boolean isStarted) {
-    if(useStrictChecking) {
+    if (useStrictChecking) {
       root.setDefaultMatchQuery(false);
       root.setDefaultMatchingMode(Template.MODE_EQUALS);
     }
@@ -128,7 +129,7 @@ public class NexusApplication
 
     // protecting service resources with "wall" permission
     this.protectedPathManager.addProtectedResource("/service/local/**",
-        "noSessionCreation,authcBasic,perms[nexus:permToCatchAllUnprotecteds]");
+        "noSessionCreation,authcBasic,csrfToken,perms[nexus:permToCatchAllUnprotecteds]");
   }
 
   @Override
@@ -158,6 +159,10 @@ public class NexusApplication
       // don't create session unless the user logs in from the UI
       filterExpression = "noSessionCreation," + filterExpression;
     }
+    if (filterExpression != null
+        && (filterExpression.contains("authcBasic") || filterExpression.contains("authcNxBasic"))) {
+      filterExpression += ",csrfToken";
+    }
 
     this.protectedPathManager.addProtectedResource("/service/local" + descriptor.getPathPattern(), filterExpression);
   }
@@ -165,6 +170,7 @@ public class NexusApplication
   @Override
   protected void attach(Router router, PlexusResource resource) {
     handlePlexusResourceSecurity(resource);
-    attach(router, resource.requireStrictChecking(), resource.getResourceUri(), new NexusPlexusResourceFinder(getContext(), resource));
+    attach(router, resource.requireStrictChecking(), resource.getResourceUri(),
+        new NexusPlexusResourceFinder(getContext(), resource));
   }
 }
