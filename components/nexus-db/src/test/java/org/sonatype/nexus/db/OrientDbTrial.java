@@ -7,6 +7,7 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 import com.orientechnologies.orient.server.OServer;
 import com.orientechnologies.orient.server.OServerMain;
 import org.junit.Test;
@@ -30,22 +31,35 @@ public class OrientDbTrial
   @Test
   public void documentTxTest() throws Exception {
     File dir = util.createTempDir("testdb");
-    ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:" + dir.getPath());
-    if (!db.exists()) {
-      db.create();
-      log("DB created");
-    }
-    else {
-      db.open("admin", "admin");
-      log("DB opened");
-    }
-
+    ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:" + dir.getPath()).create();
     try {
       ODocument doc = db.newInstance("Person");
       doc.field("name", "Luke");
       doc.field("surname", "Skywalker");
       doc.field("city", new ODocument("City").field("name", "Rome").field("country", "Italy"));
       doc.save();
+    }
+    finally {
+      db.close();
+    }
+  }
+
+  public static class Person
+  {
+    public String firstName;
+    public String lastName;
+  }
+
+  @Test
+  public void objectTxTest() throws Exception {
+    File dir = util.createTempDir("testdb");
+    OObjectDatabaseTx db = new OObjectDatabaseTx("plocal:" + dir.getPath()).create();
+    db.getEntityManager().registerEntityClass(Person.class);
+    try {
+      Person person = new Person();
+      person.firstName = "James";
+      person.lastName = "Bond";
+      db.save(person);
     }
     finally {
       db.close();
