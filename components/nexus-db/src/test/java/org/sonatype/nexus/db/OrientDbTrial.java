@@ -28,29 +28,34 @@ public class OrientDbTrial
     server.shutdown();
   }
 
-  //@Test
-  //public void embeddedDatabaseAccess() throws Exception {
-  //  OServer server = OServerMain.create();
-  //  URL config = getClass().getResource("server-config.xml");
-  //  log(config);
-  //  server.startup(config.openStream());
-  //  server.activate();
-  //
-  //  try {
-  //    ODatabaseDocumentTx db = (ODatabaseDocumentTx) server.openDatabase("document", "test", null, null);
-  //    try {
-  //      ODocument doc = db.newInstance("Test");
-  //      doc.field("foo", "bar");
-  //      doc.save();
-  //    }
-  //    finally {
-  //      db.close();
-  //    }
-  //  }
-  //  finally {
-  //    server.shutdown();
-  //  }
-  //}
+  @Test
+  public void embeddedDatabaseAccess() throws Exception {
+    OServer server = OServerMain.create();
+    URL config = getClass().getResource("server-config.xml");
+    log(config);
+    server.startup(config.openStream());
+    server.activate();
+
+    // NOTE: This doesn't root into the databases directory, not sure why
+    try {
+      ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:test").create();
+      try {
+        ODocument doc = db.newInstance("Person");
+        doc.field("name", "Luke");
+        doc.field("surname", "Skywalker");
+        doc.field("city", new ODocument("City")
+            .field("name", "Rome")
+            .field("country", "Italy"));
+        doc.save();
+      }
+      finally {
+        db.close();
+      }
+    }
+    finally {
+      server.shutdown();
+    }
+  }
 
   @Test
   public void documentTx() throws Exception {
