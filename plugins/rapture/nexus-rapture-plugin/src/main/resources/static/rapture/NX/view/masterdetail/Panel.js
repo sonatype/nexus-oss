@@ -47,7 +47,11 @@ Ext.define('NX.view.masterdetail.Panel', {
         collapsible: true,
         flex: 0.5,
         hidden: true,
-        autoScroll: true, // FIXME this only works for 1 tab
+        layout: {
+          type: 'vbox',
+          align: 'stretch',
+          pack: 'start'
+        },
         tabs: me.tabs
       }
     ];

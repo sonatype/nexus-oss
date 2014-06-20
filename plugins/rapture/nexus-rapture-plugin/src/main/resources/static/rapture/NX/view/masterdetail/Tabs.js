@@ -30,7 +30,7 @@ Ext.define('NX.view.masterdetail.Tabs', {
       content = me.getTabsConfig(content);
     }
     else {
-      content = Ext.apply({}, content, { title: undefined });
+      content = Ext.apply({}, content, { title: undefined, flex: 1 });
     }
     content = Ext.Array.from(content);
     Ext.Array.insert(content, 0, [
@@ -65,6 +65,7 @@ Ext.define('NX.view.masterdetail.Tabs', {
       activeTab: 0,
       layoutOnTabChange: true,
       plain: true,
+      flex: 1,
       items: items
     };
   },

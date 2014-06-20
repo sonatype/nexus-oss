@@ -19,6 +19,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsTab', {
   extend: 'Ext.Panel',
   alias: 'widget.nx-coreui-repository-settings-tab',
 
-  title: 'Settings'
+  title: 'Settings',
+  autoScroll: true
 
 });
