@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.extdirect.model;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.Path.Node;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
@@ -62,7 +64,11 @@ public class ValidationResponse
     Set<ConstraintViolation<?>> violations = cause.getConstraintViolations();
     if (violations != null && violations.size() > 0) {
       for (ConstraintViolation<?> violation : violations) {
-        String key = violation.getPropertyPath().toString();
+        String key = null;
+        // iterate path to get the property name from leaf
+        for (Node node : violation.getPropertyPath()) {
+          key = node.getName();
+        }
         if (key == null || key.trim().isEmpty()) {
           if (messages == null) {
             messages = Lists.newArrayList();
