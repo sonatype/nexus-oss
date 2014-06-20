@@ -36,7 +36,9 @@ public class OrientDbTrial
       ODocument doc = db.newInstance("Person");
       doc.field("name", "Luke");
       doc.field("surname", "Skywalker");
-      doc.field("city", new ODocument("City").field("name", "Rome").field("country", "Italy"));
+      doc.field("city", new ODocument("City")
+          .field("name", "Rome")
+          .field("country", "Italy"));
       doc.save();
     }
     finally {
@@ -79,6 +81,7 @@ public class OrientDbTrial
       db.save(newPerson);
 
       for (Person person : db.browseClass(Person.class)) {
+        // NOTE: The javaassist proxy here doesn't properly toString()
         log("{} {}", person.getFirstName(), person.getLastName());
       }
     }
