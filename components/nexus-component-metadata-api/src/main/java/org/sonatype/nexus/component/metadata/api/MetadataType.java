@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.component.metadata.api.MetadataType.Attribute.Type;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.common.base.Objects;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
@@ -63,13 +64,19 @@ public class MetadataType
     return name;
   }
 
-  // Must be IdentityMetadata or implement SecondaryMetadata
+  // must be IdentityMetadata or a subclass of SecondaryMetadata
   private static Class checkMetadataClass(Class metadataClass) {
     checkNotNull(metadataClass);
     if (metadataClass != IdentityMetadata.class) {
-      checkInterface(metadataClass, SecondaryMetadata.class);
+      Class parent = metadataClass.getSuperclass();
+      while (parent != null) {
+        if (parent == SecondaryMetadata.class) {
+          return metadataClass;
+        }
+        parent = parent.getSuperclass();
+      }
     }
-    return metadataClass;
+    throw new IllegalArgumentException(metadataClass + " is not a subclass of " + SecondaryMetadata.class);
   }
 
   private static void checkInterface(Class theClass, Class theInterface) {
@@ -179,8 +186,7 @@ public class MetadataType
     }
     StringBuilder builder = new StringBuilder(name);
     for (String column: index.getColumns()) {
-      builder.append("-");
-      builder.append(column);
+      builder.append("-").append(column);
     }
     return builder.toString();
   }
@@ -202,14 +208,31 @@ public class MetadataType
   }
 
   @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    final MetadataType other = (MetadataType) obj;
+    return Objects.equal(name, other.name)
+        && Objects.equal(metadataClass, other.metadataClass)
+        && Objects.equal(metadataBuilderClass, other.metadataBuilderClass)
+        && Objects.equal(attributes, other.attributes)
+        && Objects.equal(indexes, other.indexes);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(name, metadataClass, metadataBuilderClass, attributes, indexes);
+  }
+
+  @Override
   public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "name=" + name +
-        ", metadataClass=" + metadataClass +
-        ", metadataBuilderClass=" + metadataBuilderClass +
-        ", attributes=" + attributes +
-        ", indexes=" + indexes +
-        "}";
+    return Objects.toStringHelper(this)
+        .add("name", name)
+        .add("metadataClass", metadataClass)
+        .add("metadataBuilderClass", metadataBuilderClass)
+        .add("attributes", attributes)
+        .add("indexes", indexes)
+        .toString();
   }
 
   public static class Attribute
@@ -222,14 +245,6 @@ public class MetadataType
       this.name = checkName(name);
       this.type = checkNotNull(type);
       this.nullable = nullable;
-    }
-
-    @Override
-    public String toString() {
-      return getClass().getSimpleName() + "{" +
-          "name=" + name +
-          "nullable=" + nullable +
-          "}";
     }
 
     public String getName() {
@@ -288,6 +303,30 @@ public class MetadataType
           throw new IllegalArgumentException(attributeClass + " is not a supported attribute class");
         }
       }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj == null) return false;
+      if (getClass() != obj.getClass()) return false;
+      final Attribute other = (Attribute) obj;
+      return Objects.equal(name, other.name)
+          && Objects.equal(type, other.type)
+          && Objects.equal(nullable, other.nullable);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hashCode(name, type, nullable);
+    }
+
+    @Override
+    public String toString() {
+      return Objects.toStringHelper(this)
+          .add("name", name)
+          .add("type", type)
+          .add("nullable", nullable)
+          .toString();
     }
   }
 

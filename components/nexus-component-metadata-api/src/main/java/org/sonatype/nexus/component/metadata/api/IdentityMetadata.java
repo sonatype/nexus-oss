@@ -15,6 +15,7 @@ package org.sonatype.nexus.component.metadata.api;
 import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.common.base.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -68,29 +69,29 @@ public class IdentityMetadata
   }
 
   @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "format=" + format +
-        ", group=" + group +
-        ", artifact=" + artifact +
-        ", version=" + version +
-        "}";
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    return o instanceof IdentityMetadata && o.toString().equals(toString());
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    final IdentityMetadata other = (IdentityMetadata) obj;
+    return Objects.equal(format, other.format)
+        && Objects.equal(group, other.group)
+        && Objects.equal(artifact, other.artifact)
+        && Objects.equal(version, other.version);
   }
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((format == null) ? 0 : format.hashCode());
-    result = prime * result + ((group == null) ? 0 : group.hashCode());
-    result = prime * result + ((artifact == null) ? 0 : artifact.hashCode());
-    result = prime * result + ((version == null) ? 0 : version.hashCode());
-    return result;
+    return Objects.hashCode(format, group, artifact, version);
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this)
+        .add("format", format)
+        .add("group", group)
+        .add("artifact", artifact)
+        .add("version", version)
+        .toString();
   }
 
   public static class Builder {

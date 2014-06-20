@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.component.metadata.api;
 
+import com.google.common.base.Objects;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MetadataHandle<T>
@@ -41,11 +43,26 @@ public class MetadataHandle<T>
   }
 
   @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    final MetadataHandle other = (MetadataHandle) obj;
+    return Objects.equal(key, other.key)
+        && Objects.equal(version, other.version)
+        && Objects.equal(metadata, other.metadata);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(key, version, metadata);
+  }
+
+  @Override
   public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "key=" + key +
-        ", version=" + version +
-        ", metadata=" + metadata +
-        "}";
+    return Objects.toStringHelper(this)
+        .add("key", key)
+        .add("version", version)
+        .add("metadata", metadata)
+        .toString();
   }
 }

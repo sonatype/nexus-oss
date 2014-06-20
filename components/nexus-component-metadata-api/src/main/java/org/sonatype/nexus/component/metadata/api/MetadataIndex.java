@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -63,12 +64,27 @@ public class MetadataIndex
   }
 
   @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    final MetadataIndex other = (MetadataIndex) obj;
+    return Objects.equal(columns, other.columns)
+        && Objects.equal(unique, other.unique)
+        && Objects.equal(descending, other.descending);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(columns, unique, descending);
+  }
+
+  @Override
   public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "columns=" + columns +
-        ", unique=" + unique +
-        ", descending=" + descending +
-        "}";
+    return Objects.toStringHelper(this)
+        .add("columns", columns)
+        .add("unique", unique)
+        .add("descending", descending)
+        .toString();
   }
 
   public static class Builder {

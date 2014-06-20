@@ -16,12 +16,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.common.base.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @JsonDeserialize(builder = ContentMetadata.Builder.class)
 public class ContentMetadata
-    implements SecondaryMetadata
+    extends SecondaryMetadata
 {
   public static final MetadataIndex INDEX_IDENTITYKEY = new MetadataIndex.Builder()
       .withColumns("identityKey")
@@ -32,8 +33,6 @@ public class ContentMetadata
       .withMetadataClass(ContentMetadata.class)
       .withIndexes(INDEX_IDENTITYKEY)
       .build();
-
-  private final String identityKey;
 
   private final List<String> blobRefs;
 
@@ -51,17 +50,12 @@ public class ContentMetadata
                           Long size,
                           Map<String, String> checksums,
                           String path) {
-    this.identityKey = checkNotNull(identityKey);
+    super(identityKey);
     this.blobRefs = checkNotNull(blobRefs);
     this.mimeType = checkNotNull(mimeType);
     this.size = checkNotNull(size);
     this.checksums = checkNotNull(checksums);
     this.path = checkNotNull(path);
-  }
-
-  @Override
-  public String getIdentityKey() {
-    return identityKey;
   }
 
   public List<String> getBlobRefs() {
@@ -84,34 +78,34 @@ public class ContentMetadata
     return path;
   }
 
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "identityKey=" + identityKey +
-        ", blobRefs=" + blobRefs +
-        ", mimeType=" + mimeType +
-        ", size=" + size +
-        ", checksums=" + checksums +
-        ", path=" + path +
-        "}";
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    return o instanceof ContentMetadata && o.toString().equals(toString());
+    @Override
+    public boolean equals(Object obj) {
+      if (obj == null) return false;
+      if (getClass() != obj.getClass()) return false;
+      final ContentMetadata other = (ContentMetadata) obj;
+      return Objects.equal(identityKey, other.identityKey)
+        && Objects.equal(blobRefs, other.blobRefs)
+        && Objects.equal(mimeType, other.mimeType)
+        && Objects.equal(size, other.size)
+        && Objects.equal(checksums, other.checksums)
+        && Objects.equal(path, other.path);
   }
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((identityKey == null) ? 0 : identityKey.hashCode());
-    result = prime * result + ((blobRefs == null) ? 0 : blobRefs.hashCode());
-    result = prime * result + ((mimeType == null) ? 0 : mimeType.hashCode());
-    result = prime * result + ((size == null) ? 0 : size.hashCode());
-    result = prime * result + ((checksums == null) ? 0 : checksums.hashCode());
-    result = prime * result + ((path == null) ? 0 : path.hashCode());
-    return result;
+    return Objects.hashCode(identityKey, blobRefs, mimeType, size, checksums, path);
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this)
+        .add("identityKey", identityKey)
+        .add("blobRefs", blobRefs)
+        .add("mimeType", mimeType)
+        .add("size", size)
+        .add("checksums", checksums)
+        .add("path", path)
+        .toString();
   }
 
   public static class Builder implements MetadataBuilder<ContentMetadata> {

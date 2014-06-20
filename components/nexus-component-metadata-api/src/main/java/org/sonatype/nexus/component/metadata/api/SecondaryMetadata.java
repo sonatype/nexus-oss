@@ -12,7 +12,15 @@
  */
 package org.sonatype.nexus.component.metadata.api;
 
-public interface SecondaryMetadata
+public abstract class SecondaryMetadata
 {
-  public String getIdentityKey();
+  protected final String identityKey;
+
+  protected SecondaryMetadata(String identityKey) {
+    this.identityKey = identityKey;
+  }
+
+  public String getIdentityKey() {
+    return identityKey;
+  }
 }
