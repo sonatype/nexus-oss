@@ -38,7 +38,13 @@ public class OrientDbTrial
 
     // NOTE: This doesn't root into the databases directory, not sure why
     try {
-      ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:test").create();
+      ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:test");
+      if (!db.exists()) {
+        db.create();
+      }
+      else {
+        db.open("admin", "admin");
+      }
       try {
         ODocument doc = db.newInstance("Person");
         doc.field("name", "Luke");
@@ -47,6 +53,7 @@ public class OrientDbTrial
             .field("name", "Rome")
             .field("country", "Italy"));
         doc.save();
+        log(doc);
       }
       finally {
         db.close();
