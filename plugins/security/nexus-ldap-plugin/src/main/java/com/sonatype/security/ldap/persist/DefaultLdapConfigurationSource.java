@@ -222,6 +222,9 @@ public class DefaultLdapConfigurationSource
       newUserAndGroup.setUserPasswordAttribute(old.getUserPasswordAttribute());
       newUserAndGroup.setUserRealNameAttribute(old.getUserRealNameAttribute());
       newUserAndGroup.setUserSubtree(old.isUserSubtree());
+
+      newUserAndGroup.setLdapFilter(old.getLdapFilter());
+      newUserAndGroup.setUserMemberOfAttribute(old.getUserMemberOfAttribute());
       return newUserAndGroup;
     }
 
