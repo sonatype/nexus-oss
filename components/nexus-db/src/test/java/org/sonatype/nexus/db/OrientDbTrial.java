@@ -3,6 +3,9 @@ package org.sonatype.nexus.db;
 import java.io.File;
 import java.net.URL;
 
+import javax.persistence.Id;
+import javax.persistence.Version;
+
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -86,9 +89,23 @@ public class OrientDbTrial
 
   public static class Person
   {
+    @Id
+    private Object id;
+
+    @Version
+    private Object version;
+
     private String firstName;
 
     private String lastName;
+
+    public Object getId() {
+      return id;
+    }
+
+    public Object getVersion() {
+      return version;
+    }
 
     public String getFirstName() {
       return firstName;
@@ -120,7 +137,7 @@ public class OrientDbTrial
 
       for (Person person : db.browseClass(Person.class)) {
         // NOTE: The javaassist proxy here doesn't properly toString()
-        log("{} {}", person.getFirstName(), person.getLastName());
+        log("{}v{} -> {} {}", person.getId(), person.getVersion(), person.getFirstName(), person.getLastName());
       }
     }
     finally {
