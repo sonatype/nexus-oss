@@ -22,11 +22,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class AbstractMetadataStore<T>
     implements MetadataStore<T>
 {
-  protected final MetadataType type;
+  protected final MetadataType<T> type;
 
   protected final Class<T> clazz;
 
-  protected AbstractMetadataStore(MetadataType type, Class<T> clazz) {
+  protected AbstractMetadataStore(MetadataType<T> type, Class<T> clazz) {
     this.type = checkNotNull(type);
     this.clazz = checkNotNull(clazz);
   }

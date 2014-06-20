@@ -32,13 +32,13 @@ import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class MetadataType
+public class MetadataType<T>
 {
   private static final Pattern NAME_PATTERN = Pattern.compile("[a-zA-Z0-9_]+");
 
   private final String name;
 
-  private final Class metadataClass;
+  private final Class<T> metadataClass;
 
   private final Class metadataBuilderClass;
 
@@ -46,7 +46,7 @@ public class MetadataType
 
   private final Set<MetadataIndex> indexes;
 
-  private MetadataType(String name, Class metadataClass, Set<String> textAttributes, Set<MetadataIndex> indexes) {
+  private MetadataType(String name, Class<T> metadataClass, Set<String> textAttributes, Set<MetadataIndex> indexes) {
     this.name = checkName(name);
     this.metadataClass = checkMetadataClass(metadataClass);
     this.metadataBuilderClass = checkMetadataBuilderClass(metadataClass);
@@ -65,16 +65,17 @@ public class MetadataType
   }
 
   // must be IdentityMetadata or a subclass of SecondaryMetadata
-  private static Class checkMetadataClass(Class metadataClass) {
+  private static <T> Class<T> checkMetadataClass(Class<T> metadataClass) {
     checkNotNull(metadataClass);
-    if (metadataClass != IdentityMetadata.class) {
-      Class parent = metadataClass.getSuperclass();
-      while (parent != null) {
-        if (parent == SecondaryMetadata.class) {
-          return metadataClass;
-        }
-        parent = parent.getSuperclass();
+    if (metadataClass == IdentityMetadata.class) {
+      return metadataClass;
+    }
+    Class parent = metadataClass.getSuperclass();
+    while (parent != null) {
+      if (parent == SecondaryMetadata.class) {
+        return metadataClass;
       }
+      parent = parent.getSuperclass();
     }
     throw new IllegalArgumentException(metadataClass + " is not a subclass of " + SecondaryMetadata.class);
   }
@@ -89,15 +90,15 @@ public class MetadataType
   }
 
   // Metadata class must have @JsonDeserialize annotation specifying a builder that is a MetadataBuilder
-  private static Class checkMetadataBuilderClass(Class metadataClass) {
-    JsonDeserialize jsonDeserialize = (JsonDeserialize)metadataClass.getAnnotation(JsonDeserialize.class);
+  private static <T> Class checkMetadataBuilderClass(Class<T> metadataClass) {
+    JsonDeserialize jsonDeserialize = metadataClass.getAnnotation(JsonDeserialize.class);
     if (jsonDeserialize == null) {
       throw new IllegalArgumentException(metadataClass + " does not have a @JsonDeserialize annotation");
     }
     if (jsonDeserialize.builder() == null) {
       throw new IllegalArgumentException(metadataClass + "'s @JsonDeserialize annotation does not specify a builder");
     }
-    Class metadataBuilderClass = jsonDeserialize.builder().getClass();
+    Class metadataBuilderClass = jsonDeserialize.builder();
     checkInterface(metadataBuilderClass, MetadataBuilder.class);
     return metadataBuilderClass;
   }
@@ -132,7 +133,7 @@ public class MetadataType
   private static String getAttributeName(Method method) {
     if (method.getParameterTypes().length == 0) {
       String name = method.getName();
-      if (name.startsWith("get")) {
+      if (name.startsWith("get") && !name.equals("getClass")) {
         return StringUtils.uncapitalize(name.substring(3));
       }
       else if (name.startsWith("is")) {

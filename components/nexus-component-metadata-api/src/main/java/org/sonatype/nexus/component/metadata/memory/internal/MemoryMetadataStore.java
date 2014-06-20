@@ -41,7 +41,7 @@ public class MemoryMetadataStore<T>
 
   private long sequence;
 
-  public MemoryMetadataStore(MetadataType type, Class<T> clazz) {
+  public MemoryMetadataStore(MetadataType<T> type, Class<T> clazz) {
     super(type, clazz);
     for (MetadataIndex index: type.getIndexes()) {
       if (index.isUnique()) {
