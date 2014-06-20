@@ -14,23 +14,13 @@
 package com.sonatype.nexus.testsuite.ssl;
 
 import javax.inject.Inject;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.client.core.exception.NexusClientErrorResponseException;
-import org.sonatype.nexus.client.core.subsystem.Restlet1xClient;
-import org.sonatype.nexus.rest.model.SmtpSettingsResource;
-import org.sonatype.nexus.rest.model.SmtpSettingsResourceRequest;
 import org.sonatype.sisu.bl.support.port.PortReservationService;
 
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.ServerSetup;
 import org.junit.Test;
 
 import static com.sonatype.nexus.ssl.model.SMTPTrustStoreKey.smtpTrustStoreKey;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
@@ -72,68 +62,6 @@ public class SSLSmtpIT
 
     truststore().disableFor(smtpTrustStoreKey());
     assertThat(truststore().isEnabledFor(smtpTrustStoreKey()), is(false));
-  }
-
-  @Test
-  public void sendEmailToSelfSignedEmailServer()
-      throws Exception
-  {
-    truststore().enableFor(smtpTrustStoreKey());
-    assertThat(truststore().isEnabledFor(smtpTrustStoreKey()), is(true));
-
-    GreenMail mailServer = null;
-    try {
-      mailServer = new GreenMail(
-          new ServerSetup(portReservationService.reservePort(), null, ServerSetup.PROTOCOL_SMTPS)
-      );
-      mailServer.start();
-      final int mailPort = mailServer.getSmtps().getPort();
-
-      // it should fail as mail server (self signed) certificate is not trusted
-      try {
-        sendTestEmail(mailPort);
-        assertThat("Expected to fail with Exception", false);
-      }
-      catch (NexusClientErrorResponseException e) {
-        assertThat(e.getResponseBody(), containsString("Failed to send validation e-mail"));
-      }
-
-      // trust mail server (self signed) certificate
-      certificates().get("localhost", mailPort, ServerSetup.PROTOCOL_SMTPS).save();
-
-      sendTestEmail(mailPort);
-    }
-    finally {
-      if (mailServer != null) {
-        portReservationService.cancelPort(mailServer.getSmtps().getPort());
-        mailServer.stop();
-      }
-    }
-  }
-
-  private void sendTestEmail(final int port) {
-    final SmtpSettingsResource smtpSettings = new SmtpSettingsResource();
-    smtpSettings.setHost("localhost");
-    smtpSettings.setPort(port);
-    smtpSettings.setTlsEnabled(true);
-    smtpSettings.setSslEnabled(true);
-    smtpSettings.setSystemEmailAddress("system@sonatype.com");
-    smtpSettings.setTestEmail("system@sonatype.com");
-
-    final SmtpSettingsResourceRequest envelope = new SmtpSettingsResourceRequest();
-    envelope.setData(smtpSettings);
-
-    client().getSubsystem(CheckSmtpSettings.class).check(envelope);
-
-  }
-
-  @Path("/service/local/check_smtp_settings")
-  public static interface CheckSmtpSettings
-      extends Restlet1xClient
-  {
-    @PUT
-    @Produces({APPLICATION_JSON})
-    void check(SmtpSettingsResourceRequest request);
   }
 
 }
