@@ -389,6 +389,8 @@ public class RoutingFilteringIT
         // GET /com/someorg/artifact/1.0/artifact-1.0.pom.sha1,
         // GET /com/someorg/artifact/1.0/artifact-1.0.pom,
         final List<String> requests = recorder.getPathsForVerb("GET");
+        log("Requests: {}", requests);
+
         assertThat(requests.size(), is(10));
         assertThat(
             requests,
