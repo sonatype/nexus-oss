@@ -30,7 +30,7 @@ public class OrientDbTrial
   @Test
   public void documentTxTest() throws Exception {
     File dir = util.createTempDir("testdb");
-    ODatabaseDocumentTx db = new ODatabaseDocumentTx("local:" + dir.getPath());
+    ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:" + dir.getPath());
     if (!db.exists()) {
       db.create();
       log("DB created");
