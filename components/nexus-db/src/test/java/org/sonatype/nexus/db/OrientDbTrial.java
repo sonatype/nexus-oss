@@ -41,7 +41,7 @@ public class OrientDbTrial
     }
 
     try {
-      ODocument doc = new ODocument("Person");
+      ODocument doc = db.newInstance("Person");
       doc.field("name", "Luke");
       doc.field("surname", "Skywalker");
       doc.field("city", new ODocument("City").field("name", "Rome").field("country", "Italy"));
