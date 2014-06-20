@@ -171,12 +171,12 @@ public abstract class AbstractLdapIT
   protected LdapUserAndGroupAuthConfigurationDTO getDefaultUserAndGroupConfiguration() {
     LdapUserAndGroupAuthConfigurationDTO userGroupConf = new LdapUserAndGroupAuthConfigurationDTO();
 
-    userGroupConf.setUserMemberOfAttribute("businesscategory");
+    // userGroupConf.setUserMemberOfAttribute("businesscategory");
     userGroupConf.setGroupBaseDn("ou=groups");
     userGroupConf.setGroupIdAttribute("cn");
-    userGroupConf.setGroupMemberAttribute("groupMemberAttribute");
-    userGroupConf.setGroupMemberFormat("cn=${username},ou=groups,o=sonatype");
-    userGroupConf.setGroupObjectClass("organizationalRole");
+    userGroupConf.setGroupMemberAttribute("uniqueMember");
+    userGroupConf.setGroupMemberFormat("uid=${username},ou=people,o=sonatype");
+    userGroupConf.setGroupObjectClass("groupOfUniqueNames");
     userGroupConf.setLdapGroupsAsRoles(true);
 
     userGroupConf.setEmailAddressAttribute("mail");

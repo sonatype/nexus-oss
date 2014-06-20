@@ -52,11 +52,13 @@ public class NXCM1665UserMappingIT
     LdapUserListResponse listResponse = this.getFromResponse(LdapUserListResponse.class, xstream,
         responseText);
 
-    assertThat(listResponse.getData(), hasSize(3));
+    assertThat(listResponse.getData(), hasSize(4));
 
-    // and make sure everyone has groups
+    // and make sure everyone has groups except "jdcasey"
     for (LdapUserDTO userDto : listResponse.getData()) {
-      assertThat(userDto.getRoles(), not(Matchers.<String>empty()));
+      if (!"jdcasey".equals(userDto.getUserId())) {
+        assertThat(userDto.getRoles(), not(Matchers.<String>empty()));
+      }
     }
   }
 }
