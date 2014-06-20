@@ -70,11 +70,6 @@ NX.define('Sonatype.repoServer.referenceData', {
       baseUrl : "",
       forceBaseUrl : false,
       uiTimeout : 30000
-    },
-    systemNotificationSettings : {
-      enabled : false,
-      emailAddresses : "",
-      roles : []
     }
   },
 

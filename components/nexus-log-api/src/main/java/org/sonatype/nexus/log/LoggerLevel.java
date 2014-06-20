@@ -10,21 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.guice;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package org.sonatype.nexus.log;
 
 /**
- * Identifies methods whose arguments and return value require validation.
- * 
- * @since 3.0
+ * Logger levels supported.
+ *
+ * @since 2.1
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
-public @interface Validate
+public enum LoggerLevel
 {
-  Class<?>[] groups() default {};
+  /**
+   * @since 2.7
+   */
+  OFF,
+
+  TRACE,
+  DEBUG,
+  INFO,
+  WARN,
+
+  /**
+   * @since 2.7
+   */
+  ERROR,
+
+  /**
+   * Level will be calculated as effective level.
+   *
+   * @since 2.7
+   */
+  DEFAULT
 }

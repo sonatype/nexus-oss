@@ -20,9 +20,13 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
 
   views: [
     'upload.UploadArtifact',
+    'upload.UploadArtifactCoordinates',
     'upload.UploadArtifactFile'
   ],
 
+  /**
+   * @private
+   */
   counter: 0,
 
   artifactPanelXType: 'nx-coreui-upload-artifact-file',
@@ -36,7 +40,7 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
     me.listen({
       component: {
         'nx-coreui-upload-artifact': {
-          afterrender: me.refreshAddButton
+          afterrender: me.afterRender
         },
         'nx-coreui-upload-artifact button[action=upload]': {
           click: me.upload
@@ -59,6 +63,17 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
 
   /**
    * @private
+   */
+  afterRender: function (form) {
+    var me = this;
+
+    me.refreshAddButton(form);
+    form.isValid();
+  },
+
+  /**
+   * @private
+   * Uploads artifacts by submitting the form.
    */
   upload: function (button) {
     var me = this,
@@ -83,6 +98,7 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
 
   /**
    * @private
+   * Resets form to initial state.
    */
   discardForm: function (form) {
     var me = this,
@@ -96,10 +112,12 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
       artifactPanel = form.down(me.artifactPanelXType);
     }
     me.refreshAddButton(form);
+    me.showOrHideCoordinates(form);
   },
 
   /**
    * @private
+   * Add an artifact selection panel.
    */
   addArtifact: function (button) {
     var me = this,
@@ -118,6 +136,7 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
 
   /**
    * @private
+   * Remove an artifact selection panel.
    */
   removeArtifact: function (button) {
     var me = this,
@@ -125,10 +144,12 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
 
     form.remove(button.up(me.artifactPanelXType));
     me.refreshAddButton(form);
+    me.showOrHideCoordinates(form);
   },
 
   /**
    * @private
+   * Move "Add" button by the end of form.
    */
   refreshAddButton: function (form) {
     var me = this,
@@ -148,24 +169,58 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
 
   /**
    * @private
+   * Update coordinates if possible.
    */
   onFileSelected: function (button, fileName) {
     var me = this,
         form = button.up('form'),
         artifactPanel = button.up(me.artifactPanelXType),
-        coordinates = me.guessCoordinates(fileName);
+        coordinates = me.guessCoordinates(fileName),
+        artifactId, version, packaging;
 
     artifactPanel.classifier.setValue(coordinates.classifier);
     artifactPanel.extension.setValue(coordinates.extension);
+    artifactPanel.isPom = coordinates.extension === 'pom' || Ext.String.endsWith(fileName, 'pom.xml', true);
 
-    if (coordinates.extension === 'pom') {
-      //form.down('#group').setValue(coordinates.group);
-      form.down('#artifact').setValue(coordinates.artifact);
-      form.down('#version').setValue(coordinates.version);
-      form.down('#packaging').setValue(coordinates.packaging);
+    me.showOrHideCoordinates(form);
+
+    artifactId = form.down('#artifactId');
+    if (artifactId && !artifactId.getValue()) {
+      artifactId.setValue(coordinates.artifact);
+    }
+    version = form.down('#version');
+    if (version && !version.getValue()) {
+      version.setValue(coordinates.version);
+    }
+    packaging = form.down('#packaging');
+    if (packaging && !packaging.getValue()) {
+      packaging.setValue(coordinates.packaging);
     }
   },
 
+  /**
+   * @private
+   * Show or Hide coordinates if a pom was selected to be uploaded or not.
+   */
+  showOrHideCoordinates: function (form) {
+    var me = this,
+        coordinatesPanel = form.down('nx-coreui-upload-artifact-coordinates');
+
+    if (form.down(me.artifactPanelXType + '[isPom=true]') || !form.down(me.artifactPanelXType)) {
+      coordinatesPanel.disable();
+      coordinatesPanel.hide();
+    }
+    else {
+      coordinatesPanel.enable();
+      coordinatesPanel.show();
+      form.isValid();
+    }
+  },
+
+  /**
+   * @private
+   * Try to guess coordinates out of a file name.
+   */
   guessCoordinates: function (fileName) {
     var g = '', a = '', v = '', c = '', p = '', e = '';
 

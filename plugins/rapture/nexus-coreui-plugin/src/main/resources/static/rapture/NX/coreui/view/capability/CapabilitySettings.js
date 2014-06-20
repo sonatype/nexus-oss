@@ -26,6 +26,10 @@ Ext.define('NX.coreui.view.capability.CapabilitySettings', {
     },
     {
       xtype: 'hiddenfield',
+      name: 'typeId'
+    },
+    {
+      xtype: 'hiddenfield',
       name: 'notes'
     },
     {
@@ -66,6 +70,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySettings', {
         values = me.getForm().getFieldValues(),
         capability = {
           id: values.id,
+          typeId: values.typeId,
           notes: values.notes,
           enabled: values.enabled,
           properties: {}

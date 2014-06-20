@@ -66,7 +66,6 @@ Ext.define('NX.coreui.app.PluginConfig', {
     },
     'NX.coreui.controller.MavenUpload',
     'NX.coreui.controller.Metrics',
-    'NX.coreui.controller.NotificationSettings',
     { id: 'NX.coreui.controller.Outreach',
       active: function () {
         return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-outreach-plugin');

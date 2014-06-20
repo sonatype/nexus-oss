@@ -10,21 +10,37 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.guice;
+package org.sonatype.nexus.log;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.IOException;
 
 /**
- * Identifies methods whose arguments and return value require validation.
- * 
- * @since 3.0
+ * LogManager MBean interface (intentionally narrowed to same as UI supports, as this is the only thing proven useful
+ * and used).
+ *
+ * @since 2.1
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
-public @interface Validate
+public interface LogManagerMBean
 {
-  Class<?>[] groups() default {};
+  String getRootLoggerLevel() throws IOException;
+
+  /**
+   * @since 2.7
+   */
+  void makeRootLoggerLevelOff() throws IOException;
+
+  void makeRootLoggerLevelTrace() throws IOException;
+
+  void makeRootLoggerLevelDebug() throws IOException;
+
+  void makeRootLoggerLevelInfo() throws IOException;
+
+  void makeRootLoggerLevelWarn() throws IOException;
+
+  /**
+   * @since 2.7
+   */
+  void makeRootLoggerLevelError() throws IOException;
+
+  void makeRootLoggerLevelDefault() throws IOException;
 }

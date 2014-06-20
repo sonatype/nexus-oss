@@ -43,6 +43,7 @@
     <module>nexus-jettyapp</module>
     <module>nexus-launcher</module>
     <module>nexus-locks</module>
+    <module>nexus-log-api</module>
     <module>nexus-mime</module>
     <module>nexus-oss-edition</module>
     <module>nexus-plugin-api</module>

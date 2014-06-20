@@ -10,21 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.guice;
+package org.sonatype.nexus.log;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.InputStream;
 
 /**
- * Identifies methods whose arguments and return value require validation.
- * 
- * @since 3.0
+ * A component contract that wants to provide extra logging configuration, participate in configuration of logging in
+ * Nexus.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
-public @interface Validate
+public interface LogConfigurationParticipant
 {
-  Class<?>[] groups() default {};
+  String getName();
+
+  InputStream getConfiguration();
+
+  /**
+   * Marker interface to be implemented by {@link LogConfigurationParticipant} instances that provide configurations
+   * which should not be tampered with, changed by users. These participant configurations will be written out
+   * (probably overwriting existing file) always, at every boot.
+   *
+   * @since 2.2
+   */
+  public interface NonEditable
+  {
+    // empty
+  }
 }
