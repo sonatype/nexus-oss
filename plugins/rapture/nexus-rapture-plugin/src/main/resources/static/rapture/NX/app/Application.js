@@ -28,6 +28,7 @@ Ext.define('NX.app.Application', {
     'NX.view.Viewport',
     'NX.util.Url',
     'NX.util.DownloadHelper',
+    'NX.util.DateFormat',
     'NX.State',
 
     // Ext overrides
