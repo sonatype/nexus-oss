@@ -18,6 +18,7 @@ import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.guice.Validate
@@ -64,7 +65,7 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
   @Validate
-  RoutingRepositorySettingsXO read(final @NotNull(message = '[repositoryId] may not be null') String repositoryId) {
+  RoutingRepositorySettingsXO read(final @NotEmpty(message = '[repositoryId] may not be empty') String repositoryId) {
     MavenRepository mavenRepository = getMavenRepository(repositoryId, MavenRepository.class)
     RoutingStatus status = manager.getStatusFor(mavenRepository)
     PublishingStatus pstatus = status.publishingStatus
@@ -139,7 +140,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:update')
   @Validate
-  RoutingRepositorySettingsXO updatePrefixFile(final @NotNull(message = '[repositoryId] may not be null') String repositoryId) {
+  RoutingRepositorySettingsXO updatePrefixFile(final @NotEmpty(message = '[repositoryId] may not be empty') String repositoryId) {
     MavenRepository mavenRepository = getMavenRepository(repositoryId, MavenRepository.class)
     manager.updatePrefixFile(mavenRepository)
     return read(repositoryId)

@@ -19,6 +19,7 @@ import groovy.transform.WithReadLock
 import groovy.transform.WithWriteLock
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.guice.Validate
@@ -89,7 +90,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:logconfig:delete')
   @Validate
-  void delete(final @NotNull(message = '[name] may not be null') String name) {
+  void delete(final @NotEmpty(message = '[name] may not be empty') String name) {
     assert name != ROOT, "${ROOT} logger cannot be removed"
     logManager.unsetLoggerLevel(name)
   }

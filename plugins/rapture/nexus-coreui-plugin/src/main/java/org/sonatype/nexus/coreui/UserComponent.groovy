@@ -20,6 +20,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.apache.shiro.authz.annotation.RequiresUser
 import org.eclipse.sisu.inject.BeanLocator
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
@@ -31,11 +32,7 @@ import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.nexus.wonderland.AuthTicketService
 import org.sonatype.security.SecuritySystem
-import org.sonatype.security.usermanagement.DefaultUser
-import org.sonatype.security.usermanagement.RoleIdentifier
-import org.sonatype.security.usermanagement.User
-import org.sonatype.security.usermanagement.UserManager
-import org.sonatype.security.usermanagement.UserSearchCriteria
+import org.sonatype.security.usermanagement.*
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager
 
 import javax.annotation.Nullable
@@ -195,8 +192,8 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:userschangepw:update')
   @Validate
-  void changePassword(final @NotNull(message = '[authToken] may not be null') String authToken,
-                      final @NotNull(message = '[password] may not be null') String password)
+  void changePassword(final @NotEmpty(message = '[authToken] may not be empty') String authToken,
+                      final @NotEmpty(message = '[password] may not be empty') String password)
   {
     if (authTickets.redeemTicket(authToken)) {
       String currentUserId = securitySystem.getSubject().getPrincipal().toString()
@@ -216,8 +213,8 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:users:delete')
   @Validate
-  void delete(final @NotNull(message = '[id] may not be null') String id,
-              final @NotNull(message = '[source] may not be null') String source)
+  void delete(final @NotEmpty(message = '[id] may not be empty') String id,
+              final @NotEmpty(message = '[source] may not be empty') String source)
   {
     // TODO check if source is required or we always delete from default realm
     securitySystem.deleteUser(id, source)
