@@ -17,8 +17,6 @@ import java.io.IOException;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
-import org.sonatype.nexus.rest.model.SmtpSettingsResource;
-import org.sonatype.nexus.rest.model.SmtpSettingsResourceRequest;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.google.common.base.Preconditions;
@@ -61,15 +59,6 @@ public class SettingsMessageUtil
     return RequestFacade.doPutForStatus("service/local/global_settings/current", representation, null);
   }
 
-  public static Status save(final SmtpSettingsResource smtpSettings)
-      throws IOException
-  {
-    SmtpSettingsResourceRequest configResponse = wrapData(smtpSettings);
-    XStreamRepresentation representation = new XStreamRepresentation(xstream, "", MediaType.APPLICATION_XML);
-    representation.setPayload(configResponse);
-    return RequestFacade.doPutForStatus("service/local/check_smtp_settings", representation, null);
-  }
-
   /**
    * Wrap a {@link GlobalConfigurationResource} in a {@link GlobalConfigurationResourceResponse} and return it.
    *
@@ -79,13 +68,6 @@ public class SettingsMessageUtil
   public static GlobalConfigurationResourceResponse wrapData(final GlobalConfigurationResource resource) {
     Preconditions.checkNotNull(resource);
     final GlobalConfigurationResourceResponse wrapper = new GlobalConfigurationResourceResponse();
-    wrapper.setData(resource);
-    return wrapper;
-  }
-
-  public static SmtpSettingsResourceRequest wrapData(final SmtpSettingsResource resource) {
-    Preconditions.checkNotNull(resource);
-    final SmtpSettingsResourceRequest wrapper = new SmtpSettingsResourceRequest();
     wrapper.setData(resource);
     return wrapper;
   }
