@@ -50,9 +50,6 @@ public class OrientDbTrial
 
     private String lastName;
 
-    public Person() {
-    }
-
     public String getFirstName() {
       return firstName;
     }
