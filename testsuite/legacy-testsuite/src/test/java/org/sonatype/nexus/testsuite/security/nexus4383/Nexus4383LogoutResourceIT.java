@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.security.nexus4383;
 
 import java.net.URI;
@@ -28,6 +29,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.cookie.Cookie;
@@ -40,6 +42,10 @@ import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * Tests to make sure the session is removed when the logout resource is called.
@@ -97,10 +103,15 @@ public class Nexus4383LogoutResourceIT
     authCache.put(targetHost, basicAuth);
     localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
 
+    String owaspQueryParams = null;
     HttpGet getMethod = new HttpGet(url);
     getMethod.addHeader(userAgentHeader);
     try {
-      Assert.assertEquals(httpClient.execute(getMethod, localcontext).getStatusLine().getStatusCode(), 200);
+      CloseableHttpResponse response = httpClient.execute(getMethod, localcontext);
+      Header owaspCsrfToken = response.getFirstHeader("OWASP_CSRFTOKEN");
+      assertThat(owaspCsrfToken, is(notNullValue()));
+      owaspQueryParams = "?" + owaspCsrfToken.getName() + "=" + owaspCsrfToken.getValue();
+      Assert.assertEquals(response.getStatusLine().getStatusCode(), 200);
     }
     finally {
       getMethod.reset();
@@ -114,7 +125,7 @@ public class Nexus4383LogoutResourceIT
 
     // now with just the cookie
     httpClient.getCookieStore().addCookie(sessionCookie);
-    getMethod = new HttpGet(url);
+    getMethod = new HttpGet(url + owaspQueryParams);
     try {
       Assert.assertEquals(httpClient.execute(getMethod).getStatusLine().getStatusCode(), 200);
     }
@@ -123,7 +134,7 @@ public class Nexus4383LogoutResourceIT
     }
 
     // do logout
-    HttpGet logoutGetMethod = new HttpGet(logoutUrl);
+    HttpGet logoutGetMethod = new HttpGet(logoutUrl + owaspQueryParams);
     try {
       final HttpResponse response = httpClient.execute(logoutGetMethod);
       Assert.assertEquals(response.getStatusLine().getStatusCode(), 200);

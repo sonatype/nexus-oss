@@ -54,18 +54,18 @@ public class LogoutAuthenticationFilter
   public void postHandle(ServletRequest request, ServletResponse response)
       throws Exception
   {
-    Subject subject = getSubject(request, response);
-
-    if (subject != null) {
-      subject.logout();
-    }
-
     if (HttpServletRequest.class.isAssignableFrom(request.getClass())) {
       HttpSession session = ((HttpServletRequest) request).getSession(false);
 
       if (session != null) {
         session.invalidate();
       }
+    }
+
+    Subject subject = getSubject(request, response);
+
+    if (subject != null) {
+      subject.logout();
     }
   }
 }

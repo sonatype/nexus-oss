@@ -20,13 +20,41 @@ define('Nexus/configuration/Ajax', ['extjs'], function(Ext) {
     'X-Nexus-UI': 'true'
   };
 
+  Ext.Ajax.on('beforerequest', function (connection, options) {
+    if (options.isUpload && options.url && XMLHttpRequest.tokenName) {
+      options.url = options.url
+          + (options.url.indexOf('?') > 0 ? '&' : '?') + XMLHttpRequest.tokenName + '=' + XMLHttpRequest.tokenValue();
+    }
+  });
+
   Ext.Ajax.on('requestexception', function(connection, response) {
     if ( response && Ext.isFunction(response.getResponseHeader) ) { // timeouts/socket closed response does not have this method(?)
+      if (XMLHttpRequest.tokenName) {
+        var tokenValue = response.getResponseHeader(XMLHttpRequest.tokenName);
+        if (tokenValue) {
+          XMLHttpRequest.tokenValue = function () {
+            return tokenValue;
+          };
+        }
+      }
       var contentType = response.getResponseHeader('Content-Type');
       if ( contentType === 'application/vnd.siesta-error-v1+json') {
         response.siestaError = Ext.decode(response.responseText);
       } else if ( contentType === 'application/vnd.siesta-validation-errors-v1+json') {
         response.siestaValidationError = Ext.decode(response.responseText);
+      }
+    }
+  });
+
+  Ext.Ajax.on('requestcomplete', function (connection, response) {
+    if (response && Ext.isFunction(response.getResponseHeader)) {
+      if (XMLHttpRequest.tokenName) {
+        var tokenValue = response.getResponseHeader(XMLHttpRequest.tokenName);
+        if (tokenValue) {
+          XMLHttpRequest.tokenValue = function () {
+            return tokenValue;
+          };
+        }
       }
     }
   });

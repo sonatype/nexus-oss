@@ -10,11 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.apache.shiro.nexus5727;
+
+import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.mgt.SessionValidationScheduler;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.slf4j.Logger;
@@ -40,6 +44,11 @@ public class FixedDefaultWebSessionManager
       final @Named("${shiro.globalSessionTimeout:-" + DEFAULT_GLOBAL_SESSION_TIMEOUT + "}") long globalSessionTimeout)
   {
     setGlobalSessionTimeout(globalSessionTimeout);
+  }
+
+  @Inject
+  public void configureSessionListeners(final Collection<SessionListener> listeners) {
+    setSessionListeners(listeners);
   }
 
   @Override

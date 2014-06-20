@@ -190,6 +190,12 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-csrfguard</artifactId>
+        <version>2.9.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-ehcache</artifactId>
         <version>2.9.0-SNAPSHOT</version>
       </dependency>
@@ -547,11 +553,14 @@
               <exclude>**/nexus-ui-extjs3-plugin/src/main/resources/static/js/ext/ux/**</exclude>
               <exclude>**/nexus-ui-extjs3-plugin/src/main/resources/static/css/ext/ux/**</exclude>
               <exclude>**/nexus-ui-extjs3-plugin/src/main/js-lib/**</exclude>
+              <exclude>**/nexus-csrfguard/src/main/resources/org/sonatype/nexus/csrfguard/csrfguard.*</exclude>
 
               <!--
               Excludes for specific classes which have compatible, yet different licences.
               -->
               <exclude>**/nexus-ldap-common/**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
+              <exclude>**/nexus-csrfguard/**/org/sonatype/nexus/csrfguard/CsrfGuardFilter.java</exclude>
+              <exclude>**/nexus-csrfguard/**/org/sonatype/nexus/csrfguard/CsrfGuardServlet.java</exclude>
             </excludes>
           </configuration>
         </plugin>

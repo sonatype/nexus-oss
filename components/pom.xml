@@ -33,6 +33,7 @@
     <module>nexus-client-core</module>
     <module>nexus-configuration-model</module>
     <module>nexus-core</module>
+    <module>nexus-csrfguard</module>
     <module>nexus-ehcache</module>
     <module>nexus-launcher</module>
     <module>nexus-ldap-common</module>
