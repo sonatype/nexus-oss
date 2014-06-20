@@ -54,6 +54,11 @@ Ext.define('NX.coreui.app.PluginConfig', {
             || NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-clm-plugin');
       }
     },
+    { id: 'NX.coreui.controller.LdapServers',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-ldap-plugin');
+      }
+    },
     { id: 'NX.coreui.controller.Log',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-logging-plugin');
