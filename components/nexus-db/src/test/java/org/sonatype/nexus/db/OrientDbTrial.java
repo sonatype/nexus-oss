@@ -29,14 +29,9 @@ import static org.hamcrest.Matchers.is;
 public class OrientDbTrial
     extends TestSupport
 {
-  @Test
-  public void embeddedServer() throws Exception {
-    OServer server = OServerMain.create();
-    URL config = getClass().getResource("server-config.xml");
-    log(config);
-    server.startup(config.openStream());
-    server.activate();
-    server.shutdown();
+  private ODatabaseDocumentTx createDatabase() {
+    File dir = util.createTempDir("testdb");
+    return new ODatabaseDocumentTx("plocal:" + dir.getPath()).create();
   }
 
   private ODocument createPerson(final ODatabaseDocumentTx db) {
@@ -48,6 +43,16 @@ public class OrientDbTrial
         .field("country", "Italy"));
     doc.save();
     return doc;
+  }
+
+  @Test
+  public void embeddedServer() throws Exception {
+    OServer server = OServerMain.create();
+    URL config = getClass().getResource("server-config.xml");
+    log(config);
+    server.startup(config.openStream());
+    server.activate();
+    server.shutdown();
   }
 
   @Test
@@ -84,13 +89,8 @@ public class OrientDbTrial
 
   @Test
   public void documentTx() throws Exception {
-    File dir = util.createTempDir("testdb");
-    ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:" + dir.getPath()).create();
-    try {
+    try (ODatabaseDocumentTx db = createDatabase()) {
       ODocument doc = createPerson(db);
-    }
-    finally {
-      db.close();
     }
   }
 
@@ -102,20 +102,14 @@ public class OrientDbTrial
     new ODatabaseDocumentTx("plocal:" + dir.getPath()).create().close();
 
     // now we should be able to get a pooled connection
-    ODatabaseDocumentTx db = ODatabaseDocumentPool.global().acquire("plocal:" + dir.getPath(), "admin", "admin");
-    try {
+    try (ODatabaseDocumentTx db = ODatabaseDocumentPool.global().acquire("plocal:" + dir.getPath(), "admin", "admin")) {
       ODocument doc = createPerson(db);
-    }
-    finally {
-      db.close();
     }
   }
 
   @Test
   public void recordIdEncoding() throws Exception {
-    File dir = util.createTempDir("testdb");
-    ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:" + dir.getPath()).create();
-    try {
+    try (ODatabaseDocumentTx db = createDatabase()) {
       ODocument doc = createPerson(db);
       log("New Document: {}", doc);
 
@@ -133,16 +127,24 @@ public class OrientDbTrial
       doc = db.getRecord(decoded);
       log("Fetched Document: {}", doc);
     }
-    finally {
-      db.close();
+  }
+
+  @Test
+  public void documentExistance() throws Exception {
+    try (ODatabaseDocumentTx db = createDatabase()) {
+      ODocument doc = createPerson(db);
+      log("Document: {}", doc);
+      ORID rid = doc.getIdentity();
+      log("RID: {}", rid);
+
+      // FIXME: This is not working as expected
+      assertThat(db.existsUserObjectByRID(rid), is(true));
     }
   }
 
   @Test
   public void loadNonExistingDocument() throws Exception {
-    File dir = util.createTempDir("testdb");
-    ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:" + dir.getPath()).create();
-    try {
+    try (ODatabaseDocumentTx db = createDatabase()) {
       ORID rid = new ORecordId("#1:1");
       log(rid);
       assertThat(db.existsUserObjectByRID(rid), is(false));
@@ -150,25 +152,17 @@ public class OrientDbTrial
       log(record);
       // NOTE: load() and getRecord() return records for non-existing documents :-\
     }
-    finally {
-      db.close();
-    }
   }
 
   @Test
   public void deleteNonExistingDocument() throws Exception {
-    File dir = util.createTempDir("testdb");
-    ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:" + dir.getPath()).create();
-    try {
+    try (ODatabaseDocumentTx db = createDatabase()) {
       ORID rid = new ORecordId("#1:1");
       log(rid);
       assertThat(db.existsUserObjectByRID(rid), is(false));
 
       db.delete(rid);
-      // apparently continues w/o exception or other notification
-    }
-    finally {
-      db.close();
+      // apparently continues w/o exception or other notification :-(
     }
   }
 
@@ -212,8 +206,7 @@ public class OrientDbTrial
   @Test
   public void objectTx() throws Exception {
     File dir = util.createTempDir("testdb");
-    OObjectDatabaseTx db = new OObjectDatabaseTx("plocal:" + dir.getPath()).create();
-    try {
+    try (OObjectDatabaseTx db = new OObjectDatabaseTx("plocal:" + dir.getPath()).create()) {
       db.getEntityManager().registerEntityClass(Person.class);
       Person newPerson = db.newInstance(Person.class);
       newPerson.setFirstName("James");
@@ -224,9 +217,6 @@ public class OrientDbTrial
         // NOTE: The javaassist proxy here doesn't properly toString()
         log("{}v{} -> {} {}", person.getId(), person.getVersion(), person.getFirstName(), person.getLastName());
       }
-    }
-    finally {
-      db.close();
     }
   }
 }
