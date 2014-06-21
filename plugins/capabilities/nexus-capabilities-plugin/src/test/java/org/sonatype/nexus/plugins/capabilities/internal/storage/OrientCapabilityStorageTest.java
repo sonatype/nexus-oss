@@ -16,6 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.capabilities.internal.storage.OrientCapabilityStorage.DB_LOCATION;
 
 /**
  * Tests for {@link OrientCapabilityStorage}.
@@ -29,7 +30,7 @@ public class OrientCapabilityStorageTest
   public void setUp() throws Exception {
     ApplicationDirectories applicationDirectories = mock(ApplicationDirectories.class);
     File dir = util.createTempDir("testdb");
-    when(applicationDirectories.getWorkDirectory(OrientCapabilityStorage.DB_LOCATION)).thenReturn(dir);
+    when(applicationDirectories.getWorkDirectory(DB_LOCATION)).thenReturn(dir);
 
     this.underTest = new OrientCapabilityStorage(applicationDirectories);
     underTest.start();

@@ -69,6 +69,7 @@ public class OrientCapabilityStorage
       }
       else {
         db.open("admin", "admin");
+        log.info("Opened database: {}", db);
       }
 
       // register entities
@@ -126,14 +127,12 @@ public class OrientCapabilityStorage
     ORID rid = convert(id);
 
     try (OObjectDatabaseTx db = openDb()) {
-      // FIXME: This does not work, need to figure out how to determine if operation has target record or not
-      //if (!db.existsUserObjectByRID(rid)) {
-      //  log.debug("Unable to update item with RID: {}", rid);
-      //  return false;
-      //}
-
       // load record and apply updated item attributes
       CapabilityStorageItem record = db.load(rid);
+      if (record == null) {
+        log.debug("Unable to update item with RID: {}", rid);
+        return false;
+      }
       record.setType(item.getType());
       record.setVersion(item.getVersion());
       record.setEnabled(item.isEnabled());
@@ -152,12 +151,6 @@ public class OrientCapabilityStorage
     ORID rid = convert(id);
 
     try (OObjectDatabaseTx db = openDb()) {
-      // FIXME: This does not work, need to figure out how to determine if operation has target record or not
-      //if (!db.existsUserObjectByRID(rid)) {
-      //  log.debug("Unable to delete item with RID: {}", rid);
-      //  return false;
-      //}
-
       db.delete(convert(id));
     }
 
