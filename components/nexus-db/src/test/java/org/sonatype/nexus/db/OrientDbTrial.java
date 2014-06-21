@@ -39,6 +39,17 @@ public class OrientDbTrial
     server.shutdown();
   }
 
+  private ODocument createPerson(final ODatabaseDocumentTx db) {
+    ODocument doc = db.newInstance("Person");
+    doc.field("name", "Luke");
+    doc.field("surname", "Skywalker");
+    doc.field("city", new ODocument("City")
+        .field("name", "Rome")
+        .field("country", "Italy"));
+    doc.save();
+    return doc;
+  }
+
   @Test
   public void embeddedDatabaseAccess() throws Exception {
     OServer server = OServerMain.create();
@@ -57,13 +68,7 @@ public class OrientDbTrial
         db.open("admin", "admin");
       }
       try {
-        ODocument doc = db.newInstance("Person");
-        doc.field("name", "Luke");
-        doc.field("surname", "Skywalker");
-        doc.field("city", new ODocument("City")
-            .field("name", "Rome")
-            .field("country", "Italy"));
-        doc.save();
+        ODocument doc = createPerson(db);
         log(doc.getIdentity());
         log(doc.getVersion());
         log(doc);
@@ -82,13 +87,7 @@ public class OrientDbTrial
     File dir = util.createTempDir("testdb");
     ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:" + dir.getPath()).create();
     try {
-      ODocument doc = db.newInstance("Person");
-      doc.field("name", "Luke");
-      doc.field("surname", "Skywalker");
-      doc.field("city", new ODocument("City")
-          .field("name", "Rome")
-          .field("country", "Italy"));
-      doc.save();
+      ODocument doc = createPerson(db);
     }
     finally {
       db.close();
@@ -105,13 +104,7 @@ public class OrientDbTrial
     // now we should be able to get a pooled connection
     ODatabaseDocumentTx db = ODatabaseDocumentPool.global().acquire("plocal:" + dir.getPath(), "admin", "admin");
     try {
-      ODocument doc = db.newInstance("Person");
-      doc.field("name", "Luke");
-      doc.field("surname", "Skywalker");
-      doc.field("city", new ODocument("City")
-          .field("name", "Rome")
-          .field("country", "Italy"));
-      doc.save();
+      ODocument doc = createPerson(db);
     }
     finally {
       db.close();
@@ -123,13 +116,7 @@ public class OrientDbTrial
     File dir = util.createTempDir("testdb");
     ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:" + dir.getPath()).create();
     try {
-      ODocument doc = db.newInstance("Person");
-      doc.field("name", "Luke");
-      doc.field("surname", "Skywalker");
-      doc.field("city", new ODocument("City")
-          .field("name", "Rome")
-          .field("country", "Italy"));
-      doc.save();
+      ODocument doc = createPerson(db);
       log("New Document: {}", doc);
 
       ORID rid = doc.getIdentity();
