@@ -22,6 +22,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 /**
  * Trials of using OrientDB.
@@ -145,12 +146,11 @@ public class OrientDbTrial
   @Test
   public void loadNonExistingDocument() throws Exception {
     try (ODatabaseDocumentTx db = createDatabase()) {
-      ORID rid = new ORecordId("#1:1");
-      log(rid);
-      assertThat(db.existsUserObjectByRID(rid), is(false));
-      ORecordInternal record = db.load(rid); // or getRecord()
-      log(record);
-      // NOTE: load() and getRecord() return records for non-existing documents :-\
+      ORID rid = new ORecordId("#1:2"); // NOTE: #1:1 will return a record, #1:2 will return null
+      log("RID: {}", rid);
+      ORecordInternal record = db.load(rid);
+      log("Record: {}", record);
+      assertThat(record, nullValue());
     }
   }
 
