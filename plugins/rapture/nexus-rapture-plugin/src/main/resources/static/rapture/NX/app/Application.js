@@ -37,6 +37,7 @@ Ext.define('NX.app.Application', {
     'NX.ext.form.field.Checkbox',
     'NX.ext.form.field.Display',
     'NX.ext.form.FieldContainer',
+    'NX.ext.grid.column.Date',
 
     'NX.ext.SearchBox'
   ],
