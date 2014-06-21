@@ -93,13 +93,17 @@ public class OrientCapabilityStorage
     return databasePool.acquire();
   }
 
-  // TODO: Sort out Hex encoding, perhaps use commons-codec?
-
+  /**
+   * Convert ORID to CapabilityIdentity using HEX encoding.
+   */
   private CapabilityIdentity convert(final ORID rid) {
     String encoded = Hex.encodeToString(rid.toStream());
     return new CapabilityIdentity(encoded);
   }
 
+  /**
+   * Convert CapabilityIdentity ORID using HEX encoding.
+   */
   private ORID convert(final CapabilityIdentity id) {
     byte[] decoded = Hex.decode(id.toString());
     return new ORecordId().fromStream(decoded);
