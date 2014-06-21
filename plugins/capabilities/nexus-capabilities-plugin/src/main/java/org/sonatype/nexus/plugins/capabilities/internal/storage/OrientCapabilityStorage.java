@@ -22,32 +22,16 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
-import org.sonatype.nexus.util.Tokens;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Maps;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
-import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.object.db.OObjectDatabasePool;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
-import io.kazuki.v0.store.KazukiException;
-import io.kazuki.v0.store.Key;
-import io.kazuki.v0.store.keyvalue.KeyValueIterable;
-import io.kazuki.v0.store.keyvalue.KeyValuePair;
-import io.kazuki.v0.store.keyvalue.KeyValueStore;
-import io.kazuki.v0.store.keyvalue.KeyValueStoreIteration.SortDirection;
-import io.kazuki.v0.store.lifecycle.Lifecycle;
-import io.kazuki.v0.store.schema.SchemaStore;
-import io.kazuki.v0.store.schema.TypeValidation;
-import io.kazuki.v0.store.schema.model.Attribute.Type;
-import io.kazuki.v0.store.schema.model.Schema;
 import org.apache.shiro.codec.Hex;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * OrientDB implementation of {@link CapabilityStorage}.
@@ -123,10 +107,14 @@ public class OrientCapabilityStorage
 
   @Override
   public CapabilityIdentity add(final CapabilityStorageItem item) throws IOException {
+    ORID rid;
     try (OObjectDatabaseTx db = openDb()) {
-      ODocument doc = db.save(item);
-      return convert(doc.getIdentity());
+      CapabilityStorageItem record = db.save(item);
+      rid = db.getIdentity(record);
     }
+
+    log.debug("Added item with RID: {}", rid);
+    return convert(rid);
   }
 
   @Override
@@ -134,10 +122,11 @@ public class OrientCapabilityStorage
     ORID rid = convert(id);
 
     try (OObjectDatabaseTx db = openDb()) {
-      // ignore if there is no record for the given id
-      if (!db.existsUserObjectByRID(rid)) {
-        return false;
-      }
+      // FIXME: This does not work, need to figure out how to determine if operation has target record or not
+      //if (!db.existsUserObjectByRID(rid)) {
+      //  log.debug("Unable to update item with RID: {}", rid);
+      //  return false;
+      //}
 
       // load record and apply updated item attributes
       CapabilityStorageItem record = db.load(rid);
@@ -148,8 +137,10 @@ public class OrientCapabilityStorage
       record.setProperties(item.getProperties());
 
       db.save(record);
-      return true;
     }
+
+    log.debug("Updated item with RID: {}", rid);
+    return true;
   }
 
   @Override
@@ -157,14 +148,17 @@ public class OrientCapabilityStorage
     ORID rid = convert(id);
 
     try (OObjectDatabaseTx db = openDb()) {
-      // ignore if there is no record for the given id
-      if (!db.existsUserObjectByRID(rid)) {
-        return false;
-      }
+      // FIXME: This does not work, need to figure out how to determine if operation has target record or not
+      //if (!db.existsUserObjectByRID(rid)) {
+      //  log.debug("Unable to delete item with RID: {}", rid);
+      //  return false;
+      //}
 
       db.delete(convert(id));
-      return true;
     }
+
+    log.debug("Deleted item with RID: {}", rid);
+    return true;
   }
 
   @Override
@@ -173,7 +167,6 @@ public class OrientCapabilityStorage
     try (OObjectDatabaseTx db = openDb()) {
       for (CapabilityStorageItem item : db.browseClass(CapabilityStorageItem.class)) {
         ORID rid = db.getIdentity(item);
-        assert rid != null;
         item = db.detach(item, true);
         items.put(convert(rid), item);
       }
