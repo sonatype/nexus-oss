@@ -151,7 +151,7 @@ public class OrientCapabilityStorage
     ORID rid = convert(id);
 
     try (OObjectDatabaseTx db = openDb()) {
-      db.delete(convert(id));
+      db.delete(rid);
     }
 
     log.debug("Deleted item with RID: {}", rid);
