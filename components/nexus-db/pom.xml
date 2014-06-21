@@ -76,6 +76,15 @@
       <artifactId>litmus-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!--
+    HACK: For Hex helper only atm.
+    -->
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-core</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>
