@@ -79,7 +79,7 @@ public class OrientCapabilityStorage
 
     this.databasePool = new OObjectDatabasePool(databaseUri, "admin", "admin");
     databasePool.setName("capability-database-pool");
-    databasePool.setup(1,10);
+    databasePool.setup(1, 10);
     log.info("Created pool: {}", databasePool);
   }
 
@@ -89,6 +89,9 @@ public class OrientCapabilityStorage
     databasePool = null;
   }
 
+  /**
+   * Open a database connection using the pool.
+   */
   private OObjectDatabaseTx openDb() {
     ensureStarted();
     return databasePool.acquire();
@@ -161,6 +164,7 @@ public class OrientCapabilityStorage
   @Override
   public Map<CapabilityIdentity, CapabilityStorageItem> getAll() throws IOException {
     Map<CapabilityIdentity, CapabilityStorageItem> items = Maps.newHashMap();
+
     try (OObjectDatabaseTx db = openDb()) {
       for (CapabilityStorageItem item : db.browseClass(CapabilityStorageItem.class)) {
         ORID rid = db.getIdentity(item);
@@ -168,6 +172,7 @@ public class OrientCapabilityStorage
         items.put(convert(rid), item);
       }
     }
+
     return items;
   }
 }
