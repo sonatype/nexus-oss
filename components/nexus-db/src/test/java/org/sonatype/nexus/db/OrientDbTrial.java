@@ -201,6 +201,16 @@ public class OrientDbTrial
     public void setLastName(final String lastName) {
       this.lastName = lastName;
     }
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "id=" + id +
+          ", version=" + version +
+          ", firstName='" + firstName + '\'' +
+          ", lastName='" + lastName + '\'' +
+          '}';
+    }
   }
 
   @Test
@@ -214,8 +224,11 @@ public class OrientDbTrial
       db.save(newPerson);
 
       for (Person person : db.browseClass(Person.class)) {
-        // NOTE: The javaassist proxy here doesn't properly toString()
         log("{}v{} -> {} {}", person.getId(), person.getVersion(), person.getFirstName(), person.getLastName());
+
+        // NOTE: The javaassist proxy here doesn't properly toString(), need to have detached object for that to work??
+        log("toString: {}", person);
+        log("detached toString: {}", db.detach(person, true));
       }
     }
   }
