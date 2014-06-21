@@ -231,6 +231,9 @@ public class RoutingFilteringIT
         proxyStatus = routing().getStatus(proxyRepository.id());
       }
 
+      // nuke the repo cache
+      nukeProxyCaches(proxyRepository.id());
+
       // clear recorder
       recorder.clear();
       // repeat the test with slightly different expectations
@@ -239,8 +242,6 @@ public class RoutingFilteringIT
         assertThat(routing().getStatus(proxyRepository.id()).getPublishedStatus(),
             equalTo(Outcome.SUCCEEDED));
 
-        // nuke the repo cache
-        nukeProxyCaches(proxyRepository.id());
         // and because we have WL, we cant fetch whatever we want (com and org)
         // only WL-enlisted of these will go remotely
         fetchAndAssert(downloadsDir, proxyRepository.id(), COM_SOMEORG_ARTIFACT_10_POM, false);
@@ -311,6 +312,9 @@ public class RoutingFilteringIT
     // waitForWLPublishingOutcomes( proxyRepository.id() );
     client().getSubsystem(Scheduler.class).waitForAllTasksToStop();
 
+    // nuke the repo cache
+    nukeProxyCaches(proxyRepository.id());
+
     try {
       // clear recorder
       recorder.clear();
@@ -320,8 +324,6 @@ public class RoutingFilteringIT
         assertThat(routing().getStatus(proxyRepository.id()).getPublishedStatus(),
             equalTo(Outcome.SUCCEEDED));
 
-        // nuke the repo cache
-        nukeProxyCaches(proxyRepository.id());
         // and because we have WL, we cant fetch whatever we want (com and org)
         // only WL-enlisted of these will go remotely
         fetchAndAssert(downloadsDir, proxyRepository.id(), COM_SOMEORG_ARTIFACT_10_POM, false);
@@ -358,6 +360,9 @@ public class RoutingFilteringIT
         proxyStatus = routing().getStatus(proxyRepository.id());
       }
 
+      // nuke the repo cache
+      nukeProxyCaches(proxyRepository.id());
+
       // clear recorder
       recorder.clear();
       // remote repo lives without prefix file
@@ -366,8 +371,6 @@ public class RoutingFilteringIT
         assertThat(routing().getStatus(proxyRepository.id()).getPublishedStatus(),
             equalTo(Outcome.FAILED));
 
-        // nuke the repo cache
-        nukeProxyCaches(proxyRepository.id());
         // and because no WL, we can fetch whatever we want (com and org)
         // all these will go remotely
         fetchAndAssert(downloadsDir, proxyRepository.id(), COM_SOMEORG_ARTIFACT_10_POM, true);
