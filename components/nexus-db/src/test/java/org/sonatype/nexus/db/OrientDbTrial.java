@@ -46,47 +46,47 @@ public class OrientDbTrial
     return doc;
   }
 
-  @Test
-  public void embeddedServer() throws Exception {
-    OServer server = OServerMain.create();
-    URL config = getClass().getResource("server-config.xml");
-    log(config);
-    server.startup(config.openStream());
-    server.activate();
-    server.shutdown();
-  }
+  //@Test
+  //public void embeddedServer() throws Exception {
+  //  OServer server = OServerMain.create();
+  //  URL config = getClass().getResource("server-config.xml");
+  //  log(config);
+  //  server.startup(config.openStream());
+  //  server.activate();
+  //  server.shutdown();
+  //}
 
-  @Test
-  public void embeddedDatabaseAccess() throws Exception {
-    OServer server = OServerMain.create();
-    URL config = getClass().getResource("server-config.xml");
-    log(config);
-    server.startup(config.openStream());
-    server.activate();
-
-    // NOTE: This doesn't root into the databases directory, not sure why
-    try {
-      ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:test");
-      if (!db.exists()) {
-        db.create();
-      }
-      else {
-        db.open("admin", "admin");
-      }
-      try {
-        ODocument doc = createPerson(db);
-        log(doc.getIdentity());
-        log(doc.getVersion());
-        log(doc);
-      }
-      finally {
-        db.close();
-      }
-    }
-    finally {
-      server.shutdown();
-    }
-  }
+  //@Test
+  //public void embeddedDatabaseAccess() throws Exception {
+  //  OServer server = OServerMain.create();
+  //  URL config = getClass().getResource("server-config.xml");
+  //  log(config);
+  //  server.startup(config.openStream());
+  //  server.activate();
+  //
+  //  // NOTE: This doesn't root into the databases directory, not sure why
+  //  try {
+  //    ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:test");
+  //    if (!db.exists()) {
+  //      db.create();
+  //    }
+  //    else {
+  //      db.open("admin", "admin");
+  //    }
+  //    try {
+  //      ODocument doc = createPerson(db);
+  //      log(doc.getIdentity());
+  //      log(doc.getVersion());
+  //      log(doc);
+  //    }
+  //    finally {
+  //      db.close();
+  //    }
+  //  }
+  //  finally {
+  //    server.shutdown();
+  //  }
+  //}
 
   @Test
   public void documentTx() throws Exception {
