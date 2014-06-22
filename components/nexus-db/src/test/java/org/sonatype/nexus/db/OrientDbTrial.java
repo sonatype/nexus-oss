@@ -14,6 +14,7 @@ import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.record.ORecordInternal;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.storage.ORecordMetadata;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 import com.orientechnologies.orient.server.OServer;
 import com.orientechnologies.orient.server.OServerMain;
@@ -22,6 +23,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 /**
@@ -135,11 +137,13 @@ public class OrientDbTrial
     try (ODatabaseDocumentTx db = createDatabase()) {
       ODocument doc = createPerson(db);
       log("Document: {}", doc);
+
       ORID rid = doc.getIdentity();
       log("RID: {}", rid);
 
-      // FIXME: This is not working as expected
-      assertThat(db.existsUserObjectByRID(rid), is(true));
+      ORecordMetadata md = db.getRecordMetadata(rid);
+      log("Metadata: {}", md);
+      assertThat(md, notNullValue());
     }
   }
 
@@ -148,6 +152,11 @@ public class OrientDbTrial
     try (ODatabaseDocumentTx db = createDatabase()) {
       ORID rid = new ORecordId("#1:2"); // NOTE: #1:1 will return a record, #1:2 will return null
       log("RID: {}", rid);
+
+      ORecordMetadata md = db.getRecordMetadata(rid);
+      log("Metadata: {}", md);
+      assertThat(md, nullValue());
+
       ORecordInternal record = db.load(rid);
       log("Record: {}", record);
       assertThat(record, nullValue());

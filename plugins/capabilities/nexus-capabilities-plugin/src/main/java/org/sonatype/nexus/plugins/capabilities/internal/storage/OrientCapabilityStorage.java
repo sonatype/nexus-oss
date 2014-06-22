@@ -27,6 +27,7 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
+import com.orientechnologies.orient.core.storage.ORecordMetadata;
 import com.orientechnologies.orient.object.db.OObjectDatabasePool;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 import org.apache.shiro.codec.Hex;
@@ -154,6 +155,13 @@ public class OrientCapabilityStorage
     ORID rid = convert(id);
 
     try (OObjectDatabaseTx db = openDb()) {
+      // if we can't get the metadata, then abort
+      ORecordMetadata md = db.getRecordMetadata(rid);
+      if (md == null) {
+        log.debug("Unable to delete item with RID: {}", rid);
+        return false;
+      }
+      // else delete the record
       db.delete(rid);
     }
 
