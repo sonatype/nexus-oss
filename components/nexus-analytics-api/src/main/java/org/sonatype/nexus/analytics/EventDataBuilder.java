@@ -50,7 +50,12 @@ public class EventDataBuilder
 
   public EventDataBuilder set(final String name, final @Nullable Object value) {
     checkNotNull(name);
-    data.getAttributes().put(name, value);
+    if (value == null) {
+      data.getAttributes().put(name, null);
+    }
+    else {
+      data.getAttributes().put(name, String.valueOf(value));
+    }
     return this;
   }
 
