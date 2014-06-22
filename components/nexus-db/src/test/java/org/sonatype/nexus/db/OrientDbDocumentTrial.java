@@ -58,7 +58,9 @@ public class OrientDbDocumentTrial
   @Test
   public void documentTx() throws Exception {
     try (ODatabaseDocumentTx db = createDatabase()) {
+      log(db);
       ODocument doc = createPerson(db);
+      log(doc);
     }
   }
 
@@ -69,7 +71,9 @@ public class OrientDbDocumentTrial
 
     // now we should be able to get a pooled connection
     try (ODatabaseDocumentTx db = ODatabaseDocumentPool.global().acquire("memory:testdb", "admin", "admin")) {
+      log(db);
       ODocument doc = createPerson(db);
+      log(doc);
     }
   }
 
