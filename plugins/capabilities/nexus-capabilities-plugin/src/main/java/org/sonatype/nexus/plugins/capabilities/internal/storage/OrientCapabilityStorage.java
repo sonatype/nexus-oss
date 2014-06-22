@@ -107,7 +107,7 @@ public class OrientCapabilityStorage
   }
 
   /**
-   * Convert CapabilityIdentity ORID using HEX encoding.
+   * Convert CapabilityIdentity to ORID using HEX encoding.
    */
   private ORID convert(final CapabilityIdentity id) {
     byte[] decoded = Hex.decode(id.toString());
