@@ -17,6 +17,8 @@ import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.log.LoggerLevel
 
+import javax.validation.constraints.NotNull
+
 /**
  * Logger exchange object.
  *
@@ -28,6 +30,6 @@ class LoggerXO
   @NotEmpty
   String name
 
-  @NotEmpty
+  @NotNull
   LoggerLevel level
 }
