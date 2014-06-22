@@ -14,12 +14,15 @@ package org.sonatype.nexus.analytics;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
+
 /**
  * Analytics event data store.
  *
  * @since 3.0
  */
 public interface EventStore
+  extends Lifecycle
 {
   void add(EventData data) throws Exception;
 
