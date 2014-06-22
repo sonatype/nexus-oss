@@ -163,18 +163,6 @@ public class OrientDbTrial
     }
   }
 
-  @Test
-  public void deleteNonExistingDocument() throws Exception {
-    try (ODatabaseDocumentTx db = createDatabase()) {
-      ORID rid = new ORecordId("#1:1");
-      log(rid);
-      assertThat(db.existsUserObjectByRID(rid), is(false));
-
-      db.delete(rid);
-      // apparently continues w/o exception or other notification :-(
-    }
-  }
-
   public static class Person
   {
     @Id
