@@ -88,11 +88,11 @@ public class OrientCapabilityStorageTest
     // verify that all is the same, except for enabled flag
     CapabilityStorageItem item3 = underTest.getAll().values().iterator().next();
     assertThat(item3, notNullValue());
-    assertThat(item2.getType(), is(item1.getType()));
-    assertThat(item2.getVersion(), is(item1.getVersion()));
-    assertThat(item2.getNotes(), is(item1.getNotes()));
-    assertThat(item2.isEnabled(), is(true));
-    assertThat(item2.getProperties(), hasEntry("foo", "bar"));
+    assertThat(item3.getType(), is(item1.getType()));
+    assertThat(item3.getVersion(), is(item1.getVersion()));
+    assertThat(item3.getNotes(), is(item1.getNotes()));
+    assertThat(item3.isEnabled(), is(true));
+    assertThat(item3.getProperties(), hasEntry("foo", "bar"));
 
     // delete
     boolean removed = underTest.remove(id);

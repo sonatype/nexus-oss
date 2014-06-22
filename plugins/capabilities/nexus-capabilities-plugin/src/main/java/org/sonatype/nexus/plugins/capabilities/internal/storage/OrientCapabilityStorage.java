@@ -27,6 +27,7 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.storage.ORecordMetadata;
 import com.orientechnologies.orient.object.db.OObjectDatabasePool;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
@@ -132,18 +133,12 @@ public class OrientCapabilityStorage
 
     try (OObjectDatabaseTx db = openDb()) {
       // load record and apply updated item attributes
-      CapabilityStorageItem record = db.load(rid);
+      ODocument record = db.getUnderlying().getRecord(rid);
       if (record == null) {
         log.debug("Unable to update item with RID: {}", rid);
         return false;
       }
-      record.setType(item.getType());
-      record.setVersion(item.getVersion());
-      record.setEnabled(item.isEnabled());
-      record.setNotes(item.getNotes());
-      record.setProperties(item.getProperties());
-
-      db.save(record);
+      db.pojo2Stream(item, record).save();
     }
 
     log.debug("Updated item with RID: {}", rid);
