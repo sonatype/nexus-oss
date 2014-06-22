@@ -8,12 +8,14 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.server.OServer;
 import com.orientechnologies.orient.server.OServerMain;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * Trials of using OrientDB embedded.
  */
+@Ignore("Disable for now, as these cause other tests which do not explicitly setup embedding to fail")
 public class OrientDbEmbeddedTrial
     extends TestSupport
 {
