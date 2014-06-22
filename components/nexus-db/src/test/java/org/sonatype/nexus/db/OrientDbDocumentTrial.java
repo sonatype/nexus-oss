@@ -9,7 +9,6 @@ import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.record.ORecordInternal;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.storage.ORecordMetadata;
-import org.apache.shiro.codec.Hex;
 import org.junit.After;
 import org.junit.Test;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -83,7 +82,7 @@ public class OrientDbDocumentTrial
       ORID rid = doc.getIdentity();
       log("RID: {}", rid);
 
-      String encoded = Hex.encodeToString(rid.toStream());
+      String encoded = Hex.encode(rid.toStream());
       log("Hex Encoded: {}", encoded);
 
       ORID decoded = new ORecordId().fromStream(Hex.decode(encoded));

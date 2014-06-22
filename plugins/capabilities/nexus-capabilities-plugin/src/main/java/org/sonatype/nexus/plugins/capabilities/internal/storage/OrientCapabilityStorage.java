@@ -21,6 +21,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.db.Hex;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
@@ -31,7 +32,6 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.storage.ORecordMetadata;
 import com.orientechnologies.orient.object.db.OObjectDatabasePool;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
-import org.apache.shiro.codec.Hex;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -103,7 +103,7 @@ public class OrientCapabilityStorage
    * Convert ORID to CapabilityIdentity using HEX encoding.
    */
   private CapabilityIdentity convert(final ORID rid) {
-    String encoded = Hex.encodeToString(rid.toStream());
+    String encoded = Hex.encode(rid.toStream());
     return new CapabilityIdentity(encoded);
   }
 
