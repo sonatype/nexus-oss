@@ -18,8 +18,12 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OSchema;
+import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.ORecordInternal;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.storage.ORecordMetadata;
 import org.junit.After;
 import org.junit.Test;
@@ -70,9 +74,30 @@ public class OrientDbDocumentTrial
   @Test
   public void documentTx() throws Exception {
     try (ODatabaseDocumentTx db = createDatabase()) {
-      log(db);
+      log("DB: {}", db);
+      log("DB size: {}", db.getSize());
+
+      // NOTE: this throws IAE since there are no "Person" classes yet
+      //log("Person count: {}", db.countClass("Person"));
+
       ODocument doc = createPerson(db);
-      log(doc);
+      log("Document: {}", doc);
+      log("Document size: {}", doc.getSize());
+      log("DB size: {}", db.getSize());
+      log("Person count: {}", db.countClass("Person"));
+    }
+
+    log("reopen");
+    try (ODatabaseDocumentTx db = openDatabase()) {
+      log("DB: {}", db);
+      log("DB size: {}", db.getSize());
+      log("Person count: {}", db.countClass("Person"));
+
+      log("delete all");
+      db.command(new OCommandSQL("delete from Person")).execute();
+      log("DB: {}", db);
+      log("DB size: {}", db.getSize());
+      log("Person count: {}", db.countClass("Person"));
     }
   }
 
@@ -139,6 +164,34 @@ public class OrientDbDocumentTrial
       ORecordInternal record = db.load(rid);
       log("Record: {}", record);
       assertThat(record, nullValue());
+    }
+  }
+
+  @Test
+  public void schema() throws Exception {
+    try (ODatabaseDocumentTx db = createDatabase()) {
+      OSchema schema = db.getMetadata().getSchema();
+      OClass eventData = schema.createClass("EventData");
+      eventData.createProperty("type", OType.STRING);
+      eventData.createProperty("timestamp", OType.LONG);
+      eventData.createProperty("userId", OType.STRING);
+      eventData.createProperty("sessionId", OType.STRING);
+      eventData.createProperty("attributes", OType.EMBEDDEDMAP);
+      schema.save();
+
+      log("Class: {}", eventData);
+      log("Properties: {}", eventData.properties());
+
+      // can count since we have defined schema
+      log("Count: {}", db.countClass("EventData"));
+    }
+
+    try (ODatabaseDocumentTx db = openDatabase()) {
+      OSchema schema = db.getMetadata().getSchema();
+      OClass eventData = schema.getClass("EventData");
+
+      log("Class: {}", eventData);
+      log("Properties: {}", eventData.properties());
     }
   }
 }
