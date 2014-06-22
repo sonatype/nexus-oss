@@ -7,6 +7,7 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 import org.junit.Test;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * Trials of using OrientDB object-api.
@@ -14,6 +15,11 @@ import org.junit.Test;
 public class OrientDbObjectTrial
     extends TestSupport
 {
+  static {
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install();
+  }
+
   public static class Person
   {
     @Id

@@ -12,6 +12,7 @@ import com.orientechnologies.orient.core.storage.ORecordMetadata;
 import org.apache.shiro.codec.Hex;
 import org.junit.After;
 import org.junit.Test;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -24,6 +25,11 @@ import static org.hamcrest.Matchers.nullValue;
 public class OrientDbDocumentTrial
     extends TestSupport
 {
+  static {
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install();
+  }
+
   private ODatabaseDocumentTx createDatabase() {
     return new ODatabaseDocumentTx("memory:testdb").create();
   }

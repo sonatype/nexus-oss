@@ -9,6 +9,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.server.OServer;
 import com.orientechnologies.orient.server.OServerMain;
 import org.junit.Test;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * Trials of using OrientDB embedded.
@@ -16,6 +17,11 @@ import org.junit.Test;
 public class OrientDbEmbeddedTrial
     extends TestSupport
 {
+  static {
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install();
+  }
+
   private ODocument createPerson(final ODatabaseDocumentTx db) {
     ODocument doc = db.newInstance("Person");
     doc.field("name", "Luke");
