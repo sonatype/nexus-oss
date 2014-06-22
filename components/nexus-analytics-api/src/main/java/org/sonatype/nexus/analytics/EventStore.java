@@ -12,9 +12,13 @@
  */
 package org.sonatype.nexus.analytics;
 
+import java.util.Iterator;
+
 import javax.annotation.Nullable;
 
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
+
+import com.google.common.collect.Iterators;
 
 /**
  * Analytics event data store.
@@ -30,5 +34,24 @@ public interface EventStore
 
   long approximateSize() throws Exception;
 
-  Iterable<EventData> iterator(long offset, @Nullable Long limit) throws Exception;
+  interface EventDataIterable
+      extends Iterable<EventData>, AutoCloseable
+  {
+    // empty
+  }
+
+  EventDataIterable EMPTY_ITERABLE = new EventDataIterable()
+  {
+    @Override
+    public void close() throws Exception {
+      // nop
+    }
+
+    @Override
+    public Iterator<EventData> iterator() {
+      return Iterators.emptyIterator();
+    }
+  };
+
+  EventDataIterable iterator(long offset, @Nullable Long limit) throws Exception;
 }
