@@ -84,7 +84,8 @@ public class DefaultLdapConfigurationSource
         try {
           final Xpp3Dom dom = Xpp3DomBuilder.build(r);
           final Xpp3Dom versionNode = dom.getChild("version");
-          if (versionNode != null && !Strings.isNullOrEmpty(versionNode.getValue())) {
+          if (versionNode != null && !Strings.isNullOrEmpty(versionNode.getValue()) && dom.getChildCount() < 2) {
+            // edge case: EMPTY (only version present) XML is Pro, as only Pro was writing versions out before
             return versionNode.getValue();
           }
           final Xpp3Dom serversNode = dom.getChild("servers");

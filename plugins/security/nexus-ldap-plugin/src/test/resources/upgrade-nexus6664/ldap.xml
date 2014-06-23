@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ldapConfiguration>
+  <version>2.8.0</version>
+  <connectionInfo>
+    <searchBase>o=example</searchBase>
+    <systemUsername>foo</systemUsername>
+    <systemPassword>CKt2jNNdIG0OHmuM</systemPassword>
+    <authScheme>simple</authScheme>
+    <protocol>ldap</protocol>
+    <host>localhost</host>
+    <port>389</port>
+  </connectionInfo>
+  <userAndGroupConfig>
+    <emailAddressAttribute>mail</emailAddressAttribute>
+    <ldapGroupsAsRoles>true</ldapGroupsAsRoles>
+    <groupBaseDn>ou=groups</groupBaseDn>
+    <groupIdAttribute>cn</groupIdAttribute>
+    <groupMemberAttribute>uniqueMember</groupMemberAttribute>
+    <groupMemberFormat>${username}</groupMemberFormat>
+    <groupObjectClass>groupOfUniqueNames</groupObjectClass>
+    <userIdAttribute>uid</userIdAttribute>
+    <userObjectClass>inetOrgPerson</userObjectClass>
+    <userBaseDn>ou=people</userBaseDn>
+    <userRealNameAttribute>cn</userRealNameAttribute>
+  </userAndGroupConfig>
+</ldapConfiguration>

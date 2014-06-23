@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package com.sonatype.security.ldap.persist;
 
-import java.io.File;
+package com.sonatype.security.ldap.persist;
 
 import com.sonatype.security.ldap.realms.persist.model.CLdapConfiguration;
 import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
@@ -65,7 +64,8 @@ public class DefaultLdapConfigurationSourceTest
    */
   @Test
   public void upgradeNexus6348() throws Exception {
-    when(applicationConfiguration.getConfigurationDirectory()).thenReturn(util.resolveFile("target/test-classes/upgrade-nexus6348"));
+    when(applicationConfiguration.getConfigurationDirectory())
+        .thenReturn(util.resolveFile("target/test-classes/upgrade-nexus6348"));
     final DefaultLdapConfigurationSource testSubject = new DefaultLdapConfigurationSource(applicationConfiguration,
         passwordHelper, legacyPasswordHelper);
 
@@ -73,5 +73,26 @@ public class DefaultLdapConfigurationSourceTest
     assertThat(cnf.getVersion(), notNullValue());
     assertThat(cnf.getVersion(), equalTo(CLdapConfiguration.MODEL_VERSION));
     assertThat(cnf.getServers(), empty());
+  }
+
+  /**
+   * Plain OSS LDAP XML from 2.8.1 to Pro release.
+   *
+   * @see <a href="https://issues.sonatype.org/browse/NEXUS-6664">NEXUS-6664</a>
+   */
+  @Test
+  public void upgradeNexus6664() throws Exception {
+    when(applicationConfiguration.getConfigurationDirectory())
+        .thenReturn(util.resolveFile("target/test-classes/upgrade-nexus6664"));
+    final DefaultLdapConfigurationSource testSubject = new DefaultLdapConfigurationSource(applicationConfiguration,
+        passwordHelper, legacyPasswordHelper);
+
+    final CLdapConfiguration cnf = testSubject.load();
+    assertThat(cnf.getVersion(), notNullValue());
+    assertThat(cnf.getVersion(), equalTo(CLdapConfiguration.MODEL_VERSION));
+    assertThat(cnf.getServers(), hasSize(1));
+    final CLdapServerConfiguration server = cnf.getServers().get(0);
+    assertThat(server.getConnectionInfo().getSearchBase(), equalTo("o=example"));
+    assertThat(server.getUserAndGroupConfig().getUserBaseDn(), equalTo("ou=people"));
   }
 }
