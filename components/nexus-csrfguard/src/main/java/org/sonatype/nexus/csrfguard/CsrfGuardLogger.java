@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 /**
  * CSRF Guard Logging adapter.
  *
- * @since 2.8.1
+ * @since 2.9
  */
 public class CsrfGuardLogger
     implements ILogger

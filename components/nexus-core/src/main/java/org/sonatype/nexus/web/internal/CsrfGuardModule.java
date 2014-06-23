@@ -25,7 +25,7 @@ import com.google.inject.servlet.ServletModule;
 /**
  * CSRF Guard Guice module.
  *
- * @since 2.8.1
+ * @since 2.9
  */
 @Named
 @Singleton

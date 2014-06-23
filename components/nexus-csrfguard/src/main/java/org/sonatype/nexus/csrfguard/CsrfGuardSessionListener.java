@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * CSRF Guard session listener (similar to {@link CsrfGuardHttpSessionListener}). generates CSRF token upon session
  * creation.
  *
- * @since 2.8.1
+ * @since 2.9
  */
 @Named
 @Singleton

@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * Changed in order to send the CSRF token as response HTTP header (on session creation),
  * skip validation in case of new sessions and do not update session tokens as they are always valid in session.
  *
- * @since 2.8.1
+ * @since 2.9
  */
 public class CsrfGuardFilter
     extends AdviceFilter

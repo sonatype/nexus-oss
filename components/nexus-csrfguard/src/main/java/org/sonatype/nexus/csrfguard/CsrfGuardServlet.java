@@ -64,7 +64,7 @@ import static com.google.common.base.Preconditions.checkState;
  * Changed in order to auto initialize {@link CsrfGuard} and do not create a session by the time
  * {@code csrfguard.js} is generated.
  *
- * @since 2.8.1
+ * @since 2.9
  */
 @Named
 @Singleton

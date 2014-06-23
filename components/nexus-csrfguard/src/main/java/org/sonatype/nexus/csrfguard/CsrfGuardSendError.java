@@ -25,7 +25,7 @@ import org.owasp.csrfguard.action.AbstractAction;
 /**
  * CSRF Guard action that sends an error response.
  *
- * @since 2.8.1
+ * @since 2.9
  */
 public final class CsrfGuardSendError
     extends AbstractAction
