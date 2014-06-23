@@ -828,37 +828,6 @@ Ext.define('Sonatype.repoServer.ServerEditPanel', {
     w.show();
   },
 
-  runStmpConfigCheck : function(testEmail, data, callback) {
-
-    data.testEmail = testEmail;
-
-    Ext.Ajax.request({
-      method : 'PUT',
-      url : Sonatype.config.repos.urls.smtpSettingsState,
-      jsonData : {
-        data : data
-      },
-      callback : function(options, success) {
-        callback(success);
-      },
-      success : function() {
-          Sonatype.MessageBox.show({
-            title : 'SMTP configuration',
-            msg : 'SMTP configuration validated successfully, check your inbox!',
-            buttons : Sonatype.MessageBox.OK,
-            icon : Sonatype.MessageBox.INFO
-          });
-      },
-      failure : function(response) {
-        Sonatype.utils.connectionError(response, 'Error on SMTP validation!', false, {
-          hideErrorStatus : true,
-          decodeErrorResponse : true
-        });
-      },
-      scope : this
-    });
-  },
-
   // (Ext.form.BasicForm, Ext.form.Action)
   actionCompleteHandler : function(form, action) {
     if (action.type === 'sonatypeLoad') {

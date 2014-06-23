@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rapture.internal.ui;
 
 import java.util.Collections;
@@ -25,6 +26,7 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpSession;
 
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
+import org.sonatype.nexus.guice.Validate;
 import org.sonatype.nexus.rapture.StateContributor;
 import org.sonatype.nexus.util.Tokens;
 import org.sonatype.nexus.wonderland.AuthTicketService;
@@ -41,6 +43,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.subject.Subject;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.rapture.internal.ui.StateComponent.shouldSend;
@@ -81,8 +84,10 @@ public class SecurityComponent
   }
 
   @DirectMethod
-  public UserXO authenticate(final String base64Username,
-                             final String base64Password) throws Exception
+  @Validate
+  public UserXO authenticate(final @NotEmpty(message = "[base64Username] may not be empty") String base64Username,
+                             final @NotEmpty(message = "[base64Password] may not be empty") String base64Password)
+      throws Exception
   {
     boolean rememberMe = false;
     Subject subject = securitySystem.getSubject();
@@ -93,8 +98,9 @@ public class SecurityComponent
   }
 
   @DirectMethod
-  public UserXO login(final String base64Username,
-                      final String base64Password,
+  @Validate
+  public UserXO login(final @NotEmpty(message = "[base64Username] may not be empty") String base64Username,
+                      final @NotEmpty(message = "[base64Password] may not be empty") String base64Password,
                       final boolean rememberMe) throws Exception
   {
     try {
@@ -125,12 +131,12 @@ public class SecurityComponent
   }
 
   @DirectMethod
-  public String authenticationToken(final String base64Username,
-                                    final String base64Password) throws Exception
+  @Validate
+  public String authenticationToken(
+      final @NotEmpty(message = "[base64Username] may not be empty") String base64Username,
+      final @NotEmpty(message = "[base64Password] may not be empty") String base64Password)
+      throws Exception
   {
-    checkNotNull(base64Username);
-    checkNotNull(base64Password);
-
     Subject subject = securitySystem.getSubject();
     if (subject == null || !subject.isAuthenticated()) {
       authenticate(base64Username, base64Password);

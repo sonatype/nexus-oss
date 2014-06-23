@@ -17,8 +17,6 @@ import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.validation.Update
 
-import javax.validation.constraints.NotNull
-
 /**
  * Capability notes exchange object.
  *
@@ -27,7 +25,6 @@ import javax.validation.constraints.NotNull
 @ToString(includePackage = false, includeNames = true)
 class CapabilityNotesXO
 {
-  @NotNull(groups = Update.class)
   @NotEmpty(groups = Update.class)
   String id
 

@@ -61,15 +61,6 @@ public class SettingsMessageUtil
     return RequestFacade.doPutForStatus("service/local/global_settings/current", representation, null);
   }
 
-  public static Status save(final SmtpSettingsResource smtpSettings)
-      throws IOException
-  {
-    SmtpSettingsResourceRequest configResponse = wrapData(smtpSettings);
-    XStreamRepresentation representation = new XStreamRepresentation(xstream, "", MediaType.APPLICATION_XML);
-    representation.setPayload(configResponse);
-    return RequestFacade.doPutForStatus("service/local/check_smtp_settings", representation, null);
-  }
-
   /**
    * Wrap a {@link GlobalConfigurationResource} in a {@link GlobalConfigurationResourceResponse} and return it.
    *

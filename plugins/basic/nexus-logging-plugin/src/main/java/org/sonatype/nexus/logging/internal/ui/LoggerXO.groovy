@@ -27,11 +27,9 @@ import javax.validation.constraints.NotNull
 @ToString(includePackage = false, includeNames = true)
 class LoggerXO
 {
-  @NotNull
   @NotEmpty
   String name
 
   @NotNull
-  @NotEmpty
   LoggerLevel level
 }

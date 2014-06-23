@@ -119,8 +119,7 @@ define('Nexus/config',['extjs', 'Nexus/messagebox', 'Sonatype/init', 'Nexus/conf
           repoTypes : servicePath + '/components/repo_types',
           repoMirrors : servicePath + '/repository_mirrors',
           repoPredefinedMirrors : servicePath + '/repository_predefined_mirrors',
-          privilegeTypes : servicePath + '/privilege_types',
-          smtpSettingsState : servicePath + '/check_smtp_settings'
+          privilegeTypes : servicePath + '/privilege_types'
         }
       },
 

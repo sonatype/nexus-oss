@@ -27,11 +27,9 @@ import javax.validation.constraints.NotNull
 @ToString(includePackage = false, includeNames = true)
 class CapabilityXO
 {
-  @NotNull(groups = Update.class)
   @NotEmpty(groups = Update.class)
   String id
 
-  @NotNull
   @NotEmpty
   String typeId
 

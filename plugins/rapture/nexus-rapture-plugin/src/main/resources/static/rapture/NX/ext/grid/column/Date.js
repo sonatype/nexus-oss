@@ -10,51 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
-package org.sonatype.nexus.coreui
-
-import groovy.transform.ToString
-import org.hibernate.validator.constraints.NotEmpty
-import org.sonatype.nexus.validation.Create
-import org.sonatype.nexus.validation.Update
-import org.sonatype.scheduling.TaskState
-
 /**
- * Task exchange object.
+ * **{@link Ext.grid.column.Date}** override, that sets format.
  *
  * @since 3.0
  */
-@ToString(includePackage = false, includeNames = true)
-class TaskXO
-{
-  @NotEmpty(groups = Update.class)
-  String id
+Ext.define('NX.ext.grid.column.Date', {
+  override: 'Ext.grid.column.Date',
 
-  Boolean enabled
+  format: 'Y-M-d H:i:s'
 
-  @NotEmpty
-  String name
-
-  @NotEmpty(groups = Create.class)
-  String typeId
-
-  String typeName
-  TaskState status
-  String statusDescription
-
-  @NotEmpty
-  String schedule
-
-  Date nextRun
-  Date lastRun
-  String lastRunResult
-  Boolean runnable
-  Boolean stoppable
-
-  String alertEmail
-
-  Map<String, String> properties
-  Date startDate
-  Integer[] recurringDays
-  String cronExpression
-}
+});
