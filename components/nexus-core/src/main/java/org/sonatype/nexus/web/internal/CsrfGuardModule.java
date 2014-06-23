@@ -27,8 +27,6 @@ import com.google.inject.servlet.ServletModule;
  *
  * @since 2.9
  */
-@Named
-@Singleton
 public class CsrfGuardModule
     extends AbstractModule
 {
