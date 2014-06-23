@@ -16,8 +16,8 @@ import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@JsonDeserialize(builder = GoodAttributesSupportedTypes.Builder.class)
-public class GoodAttributesSupportedTypes
+@JsonDeserialize(builder = GoodMetadataComplex.Builder.class)
+public class GoodMetadataComplex
     extends SecondaryMetadata
 {
   public static final MetadataIndex INDEX_IDENTITYKEY = new MetadataIndex.Builder()
@@ -25,9 +25,9 @@ public class GoodAttributesSupportedTypes
       .unique()
       .build();
 
-  public static final MetadataType<GoodAttributesSupportedTypes> TYPE = new MetadataType.Builder<GoodAttributesSupportedTypes>()
+  public static final MetadataType<GoodMetadataComplex> TYPE = new MetadataType.Builder<GoodMetadataComplex>()
       .withName("goodattributes")
-      .withMetadataClass(GoodAttributesSupportedTypes.class)
+      .withMetadataClass(GoodMetadataComplex.class)
       .withIndexes(INDEX_IDENTITYKEY)
       .build();
 
@@ -44,19 +44,19 @@ public class GoodAttributesSupportedTypes
   private final List<Object> listAttribute;
   private final Map<Object, Object> mapAttribute;
 
-  private GoodAttributesSupportedTypes(String identityKey,
-                                       DateTime dateTimeAttribute,
-                                       Long longAttribute,
-                                       long longPrimitiveAttribute,
-                                       Integer integerAttribute,
-                                       int intPrimitiveAttribute,
-                                       Type enumAttribute,
-                                       Character characterAttribute,
-                                       char charPrimitiveAttribute,
-                                       Boolean booleanAttribute,
-                                       boolean booleanPrimitiveAttribute,
-                                       List<Object> listAttribute,
-                                       @Nullable Map<Object, Object> mapAttribute) {
+  private GoodMetadataComplex(String identityKey,
+                              DateTime dateTimeAttribute,
+                              Long longAttribute,
+                              long longPrimitiveAttribute,
+                              Integer integerAttribute,
+                              int intPrimitiveAttribute,
+                              Type enumAttribute,
+                              Character characterAttribute,
+                              char charPrimitiveAttribute,
+                              Boolean booleanAttribute,
+                              boolean booleanPrimitiveAttribute,
+                              List<Object> listAttribute,
+                              @Nullable Map<Object, Object> mapAttribute) {
     super(identityKey);
     this.dateTimeAttribute = checkNotNull(dateTimeAttribute);
     this.longAttribute = checkNotNull(longAttribute);
@@ -86,7 +86,7 @@ public class GoodAttributesSupportedTypes
   public @Nullable Map<Object, Object> getMapAttribute() { return mapAttribute; }
 
   public static class Builder
-      implements MetadataBuilder<GoodAttributesSupportedTypes>
+      implements MetadataBuilder<GoodMetadataComplex>
   {
     private String identityKey;
     private DateTime dateTimeAttribute;
@@ -117,8 +117,8 @@ public class GoodAttributesSupportedTypes
     public Builder withMapAttribute(Map<Object, Object> mapAttribute) { this.mapAttribute = mapAttribute; return this; }
 
     @Override
-    public GoodAttributesSupportedTypes build() {
-      return new GoodAttributesSupportedTypes(
+    public GoodMetadataComplex build() {
+      return new GoodMetadataComplex(
           identityKey,
           dateTimeAttribute,
           longAttribute,

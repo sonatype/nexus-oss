@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.component.metadata.api.MetadataType.Attribute.Type;
-import org.sonatype.nexus.component.metadata.testsupport.GoodAttributesSupportedTypes;
-import org.sonatype.nexus.component.metadata.testsupport.GoodMetadata;
+import org.sonatype.nexus.component.metadata.testsupport.GoodMetadataComplex;
+import org.sonatype.nexus.component.metadata.testsupport.GoodMetadataSimple;
 import org.sonatype.nexus.component.metadata.testsupport.TestMetadataStore;
 import org.sonatype.nexus.component.metadata.testsupport.TestMetadataTypeRegistry;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -41,15 +41,15 @@ public class MetadataStoreTest
 
   @Before
   public void setup() {
-    testRegistry.registerType(GoodMetadata.TYPE);
-    testRegistry.registerType(GoodAttributesSupportedTypes.TYPE);
+    testRegistry.registerType(GoodMetadataSimple.TYPE);
+    testRegistry.registerType(GoodMetadataComplex.TYPE);
   }
 
   // ctor
 
   @Test(expected = NullPointerException.class)
   public void badRegistryNull() {
-    getInstance(null, GoodMetadata.class);
+    getInstance(null, GoodMetadataSimple.class);
   }
 
   @Test(expected = NullPointerException.class)
@@ -61,23 +61,23 @@ public class MetadataStoreTest
 
   @Test(expected = NullPointerException.class)
   public void findBadFilterNull() {
-    getInstance().find(null, GoodMetadata.INDEX_IDENTITYKEY);
+    getInstance().find(null, GoodMetadataSimple.INDEX_IDENTITYKEY);
   }
 
   @Test(expected = NullPointerException.class)
   public void findBadIndexNull() {
-    getInstance().find(new GoodMetadata.Builder(), null);
+    getInstance().find(new GoodMetadataSimple.Builder(), null);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void findBadIndexNotRegistered() {
-    getInstance().find(new GoodMetadata.Builder(), new MetadataIndex.Builder().withColumns("foo").build());
+    getInstance().find(new GoodMetadataSimple.Builder(), new MetadataIndex.Builder().withColumns("foo").build());
   }
 
   @Test
   public void findGoodIndexSupportedTypes() {
-    TestMetadataStore<GoodAttributesSupportedTypes> store = new TestMetadataStore<>
-        (testRegistry, GoodAttributesSupportedTypes.class);
+    TestMetadataStore<GoodMetadataComplex> store = new TestMetadataStore<>
+        (testRegistry, GoodMetadataComplex.class);
 
     final String identityKeyValue = "a";
     final DateTime dateTimeValue = new DateTime();
@@ -91,7 +91,7 @@ public class MetadataStoreTest
     final List<Object> listValue = Lists.newArrayList(new Object());
     final Map<Object, Object> mapValue = Maps.newHashMap();
 
-    GoodAttributesSupportedTypes.Builder filter = new GoodAttributesSupportedTypes.Builder()
+    GoodMetadataComplex.Builder filter = new GoodMetadataComplex.Builder()
         .withIdentityKey(identityKeyValue)
         .withDateTimeAttribute(dateTimeValue)
         .withLongAttribute(longValue)
@@ -106,7 +106,7 @@ public class MetadataStoreTest
         .withListAttribute(listValue)
         .withMapAttribute(mapValue);
 
-    store.find(filter, GoodAttributesSupportedTypes.INDEX_IDENTITYKEY);
+    store.find(filter, GoodMetadataComplex.INDEX_IDENTITYKEY);
 
     Map<String, Object> expectedFilter = Maps.newHashMap();
     expectedFilter.put("identityKey", identityKeyValue);
@@ -124,35 +124,35 @@ public class MetadataStoreTest
     expectedFilter.put("mapAttribute", mapValue);
 
     assertThat(store.getLastFilter(), is(expectedFilter));
-    assertThat(store.getLastIndex(), is(GoodAttributesSupportedTypes.INDEX_IDENTITYKEY));
+    assertThat(store.getLastIndex(), is(GoodMetadataComplex.INDEX_IDENTITYKEY));
   }
 
   // findFirst
 
   @Test(expected = NullPointerException.class)
   public void findFirstBadFilterNull() {
-    getInstance().findFirst(null, GoodMetadata.INDEX_IDENTITYKEY);
+    getInstance().findFirst(null, GoodMetadataSimple.INDEX_IDENTITYKEY);
   }
 
   @Test(expected = NullPointerException.class)
   public void findFirstBadIndexNull() {
-    getInstance().findFirst(new GoodMetadata.Builder(), null);
+    getInstance().findFirst(new GoodMetadataSimple.Builder(), null);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void findFirstBadIndexNotRegistered() {
-    getInstance().findFirst(new GoodMetadata.Builder(), new MetadataIndex.Builder().withColumns("foo").build());
+    getInstance().findFirst(new GoodMetadataSimple.Builder(), new MetadataIndex.Builder().withColumns("foo").build());
   }
 
   @Test
   public void findFirstGoodIndex() {
-    assertThat(getInstance().findFirst(new GoodMetadata.Builder(), GoodMetadata.INDEX_IDENTITYKEY), is("first"));
+    assertThat(getInstance().findFirst(new GoodMetadataSimple.Builder(), GoodMetadataSimple.INDEX_IDENTITYKEY), is("first"));
   }
 
   // support
 
-  private TestMetadataStore<GoodMetadata> getInstance() {
-    return getInstance(testRegistry, GoodMetadata.class);
+  private TestMetadataStore<GoodMetadataSimple> getInstance() {
+    return getInstance(testRegistry, GoodMetadataSimple.class);
   }
 
   private static <T> TestMetadataStore<T> getInstance(MetadataTypeRegistry registry, Class<T> clazz) {

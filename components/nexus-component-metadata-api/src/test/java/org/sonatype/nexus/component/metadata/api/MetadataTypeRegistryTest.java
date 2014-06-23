@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.component.metadata.api;
 
-import org.sonatype.nexus.component.metadata.testsupport.GoodAttributesSupportedTypes;
-import org.sonatype.nexus.component.metadata.testsupport.GoodMetadata;
+import org.sonatype.nexus.component.metadata.testsupport.GoodMetadataComplex;
+import org.sonatype.nexus.component.metadata.testsupport.GoodMetadataSimple;
 import org.sonatype.nexus.component.metadata.testsupport.TestMetadataTypeRegistry;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -31,9 +31,9 @@ public class MetadataTypeRegistryTest
 {
   private TestMetadataTypeRegistry instance = new TestMetadataTypeRegistry();
 
-  private MetadataType<GoodMetadata> goodMetadataType = new MetadataType.Builder<GoodMetadata>()
+  private MetadataType<GoodMetadataSimple> goodMetadataType = new MetadataType.Builder<GoodMetadataSimple>()
           .withName("goodName")
-          .withMetadataClass(GoodMetadata.class)
+          .withMetadataClass(GoodMetadataSimple.class)
           .build();
 
   @Test(expected = NullPointerException.class)
@@ -44,18 +44,18 @@ public class MetadataTypeRegistryTest
   @Test(expected = IllegalStateException.class)
   public void registerTypeBadClassAlreadyBound() {
     checkRegisterType(goodMetadataType);
-    checkRegisterType(new MetadataType.Builder<GoodMetadata>()
+    checkRegisterType(new MetadataType.Builder<GoodMetadataSimple>()
         .withName("uniqueName")
-        .withMetadataClass(GoodMetadata.class)
+        .withMetadataClass(GoodMetadataSimple.class)
         .build());
   }
 
   @Test(expected = IllegalStateException.class)
   public void registerTypeBadNameAlreadyBound() {
     checkRegisterType(goodMetadataType);
-    checkRegisterType(new MetadataType.Builder<GoodAttributesSupportedTypes>()
+    checkRegisterType(new MetadataType.Builder<GoodMetadataComplex>()
         .withName("goodName")
-        .withMetadataClass(GoodAttributesSupportedTypes.class)
+        .withMetadataClass(GoodMetadataComplex.class)
         .build());
   }
 
@@ -78,12 +78,12 @@ public class MetadataTypeRegistryTest
 
   @Test(expected = IllegalArgumentException.class)
   public void getTypeBadNotRegistered() {
-    instance.getType(GoodMetadata.class);
+    instance.getType(GoodMetadataSimple.class);
   }
 
   @Test
   public void getTypeGood() {
     instance.registerType(goodMetadataType);
-    assertThat(instance.getType(GoodMetadata.class), is(goodMetadataType));
+    assertThat(instance.getType(GoodMetadataSimple.class), is(goodMetadataType));
   }
 }

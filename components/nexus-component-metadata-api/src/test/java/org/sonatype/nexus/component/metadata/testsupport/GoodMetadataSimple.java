@@ -9,23 +9,24 @@ import org.sonatype.nexus.component.metadata.api.SecondaryMetadata;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = GoodMetadata.Builder.class)
-public class GoodMetadata extends SecondaryMetadata
+@JsonDeserialize(builder = GoodMetadataSimple.Builder.class)
+public class GoodMetadataSimple
+    extends SecondaryMetadata
 {
   public static final MetadataIndex INDEX_IDENTITYKEY = new MetadataIndex.Builder()
       .withColumns("identityKey")
       .unique()
       .build();
 
-  public static final MetadataType<GoodMetadata> TYPE = new MetadataType.Builder<GoodMetadata>()
+  public static final MetadataType<GoodMetadataSimple> TYPE = new MetadataType.Builder<GoodMetadataSimple>()
       .withName("good")
-      .withMetadataClass(GoodMetadata.class)
+      .withMetadataClass(GoodMetadataSimple.class)
       .withIndexes(INDEX_IDENTITYKEY)
       .build();
 
   private final String foo;
 
-  private GoodMetadata(String identityKey, @Nullable String foo) {
+  private GoodMetadataSimple(String identityKey, @Nullable String foo) {
     super(identityKey);
     this.foo = foo;
   }
@@ -36,7 +37,7 @@ public class GoodMetadata extends SecondaryMetadata
   }
 
   public static class Builder
-      implements MetadataBuilder<GoodMetadata>
+      implements MetadataBuilder<GoodMetadataSimple>
   {
     private String identityKey;
     private String foo;
@@ -52,8 +53,8 @@ public class GoodMetadata extends SecondaryMetadata
     }
 
     @Override
-    public GoodMetadata build() {
-      return new GoodMetadata(identityKey, foo);
+    public GoodMetadataSimple build() {
+      return new GoodMetadataSimple(identityKey, foo);
     }
   }
 }

@@ -22,9 +22,9 @@ import org.sonatype.nexus.component.metadata.testsupport.BadMetadataJsonDeserial
 import org.sonatype.nexus.component.metadata.testsupport.BadMetadataJsonDeserializeBuilderNotSpecified;
 import org.sonatype.nexus.component.metadata.testsupport.BadMetadataJsonDeserializeNotPresent;
 import org.sonatype.nexus.component.metadata.testsupport.BadMetadataNotSecondarySubclass;
-import org.sonatype.nexus.component.metadata.testsupport.GoodAttributesSupportedTypes;
-import org.sonatype.nexus.component.metadata.testsupport.GoodMetadata;
-import org.sonatype.nexus.component.metadata.testsupport.GoodMetadata.Builder;
+import org.sonatype.nexus.component.metadata.testsupport.GoodMetadataComplex;
+import org.sonatype.nexus.component.metadata.testsupport.GoodMetadataSimple;
+import org.sonatype.nexus.component.metadata.testsupport.GoodMetadataSimple.Builder;
 import org.sonatype.nexus.component.metadata.api.MetadataType.Attribute;
 import org.sonatype.nexus.component.metadata.api.MetadataType.Attribute.Type;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -65,9 +65,9 @@ public class MetadataTypeTest
   }
 
   private static String checkName(String name) {
-    return new MetadataType.Builder<GoodMetadata>()
+    return new MetadataType.Builder<GoodMetadataSimple>()
         .withName(name)
-        .withMetadataClass(GoodMetadata.class)
+        .withMetadataClass(GoodMetadataSimple.class)
         .build()
         .getName();
   }
@@ -104,7 +104,7 @@ public class MetadataTypeTest
 
   @Test
   public void goodMetadataClassSecondarySubclass() {
-    assertThat(checkMetadataClass(GoodMetadata.class), Matchers.<Class>is(GoodMetadata.class));
+    assertThat(checkMetadataClass(GoodMetadataSimple.class), Matchers.<Class>is(GoodMetadataSimple.class));
   }
 
   private static <T> Class<T> checkMetadataClass(Class<T> metadataClass) {
@@ -154,18 +154,18 @@ public class MetadataTypeTest
   }
 
   private static Map<String, Attribute> checkTextAttributes(String... textAttributes) {
-    return new MetadataType.Builder<GoodMetadata>()
+    return new MetadataType.Builder<GoodMetadataSimple>()
         .withName("name")
-        .withMetadataClass(GoodMetadata.class)
+        .withMetadataClass(GoodMetadataSimple.class)
         .withTextAttributes(textAttributes)
         .build()
         .getAttributes();
   }
 
   private static Map<String, Attribute> checkTextAttributesSupportedTypes(String... textAttributes) {
-    return new MetadataType.Builder<GoodAttributesSupportedTypes>()
+    return new MetadataType.Builder<GoodMetadataComplex>()
         .withName("name")
-        .withMetadataClass(GoodAttributesSupportedTypes.class)
+        .withMetadataClass(GoodMetadataComplex.class)
         .withTextAttributes(textAttributes)
         .build()
         .getAttributes();
@@ -178,7 +178,7 @@ public class MetadataTypeTest
 
   @Test
   public void goodAttributesSupportedTypes() {
-    Map<String, Attribute> result = checkAttributes(GoodAttributesSupportedTypes.class);
+    Map<String, Attribute> result = checkAttributes(GoodMetadataComplex.class);
 
     checkAttribute(result, "identityKey", Type.SMALLSTRING, false);
     checkAttribute(result, "dateTimeAttribute", Type.DATE, false);
@@ -306,10 +306,10 @@ public class MetadataTypeTest
   }
 
   private static Set<MetadataIndex> checkIndexes(MetadataIndex... indexes) {
-    return new MetadataType.Builder<GoodAttributesSupportedTypes>()
+    return new MetadataType.Builder<GoodMetadataComplex>()
         .withName("name")
         .withTextAttributes("identityKey")
-        .withMetadataClass(GoodAttributesSupportedTypes.class)
+        .withMetadataClass(GoodMetadataComplex.class)
         .withIndexes(indexes)
         .build()
         .getIndexes();
@@ -321,9 +321,9 @@ public class MetadataTypeTest
         .withColumns("identityKey")
         .build();
 
-    MetadataType type = new MetadataType.Builder<GoodMetadata>()
+    MetadataType type = new MetadataType.Builder<GoodMetadataSimple>()
         .withName("name")
-        .withMetadataClass(GoodMetadata.class)
+        .withMetadataClass(GoodMetadataSimple.class)
         .build();
 
     type.getIndexName(index);
@@ -335,9 +335,9 @@ public class MetadataTypeTest
         .withColumns("identityKey")
         .build();
 
-    MetadataType type = new MetadataType.Builder<GoodMetadata>()
+    MetadataType type = new MetadataType.Builder<GoodMetadataSimple>()
         .withName("name")
-        .withMetadataClass(GoodMetadata.class)
+        .withMetadataClass(GoodMetadataSimple.class)
         .withIndexes(index)
         .build();
 
@@ -346,9 +346,9 @@ public class MetadataTypeTest
 
   @Test
   public void getMetadataBuilderClass() {
-    MetadataType type = new MetadataType.Builder<GoodMetadata>()
+    MetadataType type = new MetadataType.Builder<GoodMetadataSimple>()
         .withName("name")
-        .withMetadataClass(GoodMetadata.class)
+        .withMetadataClass(GoodMetadataSimple.class)
         .build();
 
     assertThat(type.getMetadataBuilderClass(), Matchers.<Class>is(Builder.class));
