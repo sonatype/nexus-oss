@@ -95,7 +95,7 @@ public class MetadataType<T>
     if (jsonDeserialize == null) {
       throw new IllegalArgumentException(metadataClass + " does not have a @JsonDeserialize annotation");
     }
-    if (jsonDeserialize.builder() == null) {
+    if (jsonDeserialize.builder() == null || jsonDeserialize.builder().getSimpleName().equals("NoClass")) {
       throw new IllegalArgumentException(metadataClass + "'s @JsonDeserialize annotation does not specify a builder");
     }
     Class metadataBuilderClass = jsonDeserialize.builder();
@@ -107,7 +107,6 @@ public class MetadataType<T>
   // Their storage types will be inferred from their return types and, if they are strings, whether they are
   // in the textAttributes set. If a suitable type cannot be found, a runtime exception will be thrown.
   // Their nullability will be assumed to be false unless annotated with @Nullable.
-  // At least one attribute must exist among all methods of the class.
   private Map<String, Attribute> checkAttributes(Set<String> textAttributes) {
     Map<String, Attribute> attributes = new HashMap<>();
     for (Method method: metadataClass.getMethods()) {
@@ -117,9 +116,6 @@ public class MetadataType<T>
         boolean nullable = method.isAnnotationPresent(Nullable.class);
         attributes.put(name, new Attribute(name, type, nullable));
       }
-    }
-    if (attributes.size() == 0) {
-      throw new IllegalArgumentException(metadataClass.getName() + " does not implement any getters");
     }
     for (String textAttribute: textAttributes) {
       if (!attributes.containsKey(textAttribute)) {
@@ -137,7 +133,7 @@ public class MetadataType<T>
         return StringUtils.uncapitalize(name.substring(3));
       }
       else if (name.startsWith("is")) {
-        return StringUtils.uncapitalize(name.substring(3));
+        return StringUtils.uncapitalize(name.substring(2));
       }
     }
     return null;
@@ -149,13 +145,8 @@ public class MetadataType<T>
   private Set<MetadataIndex> checkIndexes(Set<MetadataIndex> indexes) {
     checkNotNull(indexes);
     boolean sawUnique = false;
-    Set<List<String>> sawColumns = new HashSet<>();
     for (MetadataIndex index: indexes) {
       List<String> columns = index.getColumns();
-      if (sawColumns.contains(columns)) {
-        throw new IllegalArgumentException("Duplicate index specified: " + columns);
-      }
-      sawColumns.add(columns);
       for (String column: columns) {
         Attribute attribute = attributes.get(column);
         if (attribute == null) {
@@ -192,7 +183,7 @@ public class MetadataType<T>
     return builder.toString();
   }
 
-  public Class getMetadataClass() {
+  public Class<T> getMetadataClass() {
     return metadataClass;
   }
 
@@ -294,7 +285,7 @@ public class MetadataType<T>
         else if (attributeClass == Boolean.class || attributeClass.toString().equals("boolean")) {
           return BOOLEAN;
         }
-        else if (attributeClass.isArray() || attributeClass == List.class) {
+        else if (attributeClass == List.class) {
           return ARRAY;
         }
         else if (attributeClass == Map.class) {
@@ -331,34 +322,34 @@ public class MetadataType<T>
     }
   }
 
-  public static class Builder {
+  public static class Builder<T> {
     private String name;
-    private Class metadataClass;
+    private Class<T> metadataClass;
     private Set<String> textAttributes = new HashSet<>();
     private Set<MetadataIndex> indexes = new HashSet<>();
 
-    public Builder withName(String name) {
+    public Builder<T> withName(String name) {
       this.name = name;
       return this;
     }
 
-    public Builder withMetadataClass(Class metadataClass) {
+    public Builder<T> withMetadataClass(Class<T> metadataClass) {
       this.metadataClass = metadataClass;
       return this;
     }
 
-    public Builder withTextAttributes(String... textAttributes) {
+    public Builder<T> withTextAttributes(String... textAttributes) {
       Collections.addAll(this.textAttributes, textAttributes);
       return this;
     }
 
-    public Builder withIndexes(MetadataIndex... indexes) {
+    public Builder<T> withIndexes(MetadataIndex... indexes) {
       Collections.addAll(this.indexes, indexes);
       return this;
     }
 
-    public MetadataType build() {
-      return new MetadataType(name, metadataClass, textAttributes, indexes);
+    public MetadataType<T> build() {
+      return new MetadataType<T>(name, metadataClass, textAttributes, indexes);
     }
   }
 }

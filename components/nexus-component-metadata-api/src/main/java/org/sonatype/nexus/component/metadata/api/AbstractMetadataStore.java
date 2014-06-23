@@ -26,16 +26,27 @@ public abstract class AbstractMetadataStore<T>
 
   protected final Class<T> clazz;
 
-  protected AbstractMetadataStore(MetadataType<T> type, Class<T> clazz) {
-    this.type = checkNotNull(type);
+  protected final MetadataTypeRegistry registry;
+
+  protected AbstractMetadataStore(MetadataTypeRegistry registry, Class<T> clazz) {
+    this.registry = checkNotNull(registry);
+    this.type = registry.getType(clazz);
     this.clazz = checkNotNull(clazz);
   }
 
   @Override
   public MetadataKeyIterable find(final MetadataBuilder<T> filter, final MetadataIndex index) {
     checkNotNull(filter);
-    checkNotNull(index);
+    checkIndex(index);
     return find(toMap(filter), index);
+  }
+
+  // index must be registered for this type
+  private void checkIndex(MetadataIndex index) {
+    checkNotNull(index);
+    if (!type.getIndexes().contains(index)) {
+      throw new IllegalArgumentException("Index " + index + " not registered for type " + type);
+    }
   }
 
   protected abstract MetadataKeyIterable find(Map<String, Object> filter, MetadataIndex index);
@@ -45,12 +56,13 @@ public abstract class AbstractMetadataStore<T>
     for (MetadataType.Attribute attribute: type.getAttributes().values()) {
       try {
         Field field = filter.getClass().getDeclaredField(attribute.getName());
+        field.setAccessible(true);
         Object value = field.get(filter);
         if (value != null) {
           map.put(attribute.getName(), value);
         }
       } catch (IllegalAccessException e) {
-        throw new RuntimeException(e);
+        throw new RuntimeException(e); // won't happen; we called field.setAccessible(true) above
       } catch (NoSuchFieldException e) {
         throw new IllegalArgumentException("No field in builder for metadata attribute: " + attribute.getName());
       }
@@ -68,6 +80,8 @@ public abstract class AbstractMetadataStore<T>
         return keys.next();
       }
       return null;
+    } catch (final RuntimeException e) {
+      throw e;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

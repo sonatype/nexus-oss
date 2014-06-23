@@ -28,7 +28,7 @@ public class ContentMetadata
       .withColumns("identityKey")
       .build();
 
-  public static final MetadataType TYPE = new MetadataType.Builder()
+  public static final MetadataType<ContentMetadata> TYPE = new MetadataType.Builder<ContentMetadata>()
       .withName("content")
       .withMetadataClass(ContentMetadata.class)
       .withIndexes(INDEX_IDENTITYKEY)

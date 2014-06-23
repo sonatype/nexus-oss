@@ -23,7 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MemoryComponentMetadataService
     implements ComponentMetadataService
 {
-  private final MetadataTypeRegistry typeRegistry = new MetadataTypeRegistry() {
+  private final MetadataTypeRegistry registry = new MetadataTypeRegistry() {
     @Override
     protected void configureType(final MetadataType type) {
       // don't need to do anything; this is a simple, transient impl
@@ -33,11 +33,11 @@ public class MemoryComponentMetadataService
   @Override
   public <T> MetadataStore<T> getStore(final Class<T> clazz) {
     checkNotNull(clazz);
-    return new MemoryMetadataStore<>(typeRegistry.getType(clazz), clazz);
+    return new MemoryMetadataStore<>(registry, clazz);
   }
 
   @Override
   public MetadataTypeRegistry getTypeRegistry() {
-    return typeRegistry;
+    return registry;
   }
 }

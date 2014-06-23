@@ -1,15 +1,21 @@
-package org.sonatype.nexus.component.metadata.api;
+package org.sonatype.nexus.component.metadata.testsupport;
 
-class BadMetadataJsonDeserializeNotPresent
+import javax.annotation.Nullable;
+
+import org.sonatype.nexus.component.metadata.api.MetadataBuilder;
+import org.sonatype.nexus.component.metadata.api.SecondaryMetadata;
+
+public class BadMetadataJsonDeserializeNotPresent
     extends SecondaryMetadata
 {
   private final String foo;
 
-  private BadMetadataJsonDeserializeNotPresent(String identityKey, String foo) {
+  private BadMetadataJsonDeserializeNotPresent(String identityKey, @Nullable String foo) {
     super(identityKey);
     this.foo = foo;
   }
 
+  @Nullable
   public String getFoo() {
     return foo;
   }

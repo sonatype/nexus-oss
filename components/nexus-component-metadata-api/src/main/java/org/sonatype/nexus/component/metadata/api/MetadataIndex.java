@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -30,7 +29,7 @@ public class MetadataIndex
   private final boolean descending;
 
   private MetadataIndex(List<String> columns, boolean unique, boolean descending) {
-    this.columns = ImmutableList.copyOf(checkNotNull(columns));
+    this.columns = checkColumns(columns);
     this.unique = unique;
     this.descending = descending;
   }

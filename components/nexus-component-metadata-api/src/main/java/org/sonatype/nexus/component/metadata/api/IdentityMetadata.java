@@ -26,7 +26,7 @@ public class IdentityMetadata
       .withColumns("artifact")
       .build();
 
-  public static final MetadataType TYPE = new MetadataType.Builder()
+  public static final MetadataType<IdentityMetadata> TYPE = new MetadataType.Builder<IdentityMetadata>()
       .withName("identity")
       .withMetadataClass(IdentityMetadata.class)
       .withIndexes(INDEX_ARTIFACT)
@@ -94,7 +94,8 @@ public class IdentityMetadata
         .toString();
   }
 
-  public static class Builder {
+  public static class Builder
+      implements MetadataBuilder<IdentityMetadata> {
     private String format;
     private String group;
     private String artifact;
@@ -129,6 +130,7 @@ public class IdentityMetadata
       return this;
     }
 
+    @Override
     public IdentityMetadata build() {
       return new IdentityMetadata(format, group, artifact, version);
     }

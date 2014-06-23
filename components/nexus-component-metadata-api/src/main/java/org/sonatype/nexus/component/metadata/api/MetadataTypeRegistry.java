@@ -31,11 +31,12 @@ public abstract class MetadataTypeRegistry
     configureType(type);
   }
 
-  public MetadataType getType(Class metadataClass) {
+  @SuppressWarnings("unchecked")
+  public <T> MetadataType<T> getType(Class<T> metadataClass) {
     checkNotNull(metadataClass);
     MetadataType type = byMetadataClass.get(metadataClass);
     if (type == null) {
-      throw new IllegalArgumentException(metadataClass + " is not associated with any registered MetadataType");
+      throw new IllegalArgumentException(metadataClass + " is not associated with a registered type");
     }
     return type;
   }
@@ -48,11 +49,11 @@ public abstract class MetadataTypeRegistry
   private void bindType(MetadataType type) {
     if (byName.containsKey(type.getName())) {
       Class metadataClass = byName.get(type.getName()).getMetadataClass();
-      throw new IllegalStateException("'" + type.getName() + "' is already bound to class " + metadataClass);
+      throw new IllegalStateException("'" + type.getName() + "' is already bound to " + metadataClass);
     }
     if (byMetadataClass.containsKey(type.getMetadataClass())) {
       String name = byMetadataClass.get(type.getMetadataClass()).getName();
-      throw new IllegalStateException("Class " + type.getMetadataClass() + " is already bound to '" + name + "'");
+      throw new IllegalStateException(type.getMetadataClass() + " is already bound to '" + name + "'");
     }
     byName.put(type.getName(), type);
     byMetadataClass.put(type.getMetadataClass(), type);

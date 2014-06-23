@@ -26,7 +26,7 @@ import org.sonatype.nexus.component.metadata.api.AbstractMetadataStore;
 import org.sonatype.nexus.component.metadata.api.MetadataHandle;
 import org.sonatype.nexus.component.metadata.api.MetadataIndex;
 import org.sonatype.nexus.component.metadata.api.MetadataKeyIterable;
-import org.sonatype.nexus.component.metadata.api.MetadataType;
+import org.sonatype.nexus.component.metadata.api.MetadataTypeRegistry;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
@@ -41,8 +41,8 @@ public class MemoryMetadataStore<T>
 
   private long sequence;
 
-  public MemoryMetadataStore(MetadataType<T> type, Class<T> clazz) {
-    super(type, clazz);
+  public MemoryMetadataStore(MetadataTypeRegistry registry, Class<T> clazz) {
+    super(registry, clazz);
     for (MetadataIndex index: type.getIndexes()) {
       if (index.isUnique()) {
         uniqueEnforcers.add(new UniqueEnforcer(index.getColumns()));

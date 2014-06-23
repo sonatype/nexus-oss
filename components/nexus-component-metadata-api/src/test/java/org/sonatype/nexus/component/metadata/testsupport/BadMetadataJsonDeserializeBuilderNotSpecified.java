@@ -1,18 +1,24 @@
-package org.sonatype.nexus.component.metadata.api;
+package org.sonatype.nexus.component.metadata.testsupport;
+
+import javax.annotation.Nullable;
+
+import org.sonatype.nexus.component.metadata.api.MetadataBuilder;
+import org.sonatype.nexus.component.metadata.api.SecondaryMetadata;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize
-class BadMetadataJsonDeserializeBuilderNotSpecified
+public class BadMetadataJsonDeserializeBuilderNotSpecified
     extends SecondaryMetadata
 {
   private final String foo;
 
-  private BadMetadataJsonDeserializeBuilderNotSpecified(String identityKey, String foo) {
+  private BadMetadataJsonDeserializeBuilderNotSpecified(String identityKey, @Nullable String foo) {
     super(identityKey);
     this.foo = foo;
   }
 
+  @Nullable
   public String getFoo() {
     return foo;
   }
