@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.component.metadata.memory;
 
+import org.sonatype.nexus.component.metadata.api.AbstractMetadataTypeRegistry;
 import org.sonatype.nexus.component.metadata.api.ComponentMetadataService;
 import org.sonatype.nexus.component.metadata.api.MetadataStore;
 import org.sonatype.nexus.component.metadata.api.MetadataType;
@@ -23,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MemoryComponentMetadataService
     implements ComponentMetadataService
 {
-  private final MetadataTypeRegistry registry = new MetadataTypeRegistry() {
+  private final MetadataTypeRegistry registry = new AbstractMetadataTypeRegistry() {
     @Override
     protected void configureType(final MetadataType type) {
       // don't need to do anything; this is a simple, transient impl

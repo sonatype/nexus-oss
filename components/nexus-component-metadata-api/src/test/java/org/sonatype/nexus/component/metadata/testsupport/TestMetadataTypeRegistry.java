@@ -1,10 +1,10 @@
 package org.sonatype.nexus.component.metadata.testsupport;
 
+import org.sonatype.nexus.component.metadata.api.AbstractMetadataTypeRegistry;
 import org.sonatype.nexus.component.metadata.api.MetadataType;
-import org.sonatype.nexus.component.metadata.api.MetadataTypeRegistry;
 
 public class TestMetadataTypeRegistry
-    extends MetadataTypeRegistry
+    extends AbstractMetadataTypeRegistry
 {
   private MetadataType lastType;
 

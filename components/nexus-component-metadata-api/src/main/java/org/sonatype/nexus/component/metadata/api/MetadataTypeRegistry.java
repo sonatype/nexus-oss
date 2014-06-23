@@ -12,52 +12,10 @@
  */
 package org.sonatype.nexus.component.metadata.api;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-public abstract class MetadataTypeRegistry
-    implements Iterable<MetadataType>
+public interface MetadataTypeRegistry
+    extends Iterable<MetadataType>
 {
-  protected final Map<String, MetadataType> byName = new HashMap<>();
+  void registerType(MetadataType type);
 
-  protected final Map<Class, MetadataType> byMetadataClass = new HashMap<>();
-
-  public void registerType(MetadataType type) {
-    checkNotNull(type);
-    bindType(type);
-    configureType(type);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> MetadataType<T> getType(Class<T> metadataClass) {
-    checkNotNull(metadataClass);
-    MetadataType type = byMetadataClass.get(metadataClass);
-    if (type == null) {
-      throw new IllegalArgumentException(metadataClass + " is not associated with a registered type");
-    }
-    return type;
-  }
-
-  @Override
-  public Iterator<MetadataType> iterator() {
-    return byMetadataClass.values().iterator();
-  }
-
-  private void bindType(MetadataType type) {
-    if (byName.containsKey(type.getName())) {
-      Class metadataClass = byName.get(type.getName()).getMetadataClass();
-      throw new IllegalStateException("'" + type.getName() + "' is already bound to " + metadataClass);
-    }
-    if (byMetadataClass.containsKey(type.getMetadataClass())) {
-      String name = byMetadataClass.get(type.getMetadataClass()).getName();
-      throw new IllegalStateException(type.getMetadataClass() + " is already bound to '" + name + "'");
-    }
-    byName.put(type.getName(), type);
-    byMetadataClass.put(type.getMetadataClass(), type);
-  }
-
-  protected abstract void configureType(MetadataType type);
+  <T> MetadataType<T> getType(Class<T> metadataClass);
 }
