@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.componentmetadata.api;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import org.sonatype.nexus.componentmetadata.api.MetadataType.Attribute.Type;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
@@ -35,6 +37,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MetadataType<T>
 {
   private static final Pattern NAME_PATTERN = Pattern.compile("[a-zA-Z0-9_]+");
+
+  private static final Set<Class> SUPPORTED_CLASSES = Sets.newHashSet(new Class[] {
+      String.class, DateTime.class, Long.class, Integer.class, Enum.class,
+      Character.class, Boolean.class, List.class, Map.class});
 
   private final String name;
 
@@ -49,8 +55,8 @@ public class MetadataType<T>
   private MetadataType(String name, Class<T> metadataClass, Set<String> textAttributes, Set<MetadataIndex> indexes) {
     this.name = checkName(name);
     this.metadataClass = checkMetadataClass(metadataClass);
-    this.metadataBuilderClass = checkMetadataBuilderClass(metadataClass);
     this.attributes = checkAttributes(textAttributes);
+    this.metadataBuilderClass = checkMetadataBuilderClass(metadataClass);
     this.indexes = checkIndexes(indexes);
   }
 
@@ -90,7 +96,11 @@ public class MetadataType<T>
   }
 
   // Metadata class must have @JsonDeserialize annotation specifying a builder that is a MetadataBuilder
-  private static <T> Class checkMetadataBuilderClass(Class<T> metadataClass) {
+  // Builder class's declared fields must:
+  // - consist only of nonprimitive types
+  // - consist only of supported types
+  // - consist only of fields for which there exist getters (attributes) in the corresponding metadata class
+  private Class checkMetadataBuilderClass(Class<T> metadataClass) {
     JsonDeserialize jsonDeserialize = metadataClass.getAnnotation(JsonDeserialize.class);
     if (jsonDeserialize == null) {
       throw new IllegalArgumentException(metadataClass + " does not have a @JsonDeserialize annotation");
@@ -100,6 +110,24 @@ public class MetadataType<T>
     }
     Class metadataBuilderClass = jsonDeserialize.builder();
     checkInterface(metadataBuilderClass, MetadataBuilder.class);
+
+    for (Field field: metadataBuilderClass.getDeclaredFields()) {
+      Class fieldType = field.getType();
+      if (fieldType.isPrimitive()) {
+        throw new IllegalArgumentException("Metadata builder uses primitive type for field '" + field.getName() +
+            "'. Try using the class equivalent or another class instead. Supported classes are: " + SUPPORTED_CLASSES);
+      }
+      if (!fieldType.isEnum() && !SUPPORTED_CLASSES.contains(fieldType)) {
+        throw new IllegalArgumentException("Metadata builder uses unsupported type for field '" + field.getName() +
+            "'. Supported classes are: " + SUPPORTED_CLASSES);
+
+      }
+      if (!attributes.containsKey(field.getName())) {
+        throw new IllegalArgumentException("Metadata builder's field '" + field.getName() + "' has no corresponding " +
+            "attribute in the associated metadata class.");
+      }
+    }
+
     return metadataBuilderClass;
   }
 

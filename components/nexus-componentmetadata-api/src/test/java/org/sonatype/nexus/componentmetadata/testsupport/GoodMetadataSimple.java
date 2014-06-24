@@ -31,10 +31,14 @@ public class GoodMetadataSimple
       .unique()
       .build();
 
+  public static final MetadataIndex INDEX_FOO = new MetadataIndex.Builder()
+      .withColumns("foo")
+      .build();
+
   public static final MetadataType<GoodMetadataSimple> TYPE = new MetadataType.Builder<GoodMetadataSimple>()
       .withName("good")
       .withMetadataClass(GoodMetadataSimple.class)
-      .withIndexes(INDEX_IDENTITYKEY)
+      .withIndexes(INDEX_IDENTITYKEY, INDEX_FOO)
       .build();
 
   private final String foo;

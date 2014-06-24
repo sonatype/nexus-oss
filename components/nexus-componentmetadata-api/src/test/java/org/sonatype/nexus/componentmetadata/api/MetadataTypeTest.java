@@ -17,7 +17,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.sonatype.nexus.componentmetadata.api.MetadataType.Attribute;
+import org.sonatype.nexus.componentmetadata.api.MetadataType.Attribute.Type;
 import org.sonatype.nexus.componentmetadata.testsupport.BadAttributesUnsupportedType;
+import org.sonatype.nexus.componentmetadata.testsupport.BadBuilderNoCorrespondingAttribute;
+import org.sonatype.nexus.componentmetadata.testsupport.BadBuilderPrimitiveType;
+import org.sonatype.nexus.componentmetadata.testsupport.BadBuilderUnsupportedType;
 import org.sonatype.nexus.componentmetadata.testsupport.BadMetadataJsonDeserializeBuilderNotBuilder;
 import org.sonatype.nexus.componentmetadata.testsupport.BadMetadataJsonDeserializeBuilderNotSpecified;
 import org.sonatype.nexus.componentmetadata.testsupport.BadMetadataJsonDeserializeNotPresent;
@@ -25,8 +30,6 @@ import org.sonatype.nexus.componentmetadata.testsupport.BadMetadataNotSecondaryS
 import org.sonatype.nexus.componentmetadata.testsupport.GoodMetadataComplex;
 import org.sonatype.nexus.componentmetadata.testsupport.GoodMetadataSimple;
 import org.sonatype.nexus.componentmetadata.testsupport.GoodMetadataSimple.Builder;
-import org.sonatype.nexus.componentmetadata.api.MetadataType.Attribute;
-import org.sonatype.nexus.componentmetadata.api.MetadataType.Attribute.Type;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Iterables;
@@ -113,6 +116,21 @@ public class MetadataTypeTest
         .withMetadataClass(metadataClass)
         .build()
         .getMetadataClass();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void badBuilderPrimitiveType() {
+    checkMetadataClass(BadBuilderPrimitiveType.class);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void badBuilderUnsupportedType() {
+    checkMetadataClass(BadBuilderUnsupportedType.class);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void badBuilderNoCorrespondingAttribute() {
+    checkMetadataClass(BadBuilderNoCorrespondingAttribute.class);
   }
 
   @Test(expected = IllegalArgumentException.class)

@@ -50,4 +50,6 @@ public interface MetadataStore<T>
 
   @Nullable
   String findFirst(MetadataBuilder<T> filter, MetadataIndex index);
+
+  MetadataKeyIterable findAll();
 }

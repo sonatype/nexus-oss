@@ -42,7 +42,6 @@ public class MetadataStoreTest
   @Before
   public void setup() {
     testRegistry.registerType(GoodMetadataSimple.TYPE);
-    testRegistry.registerType(GoodMetadataComplex.TYPE2);
   }
 
   // ctor
@@ -72,12 +71,15 @@ public class MetadataStoreTest
 
   @Test(expected = IllegalArgumentException.class)
   public void findBadFilterFirstIndexColumnNotConstrained() {
+    testRegistry.registerType(GoodMetadataComplex.TYPE2);
     getInstanceComplex().find(new GoodMetadataComplex.Builder()
             .withEnumAttribute(Type.INTEGER),
         GoodMetadataComplex.INDEX_IDENTITYKEY_ENUMATTRIBUTE_LONGATTRIBUTE);
   }
+
   @Test(expected = IllegalArgumentException.class)
   public void findBadFilterAllUniqueIndexColumnsNotConstrained() {
+    testRegistry.registerType(GoodMetadataComplex.TYPE2);
     getInstanceComplex().find(new GoodMetadataComplex.Builder()
         .withIdentityKey("identityKey")
         .withLongAttribute(1L),
@@ -96,6 +98,16 @@ public class MetadataStoreTest
 
   @Test
   public void findGoodIndexSupportedTypes() {
+    MetadataIndex testIndex = new MetadataIndex.Builder()
+        .withColumns("identityKey", "dateTimeAttribute", "longAttribute", "longPrimitiveAttribute",
+            "integerAttribute", "intPrimitiveAttribute", "enumAttribute", "characterAttribute",
+            "charPrimitiveAttribute", "booleanAttribute", "booleanPrimitiveAttribute")
+        .build();
+    testRegistry.registerType(new MetadataType.Builder<GoodMetadataComplex>()
+        .withName("complex")
+        .withMetadataClass(GoodMetadataComplex.class)
+        .withIndexes(testIndex)
+        .build());
     TestMetadataStore<GoodMetadataComplex> store = new TestMetadataStore<>
         (testRegistry, GoodMetadataComplex.class);
 
@@ -122,11 +134,9 @@ public class MetadataStoreTest
         .withCharacterAttribute(characterValue)
         .withCharPrimitiveAttribute(charPrimitiveValue)
         .withBooleanAttribute(true)
-        .withBooleanPrimitiveAttribute(true)
-        .withListAttribute(listValue)
-        .withMapAttribute(mapValue);
+        .withBooleanPrimitiveAttribute(true);
 
-    store.find(filter, GoodMetadataComplex.INDEX_IDENTITYKEY);
+    store.find(filter, testIndex);
 
     Map<String, Object> expectedFilter = Maps.newHashMap();
     expectedFilter.put("identityKey", identityKeyValue);
@@ -140,11 +150,9 @@ public class MetadataStoreTest
     expectedFilter.put("charPrimitiveAttribute", charPrimitiveValue);
     expectedFilter.put("booleanAttribute", true);
     expectedFilter.put("booleanPrimitiveAttribute", true);
-    expectedFilter.put("listAttribute", listValue);
-    expectedFilter.put("mapAttribute", mapValue);
 
     assertThat(store.getLastFilter(), is(expectedFilter));
-    assertThat(store.getLastIndex(), is(GoodMetadataComplex.INDEX_IDENTITYKEY));
+    assertThat(store.getLastIndex(), is(testIndex));
   }
 
   // findFirst
@@ -167,7 +175,7 @@ public class MetadataStoreTest
 
   @Test
   public void findFirstGoodIndex() {
-    assertThat(getInstanceSimple().findFirst(new GoodMetadataSimple.Builder(),
+    assertThat(getInstanceSimple().findFirst(new GoodMetadataSimple.Builder().withIdentityKey("identityKey"),
         GoodMetadataSimple.INDEX_IDENTITYKEY), is("first"));
   }
 

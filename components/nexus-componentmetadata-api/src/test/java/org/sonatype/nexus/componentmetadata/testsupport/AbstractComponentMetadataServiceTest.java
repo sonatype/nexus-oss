@@ -352,15 +352,15 @@ public abstract class AbstractComponentMetadataServiceTest
     assertThat(retrievedHandle1, is(handle1));
     assertThat(retrievedHandle2, is(handle2));
 
-    // Should get one result for query on unique attribute
+    // Should get one result for query on attribute with unique value
 
     GoodMetadataSimple.Builder filter1 = new GoodMetadataSimple.Builder().withIdentityKey(identityKey1);
     assertResultsMatchKeys(store.find(filter1, GoodMetadataSimple.INDEX_IDENTITYKEY), handle1.getKey());
 
-    // Should get two results for query on non-unique attribute with same value
+    // Should get two results for query on attribute with duplicate value
 
     GoodMetadataSimple.Builder filter2 = new GoodMetadataSimple.Builder().withFoo(fooValue);
-    assertResultsMatchKeys(store.find(filter2, GoodMetadataSimple.INDEX_IDENTITYKEY), handle1.getKey(),
+    assertResultsMatchKeys(store.find(filter2, GoodMetadataSimple.INDEX_FOO), handle1.getKey(),
         handle2.getKey());
 
     // Update one record with new foo value
@@ -397,7 +397,7 @@ public abstract class AbstractComponentMetadataServiceTest
   }
 
   private void assertEmpty(MetadataStore<GoodMetadataSimple> store) {
-    assertThat(store.findFirst(new GoodMetadataSimple.Builder(), GoodMetadataSimple.INDEX_IDENTITYKEY), nullValue());
+    assertThat(Iterables.isEmpty(store.findAll()), is(true));
   }
 
   private GoodMetadataComplex buildGoodMetadataComplex(String identityKey, boolean mapNull) {

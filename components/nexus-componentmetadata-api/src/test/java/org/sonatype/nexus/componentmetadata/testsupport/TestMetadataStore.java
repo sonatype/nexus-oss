@@ -61,6 +61,11 @@ public class TestMetadataStore<T>
   }
 
   @Override
+  public MetadataKeyIterable findAll() {
+    return null;
+  }
+
+  @Override
   public MetadataHandle<T> create(final T metadata) {
     return null;
   }

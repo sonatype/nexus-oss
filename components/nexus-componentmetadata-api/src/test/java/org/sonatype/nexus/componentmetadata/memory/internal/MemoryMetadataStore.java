@@ -114,6 +114,21 @@ public class MemoryMetadataStore<T>
   }
 
   @Override
+  public MetadataKeyIterable findAll() {
+    return new MetadataKeyIterable() {
+      @Override
+      public void close() throws Exception {
+        // nothing to do
+      }
+
+      @Override
+      public Iterator<String> iterator() {
+        return map.keySet().iterator();
+      }
+    };
+  }
+
+  @Override
   protected MetadataKeyIterable find(final Map<String, Object> filter, final MetadataIndex index) {
     return new MetadataKeyIterable() {
       @Override
