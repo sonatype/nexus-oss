@@ -29,13 +29,11 @@ import javax.validation.constraints.NotNull
 @ToString(includePackage = false, includeNames = true)
 class LdapServerXO
 {
-  @NotNull(groups = Update)
-  @NotEmpty
+  @NotEmpty(groups = Update)
   String id
 
   Integer order
 
-  @NotNull
   @NotEmpty
   String name
   String url
@@ -44,7 +42,6 @@ class LdapServerXO
   Protocol protocol
   Boolean useTrustStore
 
-  @NotNull
   @NotEmpty
   String host
 
@@ -53,22 +50,18 @@ class LdapServerXO
   @Max(65535L)
   Integer port
 
-  @NotNull
   @NotEmpty
   String searchBase
 
-  @NotNull
   @NotEmpty
   String authScheme
 
   String authRealm
 
-  @NotNull(groups = AuthScheme)
-  @NotEmpty
+  @NotEmpty(groups = AuthScheme)
   String authUsername
 
   @NotNull(groups = AuthScheme)
-  @NotEmpty
   Password authPassword
 
   @Min(0L)
@@ -85,8 +78,7 @@ class LdapServerXO
   @NotNull(groups = BackupMirror)
   Protocol backupMirrorProtocol
 
-  @NotNull(groups = BackupMirror)
-  @NotEmpty
+  @NotEmpty(groups = BackupMirror)
   String backupMirrorHost
 
   @NotNull(groups = BackupMirror)
@@ -97,21 +89,17 @@ class LdapServerXO
   String userBaseDn
   Boolean userSubtree
 
-  @NotNull
   @NotEmpty
   String userObjectClass
 
   String userLdapFilter
 
-  @NotNull
   @NotEmpty
   String userIdAttribute
 
-  @NotNull
   @NotEmpty
   String userRealNameAttribute
 
-  @NotNull
   @NotEmpty
   String userEmailAddressAttribute
 
@@ -125,24 +113,19 @@ class LdapServerXO
 
   Boolean groupSubtree
 
-  @NotNull(groups = GroupStatic)
-  @NotEmpty
+  @NotEmpty(groups = GroupStatic)
   String groupObjectClass
 
-  @NotNull(groups = GroupStatic)
-  @NotEmpty
+  @NotEmpty(groups = GroupStatic)
   String groupIdAttribute
 
-  @NotNull(groups = GroupStatic)
-  @NotEmpty
+  @NotEmpty(groups = GroupStatic)
   String groupMemberAttribute
 
-  @NotNull(groups = GroupStatic)
-  @NotEmpty
+  @NotEmpty(groups = GroupStatic)
   String groupMemberFormat
 
-  @NotNull(groups = GroupDynamic)
-  @NotEmpty
+  @NotEmpty(groups = GroupStatic)
   String userMemberOfAttribute
 
   public static enum Protocol {

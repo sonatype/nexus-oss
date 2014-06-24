@@ -18,10 +18,11 @@ import com.sonatype.nexus.ssl.model.CertificatePemXO
 import com.sonatype.nexus.ssl.model.CertificateXO
 import com.sonatype.nexus.ssl.plugin.internal.rest.TrustStoreResource
 import org.apache.shiro.authz.annotation.RequiresAuthentication
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.guice.Validate
+import org.sonatype.nexus.validation.Create
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -72,7 +73,7 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @Validate
-  void delete(final @NotNull(message = '[id] may not be null') String id) {
+  void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
     trustStoreResource.delete(id)
   }
 

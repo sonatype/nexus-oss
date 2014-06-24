@@ -17,9 +17,10 @@ import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import com.sonatype.nexus.ssl.model.CertificatePemXO
 import com.sonatype.nexus.ssl.model.CertificateXO
 import com.sonatype.nexus.ssl.plugin.internal.rest.CertificatesResource
-import org.sonatype.nexus.guice.Validate
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.guice.Validate
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -52,7 +53,7 @@ extends DirectComponentSupport
    */
   @DirectMethod
   @Validate
-  CertificateXO retrieveFromHost(final @NotNull(message = '[host] may not be null') String host,
+  CertificateXO retrieveFromHost(final @NotEmpty(message = '[host] may not be empty') String host,
                                  final @Nullable Integer port,
                                  final @Nullable String protocolHint)
   {

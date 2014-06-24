@@ -28,6 +28,7 @@ import com.sonatype.security.ldap.templates.LdapSchemaTemplateManager
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.apache.shiro.realm.ldap.LdapContextFactory
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
@@ -145,7 +146,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:ldapconfig:delete')
   @Validate
-  void delete(final @NotNull(message = '[id] may not be null') String id) {
+  void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
     ldapConfigurationManager.deleteLdapServerConfiguration(id)
   }
 
@@ -214,8 +215,8 @@ extends DirectComponentSupport
   @RequiresPermissions('security:ldapconfig:update')
   @Validate
   void verifyLogin(final @NotNull(message = '[ldapServerXO] may not be null') @Valid LdapServerXO ldapServerXO,
-                   final @NotNull(message = '[base64Username] may not be null') String base64Username,
-                   final @NotNull(message = '[base64Password] may not be null') String base64Password)
+                   final @NotEmpty(message = '[base64Username] may not be empty') String base64Username,
+                   final @NotEmpty(message = '[base64Password] may not be empty') String base64Password)
   {
     String authPassword = null
     if (ldapServerXO.id) {
