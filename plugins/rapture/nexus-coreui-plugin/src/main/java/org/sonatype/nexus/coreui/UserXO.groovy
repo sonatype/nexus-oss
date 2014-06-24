@@ -46,7 +46,7 @@ class UserXO
   @NotNull
   UserStatus status
 
-  @NotEmpty(groups = Create.class)
+  @NotNull(groups = Create.class)
   Password password
 
   @NotEmpty
