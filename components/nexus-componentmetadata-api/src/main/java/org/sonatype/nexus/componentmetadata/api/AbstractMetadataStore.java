@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.google.common.base.Throwables;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractMetadataStore<T>
@@ -38,7 +40,34 @@ public abstract class AbstractMetadataStore<T>
   public MetadataKeyIterable find(final MetadataBuilder<T> filter, final MetadataIndex index) {
     checkNotNull(filter);
     checkIndex(index);
-    return find(toMap(filter), index);
+    Map<String, Object> filterAsMap = toMap(filter);
+    checkFilterAsMap(filterAsMap, index);
+    return find(filterAsMap, index);
+  }
+
+  private static void checkFilterAsMap(Map<String, Object> map, MetadataIndex index) {
+    // all constrained attributes in the map must be part of the index
+    for (String attribute: map.keySet()) {
+      if (!index.getColumns().contains(attribute)) {
+        throw new IllegalArgumentException("Constrained attribute '" + attribute +
+            "' is not part of the specified index");
+      }
+    }
+    // the first column of the index must be constrained by the map
+    String firstColumn = index.getColumns().get(0);
+    if (!map.containsKey(firstColumn)) {
+      throw new IllegalArgumentException("First column, '" + firstColumn + "' of specified " +
+          "index must be a constrained attribute of the query");
+    }
+    // if index is unique, all columns must be constrained by the query
+    if (index.isUnique()) {
+      for (String column: index.getColumns()) {
+        if (!map.containsKey(column)) {
+          throw new IllegalArgumentException("For unique index queries, all constituent " +
+              "columns must be constrained attributes of the query");
+        }
+      }
+    }
   }
 
   // index must be registered for this type
@@ -49,7 +78,7 @@ public abstract class AbstractMetadataStore<T>
     }
   }
 
-  protected abstract MetadataKeyIterable find(Map<String, Object> filter, MetadataIndex index);
+  protected abstract MetadataKeyIterable find(Map<String, Object> filterAsMap, MetadataIndex index);
 
   private Map<String, Object> toMap(MetadataBuilder<T> filter) {
     Map<String, Object> map = new HashMap<>();
@@ -61,10 +90,8 @@ public abstract class AbstractMetadataStore<T>
         if (value != null) {
           map.put(attribute.getName(), value);
         }
-      } catch (IllegalAccessException e) {
-        throw new RuntimeException(e); // won't happen; we called field.setAccessible(true) above
-      } catch (NoSuchFieldException e) {
-        throw new IllegalArgumentException("No field in builder for metadata attribute: " + attribute.getName());
+      } catch (Throwable t) {
+        Throwables.propagate(t);
       }
     }
     return map;
@@ -79,11 +106,9 @@ public abstract class AbstractMetadataStore<T>
       if (keys.hasNext()) {
         return keys.next();
       }
-      return null;
-    } catch (final RuntimeException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    } catch (Throwable t) {
+      Throwables.propagate(t);
     }
+    return null;
   }
 }

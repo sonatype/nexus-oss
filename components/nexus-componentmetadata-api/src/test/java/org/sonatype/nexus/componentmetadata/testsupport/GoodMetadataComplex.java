@@ -38,10 +38,21 @@ public class GoodMetadataComplex
       .unique()
       .build();
 
+  public static final MetadataIndex INDEX_IDENTITYKEY_ENUMATTRIBUTE_LONGATTRIBUTE = new MetadataIndex.Builder()
+      .withColumns("identityKey", "enumAttribute", "longAttribute")
+      .unique()
+      .build();
+
   public static final MetadataType<GoodMetadataComplex> TYPE = new MetadataType.Builder<GoodMetadataComplex>()
       .withName("goodattributes")
       .withMetadataClass(GoodMetadataComplex.class)
       .withIndexes(INDEX_IDENTITYKEY)
+      .build();
+
+  public static final MetadataType<GoodMetadataComplex> TYPE2 = new MetadataType.Builder<GoodMetadataComplex>()
+      .withName("goodattributes")
+      .withMetadataClass(GoodMetadataComplex.class)
+      .withIndexes(INDEX_IDENTITYKEY_ENUMATTRIBUTE_LONGATTRIBUTE)
       .build();
 
   private final DateTime dateTimeAttribute;
@@ -161,14 +172,14 @@ public class GoodMetadataComplex
     private String identityKey;
     private DateTime dateTimeAttribute;
     private Long longAttribute;
-    private long longPrimitiveAttribute;
+    private Long longPrimitiveAttribute;
     private Integer integerAttribute;
-    private int intPrimitiveAttribute;
+    private Integer intPrimitiveAttribute;
     private Type enumAttribute;
     private Character characterAttribute;
-    private char charPrimitiveAttribute;
+    private Character charPrimitiveAttribute;
     private Boolean booleanAttribute;
-    private boolean booleanPrimitiveAttribute;
+    private Boolean booleanPrimitiveAttribute;
     private List<Object> listAttribute;
     private Map<Object, Object> mapAttribute;
 
