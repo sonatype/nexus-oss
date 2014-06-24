@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ldapConfiguration>
+  <version>2.0.1</version>
+  <servers>
+    <server>
+      <id>default</id>
+      <!-- <name>ldap://localhost:12345</name> --><!-- Missing Name -->
+      <connectionInfo>
+        <searchBase>o=sonatype</searchBase>
+        <systemUsername>uid=admin,ou=system</systemUsername>
+        <systemPassword>CMw7ArkDsKp4yvV0M1yl</systemPassword>
+        <authScheme>simple</authScheme>
+        <protocol>ldap</protocol>
+        <host>localhost</host>
+        <port>12345</port>
+        <connectionRetryDelay>300</connectionRetryDelay>
+        <cacheTimeout>30</cacheTimeout>
+      </connectionInfo>
+      <userAndGroupConfig>
+        <emailAddressAttribute>mail</emailAddressAttribute>
+        <ldapGroupsAsRoles>true</ldapGroupsAsRoles>
+        <groupBaseDn>ou=groups</groupBaseDn>
+        <groupIdAttribute>cn</groupIdAttribute>
+        <groupMemberAttribute>uniqueMember</groupMemberAttribute>
+        <groupMemberFormat>uid=${username},ou=people,o=sonatype</groupMemberFormat>
+        <groupObjectClass>groupOfUniqueNames</groupObjectClass>
+        <userPasswordAttribute>userPassword</userPasswordAttribute>
+        <preferredPasswordEncoding>clear</preferredPasswordEncoding>
+        <userIdAttribute>uid</userIdAttribute>
+        <userObjectClass>inetOrgPerson</userObjectClass>
+        <userBaseDn>ou=people</userBaseDn>
+        <userRealNameAttribute>sn</userRealNameAttribute>
+      </userAndGroupConfig>
+    </server>
+  </servers>
+</ldapConfiguration>

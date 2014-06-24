@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2008-2013 Sonatype, Inc.
+
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/pro/attributions
+    Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
+    M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<ldapConfiguration>
+  <connectionInfo>
+    <searchBase>o=sonatype</searchBase>
+    <systemUsername>uid=admin,ou=system</systemUsername>
+    <systemPassword>CMw7ArkDsKp4yvV0M1yl</systemPassword>
+    <authScheme>simple</authScheme>
+    <protocol>ldaps</protocol>
+    <host>localhost</host>
+    <port>${port}</port>
+  </connectionInfo>
+  <userAndGroupConfig>
+    <emailAddressAttribute>mail</emailAddressAttribute>
+    <ldapGroupsAsRoles>true</ldapGroupsAsRoles>
+    <groupBaseDn>ou=groups</groupBaseDn>
+    <groupIdAttribute>cn</groupIdAttribute>
+    <userMemberOfAttribute>businesscategory</userMemberOfAttribute>
+    <groupMemberFormat>cn=${username},ou=groups,o=sonatype</groupMemberFormat>
+    <groupObjectClass>organizationalRole</groupObjectClass>
+    <userPasswordAttribute>userPassword</userPasswordAttribute>
+    <preferredPasswordEncoding>clear</preferredPasswordEncoding>
+    <userIdAttribute>uid</userIdAttribute>
+    <userObjectClass>inetOrgPerson</userObjectClass>
+    <userBaseDn>ou=people</userBaseDn>
+    <userRealNameAttribute>sn</userRealNameAttribute>
+  </userAndGroupConfig>
+
+</ldapConfiguration>

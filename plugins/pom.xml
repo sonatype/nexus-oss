@@ -180,7 +180,13 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-ldap-realm-plugin</artifactId>
+        <artifactId>nexus-ldap-model</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-ldap-plugin</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
@@ -189,6 +195,26 @@
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-rutauth-plugin</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <!-- ssl -->
+      
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-ssl-client</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-ssl-model</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-ssl-plugin</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 

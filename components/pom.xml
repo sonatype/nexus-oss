@@ -42,7 +42,6 @@
     <module>nexus-formfields</module>
     <module>nexus-jettyapp</module>
     <module>nexus-launcher</module>
-    <module>nexus-ldap-common</module>
     <module>nexus-locks</module>
     <module>nexus-log-api</module>
     <module>nexus-mime</module>

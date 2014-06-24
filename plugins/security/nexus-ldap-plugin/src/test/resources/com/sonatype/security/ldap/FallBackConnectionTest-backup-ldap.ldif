@@ -1,0 +1,48 @@
+dn: o=sonatype
+objectClass: top
+objectClass: organization
+o: sonatype
+
+dn: ou=people,o=sonatype
+objectClass: organizationalUnit
+objectClass: top
+ou: people
+description: Contains entries which describe persons
+
+dn: uid=ehearn,ou=people,o=sonatype
+objectclass: inetOrgPerson
+cn: ehearn
+sn: Eula Hearn
+uid: ehearn
+userpassword: ehearn123
+mail: ehearn@sonatype.com
+description: Eula
+
+dn: uid=jgoodman,ou=people,o=sonatype
+objectclass: inetOrgPerson
+cn: jgoodman
+sn: Joseph M. Goodman
+uid: jgoodman
+userpassword: jgoodman123
+mail: jgoodman@sonatype.com
+description: This is Joe
+
+dn: ou=groups,o=sonatype
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+description: Contains entries which describe groups
+
+dn: cn=alpha,ou=groups,o=sonatype
+objectClass: groupOfUniqueNames
+cn: alpha
+uniqueMember: uid=ehearn,ou=people,o=sonatype 
+uniqueMember: uid=jgoodman,ou=people,o=sonatype
+description: Alpha group
+
+dn: cn=beta,ou=groups,o=sonatype
+objectClass: groupOfUniqueNames
+cn: beta
+uniqueMember: uid=jgoodman,ou=people,o=sonatype 
+description: Beta group
+

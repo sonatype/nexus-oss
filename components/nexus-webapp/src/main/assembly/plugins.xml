@@ -46,7 +46,8 @@
         <include>*:nexus-logging-plugin</include>
         <include>*:nexus-lvo-plugin</include>
         <include>*:nexus-plugin-console-plugin</include>
-        <include>*:nexus-ldap-realm-plugin</include>
+        <include>*:nexus-ssl-plugin</include>
+        <include>*:nexus-ldap-plugin</include>
         <include>*:nexus-rrb-plugin</include>
         <include>*:nexus-indexer-lucene-plugin</include>
         <include>*:nexus-timeline-plugin</include>

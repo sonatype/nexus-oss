@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2007-2014 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<xsd:schema
+    targetNamespace="http://sonatype.com/xsd/nexus-ssl-plugin/rest/1.0"
+    version="1.0"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:model="http://sonatype.com/xsd/nexus-ssl-plugin/rest/1.0"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:version="2.1"
+    xsi:schemaLocation="
+            http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd
+            http://www.w3.org/2001/XMLSchema http://www.w3.org/2001/XMLSchema.xsd">
+
+  <xsd:complexType name="certificate">
+    <xsd:sequence>
+      <xsd:element name="id" type="xsd:string"/>
+      <xsd:element name="fingerprint" type="xsd:string"/>
+      <xsd:element name="pem" type="xsd:string"/>
+      <xsd:element name="serialNumber" type="xsd:string"/>
+      <xsd:element name="subjectCommonName" type="xsd:string"/>
+      <xsd:element name="subjectOrganization" type="xsd:string"/>
+      <xsd:element name="subjectOrganizationalUnit" type="xsd:string"/>
+      <xsd:element name="issuerCommonName" type="xsd:string"/>
+      <xsd:element name="issuerOrganization" type="xsd:string"/>
+      <xsd:element name="issuerOrganizationalUnit" type="xsd:string"/>
+      <xsd:element name="issuedOn" type="xsd:long"/>
+      <xsd:element name="expiresOn" type="xsd:long"/>
+      <xsd:element name="inNexusSSLTrustStore" type="xsd:boolean"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:element name="certificate" type="model:certificate"/>
+
+  <xsd:complexType name="certificatePem">
+    <xsd:sequence>
+      <xsd:element name="value" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:element name="certificatePem" type="model:certificatePem"/>
+
+  <xsd:complexType name="trustStoreKey">
+    <xsd:sequence>
+      <xsd:element name="enabled" type="xsd:boolean"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:element name="trustStoreKey" type="model:trustStoreKey"/>
+
+</xsd:schema>
