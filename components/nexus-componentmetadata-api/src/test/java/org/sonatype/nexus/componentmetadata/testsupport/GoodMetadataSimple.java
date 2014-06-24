@@ -20,6 +20,7 @@ import org.sonatype.nexus.componentmetadata.api.MetadataType;
 import org.sonatype.nexus.componentmetadata.api.SecondaryMetadata;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.common.base.Objects;
 
 @JsonDeserialize(builder = GoodMetadataSimple.Builder.class)
 public class GoodMetadataSimple
@@ -46,6 +47,28 @@ public class GoodMetadataSimple
   @Nullable
   public String getFoo() {
     return foo;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    final GoodMetadataSimple other = (GoodMetadataSimple) obj;
+    return Objects.equal(identityKey, other.identityKey)
+        && Objects.equal(foo, other.foo);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(identityKey, foo);
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this)
+        .add("identityKey", identityKey)
+        .add("foo", foo)
+        .toString();
   }
 
   public static class Builder

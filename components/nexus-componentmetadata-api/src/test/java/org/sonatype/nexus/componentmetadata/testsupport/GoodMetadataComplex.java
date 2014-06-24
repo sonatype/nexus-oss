@@ -24,6 +24,7 @@ import org.sonatype.nexus.componentmetadata.api.MetadataType.Attribute.Type;
 import org.sonatype.nexus.componentmetadata.api.SecondaryMetadata;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.common.base.Objects;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -96,6 +97,63 @@ public class GoodMetadataComplex
   public boolean isBooleanPrimitiveAttribute() { return booleanPrimitiveAttribute; }
   public List<Object> getListAttribute() { return listAttribute; }
   public @Nullable Map<Object, Object> getMapAttribute() { return mapAttribute; }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    final GoodMetadataComplex other = (GoodMetadataComplex) obj;
+    return Objects.equal(identityKey, other.identityKey)
+        && Objects.equal(dateTimeAttribute, other.dateTimeAttribute)
+        && Objects.equal(longAttribute, other.longAttribute)
+        && Objects.equal(longPrimitiveAttribute, other.longPrimitiveAttribute)
+        && Objects.equal(integerAttribute, other.integerAttribute)
+        && Objects.equal(intPrimitiveAttribute, other.intPrimitiveAttribute)
+        && Objects.equal(enumAttribute, other.enumAttribute)
+        && Objects.equal(characterAttribute, other.characterAttribute)
+        && Objects.equal(charPrimitiveAttribute, other.charPrimitiveAttribute)
+        && Objects.equal(booleanAttribute, other.booleanAttribute)
+        && Objects.equal(booleanPrimitiveAttribute, other.booleanPrimitiveAttribute)
+        && Objects.equal(listAttribute, other.listAttribute)
+        && Objects.equal(mapAttribute, other.mapAttribute);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(
+        identityKey,
+        dateTimeAttribute,
+        longAttribute,
+        longPrimitiveAttribute,
+        integerAttribute,
+        intPrimitiveAttribute,
+        enumAttribute,
+        characterAttribute,
+        charPrimitiveAttribute,
+        booleanAttribute,
+        booleanPrimitiveAttribute,
+        listAttribute,
+        mapAttribute);
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this)
+        .add("identityKey", identityKey)
+        .add("dateTimeAttribute", dateTimeAttribute)
+        .add("longAttribute", longAttribute)
+        .add("longPrimitiveAttribute", longPrimitiveAttribute)
+        .add("integerAttribute", integerAttribute)
+        .add("intPrimitiveAttribute", intPrimitiveAttribute)
+        .add("enumAttribute", enumAttribute)
+        .add("characterAttribute", characterAttribute)
+        .add("charPrimitiveAttribute", charPrimitiveAttribute)
+        .add("booleanAttribute", booleanAttribute)
+        .add("booleanPrimitiveAttribute", booleanPrimitiveAttribute)
+        .add("listAttribute", listAttribute)
+        .add("mapAttribute", mapAttribute)
+        .toString();
+  }
 
   public static class Builder
       implements MetadataBuilder<GoodMetadataComplex>
