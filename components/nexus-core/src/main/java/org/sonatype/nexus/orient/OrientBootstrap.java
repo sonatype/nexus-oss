@@ -19,11 +19,12 @@ import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.Subscribe;
+import com.orientechnologies.orient.core.OConstants;
 import com.orientechnologies.orient.core.Orient;
 import org.eclipse.sisu.EagerSingleton;
 
 /**
- * Helper to shutdown OrientDB cleanly.
+ * OrientDB bootstrap lifecycle adapter.
  * 
  * @since 3.0
  */
@@ -34,11 +35,15 @@ public class OrientBootstrap
     implements EventSubscriber
 {
   public OrientBootstrap() {
+    log.info("OrientDB version: {}", OConstants.getVersion());
+
+    // disable default shutdown-hook, will shutdown manually when nexus is stopped
     Orient.instance().removeShutdownHook();
   }
 
   @Subscribe
   public void on(final NexusStoppedEvent event) {
+    log.info("Shutting down OrientDB");
     Orient.instance().shutdown();
   }
 }
