@@ -34,7 +34,7 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.listen({
@@ -56,6 +56,9 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
         },
         'nx-coreui-upload-artifact-file fileuploadfield': {
           change: me.onFileSelected
+        },
+        'nx-coreui-upload-artifact-file field': {
+          change: me.onFieldChange
         }
       }
     });
@@ -64,7 +67,7 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
   /**
    * @private
    */
-  afterRender: function (form) {
+  afterRender: function(form) {
     var me = this;
 
     me.refreshAddButton(form);
@@ -75,13 +78,13 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
    * @private
    * Uploads artifacts by submitting the form.
    */
-  upload: function (button) {
+  upload: function(button) {
     var me = this,
         form = button.up('form');
 
     form.submit({
       waitMsg: 'Uploading your artifacts...',
-      success: function () {
+      success: function() {
         NX.Messages.add({ text: 'Artifacts uploaded', type: 'success' });
         me.discardForm(form);
       }
@@ -91,7 +94,7 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
   /**
    * @private
    */
-  discard: function (button) {
+  discard: function(button) {
     var me = this;
     me.discardForm(button.up('form'));
   },
@@ -100,7 +103,7 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
    * @private
    * Resets form to initial state.
    */
-  discardForm: function (form) {
+  discardForm: function(form) {
     var me = this,
         artifactPanel;
 
@@ -119,7 +122,7 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
    * @private
    * Add an artifact selection panel.
    */
-  addArtifact: function (button) {
+  addArtifact: function(button) {
     var me = this,
         form = button.up('form'),
         name = 'a.' + me.counter++;
@@ -138,7 +141,7 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
    * @private
    * Remove an artifact selection panel.
    */
-  removeArtifact: function (button) {
+  removeArtifact: function(button) {
     var me = this,
         form = button.up('form');
 
@@ -151,7 +154,7 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
    * @private
    * Move "Add" button by the end of form.
    */
-  refreshAddButton: function (form) {
+  refreshAddButton: function(form) {
     var me = this,
         addButton = form.down('button[action=add]');
 
@@ -171,7 +174,7 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
    * @private
    * Update coordinates if possible.
    */
-  onFileSelected: function (button, fileName) {
+  onFileSelected: function(button, fileName) {
     var me = this,
         form = button.up('form'),
         artifactPanel = button.up(me.artifactPanelXType),
@@ -180,33 +183,45 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
 
     artifactPanel.classifier.setValue(coordinates.classifier);
     artifactPanel.extension.setValue(coordinates.extension);
-    artifactPanel.isPom = coordinates.extension === 'pom' || Ext.String.endsWith(fileName, 'pom.xml', true);
 
     me.showOrHideCoordinates(form);
 
-    artifactId = form.down('#artifactId');
-    if (artifactId && !artifactId.getValue()) {
-      artifactId.setValue(coordinates.artifact);
+    if (!(coordinates.extension === 'pom')) {
+      artifactId = form.down('#artifactId');
+      if (artifactId && !artifactId.getValue()) {
+        artifactId.setValue(coordinates.artifact);
+      }
+      version = form.down('#version');
+      if (version && !version.getValue()) {
+        version.setValue(coordinates.version);
+      }
+      packaging = form.down('#packaging');
+      if (packaging && !packaging.getValue()) {
+        packaging.setValue(coordinates.packaging);
+      }
     }
-    version = form.down('#version');
-    if (version && !version.getValue()) {
-      version.setValue(coordinates.version);
-    }
-    packaging = form.down('#packaging');
-    if (packaging && !packaging.getValue()) {
-      packaging.setValue(coordinates.packaging);
-    }
+  },
+
+  /**
+   * @private
+   */
+  onFieldChange: function(field) {
+    var me = this;
+
+    me.showOrHideCoordinates(field.up('form'));
   },
 
   /**
    * @private
    * Show or Hide coordinates if a pom was selected to be uploaded or not.
    */
-  showOrHideCoordinates: function (form) {
+  showOrHideCoordinates: function(form) {
     var me = this,
-        coordinatesPanel = form.down('nx-coreui-upload-artifact-coordinates');
+        coordinatesPanel = form.down('nx-coreui-upload-artifact-coordinates'),
+        fileWithPomExtension = form.down(me.artifactPanelXType + ' field[extension=true][value=pom]');
 
-    if (form.down(me.artifactPanelXType + '[isPom=true]') || !form.down(me.artifactPanelXType)) {
+    if (!form.down(me.artifactPanelXType) ||
+        (fileWithPomExtension && !fileWithPomExtension.up('panel').classifier.value)) {
       coordinatesPanel.disable();
       coordinatesPanel.hide();
     }
@@ -221,8 +236,12 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
    * @private
    * Try to guess coordinates out of a file name.
    */
-  guessCoordinates: function (fileName) {
+  guessCoordinates: function(fileName) {
     var g = '', a = '', v = '', c = '', p = '', e = '';
+
+    if (Ext.String.endsWith(fileName, 'pom.xml', true)) {
+      return { extension: 'pom' };
+    }
 
     // match extension to guess the packaging
     var extensionIndex = fileName.lastIndexOf('.');

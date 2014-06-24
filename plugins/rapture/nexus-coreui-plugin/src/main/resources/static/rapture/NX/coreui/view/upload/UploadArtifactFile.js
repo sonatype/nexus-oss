@@ -19,7 +19,7 @@ Ext.define('NX.coreui.view.upload.UploadArtifactFile', {
   extend: 'Ext.Panel',
   alias: 'widget.nx-coreui-upload-artifact-file',
 
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = [
@@ -55,13 +55,15 @@ Ext.define('NX.coreui.view.upload.UploadArtifactFile', {
         xtype: 'textfield',
         fieldLabel: 'Classifier',
         helpText: 'Classifier of the uploaded artifact. If not supplied, no classifier will be appended to the artifact.',
-        name: me.name + '.classifier'
+        name: me.name + '.classifier',
+        classifier: true
       },
       {
         xtype: 'textfield',
         fieldLabel: 'Extension',
         helpText: 'Extension of the uploaded artifact. If not supplied, the default extension (derived from the packaging type) will be used.',
         name: me.name + '.extension',
+        extension: true,
         allowBlank: false
       }
     ];
