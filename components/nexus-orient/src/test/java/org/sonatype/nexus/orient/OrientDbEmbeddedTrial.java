@@ -13,17 +13,13 @@
 package org.sonatype.nexus.orient;
 
 import java.io.File;
-import java.net.URL;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.config.OGlobalConfiguration;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.server.OServer;
-import com.orientechnologies.orient.server.OServerMain;
 import com.orientechnologies.orient.server.config.OServerConfiguration;
 import com.orientechnologies.orient.server.config.OServerEntryConfiguration;
 import com.orientechnologies.orient.server.config.OServerNetworkConfiguration;
@@ -49,37 +45,20 @@ public class OrientDbEmbeddedTrial
     SLF4JBridgeHandler.install();
   }
 
-  private ODocument createPerson(final ODatabaseDocumentTx db) {
-    ODocument doc = db.newInstance("Person");
-    doc.field("name", "Luke");
-    doc.field("surname", "Skywalker");
-    doc.field("city", new ODocument("City")
-        .field("name", "Rome")
-        .field("country", "Italy"));
-    doc.save();
-    return doc;
-  }
-
-  @Test
-  public void embeddedServerFromXml() throws Exception {
-    OServer server = OServerMain.create();
-    URL config = getClass().getResource("server-config.xml");
-    log(config);
-    server.startup(config.openStream());
-    server.activate();
-    server.shutdown();
-  }
-
   /**
    * Tests configuring the server w/o xml but configuring the JAXB objects directly.
    */
   @Test
   public void embeddedServerProgrammatic() throws Exception {
     File homeDir = util.createTempDir("orientdb-home").getCanonicalFile();
+    System.setProperty("orient.home", homeDir.getPath());
     System.setProperty(Orient.ORIENTDB_HOME, homeDir.getPath());
 
     OServer server = new OServer();
     OServerConfiguration config = new OServerConfiguration();
+
+    // Unsure what this is used for, its apparently assigned to xml location, but forcing it here
+    config.location = "DYNAMIC-CONFIGURATION";
 
     File databaseDir = new File(homeDir, "db");
     config.properties = new OServerEntryConfiguration[] {
@@ -112,6 +91,8 @@ public class OrientDbEmbeddedTrial
     };
 
     config.security = new OServerSecurityConfiguration();
+    config.security.users = Lists.newArrayList();
+    config.security.resources = Lists.newArrayList();
 
     // Dumps to System.out :-(
     OGlobalConfiguration.ENVIRONMENT_DUMP_CFG_AT_STARTUP.setValue(true);
@@ -119,37 +100,5 @@ public class OrientDbEmbeddedTrial
     server.startup(config);
     server.activate();
     server.shutdown();
-  }
-
-  @Test
-  public void embeddedDatabaseAccess() throws Exception {
-    OServer server = OServerMain.create();
-    URL config = getClass().getResource("server-config.xml");
-    log(config);
-    server.startup(config.openStream());
-    server.activate();
-
-    // NOTE: This doesn't root into the databases directory, not sure why
-    try {
-      ODatabaseDocumentTx db = new ODatabaseDocumentTx("plocal:test");
-      if (!db.exists()) {
-        db.create();
-      }
-      else {
-        db.open("admin", "admin");
-      }
-      try {
-        ODocument doc = createPerson(db);
-        log(doc.getIdentity());
-        log(doc.getVersion());
-        log(doc);
-      }
-      finally {
-        db.close();
-      }
-    }
-    finally {
-      server.shutdown();
-    }
   }
 }
