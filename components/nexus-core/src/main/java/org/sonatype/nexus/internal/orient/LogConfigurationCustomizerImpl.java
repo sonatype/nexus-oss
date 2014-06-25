@@ -31,6 +31,8 @@ public class LogConfigurationCustomizerImpl
 {
   @Override
   public void customize(final Configuration config) {
+    config.setLoggerLevel("org.sonatype.nexus.orient", DEFAULT);
+    config.setLoggerLevel("org.sonatype.nexus.internal.orient", DEFAULT);
     config.setLoggerLevel("com.orientechnologies", DEFAULT);
   }
 }
