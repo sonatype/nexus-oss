@@ -21,13 +21,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
-import org.sonatype.nexus.orient.Hex;
+import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.id.ORID;
-import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.storage.ORecordMetadata;
 import com.orientechnologies.orient.object.db.OObjectDatabasePool;
@@ -99,20 +98,13 @@ public class OrientCapabilityStorage
     return databasePool.acquire();
   }
 
-  /**
-   * Convert ORID to CapabilityIdentity using HEX encoding.
-   */
   private CapabilityIdentity convert(final ORID rid) {
-    String encoded = Hex.encode(rid.toStream());
+    String encoded = RecordIdObfuscator.encode(rid);
     return new CapabilityIdentity(encoded);
   }
 
-  /**
-   * Convert CapabilityIdentity to ORID using HEX encoding.
-   */
   private ORID convert(final CapabilityIdentity id) {
-    byte[] decoded = Hex.decode(id.toString());
-    return new ORecordId().fromStream(decoded);
+    return RecordIdObfuscator.decode(id.toString());
   }
 
   @Override
