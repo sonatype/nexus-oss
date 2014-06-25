@@ -13,6 +13,8 @@
 package org.sonatype.nexus.orient;
 
 import java.io.File;
+import java.io.PrintStream;
+import java.io.StringWriter;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -29,6 +31,7 @@ import com.orientechnologies.orient.server.config.OServerSecurityConfiguration;
 import com.orientechnologies.orient.server.config.OServerStorageConfiguration;
 import com.orientechnologies.orient.server.config.OServerUserConfiguration;
 import com.orientechnologies.orient.server.network.protocol.binary.ONetworkProtocolBinary;
+import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -94,10 +97,13 @@ public class OrientDbEmbeddedTrial
     config.security.users = Lists.newArrayList();
     config.security.resources = Lists.newArrayList();
 
-    // Dumps to System.out :-(
-    OGlobalConfiguration.ENVIRONMENT_DUMP_CFG_AT_STARTUP.setValue(true);
-
     server.startup(config);
+
+    // Dump config to log stream
+    StringWriter buff = new StringWriter();
+    OGlobalConfiguration.dumpConfiguration(new PrintStream(new WriterOutputStream(buff), true));
+    log("Configuration:\n{}", buff);
+
     server.activate();
     server.shutdown();
   }
