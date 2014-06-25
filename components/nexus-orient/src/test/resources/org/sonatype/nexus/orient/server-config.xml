@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <orient-server>
   <handlers>
-    <handler class="com.orientechnologies.orient.graph.handler.OGraphServerHandler">
-      <parameters>
-        <parameter name="enabled" value="true"/>
-        <parameter name="graph.pool.max" value="50"/>
-      </parameters>
-    </handler>
+    <!--<handler class="com.orientechnologies.orient.graph.handler.OGraphServerHandler">-->
+      <!--<parameters>-->
+        <!--<parameter name="enabled" value="true"/>-->
+        <!--<parameter name="graph.pool.max" value="50"/>-->
+      <!--</parameters>-->
+    <!--</handler>-->
 
     <!-- JMX SERVER, TO TURN ON SET THE 'ENABLED' PARAMETER TO 'true' -->
-    <handler class="com.orientechnologies.orient.server.handler.OJMXPlugin">
-      <parameters>
-        <parameter name="enabled" value="false"/>
-        <parameter name="profilerManaged" value="true"/>
-      </parameters>
-    </handler>
+    <!--<handler class="com.orientechnologies.orient.server.handler.OJMXPlugin">-->
+      <!--<parameters>-->
+        <!--<parameter name="enabled" value="false"/>-->
+        <!--<parameter name="profilerManaged" value="true"/>-->
+      <!--</parameters>-->
+    <!--</handler>-->
 
     <!-- AUTOMATIC BACKUP, TO TURN ON SET THE 'ENABLED' PARAMETER TO 'true' -->
-    <handler class="com.orientechnologies.orient.server.handler.OAutomaticBackup">
-      <parameters>
-        <parameter name="enabled" value="false"/>
-        <parameter name="delay" value="4h"/>
-        <parameter name="target.directory" value="backup"/>
-        <parameter name="target.fileName" value="${DBNAME}-${DATE:yyyyMMddHHmmss}.json"/>
-        <parameter name="compressionLevel" value="9"/>
-        <parameter name="bufferSize" value="1048576"/>
-        <!--${DBNAME} AND ${DATE:} VARIABLES ARE SUPPORTED -->
-        <parameter name="db.include" value=""/>
-        <!-- DEFAULT: NO ONE, THAT MEANS ALL DATABASES. USE COMMA TO SEPARATE MULTIPLE DATABASE NAMES -->
-        <parameter name="db.exclude" value=""/>
-        <!-- USE COMMA TO SEPARATE MULTIPLE DATABASE NAMES -->
-      </parameters>
-    </handler>
+    <!--<handler class="com.orientechnologies.orient.server.handler.OAutomaticBackup">-->
+      <!--<parameters>-->
+        <!--<parameter name="enabled" value="false"/>-->
+        <!--<parameter name="delay" value="4h"/>-->
+        <!--<parameter name="target.directory" value="backup"/>-->
+        <!--<parameter name="target.fileName" value="${DBNAME}-${DATE:yyyyMMddHHmmss}.json"/>-->
+        <!--<parameter name="compressionLevel" value="9"/>-->
+        <!--<parameter name="bufferSize" value="1048576"/>-->
+        <!--&lt;!&ndash;${DBNAME} AND ${DATE:} VARIABLES ARE SUPPORTED &ndash;&gt;-->
+        <!--<parameter name="db.include" value=""/>-->
+        <!--&lt;!&ndash; DEFAULT: NO ONE, THAT MEANS ALL DATABASES. USE COMMA TO SEPARATE MULTIPLE DATABASE NAMES &ndash;&gt;-->
+        <!--<parameter name="db.exclude" value=""/>-->
+        <!--&lt;!&ndash; USE COMMA TO SEPARATE MULTIPLE DATABASE NAMES &ndash;&gt;-->
+      <!--</parameters>-->
+    <!--</handler>-->
 
     <!-- SERVER SIDE SCRIPT INTERPRETER. WARNING! THIS CAN BE A SECURITY HOLE:
         ENABLE IT ONLY IF CLIENTS ARE TRUCT, TO TURN ON SET THE 'ENABLED' PARAMETER
         TO 'true' -->
-    <handler class="com.orientechnologies.orient.server.handler.OServerSideScriptInterpreter">
-      <parameters>
-        <parameter name="enabled" value="true"/>
-        <parameter name="allowedLanguages" value="SQL"/>
-      </parameters>
-    </handler>
+    <!--<handler class="com.orientechnologies.orient.server.handler.OServerSideScriptInterpreter">-->
+      <!--<parameters>-->
+        <!--<parameter name="enabled" value="true"/>-->
+        <!--<parameter name="allowedLanguages" value="SQL"/>-->
+      <!--</parameters>-->
+    <!--</handler>-->
   </handlers>
 
   <network>
@@ -89,21 +89,21 @@
           <!-- parameter name="network.http.additionalResponseHeaders" value="Access-Control-Allow-Origin:
               *;Access-Control-Allow-Credentials: true" / -->
         </parameters>
-        <commands>
-          <command
-              pattern="GET|www GET|studio/ GET| GET|*.htm GET|*.html GET|*.xml GET|*.jpeg GET|*.jpg GET|*.png GET|*.gif GET|*.js GET|*.css GET|*.swf GET|*.ico GET|*.txt GET|*.otf GET|*.pjs GET|*.svg"
-              implementation="com.orientechnologies.orient.server.network.protocol.http.command.get.OServerCommandGetStaticContent">
-            <parameters>
-              <!-- Don't cache html resources in development mode -->
-              <entry name="http.cache:*.htm *.html"
-                     value="Cache-Control: no-cache, no-store, max-age=0, must-revalidate\r\nPragma: no-cache"/>
-              <!-- Default caching -->
-              <entry name="http.cache:default" value="Cache-Control: max-age=120"/>
-            </parameters>
-          </command>
-          <command pattern="GET|gephi/*"
-                   implementation="com.orientechnologies.orient.graph.server.command.OServerCommandGetGephi"/>
-        </commands>
+        <!--<commands>-->
+          <!--<command-->
+              <!--pattern="GET|www GET|studio/ GET| GET|*.htm GET|*.html GET|*.xml GET|*.jpeg GET|*.jpg GET|*.png GET|*.gif GET|*.js GET|*.css GET|*.swf GET|*.ico GET|*.txt GET|*.otf GET|*.pjs GET|*.svg"-->
+              <!--implementation="com.orientechnologies.orient.server.network.protocol.http.command.get.OServerCommandGetStaticContent">-->
+            <!--<parameters>-->
+              <!--&lt;!&ndash; Don't cache html resources in development mode &ndash;&gt;-->
+              <!--<entry name="http.cache:*.htm *.html"-->
+                     <!--value="Cache-Control: no-cache, no-store, max-age=0, must-revalidate\r\nPragma: no-cache"/>-->
+              <!--&lt;!&ndash; Default caching &ndash;&gt;-->
+              <!--<entry name="http.cache:default" value="Cache-Control: max-age=120"/>-->
+            <!--</parameters>-->
+          <!--</command>-->
+          <!--<command pattern="GET|gephi/*"-->
+                   <!--implementation="com.orientechnologies.orient.graph.server.command.OServerCommandGetGephi"/>-->
+        <!--</commands>-->
       </listener>
     </listeners>
 
