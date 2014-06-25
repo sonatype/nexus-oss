@@ -74,7 +74,7 @@ public class OrientBootstrap
 
   @Override
   protected void doStart() throws Exception {
-    this.server = new OServer();
+    OServer server = new OServer();
     OServerConfiguration config = createConfiguration();
     server.startup(config);
 
@@ -86,6 +86,7 @@ public class OrientBootstrap
     }
 
     server.activate();
+    this.server = server;
   }
 
   private OServerConfiguration createConfiguration() {
