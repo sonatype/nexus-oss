@@ -13,13 +13,12 @@
 package org.sonatype.nexus.plugins.p2bridge.internal;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.jar.Manifest;
 
 import javax.inject.Inject;
@@ -32,13 +31,13 @@ import org.sonatype.eclipse.bridge.EclipseLocation;
 import org.sonatype.eclipse.bridge.EclipseLocationFactory;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
-import org.sonatype.nexus.util.GAVCoordinate;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.nexus.util.file.DirSupport;
 
 import com.google.common.base.Strings;
-import org.codehaus.plexus.archiver.UnArchiver;
 import org.eclipse.core.runtime.internal.adaptor.EclipseEnvironmentInfo;
+import org.eclipse.sisu.space.ClassSpace;
+import org.zeroturnaround.zip.ZipUtil;
 
 @Named
 @Singleton
@@ -58,23 +57,24 @@ class P2Runtime
 
   private final EclipseBridge eclipseBridge;
 
-  private final File pluginRepositoryDir;
+  private final ApplicationDirectories applicationDirectories;
 
   private final ApplicationConfiguration applicationConfiguration;
 
-  private final UnArchiver unArchiver;
+  private final ClassSpace space;
 
   @Inject
-  public P2Runtime(final EclipseBridge eclipseBridge, final EclipseLocationFactory eclipseLocationFactory,
+  public P2Runtime(final EclipseBridge eclipseBridge,
+                   final EclipseLocationFactory eclipseLocationFactory,
                    final ApplicationDirectories applicationDirectories,
                    final ApplicationConfiguration applicationConfiguration,
-                   final @Named("zip") UnArchiver unArchiver)
+                   final ClassSpace space)
   {
     this.eclipseBridge = eclipseBridge;
     this.eclipseLocationFactory = eclipseLocationFactory;
-    this.pluginRepositoryDir = applicationDirectories.getAppDirectory("plugin-repository");
+    this.applicationDirectories = applicationDirectories;
     this.applicationConfiguration = applicationConfiguration;
-    this.unArchiver = unArchiver;
+    this.space = space;
   }
 
   EclipseInstance get() {
@@ -90,9 +90,8 @@ class P2Runtime
     if (eclipse != null) {
       return;
     }
-    final File p2BridgePluginDir = unpackP2BridgePlugin();
-    final File p2BridgeRuntimeDir = new File(p2BridgePluginDir, "runtime");
-    final File p2BridgeTempDir = new File(p2BridgePluginDir, "tmp");
+    final File p2BridgeRuntimeDir = new File(applicationDirectories.getTemporaryDirectory(), "p2-runtime");
+    final File p2BridgeTempDir = new File(applicationDirectories.getTemporaryDirectory(), "p2-tmp");
     final File eclipseDir = new File(p2BridgeRuntimeDir, "eclipse");
 
     // if temporary plugin directory exists, remove it to avoid the fact that eclipse stores absolute paths to
@@ -114,10 +113,8 @@ class P2Runtime
       );
     }
     // create a fresh eclipse instance
-    try {
-      unArchiver.setSourceFile(new File(p2BridgePluginDir, "p2-bridge/eclipse.zip"));
-      unArchiver.setDestDirectory(p2BridgeRuntimeDir);
-      unArchiver.extract();
+    try (InputStream is = getClass().getResourceAsStream("/p2-bridge/eclipse.zip")) {
+      ZipUtil.unpack(is, p2BridgeRuntimeDir);
     }
     catch (final Exception e) {
       throw new RuntimeException("Cannot unpack Eclipse", e);
@@ -141,16 +138,10 @@ class P2Runtime
             new String[]{"-eclipse.keyring", secureStorage.getAbsolutePath()}
         );
       }
-      eclipse.start(initParams(p2BridgePluginDir, eclipseDir, p2BridgeTempDir));
-      final File[] bundles = new File(p2BridgePluginDir, "p2-bridge/bundles").listFiles(new FilenameFilter()
-      {
-        @Override
-        public boolean accept(final File dir, final String name) {
-          return name.endsWith(".jar");
-        }
-      });
-      for (final File bundle : bundles) {
-        eclipse.startBundle(eclipse.installBundle(bundle.toURI().toASCIIString()));
+      eclipse.start(initParams(eclipseDir, p2BridgeTempDir));
+      final Enumeration<URL> bundles = space.findEntries("/p2-bridge/bundles", "*.jar", false);
+      while (bundles.hasMoreElements()) {
+        eclipse.startBundle(eclipse.installBundle(bundles.nextElement().toURI().toASCIIString()));
       }
     }
     catch (final Exception e) {
@@ -158,14 +149,13 @@ class P2Runtime
     }
   }
 
-  private Map<String, String> initParams(final File p2BridgePluginDir,
-                                         final File eclipseDir,
+  private Map<String, String> initParams(final File eclipseDir,
                                          final File p2BridgeAgentsTempDir)
   {
     final Map<String, String> initParams = new HashMap<String, String>();
     initParams.put("org.eclipse.equinox.simpleconfigurator.exclusiveInstallation", "false");
     initParams.put("osgi.java.profile.bootdelegation", "none");
-    final String bridgedPackages = scanBridgedPackages(new File(p2BridgePluginDir, "p2-bridge"));
+    final String bridgedPackages = scanBridgedPackages();
     if (!Strings.isNullOrEmpty(bridgedPackages)) {
       initParams.put("org.osgi.framework.system.packages.extra", bridgedPackages);
     }
@@ -173,31 +163,25 @@ class P2Runtime
       initParams.put("osgi.debug", new File(eclipseDir, ".options").getAbsolutePath());
     }
     initParams.put(EclipseInstance.TEMPDIR_PROPERTY, p2BridgeAgentsTempDir.getAbsolutePath());
-    initParams.put("osgi.framework", findEclipseFramework(new File(p2BridgePluginDir, "lib")));
+    initParams.put("osgi.framework", findEclipseFramework(new File(eclipseDir, "plugins")));
     initParams.put("eclipse.enableStateSaver", "false");
     return initParams;
   }
 
   private static String findEclipseFramework(final File dir) {
     for (final File f : dir.listFiles()) {
-      if (f.getName().startsWith("org.eclipse.osgi")) {
+      if (f.getName().startsWith("org.eclipse.osgi_")) {
         return f.toURI().toString();
       }
     }
     throw new IllegalStateException("Could not locate org.eclipse.osgi bundle");
   }
 
-  private String scanBridgedPackages(final File dir) {
+  private String scanBridgedPackages() {
     final StringBuilder bridgedPackages = new StringBuilder();
-    final File[] manifests = dir.listFiles(new FilenameFilter()
-    {
-      @Override
-      public boolean accept(final File dir, final String name) {
-        return name.endsWith(".manifest");
-      }
-    });
-    for (final File manifestFile : manifests) {
-      try (InputStream is = new FileInputStream(manifestFile)) {
+    final Enumeration<URL> manifests = space.findEntries("/p2-bridge", "*.manifest", false);
+    while (manifests.hasMoreElements()) {
+      try (InputStream is = manifests.nextElement().openStream()) {
         final Manifest manifest = new Manifest(is);
         final String pkg = manifest.getMainAttributes().getValue("Export-Package");
         if (!Strings.isNullOrEmpty(pkg)) {
@@ -212,61 +196,6 @@ class P2Runtime
       }
     }
     return bridgedPackages.toString();
-  }
-
-  private File unpackP2BridgePlugin() {
-    final GAVCoordinate pluginGav = getP2BridgePluginGAV();
-    final File p2BridgePluginJar =
-        new File(pluginRepositoryDir, pluginGav.getArtifactId() + '-' + pluginGav.getVersion() + ".jar");
-    final File p2BridgePluginDir = new File(
-        applicationConfiguration.getTemporaryDirectory(), "nexus-p2-bridge-plugin"
-    );
-    try {
-      DirSupport.deleteIfExists(p2BridgePluginDir.toPath());
-    }
-    catch (IOException e) {
-      throw new RuntimeException(
-          "Cannot delete nexus-p2-bridge temporary directory " + p2BridgePluginDir.getAbsolutePath(), e
-      );
-    }
-    try {
-      DirSupport.mkdir(p2BridgePluginDir.toPath());
-    }
-    catch (IOException e) {
-      throw new RuntimeException(
-          "Cannot create nexus-p2-bridge temporary directory " + p2BridgePluginDir.getAbsolutePath(), e
-      );
-    }
-    try {
-      unArchiver.setSourceFile(p2BridgePluginJar);
-      unArchiver.setDestDirectory(p2BridgePluginDir);
-      unArchiver.extract();
-    }
-    catch (final Exception e) {
-      throw new RuntimeException("Cannot unpack P2 bridge plugin", e);
-    }
-    return p2BridgePluginDir;
-  }
-
-  private GAVCoordinate getP2BridgePluginGAV() {
-    final Properties props = new Properties();
-
-    final InputStream is =
-        P2Runtime.class.getResourceAsStream("/nexus-p2-plugin.properties");
-
-    if (is != null) {
-      try {
-        props.load(is);
-      }
-      catch (final IOException e) {
-        throw new RuntimeException(e.getMessage(), e);
-      }
-    }
-
-    final GAVCoordinate coordinate =
-        new GAVCoordinate("org.sonatype.nexus.plugins", "nexus-p2-bridge-plugin", props.getProperty("version"));
-
-    return coordinate;
   }
 
 }
