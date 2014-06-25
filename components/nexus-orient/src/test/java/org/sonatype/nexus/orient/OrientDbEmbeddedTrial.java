@@ -102,7 +102,7 @@ public class OrientDbEmbeddedTrial
     // Dump config to log stream
     StringWriter buff = new StringWriter();
     OGlobalConfiguration.dumpConfiguration(new PrintStream(new WriterOutputStream(buff), true));
-    log("Configuration:\n{}", buff);
+    log("Global configuration:\n{}", buff);
 
     server.activate();
     server.shutdown();
