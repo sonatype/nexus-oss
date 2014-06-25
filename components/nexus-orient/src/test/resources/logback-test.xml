@@ -20,6 +20,9 @@
     </encoder>
   </appender>
 
+  <logger name="org.sonatype.nexus.orient" level="DEBUG"/>
+  <logger name="com.orientechnologies.orient" level="DEBUG"/>
+
   <!--
   HACK: keep ODatabaseRecordAbstract anonymous bits from complaining about unsupported sbtree collections
   HACK: for 'memory' and 'local' storage (use of 'plocal' doesn't have this warning).
