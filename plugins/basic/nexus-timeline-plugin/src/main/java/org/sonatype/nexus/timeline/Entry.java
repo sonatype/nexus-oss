@@ -17,10 +17,12 @@ import java.util.Map;
 /**
  * Timeline entry.
  *
- * @since 3.0
+ * @author: cstamas
+ * @since 2.0
  */
 public interface Entry
 {
+
   long getTimestamp();
 
   String getType();

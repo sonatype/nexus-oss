@@ -126,12 +126,6 @@
       </dependency>
 
       <dependency>
-         <groupId>rome</groupId>
-         <artifactId>rome</artifactId>
-         <version>0.9</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.owasp</groupId>
         <artifactId>csrfguard</artifactId>
         <version>3.0.0</version>

@@ -33,7 +33,6 @@ import io.kazuki.v0.store.Key;
 import io.kazuki.v0.store.keyvalue.KeyValueIterable;
 import io.kazuki.v0.store.keyvalue.KeyValuePair;
 import io.kazuki.v0.store.keyvalue.KeyValueStore;
-import io.kazuki.v0.store.keyvalue.KeyValueStoreIteration.SortDirection;
 import io.kazuki.v0.store.lifecycle.Lifecycle;
 import io.kazuki.v0.store.schema.SchemaStore;
 import io.kazuki.v0.store.schema.TypeValidation;
@@ -128,7 +127,7 @@ public class DefaultCapabilityStorage
     Map<CapabilityIdentity, CapabilityStorageItem> items = Maps.newHashMap();
 
     try (KeyValueIterable<KeyValuePair<CapabilityStorageItem>> entries = keyValueStore.iterators().entries(
-        CAPABILITY_SCHEMA, CapabilityStorageItem.class, SortDirection.ASCENDING
+        CAPABILITY_SCHEMA, CapabilityStorageItem.class
     )) {
       for (KeyValuePair<CapabilityStorageItem> entry : entries) {
         items.put(asCapabilityIdentity(entry.getKey()), entry.getValue());
