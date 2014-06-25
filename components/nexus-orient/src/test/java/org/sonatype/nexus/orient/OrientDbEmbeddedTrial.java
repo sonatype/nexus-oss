@@ -12,14 +12,27 @@
  */
 package org.sonatype.nexus.orient;
 
+import java.io.File;
 import java.net.URL;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import com.google.common.collect.Lists;
+import com.orientechnologies.orient.core.Orient;
+import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.server.OServer;
 import com.orientechnologies.orient.server.OServerMain;
+import com.orientechnologies.orient.server.config.OServerConfiguration;
+import com.orientechnologies.orient.server.config.OServerEntryConfiguration;
+import com.orientechnologies.orient.server.config.OServerNetworkConfiguration;
+import com.orientechnologies.orient.server.config.OServerNetworkListenerConfiguration;
+import com.orientechnologies.orient.server.config.OServerNetworkProtocolConfiguration;
+import com.orientechnologies.orient.server.config.OServerSecurityConfiguration;
+import com.orientechnologies.orient.server.config.OServerStorageConfiguration;
+import com.orientechnologies.orient.server.config.OServerUserConfiguration;
+import com.orientechnologies.orient.server.network.protocol.binary.ONetworkProtocolBinary;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -48,11 +61,62 @@ public class OrientDbEmbeddedTrial
   }
 
   @Test
-  public void embeddedServer() throws Exception {
+  public void embeddedServerFromXml() throws Exception {
     OServer server = OServerMain.create();
     URL config = getClass().getResource("server-config.xml");
     log(config);
     server.startup(config.openStream());
+    server.activate();
+    server.shutdown();
+  }
+
+  /**
+   * Tests configuring the server w/o xml but configuring the JAXB objects directly.
+   */
+  @Test
+  public void embeddedServerProgrammatic() throws Exception {
+    File homeDir = util.createTempDir("orientdb-home").getCanonicalFile();
+    System.setProperty(Orient.ORIENTDB_HOME, homeDir.getPath());
+
+    OServer server = new OServer();
+    OServerConfiguration config = new OServerConfiguration();
+
+    File databaseDir = new File(homeDir, "db");
+    config.properties = new OServerEntryConfiguration[] {
+        new OServerEntryConfiguration("server.database.path", databaseDir.getPath())
+    };
+
+    config.handlers = Lists.newArrayList();
+
+    config.hooks = Lists.newArrayList();
+
+    config.network = new OServerNetworkConfiguration();
+    config.network.protocols = Lists.newArrayList(
+        new OServerNetworkProtocolConfiguration("binary", ONetworkProtocolBinary.class.getName())
+    );
+
+    OServerNetworkListenerConfiguration binaryListener = new OServerNetworkListenerConfiguration();
+    binaryListener.ipAddress = "0.0.0.0";
+    binaryListener.portRange = "2424-2430";
+    binaryListener.protocol = "binary";
+    binaryListener.socket = "default";
+
+    config.network.listeners = Lists.newArrayList(
+        binaryListener
+    );
+
+    config.storages = new OServerStorageConfiguration[] {};
+
+    config.users = new OServerUserConfiguration[] {
+        new OServerUserConfiguration("admin", "admin", "*")
+    };
+
+    config.security = new OServerSecurityConfiguration();
+
+    // Dumps to System.out :-(
+    OGlobalConfiguration.ENVIRONMENT_DUMP_CFG_AT_STARTUP.setValue(true);
+
+    server.startup(config);
     server.activate();
     server.shutdown();
   }
