@@ -11,40 +11,18 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Maven upload panel.
+ * Maven Upload Hosted Repository store.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.maven.MavenUpload', {
-  extend: 'NX.view.SettingsPanel',
-  alias: 'widget.nx-coreui-maven-upload',
+Ext.define('NX.coreui.store.MavenUploadRepositoryHosted', {
+  extend: 'NX.coreui.store.RepositoryReference',
 
-  items: {
-    xtype: 'nx-coreui-upload-artifact',
-    api: {
-      submit: 'NX.direct.maven_Maven.uploadArtifacts'
-    }
-  },
-
-  initComponent: function() {
-    var me = this;
-
-    me.callParent(arguments);
-
-    me.down('form').insert(0, [
-      {
-        xtype: 'combo',
-        name: 'repositoryId',
-        fieldLabel: 'Repository',
-        helpText: 'Select the repository where artifacts will be uploaded.',
-        emptyText: 'select repository',
-        queryMode: 'local',
-        displayField: 'name',
-        valueField: 'id',
-        store: 'MavenUploadRepositoryHosted',
-        editable: false
-      }
-    ]);
-  }
+  remoteFilter: true,
+  filters: [
+    { property: 'type', value: 'hosted' },
+    { property: 'format', value: 'maven2' },
+    { property: 'policy', value: 'RELEASE' }
+  ]
 
 });
