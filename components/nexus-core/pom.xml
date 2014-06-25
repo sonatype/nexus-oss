@@ -354,7 +354,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-db</artifactId>
+      <artifactId>nexus-orient</artifactId>
     </dependency>
 
     <!--JSR-303 Validation-->
