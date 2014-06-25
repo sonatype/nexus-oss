@@ -36,7 +36,6 @@
     <module>nexus-client-core</module>
     <module>nexus-configuration-model</module>
     <module>nexus-core</module>
-    <module>nexus-db</module>
     <module>nexus-ehcache</module>
     <module>nexus-extender</module>
     <module>nexus-httpclient-api</module>
@@ -46,6 +45,7 @@
     <module>nexus-locks</module>
     <module>nexus-log-api</module>
     <module>nexus-mime</module>
+    <module>nexus-orient</module>
     <module>nexus-oss-edition</module>
     <module>nexus-plugin-api</module>
     <module>nexus-repository-metadata-api</module>
