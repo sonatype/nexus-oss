@@ -47,14 +47,17 @@ import com.google.inject.name.Names;
 import io.kazuki.v0.store.journal.JournalStore;
 import io.kazuki.v0.store.journal.PartitionInfoSnapshot;
 import io.kazuki.v0.store.keyvalue.KeyValueIterable;
-import org.hamcrest.MatcherAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 

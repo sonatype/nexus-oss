@@ -29,8 +29,6 @@ import com.google.common.collect.Maps;
 public final class EntryRecord
     implements Entry
 {
-  public static final String SCHEMA_NAME = "timeline-entry";
-
   private final long timestamp;
 
   private final String type;
