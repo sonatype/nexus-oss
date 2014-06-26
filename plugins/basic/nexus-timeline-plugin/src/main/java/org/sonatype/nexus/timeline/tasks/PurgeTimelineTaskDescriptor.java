@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.timeline.tasks;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
@@ -22,14 +22,7 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 
-import com.google.common.collect.ImmutableList;
-
-/**
- * Task descriptor for {@link PurgeTimelineTask}.
- *
- * @since 3.0
- */
-@Named(PurgeTimelineTaskDescriptor.ID)
+@Named("PurgeTimeline")
 @Singleton
 public class PurgeTimelineTaskDescriptor
     extends AbstractScheduledTaskDescriptor
@@ -38,30 +31,25 @@ public class PurgeTimelineTaskDescriptor
 
   public static final String OLDER_THAN_FIELD_ID = "purgeOlderThan";
 
-  private final NumberTextFormField olderThanField;
+  private final NumberTextFormField olderThanField = new NumberTextFormField(OLDER_THAN_FIELD_ID,
+      "Purge items older than (days)",
+      "Set the number of days, to purge all items that were trashed before the given number of days.",
+      FormField.MANDATORY);
 
-  private final List<FormField> formFields;
-
-  public PurgeTimelineTaskDescriptor() {
-    this.olderThanField = new NumberTextFormField(OLDER_THAN_FIELD_ID,
-        "Purge items older than (days)",
-        "Set the number of days, to purge all items that were trashed before the given number of days.",
-        FormField.MANDATORY);
-    this.formFields = ImmutableList.<FormField>of(olderThanField);
-  }
-
-  @Override
   public String getId() {
     return ID;
   }
 
-  @Override
   public String getName() {
-    return "Purge Timeline";
+    return "Purge Nexus Timeline";
   }
 
   @Override
   public List<FormField> formFields() {
-    return formFields;
+    List<FormField> fields = new ArrayList<FormField>();
+
+    fields.add(olderThanField);
+
+    return fields;
   }
 }

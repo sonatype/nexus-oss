@@ -85,6 +85,12 @@
       <artifactId>nexus-plugin-console-plugin</artifactId>
     </dependency>
 
+    <!-- NEXUS-639 (Timeline) -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-timeline-plugin</artifactId>
+    </dependency>
+
     <!-- NEXUS-156 (RRB perms) -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
