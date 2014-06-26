@@ -22,7 +22,7 @@ Ext.define('NX.coreui.view.maven.MavenUpload', {
   items: {
     xtype: 'nx-coreui-upload-artifact',
     api: {
-      submit: 'NX.direct.maven_Maven.uploadArtifacts'
+      submit: 'NX.direct.coreui_MavenUpload.uploadArtifacts'
     }
   },
 

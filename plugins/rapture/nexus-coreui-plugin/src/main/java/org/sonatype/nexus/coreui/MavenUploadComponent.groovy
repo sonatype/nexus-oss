@@ -53,8 +53,8 @@ import java.security.cert.X509Certificate
  */
 @Named
 @Singleton
-@DirectAction(action = 'maven_Maven')
-class MavenComponent
+@DirectAction(action = 'coreui_MavenUpload')
+class MavenUploadComponent
 extends DirectComponentSupport
 {
 
