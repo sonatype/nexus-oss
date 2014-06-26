@@ -17,18 +17,21 @@
  */
 Ext.define('NX.coreui.controller.MavenUpload', {
   extend: 'Ext.app.Controller',
-  requires: [
-    'NX.coreui.store.RepositoryReference'
-  ],
 
+  stores: [
+    'MavenUploadRepositoryHosted'
+  ],
   views: [
     'maven.MavenUpload'
+  ],
+  refs: [
+    { ref: 'uploadPanel', selector: 'nx-coreui-maven-upload' }
   ],
 
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.getApplication().getFeaturesController().registerFeature({
@@ -40,10 +43,36 @@ Ext.define('NX.coreui.controller.MavenUpload', {
         file: 'upload.png',
         variants: ['x16', 'x32']
       },
-      visible: function () {
+      visible: function() {
         return NX.Permissions.check('nexus:artifact', 'create');
       }
     });
+
+    me.listen({
+      controller: {
+        '#Refresh': {
+          refresh: me.loadRepositories
+        }
+      },
+      component: {
+        'nx-coreui-maven-upload': {
+          beforerender: me.loadRepositories
+        }
+      }
+    });
+  },
+
+  /**
+   * @private
+   * Loads repositories if upload panel is active.
+   */
+  loadRepositories: function() {
+    var me = this,
+        uploadPanel = me.getUploadPanel();
+
+    if (uploadPanel) {
+      me.getMavenUploadRepositoryHostedStore().load();
+    }
   }
 
 });
