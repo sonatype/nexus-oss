@@ -243,7 +243,7 @@ public class DefaultTimeline
   public void retrieve(final int fromItem, final int count, final Set<String> types, final Set<String> subTypes,
       final Predicate<Entry> filter, final TimelineCallback callback)
   {
-    if (!isStarted()) {
+    if (!isStarted() || count == 0) {
       return;
     }
     try (ODatabaseDocumentTx db = db()) {
