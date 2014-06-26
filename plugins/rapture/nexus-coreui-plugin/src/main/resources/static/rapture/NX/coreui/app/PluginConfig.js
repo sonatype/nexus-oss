@@ -41,9 +41,6 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.BrowseRepositories',
     'NX.coreui.controller.BrowseStorage',
     'NX.coreui.controller.BrowseIndex',
-    'NX.coreui.controller.ComponentSummary',
-    'NX.coreui.controller.ComponentLicense',
-    'NX.coreui.controller.ComponentSecurity',
     'NX.coreui.controller.FeatureGroups',
     'NX.coreui.controller.Feeds',
     'NX.coreui.controller.HttpSettings',
@@ -100,6 +97,8 @@ Ext.define('NX.coreui.app.PluginConfig', {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-ssl-plugin');
       }
     },
+    'NX.coreui.controller.StorageFileInfo',
+    'NX.coreui.controller.StorageFileMavenInfo',
     'NX.coreui.controller.SupportRequest',
     { id: 'NX.coreui.controller.SupportZip',
       active: function () {

@@ -11,41 +11,17 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Component summary panel.
+ * Browse Managed Repository store.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.component.ComponentSummary', {
-  extend: 'Ext.Panel',
-  alias: 'widget.nx-coreui-component-summary',
+Ext.define('NX.coreui.store.BrowseManagedRepository', {
+  extend: 'NX.coreui.store.Repository',
 
-  buttonConfig: {
-    tooltip: 'Summary',
-    iconCls: NX.Icons.cls('component-summary', 'x32')
-  },
-
-  items: [
-    {
-      xtype: 'panel',
-      margin: 5,
-      layout: 'hbox',
-      style: {
-        marginBottom: '10px'
-      },
-      items: [
-        { xtype: 'component', html: NX.Icons.img('component-summary', 'x16') },
-        { xtype: 'label',
-          itemId: 'title',
-          margin: '0 0 0 5',
-          style: {
-            'color': '#000000',
-            'font-size': '16px',
-            'font-weight': 'bold',
-            'text-align': 'center'
-          }
-        }
-      ]
-    }
+  remoteFilter: true,
+  filters: [
+    { property: 'includeUserManaged', value: 'false' },
+    { property: 'includeNexusManaged', value: 'true' }
   ]
 
 });

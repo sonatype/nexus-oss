@@ -16,9 +16,12 @@ import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.commons.io.FilenameUtils
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
+import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.proxy.ResourceStoreRequest
+import org.sonatype.nexus.proxy.access.AccessManager
 import org.sonatype.nexus.proxy.item.StorageCollectionItem
 import org.sonatype.nexus.proxy.item.StorageFileItem
 import org.sonatype.nexus.proxy.item.StorageItem
@@ -47,15 +50,18 @@ extends DirectComponentSupport
 
   @Named("protected")
   @Inject
-  RepositoryRegistry repositoryRegistry
+  RepositoryRegistry protectedRepositoryRegistry
 
   @Inject
   RepositoryRouter repositoryRouter
 
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
-  List<RepositoryStorageItemXO> read(final String repositoryId, final String path) {
-    def repository = repositoryRegistry.getRepository(repositoryId)
+  @Validate
+  List<RepositoryStorageItemXO> read(final @NotEmpty(message = '[repositoryId] may not be empty') String repositoryId,
+                                     final @NotEmpty(message = '[path] may not be empty') String path)
+  {
+    def repository = protectedRepositoryRegistry.getRepository(repositoryId)
     def request = new ResourceStoreRequest(path, true, false)
     StorageItem item = repository.retrieveItem(request)
     def itemXOs = render(item)
@@ -65,6 +71,35 @@ extends DirectComponentSupport
       }
     }
     return itemXOs
+  }
+
+  @DirectMethod
+  @RequiresPermissions('nexus:repositories:read')
+  @Validate
+  RepositoryStorageItemInfoXO readInfo(final @NotEmpty(message = '[repositoryId] may not be empty') String repositoryId,
+                                       final @NotEmpty(message = '[path] may not be empty') String path)
+  {
+    def repository = protectedRepositoryRegistry.getRepository(repositoryId)
+    def request = new ResourceStoreRequest(path, true, false)
+    StorageItem item = repository.retrieveItem(request)
+    if (item instanceof StorageLinkItem) {
+      item = repositoryRouter.dereferenceLink(item, true, false)
+    }
+    return new RepositoryStorageItemInfoXO(
+        repositoryId: repositoryId,
+        path: item.path,
+        createdBy: item.repositoryItemAttributes.get(AccessManager.REQUEST_USER),
+        created: new Date(item.created),
+        modified: new Date(item.modified),
+        sha1: item.repositoryItemAttributes.get(StorageFileItem.DIGEST_SHA1_KEY),
+        md5: item.repositoryItemAttributes.get(StorageFileItem.DIGEST_MD5_KEY),
+        size: item instanceof StorageFileItem ? item.length : null,
+        repositories: protectedRepositoryRegistry.repositories.findResults {
+
+        }.collect {
+          new ReferenceXO(id: it.id, name: it.name)
+        }
+    )
   }
 
   List<RepositoryStorageItemXO> render(final StorageItem item) {

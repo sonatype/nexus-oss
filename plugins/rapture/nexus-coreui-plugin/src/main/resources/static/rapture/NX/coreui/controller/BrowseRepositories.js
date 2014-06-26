@@ -16,78 +16,75 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.BrowseRepositories', {
-  extend: 'Ext.app.Controller',
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
+  extend: 'NX.controller.MasterDetail',
 
+  list: 'nx-coreui-repositorybrowse-list',
+
+  stores: [
+    'BrowseManagedRepository',
+    'BrowseStandardRepository'
+  ],
   views: [
-    'repository.RepositoryBrowseManagedFeature',
-    'repository.RepositoryBrowseManagedList',
-    'repository.RepositoryBrowseStandardFeature',
-    'repository.RepositoryBrowseStandardList'
+    'repositorybrowse.BrowseManagedRepositoryFeature',
+    'repositorybrowse.BrowseManagedRepositoryList',
+    'repositorybrowse.BrowseStandardRepositoryFeature',
+    'repositorybrowse.BrowseStandardRepositoryList'
   ],
   refs: [
+    { ref: 'list', selector: 'nx-coreui-repositorybrowse-list' }
+  ],
+  icons: [
     {
-      ref: 'list',
-      selector: 'nx-coreui-repository-browse-list'
+      'repository-managed': {
+        file: 'database_yellow.png',
+        variants: ['x16', 'x32']
+      }
     }
   ],
+  features: [
+    {
+      mode: 'browse',
+      path: '/Repository/Standard',
+      description: 'Browse standard repositories',
+      view: { xtype: 'nx-coreui-repositorybrowse-standard-feature' },
+      weight: 10,
+      authenticationRequired: false,
+      iconConfig: {
+        file: 'database.png',
+        variants: ['x16', 'x32']
+      },
+      visible: function() {
+        return NX.Permissions.check('nexus:repositories', 'read');
+      }
+    },
+    {
+      mode: 'browse',
+      path: '/Repository/Managed',
+      description: 'Browse managed repositories',
+      view: { xtype: 'nx-coreui-repositorybrowse-managed-feature' },
+      weight: 300,
+      iconConfig: {
+        file: 'database_yellow.png',
+        variants: ['x16', 'x32']
+      },
+      visible: function() {
+        return NX.Permissions.check('nexus:repositories', 'read');
+      }
+    }
+  ],
+  permission: 'nexus:repositories',
 
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
-    me.getApplication().getFeaturesController().registerFeature([
-      {
-        mode: 'browse',
-        path: '/Repository/Standard',
-        description: 'Browse standard repositories',
-        view: { xtype: 'nx-coreui-repository-browse-standard-feature' },
-        weight: 10,
-        authenticationRequired: false,
-        iconConfig: {
-          file: 'database.png',
-          variants: ['x16', 'x32']
-        },
-        visible: function () {
-          return NX.Permissions.check('nexus:repositories', 'read');
-        }
-      },
-      {
-        mode: 'browse',
-        path: '/Repository/Managed',
-        description: 'Browse managed repositories',
-        view: { xtype: 'nx-coreui-repository-browse-managed-feature' },
-        weight: 300,
-        iconConfig: {
-          file: 'database_yellow.png',
-          variants: ['x16', 'x32']
-        },
-        visible: function () {
-          return NX.Permissions.check('nexus:repositories', 'read');
-        }
-      }
-    ]);
+    me.callParent(arguments);
 
     me.listen({
-      controller: {
-        '#Bookmarking': {
-          navigate: me.navigateTo
-        },
-        '#Refresh': {
-          refresh: me.refresh
-        }
-      },
       component: {
-        'nx-coreui-repository-browse-list': {
-          beforerender: me.load,
-          selectionchange: me.onSelectionChange,
-          itemdblclick: me.onItemDblClick
-        },
-        'nx-coreui-repository-browse-standard-list button[action=admin]': {
+        'nx-coreui-repositorybrowse-list button[action=admin]': {
           afterrender: me.bindAdminButton,
           click: me.navigateToAdminMode
         }
@@ -95,79 +92,15 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     });
   },
 
-  refresh: function () {
-    var me = this,
-        list = me.getList();
-
-    if (list) {
-      me.load(list);
-    }
+  getDescription: function(model) {
+    return model.get('name');
   },
 
-  load: function (list) {
+  onSelection: function(list, model) {
     var me = this;
 
-    if (!list.repositoryStore) {
-      list.repositoryStore = Ext.create('NX.coreui.store.Repository', { remoteFilter: true });
-      list.repositoryStore.filter({ property: 'includeNexusManaged', value: 'true' });
-    }
-    else {
-      list.repositoryStore.filter();
-    }
-    list.getStore().on('load', function () {
-      me.navigateTo(NX.Bookmarks.getBookmark());
-    }, me, { single: true });
-    list.getStore().load();
-  },
+    if (Ext.isDefined(model)) {
 
-  onSelectionChange: function (selectionModel, selected) {
-    var me = this,
-        list = me.getList(),
-        bookmark = NX.Bookmarks.fromToken(NX.Bookmarks.getBookmark().getSegment(0)),
-        repositoryModel;
-
-    if (selected.length) {
-      repositoryModel = list.repositoryStore.getById(selected[0].getId());
-      list.setTitle(repositoryModel ? repositoryModel.get('name') : '');
-      if (repositoryModel) {
-        list.fireEvent('selection', list, repositoryModel);
-      }
-      bookmark.appendSegments(encodeURIComponent(selected[0].getId()));
-    }
-    NX.Bookmarks.bookmark(bookmark, me);
-  },
-
-  onItemDblClick: function () {
-    var me = this,
-        list = me.getList();
-
-    list.collapse();
-  },
-
-  /**
-   * @private
-   * @param {NX.Bookmark} bookmark to navigate to
-   */
-  navigateTo: function (bookmark) {
-    var me = this,
-        list = me.getList(),
-        store, modelId, model;
-
-    if (list && bookmark) {
-      modelId = bookmark.getSegment(1);
-      if (modelId) {
-        modelId = decodeURIComponent(modelId);
-        me.logDebug('Navigate to: ' + modelId);
-        store = list.getStore();
-        model = store.getById(modelId);
-        if (model) {
-          list.getSelectionModel().select(model, false, false);
-          list.getView().focusRow(model);
-        }
-      }
-      else {
-        list.getSelectionModel().deselectAll();
-      }
     }
   },
 
@@ -175,7 +108,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
    * @protected
    * Show 'Admin' when user has 'update' permission.
    */
-  bindAdminButton: function (button) {
+  bindAdminButton: function(button) {
     button.mon(
         NX.Conditions.and(
             NX.Conditions.isPermitted('nexus:repositories', 'update')
@@ -188,7 +121,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     );
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.gridHasSelection('nx-coreui-repository-browse-list')
+            NX.Conditions.gridHasSelection('nx-coreui-repositorybrowse-list')
         ),
         {
           satisfied: button.enable,
@@ -198,7 +131,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     );
   },
 
-  navigateToAdminMode: function (button) {
+  navigateToAdminMode: function(button) {
     var list = button.up('grid');
 
     NX.Bookmarks.navigateTo(NX.Bookmarks.fromSegments([

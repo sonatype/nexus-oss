@@ -597,8 +597,12 @@ extends DirectComponentSupport
       hasAnyOfContentClasses(contentClasses)?.with(filter)
       hasNoneOfContentClasses(contentClasses)?.with(filter)
 
+      def includeUserManagedFilter = parameters.getFilter('includeUserManaged')
+      if (includeUserManagedFilter) {
+        includeUserManaged = Boolean.valueOf(includeUserManagedFilter)
+      }
       def includeNexusManagedFilter = parameters.getFilter('includeNexusManaged')
-      if (includeNexusManagedFilter != null) {
+      if (includeNexusManagedFilter) {
         includeNexusManaged = Boolean.valueOf(includeNexusManagedFilter)
       }
     }

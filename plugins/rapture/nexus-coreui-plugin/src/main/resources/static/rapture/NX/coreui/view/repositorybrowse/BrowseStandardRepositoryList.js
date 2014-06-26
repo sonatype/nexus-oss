@@ -11,41 +11,14 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Component CLM Security Issues panel.
+ * Browse Standard Repository grid.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.component.ComponentSecurity', {
-  extend: 'Ext.Panel',
-  alias: 'widget.nx-coreui-component-security',
+Ext.define('NX.coreui.view.repositorybrowse.BrowseStandardRepositoryList', {
+  extend: 'NX.coreui.view.repositorybrowse.BrowseRepositoryList',
+  alias: 'widget.nx-coreui-repositorybrowse-standard-list',
 
-  buttonConfig: {
-    tooltip: 'Security Issues',
-    iconCls: NX.Icons.cls('component-security', 'x32')
-  },
-
-  items: [
-    {
-      xtype: 'panel',
-      margin: 5,
-      layout: 'hbox',
-      style: {
-        marginBottom: '10px'
-      },
-      items: [
-        { xtype: 'component', html: NX.Icons.img('component-security', 'x16') },
-        { xtype: 'label',
-          itemId: 'title',
-          margin: '0 0 0 5',
-          style: {
-            'color': '#000000',
-            'font-size': '16px',
-            'font-weight': 'bold',
-            'text-align': 'center'
-          }
-        }
-      ]
-    }
-  ]
+  store: 'BrowseStandardRepository'
 
 });

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Browse repository / storage controller.
+ * Browse storage controller.
  *
  * @since 3.0
  */
@@ -19,37 +19,19 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
   extend: 'Ext.app.Controller',
 
   views: [
-    'repository.RepositoryBrowseStorage',
-    'repository.RepositoryBrowseStorageTree',
-    'component.ComponentDetail'
+    'repositorybrowse.BrowseStorage',
+    'repositorybrowse.BrowseStorageTree',
+    'repositorybrowse.StorageFileContainer'
   ],
   refs: [
-    {
-      ref: 'feature',
-      selector: 'nx-coreui-repository-browse-feature'
-    },
-    {
-      ref: 'list',
-      selector: 'nx-coreui-repository-browse-list'
-    },
-    {
-      ref: 'panel',
-      selector: 'nx-coreui-repository-browse-storage'
-    },
-    {
-      ref: 'tree',
-      selector: 'nx-coreui-repository-browse-storage-tree'
-    },
-    {
-      ref: 'componentDetail',
-      selector: 'nx-coreui-component-detail'
-    }
+    { ref: 'tree', selector: 'nx-coreui-repositorybrowse-storage-tree' },
+    { ref: 'storageFileContainer', selector: 'nx-coreui-repositorybrowse-storagefilecontainer' }
   ],
 
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.getApplication().getIconController().addIcons({
@@ -85,14 +67,10 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
 
     me.listen({
       component: {
-        'nx-coreui-repository-browse-list': {
+        'nx-coreui-repositorybrowse-list': {
           selection: me.onSelection
         },
-        'nx-coreui-repository-browse-storage': {
-          activate: me.onActivate,
-          deactivate: me.onDeactivate
-        },
-        'nx-coreui-repository-browse-storage-tree': {
+        'nx-coreui-repositorybrowse-storage-tree': {
           select: me.onNodeSelected,
           beforeitemexpand: me.onBeforeItemExpand
         }
@@ -100,53 +78,36 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
     });
   },
 
-  onActivate: function (panel) {
+  onSelection: function(repositoryGrid, repositoryModel) {
     var me = this;
 
-    panel.active = true;
-    me.buildTree(me.getList().getSelectionModel().getSelection()[0]);
+    me.buildTree(repositoryModel);
   },
 
-  onDeactivate: function (panel) {
-    panel.active = false;
-  },
-
-  onSelection: function (repositoryGrid, repositoryModel) {
-    var me = this,
-        panel = me.getPanel();
-
-    if (!panel) {
-      panel = me.getFeature().addTab({ xtype: 'nx-coreui-repository-browse-storage', title: 'Storage' });
-    }
-    if (panel.active) {
-      me.buildTree(repositoryModel);
-    }
-  },
-
-  buildTree: function (repositoryModel) {
+  buildTree: function(repositoryModel) {
     var me = this,
         tree = me.getTree();
 
     tree.getStore().setRootNode({
       repositoryId: repositoryModel.getId(),
+      path: '/',
       text: repositoryModel.get('name')
     });
     me.onNodeSelected(tree, tree.getStore().getRootNode());
   },
 
-  onNodeSelected: function (tree, node) {
+  onNodeSelected: function(tree, node) {
     var me = this;
-
-    me.getComponentDetail().setComponent(node.isRoot() ? undefined : {
-      repositoryId: node.get('repositoryId'),
-      uri: node.get('path')
-    });
+    me.getStorageFileContainer().showStorageFile(
+        node.get('repositoryId'),
+        node.isLeaf() ? node.get('path') : undefined
+    );
   },
 
-  onBeforeItemExpand: function (node) {
+  onBeforeItemExpand: function(node) {
     if (!node.processed) {
       node.processed = true;
-      NX.direct.coreui_RepositoryStorage.read(node.get('repositoryId'), node.getPath('name'), function (response) {
+      NX.direct.coreui_RepositoryStorage.read(node.get('repositoryId'), node.get('path'), function(response) {
         if (Ext.isDefined(response) && response.success && response.data && response.data.length) {
           Ext.suspendLayouts();
           node.appendChild(response.data);
