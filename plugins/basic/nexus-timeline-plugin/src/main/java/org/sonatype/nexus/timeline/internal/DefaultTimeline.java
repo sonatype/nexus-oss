@@ -34,8 +34,9 @@ import org.sonatype.nexus.timeline.TimelineCallback;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
-import com.google.common.base.Joiner;
+import com.google.common.annotations.VisibleForTesting;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -70,9 +71,11 @@ public class DefaultTimeline
 {
   private static final String DB_LOCATION = "db/timeline";
 
-  private static final String DB_CLASS = "entryrecord";
+  @VisibleForTesting
+  static final String DB_CLASS = "entryrecord";
 
-  private static final String DB_CLUSTER_PREFIX = DB_CLASS + "_cluster";
+  @VisibleForTesting
+  static final String DB_CLUSTER_PREFIX = DB_CLASS + "_cluster_";
 
   private static final String P_TIMESTAMP = "timestamp";
 
@@ -168,7 +171,8 @@ public class DefaultTimeline
     pool = null;
   }
 
-  private ODatabaseDocumentTx db() {
+  @VisibleForTesting
+  ODatabaseDocumentTx db() {
     ensureStarted();
     return pool.acquire();
   }
@@ -216,7 +220,7 @@ public class DefaultTimeline
 
   private synchronized int maybeAddNewCluster(final long timestamp) {
     try (ODatabaseDocumentTx db = db()) {
-      final String name = String.format("%s_%s", DB_CLUSTER_PREFIX,
+      final String name = String.format("%s%s", DB_CLUSTER_PREFIX,
           new DateMidnight(timestamp, DateTimeZone.UTC).toString("YYYYMMdd"));
       int cid = db.getClusterIdByName(name); // undocumented: if cluster not exists, returns -1
       if (cid == -1) {
@@ -249,10 +253,10 @@ public class DefaultTimeline
         sb.append(P_TYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(types)).append("\"] AND ");
       }
       if (subTypes != null && !subTypes.isEmpty()) {
-        sb.append(P_SUBTYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(types)).append("\"] AND ");
+        sb.append(P_SUBTYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(subTypes)).append("\"] AND ");
       }
-      sb.append("1=1 ");
-      sb.append("ORDER BY ").append(P_TIMESTAMP).append(" DESC ");
+      sb.append("'1'='1' ");
+      sb.append("ORDER BY @rid desc "); // .append(P_TIMESTAMP).append(" DESC ");
       sb.append("SKIP ").append(fromItem).append(" LIMIT ").append(count);
 
       log.info("Query: {}", sb.toString());
@@ -285,17 +289,17 @@ public class DefaultTimeline
     }
     try (ODatabaseDocumentTx db = db()) {
       final DateMidnight nowDm = new DateMidnight(DateTimeZone.UTC);
+      final int prefixLen = DB_CLUSTER_PREFIX.length();
       final int[] cids = db.getMetadata().getSchema().getClass(DB_CLASS).getClusterIds();
       for (int cid : cids) {
         final String name = db.getClusterNameById(cid);
         if (name.startsWith(DB_CLUSTER_PREFIX)) {
-          final int year = Integer.parseInt(name.substring(DB_CLUSTER_PREFIX.length(), DB_CLUSTER_PREFIX.length() + 4));
-          final int month = Integer.parseInt(name.substring(DB_CLUSTER_PREFIX.length() + 4,
-              DB_CLUSTER_PREFIX.length() + 6));
-          final int day = Integer.parseInt(name.substring(DB_CLUSTER_PREFIX.length() + 6,
-              DB_CLUSTER_PREFIX.length() + 8));
+          final int year = Integer.parseInt(name.substring(prefixLen, prefixLen + 4));
+          final int month = Integer.parseInt(name.substring(prefixLen + 4, prefixLen + 6));
+          final int day = Integer.parseInt(name.substring(prefixLen + 6, prefixLen + 8));
           final DateMidnight clusterDm = new DateMidnight(year, month, day, DateTimeZone.UTC);
-          if (Days.daysBetween(nowDm, clusterDm).getDays() >= days) {
+          if (Days.daysBetween(clusterDm, nowDm).getDays() >= days) {
+            log.info("Cluster {}, is {} days old, purging it", days, name, Days.daysBetween(clusterDm, nowDm).getDays());
             OSchema schema = db.getMetadata().getSchema();
             OClass type = schema.getClass(DB_CLASS);
             type.removeClusterId(cid);
