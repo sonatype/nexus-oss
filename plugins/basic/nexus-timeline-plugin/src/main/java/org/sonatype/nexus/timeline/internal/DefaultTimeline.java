@@ -230,7 +230,7 @@ public class DefaultTimeline
         type.addClusterId(cid);
         type.setDefaultClusterId(cid);
         schema.save();
-        log.debug("Created new journal cluster; id: {}, name: {}", cid, name);
+        log.info("Created new journal cluster; id: {}, name: {}", cid, name);
         return cid;
       }
       else {
@@ -299,7 +299,7 @@ public class DefaultTimeline
           final int day = Integer.parseInt(name.substring(prefixLen + 6, prefixLen + 8));
           final DateMidnight clusterDm = new DateMidnight(year, month, day, DateTimeZone.UTC);
           if (Days.daysBetween(clusterDm, nowDm).getDays() >= days) {
-            log.info("Cluster {}, is {} days old, purging it", days, name, Days.daysBetween(clusterDm, nowDm).getDays());
+            log.info("Cluster {}, is {} days old, purging it", name, Days.daysBetween(clusterDm, nowDm).getDays());
             OSchema schema = db.getMetadata().getSchema();
             OClass type = schema.getClass(DB_CLASS);
             type.removeClusterId(cid);

@@ -31,6 +31,10 @@ import org.sonatype.sisu.goodies.common.Time;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.joda.time.DateTimeZone;
+
+import org.joda.time.DateMidnight;
+import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.google.common.collect.Collections2;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
@@ -57,6 +61,10 @@ import static org.mockito.Mockito.when;
 public class DefaultTimelineTest
     extends TestSupport
 {
+  static {
+    OGlobalConfiguration.STORAGE_KEEP_OPEN.setValue(false);
+  }
+
   @Mock
   private ApplicationDirectories applicationDirectories;
 
@@ -183,7 +191,7 @@ public class DefaultTimelineTest
 
   @Test
   public void partitioningByDay() throws Exception {
-    final long now = System.currentTimeMillis();
+    final long now = new DateMidnight(DateTimeZone.UTC).getMillis();
     defaultNexusTimeline
         .add(new EntryRecord(now - TimeUnit.DAYS.toMillis(2), "TEST", "1", ImmutableMap.of("day", "1")));
     defaultNexusTimeline
