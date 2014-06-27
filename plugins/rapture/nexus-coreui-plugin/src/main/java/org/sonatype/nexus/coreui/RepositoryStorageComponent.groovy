@@ -66,6 +66,7 @@ extends DirectComponentSupport
     StorageItem item = repository.retrieveItem(request)
     def itemXOs = render(item)
     itemXOs.each { itemXO ->
+      itemXO.repositoryId = repositoryId
       if (itemXO.leaf) {
         itemXO.type = FilenameUtils.getExtension(itemXO.name)
       }
