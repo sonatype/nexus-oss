@@ -26,17 +26,12 @@ import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
 import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.nexus.timeline.TimelineCallback;
-import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.Time;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.joda.time.DateTimeZone;
-
-import org.joda.time.DateMidnight;
-import com.orientechnologies.orient.core.config.OGlobalConfiguration;
-import com.google.common.collect.Collections2;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -44,11 +39,17 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.mockito.Mock;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -65,6 +66,9 @@ public class DefaultTimelineTest
     OGlobalConfiguration.STORAGE_KEEP_OPEN.setValue(false);
   }
 
+  @Rule
+  public TestName testName = new TestName();
+
   @Mock
   private ApplicationDirectories applicationDirectories;
 
@@ -75,8 +79,9 @@ public class DefaultTimelineTest
 
   @Before
   public void prepare() throws Exception {
-    final File timelineWorkdir = util.resolveFile("target/workdir");
-    DirSupport.deleteIfExists(timelineWorkdir.toPath());
+    final File timelineWorkdir = util.resolveFile("target/workdir/");
+    // final File timelineWorkdir = util.resolveFile("target/workdir/" + testName.getMethodName());
+    // DirSupport.deleteIfExists(timelineWorkdir.toPath());
     timelineWorkdir.mkdirs();
     when(applicationDirectories.getWorkDirectory(anyString())).thenReturn(timelineWorkdir);
 
@@ -92,6 +97,7 @@ public class DefaultTimelineTest
     final Injector injector = Guice.createInjector(testModule); // , new TimelineModule());
     defaultNexusTimeline = (DefaultTimeline) injector.getInstance(Timeline.class);
     defaultNexusTimeline.start();
+    defaultNexusTimeline.purgeOlderThan(0);
   }
 
   @After

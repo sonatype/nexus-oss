@@ -34,8 +34,9 @@ import org.sonatype.nexus.timeline.TimelineCallback;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
-import com.google.common.annotations.VisibleForTesting;
+import com.orientechnologies.orient.core.sql.OCommandSQL;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
@@ -85,9 +86,9 @@ public class DefaultTimeline
 
   private static final String P_DATA = "data";
 
-  private static final String I_TYPE = "typeIdx";
+  private static final String I_TYPE = DB_CLASS + "." + P_TYPE;
 
-  private static final String I_SUBTYPE = "subtypeIdx";
+  private static final String I_SUBTYPE = DB_CLASS + "." + P_SUBTYPE;
 
   private final File databaseDirectory;
 
@@ -146,12 +147,13 @@ public class DefaultTimeline
         type.createProperty(P_TYPE, OType.STRING);
         type.createProperty(P_SUBTYPE, OType.STRING);
         type.createProperty(P_DATA, OType.EMBEDDEDMAP);
-        type.createIndex(I_TYPE, INDEX_TYPE.NOTUNIQUE_HASH_INDEX, P_TYPE);
-        type.createIndex(I_SUBTYPE, INDEX_TYPE.NOTUNIQUE_HASH_INDEX, P_SUBTYPE);
+        // TODO: not using indexes as they break with dropped clusters
+        // See https://groups.google.com/forum/#!topic/orient-database/HYMUAaMq4y8
+        // type.createIndex(I_TYPE, INDEX_TYPE.NOTUNIQUE_HASH_INDEX, P_TYPE);
+        // type.createIndex(I_SUBTYPE, INDEX_TYPE.NOTUNIQUE_HASH_INDEX, P_SUBTYPE);
 
         // make sure cluster selection is set, as we rely on clustering
         type.setClusterSelection(ODefaultClusterSelectionStrategy.NAME);
-        // cluster will be created and set on 1st addition, if needed
 
         schema.save();
         log.info("Created schema: {}, properties: {}", type, type.properties());
@@ -205,37 +207,55 @@ public class DefaultTimeline
   }
 
   private void addEntryRecord(final List<EntryRecord> records) {
-    for (EntryRecord record : records) {
-      maybeAddNewCluster(record.getTimestamp());
-      try (ODatabaseDocumentTx db = db()) {
-        ODocument doc = db.newInstance(DB_CLASS);
-        doc.field(P_TIMESTAMP, record.getTimestamp());
-        doc.field(P_TYPE, record.getType());
-        doc.field(P_SUBTYPE, record.getSubType());
-        doc.field(P_DATA, record.getData());
-        doc.save();
+    if (records.isEmpty()) {
+      return; // spare resources from getting DB for nothing
+    }
+    try (ODatabaseDocumentTx db = db()) {
+      db.begin();
+      try {
+        for (EntryRecord record : records) {
+          maybeAddNewCluster(db, record.getTimestamp());
+          ODocument doc = db.newInstance(DB_CLASS);
+          doc.field(P_TIMESTAMP, record.getTimestamp());
+          doc.field(P_TYPE, record.getType());
+          doc.field(P_SUBTYPE, record.getSubType());
+          doc.field(P_DATA, record.getData());
+          doc.save();
+        }
+        db.commit();
+      }
+      catch (Exception e) {
+        db.rollback();
+        throw Throwables.propagate(e);
       }
     }
   }
 
-  private synchronized int maybeAddNewCluster(final long timestamp) {
-    try (ODatabaseDocumentTx db = db()) {
-      final String name = String.format("%s%s", DB_CLUSTER_PREFIX,
-          new DateMidnight(timestamp, DateTimeZone.UTC).toString("YYYYMMdd"));
-      int cid = db.getClusterIdByName(name); // undocumented: if cluster not exists, returns -1
-      if (cid == -1) {
-        cid = db.addCluster(name, CLUSTER_TYPE.PHYSICAL);
-        final OSchema schema = db.getMetadata().getSchema();
-        final OClass type = schema.getClass(DB_CLASS);
-        type.addClusterId(cid);
-        type.setDefaultClusterId(cid);
-        schema.save();
-        log.info("Created new journal cluster; id: {}, name: {}", cid, name);
-        return cid;
-      }
-      else {
-        return cid;
-      }
+  /**
+   * Adds new cluster if not exists, based on cluster name formed out of passed in timestamp. Clusters have common
+   * prefixes (see {@link #DB_CLUSTER_PREFIX}) and suffix is timestamp's date (rounded to midnight) as string with
+   * pattern {@code YYYYMMDD}. As OrientDB DDL is not atomic, this method must be mutually exclusive with method
+   * {@link #purgeOlderThan(int)}, hence both are synchronized.
+   */
+  private synchronized int maybeAddNewCluster(final ODatabaseDocumentTx db, final long timestamp) {
+    final String name = String.format("%s%s", DB_CLUSTER_PREFIX,
+        new DateMidnight(timestamp, DateTimeZone.UTC).toString("YYYYMMdd"));
+    int cid = db.getClusterIdByName(name); // undocumented: if cluster not exists, returns -1
+    if (cid == -1) {
+      db.commit();
+      cid = db.addCluster(name, CLUSTER_TYPE.PHYSICAL);
+      final OSchema schema = db.getMetadata().getSchema();
+      final OClass type = schema.getClass(DB_CLASS);
+      type.addClusterId(cid);
+      type.setDefaultClusterId(cid);
+      schema.save();
+      log.info("Created new journal cluster; id: {}, name: {}", cid, name);
+      db.begin();
+      return cid;
+    }
+    else {
+      log.info("Journal cluster exists; id: {}, name: {}", cid, name);
+      return cid;
     }
   }
 
@@ -248,16 +268,20 @@ public class DefaultTimeline
     }
     try (ODatabaseDocumentTx db = db()) {
       final StringBuilder sb = new StringBuilder();
-      sb.append("SELECT FROM ").append(DB_CLASS).append(" WHERE ");
+      sb.append("SELECT FROM ").append(DB_CLASS);
+      if ((types != null && !types.isEmpty()) || (subTypes != null && !subTypes.isEmpty())) {
+        sb.append(" WHERE ");
+      }
       if ((types != null && !types.isEmpty())) {
-        sb.append(P_TYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(types)).append("\"] AND ");
+        sb.append(P_TYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(types)).append("\"] ");
       }
       if (subTypes != null && !subTypes.isEmpty()) {
-        sb.append(P_SUBTYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(subTypes)).append("\"] AND ");
+        if ((types != null && !types.isEmpty())) {
+          sb.append(" AND ");
+        }
+        sb.append(P_SUBTYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(subTypes)).append("\"] ");
       }
-      sb.append("'1'='1' ");
-      sb.append("ORDER BY @rid desc "); // .append(P_TIMESTAMP).append(" DESC ");
-      sb.append("SKIP ").append(fromItem).append(" LIMIT ").append(count);
+      sb.append(" ORDER BY @rid DESC SKIP ").append(fromItem).append(" LIMIT ").append(count);
 
       log.info("Query: {}", sb.toString());
 
@@ -282,8 +306,13 @@ public class DefaultTimeline
     }
   }
 
+  /**
+   * Purges old clusters based on {@code days} ("older than days") parameters. If input is {@code 0}, all clusters will
+   * be removed, meaning all the timeline is purged. As Orient DDL is not atomic, this method must be mutually exclusive
+   * with {@link #maybeAddNewCluster(ODatabaseDocumentTx, long)}, hence both are synchronized.
+   */
   @Override
-  public void purgeOlderThan(final int days) {
+  public synchronized void purgeOlderThan(final int days) {
     if (!isStarted()) {
       return;
     }
@@ -293,6 +322,7 @@ public class DefaultTimeline
       final int[] cids = db.getMetadata().getSchema().getClass(DB_CLASS).getClusterIds();
       for (int cid : cids) {
         final String name = db.getClusterNameById(cid);
+        log.info("Cluster: {} {}", cid, name);
         if (name.startsWith(DB_CLUSTER_PREFIX)) {
           final int year = Integer.parseInt(name.substring(prefixLen, prefixLen + 4));
           final int month = Integer.parseInt(name.substring(prefixLen + 4, prefixLen + 6));
@@ -309,6 +339,11 @@ public class DefaultTimeline
           }
         }
       }
+      // Not using indexes, as they seems broken with clusters being dropped
+      // See https://groups.google.com/forum/#!topic/orient-database/HYMUAaMq4y8
+      // log.info("Rebuilding indexes...");
+      // db.command(new OCommandSQL("REBUILD INDEX " + I_TYPE)).execute();
+      // db.command(new OCommandSQL("REBUILD INDEX " + I_SUBTYPE)).execute();
     }
   }
 }
