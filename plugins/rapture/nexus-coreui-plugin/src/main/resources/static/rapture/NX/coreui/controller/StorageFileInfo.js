@@ -49,7 +49,10 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
       var info = {};
       if (Ext.isDefined(response) && response.success && response.data) {
         info = {
-          'Path': response.data['path'],
+          'Path': NX.util.Url.asLink(
+              NX.util.Url.urlOf('content/repositories/' + repositoryId + response.data['path']),
+              response.data['path']
+          ),
           'Size': me.toSizeString(response.data['size']),
           'Uploaded by': response.data['createdBy'],
           'Uploaded Date': Ext.Date.parse(response.data['created'], 'c'),
