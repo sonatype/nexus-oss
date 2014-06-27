@@ -20,6 +20,7 @@ import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.guice.Validate
+import org.sonatype.nexus.proxy.ItemNotFoundException
 import org.sonatype.nexus.proxy.ResourceStoreRequest
 import org.sonatype.nexus.proxy.access.AccessManager
 import org.sonatype.nexus.proxy.item.StorageCollectionItem
@@ -75,7 +76,7 @@ extends DirectComponentSupport
     itemXOs.each { itemXO ->
       itemXO.repositoryId = repositoryId
       if (itemXO.leaf) {
-        itemXO.type = FilenameUtils.getExtension(itemXO.name)
+        itemXO.type = FilenameUtils.getExtension(itemXO.text)
       }
     }
     return itemXOs
@@ -96,25 +97,35 @@ extends DirectComponentSupport
   {
     def repository = protectedRepositoryRegistry.getRepository(repositoryId)
     def request = new ResourceStoreRequest(path, true, false)
-    StorageItem item = repository.retrieveItem(request)
-    if (item instanceof StorageLinkItem) {
-      item = repositoryRouter.dereferenceLink(item, true, false)
+    try {
+      StorageItem item = repository.retrieveItem(request)
+      if (item instanceof StorageLinkItem) {
+        item = repositoryRouter.dereferenceLink(item, true, false)
+      }
+      return new RepositoryStorageItemInfoXO(
+          repositoryId: repositoryId,
+          path: item.path,
+          inLocalStorage: true,
+          createdBy: item.repositoryItemAttributes.get(AccessManager.REQUEST_USER),
+          created: new Date(item.created),
+          modified: new Date(item.modified),
+          sha1: item.repositoryItemAttributes.get(StorageFileItem.DIGEST_SHA1_KEY),
+          md5: item.repositoryItemAttributes.get(StorageFileItem.DIGEST_MD5_KEY),
+          size: item instanceof StorageFileItem ? item.length : null,
+          repositories: protectedRepositoryRegistry.repositories.findResults {
+            // TODO
+          }.collect {
+            new ReferenceXO(id: it.id, name: it.name)
+          }
+      )
     }
-    return new RepositoryStorageItemInfoXO(
-        repositoryId: repositoryId,
-        path: item.path,
-        createdBy: item.repositoryItemAttributes.get(AccessManager.REQUEST_USER),
-        created: new Date(item.created),
-        modified: new Date(item.modified),
-        sha1: item.repositoryItemAttributes.get(StorageFileItem.DIGEST_SHA1_KEY),
-        md5: item.repositoryItemAttributes.get(StorageFileItem.DIGEST_MD5_KEY),
-        size: item instanceof StorageFileItem ? item.length : null,
-        repositories: protectedRepositoryRegistry.repositories.findResults {
-
-        }.collect {
-          new ReferenceXO(id: it.id, name: it.name)
-        }
-    )
+    catch (ItemNotFoundException e) {
+      return new RepositoryStorageItemInfoXO(
+          repositoryId: repositoryId,
+          path: path,
+          inLocalStorage: false
+      )
+    }
   }
 
   List<RepositoryStorageItemXO> render(final StorageItem item) {
@@ -135,7 +146,6 @@ extends DirectComponentSupport
         repositoryId: item.repositoryId,
         path: item.path,
         text: item.name,
-        name: item.name,
         leaf: true
     )
     if (item.itemContext.containsKey(OVERRIDE_FILENAME_KEY)) {
@@ -150,7 +160,6 @@ extends DirectComponentSupport
         repositoryId: item.repositoryId,
         path: item.path,
         text: actualItem.name,
-        name: item.name,
         leaf: true
     )
     if (actualItem.itemContext.containsKey(OVERRIDE_FILENAME_KEY)) {
@@ -171,7 +180,6 @@ extends DirectComponentSupport
           repositoryId: child.repositoryId,
           path: child.path,
           text: actualChild.name,
-          name: child.name,
           leaf: !(actualChild instanceof StorageCollectionItem)
       )
       if (actualChild.itemContext.containsKey(OVERRIDE_FILENAME_KEY)) {

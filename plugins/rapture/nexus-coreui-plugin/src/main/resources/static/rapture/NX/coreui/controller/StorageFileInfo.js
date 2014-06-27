@@ -55,15 +55,19 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
         info = {
           'Path': NX.util.Url.asLink(
               NX.util.Url.urlOf('content/repositories/' + repositoryId + response.data['path']),
-              response.data['path']
-          ),
-          'Size': me.toSizeString(response.data['size']),
-          'Uploaded by': response.data['createdBy'],
-          'Uploaded Date': Ext.Date.parse(response.data['created'], 'c'),
-          'Last Modified': Ext.Date.parse(response.data['modified'], 'c'),
-          'SHA1': response.data['sha1'],
-          'MD5': response.data['md5']
+              response.data['path'] + (response.data['inLocalStorage'] ? '' : ' (Not Locally Cached)')
+          )
         };
+        if (response.data['inLocalStorage']) {
+          Ext.apply(info, {
+            'Size': me.toSizeString(response.data['size']),
+            'Uploaded by': response.data['createdBy'],
+            'Uploaded Date': Ext.Date.parse(response.data['created'], 'c'),
+            'Last Modified': Ext.Date.parse(response.data['modified'], 'c'),
+            'SHA1': response.data['sha1'],
+            'MD5': response.data['md5']
+          });
+        }
       }
       panel.showInfo(info);
     });

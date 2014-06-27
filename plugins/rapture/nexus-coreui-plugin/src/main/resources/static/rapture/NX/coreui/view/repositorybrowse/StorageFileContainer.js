@@ -33,7 +33,6 @@ Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
 
     if (repositoryId && path) {
       if (me.hidden) {
-        me.expand(false);
         me.show();
       }
       me.fireEvent('updated', me, repositoryId, path);
@@ -42,7 +41,6 @@ Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
       }
     }
     else {
-      me.collapse(false);
       me.hide();
     }
   }

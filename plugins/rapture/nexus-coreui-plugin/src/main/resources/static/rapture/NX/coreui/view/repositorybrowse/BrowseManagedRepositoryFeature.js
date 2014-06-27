@@ -23,6 +23,9 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseManagedRepositoryFeature', {
 
   iconName: 'repository-managed',
 
-  tabs: { xtype: 'nx-coreui-repositorybrowse-storage' }
+  tabs: [
+    { xtype: 'nx-coreui-repositorybrowse-storage', title: 'Storage' },
+    { xtype: 'nx-coreui-repositorybrowse-index', title: 'Index' }
+  ]
 
 });

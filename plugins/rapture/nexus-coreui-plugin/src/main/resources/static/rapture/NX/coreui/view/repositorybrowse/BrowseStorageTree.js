@@ -35,8 +35,8 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseStorageTree', {
         'repositoryId',
         'path',
         'text',
-        'name',
         'type',
+        'processed',
         {
           name: 'iconCls',
           convert: function (val, row) {

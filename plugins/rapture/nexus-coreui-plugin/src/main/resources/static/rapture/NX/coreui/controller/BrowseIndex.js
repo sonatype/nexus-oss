@@ -19,109 +19,93 @@ Ext.define('NX.coreui.controller.BrowseIndex', {
   extend: 'Ext.app.Controller',
 
   views: [
-    'repository.RepositoryBrowseIndex',
-    'repository.RepositoryBrowseIndexTree'
+    'repositorybrowse.BrowseIndex',
+    'repositorybrowse.BrowseIndexTree',
+    'repositorybrowse.StorageFileContainer'
   ],
   refs: [
-    {
-      ref: 'feature',
-      selector: 'nx-coreui-repository-browse-feature'
-    },
-    {
-      ref: 'list',
-      selector: 'nx-coreui-repository-browse-list'
-    },
-    {
-      ref: 'panel',
-      selector: 'nx-coreui-repository-browse-index'
-    },
-    {
-      ref: 'tree',
-      selector: 'nx-coreui-repository-browse-index-tree'
-    },
-    {
-      ref: 'componentDetail',
-      selector: 'nx-coreui-component-detail'
-    }
+    { ref: 'tree', selector: 'nx-coreui-repositorybrowse-indextree' },
+    { ref: 'storageFileContainer', selector: 'nx-coreui-repositorybrowse-index nx-coreui-repositorybrowse-storagefilecontainer' }
   ],
 
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.listen({
       component: {
-        'nx-coreui-repository-browse-list': {
+        'nx-coreui-repositorybrowse-list': {
           selection: me.onSelection
         },
-        'nx-coreui-repository-browse-index': {
-          activate: me.onActivate,
-          deactivate: me.onDeactivate
-        },
-        'nx-coreui-repository-browse-index-tree': {
+        'nx-coreui-repositorybrowse-indextree': {
           select: me.onNodeSelected,
-          beforeitemexpand: me.onBeforeItemExpand
+          beforeitemexpand: me.loadChildren,
+          itemclick: me.onItemClick
         }
       }
     });
   },
 
-  onActivate: function (panel) {
-    var me = this;
-
-    panel.active = true;
-    me.buildTree(me.getList().getSelectionModel().getSelection()[0]);
-  },
-
-  onDeactivate: function (panel) {
-    panel.active = false;
-  },
-
-  onSelection: function (repositoryGrid, repositoryModel) {
-    var me = this,
-        panel = me.getPanel();
-
-    if (repositoryModel.get('indexable') || repositoryModel.get('downloadRemoteIndexes')) {
-      if (!panel) {
-        panel = me.getFeature().addTab({ xtype: 'nx-coreui-repository-browse-index', title: 'Index' });
-      }
-      if (panel.active) {
-        me.buildTree(repositoryModel);
-      }
-    }
-    else {
-      if (panel) {
-        me.getFeature().removeTab(panel);
-      }
+  /**
+   * @private
+   * (Re)build tree for selected repository.
+   */
+  onSelection: function(list, repositoryModel) {
+    if (repositoryModel) {
+      this.buildTree(repositoryModel);
     }
   },
 
-  buildTree: function (repositoryModel) {
+  /**
+   * @private
+   * (Re)build tree for selected repository.
+   */
+  buildTree: function(repositoryModel) {
     var me = this,
         tree = me.getTree();
 
     tree.getStore().setRootNode({
       repositoryId: repositoryModel.getId(),
+      path: '/',
       text: repositoryModel.get('name')
     });
     me.onNodeSelected(tree, tree.getStore().getRootNode());
   },
 
-  onNodeSelected: function (tree, node) {
+  /**
+   * @private
+   * When a node gets selected, refresh storage file in right-side container.
+   */
+  onNodeSelected: function(tree, node) {
     var me = this;
-
-    me.getComponentDetail().setComponent(node.isRoot() ? undefined : {
-      repositoryId: node.get('repositoryId'),
-      uri: node.get('path')
-    });
+    me.getStorageFileContainer().showStorageFile(
+        node.get('repositoryId'),
+        node.isLeaf() ? node.get('path') : undefined
+    );
   },
 
-  onBeforeItemExpand: function (node) {
-    if (!node.processed) {
-      node.processed = true;
-      NX.direct.coreui_RepositoryStorage.read(node.get('repositoryId'), node.getPath('name'), function (response) {
+  /**
+   * @private
+   * Auto expand nodes on click.
+   */
+  onItemClick: function(tree, node) {
+    if (!node.isLeaf()) {
+      this.getTree().expandNode(node);
+    }
+  },
+
+  /**
+   * @private
+   * Load children of selected node, if not already loaded.
+   */
+  loadChildren: function(node) {
+    var me = this;
+
+    if (!node.get('processed')) {
+      node.set('processed', true);
+      NX.direct.coreui_BrowseIndex.readChildren(node.get('repositoryId'), node.get('path'), function(response) {
         if (Ext.isDefined(response) && response.success && response.data && response.data.length) {
           Ext.suspendLayouts();
           node.appendChild(response.data);

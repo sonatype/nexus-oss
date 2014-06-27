@@ -25,7 +25,7 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
   ],
   refs: [
     { ref: 'tree', selector: 'nx-coreui-repositorybrowse-storage-tree' },
-    { ref: 'storageFileContainer', selector: 'nx-coreui-repositorybrowse-storagefilecontainer' }
+    { ref: 'storageFileContainer', selector: 'nx-coreui-repositorybrowse-storage nx-coreui-repositorybrowse-storagefilecontainer' }
   ],
 
   /**
@@ -111,8 +111,8 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
    * Load children of selected node, if not already loaded.
    */
   loadChildren: function(node) {
-    if (!node.processed) {
-      node.processed = true;
+    if (!node.get('processed')) {
+      node.set('processed', true);
       NX.direct.coreui_RepositoryStorage.readChildren(node.get('repositoryId'), node.get('path'), function(response) {
         if (Ext.isDefined(response) && response.success && response.data && response.data.length) {
           Ext.suspendLayouts();

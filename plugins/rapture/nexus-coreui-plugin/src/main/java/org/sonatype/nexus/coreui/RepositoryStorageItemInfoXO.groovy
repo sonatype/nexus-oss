@@ -24,6 +24,7 @@ class RepositoryStorageItemInfoXO
 {
   String repositoryId
   String path
+  Boolean inLocalStorage
   Long size
   String createdBy
   Date created

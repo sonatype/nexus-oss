@@ -15,28 +15,27 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseIndex', {
+Ext.define('NX.coreui.view.repositorybrowse.BrowseIndex', {
   extend: 'Ext.Panel',
-  alias: 'widget.nx-coreui-repository-browse-index',
+  alias: 'widget.nx-coreui-repositorybrowse-index',
 
   layout: 'border',
 
   items: [
     {
-      xtype: 'nx-coreui-repository-browse-index-tree',
-      region: 'center',
-      collapsible: true,
-      headerPosition: 'left',
-      header: false
+      xtype: 'nx-coreui-repositorybrowse-indextree',
+      region: 'center'
     },
     {
-      xtype: 'nx-coreui-component-detail',
+      xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
       region: 'east',
-      collapsible: true,
       split: true,
-      width: '50%',
-      headerPosition: 'right',
-      hidden: true
+      flex: 1,
+      header: false,
+      collapsible: true,
+      collapsed: false,
+      collapseMode: 'mini',
+      hidden: false
     }
   ]
 
