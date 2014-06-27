@@ -70,7 +70,7 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
       return '<unknown>';
     }
     if (v < 0) {
-      return '0 Bytes';
+      return 'Unknown';
     }
     if (v < 1024) {
       return v + ' Bytes';
