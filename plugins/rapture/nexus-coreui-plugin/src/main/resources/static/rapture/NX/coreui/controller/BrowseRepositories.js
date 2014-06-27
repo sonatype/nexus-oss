@@ -92,20 +92,15 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     });
   },
 
+  /**
+   * @override
+   */
   getDescription: function(model) {
     return model.get('name');
   },
 
-  onSelection: function(list, model) {
-    var me = this;
-
-    if (Ext.isDefined(model)) {
-
-    }
-  },
-
   /**
-   * @protected
+   * @private
    * Show 'Admin' when user has 'update' permission.
    */
   bindAdminButton: function(button) {
@@ -131,6 +126,10 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     );
   },
 
+  /**
+   * @private
+   * Navigate to same repository in admin mode.
+   */
   navigateToAdminMode: function(button) {
     var list = button.up('grid');
 

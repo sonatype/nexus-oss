@@ -35,34 +35,13 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
     var me = this;
 
     me.getApplication().getIconController().addIcons({
-      'repository-item-type-default': {
-        file: 'file_extension_default.png',
-        variants: ['x16', 'x24', 'x32']
-      },
-      'repository-item-type-md5': {
-        file: 'file_extension_checksum.png',
-        variants: ['x16', 'x32']
-      },
-      'repository-item-type-jar': {
-        file: 'file_extension_jar.png',
-        variants: ['x16', 'x32']
-      },
-      'repository-item-type-pom': {
-        file: 'file_extension_xml.png',
-        variants: ['x16', 'x32']
-      },
-      'repository-item-type-sha1': {
-        file: 'file_extension_checksum.png',
-        variants: ['x16', 'x32']
-      },
-      'repository-item-type-xml': {
-        file: 'file_extension_xml.png',
-        variants: ['x16', 'x32']
-      },
-      'repository-item-type-zip': {
-        file: 'file_extension_zip.png',
-        variants: ['x16', 'x32']
-      }
+      'repository-item-type-default': { file: 'file_extension_default.png', variants: ['x16', 'x24', 'x32'] },
+      'repository-item-type-md5': { file: 'file_extension_checksum.png', variants: ['x16', 'x32'] },
+      'repository-item-type-jar': { file: 'file_extension_jar.png', variants: ['x16', 'x32'] },
+      'repository-item-type-pom': { file: 'file_extension_xml.png', variants: ['x16', 'x32'] },
+      'repository-item-type-sha1': { file: 'file_extension_checksum.png', variants: ['x16', 'x32'] },
+      'repository-item-type-xml': { file: 'file_extension_xml.png', variants: ['x16', 'x32'] },
+      'repository-item-type-zip': { file: 'file_extension_zip.png', variants: ['x16', 'x32'] }
     });
 
     me.listen({
@@ -72,18 +51,27 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
         },
         'nx-coreui-repositorybrowse-storage-tree': {
           select: me.onNodeSelected,
-          beforeitemexpand: me.onBeforeItemExpand
+          beforeitemexpand: me.loadChildren,
+          itemclick: me.onItemClick
         }
       }
     });
   },
 
-  onSelection: function(repositoryGrid, repositoryModel) {
-    var me = this;
-
-    me.buildTree(repositoryModel);
+  /**
+   * @private
+   * (Re)build tree for selected repository.
+   */
+  onSelection: function(list, repositoryModel) {
+    if (repositoryModel) {
+      this.buildTree(repositoryModel);
+    }
   },
 
+  /**
+   * @private
+   * (Re)build tree for selected repository.
+   */
   buildTree: function(repositoryModel) {
     var me = this,
         tree = me.getTree();
@@ -96,6 +84,10 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
     me.onNodeSelected(tree, tree.getStore().getRootNode());
   },
 
+  /**
+   * @private
+   * When a node gets selected, refresh storage file in right-side container.
+   */
   onNodeSelected: function(tree, node) {
     var me = this;
     me.getStorageFileContainer().showStorageFile(
@@ -104,10 +96,24 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
     );
   },
 
-  onBeforeItemExpand: function(node) {
+  /**
+   * @private
+   * Auto expand nodes on click.
+   */
+  onItemClick: function(tree, node) {
+    if (!node.isLeaf()) {
+      this.getTree().expandNode(node);
+    }
+  },
+
+  /**
+   * @private
+   * Load children of selected node, if not already loaded.
+   */
+  loadChildren: function(node) {
     if (!node.processed) {
       node.processed = true;
-      NX.direct.coreui_RepositoryStorage.read(node.get('repositoryId'), node.get('path'), function(response) {
+      NX.direct.coreui_RepositoryStorage.readChildren(node.get('repositoryId'), node.get('path'), function(response) {
         if (Ext.isDefined(response) && response.success && response.data && response.data.length) {
           Ext.suspendLayouts();
           node.appendChild(response.data);

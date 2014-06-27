@@ -37,14 +37,18 @@ Ext.define('NX.coreui.controller.StorageFileMavenInfo', {
     });
   },
 
-  onUpdated: function(detailPanel, repositoryId, path) {
+  /**
+   * @private
+   * Loads & eventual shows Maven information about selected file.
+   */
+  onUpdated: function(container, repositoryId, path) {
     NX.direct.coreui_Maven.readInfo(repositoryId, path, function(response) {
-      var panel = detailPanel.down('nx-coreui-repositorybrowse-storagefilemaveninfo'),
+      var panel = container.down('nx-coreui-repositorybrowse-storagefilemaveninfo'),
           info;
 
       if (Ext.isDefined(response) && response.success && response.data) {
         if (!panel) {
-          panel = detailPanel.add({ xtype: 'nx-coreui-repositorybrowse-storagefilemaveninfo' });
+          panel = container.add({ xtype: 'nx-coreui-repositorybrowse-storagefilemaveninfo' });
         }
         info = {
           'Group': response.data['groupId'],
@@ -64,7 +68,7 @@ Ext.define('NX.coreui.controller.StorageFileMavenInfo', {
       }
       else {
         if (panel) {
-          detailPanel.remove(panel);
+          container.remove(panel);
         }
       }
     });

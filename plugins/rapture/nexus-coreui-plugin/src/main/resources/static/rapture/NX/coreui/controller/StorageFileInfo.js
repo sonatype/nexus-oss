@@ -37,12 +37,16 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
     });
   },
 
-  onUpdated: function(detailPanel, repositoryId, path) {
+  /**
+   * @private
+   * Loads & shows generic information about selected file.
+   */
+  onUpdated: function(container, repositoryId, path) {
     var me = this,
-        panel = detailPanel.down('nx-coreui-repositorybrowse-storagefileinfo');
+        panel = container.down('nx-coreui-repositorybrowse-storagefileinfo');
 
     if (!panel) {
-      panel = detailPanel.add({ xtype: 'nx-coreui-repositorybrowse-storagefileinfo' });
+      panel = container.add({ xtype: 'nx-coreui-repositorybrowse-storagefileinfo' });
     }
 
     NX.direct.coreui_RepositoryStorage.readInfo(repositoryId, path, function(response) {
@@ -65,6 +69,9 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
     });
   },
 
+  /**
+   * @private
+   */
   toSizeString: function(v) {
     if (typeof v !== 'number') {
       return '<unknown>';

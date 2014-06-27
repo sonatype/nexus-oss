@@ -21,6 +21,13 @@ Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
 
   plain: true,
 
+  /**
+   * @public
+   * Shows a file in container.
+   *
+   * @param repositoryId containing the file to be shown
+   * @param path of file to be shown
+   */
   showStorageFile: function(repositoryId, path) {
     var me = this;
 

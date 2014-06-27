@@ -43,6 +43,13 @@ extends DirectComponentSupport
   @Inject
   @Named("protected") RepositoryRegistry protectedRepositoryRegistry
 
+  /**
+   * Retrieves Maven related information.
+   *
+   * @param repositoryId containing the artifact
+   * @param path of artifact
+   * @return Maven information or null if repository / path does not point to a Maven artifact.
+   */
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
   @Validate

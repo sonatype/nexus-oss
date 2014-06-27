@@ -55,11 +55,18 @@ extends DirectComponentSupport
   @Inject
   RepositoryRouter repositoryRouter
 
+  /**
+   * Retrieves children of specified path.
+   *
+   * @param repositoryId containing the path
+   * @param path to retrieve children for
+   * @return list of children
+   */
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
   @Validate
-  List<RepositoryStorageItemXO> read(final @NotEmpty(message = '[repositoryId] may not be empty') String repositoryId,
-                                     final @NotEmpty(message = '[path] may not be empty') String path)
+  List<RepositoryStorageItemXO> readChildren(final @NotEmpty(message = '[repositoryId] may not be empty') String repositoryId,
+                                             final @NotEmpty(message = '[path] may not be empty') String path)
   {
     def repository = protectedRepositoryRegistry.getRepository(repositoryId)
     def request = new ResourceStoreRequest(path, true, false)
@@ -74,6 +81,13 @@ extends DirectComponentSupport
     return itemXOs
   }
 
+  /**
+   * Retrieves generic information about a storage item specified by path.
+   *
+   * @param repositoryId containing storage item
+   * @param path of storage item
+   * @return generic info
+   */
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
   @Validate

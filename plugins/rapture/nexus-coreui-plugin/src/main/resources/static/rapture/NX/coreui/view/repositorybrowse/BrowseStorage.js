@@ -34,9 +34,9 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseStorage', {
       minWidth: 100,
       header: false,
       collapsible: true,
-      collapsed: true,
+      collapsed: false,
       collapseMode: 'mini',
-      hidden: true
+      hidden: false
     }
   ]
 
