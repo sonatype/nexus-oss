@@ -61,10 +61,6 @@ public class ConfigurationBuilder
     return properties(props);
   }
 
-  private URL getResource(final Class<?> clazz, final String name) {
-    return clazz.getResource(name);
-  }
-
   public ConfigurationBuilder properties(final String resource, final boolean required) throws IOException {
     return properties(getClass(), resource, required);
   }
@@ -73,7 +69,7 @@ public class ConfigurationBuilder
    * @since 3.0
    */
   public ConfigurationBuilder properties(final Class<?> clazz, final String resource, final boolean required) throws IOException {
-    URL url = getResource(clazz, resource);
+    URL url = clazz.getResource(resource);
     if (url == null) {
       if (required) {
         throw new IllegalStateException("Missing required resource: " + resource);
@@ -81,6 +77,19 @@ public class ConfigurationBuilder
       return this;
     }
     return properties(url);
+  }
+
+  /**
+   * @since 3.0
+   */
+  public ConfigurationBuilder properties(final File resource, final boolean required) throws IOException {
+    if (resource == null || !resource.exists()) {
+      if (required) {
+        throw new IllegalStateException("Missing required resource: " + resource);
+      }
+      return this;
+    }
+    return properties(resource.toURI().toURL());
   }
 
   public ConfigurationBuilder defaults() throws IOException {

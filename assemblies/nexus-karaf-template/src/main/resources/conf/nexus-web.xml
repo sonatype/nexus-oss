@@ -21,12 +21,12 @@
   <display-name>Sonatype Nexus ${project.version}</display-name>
 
   <listener>
-    <listener-class>org.sonatype.nexus.webapp.WebappBootstrap</listener-class>
+    <listener-class>org.sonatype.nexus.bootstrap.osgi.BootstrapListener</listener-class>
   </listener>
-  
+
   <filter>
     <filter-name>nexusFilter</filter-name>
-    <filter-class>org.sonatype.nexus.webapp.DelegatingFilter</filter-class>
+    <filter-class>org.sonatype.nexus.bootstrap.osgi.DelegatingFilter</filter-class>
   </filter>
 
   <filter-mapping>

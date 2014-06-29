@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.webapp;
+package org.sonatype.nexus.bootstrap.osgi;
 
 import java.io.IOException;
 
@@ -27,7 +27,7 @@ import javax.servlet.ServletResponse;
  * 
  * @since 3.0
  */
-public class DelegatingFilter
+public final class DelegatingFilter
     implements Filter
 {
   private static FilterConfig cachedConfig;
@@ -55,7 +55,7 @@ public class DelegatingFilter
     }
   }
 
-  public void init(final FilterConfig filterConfig) throws ServletException {
+  public void init(FilterConfig filterConfig) throws ServletException {
     synchronized (DelegatingFilter.class) {
       cachedConfig = filterConfig;
       if (delegate != null) {
@@ -64,8 +64,8 @@ public class DelegatingFilter
     }
   }
 
-  public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
-      throws IOException, ServletException
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
+      ServletException
   {
     Filter filter = delegate;
     if (filter != null) {

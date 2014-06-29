@@ -15,6 +15,7 @@ package org.sonatype.nexus.bootstrap;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Handler;
 
 import javax.annotation.Nullable;
 
@@ -29,7 +30,6 @@ import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
 import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_PING_INTERVAL;
@@ -43,6 +43,19 @@ import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_TI
  */
 public class Launcher
 {
+  static {
+    boolean hasJulBridge;
+    try {
+      // check whether we have access to the optional JUL->SLF4J logging bridge
+      hasJulBridge = Handler.class.isAssignableFrom(org.slf4j.bridge.SLF4JBridgeHandler.class);
+    } catch (Exception|LinkageError e) {
+      hasJulBridge = false;
+    }
+    HAS_JUL_BRIDGE = hasJulBridge;
+  }
+
+  private static final boolean HAS_JUL_BRIDGE;
+
   // FIXME: Move this to CommandMonitorThread
   public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
 
@@ -59,26 +72,43 @@ public class Launcher
                   final String[] args)
       throws Exception
   {
-    if (args == null) {
-      throw new NullPointerException();
-    }
-    if (args.length == 0) {
+    this(null, classLoader, overrides, args);
+  }
+  
+  public Launcher(final @Nullable String basePath,
+                  final @Nullable ClassLoader classLoader,
+                  final @Nullable Map<String, String> overrides,
+                  final String[] args)
+      throws Exception
+  {
+    if (args == null || args.length == 0) {
       throw new IllegalArgumentException("Missing args");
     }
 
-    // install JUL bridge
-    SLF4JBridgeHandler.removeHandlersForRootLogger();
-    SLF4JBridgeHandler.install();
+    if (HAS_JUL_BRIDGE) {
+      org.slf4j.bridge.SLF4JBridgeHandler.removeHandlersForRootLogger();
+      org.slf4j.bridge.SLF4JBridgeHandler.install();
+    }
 
+    File baseDir = new File(basePath == null ? "." : basePath).getCanonicalFile();
     ClassLoader cl = (classLoader == null) ? getClass().getClassLoader() : classLoader;
 
-    ConfigurationBuilder builder = new ConfigurationBuilder()
-        .defaults()
-        .set("bundleBasedir", new File(".").getCanonicalPath())
-        .properties("/nexus.properties", true)
-        .properties("/nexus-test.properties", false)
-        .custom(new EnvironmentVariables())
-        .override(System.getProperties());
+    ConfigurationBuilder builder = new ConfigurationBuilder().defaults();
+
+    builder.set("nexus-base", baseDir.getPath());
+    if (basePath != null) {
+      // look for configuration relative to the base
+      builder.properties(new File(baseDir, "conf/nexus.properties"), true);
+      builder.properties(new File(baseDir, "conf/nexus-test.properties"), false);
+    }
+    else {
+      // search the classpath for the configuration
+      builder.properties("/nexus.properties", true);
+      builder.properties("/nexus-test.properties", false);
+    }
+
+    builder.custom(new EnvironmentVariables());
+    builder.override(System.getProperties());
 
     if (overrides != null) {
       // using properties() instead of override() so we get all values added, not just those with existing entries

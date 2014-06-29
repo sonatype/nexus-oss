@@ -33,13 +33,13 @@ public class EnvironmentVariables
     maybeSetLegacy(builder, "application-host", "PLEXUS_APPLICATION_HOST");
     maybeSetLegacy(builder, "application-port", "PLEXUS_APPLICATION_PORT");
     maybeSetLegacy(builder, "nexus-work", "PLEXUS_NEXUS_WORK");
-    maybeSetLegacy(builder, "nexus-webapp-context-path", "PLEXUS_CONTEXT_PATH");
+    maybeSetLegacy(builder, "nexus-context-path", "PLEXUS_CONTEXT_PATH");
 
     // non-legacy environment variables take precedence
     maybeSet(builder, "application-host", "NEXUS_APPLICATION_HOST");
     maybeSet(builder, "application-port", "NEXUS_APPLICATION_PORT");
     maybeSet(builder, "nexus-work", "NEXUS_WORK");
-    maybeSet(builder, "nexus-webapp-context-path", "NEXUS_CONTEXT_PATH");
+    maybeSet(builder, "nexus-context-path", "NEXUS_CONTEXT_PATH");
   }
 
   private boolean maybeSet(final ConfigurationBuilder builder, final String property, final String env) {

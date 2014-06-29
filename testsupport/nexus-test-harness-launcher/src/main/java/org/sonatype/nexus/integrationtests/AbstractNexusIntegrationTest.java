@@ -114,7 +114,7 @@ public abstract class AbstractNexusIntegrationTest
   /**
    * relative path from {@link #nexusBaseDir} to plugin-repository
    */
-  public static final String RELATIVE_PLUGIN_REPOSITORY_DIR = "nexus/WEB-INF/plugin-repository";
+  public static final String RELATIVE_PLUGIN_REPOSITORY_DIR = "plugin-repository";
 
   public static final String GROUP_REPOSITORY_RELATIVE_URL = "content/groups/";
 
@@ -130,7 +130,7 @@ public abstract class AbstractNexusIntegrationTest
 
   public static final String nexusWorkDir;
 
-  public static final String RELATIVE_CONF_DIR = "runtime/apps/nexus/conf";
+  public static final String RELATIVE_CONF_DIR = "../sonatype-work/nexus/conf";
 
   public static final String WORK_CONF_DIR;
 

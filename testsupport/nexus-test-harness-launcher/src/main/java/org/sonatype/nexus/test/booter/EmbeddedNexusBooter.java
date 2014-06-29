@@ -81,7 +81,7 @@ public class EmbeddedNexusBooter
 
     overrides = new HashMap<>();
     overrides.put("application-port", String.valueOf(port));
-    overrides.put("bundleBasedir", installDir.getPath());
+    overrides.put("nexus-base", installDir.getPath());
     overrides.put("nexus-work", workDir.getPath());
 
     // force bootstrap logback configuration
