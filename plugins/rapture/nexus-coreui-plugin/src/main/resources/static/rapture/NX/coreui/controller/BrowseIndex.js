@@ -109,6 +109,11 @@ Ext.define('NX.coreui.controller.BrowseIndex', {
         if (Ext.isDefined(response) && response.success && response.data && response.data.length) {
           Ext.suspendLayouts();
           node.appendChild(response.data);
+          node.sort(function(n1, n2) {
+            var t1 = n1.get('text') || '',
+                t2 = n2.get('text') || '';
+            return t1.localeCompare(t2);
+          }, true);
           Ext.resumeLayouts(true);
         }
       });

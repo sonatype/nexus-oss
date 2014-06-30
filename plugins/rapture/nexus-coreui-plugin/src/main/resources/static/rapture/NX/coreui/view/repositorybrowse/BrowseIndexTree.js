@@ -52,8 +52,7 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseIndexTree', {
             return iconCls
           }
         }
-      ],
-      sorters: { property: 'text', direction: 'ASC' }
+      ]
     });
 
     me.callParent(arguments);
