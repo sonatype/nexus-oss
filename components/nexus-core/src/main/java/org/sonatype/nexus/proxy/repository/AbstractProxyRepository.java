@@ -1161,7 +1161,8 @@ public abstract class AbstractProxyRepository
               }
 
               if (ex instanceof RemoteStorageTransportException
-                  || ex instanceof LocalStorageEOFException) {
+                  || ex instanceof LocalStorageEOFException
+                  || ex instanceof RemoteAccessDeniedException) {
                 throw ex;
               }
 
