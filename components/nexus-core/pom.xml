@@ -352,6 +352,11 @@
       <artifactId>nexus-log-api</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-orient</artifactId>
+    </dependency>
+
     <!--JSR-303 Validation-->
     <dependency>
       <groupId>javax.validation</groupId>
