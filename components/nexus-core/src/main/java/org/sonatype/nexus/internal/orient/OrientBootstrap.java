@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.internal.orient;
 
 import java.io.File;
@@ -19,7 +18,6 @@ import java.io.StringWriter;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.events.EventSubscriber;
@@ -45,32 +43,28 @@ import com.orientechnologies.orient.server.config.OServerStorageConfiguration;
 import com.orientechnologies.orient.server.config.OServerUserConfiguration;
 import com.orientechnologies.orient.server.network.protocol.binary.ONetworkProtocolBinary;
 import org.apache.commons.io.output.WriterOutputStream;
+import org.eclipse.sisu.EagerSingleton;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * OrientDB bootstrap lifecycle adapter.
- *
+ * 
  * @since 3.0
  */
 @Named
-@Singleton
+@EagerSingleton
 public class OrientBootstrap
     extends LifecycleSupport
     implements EventSubscriber
 {
   private final ApplicationDirectories applicationDirectories;
 
-  private final boolean listenerEnabled;
-
   private OServer server;
 
   @Inject
-  public OrientBootstrap(final ApplicationDirectories applicationDirectories,
-                         final @Named("${nexus.orient.listenerEnabled:-false}") boolean listenerEnabled)
-  {
+  public OrientBootstrap(final ApplicationDirectories applicationDirectories) {
     this.applicationDirectories = checkNotNull(applicationDirectories);
-    this.listenerEnabled = listenerEnabled;
 
     log.info("OrientDB version: {}", OConstants.getVersion());
 
@@ -107,7 +101,7 @@ public class OrientBootstrap
     config.location = "DYNAMIC-CONFIGURATION";
 
     File databaseDir = applicationDirectories.getWorkDirectory("db");
-    config.properties = new OServerEntryConfiguration[]{
+    config.properties = new OServerEntryConfiguration[] {
         new OServerEntryConfiguration("server.database.path", databaseDir.getPath())
     };
 
@@ -120,24 +114,19 @@ public class OrientBootstrap
         new OServerNetworkProtocolConfiguration("binary", ONetworkProtocolBinary.class.getName())
     );
 
-    // HACK: Optionally enable the binary listener
-    if (listenerEnabled) {
-      OServerNetworkListenerConfiguration binaryListener = new OServerNetworkListenerConfiguration();
-      binaryListener.ipAddress = "0.0.0.0";
-      binaryListener.portRange = "2424-2430";
-      binaryListener.protocol = "binary";
-      binaryListener.socket = "default";
+    OServerNetworkListenerConfiguration binaryListener = new OServerNetworkListenerConfiguration();
+    binaryListener.ipAddress = "0.0.0.0";
+    binaryListener.portRange = "2424-2430";
+    binaryListener.protocol = "binary";
+    binaryListener.socket = "default";
 
-      config.network.listeners = Lists.newArrayList(
-          binaryListener
-      );
+    config.network.listeners = Lists.newArrayList(
+        binaryListener
+    );
 
-      log.info("Listener enabled: {}:[{}]", binaryListener.ipAddress, binaryListener.portRange);
-    }
+    config.storages = new OServerStorageConfiguration[] {};
 
-    config.storages = new OServerStorageConfiguration[]{};
-
-    config.users = new OServerUserConfiguration[]{
+    config.users = new OServerUserConfiguration[] {
         new OServerUserConfiguration("admin", "admin", "*")
     };
 
@@ -150,10 +139,8 @@ public class OrientBootstrap
 
   @Override
   protected void doStop() throws Exception {
-    // TODO: Do we need to do this, or leave this to global shutdown?
-    //server.shutdown();
-    server = null;
     Orient.instance().shutdown();
+    server = null;
   }
 
   //
