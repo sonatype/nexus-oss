@@ -20,9 +20,6 @@ import javax.inject.Named;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.plugins.capabilities.internal.ActivationConditionHandlerFactory;
 import org.sonatype.nexus.plugins.capabilities.internal.ValidityConditionHandlerFactory;
-import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
-import org.sonatype.nexus.plugins.capabilities.internal.storage.KazukiCapabilityStorage;
-import org.sonatype.nexus.plugins.capabilities.internal.storage.OrientCapabilityStorage;
 import org.sonatype.nexus.plugins.capabilities.validator.ValidatorFactory;
 
 import com.google.inject.AbstractModule;
@@ -37,7 +34,7 @@ import io.kazuki.v0.store.keyvalue.KeyValueStoreConfiguration;
 import io.kazuki.v0.store.sequence.SequenceServiceConfiguration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.plugins.capabilities.internal.storage.KazukiCapabilityStorage.CAPABILITY_SCHEMA;
+import static org.sonatype.nexus.plugins.capabilities.internal.storage.DefaultCapabilityStorage.CAPABILITY_SCHEMA;
 
 /**
  * Capabilities plugin Guice module.
@@ -51,10 +48,6 @@ public class GuiceModule
 
   @Override
   protected void configure() {
-    // Configure OrientDB-based storage impl
-    bind(CapabilityStorage.class).to(OrientCapabilityStorage.class);
-    //bind(CapabilityStorage.class).to(KazukiCapabilityStorage.class);
-
     install(new FactoryModuleBuilder().build(ActivationConditionHandlerFactory.class));
     install(new FactoryModuleBuilder().build(ValidityConditionHandlerFactory.class));
     install(new FactoryModuleBuilder().build(ValidatorFactory.class));

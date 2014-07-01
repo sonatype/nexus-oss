@@ -95,12 +95,10 @@ public class EventDataBuilderTest
   public void setAttributes() throws Exception {
     EventData event = new EventDataBuilder("TEST")
         .set("foo", "bar")
-        .set("baz", null)
         .build();
 
     assertThat(event, notNullValue());
-    assertThat(event.getAttributes().entrySet(), hasSize(2));
+    assertThat(event.getAttributes().entrySet(), hasSize(1));
     assertThat(event.getAttributes(), hasEntry("foo", (Object) "bar"));
-    assertThat(event.getAttributes(), hasEntry("baz", null));
   }
 }
