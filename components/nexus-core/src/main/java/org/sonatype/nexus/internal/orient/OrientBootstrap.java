@@ -18,6 +18,7 @@ import java.io.StringWriter;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.events.EventSubscriber;
@@ -43,28 +44,32 @@ import com.orientechnologies.orient.server.config.OServerStorageConfiguration;
 import com.orientechnologies.orient.server.config.OServerUserConfiguration;
 import com.orientechnologies.orient.server.network.protocol.binary.ONetworkProtocolBinary;
 import org.apache.commons.io.output.WriterOutputStream;
-import org.eclipse.sisu.EagerSingleton;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * OrientDB bootstrap lifecycle adapter.
- * 
+ *
  * @since 3.0
  */
 @Named
-@EagerSingleton
+@Singleton
 public class OrientBootstrap
     extends LifecycleSupport
     implements EventSubscriber
 {
   private final ApplicationDirectories applicationDirectories;
 
+  private final boolean listenerEnabled;
+
   private OServer server;
 
   @Inject
-  public OrientBootstrap(final ApplicationDirectories applicationDirectories) {
+  public OrientBootstrap(final ApplicationDirectories applicationDirectories,
+                         final @Named("${nexus.orient.listenerEnabled:-false}") boolean listenerEnabled)
+  {
     this.applicationDirectories = checkNotNull(applicationDirectories);
+    this.listenerEnabled = listenerEnabled;
 
     log.info("OrientDB version: {}", OConstants.getVersion());
 
@@ -86,6 +91,8 @@ public class OrientBootstrap
     }
 
     server.activate();
+    log.info("Server activated");
+
     this.server = server;
   }
 
@@ -114,19 +121,22 @@ public class OrientBootstrap
         new OServerNetworkProtocolConfiguration("binary", ONetworkProtocolBinary.class.getName())
     );
 
-    OServerNetworkListenerConfiguration binaryListener = new OServerNetworkListenerConfiguration();
-    binaryListener.ipAddress = "0.0.0.0";
-    binaryListener.portRange = "2424-2430";
-    binaryListener.protocol = "binary";
-    binaryListener.socket = "default";
+    config.network.listeners = Lists.newArrayList();
 
-    config.network.listeners = Lists.newArrayList(
-        binaryListener
-    );
+    // HACK: Optionally enable the binary listener
+    if (listenerEnabled) {
+      OServerNetworkListenerConfiguration binaryListener = new OServerNetworkListenerConfiguration();
+      binaryListener.ipAddress = "0.0.0.0";
+      binaryListener.portRange = "2424-2430";
+      binaryListener.protocol = "binary";
+      binaryListener.socket = "default";
+      config.network.listeners.add(binaryListener);
+      log.info("Listener enabled: {}:[{}]", binaryListener.ipAddress, binaryListener.portRange);
+    }
 
-    config.storages = new OServerStorageConfiguration[] {};
+    config.storages = new OServerStorageConfiguration[]{};
 
-    config.users = new OServerUserConfiguration[] {
+    config.users = new OServerUserConfiguration[]{
         new OServerUserConfiguration("admin", "admin", "*")
     };
 
@@ -139,8 +149,10 @@ public class OrientBootstrap
 
   @Override
   protected void doStop() throws Exception {
-    Orient.instance().shutdown();
+    // TODO: Do we need to do this, or leave this to global shutdown?
+    //server.shutdown();
     server = null;
+    Orient.instance().shutdown();
   }
 
   //
