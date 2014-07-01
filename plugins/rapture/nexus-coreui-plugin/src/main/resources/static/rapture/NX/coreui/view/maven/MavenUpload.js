@@ -19,39 +19,29 @@ Ext.define('NX.coreui.view.maven.MavenUpload', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-maven-upload',
 
-  initComponent: function () {
-    var me = this,
-        store;
+  items: {
+    xtype: 'nx-coreui-upload-artifact',
+    api: {
+      submit: 'NX.direct.coreui_MavenUpload.uploadArtifacts'
+    }
+  },
 
-    store = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
-    store.filter(
-        { property: 'type', value: 'hosted' },
-        { property: 'format', value: 'maven2' }
-    );
+  initComponent: function() {
+    var me = this;
 
-    me.items = {
-      xtype: 'nx-coreui-upload-artifact',
-      api: {
-        submit: 'NX.direct.maven_Maven.upload'
-      }
-    };
-
-    me.callParent();
+    me.callParent(arguments);
 
     me.down('form').insert(0, [
       {
-        xtype: 'label',
-        html: '<p>Select the repository where to upload and artifacts to be uploaded.</p>'
-      },
-      {
         xtype: 'combo',
-        name: 'repository',
+        name: 'repositoryId',
         fieldLabel: 'Repository',
-        emptyText: 'select repository to upload to',
+        helpText: 'Select the repository where artifacts will be uploaded.',
+        emptyText: 'select repository',
         queryMode: 'local',
         displayField: 'name',
         valueField: 'id',
-        store: store,
+        store: 'MavenUploadRepositoryHosted',
         editable: false
       }
     ]);
