@@ -112,6 +112,10 @@ Ext.define('NX.coreui.controller.BrowseIndex', {
           node.sort(function(n1, n2) {
             var t1 = n1.get('text') || '',
                 t2 = n2.get('text') || '';
+
+            if (n1.isLeaf() !== n2.isLeaf()) {
+              return n1.isLeaf() ? 1 : -1;
+            }
             return t1.localeCompare(t2);
           }, true);
           Ext.resumeLayouts(true);
