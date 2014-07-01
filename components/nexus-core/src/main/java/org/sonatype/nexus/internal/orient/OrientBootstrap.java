@@ -25,9 +25,8 @@ import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
-import org.sonatype.sisu.goodies.lifecycle.Starter;
-import org.sonatype.sisu.goodies.lifecycle.Stopper;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.OConstants;
@@ -49,7 +48,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * OrientDB bootstrap lifecycle adapter.
- *
+ * 
  * @since 3.0
  */
 @Named
@@ -134,9 +133,9 @@ public class OrientBootstrap
       log.info("Listener enabled: {}:[{}]", binaryListener.ipAddress, binaryListener.portRange);
     }
 
-    config.storages = new OServerStorageConfiguration[]{};
+    config.storages = new OServerStorageConfiguration[] {};
 
-    config.users = new OServerUserConfiguration[]{
+    config.users = new OServerUserConfiguration[] {
         new OServerUserConfiguration("admin", "admin", "*")
     };
 
@@ -161,11 +160,21 @@ public class OrientBootstrap
 
   @Subscribe
   public void on(final NexusInitializedEvent event) {
-    Starter.start(this);
+    try {
+      start();
+    }
+    catch (Exception e) {
+      throw new Error("Failed to start", e);
+    }
   }
 
   @Subscribe
   public void on(final NexusStoppedEvent event) {
-    Stopper.stop(this);
+    try {
+      stop();
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 }

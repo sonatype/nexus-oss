@@ -283,32 +283,6 @@
 
   <build>
     <plugins>
-      <!--
-      Workaround for issue where jetty-osgi-boot prefers a file URL (will be fixed by reworking bootstrap code)
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <stripVersion>true</stripVersion>
-              <outputDirectory>${project.build.directory}/assembly/tmp</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus</groupId>
-                  <artifactId>nexus-jettyapp</artifactId>
-                  <version>${nexus.version}</version>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
@@ -321,10 +295,8 @@
             <configuration>
               <target>
                 <echo append="true" file="${project.build.directory}/assembly/etc/custom.properties">
-                  bundleBasedir=${karaf.base}
-                </echo>
-                <echo append="true" file="${project.build.directory}/assembly/etc/system.properties">
-                  jetty.home.bundle=org.eclipse.jetty.osgi.boot
+                  nexus-base=${karaf.base}
+                  nexus-args=${karaf.base}/conf/jetty.xml,${karaf.base}/conf/jetty-requestlog.xml
                 </echo>
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg"
                   token=",management" value=",nexus-oss-edition" />

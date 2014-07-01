@@ -32,7 +32,7 @@ assert pluginFile && pluginFile.exists()
 def installDir = options.i as File
 assert installDir && installDir.exists()
 
-def repoDir = new File(installDir, 'nexus/WEB-INF/plugin-repository')
+def repoDir = new File(installDir, 'plugin-repository')
 
 def ant = new AntBuilder()
 

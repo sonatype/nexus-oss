@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.webapp;
+package org.sonatype.nexus.bootstrap.osgi;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -27,15 +27,17 @@ import org.osgi.util.tracker.ServiceTracker;
  * 
  * @since 3.0
  */
-final class ListenerTracker
+public final class ListenerTracker
     extends ServiceTracker<ServletContextListener, ServletContextListener>
 {
   private static final String QUERY = "(&(objectClass=" + ServletContextListener.class.getName() + ")(name=%s))";
 
-  private ServletContext servletContext;
+  private final ServletContext servletContext;
 
-  public ListenerTracker(BundleContext ctx, String name, ServletContext servletContext) throws InvalidSyntaxException {
-    super(ctx, FrameworkUtil.createFilter(String.format(QUERY, name)), null);
+  public ListenerTracker(BundleContext bundleContext, String name, ServletContext servletContext)
+      throws InvalidSyntaxException
+  {
+    super(bundleContext, FrameworkUtil.createFilter(String.format(QUERY, name)), null);
     this.servletContext = servletContext;
   }
 
