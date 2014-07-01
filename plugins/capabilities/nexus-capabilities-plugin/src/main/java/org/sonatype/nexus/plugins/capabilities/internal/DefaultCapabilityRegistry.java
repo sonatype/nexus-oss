@@ -41,7 +41,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityNotFoundException;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent;
+import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent.Ready;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.ValidationResult;
 import org.sonatype.nexus.plugins.capabilities.Validator;
@@ -364,7 +364,7 @@ public class DefaultCapabilityRegistry
         reference.activate();
       }
     }
-    eventBus.post(new CapabilityRegistryEvent.AfterLoad(this));
+    eventBus.post(new Ready(this));
   }
 
   private DefaultCapabilityReference create(final CapabilityIdentity id,

@@ -13,11 +13,10 @@
 package org.sonatype.nexus.rapture.internal.capability;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityBooterSupport;
-
-import org.eclipse.sisu.EagerSingleton;
 
 /**
  * Automatically create Rapture capabilities.
@@ -25,15 +24,12 @@ import org.eclipse.sisu.EagerSingleton;
  * @since 3.0
  */
 @Named
-@EagerSingleton
+@Singleton
 public class RaptureCapabilitiesBooter
     extends CapabilityBooterSupport
 {
-
   @Override
-  protected void boot(final CapabilityRegistry registry)
-      throws Exception
-  {
+  protected void boot(final CapabilityRegistry registry) throws Exception {
     maybeAddCapability(
         registry,
         RaptureSettingsCapabilityDescriptor.TYPE,
@@ -42,5 +38,4 @@ public class RaptureCapabilitiesBooter
         new RaptureSettingsCapabilityConfiguration().asMap()
     );
   }
-
 }

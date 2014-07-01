@@ -26,8 +26,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.threads.NexusExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -44,7 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class EventSubscriberHost
-    extends ComponentSupport
+    extends LifecycleSupport
 {
   private final int HOST_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
       EventSubscriberHost.class.getName() + ".poolSize", 500);
@@ -73,8 +73,8 @@ public class EventSubscriberHost
     log.info("Initialized");
   }
 
-  public void startup() {
-    log.info("Starting");
+  @Override
+  protected void doStart() throws Exception {
     for (Provider<EventSubscriber> eventSubscriberProvider : eventSubscriberProviders) {
       EventSubscriber es = null;
       try {
@@ -82,14 +82,14 @@ public class EventSubscriberHost
         register(es);
       }
       catch (Exception e) {
-        log.warn("Could not register {}", es, e);
+        log.warn("Could not register: {}", es, e);
       }
     }
   }
 
-  public void shutdown() {
+  @Override
+  protected void doStop() throws Exception {
     eventBus.unregister(this);
-    log.info("Stopping");
 
     for (Provider<EventSubscriber> eventSubscriberProvider : eventSubscriberProviders) {
       EventSubscriber es = null;
@@ -98,7 +98,7 @@ public class EventSubscriberHost
         unregister(es);
       }
       catch (Exception e) {
-        log.warn("Could not unregister {}", es, e);
+        log.warn("Could not unregister: {}", es, e);
       }
     }
 
