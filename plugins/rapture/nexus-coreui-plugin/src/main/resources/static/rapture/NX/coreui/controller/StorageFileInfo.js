@@ -50,7 +50,9 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
     }
 
     NX.direct.coreui_RepositoryStorage.readInfo(repositoryId, path, function(response) {
-      var info = {};
+      var info = {},
+          repositories = [];
+
       if (Ext.isDefined(response) && response.success && response.data) {
         info = {
           'Path': NX.util.Url.asLink(
@@ -59,14 +61,23 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
           )
         };
         if (response.data['inLocalStorage']) {
+          Ext.Array.each(response.data['repositories'], function(repository) {
+            repositories.push(NX.util.Url.asLink(
+                NX.util.Url.urlOf('#browse/repository/standard:' + repository['id'] + ':storage'),
+                repository['name'],
+                '_self'
+            ));
+          });
           Ext.apply(info, {
             'Size': me.toSizeString(response.data['size']),
             'Uploaded by': response.data['createdBy'],
             'Uploaded Date': Ext.Date.parse(response.data['created'], 'c'),
             'Last Modified': Ext.Date.parse(response.data['modified'], 'c'),
             'SHA1': response.data['sha1'],
-            'MD5': response.data['md5']
+            'MD5': response.data['md5'],
+            'Contained in': repositories
           });
+
         }
       }
       panel.showInfo(info);
