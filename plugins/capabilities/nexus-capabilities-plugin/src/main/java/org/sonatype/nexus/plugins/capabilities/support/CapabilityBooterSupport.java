@@ -16,20 +16,16 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
-import javax.inject.Inject;
-
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent;
+import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent.Ready;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
 import com.google.common.eventbus.Subscribe;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder.capabilities;
 
 /**
@@ -38,30 +34,21 @@ import static org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenc
  * @since capabilities 2.2
  */
 public abstract class CapabilityBooterSupport
+  extends ComponentSupport
+  implements EventSubscriber
 {
-
-  private static final Logger log = LoggerFactory.getLogger(CapabilityBooterSupport.class);
-
-  @Inject
-  public void installEventBus(final EventBus eventBus) {
-    checkNotNull(eventBus).register(new Object()
-    {
-      @Subscribe
-      public void handle(final CapabilityRegistryEvent.AfterLoad event) {
-        eventBus.unregister(this);
-        final CapabilityRegistry registry = event.getEventSender();
-        try {
-          boot(registry);
-        }
-        catch (Exception e) {
-          throw Throwables.propagate(e);
-        }
-      }
-    });
+  @Subscribe
+  public void handle(final Ready event) {
+    final CapabilityRegistry registry = event.getEventSender();
+    try {
+      boot(registry);
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 
-  protected abstract void boot(final CapabilityRegistry registry)
-      throws Exception;
+  protected abstract void boot(final CapabilityRegistry registry) throws Exception;
 
   protected void maybeAddCapability(final CapabilityRegistry capabilityRegistry,
                                     final CapabilityType type,

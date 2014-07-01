@@ -14,16 +14,19 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.EventSubscriber;
+import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent.Ready;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageConverter;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.DefaultCapabilityStorage;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.base.Throwables;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Provider;
-import org.eclipse.sisu.EagerSingleton;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -33,35 +36,43 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since capabilities 2.0
  */
 @Named
-@EagerSingleton
+@Singleton
 public class CapabilityRegistryBooter
+  implements EventSubscriber
 {
-  private final Provider<DefaultCapabilityRegistry> capabilityRegistry;
+  private final EventBus eventBus;
 
-  private final DefaultCapabilityStorage capabilityStorage;
+  private final Provider<DefaultCapabilityRegistry> capabilityRegistryProvider;
 
-  private final CapabilityStorageConverter storageConverter;
+  private final Provider<DefaultCapabilityStorage> capabilityStorageProvider;
+
+  private final Provider<CapabilityStorageConverter> storageConverterProvider;
 
   @Inject
-  public CapabilityRegistryBooter(final Provider<DefaultCapabilityRegistry> capabilityRegistry,
-                                  final DefaultCapabilityStorage capabilityStorage,
-                                  final EventBus eventBus,
-                                  final CapabilityStorageConverter storageConverter)
+  public CapabilityRegistryBooter(final EventBus eventBus,
+                                  final Provider<DefaultCapabilityRegistry> capabilityRegistryProvider,
+                                  final Provider<DefaultCapabilityStorage> capabilityStorageProvider,
+                                  final Provider<CapabilityStorageConverter> storageConverterProvider)
   {
-    this.capabilityRegistry = capabilityRegistry;
-    this.capabilityStorage = checkNotNull(capabilityStorage);
-    this.storageConverter = checkNotNull(storageConverter);
-    checkNotNull(eventBus).register(this);
+    this.eventBus = checkNotNull(eventBus);
+    this.capabilityRegistryProvider = checkNotNull(capabilityRegistryProvider);
+    this.capabilityStorageProvider = checkNotNull(capabilityStorageProvider);
+    this.storageConverterProvider = checkNotNull(storageConverterProvider);
   }
 
   @Subscribe
   public void handle(final NexusInitializedEvent event) {
     try {
-      capabilityStorage.start();
-      storageConverter.convertToKazukiIfNecessary();
-      capabilityRegistry.get().load();
+      capabilityStorageProvider.get().start();
+      storageConverterProvider.get().convertToKazukiIfNecessary();
+      DefaultCapabilityRegistry registry = capabilityRegistryProvider.get();
+      registry.load();
+
+      // fire event when the registry is loaded and ready for use
+      eventBus.post(new Ready(registry));
     }
     catch (final Exception e) {
+      // fail hard with an error to stop further server activity
       throw new Error("Could not boot capabilities", e);
     }
   }
@@ -69,16 +80,10 @@ public class CapabilityRegistryBooter
   @Subscribe
   public void handle(final NexusStoppingEvent event) {
     try {
-      capabilityStorage.stop();
+      capabilityStorageProvider.get().stop();
     }
     catch (final Exception e) {
-      throw new RuntimeException("Could not shutdown", e);
+      throw Throwables.propagate(e);
     }
   }
-
-  @Override
-  public String toString() {
-    return "Load capabilities from persistence store when Nexus is initialized";
-  }
-
 }

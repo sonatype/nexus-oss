@@ -93,7 +93,7 @@ public class DebugEventInspector
 
   @Subscribe
   @AllowConcurrentEvents
-  public void accept(Event<?> evt) {
-    log.info(String.valueOf(evt));
+  public void accept(final Event<?> event) {
+    log.info("{}", event);
   }
 }

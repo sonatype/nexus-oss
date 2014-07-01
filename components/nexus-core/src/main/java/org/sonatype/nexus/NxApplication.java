@@ -67,10 +67,13 @@ public class NxApplication
   private final EventSubscriberHost eventSubscriberHost;
 
   @Inject
-  public NxApplication(final EventBus eventBus, final NexusConfiguration nexusConfiguration,
-      final ApplicationStatusSource applicationStatusSource, final SecuritySystem securitySystem,
-      final NexusScheduler nexusScheduler, final RepositoryRegistry repositoryRegistry,
-      final EventSubscriberHost eventSubscriberHost)
+  public NxApplication(final EventBus eventBus,
+                       final NexusConfiguration nexusConfiguration,
+                       final ApplicationStatusSource applicationStatusSource,
+                       final SecuritySystem securitySystem,
+                       final NexusScheduler nexusScheduler,
+                       final RepositoryRegistry repositoryRegistry,
+                       final EventSubscriberHost eventSubscriberHost)
   {
     this.eventBus = checkNotNull(eventBus);
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
@@ -101,10 +104,9 @@ public class NxApplication
   }
 
   @Override
-  protected void doStart() {
-
+  protected void doStart() throws Exception {
     // register core and plugin contributed subscribers, start dispatching events to them
-    eventSubscriberHost.startup();
+    eventSubscriberHost.start();
 
     applicationStatusSource.setState(SystemState.STOPPED);
     applicationStatusSource.getSystemStatus().setInitializedAt(new Date());
@@ -171,14 +173,14 @@ public class NxApplication
   }
 
   @Override
-  protected void doStop() {
+  protected void doStop() throws Exception {
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPING);
     // Due to no dependency mechanism in NX for components, we need to fire off a hint about shutdown first
     eventBus.post(new NexusStoppingEvent(this));
     // kill services + notify
     nexusScheduler.shutdown();
     eventBus.post(new NexusStoppedEvent(this));
-    eventSubscriberHost.shutdown();
+    eventSubscriberHost.stop();
     nexusConfiguration.dropInternals();
     securitySystem.stop();
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPED);
