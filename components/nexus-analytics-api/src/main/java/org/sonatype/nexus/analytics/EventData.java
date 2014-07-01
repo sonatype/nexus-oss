@@ -34,7 +34,7 @@ public class EventData
 
   private String sessionId;
 
-  private final Map<String, Object> attributes = Maps.newHashMap();
+  private final Map<String, String> attributes = Maps.newHashMap();
 
   public String getType() {
     return type;
@@ -76,7 +76,7 @@ public class EventData
     this.sessionId = sessionId;
   }
 
-  public Map<String, Object> getAttributes() {
+  public Map<String, String> getAttributes() {
     return attributes;
   }
 
