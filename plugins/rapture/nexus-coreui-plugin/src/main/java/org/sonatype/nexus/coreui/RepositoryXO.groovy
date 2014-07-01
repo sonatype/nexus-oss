@@ -30,6 +30,7 @@ class RepositoryXO
   String format
   String formatName
   String localStatus
+  Boolean userManaged
   Boolean browseable
   Boolean exposed
   String url

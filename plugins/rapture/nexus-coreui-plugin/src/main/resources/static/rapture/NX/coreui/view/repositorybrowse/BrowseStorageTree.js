@@ -56,6 +56,17 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseStorageTree', {
     });
 
     me.callParent(arguments);
+
+    me.addEvents(
+        /**
+         * @event beforecontextmenushow
+         * Fires before showing the context menu.
+         * @param {Ext.menu.Menu} to be shown
+         * @param {NX.coreui.model.Repository} repository
+         * param {Ext.data.NodeInterface} clicked node
+         */
+        'beforecontextmenushow'
+    );
   }
 
 });

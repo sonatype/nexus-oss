@@ -52,7 +52,9 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
         'nx-coreui-repositorybrowse-storage-tree': {
           select: me.onNodeSelected,
           beforeitemexpand: me.loadChildren,
-          itemclick: me.onItemClick
+          itemclick: me.onItemClick,
+          beforeitemcontextmenu: me.showContextMenu,
+          beforecontextmenushow: me.fillContextMenu
         }
       }
     });
@@ -76,6 +78,7 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
     var me = this,
         tree = me.getTree();
 
+    tree.repository = repositoryModel;
     tree.getStore().setRootNode({
       repositoryId: repositoryModel.getId(),
       path: '/',
@@ -126,6 +129,153 @@ Ext.define('NX.coreui.controller.BrowseStorage', {
         }
       });
     }
+  },
+
+  /**
+   * @private
+   * Show context menu.
+   */
+  showContextMenu: function(view, node, item, index, event) {
+    var me = this,
+        tree = me.getTree(),
+        menu = Ext.create('Ext.menu.Menu');
+
+    tree.fireEvent('beforecontextmenushow', menu, tree.repository, node);
+    event.stopEvent();
+    if (menu.items.length) {
+      menu.showAt(event.getXY());
+      return false;
+    }
+    return true;
+  },
+
+  /**
+   * @private
+   * Fill context menu with default menu items.
+   */
+  fillContextMenu: function(menu, repository, node) {
+    var me = this;
+
+    if (NX.Permissions.check('nexus:cache', 'delete')
+        && repository.get('type') !== 'virtual' && repository.get('userManaged')) {
+      menu.add({
+        text: 'Expire Cache',
+        handler: Ext.bind(me.expireCache, me, [repository, node.get('path')])
+      });
+    }
+    if (NX.Permissions.check('nexus:metadata', 'delete')
+        && (repository.get('format') === 'maven1' || repository.get('format') === 'maven2' )
+        && (repository.get('type') === 'hosted' || repository.get('type') === 'group' )
+        && repository.get('userManaged')) {
+      menu.add({
+        text: 'Rebuild Metadata',
+        handler: Ext.bind(me.rebuildMavenMetadata, me, [repository, node.get('path')])
+      });
+    }
+    if (node.isLeaf() && repository.get('type') === 'proxy') {
+      menu.add({
+        text: 'Download From Remote',
+        handler: Ext.bind(me.downloadPath, me, [repository.get('remoteStorageUrl'), node.get('path')])
+      });
+    }
+    if (!node.isRoot() && !node.isLeaf() && repository.get('type') === 'proxy') {
+      menu.add({
+        text: 'View Remote',
+        handler: Ext.bind(me.downloadPath, me, [repository.get('remoteStorageUrl'), node.get('path')])
+      });
+    }
+    if (node.isLeaf()) {
+      menu.add({
+        text: 'Download',
+        handler: Ext.bind(me.downloadStorageFile, me, [repository.getId(), node.get('path')])
+      });
+    }
+    if (!node.isRoot() && repository.get('type') !== 'group') {
+      menu.add({
+        text: 'Delete',
+        handler: Ext.bind(me.deleteStorageFile, me, [repository, node])
+      });
+    }
+  },
+
+  /**
+   * @private
+   * Expire repository cache.
+   * @param repository repository (model) to expire cache
+   * @param path path to expire cache
+   */
+  expireCache: function(repository, path) {
+    NX.direct.coreui_Repository.clearCache(repository.getId(), path, function(response) {
+      if (Ext.isDefined(response) && response.success) {
+        NX.Messages.add({
+          text: 'Started expiring caches of "' + repository.get('name') + '", path "' + path + '"',
+          type: 'success'
+        });
+      }
+    });
+  },
+
+  /**
+   * @private
+   * Rebuild Maven metadata.
+   * @param repository repository (model) to rebuild metadata
+   * @param path path to rebuild metadata
+   */
+  rebuildMavenMetadata: function(repository, path) {
+    NX.direct.coreui_Maven.rebuildMetadata(repository.getId(), path, function(response) {
+      if (Ext.isDefined(response) && response.success) {
+        NX.Messages.add({
+          text: 'Started rebuilding metadata of "' + repository.get('name') + '", path "' + path + '"',
+          type: 'success'
+        });
+      }
+    });
+  },
+
+  /**
+   * @private
+   * Download path.
+   * @param url to download from
+   * @param path to download
+   */
+  downloadPath: function(url, path) {
+    window.open(url + path);
+  },
+
+  /**
+   * @private
+   * Download via content.
+   * @param repositoryId id of repository to download from
+   * @param path to download
+   */
+  downloadStorageFile: function(repositoryId, path) {
+    this.downloadPath(NX.util.Url.urlOf('content/repositories/' + repositoryId), path);
+  },
+
+  /**
+   * @private
+   * Delete storage file.
+   * @param repository repository (model) to delete from
+   * @param node to delete
+   */
+  deleteStorageFile: function(repository, node) {
+    var path = node.get('path');
+
+    NX.Dialogs.askConfirmation(
+        'Delete Repository Item',
+        'Delete the selected "' + path + '" ' + (node.isLeaf() ? 'file' : 'folder'),
+        function() {
+          NX.direct.coreui_RepositoryStorage.delete(repository.getId(), path, function(response) {
+            if (Ext.isDefined(response) && response.success) {
+              node.parentNode.removeChild(node);
+              NX.Messages.add({
+                text: 'Deleted "' + repository.get('name') + '", path "' + path + '"',
+                type: 'success'
+              });
+            }
+          });
+        }
+    );
   }
 
 });

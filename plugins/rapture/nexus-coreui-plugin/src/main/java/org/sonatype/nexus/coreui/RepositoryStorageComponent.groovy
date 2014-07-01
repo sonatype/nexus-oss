@@ -15,6 +15,7 @@ package org.sonatype.nexus.coreui
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.commons.io.FilenameUtils
+import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
@@ -126,6 +127,16 @@ extends DirectComponentSupport
           inLocalStorage: false
       )
     }
+  }
+
+  @DirectMethod
+  @RequiresAuthentication
+  @Validate
+  void delete(final @NotEmpty(message = '[id] may not be empty') String id,
+              final String path)
+  {
+    protectedRepositoryRegistry.getRepository(id).deleteItem(new ResourceStoreRequest(path, true))
+    log.info "Storage item(s) on path \"${path}\" (and below) were deleted from repository [${id}]"
   }
 
   List<RepositoryStorageItemXO> render(final StorageItem item) {
