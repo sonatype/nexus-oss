@@ -86,6 +86,8 @@ public class OrientBootstrap
     }
 
     server.activate();
+    log.info("Server activated");
+
     this.server = server;
   }
 
@@ -114,15 +116,18 @@ public class OrientBootstrap
         new OServerNetworkProtocolConfiguration("binary", ONetworkProtocolBinary.class.getName())
     );
 
-    OServerNetworkListenerConfiguration binaryListener = new OServerNetworkListenerConfiguration();
-    binaryListener.ipAddress = "0.0.0.0";
-    binaryListener.portRange = "2424-2430";
-    binaryListener.protocol = "binary";
-    binaryListener.socket = "default";
+    config.network.listeners = Lists.newArrayList();
 
-    config.network.listeners = Lists.newArrayList(
-        binaryListener
-    );
+    // HACK: Optionally enable the binary listener
+    if (listenerEnabled) {
+      OServerNetworkListenerConfiguration binaryListener = new OServerNetworkListenerConfiguration();
+      binaryListener.ipAddress = "0.0.0.0";
+      binaryListener.portRange = "2424-2430";
+      binaryListener.protocol = "binary";
+      binaryListener.socket = "default";
+      config.network.listeners.add(binaryListener);
+      log.info("Listener enabled: {}:[{}]", binaryListener.ipAddress, binaryListener.portRange);
+    }
 
     config.storages = new OServerStorageConfiguration[] {};
 
