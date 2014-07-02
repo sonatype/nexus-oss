@@ -1164,9 +1164,8 @@ public abstract class AbstractProxyRepository
               }
 
               if (ex instanceof RemoteAccessDeniedException) {
-                if (log.isDebugEnabled()) {
-                  log.debug("Error code 403 {} obtaining {} from remote storage.", ex.getMessage(), request);
-                }
+                log.debug("Error code 403 {} obtaining {} from remote storage.", ex.getMessage(), request);
+                request.getRequestContext().put("remote.accessDeniedException", ex);
               }
 
               remoteItem = null;
