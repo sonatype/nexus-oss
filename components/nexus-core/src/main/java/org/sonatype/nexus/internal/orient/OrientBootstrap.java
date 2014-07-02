@@ -21,14 +21,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
-import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
-import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.OConstants;
 import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.config.OGlobalConfiguration;
@@ -43,6 +38,7 @@ import com.orientechnologies.orient.server.config.OServerStorageConfiguration;
 import com.orientechnologies.orient.server.config.OServerUserConfiguration;
 import com.orientechnologies.orient.server.network.protocol.binary.ONetworkProtocolBinary;
 import org.apache.commons.io.output.WriterOutputStream;
+import org.eclipse.sisu.Priority;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -53,9 +49,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @Singleton
+@Priority(-1000000)
 public class OrientBootstrap
     extends LifecycleSupport
-    implements EventSubscriber
+    //implements EventSubscriber
 {
   private final ApplicationDirectories applicationDirectories;
 
@@ -72,12 +69,18 @@ public class OrientBootstrap
 
     log.info("OrientDB version: {}", OConstants.getVersion());
 
-    // disable default shutdown-hook, will shutdown manually when nexus is stopped
+    // disable default global shutdown-hook, will shutdown manually when nexus is stopped
     Orient.instance().removeShutdownHook();
   }
 
   @Override
   protected void doStart() throws Exception {
+    // global startup
+    //Orient.instance().startup();
+
+    System.out.println("ORIENTDB STARTUP\n\n");
+
+    // instance startup
     OServer server = new OServer();
     OServerConfiguration config = createConfiguration();
     server.startup(config);
@@ -148,33 +151,37 @@ public class OrientBootstrap
 
   @Override
   protected void doStop() throws Exception {
-    // TODO: Do we need to do this, or leave this to global shutdown?
-    //server.shutdown();
+    // instance shutdown
+    server.shutdown();
     server = null;
-    Orient.instance().shutdown();
+
+    // global shutdown
+    //Orient.instance().shutdown();
+
+    log.info("Server shutdown");
   }
 
   //
   // Event adapters
   //
 
-  @Subscribe
-  public void on(final NexusInitializedEvent event) {
-    try {
-      start();
-    }
-    catch (Exception e) {
-      throw new Error("Failed to start", e);
-    }
-  }
-
-  @Subscribe
-  public void on(final NexusStoppedEvent event) {
-    try {
-      stop();
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
-  }
+  //@Subscribe
+  //public void on(final NexusInitializedEvent event) {
+  //  try {
+  //    start();
+  //  }
+  //  catch (Exception e) {
+  //    throw new Error("Failed to start", e);
+  //  }
+  //}
+  //
+  //@Subscribe
+  //public void on(final NexusStoppedEvent event) {
+  //  try {
+  //    stop();
+  //  }
+  //  catch (Exception e) {
+  //    throw Throwables.propagate(e);
+  //  }
+  //}
 }
