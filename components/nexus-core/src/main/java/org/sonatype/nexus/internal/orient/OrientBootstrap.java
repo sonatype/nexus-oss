@@ -73,7 +73,7 @@ public class OrientBootstrap
   @Override
   protected void doStart() throws Exception {
     // global startup
-    //Orient.instance().startup();
+    Orient.instance().startup();
 
     // instance startup
     OServer server = new OServer();
@@ -88,7 +88,7 @@ public class OrientBootstrap
     }
 
     server.activate();
-    log.info("Server activated");
+    log.info("OrientDB activated");
 
     this.server = server;
   }
@@ -151,8 +151,8 @@ public class OrientBootstrap
     server = null;
 
     // global shutdown
-    //Orient.instance().shutdown();
+    Orient.instance().shutdown();
 
-    log.info("Server shutdown");
+    log.info("OrientDB shutdown");
   }
 }
