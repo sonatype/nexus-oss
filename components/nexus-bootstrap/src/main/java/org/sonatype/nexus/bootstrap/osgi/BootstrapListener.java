@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.webapp;
+package org.sonatype.nexus.bootstrap.osgi;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,9 @@ import org.sonatype.nexus.bootstrap.LockFile;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.startlevel.FrameworkStartLevel;
@@ -42,14 +44,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Web application bootstrap {@link ServletContextListener}.
+ * {@link ServletContextListener} that bootstraps an OSGi-based application.
  * 
- * @since 2.8
+ * @since 3.0
  */
-public class WebappBootstrap
+public class BootstrapListener
     implements ServletContextListener
 {
-  private static final Logger log = LoggerFactory.getLogger(WebappBootstrap.class);
+  private static final Logger log = LoggerFactory.getLogger(BootstrapListener.class);
 
   private LockFile lockFile;
 
@@ -71,14 +73,16 @@ public class WebappBootstrap
         log.info("Using bootstrap launcher configuration");
       }
       else {
-        log.info("Loading configuration for WAR deployment environment");
+        log.info("Loading configuration for WAR deployment");
 
-        // FIXME: This is what was done before, it seems completely wrong in WAR deployment since there is no bundle
-        String baseDir = System.getProperty("bundleBasedir", servletContext.getRealPath("/WEB-INF"));
+        String baseDir = (String) servletContext.getAttribute("nexus-base");
+        if (baseDir == null) {
+          baseDir = servletContext.getRealPath("/WEB-INF");
+        }
 
         properties = new ConfigurationBuilder()
             .defaults()
-            .set("bundleBasedir", new File(baseDir).getCanonicalPath())
+            .set("nexus-base", new File(baseDir).getCanonicalPath())
             .properties("/nexus.properties", true)
             .properties("/nexus-test.properties", false)
             .custom(new EnvironmentVariables())
@@ -90,7 +94,7 @@ public class WebappBootstrap
       }
 
       // Ensure required properties exist
-      requireProperty(properties, "bundleBasedir");
+      requireProperty(properties, "nexus-base");
       requireProperty(properties, "nexus-work");
       requireProperty(properties, "nexus-app");
       requireProperty(properties, "application-conf");
@@ -108,62 +112,29 @@ public class WebappBootstrap
         throw new IllegalStateException("Nexus work directory already in use: " + workDir);
       }
 
-      StringBuilder exports = new StringBuilder("com.sun.net.httpserver,");
-      InputStream is = getClass().getClassLoader().getResourceAsStream("META-INF/MANIFEST.MF");
-      try {
-        exports.append(new Manifest(is).getMainAttributes().getValue(Constants.EXPORT_PACKAGE));
+      // are we already running in OSGi or should we embed OSGi?
+      Bundle containingBundle = FrameworkUtil.getBundle(getClass());
+      BundleContext bundleContext;
+      if (containingBundle != null) {
+        bundleContext = containingBundle.getBundleContext();
       }
-      finally {
-        is.close();
-      }
-
-      // export additional core (non-plugin) packages from system bundle
-      properties.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, exports.toString());
-
-      properties.put(Constants.FRAMEWORK_STORAGE, workDir + "/felix-cache");
-      properties.put(Constants.FRAMEWORK_STORAGE_CLEAN, Constants.FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
-      properties.put(Constants.FRAMEWORK_BOOTDELEGATION, "sun.*");
-
-      framework = ServiceLoader.load(FrameworkFactory.class).iterator().next().newFramework(properties);
-
-      framework.init();
-      framework.start();
-
-      BundleContext ctx = framework.getBundleContext();
-      FrameworkStartLevel startLevel = framework.adapt(FrameworkStartLevel.class);
-      startLevel.setStartLevel(1);
-
-      startLevel.setInitialBundleStartLevel(80);
-
-      File[] bundleFiles = new File(properties.get("nexus-app") + "/bundles").listFiles();
-
-      // auto-install anything in the bundles repository
-      if (bundleFiles != null && bundleFiles.length > 0) {
-        for (File file : bundleFiles) {
-          try {
-            Bundle bundle = ctx.installBundle("reference:" + file.toURI());
-            BundleRevision revision = bundle.adapt(BundleRevision.class);
-            if (revision != null && (revision.getTypes() & BundleRevision.TYPE_FRAGMENT) == 0) {
-              bundle.start(); // only need to start non-fragment bundles
-            }
-          }
-          catch (Exception e) {
-            log.warn("Problem installing: {}", file, e);
-          }
-        }
+      else {
+        bundleContext = launchFramework(workDir, properties);
       }
 
-      startLevel.setStartLevel(80); // activate all installed bundles
-
-      // wait for the Nexus listener
-      listenerTracker = new ListenerTracker(ctx, "nexus", servletContext);
+      // watch out for the real Nexus listener
+      listenerTracker = new ListenerTracker(bundleContext, "nexus", servletContext);
       listenerTracker.open();
-      listenerTracker.waitForService(0);
 
-      // wait for the Nexus filter
-      filterTracker = new FilterTracker(ctx, "nexus");
+      // watch out for the real Nexus filter
+      filterTracker = new FilterTracker(bundleContext, "nexus");
       filterTracker.open();
-      filterTracker.waitForService(0);
+
+      if (containingBundle == null) {
+        // wait for embedded framework
+        listenerTracker.waitForService(0);
+        filterTracker.waitForService(0);
+      }
     }
     catch (Exception e) {
       log.error("Failed to start Nexus", e);
@@ -171,6 +142,58 @@ public class WebappBootstrap
     }
 
     log.info("Initialized");
+  }
+
+  private BundleContext launchFramework(File workDir, Map<String, String> properties) throws IOException,
+      BundleException
+  {
+    StringBuilder exports = new StringBuilder("com.sun.net.httpserver,");
+    InputStream is = getClass().getResourceAsStream("/BOOT-INF/MANIFEST.MF");
+    try {
+      exports.append(new Manifest(is).getMainAttributes().getValue(Constants.EXPORT_PACKAGE));
+    }
+    finally {
+      is.close();
+    }
+
+    // export additional core (non-plugin) packages from system bundle
+    properties.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, exports.toString());
+
+    properties.put(Constants.FRAMEWORK_STORAGE, workDir + "/felix-cache");
+    properties.put(Constants.FRAMEWORK_STORAGE_CLEAN, Constants.FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
+    properties.put(Constants.FRAMEWORK_BOOTDELEGATION, "sun.*");
+
+    framework = ServiceLoader.load(FrameworkFactory.class).iterator().next().newFramework(properties);
+
+    framework.init();
+    framework.start();
+
+    BundleContext bundleContext = framework.getBundleContext();
+    FrameworkStartLevel startLevel = framework.adapt(FrameworkStartLevel.class);
+    startLevel.setStartLevel(1);
+
+    startLevel.setInitialBundleStartLevel(80);
+
+    File[] bundleFiles = new File(properties.get("nexus-app") + "/bundles").listFiles();
+
+    // auto-install anything in the bundles repository
+    if (bundleFiles != null && bundleFiles.length > 0) {
+      for (File file : bundleFiles) {
+        try {
+          Bundle bundle = bundleContext.installBundle("reference:" + file.toURI());
+          BundleRevision revision = bundle.adapt(BundleRevision.class);
+          if (revision != null && (revision.getTypes() & BundleRevision.TYPE_FRAGMENT) == 0) {
+            bundle.start(); // only need to start non-fragment bundles
+          }
+        }
+        catch (Exception e) {
+          log.warn("Problem installing: {}", file, e);
+        }
+      }
+    }
+
+    startLevel.setStartLevel(80); // activate all installed bundles
+    return bundleContext;
   }
 
   private static void requireProperty(final Map<String, String> properties, final String name) {

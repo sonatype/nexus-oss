@@ -21,15 +21,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
-import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
-import org.sonatype.sisu.goodies.lifecycle.Starter;
-import org.sonatype.sisu.goodies.lifecycle.Stopper;
 
 import com.google.common.collect.Lists;
-import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.OConstants;
 import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.config.OGlobalConfiguration;
@@ -49,14 +43,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * OrientDB bootstrap lifecycle adapter.
- *
+ * 
  * @since 3.0
  */
 @Named
 @Singleton
 public class OrientBootstrap
     extends LifecycleSupport
-    implements EventSubscriber
 {
   private final ApplicationDirectories applicationDirectories;
 
@@ -73,12 +66,16 @@ public class OrientBootstrap
 
     log.info("OrientDB version: {}", OConstants.getVersion());
 
-    // disable default shutdown-hook, will shutdown manually when nexus is stopped
+    // disable default global shutdown-hook, will shutdown manually when nexus is stopped
     Orient.instance().removeShutdownHook();
   }
 
   @Override
   protected void doStart() throws Exception {
+    // global startup
+    //Orient.instance().startup();
+
+    // instance startup
     OServer server = new OServer();
     OServerConfiguration config = createConfiguration();
     server.startup(config);
@@ -134,9 +131,9 @@ public class OrientBootstrap
       log.info("Listener enabled: {}:[{}]", binaryListener.ipAddress, binaryListener.portRange);
     }
 
-    config.storages = new OServerStorageConfiguration[]{};
+    config.storages = new OServerStorageConfiguration[] {};
 
-    config.users = new OServerUserConfiguration[]{
+    config.users = new OServerUserConfiguration[] {
         new OServerUserConfiguration("admin", "admin", "*")
     };
 
@@ -149,21 +146,13 @@ public class OrientBootstrap
 
   @Override
   protected void doStop() throws Exception {
+    // instance shutdown
     server.shutdown();
     server = null;
-  }
 
-  //
-  // Event adapters
-  //
+    // global shutdown
+    //Orient.instance().shutdown();
 
-  @Subscribe
-  public void on(final NexusInitializedEvent event) {
-    Starter.start(this);
-  }
-
-  @Subscribe
-  public void on(final NexusStoppedEvent event) {
-    Stopper.stop(this);
+    log.info("Server shutdown");
   }
 }

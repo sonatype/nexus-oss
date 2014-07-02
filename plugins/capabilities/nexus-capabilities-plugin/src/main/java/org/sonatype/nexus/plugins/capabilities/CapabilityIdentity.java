@@ -15,7 +15,7 @@ package org.sonatype.nexus.plugins.capabilities;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Indentity of a capability.
+ * Identity of a capability.
  *
  * @since capabilities 2.0
  */

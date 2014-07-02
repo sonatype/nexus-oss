@@ -41,10 +41,15 @@
   <New id="NexusHandler" class="org.sonatype.nexus.bootstrap.jetty.InstrumentedHandler">
     <Arg>
       <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
-        <Arg><Property name="nexus-webapp"/></Arg>
-        <Arg><Property name="nexus-webapp-context-path"/></Arg>
-        <Set name="extractWAR">false</Set>
+        <Set name="descriptor"><Property name="nexus-base"/>/conf/nexus-web.xml</Set>
+        <Set name="resourceBase"><Property name="nexus-base"/>/public</Set>
+        <Set name="contextPath"><Property name="nexus-context-path"/></Set>
         <Set name="throwUnavailableOnStartupException">true</Set>
+        <Set name="configurationClasses">
+          <Array type="java.lang.String">
+            <Item>org.eclipse.jetty.webapp.WebXmlConfiguration</Item>
+          </Array>
+        </Set>
       </New>
     </Arg>
   </New>

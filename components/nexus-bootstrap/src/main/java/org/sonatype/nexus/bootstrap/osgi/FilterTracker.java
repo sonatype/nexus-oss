@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.webapp;
+package org.sonatype.nexus.bootstrap.osgi;
 
 import javax.servlet.Filter;
 
@@ -25,13 +25,13 @@ import org.osgi.util.tracker.ServiceTracker;
  * 
  * @since 3.0
  */
-final class FilterTracker
+public final class FilterTracker
     extends ServiceTracker<Filter, Filter>
 {
   private static final String QUERY = "(&(objectClass=" + Filter.class.getName() + ")(name=%s))";
 
-  public FilterTracker(BundleContext ctx, String name) throws InvalidSyntaxException {
-    super(ctx, FrameworkUtil.createFilter(String.format(QUERY, name)), null);
+  public FilterTracker(BundleContext bundleContext, String name) throws InvalidSyntaxException {
+    super(bundleContext, FrameworkUtil.createFilter(String.format(QUERY, name)), null);
   }
 
   @Override
