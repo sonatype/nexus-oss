@@ -38,7 +38,6 @@ import com.orientechnologies.orient.server.config.OServerStorageConfiguration;
 import com.orientechnologies.orient.server.config.OServerUserConfiguration;
 import com.orientechnologies.orient.server.network.protocol.binary.ONetworkProtocolBinary;
 import org.apache.commons.io.output.WriterOutputStream;
-import org.eclipse.sisu.Priority;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -49,10 +48,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @Singleton
-@Priority(-1000000)
 public class OrientBootstrap
     extends LifecycleSupport
-    //implements EventSubscriber
 {
   private final ApplicationDirectories applicationDirectories;
 
@@ -160,28 +157,4 @@ public class OrientBootstrap
 
     log.info("Server shutdown");
   }
-
-  //
-  // Event adapters
-  //
-
-  //@Subscribe
-  //public void on(final NexusInitializedEvent event) {
-  //  try {
-  //    start();
-  //  }
-  //  catch (Exception e) {
-  //    throw new Error("Failed to start", e);
-  //  }
-  //}
-  //
-  //@Subscribe
-  //public void on(final NexusStoppedEvent event) {
-  //  try {
-  //    stop();
-  //  }
-  //  catch (Exception e) {
-  //    throw Throwables.propagate(e);
-  //  }
-  //}
 }
