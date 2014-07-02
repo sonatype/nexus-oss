@@ -110,8 +110,6 @@ public class NxApplication
 
   @Override
   protected void doStart() throws Exception {
-    System.out.println("NEXUS START\n\n");
-
     // register core and plugin contributed subscribers, start dispatching events to them
     eventSubscriberHost.start();
 
@@ -185,8 +183,6 @@ public class NxApplication
 
   @Override
   protected void doStop() throws Exception {
-    System.out.println("NEXUS STOP\n\n");
-
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPING);
 
     // Due to no dependency mechanism in NX for components, we need to fire off a hint about shutdown first

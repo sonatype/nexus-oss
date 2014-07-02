@@ -75,8 +75,6 @@ public class OrientBootstrap
     // global startup
     //Orient.instance().startup();
 
-    System.out.println("ORIENTDB STARTUP\n\n");
-
     // instance startup
     OServer server = new OServer();
     OServerConfiguration config = createConfiguration();
