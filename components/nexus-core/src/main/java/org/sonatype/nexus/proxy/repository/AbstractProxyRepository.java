@@ -279,18 +279,16 @@ public abstract class AbstractProxyRepository
   /**
    * Token set when expire proxy caches is done for entire collection.
    *
-   * @since 2.9
-   *
    * @see #doExpireProxyCaches(ResourceStoreRequest, WalkerFilter)
+   * @since 2.9
    */
   protected volatile String proxyCacheInvalidationToken;
 
   /**
    * Key for storage-item invalidation token attribute.
    *
-   * @since 2.9
-   *
    * @see #isOld(int, StorageItem, boolean)
+   * @since 2.9
    */
   public static final String PROXY_CACHE_INVALIDATION_TOKEN_KEY = "proxyRepository-invalidationToken";
 
@@ -1163,6 +1161,11 @@ public abstract class AbstractProxyRepository
               if (ex instanceof RemoteStorageTransportException
                   || ex instanceof LocalStorageEOFException) {
                 throw ex;
+              }
+
+              if (ex instanceof RemoteAccessDeniedException) {
+                log.debug("Error code 403 {} obtaining {} from remote storage.", ex.getMessage(), request);
+                request.getRequestContext().put("remote.accessDeniedException", ex);
               }
 
               remoteItem = null;
