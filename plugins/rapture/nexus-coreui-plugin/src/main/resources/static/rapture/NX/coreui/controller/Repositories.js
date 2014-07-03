@@ -45,19 +45,14 @@ Ext.define('NX.coreui.controller.Repositories', {
     'repository.RepositorySettingsGroup',
     'repository.RepositorySettingsHosted',
     'repository.RepositorySettingsHostedMaven',
+    'repository.RepositorySettingsLocalStorage',
     'repository.RepositorySettingsProxy',
     'repository.RepositorySettingsProxyMaven',
-    'repository.RepositorySettingsVirtual',
+    'repository.RepositorySettingsVirtual'
   ],
   refs: [
-    {
-      ref: 'list',
-      selector: 'nx-coreui-repository-list'
-    },
-    {
-      ref: 'settings',
-      selector: 'nx-coreui-repository-feature nx-coreui-repository-settings-tab'
-    }
+    { ref: 'list', selector: 'nx-coreui-repository-list' },
+    { ref: 'settings', selector: 'nx-coreui-repository-feature nx-coreui-repository-settings-tab' }
   ],
   icons: {
     'repository-default': {
@@ -74,7 +69,7 @@ Ext.define('NX.coreui.controller.Repositories', {
       file: 'database.png',
       variants: ['x16', 'x32']
     },
-    visible: function () {
+    visible: function() {
       return NX.Permissions.check('nexus:repositories', 'read');
     }
   },
@@ -83,7 +78,7 @@ Ext.define('NX.coreui.controller.Repositories', {
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.callParent();
@@ -96,12 +91,14 @@ Ext.define('NX.coreui.controller.Repositories', {
       },
       controller: {
         '#Refresh': {
-          refresh: me.loadRepositoryTemplate
+          refresh: me.loadRelatedStores
         }
       },
       component: {
         'nx-coreui-repository-list': {
-          beforerender: me.loadRepositoryTemplate
+          beforerender: me.loadRelatedStores,
+          afterrender: me.startStatusPolling,
+          beforedestroy: me.stopStatusPolling
         },
         'nx-coreui-repository-list button[action=browse]': {
           afterrender: me.bindBrowseButton,
@@ -117,11 +114,18 @@ Ext.define('NX.coreui.controller.Repositories', {
     });
   },
 
-  getDescription: function (model) {
+  /**
+   * @override
+   */
+  getDescription: function(model) {
     return model.get('name');
   },
 
-  onSelection: function (list, model) {
+  /**
+   * @override
+   * Create & show settings panel for selected repository based on type/provider/format.
+   */
+  onSelection: function(list, model) {
     var me = this,
         settingsTab, settingsForm;
 
@@ -145,18 +149,27 @@ Ext.define('NX.coreui.controller.Repositories', {
 
   /**
    * @private
-   * (Re)load repository template store.
+   * (Re)load repository status / template stores.
    */
-  loadRepositoryTemplate: function () {
+  loadRelatedStores: function() {
     var me = this,
         list = me.getList();
 
     if (list) {
       me.getRepositoryTemplateStore().load();
+      NX.direct.coreui_Repository.readStatus(true, function(response) {
+        if (Ext.isDefined(response) && response.success) {
+          me.updateRepositoryModels(response.data);
+        }
+      });
     }
   },
 
-  onRepositoryTemplateLoad: function (store) {
+  /**
+   * @private
+   * Recreate "New" menu entries / template type.
+   */
+  onRepositoryTemplateLoad: function(store) {
     var me = this,
         list = me.getList(),
         newButton, templatesPerType = {};
@@ -164,7 +177,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     if (list) {
       newButton = list.down('button[action=new]');
       newButton.menu.removeAll();
-      store.each(function (template) {
+      store.each(function(template) {
         if (!templatesPerType[template.get('type')]) {
           templatesPerType[template.get('type')] = [];
         }
@@ -174,7 +187,7 @@ Ext.define('NX.coreui.controller.Repositories', {
           template: template
         })
       });
-      Ext.Object.each(templatesPerType, function (key, value) {
+      Ext.Object.each(templatesPerType, function(key, value) {
         newButton.menu.add({
           text: Ext.String.capitalize(key) + ' Repository',
           menu: value
@@ -187,14 +200,18 @@ Ext.define('NX.coreui.controller.Repositories', {
   /**
    * @private
    */
-  showAddWindow: function (menu) {
+  showAddWindow: function(menu) {
     var me = this,
         template = menu.template;
 
     me.createComponent('add', Ext.apply({}, template.data));
   },
 
-  createComponent: function (action, template) {
+  /**
+   * @private
+   * Creates a component specific to action / template.
+   */
+  createComponent: function(action, template) {
     var me = this,
         cmpName = 'widget.nx-repository-' + action + '-' + template.type + '-' + template.provider,
         cmpClass;
@@ -213,7 +230,7 @@ Ext.define('NX.coreui.controller.Repositories', {
   /**
    * @private
    */
-  onSettingsSubmitted: function (form, action) {
+  onSettingsSubmitted: function(form, action) {
     var me = this,
         win = form.up('nx-coreui-repository-add');
 
@@ -231,11 +248,11 @@ Ext.define('NX.coreui.controller.Repositories', {
    * Delete repository.
    * @param model repository to be deleted
    */
-  deleteModel: function (model) {
+  deleteModel: function(model) {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.coreui_Repository.delete(model.getId(), function (response) {
+    NX.direct.coreui_Repository.delete(model.getId(), function(response) {
       me.loadStore();
       if (Ext.isDefined(response) && response.success) {
         NX.Messages.add({
@@ -245,54 +262,72 @@ Ext.define('NX.coreui.controller.Repositories', {
     });
   },
 
-  getLocalStatus: function (model) {
-    var localStatus = model.get('localStatus');
+  /**
+   * @private
+   * Start polling for repository statuses.
+   */
+  startStatusPolling: function() {
+    var me = this;
 
-    if (localStatus === 'IN_SERVICE') {
-      return 'In Service';
+    if (me.statusProvider) {
+      me.statusProvider.disconnect();
     }
-    else if (localStatus === 'OUT_OF_SERVICE') {
-      return 'Out Of Service';
-    }
-    return localStatus;
+    me.statusProvider = Ext.Direct.addProvider({
+      type: 'polling',
+      url: NX.direct.api.POLLING_URLS.coreui_Repository_readStatus,
+      interval: 5000,
+      baseParams: {
+      },
+      listeners: {
+        data: function(provider, event) {
+          if (event.data && event.data.success && event.data.data) {
+            me.updateRepositoryModels(event.data.data);
+          }
+        },
+        scope: me
+      }
+    });
+    me.logDebug('Repository status pooling started');
   },
 
-  getProxyMode: function (model) {
-    var proxyMode = model.get('proxyMode');
+  /**
+   * @private
+   * Stop polling for repository statuses.
+   */
+  stopStatusPolling: function() {
+    var me = this;
 
-    if (proxyMode === 'ALLOW') {
-      return 'Allowed';
+    if (me.statusProvider) {
+      me.statusProvider.disconnect();
     }
-    else if (proxyMode === 'BLOCKED_MANUAL') {
-      return 'Manually blocked';
-    }
-    else if (proxyMode === 'BLOCKED_AUTO') {
-      return 'Automatically blocked';
-    }
-    return proxyMode;
+    me.logDebug('Repository status pooling stopped');
   },
 
-  getRemoteStatus: function (model) {
-    var remoteStatus = model.get('remoteStatus'),
-        remoteStatusReason = model.get('remoteStatusReason');
+  /**
+   * @private
+   * Updates Repository store records with values returned by status polling.
+   * @param {Array} repositoryStatuses array of status objects
+   */
+  updateRepositoryModels: function(repositoryStatuses) {
+    var me = this;
 
-    if (remoteStatus === 'UNKNOWN') {
-      return 'Unknown';
-    }
-    else if (remoteStatus === 'AVAILABLE') {
-      return 'Available';
-    }
-    else if (remoteStatus === 'UNAVAILABLE') {
-      return 'Unavailable' + (remoteStatusReason ? ' due to ' + remoteStatusReason : '');
-    }
-    return remoteStatus;
+    Ext.Array.each(repositoryStatuses, function(repositoryStatus) {
+      var repositoryModel = me.getRepositoryStore().getById(repositoryStatus.id);
+      if (repositoryModel) {
+        repositoryModel.set('localStatus', repositoryStatus['localStatus']);
+        repositoryModel.set('proxyMode', repositoryStatus['proxyMode']);
+        repositoryModel.set('remoteStatus', repositoryStatus['remoteStatus']);
+        repositoryModel.set('remoteStatusReason', repositoryStatus['remoteStatusReason']);
+        repositoryModel.commit(true);
+      }
+    });
   },
 
   /**
    * @protected
    * Enable 'Browse' when user has selected a repository.
    */
-  bindBrowseButton: function (button) {
+  bindBrowseButton: function(button) {
     var me = this;
     button.mon(
         NX.Conditions.and(
@@ -310,7 +345,7 @@ Ext.define('NX.coreui.controller.Repositories', {
    * @private
    * Navigate to same repository in browse mode.
    */
-  navigateToBrowseMode: function () {
+  navigateToBrowseMode: function() {
     var me = this,
         list = me.getList();
 

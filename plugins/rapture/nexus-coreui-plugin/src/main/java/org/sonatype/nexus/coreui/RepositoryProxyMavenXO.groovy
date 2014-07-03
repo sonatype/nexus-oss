@@ -16,6 +16,10 @@ import groovy.transform.ToString
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy
 
+import javax.validation.constraints.Max
+import javax.validation.constraints.Min
+import javax.validation.constraints.NotNull
+
 /**
  * Repository Proxy Maven exchange object.
  *
@@ -26,8 +30,17 @@ class RepositoryProxyMavenXO
 extends RepositoryProxyXO
 {
   RepositoryPolicy repositoryPolicy
+
+  @NotNull
   Boolean downloadRemoteIndexes
+
   ChecksumPolicy checksumPolicy
+
+  @Min(-1L)
+  @Max(511000L)
   Integer artifactMaxAge
+
+  @Min(-1L)
+  @Max(511000L)
   Integer metadataMaxAge
 }

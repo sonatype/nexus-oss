@@ -13,8 +13,9 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
-import org.sonatype.nexus.proxy.maven.RepositoryPolicy
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy
+
+import javax.validation.constraints.NotNull
 
 /**
  * Repository Hosted exchange object.
@@ -25,5 +26,6 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy
 class RepositoryHostedXO
 extends RepositoryXO
 {
+  @NotNull
   RepositoryWritePolicy writePolicy
 }
