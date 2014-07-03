@@ -31,6 +31,11 @@
     Testsuite auto-sharding support.
     -->
     <testsuite.basedir>${project.basedir}/..</testsuite.basedir>
+
+    <!--
+    Selects version of maven used to deploy, etc. in ITs
+    -->
+    <maven-version>2.2.1</maven-version>
   </properties>
 
   <dependencies>
@@ -168,6 +173,13 @@
         </property>
       </activation>
       <build>
+        <resources>
+          <resource>
+            <directory>${basedir}/src/test/it-resources/default-config</directory>
+            <targetPath>${project.build.directory}/resources/default-configs</targetPath>
+            <filtering>false</filtering>
+          </resource>
+        </resources>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -218,37 +230,100 @@
               </execution>
             </executions>
           </plugin>
-
           <plugin>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-test-environment-maven-plugin</artifactId>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
             <executions>
               <execution>
+                <id>unpack-maven</id>
+                <phase>pre-integration-test</phase>
                 <goals>
-                  <goal>setup-environment</goal>
+                  <goal>unpack</goal>
                 </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/maven</outputDirectory>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.apache.maven</groupId>
+                      <artifactId>apache-maven</artifactId>
+                      <version>${maven-version}</version>
+                      <classifier>bin</classifier>
+                      <type>tar.gz</type>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+              <execution>
+                <id>unpack-nexus</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/nexus</outputDirectory>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>${it.nexus.bundle.groupId}</groupId>
+                      <artifactId>${it.nexus.bundle.artifactId}</artifactId>
+                      <version>${it.nexus.bundle.version}</version>
+                      <classifier>bundle</classifier>
+                      <type>zip</type>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+              <execution>
+                <id>install-plugins</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/nexus/${it.nexus.bundle.artifactId}-${it.nexus.bundle.version}/plugin-repository</outputDirectory>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.sonatype.nexus</groupId>
+                      <artifactId>nexus-it-helper-plugin</artifactId>
+                      <version>${nexus.version}</version>
+                    </artifactItem>
+                    <artifactItem>
+                      <groupId>org.sonatype.nexus.plugins</groupId>
+                      <artifactId>nexus-p2-bridge-plugin</artifactId>
+                      <version>${nexus.version}</version>
+                    </artifactItem>
+                    <artifactItem>
+                      <groupId>org.sonatype.nexus.plugins</groupId>
+                      <artifactId>nexus-p2-repository-plugin</artifactId>
+                      <version>${nexus.version}</version>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
               </execution>
             </executions>
-            <configuration>
-              <setupMaven>true</setupMaven>
-              <nexusBundleArtifact>
-                <groupId>${it.nexus.bundle.groupId}</groupId>
-                <artifactId>${it.nexus.bundle.artifactId}</artifactId>
-                <version>${it.nexus.bundle.version}</version>
-                <classifier>bundle</classifier>
-                <type>zip</type>
-              </nexusBundleArtifact>
-              <nexusPluginsArtifacts>
-                <plugin>
-                  <groupId>org.sonatype.nexus</groupId>
-                  <artifactId>nexus-it-helper-plugin</artifactId>
-                </plugin>
-                <plugin>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-p2-repository-plugin</artifactId>
-                </plugin>
-              </nexusPluginsArtifacts>
-            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>reserve-network-port</id>
+                <goals>
+                  <goal>reserve-network-port</goal>
+                </goals>
+                <phase>process-resources</phase>
+                <configuration>
+                  <portNames>
+                    <portName>proxy-repo-port</portName>
+                    <portName>proxy-repo-control-port</portName>
+                    <portName>nexus-application-port</portName>
+                    <portName>nexus-proxy-port</portName>
+                    <portName>nexus-control-port</portName>
+                    <portName>email-server-port</portName>
+                    <portName>webproxy-server-port</portName>
+                  </portNames>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
