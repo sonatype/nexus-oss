@@ -40,7 +40,6 @@
     <module>nexus-extender</module>
     <module>nexus-httpclient-api</module>
     <module>nexus-formfields</module>
-    <module>nexus-jettyapp</module>
     <module>nexus-launcher</module>
     <module>nexus-locks</module>
     <module>nexus-log-api</module>
@@ -52,7 +51,6 @@
     <module>nexus-scheduler</module>
     <module>nexus-security</module>
     <module>nexus-security-realms</module>
-    <module>nexus-webapp</module>
     <module>nexus-webresources-api</module>
   </modules>
 

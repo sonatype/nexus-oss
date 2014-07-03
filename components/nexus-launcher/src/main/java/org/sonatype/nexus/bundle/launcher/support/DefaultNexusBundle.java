@@ -87,8 +87,8 @@ public class DefaultNexusBundle
 
   /**
    * Whether plugins installed in "sonatype-work/nexus/plugin-repository" should not be used in case they are present
-   * in "nexus/WEB-INF/plugin-repository". This is mainly used by tests that wish to test against a bundle that
-   * already contains the plugins installed by tests.
+   * in "plugin-repository". This is mainly used by tests that wish to test against a bundle that already contains
+   * the plugins installed by tests.
    */
   private final Boolean useBundlePluginsIfPresent;
 
@@ -435,7 +435,7 @@ public class DefaultNexusBundle
     );
     if (workDirPlugins.size() > 0) {
       final Map<String, File> bundlePlugins = listPlugins(
-          new File(getNexusDirectory(), "nexus/WEB-INF/plugin-repository")
+          new File(getNexusDirectory(), "plugin-repository")
       );
       for (final Map.Entry<String, File> entry : workDirPlugins.entrySet()) {
         if (bundlePlugins.containsKey(entry.getKey())) {

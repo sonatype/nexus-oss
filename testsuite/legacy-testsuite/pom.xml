@@ -32,7 +32,10 @@
     -->
     <testsuite.basedir>${project.basedir}/..</testsuite.basedir>
 
-    <cargo.version>1.4.5</cargo.version>
+    <!--
+    Selects version of maven used to deploy, etc. in ITs
+    -->
+    <maven-version>2.2.1</maven-version>
   </properties>
 
   <dependencies>
@@ -46,11 +49,6 @@
         <exclusion>
           <groupId>junit</groupId>
           <artifactId>junit-dep</artifactId>
-        </exclusion>
-        <exclusion>
-          <!-- conflict with ant 1.7.1 from cargo tests -->
-          <groupId>ant</groupId>
-          <artifactId>ant</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -136,45 +134,6 @@
       <artifactId>nexus-ssl-client</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-ldap-plugin</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- nexus3860/* (cargo) tests -->
-    <dependency>
-      <groupId>org.codehaus.cargo</groupId>
-      <artifactId>cargo-core-api-generic</artifactId>
-      <version>${cargo.version}</version>
-      <scope>test</scope>
-      <exclusions>
-        <!-- Omit these dependencies due to enforce rules banning them -->
-        <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.cargo</groupId>
-      <artifactId>cargo-core-container-tomcat</artifactId>
-      <version>${cargo.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.cargo</groupId>
-      <artifactId>cargo-core-container-jetty</artifactId>
-      <version>${cargo.version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <profiles>
@@ -196,35 +155,6 @@
                   <properties>
                     <autoshard.mode>normal</autoshard.mode>
                     <autoshard.count>10</autoshard.count>
-
-                    <!--
-                    Exclude some slow tests for execution is slow shard.
-                    -->
-                    <autoshard.excludes>**/nexus3860/**</autoshard.excludes>
-                    <!-- cargo-based tests -->
-                  </properties>
-                </configuration>
-              </execution>
-
-              <!--
-              Generate special shard for slowly running tests.
-              -->
-              <execution>
-                <id>slow</id>
-                <phase>process-test-sources</phase>
-                <goals>
-                  <goal>execute</goal>
-                </goals>
-                <configuration>
-                  <properties>
-                    <autoshard.mode>custom</autoshard.mode>
-                    <autoshard.shardId>slow</autoshard.shardId>
-                    <autoshard.includes>**/nexus3860/**/*IT.java</autoshard.includes>
-
-                    <!--
-                    HACK: gmaven executions leak project.properties, force reconfiguration to avoid using excludes from default execution.
-                    -->
-                    <autoshard.excludes>ignore</autoshard.excludes>
                   </properties>
                 </configuration>
               </execution>
@@ -243,6 +173,13 @@
         </property>
       </activation>
       <build>
+        <resources>
+          <resource>
+            <directory>${basedir}/src/test/it-resources/default-config</directory>
+            <targetPath>${project.build.directory}/resources/default-configs</targetPath>
+            <filtering>false</filtering>
+          </resource>
+        </resources>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -293,100 +230,100 @@
               </execution>
             </executions>
           </plugin>
-
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
             <executions>
               <execution>
+                <id>unpack-maven</id>
                 <phase>pre-integration-test</phase>
                 <goals>
                   <goal>unpack</goal>
                 </goals>
                 <configuration>
+                  <outputDirectory>${project.build.directory}/maven</outputDirectory>
                   <artifactItems>
-                    <!-- Required for nexus3860/* (cargo) tests -->
+                    <artifactItem>
+                      <groupId>org.apache.maven</groupId>
+                      <artifactId>apache-maven</artifactId>
+                      <version>${maven-version}</version>
+                      <classifier>bin</classifier>
+                      <type>tar.gz</type>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+              <execution>
+                <id>unpack-nexus</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/nexus</outputDirectory>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>${it.nexus.bundle.groupId}</groupId>
+                      <artifactId>${it.nexus.bundle.artifactId}</artifactId>
+                      <version>${it.nexus.bundle.version}</version>
+                      <classifier>bundle</classifier>
+                      <type>zip</type>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+              <execution>
+                <id>install-plugins</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/nexus/${it.nexus.bundle.artifactId}-${it.nexus.bundle.version}/plugin-repository</outputDirectory>
+                  <artifactItems>
                     <artifactItem>
                       <groupId>org.sonatype.nexus</groupId>
-                      <artifactId>nexus-webapp</artifactId>
-                      <type>war</type>
-                      <outputDirectory>${project.build.directory}/nexus/webapp</outputDirectory>
-                    </artifactItem>
-                    <!--
-                    Versions here must be kept in sync with nexus3860/* (cargo) tests.
-                    Including/excluding only the bits needed for the container tests to function, keep out all other ancillary crud.
-
-                    The Tomcat distributions referenced are not actually available in central, but are in the third-party repository on RSO:
-                    https://repository.sonatype.org/content/repositories/third-party/org/apache/tomcat/apache-tomcat/
-                    -->
-                    <artifactItem>
-                      <groupId>org.apache.tomcat</groupId>
-                      <artifactId>apache-tomcat</artifactId>
-                      <version>6.0.37</version>
-                      <type>zip</type>
-                      <outputDirectory>${project.build.directory}/containers</outputDirectory>
-                      <includes>*/bin/**,*/conf/**,*/lib/**,*/webapps/*manager/**</includes>
+                      <artifactId>nexus-it-helper-plugin</artifactId>
+                      <version>${nexus.version}</version>
                     </artifactItem>
                     <artifactItem>
-                      <groupId>org.apache.tomcat</groupId>
-                      <artifactId>apache-tomcat</artifactId>
-                      <version>7.0.47</version>
-                      <type>zip</type>
-                      <outputDirectory>${project.build.directory}/containers</outputDirectory>
-                      <includes>*/bin/**,*/conf/**,*/lib/**,*/webapps/*manager/**</includes>
+                      <groupId>org.sonatype.nexus.plugins</groupId>
+                      <artifactId>nexus-p2-bridge-plugin</artifactId>
+                      <version>${nexus.version}</version>
                     </artifactItem>
                     <artifactItem>
-                      <groupId>org.eclipse.jetty</groupId>
-                      <artifactId>jetty-distribution</artifactId>
-                      <version>8.1.14.v20131031</version>
-                      <type>zip</type>
-                      <outputDirectory>${project.build.directory}/containers</outputDirectory>
-                      <includes>*/start*,*/bin/**,*/etc/**,*/lib/**</includes>
-                    </artifactItem>
-                    <artifactItem>
-                      <groupId>org.eclipse.jetty</groupId>
-                      <artifactId>jetty-distribution</artifactId>
-                      <version>7.6.14.v20131031</version>
-                      <type>zip</type>
-                      <outputDirectory>${project.build.directory}/containers</outputDirectory>
-                      <includes>*/start*,*/bin/**,*/etc/**,*/lib/**</includes>
+                      <groupId>org.sonatype.nexus.plugins</groupId>
+                      <artifactId>nexus-p2-repository-plugin</artifactId>
+                      <version>${nexus.version}</version>
                     </artifactItem>
                   </artifactItems>
                 </configuration>
               </execution>
             </executions>
           </plugin>
-
           <plugin>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-test-environment-maven-plugin</artifactId>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
             <executions>
               <execution>
+                <id>reserve-network-port</id>
                 <goals>
-                  <goal>setup-environment</goal>
+                  <goal>reserve-network-port</goal>
                 </goals>
+                <phase>process-resources</phase>
+                <configuration>
+                  <portNames>
+                    <portName>proxy-repo-port</portName>
+                    <portName>proxy-repo-control-port</portName>
+                    <portName>nexus-application-port</portName>
+                    <portName>nexus-proxy-port</portName>
+                    <portName>nexus-control-port</portName>
+                    <portName>email-server-port</portName>
+                    <portName>webproxy-server-port</portName>
+                  </portNames>
+                </configuration>
               </execution>
             </executions>
-            <configuration>
-              <setupMaven>true</setupMaven>
-              <nexusBundleArtifact>
-                <groupId>${it.nexus.bundle.groupId}</groupId>
-                <artifactId>${it.nexus.bundle.artifactId}</artifactId>
-                <version>${it.nexus.bundle.version}</version>
-                <classifier>bundle</classifier>
-                <type>zip</type>
-              </nexusBundleArtifact>
-              <nexusPluginsArtifacts>
-                <plugin>
-                  <groupId>org.sonatype.nexus</groupId>
-                  <artifactId>nexus-it-helper-plugin</artifactId>
-                </plugin>
-                <plugin>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-p2-repository-plugin</artifactId>
-                </plugin>
-              </nexusPluginsArtifacts>
-            </configuration>
           </plugin>
         </plugins>
       </build>

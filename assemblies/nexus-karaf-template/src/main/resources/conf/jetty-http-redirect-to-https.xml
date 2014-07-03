@@ -16,24 +16,34 @@
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
 <!-- =============================================================== -->
-<!-- Configure the Jetty Request Log                                 -->
+<!-- Force HTTP connections to redirect to the HTTPS connector       -->
+<!-- REQUIRES jetty-https.xml or connector with application-port-ssl -->
 <!-- =============================================================== -->
-
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
-  <Ref id="Handlers">
-    <Call name="addHandler">
-      <Arg>
-        <New id="RequestLogHandler" class="org.eclipse.jetty.server.handler.RequestLogHandler">
-          <Set name="requestLog">
-            <New id="LogbackRequestLog" class="ch.qos.logback.access.jetty.RequestLogImpl">
-              <Set name="fileName"><Property name="nexus-base"/>/conf/logback-access.xml</Set>
-              <Set name="quiet">true</Set>
+  <Ref id="HTTPConnector">
+    <Set name="confidentialPort"><Property name="application-port-ssl"/></Set>
+  </Ref>
+
+  <Ref id="NexusWebAppContext">
+    <!-- enforce use of the confidential port -->
+    <Set name="securityHandler">
+      <New class="org.eclipse.jetty.security.ConstraintSecurityHandler">
+        <Call name="addConstraintMapping">
+          <Arg>
+            <New class="org.eclipse.jetty.security.ConstraintMapping">
+              <Set name="pathSpec">/*</Set>
+              <Set name="constraint">
+                <New class="org.eclipse.jetty.util.security.Constraint">
+                  <!-- 2 means CONFIDENTIAL. 1 means INTEGRITY -->
+                  <Set name="dataConstraint">2</Set>
+                </New>
+              </Set>
             </New>
-          </Set>
-        </New>
-      </Arg>
-    </Call>
+          </Arg>
+        </Call>
+      </New>
+    </Set>
   </Ref>
 
 </Configure>
