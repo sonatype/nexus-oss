@@ -10,26 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.coreui
-
-import groovy.transform.ToString
-
 /**
- * Repository Storage Item Info exchange object.
+ * Browse Standard Repository store.
  *
  * @since 3.0
  */
-@ToString(includePackage = false, includeNames = true)
-class RepositoryStorageItemInfoXO
-{
-  String repositoryId
-  String path
-  Boolean inLocalStorage
-  Long size
-  String createdBy
-  Date created
-  Date modified
-  String sha1
-  String md5
-  List<ReferenceXO> repositories
-}
+Ext.define('NX.coreui.store.BrowseStandardRepository', {
+  extend: 'NX.coreui.store.Repository'
+
+});

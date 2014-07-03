@@ -33,9 +33,9 @@ Ext.define('NX.view.info.Entry', {
     '</div>'
   ]),
 
-  showInfo: function (info) {
+  showInfo: function(info) {
     var entries = [];
-    Ext.Object.each(info, function (key, value) {
+    Ext.Object.each(info, function(key, value) {
       if (!Ext.isEmpty(value)) {
         entries.push(
             {
@@ -45,8 +45,13 @@ Ext.define('NX.view.info.Entry', {
         )
       }
     });
-    this.tpl.overwrite(this.getEl(), entries);
-    this.up('panel').doComponentLayout();
+    if (this.getEl()) {
+      this.tpl.overwrite(this.getEl(), entries);
+      this.up('panel').doComponentLayout();
+    }
+    else {
+      this.html = this.tpl.apply(entries);
+    }
   }
 
 });

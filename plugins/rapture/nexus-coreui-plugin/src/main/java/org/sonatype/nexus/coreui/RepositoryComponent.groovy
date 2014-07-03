@@ -40,6 +40,8 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry
 import org.sonatype.nexus.proxy.repository.*
 import org.sonatype.nexus.rapture.TrustStoreKeys
 import org.sonatype.nexus.rest.RepositoryURLBuilder
+import org.sonatype.nexus.scheduling.NexusScheduler
+import org.sonatype.nexus.tasks.ExpireCacheTask
 import org.sonatype.nexus.templates.TemplateManager
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider
 import org.sonatype.nexus.templates.repository.RepositoryTemplate
@@ -87,6 +89,9 @@ extends DirectComponentSupport
   @Inject
   @Named('nexus-uber')
   ClassLoader uberClassLoader
+
+  @Inject
+  NexusScheduler nexusScheduler
 
   @Inject
   @Nullable
@@ -289,6 +294,21 @@ extends DirectComponentSupport
   @Validate
   void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
     repositoryRegistry.removeRepository(id)
+  }
+
+  @DirectMethod
+  @RequiresAuthentication
+  @RequiresPermissions('nexus:cache:delete')
+  @Validate
+  void clearCache(final @NotEmpty(message = '[id] may not be empty') String id,
+                  final String path)
+  {
+    // validate repository id
+    repositoryRegistry.getRepository(id)
+    ExpireCacheTask task = nexusScheduler.createTaskInstance(ExpireCacheTask)
+    task.setRepositoryId(id)
+    task.setResourceStorePath(path)
+    nexusScheduler.submit("Clear cache ${id}:${path}", task)
   }
 
   def RepositoryXO create(RepositoryXO repositoryXO, Closure... updateClosures) {
@@ -532,6 +552,7 @@ extends DirectComponentSupport
         exposed = repo.exposed
         localStatus = repo.localStatus
         url = repositoryURLBuilder.getExposedRepositoryContentUrl(repo)
+        userManaged = repo.userManaged
       }
     }
     return xo
@@ -597,8 +618,12 @@ extends DirectComponentSupport
       hasAnyOfContentClasses(contentClasses)?.with(filter)
       hasNoneOfContentClasses(contentClasses)?.with(filter)
 
+      def includeUserManagedFilter = parameters.getFilter('includeUserManaged')
+      if (includeUserManagedFilter) {
+        includeUserManaged = Boolean.valueOf(includeUserManagedFilter)
+      }
       def includeNexusManagedFilter = parameters.getFilter('includeNexusManaged')
-      if (includeNexusManagedFilter != null) {
+      if (includeNexusManagedFilter) {
         includeNexusManaged = Boolean.valueOf(includeNexusManagedFilter)
       }
     }

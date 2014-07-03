@@ -28,6 +28,7 @@ Ext.define('NX.coreui.model.Repository', {
     'exposed',
     'localStatus',
     'url',
+    'userManaged',
     'browseable',                         // hosted/proxy
     'writePolicy',                        // hosted
     'indexable',                          // hosted maven

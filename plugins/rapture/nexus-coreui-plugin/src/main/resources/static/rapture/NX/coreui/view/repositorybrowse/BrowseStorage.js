@@ -11,40 +11,31 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Component CLM License Details panel.
+ * Browse repository storage panel.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.component.ComponentLicense', {
+Ext.define('NX.coreui.view.repositorybrowse.BrowseStorage', {
   extend: 'Ext.Panel',
-  alias: 'widget.nx-coreui-component-license',
+  alias: 'widget.nx-coreui-repositorybrowse-storage',
 
-  buttonConfig: {
-    tooltip: 'License Details',
-    iconCls: NX.Icons.cls('component-license', 'x32')
-  },
+  layout: 'border',
 
   items: [
     {
-      xtype: 'panel',
-      margin: 5,
-      layout: 'hbox',
-      style: {
-        marginBottom: '10px'
-      },
-      items: [
-        { xtype: 'component', html: NX.Icons.img('component-license', 'x16') },
-        { xtype: 'label',
-          itemId: 'title',
-          margin: '0 0 0 5',
-          style: {
-            'color': '#000000',
-            'font-size': '16px',
-            'font-weight': 'bold',
-            'text-align': 'center'
-          }
-        }
-      ]
+      xtype: 'nx-coreui-repositorybrowse-storage-tree',
+      region: 'center'
+    },
+    {
+      xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
+      region: 'east',
+      split: true,
+      flex: 1,
+      header: false,
+      collapsible: true,
+      collapsed: false,
+      collapseMode: 'mini',
+      hidden: false
     }
   ]
 

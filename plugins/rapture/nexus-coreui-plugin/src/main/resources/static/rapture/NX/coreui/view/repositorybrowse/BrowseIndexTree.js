@@ -15,9 +15,9 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseIndexTree', {
+Ext.define('NX.coreui.view.repositorybrowse.BrowseIndexTree', {
   extend: 'Ext.tree.Panel',
-  alias: 'widget.nx-coreui-repository-browse-index-tree',
+  alias: 'widget.nx-coreui-repositorybrowse-indextree',
 
   viewConfig: {
     markDirty: false
@@ -35,8 +35,8 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseIndexTree', {
         'repositoryId',
         'path',
         'text',
-        'name',
         'type',
+        'processed',
         {
           name: 'iconCls',
           convert: function (val, row) {

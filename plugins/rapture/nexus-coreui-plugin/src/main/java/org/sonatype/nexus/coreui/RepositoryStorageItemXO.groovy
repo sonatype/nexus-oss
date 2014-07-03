@@ -25,7 +25,8 @@ class RepositoryStorageItemXO
   String repositoryId
   String path
   String text
-  String name
   String type
   Boolean leaf
+  Boolean processed
+  List<RepositoryStorageItemXO> children
 }
