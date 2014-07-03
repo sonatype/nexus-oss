@@ -15,9 +15,9 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseStorageTree', {
+Ext.define('NX.coreui.view.repositorybrowse.BrowseStorageTree', {
   extend: 'Ext.tree.Panel',
-  alias: 'widget.nx-coreui-repository-browse-storage-tree',
+  alias: 'widget.nx-coreui-repositorybrowse-storage-tree',
 
   viewConfig: {
     markDirty: false
@@ -35,8 +35,8 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseStorageTree', {
         'repositoryId',
         'path',
         'text',
-        'name',
         'type',
+        'processed',
         {
           name: 'iconCls',
           convert: function (val, row) {
@@ -56,6 +56,17 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseStorageTree', {
     });
 
     me.callParent(arguments);
+
+    me.addEvents(
+        /**
+         * @event beforecontextmenushow
+         * Fires before showing the context menu.
+         * @param {Ext.menu.Menu} to be shown
+         * @param {NX.coreui.model.Repository} repository
+         * param {Ext.data.NodeInterface} clicked node
+         */
+        'beforecontextmenushow'
+    );
   }
 
 });

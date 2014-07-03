@@ -11,26 +11,26 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Browse Standard Repository grid.
+ * Browse Repository grid.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseStandardList', {
+Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryList', {
   extend: 'Ext.grid.Panel',
-  alias: ['widget.nx-coreui-repository-browse-standard-list', 'widget.nx-coreui-repository-browse-list'],
+  alias: 'widget.nx-coreui-repositorybrowse-list',
 
   columns: [
     {
       xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
-      iconName: function () {
+      iconName: function() {
         return 'repository-default';
       }
     },
     { header: 'Name', dataIndex: 'name', flex: 1 },
     { header: 'Type', dataIndex: 'type',
-      renderer: function (value) {
+      renderer: function(value) {
         return Ext.String.capitalize(value);
       }
     },
@@ -38,22 +38,14 @@ Ext.define('NX.coreui.view.repository.RepositoryBrowseStandardList', {
     { header: 'Provider', dataIndex: 'providerName' }
   ],
 
-  emptyText: 'No standard repositories defined',
+  emptyText: 'No repositories defined',
 
   tbar: [
     { xtype: 'button', text: 'Administrate', glyph: 'xf013@FontAwesome' /* fa-gear */, action: 'admin', disabled: true, hidden: true }
   ],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No standard repository matched criteria "$filter"' }
-  ],
-
-  initComponent: function () {
-    var me = this;
-
-    me.store = Ext.create('NX.coreui.store.Repository');
-
-    me.callParent(arguments);
-  }
+    { ptype: 'gridfilterbox', emptyText: 'No repositories matched criteria "$filter"' }
+  ]
 
 });

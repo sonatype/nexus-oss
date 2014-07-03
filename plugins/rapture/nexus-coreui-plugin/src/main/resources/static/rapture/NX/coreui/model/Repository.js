@@ -30,6 +30,7 @@ Ext.define('NX.coreui.model.Repository', {
     'url',
     'defaultLocalStorageUrl',
     'overrideLocalStorageUrl',
+    'userManaged',
     'browseable',                         // hosted/proxy
     'writePolicy',                        // hosted
     'indexable',                          // hosted maven

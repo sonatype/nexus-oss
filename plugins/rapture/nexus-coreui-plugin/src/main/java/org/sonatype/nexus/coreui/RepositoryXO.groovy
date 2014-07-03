@@ -52,4 +52,5 @@ class RepositoryXO
   String url
   String defaultLocalStorageUrl
   String overrideLocalStorageUrl
+  String userManaged
 }

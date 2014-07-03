@@ -11,33 +11,21 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Browse repository storage panel.
+ * Browse Managed Repository feature panel.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseStorage', {
-  extend: 'Ext.Panel',
-  alias: 'widget.nx-coreui-repository-browse-storage',
+Ext.define('NX.coreui.view.repositorybrowse.BrowseManagedRepositoryFeature', {
+  extend: 'NX.view.masterdetail.Panel',
+  alias: 'widget.nx-coreui-repositorybrowse-managed-feature',
 
-  layout: 'border',
+  list: 'nx-coreui-repositorybrowse-managed-list',
 
-  items: [
-    {
-      xtype: 'nx-coreui-repository-browse-storage-tree',
-      region: 'center',
-      collapsible: true,
-      headerPosition: 'left',
-      header: false
-    },
-    {
-      xtype: 'nx-coreui-component-detail',
-      region: 'east',
-      collapsible: true,
-      split: true,
-      width: '50%',
-      headerPosition: 'right',
-      hidden: true
-    }
+  iconName: 'repository-managed',
+
+  tabs: [
+    { xtype: 'nx-coreui-repositorybrowse-storage', title: 'Storage' },
+    { xtype: 'nx-coreui-repositorybrowse-index', title: 'Index' }
   ]
 
 });

@@ -10,15 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+package org.sonatype.nexus.coreui
+
+import groovy.transform.ToString
+
 /**
- * Browse managed repository feature panel.
+ * Repository Storage Item Maven Info exchange object.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseManagedFeature', {
-  extend: 'NX.coreui.view.repository.RepositoryBrowseFeature',
-  alias: 'widget.nx-coreui-repository-browse-managed-feature',
-
-  list: 'nx-coreui-repository-browse-managed-list'
-
-});
+@ToString(includePackage = false, includeNames = true)
+class RepositoryStorageItemMavenInfoXO
+{
+  String repositoryId
+  String groupId
+  String artifactId
+  String baseVersion
+  String version
+  String extension
+  String classifier
+  String xml
+}

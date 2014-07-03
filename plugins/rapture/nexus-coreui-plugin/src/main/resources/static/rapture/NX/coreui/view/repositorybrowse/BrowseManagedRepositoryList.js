@@ -11,14 +11,14 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Browse standard repository feature panel.
+ * Browse Managed Repository grid.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseStandardFeature', {
-  extend: 'NX.coreui.view.repository.RepositoryBrowseFeature',
-  alias: 'widget.nx-coreui-repository-browse-standard-feature',
+Ext.define('NX.coreui.view.repositorybrowse.BrowseManagedRepositoryList', {
+  extend: 'NX.coreui.view.repositorybrowse.BrowseRepositoryList',
+  alias: 'widget.nx-coreui-repositorybrowse-managed-list',
 
-  list: 'nx-coreui-repository-browse-standard-list'
+  store: 'BrowseManagedRepository'
 
 });

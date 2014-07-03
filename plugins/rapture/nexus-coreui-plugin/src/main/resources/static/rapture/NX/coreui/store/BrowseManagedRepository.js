@@ -11,33 +11,17 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Browse repository index panel.
+ * Browse Managed Repository store.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositoryBrowseIndex', {
-  extend: 'Ext.Panel',
-  alias: 'widget.nx-coreui-repository-browse-index',
+Ext.define('NX.coreui.store.BrowseManagedRepository', {
+  extend: 'NX.coreui.store.Repository',
 
-  layout: 'border',
-
-  items: [
-    {
-      xtype: 'nx-coreui-repository-browse-index-tree',
-      region: 'center',
-      collapsible: true,
-      headerPosition: 'left',
-      header: false
-    },
-    {
-      xtype: 'nx-coreui-component-detail',
-      region: 'east',
-      collapsible: true,
-      split: true,
-      width: '50%',
-      headerPosition: 'right',
-      hidden: true
-    }
+  remoteFilter: true,
+  filters: [
+    { property: 'includeUserManaged', value: 'false' },
+    { property: 'includeNexusManaged', value: 'true' }
   ]
 
 });
