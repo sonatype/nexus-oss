@@ -194,11 +194,12 @@ public class NxApplication
     eventBus.post(new NexusStoppedEvent(this));
     eventSubscriberHost.stop();
 
+    nexusConfiguration.dropInternals();
+    securitySystem.stop();
+
     // HACK: Must stop database services manually
     orientBootstrap.stop();
 
-    nexusConfiguration.dropInternals();
-    securitySystem.stop();
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPED);
     log.info("Stopped {}", getNexusNameForLogs());
   }

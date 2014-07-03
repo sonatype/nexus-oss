@@ -83,6 +83,9 @@ public class OrientDbDocumentTrial
       ODocument doc = createPerson(db);
       log("Document: {}", doc);
       log("Document size: {}", doc.getSize());
+      log("Document (default) JSON: {}", doc.toJSON());
+      log("Document (custom) JSON: {}", doc.toJSON("rid,version,class,type,attribSameRow,keepTypes,alwaysFetchEmbedded,prettyPrint,fetchPlan:*:0"));
+
       log("DB size: {}", db.getSize());
       log("Person count: {}", db.countClass("Person"));
     }
