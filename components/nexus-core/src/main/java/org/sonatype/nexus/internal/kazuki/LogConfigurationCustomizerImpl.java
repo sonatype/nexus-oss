@@ -10,30 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.kazuki;
+package org.sonatype.nexus.internal.kazuki;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.nexus.log.LogConfigurationCustomizer;
 
-import io.kazuki.v0.PackageVersion;
-import org.eclipse.sisu.EagerSingleton;
-import org.h2.engine.Constants;
+import static org.sonatype.nexus.log.LoggerLevel.DEFAULT;
 
 /**
- * Helper to log Kazuki version on boot.
+ * Kazuki {@link LogConfigurationCustomizer}.
  *
  * @since 3.0
  */
 @Named
-@EagerSingleton
-public class KazukiBootstrap
-  extends ComponentSupport
+@Singleton
+public class LogConfigurationCustomizerImpl
+    implements LogConfigurationCustomizer
 {
-  @Inject
-  public KazukiBootstrap() throws Exception {
-    log.info("Kazuki version: {}", PackageVersion.VERSION);
-    log.info("H2 version: {}", Constants.getVersion());
+  @Override
+  public void customize(final Configuration config) {
+    config.setLoggerLevel("io.kazuki", DEFAULT);
+    config.setLoggerLevel("org.skife.jdbi", DEFAULT);
+    config.setLoggerLevel("org.antlr.stringtemplate", DEFAULT);
   }
 }
