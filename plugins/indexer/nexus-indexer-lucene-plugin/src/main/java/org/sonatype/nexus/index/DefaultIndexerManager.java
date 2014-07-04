@@ -982,6 +982,9 @@ public class DefaultIndexerManager
     }
 
     if (ISGROUP(repository)) {
+      if (fullReindex) {
+        deleteIndexItems(repository); // groups must reset the chain too
+      }
       return;
     }
 
@@ -1522,6 +1525,14 @@ public class DefaultIndexerManager
     ResourceStoreRequest request = new ResourceStoreRequest(PUBLISHING_PATH_PREFIX);
 
     try {
+      // kill the chain, deleting the props file basically resets the chain
+      shared(repository, new Runnable() {
+        @Override
+        public void run(IndexingContext context) throws IOException {
+          if (context.getIndexDirectoryFile() != null) {
+            new File( context.getIndexDirectoryFile(), IndexingContext.INDEX_PACKER_PROPERTIES_FILE ).delete();
+          }
+        }});
       repository.deleteItem(false, request);
     }
     catch (ItemNotFoundException e) {
