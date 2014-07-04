@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.storage;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -20,17 +19,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Maps;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.storage.ORecordMetadata;
-import com.orientechnologies.orient.object.db.OObjectDatabasePool;
-import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -45,43 +44,29 @@ public class OrientCapabilityStorage
     extends LifecycleSupport
     implements CapabilityStorage
 {
-  public static final String DB_LOCATION = "db/capability";
+  public static final String DB_NAME = "capability";
 
-  private final File databaseDirectory;
+  private final DatabaseManager databaseManager;
 
-  private OObjectDatabasePool databasePool;
+  private final CapabilityStorageItemEntityAdapter entityAdapter = new CapabilityStorageItemEntityAdapter();
+
+  private ODatabaseDocumentPool databasePool;
 
   @Inject
-  public OrientCapabilityStorage(final ApplicationDirectories applicationDirectories) {
-    checkNotNull(applicationDirectories);
-    this.databaseDirectory = applicationDirectories.getWorkDirectory(DB_LOCATION);
-    log.info("Database directory: {}", databaseDirectory);
+  public OrientCapabilityStorage(final DatabaseManager databaseManager) {
+    this.databaseManager = checkNotNull(databaseManager);
   }
 
   @Override
   protected void doStart() throws Exception {
-    String databaseUri = "plocal:" + databaseDirectory;
-
-    // create database and register entities
-    try (OObjectDatabaseTx db = new OObjectDatabaseTx(databaseUri)) {
-      if (!db.exists()) {
-        db.create();
-        log.info("Created database: {}", db);
-      }
-      else {
-        db.open("admin", "admin");
-        log.info("Opened database: {}", db);
-      }
-
-      // register entities
-      db.setAutomaticSchemaGeneration(true);
-      db.getEntityManager().registerEntityClass(CapabilityStorageItem.class);
+    // create database
+    try (ODatabaseDocumentTx db = databaseManager.connect(DB_NAME, true)) {
+      // register schema
+      entityAdapter.register(db);
     }
 
-    this.databasePool = new OObjectDatabasePool(databaseUri, "admin", "admin");
-    databasePool.setName("capability-database-pool");
-    databasePool.setup(1, 10);
-    log.info("Created pool: {}", databasePool);
+    // setup the database connection pool
+    this.databasePool = databaseManager.pool(DB_NAME);
   }
 
   @Override
@@ -93,7 +78,7 @@ public class OrientCapabilityStorage
   /**
    * Open a database connection using the pool.
    */
-  private OObjectDatabaseTx openDb() {
+  private ODatabaseDocumentTx openDb() {
     ensureStarted();
     return databasePool.acquire();
   }
@@ -110,9 +95,9 @@ public class OrientCapabilityStorage
   @Override
   public CapabilityIdentity add(final CapabilityStorageItem item) throws IOException {
     ORID rid;
-    try (OObjectDatabaseTx db = openDb()) {
-      CapabilityStorageItem record = db.save(item);
-      rid = db.getIdentity(record);
+    try (ODatabaseDocumentTx db = openDb()) {
+      ODocument doc = entityAdapter.create(db, item);
+      rid = doc.getIdentity();
     }
 
     log.debug("Added item with RID: {}", rid);
@@ -123,14 +108,14 @@ public class OrientCapabilityStorage
   public boolean update(final CapabilityIdentity id, final CapabilityStorageItem item) throws IOException {
     ORID rid = convert(id);
 
-    try (OObjectDatabaseTx db = openDb()) {
+    try (ODatabaseDocumentTx db = openDb()) {
       // load record and apply updated item attributes
-      ODocument record = db.getUnderlying().getRecord(rid);
-      if (record == null) {
+      ODocument doc = db.getRecord(rid);
+      if (doc == null) {
         log.debug("Unable to update item with RID: {}", rid);
         return false;
       }
-      db.pojo2Stream(item, record).save();
+      entityAdapter.write(doc, item);
     }
 
     log.debug("Updated item with RID: {}", rid);
@@ -141,7 +126,7 @@ public class OrientCapabilityStorage
   public boolean remove(final CapabilityIdentity id) throws IOException {
     ORID rid = convert(id);
 
-    try (OObjectDatabaseTx db = openDb()) {
+    try (ODatabaseDocumentTx db = openDb()) {
       // if we can't get the metadata, then abort
       ORecordMetadata md = db.getRecordMetadata(rid);
       if (md == null) {
@@ -160,10 +145,10 @@ public class OrientCapabilityStorage
   public Map<CapabilityIdentity, CapabilityStorageItem> getAll() throws IOException {
     Map<CapabilityIdentity, CapabilityStorageItem> items = Maps.newHashMap();
 
-    try (OObjectDatabaseTx db = openDb()) {
-      for (CapabilityStorageItem item : db.browseClass(CapabilityStorageItem.class)) {
-        ORID rid = db.getIdentity(item);
-        item = db.detach(item, true);
+    try (ODatabaseDocumentTx db = openDb()) {
+      for (ODocument doc : db.browseClass(CapabilityStorageItemEntityAdapter.DB_CLASS)) {
+        ORID rid = doc.getIdentity();
+        CapabilityStorageItem item = entityAdapter.read(doc);
         items.put(convert(rid), item);
       }
     }
