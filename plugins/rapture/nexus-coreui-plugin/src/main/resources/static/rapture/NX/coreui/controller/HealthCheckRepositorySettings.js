@@ -30,7 +30,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.listen({
@@ -54,7 +54,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
    * Set "active" flag on panel.
    * @param {NX.coreui.view.healthcheck.HealthCheckRepositorySettings} panel activated
    */
-  onActivate: function (panel) {
+  onActivate: function(panel) {
     var me = this;
 
     panel.active = true;
@@ -66,7 +66,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
    * Unset "active" flag on panel.
    * @param {NX.coreui.view.healthcheck.HealthCheckRepositorySettings} panel deactivated
    */
-  onDeactivate: function (panel) {
+  onDeactivate: function(panel) {
     panel.active = false;
   },
 
@@ -77,12 +77,12 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
    * @param {NX.coreui.view.repository.RepositoryList} grid repository grid
    * @param {NX.coreui.model.Repository} model selected repository
    */
-  onSelection: function (grid, model) {
+  onSelection: function(grid, model) {
     var me = this,
         panel = me.getPanel();
 
-    if (model.get('type') === 'proxy'
-        && ((model.get('format') !== 'maven2') || model.get('repositoryPolicy') === 'RELEASE')) {
+    if (model && (model.get('type') === 'proxy' &&
+        ((model.get('format') !== 'maven2') || model.get('repositoryPolicy') === 'RELEASE'))) {
 
       if (!panel) {
         me.getFeature().addTab({ xtype: 'nx-coreui-healthcheck-repository-settings', title: 'Health Check' });
@@ -102,7 +102,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
    * @private
    * Load health check settings for current repository.
    */
-  loadSettings: function () {
+  loadSettings: function() {
     var me = this,
         panel = me.getPanel(),
         form = panel.down('nx-settingsform');
@@ -116,7 +116,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
    * @private
    * Show EULA if not already accepted.
    */
-  onAgree: function (button) {
+  onAgree: function(button) {
     var me = this,
         win = button.up('window'),
         form = me.getPanel().down('nx-settingsform'),

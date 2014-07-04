@@ -31,7 +31,7 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.listen({
@@ -61,7 +61,7 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
    * @private
    * Set "active" flag on panel.
    */
-  onActivate: function (panel) {
+  onActivate: function(panel) {
     var me = this;
 
     panel.active = true;
@@ -72,7 +72,7 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
    * @private
    * Unset "active" flag on panel.
    */
-  onDeactivate: function (panel) {
+  onDeactivate: function(panel) {
     panel.active = false;
   },
 
@@ -82,12 +82,13 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
    * @param {NX.coreui.view.repository.RepositoryList} grid repository grid
    * @param {NX.coreui.model.Repository} model selected repository
    */
-  onSelection: function (grid, model) {
+  onSelection: function(grid, model) {
     var me = this,
         hostedPanel = me.getHostedPanel(),
         proxyPanel = me.getProxyPanel();
 
-    if (model.get('format') === 'maven2' && (model.get('type') === 'hosted') || model.get('type') === 'group') {
+    if (model &&
+        (model.get('format') === 'maven2' && (model.get('type') === 'hosted') || model.get('type') === 'group')) {
       if (!hostedPanel) {
         me.getFeature().addTab({ xtype: 'nx-coreui-routing-hosted-repository-settings', title: 'Routing' });
         hostedPanel = me.getHostedPanel();
@@ -101,7 +102,7 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
       }
     }
 
-    if (model.get('format') === 'maven2' && model.get('type') === 'proxy') {
+    if (model && (model.get('format') === 'maven2' && model.get('type') === 'proxy')) {
       if (!proxyPanel) {
         me.getFeature().addTab({ xtype: 'nx-coreui-routing-proxy-repository-settings', title: 'Routing' });
         proxyPanel = me.getProxyPanel();
@@ -120,7 +121,7 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
    * @private
    * Load routing settings for current repository.
    */
-  loadSettings: function (panel) {
+  loadSettings: function(panel) {
     var form = panel.down('nx-settingsform');
 
     if (panel.active) {
@@ -132,7 +133,7 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
    * @private
    * Enable/Disable discovery interval.
    */
-  onDiscoveryEnabledChange: function (discoveryEnabled) {
+  onDiscoveryEnabledChange: function(discoveryEnabled) {
     var discoveryInterval = discoveryEnabled.up('form').down('#discoveryInterval');
 
     if (discoveryEnabled.getValue()) {
@@ -149,11 +150,11 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
    * @private
    * Force updates prefix list.
    */
-  updateNow: function () {
+  updateNow: function() {
     var me = this,
         panel = me.getProxyPanel();
 
-    NX.direct.coreui_RoutingRepositorySettings.updatePrefixFile(panel.getRepository().getId(), function (response) {
+    NX.direct.coreui_RoutingRepositorySettings.updatePrefixFile(panel.getRepository().getId(), function(response) {
       if (Ext.isDefined(response) && response.success) {
         NX.Messages.add({
           text: 'Discovery started for: ' + panel.getRepository().get('name'), type: 'success'
