@@ -267,38 +267,43 @@ public class DefaultTimeline
       return;
     }
     try (ODatabaseDocumentTx db = db()) {
-      final StringBuilder sb = new StringBuilder();
-      sb.append("SELECT FROM ").append(DB_CLASS);
-      if ((types != null && !types.isEmpty()) || (subTypes != null && !subTypes.isEmpty())) {
-        sb.append(" WHERE ");
-      }
-      if ((types != null && !types.isEmpty())) {
-        sb.append(P_TYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(types)).append("\"] ");
-      }
-      if (subTypes != null && !subTypes.isEmpty()) {
+      db.begin();
+      try {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("SELECT FROM ").append(DB_CLASS);
+        if ((types != null && !types.isEmpty()) || (subTypes != null && !subTypes.isEmpty())) {
+          sb.append(" WHERE ");
+        }
         if ((types != null && !types.isEmpty())) {
-          sb.append(" AND ");
+          sb.append(P_TYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(types)).append("\"] ");
         }
-        sb.append(P_SUBTYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(subTypes)).append("\"] ");
-      }
-      sb.append(" ORDER BY @rid DESC SKIP ").append(fromItem).append(" LIMIT ").append(count);
-
-      log.info("Query: {}", sb.toString());
-
-      final OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(sb.toString());
-
-      final OResultSet<ODocument> results = db.query(query);
-      if (results.isEmpty()) {
-        return;
-      }
-      for (ODocument doc : results) {
-        final EntryRecord record = new EntryRecord((Long) doc.field(P_TIMESTAMP, OType.LONG), (String) doc.field(
-            P_TYPE, OType.STRING), (String) doc.field(P_SUBTYPE, OType.STRING), null);
-        final Map<String, String> attributes = doc.field(P_DATA, OType.EMBEDDEDMAP);
-        record.getData().putAll(attributes);
-        if (!callback.processNext(record)) {
-          break;
+        if (subTypes != null && !subTypes.isEmpty()) {
+          if ((types != null && !types.isEmpty())) {
+            sb.append(" AND ");
+          }
+          sb.append(P_SUBTYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(subTypes)).append("\"] ");
         }
+        sb.append(" ORDER BY @rid DESC SKIP ").append(fromItem).append(" LIMIT ").append(count);
+  
+        log.info("Query: {}", sb.toString());
+  
+        final OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(sb.toString());
+  
+        final OResultSet<ODocument> results = db.query(query);
+        if (results.isEmpty()) {
+          return;
+        }
+        for (ODocument doc : results) {
+          final EntryRecord record = new EntryRecord((Long) doc.field(P_TIMESTAMP, OType.LONG), (String) doc.field(
+              P_TYPE, OType.STRING), (String) doc.field(P_SUBTYPE, OType.STRING), null);
+          final Map<String, String> attributes = doc.field(P_DATA, OType.EMBEDDEDMAP);
+          record.getData().putAll(attributes);
+          if (!callback.processNext(record)) {
+            break;
+          }
+        }
+      } finally {
+        db.commit();
       }
     }
     catch (IOException e) {
@@ -317,27 +322,32 @@ public class DefaultTimeline
       return;
     }
     try (ODatabaseDocumentTx db = db()) {
-      final DateMidnight nowDm = new DateMidnight(DateTimeZone.UTC);
-      final int prefixLen = DB_CLUSTER_PREFIX.length();
-      final int[] cids = db.getMetadata().getSchema().getClass(DB_CLASS).getClusterIds();
-      for (int cid : cids) {
-        final String name = db.getClusterNameById(cid);
-        log.info("Cluster: {} {}", cid, name);
-        if (name.startsWith(DB_CLUSTER_PREFIX)) {
-          final int year = Integer.parseInt(name.substring(prefixLen, prefixLen + 4));
-          final int month = Integer.parseInt(name.substring(prefixLen + 4, prefixLen + 6));
-          final int day = Integer.parseInt(name.substring(prefixLen + 6, prefixLen + 8));
-          final DateMidnight clusterDm = new DateMidnight(year, month, day, DateTimeZone.UTC);
-          if (Days.daysBetween(clusterDm, nowDm).getDays() >= days) {
-            log.info("Cluster {}, is {} days old, purging it", name, Days.daysBetween(clusterDm, nowDm).getDays());
-            OSchema schema = db.getMetadata().getSchema();
-            OClass type = schema.getClass(DB_CLASS);
-            type.removeClusterId(cid);
-            schema.save();
-            ((OClassImpl) type).fromStream(); // workaround for OrientDB polymorphicClusterId bug
-            db.dropCluster(cid, true);
+      db.begin();
+      try {
+        final DateMidnight nowDm = new DateMidnight(DateTimeZone.UTC);
+        final int prefixLen = DB_CLUSTER_PREFIX.length();
+        final int[] cids = db.getMetadata().getSchema().getClass(DB_CLASS).getClusterIds();
+        for (int cid : cids) {
+          final String name = db.getClusterNameById(cid);
+          log.info("Cluster: {} {}", cid, name);
+          if (name.startsWith(DB_CLUSTER_PREFIX)) {
+            final int year = Integer.parseInt(name.substring(prefixLen, prefixLen + 4));
+            final int month = Integer.parseInt(name.substring(prefixLen + 4, prefixLen + 6));
+            final int day = Integer.parseInt(name.substring(prefixLen + 6, prefixLen + 8));
+            final DateMidnight clusterDm = new DateMidnight(year, month, day, DateTimeZone.UTC);
+            if (Days.daysBetween(clusterDm, nowDm).getDays() >= days) {
+              log.info("Cluster {}, is {} days old, purging it", name, Days.daysBetween(clusterDm, nowDm).getDays());
+              OSchema schema = db.getMetadata().getSchema();
+              OClass type = schema.getClass(DB_CLASS);
+              type.removeClusterId(cid);
+              schema.save();
+              ((OClassImpl) type).fromStream(); // workaround for OrientDB polymorphicClusterId bug
+              db.dropCluster(cid, true);
+            }
           }
         }
+      } finally {
+        db.commit();
       }
       // Not using indexes, as they seems broken with clusters being dropped
       // See https://groups.google.com/forum/#!topic/orient-database/HYMUAaMq4y8
