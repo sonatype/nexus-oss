@@ -24,9 +24,12 @@ class RepositoryStorageItemInfoXO
 {
   String repositoryId
   String path
+  Boolean inLocalStorage
   Long size
-  Long created
-  Long modified
+  String createdBy
+  Date created
+  Date modified
   String sha1
   String md5
+  List<ReferenceXO> repositories
 }

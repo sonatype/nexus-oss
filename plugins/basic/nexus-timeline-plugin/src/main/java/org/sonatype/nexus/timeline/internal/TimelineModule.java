@@ -19,7 +19,6 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.timeline.TimelinePlugin;
-import org.sonatype.nexus.timeline.internal.EntryRecord;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
@@ -72,7 +71,7 @@ public class TimelineModule
     builder.withPartitionName("default");
     builder.withPartitionSize(100_000L);
     builder.withStrictTypeCreation(true);
-    builder.withDataType(EntryRecord.SCHEMA_NAME); // Journal store supports one schema only and this is must
+    builder.withDataType(KazukiTimeline.SCHEMA_NAME); // Journal store supports one schema only and this is must
 
     return builder.build();
   }

@@ -13,47 +13,55 @@
 
 package org.sonatype.nexus.timeline.internal;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.nexus.timeline.TimelineCallback;
-import org.sonatype.nexus.timeline.TimelinePlugin;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
+import com.orientechnologies.orient.core.sql.OCommandSQL;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
-import io.kazuki.v0.store.KazukiException;
-import io.kazuki.v0.store.journal.JournalStore;
-import io.kazuki.v0.store.journal.PartitionInfo;
-import io.kazuki.v0.store.journal.PartitionInfoSnapshot;
-import io.kazuki.v0.store.keyvalue.KeyValueIterable;
-import io.kazuki.v0.store.keyvalue.KeyValuePair;
-import io.kazuki.v0.store.keyvalue.KeyValueStoreIteration.SortDirection;
-import io.kazuki.v0.store.lifecycle.Lifecycle;
-import io.kazuki.v0.store.schema.SchemaStore;
-import io.kazuki.v0.store.schema.TypeValidation;
-import io.kazuki.v0.store.schema.model.Attribute.Type;
-import io.kazuki.v0.store.schema.model.Schema;
-
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
+import com.orientechnologies.orient.core.metadata.schema.OClassImpl;
+import com.orientechnologies.orient.core.metadata.schema.OSchema;
+import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.metadata.schema.clusterselection.ODefaultClusterSelectionStrategy;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.query.OResultSet;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+import com.orientechnologies.orient.core.storage.OStorage.CLUSTER_TYPE;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Days;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Implementation of {@link Timeline} backed by Kazuki.
- *
+ * Implementation of {@link Timeline} backed by OrientDB.
+ * 
  * @since 3.0
  */
 @Named
@@ -62,27 +70,34 @@ public class DefaultTimeline
     extends LifecycleSupport
     implements Timeline
 {
-  private static final long A_DAY_IN_MILLIS = TimeUnit.DAYS.toMillis(1);
+  private static final String DB_LOCATION = "db/timeline";
 
-  private final Lifecycle lifecycle;
+  @VisibleForTesting
+  static final String DB_CLASS = "entryrecord";
 
-  private final JournalStore journalStore;
+  @VisibleForTesting
+  static final String DB_CLUSTER_PREFIX = DB_CLASS + "_cluster_";
 
-  private final SchemaStore schemaStore;
+  private static final String P_TIMESTAMP = "timestamp";
 
-  private final Object runningDayMonitor = new Object();
+  private static final String P_TYPE = "type";
 
-  private Long runningDay;
+  private static final String P_SUBTYPE = "subtype";
+
+  private static final String P_DATA = "data";
+
+  private static final String I_TYPE = DB_CLASS + "." + P_TYPE;
+
+  private static final String I_SUBTYPE = DB_CLASS + "." + P_SUBTYPE;
+
+  private final File databaseDirectory;
+
+  private ODatabaseDocumentPool pool;
 
   @Inject
-  public DefaultTimeline(final EventBus eventBus,
-                         final @Named(TimelinePlugin.ARTIFACT_ID) Lifecycle lifecycle,
-                         final @Named(TimelinePlugin.ARTIFACT_ID) JournalStore journalStore,
-                         final @Named(TimelinePlugin.ARTIFACT_ID) SchemaStore schemaStore)
-  {
-    this.lifecycle = checkNotNull(lifecycle);
-    this.journalStore = checkNotNull(journalStore);
-    this.schemaStore = checkNotNull(schemaStore);
+  public DefaultTimeline(final EventBus eventBus, final ApplicationDirectories applicationDirectories) {
+    checkNotNull(applicationDirectories);
+    this.databaseDirectory = applicationDirectories.getWorkDirectory(DB_LOCATION);
     eventBus.register(this);
   }
 
@@ -112,28 +127,56 @@ public class DefaultTimeline
 
   @Override
   public void doStart() throws Exception {
-    lifecycle.init();
-    lifecycle.start();
+    final String dbUri = "plocal:" + databaseDirectory.getAbsolutePath();
 
-    // create schema if needed
-    if (schemaStore.retrieveSchema(EntryRecord.SCHEMA_NAME) == null) {
-      log.info("Creating schema for {} type", EntryRecord.SCHEMA_NAME);
+    try (ODatabaseDocumentTx db = new ODatabaseDocumentTx(dbUri)) {
+      if (!db.exists()) {
+        db.create();
+        log.info("Created database: {}", databaseDirectory);
+      }
+      else {
+        db.open("admin", "admin");
+        log.info("Opened database: {}", db);
+      }
 
-      Schema schema = new Schema.Builder().
-          addAttribute("timestamp", Type.I64, false).
-          addAttribute("type", Type.UTF8_SMALLSTRING, false).
-          addAttribute("subType", Type.UTF8_SMALLSTRING, false).
-          addAttribute("data", Type.MAP, false).
-          build();
+      // entities
+      final OSchema schema = db.getMetadata().getSchema();
+      if (!schema.existsClass(DB_CLASS)) {
+        final OClass type = schema.createClass(DB_CLASS);
+        type.createProperty(P_TIMESTAMP, OType.LONG);
+        type.createProperty(P_TYPE, OType.STRING);
+        type.createProperty(P_SUBTYPE, OType.STRING);
+        type.createProperty(P_DATA, OType.EMBEDDEDMAP);
+        // TODO: not using indexes as they break with dropped clusters
+        // See https://groups.google.com/forum/#!topic/orient-database/HYMUAaMq4y8
+        // type.createIndex(I_TYPE, INDEX_TYPE.NOTUNIQUE_HASH_INDEX, P_TYPE);
+        // type.createIndex(I_SUBTYPE, INDEX_TYPE.NOTUNIQUE_HASH_INDEX, P_SUBTYPE);
 
-      schemaStore.createSchema(EntryRecord.SCHEMA_NAME, schema);
+        // make sure cluster selection is set, as we rely on clustering
+        type.setClusterSelection(ODefaultClusterSelectionStrategy.NAME);
+
+        schema.save();
+        log.info("Created schema: {}, properties: {}", type, type.properties());
+      }
     }
+
+    pool = new ODatabaseDocumentPool(dbUri, "admin", "admin");
+    pool.setName("timeline-database-pool");
+    pool.setup(1, 10);
+    log.info("Created pool: {}", pool);
   }
 
   @Override
   public void doStop() throws Exception {
-    lifecycle.stop();
-    lifecycle.shutdown();
+    log.info("Closing pool: {}", pool);
+    pool.close();
+    pool = null;
+  }
+
+  @VisibleForTesting
+  ODatabaseDocumentTx db() {
+    ensureStarted();
+    return pool.acquire();
   }
 
   // API
@@ -157,117 +200,160 @@ public class DefaultTimeline
         entries.add((EntryRecord) record);
       }
       else {
-        entries.add(new EntryRecord(
-            record.getTimestamp(),
-            record.getType(),
-            record.getSubType(),
-            record.getData()));
+        entries.add(new EntryRecord(record.getTimestamp(), record.getType(), record.getSubType(), record.getData()));
       }
     }
     addEntryRecord(entries);
   }
 
   private void addEntryRecord(final List<EntryRecord> records) {
-    try {
-      for (EntryRecord record : records) {
-        // Long and not primitive, to avoid NPE due to auto-unboxing, since runningDay is null initially
-        final Long currentEntryRunningDay = record.getTimestamp() / A_DAY_IN_MILLIS;
-        synchronized (runningDayMonitor) {
-          if (runningDay == null || runningDay < currentEntryRunningDay) {
-            if (runningDay != null) {
-              journalStore.closeActivePartition();
-            }
-            runningDay = currentEntryRunningDay;
-          }
-        }
-        journalStore.append(EntryRecord.SCHEMA_NAME, EntryRecord.class, record, TypeValidation.STRICT);
-      }
+    if (records.isEmpty()) {
+      return; // spare resources from getting DB for nothing
     }
-    catch (KazukiException e) {
-      log.warn("Failed to append a Timeline record", e);
+    try (ODatabaseDocumentTx db = db()) {
+      db.begin();
+      try {
+        for (EntryRecord record : records) {
+          maybeAddNewCluster(db, record.getTimestamp());
+          ODocument doc = db.newInstance(DB_CLASS);
+          doc.field(P_TIMESTAMP, record.getTimestamp());
+          doc.field(P_TYPE, record.getType());
+          doc.field(P_SUBTYPE, record.getSubType());
+          doc.field(P_DATA, record.getData());
+          doc.save();
+        }
+        db.commit();
+      }
+      catch (Exception e) {
+        db.rollback();
+        throw Throwables.propagate(e);
+      }
     }
   }
 
+  /**
+   * Adds new cluster if not exists, based on cluster name formed out of passed in timestamp. Clusters have common
+   * prefixes (see {@link #DB_CLUSTER_PREFIX}) and suffix is timestamp's date (rounded to midnight) as string with
+   * pattern {@code YYYYMMDD}. As OrientDB DDL is not atomic, this method must be mutually exclusive with method
+   * {@link #purgeOlderThan(int)}, hence both are synchronized.
+   */
+  private synchronized int maybeAddNewCluster(final ODatabaseDocumentTx db, final long timestamp) {
+    final String name = String.format("%s%s", DB_CLUSTER_PREFIX,
+        new DateMidnight(timestamp, DateTimeZone.UTC).toString("YYYYMMdd"));
+    int cid = db.getClusterIdByName(name); // undocumented: if cluster not exists, returns -1
+    if (cid == -1) {
+      db.commit();
+      cid = db.addCluster(name, CLUSTER_TYPE.PHYSICAL);
+      final OSchema schema = db.getMetadata().getSchema();
+      final OClass type = schema.getClass(DB_CLASS);
+      type.addClusterId(cid);
+      type.setDefaultClusterId(cid);
+      schema.save();
+      log.info("Created new journal cluster; id: {}, name: {}", cid, name);
+      db.begin();
+      return cid;
+    }
+    else {
+      log.info("Journal cluster exists; id: {}, name: {}", cid, name);
+      return cid;
+    }
+  }
 
   @Override
-  public void retrieve(final int fromItem,
-                       final int count,
-                       final Set<String> types,
-                       final Set<String> subTypes,
-                       final Predicate<Entry> filter,
-                       final TimelineCallback callback)
+  public void retrieve(final int fromItem, final int count, final Set<String> types, final Set<String> subTypes,
+      final Predicate<Entry> filter, final TimelineCallback callback)
   {
-    if (!isStarted()) {
+    if (!isStarted() || count == 0) {
       return;
     }
-    try {
-      // We do manual filtering here, so not passing in limit and limiting manually
-      int currentCount = 0;
-      try (final KeyValueIterable<KeyValuePair<EntryRecord>> kvs = journalStore
-          .entriesRelative(EntryRecord.SCHEMA_NAME, EntryRecord.class, SortDirection.DESCENDING, (long) fromItem,
-              null)) {
-        for (KeyValuePair<EntryRecord> kv : kvs) {
-          final EntryRecord record = kv.getValue();
-          // TODO: secondary indexes for types and subTypes?
-          if (types != null && !types.contains(record.getType())) {
-            continue; // skip it
+    try (ODatabaseDocumentTx db = db()) {
+      db.begin();
+      try {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("SELECT FROM ").append(DB_CLASS);
+        if ((types != null && !types.isEmpty()) || (subTypes != null && !subTypes.isEmpty())) {
+          sb.append(" WHERE ");
+        }
+        if ((types != null && !types.isEmpty())) {
+          sb.append(P_TYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(types)).append("\"] ");
+        }
+        if (subTypes != null && !subTypes.isEmpty()) {
+          if ((types != null && !types.isEmpty())) {
+            sb.append(" AND ");
           }
-          if (subTypes != null && !subTypes.contains(record.getSubType())) {
-            continue; // skip it
-          }
-          if (filter != null && !filter.apply(record)) {
-            continue; // skip it
-          }
-          currentCount++;
-          if (count < currentCount) {
-            break;
-          }
+          sb.append(P_SUBTYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(subTypes)).append("\"] ");
+        }
+        sb.append(" ORDER BY @rid DESC SKIP ").append(fromItem).append(" LIMIT ").append(count);
+  
+        log.info("Query: {}", sb.toString());
+  
+        final OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(sb.toString());
+  
+        final OResultSet<ODocument> results = db.query(query);
+        if (results.isEmpty()) {
+          return;
+        }
+        for (ODocument doc : results) {
+          final EntryRecord record = new EntryRecord((Long) doc.field(P_TIMESTAMP, OType.LONG), (String) doc.field(
+              P_TYPE, OType.STRING), (String) doc.field(P_SUBTYPE, OType.STRING), null);
+          final Map<String, String> attributes = doc.field(P_DATA, OType.EMBEDDEDMAP);
+          record.getData().putAll(attributes);
           if (!callback.processNext(record)) {
             break;
           }
         }
+      } finally {
+        db.commit();
       }
     }
-    catch (Exception e) {
-      log.warn("Failure during retrieve or callback, processing stopped", e);
+    catch (IOException e) {
+      throw Throwables.propagate(e);
     }
   }
 
+  /**
+   * Purges old clusters based on {@code days} ("older than days") parameters. If input is {@code 0}, all clusters will
+   * be removed, meaning all the timeline is purged. As Orient DDL is not atomic, this method must be mutually exclusive
+   * with {@link #maybeAddNewCluster(ODatabaseDocumentTx, long)}, hence both are synchronized.
+   */
   @Override
-  public void purgeOlderThan(final int days) {
+  public synchronized void purgeOlderThan(final int days) {
     if (!isStarted()) {
       return;
     }
-    try {
-      if (days == 0) {
-        // today included, close current partition too, so that any new events are separate from those that exist already
-        journalStore.closeActivePartition();
-      }
-      final List<String> partitionIds = Lists.newArrayList();
-      try (KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
-        // gather all partitions, KZ returns them in creation order (oldest first)
-        for (PartitionInfo partition : partitions) {
-          // KZ can have only one non-closed "active" partition, and it is the last one returned
-          // This means that we will put current active last partition that is possible okay
-          // but, if we want to DELETE active one, it cannot be open, as at line above we
-          // check for days==0, and we would close it. If days != 0, we will pop it anyway
-          // without close, so is fine.
-          partitionIds.add(partition.getPartitionId());
+    try (ODatabaseDocumentTx db = db()) {
+      db.begin();
+      try {
+        final DateMidnight nowDm = new DateMidnight(DateTimeZone.UTC);
+        final int prefixLen = DB_CLUSTER_PREFIX.length();
+        final int[] cids = db.getMetadata().getSchema().getClass(DB_CLASS).getClusterIds();
+        for (int cid : cids) {
+          final String name = db.getClusterNameById(cid);
+          log.info("Cluster: {} {}", cid, name);
+          if (name.startsWith(DB_CLUSTER_PREFIX)) {
+            final int year = Integer.parseInt(name.substring(prefixLen, prefixLen + 4));
+            final int month = Integer.parseInt(name.substring(prefixLen + 4, prefixLen + 6));
+            final int day = Integer.parseInt(name.substring(prefixLen + 6, prefixLen + 8));
+            final DateMidnight clusterDm = new DateMidnight(year, month, day, DateTimeZone.UTC);
+            if (Days.daysBetween(clusterDm, nowDm).getDays() >= days) {
+              log.info("Cluster {}, is {} days old, purging it", name, Days.daysBetween(clusterDm, nowDm).getDays());
+              OSchema schema = db.getMetadata().getSchema();
+              OClass type = schema.getClass(DB_CLASS);
+              type.removeClusterId(cid);
+              schema.save();
+              ((OClassImpl) type).fromStream(); // workaround for OrientDB polymorphicClusterId bug
+              db.dropCluster(cid, true);
+            }
+          }
         }
+      } finally {
+        db.commit();
       }
-      // reverse the list, to have latest first, usually first "days" we want to keep
-      Collections.reverse(partitionIds);
-      // keep "days" partition by removing them from list
-      for (int i = 0; i < days; i++) {
-        partitionIds.remove(0);
-      }
-      // drop others on the list
-      while (!partitionIds.isEmpty()) {
-        journalStore.dropPartition(partitionIds.remove(0));
-      }
-    }
-    catch (KazukiException e) {
-      log.warn("Failed to purge Timeline store", e);
+      // Not using indexes, as they seems broken with clusters being dropped
+      // See https://groups.google.com/forum/#!topic/orient-database/HYMUAaMq4y8
+      // log.info("Rebuilding indexes...");
+      // db.command(new OCommandSQL("REBUILD INDEX " + I_TYPE)).execute();
+      // db.command(new OCommandSQL("REBUILD INDEX " + I_SUBTYPE)).execute();
     }
   }
 }

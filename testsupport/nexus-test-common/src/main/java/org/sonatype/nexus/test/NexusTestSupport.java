@@ -41,7 +41,7 @@ public abstract class NexusTestSupport
 
   public static final String SECURITY_XML_FILE = "security-xml-file";
 
-  public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
+  public static final String NEXUS_BASE_CONFIGURATION_KEY = "nexus-base";
 
   public static final String NEXUS_APP_CONFIGURATION_KEY = "nexus-app";
 
@@ -53,7 +53,7 @@ public abstract class NexusTestSupport
 
   private File confHomeDir = null;
 
-  private File runtimeHomeDir = null;
+  private File baseHomeDir = null;
 
   private File nexusappHomeDir = null;
 
@@ -69,7 +69,7 @@ public abstract class NexusTestSupport
     appsHomeDir = new File(plexusHomeDir, "apps");
     workHomeDir = new File(plexusHomeDir, "nexus-work");
     confHomeDir = new File(workHomeDir, "conf");
-    runtimeHomeDir = new File(plexusHomeDir, "runtime");
+    baseHomeDir = new File(plexusHomeDir, "nexus-base");
     nexusappHomeDir = new File(plexusHomeDir, "nexus-app");
     tempDir = new File(workHomeDir, "tmp");
 
@@ -77,7 +77,7 @@ public abstract class NexusTestSupport
     ctx.put(APPS_CONFIGURATION_KEY, appsHomeDir.getAbsolutePath());
     ctx.put(CONF_DIR_KEY, confHomeDir.getAbsolutePath());
     ctx.put(SECURITY_XML_FILE, getNexusSecurityConfiguration());
-    ctx.put(RUNTIME_CONFIGURATION_KEY, runtimeHomeDir.getAbsolutePath());
+    ctx.put(NEXUS_BASE_CONFIGURATION_KEY, baseHomeDir.getAbsolutePath());
     ctx.put(NEXUS_APP_CONFIGURATION_KEY, nexusappHomeDir.getAbsolutePath());
     ctx.put("java.io.tmpdir", tempDir.getAbsolutePath());
   }
@@ -102,7 +102,7 @@ public abstract class NexusTestSupport
     appsHomeDir.mkdirs();
     workHomeDir.mkdirs();
     confHomeDir.mkdirs();
-    runtimeHomeDir.mkdirs();
+    baseHomeDir.mkdirs();
     nexusappHomeDir.mkdirs();
     tempDir.mkdirs();
   }

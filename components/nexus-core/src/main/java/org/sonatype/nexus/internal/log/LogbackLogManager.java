@@ -51,6 +51,8 @@ import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import org.slf4j.ILoggerFactory;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -69,6 +71,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.impl.StaticLoggerBinder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -149,7 +152,12 @@ public class LogbackLogManager
   }
 
   private LoggerContext getLoggerContext() {
-    return (LoggerContext) LoggerFactory.getILoggerFactory();
+    ILoggerFactory factory = LoggerFactory.getILoggerFactory();
+    if (factory instanceof LoggerContext) {
+      return (LoggerContext) factory;
+    }
+    // temporary workaround for situations where SLF4j is not backed by logback
+    return (LoggerContext) StaticLoggerBinder.getSingleton().getLoggerFactory();
   }
 
   @Override

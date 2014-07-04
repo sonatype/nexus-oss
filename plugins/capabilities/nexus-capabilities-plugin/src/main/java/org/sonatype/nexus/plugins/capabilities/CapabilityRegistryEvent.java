@@ -22,7 +22,6 @@ import org.sonatype.nexus.events.AbstractEvent;
 public class CapabilityRegistryEvent
     extends AbstractEvent<CapabilityRegistry>
 {
-
   public CapabilityRegistryEvent(final CapabilityRegistry capabilityRegistry) {
     super(capabilityRegistry);
   }
@@ -40,7 +39,6 @@ public class CapabilityRegistryEvent
   public static class AfterLoad
       extends CapabilityRegistryEvent
   {
-
     public AfterLoad(final CapabilityRegistry capabilityRegistry) {
       super(capabilityRegistry);
     }
@@ -49,7 +47,23 @@ public class CapabilityRegistryEvent
     public String toString() {
       return "Loaded " + super.toString();
     }
-
   }
 
+  /**
+   * Event fired once the registry is ready on boot.
+   *
+   * @since 3.0
+   */
+  public static class Ready
+      extends CapabilityRegistryEvent
+  {
+    public Ready(final CapabilityRegistry capabilityRegistry) {
+      super(capabilityRegistry);
+    }
+
+    @Override
+    public String toString() {
+      return "Ready " + super.toString();
+    }
+  }
 }

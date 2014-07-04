@@ -13,12 +13,11 @@
 package org.sonatype.nexus.yum.internal.capabilities;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityBooterSupport;
 import org.sonatype.nexus.yum.YumRegistry;
-
-import org.eclipse.sisu.EagerSingleton;
 
 /**
  * Automatically create Yum capability.
@@ -26,15 +25,12 @@ import org.eclipse.sisu.EagerSingleton;
  * @since yum 3.0
  */
 @Named
-@EagerSingleton
+@Singleton
 public class YumCapabilitiesBooter
     extends CapabilityBooterSupport
 {
-
   @Override
-  protected void boot(final CapabilityRegistry registry)
-      throws Exception
-  {
+  protected void boot(final CapabilityRegistry registry) throws Exception {
     maybeAddCapability(
         registry,
         YumCapabilityDescriptor.TYPE,
@@ -43,5 +39,4 @@ public class YumCapabilitiesBooter
         new YumCapabilityConfiguration(YumRegistry.DEFAULT_MAX_NUMBER_PARALLEL_THREADS).asMap()
     );
   }
-
 }

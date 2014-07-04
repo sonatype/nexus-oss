@@ -46,11 +46,11 @@ public class ApplicationDirectoriesImpl
   private final File tempDir;
 
   // FIXME: Normalize properties used, deferring for now until we redesign installation layout and boot configuration
-  // FIXME: bundleBasedir -> nexus.install
+  // FIXME: nexus-base -> nexus.install
   // FIXME: nexus-work -> nexus.work
 
   @Inject
-  public ApplicationDirectoriesImpl(final @Named("${bundleBasedir}") @Nullable File installDir,
+  public ApplicationDirectoriesImpl(final @Named("${nexus-base}") @Nullable File installDir,
                                     final @Named("${nexus-app}") File appDir,
                                     final @Named("${nexus-work}") File workDir)
   {
