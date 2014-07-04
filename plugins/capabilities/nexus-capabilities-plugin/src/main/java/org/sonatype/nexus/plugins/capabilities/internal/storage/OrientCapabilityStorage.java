@@ -56,7 +56,7 @@ public class OrientCapabilityStorage
 
   @Inject
   public OrientCapabilityStorage(final DatabaseManager databaseManager,
-                                 final @Named("hex") RecordIdObfuscator recordIdObfuscator)
+                                 final RecordIdObfuscator recordIdObfuscator)
   {
     this.databaseManager = checkNotNull(databaseManager);
     this.recordIdObfuscator = checkNotNull(recordIdObfuscator);
