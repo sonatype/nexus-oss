@@ -66,10 +66,13 @@
       <artifactId>orientdb-server</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>com.orientechnologies</groupId>
-      <artifactId>orientdb-object</artifactId>
-    </dependency>
+    <!--
+    NOTE: Not using object-api this is not recommended for usage by orient support.
+    -->
+    <!--<dependency>-->
+      <!--<groupId>com.orientechnologies</groupId>-->
+      <!--<artifactId>orientdb-object</artifactId>-->
+    <!--</dependency>-->
 
     <!--
     NOTE: excluding for now, enable once we need graphdb features.
