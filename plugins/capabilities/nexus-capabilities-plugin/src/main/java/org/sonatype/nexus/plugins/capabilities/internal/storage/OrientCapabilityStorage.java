@@ -146,7 +146,7 @@ public class OrientCapabilityStorage
     Map<CapabilityIdentity, CapabilityStorageItem> items = Maps.newHashMap();
 
     try (ODatabaseDocumentTx db = openDb()) {
-      for (ODocument doc : db.browseClass(CapabilityStorageItemEntityAdapter.DB_CLASS)) {
+      for (ODocument doc : entityAdapter.browse(db)) {
         ORID rid = doc.getIdentity();
         CapabilityStorageItem item = entityAdapter.read(doc);
         items.put(convert(rid), item);

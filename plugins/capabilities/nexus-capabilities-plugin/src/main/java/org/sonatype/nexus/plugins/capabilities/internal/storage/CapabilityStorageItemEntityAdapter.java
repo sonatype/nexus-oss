@@ -109,4 +109,12 @@ public class CapabilityStorageItemEntityAdapter
 
     return entity;
   }
+
+  /**
+   * Browse all documents.
+   */
+  public Iterable<ODocument> browse(final ODatabaseDocumentTx db) {
+    checkNotNull(db);
+    return db.browseClass(DB_CLASS);
+  }
 }
