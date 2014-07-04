@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.internal.orient.DatabaseManagerImpl;
+import org.sonatype.nexus.internal.orient.HexRecordIdObfuscator;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -50,7 +51,7 @@ public class OrientCapabilityStorageTest
     // TODO: Replace with in-memory manager impl
     DatabaseManagerImpl databaseManager = new DatabaseManagerImpl(applicationDirectories);
 
-    this.underTest = new OrientCapabilityStorage(databaseManager);
+    this.underTest = new OrientCapabilityStorage(databaseManager, new HexRecordIdObfuscator());
     underTest.start();
   }
 

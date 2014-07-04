@@ -48,13 +48,16 @@ public class OrientCapabilityStorage
 
   private final DatabaseManager databaseManager;
 
+  private final RecordIdObfuscator recordIdObfuscator;
+
   private final CapabilityStorageItemEntityAdapter entityAdapter = new CapabilityStorageItemEntityAdapter();
 
   private ODatabaseDocumentPool databasePool;
 
   @Inject
-  public OrientCapabilityStorage(final DatabaseManager databaseManager) {
+  public OrientCapabilityStorage(final DatabaseManager databaseManager, final RecordIdObfuscator recordIdObfuscator) {
     this.databaseManager = checkNotNull(databaseManager);
+    this.recordIdObfuscator = checkNotNull(recordIdObfuscator);
   }
 
   @Override
@@ -84,12 +87,12 @@ public class OrientCapabilityStorage
   }
 
   private CapabilityIdentity convert(final ORID rid) {
-    String encoded = RecordIdObfuscator.encode(rid);
+    String encoded = recordIdObfuscator.encode(rid);
     return new CapabilityIdentity(encoded);
   }
 
   private ORID convert(final CapabilityIdentity id) {
-    return RecordIdObfuscator.decode(id.toString());
+    return recordIdObfuscator.decode(id.toString());
   }
 
   @Override
