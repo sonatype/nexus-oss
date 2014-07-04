@@ -77,7 +77,7 @@ public class EncryptedRecordIdObfuscator
     checkNotNull(rid);
 
     try {
-      // rid record is 10 byte long, need to be in multiples of 8 for cipher
+      // rid is 10 byte long, need to be in multiples of 8 for cipher
       byte[] plain = ByteBuffer.allocate(16).put(rid.toStream()).array();
       cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
       byte[] encrypted = cipher.doFinal(plain);
