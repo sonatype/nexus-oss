@@ -10,48 +10,41 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.analytics;
+package org.sonatype.nexus.orient;
 
-import java.util.Iterator;
+import com.google.common.base.Throwables;
+import org.apache.commons.codec.DecoderException;
 
-import javax.annotation.Nullable;
-
-import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
-
-import com.google.common.collect.Iterators;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.commons.codec.binary.Hex.decodeHex;
+import static org.apache.commons.codec.binary.Hex.encodeHex;
 
 /**
- * Analytics event data store.
+ * HEX encoding helpers.
  *
  * @since 3.0
  */
-public interface EventStore
-  extends Lifecycle
+public class Hex
 {
-  void add(EventData data) throws Exception;
-
-  void clear() throws Exception;
-
-  long approximateSize() throws Exception;
-
-  interface EventDataIterable
-      extends Iterable<EventData>, AutoCloseable
-  {
-    // empty
+  /**
+   * HEX encode bytes to string.
+   */
+  public static String encode(final byte[] bytes) {
+    checkNotNull(bytes);
+    char[] encoded = encodeHex(bytes);
+    return new String(encoded);
   }
 
-  EventDataIterable EMPTY_ITERABLE = new EventDataIterable()
-  {
-    @Override
-    public void close() throws Exception {
-      // nop
+  /**
+   * HEX decode string to bytes.
+   */
+  public static byte[] decode(final String encoded) {
+    checkNotNull(encoded);
+    try {
+      return decodeHex(encoded.toCharArray());
     }
-
-    @Override
-    public Iterator<EventData> iterator() {
-      return Iterators.emptyIterator();
+    catch (DecoderException e) {
+      throw Throwables.propagate(e);
     }
-  };
-
-  EventDataIterable iterator(long offset, @Nullable Long limit) throws Exception;
+  }
 }

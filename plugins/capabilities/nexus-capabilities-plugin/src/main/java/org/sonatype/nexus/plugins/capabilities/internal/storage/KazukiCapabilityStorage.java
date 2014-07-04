@@ -38,11 +38,11 @@ import io.kazuki.v0.store.schema.model.Schema;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Handles persistence of capabilities configuration.
+ * Kazuki implementation of {@link CapabilityStorage}.
  */
+@Named("kazuki")
 @Singleton
-@Named
-public class DefaultCapabilityStorage
+public class KazukiCapabilityStorage
     extends LifecycleSupport
     implements CapabilityStorage
 {
@@ -55,9 +55,9 @@ public class DefaultCapabilityStorage
   private final SchemaStore schemaStore;
 
   @Inject
-  public DefaultCapabilityStorage(final @Named("nexuscapability") Lifecycle lifecycle,
-                                  final @Named("nexuscapability") KeyValueStore keyValueStore,
-                                  final @Named("nexuscapability") SchemaStore schemaStore)
+  public KazukiCapabilityStorage(final @Named("nexuscapability") Lifecycle lifecycle,
+                                 final @Named("nexuscapability") KeyValueStore keyValueStore,
+                                 final @Named("nexuscapability") SchemaStore schemaStore)
   {
     this.lifecycle = checkNotNull(lifecycle);
     this.keyValueStore = checkNotNull(keyValueStore);

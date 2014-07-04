@@ -30,6 +30,8 @@ public interface CapabilityStorage extends Lifecycle
   public CapabilityIdentity add(CapabilityStorageItem item)
       throws IOException;
 
+  // FIXME: update() and remove() return values are never used, probably should return void instead
+
   /**
    * Updates stored capability if exists.
    *

@@ -19,7 +19,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent.Ready;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageConverter;
-import org.sonatype.nexus.plugins.capabilities.internal.storage.DefaultCapabilityStorage;
+import org.sonatype.nexus.plugins.capabilities.internal.storage.OrientCapabilityStorage;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -44,14 +44,14 @@ public class CapabilityRegistryBooter
 
   private final Provider<DefaultCapabilityRegistry> capabilityRegistryProvider;
 
-  private final Provider<DefaultCapabilityStorage> capabilityStorageProvider;
+  private final Provider<OrientCapabilityStorage> capabilityStorageProvider;
 
   private final Provider<CapabilityStorageConverter> storageConverterProvider;
 
   @Inject
   public CapabilityRegistryBooter(final EventBus eventBus,
                                   final Provider<DefaultCapabilityRegistry> capabilityRegistryProvider,
-                                  final Provider<DefaultCapabilityStorage> capabilityStorageProvider,
+                                  final Provider<OrientCapabilityStorage> capabilityStorageProvider,
                                   final Provider<CapabilityStorageConverter> storageConverterProvider)
   {
     this.eventBus = checkNotNull(eventBus);

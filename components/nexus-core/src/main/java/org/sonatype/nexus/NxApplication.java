@@ -25,6 +25,7 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventSubscriberHost;
+import org.sonatype.nexus.internal.orient.OrientBootstrap;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
@@ -66,6 +67,8 @@ public class NxApplication
 
   private final EventSubscriberHost eventSubscriberHost;
 
+  private final OrientBootstrap orientBootstrap;
+
   @Inject
   public NxApplication(final EventBus eventBus,
                        final NexusConfiguration nexusConfiguration,
@@ -73,7 +76,8 @@ public class NxApplication
                        final SecuritySystem securitySystem,
                        final NexusScheduler nexusScheduler,
                        final RepositoryRegistry repositoryRegistry,
-                       final EventSubscriberHost eventSubscriberHost)
+                       final EventSubscriberHost eventSubscriberHost,
+                       final OrientBootstrap orientBootstrap)
   {
     this.eventBus = checkNotNull(eventBus);
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
@@ -82,6 +86,7 @@ public class NxApplication
     this.nexusScheduler = checkNotNull(nexusScheduler);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.eventSubscriberHost = checkNotNull(eventSubscriberHost);
+    this.orientBootstrap = checkNotNull(orientBootstrap);
 
     logInitialized();
   }
@@ -110,6 +115,10 @@ public class NxApplication
 
     applicationStatusSource.setState(SystemState.STOPPED);
     applicationStatusSource.getSystemStatus().setInitializedAt(new Date());
+
+    // HACK: Must start database services manually
+    orientBootstrap.start();
+
     eventBus.post(new NexusInitializedEvent(this));
 
     applicationStatusSource.getSystemStatus().setState(SystemState.STARTING);
@@ -175,14 +184,22 @@ public class NxApplication
   @Override
   protected void doStop() throws Exception {
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPING);
+
     // Due to no dependency mechanism in NX for components, we need to fire off a hint about shutdown first
     eventBus.post(new NexusStoppingEvent(this));
+
     // kill services + notify
     nexusScheduler.shutdown();
+
     eventBus.post(new NexusStoppedEvent(this));
     eventSubscriberHost.stop();
+
     nexusConfiguration.dropInternals();
     securitySystem.stop();
+
+    // HACK: Must stop database services manually
+    orientBootstrap.stop();
+
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPED);
     log.info("Stopped {}", getNexusNameForLogs());
   }
