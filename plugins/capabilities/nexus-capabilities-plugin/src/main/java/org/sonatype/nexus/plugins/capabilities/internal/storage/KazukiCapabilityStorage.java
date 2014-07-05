@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.storage;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -19,9 +20,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import io.kazuki.v0.internal.v2schema.Attribute;
@@ -51,6 +55,8 @@ public class KazukiCapabilityStorage
 {
   public static final String CAPABILITY_SCHEMA = "capability";
 
+  private final ApplicationDirectories applicationDirectories;
+
   private final Lifecycle lifecycle;
 
   private final KeyValueStore keyValueStore;
@@ -58,13 +64,41 @@ public class KazukiCapabilityStorage
   private final SchemaStore schemaStore;
 
   @Inject
-  public KazukiCapabilityStorage(final @Named("nexuscapability") Lifecycle lifecycle,
+  public KazukiCapabilityStorage(final ApplicationDirectories applicationDirectories,
+                                 final @Named("nexuscapability") Lifecycle lifecycle,
                                  final @Named("nexuscapability") KeyValueStore keyValueStore,
                                  final @Named("nexuscapability") SchemaStore schemaStore)
   {
+    this.applicationDirectories = checkNotNull(applicationDirectories);
     this.lifecycle = checkNotNull(lifecycle);
     this.keyValueStore = checkNotNull(keyValueStore);
     this.schemaStore = checkNotNull(schemaStore);
+  }
+
+  /**
+   * Helper to determine if KZ-based storage database exists.
+   *
+   * @since 2.9
+   */
+  public boolean exists() {
+    File dir = applicationDirectories.getWorkDirectory("db/capabilities", false);
+    File file = new File(dir, "capabilities.h2.db");
+    return file.exists();
+  }
+
+  /**
+   * Helper to drop entire KZ-based storage database.
+   *
+   * @since 2.9
+   */
+  public void drop() {
+    File dir = applicationDirectories.getWorkDirectory("db/capabilities", false);
+    try {
+      DirSupport.deleteIfExists(dir.toPath());
+    }
+    catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override
