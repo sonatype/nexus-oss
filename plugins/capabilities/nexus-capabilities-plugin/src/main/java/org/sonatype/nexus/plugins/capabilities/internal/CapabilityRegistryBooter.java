@@ -15,8 +15,8 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageConverter;
-import org.sonatype.nexus.plugins.capabilities.internal.storage.DefaultCapabilityStorage;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -38,13 +38,13 @@ public class CapabilityRegistryBooter
 {
   private final Provider<DefaultCapabilityRegistry> capabilityRegistry;
 
-  private final DefaultCapabilityStorage capabilityStorage;
+  private final CapabilityStorage capabilityStorage;
 
   private final CapabilityStorageConverter storageConverter;
 
   @Inject
   public CapabilityRegistryBooter(final Provider<DefaultCapabilityRegistry> capabilityRegistry,
-                                  final DefaultCapabilityStorage capabilityStorage,
+                                  final CapabilityStorage capabilityStorage,
                                   final EventBus eventBus,
                                   final CapabilityStorageConverter storageConverter)
   {
@@ -58,7 +58,10 @@ public class CapabilityRegistryBooter
   public void handle(final NexusInitializedEvent event) {
     try {
       capabilityStorage.start();
-      storageConverter.convertToKazukiIfNecessary();
+
+      // FIXME: Replace with kazuki -> xml
+      //storageConverter.convertToKazukiIfNecessary();
+
       capabilityRegistry.get().load();
     }
     catch (final Exception e) {

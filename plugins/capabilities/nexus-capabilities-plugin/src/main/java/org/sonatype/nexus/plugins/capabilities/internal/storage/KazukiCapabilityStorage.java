@@ -24,7 +24,6 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-
 import io.kazuki.v0.internal.v2schema.Attribute;
 import io.kazuki.v0.internal.v2schema.Attribute.Type;
 import io.kazuki.v0.internal.v2schema.Schema;
@@ -36,14 +35,17 @@ import io.kazuki.v0.store.keyvalue.KeyValueStore;
 import io.kazuki.v0.store.lifecycle.Lifecycle;
 import io.kazuki.v0.store.schema.SchemaStore;
 import io.kazuki.v0.store.schema.TypeValidation;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Handles persistence of capabilities configuration.
+ * Kauzki-based {@link CapabilityStorage}.
+ *
+ * @since 2.8
  */
+@Named("kazuki")
 @Singleton
-@Named
-public class DefaultCapabilityStorage
+public class KazukiCapabilityStorage
     extends LifecycleSupport
     implements CapabilityStorage
 {
@@ -56,9 +58,9 @@ public class DefaultCapabilityStorage
   private final SchemaStore schemaStore;
 
   @Inject
-  public DefaultCapabilityStorage(final @Named("nexuscapability") Lifecycle lifecycle,
-                                  final @Named("nexuscapability") KeyValueStore keyValueStore,
-                                  final @Named("nexuscapability") SchemaStore schemaStore)
+  public KazukiCapabilityStorage(final @Named("nexuscapability") Lifecycle lifecycle,
+                                 final @Named("nexuscapability") KeyValueStore keyValueStore,
+                                 final @Named("nexuscapability") SchemaStore schemaStore)
   {
     this.lifecycle = checkNotNull(lifecycle);
     this.keyValueStore = checkNotNull(keyValueStore);
