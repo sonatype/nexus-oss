@@ -50,13 +50,8 @@ public class SupportBundleCustomizerImpl
     this.databaseManager = checkNotNull(databaseManager);
   }
 
-  /**
-   * Customize the given bundle, adding one or more content sources.
-   */
   @Override
   public void customize(final SupportBundle supportBundle) {
-    // FIXME: Sort out compression here, and/or filename
-    // FIXME: Already compressed by zip so probably allow uncompressed format here?
     String path = String.format("work/%s/%s/%s",
         DatabaseManagerImpl.WORK_PATH,
         OrientCapabilityStorage.DB_NAME,
@@ -66,6 +61,7 @@ public class SupportBundleCustomizerImpl
     {
       @Override
       protected void generate(final File file) throws Exception {
+        // output non-compressed, no need to double compress contents
         try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
           databaseManager.export(OrientCapabilityStorage.DB_NAME, out);
         }
