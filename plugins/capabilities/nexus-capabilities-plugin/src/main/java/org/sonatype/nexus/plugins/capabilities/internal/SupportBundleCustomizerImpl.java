@@ -33,7 +33,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Capabilities {@link SupportBundleCustomizer}.
+ * Capabilities {@link SupportBundleCustomizer} to include exported capability database in support-zips.
  *
  * @since 2.7
  */
@@ -59,6 +59,11 @@ public class SupportBundleCustomizerImpl
     );
     supportBundle.add(new GeneratedContentSourceSupport(Type.CONFIG, path)
     {
+      {
+        // capabilities are critical to system operation, ensure this always gets into the zip
+        setPriority(Priority.REQUIRED);
+      }
+
       @Override
       protected void generate(final File file) throws Exception {
         // output non-compressed, no need to double compress contents
