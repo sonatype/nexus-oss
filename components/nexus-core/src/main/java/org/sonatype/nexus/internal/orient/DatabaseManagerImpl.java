@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import javax.inject.Inject;
@@ -31,6 +32,7 @@ import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.command.OCommandOutputListener;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -57,10 +59,11 @@ public class DatabaseManagerImpl
 
   public static final String SYSTEM_PASSWORD = "admin";
 
-  /**
-   * Standard location for export file inside of instance-specific database directory.
-   */
-  public static final String RESTORE_DATABASE_FILENAME = "restore-db.gz";
+  public static final int BACKUP_BUFFER_SIZE = 16 * 1024;
+
+  public static final int IMPORT_BUFFER_SIZE = 16 * 1024;
+
+  public static final int BACKUP_COMPRESSION_LEVEL = 9;
 
   private final File databasesDirectory;
 
@@ -108,9 +111,9 @@ public class DatabaseManagerImpl
         db.create();
         log.debug("Created database: {} -> {}", name, db);
 
-        // Attempt to restore previously exported database
+        // Attempt to import previously exported database
         try {
-          maybeRestore(name, db);
+          maybeImport(name, db);
         }
         catch (IOException e) {
           throw Throwables.propagate(e);
@@ -137,27 +140,41 @@ public class DatabaseManagerImpl
     return pool;
   }
 
+  /**
+   * Helper to log prefixed command output messages.
+   */
+  private class LoggingCommandOutputListener
+      implements OCommandOutputListener
+  {
+    private final String prefix;
+
+    private LoggingCommandOutputListener(final String prefix) {
+      this.prefix = prefix;
+    }
+
+    @Override
+    public void onMessage(final String text) {
+      if (log.isDebugEnabled()) {
+        log.debug("{}: {}", prefix, text.trim());
+      }
+    }
+  }
+
   @Override
-  public void export(final String name, final OutputStream output) throws IOException {
+  public void backup(final String name, final OutputStream output) throws IOException {
     checkNotNull(name);
     checkNotNull(output);
 
-    log.debug("Exporting database: {}", name);
+    log.debug("Backup database: {}", name);
 
     try (ODatabaseDocumentTx db = connect(name, false)) {
       checkState(db.exists(), "Database does not exist: %s", name);
 
-      log.debug("Starting export");
-      ODatabaseExport exporter = new ODatabaseExport(db, output, new OCommandOutputListener()
-      {
-        @Override
-        public void onMessage(final String message) {
-          log.debug("EXPORT: ", message.trim());
-        }
-      });
-      exporter.exportDatabase();
-
-      log.debug("Completed export");
+      log.debug("Starting backup");
+      Map<String, Object> options = Maps.newHashMap();
+      db.backup(output, options, null, new LoggingCommandOutputListener("BACKUP"),
+          BACKUP_COMPRESSION_LEVEL, BACKUP_BUFFER_SIZE);
+      log.debug("Completed backup");
     }
   }
 
@@ -172,40 +189,84 @@ public class DatabaseManagerImpl
       checkState(!db.exists(), "Database already exists: %s", name);
       db.create();
 
-      restore(db, input);
+      log.debug("Starting restore");
+      Map<String, Object> options = Maps.newHashMap();
+      db.restore(input, options, null, new LoggingCommandOutputListener("RESTORE"));
+      log.debug("Completed import");
     }
   }
 
-  private void restore(final ODatabaseDocumentTx db, final InputStream input) throws IOException {
+  @Override
+  public void export(final String name, final OutputStream output) throws IOException {
+    checkNotNull(name);
+    checkNotNull(output);
+
+    log.debug("Exporting database: {}", name);
+
+    try (ODatabaseDocumentTx db = connect(name, false)) {
+      checkState(db.exists(), "Database does not exist: %s", name);
+
+      log.debug("Starting export");
+      ODatabaseExport exporter = new ODatabaseExport(db, output, new LoggingCommandOutputListener("EXPORT"));
+      exporter.exportDatabase();
+      log.debug("Completed export");
+    }
+  }
+
+  @Override
+  public void import_(final String name, final InputStream input) throws IOException {
+    checkNotNull(name);
     checkNotNull(input);
 
-    log.debug("Starting restore");
+    log.debug("Importing database: {}", name);
 
-    ODatabaseImport importer = new ODatabaseImport(db, input, new OCommandOutputListener()
-    {
-      @Override
-      public void onMessage(final String message) {
-        log.debug("RESTORE: {}", message.trim());
-      }
-    });
+    try (ODatabaseDocumentTx db = connect(name, false)) {
+      checkState(!db.exists(), "Database already exists: %s", name);
+      db.create();
+
+      import_(db, input);
+    }
+  }
+
+  private void import_(final ODatabaseDocumentTx db, final InputStream input) throws IOException {
+    checkNotNull(input);
+
+    log.debug("Starting import");
+    ODatabaseImport importer = new ODatabaseImport(db, input, new LoggingCommandOutputListener("IMPORT"));
     importer.importDatabase();
-
-    log.debug("Completed restore");
+    log.debug("Completed import");
   }
 
   /**
-   * Maybe restore the database if there is an export file in the standard location.
+   * Maybe import the database if there is an export file in the standard location.
+   *
+   * @see #EXPORT_FILENAME
+   * @see #EXPORT_GZ_FILENAME
    */
-  private void maybeRestore(final String name, final ODatabaseDocumentTx db) throws IOException {
-    File file = new File(directory(name), RESTORE_DATABASE_FILENAME);
+  private void maybeImport(final String name, final ODatabaseDocumentTx db) throws IOException {
+    InputStream input = null;
+
+    File dir = directory(name);
+    File file = new File(dir, EXPORT_FILENAME);
     if (file.exists()) {
-      log.debug("Restoring database: {} from: {}", name, file);
-
-      try (InputStream input = new GZIPInputStream(new BufferedInputStream(new FileInputStream(file)), 16384)) {
-        restore(db, input);
+      input = new BufferedInputStream(new FileInputStream(file), IMPORT_BUFFER_SIZE);
+    }
+    else {
+      file = new File(dir, EXPORT_GZ_FILENAME);
+      if (file.exists()) {
+        input = new GZIPInputStream(new FileInputStream(file), IMPORT_BUFFER_SIZE);
       }
+    }
 
-      // TODO: Move file out of place
+    if (input != null) {
+      log.debug("Importing database: {} from: {}", name, file);
+
+      try {
+        import_(db, input);
+      }
+      finally {
+        input.close();
+      }
     }
   }
 }

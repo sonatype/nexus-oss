@@ -31,10 +31,48 @@ public interface DatabaseManager
   ODatabaseDocumentPool pool(String name);
 
   //
-  // TODO: Expose import/export and backup/restore semantics, they are different
+  // Backup & Restore
   //
 
+  /**
+   * Backup database.  Output format is a compressed ZIP file.
+   *
+   * @see #restore(String, InputStream)
+   */
+  void backup(String name, OutputStream output) throws IOException;
+
+  /**
+   * Restore database.
+   *
+   * @see #backup(String, OutputStream)
+   */
+  void restore(String name, InputStream input) throws IOException;
+
+  //
+  // Export and Import
+  //
+
+  /**
+   * Standard file name inside of database export in instance-specific database directory.
+   */
+  String EXPORT_FILENAME = "export.json";
+
+  /**
+   * Compressed variant of {@link #EXPORT_FILENAME}.
+   */
+  String EXPORT_GZ_FILENAME = EXPORT_FILENAME + ".gz";
+
+  /**
+   * Export database.  Output format is a JSON file.
+   *
+   * @see #import_(String, InputStream)
+   */
   void export(String name, OutputStream output) throws IOException;
 
-  void restore(String name, InputStream input) throws IOException;
+  /**
+   * Import database.
+   *
+   * @see #export(String, OutputStream)
+   */
+  void import_(String name, InputStream input) throws IOException;
 }
