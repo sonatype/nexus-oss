@@ -157,7 +157,7 @@ public class DatabaseManagerImpl
       });
       exporter.exportDatabase();
 
-      log.debug("Completed restore");
+      log.debug("Completed export");
     }
   }
 
