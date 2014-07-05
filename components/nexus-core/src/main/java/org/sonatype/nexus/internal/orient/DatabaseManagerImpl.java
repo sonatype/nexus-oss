@@ -10,10 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.internal.orient;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,10 +28,14 @@ import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
+import com.orientechnologies.orient.core.command.OCommandOutputListener;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.db.tool.ODatabaseExport;
+import com.orientechnologies.orient.core.db.tool.ODatabaseImport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Default {@link DatabaseManager} implementation.
@@ -38,8 +45,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class DatabaseManagerImpl
-  extends ComponentSupport
-  implements DatabaseManager
+    extends ComponentSupport
+    implements DatabaseManager
 {
   public static final String WORK_PATH = "db";
 
@@ -107,5 +114,52 @@ public class DatabaseManagerImpl
     log.debug("Created database pool: {} -> {}", name, pool);
 
     return pool;
+  }
+
+  @Override
+  public void export(final String name, final OutputStream output) throws IOException {
+    checkNotNull(name);
+    checkNotNull(output);
+
+    log.debug("Exporting database: {}", name);
+
+    try (ODatabaseDocumentTx db = connect(name, false)) {
+      checkState(db.exists(), "Database does not exist: %s", name);
+
+      log.debug("Starting export");
+      ODatabaseExport exporter = new ODatabaseExport(db, output, new OCommandOutputListener()
+      {
+        @Override
+        public void onMessage(final String message) {
+          log.debug(message.trim());
+        }
+      });
+      exporter.exportDatabase();
+      log.debug("Completed restore");
+    }
+  }
+
+  @Override
+  public void restore(final String name, final InputStream input) throws IOException {
+    checkNotNull(name);
+    checkNotNull(input);
+
+    log.debug("Restoring database: {}", name);
+
+    try (ODatabaseDocumentTx db = connect(name, false)) {
+      checkState(!db.exists(), "Database already exists: %s", name);
+      db.create();
+
+      log.debug("Starting restore");
+      ODatabaseImport importer = new ODatabaseImport(db, input, new OCommandOutputListener()
+      {
+        @Override
+        public void onMessage(final String message) {
+          log.debug(message.trim());
+        }
+      });
+      importer.importDatabase();
+      log.debug("Completed restore");
+    }
   }
 }

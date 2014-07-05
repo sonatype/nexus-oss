@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.orient;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
@@ -27,4 +31,8 @@ public interface DatabaseManager
   ODatabaseDocumentTx connect(String name);
 
   ODatabaseDocumentPool pool(String name);
+
+  void export(String name, OutputStream output) throws IOException;
+
+  void restore(String name, InputStream input) throws IOException;
 }
