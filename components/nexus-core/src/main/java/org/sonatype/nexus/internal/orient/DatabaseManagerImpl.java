@@ -267,6 +267,8 @@ public class DatabaseManagerImpl
       finally {
         input.close();
       }
+
+      // TODO: Rename file now that its processed?  Or maybe delete it?
     }
   }
 }
