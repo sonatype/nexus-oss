@@ -31,7 +31,7 @@ public interface DatabaseManager
   ODatabaseDocumentPool pool(String name);
 
   //
-  // Backup & Restore
+  // Backup and Restore
   //
 
   /**
