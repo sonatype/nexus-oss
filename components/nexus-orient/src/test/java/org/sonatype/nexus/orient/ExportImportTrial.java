@@ -12,7 +12,10 @@
  */
 package org.sonatype.nexus.orient;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -21,12 +24,12 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.db.tool.ODatabaseExport;
 import com.orientechnologies.orient.core.db.tool.ODatabaseImport;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
- * Trials of using OrientDB export function.
+ * Trials of using OrientDB export and import functions.
  */
 public class ExportImportTrial
     extends TestSupport
@@ -36,12 +39,21 @@ public class ExportImportTrial
     SLF4JBridgeHandler.install();
   }
 
+  private File basedir;
+
+  @Before
+  public void setUp() throws Exception {
+    this.basedir = util.createTempDir("db");
+  }
+
   private ODatabaseDocumentTx createDatabase(final String name) {
-    return new ODatabaseDocumentTx("plocal:" + name).create();
+    File dir = new File(basedir, name);
+    return new ODatabaseDocumentTx("plocal:" + dir).create();
   }
 
   private ODatabaseDocumentTx openDatabase(final String name) {
-    return new ODatabaseDocumentTx("plocal:" + name).open("admin", "admin");
+    File dir = new File(basedir, name);
+    return new ODatabaseDocumentTx("plocal:" + dir).open("admin", "admin");
   }
 
   private ODocument createPerson(final ODatabaseDocumentTx db) {
@@ -55,31 +67,25 @@ public class ExportImportTrial
     return doc;
   }
 
-  @After
-  public void tearDown() throws Exception {
-    try (ODatabaseDocumentTx db = openDatabase("test")) {
-      db.drop();
-    }
-    try (ODatabaseDocumentTx db = openDatabase("test2")) {
-      db.drop();
-    }
-  }
-
   @Test
-  public void exportSimpleDatabase() throws Exception {
+  public void backupDatabase() throws Exception {
     try (ODatabaseDocumentTx db = createDatabase("test")) {
       ODocument doc = createPerson(db);
 
-      File file = File.createTempFile("export-", ".gz", util.getTmpDir());
+      // Backup makes ZIP files
+      File file = File.createTempFile("export-", ".zip", util.getTmpDir());
       log("Exporting to: {}", file);
 
-      ODatabaseExport exporter = new ODatabaseExport(db, file.getPath(), new OCommandOutputListener() {
-        @Override
-        public void onMessage(final String text) {
-          log("> {}", text.trim());
-        }
-      });
-      exporter.exportDatabase();
+      try (OutputStream output = new BufferedOutputStream(new FileOutputStream(file))) {
+        OCommandOutputListener listener = new OCommandOutputListener()
+        {
+          @Override
+          public void onMessage(final String text) {
+            log("> {}", text.trim());
+          }
+        };
+        db.backup(output, null, null, listener, 9, 16384);
+      }
     }
   }
 

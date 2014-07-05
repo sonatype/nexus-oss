@@ -30,6 +30,10 @@ public interface DatabaseManager
 
   ODatabaseDocumentPool pool(String name);
 
+  //
+  // TODO: Expose import/export and backup/restore semantics, they are different
+  //
+
   void export(String name, OutputStream output) throws IOException;
 
   void restore(String name, InputStream input) throws IOException;
