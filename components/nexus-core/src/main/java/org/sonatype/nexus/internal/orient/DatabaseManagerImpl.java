@@ -13,10 +13,13 @@
 
 package org.sonatype.nexus.internal.orient;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -54,6 +57,11 @@ public class DatabaseManagerImpl
 
   public static final String SYSTEM_PASSWORD = "admin";
 
+  /**
+   * Standard location for export file inside of instance-specific database directory.
+   */
+  public static final String RESTORE_DATABASE_FILENAME = "restore-db.gz";
+
   private final File databasesDirectory;
 
   @Inject
@@ -63,9 +71,19 @@ public class DatabaseManagerImpl
     log.debug("Databases directory: {}", databasesDirectory);
   }
 
-  private String buildUri(final String name) {
+  /**
+   * Returns the directory for the given named database.  Directory many or many not exist.
+   */
+  private File directory(final String name) {
+    return new File(databasesDirectory, name);
+  }
+
+  /**
+   * Build connection URI for given named database.  This will create the database directory if needed.
+   */
+  private String connectionUri(final String name) {
     try {
-      File dir = new File(databasesDirectory, name);
+      File dir = directory(name);
       DirSupport.mkdir(dir);
       return "plocal:" + dir.getCanonicalPath();
     }
@@ -78,7 +96,7 @@ public class DatabaseManagerImpl
   public ODatabaseDocumentTx connect(final String name, final boolean create) {
     checkNotNull(name);
 
-    String uri = buildUri(name);
+    String uri = connectionUri(name);
     ODatabaseDocumentTx db = new ODatabaseDocumentTx(uri);
 
     if (db.exists()) {
@@ -89,6 +107,14 @@ public class DatabaseManagerImpl
       if (create) {
         db.create();
         log.debug("Created database: {} -> {}", name, db);
+
+        // Attempt to restore previously exported database
+        try {
+          maybeRestore(name, db);
+        }
+        catch (IOException e) {
+          throw Throwables.propagate(e);
+        }
       }
       else {
         log.debug("Database does not exist: {}", name);
@@ -99,15 +125,10 @@ public class DatabaseManagerImpl
   }
 
   @Override
-  public ODatabaseDocumentTx connect(final String name) {
-    return connect(name, true);
-  }
-
-  @Override
   public ODatabaseDocumentPool pool(final String name) {
     checkNotNull(name);
 
-    String uri = buildUri(name);
+    String uri = connectionUri(name);
     ODatabaseDocumentPool pool = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
     pool.setName(String.format("%s-database-pool", name));
     pool.setup(1, 25);
@@ -131,10 +152,11 @@ public class DatabaseManagerImpl
       {
         @Override
         public void onMessage(final String message) {
-          log.debug(message.trim());
+          log.debug("EXPORT: ", message.trim());
         }
       });
       exporter.exportDatabase();
+
       log.debug("Completed restore");
     }
   }
@@ -150,16 +172,40 @@ public class DatabaseManagerImpl
       checkState(!db.exists(), "Database already exists: %s", name);
       db.create();
 
-      log.debug("Starting restore");
-      ODatabaseImport importer = new ODatabaseImport(db, input, new OCommandOutputListener()
-      {
-        @Override
-        public void onMessage(final String message) {
-          log.debug(message.trim());
-        }
-      });
-      importer.importDatabase();
-      log.debug("Completed restore");
+      restore(db, input);
+    }
+  }
+
+  private void restore(final ODatabaseDocumentTx db, final InputStream input) throws IOException {
+    checkNotNull(input);
+
+    log.debug("Starting restore");
+
+    ODatabaseImport importer = new ODatabaseImport(db, input, new OCommandOutputListener()
+    {
+      @Override
+      public void onMessage(final String message) {
+        log.debug("RESTORE: {}", message.trim());
+      }
+    });
+    importer.importDatabase();
+
+    log.debug("Completed restore");
+  }
+
+  /**
+   * Maybe restore the database if there is an export file in the standard location.
+   */
+  private void maybeRestore(final String name, final ODatabaseDocumentTx db) throws IOException {
+    File file = new File(directory(name), RESTORE_DATABASE_FILENAME);
+    if (file.exists()) {
+      log.debug("Restoring database: {} from: {}", name, file);
+
+      try (InputStream input = new GZIPInputStream(new BufferedInputStream(new FileInputStream(file)), 16384)) {
+        restore(db, input);
+      }
+
+      // TODO: Move file out of place
     }
   }
 }

@@ -28,8 +28,6 @@ public interface DatabaseManager
 {
   ODatabaseDocumentTx connect(String name, boolean create);
 
-  ODatabaseDocumentTx connect(String name);
-
   ODatabaseDocumentPool pool(String name);
 
   void export(String name, OutputStream output) throws IOException;
