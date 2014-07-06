@@ -51,8 +51,12 @@ public class SimpleFileOperations
 
     final MetricsInputStream metrics = metricsInputStream(data, DigestHelper.createSha1());
 
-    try (final OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.CREATE_NEW)) {
-      ByteStreams.copy(metrics, outputStream);
+    try {
+      try (final OutputStream output = Files.newOutputStream(path, StandardOpenOption.CREATE_NEW)) {
+        ByteStreams.copy(metrics, output);
+      }
+    }
+    finally {
       data.close();
     }
 

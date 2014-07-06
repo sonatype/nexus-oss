@@ -45,7 +45,9 @@ public interface FileOperations
 
   /**
    * Creates a file (and its containing directories, if necessary) and populates it from the
-   * InputStream, which gets closed.  Returns some basic metrics about the stream.
+   * InputStream, which gets closed.
+   *
+   * @return Basic metrics about the stream.
    */
   StreamMetrics create(Path path, InputStream data) throws IOException;
 
