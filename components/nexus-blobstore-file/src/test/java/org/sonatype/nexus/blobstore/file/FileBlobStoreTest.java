@@ -31,6 +31,7 @@ import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -75,8 +76,10 @@ public class FileBlobStoreTest
     final long contentSize = 200L;
     final String fakeSHA1 = "3757y5abc234cfgg";
     final InputStream inputStream = mock(InputStream.class);
-    final ImmutableMap<String, String> headers = ImmutableMap
-        .of(BlobStore.BLOB_NAME_HEADER, "my blob", BlobStore.CREATED_BY_HEADER, "John did this");
+    final ImmutableMap<String, String> headers = ImmutableMap.of(
+        BlobStore.BLOB_NAME_HEADER, "my blob",
+        BlobStore.CREATED_BY_HEADER, "John did this"
+    );
 
     when(metadataStore.add(any(BlobMetadata.class))).thenReturn(fakeId);
     when(pathPolicy.forContent(fakeId)).thenReturn(fakePath);
@@ -108,6 +111,7 @@ public class FileBlobStoreTest
     when(fileOps.openInputStream(fakePath)).thenReturn(mock(InputStream.class));
 
     final Blob blob = fileBlobStore.get(fakeId);
+    assertThat(blob, notNullValue());
     assertThat(blob.getId(), is(equalTo(fakeId)));
   }
 
