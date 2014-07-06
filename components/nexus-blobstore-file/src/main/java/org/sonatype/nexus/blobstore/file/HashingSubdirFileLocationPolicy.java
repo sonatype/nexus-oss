@@ -28,9 +28,9 @@ import static org.sonatype.nexus.blobstore.file.internal.FilenameEscaper.escapeF
 public class HashingSubdirFileLocationPolicy
     implements FilePathPolicy
 {
-  public static final int TIER_1_MODULO = 43;
+  private static final int TIER_1_MODULO = 43;
 
-  public static final int TIER_2_MODULO = 47;
+  private static final int TIER_2_MODULO = 47;
 
   private final Path root;
 
