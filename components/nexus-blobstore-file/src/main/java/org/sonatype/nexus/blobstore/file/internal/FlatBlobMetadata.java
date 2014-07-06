@@ -79,8 +79,8 @@ class FlatBlobMetadata
 
   @Override
   public String toString() {
-    return "FlatBlobMetadata{" +
-        ", state=" + blobState +
+    return getClass().getSimpleName() + "{" +
+        "blobState=" + blobState +
         ", headers=" + headers +
         ", creationTime=" + creationTime +
         ", sha1Hash='" + sha1Hash + '\'' +
