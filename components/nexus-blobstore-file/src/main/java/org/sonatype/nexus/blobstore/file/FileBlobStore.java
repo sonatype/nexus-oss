@@ -96,7 +96,6 @@ public class FileBlobStore
 
       final StreamMetrics streamMetrics = fileOperations.create(path, blobData);
       final BlobMetrics metrics = new BlobMetrics(new DateTime(), streamMetrics.getSHA1(), streamMetrics.getSize());
-
       final FileBlob blob = new FileBlob(blobId, headers, path, metrics);
 
       if (listener != null) {

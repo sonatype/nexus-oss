@@ -38,14 +38,20 @@ public interface BlobMetadataStore
 
   void delete(BlobId blobId);
 
+  // TODO: Change to Iterable<BlobId>, slightly nicer API
+
   /**
    * This iterator may produce nulls.
    */
   Iterator<BlobId> findWithState(BlobState blobState);
 
+  // FIXME: Expose count/byte-size on store intf, not sure why we have another abstraction here
+
   /**
-   * Aggregate metrics about the blobs in the blob store, derived from the metadata.  These are used as a component of
-   * the {@link BlobStoreMetrics}, which has other information not stored in in the {@link BlobMetadataStore}.
+   * Aggregate metrics about the blobs in the blob store, derived from the metadata.
+   *
+   * These are used as a component of the {@link BlobStoreMetrics},
+   * which has other information not stored in in the {@link BlobMetadataStore}.
    */
   class MetadataMetrics
   {
@@ -71,6 +77,14 @@ public interface BlobMetadataStore
      */
     public long getTotalSize() {
       return totalSize;
+    }
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "blobCount=" + blobCount +
+          ", totalSize=" + totalSize +
+          '}';
     }
   }
 

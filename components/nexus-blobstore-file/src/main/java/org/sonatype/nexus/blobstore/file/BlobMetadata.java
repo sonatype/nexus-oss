@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.blobstore.file;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
@@ -24,6 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class BlobMetadata
+  implements Serializable
 {
   private BlobState blobState;
 
@@ -31,7 +33,7 @@ public class BlobMetadata
 
   private BlobMetrics metrics;
 
-  public BlobMetadata(BlobState blobState, final Map<String, String> headers) {
+  public BlobMetadata(final BlobState blobState, final Map<String, String> headers) {
     this.blobState = checkNotNull(blobState);
     this.headers = checkNotNull(headers);
   }

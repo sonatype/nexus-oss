@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.blobstore.api;
 
+import java.io.Serializable;
+
 import org.joda.time.DateTime;
 
 /**
@@ -20,6 +22,7 @@ import org.joda.time.DateTime;
  * @since 3.0
  */
 public class BlobMetrics
+  implements Serializable
 {
   private final DateTime creationTime;
 

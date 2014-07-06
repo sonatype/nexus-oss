@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.blobstore.api;
 
+import java.io.Serializable;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -20,6 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class BlobId
+  implements Serializable
 {
   private final String id;
 
