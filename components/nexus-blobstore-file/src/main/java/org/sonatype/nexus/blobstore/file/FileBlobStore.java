@@ -245,14 +245,18 @@ public class FileBlobStore
 
   @Override
   public void compact() {
+    log.debug("Compacting");
     final Iterator<BlobId> withState = metadataStore.findWithState(BlobState.MARKED_FOR_DELETION);
+    int count = 0;
     while (withState.hasNext()) {
       final BlobId blobId = withState.next();
       // This iterator can occasionally return null
       if (blobId != null) {
         deleteHard(blobId);
+        count++;
       }
     }
+    log.debug("Deleted {} blobs", count);
   }
 
   private void checkExists(final Path path, final BlobId blobId) throws IOException {
