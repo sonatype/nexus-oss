@@ -44,4 +44,13 @@ public class BlobMetrics
   public long getContentSize() {
     return contentSize;
   }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "creationTime=" + creationTime +
+        ", SHA1Hash='" + SHA1Hash + '\'' +
+        ", contentSize=" + contentSize +
+        '}';
+  }
 }
