@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.blobstore.file.MetricsInputStream.metricsInputStream;
 
 /**
- * A straightforward java.nio implementation of {@link SimpleFileOperations}.
+ * A simple {@code java.nio} implementation of {@link FileOperations}.
  *
  * @since 3.0
  */
