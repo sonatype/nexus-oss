@@ -26,14 +26,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.blobstore.file.FileOperations;
-import org.sonatype.nexus.blobstore.file.MetricsInputStream;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.io.ByteStreams;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.blobstore.file.MetricsInputStream.metricsInputStream;
+import static org.sonatype.nexus.blobstore.file.internal.MetricsInputStream.metricsInputStream;
 
 /**
  * A simple {@code java.nio} implementation of {@link FileOperations}.

@@ -10,14 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.blobstore.file;
+package org.sonatype.nexus.blobstore.file.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 
-import org.sonatype.nexus.blobstore.file.internal.DigestHelper;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
@@ -53,7 +52,7 @@ public class MetricsInputStreamTest
   @Test
   public void referenceHashMatches() throws Exception {
     final MetricsInputStream measure = measure(
-        getClass().getResourceAsStream("/sha1_is_2589766c6dac3402cab552602d457e7e8af12efd.bytes"));
+        getClass().getResourceAsStream("sha1_is_2589766c6dac3402cab552602d457e7e8af12efd.bytes"));
     assertThat(measure.getMessageDigest(), is(equalTo("2589766c6dac3402cab552602d457e7e8af12efd")));
   }
 

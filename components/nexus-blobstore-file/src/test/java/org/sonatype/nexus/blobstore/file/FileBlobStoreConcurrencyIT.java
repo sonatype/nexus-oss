@@ -38,6 +38,7 @@ import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreException;
 import org.sonatype.nexus.blobstore.file.internal.DigestHelper;
 import org.sonatype.nexus.blobstore.file.internal.FileBlobStoreModule;
+import org.sonatype.nexus.blobstore.file.internal.MetricsInputStream;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
