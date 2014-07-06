@@ -13,9 +13,7 @@
 package org.sonatype.nexus.blobstore.file.internal;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -36,7 +34,6 @@ public class MetricsInputStreamTest
 {
   @Test
   public void testLength() throws Exception {
-
     assertThat(measure("ABC".getBytes("UTF-8")).getSize(), is(equalTo(3L)));
     assertThat(measure(new byte[10000]).getSize(), is(equalTo(10000L)));
   }
@@ -56,16 +53,12 @@ public class MetricsInputStreamTest
     assertThat(measure.getMessageDigest(), is(equalTo("2589766c6dac3402cab552602d457e7e8af12efd")));
   }
 
-  private MetricsInputStream measure(final byte[] testData) throws NoSuchAlgorithmException, IOException {
+  private MetricsInputStream measure(final byte[] testData) throws Exception {
     return measure(new ByteArrayInputStream(testData));
   }
 
-  private MetricsInputStream measure(final InputStream inputStream)
-      throws NoSuchAlgorithmException, IOException
-  {
-    final MetricsInputStream metricStream =
-        MetricsInputStream.metricsInputStream(inputStream, DigestHelper.createSha1());
-
+  private MetricsInputStream measure(final InputStream inputStream) throws Exception {
+    final MetricsInputStream metricStream = new MetricsInputStream(inputStream, DigestHelper.createSha1());
     copy(metricStream, nullOutputStream());
     return metricStream;
   }

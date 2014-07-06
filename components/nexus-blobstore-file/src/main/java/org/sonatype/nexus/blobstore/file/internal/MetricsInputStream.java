@@ -17,11 +17,10 @@ import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
+import org.sonatype.nexus.blobstore.file.FileOperations.StreamMetrics;
 import org.sonatype.nexus.orient.Hex;
 
 import com.google.common.io.CountingInputStream;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A utility to collect metrics about the content of an input stream.
@@ -31,14 +30,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MetricsInputStream
     extends FilterInputStream
 {
-  private MessageDigest messageDigest;
+  private final MessageDigest messageDigest;
 
-  private CountingInputStream countingInputStream;
+  private final CountingInputStream countingInputStream;
 
-  public static MetricsInputStream metricsInputStream(final InputStream wrappedStream, final MessageDigest digest) {
-    checkNotNull(wrappedStream);
-    checkNotNull(digest);
-    return new MetricsInputStream(new CountingInputStream(wrappedStream), digest);
+  public MetricsInputStream(final InputStream input, final MessageDigest messageDigest) {
+    this(new CountingInputStream(input), messageDigest);
   }
 
   private MetricsInputStream(final CountingInputStream countingStream, final MessageDigest messageDigest) {
@@ -53,5 +50,9 @@ public class MetricsInputStream
 
   public long getSize() {
     return countingInputStream.getCount();
+  }
+
+  public StreamMetrics getMetrics() {
+    return new StreamMetrics(getSize(), getMessageDigest());
   }
 }

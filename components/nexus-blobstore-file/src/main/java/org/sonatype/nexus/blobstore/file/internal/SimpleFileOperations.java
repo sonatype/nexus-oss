@@ -30,7 +30,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.io.ByteStreams;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.blobstore.file.internal.MetricsInputStream.metricsInputStream;
 
 /**
  * A simple {@code java.nio} implementation of {@link FileOperations}.
@@ -49,18 +48,17 @@ public class SimpleFileOperations
     checkNotNull(data);
     ensureDirectoryExists(path.getParent());
 
-    final MetricsInputStream metrics = metricsInputStream(data, DigestHelper.createSha1());
-
+    final MetricsInputStream input = new MetricsInputStream(data, DigestHelper.createSha1());
     try {
       try (final OutputStream output = Files.newOutputStream(path, StandardOpenOption.CREATE_NEW)) {
-        ByteStreams.copy(metrics, output);
+        ByteStreams.copy(input, output);
       }
     }
     finally {
       data.close();
     }
 
-    return new StreamMetrics(metrics.getSize(), metrics.getMessageDigest());
+    return input.getMetrics();
   }
 
   @Override

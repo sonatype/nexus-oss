@@ -245,7 +245,7 @@ public class FileBlobStoreConcurrencyIT
                                              final BlobMetrics metadataMetrics)
       throws NoSuchAlgorithmException, IOException
   {
-    final MetricsInputStream measured = MetricsInputStream.metricsInputStream(inputStream, DigestHelper.createSha1());
+    final MetricsInputStream measured = new MetricsInputStream(inputStream, DigestHelper.createSha1());
     ByteStreams.copy(measured, nullOutputStream());
 
     checkEqual("stream length", metadataMetrics.getContentSize(), measured.getSize(), blobId);
