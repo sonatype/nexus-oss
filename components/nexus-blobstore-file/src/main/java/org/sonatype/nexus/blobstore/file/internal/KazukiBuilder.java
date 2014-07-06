@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.blobstore.file.guice;
+package org.sonatype.nexus.blobstore.file.internal;
 
 import java.io.File;
 
@@ -27,7 +27,7 @@ import io.kazuki.v0.store.lifecycle.Lifecycle;
 import io.kazuki.v0.store.schema.SchemaStore;
 import io.kazuki.v0.store.sequence.SequenceServiceConfiguration;
 
-import static org.sonatype.nexus.blobstore.file.kazuki.KazukiBlobMetadataStore.METADATA_TYPE;
+import static org.sonatype.nexus.blobstore.file.internal.KazukiBlobMetadataStore.METADATA_TYPE;
 
 /**
  * Encapsulates construction of a Kazuki key value store in a separate Injector to eliminate interactions with the rest

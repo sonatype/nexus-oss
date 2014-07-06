@@ -24,7 +24,7 @@ import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreMetrics;
-import org.sonatype.nexus.blobstore.file.guice.FileBlobStoreModule;
+import org.sonatype.nexus.blobstore.file.internal.FileBlobStoreModule;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -44,9 +44,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.sonatype.nexus.blobstore.api.BlobStore.BLOB_NAME_HEADER;
 import static org.sonatype.nexus.blobstore.api.BlobStore.CREATED_BY_HEADER;
 
-
 /**
- * @since 3.0
+ * {@link FileBlobStore} integration tests.
  */
 public class FileBlobStoreIT
     extends TestSupport

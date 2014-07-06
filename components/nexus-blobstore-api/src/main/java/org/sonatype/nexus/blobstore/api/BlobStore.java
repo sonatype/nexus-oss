@@ -20,8 +20,8 @@ import javax.annotation.Nullable;
 /**
  * A generic storage bin for binary objects of all sizes.
  *
- * In general, most methods can throw BlobStoreException for conditions such as network connectivity problems, or
- * file IO issues, blob store misconfiguration, or internal corruption.
+ * In general, most methods can throw {@link BlobStoreException} for conditions such as network connectivity problems,
+ * or file IO issues, blob store misconfiguration, or internal corruption.
  *
  * @since 3.0
  */

@@ -62,8 +62,8 @@ public class BlobMetadata
 
   @Override
   public String toString() {
-    return "BlobMetadata{" +
-        ", state=" + blobState +
+    return getClass().getSimpleName() + "{" +
+        "blobState=" + blobState +
         ", headers=" + headers +
         ", metrics=" + metrics +
         '}';

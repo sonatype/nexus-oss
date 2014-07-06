@@ -18,8 +18,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
-import org.sonatype.nexus.blobstore.file.guice.FileBlobStoreModule;
+import org.sonatype.nexus.blobstore.file.internal.FileBlobStoreModule;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Guice;
@@ -35,9 +36,10 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 /**
- * @since 3.0
+ * Tests for {@link FileBlobStoreModule}.
  */
 public class FileBlobStoreModuleTest
+  extends TestSupport
 {
   @Inject
   @Named("alpha")
@@ -92,6 +94,4 @@ public class FileBlobStoreModuleTest
 
     assertThat(blobStoreB.getMetrics().getBlobCount(), is(equalTo(1L)));
   }
-
-
 }

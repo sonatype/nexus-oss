@@ -29,7 +29,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 /**
- * @since 3.0
+ * Tests for {@link MetricsInputStream}.
  */
 public class MetricsInputStreamTest
     extends TestSupport

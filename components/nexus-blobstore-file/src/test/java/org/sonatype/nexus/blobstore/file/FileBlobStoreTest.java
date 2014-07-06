@@ -37,6 +37,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests for {@link FileBlobStore}.
+ */
 public class FileBlobStoreTest
     extends TestSupport
 {
@@ -91,7 +94,6 @@ public class FileBlobStoreTest
 
   @Test
   public void getExistingBlob() throws Exception {
-
     final BlobId fakeId = new BlobId("fakeId");
     final BlobMetadata metadata = mock(BlobMetadata.class);
     when(metadataStore.get(fakeId)).thenReturn(metadata);
@@ -125,7 +127,6 @@ public class FileBlobStoreTest
 
   @Test
   public void secondDeletionRedundant() {
-
     final BlobId fakeId = new BlobId("testId");
     final BlobMetadata metadata = mock(BlobMetadata.class);
     when(metadataStore.get(fakeId)).thenReturn(metadata);

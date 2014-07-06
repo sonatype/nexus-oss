@@ -17,9 +17,8 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
-import org.sonatype.nexus.blobstore.file.utils.FilenameEscaper;
 
-import static org.sonatype.nexus.blobstore.file.utils.FilenameEscaper.escapeFilename;
+import static org.sonatype.nexus.blobstore.file.internal.FilenameEscaper.escapeFilename;
 
 /**
  * Stores blobs and blob headers in a two-deep directory tree, the first layer having {@link #TIER_1_MODULO}
@@ -35,8 +34,6 @@ public class HashingSubdirFileLocationPolicy
   public static final int TIER_2_MODULO = 47;
 
   private Path dataDirectory;
-
-  private FilenameEscaper escaper = new FilenameEscaper();
 
   @Inject
   public HashingSubdirFileLocationPolicy(final Path dataDirectory) {
@@ -67,5 +64,4 @@ public class HashingSubdirFileLocationPolicy
   private String leftPad(final int i) {
     return String.format("%02d", Math.abs(i) + 1);
   }
-
 }

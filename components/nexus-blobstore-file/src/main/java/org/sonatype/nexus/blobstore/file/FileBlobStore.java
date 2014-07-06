@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.blobstore.file;
 
 import java.io.IOException;
@@ -32,12 +33,11 @@ import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreException;
 import org.sonatype.nexus.blobstore.api.BlobStoreListener;
 import org.sonatype.nexus.blobstore.api.BlobStoreMetrics;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Preconditions;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -46,6 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class FileBlobStore
+    extends ComponentSupport
     implements BlobStore
 {
   /**
@@ -53,11 +54,7 @@ public class FileBlobStore
    */
   public static final String FILE_BLOB_STORE_NAME_BINDING = "FileBlobStore.name";
 
-  private static final Logger logger = LoggerFactory.getLogger(FileBlobStore.class);
-
   private final String name;
-
-  private BlobStoreListener listener;
 
   private final FilePathPolicy paths;
 
@@ -65,9 +62,13 @@ public class FileBlobStore
 
   private final BlobMetadataStore metadataStore;
 
+  private volatile BlobStoreListener listener;
+
   @Inject
-  public FileBlobStore(@Named(FILE_BLOB_STORE_NAME_BINDING) final String name, final FilePathPolicy paths,
-                       final FileOperations fileOperations, final BlobMetadataStore metadataStore)
+  public FileBlobStore(final @Named(FILE_BLOB_STORE_NAME_BINDING) String name,
+                       final FilePathPolicy paths,
+                       final FileOperations fileOperations,
+                       final BlobMetadataStore metadataStore)
   {
     this.name = checkNotNull(name);
     this.paths = checkNotNull(paths);
@@ -80,8 +81,8 @@ public class FileBlobStore
     checkNotNull(blobData);
     checkNotNull(headers);
 
-    Preconditions.checkArgument(headers.containsKey(BLOB_NAME_HEADER));
-    Preconditions.checkArgument(headers.containsKey(CREATED_BY_HEADER));
+    checkArgument(headers.containsKey(BLOB_NAME_HEADER));
+    checkArgument(headers.containsKey(CREATED_BY_HEADER));
 
     BlobId blobId = null;
 
@@ -90,7 +91,9 @@ public class FileBlobStore
       final BlobMetadata metadata = new BlobMetadata(BlobState.CREATING, headers);
       blobId = metadataStore.add(metadata);
 
-      logger.debug("Writing blob {} to {}", blobId, paths.forContent(blobId));
+      if (log.isDebugEnabled()) {
+        log.debug("Writing blob {} to {}", blobId, paths.forContent(blobId));
+      }
 
       final StreamMetrics streamMetrics = storeBlob(blobId, blobData);
 
@@ -127,23 +130,23 @@ public class FileBlobStore
 
     BlobMetadata metadata = metadataStore.get(blobId);
     if (metadata == null) {
-      logger.debug("Attempt to access non-existent blob {}", blobId);
+      log.debug("Attempt to access non-existent blob {}", blobId);
       return null;
     }
 
     if (!metadata.isAlive()) {
-      logger.debug("Attempt to access blob {} in state {}", blobId, metadata.getBlobState());
+      log.debug("Attempt to access blob {} in state {}", blobId, metadata.getBlobState());
       return null;
     }
 
     if (!fileOperations.exists(paths.forContent(blobId))) {
-      logger.error("Blob content for blob {} not found at expected location {}", blobId, paths.forContent(blobId));
+      log.error("Blob content for blob {} not found at expected location {}", blobId, paths.forContent(blobId));
       throw new BlobStoreException("Blob content unexpectedly missing.", getName(), blobId);
     }
 
     final FileBlob blob = new FileBlob(blobId, metadata.getHeaders(), paths.forContent(blobId), metadata.getMetrics());
 
-    logger.debug("Accessing blob {}", blobId);
+    log.debug("Accessing blob {}", blobId);
     if (listener != null) {
       listener.blobAccessed(blob, null);
     }
@@ -156,11 +159,11 @@ public class FileBlobStore
 
     BlobMetadata metadata = metadataStore.get(blobId);
     if (metadata == null) {
-      logger.debug("Attempt to mark-for-delete non-existent blob {}", blobId);
+      log.debug("Attempt to mark-for-delete non-existent blob {}", blobId);
       return false;
     }
     else if (!metadata.isAlive()) {
-      logger.debug("Attempt to delete blob {} in state {}", blobId, metadata.getBlobState());
+      log.debug("Attempt to delete blob {} in state {}", blobId, metadata.getBlobState());
       return false;
     }
 
@@ -176,7 +179,7 @@ public class FileBlobStore
 
     BlobMetadata metadata = metadataStore.get(blobId);
     if (metadata == null) {
-      logger.debug("Attempt to deleteHard non-existent blob {}", blobId);
+      log.debug("Attempt to deleteHard non-existent blob {}", blobId);
       return false;
     }
 
@@ -184,10 +187,10 @@ public class FileBlobStore
       final boolean blobDeleted = fileOperations.delete(paths.forContent(blobId));
 
       if (!blobDeleted) {
-        logger.error("Deleting blob {} : content file was missing.", blobId);
+        log.error("Deleting blob {} : content file was missing.", blobId);
       }
 
-      logger.debug("Deleting-hard blob {}", blobId);
+      log.debug("Deleting-hard blob {}", blobId);
 
       if (listener != null) {
         listener.blobDeleted(blobId, "Path:" + paths.forContent(blobId).toAbsolutePath());
@@ -289,18 +292,15 @@ public class FileBlobStore
 
     private final BlobMetrics metrics;
 
-    FileBlob(final BlobId blobId, final Map<String, String> headers, final Path contentPath,
+    FileBlob(final BlobId blobId,
+             final Map<String, String> headers,
+             final Path contentPath,
              final BlobMetrics metrics)
     {
-      checkNotNull(blobId);
-      checkNotNull(headers);
-      checkNotNull(contentPath);
-      checkNotNull(metrics);
-
-      this.blobId = blobId;
-      this.headers = headers;
-      this.contentPath = contentPath;
-      this.metrics = metrics;
+      this.blobId = checkNotNull(blobId);
+      this.headers = checkNotNull(headers);
+      this.contentPath = checkNotNull(contentPath);
+      this.metrics = checkNotNull(metrics);
     }
 
     @Override

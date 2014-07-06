@@ -18,7 +18,7 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.sonatype.nexus.blobstore.file.utils.DigesterUtils;
+import org.sonatype.nexus.orient.Hex;
 
 import com.google.common.io.CountingInputStream;
 
@@ -48,7 +48,7 @@ public class MetricsInputStream
   }
 
   public String getMessageDigest() {
-    return DigesterUtils.getDigestAsString(messageDigest.digest());
+    return Hex.encode(messageDigest.digest());
   }
 
   public long getSize() {

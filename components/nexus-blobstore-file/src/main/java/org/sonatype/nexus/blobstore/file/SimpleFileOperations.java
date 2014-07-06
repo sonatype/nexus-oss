@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.blobstore.file;
 
 import java.io.IOException;
@@ -22,12 +23,11 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
-import org.sonatype.nexus.blobstore.file.utils.DigesterUtils;
+import org.sonatype.nexus.blobstore.file.internal.DigestHelper;
 import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.io.ByteStreams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.blobstore.file.MetricsInputStream.metricsInputStream;
@@ -38,10 +38,9 @@ import static org.sonatype.nexus.blobstore.file.MetricsInputStream.metricsInputS
  * @since 3.0
  */
 public class SimpleFileOperations
+    extends ComponentSupport
     implements FileOperations
 {
-  private static final Logger logger = LoggerFactory.getLogger(FileBlobStore.class);
-
   @Override
   public StreamMetrics create(final Path path, final InputStream data) throws IOException, NoSuchAlgorithmException {
     checkNotNull(path);
@@ -81,7 +80,7 @@ public class SimpleFileOperations
   public String computeSha1Hash(final Path path) throws IOException {
     checkNotNull(path);
     try (InputStream inputStream = openInputStream(path)) {
-      return DigesterUtils.getSha1Digest(inputStream);
+      return DigestHelper.getSha1Digest(inputStream);
     }
   }
 
