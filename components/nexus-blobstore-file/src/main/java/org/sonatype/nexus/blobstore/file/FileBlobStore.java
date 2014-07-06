@@ -81,8 +81,8 @@ public class FileBlobStore
     checkNotNull(blobData);
     checkNotNull(headers);
 
-    checkArgument(headers.containsKey(BLOB_NAME_HEADER));
-    checkArgument(headers.containsKey(CREATED_BY_HEADER));
+    checkArgument(headers.containsKey(BLOB_NAME_HEADER), "Missing header: %s", BLOB_NAME_HEADER);
+    checkArgument(headers.containsKey(CREATED_BY_HEADER), "Missing header: %s", CREATED_BY_HEADER);
 
     BlobId blobId = null;
 
@@ -91,17 +91,16 @@ public class FileBlobStore
       final BlobMetadata metadata = new BlobMetadata(BlobState.CREATING, headers);
       blobId = metadataStore.add(metadata);
 
-      if (log.isDebugEnabled()) {
-        log.debug("Writing blob {} to {}", blobId, paths.forContent(blobId));
-      }
+      final Path path = paths.forContent(blobId);
+      log.debug("Writing blob {} to {}", blobId, path);
 
       final StreamMetrics streamMetrics = storeBlob(blobId, blobData);
 
       BlobMetrics metrics = createBlobMetrics(streamMetrics);
 
-      final FileBlob blob = new FileBlob(blobId, headers, paths.forContent(blobId), metrics);
+      final FileBlob blob = new FileBlob(blobId, headers, path, metrics);
       if (listener != null) {
-        listener.blobCreated(blob, "Blob " + blobId + " written to " + paths.forContent(blobId));
+        listener.blobCreated(blob, "Blob: " + blobId + " written to: " + path);
       }
 
       metadata.setMetrics(metrics);
@@ -139,12 +138,13 @@ public class FileBlobStore
       return null;
     }
 
-    if (!fileOperations.exists(paths.forContent(blobId))) {
-      log.error("Blob content for blob {} not found at expected location {}", blobId, paths.forContent(blobId));
-      throw new BlobStoreException("Blob content unexpectedly missing.", getName(), blobId);
+    final Path path = paths.forContent(blobId);
+    if (!fileOperations.exists(path)) {
+      log.error("Blob content for blob {} not found at expected location {}", blobId, path);
+      throw new BlobStoreException("Blob content unexpectedly missing", getName(), blobId);
     }
 
-    final FileBlob blob = new FileBlob(blobId, metadata.getHeaders(), paths.forContent(blobId), metadata.getMetrics());
+    final FileBlob blob = new FileBlob(blobId, metadata.getHeaders(), path, metadata.getMetrics());
 
     log.debug("Accessing blob {}", blobId);
     if (listener != null) {
@@ -184,16 +184,17 @@ public class FileBlobStore
     }
 
     try {
-      final boolean blobDeleted = fileOperations.delete(paths.forContent(blobId));
+      final Path path = paths.forContent(blobId);
+      final boolean blobDeleted = fileOperations.delete(path);
 
       if (!blobDeleted) {
-        log.error("Deleting blob {} : content file was missing.", blobId);
+        log.error("Deleting blob {} : content file was missing", blobId);
       }
 
       log.debug("Deleting-hard blob {}", blobId);
 
       if (listener != null) {
-        listener.blobDeleted(blobId, "Path:" + paths.forContent(blobId).toAbsolutePath());
+        listener.blobDeleted(blobId, "Path: " + path);
       }
 
       metadataStore.delete(blobId);
@@ -277,7 +278,7 @@ public class FileBlobStore
     if (!fileOperations.exists(path)) {
       // I'm not completely happy with this, since it means that blob store clients can get a blob, be satisfied
       // that it exists, and then discover that it doesn't, mid-operation
-      throw new BlobStoreException("Blob has been deleted.", getName(), blobId);
+      throw new BlobStoreException("Blob has been deleted", getName(), blobId);
     }
   }
 
