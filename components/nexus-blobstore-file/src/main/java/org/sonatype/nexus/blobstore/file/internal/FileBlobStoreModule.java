@@ -26,13 +26,11 @@ import org.sonatype.nexus.blobstore.file.FileBlobStore;
 import org.sonatype.nexus.blobstore.file.FileOperations;
 import org.sonatype.nexus.blobstore.file.FilePathPolicy;
 import org.sonatype.nexus.blobstore.file.HashingSubdirFileLocationPolicy;
-import org.sonatype.nexus.blobstore.file.SimpleFileOperations;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
-import com.google.inject.Scopes;
 import com.google.inject.name.Names;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +70,6 @@ public class FileBlobStoreModule
     // Create and expose blob store itself
     bind(String.class).annotatedWith(Names.named("FileBlobStoreModule.name-key")).toInstance(name);
     bind(BlobStore.class).annotatedWith(Names.named(name)).toProvider(BlobStoreProvider.class);
-    bind(FileOperations.class).to(SimpleFileOperations.class).in(Scopes.SINGLETON);
     expose(BlobStore.class).annotatedWith(Names.named(name));
 
     // Expose the metadata store's lifecycle

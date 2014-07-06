@@ -23,6 +23,7 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.junit.After;
@@ -59,8 +60,19 @@ public class FileBlobStoreModuleTest
 
   @Before
   public void instantiateTwoFileBlobStores() throws Exception {
-    final Injector injector = Guice
-        .createInjector(new FileBlobStoreModule("alpha"), new FileBlobStoreModule("beta"), new TempDirectoryModule());
+    final Injector injector = Guice.createInjector(
+        new FileBlobStoreModule("alpha"),
+        new FileBlobStoreModule("beta"),
+        new TempDirectoryModule(),
+
+        // HACK: Since this test is not sisu-based, bind some components for this test
+        new AbstractModule() {
+          @Override
+          protected void configure() {
+            bind(FileOperations.class).to(SimpleFileOperations.class);
+          }
+        }
+    );
 
     injector.injectMembers(this);
 

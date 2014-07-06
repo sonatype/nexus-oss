@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -77,6 +76,22 @@ public class FileBlobStore
   }
 
   @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public void setBlobStoreListener(@Nullable final BlobStoreListener listener) {
+    this.listener = listener;
+  }
+
+  @Nullable
+  @Override
+  public BlobStoreListener getBlobStoreListener() {
+    return listener;
+  }
+
+  @Override
   public Blob create(final InputStream blobData, final Map<String, String> headers) {
     checkNotNull(blobData);
     checkNotNull(headers);
@@ -94,11 +109,11 @@ public class FileBlobStore
       final Path path = paths.forContent(blobId);
       log.debug("Writing blob {} to {}", blobId, path);
 
-      final StreamMetrics streamMetrics = storeBlob(blobId, blobData);
-
-      BlobMetrics metrics = createBlobMetrics(streamMetrics);
+      final StreamMetrics streamMetrics = fileOperations.create(path, blobData);
+      final BlobMetrics metrics = new BlobMetrics(new DateTime(), streamMetrics.getSHA1(), streamMetrics.getSize());
 
       final FileBlob blob = new FileBlob(blobId, headers, path, metrics);
+
       if (listener != null) {
         listener.blobCreated(blob, "Blob: " + blobId + " written to: " + path);
       }
@@ -113,13 +128,6 @@ public class FileBlobStore
     catch (IOException e) {
       throw new BlobStoreException(e, getName(), blobId);
     }
-  }
-
-  private BlobMetrics createBlobMetrics(final StreamMetrics streamMetrics) {
-    checkNotNull(streamMetrics);
-    final DateTime creationTime = new DateTime();
-
-    return new BlobMetrics(creationTime, streamMetrics.getSHA1(), streamMetrics.getSize());
   }
 
   @Nullable
@@ -168,7 +176,7 @@ public class FileBlobStore
     }
 
     metadata.setBlobState(BlobState.MARKED_FOR_DELETION);
-    // TODO: Handle concurrent modification of metadata, potentially with kazuki's upcoming optimistic locking
+    // TODO: Handle concurrent modification of metadata
     metadataStore.update(blobId, metadata);
     return true;
   }
@@ -207,13 +215,7 @@ public class FileBlobStore
   }
 
   @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
   public BlobStoreMetrics getMetrics() {
-
     final MetadataMetrics metadataMetrics = metadataStore.getMetadataMetrics();
 
     return new BlobStoreMetrics()
@@ -242,17 +244,6 @@ public class FileBlobStore
   }
 
   @Override
-  public void setBlobStoreListener(@Nullable final BlobStoreListener listener) {
-    this.listener = listener;
-  }
-
-  @Nullable
-  @Override
-  public BlobStoreListener getBlobStoreListener() {
-    return listener;
-  }
-
-  @Override
   public void compact() {
     final Iterator<BlobId> withState = metadataStore.findWithState(BlobState.MARKED_FOR_DELETION);
     while (withState.hasNext()) {
@@ -264,17 +255,7 @@ public class FileBlobStore
     }
   }
 
-  private StreamMetrics storeBlob(final BlobId blobId, final InputStream blobData) throws IOException {
-    try {
-      // write the content to disk
-      return fileOperations.create(paths.forContent(blobId), blobData);
-    }
-    catch (NoSuchAlgorithmException e) {
-      throw new BlobStoreException(e, getName(), blobId);
-    }
-  }
-
-  private void checkExists(final Path path, BlobId blobId) throws IOException {
+  private void checkExists(final Path path, final BlobId blobId) throws IOException {
     if (!fileOperations.exists(path)) {
       // I'm not completely happy with this, since it means that blob store clients can get a blob, be satisfied
       // that it exists, and then discover that it doesn't, mid-operation
@@ -330,5 +311,4 @@ public class FileBlobStore
       return metrics;
     }
   }
-
 }

@@ -20,8 +20,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.blobstore.file.internal.DigestHelper;
 import org.sonatype.nexus.util.file.DirSupport;
@@ -37,17 +39,19 @@ import static org.sonatype.nexus.blobstore.file.MetricsInputStream.metricsInputS
  *
  * @since 3.0
  */
+@Named("simple")
+@Singleton
 public class SimpleFileOperations
     extends ComponentSupport
     implements FileOperations
 {
   @Override
-  public StreamMetrics create(final Path path, final InputStream data) throws IOException, NoSuchAlgorithmException {
+  public StreamMetrics create(final Path path, final InputStream data) throws IOException {
     checkNotNull(path);
     checkNotNull(data);
     ensureDirectoryExists(path.getParent());
 
-    final MetricsInputStream metrics = metricsInputStream(data, "SHA1");
+    final MetricsInputStream metrics = metricsInputStream(data, DigestHelper.createSha1());
 
     try (final OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.CREATE_NEW)) {
       ByteStreams.copy(metrics, outputStream);
@@ -80,7 +84,7 @@ public class SimpleFileOperations
   public String computeSha1Hash(final Path path) throws IOException {
     checkNotNull(path);
     try (InputStream inputStream = openInputStream(path)) {
-      return DigestHelper.getSha1Digest(inputStream);
+      return DigestHelper.calculateSha1(inputStream);
     }
   }
 

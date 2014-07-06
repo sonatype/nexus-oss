@@ -12,8 +12,10 @@
  */
 package org.sonatype.nexus.blobstore.file.internal;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import org.sonatype.nexus.orient.Hex;
 
@@ -28,29 +30,38 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class DigestHelper
 {
-  private static String getDigest(final String algorithm, final InputStream input) throws Exception {
-    MessageDigest md = MessageDigest.getInstance(algorithm);
-
+  private static byte[] calculateDigest(final MessageDigest digest, final InputStream input) throws IOException {
     byte[] buffer = new byte[1024];
     int n;
     do {
       n = input.read(buffer);
       if (n > 0) {
-        md.update(buffer, 0, n);
+        digest.update(buffer, 0, n);
       }
     }
     while (n != -1);
 
-    return Hex.encode(md.digest());
+    return digest.digest();
+  }
+
+  public static MessageDigest createSha1() {
+    try {
+      return MessageDigest.getInstance("SHA1");
+    }
+    catch (NoSuchAlgorithmException e) {
+      // should never happen
+      throw Throwables.propagate(e);
+    }
   }
 
   /**
-   * Calculates a SHA1 digest for a stream.
+   * Calculates a HEX-encoded SHA1 digest for a stream.
    */
-  public static String getSha1Digest(final InputStream input) {
+  public static String calculateSha1(final InputStream input) {
     checkNotNull(input);
     try {
-      return getDigest("SHA1", input);
+      byte[] digest = calculateDigest(createSha1(), input);
+      return Hex.encode(digest);
     }
     catch (Exception e) {
       throw Throwables.propagate(e);

@@ -36,6 +36,7 @@ import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreException;
+import org.sonatype.nexus.blobstore.file.internal.DigestHelper;
 import org.sonatype.nexus.blobstore.file.internal.FileBlobStoreModule;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -243,7 +244,7 @@ public class FileBlobStoreConcurrencyIT
                                              final BlobMetrics metadataMetrics)
       throws NoSuchAlgorithmException, IOException
   {
-    final MetricsInputStream measured = MetricsInputStream.metricsInputStream(inputStream, "SHA1");
+    final MetricsInputStream measured = MetricsInputStream.metricsInputStream(inputStream, DigestHelper.createSha1());
     ByteStreams.copy(measured, nullOutputStream());
 
     checkEqual("stream length", metadataMetrics.getContentSize(), measured.getSize(), blobId);

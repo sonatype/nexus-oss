@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 
+import org.sonatype.nexus.blobstore.file.internal.DigestHelper;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
@@ -63,8 +64,8 @@ public class MetricsInputStreamTest
   private MetricsInputStream measure(final InputStream inputStream)
       throws NoSuchAlgorithmException, IOException
   {
-    final MetricsInputStream metricStream = MetricsInputStream
-        .metricsInputStream(inputStream, "SHA1");
+    final MetricsInputStream metricStream =
+        MetricsInputStream.metricsInputStream(inputStream, DigestHelper.createSha1());
 
     copy(metricStream, nullOutputStream());
     return metricStream;

@@ -15,7 +15,6 @@ package org.sonatype.nexus.blobstore.file;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 /**
@@ -29,7 +28,7 @@ public interface FileOperations
    * Creates a file (and its containing directories, if necessary) and populates it from the
    * InputStream, which gets closed.  Returns some basic metrics about the stream.
    */
-  StreamMetrics create(Path path, InputStream data) throws IOException, NoSuchAlgorithmException;
+  StreamMetrics create(Path path, InputStream data) throws IOException;
 
   boolean exists(Path path);
 

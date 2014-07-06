@@ -16,11 +16,12 @@ import java.io.FilterInputStream;
 import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import org.sonatype.nexus.orient.Hex;
 
 import com.google.common.io.CountingInputStream;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A utility to collect metrics about the content of an input stream.
@@ -34,10 +35,9 @@ public class MetricsInputStream
 
   private CountingInputStream countingInputStream;
 
-  public static MetricsInputStream metricsInputStream(final InputStream wrappedStream, final String algorithm)
-      throws NoSuchAlgorithmException
-  {
-    final MessageDigest digest = MessageDigest.getInstance(algorithm);
+  public static MetricsInputStream metricsInputStream(final InputStream wrappedStream, final MessageDigest digest) {
+    checkNotNull(wrappedStream);
+    checkNotNull(digest);
     return new MetricsInputStream(new CountingInputStream(wrappedStream), digest);
   }
 
