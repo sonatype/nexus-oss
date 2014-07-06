@@ -23,7 +23,6 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobId;
@@ -50,13 +49,6 @@ public class FileBlobStore
     extends ComponentSupport
     implements BlobStore
 {
-  /**
-   * Used to provide the name of the blob store from the guice module.
-   */
-  public static final String FILE_BLOB_STORE_NAME_BINDING = "FileBlobStore.name";
-
-  private final String name;
-
   private final FilePathPolicy paths;
 
   private final FileOperations fileOperations;
@@ -66,20 +58,13 @@ public class FileBlobStore
   private volatile BlobStoreListener listener;
 
   @Inject
-  public FileBlobStore(final @Named(FILE_BLOB_STORE_NAME_BINDING) String name,
-                       final FilePathPolicy paths,
+  public FileBlobStore(final FilePathPolicy paths,
                        final FileOperations fileOperations,
                        final BlobMetadataStore metadataStore)
   {
-    this.name = checkNotNull(name);
     this.paths = checkNotNull(paths);
     this.fileOperations = checkNotNull(fileOperations);
     this.metadataStore = checkNotNull(metadataStore);
-  }
-
-  @Override
-  public String getName() {
-    return name;
   }
 
   @Override
@@ -128,7 +113,7 @@ public class FileBlobStore
       return blob;
     }
     catch (IOException e) {
-      throw new BlobStoreException(e, getName(), blobId);
+      throw new BlobStoreException(e, blobId);
     }
   }
 
@@ -151,7 +136,7 @@ public class FileBlobStore
     final Path path = paths.forContent(blobId);
     if (!fileOperations.exists(path)) {
       log.error("Blob content for blob {} not found at expected location {}", blobId, path);
-      throw new BlobStoreException("Blob content unexpectedly missing", getName(), blobId);
+      throw new BlobStoreException("Blob content unexpectedly missing", blobId);
     }
 
     final FileBlob blob = new FileBlob(blobId, metadata.getHeaders(), path, metadata.getMetrics());
@@ -212,7 +197,7 @@ public class FileBlobStore
       return blobDeleted;
     }
     catch (IOException e) {
-      throw new BlobStoreException(e, getName(), blobId);
+      throw new BlobStoreException(e, blobId);
     }
   }
 
@@ -239,7 +224,7 @@ public class FileBlobStore
           return fileStore.getUsableSpace();
         }
         catch (IOException e) {
-          throw new BlobStoreException(e, getName(), null);
+          throw new BlobStoreException(e, null);
         }
       }
     };
@@ -248,7 +233,9 @@ public class FileBlobStore
   @Override
   public void compact() {
     log.debug("Compacting");
+
     final Iterator<BlobId> withState = metadataStore.findWithState(BlobState.MARKED_FOR_DELETION);
+
     int count = 0;
     while (withState.hasNext()) {
       final BlobId blobId = withState.next();
@@ -258,6 +245,7 @@ public class FileBlobStore
         count++;
       }
     }
+
     log.debug("Deleted {} blobs", count);
   }
 
@@ -265,7 +253,7 @@ public class FileBlobStore
     if (!fileOperations.exists(path)) {
       // I'm not completely happy with this, since it means that blob store clients can get a blob, be satisfied
       // that it exists, and then discover that it doesn't, mid-operation
-      throw new BlobStoreException("Blob has been deleted", getName(), blobId);
+      throw new BlobStoreException("Blob has been deleted", blobId);
     }
   }
 
@@ -308,7 +296,7 @@ public class FileBlobStore
         return fileOperations.openInputStream(contentPath);
       }
       catch (IOException e) {
-        throw new BlobStoreException(e, getName(), blobId);
+        throw new BlobStoreException(e, blobId);
       }
     }
 

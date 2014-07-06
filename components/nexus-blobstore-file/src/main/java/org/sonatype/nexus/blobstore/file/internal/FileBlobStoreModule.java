@@ -112,7 +112,7 @@ public class FileBlobStoreModule
 
     @Override
     public BlobStore get() {
-      return new FileBlobStore(name, paths, fileOperations, metadataStore);
+      return new FileBlobStore(paths, fileOperations, metadataStore);
     }
   }
 

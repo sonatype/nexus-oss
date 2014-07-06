@@ -74,11 +74,6 @@ public interface BlobStore
   boolean deleteHard(BlobId blobId);
 
   /**
-   * Returns an identifier to differentiate this blob store from other stores.
-   */
-  String getName();
-
-  /**
    * Provides metrics about the BlobStore's usage.
    */
   BlobStoreMetrics getMetrics();

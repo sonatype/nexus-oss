@@ -59,7 +59,7 @@ public class FileBlobStoreTest
     fileOps = mock(FileOperations.class);
     metadataStore = mock(BlobMetadataStore.class);
 
-    fileBlobStore = new FileBlobStore("testStore", pathPolicy, fileOps, metadataStore);
+    fileBlobStore = new FileBlobStore(pathPolicy, fileOps, metadataStore);
   }
 
   @Test(expected = IllegalArgumentException.class)

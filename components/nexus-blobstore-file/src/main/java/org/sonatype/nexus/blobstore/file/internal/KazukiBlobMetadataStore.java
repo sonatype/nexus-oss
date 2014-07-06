@@ -138,7 +138,7 @@ public class KazukiBlobMetadataStore
       return asBlobId(key);
     }
     catch (KazukiException e) {
-      throw new BlobStoreException(e, "unknown", asBlobId(key));
+      throw new BlobStoreException(e, asBlobId(key));
     }
   }
 
@@ -154,7 +154,7 @@ public class KazukiBlobMetadataStore
       return expand(metadata);
     }
     catch (KazukiException e) {
-      throw new BlobStoreException(e, "unknown", blobId);
+      throw new BlobStoreException(e, blobId);
     }
   }
 
@@ -166,7 +166,7 @@ public class KazukiBlobMetadataStore
       kvStore.update(key, FlatBlobMetadata.class, flat);
     }
     catch (KazukiException e) {
-      throw new BlobStoreException(e, "unknown", blobId);
+      throw new BlobStoreException(e, blobId);
     }
   }
 
@@ -177,7 +177,7 @@ public class KazukiBlobMetadataStore
       kvStore.delete(asKey(blobId));
     }
     catch (KazukiException e) {
-      throw new BlobStoreException(e, "unknown", blobId);
+      throw new BlobStoreException(e, blobId);
     }
   }
 
