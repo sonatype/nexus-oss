@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobId;
@@ -57,7 +56,6 @@ public class FileBlobStore
 
   private volatile BlobStoreListener listener;
 
-  @Inject
   public FileBlobStore(final FilePathPolicy paths,
                        final FileOperations fileOperations,
                        final BlobMetadataStore metadataStore)
