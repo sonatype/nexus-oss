@@ -14,10 +14,9 @@ package org.sonatype.nexus.blobstore.file;
 
 import java.nio.file.Path;
 
-import javax.inject.Inject;
-
 import org.sonatype.nexus.blobstore.api.BlobId;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.blobstore.file.internal.FilenameEscaper.escapeFilename;
 
 /**
@@ -33,35 +32,31 @@ public class HashingSubdirFileLocationPolicy
 
   public static final int TIER_2_MODULO = 47;
 
-  private Path dataDirectory;
+  private final Path root;
 
-  @Inject
-  public HashingSubdirFileLocationPolicy(final Path dataDirectory) {
-    this.dataDirectory = dataDirectory;
+  public HashingSubdirFileLocationPolicy(final Path root) {
+    this.root = checkNotNull(root);
   }
 
   @Override
   public Path getRoot() {
-    return dataDirectory;
+    return root;
   }
 
   @Override
   public Path forContent(final BlobId blobId) {
-    return dataDirectory.resolve(computeSubdirectory(blobId) + "/" + escapeFilename(blobId.getId()) + ".blob");
+    checkNotNull(blobId);
+
+    String path = String.format("vol-%02d/chap-%02d/%s.blob",
+        tier(blobId, TIER_1_MODULO),
+        tier(blobId, TIER_2_MODULO),
+        escapeFilename(blobId.getId())
+    );
+
+    return root.resolve(path);
   }
 
-  private String computeSubdirectory(final BlobId blobId) {
-    StringBuilder subdirectory = new StringBuilder();
-    subdirectory.append("vol-");
-    subdirectory.append(leftPad(blobId.hashCode() % TIER_1_MODULO));
-
-    subdirectory.append("/chap-");
-    subdirectory.append(leftPad(blobId.hashCode() % TIER_2_MODULO));
-
-    return subdirectory.toString();
-  }
-
-  private String leftPad(final int i) {
-    return String.format("%02d", Math.abs(i) + 1);
+  private int tier(final BlobId blobId, final int modulo) {
+    return Math.abs(blobId.hashCode() % modulo) + 1;
   }
 }
