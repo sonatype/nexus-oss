@@ -46,7 +46,11 @@ public class SimpleFileOperations
   public StreamMetrics create(final Path path, final InputStream data) throws IOException {
     checkNotNull(path);
     checkNotNull(data);
-    ensureDirectoryExists(path.getParent());
+
+    // Ensure path exists for new blob
+    Path dir = path.getParent();
+    checkNotNull(dir, "Null parent for path: %s", path);
+    DirSupport.mkdir(dir);
 
     final MetricsInputStream input = new MetricsInputStream(data, DigestHelper.createSha1());
     try {
@@ -55,6 +59,7 @@ public class SimpleFileOperations
       }
     }
     finally {
+      // FIXME: Revisit closing stream which is passed in as parameter, this should be the responsibility of the caller
       data.close();
     }
 
@@ -76,25 +81,13 @@ public class SimpleFileOperations
   @Override
   public boolean delete(final Path path) throws IOException {
     checkNotNull(path);
-    try {
-      return Files.deleteIfExists(path);
-    }
-    finally {
-      // FIXME: This is error prone to throw in finally block
-      if (exists(path)) {
-        throw new IOException("File was not successfully deleted.");
-      }
-    }
-  }
+    boolean deleted = Files.deleteIfExists(path);
 
-  /**
-   * Creates directories if they don't exist.  This method is synchronized as a simple way of ensuring that multiple
-   * threads aren't fighting to create the same directories at the same time.
-   */
-  private synchronized void ensureDirectoryExists(final Path directory) throws IOException {
-    checkNotNull(directory);
-    if (!exists(directory)) {
-      DirSupport.mkdir(directory);
+    // complain if request to delete file has failed
+    if (!deleted && exists(path)) {
+      throw new IOException("File was not successfully deleted: " + path);
     }
+
+    return deleted;
   }
 }
