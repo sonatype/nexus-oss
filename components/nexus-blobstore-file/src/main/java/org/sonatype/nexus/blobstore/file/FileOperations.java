@@ -15,7 +15,6 @@ package org.sonatype.nexus.blobstore.file;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.Date;
 
 /**
  * A wrapper around file operations to make mocking easier.
@@ -54,14 +53,8 @@ public interface FileOperations
 
   InputStream openInputStream(Path path) throws IOException;
 
-  Date fileCreationDate(Path path) throws IOException;
-
-  String computeSha1Hash(Path path) throws IOException;
-
   /**
    * Returns true if the file existed before deletion, false otherwise.
    */
   boolean delete(Path path) throws IOException;
-
-  long fileSize(Path path) throws IOException;
 }

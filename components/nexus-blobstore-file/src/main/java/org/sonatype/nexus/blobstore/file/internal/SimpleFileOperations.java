@@ -19,8 +19,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Date;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -74,37 +72,17 @@ public class SimpleFileOperations
   }
 
   @Override
-  public Date fileCreationDate(final Path path) throws IOException {
-    checkNotNull(path);
-    BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
-    return new Date(attr.creationTime().toMillis());
-  }
-
-  @Override
-  public String computeSha1Hash(final Path path) throws IOException {
-    checkNotNull(path);
-    try (InputStream inputStream = openInputStream(path)) {
-      return DigestHelper.calculateSha1(inputStream);
-    }
-  }
-
-  @Override
   public boolean delete(final Path path) throws IOException {
     checkNotNull(path);
     try {
       return Files.deleteIfExists(path);
     }
     finally {
+      // FIXME: This is error prone to throw in finally block
       if (exists(path)) {
         throw new IOException("File was not successfully deleted.");
       }
     }
-  }
-
-  @Override
-  public long fileSize(final Path path) throws IOException {
-    checkNotNull(path);
-    return Files.size(path);
   }
 
   /**
