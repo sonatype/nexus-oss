@@ -32,6 +32,8 @@ import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreException;
 import org.sonatype.nexus.blobstore.api.BlobStoreListener;
 import org.sonatype.nexus.blobstore.api.BlobStoreMetrics;
+import org.sonatype.nexus.blobstore.file.BlobMetadataStore.MetadataMetrics;
+import org.sonatype.nexus.blobstore.file.FileOperations.StreamMetrics;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.joda.time.DateTime;

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.blobstore.file;
+package org.sonatype.nexus.blobstore.file.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +25,8 @@ import java.util.Date;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.blobstore.file.internal.DigestHelper;
+import org.sonatype.nexus.blobstore.file.FileOperations;
+import org.sonatype.nexus.blobstore.file.MetricsInputStream;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 

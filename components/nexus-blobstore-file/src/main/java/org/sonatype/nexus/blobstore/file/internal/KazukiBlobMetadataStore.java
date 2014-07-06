@@ -26,7 +26,6 @@ import org.sonatype.nexus.blobstore.api.BlobStoreException;
 import org.sonatype.nexus.blobstore.file.BlobMetadata;
 import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.BlobState;
-import org.sonatype.nexus.blobstore.file.MetadataMetrics;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import io.kazuki.v0.store.KazukiException;

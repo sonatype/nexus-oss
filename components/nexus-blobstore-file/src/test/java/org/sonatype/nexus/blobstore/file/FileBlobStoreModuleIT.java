@@ -23,7 +23,6 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.junit.After;
@@ -39,7 +38,7 @@ import static org.hamcrest.Matchers.nullValue;
 /**
  * Tests for {@link FileBlobStoreModule}.
  */
-public class FileBlobStoreModuleTest
+public class FileBlobStoreModuleIT
   extends TestSupport
 {
   @Inject
@@ -63,15 +62,7 @@ public class FileBlobStoreModuleTest
     final Injector injector = Guice.createInjector(
         new FileBlobStoreModule("alpha"),
         new FileBlobStoreModule("beta"),
-        new TempDirectoryModule(),
-
-        // HACK: Since this test is not sisu-based, bind some components for this test
-        new AbstractModule() {
-          @Override
-          protected void configure() {
-            bind(FileOperations.class).to(SimpleFileOperations.class);
-          }
-        }
+        new TempDirectoryModule()
     );
 
     injector.injectMembers(this);

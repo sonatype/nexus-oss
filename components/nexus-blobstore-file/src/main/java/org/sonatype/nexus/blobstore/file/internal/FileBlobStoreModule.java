@@ -67,6 +67,9 @@ public class FileBlobStoreModule
 
   @Override
   protected void configure() {
+    // NOTE: exposed for tests, which are not using sisu atm and need manual binding
+    bind(FileOperations.class).to(SimpleFileOperations.class).in(Singleton.class);
+
     // Create and expose blob store itself
     bind(String.class).annotatedWith(Names.named("FileBlobStoreModule.name-key")).toInstance(name);
     bind(BlobStore.class).annotatedWith(Names.named(name)).toProvider(BlobStoreProvider.class);

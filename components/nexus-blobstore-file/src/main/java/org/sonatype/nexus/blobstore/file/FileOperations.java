@@ -24,6 +24,26 @@ import java.util.Date;
  */
 public interface FileOperations
 {
+  class StreamMetrics
+  {
+    private final long size;
+
+    private final String SHA1;
+
+    public StreamMetrics(final long size, final String SHA1) {
+      this.size = size;
+      this.SHA1 = SHA1;
+    }
+
+    public long getSize() {
+      return size;
+    }
+
+    public String getSHA1() {
+      return SHA1;
+    }
+  }
+
   /**
    * Creates a file (and its containing directories, if necessary) and populates it from the
    * InputStream, which gets closed.  Returns some basic metrics about the stream.
