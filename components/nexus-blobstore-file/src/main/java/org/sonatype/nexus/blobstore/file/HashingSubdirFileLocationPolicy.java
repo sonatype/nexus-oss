@@ -20,8 +20,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.blobstore.file.internal.FilenameEscaper.escapeFilename;
 
 /**
- * Stores blobs and blob headers in a two-deep directory tree, the first layer having {@link #TIER_1_MODULO}
- * directories, the second having {@link #TIER_2_MODULO}.
+ * Stores blobs and blob headers in a two-deep directory tree.
+ *
+ * The first layer, {@code vol}, having {@link #TIER_1_MODULO} directories,
+ * and the second {@code chap} having {@link #TIER_2_MODULO}.
  *
  * @since 3.0
  */
