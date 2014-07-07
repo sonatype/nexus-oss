@@ -69,7 +69,7 @@ Ext.define('NX.coreui.controller.Search', {
       mode: 'browse',
       group: true,
       iconName: 'search-default',
-      weight: 20
+      weight: 500
     });
 
     me.getSearchFilterStore().each(function (model) {
@@ -267,14 +267,14 @@ Ext.define('NX.coreui.controller.Search', {
       mode: 'browse',
       view: { xtype: 'nx-searchfeature', searchFilter: model },
       iconConfig: {
-        name: model.get('iconName') ? model.get('iconName') : 'feature-search'
+        name: model.get('iconName') ? model.get('iconName') : 'search-default'
       },
       description: model.get('description'),
       authenticationRequired: false
     });
 
     me.getController('Menu').refreshTree();
-    NX.Bookmarks.navigateTo(NX.Bookmarks.fromToken('search/saved/' + model.get('name')))
+    NX.Bookmarks.navigateTo(NX.Bookmarks.fromToken('browse/search/saved/' + model.get('name')))
 
     win.close();
   },
