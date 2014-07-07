@@ -40,6 +40,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     'repository.RepositoryAddVirtual',
     'repository.RepositoryFeature',
     'repository.RepositoryList',
+    'repository.RepositorySelectTemplate',
     'repository.RepositorySettingsTab',
     'repository.RepositorySettingsCommon',
     'repository.RepositorySettingsGroup',
@@ -52,7 +53,8 @@ Ext.define('NX.coreui.controller.Repositories', {
   ],
   refs: [
     { ref: 'list', selector: 'nx-coreui-repository-list' },
-    { ref: 'settings', selector: 'nx-coreui-repository-feature nx-coreui-repository-settings-tab' }
+    { ref: 'settings', selector: 'nx-coreui-repository-feature nx-coreui-repository-settings-tab' },
+    { ref: 'selectTemplate', selector: 'nx-coreui-repository-selecttemplate' },
   ],
   icons: {
     'repository-default': {
@@ -84,11 +86,6 @@ Ext.define('NX.coreui.controller.Repositories', {
     me.callParent();
 
     me.listen({
-      store: {
-        '#RepositoryTemplate': {
-          load: me.onRepositoryTemplateLoad
-        }
-      },
       controller: {
         '#Refresh': {
           refresh: me.loadRelatedStores
@@ -104,11 +101,14 @@ Ext.define('NX.coreui.controller.Repositories', {
           afterrender: me.bindBrowseButton,
           click: me.navigateToBrowseMode
         },
-        'nx-coreui-repository-list menuitem[action=new]': {
-          click: me.showAddWindow
+        'nx-coreui-repository-list button[action=new]': {
+          click: me.showSelectTemplateWindow
         },
         'nx-coreui-repository-settings': {
           submitted: me.onSettingsSubmitted
+        },
+        'nx-coreui-repository-selecttemplate grid': {
+          selectionchange: me.showAddWindow
         }
       }
     });
@@ -167,44 +167,19 @@ Ext.define('NX.coreui.controller.Repositories', {
 
   /**
    * @private
-   * Recreate "New" menu entries / template type.
    */
-  onRepositoryTemplateLoad: function(store) {
-    var me = this,
-        list = me.getList(),
-        newButton, templatesPerType = {};
-
-    if (list) {
-      newButton = list.down('button[action=new]');
-      newButton.menu.removeAll();
-      store.each(function(template) {
-        if (!templatesPerType[template.get('type')]) {
-          templatesPerType[template.get('type')] = [];
-        }
-        templatesPerType[template.get('type')].push({
-          text: template.get('providerName'),
-          action: 'new',
-          template: template
-        })
-      });
-      Ext.Object.each(templatesPerType, function(key, value) {
-        newButton.menu.add({
-          text: Ext.String.capitalize(key) + ' Repository',
-          menu: value
-        });
-      });
-      me.reselect();
-    }
+  showSelectTemplateWindow: function(menu) {
+    Ext.widget('nx-coreui-repository-selecttemplate');
   },
 
   /**
    * @private
    */
-  showAddWindow: function(menu) {
-    var me = this,
-        template = menu.template;
+  showAddWindow: function(selectionModel, selected) {
+    var me = this;
 
-    me.createComponent('add', Ext.apply({}, template.data));
+    me.getSelectTemplate().close();
+    me.createComponent('add', Ext.apply({}, selected[0].data));
   },
 
   /**
