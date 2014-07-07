@@ -27,8 +27,7 @@ public class BlobId
   private final String id;
 
   public BlobId(final String id) {
-    checkNotNull(id);
-    this.id = id;
+    this.id = checkNotNull(id);
   }
 
   public String getId() {
@@ -37,7 +36,7 @@ public class BlobId
 
   @Override
   public String toString() {
-    return "BlobId[" + id + "]";
+    return getClass().getSimpleName() + "[" + id + "]";
   }
 
   @Override

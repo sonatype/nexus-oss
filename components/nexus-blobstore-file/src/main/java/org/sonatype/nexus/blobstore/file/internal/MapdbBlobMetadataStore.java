@@ -10,10 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.blobstore.file.internal;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import java.util.NavigableSet;
 
 import javax.annotation.Nullable;
@@ -25,12 +28,16 @@ import org.sonatype.nexus.blobstore.file.BlobState;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
+import com.google.common.collect.Lists;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.HTreeMap;
+import org.mapdb.TxBlock;
+import org.mapdb.TxMaker;
+import org.mapdb.TxRollbackException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -40,18 +47,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class MapdbBlobMetadataStore
-  extends LifecycleSupport
-  implements BlobMetadataStore
+    extends LifecycleSupport
+    implements BlobMetadataStore
 {
   private final Path root;
 
-  private DB database;
-
-  private HTreeMap<BlobId,BlobMetadata> entries;
-
-  private NavigableSet<Tuple2<BlobState,BlobId>> states;
-
-  private Atomic.Long idSequence;
+  private TxMaker database;
 
   public MapdbBlobMetadataStore(final Path root) {
     this.root = checkNotNull(root);
@@ -64,26 +65,32 @@ public class MapdbBlobMetadataStore
     File file = root.resolve("db").toFile();
     this.database = DBMaker.newFileDB(file)
         .checksumEnable()
-        .make();
-
-    this.entries = database.getHashMap("entries");
-    this.states = database.getTreeSet("states");
-    this.idSequence = database.getAtomicLong("id_sequence");
+        .makeTxMaker();
   }
 
   @Override
   protected void doStop() throws Exception {
-    entries = null;
-    idSequence = null;
     database.close();
     database = null;
+  }
+
+  private HTreeMap<BlobId, BlobMetadata> entries(final DB db) {
+    return db.getHashMap("entries");
+  }
+
+  private NavigableSet<Tuple2<BlobState, BlobId>> states(final DB db) {
+    return db.getTreeSet("states");
+  }
+
+  private Atomic.Long idSequence(final DB db) {
+    return db.getAtomicLong("id_sequence");
   }
 
   /**
    * Generate a new blob identifier.
    */
-  private BlobId newId() {
-    long id = idSequence.incrementAndGet();
+  private BlobId newId(final DB db) {
+    long id = idSequence(db).incrementAndGet();
     return new BlobId(String.format("%016x", id));
   }
 
@@ -92,17 +99,21 @@ public class MapdbBlobMetadataStore
     checkNotNull(metadata);
     ensureStarted();
 
-    BlobId id = newId();
-    log.debug("Add: {}={}", id, metadata);
+    return database.execute(new Fun.Function1<BlobId, DB>()
+    {
+      @Override
+      public BlobId run(final DB db) {
+        BlobId id = newId(db);
+        log.trace("Add: {}={}", id, metadata);
 
-    entries.put(id, metadata);
+        entries(db).put(id, metadata);
 
-    // track state
-    states.add(Fun.t2(metadata.getBlobState(), id));
+        // track state
+        states(db).add(Fun.t2(metadata.getBlobState(), id));
 
-    database.commit();
-
-    return id;
+        return id;
+      }
+    });
   }
 
   @Nullable
@@ -111,9 +122,14 @@ public class MapdbBlobMetadataStore
     checkNotNull(id);
     ensureStarted();
 
-    log.debug("Get: {}", id);
-
-    return entries.get(id);
+    return database.execute(new Fun.Function1<BlobMetadata, DB>()
+    {
+      @Override
+      public BlobMetadata run(final DB db) {
+        log.trace("Get: {}", id);
+        return entries(db).get(id);
+      }
+    });
   }
 
   @Override
@@ -122,32 +138,43 @@ public class MapdbBlobMetadataStore
     checkNotNull(metadata);
     ensureStarted();
 
-    log.debug("Update: {}={}", id, metadata);
+    database.execute(new TxBlock()
+    {
+      @Override
+      public void tx(final DB db) throws TxRollbackException {
+        log.trace("Update: {}={}", id, metadata);
 
-    entries.put(id, metadata);
+        Map<BlobId, BlobMetadata> entries = entries(db);
+        BlobMetadata prev = entries.get(id);
+        entries.put(id, metadata);
 
-    // replace state
-    BlobState newState = metadata.getBlobState();
-    for (BlobState state : BlobState.values()) {
-      if (state == newState) {
-        states.add(Fun.t2(newState, id));
+        // replace state
+        NavigableSet<Tuple2<BlobState, BlobId>> states = states(db);
+        states.remove(Fun.t2(prev.getBlobState(), id));
+        states.add(Fun.t2(metadata.getBlobState(), id));
       }
-      else {
-        states.remove(Fun.t2(newState, id));
-      }
-    }
-
-    database.commit();
+    });
   }
 
   @Override
   public void delete(final BlobId id) {
     checkNotNull(id);
+    ensureStarted();
 
-    log.debug("Delete: {}", id);
+    database.execute(new TxBlock()
+    {
+      @Override
+      public void tx(final DB db) throws TxRollbackException {
+        log.trace("Delete: {}", id);
 
-    entries.remove(id);
-    database.commit();
+        Map<BlobId, BlobMetadata> entries = entries(db);
+        BlobMetadata prev = entries.get(id);
+        entries.remove(id);
+
+        // remove state
+        states(db).remove(Fun.t2(prev.getBlobState(), id));
+      }
+    });
   }
 
   @Override
@@ -155,9 +182,21 @@ public class MapdbBlobMetadataStore
     checkNotNull(state);
     ensureStarted();
 
-    log.debug("Find with state: {}", state);
+    log.trace("Find with state: {}", state);
 
-    return Fun.filter(states, state);
+    DB db = database.makeTx();
+    try {
+      // copy ids avoid leaking transactional scope, may cause memory pressure
+      List<BlobId> ids = Lists.newLinkedList();
+      for (BlobId id : Fun.filter(states(db), state)) {
+        ids.add(id);
+      }
+      log.trace("Found: {} with state: {}", ids.size(), state);
+      return ids;
+    }
+    finally {
+      db.close();
+    }
   }
 
   private File[] listFiles() {
@@ -173,21 +212,33 @@ public class MapdbBlobMetadataStore
   public MetadataMetrics getMetadataMetrics() {
     ensureStarted();
 
-    long count = entries.sizeLong();
+    DB db = database.makeTx();
+    try {
+      long count = entries(db).sizeLong();
 
-    // sum all file bytes in the database root
-    long bytes = 0;
-    for (File file : listFiles()) {
-      bytes += file.length();
+      // sum all file bytes in the database root
+      long bytes = 0;
+      for (File file : listFiles()) {
+        bytes += file.length();
+      }
+
+      return new MetadataMetrics(count, bytes);
     }
-
-    return new MetadataMetrics(count, bytes);
+    finally {
+      db.close();
+    }
   }
 
   public void compact() {
     ensureStarted();
 
-    log.debug("Compacting");
-    database.compact();
+    database.execute(new TxBlock()
+    {
+      @Override
+      public void tx(final DB db) throws TxRollbackException {
+        log.trace("Compacting");
+        db.compact();
+      }
+    });
   }
 }
