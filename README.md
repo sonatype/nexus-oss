@@ -28,10 +28,10 @@ Sonatype Nexus - Open Source Edition
 
 The run Nexus, after building, unzip the assembly and start the server:
 
-    unzip -d target assemblies/nexus-bundle-template/target/nexus-bundle-template-*-bundle.zip
-    ./target/nexus-bundle-template-*/bin/nexus console
+    unzip -d target assemblies/nexus-base-template/target/nexus-base-template-*.zip
+    ./target/nexus-base-template-*/bin/nexus console
 
-The `nexus-bundle-template` assembly is used as the basis for the official Sonatype Nexus distributions.
+The `nexus-base-template` assembly is used as the basis for the official Sonatype Nexus distributions.
 
 ## HOWTO
 

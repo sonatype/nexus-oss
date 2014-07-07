@@ -266,7 +266,6 @@
                       <groupId>${it.nexus.bundle.groupId}</groupId>
                       <artifactId>${it.nexus.bundle.artifactId}</artifactId>
                       <version>${it.nexus.bundle.version}</version>
-                      <classifier>bundle</classifier>
                       <type>zip</type>
                     </artifactItem>
                   </artifactItems>
