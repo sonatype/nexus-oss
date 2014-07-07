@@ -15,6 +15,10 @@
 -->
 <!-- This configuration added to prevent logback default of DEBUG output -->
 <configuration>
+  <appender name="osgi" class="org.ops4j.pax.logging.logback.appender.PaxAppenderDelegate">
+    <paxname>*</paxname>
+  </appender>
+
   <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>%d{"yyyy-MM-dd HH:mm:ss,SSSZ"} %-5p [%thread] %X{userId} %c - %m%n</pattern>
@@ -26,6 +30,6 @@
   <logger name="org.eclipse.jetty.webapp.StandardDescriptorProcessor" level="WARN"/>
 
   <root level="${nexus.log.level:-INFO}">
-    <appender-ref ref="console"/>
+    <appender-ref ref="osgi"/>
   </root>
 </configuration>
