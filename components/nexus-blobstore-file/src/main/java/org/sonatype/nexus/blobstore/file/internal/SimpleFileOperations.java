@@ -52,7 +52,7 @@ public class SimpleFileOperations
     checkNotNull(dir, "Null parent for path: %s", path);
     DirSupport.mkdir(dir);
 
-    final MetricsInputStream input = new MetricsInputStream(data, DigestHelper.createSha1());
+    final MetricsInputStream input = new MetricsInputStream(data);
     try {
       try (final OutputStream output = Files.newOutputStream(path, StandardOpenOption.CREATE_NEW)) {
         ByteStreams.copy(input, output);

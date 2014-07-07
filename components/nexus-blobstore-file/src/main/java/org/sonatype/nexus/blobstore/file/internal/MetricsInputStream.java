@@ -16,10 +16,12 @@ import java.io.FilterInputStream;
 import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import org.sonatype.nexus.blobstore.file.FileOperations.StreamMetrics;
 import org.sonatype.nexus.orient.Hex;
 
+import com.google.common.base.Throwables;
 import com.google.common.io.CountingInputStream;
 
 /**
@@ -34,8 +36,8 @@ public class MetricsInputStream
 
   private final CountingInputStream countingInputStream;
 
-  public MetricsInputStream(final InputStream input, final MessageDigest messageDigest) {
-    this(new CountingInputStream(input), messageDigest);
+  public MetricsInputStream(final InputStream input) {
+    this(new CountingInputStream(input), createSha1());
   }
 
   private MetricsInputStream(final CountingInputStream countingStream, final MessageDigest messageDigest) {
@@ -54,5 +56,15 @@ public class MetricsInputStream
 
   public StreamMetrics getMetrics() {
     return new StreamMetrics(getSize(), getMessageDigest());
+  }
+
+  private static MessageDigest createSha1() {
+    try {
+      return MessageDigest.getInstance("SHA1");
+    }
+    catch (NoSuchAlgorithmException e) {
+      // should never happen
+      throw Throwables.propagate(e);
+    }
   }
 }

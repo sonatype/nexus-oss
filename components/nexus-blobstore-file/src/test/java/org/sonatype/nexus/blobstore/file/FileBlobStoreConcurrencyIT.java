@@ -33,7 +33,6 @@ import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.api.BlobStoreException;
-import org.sonatype.nexus.blobstore.file.internal.DigestHelper;
 import org.sonatype.nexus.blobstore.file.internal.MapdbBlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.internal.MetricsInputStream;
 import org.sonatype.nexus.blobstore.file.internal.SimpleFileOperations;
@@ -240,7 +239,7 @@ public class FileBlobStoreConcurrencyIT
                                              final BlobMetrics metadataMetrics)
       throws NoSuchAlgorithmException, IOException
   {
-    final MetricsInputStream measured = new MetricsInputStream(inputStream, DigestHelper.createSha1());
+    final MetricsInputStream measured = new MetricsInputStream(inputStream);
     ByteStreams.copy(measured, nullOutputStream());
 
     checkEqual("stream length", metadataMetrics.getContentSize(), measured.getSize(), blobId);

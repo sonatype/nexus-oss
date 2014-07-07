@@ -58,7 +58,7 @@ public class MetricsInputStreamTest
   }
 
   private MetricsInputStream measure(final InputStream inputStream) throws Exception {
-    final MetricsInputStream metricStream = new MetricsInputStream(inputStream, DigestHelper.createSha1());
+    final MetricsInputStream metricStream = new MetricsInputStream(inputStream);
     copy(metricStream, nullOutputStream());
     return metricStream;
   }
