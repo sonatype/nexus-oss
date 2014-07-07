@@ -13,11 +13,11 @@
 package org.sonatype.nexus.blobstore.file;
 
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.blobstore.file.internal.FilenameEscaper.escapeFilename;
 
 /**
  * Stores blobs in a two-deep directory tree.
@@ -33,6 +33,8 @@ public class HashingSubdirFileLocationPolicy
   private static final int TIER_1_MODULO = 43;
 
   private static final int TIER_2_MODULO = 47;
+
+  private static Pattern UNSAFE_TOKENS = Pattern.compile("[.\\\\:/]");
 
   @Override
   public Path pathFor(final Path root, final BlobId blobId) {
@@ -50,5 +52,9 @@ public class HashingSubdirFileLocationPolicy
 
   private int tier(final BlobId blobId, final int modulo) {
     return Math.abs(blobId.hashCode() % modulo) + 1;
+  }
+
+  private String escapeFilename(final String value) {
+    return UNSAFE_TOKENS.matcher(value).replaceAll("-");
   }
 }
