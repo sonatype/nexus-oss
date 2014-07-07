@@ -30,8 +30,8 @@
 
   <modules>
     <module>nexus-base-feature</module>
+    <module>nexus-base-template</module>
     <module>nexus-bundle-template</module>
-    <module>nexus-karaf-template</module>
   </modules>
 
   <dependencyManagement>
