@@ -14,7 +14,6 @@ package org.sonatype.nexus.blobstore.file.internal;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.security.SecureRandom;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -24,13 +23,13 @@ import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.file.BlobMetadata;
 import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.BlobState;
-import org.sonatype.nexus.orient.Hex;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
+import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
@@ -48,11 +47,11 @@ public class MapdbBlobMetadataStore
 {
   private final Path root;
 
-  private final SecureRandom random = new SecureRandom();
-
   private DB database;
 
   private HTreeMap<BlobId,BlobMetadata> entries;
+
+  private Atomic.Long idSequence;
 
   public MapdbBlobMetadataStore(final Path root) {
     this.root = checkNotNull(root);
@@ -65,22 +64,23 @@ public class MapdbBlobMetadataStore
     this.database = DBMaker.newFileDB(root.resolve("db").toFile()).make();
     this.entries = database.getHashMap("entries");
     log.debug("Opened entries; count: {}", entries.sizeLong());
+    this.idSequence = database.getAtomicLong("id_sequence");
   }
 
   @Override
   protected void doStop() throws Exception {
     entries = null;
+    idSequence = null;
     database.close();
     database = null;
   }
 
   /**
-   * Generate a new unique (secure-random) 8 byte HEX-encoded identifier.
+   * Generate a new blob identifier.
    */
   private BlobId newId() {
-    byte[] bytes = new byte[8];
-    random.nextBytes(bytes);
-    return new BlobId(Hex.encode(bytes));
+    long id = idSequence.incrementAndGet();
+    return new BlobId(String.format("%016x", id));
   }
 
   @Override
