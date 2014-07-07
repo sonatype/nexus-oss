@@ -20,7 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.blobstore.file.internal.FilenameEscaper.escapeFilename;
 
 /**
- * Stores blobs and blob headers in a two-deep directory tree.
+ * Stores blobs in a two-deep directory tree.
  *
  * The first layer, {@code vol}, having {@link #TIER_1_MODULO} directories,
  * and the second {@code chap} having {@link #TIER_2_MODULO}.
@@ -34,19 +34,9 @@ public class HashingSubdirFileLocationPolicy
 
   private static final int TIER_2_MODULO = 47;
 
-  private final Path root;
-
-  public HashingSubdirFileLocationPolicy(final Path root) {
-    this.root = checkNotNull(root);
-  }
-
   @Override
-  public Path getRoot() {
-    return root;
-  }
-
-  @Override
-  public Path forContent(final BlobId blobId) {
+  public Path pathFor(final Path root, final BlobId blobId) {
+    checkNotNull(root);
     checkNotNull(blobId);
 
     String path = String.format("vol-%02d/chap-%02d/%s.blob",

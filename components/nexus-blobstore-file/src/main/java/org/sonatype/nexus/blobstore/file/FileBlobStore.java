@@ -48,7 +48,9 @@ public class FileBlobStore
     extends ComponentSupport
     implements BlobStore
 {
-  private final FilePathPolicy paths;
+  private final Path root;
+
+  private final FilePathPolicy filePathPolicy;
 
   private final FileOperations fileOperations;
 
@@ -56,11 +58,13 @@ public class FileBlobStore
 
   private volatile BlobStoreListener listener;
 
-  public FileBlobStore(final FilePathPolicy paths,
+  public FileBlobStore(final Path root,
+                       final FilePathPolicy filePathPolicy,
                        final FileOperations fileOperations,
                        final BlobMetadataStore metadataStore)
   {
-    this.paths = checkNotNull(paths);
+    this.root = checkNotNull(root);
+    this.filePathPolicy = checkNotNull(filePathPolicy);
     this.fileOperations = checkNotNull(fileOperations);
     this.metadataStore = checkNotNull(metadataStore);
   }
@@ -74,6 +78,13 @@ public class FileBlobStore
   @Override
   public BlobStoreListener getBlobStoreListener() {
     return listener;
+  }
+
+  /**
+   * Returns path for blob-id relative to root directory.
+   */
+  private Path pathFor(final BlobId id) {
+    return filePathPolicy.pathFor(root, id);
   }
 
   @Override
@@ -91,7 +102,7 @@ public class FileBlobStore
       final BlobMetadata metadata = new BlobMetadata(BlobState.CREATING, headers);
       blobId = metadataStore.add(metadata);
 
-      final Path path = paths.forContent(blobId);
+      final Path path = pathFor(blobId);
       log.debug("Writing blob {} to {}", blobId, path);
 
       final StreamMetrics streamMetrics = fileOperations.create(path, blobData);
@@ -130,7 +141,7 @@ public class FileBlobStore
       return null;
     }
 
-    final Path path = paths.forContent(blobId);
+    final Path path = pathFor(blobId);
     if (!fileOperations.exists(path)) {
       log.error("Blob content for blob {} not found at expected location {}", blobId, path);
       throw new BlobStoreException("Blob content unexpectedly missing", blobId);
@@ -176,7 +187,7 @@ public class FileBlobStore
     }
 
     try {
-      final Path path = paths.forContent(blobId);
+      final Path path = pathFor(blobId);
       final boolean blobDeleted = fileOperations.delete(path);
 
       if (!blobDeleted) {
@@ -217,7 +228,7 @@ public class FileBlobStore
       @Override
       public long getAvailableSpace() {
         try {
-          final FileStore fileStore = Files.getFileStore(paths.getRoot());
+          final FileStore fileStore = Files.getFileStore(root);
           return fileStore.getUsableSpace();
         }
         catch (IOException e) {

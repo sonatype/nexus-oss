@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.blobstore.file.internal;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.file.BlobMetadata;
@@ -34,8 +34,8 @@ public class MapdbBlobMetadataStoreTest
 
   @Before
   public void setUp() throws Exception {
-    File dir = util.createTempDir();
-    this.underTest = new MapdbBlobMetadataStore(dir);
+    Path root = util.createTempDir().toPath();
+    this.underTest = new MapdbBlobMetadataStore(root);
     underTest.start();
   }
 

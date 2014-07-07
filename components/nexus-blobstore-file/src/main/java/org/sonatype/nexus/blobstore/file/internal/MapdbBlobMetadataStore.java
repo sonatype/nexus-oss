@@ -13,6 +13,7 @@
 package org.sonatype.nexus.blobstore.file.internal;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -45,7 +46,7 @@ public class MapdbBlobMetadataStore
   extends LifecycleSupport
   implements BlobMetadataStore
 {
-  private final File directory;
+  private final Path root;
 
   private final SecureRandom random = new SecureRandom();
 
@@ -53,15 +54,15 @@ public class MapdbBlobMetadataStore
 
   private HTreeMap<BlobId,BlobMetadata> entries;
 
-  public MapdbBlobMetadataStore(final File directory) {
-    this.directory = checkNotNull(directory);
-    log.debug("Directory: {}", directory);
+  public MapdbBlobMetadataStore(final Path root) {
+    this.root = checkNotNull(root);
+    log.debug("Root: {}", root);
   }
 
   @Override
   protected void doStart() throws Exception {
-    DirSupport.mkdir(directory);
-    this.database = DBMaker.newFileDB(new File(directory, "db")).make();
+    DirSupport.mkdir(root);
+    this.database = DBMaker.newFileDB(root.resolve("db").toFile()).make();
     this.entries = database.getHashMap("entries");
     log.debug("Opened entries; count: {}", entries.sizeLong());
   }
@@ -73,6 +74,9 @@ public class MapdbBlobMetadataStore
     database = null;
   }
 
+  /**
+   * Generate a new unique (secure-random) 8 byte HEX-encoded identifier.
+   */
   private BlobId newId() {
     byte[] bytes = new byte[8];
     random.nextBytes(bytes);
@@ -156,7 +160,7 @@ public class MapdbBlobMetadataStore
   }
 
   private File[] listFiles() {
-    File[] files = directory.listFiles();
+    File[] files = root.toFile().listFiles();
     if (files == null) {
       // should never happen
       return new File[0];
@@ -170,7 +174,7 @@ public class MapdbBlobMetadataStore
 
     long count = entries.sizeLong();
 
-    // sum all file bytes in the database directory
+    // sum all file bytes in the database root
     long bytes = 0;
     for (File file : listFiles()) {
       bytes += file.length();

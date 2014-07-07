@@ -17,7 +17,7 @@ import java.nio.file.Path;
 import org.sonatype.nexus.blobstore.api.BlobId;
 
 /**
- * Indicates where a blob with a given blob ID should be stored, relative to a blob store root.
+ * Determines where a blob with a given blob ID should be stored.
  *
  * Implementations might use algorithms to divide files up into multiple directories for easier management.
  *
@@ -26,12 +26,7 @@ import org.sonatype.nexus.blobstore.api.BlobId;
 public interface FilePathPolicy
 {
   /**
-   * Returns the root directory that holds all of the content files.
-   */
-  Path getRoot();
-
-  /**
    * Returns a path to a file where the blob's content should be stored.
    */
-  Path forContent(BlobId blobId);
+  Path pathFor(Path root, BlobId blobId);
 }

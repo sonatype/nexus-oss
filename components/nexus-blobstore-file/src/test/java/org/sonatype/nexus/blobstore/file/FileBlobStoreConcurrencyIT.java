@@ -15,6 +15,7 @@ package org.sonatype.nexus.blobstore.file;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,25 +29,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
-import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreException;
 import org.sonatype.nexus.blobstore.file.internal.DigestHelper;
-import org.sonatype.nexus.blobstore.file.internal.FileBlobStoreModule;
+import org.sonatype.nexus.blobstore.file.internal.MapdbBlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.internal.MetricsInputStream;
-import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
+import org.sonatype.nexus.blobstore.file.internal.SimpleFileOperations;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteStreams;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,34 +57,33 @@ import static org.sonatype.nexus.blobstore.api.BlobStore.CREATED_BY_HEADER;
 public class FileBlobStoreConcurrencyIT
     extends TestSupport
 {
-  public static final ImmutableMap<String, String> TEST_HEADERS = ImmutableMap
-      .of(CREATED_BY_HEADER, "test", BLOB_NAME_HEADER, "test/randomData.bin");
+  public static final ImmutableMap<String, String> TEST_HEADERS = ImmutableMap.of(
+      CREATED_BY_HEADER, "test",
+      BLOB_NAME_HEADER, "test/randomData.bin"
+  );
 
   public static final int BLOB_MAX_SIZE_BYTES = 5_000_000;
 
-  public static final String STORE_NAME = "concurrencyTestStore";
+  private MapdbBlobMetadataStore metadataStore;
 
-  @Inject
-  @Named(STORE_NAME)
-  private BlobStore blobStore;
-
-  @Inject
-  @Named(STORE_NAME)
-  private Lifecycle lifecycle;
+  private FileBlobStore underTest;
 
   @Before
-  public void init() throws Exception {
-    Injector injector = Guice.createInjector(new FileBlobStoreModule(STORE_NAME), new TempDirectoryModule());
-    injector.injectMembers(this);
+  public void setUp() throws Exception {
+    Path root = util.createTempDir().toPath();
+    Path content = root.resolve("content");
+    Path metadata = root.resolve("metadata");
 
-    lifecycle.start();
+    this.metadataStore = new MapdbBlobMetadataStore(metadata);
+    metadataStore.start();
+
+    this.underTest = new FileBlobStore(content, new HashingSubdirFileLocationPolicy(), new SimpleFileOperations(), metadataStore);
   }
 
+
   @After
-  public void shutdown() throws Exception {
-    if (lifecycle != null) {
-      lifecycle.stop();
-    }
+  public void tearDown() throws Exception {
+    metadataStore.stop();
   }
 
   @Test
@@ -137,7 +131,7 @@ public class FileBlobStoreConcurrencyIT
             public void run() throws Exception {
               final byte[] data = new byte[random.nextInt(BLOB_MAX_SIZE_BYTES) + 1];
               random.nextBytes(data);
-              final Blob blob = blobStore.create(new ByteArrayInputStream(data), TEST_HEADERS);
+              final Blob blob = underTest.create(new ByteArrayInputStream(data), TEST_HEADERS);
 
               blobIdsInTheStore.add(blob.getId());
             }
@@ -160,7 +154,7 @@ public class FileBlobStoreConcurrencyIT
                 return;
               }
 
-              final Blob blob = blobStore.get(blobId);
+              final Blob blob = underTest.get(blobId);
               if (blob == null) {
                 log("Attempted to obtain blob, but it was deleted:" + blobId);
                 return;
@@ -190,15 +184,15 @@ public class FileBlobStoreConcurrencyIT
                 log("deleter: null blob id");
                 return;
               }
-              blobStore.delete(blobId);
+              underTest.delete(blobId);
             }
           }));
     }
 
     // Shufflers pull blob IDs off the front of the queue and stick them on the back, to make the blobID queue a bit less orderly
     for (int i = 0; i < numberOfShufflers; i++) {
-      testWorkers
-          .add(new TestWorker(testWorkers.size(), startingGun, failureHasOccurred, numberOfIterations, new TestTask()
+      testWorkers.add(
+          new TestWorker(testWorkers.size(), startingGun, failureHasOccurred, numberOfIterations, new TestTask()
           {
             @Override
             public void run() throws Exception {
@@ -211,12 +205,12 @@ public class FileBlobStoreConcurrencyIT
     }
 
     for (int i = 0; i < numberOfCompactors; i++) {
-      testWorkers
-          .add(new TestWorker(testWorkers.size(), startingGun, failureHasOccurred, numberOfIterations, new TestTask()
+      testWorkers.add(
+          new TestWorker(testWorkers.size(), startingGun, failureHasOccurred, numberOfIterations, new TestTask()
           {
             @Override
             public void run() throws Exception {
-              blobStore.compact();
+              underTest.compact();
             }
           }));
     }
@@ -241,7 +235,8 @@ public class FileBlobStoreConcurrencyIT
    *
    * @throws RuntimeException if there is any deviation
    */
-  private void readContentAndValidateMetrics(final BlobId blobId, final InputStream inputStream,
+  private void readContentAndValidateMetrics(final BlobId blobId,
+                                             final InputStream inputStream,
                                              final BlobMetrics metadataMetrics)
       throws NoSuchAlgorithmException, IOException
   {
