@@ -119,7 +119,7 @@
               org.sonatype.nexus.bootstrap.osgi.LauncherActivator
             </Bundle-Activator>
             <DynamicImport-Package>
-              org.eclipse.jetty.*
+              org.eclipse.jetty.*,ch.qos.logback.access.jetty
             </DynamicImport-Package>
             <_exportcontents>
               org.*

@@ -294,10 +294,36 @@
             </goals>
             <configuration>
               <target>
+                <echo append="true" file="${project.build.directory}/assembly/bin/setenv">
+                  export JAVA_MAX_PERM_MEM=256M
+                </echo>
+                <echo append="true" file="${project.build.directory}/assembly/bin/setenv.bat">
+                  SET JAVA_MAX_PERM_MEM=256M
+                </echo>
+                <echo append="false" file="${project.build.directory}/assembly/etc/org.ops4j.pax.logging.cfg">
+                  org.ops4j.pax.logging.logback.config.file=${karaf.base}/conf/logback.xml
+                </echo>
                 <echo append="true" file="${project.build.directory}/assembly/etc/custom.properties">
                   nexus-base=${karaf.base}
                   nexus-args=${karaf.base}/conf/jetty.xml,${karaf.base}/conf/jetty-requestlog.xml
                 </echo>
+                <echo append="true" file="${project.build.directory}/assembly/etc/system.properties">
+                  org.ops4j.pax.logging.StaticLogbackContext=true
+                </echo>
+                <replace file="${project.build.directory}/assembly/etc/startup.properties">
+<!-- TODO: find a better way to replace this section -->
+<replacetoken><![CDATA[
+mvn\:org.ops4j.pax.logging/pax-logging-api/1.7.2 = 8
+mvn\:org.ops4j.pax.logging/pax-logging-service/1.7.2 = 8
+]]></replacetoken>
+<replacevalue><![CDATA[
+mvn\:com.codahale.metrics/metrics-core/3.0.2 = 8
+mvn\:com.codahale.metrics/metrics-logback/3.0.2 = 8
+mvn\:org.sonatype.nexus/pax-logging-metrics/3.0.0-SNAPSHOT = 8
+mvn\:org.ops4j.pax.logging/pax-logging-api/1.7.3-SNAPSHOT = 8
+mvn\:org.ops4j.pax.logging/pax-logging-logback/1.7.3-SNAPSHOT = 8
+]]></replacevalue>
+                </replace>
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg"
                   token=",management" value=",nexus-oss-edition" />
                 <move todir="${project.build.directory}/assembly/plugin-repository" flatten="true">
