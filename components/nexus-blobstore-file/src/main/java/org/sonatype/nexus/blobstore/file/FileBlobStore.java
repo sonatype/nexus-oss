@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -245,11 +244,8 @@ public class FileBlobStore
   public void compact() {
     log.debug("Compacting");
 
-    final Iterator<BlobId> withState = metadataStore.findWithState(BlobState.MARKED_FOR_DELETION);
-
     int count = 0;
-    while (withState.hasNext()) {
-      final BlobId blobId = withState.next();
+    for (BlobId blobId : metadataStore.findWithState(BlobState.MARKED_FOR_DELETION)) {
       // This iterator can occasionally return null
       if (blobId != null) {
         deleteHard(blobId);

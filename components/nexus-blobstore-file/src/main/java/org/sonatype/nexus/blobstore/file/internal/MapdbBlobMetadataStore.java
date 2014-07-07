@@ -14,8 +14,7 @@ package org.sonatype.nexus.blobstore.file.internal;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.NavigableSet;
 
 import javax.annotation.Nullable;
 
@@ -26,12 +25,11 @@ import org.sonatype.nexus.blobstore.file.BlobState;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterators;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mapdb.Fun;
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.HTreeMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -51,6 +49,8 @@ public class MapdbBlobMetadataStore
 
   private HTreeMap<BlobId,BlobMetadata> entries;
 
+  private NavigableSet<Tuple2<BlobState,BlobId>> states;
+
   private Atomic.Long idSequence;
 
   public MapdbBlobMetadataStore(final Path root) {
@@ -61,9 +61,13 @@ public class MapdbBlobMetadataStore
   @Override
   protected void doStart() throws Exception {
     DirSupport.mkdir(root);
-    this.database = DBMaker.newFileDB(root.resolve("db").toFile()).make();
+    File file = root.resolve("db").toFile();
+    this.database = DBMaker.newFileDB(file)
+        .checksumEnable()
+        .make();
+
     this.entries = database.getHashMap("entries");
-    log.debug("Opened entries; count: {}", entries.sizeLong());
+    this.states = database.getTreeSet("states");
     this.idSequence = database.getAtomicLong("id_sequence");
   }
 
@@ -92,6 +96,10 @@ public class MapdbBlobMetadataStore
     log.debug("Add: {}={}", id, metadata);
 
     entries.put(id, metadata);
+
+    // track state
+    states.add(Fun.t2(metadata.getBlobState(), id));
+
     database.commit();
 
     return id;
@@ -117,6 +125,19 @@ public class MapdbBlobMetadataStore
     log.debug("Update: {}={}", id, metadata);
 
     entries.put(id, metadata);
+
+    // replace state
+    BlobState newState = metadata.getBlobState();
+    for (BlobState state : BlobState.values()) {
+      if (state == newState) {
+        states.add(Fun.t2(newState, id));
+      }
+      else {
+        states.remove(Fun.t2(newState, id));
+      }
+    }
+
+    database.commit();
   }
 
   @Override
@@ -130,33 +151,13 @@ public class MapdbBlobMetadataStore
   }
 
   @Override
-  public Iterator<BlobId> findWithState(final BlobState state) {
+  public Iterable<BlobId> findWithState(final BlobState state) {
     checkNotNull(state);
     ensureStarted();
 
     log.debug("Find with state: {}", state);
 
-    // filter entries in given state
-    Iterator<Entry<BlobId,BlobMetadata>> filter = Iterators.filter(entries.entrySet().iterator(), new Predicate<Entry<BlobId,BlobMetadata>>()
-    {
-      @Override
-      public boolean apply(final @Nullable Entry<BlobId,BlobMetadata> input) {
-        return input != null && state == input.getValue().getBlobState();
-      }
-    });
-
-    // transform filtered entries to return blob-id
-    return Iterators.transform(filter, new Function<Entry<BlobId,BlobMetadata>,BlobId>()
-    {
-      @Nullable
-      @Override
-      public BlobId apply(final @Nullable Entry<BlobId, BlobMetadata> input) {
-        if (input != null) {
-          return input.getKey();
-        }
-        return null;
-      }
-    });
+    return Fun.filter(states, state);
   }
 
   private File[] listFiles() {

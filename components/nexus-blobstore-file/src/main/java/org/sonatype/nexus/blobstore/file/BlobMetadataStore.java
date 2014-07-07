@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.blobstore.file;
 
-import java.util.Iterator;
-
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
@@ -38,12 +36,7 @@ public interface BlobMetadataStore
 
   void delete(BlobId blobId);
 
-  // TODO: Change to Iterable<BlobId>, slightly nicer API
-
-  /**
-   * This iterator may produce nulls.
-   */
-  Iterator<BlobId> findWithState(BlobState blobState);
+  Iterable<BlobId> findWithState(BlobState blobState);
 
   // FIXME: Expose count/byte-size on store intf, not sure why we have another abstraction here
 

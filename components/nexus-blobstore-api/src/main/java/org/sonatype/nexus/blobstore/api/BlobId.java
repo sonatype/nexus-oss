@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class BlobId
-  implements Serializable
+  implements Serializable, Comparable<BlobId>
 {
   private final String id;
 
@@ -57,5 +57,10 @@ public class BlobId
   @Override
   public int hashCode() {
     return id.hashCode();
+  }
+
+  @Override
+  public int compareTo(final BlobId o) {
+    return id.compareTo(o.id);
   }
 }

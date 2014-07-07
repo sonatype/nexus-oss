@@ -57,10 +57,14 @@ public class MapdbBlobMetadataStoreTest
     log(id);
     log(underTest.getMetadataMetrics());
 
+    dumpStates();
+
     // update a record
     md.setBlobState(BlobState.ALIVE);
     underTest.update(id, md);
     log(underTest.getMetadataMetrics());
+
+    dumpStates();
 
     // fetch a record
     BlobMetadata md2 = underTest.get(id);
@@ -71,8 +75,19 @@ public class MapdbBlobMetadataStoreTest
     underTest.delete(id);
     log(underTest.getMetadataMetrics());
 
+    dumpStates();
+
     // compact
     underTest.compact();
     log(underTest.getMetadataMetrics());
+  }
+
+  private void dumpStates() {
+    for (BlobState state : BlobState.values()) {
+      log(state);
+      for (BlobId foundId : underTest.findWithState(state)) {
+        log("  {}", foundId);
+      }
+    }
   }
 }
