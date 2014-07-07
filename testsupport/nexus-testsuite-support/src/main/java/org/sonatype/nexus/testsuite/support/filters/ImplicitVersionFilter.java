@@ -13,6 +13,7 @@
 package org.sonatype.nexus.testsuite.support.filters;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.nexus.testsuite.support.Filter;
@@ -21,25 +22,28 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Adds an implicit version "${project.dm.version}" if none provided.
- *
+ * 
  * @since 2.2
  */
 public class ImplicitVersionFilter
     implements Filter
 {
+  // the expected classifiers should either be empty or start with a letter
+  private static final Pattern CLASSIFIER = Pattern.compile("([A-Za-z].*)?");
 
   /**
    * Filters by adding an implicit version "${project.dm.version}" if none provided.
-   *
+   * 
    * @param context filtering context. Cannot be null.
-   * @param value   value to be filtered. Cannot be null.
+   * @param value value to be filtered. Cannot be null.
    * @return filtered value
    */
   public String filter(final Map<String, String> context, final String value) {
     String filtered = checkNotNull(value);
     try {
       final DefaultArtifact artifact = new DefaultArtifact(value + ":${project.dm.version}");
-      if ("${project.dm.version}".equals(artifact.getVersion())) {
+      if ("${project.dm.version}".equals(artifact.getVersion())
+          && CLASSIFIER.matcher(artifact.getClassifier()).matches()) {
         filtered = value + ":${project.dm.version}";
       }
     }

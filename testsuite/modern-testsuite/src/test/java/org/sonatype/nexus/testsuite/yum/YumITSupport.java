@@ -62,7 +62,7 @@ public class YumITSupport
     return firstAvailableTestParameters(
         systemTestParameters(),
         testParameters(
-            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle")
+            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip")
         )
     ).load();
   }

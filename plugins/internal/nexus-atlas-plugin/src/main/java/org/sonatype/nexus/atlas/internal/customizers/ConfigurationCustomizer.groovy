@@ -77,8 +77,7 @@ class ConfigurationCustomizer
       // could be null
       maybeIncludeFile new File(installDir, 'conf/jetty.xml'), 'install/conf', HIGH
       maybeIncludeFile new File(installDir, 'conf/nexus.properties'), 'install/conf', HIGH
-      maybeIncludeFile new File(installDir, 'bin/jsw/conf/wrapper.conf'), 'install/bin/jsw/conf', HIGH
-      maybeIncludeFile new File(installDir, 'bin/nexus.vmoptions'), 'install/bin', HIGH
+      //TODO:KARAF include karaf configuration
     }
   }
 

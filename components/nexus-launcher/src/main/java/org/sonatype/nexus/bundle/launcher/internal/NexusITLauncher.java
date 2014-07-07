@@ -22,8 +22,6 @@ import org.sonatype.nexus.bootstrap.monitor.commands.HaltCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.PingCommand;
 import org.sonatype.nexus.bootstrap.monitor.commands.StopApplicationCommand;
 
-import org.tanukisoftware.wrapper.WrapperManager;
-
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
 import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_PING_INTERVAL;
 import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_PORT;
@@ -32,7 +30,7 @@ import static org.sonatype.nexus.bootstrap.monitor.KeepAliveThread.KEEP_ALIVE_TI
 /**
  * The main Nexus class (launcher) used to replace Nexus launchers for versions < 2.2.
  * <p/>
- * The launcher will start (if configured) the threads bellow and then redirect to original JSW configured launcher:
+ * The launcher will start (if configured) the threads bellow and then redirect to original configured launcher:
  * <br/>
  * * the command monitor (on port {#link NexusITLauncher#COMMAND_MONITOR_PORT}<br/>
  * * the keep alive thread (on port {#link NexusITLauncher#KEEP_ALIVE_PORT}<br></br>
@@ -64,7 +62,7 @@ public class NexusITLauncher
   public static final String ONE_SECOND = "1000";
 
   /**
-   * Starts the command monitor/keep alive if configured and launches original JSW launcher.
+   * Starts the command monitor/keep alive if configured and launches original launcher.
    *
    * @param args startup arguments
    * @return null (continue running)
@@ -109,7 +107,7 @@ public class NexusITLauncher
           {
             @Override
             public void run() {
-              WrapperManager.stopAndReturn(0);
+              //TODO:KARAF WrapperManager.stopAndReturn(0);
             }
           }),
           new PingCommand(),
