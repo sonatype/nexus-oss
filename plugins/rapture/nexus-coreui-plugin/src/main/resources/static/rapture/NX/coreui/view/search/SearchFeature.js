@@ -77,7 +77,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
             ]
           },
           {
-            xtype: 'nx-coreui-component-detail',
+            xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
             region: 'east',
             collapsible: true,
             split: true,

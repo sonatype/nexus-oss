@@ -46,8 +46,8 @@ Ext.define('NX.coreui.controller.Search', {
       selector: 'nx-header-panel #quicksearch'
     },
     {
-      ref: 'componentDetail',
-      selector: 'nx-coreui-component-detail'
+      ref: 'storageFileContainer',
+      selector: 'nx-coreui-repositorybrowse-storagefilecontainer'
     }
   ],
 
@@ -227,8 +227,12 @@ Ext.define('NX.coreui.controller.Search', {
   },
 
   onSelectionChange: function (selectionModel, selected) {
-    var me = this;
-    me.getComponentDetail().setComponent(selected[0] ? selected[0].data : undefined);
+    var me = this,
+        result = selected[0] || {};
+
+    if(component){
+      me.getStorageFileContainer().showStorageFile(result.get('repositoryId'), result.get('path'));
+    }
   },
 
   showSaveSearchFilterWindow: function () {
