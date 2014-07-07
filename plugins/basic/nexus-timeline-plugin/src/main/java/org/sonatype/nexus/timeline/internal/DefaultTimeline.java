@@ -254,7 +254,7 @@ public class DefaultTimeline
       return cid;
     }
     else {
-      log.info("Journal cluster exists; id: {}, name: {}", cid, name);
+      log.debug("Journal cluster exists; id: {}, name: {}", cid, name);
       return cid;
     }
   }
@@ -285,7 +285,7 @@ public class DefaultTimeline
         }
         sb.append(" ORDER BY @rid DESC SKIP ").append(fromItem).append(" LIMIT ").append(count);
   
-        log.info("Query: {}", sb.toString());
+        log.debug("Query: {}", sb);
   
         final OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(sb.toString());
   
@@ -322,32 +322,27 @@ public class DefaultTimeline
       return;
     }
     try (ODatabaseDocumentTx db = db()) {
-      db.begin();
-      try {
-        final DateMidnight nowDm = new DateMidnight(DateTimeZone.UTC);
-        final int prefixLen = DB_CLUSTER_PREFIX.length();
-        final int[] cids = db.getMetadata().getSchema().getClass(DB_CLASS).getClusterIds();
-        for (int cid : cids) {
-          final String name = db.getClusterNameById(cid);
-          log.info("Cluster: {} {}", cid, name);
-          if (name.startsWith(DB_CLUSTER_PREFIX)) {
-            final int year = Integer.parseInt(name.substring(prefixLen, prefixLen + 4));
-            final int month = Integer.parseInt(name.substring(prefixLen + 4, prefixLen + 6));
-            final int day = Integer.parseInt(name.substring(prefixLen + 6, prefixLen + 8));
-            final DateMidnight clusterDm = new DateMidnight(year, month, day, DateTimeZone.UTC);
-            if (Days.daysBetween(clusterDm, nowDm).getDays() >= days) {
-              log.info("Cluster {}, is {} days old, purging it", name, Days.daysBetween(clusterDm, nowDm).getDays());
-              OSchema schema = db.getMetadata().getSchema();
-              OClass type = schema.getClass(DB_CLASS);
-              type.removeClusterId(cid);
-              schema.save();
-              ((OClassImpl) type).fromStream(); // workaround for OrientDB polymorphicClusterId bug
-              db.dropCluster(cid, true);
-            }
+      final DateMidnight nowDm = new DateMidnight(DateTimeZone.UTC);
+      final int prefixLen = DB_CLUSTER_PREFIX.length();
+      final int[] cids = db.getMetadata().getSchema().getClass(DB_CLASS).getClusterIds();
+      for (int cid : cids) {
+        final String name = db.getClusterNameById(cid);
+        log.debug("Cluster: {} {}", cid, name);
+        if (name.startsWith(DB_CLUSTER_PREFIX)) {
+          final int year = Integer.parseInt(name.substring(prefixLen, prefixLen + 4));
+          final int month = Integer.parseInt(name.substring(prefixLen + 4, prefixLen + 6));
+          final int day = Integer.parseInt(name.substring(prefixLen + 6, prefixLen + 8));
+          final DateMidnight clusterDm = new DateMidnight(year, month, day, DateTimeZone.UTC);
+          if (Days.daysBetween(clusterDm, nowDm).getDays() >= days) {
+            log.info("Cluster {}, is {} days old, purging it", name, Days.daysBetween(clusterDm, nowDm).getDays());
+            OSchema schema = db.getMetadata().getSchema();
+            OClass type = schema.getClass(DB_CLASS);
+            type.removeClusterId(cid);
+            schema.save();
+            ((OClassImpl) type).fromStream(); // workaround for OrientDB polymorphicClusterId bug
+            db.dropCluster(cid, true);
           }
         }
-      } finally {
-        db.commit();
       }
       // Not using indexes, as they seems broken with clusters being dropped
       // See https://groups.google.com/forum/#!topic/orient-database/HYMUAaMq4y8
