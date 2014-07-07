@@ -48,8 +48,8 @@
     </dependency>
 
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
+      <groupId>org.ops4j.pax.logging</groupId>
+      <artifactId>pax-logging-logback</artifactId>
       <scope>runtime</scope>
     </dependency>
 
@@ -57,6 +57,12 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-access</artifactId>
       <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-core</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -147,6 +153,12 @@
       <groupId>com.codahale.metrics</groupId>
       <artifactId>metrics-logback</artifactId>
       <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

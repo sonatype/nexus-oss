@@ -16,9 +16,7 @@
 <included>
   <jmxConfigurator/>
 
-  <appender name="osgi" class="org.ops4j.pax.logging.logback.appender.PaxAppenderDelegate">
-    <paxname>*</paxname>
-  </appender>
+  <appender name="osgi" class="org.ops4j.pax.logging.logback.appender.PaxAppenderDelegate"/>
 
   <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
