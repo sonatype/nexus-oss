@@ -23,10 +23,10 @@ import org.sonatype.nexus.blobstore.api.BlobId;
  *
  * @since 3.0
  */
-public interface FilePathPolicy
+public interface LocationPolicy
 {
   /**
    * Returns a path to a file where the blob's content should be stored.
    */
-  Path pathFor(Path root, BlobId blobId);
+  Path location(Path root, BlobId blobId);
 }

@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
 public class FileBlobStoreTest
     extends TestSupport
 {
-  private FilePathPolicy pathPolicy;
+  private LocationPolicy pathPolicy;
 
   private FileOperations fileOps;
 
@@ -57,7 +57,7 @@ public class FileBlobStoreTest
 
   @Before
   public void setUp() throws Exception {
-    pathPolicy = mock(FilePathPolicy.class);
+    pathPolicy = mock(LocationPolicy.class);
     fileOps = mock(FileOperations.class);
     metadataStore = mock(BlobMetadataStore.class);
 
@@ -85,7 +85,7 @@ public class FileBlobStoreTest
     );
 
     when(metadataStore.add(any(BlobMetadata.class))).thenReturn(fakeId);
-    when(pathPolicy.pathFor(root, fakeId)).thenReturn(fakePath);
+    when(pathPolicy.location(root, fakeId)).thenReturn(fakePath);
     when(fileOps.create(fakePath, inputStream)).thenReturn(new StreamMetrics(contentSize, fakeSHA1));
 
     final Blob blob = underTest.create(inputStream, headers);
@@ -108,7 +108,7 @@ public class FileBlobStoreTest
     when(metadata.getMetrics()).thenReturn(mock(BlobMetrics.class));
 
     final Path fakePath = mock(Path.class);
-    when(pathPolicy.pathFor(root, fakeId)).thenReturn(fakePath);
+    when(pathPolicy.location(root, fakeId)).thenReturn(fakePath);
     when(fileOps.exists(fakePath)).thenReturn(true);
 
     when(fileOps.openInputStream(fakePath)).thenReturn(mock(InputStream.class));

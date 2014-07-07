@@ -50,7 +50,7 @@ public class FileBlobStore
 {
   private final Path root;
 
-  private final FilePathPolicy filePathPolicy;
+  private final LocationPolicy locationPolicy;
 
   private final FileOperations fileOperations;
 
@@ -59,12 +59,12 @@ public class FileBlobStore
   private volatile BlobStoreListener listener;
 
   public FileBlobStore(final Path root,
-                       final FilePathPolicy filePathPolicy,
+                       final LocationPolicy locationPolicy,
                        final FileOperations fileOperations,
                        final BlobMetadataStore metadataStore)
   {
     this.root = checkNotNull(root);
-    this.filePathPolicy = checkNotNull(filePathPolicy);
+    this.locationPolicy = checkNotNull(locationPolicy);
     this.fileOperations = checkNotNull(fileOperations);
     this.metadataStore = checkNotNull(metadataStore);
   }
@@ -84,7 +84,7 @@ public class FileBlobStore
    * Returns path for blob-id relative to root directory.
    */
   private Path pathFor(final BlobId id) {
-    return filePathPolicy.pathFor(root, id);
+    return locationPolicy.location(root, id);
   }
 
   @Override

@@ -65,7 +65,7 @@ public class FileBlobStoreIT
     this.metadataStore = new MapdbBlobMetadataStore(metadata);
     metadataStore.start();
 
-    this.underTest = new FileBlobStore(content, new HashingSubdirFileLocationPolicy(), new SimpleFileOperations(), metadataStore);
+    this.underTest = new FileBlobStore(content, new VolumeChapterLocationPolicy(), new SimpleFileOperations(), metadataStore);
   }
 
   @After

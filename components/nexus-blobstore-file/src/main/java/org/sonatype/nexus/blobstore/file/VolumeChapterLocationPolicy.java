@@ -27,8 +27,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class HashingSubdirFileLocationPolicy
-    implements FilePathPolicy
+public class VolumeChapterLocationPolicy
+    implements LocationPolicy
 {
   private static final int TIER_1_MODULO = 43;
 
@@ -37,7 +37,7 @@ public class HashingSubdirFileLocationPolicy
   private static Pattern UNSAFE_TOKENS = Pattern.compile("[.\\\\:/]");
 
   @Override
-  public Path pathFor(final Path root, final BlobId blobId) {
+  public Path location(final Path root, final BlobId blobId) {
     checkNotNull(root);
     checkNotNull(blobId);
 
