@@ -230,7 +230,7 @@ Ext.define('NX.coreui.controller.Search', {
     var me = this,
         result = selected[0] || {};
 
-    if(component){
+    if(result){
       me.getStorageFileContainer().showStorageFile(result.get('repositoryId'), result.get('path'));
     }
   },
