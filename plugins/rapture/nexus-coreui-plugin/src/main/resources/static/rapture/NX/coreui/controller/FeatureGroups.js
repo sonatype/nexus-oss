@@ -70,17 +70,6 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       },
       {
         mode: 'browse',
-        path: '/Search',
-        description: 'Search repositories',
-        group: true,
-        iconConfig: {
-          file: 'magnifier.png',
-          variants: ['x16', 'x32']
-        },
-        weight: 20
-      },
-      {
-        mode: 'browse',
         path: '/Repository',
         description: 'Browse repositories',
         group: true,

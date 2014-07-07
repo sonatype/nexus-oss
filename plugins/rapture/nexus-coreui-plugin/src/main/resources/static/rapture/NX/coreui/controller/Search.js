@@ -54,8 +54,9 @@ Ext.define('NX.coreui.controller.Search', {
   /**
    * @override
    */
-  init: function () {
-    var me = this;
+  init: function() {
+    var me = this,
+        mainSearch;
 
     me.getApplication().getIconController().addIcons({
       'search-default': {
@@ -72,7 +73,7 @@ Ext.define('NX.coreui.controller.Search', {
       weight: 500
     });
 
-    me.getSearchFilterStore().each(function (model) {
+    me.getSearchFilterStore().each(function(model) {
       me.getApplication().getFeaturesController().registerFeature({
         mode: 'browse',
         path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
@@ -81,7 +82,25 @@ Ext.define('NX.coreui.controller.Search', {
         description: model.get('description'),
         authenticationRequired: false
       });
+      if (!mainSearch && model.getId() === 'keyword') {
+        mainSearch = model;
+      }
     });
+
+    if (mainSearch) {
+      me.getApplication().getFeaturesController().registerFeature({
+        mode: 'browse',
+        path: '/Search',
+        description: 'Search repositories',
+        group: true,
+        view: { xtype: 'nx-searchfeature', searchFilter: mainSearch },
+        iconConfig: {
+          file: 'magnifier.png',
+          variants: ['x16', 'x32']
+        },
+        weight: 20
+      });
+    }
 
     me.listen({
       component: {
@@ -113,7 +132,7 @@ Ext.define('NX.coreui.controller.Search', {
 
   },
 
-  initCriterias: function () {
+  initCriterias: function() {
     var me = this,
         searchPanel = me.getSearchFeature(),
         searchFilter = searchPanel.searchFilter,
@@ -125,7 +144,7 @@ Ext.define('NX.coreui.controller.Search', {
         searchCriteria;
 
     if (bookmarkSegments && bookmarkSegments.length > 1) {
-      Ext.Array.each(Ext.Array.slice(bookmarkSegments, 1), function (segment) {
+      Ext.Array.each(Ext.Array.slice(bookmarkSegments, 1), function(segment) {
         var split = segment.split('=');
         if (split.length == 2) {
           bookmarkValues[split[0]] = decodeURIComponent(split[1]);
@@ -137,7 +156,7 @@ Ext.define('NX.coreui.controller.Search', {
     me.getSearchResultStore().clearFilter(true);
 
     if (searchFilter && searchFilter.get('criterias')) {
-      Ext.Array.each(Ext.Array.from(searchFilter.get('criterias')), function (criteriaRef) {
+      Ext.Array.each(Ext.Array.from(searchFilter.get('criterias')), function(criteriaRef) {
         var criteria = searchCriteriaStore.getById(criteriaRef.id);
 
         if (criteria) {
@@ -157,7 +176,7 @@ Ext.define('NX.coreui.controller.Search', {
       });
     }
 
-    searchCriteriaStore.each(function (criteria) {
+    searchCriteriaStore.each(function(criteria) {
       addCriteriaMenu.push({
         text: criteria.get('config').fieldLabel,
         criteria: criteria,
@@ -176,7 +195,7 @@ Ext.define('NX.coreui.controller.Search', {
     me.getSearchResultStore().filter();
   },
 
-  addCriteria: function (menuitem) {
+  addCriteria: function(menuitem) {
     var me = this,
         searchPanel = me.getSearchFeature(),
         searchCriteria = searchPanel.down('#criteria'),
@@ -192,12 +211,12 @@ Ext.define('NX.coreui.controller.Search', {
     searchCriteria.add(addButton);
   },
 
-  onSearchCriteriaChange: function (searchCriteria) {
+  onSearchCriteriaChange: function(searchCriteria) {
     var me = this;
     me.applyFilter(searchCriteria, true);
   },
 
-  applyFilter: function (searchCriteria, apply) {
+  applyFilter: function(searchCriteria, apply) {
     var me = this,
         store = me.getSearchResultStore(),
         filter = searchCriteria.filter;
@@ -226,27 +245,27 @@ Ext.define('NX.coreui.controller.Search', {
     me.bookmarkFilters();
   },
 
-  onSelectionChange: function (selectionModel, selected) {
+  onSelectionChange: function(selectionModel, selected) {
     var me = this,
         result = selected[0] || {};
 
-    if(result){
+    if (result) {
       me.getStorageFileContainer().showStorageFile(result.get('repositoryId'), result.get('path'));
     }
   },
 
-  showSaveSearchFilterWindow: function () {
+  showSaveSearchFilterWindow: function() {
     Ext.widget('nx-coreui-search-save');
   },
 
-  saveSearchFilter: function (button) {
+  saveSearchFilter: function(button) {
     var me = this,
         win = button.up('window'),
         values = button.up('form').getValues(),
         criterias = [],
         model;
 
-    Ext.Array.each(Ext.ComponentQuery.query('nx-searchfeature component[searchCriteria=true]'), function (cmp) {
+    Ext.Array.each(Ext.ComponentQuery.query('nx-searchfeature component[searchCriteria=true]'), function(cmp) {
       criterias.push({
         id: cmp.criteriaId,
         value: cmp.getValue(),
@@ -283,11 +302,11 @@ Ext.define('NX.coreui.controller.Search', {
    * @private
    * Bookmark search values.
    */
-  bookmarkFilters: function () {
+  bookmarkFilters: function() {
     var me = this,
         segments = [NX.Bookmarks.getBookmark().getSegment(0)];
 
-    Ext.Array.each(Ext.ComponentQuery.query('nx-searchfeature component[searchCriteria=true]'), function (cmp) {
+    Ext.Array.each(Ext.ComponentQuery.query('nx-searchfeature component[searchCriteria=true]'), function(cmp) {
       if (cmp.getValue() && !cmp.isHidden()) {
         segments.push(cmp.criteriaId + '=' + encodeURIComponent(cmp.getValue()));
       }
@@ -301,7 +320,7 @@ Ext.define('NX.coreui.controller.Search', {
    * @param {NX.ext.SearchBox} quickSearch search box
    * @param {String} searchValue search value
    */
-  onQuickSearch: function (quickSearch, searchValue) {
+  onQuickSearch: function(quickSearch, searchValue) {
     var me = this,
         searchFeature = me.getSearchFeature();
 
