@@ -12,21 +12,19 @@
  */
 package org.sonatype.nexus.blobstore.file;
 
-import java.nio.file.Path;
-
 import org.sonatype.nexus.blobstore.api.BlobId;
 
 /**
- * Determines where a blob with a given blob ID should be stored.
+ * Strategy determines the location of a blob file in a store.
  *
  * Implementations might use algorithms to divide files up into multiple directories for easier management.
  *
  * @since 3.0
  */
-public interface LocationPolicy
+public interface LocationStrategy
 {
   /**
-   * Returns a path to a file where the blob's content should be stored.
+   * Returns the location where blob file should exist.
    */
-  Path location(Path root, BlobId blobId);
+  String location(BlobId blobId);
 }

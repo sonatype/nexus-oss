@@ -76,7 +76,7 @@ public class FileBlobStoreConcurrencyIT
     this.metadataStore = new MapdbBlobMetadataStore(metadata);
     metadataStore.start();
 
-    this.underTest = new FileBlobStore(content, new VolumeChapterLocationPolicy(), new SimpleFileOperations(), metadataStore);
+    this.underTest = new FileBlobStore(content, new VolumeChapterLocationStrategy(), new SimpleFileOperations(), metadataStore);
   }
 
 

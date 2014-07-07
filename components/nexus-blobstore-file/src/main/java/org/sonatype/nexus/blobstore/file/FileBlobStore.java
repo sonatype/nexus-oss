@@ -48,9 +48,11 @@ public class FileBlobStore
     extends ComponentSupport
     implements BlobStore
 {
+  public static final String BLOB_CONTENT_SUFFIX = ".blob";
+
   private final Path root;
 
-  private final LocationPolicy locationPolicy;
+  private final LocationStrategy locationStrategy;
 
   private final FileOperations fileOperations;
 
@@ -59,12 +61,12 @@ public class FileBlobStore
   private volatile BlobStoreListener listener;
 
   public FileBlobStore(final Path root,
-                       final LocationPolicy locationPolicy,
+                       final LocationStrategy locationStrategy,
                        final FileOperations fileOperations,
                        final BlobMetadataStore metadataStore)
   {
     this.root = checkNotNull(root);
-    this.locationPolicy = checkNotNull(locationPolicy);
+    this.locationStrategy = checkNotNull(locationStrategy);
     this.fileOperations = checkNotNull(fileOperations);
     this.metadataStore = checkNotNull(metadataStore);
   }
@@ -81,10 +83,11 @@ public class FileBlobStore
   }
 
   /**
-   * Returns path for blob-id relative to root directory.
+   * Returns path for blob-id content file relative to root directory.
    */
   private Path pathFor(final BlobId id) {
-    return locationPolicy.location(root, id);
+    String location = locationStrategy.location(id);
+    return root.resolve(location + BLOB_CONTENT_SUFFIX);
   }
 
   @Override

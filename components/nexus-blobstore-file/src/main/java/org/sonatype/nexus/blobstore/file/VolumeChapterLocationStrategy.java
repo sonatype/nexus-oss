@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.blobstore.file;
 
-import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
@@ -27,27 +26,24 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class VolumeChapterLocationPolicy
-    implements LocationPolicy
+public class VolumeChapterLocationStrategy
+    implements LocationStrategy
 {
   private static final int TIER_1_MODULO = 43;
 
   private static final int TIER_2_MODULO = 47;
 
-  private static Pattern UNSAFE_TOKENS = Pattern.compile("[.\\\\:/]");
+  private static final Pattern UNSAFE_TOKENS = Pattern.compile("[.\\\\:/]");
 
   @Override
-  public Path location(final Path root, final BlobId blobId) {
-    checkNotNull(root);
+  public String location(final BlobId blobId) {
     checkNotNull(blobId);
 
-    String path = String.format("vol-%02d/chap-%02d/%s.blob",
+    return String.format("vol-%02d/chap-%02d/%s",
         tier(blobId, TIER_1_MODULO),
         tier(blobId, TIER_2_MODULO),
         escapeFilename(blobId.getId())
     );
-
-    return root.resolve(path);
   }
 
   private int tier(final BlobId blobId, final int modulo) {

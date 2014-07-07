@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
 public class FileBlobStoreTest
     extends TestSupport
 {
-  private LocationPolicy pathPolicy;
+  private LocationStrategy locationStrategy;
 
   private FileOperations fileOps;
 
@@ -57,12 +57,12 @@ public class FileBlobStoreTest
 
   @Before
   public void setUp() throws Exception {
-    pathPolicy = mock(LocationPolicy.class);
+    locationStrategy = mock(LocationStrategy.class);
     fileOps = mock(FileOperations.class);
     metadataStore = mock(BlobMetadataStore.class);
 
     root = util.createTempDir().toPath();
-    underTest = new FileBlobStore(root, pathPolicy, fileOps, metadataStore);
+    underTest = new FileBlobStore(root, locationStrategy, fileOps, metadataStore);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -75,7 +75,6 @@ public class FileBlobStoreTest
   @Test
   public void successfulCreation() throws Exception {
     final BlobId fakeId = new BlobId("testId");
-    final Path fakePath = mock(Path.class);
     final long contentSize = 200L;
     final String fakeSHA1 = "3757y5abc234cfgg";
     final InputStream inputStream = mock(InputStream.class);
@@ -85,7 +84,8 @@ public class FileBlobStoreTest
     );
 
     when(metadataStore.add(any(BlobMetadata.class))).thenReturn(fakeId);
-    when(pathPolicy.location(root, fakeId)).thenReturn(fakePath);
+    when(locationStrategy.location(fakeId)).thenReturn("fakePath");
+    final Path fakePath = root.resolve("fakePath" + FileBlobStore.BLOB_CONTENT_SUFFIX);
     when(fileOps.create(fakePath, inputStream)).thenReturn(new StreamMetrics(contentSize, fakeSHA1));
 
     final Blob blob = underTest.create(inputStream, headers);
@@ -107,8 +107,8 @@ public class FileBlobStoreTest
     when(metadata.isAlive()).thenReturn(true);
     when(metadata.getMetrics()).thenReturn(mock(BlobMetrics.class));
 
-    final Path fakePath = mock(Path.class);
-    when(pathPolicy.location(root, fakeId)).thenReturn(fakePath);
+    when(locationStrategy.location(fakeId)).thenReturn("fakePath");
+    final Path fakePath = root.resolve("fakePath" + FileBlobStore.BLOB_CONTENT_SUFFIX);
     when(fileOps.exists(fakePath)).thenReturn(true);
 
     when(fileOps.openInputStream(fakePath)).thenReturn(mock(InputStream.class));
