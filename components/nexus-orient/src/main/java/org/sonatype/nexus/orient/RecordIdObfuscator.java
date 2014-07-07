@@ -10,29 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.kazuki;
+package org.sonatype.nexus.orient;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import com.orientechnologies.orient.core.id.ORID;
+import com.orientechnologies.orient.core.id.ORecordId;
 
-import org.sonatype.nexus.log.LogConfigurationCustomizer;
-
-import static org.sonatype.nexus.log.LoggerLevel.DEFAULT;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Kazuki {@link LogConfigurationCustomizer}.
+ * {@link ORID} obfuscation helper.
  *
  * @since 3.0
  */
-@Named
-@Singleton
-public class LogConfigurationCustomizerImpl
-    implements LogConfigurationCustomizer
+public class RecordIdObfuscator
 {
-  @Override
-  public void customize(final Configuration config) {
-    config.setLoggerLevel("io.kazuki", DEFAULT);
-    config.setLoggerLevel("org.skife.jdbi", DEFAULT);
-    config.setLoggerLevel("org.antlr.stringtemplate", DEFAULT);
+  // TODO: replace with fast encrypt/decrypt
+
+  public static String encode(final ORID rid) {
+    checkNotNull(rid);
+    return Hex.encode(rid.toStream());
+  }
+
+  public static ORID decode(final String encoded) {
+    checkNotNull(encoded);
+    byte[] decoded = Hex.decode(encoded);
+    return new ORecordId().fromStream(decoded);
   }
 }

@@ -131,7 +131,7 @@
             <Embed-Transitive>true</Embed-Transitive>
             <_exportcontents>
               !com.google.inject.internal.*,
-              com.*|eu.*|javax.*|net.*|org.*|io.*
+              com.*|eu.*|javax.*|net.*|org.*|io.*|javassist.*
             </_exportcontents>
           </instructions>
         </configuration>
