@@ -15,9 +15,7 @@
 -->
 <!-- This configuration added to prevent logback default of DEBUG output -->
 <configuration>
-  <appender name="osgi" class="org.ops4j.pax.logging.logback.appender.PaxAppenderDelegate">
-    <paxname>*</paxname>
-  </appender>
+  <appender name="osgi" class="org.ops4j.pax.logging.logback.appender.PaxAppenderDelegate"/>
 
   <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
