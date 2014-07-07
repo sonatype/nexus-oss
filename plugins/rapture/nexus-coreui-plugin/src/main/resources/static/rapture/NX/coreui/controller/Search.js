@@ -65,17 +65,17 @@ Ext.define('NX.coreui.controller.Search', {
     });
 
     me.getApplication().getFeaturesController().registerFeature({
-      path: '/Saved',
-      mode: 'search',
+      path: '/Search/Saved',
+      mode: 'browse',
       group: true,
       iconName: 'search-default',
-      weight: 500
+      weight: 20
     });
 
     me.getSearchFilterStore().each(function (model) {
       me.getApplication().getFeaturesController().registerFeature({
-        mode: 'search',
-        path: '/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
+        mode: 'browse',
+        path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
         view: { xtype: 'nx-searchfeature', searchFilter: model },
         iconName: model.get('iconName') ? model.get('iconName') : 'search-default',
         description: model.get('description'),
@@ -263,8 +263,8 @@ Ext.define('NX.coreui.controller.Search', {
     me.getSearchFilterStore().add(model);
 
     me.getApplication().getFeaturesController().registerFeature({
-      path: '/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
-      mode: 'search',
+      path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
+      mode: 'browse',
       view: { xtype: 'nx-searchfeature', searchFilter: model },
       iconConfig: {
         name: model.get('iconName') ? model.get('iconName') : 'feature-search'
@@ -308,7 +308,7 @@ Ext.define('NX.coreui.controller.Search', {
     if (!searchFeature || (searchFeature.searchFilter.getId() !== 'keyword')) {
       if (searchValue) {
         NX.Bookmarks.navigateTo(
-            NX.Bookmarks.fromSegments(['search/keyword', 'keyword=' + encodeURIComponent(searchValue)]),
+            NX.Bookmarks.fromSegments(['browse/search/keyword', 'keyword=' + encodeURIComponent(searchValue)]),
             me
         );
       }
