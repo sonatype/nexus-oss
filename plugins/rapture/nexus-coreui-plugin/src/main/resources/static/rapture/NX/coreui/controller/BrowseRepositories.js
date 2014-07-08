@@ -160,23 +160,9 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
           store.each(function(model) {
             rootNode.appendChild({
               repositoryId: model.getId(),
+              path: '/',
               text: model.get('name'),
-              iconCls: NX.Icons.cls('repository-default', 'x16'),
-              children: [
-                {
-                  repositoryId: model.getId(),
-                  path: '/',
-                  text: 'Storage',
-                  source: 'storage',
-                  iconCls: NX.Icons.cls('repository-default', 'x16')
-                },
-                {
-                  repositoryId: model.getId(),
-                  path: '/',
-                  text: 'Index',
-                  source: 'index'
-                }
-              ]
+              iconCls: NX.Icons.cls('repository-default', 'x16')
             });
           });
           Ext.resumeLayouts(true);
@@ -217,12 +203,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
     if (!node.get('processed')) {
       node.set('processed', true);
-      if (node.get('source') === 'storage') {
-        me.loadChildrenFromStorage(node);
-      }
-      else if (node.get('source') === 'index') {
-        me.loadChildrenFromIndex(node);
-      }
+      me.loadChildrenFromStorage(node);
     }
   },
 
@@ -314,47 +295,45 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
   fillContextMenu: function(menu, repository, node) {
     var me = this;
 
-    if (node.get('source') === 'storage') {
-      if (NX.Permissions.check('nexus:cache', 'delete')
-          && repository.get('type') !== 'virtual' && repository.get('userManaged')) {
-        menu.add({
-          text: 'Expire Cache',
-          handler: Ext.bind(me.expireCache, me, [repository, node.get('path')])
-        });
-      }
-      if (NX.Permissions.check('nexus:metadata', 'delete')
-          && (repository.get('format') === 'maven1' || repository.get('format') === 'maven2' )
-          && (repository.get('type') === 'hosted' || repository.get('type') === 'group' )
-          && repository.get('userManaged')) {
-        menu.add({
-          text: 'Rebuild Metadata',
-          handler: Ext.bind(me.rebuildMavenMetadata, me, [repository, node.get('path')])
-        });
-      }
-      if (node.isLeaf() && repository.get('type') === 'proxy') {
-        menu.add({
-          text: 'Download From Remote',
-          handler: Ext.bind(me.downloadPath, me, [repository.get('remoteStorageUrl'), node.get('path')])
-        });
-      }
-      if (!node.isRoot() && !node.isLeaf() && repository.get('type') === 'proxy') {
-        menu.add({
-          text: 'View Remote',
-          handler: Ext.bind(me.downloadPath, me, [repository.get('remoteStorageUrl'), node.get('path')])
-        });
-      }
-      if (node.isLeaf()) {
-        menu.add({
-          text: 'Download',
-          handler: Ext.bind(me.downloadStorageFile, me, [repository.getId(), node.get('path')])
-        });
-      }
-      if ((node.get('path') !== '/') && (repository.get('type') !== 'group')) {
-        menu.add({
-          text: 'Delete',
-          handler: Ext.bind(me.deleteStorageFile, me, [repository, node])
-        });
-      }
+    if (NX.Permissions.check('nexus:cache', 'delete')
+        && repository.get('type') !== 'virtual' && repository.get('userManaged')) {
+      menu.add({
+        text: 'Expire Cache',
+        handler: Ext.bind(me.expireCache, me, [repository, node.get('path')])
+      });
+    }
+    if (NX.Permissions.check('nexus:metadata', 'delete')
+        && (repository.get('format') === 'maven1' || repository.get('format') === 'maven2' )
+        && (repository.get('type') === 'hosted' || repository.get('type') === 'group' )
+        && repository.get('userManaged')) {
+      menu.add({
+        text: 'Rebuild Metadata',
+        handler: Ext.bind(me.rebuildMavenMetadata, me, [repository, node.get('path')])
+      });
+    }
+    if (node.isLeaf() && repository.get('type') === 'proxy') {
+      menu.add({
+        text: 'Download From Remote',
+        handler: Ext.bind(me.downloadPath, me, [repository.get('remoteStorageUrl'), node.get('path')])
+      });
+    }
+    if (!node.isRoot() && !node.isLeaf() && repository.get('type') === 'proxy') {
+      menu.add({
+        text: 'View Remote',
+        handler: Ext.bind(me.downloadPath, me, [repository.get('remoteStorageUrl'), node.get('path')])
+      });
+    }
+    if (node.isLeaf()) {
+      menu.add({
+        text: 'Download',
+        handler: Ext.bind(me.downloadStorageFile, me, [repository.getId(), node.get('path')])
+      });
+    }
+    if ((node.get('path') !== '/') && (repository.get('type') !== 'group')) {
+      menu.add({
+        text: 'Delete',
+        handler: Ext.bind(me.deleteStorageFile, me, [repository, node])
+      });
     }
   },
 

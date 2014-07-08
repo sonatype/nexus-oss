@@ -39,7 +39,6 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
         'text',
         'type',
         'processed',
-        'source',
         {
           name: 'iconCls',
           convert: function(val, row) {
