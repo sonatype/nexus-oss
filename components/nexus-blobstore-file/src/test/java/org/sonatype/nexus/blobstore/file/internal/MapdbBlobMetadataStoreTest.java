@@ -109,13 +109,11 @@ public class MapdbBlobMetadataStoreTest
   public void basic() throws Exception {
     BlobMetadata md = new BlobMetadata(BlobState.CREATING, ImmutableMap.of("foo", "bar"));
     log(md);
-    log(underTest.getMetadataMetrics());
 
     // add a record
     log("add");
     BlobId id = underTest.add(md);
     log(id);
-    log(underTest.getMetadataMetrics());
 
     dumpStates();
 
@@ -123,7 +121,6 @@ public class MapdbBlobMetadataStoreTest
     log("update");
     md.setBlobState(BlobState.ALIVE);
     underTest.update(id, md);
-    log(underTest.getMetadataMetrics());
 
     dumpStates();
 
@@ -131,19 +128,16 @@ public class MapdbBlobMetadataStoreTest
     log("fetch");
     BlobMetadata md2 = underTest.get(id);
     log(md2);
-    log(underTest.getMetadataMetrics());
 
     // delete a record
     log("delete");
     underTest.delete(id);
-    log(underTest.getMetadataMetrics());
 
     dumpStates();
 
     // compact
     log("compact");
     underTest.compact();
-    log(underTest.getMetadataMetrics());
   }
 
   private void dumpStates() throws Exception {

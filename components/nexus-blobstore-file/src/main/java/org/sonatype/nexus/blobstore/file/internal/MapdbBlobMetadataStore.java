@@ -303,36 +303,27 @@ public class MapdbBlobMetadataStore
   }
 
   @Override
-  public MetadataMetrics getMetadataMetrics() {
+  public long getBlobCount() {
     ensureStarted();
-
     DB db = database.makeTx();
     try {
-      final long count = entries(db).sizeLong();
-
-      // sum all file bytes in the database root
-      long bytes = 0;
-      for (File file : listFiles()) {
-        bytes += file.length();
-      }
-      final long size = bytes;
-
-      return new MetadataMetrics()
-      {
-        @Override
-        public long getBlobCount() {
-          return count;
-        }
-
-        @Override
-        public long getTotalSize() {
-          return size;
-        }
-      };
+      return entries(db).sizeLong();
     }
     finally {
       db.close();
     }
+  }
+
+  @Override
+  public long getTotalSize() {
+    ensureStarted();
+
+    // sum all file bytes in the database root
+    long bytes = 0;
+    for (File file : listFiles()) {
+      bytes += file.length();
+    }
+    return bytes;
   }
 
   public void compact() {

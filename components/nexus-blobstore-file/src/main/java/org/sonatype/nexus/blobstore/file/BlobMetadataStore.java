@@ -42,12 +42,7 @@ public interface BlobMetadataStore
    */
   AutoClosableIterable<BlobId> findWithState(BlobState state);
 
-  interface MetadataMetrics
-  {
-    long getBlobCount();
+  long getBlobCount();
 
-    long getTotalSize();
-  }
-
-  MetadataMetrics getMetadataMetrics();
+  long getTotalSize();
 }
