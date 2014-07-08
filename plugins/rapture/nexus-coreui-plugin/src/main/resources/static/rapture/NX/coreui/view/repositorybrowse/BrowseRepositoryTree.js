@@ -15,18 +15,20 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repositorybrowse.BrowseStorageTree', {
+Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
   extend: 'Ext.tree.Panel',
-  alias: 'widget.nx-coreui-repositorybrowse-storage-tree',
+  alias: 'widget.nx-coreui-repositorybrowse-tree',
 
   viewConfig: {
     markDirty: false
   },
 
+  rootVisible: false,
+
   /**
    * @override
    */
-  initComponent: function () {
+  initComponent: function() {
     var me = this,
         icons = NX.getApplication().getIconController();
 
@@ -37,10 +39,11 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseStorageTree', {
         'text',
         'type',
         'processed',
+        'source',
         {
           name: 'iconCls',
-          convert: function (val, row) {
-            var iconCls;
+          convert: function(val, row) {
+            var iconCls = val;
             if (row.data.type) {
               if (icons.findIcon('repository-item-type-' + row.data.type, 'x16')) {
                 iconCls = NX.Icons.cls('repository-item-type-' + row.data.type, 'x16');
@@ -49,10 +52,16 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseStorageTree', {
                 iconCls = NX.Icons.cls('repository-item-type-default', 'x16');
               }
             }
-            return iconCls
+            return iconCls;
           }
         }
-      ]
+      ],
+
+      root: {
+        expanded: true,
+        text: 'Repositories',
+        children: []
+      }
     });
 
     me.callParent(arguments);
