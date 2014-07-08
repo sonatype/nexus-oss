@@ -98,7 +98,8 @@ Ext.define('NX.coreui.controller.Search', {
           file: 'magnifier.png',
           variants: ['x16', 'x32']
         },
-        weight: 20
+        weight: 20,
+        expanded: false
       });
     }
 
