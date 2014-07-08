@@ -33,6 +33,7 @@ import org.sonatype.nexus.blobstore.file.BlobMetadataStore.MetadataMetrics;
 import org.sonatype.nexus.blobstore.file.FileOperations.StreamMetrics;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.base.Throwables;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -244,16 +245,20 @@ public class FileBlobStore
   public void compact() {
     log.debug("Compacting");
 
-    int count = 0;
-    for (BlobId blobId : metadataStore.findWithState(BlobState.MARKED_FOR_DELETION)) {
-      // This iterator can occasionally return null
-      if (blobId != null) {
-        deleteHard(blobId);
-        count++;
+    try {
+      int count = 0;
+      try (AutoClosableIterable<BlobId> iter = metadataStore.findWithState(BlobState.MARKED_FOR_DELETION)) {
+        for (BlobId blobId : iter) {
+          deleteHard(blobId);
+          count++;
+        }
       }
-    }
 
-    log.debug("Deleted {} blobs", count);
+      log.debug("Deleted {} blobs", count);
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   private void checkExists(final Path path, final BlobId blobId) throws IOException {

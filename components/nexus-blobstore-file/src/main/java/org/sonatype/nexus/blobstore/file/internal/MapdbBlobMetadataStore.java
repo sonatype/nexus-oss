@@ -14,20 +14,24 @@
 package org.sonatype.nexus.blobstore.file.internal;
 
 import java.io.File;
-import java.util.List;
+import java.io.Serializable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.NavigableSet;
 
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
+import org.sonatype.nexus.blobstore.api.BlobMetrics;
+import org.sonatype.nexus.blobstore.file.AutoClosableIterable;
 import org.sonatype.nexus.blobstore.file.BlobMetadata;
 import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.BlobState;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.joda.time.DateTime;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -83,12 +87,73 @@ public class MapdbBlobMetadataStore
     return db.getAtomicLong("id_sequence");
   }
 
-  private HTreeMap<BlobId, BlobMetadata> entries(final DB db) {
+  private HTreeMap<BlobId, MetadataRecord> entries(final DB db) {
     return db.getHashMap("entries");
   }
 
   private NavigableSet<BlobId> states(final DB db, final BlobState state) {
     return db.getTreeSet("state_" + state.name());
+  }
+
+  /**
+   * Immutable metadata record for internal storage in MapDB.
+   */
+  private static class MetadataRecord
+    implements Serializable
+  {
+    private final BlobState state;
+
+    private final Map<String,String> headers;
+
+    private final boolean metrics;
+
+    private final DateTime created;
+
+    private final String sha1;
+
+    private final Long size;
+
+    public MetadataRecord(final BlobMetadata source) {
+      this.state = source.getBlobState();
+      this.headers = Maps.newHashMap(source.getHeaders());
+      BlobMetrics metrics = source.getMetrics();
+      if (metrics != null) {
+        this.metrics = true;
+        this.created = metrics.getCreationTime();
+        this.sha1 = metrics.getSHA1Hash();
+        this.size = metrics.getContentSize();
+      }
+      else {
+        this.metrics = false;
+        this.created = null;
+        this.sha1 = null;
+        this.size = null;
+      }
+    }
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "state=" + state +
+          ", headers=" + headers +
+          ", metrics=" + metrics +
+          ", created=" + created +
+          ", sha1='" + sha1 + '\'' +
+          ", size=" + size +
+          '}';
+    }
+  }
+
+  private MetadataRecord convert(final BlobMetadata source) {
+    return new MetadataRecord(source);
+  }
+
+  private BlobMetadata convert(final MetadataRecord source) {
+    BlobMetadata target = new BlobMetadata(source.state, Maps.newHashMap(source.headers));
+    if (source.metrics) {
+      target.setMetrics(new BlobMetrics(source.created, source.sha1, source.size));
+    }
+    return target;
   }
 
   /**
@@ -99,30 +164,24 @@ public class MapdbBlobMetadataStore
     return new BlobId(String.format("%016x", id));
   }
 
-  //
-  // FIXME: values need to be immutable
-  // FIXME: BlobMetadata is a non-trivial object with nested members which makes simple clone not enough to isolate it.
-  //
-
   @Override
   public BlobId add(final BlobMetadata metadata) {
     checkNotNull(metadata);
     ensureStarted();
 
-    // copy as values need to be immutable
-    final BlobMetadata copy = metadata.copy();
+    final MetadataRecord record = convert(metadata);
 
     return database.execute(new Fun.Function1<BlobId, DB>()
     {
       @Override
       public BlobId run(final DB db) {
         BlobId id = newId(db);
-        log.trace("Add: {}={}", id, copy);
+        log.trace("Add: {}={}", id, record);
 
-        entries(db).put(id, copy);
+        entries(db).put(id, record);
 
         // track state
-        states(db, copy.getBlobState()).add(id);
+        states(db, record.state).add(id);
 
         return id;
       }
@@ -139,7 +198,11 @@ public class MapdbBlobMetadataStore
 
     DB db = database.makeTx();
     try {
-      return entries(db).get(id);
+      MetadataRecord record = entries(db).get(id);
+      if (record != null) {
+        return convert(record);
+      }
+      return null;
     }
     finally {
       db.close();
@@ -152,20 +215,18 @@ public class MapdbBlobMetadataStore
     checkNotNull(metadata);
     ensureStarted();
 
-    // copy as values need to be immutable
-    final BlobMetadata copy = metadata.copy();
-    log.trace("Update: {}={}", id, copy);
+    final MetadataRecord record = convert(metadata);
+    log.trace("Update: {}={}", id, record);
 
     database.execute(new TxBlock()
     {
       @Override
       public void tx(final DB db) throws TxRollbackException {
-        Map<BlobId, BlobMetadata> entries = entries(db);
-        BlobMetadata prev = entries.put(id, copy);
+        MetadataRecord prev = entries(db).put(id, record);
 
         // replace state
-        states(db, prev.getBlobState()).remove(id);
-        states(db, copy.getBlobState()).add(id);
+        states(db, prev.state).remove(id);
+        states(db, record.state).add(id);
       }
     });
   }
@@ -181,37 +242,51 @@ public class MapdbBlobMetadataStore
     {
       @Override
       public void tx(final DB db) throws TxRollbackException {
-        Map<BlobId, BlobMetadata> entries = entries(db);
-        BlobMetadata prev = entries.remove(id);
+        MetadataRecord prev = entries(db).remove(id);
 
         // remove state
-        states(db, prev.getBlobState()).remove(id);
+        states(db, prev.state).remove(id);
       }
     });
   }
 
   @Override
-  public Iterable<BlobId> findWithState(final BlobState state) {
+  public AutoClosableIterable<BlobId> findWithState(final BlobState state) {
     checkNotNull(state);
     ensureStarted();
 
     log.trace("Find with state: {}", state);
 
-    List<BlobId> ids = Lists.newLinkedList();
-    DB db = database.makeTx();
-    try {
-      // FIXME: copy ids avoid leaking transactional scope, may cause memory pressure
-      // FIXME: may need to snapshot and expose AutoClosable Iterable to avoid ^^^
-      for (BlobId id : states(db, state)) {
-        ids.add(id);
-      }
-    }
-    finally {
-      db.close();
-    }
+    final DB db = database.makeTx().snapshot();
 
-    log.trace("Found #{} with state: {}", ids.size(), state);
-    return ids;
+    return new AutoClosableIterable<BlobId>()
+    {
+      private volatile boolean closed = false;
+
+      @Override
+      public Iterator<BlobId> iterator() {
+        return states(db, state).iterator();
+      }
+
+      @Override
+      public void close() throws Exception {
+        db.close();
+        closed = true;
+      }
+
+      @Override
+      protected void finalize() throws Throwable {
+        try {
+          if (!closed) {
+            log.warn("Leaked database connection: {}", db);
+            db.close();
+          }
+        }
+        finally {
+          super.finalize();
+        }
+      }
+    };
   }
 
   private File[] listFiles() {

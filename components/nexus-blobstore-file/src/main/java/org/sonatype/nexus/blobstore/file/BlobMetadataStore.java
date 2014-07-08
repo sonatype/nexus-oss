@@ -36,7 +36,7 @@ public interface BlobMetadataStore
 
   void delete(BlobId blobId);
 
-  Iterable<BlobId> findWithState(BlobState blobState);
+  AutoClosableIterable<BlobId> findWithState(BlobState state);
 
   // FIXME: Expose count/byte-size on store intf, not sure why we have another abstraction here
 
