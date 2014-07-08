@@ -135,14 +135,15 @@ public class MapdbBlobMetadataStore
     checkNotNull(id);
     ensureStarted();
 
-    return database.execute(new Fun.Function1<BlobMetadata, DB>()
-    {
-      @Override
-      public BlobMetadata run(final DB db) {
-        log.trace("Get: {}", id);
-        return entries(db).get(id);
-      }
-    });
+    log.trace("Get: {}", id);
+
+    DB db = database.makeTx();
+    try {
+      return entries(db).get(id);
+    }
+    finally {
+      db.close();
+    }
   }
 
   @Override
@@ -153,13 +154,12 @@ public class MapdbBlobMetadataStore
 
     // copy as values need to be immutable
     final BlobMetadata copy = metadata.copy();
+    log.trace("Update: {}={}", id, copy);
 
     database.execute(new TxBlock()
     {
       @Override
       public void tx(final DB db) throws TxRollbackException {
-        log.trace("Update: {}={}", id, copy);
-
         Map<BlobId, BlobMetadata> entries = entries(db);
         BlobMetadata prev = entries.put(id, copy);
 
@@ -175,12 +175,12 @@ public class MapdbBlobMetadataStore
     checkNotNull(id);
     ensureStarted();
 
+    log.trace("Delete: {}", id);
+
     database.execute(new TxBlock()
     {
       @Override
       public void tx(final DB db) throws TxRollbackException {
-        log.trace("Delete: {}", id);
-
         Map<BlobId, BlobMetadata> entries = entries(db);
         BlobMetadata prev = entries.remove(id);
 
@@ -197,19 +197,21 @@ public class MapdbBlobMetadataStore
 
     log.trace("Find with state: {}", state);
 
+    List<BlobId> ids = Lists.newLinkedList();
     DB db = database.makeTx();
     try {
-      // copy ids avoid leaking transactional scope, may cause memory pressure
-      List<BlobId> ids = Lists.newLinkedList();
+      // FIXME: copy ids avoid leaking transactional scope, may cause memory pressure
+      // FIXME: may need to snapshot and expose AutoClosable Iterable to avoid ^^^
       for (BlobId id : states(db, state)) {
         ids.add(id);
       }
-      log.trace("Found #{} with state: {}", ids.size(), state);
-      return ids;
     }
     finally {
       db.close();
     }
+
+    log.trace("Found #{} with state: {}", ids.size(), state);
+    return ids;
   }
 
   private File[] listFiles() {
