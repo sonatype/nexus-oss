@@ -74,10 +74,18 @@ class ConfigurationCustomizer
     // include installation configuration files
     def installDir = applicationConfiguration.installDirectory
     if (installDir) {
-      // could be null
-      maybeIncludeFile new File(installDir, 'conf/jetty.xml'), 'install/conf', HIGH
+      // include all jetty configuration files
+      new File(installDir, 'conf').eachFileMatch(~'jetty.*xml') {
+        maybeIncludeFile it, 'install/conf', HIGH
+      }
+
+      // core properties
       maybeIncludeFile new File(installDir, 'conf/nexus.properties'), 'install/conf', HIGH
+
+      // jsw launcher configuration
       maybeIncludeFile new File(installDir, 'bin/jsw/conf/wrapper.conf'), 'install/bin/jsw/conf', HIGH
+
+      // installer launcher configuration
       maybeIncludeFile new File(installDir, 'bin/nexus.vmoptions'), 'install/bin', HIGH
     }
   }
