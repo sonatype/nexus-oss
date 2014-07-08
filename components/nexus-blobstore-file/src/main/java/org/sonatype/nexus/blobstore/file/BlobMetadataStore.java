@@ -35,6 +35,11 @@ public interface BlobMetadataStore
 
   void delete(BlobId blobId);
 
+  /**
+   * Returns iterable with all blob-ids in the given state.
+   *
+   * @return Iterable handle must be closed when finished using it.
+   */
   AutoClosableIterable<BlobId> findWithState(BlobState state);
 
   interface MetadataMetrics
