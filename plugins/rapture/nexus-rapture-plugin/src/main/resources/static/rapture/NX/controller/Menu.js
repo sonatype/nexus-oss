@@ -471,7 +471,7 @@ Ext.define('NX.controller.Menu', {
     });
 
     // remove all groups without children
-    me.getFeatureMenuStore().getRootNode().eachChild(function (node) {
+    me.getFeatureMenuStore().getRootNode().cascadeBy(function (node) {
       if (node.get('group') && !node.hasChildNodes()) {
         groupsToRemove.push(node);
       }

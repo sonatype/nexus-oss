@@ -27,7 +27,7 @@ Ext.define('NX.controller.Dashboard', {
 
     me.getApplication().getFeaturesController().registerFeature({
       path: '/Welcome',
-      mode: 'dashboard',
+      mode: 'browse',
       view: 'NX.view.dashboard.Welcome',
       iconConfig: {
         file: 'dashboard.png',
