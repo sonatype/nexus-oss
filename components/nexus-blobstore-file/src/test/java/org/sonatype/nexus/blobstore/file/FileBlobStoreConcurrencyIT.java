@@ -313,7 +313,6 @@ public class FileBlobStoreConcurrencyIT
         iterationStartSignal.reset();
         this.exception.set(e);
         log("Runnable threw an exception for worker " + workerNumber, e);
-        e.printStackTrace();
       }
       finally {
         log("Test worker " + workerNumber + " completing.");
