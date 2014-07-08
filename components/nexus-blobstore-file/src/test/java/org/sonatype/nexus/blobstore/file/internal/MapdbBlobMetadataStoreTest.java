@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.blobstore.file.internal;
 
-import java.nio.file.Path;
+import java.io.File;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.file.BlobMetadata;
@@ -24,6 +24,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.emptyIterable;
+
 /**
  * Tests for {@link MapdbBlobMetadataStore}.
  */
@@ -34,8 +38,9 @@ public class MapdbBlobMetadataStoreTest
 
   @Before
   public void setUp() throws Exception {
-    Path root = util.createTempDir().toPath();
-    this.underTest = new MapdbBlobMetadataStore(root);
+    File root = util.createTempDir("databases");
+    File dir = new File(root, "test");
+    this.underTest = new MapdbBlobMetadataStore(dir);
     underTest.start();
   }
 
@@ -44,6 +49,44 @@ public class MapdbBlobMetadataStoreTest
     if (underTest != null) {
       underTest.stop();
     }
+  }
+
+  @Test
+  public void stateTracking() throws Exception {
+    BlobMetadata md = new BlobMetadata(BlobState.CREATING, ImmutableMap.of("foo", "bar"));
+    BlobId id = underTest.add(md);
+    log("Added: {} -> {}", id, md);
+
+    // states should only contain CREATING
+    assertThat(underTest.findWithState(BlobState.CREATING), contains(id));
+    assertThat(underTest.findWithState(BlobState.ALIVE), emptyIterable());
+    assertThat(underTest.findWithState(BlobState.MARKED_FOR_DELETION), emptyIterable());
+
+    md.setBlobState(BlobState.ALIVE);
+    underTest.update(id, md);
+    log("Updated: {} -> {}", id, md);
+
+    // states should only contain ALIVE
+    assertThat(underTest.findWithState(BlobState.CREATING), emptyIterable());
+    assertThat(underTest.findWithState(BlobState.ALIVE), contains(id));
+    assertThat(underTest.findWithState(BlobState.MARKED_FOR_DELETION), emptyIterable());
+
+    md.setBlobState(BlobState.MARKED_FOR_DELETION);
+    underTest.update(id, md);
+    log("Updated: {} -> {}", id, md);
+
+    // states should only contain marked for MARKED_FOR_DELETION
+    assertThat(underTest.findWithState(BlobState.CREATING), emptyIterable());
+    assertThat(underTest.findWithState(BlobState.ALIVE), emptyIterable());
+    assertThat(underTest.findWithState(BlobState.MARKED_FOR_DELETION), contains(id));
+
+    underTest.delete(id);
+    log("Deleted: {}", id);
+
+    // states all be empty
+    assertThat(underTest.findWithState(BlobState.CREATING), emptyIterable());
+    assertThat(underTest.findWithState(BlobState.ALIVE), emptyIterable());
+    assertThat(underTest.findWithState(BlobState.MARKED_FOR_DELETION), emptyIterable());
   }
 
   @Test

@@ -25,7 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class BlobMetadata
-  implements Serializable
+  implements Serializable, Cloneable
 {
   private BlobState blobState;
 
@@ -60,6 +60,20 @@ public class BlobMetadata
 
   public BlobMetrics getMetrics() {
     return metrics;
+  }
+
+  //
+  // HACK: Remove this, need to sort out better strategy.
+  //
+
+  public BlobMetadata copy() {
+    try {
+      // FIXME: Needs to be deep clone, perhaps change impl to marshal
+      return (BlobMetadata) super.clone();
+    }
+    catch (CloneNotSupportedException e) {
+      throw new Error(e);
+    }
   }
 
   @Override

@@ -73,7 +73,7 @@ public class FileBlobStoreConcurrencyIT
     Path content = root.resolve("content");
     Path metadata = root.resolve("metadata");
 
-    this.metadataStore = new MapdbBlobMetadataStore(metadata);
+    this.metadataStore = new MapdbBlobMetadataStore(metadata.toFile());
     metadataStore.start();
 
     this.underTest = new FileBlobStore(content, new VolumeChapterLocationStrategy(), new SimpleFileOperations(), metadataStore);

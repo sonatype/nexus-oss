@@ -14,7 +14,6 @@
 package org.sonatype.nexus.blobstore.file.internal;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
@@ -33,7 +32,6 @@ import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
 import org.mapdb.HTreeMap;
 import org.mapdb.TxBlock;
 import org.mapdb.TxMaker;
@@ -50,41 +48,26 @@ public class MapdbBlobMetadataStore
     extends LifecycleSupport
     implements BlobMetadataStore
 {
-  private final Path root;
+  private final File file;
 
   private TxMaker database;
 
-  public MapdbBlobMetadataStore(final Path root) {
-    this.root = checkNotNull(root);
-    log.debug("Root: {}", root);
+  public MapdbBlobMetadataStore(final File directory) {
+    checkNotNull(directory);
+    this.file = new File(directory, directory.getName() + ".db");
+    log.debug("File: {}", file);
   }
 
-  ///**
-  // * Serializer for {@link BlobId}.
-  // */
-  //private static final class BlobIdSerializer
-  //  implements Serializer<BlobId>, Serializable
-  //{
-  //  @Override
-  //  public void serialize(final DataOutput out, final BlobId value) throws IOException {
-  //    out.writeUTF(value.getId());
-  //  }
-  //
-  //  @Override
-  //  public BlobId deserialize(final DataInput in, final int available) throws IOException {
-  //    return new BlobId(in.readUTF());
-  //  }
-  //
-  //  @Override
-  //  public int fixedSize() {
-  //    return -1;
-  //  }
-  //}
+  /**
+   * Returns the primary database file.  MapDB has additional files which are based on this filename.
+   */
+  public File getFile() {
+    return file;
+  }
 
   @Override
   protected void doStart() throws Exception {
-    DirSupport.mkdir(root);
-    File file = root.resolve("db").toFile();
+    DirSupport.mkdir(file.getParentFile());
     this.database = DBMaker.newFileDB(file)
         .checksumEnable()
         .makeTxMaker();
@@ -96,19 +79,16 @@ public class MapdbBlobMetadataStore
     database = null;
   }
 
-  private HTreeMap<BlobId, BlobMetadata> entries(final DB db) {
-    return db.createHashMap("entries")
-        //.keySerializer(new BlobIdSerializer())
-        .makeOrGet();
-  }
-
-  private NavigableSet<Tuple2<BlobState, BlobId>> states(final DB db) {
-    return db.createTreeSet("states")
-        .makeOrGet();
-  }
-
   private Atomic.Long idSequence(final DB db) {
     return db.getAtomicLong("id_sequence");
+  }
+
+  private HTreeMap<BlobId, BlobMetadata> entries(final DB db) {
+    return db.getHashMap("entries");
+  }
+
+  private NavigableSet<BlobId> states(final DB db, final BlobState state) {
+    return db.getTreeSet("state_" + state.name());
   }
 
   /**
@@ -119,22 +99,30 @@ public class MapdbBlobMetadataStore
     return new BlobId(String.format("%016x", id));
   }
 
+  //
+  // FIXME: values need to be immutable
+  // FIXME: BlobMetadata is a non-trivial object with nested members which makes simple clone not enough to isolate it.
+  //
+
   @Override
   public BlobId add(final BlobMetadata metadata) {
     checkNotNull(metadata);
     ensureStarted();
+
+    // copy as values need to be immutable
+    final BlobMetadata copy = metadata.copy();
 
     return database.execute(new Fun.Function1<BlobId, DB>()
     {
       @Override
       public BlobId run(final DB db) {
         BlobId id = newId(db);
-        log.trace("Add: {}={}", id, metadata);
+        log.trace("Add: {}={}", id, copy);
 
-        entries(db).put(id, metadata);
+        entries(db).put(id, copy);
 
         // track state
-        states(db).add(Fun.t2(metadata.getBlobState(), id));
+        states(db, copy.getBlobState()).add(id);
 
         return id;
       }
@@ -163,20 +151,21 @@ public class MapdbBlobMetadataStore
     checkNotNull(metadata);
     ensureStarted();
 
+    // copy as values need to be immutable
+    final BlobMetadata copy = metadata.copy();
+
     database.execute(new TxBlock()
     {
       @Override
       public void tx(final DB db) throws TxRollbackException {
-        log.trace("Update: {}={}", id, metadata);
+        log.trace("Update: {}={}", id, copy);
 
         Map<BlobId, BlobMetadata> entries = entries(db);
-        BlobMetadata prev = entries.get(id);
-        entries.put(id, metadata);
+        BlobMetadata prev = entries.put(id, copy);
 
         // replace state
-        NavigableSet<Tuple2<BlobState, BlobId>> states = states(db);
-        states.remove(Fun.t2(prev.getBlobState(), id));
-        states.add(Fun.t2(metadata.getBlobState(), id));
+        states(db, prev.getBlobState()).remove(id);
+        states(db, copy.getBlobState()).add(id);
       }
     });
   }
@@ -196,7 +185,7 @@ public class MapdbBlobMetadataStore
         BlobMetadata prev = entries.remove(id);
 
         // remove state
-        states(db).remove(Fun.t2(prev.getBlobState(), id));
+        states(db, prev.getBlobState()).remove(id);
       }
     });
   }
@@ -212,10 +201,10 @@ public class MapdbBlobMetadataStore
     try {
       // copy ids avoid leaking transactional scope, may cause memory pressure
       List<BlobId> ids = Lists.newLinkedList();
-      for (BlobId id : Fun.filter(states(db), state)) {
+      for (BlobId id : states(db, state)) {
         ids.add(id);
       }
-      log.trace("Found: {} with state: {}", ids.size(), state);
+      log.trace("Found #{} with state: {}", ids.size(), state);
       return ids;
     }
     finally {
@@ -224,7 +213,7 @@ public class MapdbBlobMetadataStore
   }
 
   private File[] listFiles() {
-    File[] files = root.toFile().listFiles();
+    File[] files = file.getParentFile().listFiles();
     if (files == null) {
       // should never happen
       return new File[0];
