@@ -30,7 +30,6 @@ import com.google.common.base.Throwables;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,8 +63,6 @@ public class EmbeddedNexusBooter
 
   private final Constructor launcherFactory;
 
-  private ClassRealm testRealm;
-
   private Object launcher;
 
   public EmbeddedNexusBooter(final File installDir, final int port) throws Exception {
@@ -96,6 +93,16 @@ public class EmbeddedNexusBooter
     // Disable autorouting initialization prevented
     overrides.put(ConfigImpl.FEATURE_ACTIVE_KEY, Boolean.FALSE.toString());
 
+    // Karaf configuration
+    String base = installDir.getCanonicalPath();
+    overrides.put("karaf.base", base);
+    overrides.put("karaf.home", base);
+    overrides.put("karaf.data", base + File.separatorChar + "data");
+    overrides.put("karaf.etc", base + File.separatorChar + "etc");
+    overrides.put("karaf.instances", base + File.separatorChar + "instances");
+    overrides.put("karaf.startLocalConsole", "false");
+    overrides.put("karaf.startRemoteShell", "false");
+
     log.info("Overrides:");
     for (Entry<String,String> entry : overrides.entrySet()) {
       log.info("  {}='{}'", entry.getKey(), entry.getValue());
@@ -106,10 +113,10 @@ public class EmbeddedNexusBooter
     world = new ClassWorld();
     bootRealm = createBootRealm();
 
-    launcherClass = bootRealm.loadClass("org.sonatype.nexus.bootstrap.Launcher");
+    launcherClass = bootRealm.loadClass("org.apache.karaf.main.Main");
     log.info("Launcher class: {}", launcherClass);
 
-    launcherFactory = launcherClass.getConstructor(ClassLoader.class, Map.class, String[].class);
+    launcherFactory = launcherClass.getConstructor(String[].class);
     log.info("Launcher factory: {}", launcherFactory);
   }
 
@@ -165,25 +172,20 @@ public class EmbeddedNexusBooter
   public void startNexus(final String testId) throws Exception {
     checkState(launcher == null, "Nexus already started");
 
-    testRealm = world.newRealm(IT_REALM_ID + "-" + testId, bootRealm);
-
     final ClassLoader cl = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(bootRealm);
+    String[] args = {};
 
     try {
-      log.info("Starting Nexus[{}]", testId);
+      System.getProperties().putAll(overrides);
 
-      launcher = launcherFactory.newInstance(
-          testRealm,
-          overrides,
-          new String[] { new File(installDir, "conf/jetty.xml").getAbsolutePath() }
-      );
+      log.info("Starting Nexus[{}]", testId);
+      launcher = launcherFactory.newInstance((Object) args);
+      launcherClass.getMethod("launch").invoke(launcher);
     }
     finally {
       Thread.currentThread().setContextClassLoader(cl);
     }
-
-    launcherClass.getMethod("start").invoke(launcher);
   }
 
   @Override
@@ -192,7 +194,7 @@ public class EmbeddedNexusBooter
       log.info("Stopping Nexus");
 
       if (launcher != null) {
-        launcherClass.getMethod("stop").invoke(launcher);
+        launcherClass.getMethod("destroy").invoke(launcher);
       }
       launcher = null;
     }
@@ -207,16 +209,6 @@ public class EmbeddedNexusBooter
       }
     }
     finally {
-      if (testRealm != null) {
-        try {
-          world.disposeRealm(testRealm.getId());
-        }
-        catch (NoSuchRealmException e) {
-          log.warn("Unexpected; ignoring", e);
-        }
-      }
-      testRealm = null;
-
       try {
         // The JVM caches URLs along with their current URL handler in a couple of static maps.
         // This causes unexpected issues when restarting legacy tests (even when using isolated
