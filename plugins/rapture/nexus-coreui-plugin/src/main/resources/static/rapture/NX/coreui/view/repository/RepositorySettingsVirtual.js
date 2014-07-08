@@ -22,15 +22,20 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtual', {
   api: {
     submit: 'NX.direct.coreui_Repository.updateVirtual'
   },
-  settingsFormSuccessMessage: function (data) {
+  settingsFormSuccessMessage: function(data) {
     return 'Repository updated: ' + data['id'];
   },
 
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.repositoryStore = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
-    me.repositoryStore.filter({ property: 'format', value: me.template.masterFormat });
+    if (me.template['masterFormat']) {
+      me.repositoryStore.filter({ property: 'format', value: me.template['masterFormat'] });
+    }
+    else {
+      me.repositoryStore.filter({ property: 'format', value: '!' + me.template['format'] });
+    }
 
     me.items = [
       {

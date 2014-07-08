@@ -13,22 +13,20 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
-import org.hibernate.validator.constraints.NotEmpty
-
-import javax.validation.constraints.NotNull
+import org.sonatype.nexus.proxy.repository.LocalStatus
+import org.sonatype.nexus.proxy.repository.ProxyMode
 
 /**
- * Repository Virtual exchange object.
+ * Repository Status exchange object.
  *
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
-class RepositoryVirtualXO
-extends RepositoryXO
+class RepositoryStatusXO
 {
-  @NotEmpty
-  String shadowOf
-
-  @NotNull
-  Boolean synchronizeAtStartup
+  String id
+  LocalStatus localStatus
+  ProxyMode proxyMode
+  String remoteStatus
+  String remoteStatusReason
 }

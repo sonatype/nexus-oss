@@ -21,31 +21,36 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
 
   store: 'Repository',
 
-  columns: [
-    {
-      xtype: 'nx-iconcolumn',
-      width: 36,
-      iconVariant: 'x16',
-      iconName: function () {
-        return 'repository-default';
-      }
-    },
-    { header: 'Name', dataIndex: 'name', flex: 1 },
-    { header: 'Type', dataIndex: 'type',
-      renderer: function (value) {
-        return Ext.String.capitalize(value);
-      }
-    },
-    { header: 'Format', dataIndex: 'formatName' },
-    { header: 'Provider', dataIndex: 'providerName' }
-  ],
+  initComponent: function() {
+    var me = this;
+
+    me.columns = [
+      {
+        xtype: 'nx-iconcolumn',
+        width: 36,
+        iconVariant: 'x16',
+        iconName: function() {
+          return 'repository-default';
+        }
+      },
+      { header: 'Name', dataIndex: 'name', flex: 2 },
+      { header: 'Type', dataIndex: 'type',
+        renderer: function(value) {
+          return Ext.String.capitalize(value);
+        }
+      },
+      { header: 'Format', dataIndex: 'formatName' },
+      { header: 'Repository Status', renderer: me.renderStatus, flex: 1 },
+      { header: 'Repository Path', dataIndex: 'url', xtype: 'nx-linkcolumn', flex: 2 }
+    ];
+
+    me.callParent(arguments);
+  },
 
   emptyText: 'No repositories defined',
 
   tbar: [
-    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
-      menu: []
-    },
+    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
     '-',
     { xtype: 'button', text: 'Browse', glyph: 'xf0e8@FontAwesome' /* fa-sitemap */, action: 'browse', disabled: true }
@@ -53,6 +58,45 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
 
   plugins: [
     { ptype: 'gridfilterbox', emptyText: 'No repositories matched criteria "$filter"' }
-  ]
+  ],
+
+  renderStatus: function(value, metaData, model) {
+    var status = (model.get('localStatus') === 'IN_SERVICE') ? 'In Service' : 'Out of Service',
+        available = model.get('remoteStatus') === 'AVAILABLE',
+        unknown = model.get('remoteStatus') === 'UNKNOWN',
+        reason = model.get('remoteReason');
+
+    if (reason) {
+      reason = '<br/><I>' + Ext.util.Format.htmlEncode(reason) + '</I>';
+    }
+
+    if (model.get('type') === 'proxy') {
+      if (model.get('proxyMode').search(/BLOCKED/) === 0) {
+        status += model.get('proxyMode') ===
+            'BLOCKED_AUTO' ? ' - Remote Automatically Blocked' : ' - Remote Manually Blocked';
+        if (available) {
+          status += ' and Available';
+        }
+        else {
+          status += ' and Unavailable';
+        }
+      }
+      else { // allow
+        if (model.get('localStatus') === 'IN_SERVICE') {
+          if (!available && unknown) {
+            status += unknown ? ' - <I>checking remote...</I>' : ' - Attempting to Proxy and Remote Unavailable';
+          }
+        }
+        else { // Out of service
+          status += available ? ' - Remote Available' : ' - Remote Unavailable';
+        }
+      }
+    }
+
+    if (reason) {
+      status += reason;
+    }
+    return status;
+  }
 
 });

@@ -47,6 +47,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMaven', {
         allowBlank: true,
         submitValue: false
       },
+      { xtype: 'nx-coreui-repository-settings-localstorage' },
       {
         xtype: 'combo',
         name: 'writePolicy',

@@ -17,6 +17,7 @@ import com.google.common.base.Predicate
 import com.google.common.base.Predicates
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import com.softwarementors.extjs.djn.config.annotations.DirectPollMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.codehaus.plexus.util.StringUtils
@@ -46,11 +47,17 @@ import org.sonatype.nexus.templates.TemplateManager
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider
 import org.sonatype.nexus.templates.repository.RepositoryTemplate
 import org.sonatype.nexus.templates.repository.maven.AbstractMavenRepositoryTemplate
+import org.sonatype.nexus.validation.Create
+import org.sonatype.nexus.validation.Update
 
 import javax.annotation.Nullable
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+import javax.validation.Valid
+import javax.validation.Validator
+import javax.validation.constraints.NotNull
+import javax.validation.groups.Default
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -69,7 +76,8 @@ extends DirectComponentSupport
   private static final TRUST_STORE_TYPE = 'repository'
 
   @Inject
-  RepositoryRegistry repositoryRegistry
+  @Named("protected")
+  RepositoryRegistry protectedRepositoryRegistry
 
   @Inject
   RepositoryTypeRegistry repositoryTypeRegistry
@@ -97,6 +105,9 @@ extends DirectComponentSupport
   @Nullable
   TrustStoreKeys trustStoreKeys
 
+  @Inject
+  Validator validator
+
   def typesToClass = [
       'proxy': ProxyRepository.class,
       'hosted': HostedRepository.class,
@@ -113,6 +124,34 @@ extends DirectComponentSupport
     def templates = readTemplates(null)
     return filter(parameters).collect { repository ->
       asRepositoryXO(repository, templates)
+    }
+  }
+
+  /**
+   * Retrieve repositories status.
+   */
+  @DirectPollMethod(event = "coreui_Repository_readStatus")
+  @RequiresPermissions('nexus:repostatus:read')
+  List<RepositoryStatusXO> readStatus(final Map<String, String> params) {
+    return readStatus(Boolean.valueOf(params['forceCheck']))
+  }
+
+  @DirectMethod
+  @RequiresPermissions('nexus:repostatus:read')
+  List<RepositoryStatusXO> readStatus(final boolean forceCheck) {
+    return protectedRepositoryRegistry.repositories.collect { repository ->
+      def repositoryStatus = new RepositoryStatusXO(
+          id: repository.id,
+          localStatus: repository.localStatus
+      )
+      repository.adaptToFacet(ProxyRepository)?.with { proxyRepository ->
+        repositoryStatus.proxyMode = proxyRepository.proxyMode
+        proxyRepository.getRemoteStatus(new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT), forceCheck)?.with { RemoteStatus status ->
+          repositoryStatus.remoteStatus = status
+          repositoryStatus.remoteStatusReason = status.reason
+        }
+      }
+      return repositoryStatus
     }
   }
 
@@ -207,84 +246,96 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:create')
-  RepositoryXO createGroup(final RepositoryGroupXO repositoryXO) {
+  @Validate(groups = [Create.class, Default.class])
+  RepositoryXO createGroup(final @NotNull(message = '[repositoryXO] may not be null') @Valid RepositoryGroupXO repositoryXO) {
     create(repositoryXO, doUpdateGroup)
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:update')
-  RepositoryXO updateGroup(final RepositoryGroupXO repositoryXO) {
+  @Validate(groups = [Update.class, Default.class])
+  RepositoryXO updateGroup(final @NotNull(message = '[repositoryXO] may not be null') @Valid RepositoryGroupXO repositoryXO) {
     update(repositoryXO, GroupRepository.class, doUpdateGroup)
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:create')
-  RepositoryXO createHosted(final RepositoryHostedXO repositoryXO) {
+  @Validate(groups = [Create.class, Default.class])
+  RepositoryXO createHosted(final @NotNull(message = '[repositoryXO] may not be null') @Valid RepositoryHostedXO repositoryXO) {
     create(repositoryXO, doUpdateHosted)
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:update')
-  RepositoryXO updateHosted(final RepositoryHostedXO repositoryXO) {
+  @Validate(groups = [Update.class, Default.class])
+  RepositoryXO updateHosted(final @NotNull(message = '[repositoryXO] may not be null') @Valid RepositoryHostedXO repositoryXO) {
     update(repositoryXO, HostedRepository.class, doUpdateHosted)
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:create')
-  RepositoryXO createHostedMaven(final RepositoryHostedMavenXO repositoryXO) {
+  @Validate(groups = [Create.class, Default.class])
+  RepositoryXO createHostedMaven(final @NotNull(message = '[repositoryXO] may not be null') @Valid RepositoryHostedMavenXO repositoryXO) {
     create(repositoryXO, doUpdateHosted, doUpdateHostedMaven)
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:update')
-  RepositoryXO updateHostedMaven(final RepositoryHostedMavenXO repositoryXO) {
+  @Validate(groups = [Update.class, Default.class])
+  RepositoryXO updateHostedMaven(final @NotNull(message = '[repositoryXO] may not be null') @Valid RepositoryHostedMavenXO repositoryXO) {
     update(repositoryXO, MavenHostedRepository.class, doUpdateHosted, doUpdateHostedMaven)
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:create')
-  RepositoryXO createProxy(final RepositoryProxyXO repositoryXO) {
+  @Validate(groups = [Create.class, Default.class])
+  RepositoryXO createProxy(final @NotNull(message = '[repositoryXO] may not be null') @Valid RepositoryProxyXO repositoryXO) {
     create(repositoryXO, doUpdateProxy)
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:update')
-  RepositoryXO updateProxy(final RepositoryProxyXO repositoryXO) {
+  @Validate(groups = [Update.class, Default.class])
+  RepositoryXO updateProxy(final @NotNull(message = '[repositoryXO] may not be null') @Valid RepositoryProxyXO repositoryXO) {
     update(repositoryXO, ProxyRepository.class, doUpdateProxy)
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:create')
-  RepositoryXO createProxyMaven(final RepositoryProxyMavenXO repositoryXO) {
+  @Validate(groups = [Create.class, Default.class])
+  RepositoryXO createProxyMaven(final @NotNull(message = '[repositoryXO] may not be null') @Valid RepositoryProxyMavenXO repositoryXO) {
     create(repositoryXO, doUpdateProxy, doUpdateProxyMaven)
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:update')
-  RepositoryXO updateProxyMaven(final RepositoryProxyMavenXO repositoryXO) {
+  @Validate(groups = [Update.class, Default.class])
+  RepositoryXO updateProxyMaven(final @NotNull(message = '[repositoryXO] may not be null') @Valid RepositoryProxyMavenXO repositoryXO) {
     update(repositoryXO, MavenProxyRepository.class, doUpdateProxy, doUpdateProxyMaven)
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:create')
-  RepositoryXO createVirtual(final RepositoryVirtualXO repositoryXO) {
+  @Validate(groups = [Create.class, Default.class])
+  RepositoryXO createVirtual(final @NotNull(message = '[repositoryXO] may not be null') @Valid RepositoryVirtualXO repositoryXO) {
     create(repositoryXO, [doCreateVirtual], [doUpdateVirtual])
   }
 
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:update')
-  RepositoryXO updateVirtual(final RepositoryVirtualXO repositoryXO) {
+  @Validate(groups = [Update.class, Default.class])
+  RepositoryXO updateVirtual(final @NotNull(message = '[repositoryXO] may not be null') @Valid RepositoryVirtualXO repositoryXO) {
     update(repositoryXO, ShadowRepository.class, doUpdateVirtual)
   }
 
@@ -293,7 +344,7 @@ extends DirectComponentSupport
   @RequiresPermissions('nexus:repositories:delete')
   @Validate
   void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
-    repositoryRegistry.removeRepository(id)
+    protectedRepositoryRegistry.removeRepository(id)
   }
 
   @DirectMethod
@@ -337,7 +388,7 @@ extends DirectComponentSupport
 
   def <T extends Repository> RepositoryXO update(RepositoryXO repositoryXO, Class<T> repoType, Closure... updateClosures) {
     if (repositoryXO.id) {
-      T updated = repositoryRegistry.getRepositoryWithFacet(repositoryXO.id, repoType).with {
+      T updated = protectedRepositoryRegistry.getRepositoryWithFacet(repositoryXO.id, repoType).with {
         name = repositoryXO.name
         exposed = repositoryXO.exposed
         return it
@@ -365,6 +416,13 @@ extends DirectComponentSupport
   }
 
   def doUpdateProxy = { ProxyRepository repo, RepositoryProxyXO repositoryXO ->
+    if (repositoryXO.authEnabled) {
+      validator.validate(repositoryXO, RepositoryProxyXO.Authentication)
+    }
+    if (repositoryXO.httpRequestSettings) {
+      validator.validate(repositoryXO, RepositoryProxyXO.HttpRequestSettings)
+    }
+
     repo.browseable = repositoryXO.browseable
     repo.remoteUrl = repositoryXO.remoteStorageUrl
     repo.autoBlockActive = repositoryXO.autoBlockActive
@@ -386,6 +444,10 @@ extends DirectComponentSupport
         )
       }
     }
+    else {
+      repo.remoteStorageContext?.removeRemoteAuthenticationSettings()
+    }
+
     if (repositoryXO.httpRequestSettings) {
       repo.remoteConnectionSettings = new DefaultRemoteConnectionSettings(
           userAgentCustomizationString: repositoryXO.userAgentCustomisation,
@@ -393,6 +455,9 @@ extends DirectComponentSupport
           connectionTimeout: repositoryXO.timeout * 1000,
           retrievalRetryCount: repositoryXO.retries
       )
+    }
+    else {
+      repo.remoteStorageContext?.removeRemoteConnectionSettings()
     }
     trustStoreKeys?.setEnabled(TRUST_STORE_TYPE, repo.id, repositoryXO.useTrustStoreForRemoteStorageUrl)
   }
@@ -415,7 +480,7 @@ extends DirectComponentSupport
 
   def doUpdateVirtual = { ShadowRepository repo, RepositoryVirtualXO repositoryXO ->
     repo.synchronizeAtStartup = repositoryXO.synchronizeAtStartup
-    repo.masterRepository = repositoryRegistry.getRepository(repositoryXO.shadowOf)
+    repo.masterRepository = protectedRepositoryRegistry.getRepository(repositoryXO.shadowOf)
   }
 
   def asRepositoryXO(Repository repo, List<RepositoryTemplateXO> templates) {
@@ -489,9 +554,9 @@ extends DirectComponentSupport
         fileTypeValidation = repo.fileTypeValidation
         userAgentCustomisation = rcs?.userAgentCustomizationString
         urlParameters = rcs?.queryString
-        timeout = rcs?.connectionTimeout == 0 ? 0 : rcs?.connectionTimeout / 1000
+        timeout = rcs?.connectionTimeout ? rcs?.connectionTimeout == 0 ? 0 : rcs?.connectionTimeout / 1000 : null
         retries = rcs?.retrievalRetryCount
-        httpRequestSettings = userAgentCustomisation || urlParameters || timeout || retries
+        httpRequestSettings = rsc?.hasRemoteConnectionSettings() && (userAgentCustomisation || urlParameters || timeout || retries)
         notFoundCacheTTL = repo.notFoundCacheTimeToLive
         itemMaxAge = repo.itemMaxAge
         authEnabled = false
@@ -507,7 +572,7 @@ extends DirectComponentSupport
           }
           return
         }
-        repo.getRemoteStatus(new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT), false)?.with { status ->
+        repo.getRemoteStatus(new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT), false)?.with { RemoteStatus status ->
           remoteStatus = status
           remoteStatusReason = status.reason
         }
@@ -553,6 +618,13 @@ extends DirectComponentSupport
         localStatus = repo.localStatus
         url = repositoryURLBuilder.getExposedRepositoryContentUrl(repo)
         userManaged = repo.userManaged
+      }
+      if (repo instanceof AbstractRepository) {
+        xo.defaultLocalStorageUrl = repo.currentCoreConfiguration.getConfiguration(false).defaultLocalStorageUrl
+        xo.overrideLocalStorageUrl = repo.currentCoreConfiguration.getConfiguration(false).localStorage.url
+        if (StringUtils.isBlank(xo.overrideLocalStorageUrl)) {
+          xo.overrideLocalStorageUrl = null
+        }
       }
     }
     return xo
@@ -600,7 +672,7 @@ extends DirectComponentSupport
   }
 
   List<Repository> filter(final @Nullable StoreLoadParameters parameters) {
-    List<Repository> repositories = repositoryRegistry.repositories
+    List<Repository> repositories = protectedRepositoryRegistry.repositories
     boolean includeUserManaged = true
     boolean includeNexusManaged = false
     if (parameters) {

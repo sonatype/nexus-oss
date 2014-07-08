@@ -30,6 +30,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHosted', {
     var me = this;
 
     me.items = [
+      { xtype: 'nx-coreui-repository-settings-localstorage' },
       {
         xtype: 'combo',
         name: 'writePolicy',

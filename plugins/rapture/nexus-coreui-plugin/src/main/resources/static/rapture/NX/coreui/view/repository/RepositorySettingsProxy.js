@@ -26,14 +26,15 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxy', {
   api: {
     submit: 'NX.direct.coreui_Repository.updateProxy'
   },
-  settingsFormSuccessMessage: function (data) {
+  settingsFormSuccessMessage: function(data) {
     return 'Repository updated: ' + data['id'];
   },
 
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = [
+      { xtype: 'nx-coreui-repository-settings-localstorage' },
       {
         xtype: 'nx-url',
         name: 'remoteStorageUrl',
@@ -74,6 +75,10 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxy', {
         name: 'notFoundCacheTTL',
         fieldLabel: 'Not Found Cache TTL',
         helpText: 'This controls how long to cache the fact that a file was not found in the repository.',
+        minValue: -1,
+        maxValue: 511000,
+        allowDecimals: false,
+        allowExponential: false,
         allowBlank: true
       }
       ,
@@ -82,6 +87,10 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxy', {
         name: 'itemMaxAge',
         fieldLabel: 'Item Max Age',
         helpText: 'Repositories may contain resources that are neither artifacts identified by GAV coordinates or metadata. This value controls how long to cache such items in the repository before rechecking the remote repository.',
+        minValue: -1,
+        maxValue: 511000,
+        allowDecimals: false,
+        allowExponential: false,
         allowBlank: true
       },
       {
