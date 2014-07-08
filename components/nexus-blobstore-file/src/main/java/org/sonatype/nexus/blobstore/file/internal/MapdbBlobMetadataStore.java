@@ -42,6 +42,7 @@ import org.mapdb.TxMaker;
 import org.mapdb.TxRollbackException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * MapDB implementation of {@link BlobMetadataStore}.
@@ -178,7 +179,8 @@ public class MapdbBlobMetadataStore
         BlobId id = newId(db);
         log.trace("Add: {}={}", id, record);
 
-        entries(db).put(id, record);
+        MetadataRecord prev = entries(db).put(id, record);
+        checkState(prev == null, "Duplicate BlobId: %s", id);
 
         // track state
         states(db, record.state).add(id);
