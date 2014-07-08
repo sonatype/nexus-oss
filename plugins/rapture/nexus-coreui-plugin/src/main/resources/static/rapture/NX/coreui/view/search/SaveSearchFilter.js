@@ -28,6 +28,7 @@ Ext.define('NX.coreui.view.search.SaveSearchFilter', {
       {
         xtype: 'textfield',
         name: 'name',
+        itemId: 'name',
         fieldLabel: 'Name',
         emptyText: 'enter a filter name'
       },
