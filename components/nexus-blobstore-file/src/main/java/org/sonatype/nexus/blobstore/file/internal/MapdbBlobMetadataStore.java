@@ -180,7 +180,7 @@ public class MapdbBlobMetadataStore
         log.trace("Add: {}={}", id, record);
 
         MetadataRecord prev = entries(db).put(id, record);
-        checkState(prev == null, "Duplicate BlobId: %s", id);
+        checkState(prev == null, "Duplicate blob-id: %s", id);
 
         // track state
         states(db, record.state).add(id);
@@ -225,6 +225,7 @@ public class MapdbBlobMetadataStore
       @Override
       public void tx(final DB db) throws TxRollbackException {
         MetadataRecord prev = entries(db).put(id, record);
+        checkState(prev != null, "Can not update non-existent blob-id: %s", id);
 
         // replace state
         states(db, prev.state).remove(id);
@@ -245,6 +246,7 @@ public class MapdbBlobMetadataStore
       @Override
       public void tx(final DB db) throws TxRollbackException {
         MetadataRecord prev = entries(db).remove(id);
+        checkState(prev != null, "Can not delete non-existent blob-id: %s", id);
 
         // remove state
         states(db, prev.state).remove(id);
