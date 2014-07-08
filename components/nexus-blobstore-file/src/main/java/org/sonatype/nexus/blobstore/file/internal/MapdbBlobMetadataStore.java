@@ -326,6 +326,7 @@ public class MapdbBlobMetadataStore
     return bytes;
   }
 
+  @Override
   public void compact() {
     ensureStarted();
 

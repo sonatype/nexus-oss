@@ -45,4 +45,6 @@ public interface BlobMetadataStore
   long getBlobCount();
 
   long getTotalSize();
+
+  void compact();
 }

@@ -251,6 +251,8 @@ public class FileBlobStore
         }
       }
 
+      metadataStore.compact();
+
       log.debug("Deleted {} blobs", count);
     }
     catch (Exception e) {
