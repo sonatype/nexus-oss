@@ -59,6 +59,28 @@ public class MapdbBlobMetadataStore
     log.debug("Root: {}", root);
   }
 
+  ///**
+  // * Serializer for {@link BlobId}.
+  // */
+  //private static final class BlobIdSerializer
+  //  implements Serializer<BlobId>, Serializable
+  //{
+  //  @Override
+  //  public void serialize(final DataOutput out, final BlobId value) throws IOException {
+  //    out.writeUTF(value.getId());
+  //  }
+  //
+  //  @Override
+  //  public BlobId deserialize(final DataInput in, final int available) throws IOException {
+  //    return new BlobId(in.readUTF());
+  //  }
+  //
+  //  @Override
+  //  public int fixedSize() {
+  //    return -1;
+  //  }
+  //}
+
   @Override
   protected void doStart() throws Exception {
     DirSupport.mkdir(root);
@@ -75,11 +97,14 @@ public class MapdbBlobMetadataStore
   }
 
   private HTreeMap<BlobId, BlobMetadata> entries(final DB db) {
-    return db.getHashMap("entries");
+    return db.createHashMap("entries")
+        //.keySerializer(new BlobIdSerializer())
+        .makeOrGet();
   }
 
   private NavigableSet<Tuple2<BlobState, BlobId>> states(final DB db) {
-    return db.getTreeSet("states");
+    return db.createTreeSet("states")
+        .makeOrGet();
   }
 
   private Atomic.Long idSequence(final DB db) {
@@ -168,8 +193,7 @@ public class MapdbBlobMetadataStore
         log.trace("Delete: {}", id);
 
         Map<BlobId, BlobMetadata> entries = entries(db);
-        BlobMetadata prev = entries.get(id);
-        entries.remove(id);
+        BlobMetadata prev = entries.remove(id);
 
         // remove state
         states(db).remove(Fun.t2(prev.getBlobState(), id));
