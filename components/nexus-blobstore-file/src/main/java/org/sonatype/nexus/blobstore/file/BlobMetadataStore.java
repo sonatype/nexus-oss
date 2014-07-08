@@ -15,7 +15,6 @@ package org.sonatype.nexus.blobstore.file;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
-import org.sonatype.nexus.blobstore.api.BlobStoreMetrics;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
@@ -38,47 +37,11 @@ public interface BlobMetadataStore
 
   AutoClosableIterable<BlobId> findWithState(BlobState state);
 
-  // FIXME: Expose count/byte-size on store intf, not sure why we have another abstraction here
-
-  /**
-   * Aggregate metrics about the blobs in the blob store, derived from the metadata.
-   *
-   * These are used as a component of the {@link BlobStoreMetrics},
-   * which has other information not stored in in the {@link BlobMetadataStore}.
-   */
-  class MetadataMetrics
+  interface MetadataMetrics
   {
-    private final long blobCount;
+    long getBlobCount();
 
-    private final long totalSize;
-
-    public MetadataMetrics(final long blobCount, final long totalSize) {
-      this.blobCount = blobCount;
-      this.totalSize = totalSize;
-    }
-
-    /**
-     * Get an approximate count of the number of blobs in the blob store.
-     */
-    public long getBlobCount() {
-      return blobCount;
-    }
-
-    /**
-     * Get the approximate total storage space consumed by this blob store in bytes, including blobs, headers, and any
-     * other metadata required by the store.
-     */
-    public long getTotalSize() {
-      return totalSize;
-    }
-
-    @Override
-    public String toString() {
-      return getClass().getSimpleName() + "{" +
-          "blobCount=" + blobCount +
-          ", totalSize=" + totalSize +
-          '}';
-    }
+    long getTotalSize();
   }
 
   MetadataMetrics getMetadataMetrics();

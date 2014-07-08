@@ -308,15 +308,27 @@ public class MapdbBlobMetadataStore
 
     DB db = database.makeTx();
     try {
-      long count = entries(db).sizeLong();
+      final long count = entries(db).sizeLong();
 
       // sum all file bytes in the database root
       long bytes = 0;
       for (File file : listFiles()) {
         bytes += file.length();
       }
+      final long size = bytes;
 
-      return new MetadataMetrics(count, bytes);
+      return new MetadataMetrics()
+      {
+        @Override
+        public long getBlobCount() {
+          return count;
+        }
+
+        @Override
+        public long getTotalSize() {
+          return size;
+        }
+      };
     }
     finally {
       db.close();
