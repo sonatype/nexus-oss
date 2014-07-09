@@ -61,6 +61,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggerContextListener;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
+import ch.qos.logback.core.helpers.NOPAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.util.StatusPrinter;
@@ -98,6 +99,8 @@ public class LogbackLogManager
   private static final String LOG_CONF = "logback.xml";
 
   private static final String LOG_CONF_PROPS = "logback.properties";
+
+  private static final String PAX_BUNDLE_CONTEXT_KEY = "org.ops4j.pax.logging.logback.bundlecontext";
 
   private final Logger logger = LoggerFactory.getLogger(LogbackLogManager.class);
 
@@ -481,10 +484,23 @@ public class LogbackLogManager
     logger.debug("Reconfiguring: {}", file);
 
     LoggerContext context = getLoggerContext();
+    Object bundleContext = context.getObject(PAX_BUNDLE_CONTEXT_KEY);
+    NOPAppender nopAppender = new NOPAppender();
+    nopAppender.setContext(context);
+    nopAppender.start();
+
     try {
       JoranConfigurator configurator = new JoranConfigurator();
       configurator.setContext(context);
+
       context.reset();
+
+      // placeholder to avoid 'No appenders present' while reconfiguring
+      context.getLogger(Logger.ROOT_LOGGER_NAME).addAppender(nopAppender);
+
+      // restore persisted setting so pax-logging can reload
+      context.putObject(PAX_BUNDLE_CONTEXT_KEY, bundleContext);
+
       context.getStatusManager().clear();
       installNonResetResistantListeners();
       configurator.doConfigure(file);
