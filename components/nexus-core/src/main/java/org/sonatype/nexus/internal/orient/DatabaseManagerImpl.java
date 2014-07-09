@@ -19,7 +19,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import javax.inject.Inject;
@@ -33,7 +32,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.command.OCommandOutputListener;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -178,8 +176,7 @@ public class DatabaseManagerImpl
       checkState(db.exists(), "Database does not exist: %s", name);
 
       log.debug("Starting backup");
-      Map<String, Object> options = Maps.newHashMap();
-      db.backup(output, options, null, new LoggingCommandOutputListener("BACKUP"),
+      db.backup(output, null, null, new LoggingCommandOutputListener("BACKUP"),
           BACKUP_COMPRESSION_LEVEL, BACKUP_BUFFER_SIZE);
       log.debug("Completed backup");
     }
@@ -197,8 +194,7 @@ public class DatabaseManagerImpl
       db.create();
 
       log.debug("Starting restore");
-      Map<String, Object> options = Maps.newHashMap();
-      db.restore(input, options, null, new LoggingCommandOutputListener("RESTORE"));
+      db.restore(input, null, null, new LoggingCommandOutputListener("RESTORE"));
       log.debug("Completed import");
     }
   }
