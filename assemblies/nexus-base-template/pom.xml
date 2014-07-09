@@ -284,61 +284,96 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>gmaven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>mvn-coordinates</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <source>
+                project.artifactMap.each(){k,v->
+                  // add 'mvn:artifactId' properties representing Pax-URL path for each transitive artifact
+                  project.properties['mvn:'+v.artifactId]='mvn\:'+v.groupId+'/'+v.artifactId+'/'+v.baseVersion
+                }
+              </source>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
+            <id>nexus-branding</id>
             <phase>prepare-package</phase>
             <goals>
               <goal>run</goal>
             </goals>
             <configuration>
               <target>
-                <echo append="true" file="${project.build.directory}/assembly/bin/setenv">
-                  export JAVA_MAX_PERM_MEM=256M
-                </echo>
-                <echo append="true" file="${project.build.directory}/assembly/bin/setenv.bat">
-                  SET JAVA_MAX_PERM_MEM=256M
-                </echo>
-                <echo append="false" file="${project.build.directory}/assembly/etc/org.ops4j.pax.logging.cfg">
-                  org.ops4j.pax.logging.logback.config.file=${karaf.base}/conf/logback.xml
-                </echo>
-                <echo append="true" file="${project.build.directory}/assembly/etc/custom.properties">
-                  nexus-base=${karaf.base}
-                  nexus-args=${karaf.base}/conf/jetty.xml,${karaf.base}/conf/jetty-requestlog.xml
-                </echo>
-                <echo append="true" file="${project.build.directory}/assembly/etc/system.properties">
-                  org.ops4j.pax.logging.StaticLogbackContext=true
-                </echo>
-                <replace file="${project.build.directory}/assembly/etc/startup.properties">
-<!-- TODO: find a better way to replace this section -->
-<replacetoken><![CDATA[
-mvn\:org.ops4j.pax.logging/pax-logging-api/1.7.2 = 8
-mvn\:org.ops4j.pax.logging/pax-logging-service/1.7.2 = 8
-]]></replacetoken>
-<replacevalue><![CDATA[
-mvn\:com.codahale.metrics/metrics-core/3.0.2 = 8
-mvn\:com.codahale.metrics/metrics-logback/3.0.2 = 8
-mvn\:org.sonatype.nexus/pax-logging-metrics/3.0.0-SNAPSHOT = 8
-mvn\:org.ops4j.pax.logging/pax-logging-api/1.7.3-SNAPSHOT = 8
-mvn\:org.ops4j.pax.logging/pax-logging-logback/1.7.3-SNAPSHOT = 8
-]]></replacevalue>
-                </replace>
+                <ac:for param="file" xmlns:ac="antlib:net.sf.antcontrib">
+                  <fileset dir="${basedir}/src/main/appended-resources" />
+                  <sequential>
+                    <local name="rel" />
+                    <property name="rel" value="@{file}" relative="yes"
+                      basedir="${basedir}/src/main/appended-resources" />
+                    <concat destfile="${project.build.directory}/assembly/${rel}" append="true">
+                      <path path="@{file}"/>
+                    </concat>
+                  </sequential>
+                </ac:for>
+                <copy todir="${project.build.directory}/assembly" overwrite="true">
+                  <fileset dir="${basedir}/src/main/overlaid-resources" />
+                </copy>
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg"
                   token=",management" value=",nexus-oss-edition" />
+                <replace file="${project.build.directory}/assembly/etc/startup.properties"
+                  token="${mvn:pax-logging-service}" value="${mvn:metrics-core} = 8${line.separator}${mvn:metrics-logback} = 8${line.separator}${mvn:pax-logging-metrics} = 8${line.separator}${mvn:pax-logging-logback}" />
                 <move todir="${project.build.directory}/assembly/plugin-repository" flatten="true">
                   <fileset dir="${project.build.directory}/assembly/system" includes="**/nexus-*-plugin-*.jar" />
                 </move>
               </target>
             </configuration>
           </execution>
+          <execution>
+            <id>sonatype-work</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <zip destfile="${project.build.directory}/${project.artifactId}-${project.version}.zip"
+                  basedir="${basedir}/src/main" includes="sonatype-work/**" update="true" />
+              </target>
+            </configuration>
+          </execution>
         </executions>
+        <dependencies>
+          <dependency>
+            <groupId>ant-contrib</groupId>
+            <artifactId>ant-contrib</artifactId>
+            <version>1.0b3</version>
+            <exclusions>
+              <exclusion>
+                <groupId>ant</groupId>
+                <artifactId>ant</artifactId>
+              </exclusion>
+            </exclusions>
+          </dependency>
+        </dependencies>
       </plugin>
 
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
         <configuration>
+          <archiveTarGz>false</archiveTarGz>
           <bootFeatures>
             <feature>standard</feature>
           </bootFeatures>
