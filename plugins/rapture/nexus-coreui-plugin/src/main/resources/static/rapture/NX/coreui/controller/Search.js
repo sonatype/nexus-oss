@@ -248,10 +248,13 @@ Ext.define('NX.coreui.controller.Search', {
 
   onSelectionChange: function(selectionModel, selected) {
     var me = this,
-        result = selected[0] || {};
+        result = selected[0];
 
     if (result) {
       me.getStorageFileContainer().showStorageFile(result.get('repositoryId'), result.get('path'));
+    }
+    else {
+      me.getStorageFileContainer().showStorageFile(undefined, undefined);
     }
   },
 
