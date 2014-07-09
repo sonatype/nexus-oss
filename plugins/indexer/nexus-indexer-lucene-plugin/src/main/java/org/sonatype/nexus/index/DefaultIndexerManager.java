@@ -1136,7 +1136,7 @@ public class DefaultIndexerManager
   {
     TaskUtil.checkInterruption();
 
-    if (!INDEXABLE(repository) || !ISPROXY(repository)) {
+    if (!INDEXABLE(repository) || !INSERVICE(repository) || !ISPROXY(repository)) {
       return;
     }
 
