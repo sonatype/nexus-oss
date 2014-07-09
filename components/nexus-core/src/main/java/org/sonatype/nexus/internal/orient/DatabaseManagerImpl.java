@@ -31,6 +31,7 @@ import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.command.OCommandOutputListener;
@@ -71,6 +72,12 @@ public class DatabaseManagerImpl
   public DatabaseManagerImpl(final ApplicationDirectories applicationDirectories) {
     checkNotNull(applicationDirectories);
     this.databasesDirectory = applicationDirectories.getWorkDirectory(WORK_PATH);
+    log.debug("Databases directory: {}", databasesDirectory);
+  }
+
+  @VisibleForTesting
+  public DatabaseManagerImpl(final File databasesDirectory) {
+    this.databasesDirectory = checkNotNull(databasesDirectory);
     log.debug("Databases directory: {}", databasesDirectory);
   }
 
