@@ -24,6 +24,7 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
   },
 
   rootVisible: false,
+  displayField: 'name',
 
   /**
    * @override
@@ -39,6 +40,10 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
         'text',
         'type',
         'processed',
+        'indexLoaded',
+        'storageLoaded',
+        { name: 'inIndex', defaultValue: false },
+        { name: 'inStorage', defaultValue: false },
         {
           name: 'iconCls',
           convert: function(val, row) {
@@ -52,6 +57,21 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
               }
             }
             return iconCls;
+          }
+        },
+        {
+          name: 'name',
+          convert: function(val, row) {
+            var name = '';
+            if (row.get('path') !== '/') {
+              if (row.get('inStorage')) {
+                name += NX.Icons.img('repositorybrowse-inStorage', 'x16') + ' ';
+              }
+              if (row.get('inIndex')) {
+                name += NX.Icons.img('repositorybrowse-inIndex', 'x16') + ' ';
+              }
+            }
+            return name + row.get('text');
           }
         }
       ],

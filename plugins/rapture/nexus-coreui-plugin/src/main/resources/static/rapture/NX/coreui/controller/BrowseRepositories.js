@@ -42,6 +42,8 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
     me.getApplication().getIconController().addIcons({
       'repository-managed': { file: 'database_yellow.png', variants: ['x16', 'x32'] },
+      'repositorybrowse-inIndex': { file: 'database_yellow.png', variants: ['x16'] },
+      'repositorybrowse-inStorage': { file: 'database.png', variants: ['x16'] },
       'repository-item-type-default': { file: 'file_extension_default.png', variants: ['x16', 'x24', 'x32'] },
       'repository-item-type-md5': { file: 'file_extension_checksum.png', variants: ['x16', 'x32'] },
       'repository-item-type-jar': { file: 'file_extension_jar.png', variants: ['x16', 'x32'] },
@@ -93,7 +95,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
         'nx-coreui-repositorybrowse-tree': {
           beforerender: me.loadRepositories,
           select: me.onNodeSelected,
-          beforeitemexpand: me.loadChildren,
+          beforeitemexpand: me.loadChildrenFromIndex,
           itemclick: me.onItemClick,
           beforeitemcontextmenu: me.showContextMenu,
           beforecontextmenushow: me.fillContextMenu
@@ -161,6 +163,8 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
             rootNode.appendChild({
               repositoryId: model.getId(),
               path: '/',
+              inIndex: true,
+              inStorage: true,
               text: model.get('name'),
               iconCls: NX.Icons.cls('repository-default', 'x16')
             });
@@ -196,77 +200,84 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
   /**
    * @private
-   * Load children of selected node, if not already loaded.
+   * Load children of selected node from index, if not already loaded.
    */
-  loadChildren: function(node) {
-    var me = this;
+  loadChildrenFromIndex: function(node) {
+    var me = this,
+        tree = me.getTree();
 
-    if (!node.get('processed')) {
-      node.set('processed', true);
+    if (node.get('inIndex') && !node.get('indexLoaded')) {
+      node.set('indexLoaded', true);
+      tree.getEl().mask('Loading...');
+      NX.direct.coreui_BrowseIndex.readChildren(node.get('repositoryId'), node.get('path'), function(response) {
+        if (Ext.isDefined(response) && response.success && response.data && response.data.length) {
+          Ext.suspendLayouts();
+          node.removeAll();
+          node.appendChild(response.data);
+          me.sortNode(node);
+          node.cascadeBy(function(child) {
+            child.set('inIndex', true);
+            child.set('name'); // this will force name conversion
+            if (child.get('processed')) {
+              child.set('indexLoaded', true);
+            }
+          });
+          Ext.resumeLayouts(true);
+        }
+        tree.getEl().unmask();
+        me.loadChildrenFromStorage(node);
+      });
+    }
+    else {
       me.loadChildrenFromStorage(node);
     }
   },
 
   /**
    * @private
-   * Load children of selected node, if not already loaded.
+   * Load children of selected node from storage, if not already loaded.
    */
   loadChildrenFromStorage: function(node) {
     var me = this,
         tree = me.getTree();
 
-    tree.getEl().mask('Loading...');
-    NX.direct.coreui_RepositoryStorage.readChildren(node.get('repositoryId'), node.get('path'), function(response) {
-      if (Ext.isDefined(response) && response.success && response.data && response.data.length) {
-        Ext.suspendLayouts();
-        node.appendChild(response.data);
-        node.sort(function(n1, n2) {
-          var t1 = n1.get('text') || '',
-              t2 = n2.get('text') || '';
-
-          if (n1.isLeaf() !== n2.isLeaf()) {
-            return n1.isLeaf() ? 1 : -1;
-          }
-          return t1.localeCompare(t2);
-        }, true);
-        node.cascadeBy(function(child) {
-          child.set('source', 'storage');
-        });
-        Ext.resumeLayouts(true);
-      }
-      tree.getEl().unmask();
-    });
+    if (node.get('inStorage') && !node.get('storageLoaded')) {
+      node.set('storageLoaded', true);
+      tree.getEl().mask('Loading...');
+      NX.direct.coreui_RepositoryStorage.readChildren(node.get('repositoryId'), node.get('path'), function(response) {
+        if (Ext.isDefined(response) && response.success && response.data && response.data.length) {
+          Ext.suspendLayouts();
+          Ext.Array.each(response.data, function(child) {
+            var nodeChild = node.findChild('text', child['text']);
+            if (!nodeChild) {
+              nodeChild = node.appendChild(child);
+            }
+            nodeChild.set('inStorage', true);
+            nodeChild.set('name'); // this will force name conversion
+          });
+          me.sortNode(node);
+          Ext.resumeLayouts(true);
+        }
+        tree.getEl().unmask();
+      });
+    }
   },
 
   /**
    * @private
-   * Load children of selected node, if not already loaded.
+   * Sort children by showing dirs first then by name.
+   * @param node
    */
-  loadChildrenFromIndex: function(node) {
-    var me = this,
-        tree = me.getTree();
+  sortNode: function(node) {
+    node.sort(function(n1, n2) {
+      var t1 = n1.get('text') || '',
+          t2 = n2.get('text') || '';
 
-    tree.getEl().mask('Loading...');
-    NX.direct.coreui_BrowseIndex.readChildren(node.get('repositoryId'), node.get('path'), function(response) {
-      if (Ext.isDefined(response) && response.success && response.data && response.data.length) {
-        Ext.suspendLayouts();
-        node.appendChild(response.data);
-        node.sort(function(n1, n2) {
-          var t1 = n1.get('text') || '',
-              t2 = n2.get('text') || '';
-
-          if (n1.isLeaf() !== n2.isLeaf()) {
-            return n1.isLeaf() ? 1 : -1;
-          }
-          return t1.localeCompare(t2);
-        }, true);
-        node.cascadeBy(function(child) {
-          child.set('source', 'index');
-        });
-        Ext.resumeLayouts(true);
+      if (n1.isLeaf() !== n2.isLeaf()) {
+        return n1.isLeaf() ? 1 : -1;
       }
-      tree.getEl().unmask();
-    });
+      return t1.localeCompare(t2);
+    }, true);
   },
 
   /**
