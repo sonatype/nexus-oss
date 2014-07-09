@@ -21,7 +21,6 @@
 
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
-<!--
   <Ref id="Handlers">
     <Call name="addHandler">
       <Arg>
@@ -36,6 +35,5 @@
       </Arg>
     </Call>
   </Ref>
--->
 
 </Configure>
