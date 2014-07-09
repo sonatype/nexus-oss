@@ -75,7 +75,7 @@ public class DatabaseManagerImpl
   }
 
   /**
-   * Returns the directory for the given named database.  Directory many or many not exist.
+   * Returns the directory for the given named database.  Directory may or may not exist.
    */
   private File directory(final String name) {
     return new File(databasesDirectory, name);
