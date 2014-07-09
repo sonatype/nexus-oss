@@ -48,12 +48,13 @@ public class CapabilityStorageItemEntityAdapter
   /**
    * Register schema.
    */
-  public void register(final ODatabaseDocumentTx db) {
+  public OClass register(final ODatabaseDocumentTx db) {
     checkNotNull(db);
 
     OSchema schema = db.getMetadata().getSchema();
-    if (!schema.existsClass(DB_CLASS)) {
-      OClass type = schema.createClass(DB_CLASS);
+    OClass type = schema.getClass(DB_CLASS);
+    if (type == null) {
+      type = schema.createClass(DB_CLASS);
       type.createProperty(P_VERSION, OType.INTEGER);
       type.createProperty(P_TYPE, OType.STRING);
       type.createProperty(P_ENABLED, OType.BOOLEAN);
@@ -63,6 +64,7 @@ public class CapabilityStorageItemEntityAdapter
       schema.save();
       log.info("Created schema: {}, properties: {}", type, type.properties());
     }
+    return type;
   }
 
   /**

@@ -28,6 +28,7 @@ import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.storage.ORecordMetadata;
 
@@ -52,6 +53,8 @@ public class OrientCapabilityStorage
 
   private final CapabilityStorageItemEntityAdapter entityAdapter = new CapabilityStorageItemEntityAdapter();
 
+  private OClass entityType;
+
   private ODatabaseDocumentPool databasePool;
 
   @Inject
@@ -67,7 +70,7 @@ public class OrientCapabilityStorage
     // create database
     try (ODatabaseDocumentTx db = databaseManager.connect(DB_NAME, true)) {
       // register schema
-      entityAdapter.register(db);
+      entityType = entityAdapter.register(db);
     }
 
     // setup the database connection pool
@@ -78,6 +81,7 @@ public class OrientCapabilityStorage
   protected void doStop() throws Exception {
     databasePool.close();
     databasePool = null;
+    entityType = null;
   }
 
   /**
@@ -89,12 +93,12 @@ public class OrientCapabilityStorage
   }
 
   private CapabilityIdentity convert(final ORID rid) {
-    String encoded = recordIdObfuscator.encode(rid);
+    String encoded = recordIdObfuscator.encode(entityType, rid);
     return new CapabilityIdentity(encoded);
   }
 
   private ORID convert(final CapabilityIdentity id) {
-    return recordIdObfuscator.decode(id.toString());
+    return recordIdObfuscator.decode(entityType, id.toString());
   }
 
   @Override

@@ -28,10 +28,11 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.Hex;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
+import org.sonatype.nexus.orient.RecordIdObfuscatorSupport;
 
-import com.google.common.base.Throwables;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -43,7 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named("encrypted")
 @Singleton
 public class EncryptedRecordIdObfuscator
-  implements RecordIdObfuscator
+  extends RecordIdObfuscatorSupport
 {
   private static final String CPREFIX = "${nexus.orient.encryptedRecordIdObfuscator";
 
@@ -73,32 +74,20 @@ public class EncryptedRecordIdObfuscator
     this.secretKey = new SecretKeySpec(tmp.getEncoded(), "DES");
   }
 
-  public String encode(final ORID rid) {
-    checkNotNull(rid);
-
-    try {
-      // rid is 10 byte long, need to be in multiples of 8 for cipher
-      byte[] plain = ByteBuffer.allocate(16).put(rid.toStream()).array();
-      cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
-      byte[] encrypted = cipher.doFinal(plain);
-      return Hex.encode(encrypted);
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+  @Override
+  protected String doEncode(final OClass type, final ORID rid) throws Exception {
+    // rid is 10 byte long, need to be in multiples of 8 for cipher
+    byte[] plain = ByteBuffer.allocate(16).put(rid.toStream()).array();
+    cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
+    byte[] encrypted = cipher.doFinal(plain);
+    return Hex.encode(encrypted);
   }
 
-  public ORID decode(final String encoded) {
-    checkNotNull(encoded);
-
-    try {
-      byte[] encrypted = Hex.decode(encoded);
-      cipher.init(Cipher.DECRYPT_MODE, secretKey, paramSpec);
-      byte[] plain = cipher.doFinal(encrypted);
-      return new ORecordId().fromStream(plain);
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+  @Override
+  protected ORID doDecode(final OClass type, final String encoded) throws Exception {
+    byte[] encrypted = Hex.decode(encoded);
+    cipher.init(Cipher.DECRYPT_MODE, secretKey, paramSpec);
+    byte[] plain = cipher.doFinal(encrypted);
+    return new ORecordId().fromStream(plain);
   }
 }

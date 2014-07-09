@@ -17,11 +17,11 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.Hex;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
+import org.sonatype.nexus.orient.RecordIdObfuscatorSupport;
 
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
 
 /**
  * HEX-encoding {@link RecordIdObfuscator}.
@@ -31,15 +31,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named("hex")
 @Singleton
 public class HexRecordIdObfuscator
-  implements RecordIdObfuscator
+  extends RecordIdObfuscatorSupport
 {
-  public String encode(final ORID rid) {
-    checkNotNull(rid);
+  @Override
+  protected String doEncode(final OClass type, final ORID rid) throws Exception {
     return Hex.encode(rid.toStream());
   }
 
-  public ORID decode(final String encoded) {
-    checkNotNull(encoded);
+  @Override
+  protected ORID doDecode(final OClass type, final String encoded) throws Exception {
     byte[] decoded = Hex.decode(encoded);
     return new ORecordId().fromStream(decoded);
   }
