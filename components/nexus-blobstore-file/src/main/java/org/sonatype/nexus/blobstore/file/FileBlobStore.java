@@ -143,13 +143,7 @@ public class FileBlobStore
       return null;
     }
 
-    final Path path = pathFor(blobId);
-    if (!fileOperations.exists(path)) {
-      log.error("Blob content for blob {} not found at expected location {}", blobId, path);
-      throw new BlobStoreException("Blob content unexpectedly missing", blobId);
-    }
-
-    final FileBlob blob = new FileBlob(blobId, metadata.getHeaders(), path, metadata.getMetrics());
+    final FileBlob blob = new FileBlob(blobId, metadata.getHeaders(), pathFor(blobId), metadata.getMetrics());
 
     log.debug("Accessing blob {}", blobId);
     if (listener != null) {
