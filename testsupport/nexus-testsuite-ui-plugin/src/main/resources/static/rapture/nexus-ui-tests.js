@@ -31,7 +31,7 @@ Harness.start(
       items: [
         {
           group: 'Functional',
-          hostPageUrl: '/nexus/rapture.html',
+          hostPageUrl: '/nexus',
           items: [
             { url: 'tests/framework/functional/Bookmarking.js' },
             { url: 'tests/framework/functional/LoginLogout.js' },
@@ -53,7 +53,7 @@ Harness.start(
       items: [
         {
           group: 'Functional',
-          hostPageUrl: '/nexus/rapture.html',
+          hostPageUrl: '/nexus',
           items: [
             { url: 'tests/repositorytarget/RepositoryTargetCRUD.js' }
           ]
