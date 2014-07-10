@@ -229,7 +229,7 @@ public class DefaultTimeline
             doc.field(P_TYPE, record.getType());
             doc.field(P_SUBTYPE, record.getSubType());
             doc.field(P_DATA, record.getData());
-            db.save(doc, timestampToClusterMap.get(record.getTimestamp()));
+            doc.save(timestampToClusterMap.get(record.getTimestamp()));
           }
           db.commit();
         }
