@@ -48,7 +48,13 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
       header: 'Timestamp',
       dataIndex: 'timestamp',
       flex: 1,
-      tooltip: 'Event timestamp in nanoseconds'
+      tooltip: 'Event timestamp in milliseconds'
+    },
+    {
+      header: 'Sequence',
+      dataIndex: 'sequence',
+      flex: 1,
+      tooltip: 'Event sequence'
     },
     {
       header: 'Duration',
