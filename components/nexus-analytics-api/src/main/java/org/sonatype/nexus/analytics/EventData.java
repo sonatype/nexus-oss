@@ -28,6 +28,8 @@ public class EventData
 
   private Long timestamp;
 
+  private Long sequence;
+
   private Long duration;
 
   private String userId;
@@ -50,6 +52,14 @@ public class EventData
 
   public void setTimestamp(final Long timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public Long getSequence() {
+    return sequence;
+  }
+
+  public void setSequence(final Long sequence) {
+    this.sequence = sequence;
   }
 
   public Long getDuration() {
@@ -85,6 +95,7 @@ public class EventData
     return getClass().getSimpleName() + "{" +
         "type='" + type + '\'' +
         ", timestamp=" + timestamp +
+        ", sequence=" + sequence +
         ", duration=" + duration +
         ", userId='" + userId + '\'' +
         ", sessionId='" + sessionId + '\'' +

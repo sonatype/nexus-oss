@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.analytics;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import javax.annotation.Nullable;
 
 import org.apache.shiro.SecurityUtils;
@@ -27,11 +29,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class EventDataBuilder
 {
+  private static final AtomicLong sequence = new AtomicLong(0);
+
   private final EventData data = new EventData();
 
   public EventDataBuilder(final String type) {
     data.setType(type);
-    data.setTimestamp(System.nanoTime());
+    data.setTimestamp(System.currentTimeMillis());
+    data.setSequence(sequence.incrementAndGet());
 
     // capture the user and session ids if we can
     Subject subject = SecurityUtils.getSubject();
@@ -60,7 +65,7 @@ public class EventDataBuilder
   }
 
   public EventData build() {
-    data.setDuration(System.nanoTime() - data.getTimestamp());
+    data.setDuration(System.currentTimeMillis() - data.getTimestamp());
     return data;
   }
 }

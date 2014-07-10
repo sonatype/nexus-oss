@@ -68,6 +68,7 @@ public class EventDataBuilderTest
     assertThat(event, notNullValue());
     assertThat(event.getType(), is("TEST"));
     assertThat(event.getTimestamp(), notNullValue());
+    assertThat(event.getSequence(), notNullValue());
     assertThat(event.getUserId(), is("foo"));
     assertThat(event.getSessionId(), is("1234"));
     assertThat(event.getDuration(), notNullValue());
