@@ -13,6 +13,9 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotEmpty
+
+import javax.validation.constraints.NotNull
 
 /**
  * Repository Virtual exchange object.
@@ -23,6 +26,9 @@ import groovy.transform.ToString
 class RepositoryVirtualXO
 extends RepositoryXO
 {
+  @NotEmpty
   String shadowOf
+
+  @NotNull
   Boolean synchronizeAtStartup
 }

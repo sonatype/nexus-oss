@@ -121,7 +121,9 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
     var me = this;
 
     NX.Dialogs.askConfirmation('Clear events', 'Clear analytics event data?', function () {
+      me.getList().getEl().mask('Clearing event data...');
       NX.direct.analytics_Events.clear(function (response) {
+        me.getList().getEl().unmask();
         me.load();
         if (Ext.isDefined(response) && response.success) {
           NX.Messages.add({ text: 'Event data has been cleared', type: 'success' });
@@ -135,9 +137,13 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
    * Export and download events.
    */
   exportEvents: function () {
+    var me = this;
+
     NX.Dialogs.askConfirmation('Export events',
         'Export and download analytics event data?<br/>No data will be sent to Sonatype.', function () {
+          me.getList().getEl().mask('Exporting event data...');
           NX.direct.analytics_Events.export(function (response) {
+            me.getList().getEl().unmask();
             if (Ext.isDefined(response) && response.success) {
               Ext.widget('nx-coreui-analytics-eventszipcreated').setValues(response.data);
             }

@@ -13,7 +13,13 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.model.Password
+import org.sonatype.nexus.proxy.repository.ProxyMode
+
+import javax.validation.constraints.Max
+import javax.validation.constraints.Min
+import javax.validation.constraints.NotNull
 
 /**
  * Repository Proxy exchange object.
@@ -24,23 +30,50 @@ import org.sonatype.nexus.extdirect.model.Password
 class RepositoryProxyXO
 extends RepositoryXO
 {
-  String proxyMode
+  ProxyMode proxyMode
   String remoteStatus
   String remoteStatusReason
   String remoteStorageUrl
   Boolean useTrustStoreForRemoteStorageUrl
+
+  @NotNull
   Boolean autoBlockActive
+
+  @NotNull
   Boolean fileTypeValidation
+
   Boolean authEnabled
+
+  @NotEmpty(groups = Authentication)
   String authUsername
+
   Password authPassword
   String authNtlmHost
   String authNtlmDomain
+
   Boolean httpRequestSettings
   String userAgentCustomisation
   String urlParameters
+
+  @Min(value = 0L, groups = HttpRequestSettings)
+  @Max(value = 3600L, groups = HttpRequestSettings)
   Integer timeout
+
+  @Min(value = 0L, groups = HttpRequestSettings)
+  @Max(value = 10L, groups = HttpRequestSettings)
   Integer retries
+
+  @Min(-1L)
+  @Max(511000L)
   Integer notFoundCacheTTL
+
+  @Min(-1L)
+  @Max(511000L)
   Integer itemMaxAge
+
+  public interface Authentication
+  {}
+
+  public interface HttpRequestSettings
+  {}
 }

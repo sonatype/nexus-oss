@@ -26,11 +26,11 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
   api: {
     submit: 'NX.direct.coreui_Repository.updateProxyMaven'
   },
-  settingsFormSuccessMessage: function (data) {
+  settingsFormSuccessMessage: function(data) {
     return 'Repository updated: ' + data['id'];
   },
 
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = [
@@ -51,6 +51,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         allowBlank: true,
         submitValue: false
       },
+      { xtype: 'nx-coreui-repository-settings-localstorage' },
       {
         xtype: 'nx-url',
         name: 'remoteStorageUrl',
@@ -113,6 +114,10 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         name: 'notFoundCacheTTL',
         fieldLabel: 'Not Found Cache TTL',
         helpText: 'This controls how long to cache the fact that a file was not found in the repository.',
+        minValue: -1,
+        maxValue: 511000,
+        allowDecimals: false,
+        allowExponential: false,
         allowBlank: true
       },
       {
@@ -120,6 +125,10 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         name: 'artifactMaxAge',
         fieldLabel: 'Artifact Max Age',
         helpText: 'This controls how long to cache the artifacts in the repository before rechecking the remote repository. In a release repository, this value should be -1 (infinite) as release artifacts shouldn\'t change.',
+        minValue: -1,
+        maxValue: 511000,
+        allowDecimals: false,
+        allowExponential: false,
         allowBlank: true
       },
       {
@@ -127,6 +136,10 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         name: 'metadataMaxAge',
         fieldLabel: 'Metadata Max Age',
         helpText: 'This controls how long to cache the metadata in the repository before rechecking the remote repository. Unlike artifact max age, this value should not be infinite or Maven won\'t discover new artifact releases.',
+        minValue: -1,
+        maxValue: 511000,
+        allowDecimals: false,
+        allowExponential: false,
         allowBlank: true
       },
       {
@@ -134,6 +147,10 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         name: 'itemMaxAge',
         fieldLabel: 'Item Max Age',
         helpText: 'Repositories may contain resources that are neither artifacts identified by GAV coordinates or metadata. This value controls how long to cache such items in the repository before rechecking the remote repository.',
+        minValue: -1,
+        maxValue: 511000,
+        allowDecimals: false,
+        allowExponential: false,
         allowBlank: true
       },
       {

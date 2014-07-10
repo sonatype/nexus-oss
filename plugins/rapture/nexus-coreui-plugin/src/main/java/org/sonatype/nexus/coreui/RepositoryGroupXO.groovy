@@ -13,15 +13,17 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotEmpty
 
 /**
  * Repository Group exchange object.
- * 
+ *
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
 class RepositoryGroupXO
 extends RepositoryXO
 {
+  @NotEmpty
   List<String> memberRepositoryIds
 }
