@@ -34,8 +34,9 @@ import org.sonatype.nexus.timeline.TimelineCallback;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
-import com.orientechnologies.orient.core.sql.OCommandSQL;
+import com.google.common.collect.Maps;
 
+import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
@@ -210,53 +211,60 @@ public class DefaultTimeline
     if (records.isEmpty()) {
       return; // spare resources from getting DB for nothing
     }
+
     try (ODatabaseDocumentTx db = db()) {
-      db.begin();
-      try {
+      // this must be synced to prevent purge drop cluster being created
+      synchronized (this) {
+        // 1st pass (no TX, DDL): add clusters needed by records
+        final Map<Long, String> timestampToClusterMap = Maps.newHashMap();
         for (EntryRecord record : records) {
-          maybeAddNewCluster(db, record.getTimestamp());
-          ODocument doc = db.newInstance(DB_CLASS);
-          doc.field(P_TIMESTAMP, record.getTimestamp());
-          doc.field(P_TYPE, record.getType());
-          doc.field(P_SUBTYPE, record.getSubType());
-          doc.field(P_DATA, record.getData());
-          doc.save();
+          timestampToClusterMap.put(record.getTimestamp(), maybeAddNewCluster(db, record.getTimestamp()));
         }
-        db.commit();
-      }
-      catch (Exception e) {
-        db.rollback();
-        throw Throwables.propagate(e);
+        // 2nd pass (in TX, DML): insert records into their places.
+        db.begin();
+        try {
+          for (EntryRecord record : records) {
+            ODocument doc = db.newInstance(DB_CLASS);
+            doc.field(P_TIMESTAMP, record.getTimestamp());
+            doc.field(P_TYPE, record.getType());
+            doc.field(P_SUBTYPE, record.getSubType());
+            doc.field(P_DATA, record.getData());
+            db.save(doc, timestampToClusterMap.get(record.getTimestamp()));
+          }
+          db.commit();
+        }
+        catch (Exception e) {
+          db.rollback();
+          throw Throwables.propagate(e);
+        }
       }
     }
   }
 
   /**
-   * Adds new cluster if not exists, based on cluster name formed out of passed in timestamp. Clusters have common
-   * prefixes (see {@link #DB_CLUSTER_PREFIX}) and suffix is timestamp's date (rounded to midnight) as string with
-   * pattern {@code YYYYMMDD}. As OrientDB DDL is not atomic, this method must be mutually exclusive with method
-   * {@link #purgeOlderThan(int)}, hence both are synchronized.
+   * Calculates the expected cluster name where given timestamp should be located. It adds new cluster if cluster with
+   * calculated name not exists, hence, after the return from this method it is guaranteed that the cluster with name
+   * returned does exists. Clusters have common prefixes (see {@link #DB_CLUSTER_PREFIX}) and suffix is timestamp's date
+   * (rounded to midnight) as string with pattern {@code YYYYMMDD}. As OrientDB DDL is not atomic, this method must be
+   * mutually exclusive with method {@link #purgeOlderThan(int)}, hence both should be synchronized (or called from
+   * synchronized block like this method). This method must be called outside of a TX as it performs DDL.
    */
-  private synchronized int maybeAddNewCluster(final ODatabaseDocumentTx db, final long timestamp) {
+  private String maybeAddNewCluster(final ODatabaseDocumentTx db, final long timestamp) {
     final String name = String.format("%s%s", DB_CLUSTER_PREFIX,
         new DateMidnight(timestamp, DateTimeZone.UTC).toString("YYYYMMdd"));
     int cid = db.getClusterIdByName(name); // undocumented: if cluster not exists, returns -1
     if (cid == -1) {
-      db.commit();
       cid = db.addCluster(name, CLUSTER_TYPE.PHYSICAL);
       final OSchema schema = db.getMetadata().getSchema();
       final OClass type = schema.getClass(DB_CLASS);
       type.addClusterId(cid);
-      type.setDefaultClusterId(cid);
       schema.save();
       log.info("Created new journal cluster; id: {}, name: {}", cid, name);
-      db.begin();
-      return cid;
     }
     else {
       log.debug("Journal cluster exists; id: {}, name: {}", cid, name);
-      return cid;
     }
+    return name;
   }
 
   @Override
@@ -284,11 +292,11 @@ public class DefaultTimeline
           sb.append(P_SUBTYPE).append(" IN ").append("[\"").append(Joiner.on("\", \"").join(subTypes)).append("\"] ");
         }
         sb.append(" ORDER BY @rid DESC SKIP ").append(fromItem).append(" LIMIT ").append(count);
-  
+
         log.debug("Query: {}", sb);
-  
+
         final OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(sb.toString());
-  
+
         final OResultSet<ODocument> results = db.query(query);
         if (results.isEmpty()) {
           return;
@@ -302,7 +310,8 @@ public class DefaultTimeline
             break;
           }
         }
-      } finally {
+      }
+      finally {
         db.commit();
       }
     }
