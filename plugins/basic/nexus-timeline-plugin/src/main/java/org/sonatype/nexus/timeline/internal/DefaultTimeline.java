@@ -218,7 +218,9 @@ public class DefaultTimeline
         // 1st pass (no TX, DDL): add clusters needed by records
         final Map<Long, String> timestampToClusterMap = Maps.newHashMap();
         for (EntryRecord record : records) {
-          timestampToClusterMap.put(record.getTimestamp(), maybeAddNewCluster(db, record.getTimestamp()));
+          if (!timestampToClusterMap.containsKey(record.getTimestamp())) {
+            timestampToClusterMap.put(record.getTimestamp(), maybeAddNewCluster(db, record.getTimestamp()));
+          }
         }
         // 2nd pass (in TX, DML): insert records into their places.
         db.begin();
