@@ -348,8 +348,8 @@
             </goals>
             <configuration>
               <target>
-                <zip destfile="${project.build.directory}/${project.artifactId}-${project.version}.zip"
-                  basedir="${basedir}/src/main" includes="sonatype-work/**" update="true" />
+                <zip destfile="${project.build.directory}/${project.artifactId}-${project.version}.zip" update="true"
+                  basedir="${basedir}/src/main" includes="sonatype-work/**" excludes="**/.placeholder" />
               </target>
             </configuration>
           </execution>
