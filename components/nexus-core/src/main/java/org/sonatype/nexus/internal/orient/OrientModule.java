@@ -10,19 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.orient;
+package org.sonatype.nexus.internal.orient;
 
-import com.orientechnologies.orient.core.id.ORID;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
+import org.sonatype.nexus.orient.RecordIdObfuscator;
+
+import com.google.inject.AbstractModule;
 
 /**
- * {@link ORID} obfuscation helper.
+ * Orient module.
  *
  * @since 3.0
  */
-public interface RecordIdObfuscator
+public class OrientModule
+  extends AbstractModule
 {
-  String encode(OClass type, ORID rid);
-
-  ORID decode(OClass type, String encoded);
+  @Override
+  protected void configure() {
+    // TODO: Change to encrypted impl once we have a performance profile for its usage
+    bind(RecordIdObfuscator.class).to(HexRecordIdObfuscator.class);
+    //bind(RecordIdObfuscator.class).to(EncryptedRecordIdObfuscator.class);
+  }
 }

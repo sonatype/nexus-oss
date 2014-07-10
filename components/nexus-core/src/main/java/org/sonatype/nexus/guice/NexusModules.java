@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.sonatype.nexus.internal.orient.OrientModule;
 import org.sonatype.nexus.web.NexusGuiceFilter;
 import org.sonatype.nexus.web.SecurityFilter;
 import org.sonatype.nexus.web.TemplateRenderer;
@@ -77,6 +78,7 @@ public class NexusModules
         }
       });
       install(new ValidationModule());
+      install(new OrientModule());
     }
   }
 
