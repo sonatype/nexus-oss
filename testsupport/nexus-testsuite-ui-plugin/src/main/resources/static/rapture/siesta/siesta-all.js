@@ -1,7 +1,7 @@
 /*
 
-Siesta 2.0.5
-Copyright(c) 2009-2013 Bryntum AB
+Siesta 2.0.8
+Copyright(c) 2009-2014 Bryntum AB
 http://bryntum.com/contact
 http://bryntum.com/products/siesta/license
 
@@ -5067,16 +5067,6 @@ Role('JooseX.Observable', {
     redistribute.
 */
 
-/*jslint evil: true, strict: false, regexp: false */
-
-/*members "", "\b", "\t", "\n", "\f", "\r", "\"", JSON, "\\", apply,
-    call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
-    getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join,
-    lastIndex, length, parse, prototype, push, replace, slice, stringify,
-    test, toJSON, toString, valueOf
-*/
-
-
 // Create a JSON object only if one does not already exist. We create the
 // methods in a closure to avoid creating global variables.
 
@@ -5937,37 +5927,24 @@ Class('Siesta.Util.Queue', {
             if (this.isAborted) return
             
             if (step) {
-                var processor       = step.processor || this.processor
-                var processorScope  = step.processorScope || this.processorScope
+                // Normally, the `doSteps` is called recursively for every step in the chain
+                // but, steps may complete synchronously, which means, stack will grow
+                // since some version, FF has smaller stack size than other browsers
+                // and it starts behaving unstable when stack grows
+                // because of that, we perform a special check if step has completed synchronously
+                // and processing the next step in the same `doStep` context (in the loop), avoiding recursion
                 
-                var index           = this.steps.length - steps.length - 1
-                
-                if (!processor) throw new Error("No process function found for step: " + index)
-                
-                if (step.isAsync) {
-                    var next = step.next = function () {
-                        me.doSteps(steps, callback, scope)
+                // if `doOneStep` has returned `true`, then step has completed synchronously
+                // and the flow did not recurse into `doSteps`
+                // in this case we continue processing to the next step
+                while (this.doOneStep(step, steps, callback, scope) && !this.isAborted) {
+                    if (steps.length)
+                        step = steps.shift()
+                    else {
+                        this.doSteps(steps, callback, scope)
+                        break;
                     }
-                    
-                    // processor should call `next` to continue
-                    processor.call(processorScope || me, step, index, this, next)
-                } else {
-                    
-                    processor.call(processorScope || me, step, index, this)
-                    
-                    if (this.isAborted) return
-                    
-                    var interval = step.interval || me.interval
-                    
-                    if (interval) 
-                        this.currentTimeout = deferer(function () {
-                            me.doSteps(steps, callback, scope)    
-                        }, interval)
-                    else
-                        me.doSteps(steps, callback, scope)
                 }
-                
-                
             } else {
                 if (callback)
                     if (this.callbackDelay)
@@ -5976,6 +5953,55 @@ Class('Siesta.Util.Queue', {
                         }, this.callbackDelay)
                     else
                         callback.call(scope || this)
+            }
+        },
+        
+        
+        doOneStep : function (step, steps, callback, scope) {
+            var me              = this
+            var deferer         = this.deferer
+            
+            var processor       = step.processor || this.processor
+            var processorScope  = step.processorScope || this.processorScope
+            
+            var index           = this.steps.length - steps.length - 1
+            
+            if (!processor) throw new Error("No process function found for step: " + index)
+            
+            if (step.isAsync) {
+                var stepHasCompletedSynchronously   = false
+                var processorHasCompleted           = false
+                
+                var next = step.next = function () {
+                    // if at this point `processorHasCompleted` is still `false`, that means that "next" function
+                    // has been called before the `processor` function has returned, and thus, step has completed 
+                    // synchronously
+                    // see the comment in `doSteps` why we treat this case differently
+                    if (!processorHasCompleted)
+                        stepHasCompletedSynchronously   = true
+                    else
+                        me.doSteps(steps, callback, scope)
+                }
+                
+                // processor should call `next` to continue
+                processor.call(processorScope || me, step, index, this, next)
+                
+                processorHasCompleted               = true
+                
+                if (stepHasCompletedSynchronously) return true
+            } else {
+                processor.call(processorScope || me, step, index, this)
+                
+                if (this.isAborted) return
+                
+                var interval = step.interval || me.interval
+                
+                if (interval) 
+                    this.currentTimeout = deferer(function () {
+                        me.doSteps(steps, callback, scope)    
+                    }, interval)
+                else
+                    me.doSteps(steps, callback, scope)
             }
         }
     }
@@ -6456,7 +6482,7 @@ Class('Siesta.Content.Manager', {
 ;
 ;
 Class('Siesta', {
-    /*PKGVERSION*/VERSION : '2.0.5',
+    /*PKGVERSION*/VERSION : '2.0.8',
 
     // "my" should been named "static"
     my : {
@@ -6495,6 +6521,611 @@ Class('Siesta', {
 if (typeof StartTest == 'undefined') StartTest = Siesta.StartTest
 if (typeof startTest == 'undefined') startTest = Siesta.StartTest
 if (typeof describe == 'undefined') describe = Siesta.StartTest;
+Siesta.CurrentLocale = Siesta.CurrentLocale || {
+
+    "Siesta.Harness.Browser.UI.AboutWindow" : {
+
+        upgradeText : 'Upgrade to Siesta Standard',
+        closeText   : 'Close',
+        titleText   : 'ABOUT SIESTA (v. {VERSION})',
+
+        bodyText    : '<img height="35" src="http://www.bryntum.com/bryntum-logo.png"/>\
+             <p>Siesta is a JavaScript unit and functional test tool made by <a target="_blank" href="http://www.bryntum.com">Bryntum</a>. You can test any web page or JavaScript code, including Ext JS, jQuery or NodeJS. \
+             Siesta comes in two versions: <strong>Lite</strong> and <strong>Standard</strong>. With Lite, you can launch your tests in the browser UI. \
+             With the Standard version, you can also automate your tests and use the automation scripts together with tools like PhantomJS or Selenium WebDriver. </p>\
+             Siesta would not be possible without these awesome products & libraries: <br>\
+                     <ul style="padding:0 0 0 30px">\
+                       <li><a href="http://sencha.com/extjs">Ext JS</a></li> \
+                       <li><a href="http://jquery.com">jQuery</a></li> \
+                       <li><a href="http://http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></li> \
+                       <li><a href="http://joose.it/">Joose</a></li> \
+                       <li><a href="https://github.com/gotwarlost/istanbul">Istanbul</a></li> \
+                    </ul>'
+    },
+
+    "Siesta.Harness.Browser.UI.AssertionGrid" : {
+        initializingText    : 'Initializing test...'
+    },
+
+    "Siesta.Harness.Browser.UI.CoverageReport" : {
+        closeText               : 'Close',
+        showText                : 'Show: ',
+        lowText                 : 'Low',
+        mediumText              : 'Med',
+        highText                : 'High',
+        statementsText          : 'Statements',
+        branchesText            : 'Branches',
+        functionsText           : 'Functions',
+        linesText               : 'Lines',
+        loadingText             : "Loading coverage data...",
+        loadingErrorText        : 'Loading error',
+        loadingErrorMessageText : 'Could not load the report data from this url: ',
+        globalNamespaceText     : '[Global namespace]'
+    },
+
+    "Siesta.Harness.Browser.UI.DomContainer" : {
+        title                   : 'DOM Panel',
+        viewDocsText            : 'View documentation for ',
+        docsUrlText             : 'http://docs.sencha.com/{0}/#!/api/{1}'
+    },
+
+    "Siesta.Harness.Browser.UI.ResultPanel" : {
+        rerunText               : 'Re-run test',
+        toggleDomVisibleText    : 'Toggle DOM visible',
+        viewSourceText          : 'View source',
+        showFailedOnlyText      : 'Show failed only',
+        domInspectorText        : 'Toggle Ext Dom Inspector',
+        eventRecorderText       : 'Event Recorder',
+        closeText               : 'Close'
+    },
+
+    "Siesta.Harness.Browser.UI.TestGrid" : {
+        title                   : 'Double click a test to run it',
+        nameText                : 'Name',
+        filterTestsText         : 'Filter tests',
+        expandCollapseAllText   : 'Expand / Collapse all',
+        runCheckedText          : 'Run checked',
+        runFailedText           : 'Run failed',
+        runAllText              : 'Run all',
+        showCoverageReportText  : 'Show coverage report',
+        passText                : 'Pass',
+        failText                : 'Fail',
+        optionsText             : 'Options...',
+        todoPassedText          : 'todo assertion(s) passed',
+        todoFailedText          : 'todo assertion(s) failed',
+        viewDomText             : 'View DOM',
+        transparentExText       : 'Transparent exceptions',
+        cachePreloadsText       : 'Cache preloads',
+        autoLaunchText          : 'Auto launch',
+        keepResultsText         : 'Keep results',
+        speedRunText            : 'Speed run',
+        breakOnFailText         : 'Break on fail',
+        debuggerOnFailText      : 'Debugger on fail',
+        aboutText               : 'About Siesta',
+        documentationText       : 'Siesta Documentation',
+        siestaDocsUrl           : 'http://bryntum.com/docs/siesta',
+        filterFieldTooltip      : 'Supported formats for tests filtering:\n1) term1 term2 - both "term1" and "term2" should present in the test url\n' +
+            '2) term1 term2 | term3 term4 | ... - both "term1" and "term2" should present in the test url, or both term3 and term4, can be ' +
+            'repeated indefinitely\n' +
+            '3) group > any term for tests filtering - filters only withing the specified `group`'
+            
+    },
+
+    "Siesta.Harness.Browser.UI.VersionChecker" : {
+
+        newUpdateText           : 'New Update Available...',
+        updateWindowTitleText   : 'New version available for download! Current version: ',
+        cancelText              : 'Cancel',
+        changelogLoadFailedText : 'Bummer! Failed to fetch changelog.',
+        downloadText            : 'Download ',
+        liteText                : ' (Lite)',
+        standardText            : ' (Standard)',
+        loadingChangelogText    : 'Loading changelog...'
+    },
+
+    "Siesta.Harness.Browser.UI.Viewport" : {
+
+        apiLinkText       : 'API Documentation',
+        apiLinkUrl        : 'http://bryntum.com/docs/siesta',
+        uncheckOthersText : 'Uncheck others (and check this)',
+        uncheckAllText    : 'Uncheck all',
+        checkAllText      : 'Check all',
+        runThisText       : 'Run this',
+        httpWarningTitle  : 'You must use a web server',
+        httpWarningDesc   : 'You must run Siesta in a web server context, and not using the file:/// protocol'
+    },
+
+    "Siesta.Harness.Browser.UI_Mobile.MainPanel" : {
+        backText                : 'Back',
+        allTestsPassedText      : 'All tests passed.',
+        failedAssertionsForText : 'Failed assertions for: '
+    },
+
+    "Siesta.Harness.Browser" : {
+        codeCoverageWarningText : "Can not enable code coverage - did you forget to include the `siesta-coverage-all.js` on the harness page?"
+    },
+
+    "Siesta.Result.Assertion" : {
+        todoText        : 'TODO: ',
+        passText        : 'ok',
+        failText        : 'fail'
+    },
+
+    "Siesta.Role.ConsoleReporter" : {
+        passText            : 'PASS',
+        failText            : 'FAIL',
+        warnText            : 'WARN',
+        missingFileText     : 'Test file [{URL}] not found.',
+        allTestsPassedText  : 'All tests passed',
+        failuresFoundText   : 'There are failures'
+    },
+
+    "Siesta.Test.Action.Drag" : {
+        byOrToMissingText   : 'Either "to" or "by" configuration option is required for "drag" step',
+        byAndToDefinedText  : 'Exactly one of "to" or "by" configuration options is required for "drag" step, not both'
+    },
+
+    "Siesta.Test.Action.Eval" : {
+        invalidMethodNameText : "Invalid method name: ",
+        wrongFormatText       : "Wrong format of the action string: ",
+        parseErrorText        : "Can't parse arguments: "
+    },
+
+    "Siesta.Test.Action.Wait" : {
+        missingMethodText     : 'Could not find a waitFor method named '
+    },
+
+    "Siesta.Test.BDD.Expectation" : {
+        expectText                  : 'Expect',
+        needNotText                 : 'Need not',
+        needText                    : 'Need',
+        needMatchingText            : 'Need matching',
+        needNotMatchingText         : 'Need not matching',
+        needStringNotContainingText : 'Need string not containing',
+        needStringContainingText    : 'Need string containing',
+        needArrayNotContainingText  : 'Need array not containing',
+        needArrayContainingText     : 'Need array containing',
+        needGreaterEqualThanText    : 'Need value greater or equal than',
+        needGreaterThanText         : 'Need value greater than',
+        needLessThanText            : 'Need value less than',
+        needLessEqualThanText       : 'Need value less or equal than',
+        needValueNotCloseToText     : 'Need value not close to',
+        needValueCloseToText        : 'Need value close to',
+        toBeText                    : 'to be',
+        toBeDefinedText             : 'to be defined',
+        toBeUndefinedText           : 'to be undefined',
+        toBeEqualToText             : 'to be equal to',
+        toBeTruthyText              : 'to be truthy',
+        toBeFalsyText               : 'to be falsy',
+        toMatchText                 : 'to match',
+        toContainText               : 'to contain',
+        toBeLessThanText            : 'to be less than',
+        toBeGreaterThanText         : 'to be greater than',
+        toBeCloseToText             : 'to be close to',
+        toThrowText                 : 'to throw exception',
+        thresholdIsText             : 'Threshold is ',
+        exactMatchText              : 'Exact match text',
+        thrownExceptionText         : 'Thrown exception',
+        noExceptionThrownText       : 'No exception thrown'
+    },
+
+    "Siesta.Test.ExtJS.Ajax"        : {
+        ajaxIsLoading               : 'An Ajax call is currently loading',
+        allAjaxRequestsToComplete   : 'all ajax requests to complete',
+        ajaxRequest                 : 'ajax request',
+        toComplete                  : 'to complete'
+    },
+
+    "Siesta.Test.ExtJS.Component"   : {
+        badInputText                : 'Expected an Ext.Component, got',
+        toBeVisible                 : 'to be visible',
+        toNotBeVisible              : 'to not be visible',
+        component                   : 'component',
+        Component                   : 'Component',
+        componentQuery              : 'componentQuery',
+        compositeQuery              : 'composite query',
+        toReturnEmptyArray          : 'to return an empty array',
+        toReturnEmpty               : 'to return empty',
+        toReturnAVisibleComponent   : 'to return a visible component',
+        toReturnHiddenCmp           : 'to return a hidden/missing component',
+        invalidDestroysOkInput      : 'No components provided, or component query returned empty result',
+        exception                   : 'Exception',
+        exceptionAnnotation         : 'Exception thrown while calling "destroy" method of',
+        destroyFailed               : 'was not destroyed (probably destroy was canceled in the `beforedestroy` listener)',
+        destroyPassed               : 'All passed components were destroyed ok'
+    },
+
+    "Siesta.Test.ExtJS.DataView"    : {
+        view                        : 'view',
+        toRender                    : 'to render'
+    },
+
+    "Siesta.Test.ExtJS.Element"     : {
+        top                         : 'top',
+        left                        : 'left',
+        bottom                      : 'bottom',
+        right                       : 'right'
+    },
+
+    "Siesta.Test.ExtJS.Grid"     : {
+        waitForRowsVisible          : 'rows to show for panel with id'
+    },
+
+    "Siesta.Test.ExtJS.Observable" : {
+        hasListenerInvalid           : '1st argument for `t.hasListener` should be an observable instance',
+        hasListenerPass              : 'Observable has listener for {eventName}',
+        hasListenerFail              : 'Provided observable has no listeners for event',
+
+        isFiredWithSignatureNotFired : 'event was not fired during the test"',
+        observableFired              : 'Observable fired',
+        correctSignature             : 'with correct signature',
+        incorrectSignature           : 'with incorrect signature'
+    },
+
+    "Siesta.Test.ExtJS.Store"        : {
+        storesToLoad                 : 'stores to load',
+        failedToLoadStore            : 'Failed to load the store',
+        URL                          : 'URL'
+    },
+
+    "Siesta.Test.Action"             : {
+        missingTestAction            : 'Action [{0}] requires `{1}` method in your test class'
+    },
+
+    "Siesta.Test.BDD"                : {
+        codeBodyMissing              : 'Code body is not provided for',
+        codeBodyOf                   : 'Code body of',
+        missingFirstArg              : 'does not declare a test instance as 1st argument',
+        iitFound                     : 't.iit should only be used during debugging'
+    },
+
+    "Siesta.Test.Browser"            : {
+        noDomElementFound            : 'No DOM element found for CSS selector',
+        noActionTargetFound          : 'No action target found for',
+        waitForEvent                 : 'observable to fire its',
+        event                        : 'event',
+        wrongFormat                  : 'Wrong format for expected number of events',
+        unrecognizedSignature        : 'Unrecognized signature for `firesOk`',
+        observableFired              : 'Observable fired',
+        observableFiredOk            : 'Observable fired expected number of',
+        actualNbrEvents              : 'Actual number of events',
+        expectedNbrEvents            : 'Expected number of events',
+        events                       : 'events',
+        noElementFound               : 'Could not find any element at',
+        targetElementOfAction        : 'Target element of action',
+        targetElementOfSomeAction    : 'Target element of some action',
+        isNotVisible                 : 'is not visible or not reachable',
+        text                         : 'text',
+        toBePresent                  : 'to be present',
+        toNotBePresent               : 'to not be present',
+        target                       : 'target',
+        toAppear                     : 'to appear'
+    },
+
+    "Siesta.Test.Date"               :  {
+        isEqualTo                    : 'is equal to',
+        Got                          : 'Got'
+    },
+
+    "Siesta.Test.Element"            : {
+        elementContent               : 'element content',
+        toAppear                     : 'to appear',
+        toDisappear                  : 'to disappear',
+        monkeyException              : 'Monkey testing action did not complete properly - probably an exception was thrown',
+        monkeyNoExceptions           : 'No exceptions thrown during monkey test',
+        monkeyActionLog              : 'Monkey action log',
+        elementHasClass              : 'Element has the CSS class',
+        elementHasNoClass            : 'Element has no CSS class',
+        elementClasses               : 'Classes of element',
+        needClass                    : 'Need CSS class',
+
+        hasStyleDescTpl              : 'Element has correct {value} for CSS style {property}',
+        elementStyles                : 'Styles of element',
+        needStyle                    : 'Need style',
+
+        hasNotStyleDescTpl           : 'Element does not have: {value} for CSS style {property}',
+        hasTheStyle                  : 'Element has the style',
+
+        element                      : 'element',
+        toBeTopEl                    : 'to be the top element at its position',
+        toNotBeTopEl                 : 'to not be the top element at its position',
+
+        selector                     : 'selector',
+        selectors                    : 'selectors',
+        toAppear                     : 'to appear',
+        toAppearAt                   : 'to appear at',
+        noCssSelector                : 'A CSS selector must be supplied',
+
+        waitForSelectorsBadInput     : 'An array of CSS selectors must be supplied',
+
+        Position                     : 'Position',
+        noElementAtPosition          : 'No element found at the specified position',
+        elementIsAtDescTpl           : 'DOM element or its child is at [ {x}, {y} ] coordinates',
+        topElement                   : 'Top element',
+        elementIsAtPassTpl           : 'DOM element is at [ {x}, {y} ] coordinates',
+        allowChildrenDesc            : 'Need exactly this or its child',
+        allowChildrenAnnotation      : 'Passed element is not the top-most one and not the child of one',
+        shouldBe                     : 'Should be',
+        noChildrenFailAnnotation     : 'Passed element is not the top-most one',
+
+        topLeft                      : '(t-l)',
+        bottomLeft                   : '(b-l)',
+        topRight                     : '(t-r)',
+        bottomRight                  : '(b-r)',
+
+        elementIsNotTopElementPassTpl: 'Element is not the top element on the screen',
+        selectorIsAtPassTpl          : 'Found element matching CSS selector {selector} at [ {xy} ]',
+        elementMatching              : 'Element matching',
+        selectorIsAtFailAnnotation   : 'Passed selector does not match any selector at',
+        selectorExistsFailTpl        : 'No element matching the passed selector found',
+        selectorExistsPassTpl        : 'Found DOM element(s) matching CSS selector {selector}',
+
+        selectorNotExistsFailTpl     : 'Elements found matching the passed selector',
+        selectorNotExistsPassTpl     : 'Did not find any DOM element(s) matching CSS selector {selector}',
+
+        toChangeForElement           : 'to change for element',
+
+        selectorCountIsPassTpl       : 'Different number of elements matching the selector {selector} found',
+        selectorCountIsFailTpl       : 'Found exactly {count} elements matching matching CSS selector {selector}',
+        isInViewPassTpl              : 'Passed element is within the visible viewport',
+
+        toAppearInTheViewport        : 'to appear in the viewport',
+
+        elementIsEmptyPassTpl        : 'Passed element is empty',
+        elementIsNotEmptyPassTpl     : 'Passed element is not empty',
+        elementToBeEmpty             : 'element to be empty',
+        elementToNotBeEmpty          : 'element to not be empty'
+    },
+
+    "Siesta.Test.ExtJS"              : {
+        bundleUrlNotFound                   : 'Cannot find Ext JS bundle url',
+        assertNoGlobalExtOverridesInvalid   : 'Was not able to find the Ext JS bundle URL in the `assertNoGlobalExtOverrides` assertion',
+        assertNoGlobalExtOverridesPassTpl   : 'No global Ext overrides found',
+        assertNoGlobalExtOverridesGotDesc   : 'Number of overrides found',
+        foundOverridesFor                   : 'Found overrides for',
+        animationsToFinalize                : 'animations to finalize',
+        extOverridesInvalid                 : 'Was not able to find the ExtJS bundle URL in the `assertMaxNumberOfGlobalExtOverrides` assertion)',
+        foundLessOrEqualThan                : 'Found less or equal than',
+        nbrOverridesFound                   : 'Number of overrides found',
+        globalOverrides                     : 'Ext JS global overrides'
+    },
+
+    "Siesta.Test.ExtJSCore"          : {
+        waitedForExt                 : 'Waiting for Ext.onReady took too long - probably some dependency could not be loaded. \nCheck the `Net` tab in Firebug',
+        waitedForApp                 : 'Waiting for MVC application launch took too long - no MVC application on test page? \nYou may need to disable the `waitForAppReady` config option',
+        noComponentMatch             : 'Your component query: "{component}" returned no components',
+        multipleComponentMatch       : 'Your component query: "{component}" returned more than 1 component',
+        noComponentFound             : 'No component found for CQ',
+        knownBugIn                   : 'Known bug in',
+        Class                        : 'Class',
+        wasLoaded                    : 'was loaded',
+        wasNotLoaded                 : 'was not loaded',
+        invalidCompositeQuery        : 'Invalid composite query selector',
+        ComponentQuery               : 'ComponentQuery',
+        CompositeQuery               : 'CompositeQuery',
+        matchedNoCmp                 : 'matched no Ext.Component',
+        messageBoxVisible            : 'Message box is visible',
+        messageBoxHidden             : 'Message box is hidden'
+    },
+
+    "Siesta.Test.Function"           : {
+        Need                         : 'need',
+        atLeast                      : 'at least',
+        exactly                      : 'exactly',
+        methodCalledExactly          : 'method was called exactly {n} times',
+        exceptionEvalutingClass      : 'Exception [{e}] caught while evaluating the class name'
+    },
+
+    "Siesta.Test.More"               : {
+        isGreaterPassTpl             : '`{value1}` is greater than `{value2}`',
+        isLessPassTpl                : '`{value1}` is less than `{value2}`',
+        isGreaterEqualPassTpl        : '`{value1}` is greater or equal to`{value2}`',
+        isLessEqualPassTpl           : '`{value1}` is less or equal to`{value2}`',
+        isApproxToPassTpl            : '`{value1}` is approximately equal to `{value2}`',
+
+        needGreaterThan              : 'Need greater than',
+        needGreaterEqualTo           : 'Need greater or equal to',
+        needLessThan                 : 'Need less than',
+        needLessEqualTo              : 'Need less or equal to',
+
+        exactMatch                   : 'Exact match',
+        withinThreshold              : 'Match within treshhold',
+        needApprox                   : 'Need approx',
+        thresholdIs                  : 'Threshold is',
+
+        stringMatchesRe              : '`{string}` matches regexp {regex}',
+        stringNotMatchesRe           : '`{string}` does not match regexp {regex}',
+        needStringMatching           : 'Need string matching',
+        needStringNotMatching        : 'Need string not matching',
+        needStringContaining         : 'Need string containing',
+        needStringNotContaining      : 'Need string not containing',
+        stringHasSubstring           : '`{string}` has a substring: `{regex}`',
+        stringHasNoSubstring         : '`{string}` does not have a substring: `{regex}`',
+
+        throwsOkInvalid              : 'throws_ok accepts a function as 1st argument',
+        didntThrow                   : 'Function did not throw an exception',
+        exMatchesRe                  : 'Function throws exception matching to {expected}',
+        exceptionStringifiesTo       : 'Exception stringifies to',
+        exContainsSubstring          : 'Function throws exception containing a substring: {expected}',
+
+        fnDoesntThrow                : 'Function does not throw any exceptions',
+        fnThrew                      : 'Function threw an exception',
+
+        isInstanceOfPass             : 'Object is an instance of the specified class',
+        needInstanceOf               : 'Need instance of',
+        isAString                    : '{value} is a string',
+        aStringValue                 : 'AStringValue',
+        isAnObject                   : '{value} is an object',
+        anObject                     : 'An object value',
+        isAnArray                    : '{value} is an array',
+        anArrayValue                 : 'An array value',
+        isANumber                    : '{value} is a number',
+        aNumberValue                 : 'a number value',
+        isABoolean                   : '{value} is a boolean',
+        aBooleanValue                : 'a number value',
+        isADate                      : '{value} is a date',
+        aDateValue                   : 'a date value',
+        isARe                        : '{value} is a regular expression',
+        aReValue                     : 'a regular expression',
+        isAFunction                  : '{value} is a function',
+        aFunctionValue               : 'a function',
+        isDeeplyPassTpl              : '{obj1} is deeply equal to {obj2}',
+        isDeeplyStrictPassTpl        : '{obj1} is strictly deeply equal to {obj2}',
+        globalCheckNotSupported      : 'Testing leakage of global variables is not supported on this platform',
+        globalVariables              : 'Global Variables',
+        noGlobalsFound               : 'No unexpected global variables found',
+        globalFound                  : 'Unexpected global found',
+        globalName                   : 'Global name',
+        value                        : 'value',
+
+        conditionToBeFulfilled       : 'condition to be fulfilled',
+        ms                           : 'ms',
+        waitingFor                   : 'Waiting for',
+        waitedTooLong                : 'Waited too long for',
+        conditionNotFulfilled        : 'Condition was not fullfilled during',
+        waitingAborted               : 'Waiting aborted',
+        Waited                       : 'Waited',
+        checkerException             : 'checker threw an exception',
+        Exception                    : 'Exception',
+        msFor                        : 'ms for',
+        forcedWaitFinalization       : 'Forced finalization of waiting for',
+        chainStepNotCompleted        : 'The step in `t.chain()` call did not complete within required timeframe, chain can not proceed',
+        stepNumber                   : 'Step number',
+        oneBased                     : '(1-based)',
+        atLine                       : 'At line',
+        chainStepEx                  : 'Chain step threw an exception',
+        stepFn                       : 'Step function',
+        notUsingNext                 : 'does not use the provided "next" function anywhere'
+    },
+
+
+    "Siesta.Test.SenchaTouch"               : {
+        STSetupFailed                       : 'Waiting for Ext.setup took too long - some dependency could not be loaded? Check the `Net` tab in Firebug',
+        invalidSwipeDir                     : 'Invalid swipe direction',
+        moveFingerByInvalidInput            : 'Trying to call moveFingerBy without relative distances',
+        scrollUntilFailed                   : 'scrollUntil failed to achieve its mission',
+        scrollUntilElementVisibleInvalid    : 'scrollUntilElementVisible: target or scrollable not provided',
+        scrollerReachPos                    : 'scroller to reach position'
+    },
+
+    "Siesta.Test"                           : {
+        noCodeProvidedToTest                : 'No code provided to test',
+        addingAssertionsAfterDone           : 'Adding assertions after the test has finished',
+        testFailedAndAborted                : 'Assertion failed, test execution aborted',
+        atLine                              : 'at line',
+        of                                  : 'of',
+        character                           : 'character',
+        isTruthy                            : '`{value}` is a "truthy" value',
+        needTruthy                          : 'Need "truthy" value',
+        isFalsy                             : '`{value}` is a "falsy" value',
+        needFalsy                           : 'Need "falsy" value',
+        isEqualTo                           : '`{got}` is equal to `{expected}`',
+        isNotEqualTo                        : '`{got}` is not equal to `{expected}`',
+        needNot                             : 'Need not',
+        isStrictlyEqual                     : '`{got}` is strictly equal to `{expected}`',
+        needStrictly                        : 'Need strictly',
+        isStrictlyNotEqual                  : '`{got}` is strictly not equal to `{expected}`',
+        needStrictlyNot                     : 'Need strictly not',
+        alreadyWaiting                      : 'Already waiting with title',
+        noOngoingWait                       : 'There is no ongoing `wait` action with title',
+        noMatchingEndAsync                  : 'No matching `endAsync` call within',
+        endAsyncMisuse                      : 'Calls to endAsync without argument should only be performed if you have single beginAsync statement',
+        codeBodyMissingForSubTest           : 'Code body is not provided for sub test',
+        codeBodyMissingTestArg              : 'Code body of sub test [{name}] does not declare a test instance as 1st argument',
+        Subtest                             : 'Subtest',
+        Test                                : 'Test',
+        failedToFinishWithin                : 'failed to finish within',
+        threwException                      : 'threw an exception',
+        testAlreadyStarted                  : 'Test has already been started',
+        setupTookTooLong                    : '`setup` method took too long to complete',
+        errorBeforeTestStarted              : 'Error happened before the test started',
+        testStillRunning                    : 'Your test is still considered to be running, if this is unexpected please see console for more information',
+        testNotFinalized                    : 'Your test [{url}] has not finalized, most likely since a timer (setTimeout) is still active. ' +
+                                              'If this is the expected behavior, try setting "overrideSetTimeout : false" on your Harness configuration.',
+        missingDoneCall                     : 'Test has completed, but there was no `t.done()` call. Add it at the bottom, or use `t.beginAsync()` for asynchronous code',
+        allTestsPassed                      : 'All tests passed'
+    },
+
+    "Siesta.Recorder.Editor.Code"           : {
+        invalidSyntax                       : 'Invalid syntax'
+    },
+
+    "Siesta.Recorder.Editor.DragTarget"     : {
+        targetLabel                         : 'Target',
+        toLabel                             : 'To',
+        byLabel                             : 'By',
+        cancelButtonText                    : 'Cancel',
+        saveButtonText                      : 'Save',
+        
+        dragVariantTitle                    : 'Edit `drag` action',
+        moveCursorVariantTitle              : 'Edit `moveCursor` action'
+    },
+
+    "Siesta.Recorder.UI.EventView"          : {
+        actionColumnHeader                  : 'Action',
+        offsetColumnHeader                  : 'Offset'
+    },
+
+    "Siesta.Recorder.UI.RecorderPanel"      : {
+        queryMatchesNothing                 : 'Query matches no DOM elements or components',
+        queryMatchesMultiple                : 'Query matches multiple components',
+        noVisibleElsFound                   : 'No visible elements found for target',
+        noTestDetected                      : 'No test detected',
+        noTestStarted                       : 'You need to run a test first',
+        recordTooltip                       : 'Record',
+        stopTooltip                         : 'Stop',
+        playTooltip                         : 'Play',
+        clearTooltip                        : 'Clear all',
+        codeWindowTitle                     : 'Code',
+        addNewTooltip                       : 'Add a new step',
+        Error                               : 'Error'
+    },
+
+    "Siesta.Recorder.UI.TargetColumn"       : {
+        headerText                          : 'Target / Value',
+        by                                  : 'by',
+        to                                  : 'to'
+    }
+};
+
+;
+// Localization helper
+Siesta.Resource = (function () {
+
+    function get(dict, key) {
+        var text = dict[key];
+
+        if (text) return text;
+
+        if (window.console && console.error) {
+            window.top.console.error('TEXT_NOT_DEFINED: ' + key);
+        }
+
+        return 'TEXT_NOT_DEFINED: ' + key;
+    }
+
+    return function (namespace, key) {
+
+        var dictionary = Siesta.CurrentLocale[namespace];
+
+        if (!dictionary) {
+            throw 'Missing dictionary for namespace: ' + namespace;
+        }
+
+        if (key) {
+            return get(dictionary, key)
+        }
+
+        return {
+            dict    : dictionary,
+
+            get     : function(key) {
+                return get(this.dict, key);
+            }
+        };
+    }
+})();
+;
 ;(function () {
     
 var ID = 0
@@ -6642,32 +7273,31 @@ Class('Siesta.Result.Summary', {
 Class('Siesta.Result.Assertion', {
     
     isa : Siesta.Result,
-    
 
     has : {
-        name        : null,
+        name            : null,
         
-        passed      : null,
+        passed          : null,
         
-        annotation  : null,
+        annotation      : null,
         
-        index       : null,
+        index           : null,
         // stored as string
-        sourceLine  : null,
+        sourceLine      : null,
         
-        isSkipped   : false,
-        isTodo      : false,
+        isSkipped       : false,
+        isTodo          : false,
         
         isException     : false,
         exceptionType   : null,
         
-        isWaitFor   : false,
-        completed   : false     // for waitFor assertions
+        isWaitFor       : false,
+        completed       : false      // for waitFor assertions
     },
     
     
     methods : {
-        
+
         isPassed : function (raw) {
             if (raw) return this.passed
             
@@ -6680,7 +7310,8 @@ Class('Siesta.Result.Assertion', {
         
         
         toString : function () {
-            var text = (this.isTodo ? 'TODO: ' : '') + (this.passed ? 'ok ' : 'fail ') + this.index + ' - ' + this.description
+            var R = Siesta.Resource('Siesta.Result.Assertion');
+            var text = (this.isTodo ? R.get('todoText') : '') + (this.passed ? R.get('passText') : R.get('failText')) + ' ' + this.index + ' - ' + this.description
             
             if (this.annotation) text += '\n' + this.annotation
             
@@ -6751,7 +7382,13 @@ Class('Siesta.Result.SubTest', {
                 passed          : isCrossContext ? null : test.isPassed()
             }
             
-            if (!test.parent)   report.url          = test.url
+            // top level test
+            if (!test.parent)   {
+                report.url          = test.url
+                report.jUnitClass   = test.getJUnitClass()
+                report.groups       = test.groups
+            }
+            
             if (test.specType)  report.bddSpecType  = test.specType
             
             var isFailed    = false
@@ -6823,24 +7460,26 @@ Role('Siesta.Test.Function', {
         isCalledNTimes : function(fn, obj, n, desc, isGreaterEqual) {
             var me      = this,
                 prop    = typeof fn === "string" ? fn : me.getPropertyName(obj, fn);
-                
+
+            var counter = 0;
+            var R       = Siesta.Resource('Siesta.Test.Function');
+
             desc        = desc ? (desc + ' ') : '';
 
             this.on('beforetestfinalizeearly', function () {
                 if (counter === n || (isGreaterEqual && counter > n)) {
-                    me.pass(desc || (prop + ' method was called exactly ' + n + ' times'));
+                    me.pass(desc || (prop + ' ' + R.get('methodCalledExactly').replace('{n}', n)));
                 } else {
 
                     me.fail(desc || prop, {
                         assertionName       : 'isCalledNTimes ' + prop,
                         got                 : counter, 
-                        need                : n ,
-                        needDesc            : ("Need " + (isGreaterEqual ? 'at least ' : 'exactly '))
+                        need                : n,
+                        needDesc            : R.get("Need") + " " + (isGreaterEqual ? R.get('atLeast') : R.get('exactly')) + " "
                     });
                 }
             });
 
-            var counter = 0;
             fn = obj[prop];
             obj[prop] = function () { counter++; return fn.apply(this, arguments); };
         },
@@ -6914,6 +7553,7 @@ Role('Siesta.Test.Function', {
         methodIsCalledNTimes: function(fn, className, n, desc, isGreaterEqual){
             var me          = this,
                 counter     = 0;
+            var R           = Siesta.Resource('Siesta.Test.Function');
 
             desc            = desc ? (desc + ' ') : '';
             
@@ -6922,7 +7562,7 @@ Role('Siesta.Test.Function', {
             } catch (e) {
                 me.fail(desc, {
                     assertionName       : 'isMethodCalled',
-                    annotation          : "Exception [" + e + "] caught, while evaluating the class name [" + className + "]"
+                    annotation          : R.get('exceptionEvalutingClass').replace('{e}', e) + "[" + className + "]"
                 })
 
                 return
@@ -6933,13 +7573,13 @@ Role('Siesta.Test.Function', {
 
             me.on('beforetestfinalizeearly', function () {
                 if (counter === n || (isGreaterEqual && counter > n)) {
-                    me.pass(desc || (prop + ' method was called exactly ' + n + ' times'));
+                    me.pass(desc || (prop + ' ' + R.get('methodCalledExactly').replace('{n}', n)));
                 } else {
                     me.fail(desc || prop, {
-                        assertionName       : 'isCalledNTimes ' + prop,
+                        assertionName       : 'methodIsCalledNTimes ' + prop,
                         got                 : counter,
                         need                : n ,
-                        needDesc            : ("Need " + (isGreaterEqual ? 'at least ' : 'exactly '))
+                        needDesc            : R.get("Need") + " " + (isGreaterEqual ? R.get('atLeast') : R.get('exactly')) + " "
                     });
                 }
             });
@@ -7001,9 +7641,11 @@ Role('Siesta.Test.Date', {
          * @param {String} [description] The description of the assertion
          */
         isDateEqual: function (got, expectedDate, description) {
+            var R = Siesta.Resource('Siesta.Test.Date');
+
             if (got - expectedDate === 0) {
                 this.pass(description, {
-                    descTpl         : '{got} date is equal to {expectedDate}',
+                    descTpl         : '{got} ' + R.get('isEqualTo') + ' {expectedDate}',
                     got             : got,
                     expectedDate    : expectedDate
                 });
@@ -7011,10 +7653,10 @@ Role('Siesta.Test.Date', {
                 this.fail(description, {
                     assertionName   : 'isDateEqual',
                     
-                    got         : got ? got.toString() : '',
-                    gotDesc     : 'Got',
+                    got             : got ? got.toString() : '',
+                    gotDesc         : R.get('Got'),
                     
-                    need        : expectedDate.toString()
+                    need            : expectedDate.toString()
                 });
             }
         }
@@ -7045,6 +7687,7 @@ Role('Siesta.Test.More', {
                 'getInterface',
                 'ExtBox1',
                 '__IE_DEVTOOLBAR_CONSOLE_COMMAND_LINE',
+                /__BROWSERTOOLS/, // IE11 with console open
                 'seleniumAlert',
                 'onload',
                 'onerror', 
@@ -7080,20 +7723,22 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isGreater : function (value1, value2, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (value1 > value2)
                 this.pass(desc, {
-                    descTpl             : '`{value1}` is greater than `{value2}`',
+                    descTpl             : R.get('isGreaterPassTpl'),
                     value1              : value1,
                     value2              : value2
                 })
             else
                 this.fail(desc, {
-                    assertionName   : 'isGreater',
+                    assertionName       : 'isGreater',
                     
-                    got         : value1,
-                    need        : value2,
+                    got                 : value1,
+                    need                : value2,
                     
-                    needDesc    : "Need, greater than"
+                    needDesc            : R.get('needGreaterThan')
                 })
         },
         
@@ -7106,20 +7751,22 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isLess : function (value1, value2, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (value1 < value2)
                 this.pass(desc, {
-                    descTpl             : '`{value1}` is less than `{value2}`',
+                    descTpl             : R.get('isLessPassTpl'),
                     value1              : value1,
                     value2              : value2
                 })
             else
                 this.fail(desc, {
-                    assertionName   : 'isLess',
+                    assertionName       : 'isLess',
                     
-                    got         : value1,
-                    need        : value2,
+                    got                 : value1,
+                    need                : value2,
                     
-                    needDesc    : "Need, less than"
+                    needDesc            : R.get('needLessThan')
                 })
         },
         
@@ -7138,20 +7785,22 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isGreaterOrEqual : function (value1, value2, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (value1 >= value2)
                 this.pass(desc, {
-                    descTpl             : '`{value1}` is greater or equal to `{value2}`',
+                    descTpl             : R.get('isGreaterEqualPassTpl'),
                     value1              : value1,
                     value2              : value2
                 })
             else
                 this.fail(desc, {
-                    assertionName   : 'isGreaterOrEqual',
+                    assertionName       : 'isGreaterOrEqual',
                     
-                    got         : value1,
-                    need        : value2,
-                    
-                    needDesc    : "Need, greater or equal to"
+                    got                 : value1,
+                    need                : value2,
+
+                    needDesc            : R.get('needGreaterEqualTo')
                 })
         },
         
@@ -7171,20 +7820,22 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isLessOrEqual : function (value1, value2, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (value1 <= value2)
                 this.pass(desc, {
-                    descTpl             : '`{value1}` is less or equal to `{value2}`',
+                    descTpl             : R.get('isLessEqualPassTpl'),
                     value1              : value1,
                     value2              : value2
                 })
             else
                 this.fail(desc, {
-                    assertionName   : 'isLessOrEqual',
+                    assertionName       : 'isLessOrEqual',
                     
-                    got         : value1,
-                    need        : value2,
-                    
-                    needDesc    : "Need, less or equal to"
+                    got                 : value1,
+                    need                : value2,
+
+                    needDesc            : R.get('needLessEqualTo')
                 })
         },
         
@@ -7200,6 +7851,8 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isApprox : function (value1, value2, threshHold, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (arguments.length == 2) threshHold  = Math.abs(value1 * 0.05)
             
             if (arguments.length == 3) {
@@ -7227,18 +7880,18 @@ Role('Siesta.Test.More', {
             
             if (Math.abs(subtract(value2, value1)) <= threshHold)
                 this.pass(desc, {
-                    descTpl             : '`{value1}` is approximately equal to `{value2}`',
+                    descTpl             : R.get('isApproxToPassTpl'),
                     value1              : value1,
                     value2              : value2,
-                    annotation          : value2 == value1 ? 'Exact match' : 'Match within treshhold: ' + threshHold
+                    annotation          : value2 == value1 ? R.get('exactMatch') : (R.get('withinThreshold') + ': ' + threshHold)
                 })
             else
                 this.fail(desc, {
                     assertionName       : 'isApprox', 
                     got                 : value1, 
                     need                : value2, 
-                    needDesc            : 'Need approx',
-                    annotation          : 'Threshold is: ' + threshHold
+                    needDesc            : R.get('needApprox'),
+                    annotation          : R.get('thresholdIs') + ': ' + threshHold
                 })
         },
         
@@ -7252,11 +7905,13 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         like : function (string, regex, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (this.typeOf(regex) == "RegExp")
             
                 if (string.match(regex))
                     this.pass(desc, {
-                        descTpl             : '`{string}` matches regexp {regex}',
+                        descTpl             : R.get('stringMatchesRe'),
                         string              : string,
                         regex               : regex
                     })
@@ -7265,13 +7920,13 @@ Role('Siesta.Test.More', {
                         assertionName       : 'like', 
                         got                 : string, 
                         need                : regex, 
-                        needDesc            : 'Need string matching'
+                        needDesc            : R.get('needStringMatching')
                     })
             else
              
                 if (string.indexOf(regex) != -1)
                     this.pass(desc, {
-                        descTpl             : '`{string}` has a substring: `{regex}`',
+                        descTpl             : R.get('stringHasSubstring'),
                         string              : string,
                         regex               : regex
                     })
@@ -7280,7 +7935,7 @@ Role('Siesta.Test.More', {
                         assertionName       : 'like', 
                         got                 : string, 
                         need                : regex, 
-                        needDesc            : 'Need string containing'
+                        needDesc            : R.get('needStringContaining')
                     })
         },
         
@@ -7292,11 +7947,13 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         unlike : function(string, regex, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (this.typeOf(regex) == "RegExp")
             
                 if (!string.match(regex))
                     this.pass(desc, {
-                        descTpl             : '`{string}` does not match regexp {regex}',
+                        descTpl             : R.get('stringNotMatchesRe'),
                         string              : string,
                         regex               : regex
                     })
@@ -7305,13 +7962,13 @@ Role('Siesta.Test.More', {
                         assertionName       : 'unlike', 
                         got                 : string, 
                         need                : regex, 
-                        needDesc            : 'Need string not matching'
+                        needDesc            : R.get('needStringNotMatching')
                     })
             else
              
                 if (string.indexOf(regex) == -1)
                     this.pass(desc, {
-                        descTpl             : '`{string}` does not have a substring: `{regex}`',
+                        descTpl             : R.get('stringHasNoSubstring'),
                         string              : string,
                         regex               : regex
                     })
@@ -7320,7 +7977,7 @@ Role('Siesta.Test.More', {
                         assertionName       : 'unlike', 
                         got                 : string, 
                         need                : regex, 
-                        needDesc            : 'Need string not containing'
+                        needDesc            : R.get('needStringNotContaining')
                     })
         },
         
@@ -7344,7 +8001,9 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         throwsOk : function (func, expected, desc) {
-            if (this.typeOf(func) != 'Function') throw new Error('throws_ok accepts a function as 1st argument')
+            var R       = Siesta.Resource('Siesta.Test.More');
+
+            if (this.typeOf(func) != 'Function') throw new Error(R.get('throwsOkInvalid'))
             
             var e = this.getExceptionCatcher()(func)
             
@@ -7352,7 +8011,7 @@ Role('Siesta.Test.More', {
             if (e === undefined) {
                 this.fail(desc, {
                     assertionName       : 'throws_ok', 
-                    annotation          : 'Function did not throw an exception'
+                    annotation          : R.get('didntThrow')
                 })
                 
                 return
@@ -7368,31 +8027,31 @@ Role('Siesta.Test.More', {
             
                 if (e.match(expected))
                     this.pass(desc, {
-                        descTpl             : 'Function throws exception matching to {expected}',
+                        descTpl             : R.get('exMatchesRe'),
                         expected            : expected
                     })
                 else
                     this.fail(desc, {
                         assertionName       : 'throws_ok', 
                         got                 : e, 
-                        gotDesc             : 'Exception stringifies to',
+                        gotDesc             : R.get('exceptionStringifiesTo'),
                         need                : expected, 
-                        needDesc            : 'Need string matching'
+                        needDesc            : R.get('needStringMatching')
                     })
             else
              
                 if (e.indexOf(expected) != -1)
                     this.pass(desc, {
-                        descTpl             : 'Function throws exception containing a substring: {expected}',
+                        descTpl             : R.get('exContainsSubstring'),
                         expected            : expected
                     })
                 else
                     this.fail(desc, {
                         assertionName       : 'throws_ok', 
-                        got                 : e, 
-                        gotDesc             : 'Exception stringifies to',
-                        need                : expected, 
-                        needDesc            : 'Need string containing'
+                        got                 : e,
+                        gotDesc             : R.get('exceptionStringifiesTo'),
+                        need                : expected,
+                        needDesc            : R.get('needStringContaining')
                     })
         },
         
@@ -7418,17 +8077,18 @@ Role('Siesta.Test.More', {
             if (this.typeOf(func) != 'Function') {
                 func = [ desc, desc = func ][ 0 ]
             }
-            
-            var e = this.getExceptionCatcher()(func)
+
+            var R       = Siesta.Resource('Siesta.Test.More');
+            var e       = this.getExceptionCatcher()(func)
             
             if (e === undefined) 
                 this.pass(desc, {
-                    descTpl             : 'Function does not throw any exceptions'
+                    descTpl             : R.get('fnDoesntThrow')
                 })
             else
                 this.fail(desc, {
                     assertionName       : 'lives_ok', 
-                    annotation          : 'Function threw an exception: ' + e
+                    annotation          : R.get('fnThrew') + ': ' + e
                 })
         },
         
@@ -7454,12 +8114,14 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isInstanceOf : function (value, className, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             try {
                 if (this.typeOf(className) == 'String') className = this.global.eval(className)
             } catch (e) {
                 this.fail(desc, {
                     assertionName       : 'isa_ok', 
-                    annotation          : "Exception [" + e + "] caught, while evaluating the class name [" + className + "]"
+                    annotation          : Siesta.Resource('Siesta.Test.Function', 'exceptionEvalutingClass')
                 })
                 
                 return
@@ -7467,15 +8129,14 @@ Role('Siesta.Test.More', {
             
             if (value instanceof className) 
                 this.pass(desc, {
-                    descTpl             : '{value} is an instance of correct class',
-                    value               : value
+                    descTpl             : R.get('isInstanceOfPass')
                 })
             else
                 this.fail(desc, {
                     assertionName       : 'isa_ok', 
                     got                 : value, 
                     need                : String(className), 
-                    needDesc            : 'Need, instance of'
+                    needDesc            : R.get('needInstanceOf')
                 })
         },
         
@@ -7487,15 +8148,17 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isString : function (value, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (this.typeOf(value) == 'String')
                 this.pass(desc, {
-                    descTpl     : '{value} is a string',
+                    descTpl     : R.get('isAString'),
                     value       : value
                 })
             else
                 this.fail(desc, {
                     got         : value,
-                    need        : "A string value"
+                    need        : R.get('aStringValue')
                 })
         },
         
@@ -7507,15 +8170,17 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isObject : function (value, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (this.typeOf(value) == 'Object')
                 this.pass(desc, {
-                    descTpl     : '{value} is an object',
+                    descTpl     : R.get('isAnObject'),
                     value       : value
                 })
             else
                 this.fail(desc, {
                     got         : value,
-                    need        : "An object value"
+                    need        : R.get('anObject')
                 })
         },
         
@@ -7527,15 +8192,17 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isArray : function (value, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (this.typeOf(value) == 'Array')
                 this.pass(desc, {
-                    descTpl     : '{value} is an array',
+                    descTpl     : R.get('isAnArray'),
                     value       : value
                 })
             else
                 this.fail(desc, {
                     got         : value,
-                    need        : "An array value"
+                    need        : R.get('anArrayValue')
                 })
         },
 
@@ -7547,15 +8214,17 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isNumber : function (value, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (this.typeOf(value) == 'Number')
                 this.pass(desc, {
-                    descTpl     : '{value} is a number',
+                    descTpl     : R.get('isANumber'),
                     value       : value
                 })
             else
                 this.fail(desc, {
                     got         : value,
-                    need        : "A number value"
+                    need        : R.get('aNumberValue')
                 })
         },
 
@@ -7567,15 +8236,17 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isBoolean : function (value, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (this.typeOf(value) == 'Boolean')
                 this.pass(desc, {
-                    descTpl     : '{value} is a boolean',
+                    descTpl     : R.get('isABoolean'),
                     value       : value
                 })
             else
                 this.fail(desc, {
                     got         : value,
-                    need        : "A boolean value"
+                    need        : R.get('aBooleanValue')
                 })
         },
 
@@ -7587,15 +8258,17 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isDate : function (value, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (this.typeOf(value) == 'Date')
                 this.pass(desc, {
-                    descTpl     : '{value} is a date',
+                    descTpl     : R.get('isADate'),
                     value       : value
                 })
             else
                 this.fail(desc, {
                     got         : value,
-                    need        : "A date value"
+                    need        : R.get('aDateValue')
                 })
         },
 
@@ -7607,15 +8280,17 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isRegExp : function (value, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (this.typeOf(value) == 'RegExp')
                 this.pass(desc, {
-                    descTpl     : '{value} is a regular expression',
+                    descTpl     : R.get('isARe'),
                     value       : value
                 })
             else
                 this.fail(desc, {
                     got         : value,
-                    need        : "A regular expression value"
+                    need        : R.get('aReValue')
                 })
         },
         
@@ -7627,15 +8302,17 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isFunction : function (value, desc) {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (this.typeOf(value) == 'Function')
                 this.pass(desc, {
-                    descTpl     : '{value} is a function',
+                    descTpl     : R.get('isAFunction'),
                     value       : value
                 })
             else
                 this.fail(desc, {
                     got         : value,
-                    need        : "A function value"
+                    need        : R.get('aFunctionValue')
                 })
         },        
         
@@ -7657,12 +8334,16 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isDeeply : function (obj1, obj2, desc) {
-            if (this.typeOf(obj1) === this.typeOf(obj2) && this.compareObjects(obj1, obj2))
+
+            if (this.typeOf(obj1) === this.typeOf(obj2) && this.compareObjects(obj1, obj2)) {
+                var R       = Siesta.Resource('Siesta.Test.More');
+
                 this.pass(desc, {
-                    descTpl             : '{obj1} is deeply equal to {obj2}',
+                    descTpl             : R.get('isDeeplyPassTpl'),
                     obj1                : obj1,
                     obj2                : obj2
                 })
+            }
             else
                 this.fail(desc, {
                     assertionName       : 'isDeeply', 
@@ -7683,12 +8364,16 @@ Role('Siesta.Test.More', {
          * @param {String} desc The description of the assertion
          */
         isDeeplyStrict : function (obj1, obj2, desc) {
-            if (this.typeOf(obj1) === this.typeOf(obj2) && this.compareObjects(obj1, obj2, true))
+            if (this.typeOf(obj1) === this.typeOf(obj2) && this.compareObjects(obj1, obj2, true)) {
+
+                var R       = Siesta.Resource('Siesta.Test.More');
+
                 this.pass(desc, {
-                    descTpl             : '{obj1} is strictly deeply equal to {obj2}',
+                    descTpl             : R.get('isDeeplyStrictPassTpl'),
                     obj1                : obj1,
                     obj2                : obj2
                 })
+            }
             else
                 this.fail(desc, {
                     assertionName       : 'isDeeplyStrict', 
@@ -7730,8 +8415,10 @@ Role('Siesta.Test.More', {
          * @param {String/RegExp} nameN The name of global property or the regular expression to match several properties
          */
         verifyGlobals : function () {
+            var R       = Siesta.Resource('Siesta.Test.More');
+
             if (this.disableGlobalsCheck) {
-                this.diag('Testing leakage of global variables is not supported on this platform')
+                this.diag(R.get('globalCheckNotSupported'));
                 
                 return
             }
@@ -7749,12 +8436,21 @@ Role('Siesta.Test.More', {
                     expectedStrings[ value ] = true 
             })
             
-            this.diag('Global variables')
+            this.diag(R.get('globalVariables'))
             
             var failed              = false
             
+            var imageWithIdCreatesGlobalEnumerable  = Siesta.Harness.Browser.FeatureSupport().supports.imageWithIdCreatesGlobalEnumerable;
+            
             for (var name in this.global) {
                 if (expectedStrings[ name ]) continue
+                
+                // remove after https://bugzilla.mozilla.org/show_bug.cgi?id=959992 will be fixed
+                if (imageWithIdCreatesGlobalEnumerable) {
+                    var domEl       = this.global.document.getElementById(name)
+                    
+                    if (domEl && domEl.tagName.toLowerCase() == 'img') continue;
+                }
                 
                 var isExpected      = false
                 
@@ -7766,13 +8462,13 @@ Role('Siesta.Test.More', {
                 }
                 
                 if (!isExpected) {
-                    me.fail('Unexpected global found', 'Global name: ' + name + ', value: ' + Siesta.Util.Serializer.stringify(this.global[name]))
+                    me.fail(R.get('globalFound'), R.get('globalName') + ': ' + name + ', ' + R.get('value') + ': ' + Siesta.Util.Serializer.stringify(this.global[name]))
                     
                     failed      = true
                 }
             }
             
-            if (!failed) this.pass('No unexpected global variables found')
+            if (!failed) this.pass(R.get('noGlobalsFound'))
         },
         
         
@@ -7842,9 +8538,14 @@ Role('Siesta.Test.More', {
          * No call to checker will be performed and callback will not receive a result from it. 
          */
         waitFor : function (method, callback, scope, timeout, interval)  {
-            var description         = ' condition to be fullfilled';
-            var assertionName       = 'waitFor';
-            var errback
+            var R                       = Siesta.Resource('Siesta.Test.More');
+            var description             = ' ' + R.get('conditionToBeFulfilled');
+            var assertionName           = 'waitFor';
+            var me                      = this;
+            var sourceLine              = me.getSourceLine();
+            var originalSetTimeout      = me.originalSetTimeout;
+            var originalClearTimeout    = me.originalClearTimeout;
+            var errback;
 
             if (arguments.length === 1 && this.typeOf(method) == 'Object') {
                 var options     = method;
@@ -7864,32 +8565,27 @@ Role('Siesta.Test.More', {
             
             var isWaitingForTime        = this.typeOf(method) == 'Number'
 
-            var description             = isWaitingForTime ? (method + ' ms') : description;
-            var me                      = this;
-            
             callback                    = callback || function () {}
-            
-            var sourceLine              = me.getSourceLine();
-            var originalSetTimeout      = me.originalSetTimeout;
-            var originalClearTimeout    = me.originalClearTimeout;
+            description                 = isWaitingForTime ? (method + ' ' + R.get('ms')) : description;
+
             var pollTimeout
             
             // early notification about the started "waitFor" operation
-            var waitAssertion           = me.startWaiting('Waiting for ' + description, sourceLine);
+            var waitAssertion           = me.startWaiting(R.get('waitingFor') + ' ' + description, sourceLine);
             
             interval                    = interval || this.waitForPollInterval
             timeout                     = timeout || this.waitForTimeout
             
-            // this async frame not supposed to fail, because its delayed to `timeout + 3 * interval`
+            // this async frame is not supposed to fail, because it's delayed to `timeout + 3 * interval`
             // failure supposed to be generated in the "pollFunc" and this async frame to be closed
-            // however, in IE it happens that async frame may end earlier than failure from "pollFunc"
-            // in such case we report same error as in "pollFunc"
+            // however, in IE the async frame may end earlier than failure from "pollFunc"
+            // in such case we report the same error as in "pollFunc"
             var async                   = this.beginAsync((isWaitingForTime ? method : timeout) + 3 * interval, function () {
                 originalClearTimeout(pollTimeout)
                 
-                me.finalizeWaiting(waitAssertion, false, 'Waited too long for: ' + description, {
+                me.finalizeWaiting(waitAssertion, false, R.get('waitedTooLong') + ': ' + description, {
                     assertionName       : assertionName,
-                    annotation          : 'Condition was not fullfilled during ' + timeout + 'ms'
+                    annotation          : R.get('conditionNotFulfilled') + ' ' + timeout + R.get('ms')
                 }, errback)
                 
                 return true
@@ -7902,7 +8598,7 @@ Role('Siesta.Test.More', {
                 if (!isDone) {
                     isDone      = true
                     
-                    me.finalizeWaiting(waitAssertion, false, 'Waiting aborted');
+                    me.finalizeWaiting(waitAssertion, false, R.get('waitingAborted'));
                     me.endAsync(async)
                     
                     originalClearTimeout(pollTimeout)
@@ -7913,13 +8609,14 @@ Role('Siesta.Test.More', {
                 pollTimeout = originalSetTimeout(function() {
                     isDone      = true
                     
-                    me.finalizeWaiting(waitAssertion, true, 'Waited ' + method + ' ms');
+                    me.finalizeWaiting(waitAssertion, true, R.get('Waited') + ' ' + method + ' ' + R.get('ms'));
                     me.endAsync(async);
                     me.processCallbackFromTest(callback, [], scope || me)
                 }, method);
                 
             } else {
-            
+
+                var result;
                 var startDate   = new Date()
             
                 var pollFunc    = function () {
@@ -7928,9 +8625,9 @@ Role('Siesta.Test.More', {
                     if (time > timeout) {
                         me.endAsync(async);
 
-                        me.finalizeWaiting(waitAssertion, false, 'Waited too long for: ' + description, {
+                        me.finalizeWaiting(waitAssertion, false, R.get('waitedTooLong') + ': ' + description, {
                             assertionName       : assertionName,
-                            annotation          : 'Condition was not fullfilled during ' + timeout + 'ms'
+                            annotation          : R.get('conditionNotFulfilled') + ' ' + timeout + R.get('ms')
                         }, errback)
                         
                         isDone      = true
@@ -7939,14 +8636,14 @@ Role('Siesta.Test.More', {
                     }
                 
                     try {
-                        var result = method.call(scope || me);
+                        result = method.call(scope || me);
                     } catch (e) {
                         me.endAsync(async);
                     
-                        me.finalizeWaiting(waitAssertion, false, assertionName + ' checker threw an exception', {
+                        me.finalizeWaiting(waitAssertion, false, assertionName + ' ' + R.get('checkerException'), {
                             assertionName       : assertionName,
                             got                 : e.toString(),
-                            gotDesc             : "Exception"
+                            gotDesc             : R.get('Exception')
                         }, errback)
                     
                         isDone      = true
@@ -7959,7 +8656,7 @@ Role('Siesta.Test.More', {
                         
                         isDone      = true
                         
-                        me.finalizeWaiting(waitAssertion, true, 'Waited ' + time + ' ms for ' + description);
+                        me.finalizeWaiting(waitAssertion, true, R.get('Waited') + ' ' + time + ' ' + R.get('msFor') + ' ' + description);
                         
                         me.processCallbackFromTest(callback, [ result ], scope || me)
                     } else 
@@ -7980,7 +8677,7 @@ Role('Siesta.Test.More', {
                     
                     me.endAsync(async);
                     
-                    me.finalizeWaiting(waitAssertion, true, 'Forced finalization of waiting for ' + description);
+                    me.finalizeWaiting(waitAssertion, true, R.get('forcedWaitFinalization') + ' ' + description);
                     
                     me.processCallbackFromTest(callback, [], scope || me)
                 }
@@ -8047,28 +8744,28 @@ Role('Siesta.Test.More', {
         
         
         /**
-         * This method accept either variable number of arguments (steps) or the array of them. 
-         * Each step should be either a function or configuration object for test actions. 
+         * This method accepts a variable number of steps, either as individual arguments or as a single array containing them. Steps and arrays
+         * of steps are handled just fine, and any step-arrays passed will be flattened. Each step should be either a function or configuration object for {@link Siesta.Test.Action test actions}.
          * These functions / actions will be executed in order.
          * 
-         * 1) If step is a function, as the 1st argument, it will receive a callback to call when the step is completed. 
+         * 1) For a function step, it will receive a callback as the 1st argument, to call when the step is completed.
          * As the 2nd and further arguments, the step function will receive the arguments passed to the previous callback.
          * 
          * The last step will receive a no-op callback, which can be ignored or still called. **Note**, that last step is assumed to
          * complete synchronously! If you need to launch some asynchronous process in the last step, you may need to add another empty function step
          * to the end of the chain.
          * 
-         * 2) If a step is presented with action configuration object, then the callback will be called by the action class automatically,
-         * there's no need to provide any. Configuration object should contain the "action" property, specifying the action class 
-         * and some other config options (depending from the action class). For brevity, instead of "action" property, configuration 
-         * object may contain the property corresponding to the action name itself, with the action's target. See the following examples and also
-         * refer to the documentation of the action classes. 
+         * 2) For Siesta.Test.Action objects, the callback will be called by the action class automatically,
+         * there's no need to provide any callback manually. The configuration object should contain an "action" property, specifying the action class
+         * along with other config options depending on the action class. For brevity, instead of using the "action" property, the configuration
+         * object can contain the property corresponding to the action name itself, with the action's target (or even a test method with arguments).
+         * See the following examples and also refer to the documentation of the action classes. 
          * 
-         * If configuration object will contain a "desc" property, a passing assertion with it value will be added to the test, after this step completion.
+         * If the configuration object will contain a "desc" property, a passing assertion with its value will be added to the test, after this step has completed.
          * 
-         * 3) If step is a sub test instance, created with {@link #getSubTest} method, then step will launch it.
+         * 3) If a step is a sub test instance, created with {@link #getSubTest} method, then the step will launch it.
          * 
-         * Its better to see how it works on the example. For example, when using using only functions:
+         * It's better to see how it works in action. For example, when using using only functions:
          
     t.chain(
         // function receives a callback as 1st argument
@@ -8093,7 +8790,8 @@ Role('Siesta.Test.More', {
     )
 
          * 
-         * The same example, using action configuration objects for first 2 steps. For the list of available actions please refer to the classes in the Siesta.Test.Action namespace.
+         * The same example, using action configuration objects for first 2 steps. For the list of available actions 
+         * please refer to the classes in the `Siesta.Test.Action` namespace.
          
     t.chain(
         {
@@ -8120,6 +8818,14 @@ Role('Siesta.Test.More', {
             desc        : "Typed in the field"
         },
         
+        {
+            waitFor     : 'Selector',
+            args        : '.selector'
+        }
+        // or, using Siesta.Test.Action.MethodCall notation:
+        {
+            waitForSelector : '.selector'
+        }
         
         function (next) {
             t.is(fieldEl.value == 'Something', 'Correct value in the field')
@@ -8148,8 +8854,8 @@ Role('Siesta.Test.More', {
     
          *  **Tip**:
          *  
-         *  If step is presented with a `null` or `undefined` value it will be ignored. Additionally, the step may be presented 
-         *  with an array of steps - all arrays in the input will be flattened.
+         *  If a step is presented with a `null` or `undefined` value it will be ignored. Additionally, a step can be
+         *  an array of steps - all arrays passed to t.chain will be flattened.
          *  
          *  These tips allows us to implement conditional steps processing, like this:
          *  
@@ -8164,7 +8870,7 @@ Role('Siesta.Test.More', {
             { click : el1IsInDom },
             
             el2IsInDom ? [
-                { click : el1IsInDom },
+                { click : el1IsInDom }
             ] : null,
         ] : null,
         
@@ -8172,14 +8878,15 @@ Role('Siesta.Test.More', {
     )
 
          *  
-         *  @param {Function/Object/Array} step1 The function to execute or action configuration, or the array of such
+         *  @param {Function/Object/Array} step1 The function to execute or action configuration, or an array of steps
          *  @param {Function/Object} step2 The function to execute or action configuration
          *  @param {Function/Object} stepN The function to execute or action configuration
          */
         chain : function () {
             // inline any arrays in the arguments into one array
             var steps       = this.flattenArray(arguments)
-            
+            var R           = Siesta.Resource('Siesta.Test.More');
+
             var nonEmpty    = []
             Joose.A.each(steps, function (step) { if (step) nonEmpty.push(step) })
             
@@ -8224,10 +8931,10 @@ Role('Siesta.Test.More', {
                             // generate their own failures
                             var async       = me.beginAsync(timeout + 100, function () {
                                 me.fail(
-                                    'The step in `t.chain()` call did not complete within required timeframe, chain can not proceed',
+                                    R.get('chainStepNotCompleted'),
                                     {
                                         sourceLine      : sourceLine,
-                                        annotation      : 'Step number: ' + (index + 1) + ' (1-based)' + (sourceLine ? '\nAt line    : ' + sourceLine : ''),
+                                        annotation      : R.get('stepNumber') + ': ' + (index + 1) + ' ' + R.get('oneBased') + (sourceLine ? ('\n' + R.get('atLine') + ': ' + sourceLine) : ''),
                                         ownTextOnly     : true
                                     }
                                 )
@@ -8255,7 +8962,7 @@ Role('Siesta.Test.More', {
                             // if the last step is a function - then provide "null" as the "next" callback for it
                             args.unshift(isLast ? function () {} : nextFunc)
                             
-                            if (!isLast && !me.analyzeChainStep(func)) me.fail('Step function [' + func.toString() + '] does not use provided "next" function anywhere')
+                            if (!isLast && !me.analyzeChainStep(func)) me.fail(R.get('stepFn') + ' [' + func.toString() + '] ' + R.get('notUsingNext'))
                             
                             if (me.transparentEx)
                                 func.apply(me, args)
@@ -8265,7 +8972,7 @@ Role('Siesta.Test.More', {
                                 })
                                 
                                 if (e !== undefined) {
-                                    me.fail("Chain step threw an exception", { annotation : e + '' })
+                                    me.fail(R.get('chainStepEx'), { annotation : e + '' })
                                 }
                             }
                             
@@ -8292,7 +8999,7 @@ Role('Siesta.Test.More', {
                             step.next       = nextFunc
                             step.test       = me
                             
-                            var action      = Siesta.Test.ActionRegistry().create(step)
+                            var action      = Siesta.Test.ActionRegistry().create(step, me)
                             
                             action.process()
                         }
@@ -8363,7 +9070,7 @@ Class('Siesta.Test.BDD.Placeholder', {
                 if (clsConstructor == context[ property ]) { clsName = property; return false }    
             })
             
-            return onlyGlobals ? clsName : clsName || clsConstructor + ''
+            return onlyGlobals ? clsName : clsName || (clsConstructor ? clsConstructor + '' : '')
         },
         
         
@@ -8406,7 +9113,7 @@ Class('Siesta.Test.BDD.Placeholder', {
         
         
         toString : function () {
-            return 'any ' + this.getClassName()
+            return 'any ' + (this.getClassName() || 'value')
         }
     }
 })
@@ -8439,13 +9146,41 @@ Class('Siesta.Test.BDD.NumberPlaceholder', {
     }
 })
 ;
+Class('Siesta.Test.BDD.StringPlaceholder', {
+    
+    does        : Siesta.Test.Role.Placeholder,
+    
+    has         : {
+        value           : { required : true }
+    },
+    
+    
+    methods     : {
+        
+        equalsTo : function (string) {
+            if (Object.prototype.toString(this.value) == '[object RegExp]')
+                return this.value.test(string)
+            else
+                return String(string).indexOf(this.value) > -1
+        },
+        
+        
+        toString : function () {
+            if (Object.prototype.toString(this.value) == '[object RegExp]')
+                return 'any string matching: ' + this.value
+            else
+                return 'any string containing: ' + this.value
+        }
+    }
+})
+;
 /**
 @class Siesta.Test.BDD.Expectation
 
-This class is a central point for writing assertions in the BDD style. Instances of this class can be generated with the {@link Siesta.Test#expect expect}
+This class is the central point for writing assertions in BDD style. Instances of this class can be generated with the {@link Siesta.Test#expect expect}
 method. Then, calling some method on the instance will create a new assertion in the test.
 
-* **Note**, that to negate any assertion, you can use a special property {@link #not}, that also contains an expectation instance, but with the opposite meaning.
+* **Note**, that to negate any assertion, you can use a special property {@link #not}, that contains an expectation instance with the opposite meaning.
 
 For example:
 
@@ -8458,7 +9193,7 @@ For example:
 
 */
 Class('Siesta.Test.BDD.Expectation', {
-    
+
     has         : {
         value           : null,
         
@@ -8476,6 +9211,7 @@ Class('Siesta.Test.BDD.Expectation', {
     methods     : {
         
         initialize : function () {
+
             if (!this.isNot) this.not = new this.constructor({
                 isNot           : true,
                 t               : this.t,
@@ -8514,11 +9250,13 @@ Class('Siesta.Test.BDD.Expectation', {
          * @param {Primitive} expectedValue An expected value 
          */
         toBe : function (expectedValue) {
+            var R = Siesta.Resource('Siesta.Test.BDD.Expectation');
+
             this.process(this.t.compareObjects(this.value, expectedValue, true, true), {
-                descTpl             : 'Expect {got} {!not}to be {need}',
+                descTpl             : R.get('expectText') + ' {got} {!not}' + R.get('toBeText') + ' {need}',
                 assertionName       : 'expect(got).toBe(need)',
                 need                : expectedValue,
-                needDesc            : this.isNot ? 'Need not' : 'Need'
+                needDesc            : this.isNot ? R.get('needNotText') : R.get('needText')
             })
         },
         
@@ -8532,11 +9270,13 @@ Class('Siesta.Test.BDD.Expectation', {
          * @param {Mixed} expectedValue An expected value 
          */
         toEqual : function (expectedValue) {
+            var R = Siesta.Resource('Siesta.Test.BDD.Expectation');
+
             this.process(this.t.compareObjects(this.value, expectedValue, true), {
-                descTpl             : 'Expect {got} {!not}to be equal to {need}',
+                descTpl             : R.get('expectText') +' {got} {!not}' + R.get('toBeEqualToText') + ' {need}',
                 assertionName       : 'expect(got).toEqual(need)',
                 need                : expectedValue,
-                needDesc            : this.isNot ? 'Need not' : 'Need'
+                needDesc            : this.isNot ? R.get('needNotText') : R.get('needText')
             })
         },
         
@@ -8545,11 +9285,13 @@ Class('Siesta.Test.BDD.Expectation', {
          * This assertion passes, when value provided to the {@link Siesta.Test#expect expect} method is `null`.
          */
         toBeNull : function () {
+            var R = Siesta.Resource('Siesta.Test.BDD.Expectation');
+
             this.process(this.t.compareObjects(this.value, null, true, true), {
-                descTpl             : 'Expect {got} {!not}to be null',
+                descTpl             : R.get('expectText') + ' {got} {!not}' + R.get('toBeText') + ' null',
                 assertionName       : 'expect(got).toBeNull()',
                 need                : null,
-                needDesc            : this.isNot ? 'Need not' : 'Need'
+                needDesc            : this.isNot ? R.get('needNotText') : R.get('needText')
             })
         },
         
@@ -8559,12 +9301,13 @@ Class('Siesta.Test.BDD.Expectation', {
          */
         toBeNaN : function () {
             var value   = this.value
-            
+            var R = Siesta.Resource('Siesta.Test.BDD.Expectation');
+
             this.process(this.t.typeOf(value) == 'Number' && value != value, {
-                descTpl             : 'Expect {got} {!not}to be NaN',
+                descTpl             : R.get('expectText') + ' {got} {!not}' + R.get('toBeText') + ' NaN',
                 assertionName       : 'expect(got).toBeNaN()',
                 need                : NaN,
-                needDesc            : this.isNot ? 'Need not' : 'Need'
+                needDesc            : this.isNot ? R.get('needNotText') : R.get('needText')
             })
         },
 
@@ -8573,8 +9316,10 @@ Class('Siesta.Test.BDD.Expectation', {
          * This assertion passes, when value provided to the {@link Siesta.Test#expect expect} method is not the `undefined` value.
          */
         toBeDefined : function () {
+            var R = Siesta.Resource('Siesta.Test.BDD.Expectation');
+
             this.process(this.value !== undefined, {
-                descTpl             : 'Expect {got} {!not}to be defined',
+                descTpl             : R.get('expectText') + ' {got} {!not}' + R.get('toBeDefinedText'),
                 assertionName       : 'expect(got).toBeDefined()'
             })
         },
@@ -8584,8 +9329,10 @@ Class('Siesta.Test.BDD.Expectation', {
          * This assertion passes, when value provided to the {@link Siesta.Test#expect expect} method is the `undefined` value.
          */
         toBeUndefined : function (value) {
+            var R = Siesta.Resource('Siesta.Test.BDD.Expectation');
+
             this.process(this.value === undefined, {
-                descTpl             : 'Expect {got} {!not}to be undefined',
+                descTpl             : R.get('expectText') + ' {got} {!not}' + R.get('toBeUndefinedText'),
                 assertionName       : 'expect(got).toBeUndefined()'
             })
         },
@@ -8596,8 +9343,10 @@ Class('Siesta.Test.BDD.Expectation', {
          * For example - non empty strings, numbers except the 0, objects, arrays etc.
          */
         toBeTruthy : function () {
+            var R = Siesta.Resource('Siesta.Test.BDD.Expectation');
+
             this.process(this.value, {
-                descTpl             : 'Expect {got} {!not}to be truthy',
+                descTpl             : R.get('expectText') + ' {got} {!not}' + R.get('toBeTruthyText'),
                 assertionName       : 'expect(got).toBeTruthy()'
             })
         },
@@ -8608,8 +9357,10 @@ Class('Siesta.Test.BDD.Expectation', {
          * For example - empty strings, number 0, `null`, `undefined`, etc.
          */
         toBeFalsy : function () {
+            var R = Siesta.Resource('Siesta.Test.BDD.Expectation');
+
             this.process(!this.value, {
-                descTpl             : 'Expect {got} {!not}to be falsy',
+                descTpl             : R.get('expectText') + ' {got} {!not}' + R.get('toBeFalsyText'),
                 assertionName       : 'expect(got).toBeFalsy()'
             })
         },
@@ -8621,13 +9372,15 @@ Class('Siesta.Test.BDD.Expectation', {
          * @param {RegExp} regexp The regular expression to match the string against
          */
         toMatch : function (regexp) {
+            var R = Siesta.Resource('Siesta.Test.BDD.Expectation');
+
             if (this.t.typeOf(regexp) != 'RegExp') throw new Error("`expect().toMatch()` matcher expects a regular expression")
             
             this.process(new RegExp(regexp).test(this.value), {
-                descTpl             : 'Expect {got} {!not}to match {need}',
+                descTpl             : R.get('expectText') + ' {got} {!not}' + R.get('toMatchText') + ' {need}',
                 assertionName       : 'expect(got).toMatch(need)',
                 need                : regexp,
-                needDesc            : this.isNot ? 'Need not matching' : 'Need matching'
+                needDesc            : this.isNot ? R.get('needNotMatchingText') : R.get('needMatchingText')
             })
         },
         
@@ -8643,15 +9396,16 @@ Class('Siesta.Test.BDD.Expectation', {
         toContain : function (element) {
             var value       = this.value
             var t           = this.t
-            
+            var R = Siesta.Resource('Siesta.Test.BDD.Expectation');
+
             var passed      = false
 
             if (t.typeOf(value) == 'String') {
                 this.process(value.indexOf(element) >= 0, {
-                    descTpl             : 'Expect {got} {!not}to contain {need}',
+                    descTpl             : R.get('expectText') + ' {got} {!not}' + R.get('toContainText') + ' {need}',
                     assertionName       : 'expect(got).toContain(need)',
                     need                : element,
-                    needDesc            : this.isNot ? 'Need string not containing' : 'Need string containing'
+                    needDesc            : this.isNot ? R.get('needStringNotContainingText') : R.get('needStringContainingText')
                 })
             } else {
                 // Normalize to allow NodeList, Arguments etc.
@@ -8664,10 +9418,10 @@ Class('Siesta.Test.BDD.Expectation', {
                     }
 
                 this.process(passed, {
-                    descTpl             : 'Expect {got} {!not}to contain {need}',
+                    descTpl             : R.get('expectText') + ' {got} {!not}' + R.get('toContainText') + ' {need}',
                     assertionName       : 'expect(got).toContain(need)',
                     need                : element,
-                    needDesc            : this.isNot ? 'Need array not containing' : 'Need array containing'
+                    needDesc            : this.isNot ? R.get('needArrayNotContainingText') : R.get('needArrayContainingText')
                 })
 
             }
@@ -8681,11 +9435,13 @@ Class('Siesta.Test.BDD.Expectation', {
          * @param {Number} expectedValue The number to compare with
          */
         toBeLessThan : function (expectedValue) {
+            var R = Siesta.Resource('Siesta.Test.BDD.Expectation');
+
             this.process(this.value < expectedValue, {
-                descTpl             : 'Expect {got} {!not}to be less than {need}',
+                descTpl             : R.get('expectText') + ' {got} {!not}' + R.get('toBeLessThanText') + ' {need}',
                 assertionName       : 'expect(got).toBeLessThan(need)',
                 need                : expectedValue,
-                needDesc            : this.isNot ? 'Need value bigger or equal than' : 'Need value less than'
+                needDesc            : this.isNot ? R.get('needGreaterEqualThanText') : R.get('needLessThanText')
             })
         },
         
@@ -8697,11 +9453,13 @@ Class('Siesta.Test.BDD.Expectation', {
          * @param {Number} expectedValue The number to compare with
          */
         toBeGreaterThan : function (expectedValue) {
+            var R = Siesta.Resource('Siesta.Test.BDD.Expectation');
+
             this.process(this.value > expectedValue, {
-                descTpl             : 'Expect {got} {!not}to be greater than {need}',
+                descTpl             : R.get('expectText') + ' {got} {!not}' + R.get('toBeGreaterThanText') + ' {need}',
                 assertionName       : 'expect(got).toBeGreaterThan(need)',
                 need                : expectedValue,
-                needDesc            : this.isNot ? 'Need value less or equal than' : 'Need value greater than'
+                needDesc            : this.isNot ? R.get('needLessEqualThanText') : R.get('needGreaterThanText')
             })
         },
         
@@ -8719,13 +9477,14 @@ Class('Siesta.Test.BDD.Expectation', {
             // not sure why we divide the precision by 2, but jasmine does that for some reason
             var threshold   = Math.pow(10, -precision) / 2
             var delta       = Math.abs(this.value - expectedValue)
-            
+            var R           = Siesta.Resource('Siesta.Test.BDD.Expectation');
+
             this.process(delta < threshold, {
-                descTpl             : 'Expect {got} {!not}to be close to {need}',
+                descTpl             : R.get('expectText') + ' {got} {!not}' + R.get('toBeCloseToText') +' {need}',
                 assertionName       : 'expect(got).toBeCloseTo(need)',
                 need                : expectedValue,
-                needDesc            : this.isNot ? 'Need value not close to' : 'Need value close to',
-                annotation          : delta ? "Threshold is " + threshold : 'Exact match'
+                needDesc            : this.isNot ? R.get('needValueNotCloseToText') : R.get('needValueCloseToText'),
+                annotation          : delta ? R.get('thresholdIsText') + threshold : R.get('exactMatchText')
             })        
         },
         
@@ -8737,7 +9496,8 @@ Class('Siesta.Test.BDD.Expectation', {
         toThrow : function () {
             var func    = this.value
             var t       = this.t
-            
+            var R       = Siesta.Resource('Siesta.Test.BDD.Expectation');
+
             if (t.typeOf(func) != 'Function') throw new Error("`expect().toMatch()` matcher expects a function")
             
             var e       = t.getExceptionCatcher()(func)
@@ -8747,9 +9507,9 @@ Class('Siesta.Test.BDD.Expectation', {
                 e = e.message || e.description
                 
             this.process(e !== undefined, {
-                descTpl             : 'Expect function {!not}to throw exception',
+                descTpl             : R.get('expectText') + ' function {!not}' + R.get('toThrowText'),
                 assertionName       : 'expect(func).toThrow()',
-                annotation          : e ? "Thrown exception: " + Siesta.Util.Serializer.stringify(e) : 'No exception thrown',
+                annotation          : e ? (R.get('thrownExceptionText') + ': ' + Siesta.Util.Serializer.stringify(e)) : R.get('noExceptionThrownText'),
                 
                 noGot               : true
             })
@@ -8798,8 +9558,8 @@ Role('Siesta.Test.BDD', {
     methods     : {
         
         checkSpecFunction : function (func, type, name) {
-            if (!func)          throw new Error("Code body is not provided for " + (type == 'describe' ? 'suite' : 'spec') + ' [' + name + ']')
-            if (!func.length)   throw new Error("Code body of " + (type == 'describe' ? 'suite' : 'spec') + ' [' + name + '] does not declare a test instance as 1st argument')
+            if (!func)          throw new Error(Siesta.Resource('Siesta.Test.BDD', 'codeBodyMissing') + " " + (type == 'describe' ? 'suite' : 'spec') + ' [' + name + ']')
+            if (!func.length)   throw new Error(Siesta.Resource('Siesta.Test.BDD', 'codeBodyOf') + " " + (type == 'describe' ? 'suite' : 'spec') + ' [' + name + '] ' + Siesta.Resource('Siesta.Test.BDD', 'missingFirstArg'))
         },
         
         
@@ -8878,7 +9638,8 @@ Role('Siesta.Test.BDD', {
          */
         iit : function (name, code, timeout) {
             if (this.harness.isAutomated) {
-                this.fail('t.iit should only be used during debugging');
+                // Must be flag driven, off by default
+//                this.fail(Siesta.Resource('Siesta.Test.BDD', 'iitFound'));
             }
             this.it(name, code, timeout, true)
         },
@@ -9002,7 +9763,7 @@ Role('Siesta.Test.BDD', {
 
     t.is(1, t.anyNumberApprox(1.2, 0.5))
     
-    t.expect(1).toBe(t.any(Number))
+    t.expect(1).toBe(t.anyNumberApprox(1.2, 0.5))
     
          * 
          * @param {Number} value The approximate value
@@ -9015,6 +9776,29 @@ Role('Siesta.Test.BDD', {
                 value               : value,
                 threshold           : threshold
             })
+        },
+        
+        
+        /**
+         * This method returns a *placeholder*, denoting any string that matches provided value. 
+         * Such placeholder can be used in various comparison assertions, like {@link #is}, {@link #isDeeply},
+         * {@link Siesta.Test.BDD.Expectation#toBe expect().toBe()}, 
+         * {@link Siesta.Test.BDD.Expectation#toBe expect().toEqual()} and so on.
+         * 
+         * For example:
+
+    t.is('foo', t.anyStringLike('oo'))
+    
+    t.expect('bar').toBe(t.anyStringLike(/ar$/))
+    
+         * 
+         * @param {String/RegExp} value If given as string will denote a substring a string being checked should contain,
+         * if given as RegExp instance then string being checked should match this RegExp
+         *  
+         * @return {Object} A placeholder object
+         */
+        anyStringLike : function (value) {
+            return new Siesta.Test.BDD.StringPlaceholder({ value : value })
         },
         
         
@@ -9250,7 +10034,17 @@ Class('Siesta.Test', {
         sourceLineForAllAssertions  : false,
         
         $passCount                  : null,
-        $failCount                  : null
+        $failCount                  : null,
+        
+        actionableMethods           : {
+            lazy        : 'buildActionableMethods'
+        },
+        
+        jUnitClass                  : null,
+        groups                      : null,
+        
+        // user-provided config values
+        config                      : null
     },
     
     
@@ -9275,20 +10069,23 @@ Class('Siesta.Test', {
             })
             
             this.subTestTimeout     = 2 * this.defaultTimeout
+            
+            // Potentially may overwrite default properties and break test instance, should be used with care
+            if (this.config) Joose.O.extend(this, this.config)
         },
         
         /**
-         * This method allows you to delay the start of the test, for example for performing some asynchronous setup code (like login into application).
-         * Note, that you may want to use {@link #setup} method instead, as its a bit simpler for implementation.  
+         * This method allows you to delay the start of the test, for example for performing some asynchronous setup code (like login into an application).
+         * Note, that you may want to use the {@link #setup} method instead, as it is a bit simpler to implement.
          * 
-         * It is supposed to be overriden in the subclass of Siesta.Test and should return object with properties "ready" and "reason" 
-         * ("reason" is only meaningful for "ready : false"). Test instance will poll this method and will only launch
-         * the test, when this method will return "ready : true". If waiting for this will take longer than {@link #isReadyTimeout} then, test
+         * It is supposed to be overridden in a subclass of the Siesta.Test class and should return an object with two properties: "ready" and "reason"
+         * ("reason" is only meaningful for the case where "ready : false"). The Test instance will poll this method and will only launch
+         * the test after this method returns "ready : true". If waiting for this condition takes longer than {@link #isReadyTimeout}, the test
          * will be launched anyway, but a failing assertion will be added to it.
          * 
-         * **Important** This method should always check the value returned by `this.SUPER` call. 
+         * **Important** This method should always check the value returned by a `this.SUPER` call.
          * 
-         * Typical example of using this method will be:
+         * A typical example of using this method can be seen below:
          * 
 
     Class('My.Test.Class', {
@@ -9341,6 +10138,8 @@ Class('Siesta.Test', {
          * @return {Object} Object with properties `{ ready : true/false, reason : 'description' }`
          */
         isReady: function() {
+            var R = Siesta.Resource('Siesta.Test');
+
             // this should allow us to wait until the presense of "run" function
             // it will become available after call to StartTest method
             // which some users may call asynchronously, after some delay
@@ -9350,7 +10149,7 @@ Class('Siesta.Test', {
             
             return {
                 ready   : this.typeOf(this.run) == 'Function',
-                reason  : 'No code provided to test'
+                reason  : R.get('noCodeProvidedToTest')
             }
         },
         
@@ -9383,8 +10182,9 @@ Class('Siesta.Test', {
             if (isAssertion && (this.isDone || this.isFinished()) && !result.isTodo) {
                 if (!this.testEndReported) {
                     this.testEndReported = true
-                    
-                    this.fail("Adding assertions after the test has finished.")
+                    var R = Siesta.Resource('Siesta.Test');
+
+                    this.fail(R.get('addingAssertionsAfterDone'))
                 }
             }
 
@@ -9499,20 +10299,22 @@ Class('Siesta.Test', {
          */
         fail : function (desc, annotation, result) {
             var sourceLine          = (result && result.sourceLine) || (annotation && annotation.sourceLine) || this.getSourceLine()
-            
+            var assertionName       = '';
+
             if (annotation && this.typeOf(annotation) != 'String') {
                 if (!desc && annotation.descTpl) desc = this.formatString(annotation.descTpl, annotation)
                 
                 var strings             = []
                 
                 var params              = annotation
-                var annotation          = params.annotation
-                var assertionName       = params.assertionName
                 var hasGot              = params.hasOwnProperty('got')
                 var hasNeed             = params.hasOwnProperty('need')
                 var gotDesc             = params.gotDesc || 'Got'
                 var needDesc            = params.needDesc || 'Need'
-                
+
+                assertionName           = params.assertionName
+                annotation              = params.annotation
+
                 if (!params.ownTextOnly && (assertionName || sourceLine)) strings.push(
                     'Failed assertion ' + (assertionName ? '`' + assertionName + '` ' : '') + this.formatSourceLine(sourceLine)
                 )
@@ -9549,13 +10351,17 @@ Class('Siesta.Test', {
                 description : desc
             }))
 
-            if (this.harness.activateDebuggerOnFail) {
-                eval("debugger");
-            }
-
-            if (this.harness.breakOnFail) {
-                this.finalize(true);
-                throw 'Assertion failed, test execution aborted';
+            if (!this.isTodo) {
+                if (this.harness.debuggerOnFail) {
+                    eval("debugger");
+                }
+    
+                if (this.harness.breakOnFail) {
+                    var R = Siesta.Resource('Siesta.Test');
+    
+                    this.finalize(true);
+                    throw R.get('testFailedAndAborted');
+                }
             }
         },
 
@@ -9627,7 +10433,8 @@ Class('Siesta.Test', {
             var text            = e.stack + '';
             var isFirefox       = /^@/.test(text)
             var lines           = text.split('\n')
-            
+            var R               = Siesta.Resource('Siesta.Test');
+
             var result          = []
             var match
             
@@ -9649,14 +10456,14 @@ Class('Siesta.Test', {
                     // the format of stack trace in Firefox has changed, 080_exception_parsing should fail
                     if (!match) return null
                     
-                    result.push('    at line ' + match[ 2 ] + ' of ' + match[ 1 ])
+                    result.push('    ' + R.get('atLine') + ' ' + match[ 2 ] + ' ' + R.get('of') + ' ' + match[ 1 ])
                 } else {
                     match       = /\s*at\s(.*?):(\d+):(\d+)/.exec(lines[ i ]);
                     
                     // the format of stack trace in Chrome has changed, 080_exception_parsing should fail
                     if (!match) return null
                     
-                    result.push('    at line ' + match[ 2 ] + ', character ' + match[ 3 ] + ', of ' + match[ 1 ])
+                    result.push('    ' + R.get('atLine') + ' ' + match[ 2 ] + ', ' + R.get('character') + ' ' + match[ 3 ] + ', ' + R.get('of') + ' ' + match[ 1 ])
                 }
             }
                 
@@ -9667,7 +10474,9 @@ Class('Siesta.Test', {
         
         
         formatSourceLine : function (sourceLine) {
-            return sourceLine ? 'at line ' + sourceLine + ' of ' + this.url : ''
+            var R               = Siesta.Resource('Siesta.Test');
+
+            return sourceLine ? (R.get('atLine') + ' ' + sourceLine + ' ' + R.get('of') + ' ' + this.url) : ''
         },
         
         
@@ -9731,7 +10540,7 @@ Class('Siesta.Test', {
          * @param {Boolean} onlyPrimitives When set to `true`, the function will not recurse into composite objects (like [] or {}) and will just report that
          * objects are different. Use this mode when you are only interesetd in comparison of primitive values (numbers, strings, etc).
          * @param {Boolean} asObjects When set to `true`, the function will compare various special Object instances, like Functions, RegExp etc,
-         * by comparison of there properties only and not taking the anything else into account.
+         * by comparison of their properties only and not taking the anything else into account.
          * @return {Boolean} `true` if the passed objects are equal
          */
         compareObjects : function (obj1, obj2, strict, onlyPrimitives, asObjects) {
@@ -9801,16 +10610,18 @@ Class('Siesta.Test', {
          * @param {String} desc The description of the assertion
          */
         ok : function (value, desc) {
+            var R               = Siesta.Resource('Siesta.Test');
+
             if (value) 
                 this.pass(desc, {
-                    descTpl             : '`{value}` is a "truthy" value',
+                    descTpl             : R.get('isTruthy'),
                     value               : value
                 })
             else 
                 this.fail(desc, {
                     assertionName       : 'ok', 
                     got                 : value, 
-                    annotation          : 'Need "truthy" value'
+                    annotation          : R.get('needTruthy')
                 })
         },
         
@@ -9828,16 +10639,18 @@ Class('Siesta.Test', {
          * @param {String} desc The description of the assertion
          */
         notOk : function (value, desc) {
-            if (!value) 
+            var R               = Siesta.Resource('Siesta.Test');
+
+            if (!value)
                 this.pass(desc, {
-                    descTpl             : '`{value}` is not a "truthy" value',
+                    descTpl             : R.get('isFalsy'),
                     value               : value
                 })
             else 
                 this.fail(desc, {
                     assertionName       : 'notOk', 
                     got                 : value, 
-                    annotation          : 'Need "falsy" value'
+                    annotation          : R.get('needFalsy')
                 })
         },
         
@@ -9852,11 +10665,13 @@ Class('Siesta.Test', {
          * @param {String} desc The description of the assertion
          */
         is : function (got, expected, desc) {
+            var R               = Siesta.Resource('Siesta.Test');
+
             if (expected && got instanceof this.global.Date) {
                 this.isDateEqual(got, expected, desc);
             } else if (this.compareObjects(got, expected, false, true))
                 this.pass(desc, {
-                    descTpl             : '`{got}` is equal to `{expected}`',
+                    descTpl             : R.get('isEqualTo'),
                     got                 : got,
                     expected            : expected
                 })
@@ -9890,9 +10705,11 @@ Class('Siesta.Test', {
          * @param {String} desc The description of the assertion
          */
         isNot : function (got, expected, desc) {
+            var R               = Siesta.Resource('Siesta.Test');
+
             if (!this.compareObjects(got, expected, false, true))
                 this.pass(desc, {
-                    descTpl             : '`{got}` is not equal to `{expected}`',
+                    descTpl             : R.get('isNotEqualTo'),
                     got                 : got,
                     expected            : expected
                 })
@@ -9901,7 +10718,7 @@ Class('Siesta.Test', {
                     assertionName       : 'isnt', 
                     got                 : got, 
                     need                : expected,
-                    needDesc            : 'Need, not'
+                    needDesc            : R.get('needNot')
                 })
         },
         
@@ -9916,9 +10733,11 @@ Class('Siesta.Test', {
          * @param {String} desc The description of the assertion
          */
         isStrict : function (got, expected, desc) {
+            var R               = Siesta.Resource('Siesta.Test');
+
             if (this.compareObjects(got, expected, true, true))
                 this.pass(desc, {
-                    descTpl             : '`{got}` is strictly equal to `{expected}`',
+                    descTpl             : R.get('isStrictlyEqual'),
                     got                 : got,
                     expected            : expected
                 })
@@ -9927,7 +10746,7 @@ Class('Siesta.Test', {
                     assertionName       : 'isStrict', 
                     got                 : got, 
                     need                : expected,
-                    needDesc            : 'Need strictly'
+                    needDesc            : R.get('needStrictly')
                 })
         },
 
@@ -9947,9 +10766,11 @@ Class('Siesta.Test', {
          * @param {String} desc The description of the assertion
          */
         isNotStrict : function (got, expected, desc) {
+            var R               = Siesta.Resource('Siesta.Test');
+
             if (!this.compareObjects(got, expected, true, true))
                 this.pass(desc, {
-                    descTpl             : '`{got}` is not strictly equal to `{expected}`',
+                    descTpl             : R.get('isStrictlyNotEqual'),
                     got                 : got,
                     expected            : expected
                 })
@@ -9958,7 +10779,7 @@ Class('Siesta.Test', {
                     assertionName       : 'isntStrict', 
                     got                 : got, 
                     need                : expected,
-                    needDesc            : 'Need, strictly not'
+                    needDesc            : R.get('needStrictlyNot')
                 })
         },
         
@@ -9984,7 +10805,9 @@ Class('Siesta.Test', {
          * @param {String} howLong The maximum time (in ms) to wait until force the finalization of this async frame. Optional. Default time is 15000 ms.
          */
         wait : function (title, howLong) {
-            if (this.waitTitles.hasOwnProperty(title)) throw new Error("Already doing a `wait` with title [" + title + "]")
+            var R               = Siesta.Resource('Siesta.Test');
+
+            if (this.waitTitles.hasOwnProperty(title)) throw new Error(R.get('alreadyWaiting')+ " [" + title + "]")
             
             return this.waitTitles[ title ] = this.beginAsync(howLong)
         },
@@ -9996,7 +10819,9 @@ Class('Siesta.Test', {
          * @param {String} title The id of frame to finalize, which was previously passed to {@link #wait} method
          */
         endWait : function (title) {
-            if (!this.waitTitles.hasOwnProperty(title)) throw new Error("There were no call to `wait` with title [" + title + "]")
+            var R               = Siesta.Resource('Siesta.Test');
+
+            if (!this.waitTitles.hasOwnProperty(title)) throw new Error(R.get('noOngoingWait') + " [" + title + "]")
             
             this.endAsync(this.waitTitles[ title ])
             
@@ -10029,7 +10854,8 @@ Class('Siesta.Test', {
          */
         beginAsync : function (time, errback) {
             time                        = time || this.defaultTimeout
-            
+
+            var R                       = Siesta.Resource('Siesta.Test');
             var me                      = this
             var originalSetTimeout      = this.originalSetTimeout
             
@@ -10041,7 +10867,7 @@ Class('Siesta.Test', {
             var timeoutId               = originalSetTimeout(function () {
                 
                 if (me.hasAsyncFrame(index)) {
-                    if (!errback || !errback.call(me, me)) me.fail('No matching `endAsync` call within ' + time + 'ms')
+                    if (!errback || !errback.call(me, me)) me.fail(R.get('noMatchingEndAsync') + ' ' + time + ' ' + Siesta.Resource('Siesta.Test.More', 'ms'))
                     
                     me.endAsync(index)
                 }
@@ -10067,10 +10893,11 @@ Class('Siesta.Test', {
             var originalSetTimeout      = this.originalSetTimeout
             var originalClearTimeout    = this.originalClearTimeout || this.global.clearTimeout
             var counter = 0
-            
+            var R                       = Siesta.Resource('Siesta.Test');
+
             if (index == null) Joose.O.each(this.timeoutIds, function (timeoutId, indx) {
                 index = indx
-                if (counter++) throw new Error("Calls to endAsync without argument should only be performed if you have single beginAsync statement") 
+                if (counter++) throw new Error(R.get('endAsyncMisuse'))
             })
             
             var timeoutId               = this.timeoutIds[ index ]
@@ -10170,7 +10997,8 @@ Class('Siesta.Test', {
          */
         getSubTest : function (arg1, arg2, arg3) {
             var config
-            
+            var R = Siesta.Resource('Siesta.Test');
+
             if (arguments.length == 2 || arguments.length == 3) 
                 config = {
                     name        : arg1,
@@ -10191,12 +11019,12 @@ Class('Siesta.Test', {
             var name            = config.name
             
             if (!config.run) {
-                this.failWithException("Code body is not provided for sub test [" + name + "]")
-                throw new Error("Code body is not provided for sub test [" + name + "]")
+                this.failWithException(R.get('codeBodyMissingForSubTest') + " [" + name + "]")
+                throw new Error(R.get('codeBodyMissingForSubTest') + " [" + name + "]")
             }
             if (!config.run.length) {
-                this.failWithException('Code body of sub test [' + name + '] does not declare a test instance as 1st argument')
-                throw new Error('Code body of sub test [' + name + '] does not declare a test instance as 1st argument')
+                this.failWithException(R.get('codeBodyMissingTestArg').replace('{name}', name))
+                throw new Error(R.get('codeBodyMissingTestArg').replace('{name}', name))
             }
             
             return new (config.meta || this.constructor)(this.processSubTestConfig(config))
@@ -10211,9 +11039,10 @@ Class('Siesta.Test', {
          */
         launchSubTest : function (subTest, callback) {
             var me          = this
-            
+            var R           = Siesta.Resource('Siesta.Test');
+
             var async       = this.beginAsync(subTest.timeout || this.subTestTimeout, function () {
-                me.fail('Subtest ' + (subTest.name ? '[' + subTest.name + ']' : '') +' failed to finish within ' + this.subTestTimeout + 'ms')
+                me.fail(R.get('Subtest') + ' ' + (subTest.name ? '[' + subTest.name + ']' : '') + ' ' + R.get('failedToFinishWithin') + ' ' + this.subTestTimeout + ' ' + Siesta.Resource('Siesta.Test.More', 'ms'))
                 
                 testEndListener.remove()
                 
@@ -10323,10 +11152,8 @@ Class('Siesta.Test', {
          */
         subTest : function (desc, code, callback, timeout) {
             var subTest     = this.getSubTest({
-                name            : desc || "Sub test",
-                
+                name            : desc || Siesta.Resource('Siesta.Test', 'Subtest'),
                 timeout         : timeout,
-                
                 run             : code
             })
 
@@ -10340,6 +11167,7 @@ Class('Siesta.Test', {
             var stackTrace              = this.getStackTrace(e)
             var stringified             = e + ''
             var annotation              = (stackTrace || []).join('\n')
+            var R                       = Siesta.Resource('Siesta.Test');
 
             this.failedException        = stringified
             this.failedExceptionType    = this.typeOf(e)
@@ -10351,7 +11179,7 @@ Class('Siesta.Test', {
                 isException     : true,
                 exceptionType   : this.failedExceptionType,
                 passed          : false,
-                description     : (this.parent ? "Sub-test `" + this.name + "`" : 'Test ') + ' threw an exception',
+                description     : (this.parent ? R.get('Subtest') + " `" + this.name + "`" : R.get('Test') + ' ') + ' ' + R.get('threwException'),
                 annotation      : annotation
             }))
             
@@ -10374,8 +11202,10 @@ Class('Siesta.Test', {
         
         
         start : function (alreadyFailedWithException) {
+            var R = Siesta.Resource('Siesta.Test');
+
             if (this.startDate) {
-                throw 'Test has already been started';
+                throw R.get('testAlreadyStarted');
             }
 
             this.startDate  = new Date() - 0
@@ -10415,7 +11245,7 @@ Class('Siesta.Test', {
                 
                 var setupTimeout    = setTimeout(function () {
                     hasTimedOut     = true
-                    me.launch('`setup` method took too long to complete')
+                    me.launch(R.get('setupTookTooLong'))
                 }, me.isReadyTimeout)
                 
                 me.setup(
@@ -10492,16 +11322,16 @@ Class('Siesta.Test', {
     })
 
          * 
-         * This method will be called *after* the {@link #isReady} method has reported that test is ready for start.
+         * This method will be called *after* the {@link #isReady} method has reported that the test is ready to start.
          * 
-         * If setup has failed for some reason, then a errback should be called and failing assertion will be added to the test
-         * (test will be lauched anyway). A text of the failed assertion can be given as the 1st argument for the errback.
+         * If the setup has failed for some reason, then an errback should be called and a failing assertion will be added to the test
+         * (though the test will be lauched anyway). A text of the failed assertion can be given as the 1st argument for the errback.
          * 
-         * Note, that setup is supposed to be completed within the {@link #isReadyTimeout} timeout, otherwise it will be 
-         * considered failed and test will be launched with failed assertion.
+         * Note, that the setup is supposed to be completed within the {@link #isReadyTimeout} timeout, otherwise it will be
+         * considered failed and the test will be launched with a failed assertion.
          * 
-         * @param {Function} callback A function to call when setup has completed successfully
-         * @param {Function} errback A function to call when setup has completed with an error
+         * @param {Function} callback A function to call when the setup has completed successfully
+         * @param {Function} errback A function to call when the setup has completed with an error
          */
         setup : function (callback, errback) {
             callback.call(this)
@@ -10510,13 +11340,18 @@ Class('Siesta.Test', {
 
         launch : function (errorMessage) {
             if (errorMessage) {
-                this.fail('Error happened even before the test has started', {
+                var R = Siesta.Resource('Siesta.Test');
+
+                this.fail(R.get('errorBeforeTestStarted'), {
                     annotation      : errorMessage
                 })
             }
             
             var me                      = this
             var global                  = this.global
+            
+            // trying to focus the window (hopefully fixes the tab key issues)
+            global.focus && global.focus()
             
             var scopeProvider           = this.scopeProvider
             
@@ -10657,9 +11492,10 @@ Class('Siesta.Test', {
                     !this.__timeoutWarning && this.overrideSetTimeout && this.lastActivityDate &&
                     new Date() - this.lastActivityDate > this.defaultTimeout * 2
                 ) {
-                    this.diag('Your test is still considered to be running, if this is unexpected please see console for more information');
-                    this.warn('Your test [' + this.url + '] has not finalized, most likely since a timer (setTimeout) is still active. ' + 
-                              'If this is the expected behavior, try setting "overrideSetTimeout : false" on your Harness configuration.');
+                    var R = Siesta.Resource('Siesta.Test');
+
+                    this.diag(R.get('testStillRunning'));
+                    this.warn(R.get('testNotFinalized').replace('{url}', this.url));
                     this.__timeoutWarning = true;
                 }
 
@@ -10667,18 +11503,21 @@ Class('Siesta.Test', {
             }
 
             if (!this.needDone && !this.isDone) {
-                // this is early "testfinalize" hook, we need "early" and "usual" hooks, since we want globals check to be the last assertion
+                // this is the early "testfinalize" hook, we need "early" and "regular" hooks, since we want the globals check to be the last assertion
                 this.fireEvent('beforetestfinalizeearly', this)
 
-                if (!force && !Joose.O.isEmpty(this.timeoutIds)) {
-                    // Firing the beforetestXXX events may trigger additional test actions
-                    return;
+                // Firing the `beforetestfinalizeearly` events may trigger additional test actions
+                if (!Joose.O.isEmpty(this.timeoutIds)) {
+                    if (force)
+                        this.clearTimeouts()
+                    else
+                        return
                 }
 
                 /**
-                 * This event is fired before the individual test case ends (no any corresponded harness actions will be run yet).
+                 * This event is fired before each individual test case ends (no any corresponding Harness actions will have been run yet).
                  * 
-                 * This event bubbles up to the {@link Siesta.Harness harness}, you can observe it on harness as well.
+                 * This event bubbles up to the {@link Siesta.Harness harness}, so you can observe it on the harness as well.
                  * 
                  * @event beforetestfinalize
                  * @member Siesta.Test
@@ -10697,9 +11536,9 @@ Class('Siesta.Test', {
             
             /**
              * This event is fired when an individual test case ends (either because it has completed correctly or thrown an exception).
-             * 
-             * This event bubbles up to the {@link Siesta.Harness harness}, you can observe it on the harness as well.
-             * 
+             *
+             * This event bubbles up to the {@link Siesta.Harness harness}, so you can observe it on the harness as well.
+             *
              * @event testfinalize
              * @member Siesta.Test
              * @param {JooseX.Observable.Event} event The event instance
@@ -10736,9 +11575,11 @@ Class('Siesta.Test', {
                     
                     if (total == assertPlanned && !failCount) res.push('All tests passed')
                 } else {
-                    if (!this.isDoneCorrectly()) res.push('Test has completed, but there were no `t.done()` call. Add it at the bottom, or use `t.beginAsync()` for asynchronous code')
+                    var R = Siesta.Resource('Siesta.Test');
+
+                    if (!this.isDoneCorrectly()) res.push(R.get('missingDoneCall'))
                     
-                    if (this.isDoneCorrectly() && !failCount) res.push('All tests passed')
+                    if (this.isDoneCorrectly() && !failCount) res.push(R.get('allTestsPassed'))
                 }
             }
             
@@ -10747,7 +11588,7 @@ Class('Siesta.Test', {
         
         
         /**
-         * This method indicates that test has completed at the expected point and no more assertions are planned. Adding assertions after the call to `done`
+         * This method indicates that the test has completed at the expected point and no more assertions are planned. Adding assertions after the call to `done`
          * will add a failing assertion "Adding assertion after test completion".
          * 
          * @param {Number} delay Optional. When provided, the test will not complete right away, but will wait for `delay` milliseconds for additional assertions. 
@@ -10928,6 +11769,22 @@ Class('Siesta.Test', {
             })
             
             return result
+        },
+        
+        
+        buildActionableMethods : function () {
+            var methods     = {}
+            
+            this.meta.getMethods().each(function (method, name) {
+                methods[ name.toLowerCase() ] = name
+            })
+            
+            return methods
+        },
+        
+        
+        getJUnitClass : function () {
+            return this.jUnitClass || this.meta.name || 'Siesta.Test'
         }
     }
     // eof methods
@@ -10939,8 +11796,10 @@ Singleton('Siesta.Test.ActionRegistry', {
     has : {
         actionClasses       : Joose.I.Object,
         
-        targetShortcuts     : function () {
-            return [ 
+        actions     : function () {
+            var actions     = {}
+            
+            Joose.A.each([ 
                 'waitFor', 
                 'click', 
                 'rightClick', 
@@ -10955,7 +11814,11 @@ Singleton('Siesta.Test.ActionRegistry', {
                 'swipe', 
                 'tap', 
                 'type' 
-            ]
+            ], function (value) {
+                actions[ value.toLowerCase() ] = value
+            })
+            
+            return actions
         }
     },
 
@@ -10972,22 +11835,21 @@ Singleton('Siesta.Test.ActionRegistry', {
         },
         
         
-        create : function (obj) {
+        create : function (obj, test) {
             if (obj !== Object(obj)) throw "Action configuration should be an Object instance"
             
             if (!obj.action) {
-                var lowerCasedKeys      = {}
+                var actions             = this.actions
+                var methods             = {}
+                
+                if (test) {
+                    methods             = test.getActionableMethods()    
+                }
                 
                 Joose.O.eachOwn(obj, function (value, key) {
-                    lowerCasedKeys[ key.toLowerCase() ] = key
-                })
-                
-                var me                  = this
-                
-                Joose.A.each(this.targetShortcuts, function (shortcut) {
-                    shortcut            = shortcut.toLowerCase()
+                    var shortcut        = key.toLowerCase()
                     
-                    if (lowerCasedKeys.hasOwnProperty(shortcut)) {
+                    if (actions[ shortcut ]) {
                         obj.action      = shortcut
                         
                         switch (shortcut) {
@@ -10996,11 +11858,23 @@ Singleton('Siesta.Test.ActionRegistry', {
                             break
                             
                             case 'type'     :
-                                obj.text        = obj[ lowerCasedKeys[ shortcut ] ]
+                                obj.text        = value
                             break
                                 
                             default         : 
-                                obj.target      = obj[ lowerCasedKeys[ shortcut ] ]
+                                obj.target      = value
+                        }
+                        
+                        return false
+                    } else if (methods[ shortcut ]) {
+                        if (shortcut.match(/^waitFor/i)) {
+                            obj.action      = 'wait'
+                            obj.waitFor     = methods[ shortcut ]
+                            obj.args        = value
+                        } else {
+                            obj.action      = 'methodCall'
+                            obj.methodName  = methods[ shortcut ]
+                            obj.args        = value
                         }
                         
                         return false
@@ -11047,7 +11921,7 @@ Class('Siesta.Test.Action', {
             
             // additional sanity check
             if (requiredTestMethod && !this.test[ requiredTestMethod ]) 
-                throw new Error("Action [" + this + "] requires `" + requiredTestMethod + "` method in your test class") 
+                throw new Error(Siesta.Resource('Siesta.Test.Action','missingTestAction').replace('{0}', this.meta.name).replace('{1}', requiredTestMethod))
         },
         
         
@@ -11220,7 +12094,54 @@ Class('Siesta.Test.Action.Wait', {
     )
          * 
          */
-        waitFor         : null
+        waitFor         : null,
+        
+        
+        /**
+         * @cfg {Object} trigger 
+         * 
+         * A config object for the action that should trigger the waiting condition. Will be executed right *after* the waiting has
+         * started, to avoid the race conditions. 
+         * 
+         * To illustrate, imagine, when clicking on some button, new data package will be loaded and some event `dataloaded` 
+         * will be fired. We want to wait for that event. Usually, you will write this as the following action steps, in the `chain` method:
+         * 
+
+    t.chain(
+        { click : '.someButton' },
+        { waitFor : 'Event', args : [ someDataStorage, 'dataload' ] },
+        ...
+    )
+
+         * However, imagine loading mechanism implements caching, and sometimes loading happens *synchronously*. In this case,
+         * the `dataload` event will be also fired synchronously, right during the "onclick" handler of the button. Then, we'll start
+         * waiting for that event (which has already been fired) and the `waitFor` action will fail.
+         * 
+         * To avoid this race condition, we need to first start waiting for the event, and only then - perform a click:
+         * 
+
+    t.chain(
+        function (next) {
+            t.waitForEvent(someDataStorage, 'dataload', next);
+            
+            t.click('.someButton', function () {})
+        },
+        ...
+    )
+
+         * or, using `trigger` config:
+
+    t.chain(
+        { 
+            waitFor : 'Event', 
+            args    : [ someDataStorage, 'dataload' ],
+            trigger : { click : '.someButton' } 
+        },
+        ...
+    )
+
+         */
+        trigger         : null
     },
 
     
@@ -11254,14 +12175,14 @@ Class('Siesta.Test.Action.Wait', {
             waitFor         = waitFor.replace(/^waitFor/, '')
             var methodName  = 'waitFor' + Joose.S.uppercaseFirst(waitFor);
             
-            if (!test[methodName]){
-                throw 'Could not find a waitFor method named ' + methodName;
+            if (!test[ methodName ]){
+                throw Siesta.Resource("Siesta.Test.Action.Wait", 'missingMethodText') + methodName;
             }
-
+            
             // If using simple waitFor statement, use the object notation to be able to pass a description
             // which gives better debugging help than "Waited too long for condition to be fulfilled".
             if (methodName === 'waitFor') {
-                test[methodName]({
+                test.waitFor({
                     method          : this.args[ 0 ],
                     callback        : this.next,
                     scope           : test,
@@ -11269,8 +12190,22 @@ Class('Siesta.Test.Action.Wait', {
                     description     : this.desc || ''
                 });
             } else {
-                test[methodName].apply(test, this.args.concat(this.next, test, this.timeout || test.waitForTimeout));
+                test[ methodName ].apply(test, this.args.concat(this.next, test, this.timeout || test.waitForTimeout));
             }
+            
+            var trigger     = this.trigger
+            
+            if (trigger) {
+                if (!(trigger instanceof Siesta.Test.Action)) {
+                    trigger.next        = function () {}
+                    trigger.test        = this.test
+                    
+                    trigger             = Siesta.Test.ActionRegistry().create(trigger, test)
+                }
+                
+                trigger.process()
+            }
+            
         }
     }
 });
@@ -11332,7 +12267,7 @@ Class('Siesta.Test.Action.Eval', {
          * Any options that will be used when simulating the event. For information about possible
          * config options, please see: <https://developer.mozilla.org/en-US/docs/DOM/event.initMouseEvent>
          */
-        actionString        : null
+        actionString          : null
     },
 
     
@@ -11351,7 +12286,7 @@ Class('Siesta.Test.Action.Eval', {
             var methodName      = parsed.methodName
             
             if (!methodName || test.typeOf(test[ methodName ]) != 'Function') {
-                test.fail("Invalid method name: " + methodName)
+                test.fail(Siesta.Resource("Siesta.Test.Action.Eval", 'invalidMethodNameText') + methodName)
                 this.next()
                 return
             }
@@ -11366,7 +12301,7 @@ Class('Siesta.Test.Action.Eval', {
             var match           = /^\s*(.+?)\(\s*(.*)\s*\)\s*$/.exec(actionString)
             
             if (!match) return {
-                error       : "Wrong format of the action string: " + actionString
+                error       : Siesta.Resource("Siesta.Test.Action.Eval", 'wrongFormatText') + actionString
             }
             
             var methodName      = match[ 1 ].replace(/^t\./, '')
@@ -11375,7 +12310,7 @@ Class('Siesta.Test.Action.Eval', {
                 var params      = JSON.parse('[' + match[ 2 ] + ']')
             } catch (e) {
                 return {
-                    error       : "Can't parse arguments: " + match[ 2 ]
+                    error       : Siesta.Resource("Siesta.Test.Action.Eval", 'parseErrorText') + match[ 2 ]
                 }
             }
             
@@ -11386,6 +12321,83 @@ Class('Siesta.Test.Action.Eval', {
         }
     }
 });
+;
+/**
+
+@class Siesta.Test.Action.MethodCall
+@extends Siesta.Test.Action
+
+This action allows you to call any method of the test class. You can add it to the `chain` method by providing a property in the config object,
+which corresponds to some method of the test class. The value of this property should contain arguments for the method call (see {@link #args}).
+
+    t.chain(
+        function (next) {
+            t.someMethodCall('arg1', 'arg2', next)
+        },
+        // or
+        {
+            someMethodCall  : [ 'arg1', 'arg2' ]
+        },
+        ...
+        {
+            waitForSelector : '.selector'
+        }
+    )
+    
+
+*/
+Class('Siesta.Test.Action.MethodCall', {
+    
+    isa         : Siesta.Test.Action,
+    
+    has : {
+        /**
+         * @cfg {String} methodName
+         *
+         * A name of the method to call.
+         */
+        methodName      : null,
+        
+        /**
+         * @cfg {Array/Function/Object} args
+         *
+         * Arguments for the method call. Usually should be an array. If its a function, then the function will be called
+         * at the action execution time and result from the action will be treated as `args`. Anything else will be converted
+         * to a single element array. 
+         * 
+         * The callback will be added as the last argument (after resolving this config), unless the {@link #callbackIndex} is specified.
+         */
+        args            : null,
+        
+        /**
+         * @cfg {Number} callbackIndex An index in the {@link #args} array where the callback should be inserted. 
+         */
+        callbackIndex   : null
+    },
+
+    
+    methods : {
+        
+        process : function () {
+            var test            = this.test
+            var methodName      = this.methodName
+            var args            = this.args
+            
+            if (test.typeOf(args) == 'Function') args  = args.call(test, this)
+            
+            if (test.typeOf(args) != 'Array') args = [ args ]
+            
+            if (this.callbackIndex != null) 
+                args.splice(this.callbackIndex, 0, this.next)
+            else
+                args.push(this.next)
+            
+            test[ methodName ].apply(test, args)
+        }
+    }
+});
+
+Siesta.Test.ActionRegistry().registerAction('methodCall', Siesta.Test.Action.MethodCall)
 ;
 /**
 
@@ -12001,7 +13013,7 @@ Class('Siesta.Harness', {
          * 
          * Groups (folder) may contain nested groups. Number of nesting levels is not limited.
          * 
-         * For example, one may easily have a special group of test files, having its own preload configuration (for example for testing on-demand loading). In the same
+         * For example, one may easily have a special group of test files, having its own `preload` configuration (for example for testing on-demand loading). In the same
          * time some test in that group may have its own preload, overriding others.
 
     Harness.configure({
@@ -12058,6 +13070,29 @@ Class('Siesta.Harness', {
     }) 
          * 
          * Values from this object takes the highest priority and will override any other configuration.
+         * 
+         * Test descriptor may contain special property - `config` which will be applied to the test instance created. Be careful not to overwrite
+         * standard properties and methods!
+         * 
+
+    Harness.start(
+        {
+            url         : 'ondemand/4-0-6-compat.t.js',
+            config      : {
+                myProperty1     : 'value1',
+                myProperty2     : 'value2'
+            }
+        },
+        ...
+    )
+    
+    StartTest(function (t) {
+        if (t.myProperty1 == 'value1') {
+            // do this
+        }
+        ...
+    }) 
+
          * 
          * @param {Array/Mixed} descriptor1 or an array of descriptors
          * @param {Mixed} descriptor2
@@ -12642,8 +13677,22 @@ Class('Siesta.Harness', {
         getNewTestConfiguration : function (desc, scopeProvider, contentManager, options, runFunc, startTestAnchor) {
             var scope           = scopeProvider.scope
             
+            var groups          = []
+            var currentDesc     = desc.parent
+            
+            while (currentDesc) {
+                // do not push name of the top-level "hidden" group which has no parent
+                currentDesc.parent && groups.unshift(String(currentDesc.group))
+                
+                currentDesc     = currentDesc.parent
+            }
+            
             var config          = {
                 url                 : desc.url,
+                name                : desc.name,
+                
+                groups              : groups,
+                jUnitClass          : this.getDescriptorConfig(desc, 'jUnitClass'),
             
                 harness             : this,
                 run                 : runFunc,
@@ -12674,11 +13723,13 @@ Class('Siesta.Harness', {
                 waitForTimeout              : this.getDescriptorConfig(desc, 'waitForTimeout') * (options.increaseTimeout ? 3 : 1),
                 isReadyTimeout              : this.getDescriptorConfig(desc, 'isReadyTimeout'),
                 
-                sourceLineForAllAssertions  : this.sourceLineForAllAssertions
+                sourceLineForAllAssertions  : this.sourceLineForAllAssertions,
+                
+                config                      : this.getDescriptorConfig(desc, 'config')
             }
             
             // potentially not safe
-            if (desc.testConfig) Joose.O.extend(config, desc.testConfig)
+            if (desc.testConfig || desc.config) Joose.O.extend(config, desc.testConfig || desc.config)
             
             return config
         },
@@ -12837,92 +13888,99 @@ Role('Siesta.Role.ConsoleReporter', {
     requires    : [ 'log', 'exit', 'allPassed' ],
     
     
-    does        : Siesta.Role.CanStyleOutput,
-    
+    does        : [
+        Siesta.Role.CanStyleOutput
+    ],
+
     has : {
         // special flag which will be used by automation launchers to prevent the summary message
         // after every page
         needSummaryMessage      : true
     },
-    
-    
+
+
     after : {
-        
+
         markMissingFile : function (desc) {
-            this.warn("Test file [" + desc.url + "] not found.")
+            this.warn(Siesta.Resource('Siesta.Role.ConsoleReporter', 'missingFileText').replace("{URL}", desc.url))
         },
-        
-        
+
+
         onTestSuiteStart : function () {
         },
-        
-        
+
+
         onTestSuiteEnd : function () {
             this.exit(this.getExitCode())
         },
-        
-        
+
+
         onTestEnd : function (test) {
             var isPassed    = test.isPassed()
-            
-            this.log('[' + (isPassed ? this.style().green('PASS') : this.style().red('FAIL')) + ']  ' + test.url + (isPassed ? '' : '\n')) 
+
+            this.log('[' + (isPassed ? this.style().green(Siesta.Resource('Siesta.Role.ConsoleReporter', 'passText')) : this.style().red(Siesta.Resource('Siesta.Role.ConsoleReporter', 'failText'))) + ']  ' + test.url + (isPassed ? '' : '\n'))
         },
-        
-        
+
+
         onTestUpdate : function (test, result, parentResult) {
             var text            = result + ''
             var needToShow      = this.verbosity > 0
-            
+
             if (result instanceof Siesta.Result.Assertion) {
                 if (result.isWaitFor && !result.completed) return;
 
                 if (result.isException && !result.isTodo) {
                     text        = this.style().bold(this.style().red(text))
-                    
+
                     needToShow  = true
                 } else if (result.isTodo) {
                     text        = this.styled(text, result.passed ? 'magenta' : 'yellow')
-                    
+
                     if (result.passed && !result.isWaitFor) needToShow = true
-                    
+
                 } else {
                     text        = this.styled(text, result.passed ? 'green' : 'red')
-                    
+
                     if (!result.passed) needToShow = true
                 }
             }
-            
+
             if (result instanceof Siesta.Result.Diagnostic) {
                 text            = this.styled(text, 'bold')
-                
+
                 if (result.isWarning) {
-                    this.warn(text)
+                    this.logWarning(result)
                     return
                 }
             }
-            
+
             if (result instanceof Siesta.Result.Summary) {
                 needToShow      = this.needSummaryMessage
-                
+
                 text            = this.styled(result.description.join(''), 'bold')
             }
-            
+
             if (needToShow) this.log(text)
-        }            
+        }
     },
-    
-    
+
+
     methods : {
-        
+
         warn : function (text) {
-            this.log(this.styled('[WARN] ', 'red') + text)
+            this.log(this.styled('[' + Siesta.Resource('Siesta.Role.ConsoleReporter', 'warnText') + '] ', 'red') + text)
         },
         
         
+        logWarning : function (result) {
+            this.warn(result + '')
+        },
+
+
         getSummaryMessage : function (allPassed) {
             allPassed = allPassed != null ? allPassed : this.allPassed()
-            
-            return allPassed ? this.style().bold(this.style().green('All tests passed')) : this.style().bold(this.style().red('There are failures'))
+
+            return allPassed ? this.style().bold(this.style().green(Siesta.Resource('Siesta.Role.ConsoleReporter', 'allTestsPassedText'))) : this.style().bold(this.style().red(Siesta.Resource('Siesta.Role.ConsoleReporter', 'failuresFoundText')))
         },
         
         
@@ -12932,7 +13990,6 @@ Role('Siesta.Role.ConsoleReporter', {
     }
     
 })
-
 
 ;
 ;
@@ -13788,6 +14845,10 @@ Role('Siesta.Role.ConsoleReporter', {
             uaMatch: function (ua) {
                 ua = ua.toLowerCase();
 
+                // temp hack for IE11
+                if (ua.match(/trident/i) && ua.match(/rv.\d\d/)) {
+                    return { browser: "msie", version: "11.0"};
+                }
                 var match = rwebkit.exec(ua) ||
 			ropera.exec(ua) ||
 			rmsie.exec(ua) ||
@@ -22597,8 +23658,7 @@ Class('Siesta.Test.Action.RightClick', {
 
 
 Siesta.Test.ActionRegistry().registerAction('rightclick', Siesta.Test.Action.RightClick)
-Siesta.Test.ActionRegistry().registerAction('contextmenu', Siesta.Test.Action.RightClick)
-;
+Siesta.Test.ActionRegistry().registerAction('contextmenu', Siesta.Test.Action.RightClick);
 /**
 
 @class Siesta.Test.Action.Type
@@ -22763,7 +23823,10 @@ Class('Siesta.Test.Action.Drag', {
          * 
          * True to skip the mouseup and not finish the drop operation (one can start another drag operation, emulating the pause during drag-n-drop).
          */
-        dragOnly            : false
+        dragOnly            : false,
+
+        byOrToMissingText   : 'Either "to" or "by" configuration option is required for "drag" step',
+        byAndToDefinedText  : 'Exactly one of "to" or "by" configuration options is required for "drag" step, not both'
     },
 
     
@@ -22783,8 +23846,8 @@ Class('Siesta.Test.Action.Drag', {
         initialize : function () {
             this.SUPER()
             
-            if (!this.to && !this.by)   throw 'Either "to" or "by" configuration option is required for "drag" step' 
-            if (this.to && this.by)     throw 'Exactly one of "to" or "by" configuration options is required for "drag" step, not both'
+            if (!this.to && !this.by)   throw this.byOrToMissingText
+            if (this.to && this.by)     throw this.byAndToDefinedText
         },
         
         
@@ -23003,11 +24066,13 @@ This is a mixin, providing the mouse events simulation functionality.
 
 Role('Siesta.Test.Simulate.Mouse', {
     
-    requires        : [ 'simulateEvent', 'getSimulateEventsWith', 'normalizeElement', 'isTextInput' ],    
+    requires        : [ 
+        'simulateEvent', 'getSimulateEventsWith', 'normalizeElement', 'isTextInput' 
+    ],    
     
     has: {
         /**
-         *  @cfg {Int} dragDelay The delay between individual drag events (mousemove)
+         * @cfg {Int} dragDelay The delay between individual drag events (mousemove)
          */
         dragDelay               : 25,
 
@@ -23017,14 +24082,16 @@ Role('Siesta.Test.Simulate.Mouse', {
         moveCursorBetweenPoints : true,
 
         /**
-         *  @cfg {Int} dragPrecision Defines how precisely to follow the path between two points when simulating a drag. 2 indicates every other point will be used.
-                                     (low value = slow dragging, high value = fast dragging)
-        */
+         * @cfg {Int} dragPrecision Defines how precisely to follow the path between two points when simulating a drag. 2 indicates every other point will be used.
+         * (low value = slow dragging, high value = fast dragging)
+         */
         dragPrecision           : $.browser.msie ? 10 : 5,
+        
+        enableUnreachableClickWarning   : true,
 
-        autoScrollElementsIntoView : true,
+        autoScrollElementsIntoView      : true,
 
-        overEls                 : Joose.I.Array
+        overEls                         : Joose.I.Array
     },
     
     
@@ -23084,7 +24151,7 @@ Role('Siesta.Test.Simulate.Mouse', {
                 event       = doc.createEvent("MouseEvents");
 
                 event.initMouseEvent(
-                    type, options.bubbles, options.cancelable, options.view, options.detail,
+                    this.processMouseEventName(type), options.bubbles, options.cancelable, options.view, options.detail,
                     options.screenX, options.screenY, options.clientX, options.clientY,
                     options.ctrlKey, options.altKey, options.shiftKey, options.metaKey,
                     options.button, options.relatedTarget || doc.body.parentNode
@@ -23122,6 +24189,12 @@ Role('Siesta.Test.Simulate.Mouse', {
             return event;
         },
         
+        
+        processMouseEventName : function (eventName) {
+            return eventName
+        },
+        
+        
         /**
         * This method will simulate a mouse move to an xy-coordinate or an element (the center of it)
         * 
@@ -23152,22 +24225,6 @@ Role('Siesta.Test.Simulate.Mouse', {
             this.moveMouse(this.currentPosition, context.globalXY, callback, scope);
         },
 
-        /**
-        * This method will simulate a mouse move from current position relative by the x and y distances provided.
-        * 
-        * @param {Array} delta The array from 2 elements: [ dx, dy ], indicating the offset. 
-        * @param {Function} callback (optional) To run this method async, provide a callback method to be called after the operation is completed.
-        * @param {Object} scope (optional) the scope for the callback
-        */
-        moveMouseBy : function(delta, callback, scope) {
-            if (!delta) {
-                throw 'Trying to call moveMouseBy without relative distances';
-            }
-
-            var targetXY = [ this.currentPosition[0] + delta[0], this.currentPosition[1] + delta[1] ];
-
-            this.moveMouseTo(targetXY, callback, scope);
-        },
 
         /**
         * Alias for moveMouseTo, this method will simulate a mouse move to an xy-coordinate or an element (the center of it)
@@ -23191,12 +24248,16 @@ Role('Siesta.Test.Simulate.Mouse', {
         },
 
         /**
-         * This method will simulate a mouse move by an x a y delta amount
-         * @param {Array} delta The delta x and y distance to move, e.g. [20, 20] for 20px down/right, or [0, 10] for just 10px down.
+         * This method will simulate a mouse move by an x and y delta amount
+         * @param {Array} delta The delta x and y distance to move, e.g. [20, 20] for 20px down/right, or [0, -10] for 10px up.
          * @param {Function} callback (optional) To run this method async, provide a callback method to be called after the operation is completed.
          * @param {Object} scope (optional) the scope for the callback
          */
         moveCursorBy : function(delta, callback, scope) {
+            if (!delta) {
+                throw 'Trying to call moveCursorBy without relative distances';
+            }
+
             // Normalize target
             var target = [this.currentPosition[0] + delta[0], this.currentPosition[1] + delta[1]];
 
@@ -23245,41 +24306,46 @@ Role('Siesta.Test.Simulate.Mouse', {
                         var point       = path[j].slice();
                         var targetEl    = me.elementFromPoint(point[0], point[1]);
 
-                        if (targetEl.ownerDocument !== document) {
-                            var win     = targetEl.ownerDocument.defaultView || targetEl.ownerDocument.parentWindow;
-                            
-                            var offsetsToTopWindow = me.$(win.frameElement).offset();
+                        // Might get null here if moving over a non-initialized frame (seen in Chrome)
+                        if (targetEl) {
 
-                            point[0]    -= offsetsToTopWindow.left,
-                            point[1]    -= offsetsToTopWindow.top;
-                        }
+                            if (targetEl.ownerDocument !== document) {
+                                var win     = targetEl.ownerDocument.defaultView || targetEl.ownerDocument.parentWindow;
 
-                        if (targetEl !== lastOverEl) {
-                            for (var i = overEls.length - 1; i >= 0; i--) {
-                                var el = overEls[i];
-                                if (el !== targetEl && me.$(el).has(targetEl).length === 0) {
-                                    if (supports.mouseEnterLeave) {
-                                        me.simulateEvent(el, "mouseleave", $.extend({ clientX: point[0], clientY: point[1], relatedTarget : targetEl}, options));
+                                var offsetsToTopWindow = me.$(win.frameElement).offset();
+
+                                point[0]    -= offsetsToTopWindow.left;
+                                point[1]    -= offsetsToTopWindow.top;
+                            }
+
+                            if (targetEl !== lastOverEl) {
+                                for (var i = overEls.length - 1; i >= 0; i--) {
+                                    var el = overEls[i];
+
+                                    if (el !== targetEl && me.$(el).has(targetEl).length === 0) {
+                                        if (supports.mouseEnterLeave) {
+                                            me.simulateEvent(el, "mouseleave", $.extend({ clientX: point[0], clientY: point[1], relatedTarget : targetEl}, options));
+                                        }
+                                        overEls.splice(i, 1);
                                     }
-                                    overEls.splice(i, 1);
                                 }
+
+                                if (lastOverEl) {
+                                    me.simulateEvent(lastOverEl, "mouseout", $.extend({ clientX: point[0], clientY: point[1], relatedTarget : targetEl}, options));
+                                }
+                                if (jQuery.inArray(targetEl, overEls) < 0) {
+                                    if (supports.mouseEnterLeave) {
+                                        me.simulateEvent(targetEl, "mouseenter", $.extend({ clientX: point[0], clientY: point[1], relatedTarget : lastOverEl}, options));
+                                    }
+                                    overEls.push(targetEl);
+                                }
+
+                                me.simulateEvent(targetEl, "mouseover", $.extend({ clientX: point[0], clientY: point[1], relatedTarget : lastOverEl}, options));
+                                lastOverEl = targetEl;
                             }
 
-                            if (lastOverEl) {
-                                me.simulateEvent(lastOverEl, "mouseout", $.extend({ clientX: point[0], clientY: point[1], relatedTarget : targetEl}, options));
-                            }
-                            if (jQuery.inArray(targetEl, overEls) < 0) {
-                                if (supports.mouseEnterLeave) {
-                                    me.simulateEvent(targetEl, "mouseenter", $.extend({ clientX: point[0], clientY: point[1], relatedTarget : lastOverEl}, options));
-                                }
-                                overEls.push(targetEl);
-                            }
-
-                            me.simulateEvent(targetEl, "mouseover", $.extend({ clientX: point[0], clientY: point[1], relatedTarget : lastOverEl}, options));
-                            lastOverEl = targetEl;
+                            me.simulateEvent(targetEl, "mousemove", $.extend({ clientX: point[0], clientY: point[1]}, options), j < toIndex);
                         }
-                     
-                        me.simulateEvent(targetEl, "mousemove", $.extend({ clientX: point[0], clientY: point[1]}, options), j < toIndex);
                     }
                 }
             });
@@ -23291,10 +24357,10 @@ Role('Siesta.Test.Simulate.Mouse', {
                 });
             }
 
-            var async       = this.beginAsync()
+            var async2       = this.beginAsync()
             
             queue.run(function () {
-                me.endAsync(async);
+                me.endAsync(async2);
                 
                 me.processCallbackFromTest(callback, null, scope || me)
             })
@@ -23350,6 +24416,8 @@ Role('Siesta.Test.Simulate.Mouse', {
             }
 
             el              = el || this.currentPosition
+            
+            var targetIsPoint = this.valueIsArray(el)
 
             var normalized  = this.normalizeElement(el, true);
 
@@ -23363,11 +24431,14 @@ Role('Siesta.Test.Simulate.Mouse', {
 
             options         = options || {};
 
-            if (!this.valueIsArray(el) && this.autoScrollElementsIntoView) {
+            if (!targetIsPoint && this.autoScrollElementsIntoView) {
                 this.scrollTargetIntoView(normalized, offset)
             }
 
-            var data        = this.getNormalizedTopElementInfo(el, false, method, offset);
+            // skip warnings about clicking in the unreachable point of the elemnt at this step
+            // when mouse position is not yet updated
+            // potentially that element will become reachable when mouse will be moved to the requried point
+            var data        = this.getNormalizedTopElementInfo(el, true, method, offset);
             
             if (!data) {
                 // No point in continuing
@@ -23375,8 +24446,13 @@ Role('Siesta.Test.Simulate.Mouse', {
                 return;
             }
             
-            options.clientX = options.clientX != null ? options.clientX : data.localXY[0];
-            options.clientY = options.clientY != null ? options.clientY : data.localXY[1];
+            // marking data as preliminary, indicating that it should be updated before the click
+            data.originalEl     = el
+            data.method         = method
+            data.offset         = offset
+            
+            options.clientX = options.clientX != null ? options.clientX : data.localXY[ 0 ];
+            options.clientY = options.clientY != null ? options.clientY : data.localXY[ 1 ];
 
             // the asynchronous case
             if (this.moveCursorBetweenPoints && callback) {
@@ -23483,8 +24559,14 @@ Role('Siesta.Test.Simulate.Mouse', {
         mouseDown: function (el, options, offset) {
             var info        = this.getNormalizedTopElementInfo(el, false, 'mouseDown', offset);
 
-            if (!info) return;
-            
+            if (!info) {
+                this.waitForTarget(el, function() {
+                    this.mouseDown(el, options, offset);
+                }, this);
+
+                return;
+            }
+
             options         = options || {}
 
             options.clientX = options.clientX != null ? options.clientX : info.localXY[0];
@@ -23524,7 +24606,7 @@ Role('Siesta.Test.Simulate.Mouse', {
          * @param {Object} options any extra options used to configure the DOM event
          */
         mouseOver: function (el, options) {
-            var info        = this.getNormalizedTopElementInfo(el);
+            var info        = this.getNormalizedTopElementInfo(el, true);
 
             if (!info) return;
             
@@ -23543,7 +24625,7 @@ Role('Siesta.Test.Simulate.Mouse', {
          * @param {Object} options any extra options used to configure the DOM event
          */        
         mouseOut: function (el, options) {
-            var info        = this.getNormalizedTopElementInfo(el);
+            var info        = this.getNormalizedTopElementInfo(el, true);
 
             if (!info) return;
             
@@ -23557,6 +24639,13 @@ Role('Siesta.Test.Simulate.Mouse', {
 
         
         processMouseClickSteps : function (clickInfo, callback, scope, options, steps) {
+            // trying to get the top element again, enabling the warning if needed
+            // do it here and not in the `genericMouseClick` method to allow scenario
+            // when target element appears when mouse moves to the click point
+            if (clickInfo.originalEl && this.enableUnreachableClickWarning) {
+                this.getNormalizedTopElementInfo(clickInfo.originalEl, false, clickInfo.method, clickInfo.offset)
+            }
+            
             var me          = this
             
             var x           = clickInfo.globalXY[ 0 ]
@@ -23588,6 +24677,22 @@ Role('Siesta.Test.Simulate.Mouse', {
                     me.simulateEvent(el, data.event, options, data.suppressLog);
                     
                     if (data.focus) me.focusOnClick(el)
+
+                    // If this is a click action in old IE, change location hash manually
+                    if (
+                        $.browser.msie &&
+                        Number(/^(\d+)/.exec($.browser.version)[ 1 ]) < 11 &&
+                        steps[ steps.length - 1 ].event === 'click' &&
+                        el.tagName.toLowerCase() === 'a' &&
+                        el.getAttribute("href") &&
+                        data.event === 'click'
+                    ) {
+                        var href = el.getAttribute("href").match(/#(.*)/);
+
+                        if (href) {
+                            me.global.location.hash     = href[1];
+                        }
+                    }
                 }
             })
             
@@ -23963,10 +25068,10 @@ Singleton('Siesta.Test.Simulate.KeyCodes', {
                 (k >= 44 && k <= 46);
         },
 
-        fromCharCode : function(code) {
-            for (var o in this.keys) {
-                if (this.keys[o] === code) return o;
-            }
+        fromCharCode : function (code, readableForm) {
+            var keys    = this.keys
+            
+            for (var key in keys) if (keys[ key ] === code && (!readableForm || key.length > 1)) return key;
         }
     },
 
@@ -24100,6 +25205,7 @@ Singleton('Siesta.Test.Simulate.KeyCodes', {
         }
         // eof key codes
     }
+    // eof has
 });;
 /**
 @class Siesta.Test.Simulate.Keyboard
@@ -24233,9 +25339,9 @@ Role('Siesta.Test.Simulate.Keyboard', {
             }
 
             if (
-                el.tagName === "INPUT"
-                && el.type === "radio"
-                && el.name !== ""
+                el.tagName  === "INPUT" &&
+                el.type     === "radio" &&
+                el.name     !== ""
             ) {
                 var name    = escapeSelectorName(el.name);
 
@@ -24351,6 +25457,15 @@ Role('Siesta.Test.Simulate.Keyboard', {
                 }
             })
 
+            // focus the element one more time for IE - this seems to fix the weird sporadic failures in 042_keyevent_simulation3.t.js
+            // failures are caused by the field "blur" immediately after 1st focus
+            // no Ext "focus/blur" methods seems to be called, so it can be a browser behavior
+            $.browser.msie && queue.addStep({
+                processor       : function () {
+                    me.focus(el)
+                }
+            })
+            
             jQuery.each(keys, function (index, key) {
                 queue.addStep({
                     key     : key.length == 1 ? key : key.substring(1, key.length - 1)
@@ -24395,6 +25510,9 @@ Role('Siesta.Test.Simulate.Keyboard', {
 
             var keyDownEvent    = me.simulateEvent(el, 'keydown', $.extend({ charCode : 0, keyCode : keyCode }, options), true);
             var keyDownPrevented    = this.isEventPrevented(keyDownEvent)
+
+            // Need to reevaluate focused element here, it may have changed in a 'keydown' listener
+            el                  = me.activeElement(true, el, el);
 
             var event           = me.simulateEvent(el, 'keypress', $.extend({ charCode : charCode, keyCode : isReadableKey ? 0 : keyCode }, options), false);
             var prevented       = this.isEventPrevented(event)
@@ -24613,15 +25731,16 @@ Role('Siesta.Test.Simulate.Event', {
         },
         
         dispatchEvent: function (el, type, evt) {
+
             // use W3C standard when available and allowed by "simulateEventsWith" option            
             if (el.dispatchEvent && this.getSimulateEventsWith() == 'dispatchEvent') {
                 el.dispatchEvent(evt);
             } else if (el.fireEvent) {
                 // IE 6,7,8 can't dispatch many events cleanly - throws exceptions
                 try {
-                    // this is the serios nominant to the best-IE-bug-ever prize and its IE7 specific
-                    // accessing the "scrollLeft" property on document or body triggers the synchronous(!) "resize" event on window
-                    // ExtJS uses singleton for Ext.EventObj and its "target" property gets overwritten with "null"
+                    // this is the serios nominant to the best-IE-bug-ever prize and it's IE7 specific
+                    // accessing the "scrollLeft" property on document or body triggers a synchronous(!) "resize" event on the window
+                    // ExtJS uses a singleton for Ext.EventObj and its "target" property gets overwritten with "null"
                     // thus consequent event handlers fails
                     // doing an access to that property to cache it
                     var doc     = this.global.document.documentElement;
@@ -24664,12 +25783,29 @@ Role('Siesta.Test.ExtJSCore', {
             lazy    : function () {
                 var isIE9           = navigator.userAgent.match(/MSIE 9.0;/)
                 var Ext             = this.getExt()
+
+                // no Ext or Ext3 should use standard "dispatchEvent" method
+                if (!Ext || !Ext.getVersion) return 'dispatchEvent'
+                
+                var extVersion      = Ext.getVersion('extjs')
+                
                 // the "Ext.getVersion('extjs')" is just "true" in Ext3? (when testing SA)
-                var isBelowExt421   = Boolean(Ext && (!Ext.getVersion || Ext.getVersion('extjs') && Ext.getVersion('extjs').isLessThan && Ext.getVersion('extjs').isLessThan('4.2.1.883')))
+                var isBelowExt421   = Boolean((extVersion && extVersion.isLessThan && extVersion.isLessThan('4.2.1.883')))
                 
                 var div             = document.createElement('div')
                 
                 return div.attachEvent && (isIE9 || isBelowExt421) ? 'fireEvent' : 'dispatchEvent'
+            }
+        },
+        
+        eventMap                : {
+            is              : 'rw',
+            lazy            : function () {
+                var Ext             = this.getExt()
+                
+                if (!Ext || !Ext.dom || !Ext.dom.Element || !Ext.dom.Element.prototype.eventMap) return null
+                
+                return Ext.dom.Element.prototype.eventMap
             }
         },
         
@@ -24679,6 +25815,13 @@ Role('Siesta.Test.ExtJSCore', {
     },
 
     override : {
+        
+        processMouseEventName : function (eventName) {
+            var eventMap        = this.getEventMap()
+            
+            return eventMap && eventMap[ eventName ] || eventName; 
+        },
+        
         
         processSubTestConfig : function () {
             var res                 = this.SUPERARG(arguments)
@@ -24697,7 +25840,8 @@ Role('Siesta.Test.ExtJSCore', {
             if (!result.ready) return result;
             
             var Ext         = this.getExt();
-            
+            var R           = Siesta.Resource('Siesta.Test.ExtJSCore');
+
             if (this.waitForExtReady && !this.onReadyWaitingStarted && Ext && Ext.onReady) {
                 this.onReadyWaitingStarted  = true
                 
@@ -24711,12 +25855,12 @@ Role('Siesta.Test.ExtJSCore', {
 
             if (this.waitForExtReady && !this.isExtOnReadyDone) return {
                 ready       : false,
-                reason      : "Waiting for Ext.onReady took too long - some dependency can't be loaded? \nCheck the `Net` tab in Firebug"
+                reason      : R.get('waitedForExt')
             }
             
             if (this.waitForAppReady && !this.isAppReadyDone) return {
                 ready       : false,
-                reason      : "Waiting for MVC application launch took too long - no MVC application on test page? \nYou may need to disable the `waitForAppReady` config option."
+                reason      : R.get('waitedForApp')
             }
             
             return {
@@ -24732,17 +25876,24 @@ Role('Siesta.Test.ExtJSCore', {
         // Test case: 507_form_checkbox.t.js
         simulateMouseClick: function (clickInfo, callback, scope, options) {
             var el      = clickInfo.el
+            var Ext     = this.getExt()
+            
+            var isExt5  = Ext && Ext.getVersion && Ext.getVersion('extjs') && Ext.getVersion('extjs').major == 5
             
             // Force check toggle for input checkboxes
-            if (this.getSimulateEventsWith() === 'fireEvent' && (el.type === 'checkbox' || el.type === 'radio') && !el.disabled && !el.readOnly) {
+            if (
+                (this.getSimulateEventsWith() === 'fireEvent' || isExt5) 
+                    && 
+                (el.type === 'checkbox' || el.type === 'radio') && !el.disabled && !el.readOnly
+            ) {
                 var oldState = el.checked;
-
+                
                 if (callback) {
-                    this.SUPER(el, function (finalClickTarget) { 
-                        if (finalClickTarget == el && el.checked === oldState) {
+                    this.SUPER(clickInfo, function () {
+                        if (el.checked === oldState) {
                             el.checked = !oldState;
                         }
-                        callback.call(scope || this, finalClickTarget);
+                        callback.call(scope || this);
                     });
                 } else {
                     this.SUPERARG(arguments);
@@ -24764,7 +25915,7 @@ Role('Siesta.Test.ExtJSCore', {
             this.expectGlobals('Ext', 'id');
             this.SUPER();
         },
-        
+
         
         start : function (alreadyFailedWithException) {
             var me      = this;
@@ -24854,9 +26005,18 @@ Role('Siesta.Test.ExtJSCore', {
 
             if (typeof component === 'string') {
                 var result = Ext.ComponentQuery.query(component);
-                
-                if (!allowEmpty && result.length < 1)   this.warn('Your component query: ' + component + ' returned no components.');
-                if (result.length > 1)   this.warn('Your component query: ' + component + ' returned more than 1 component.');
+                var R      = Siesta.Resource('Siesta.Test.ExtJSCore');
+
+                if (!allowEmpty && result.length < 1)   this.warn(R.get('noComponentMatch').replace('{component}', component));
+                if (result.length > 1)   {
+                    var text = R.get('multipleComponentMatch').replace('{component}', component);
+
+                    if (this.harness.failOnMultipleComponentMatches) {
+                        this.fail(text);
+                    } else {
+                        this.warn(text);
+                    }
+                }
                 
                 component = result[ 0 ];
             }            
@@ -24901,28 +26061,57 @@ Role('Siesta.Test.ExtJSCore', {
 
         // Accept Ext.Element and Ext.Component
         // If the 'shallow' flag is true we should not 'reevaluate' the target element - stop at the component element.
-        normalizeElement : function(el, allowMissing, shallow) {
+        normalizeElement : function(el, allowMissing, shallow, detailed) {
             if (!el) return null
             
+            var matchingMultiple = false
+            var query   
             var Ext     = this.getExt();
-
             var origEl  = el;
+            var scopeAdjusted;
 
             if (typeof el === 'string') {
-                if (el.match(/=>/))
+                var mainParts  = el.split('->');
+
+                if (mainParts.length === 2) {
+                    scopeAdjusted = this.adjustScope(el);
+
+                    el = mainParts[1].trim();
+
+                    // Frame might not yet exist, or be ready
+                    if (!scopeAdjusted ||
+                        ((el.match(/^\s*>>/) || el.match(/=>/)) && !this.Ext())) {
+                        this.resetScope();
+                        return null;
+                    }
+                }
+
+                if (el.match(/=>/)) {
                     // Composite query
-                    el      = this.compositeQuery(el, null, allowMissing)[ 0 ]
-                else if (el.match(/^\s*>>/)) {
+                    query   = this.compositeQuery(el, null, allowMissing)
+                    el      = query[ 0 ]
+                    matchingMultiple = query.length > 1
+                } else if (el.match(/^\s*>>/)) {
                     // Component query
-                    el      = this.cq1(el.substring(2))
+                    query   = this.cq(el.substring(2))
+                    el      = query[ 0 ]
+                    matchingMultiple = query.length > 1
                 } else {
-                    // string in  unknown format, guessing its a DOM query
-                    return this.SUPER(el, allowMissing)
+                    // string in unknown format, guessing it's a DOM query
+                    var retVal = this.SUPER(el, allowMissing, shallow, detailed);
+
+                    if (scopeAdjusted) this.resetScope();
+
+                    return retVal;
                 }
 
                 if (!allowMissing && !el) {
-                    this.warn('No component found for CQ: ' + origEl)
-                    throw 'No component found for CQ: ' + origEl;
+                    var R           = Siesta.Resource('Siesta.Test.ExtJSCore');
+                    var warning     = R.get('noComponentFound') + ': ' + origEl;
+
+                    this.warn(warning);
+                    if (scopeAdjusted) this.resetScope();
+                    throw warning;
                 }
             }
 
@@ -24937,10 +26126,14 @@ Role('Siesta.Test.ExtJSCore', {
             }
 
             // ExtJS Element
-            if (el && el.dom) return el.dom
-                
+            if (el && el.dom) el = el.dom
+            
             // will also handle the case of conversion of array with coordinates to el 
-            return this.SUPER(el, allowMissing, shallow);
+            var res     = this.SUPER(el, allowMissing, shallow);
+
+            if (scopeAdjusted) this.resetScope();
+
+            return detailed ? { el : res, matchingMultiple : matchingMultiple } : res
         },
         
         
@@ -24951,28 +26144,54 @@ Role('Siesta.Test.ExtJSCore', {
         // but on ExtJS level user can also use ComponentQuery and next step need to receive the 
         // component instance
         normalizeActionTarget : function (el, allowMissing) {
+            var scopeAdjusted, retVal;
+
             if (typeof el === 'string') {
+                var mainParts  = el.split('->');
+
+                if (mainParts.length === 2) {
+                    scopeAdjusted = this.adjustScope(el);
+
+                    el = mainParts[1].trim();
+
+                    // Frame might not yet exist, or be ready
+                    if (!scopeAdjusted || (el.match(/^\s*>>/) && !this.Ext())) {
+                        this.resetScope();
+                        return null;
+                    }
+                }
+
                 if (el.match(/^\s*>>/)) {
                     // Component query
                     var result = this.cq1(el.substring(2));
 
+                    if (scopeAdjusted) this.resetScope();
+
                     if (!result && !allowMissing) {
-                        this.warn('No component found for CQ: ' + el)
-                        throw 'No component found found for CQ: ' + el;
+                        var R           = Siesta.Resource('Siesta.Test.ExtJSCore');
+                        var warning     = R.get('noComponentFound') + ': ' + el;
+
+                        this.warn(warning);
+                        throw warning;
                     }
                     return result;
                 }
             }
-            
-            var Ext = this.getExt();
-            
-            // if user has passed ExtJS Component, return it as is
-            if (this.isExtJSComponent(el)) return el
-            
-            // if user has passed ExtJS Element, return it as is
-            if (el && el.dom) return el
 
-            return this.SUPER(el, allowMissing)
+
+            if (this.isExtJSComponent(el)) {
+                // if user has passed ExtJS Component, return it as is
+                retVal = el
+            } else if (el && el.dom) {
+                // if user has passed ExtJS Element, return it as is
+                retVal = el
+            } else {
+                retVal = this.SUPER(el, allowMissing);
+            }
+
+            if (scopeAdjusted) this.resetScope();
+
+            return retVal;
         },
 
          /**
@@ -24987,13 +26206,14 @@ Role('Siesta.Test.ExtJSCore', {
          * @param {String} reason The reason or explanation of the bug
         */
         knownBugIn : function(frameworkVersion, fn, reason) {
-            var Ext = this.getExt();
+            var Ext     = this.getExt();
             var version = Ext.versions.extjs || Ext.versions.touch;
+            var R       = Siesta.Resource('Siesta.Test.ExtJSCore');
 
             if (this.harness.failKnownBugIn || version.isGreaterThan(frameworkVersion)) {
                 fn.call(this.global, this);
             } else {
-                this.todo('Known bug in ' + frameworkVersion + ': ' + (reason || ''), fn);
+                this.todo(R.get('knownBugIn') + ' ' + frameworkVersion + ': ' + (reason || ''), fn);
             }
         },
         
@@ -25018,8 +26238,9 @@ Role('Siesta.Test.ExtJSCore', {
             var global              = this.global
             var Ext                 = this.getExt()
             var args                = Array.prototype.concat.apply([], arguments)
-            
-            var callback
+            var R                   = Siesta.Resource('Siesta.Test.ExtJSCore');
+
+             var callback
             
             if (this.typeOf(args[ args.length - 1 ]) == 'Function') callback = args.pop()
             
@@ -25033,9 +26254,9 @@ Role('Siesta.Test.ExtJSCore', {
                     
                     //                       normal class                         singleton
                     if (cls && (me.typeOf(cls) == 'Function' || me.typeOf(cls.self) == 'Function'))
-                        me.pass("Class: " + className + " was loaded")
+                        me.pass(R.get('Class') + ": " + className + " " + R.get('wasLoaded'))
                     else
-                        me.fail("Class: " + className + " was loaded")
+                        me.fail(R.get('Class') + ": " + className + " " + R.get('wasNotLoaded'))
                 })
                 
                 callback && me.processCallbackFromTest(callback)
@@ -25134,13 +26355,17 @@ Role('Siesta.Test.ExtJSCore', {
             allowEmpty  = allowEmpty !== false
             
             var Ext     = this.Ext();
+            var R       = Siesta.Resource('Siesta.Test.ExtJSCore');
             // Try to find magic => selector for nested ComponentQuery and CSS selector
             var mainParts  = selector.split('=>');
             var result, i, cmp;
 
             root        = root || Ext.ComponentQuery;
 
-            if (mainParts.length < 2) throw "Invalid composite query selector: " + selector
+            // Root might exist, Ext could be loaded in bootstrap mode without CQ
+            if (!root) return [];
+
+            if (mainParts.length < 2) throw R.get('invalidCompositeQuery') + ': ' + selector
 
             // TODO NICK, AMEND
             var components;
@@ -25171,13 +26396,14 @@ Role('Siesta.Test.ExtJSCore', {
                 if (allowEmpty) 
                     return []
                 else
-                    throw 'ComponentQuery ' + mainParts[0] + ' matched no Ext.Component';
+                    throw R.get('ComponentQuery') + ' ' + mainParts[0] + ' ' + R.get('matchedNoCmp');
             
             for (i = 0; i < components.length; i++) {
                 cmp         = components[i];
 
                 if (cmp.rendered) {
-                    result = this.compToEl(cmp, false).query(mainParts[1]);
+                    result = this.compToEl(cmp, false);
+                    result = Array.prototype.slice.call($(mainParts[1], result.dom));
 
                     if (result.length > 0) {
                         return result;
@@ -25188,7 +26414,7 @@ Role('Siesta.Test.ExtJSCore', {
             if (allowEmpty) {
                 return [];
             }
-            throw 'Composite query ' + selector + ' matched no Ext.Component';
+            throw R.get('CompositeQuery') + ' ' + selector + ' ' + R.get('matchedNoCmp');
         },
         
         /**
@@ -25218,7 +26444,7 @@ Role('Siesta.Test.ExtJSCore', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value.
          */
         waitForTarget : function(target, callback, scope, timeout) {
-            this.SUPER(target, function() {
+            return this.SUPER(target, function() {
                 this.waitForAnimations(callback, scope, timeout);
             }, this, timeout);
         },
@@ -25230,7 +26456,7 @@ Role('Siesta.Test.ExtJSCore', {
          * @param {String} [description] The description for the assertion
          */
         messageBoxIsVisible : function(desc) {
-            return this.notOk(this.Ext().Msg.isHidden(), desc || 'Message box is visible');
+            return this.notOk(this.Ext().Msg.isHidden(), desc || Siesta.Resource('Siesta.Test.ExtJSCore', 'messageBoxVisible'));
         },
 
         /**
@@ -25240,7 +26466,7 @@ Role('Siesta.Test.ExtJSCore', {
          * @param {String} [description] The description for the assertion
          */
         messageBoxIsHidden : function(desc) {
-            return this.ok(this.Ext().Msg.isHidden(), desc || 'Message box is hidden');
+            return this.ok(this.Ext().Msg.isHidden(), desc || Siesta.Resource('Siesta.Test.ExtJSCore', 'messageBoxHidden'));
         },
 
         /**
@@ -25283,7 +26509,7 @@ This is only supported when testing Ext JS 4.
 */
 Role('Siesta.Test.ExtJS.Ajax', {
     has : {
-        responses : Joose.I.Array,
+        responses   : Joose.I.Array,
         urlMatchers : Joose.I.Array
     },
 
@@ -25297,7 +26523,7 @@ Role('Siesta.Test.ExtJS.Ajax', {
          */
         isAjaxLoading: function (obj, description) {
             var Ext = this.Ext();
-            this.ok(Ext.Ajax.isLoading(obj), description || 'An Ajax call is currently loading');
+            this.ok(Ext.Ajax.isLoading(obj), description || Siesta.Resource('Siesta.Test.ExtJS.Ajax', 'ajaxIsLoading'));
         },
 
         /**
@@ -25310,14 +26536,14 @@ Role('Siesta.Test.ExtJS.Ajax', {
          * @param {Object} scope The scope for the callback
          */
         ajaxRequestAndThen: function (url, callback, scope) {
-            var Ext = this.Ext();
+            var Ext     = this.Ext();
             var options = url;
 
             if (typeof(url) === 'string') {
                 options = {
-                    url : url,
-                    callback : callback,
-                    scope : scope
+                    url         : url,
+                    callback    : callback,
+                    scope       : scope
                 };
             }
 
@@ -25325,7 +26551,7 @@ Role('Siesta.Test.ExtJS.Ajax', {
         },
 
         /**
-         * Waits until the 
+         * Waits until the passed Ext.Ajax request object has completed, or until the latest performed Ajax request is done if the first argument is omitted.
          * 
          * @param {Object} object (optional) The options object passed to Ext.Ajax.request
          * @param {Function} callback The callback to call after the ajax request is completed
@@ -25337,21 +26563,21 @@ Role('Siesta.Test.ExtJS.Ajax', {
             var msg;
 
             if (typeof obj === 'function') {
-                msg = ' all ajax requests to complete';
-                timeout = scope;
-                scope = callback;
-                callback = obj;
-                obj = undefined;
+                msg         = ' ' + Siesta.Resource('Siesta.Test.ExtJS.Ajax', 'allAjaxRequestsToComplete');
+                timeout     = scope;
+                scope       = callback;
+                callback    = obj;
+                obj         = undefined;
             } else {
-                msg = ' ajax request to "' + obj.options.url + '" to complete';
+                msg = ' ' + Siesta.Resource('Siesta.Test.ExtJS.Ajax', 'ajaxRequest') + ' "' + obj.options.url + '" ' + Siesta.Resource('Siesta.Test.ExtJS.Ajax', 'toComplete');
             }
 
-            this.waitFor({
+            return this.waitFor({
                 method          : function() { 
                     if (obj) {
                         return !Ext.Ajax.isLoading(obj) && obj;
                     }
-                    return !Ext.Ajax.isLoading(obj);
+                    return !Ext.Ajax.isLoading();
                 }, 
                 callback        : callback,
                 scope           : scope, 
@@ -25392,7 +26618,9 @@ Role('Siesta.Test.ExtJS.Store', {
             var Ext         = this.getExt();
             var args        = Array.prototype.concat.apply([], arguments)
             var me          = this;
-                                                         // Ext 3
+            var R           = Siesta.Resource('Siesta.Test.ExtJS.Store');
+
+            // Ext 3
             var baseStoreCls = Ext.data.AbstractStore || Ext.data.Store;
             var callback
             var storesNum;
@@ -25408,11 +26636,11 @@ Role('Siesta.Test.ExtJS.Store', {
 
             var loaded      = 0;
             
-            me.waitFor({
+            var result      = me.waitFor({
                 method      : function() { return loaded == storesNum; },
                 callback    : callback,
                 name        : 'waitForStoresToLoad',
-                description : storesNum + ' stores to load'
+                description : storesNum + ' ' + R.get('storesToLoad')
             });
 
             Joose.A.each(args, function (store) {               
@@ -25436,11 +26664,13 @@ Role('Siesta.Test.ExtJS.Store', {
                 var exceptionFailure = function (proxy, response, operation) {
                     var url     = proxy.api && proxy.api.read || proxy.url
                     
-                    me.fail("Failed to load the store", "Store [READ] URL: " + url);
+                    me.fail(R.get('failedToLoadStore'), R.get('URL') + ": " + url);
                 };
 
                 proxy.on('exception', exceptionFailure);
             });
+            
+            return result
         },
 
         /**
@@ -25571,7 +26801,7 @@ Role('Siesta.Test.ExtJS.Observable', {
          * @param {Number} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value.
          */
         waitForEvent : function (observable, event, callback, scope, timeout) {
-            var Ext         = this.Ext();
+            var R           = Siesta.Resource('Siesta.Test.Browser');
             observable      = this.normalizeComponent(observable);
             
             if (observable && observable.un && observable.on) {
@@ -25585,7 +26815,7 @@ Role('Siesta.Test.ExtJS.Observable', {
                     scope           : scope,
                     timeout         : timeout,
                     assertionName   : 'waitForEvent',
-                    description     : ' observable to fire its "' + event + '" event'
+                    description     : ' ' + R.get('waitForEvent') + ' "' + event + '" ' + R.get('event')
                 });
             } else {
                 return this.SUPERARG(arguments);
@@ -25601,10 +26831,12 @@ Role('Siesta.Test.ExtJS.Observable', {
          * @param {String} [description] The description of the assertion.
          */
         hasListener : function (observable, eventName, description) {
+            var R           = Siesta.Resource('Siesta.Test.ExtJS.Observable');
+
             if (!observable || !observable.hasListener) {
                 this.fail(description, {
                     assertionName       : 'hasListener',
-                    annotation          : '1st argument for `t.hasListener` should be an observable instance'
+                    annotation          : R.get('hasListenerInvalid')
                 })
                 
                 return
@@ -25612,13 +26844,13 @@ Role('Siesta.Test.ExtJS.Observable', {
             
             if (observable.hasListener(eventName))
                 this.pass(description, {
-                    descTpl             : 'Observable has listener for {eventName}',
+                    descTpl             : R.get('hasListenerPass'),
                     eventName           : eventName
                 })
             else
                 this.fail(description, {
                     assertionName       : 'hasListener',
-                    annotation          : 'Provided observable has no listeners for event: ' + eventName
+                    annotation          : R.get('hasListenerFail') + ': ' + eventName
                 })
         },
 
@@ -25645,12 +26877,13 @@ Role('Siesta.Test.ExtJS.Observable', {
             var eventFired;
             var me              = this;
             var sourceLine      = me.getSourceLine();
-            
+            var R               = Siesta.Resource('Siesta.Test.ExtJS.Observable');
+
             var verifyFiredFn = function () {
                 observable.un(event, listener);
 
                 if (!eventFired) {
-                    me.fail(event + " event was not fired during the test");
+                    me.fail(event + " " + R.get('isFiredWithSignatureNotFired'));
                 }
             };
             
@@ -25662,13 +26895,13 @@ Role('Siesta.Test.ExtJS.Observable', {
                 var result = checkerFn.apply(me, arguments);
 
                 if (!eventFired && result) {
-                    me.pass(description || 'Observable fired ' + event + ' with correct signature', {
+                    me.pass(description || R.get('observableFired') + ' ' + event + ' ' + R.get('correctSignature'), {
                         sourceLine  : sourceLine
                     });
                 }
 
                 if (!result) {
-                    me.fail(description || 'Observable fired ' + event + ' with incorrect signature', {
+                    me.fail(description || R.get('observableFired') + ' ' + event + ' ' + R.get('incorrectSignature'), {
                         sourceLine  : sourceLine
                     });
                     
@@ -25704,21 +26937,22 @@ Role('Siesta.Test.ExtJS.Component', {
         * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value. 
         */
         waitForComponentVisible: function (component, callback, scope, timeout) {
+            var R = Siesta.Resource('Siesta.Test.ExtJS.Component');
+            var me = this;
+
             component = this.normalizeComponent(component);
             
             if (!this.isExtJSComponent(component)) {
-                throw 'Expected an Ext.Component, got: ' + component;
+                throw R.get('badInputText') + ': ' + component;
             }
 
-            var me = this;
-
-            this.waitFor({
+            return this.waitFor({
                 method          : function () { var el = me.compToEl(component); return el && me.elementIsTop(el, true) && component; },
                 callback        : callback,
                 scope           : scope,
                 timeout         : timeout,
                 assertionName   : 'waitForComponentVisible',
-                description     : ' component ' + component.id + ' to be visible'
+                description     : ' ' + R.get('component') + ' ' + component.id + ' ' + R.get('toBeVisible')
             });
         },
 
@@ -25732,21 +26966,28 @@ Role('Siesta.Test.ExtJS.Component', {
         * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value. 
         */
         waitForComponentNotVisible: function (component, callback, scope, timeout) {
+            var R = Siesta.Resource('Siesta.Test.ExtJS.Component');
+
             component = this.normalizeComponent(component);
 
             if (!this.isExtJSComponent(component)) {
-                throw 'Expected an Ext.Component, got: ' + component;
+                throw R.get('badInputText') + ': ' + component;
             }
 
             var me = this;
 
-            this.waitFor({
-                method          : function () { return component.el && !me.isElementVisible(component.el) && component; },
+            return this.waitFor({
+                method          : function () {
+                    // Ext vs Touch normalization
+                    var el = component.el || component.element;
+
+                    return (component.isHidden() || (el && !me.isElementVisible(el))) && component;
+                },
                 callback        : callback,
                 scope           : scope,
                 timeout         : timeout,
                 assertionName   : 'waitForComponentNotVisible',
-                description     : ' component ' + component.id + ' to not be visible'
+                description     : ' ' + R.get('component') + ' ' + component.id + ' ' + R.get('toNotBeVisible')
             });
         },
 
@@ -25771,7 +27012,7 @@ Role('Siesta.Test.ExtJS.Component', {
                 root = this.getExt().ComponentQuery
             }
 
-            this.waitFor({
+            return this.waitFor({
                 method      : function () {
                     var result = root.query(query);
                     return result.length > 0 ? result : false;
@@ -25780,7 +27021,7 @@ Role('Siesta.Test.ExtJS.Component', {
                 scope       : scope,
                 timeout     : timeout,
                 assertionName   : 'waitForComponentQuery',
-                description     : ' component query "' + query + '"'
+                description     : ' ' + Siesta.Resource('Siesta.Test.ExtJS.Component', 'componentQuery') + ' "' + query + '"'
             });
         },
 
@@ -25806,7 +27047,7 @@ Role('Siesta.Test.ExtJS.Component', {
 
             var me = this;
 
-            me.waitFor({
+            return me.waitFor({
                 method      : function () {
                     var result = me.compositeQuery(query, root, true);
                     
@@ -25817,7 +27058,7 @@ Role('Siesta.Test.ExtJS.Component', {
                 timeout     : timeout,
                 
                 assertionName   : 'waitForCompositeQuery',
-                description     : ' composite query "' + query + '"'
+                description     : ' ' + Siesta.Resource('Siesta.Test.ExtJS.Component', 'compositeQuery') + ' "' + query + '"'
             });
         },
         
@@ -25844,7 +27085,7 @@ Role('Siesta.Test.ExtJS.Component', {
 
             var me = this;
 
-            me.waitFor({
+            return me.waitFor({
                 method      : function () {
                     var result = me.compositeQuery(query, root, true);
                     
@@ -25855,7 +27096,7 @@ Role('Siesta.Test.ExtJS.Component', {
                 timeout     : timeout,
                 
                 assertionName   : 'waitForCompositeQueryNotFound',
-                description     : ' composite query "' + query + '" to return empty array'
+                description     : ' ' + Siesta.Resource('Siesta.Test.ExtJS.Component', 'compositeQuery') + ' "' + query + '" ' + Siesta.Resource('Siesta.Test.ExtJS.Component', 'toReturnEmptyArray')
             });
         },
         
@@ -25871,7 +27112,7 @@ Role('Siesta.Test.ExtJS.Component', {
         * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value. 
         */
         waitForCQ: function () {
-            this.waitForComponentQuery.apply(this, arguments);
+            return this.waitForComponentQuery.apply(this, arguments);
         },
 
 
@@ -25884,7 +27125,7 @@ Role('Siesta.Test.ExtJS.Component', {
         * @param {Number} timeout
         */
         waitForCQNotFound: function () {
-            this.waitForComponentQueryNotFound.apply(this, arguments);
+            return this.waitForComponentQueryNotFound.apply(this, arguments);
         },
 
 
@@ -25900,6 +27141,8 @@ Role('Siesta.Test.ExtJS.Component', {
         * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value.
         */
         waitForComponentQueryNotFound: function (query, root, callback, scope, timeout) {
+            var R = Siesta.Resource('Siesta.Test.ExtJS.Component');
+
             // no `root` supplied
             if (this.typeOf(root) == 'Function') {
                 timeout     = scope
@@ -25908,7 +27151,7 @@ Role('Siesta.Test.ExtJS.Component', {
                 root        = this.getExt().ComponentQuery
             }
 
-            this.waitFor({
+            return this.waitFor({
                 method      : function () {
                     var result = root.query(query);
                     return result.length === 0 && result;
@@ -25917,7 +27160,7 @@ Role('Siesta.Test.ExtJS.Component', {
                 scope       : scope, 
                 timeout     : timeout,
                 assertionName   : 'waitForComponentQueryNotFound',
-                description     : ' component query: ' + query + ' to return empty'
+                description     : R.get('componentQuery') + ': ' + query + ' ' + R.get('toReturnEmpty')
             });
         },
 
@@ -25931,7 +27174,7 @@ Role('Siesta.Test.ExtJS.Component', {
         * @param {Number} timeout
         */
         waitForCQVisible: function () {
-            this.waitForComponentQueryVisible.apply(this, arguments);
+            return this.waitForComponentQueryVisible.apply(this, arguments);
         },
 
         /**
@@ -25943,7 +27186,7 @@ Role('Siesta.Test.ExtJS.Component', {
          * @param {Number} timeout
          */
         waitForCQNotVisible: function () {
-            this.waitForComponentQueryNotVisible.apply(this, arguments);
+            return this.waitForComponentQueryNotVisible.apply(this, arguments);
         },
 
         /**
@@ -25959,6 +27202,7 @@ Role('Siesta.Test.ExtJS.Component', {
         */
         waitForComponentQueryVisible: function (query, root, callback, scope, timeout) {
             var me  = this,
+                R   = Siesta.Resource('Siesta.Test.ExtJS.Component'),
                 Ext = me.getExt();
 
             // no `root` supplied
@@ -25969,7 +27213,7 @@ Role('Siesta.Test.ExtJS.Component', {
                 root        = Ext.ComponentQuery
             }
 
-            this.waitFor({
+            return this.waitFor({
                 method      : function () {
                     var result = root.query(query),
                         allVisible = true;
@@ -25990,7 +27234,7 @@ Role('Siesta.Test.ExtJS.Component', {
                 scope       : scope,
                 timeout     : timeout,
                 assertionName   : 'waitForComponentQueryVisible',
-                description     : ' component query: ' + query + ' to return a visible component'
+                description     : ' ' + R.get('componentQuery') + ': ' + query + ' ' + R.get('toReturnAVisibleComponent')
             });
         },
 
@@ -26007,6 +27251,7 @@ Role('Siesta.Test.ExtJS.Component', {
          */
         waitForComponentQueryNotVisible: function (query, root, callback, scope, timeout) {
             var me  = this,
+                R   = Siesta.Resource('Siesta.Test.ExtJS.Component'),
                 Ext = me.getExt();
 
             // no `root` supplied
@@ -26017,14 +27262,14 @@ Role('Siesta.Test.ExtJS.Component', {
                 root        = Ext.ComponentQuery
             }
 
-            this.waitFor({
+            return this.waitFor({
                 method          : function () {
                     var result = root.query(query),
                         allHidden = true;
 
                     if (result.length > 0) {
                         Joose.A.each(result, function (c) {
-                            if (c.rendered && c.isVisible()) {
+                            if (c.rendered && !c.isHidden()) {
                                 allHidden = false;
                                 return false;
                             }
@@ -26038,7 +27283,7 @@ Role('Siesta.Test.ExtJS.Component', {
                 scope           : scope,
                 timeout         : timeout,
                 assertionName   : 'waitForComponentQueryVisible',
-                description     : ' component query: ' + query + ' to return a hidden/missing component'
+                description     : ' ' + R.get('componentQuery') + ': ' + query + ' ' + R.get('toReturnHiddenCmp')
             });
         },
 
@@ -26054,7 +27299,7 @@ Role('Siesta.Test.ExtJS.Component', {
         * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value. 
         */
         waitForXType: function (xtype, root, callback, scope, timeout) {
-            this.waitForComponentQuery(xtype, root, callback, scope, timeout);
+            return this.waitForComponentQuery(xtype, root, callback, scope, timeout);
         },
 
         /**
@@ -26080,7 +27325,7 @@ Role('Siesta.Test.ExtJS.Component', {
                 xtype = xtype + '[rendered]';
             }
 
-            this.waitForXType(xtype, callback, scope, timeout);
+            return this.waitForXType(xtype, callback, scope, timeout);
         },
 
         /**
@@ -26121,7 +27366,8 @@ Role('Siesta.Test.ExtJS.Component', {
          */
         destroysOk : function (components, description) {
             var Ext     = this.Ext();
-            
+            var R       = Siesta.Resource('Siesta.Test.ExtJS.Component');
+
             if (this.typeOf(components) != 'Array') {
                 if (this.typeOf(components) == 'String') 
                     components  = this.Ext().ComponentQuery.query(components);
@@ -26132,7 +27378,7 @@ Role('Siesta.Test.ExtJS.Component', {
             if (!components.length) {
                 this.fail(description, {
                     assertionName       : 'destroysOk',
-                    annotation          : 'No components provided, or component query returned empty result'
+                    annotation          : R.get('invalidDestroysOkInput')
                 })
                 
                 return
@@ -26152,8 +27398,8 @@ Role('Siesta.Test.ExtJS.Component', {
                 this.fail(description, {
                     assertionName       : 'destroysOk',
                     got                 : e,
-                    gotDesc             : 'Exception',
-                    annotation          : 'Exception thrown while calling "destroy" method of ' + currentComp.id
+                    gotDesc             : R.get('exception'),
+                    annotation          : R.get('exceptionAnnotation') + ' ' + currentComp.id
                 })
                 
                 return
@@ -26166,7 +27412,7 @@ Role('Siesta.Test.ExtJS.Component', {
                 if (!(component.isDestroyed || component.destroy == Ext.emptyFn)) {
                     me.fail(description, {
                         assertionName       : 'destroysOk',
-                        annotation          : 'Component [' + component.id + '] was not destroyed (probably destroy was canceled in the `beforedestroy` listener)'
+                        annotation          : R.get('Component') + ' [' + component.id + '] ' + R.get('destroyFailed')
                     })
                     
                     return false
@@ -26176,7 +27422,7 @@ Role('Siesta.Test.ExtJS.Component', {
             if (allDestroyed === false) return
             
             this.pass(description, {
-                descTpl     : 'All passed components were destroyed ok'
+                descTpl     : R.get('destroyPassed')
             })
         }
     }
@@ -26205,10 +27451,10 @@ Role('Siesta.Test.ExtJS.Grid', {
          */
         waitForRowsVisible : function(panel, callback, scope, timeout) {
             if (typeof panel === 'function') {
-                timeout = scope;
-                scope = callback;
-                callback = panel;
-                panel = this.cq1('tablepanel');
+                timeout     = scope;
+                scope       = callback;
+                callback    = panel;
+                panel       = this.cq1('tablepanel');
             }
 
             var cmp = this.normalizeComponent(panel, true);
@@ -26216,11 +27462,11 @@ Role('Siesta.Test.ExtJS.Grid', {
 
             if (!cmp && typeof panel === 'string') {
                 // Make sure CQ returns a result first
-                this.waitForCQ(panel, function(result) { this.waitForRowsVisible(result[0], callback, scope, timeout); }, this);
+                return this.waitForCQ(panel, function(result) { this.waitForRowsVisible(result[0], callback, scope, timeout); }, this);
             } else {
                 var checkerFn;
 
-                // Handle case of locking grid
+                // Handle case of locking grid (Ext JS 4 only)
                 if(cmp.normalGrid) {
                     var selector = cmp.normalGrid.getView().itemSelector;
                     checkerFn = function() {
@@ -26237,7 +27483,9 @@ Role('Siesta.Test.ExtJS.Grid', {
                         }
                     }
                 } else {
-                    var selector = cmp.getView().itemSelector;
+                    var view = cmp.getView();
+                    var selector = view.itemSelector || view.rowSelector; // Handling Ext 4 + Ext 3 cases
+
                     checkerFn = function() {
                         if (!cmp.rendered) return;
                          
@@ -26250,13 +27498,13 @@ Role('Siesta.Test.ExtJS.Grid', {
                 }
 
 
-                this.waitFor({
+                return this.waitFor({
                     method          : checkerFn, 
                     callback        : callback,
                     scope           : scope,
                     timeout         : timeout,
                     assertionName   : 'waitForRowsVisible',
-                    description     : ' rows to show for panel with id "' + cmp.id + '"'
+                    description     : ' ' + Siesta.Resource('Siesta.Test.ExtJS.Grid').get('waitForRowsVisible') + ' "' + cmp.id + '"'
                 });
             }
         },
@@ -26269,7 +27517,7 @@ Role('Siesta.Test.ExtJS.Grid', {
          */
         getFirstRow : function(grid) {
             grid = this.normalizeComponent(grid);
-            var Ext = this.getExt();
+
             return grid.el.select(grid.getView().itemSelector).item(0);
         },
 
@@ -26309,7 +27557,8 @@ Role('Siesta.Test.ExtJS.Grid', {
         getCell : function(grid, row, col) {
             grid = this.normalizeComponent(grid);
             var rowEl = this.getRow(grid, row);
-            return rowEl.child('td:nth-child(' + String(col+1) + ')');
+
+            return rowEl.down('td:nth-child(' + String(col+1) + ')');
         },
 
         /**
@@ -26322,6 +27571,7 @@ Role('Siesta.Test.ExtJS.Grid', {
          */
         getLastCellInRow : function(grid, row) {
             grid = this.normalizeComponent(grid);
+
             return this.getCell(grid, row, grid.headerCt.getColumnCount() - 1);
         },
 
@@ -26362,6 +27612,59 @@ Role('Siesta.Test.ExtJS.Grid', {
                     annotation  : 'Row index: ' + rowIndex + ', column index: ' + colIndex
                 });
             }
+        },
+        
+        
+        /**
+         * This method performs either a click or double click on the specified grid cell 
+         * (depending from the [clicksToEdit](http://docs.sencha.com/extjs/4.2.2/#!/api/Ext.grid.plugin.Editing-cfg-clicksToEdit)
+         * config of it's editing plugin), then waits until the `input` selector appears under the cursor and calls the provided callback.
+         * The callback will receive the DOM `&lt;input&gt; element as the 1st argument. 
+         * 
+         * In some browsers the editor is shown with delay, so its highly recommended to use this method when editing cells.
+         * Typical usage will be:
+         * 
+
+    t.chain(
+        function (next) {
+            t.clickToEdit(grid, 0, 1, next)
+        },
+        function (next, inputEl) {
+            t.type(inputEl, "my text", next)
+        }
+    )
+
+         * 
+         * 
+         * @param {Ext.grid.Panel/String} grid The grid panel or a ComponentQuery matching a panel
+         * @param {Int} rowIndex The row index
+         * @param {Int} colIndex The column index
+         * @param {Function} callback The callback to call once the `input` selector appears under the cursor
+         * @param {String} selector Custom selector to wait for, instead of `input`.
+         */
+        clickToEditCell : function (grid, rowIndex, colIndex, callback, selector) {
+            var Ext             = this.getExt()
+            
+            grid                = this.normalizeComponent(grid);
+            
+            var editingPlugin   = grid && grid.editingPlugin
+            
+            if (!editingPlugin || !(editingPlugin instanceof Ext.grid.plugin.CellEditing)) {
+                t.fail("No grid, or grid has no editing plugin, or its not a Ext.grid.plugin.CellEditing plugin")
+                
+                callback && callback(null)
+                
+                return
+            }
+            
+            var me      = this
+            
+            this[ editingPlugin.clicksToEdit == 2 ? 'doubleClick' : 'click' ](this.getCell(grid, rowIndex, colIndex), function () {
+                // manually force editing if it didn't get started by the click
+                if (!editingPlugin.getActiveEditor()) editingPlugin.startEditByPosition({ row : rowIndex, column : colIndex })
+                
+                me.waitForSelectorAtCursor(selector || 'input', callback)
+            })
         }
     }
 });
@@ -26386,16 +27689,18 @@ Role('Siesta.Test.ExtJS.DataView', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value. 
          */
         waitForViewRendered : function(view, callback, scope, timeout) {
-            view = this.normalizeComponent(view);
-            var hasItems    = view.store.getCount() > 0
+            view            = this.normalizeComponent(view);
 
-            this.waitFor({
+            var hasItems    = view.store.getCount() > 0
+            var R           = Siesta.Resource('Siesta.Test.ExtJS.DataView');
+
+            return this.waitFor({
                 method      : function() { return hasItems ? !!view.getNode(0) : view.rendered }, 
                 callback    : callback,
                 scope       : scope,
                 timeout     : timeout,
                 assertionName   : 'waitForViewRendered',
-                description     : ' view ' + view.id + ' to render'
+                description     : ' ' + R.get('view') + ' ' + view.id + ' ' + R.get('toRender')
             });
         },
 
@@ -26406,9 +27711,10 @@ Role('Siesta.Test.ExtJS.DataView', {
          * @return {Ext.Element} The first element of the view
          */
         getFirstItem : function(view) {
+            var Ext = this.getExt();
+
             view = this.normalizeComponent(view);
 
-            var Ext = this.getExt();
             return Ext.get(view.getNode(0));
         }
     }
@@ -26417,7 +27723,7 @@ Role('Siesta.Test.ExtJS.DataView', {
 /**
 @class Siesta.Test.ExtJS.Element
 
-This is a mixin, with helper methods for testing functionality relating to DOM elements. This mixin is consumed by {@link Siesta.Test.ExtJS}
+This is a mixin, with helper methods for testing functionality relating to ExtJS/DOM elements. This mixin is consumed by {@link Siesta.Test.ExtJS}
 
 */
 Role('Siesta.Test.ExtJS.Element', {
@@ -26432,11 +27738,12 @@ Role('Siesta.Test.ExtJS.Element', {
          */
         hasRegion : function(el, region, description) {
             var elRegion = el.getRegion();
+            var R        = Siesta.Resource('Siesta.Test.ExtJS.Element');
 
-            this.is(elRegion["top"], region["top"], description + ' (top)');
-            this.is(elRegion["right"], region["right"], description + ' (right)');
-            this.is(elRegion["bottom"], region["bottom"], description + ' (bottom)');
-            this.is(elRegion["left"], region["left"], description + ' (left)');
+            this.is(elRegion["top"], region["top"], description + ' ' + R.get('top') + ')');
+            this.is(elRegion["right"], region["right"], description + ' ' + R.get('right') + ')');
+            this.is(elRegion["bottom"], region["bottom"], description + ' ' + R.get('bottom') + ')');
+            this.is(elRegion["left"], region["left"], description + ' ' + R.get('left') + ')');
         }
     }
 });
@@ -26504,7 +27811,8 @@ Role('Siesta.Test.TextSelection', {
         getSelectedText : function (el){
             el = this.normalizeElement(el);
             
-            if ('selectionStart' in el) {
+            // the "email" input field does not allow to access the "selectionStart/End" properties
+            if (('selectionStart' in el) && el.type != 'email') {
                 return el.value.substring(el.selectionStart, el.selectionEnd);
             }
 
@@ -26596,21 +27904,25 @@ Role('Siesta.Test.Element', {
             offset              = offset || [ '50%', '50%' ];
 
             if (typeof (offset[ 0 ]) === 'string') {
-                parts = offset[ 0 ].split('%');
-                offset[ 0 ]     = parseInt(offset[ 0 ].match(/\d+/)[ 0 ], 10) * $el.outerWidth() / 100;
+                parts           = offset[ 0 ].split('%');
+                offset[ 0 ]     = parseInt(offset[ 0 ].match(/\d+/)[ 0 ], 10) * ($el.outerWidth() - 1) / 100;
 
-                if (parts[1]) {
-                    offset[ 0 ]     += parseInt(parts[ 1 ]);
+                if (parts[ 1 ]) {
+                    offset[ 0 ] += parseInt(parts[ 1 ]);
                 }
+                
+                offset[ 0 ]     = Math.round(offset[ 0 ])
             }
 
             if (typeof (offset[ 1 ]) === 'string') {
-                parts = offset[ 1 ].split('%');
-                offset[ 1 ]     = parseInt(offset[ 1 ].match(/\d+/)[ 0 ], 10) * $el.outerHeight() / 100;
+                parts           = offset[ 1 ].split('%');
+                offset[ 1 ]     = parseInt(offset[ 1 ].match(/\d+/)[ 0 ], 10) * ($el.outerHeight() - 1) / 100;
 
-                if (parts[1]) {
-                    offset[ 1 ]     += parseInt(parts[ 1 ]);
+                if (parts[ 1 ]) {
+                    offset[ 1 ] += parseInt(parts[ 1 ]);
                 }
+                
+                offset[ 1 ]     = Math.round(offset[ 1 ])
             }
 
             return offset
@@ -26701,15 +28013,17 @@ Role('Siesta.Test.Element', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value. 
          */
         waitForContentLike : function(el, text, callback, scope, timeout) {
+            var R = Siesta.Resource('Siesta.Test.Element');
+
             el = this.normalizeElement(el);
 
-            this.waitFor({
-                method      : function() { return el.innerHTML.match(text); }, 
-                callback    : callback,
-                scope       : scope, 
-                timeout     : timeout,
+            return this.waitFor({
+                method          : function() { return el.innerHTML.match(text); },
+                callback        : callback,
+                scope           : scope,
+                timeout         : timeout,
                 assertionName   : 'waitForContentLike',
-                description     : ' element content "' + text + '" to appear'
+                description     : ' ' + R.get('elementContent') + ' "' + text + '" ' + R.get('toAppear')
             });
         },
 
@@ -26723,15 +28037,17 @@ Role('Siesta.Test.Element', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value. 
          */
         waitForContentNotLike : function(el, text, callback, scope, timeout) {
+            var R = Siesta.Resource('Siesta.Test.Element');
+
             el = this.normalizeElement(el);
 
-            this.waitFor({
+            return this.waitFor({
                 method          : function() { return !el.innerHTML.match(text); }, 
                 callback        : callback,
                 scope           : scope, 
                 timeout         : timeout,
                 assertionName   : 'waitForContentNotLike',
-                description     : ' element content "' + text + '" to disappear'
+                description     : ' ' + R.get('elementContent') + ' "' + text + '" ' + R.get('toDisappear')
             });
         },
 
@@ -26750,7 +28066,7 @@ Role('Siesta.Test.Element', {
          * @param {Object} scope The scope for the callback
          */
         monkeyTest : function(el, nbrInteractions, description, callback, scope) {
-            el              = this.normalizeElement(el) || this.global.document.body;
+            el              = this.normalizeElement(el, false, true) || this.global.document.body;
             nbrInteractions = nbrInteractions || 30;
 
             var me          = this,
@@ -26759,6 +28075,7 @@ Role('Siesta.Test.Element', {
                 bottom      = offset.top + me.$(el).height();
                 
             var actionLog   = []
+            var R           = Siesta.Resource('Siesta.Test.Element');
 
             var queue       = new Siesta.Util.Queue({
                 deferer         : me.originalSetTimeout,
@@ -26770,13 +28087,13 @@ Role('Siesta.Test.Element', {
                 
                 processor   : function (data) {
                     if (me.nbrExceptions || me.failed) {
-                        me.warn("Monkey action log:" + JSON2.stringify(actionLog))
+                        me.warn(R.get('monkeyActionLog') + ":" + JSON2.stringify(actionLog))
                         // do not continue if the test has detected an exception thrown
                         queue.abort()
                     } else {
                         var async       = me.beginAsync(null, function (test) {
-                            test.fail("Monkey testing action did not complete properly - probably some exception was thrown")
-                            me.warn("Monkey action log:" + JSON.stringify(actionLog))
+                            test.fail(R.get('monkeyException'))
+                            me.warn(R.get('monkeyActionLog') + ":" + JSON.stringify(actionLog))
                             
                             return true
                         });
@@ -26873,9 +28190,9 @@ Role('Siesta.Test.Element', {
             var assertionChecker    = function () {
                 checkerActivated    = true
                 
-                if (me.nbrExceptions) me.warn("Monkey action log:" + JSON.stringify(actionLog))
+                if (me.nbrExceptions) me.warn(R.get('monkeyActionLog') + ":" + JSON.stringify(actionLog))
                 
-                me.is(me.nbrExceptions, 0, description || '0 exceptions thrown during monkey test');
+                me.is(me.nbrExceptions, 0, description || R.get('monkeyNoExceptions'));
             }
             
             this.on('beforetestfinalizeearly', assertionChecker) 
@@ -26899,21 +28216,23 @@ Role('Siesta.Test.Element', {
          * @param {String} [description] The description for the assertion
          */
         hasCls : function (el, cls, description) {
-            el = this.normalizeElement(el);
+            var R           = Siesta.Resource('Siesta.Test.Element');
+
+            el              = this.normalizeElement(el);
             
             if (this.$(el).hasClass(cls)) {
                 this.pass(description, {
-                    descTpl     : 'Element has CSS class {cls}',
+                    descTpl     : R.get('elementHasClass') + ' {cls}',
                     cls         : cls
                 });
             } else {
                 this.fail(description, {
                     assertionName   : 'hasCls',
                     
-                    got         : el.className,
-                    gotDesc     : 'Classes of element',
-                    need        : cls,
-                    needDesc    : 'Need CSS class'
+                    got             : el.className,
+                    gotDesc         : R.get('elementClasses'),
+                    need            : cls,
+                    needDesc        : R.get('needClass')
                 })
             }
         },
@@ -26927,19 +28246,21 @@ Role('Siesta.Test.Element', {
          * @param {String} [description] The description for the assertion
          */
         hasNotCls : function (el, cls, description) {
-            el = this.normalizeElement(el);
+            var R           = Siesta.Resource('Siesta.Test.Element');
+
+            el              = this.normalizeElement(el);
             
             if (!this.$(el).hasClass(cls)) {
                 this.pass(description, {
-                    descTpl         : 'Element has no CSS class {cls}',
+                    descTpl         : R.get('elementHasNoClass') + ' {cls}',
                     cls             : cls
                 });
             } else {
                 this.fail(description, {
                     assertionName   : 'hasNotCls',
                     got             : el.className,
-                    gotDesc         : 'Classes of element',
-                    annotation      : 'Element has the class [' + cls + ']'
+                    gotDesc         : R.get('elementClasses'),
+                    annotation      : R.get('elementHasClass') + ' [' + cls + ']'
                 })
             }
         },
@@ -26953,11 +28274,13 @@ Role('Siesta.Test.Element', {
          * @param {String} [description] The description for the assertion
          */
         hasStyle : function (el, property, value, description) {
-            el = this.normalizeElement(el);
+            var R           = Siesta.Resource('Siesta.Test.Element');
+
+            el              = this.normalizeElement(el);
             
             if (this.$(el).css(property) === value) {
                 this.pass(description, {
-                    descTpl         : 'Element has correct {value} for CSS style {property}',
+                    descTpl         : R.get('hasStyleDescTpl'),
                     value           : value,
                     property        : property
                 });
@@ -26965,9 +28288,9 @@ Role('Siesta.Test.Element', {
                 this.fail(description, {
                     assertionName   : 'hasStyle',
                     got             : this.$(el).css(property),
-                    gotDesc         : 'Styles of element',
+                    gotDesc         : R.get('elementStyles'),
                     need            : value,
-                    needDesc        : 'Need style'
+                    needDesc        :  R.get('needStyle')
                 });
             }
         },
@@ -26982,20 +28305,22 @@ Role('Siesta.Test.Element', {
          * @param {String} [description] The description for the assertion
          */
         hasNotStyle : function (el, property, value, description) {
-            el = this.normalizeElement(el);
+            var R           = Siesta.Resource('Siesta.Test.Element');
+
+            el              = this.normalizeElement(el);
             
             if (this.$(el).css(property) !== value) {
                 this.pass(description, {
-                    descTpl         : 'Element has no value {value} for CSS style {property}',
+                    descTpl         : R.get('hasNotStyleDescTpl'),
                     value           : value,
                     property        : property
                 });
             } else {
                 this.fail(description, {
                     assertionName   : 'hasNotStyle',
-                    got         : el.style.toString(),
-                    gotDesc     : 'Style of element',
-                    annotation  : 'Element has the style [' + property + ']'
+                    got             : el.style.toString(),
+                    gotDesc         : R.get('elementStyles'),
+                    annotation      : R.get('hasTheStyle') + ' [' + property + ']'
                 });
             }
         },
@@ -27011,11 +28336,13 @@ Role('Siesta.Test.Element', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test#waitForTimeout} value. 
          */
         waitForSelectorAt : function(xy, selector, callback, scope, timeout) {
-            if (!selector) throw 'A CSS selector must be supplied';
+            var R           = Siesta.Resource('Siesta.Test.Element');
+
+            if (!selector) throw R.get('noCssSelector');
             
             var me      = this
             
-            this.waitFor({
+            return this.waitFor({
                 method          : function() { 
                     var el = me.elementFromPoint(xy[0], xy[1], true);
                     
@@ -27025,7 +28352,7 @@ Role('Siesta.Test.Element', {
                 scope           : scope, 
                 timeout         : timeout,
                 assertionName   : 'waitForSelectorAt',
-                description     : ' selector "' + selector + '" to appear at: [' + xy.toString() + ']'
+                description     : ' ' + R.get('selector') + ' "' + selector + '" ' + R.get('toAppearAt') + ': [' + xy.toString() + ']'
             });
         },
 
@@ -27039,7 +28366,7 @@ Role('Siesta.Test.Element', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test#waitForTimeout} value. 
          */
         waitForSelectorAtCursor : function(selector, callback, scope, timeout) {
-            this.waitForSelectorAt(this.currentPosition, selector, callback, scope, timeout);
+            return this.waitForSelectorAt(this.currentPosition, selector, callback, scope, timeout);
         },
 
         /**
@@ -27053,8 +28380,9 @@ Role('Siesta.Test.Element', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test#waitForTimeout} value. 
          */
         waitForSelector : function(selector, root, callback, scope, timeout) {
-            
-            if (!selector) throw 'A CSS selector must be supplied';
+            var R           = Siesta.Resource('Siesta.Test.Element');
+
+            if (!selector) throw R.get('noCssSelector');
 
             if (jQuery.isFunction(root)) {
                 timeout     = scope;
@@ -27065,7 +28393,7 @@ Role('Siesta.Test.Element', {
 
             if (root) root  = this.normalizeElement(root);
 
-            this.waitFor({
+            return this.waitFor({
                 method          : function() { 
                     var result = this.$(selector, root); 
                     if (result.length > 0) return result;
@@ -27074,7 +28402,7 @@ Role('Siesta.Test.Element', {
                 scope           : scope, 
                 timeout         : timeout,
                 assertionName   : 'waitForSelector',
-                description     : ' selector "' + selector + '" to appear'
+                description     : ' ' + R.get('selector') + ' "' + selector + '" ' + R.get('toAppear')
             });
         },
         
@@ -27089,7 +28417,9 @@ Role('Siesta.Test.Element', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test#waitForTimeout} value. 
          */
         waitForSelectors : function(selectors, root, callback, scope, timeout) {
-            if (selectors.length < 1) throw 'An array of CSS selectors must be supplied';
+            var R           = Siesta.Resource('Siesta.Test.Element');
+
+            if (selectors.length < 1) throw R.get('waitForSelectorsBadInput');
 
             if (jQuery.isFunction(root)) {
                 timeout     = scope;
@@ -27102,8 +28432,8 @@ Role('Siesta.Test.Element', {
             
             var me          = this
 
-            this.waitFor({
-                method      :  function () {
+            return this.waitFor({
+                method          :  function () {
                     var allPresent  = true
                     
                     Joose.A.each(selectors, function (selector) {
@@ -27116,11 +28446,11 @@ Role('Siesta.Test.Element', {
                     
                     return allPresent
                 }, 
-                callback    : callback,
-                scope       : scope, 
-                timeout     : timeout,
+                callback        : callback,
+                scope           : scope,
+                timeout         : timeout,
                 assertionName   : 'waitForSelectors',
-                description     : ' selectors "' + selectors + '" to appear'
+                description     : ' ' + R.get('selectors') + ' "' + selectors + '" ' + R.get('toAppear')
             });
         },
         
@@ -27136,6 +28466,8 @@ Role('Siesta.Test.Element', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test#waitForTimeout} value. 
          */
         waitForSelectorNotFound : function(selector, root, callback, scope, timeout) {
+            var R           = Siesta.Resource('Siesta.Test.Element');
+
             if (!selector) throw 'A CSS selector must be supplied';
 
             if (jQuery.isFunction(root)) {
@@ -27147,13 +28479,13 @@ Role('Siesta.Test.Element', {
 
             if (root) root  = this.normalizeElement(root);
 
-            this.waitFor({
+            return this.waitFor({
                 method          : function() { return this.$(selector, root).length === 0; }, 
                 callback        : callback,
                 scope           : scope, 
                 timeout         : timeout,
                 assertionName   : 'waitForSelectorNotFound',
-                description     : ' selector "' + selector + '" to disappear'
+                description     : ' ' + R.get('selector') + ' "' + selector + '" ' + R.get('toDisappear')
             });
         },
         
@@ -27172,16 +28504,18 @@ Role('Siesta.Test.Element', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value. 
          */
         waitForElementVisible : function(el, callback, scope, timeout) {
-            el          = this.normalizeElement(el);
+            var R       = Siesta.Resource('Siesta.Test.Element');
             var me      = this;
 
-            this.waitFor({
+            el          = this.normalizeElement(el);
+
+            return this.waitFor({
                 method          : function() { return me.isElementVisible(el) && el; }, 
                 callback        : callback,
                 scope           : scope, 
                 timeout         : timeout,
                 assertionName   : 'waitForElementVisible',
-                description     : ' element "' + el.toString() + '" to appear'
+                description     : ' ' + R.get('element') + ' "' + el.toString() + '" ' + R.get('toAppear')
             });
         },
 
@@ -27200,15 +28534,17 @@ Role('Siesta.Test.Element', {
          */
         waitForElementNotVisible : function(el, callback, scope, timeout) {
             el          = this.normalizeElement(el);
+
+            var R       = Siesta.Resource('Siesta.Test.Element');
             var me      = this;
 
-            this.waitFor({
+            return this.waitFor({
                 method          : function() { return !me.isElementVisible(el) && el; }, 
                 callback        : callback,
                 scope           : scope, 
                 timeout         : timeout,
                 assertionName   : 'waitForElementNotVisible',
-                description     : ' element "' + el.toString() + '" to disappear'
+                description     :  ' ' + R.get('element') + ' "' + el.toString() +  '" ' + R.get('toDisappear')
             });
         },
         
@@ -27225,15 +28561,16 @@ Role('Siesta.Test.Element', {
          */
         waitForElementTop : function(el, callback, scope, timeout) {
             el          = this.normalizeElement(el);
+            var R       = Siesta.Resource('Siesta.Test.Element');
             var me      = this;
 
-            this.waitFor({
+            return this.waitFor({
                 method          : function() { return me.elementIsTop(el, true) && el; }, 
                 callback        : callback,
                 scope           : scope, 
                 timeout         : timeout,
                 assertionName   : 'waitForElementTop',
-                description     : ' element "' + el.toString() + '" to be the top element at its position'
+                description     : ' ' + R.get('element') + ' "' + el.toString() + '" ' + R.get('toBeTopEl')
             });
         },
 
@@ -27249,10 +28586,11 @@ Role('Siesta.Test.Element', {
          */
         waitForElementNotTop : function(el, callback, scope, timeout) {
             el          = this.normalizeElement(el);
-            
+
+            var R       = Siesta.Resource('Siesta.Test.Element');
             var me      = this
 
-            this.waitFor({
+            return this.waitFor({
                 method          : function() {    
                     if (!me.elementIsTop(el, true)) {
                         var center = me.findCenter(el);
@@ -27263,7 +28601,7 @@ Role('Siesta.Test.Element', {
                 scope           : scope, 
                 timeout         : timeout,
                 assertionName   : 'waitForElementNotTop',
-                description     : ' element "' + el.toString() + '" to not be the top element at its position'
+                description     : ' ' + R.get('element') + ' "' + el.toString() + '" ' + R.get('toNotBeTopEl')
             });
         },
 
@@ -27288,19 +28626,23 @@ Role('Siesta.Test.Element', {
         },
 
         /**
-         * Utility method which checks if the passed method is the 'top' element at its position. "Top" element means,
-         * that element is not covered with any other elements. 
+         * Utility method which checks if the passed method is the 'top' element at its position. By default, "top" element means,
+         * that center point of the element is not covered with any other elements. You can also check any other point reachability
+         * using the "offset" argument. 
          * 
          * @param {Siesta.Test.ActionTarget} el The element to look for.
          * @param {Boolean} allowChildren true to also include child nodes. False to strictly check for the passed element.
+         * @param {Array} offset An array of 2 elements, defining "x" and "y" offset from the left-top corner of the element
+         * 
          * @return {Boolean} true if the element is the top element.
          */
-        elementIsTop : function(el, allowChildren) {
+        elementIsTop : function (el, allowChildren, offset) {
             el              = this.normalizeElement(el);
-
-            var elDoc       = el.ownerDocument,
-                center      = this.findCenter(el),
-                foundEl     = elDoc.elementFromPoint(center[0], center[1]);
+            
+            var elDoc       = el.ownerDocument
+            
+            var localPoint  = this.getTargetCoordinate(el, true, offset)
+            var foundEl     = elDoc.elementFromPoint(localPoint[ 0 ], localPoint[ 1 ]);
             
             return foundEl && (foundEl === el || (allowChildren && this.$(foundEl).closest(el).length > 0));
         },
@@ -27317,18 +28659,19 @@ Role('Siesta.Test.Element', {
             el              = this.normalizeElement(el);
             
             var foundEl     = this.elementFromPoint(xy[0], xy[1], true);
-            
+            var R           = Siesta.Resource('Siesta.Test.Element');
+
             if (!foundEl) {
                 this.fail(description, {
                     assertionName       : 'elementIsAt',
                     got                 : { x: xy[0], y : xy[1] },
-                    gotDesc             : 'Position',
-                    annotation          : 'No element found at the specified position'
+                    gotDesc             : R.get('Position'),
+                    annotation          : R.get('noElementAtPosition')
                 });
             } else if (allowChildren) {
                 if (foundEl === el || this.$(foundEl).closest(el).length > 0) {
                     this.pass(description, {
-                        descTpl         : 'DOM element or its child is at [ {x}, {y} ] coordinates',
+                        descTpl         : R.get('elementIsAtDescTpl'),
                         x               : xy[ 0 ],
                         y               : xy[ 1 ]
                     });
@@ -27336,16 +28679,16 @@ Role('Siesta.Test.Element', {
                     this.fail(description, {
                         assertionName   : 'elementIsAt',
                         got             : foundEl,
-                        gotDesc         : 'Top element',
+                        gotDesc         : R.get('topElement'),
                         need            : el,
-                        needDesc        : 'Need exactly this or its child',
-                        annotation      : 'Passed element is not the top-most one and not the child of one'
+                        needDesc        : R.get('allowChildrenDesc'),
+                        annotation      : R.get('allowChildrenAnnotation')
                     });
                 }
             } else {
                 if (foundEl === el) {
                     this.pass(description, {
-                        descTpl         : 'DOM element is at [ {x}, {y} ] coordinates',
+                        descTpl         : R.get('elementIsAtPassTpl'),
                         x               : xy[ 0 ],
                         y               : xy[ 1 ]
                     });
@@ -27353,10 +28696,10 @@ Role('Siesta.Test.Element', {
                     this.fail(description, {
                         assertionName   : 'elementIsAt',
                         got             : foundEl,
-                        gotDesc         : 'Top element',
+                        gotDesc         : R.get('topElement'),
                         need            : el,
                         needDesc        : 'Should be',
-                        annotation      : 'Passed element is not the top-most one'
+                        annotation      : R.get('noChildrenFailAnnotation')
                     });
                 }
             }
@@ -27379,17 +28722,18 @@ Role('Siesta.Test.Element', {
 
             if (strict) {
                 var o           = this.$(el).offset();
-                var region      = { 
+                var R           = Siesta.Resource('Siesta.Test.Element');
+                var region      = {
                     top     : o.top,
                     right   : o.left + this.$(el).outerWidth(),
                     bottom  : o.top + this.$(el).outerHeight(),
                     left    : o.left
                 };
 
-                this.elementIsAt(el, [region.left+1, region.top+1], allowChildren, description + ' (t-l)');
-                this.elementIsAt(el, [region.left+1, region.bottom-1], allowChildren, description + ' (b-l)');
-                this.elementIsAt(el, [region.right-1, region.top+1], allowChildren, description + ' (t-r)');
-                this.elementIsAt(el, [region.right-1, region.bottom-1], allowChildren, description + ' (b-r)');
+                this.elementIsAt(el, [region.left+1, region.top+1], allowChildren, description + ' ' + R.get('topLeft'));
+                this.elementIsAt(el, [region.left+1, region.bottom-1], allowChildren, description + ' ' + R.get('bottomLeft'));
+                this.elementIsAt(el, [region.right-1, region.top+1], allowChildren, description + ' ' + R.get('topRight'));
+                this.elementIsAt(el, [region.right-1, region.bottom-1], allowChildren, description + ' ' + R.get('bottomRight'));
             } else {
                 this.elementIsAt(el, this.findCenter(el), allowChildren, description);
             }
@@ -27409,8 +28753,10 @@ Role('Siesta.Test.Element', {
             var foundEl     = this.elementFromPoint(center[ 0 ], center[ 1 ], true);
             
             if (!foundEl) {
+                var R           = Siesta.Resource('Siesta.Test.Element');
+
                 this.pass(description, {
-                    descTpl         : 'Element is not the top element on the screen'   
+                    descTpl         : R.get('elementIsNotTopElementPassTpl')
                 });
                 
                 return
@@ -27432,22 +28778,24 @@ Role('Siesta.Test.Element', {
          * @param {String} [description] The description for the assertion
          */
         selectorIsAt : function(selector, xy, description) {
-            if (!selector) throw 'A CSS selector must be supplied';
+            var R           = Siesta.Resource('Siesta.Test.Element');
+
+            if (!selector) throw R.get('noCssSelector');
 
             var foundEl = this.$(this.elementFromPoint(xy[0], xy[1], true));
             
             if (foundEl.has(selector).length > 0 || foundEl.closest(selector).length > 0) {
                 this.pass(description, {
-                    descTpl         : 'Found element matching CSS selector {selector} at [ {xy} ]',
+                    descTpl         : R.get('selectorIsAtPassTpl'),
                     selector        : selector,
                     xy              : xy
                 });
             } else {
                 this.fail(description, {
                     got             : foundEl[0].outerHTML ? foundEl[0].outerHTML : foundEl[0].innerHTML,
-                    need            : 'Element matching ' + selector,
+                    need            : R.get('elementMatching') + ' ' + selector,
                     assertionName   : 'selectorIsAt',
-                    annotation      : 'Passed selector does not match any selector at [' + xy + ']'
+                    annotation      : R.get('selectorIsAtFailAnnotation') + ' [' + xy + ']'
                 });
             }
         },
@@ -27459,13 +28807,15 @@ Role('Siesta.Test.Element', {
          * @param {String} [description] The description for the assertion
          */
         selectorExists : function(selector, description) {
-            if (!selector) throw 'A CSS selector must be supplied';
+            var R           = Siesta.Resource('Siesta.Test.Element');
+
+            if (!selector) throw R.get('noCssSelector');
 
             if (this.$(selector).length <= 0) {
-                this.fail(description, 'No element matching the passed selector found: ' + selector);
+                this.fail(description, R.get('selectorExistsFailTpl') + ' : ' + selector);
             } else {
                 this.pass(description, {
-                    descTpl         : 'Found DOM element(s) matching CSS selector {selector}',
+                    descTpl         : R.get('selectorExistsPassTpl'),
                     selector        : selector
                 });
             } 
@@ -27478,11 +28828,17 @@ Role('Siesta.Test.Element', {
          * @param {String} [description] The description for the assertion
          */
         selectorNotExists : function(selector, description) {
-            if (this.$(selector).length > 0) {
-                this.fail(description, 'Elements found matching the passed selector: ' + selector);
+            var R           = Siesta.Resource('Siesta.Test.Element');
+            var els         = this.$(selector);
+
+            if (els.length > 0) {
+                this.fail(description, {
+                    descTpl     : R.get('selectorNotExistsFailTpl') + ': ' + selector,
+                    annotation  : $.map(els, function(el, i) { return (i+1) + ". " + el.className; }).join('\r\n')
+                });
             } else {
                 this.pass(description, {
-                    descTpl         : 'Not found any DOM element(s) matching CSS selector {selector}',
+                    descTpl         : R.get('selectorNotExistsPassTpl'),
                     selector        : selector
                 });
             } 
@@ -27503,14 +28859,15 @@ Role('Siesta.Test.Element', {
             el                  = this.normalizeElement(el);
             var scrollProp      = 'scroll' + Joose.S.uppercaseFirst(side);
             var original        = el[scrollProp];
+            var R               = Siesta.Resource('Siesta.Test.Element');
 
-            this.waitFor({
+            return this.waitFor({
                 method          : function() { if (el[scrollProp] !== original) return el[scrollProp]; }, 
                 callback        : callback,
                 scope           : scope, 
                 timeout         : timeout,
                 assertionName   : 'waitForScrollChange',
-                description     : scrollProp  + ' + to change for element "' + el.toString()
+                description     : ' ' + scrollProp + ' ' + R.get('toChangeForElement') + ' ' + el.toString()
             });
         },
 
@@ -27525,7 +28882,7 @@ Role('Siesta.Test.Element', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value. 
          */
         waitForScrollLeftChange : function(el, callback, scope, timeout) {
-            this.waitForScrollChange(this.normalizeElement(el), 'left', callback, scope, timeout);
+            return this.waitForScrollChange(this.normalizeElement(el), 'left', callback, scope, timeout);
         },
 
         /**
@@ -27539,7 +28896,7 @@ Role('Siesta.Test.Element', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value. 
          */
         waitForScrollTopChange : function(el, callback, scope, timeout) {
-            this.waitForScrollChange(this.normalizeElement(el), 'top', callback, scope, timeout);
+            return this.waitForScrollChange(this.normalizeElement(el), 'top', callback, scope, timeout);
         },
         
         
@@ -27763,7 +29120,9 @@ Role('Siesta.Test.Element', {
          * @param {String} [description] The description for the assertion
          */
         selectorCountIs : function (selector, root, count, description) {
-            if (!selector) throw 'A CSS selector must be supplied';
+            var R           = Siesta.Resource('Siesta.Test.Element');
+
+            if (!selector) throw R.get('noCssSelector');
 
             if (this.typeOf(root) == 'Number') {
                 description     = count
@@ -27777,14 +29136,14 @@ Role('Siesta.Test.Element', {
             if (inDOMCount != count) {
                 this.fail(description, {
                     assertionName   : 'selectorCountIs',
-                    descTpl         : 'Different number of elements matching the selector {selector} found',
+                    descTpl         : R.get('selectorCountIsFailTpl'),
                     selector        : selector,
                     got             : inDOMCount,
                     need            : count
                 });
             } else {
                 this.pass(description, {
-                    descTpl         : 'Found exactly {count} elements matching matching CSS selector {selector}',
+                    descTpl         : R.get('selectorCountIsPassTpl'),
                     count           : count,
                     selector        : selector
                 });
@@ -27799,10 +29158,13 @@ Role('Siesta.Test.Element', {
          * @param {String} [description] The description for the assertion
          */
         isInView : function (el, description) {
-            if (this.elementIsInView(el))
+            if (this.elementIsInView(el)) {
+                var R           = Siesta.Resource('Siesta.Test.Element');
+
                 this.pass(description, {
-                    descTpl         : 'Passed element is within the visible viewport'
+                    descTpl         : R.get('isInViewPassTpl')
                 })
+            }
             else
                 this.fail(description, {
                     assertionName   : 'isInView'
@@ -27845,14 +29207,15 @@ Role('Siesta.Test.Element', {
             el              = this.normalizeElement(el);
             
             var me          = this;
-            
+            var R           = Siesta.Resource('Siesta.Test.Element');
+
             this.waitFor({
                 method          : function() { return me.elementIsInView(el) && el; }, 
                 callback        : callback,
                 scope           : scope, 
                 timeout         : timeout,
                 assertionName   : 'waitUntilInView',
-                description     : el.toString + ' to appear in the viewport'
+                description     : el.toString + ' ' + R.get('toAppearInTheViewport')
             });
         },
         
@@ -27862,6 +29225,7 @@ Role('Siesta.Test.Element', {
             
             try {
                 if (prevIndex == null) el.setAttribute('tabIndex', -1)
+                
                 el.focus() 
             } catch (e) {
             } finally {
@@ -27880,12 +29244,16 @@ Role('Siesta.Test.Element', {
          * @param {String} [description] The description for the assertion
          */
         elementIsEmpty : function (el, description) {
+
             el              = this.normalizeElement(el);
 
-            if (el && this.isElementEmpty(el))
+            if (el && this.isElementEmpty(el)) {
+                var R           = Siesta.Resource('Siesta.Test.Element');
+
                 this.pass(description, {
-                    descTpl         : 'Passed element is empty'
+                    descTpl         : R.get('elementIsEmptyPassTpl')
                 })
+            }
             else
                 this.fail(description, {
                     assertionName   : 'elementIsEmpty'
@@ -27901,10 +29269,13 @@ Role('Siesta.Test.Element', {
         elementIsNotEmpty : function (el, description) {
             el              = this.normalizeElement(el);
 
-            if (el && !this.isElementEmpty(el))
+            if (el && !this.isElementEmpty(el)) {
+                var R           = Siesta.Resource('Siesta.Test.Element');
+
                 this.pass(description, {
-                    descTpl         : 'Passed element is not empty'
+                    descTpl         : R.get('elementIsNotEmptyPassTpl')
                 })
+            }
             else
                 this.fail(description, {
                     assertionName   : 'elementIsNotEmpty'
@@ -27920,16 +29291,18 @@ Role('Siesta.Test.Element', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value.
          */
         waitForElementEmpty : function(el, callback, scope, timeout) {
-            var me = this;
-            el = this.normalizeElement(el);
+            var me          = this;
+            var R           = Siesta.Resource('Siesta.Test.Element');
 
-            this.waitFor({
+            el              = this.normalizeElement(el);
+
+            return this.waitFor({
                 method          : function() { return me.isElementEmpty(el); },
                 callback        : callback,
                 scope           : scope,
                 timeout         : timeout,
                 assertionName   : 'waitForElementEmpty',
-                description     : ' element to be empty'
+                description     : ' ' + R.get('elementToBeEmpty')
             });
         },
 
@@ -27942,16 +29315,18 @@ Role('Siesta.Test.Element', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value.
          */
         waitForElementNotEmpty : function(el, callback, scope, timeout) {
-            var me = this;
-            el = this.normalizeElement(el);
+            var me          = this;
+            var R           = Siesta.Resource('Siesta.Test.Element');
 
-            this.waitFor({
+            el              = this.normalizeElement(el);
+
+            return this.waitFor({
                 method          : function() { return !me.isElementEmpty(el); },
                 callback        : callback,
                 scope           : scope,
                 timeout         : timeout,
                 assertionName   : 'waitForElementNotEmpty',
-                description     : ' element to not be empty'
+                description     : ' ' + R.get('elementToNotBeEmpty')
             });
         },
 
@@ -27995,7 +29370,13 @@ Class('Siesta.Test.Browser', {
            init : function () { return [ 0, 0 ]; }
         },
         
-        forceDOMVisible         : false
+        forceDOMVisible         : false,
+        
+        browserInfo             : {
+            lazy    : function () {
+                return this.parseBrowser(window.navigator.userAgent)
+            }
+        }
     },
 
     methods : { 
@@ -28003,8 +29384,8 @@ Class('Siesta.Test.Browser', {
             var local$ = $.rebindWindowContext(this.global);
             return local$.apply(this.global, arguments);
         },
-        
-        
+
+
         isEventPrevented : function (event) {
             // our custom property - takes highest priority
             if (this.typeOf(event.$defaultPrevented) == 'Boolean') return event.$defaultPrevented
@@ -28126,21 +29507,33 @@ Class('Siesta.Test.Browser', {
         
         // Normalizes the element to an HTML element. Every 'framework layer' will need to provide its own implementation
         // This implementation accepts either a CSS selector or an Array with xy coordinates.
-        normalizeElement : function (el, allowMissing, shallow) {
+        normalizeElement : function (el, allowMissing, shallow, detailed) {
+            var matchingMultiple = false
+            
             if (typeof el === 'string') {
                 // DOM query
                 var origEl  = el;
-                el          = this.$(el)[ 0 ];
+
+                var wasAdjusted = this.adjustScope(el);
+
+                var query   = this.$(el.indexOf('->') >= 0 ? el.split('->')[1] : el);
+
+                if (wasAdjusted) this.resetScope();
+
+                el          = query[ 0 ];
+                matchingMultiple = query.length > 1
                 
                 if (!allowMissing && !el) {
-                    this.warn('No DOM element found for CSS selector: ' + origEl)
-                    throw 'No DOM element found for CSS selector: ' + origEl;
+                    var warning = Siesta.Resource('Siesta.Test.Browser','noDomElementFound') + ': ' + origEl
+
+                    this.warn(warning);
+                    throw warning;
                 }
             }
             
-            if (this.valueIsArray(el)) el = this.elementFromPoint(el[0], el[1]);
+            if (this.valueIsArray(el)) el = this.elementFromPoint(el[ 0 ], el[ 1 ]);
             
-            return el;
+            return detailed ? { el : el, matchingMultiple : matchingMultiple } : el;
         },
         
         
@@ -28152,9 +29545,9 @@ Class('Siesta.Test.Browser', {
         // component instance
         normalizeActionTarget : function (el, allowMissing) {
             var result = this.normalizeElement(el, allowMissing);
-            
+
             if (!allowMissing && !result) {
-                throw 'No action target found for: ' + el;
+                throw Siesta.Resource('Siesta.Test.Browser', 'noActionTargetFound') + ': ' + el
             }
             return result;
         },
@@ -28337,7 +29730,8 @@ Class('Siesta.Test.Browser', {
          */
         waitForEvent : function (observable, event, callback, scope, timeout) {
             var eventFired      = false
-            
+            var R               = Siesta.Resource('Siesta.Test.Browser');
+
             this.$(observable).bind(event, function () { eventFired = true })
             
             return this.waitFor({
@@ -28346,7 +29740,7 @@ Class('Siesta.Test.Browser', {
                 scope           : scope,
                 timeout         : timeout,
                 assertionName   : 'waitForEvent',
-                description     : ' observable to fire its "' + event + '" event'
+                description     : ' ' + R.get('waitForEvent') + ' "' + event + '" ' + R.get('event')
             });
         },
         
@@ -28366,8 +29760,9 @@ Class('Siesta.Test.Browser', {
             
             if (this.typeOf(expected) == 'String') {
                 var match       = /([<>=]=?)\s*(\d+)/.exec(expected)
-                
-                if (!match) throw new Error("Wrong format for expected number of events: " + expected)
+                var R               = Siesta.Resource('Siesta.Test.Browser');
+
+                if (!match) throw new Error(R.get('wrongFormat')  + ": " + expected)
                 
                 operator        = match[ 1 ]
                 expected        = Number(match[ 2 ])
@@ -28392,7 +29787,9 @@ Class('Siesta.Test.Browser', {
     t.firesOk({
         observable      : store,
         events          : {
-            { update : 1, add : 2, datachanged : '> 1' }
+            update      : 1,
+            add         : 2,
+            datachanged : '> 1'
         },
         during          : function () {
             store.getAt(0).set('Foo', 'Bar');
@@ -28408,7 +29805,9 @@ Class('Siesta.Test.Browser', {
     t.firesOk({
         observable      : store,
         events          : {
-            { update : 1, add : 2, datachanged : '>= 1' }
+            update      : 1,
+            add         : 2,
+            datachanged : '>= 1'
         },
         during          : 1
     })
@@ -28449,10 +29848,11 @@ Class('Siesta.Test.Browser', {
             //                    |        backward compat arguments        | 
             var me              = this;
             var sourceLine      = me.getSourceLine();
-            
+            var R               = Siesta.Resource('Siesta.Test.Browser');
+            var nbrArgs         = arguments.length
             var observable, during
             
-            if (arguments.length == 1) {
+            if (nbrArgs == 1) {
                 observable      = options.observable
                 events          = options.events
                 during          = options.during
@@ -28462,7 +29862,7 @@ Class('Siesta.Test.Browser', {
                 timeOut         = this.typeOf(during) == 'Number' ? during : null
                 func            = this.typeOf(during) == 'Function' ? during : null
                 
-            } else if (arguments.length >= 5) {
+            } else if (nbrArgs >= 5) {
                 // old signature, backward compat
                 observable      = options
                 
@@ -28472,11 +29872,11 @@ Class('Siesta.Test.Browser', {
                     
                     events          = obj
                 }
-            } else if (arguments.length <= 3 && this.typeOf(events) == 'Object') {
+            } else if (nbrArgs <= 3 && this.typeOf(events) == 'Object') {
                 // shortcut form 1
                 observable      = options
                 desc            = n
-            } else if (arguments.length <= 4 && this.typeOf(events) == 'String') {
+            } else if (nbrArgs <= 4 && this.typeOf(events) == 'String') {
                 // shortcut form 2
                 observable      = options
                 
@@ -28487,7 +29887,7 @@ Class('Siesta.Test.Browser', {
                 desc            = timeOut
                 timeOut         = null
             } else
-                throw new Error("Unrecognized signature for `firesOk`")
+                throw new Error(R.get('unrecognizedSignature'))
             
             // start recording
             var counters    = {};
@@ -28513,17 +29913,17 @@ Class('Siesta.Test.Browser', {
     
                     if (me.verifyExpectedNumberOfFiredEvents(actualNumber, expected))
                         me.pass(desc, {
-                            descTpl         : 'Observable fired ' + actualNumber + ' `' + eventName + '` events'
+                            descTpl         : R.get('observableFired') + ' ' + actualNumber + ' `' + eventName + '` ' + R.get('events')
                         });
                     else
                         me.fail(desc, {
                             assertionName   : 'firesOk',
                             sourceLine      : sourceLine,
-                            descTpl         : 'Observable fired expected number of `' + eventName + '` events',
+                            descTpl         : R.get('observableFiredOk') + ' `' + eventName + '` ' + R.get('events'),
                             got             : actualNumber,
-                            gotDesc         : 'Actual number of events',
+                            gotDesc         : R.get('actualNbrEvents'),
                             need            : expected,
-                            needDesc        : 'Expected number of events'
+                            needDesc        : R.get('expectedNbrEvents')
                         });
                 })
             }
@@ -28642,9 +30042,11 @@ Class('Siesta.Test.Browser', {
             var localXY, globalXY, el;
 
             actionTarget    = actionTarget || this.currentPosition;
+            
+            var targetIsPoint   = this.valueIsArray(actionTarget)
 
             // First lets get a normal DOM element to work with
-            if (this.valueIsArray(actionTarget)) {
+            if (targetIsPoint) {
                 globalXY    = actionTarget;
                 
                 var info    = this.elementFromPoint(actionTarget[ 0 ], actionTarget[ 1 ], false, null, true);
@@ -28662,14 +30064,24 @@ Class('Siesta.Test.Browser', {
             // 1. If this element is not visible, something is wrong
             // 2. If element is visible but not reachable (scrolled out of view) this is also an invalid scenario (this check is skipped for IE)
             //    TODO needs further investigation, conflicting with starting a drag operation on an element that isn't visible until the cursor is above it
-            if (!skipWarning && (!this.isElementVisible(el) /* || (!$.browser.msie && !this.elementIsTop(el, true))*/ )) {
-                this.fail('findTopDomElement: ' + (actionName ? "Target element of action [" + actionName + "]" : "Target element of some action") +
-                        " is not visible or not reachable: " + (el.id ? '#' + el.id : el)
-                );
+            
+            // we don't need to this check if target is a coordinate point, because in this case element is reachable by definition
+            if (!skipWarning && !targetIsPoint) {
+                var R       = Siesta.Resource('Siesta.Test.Browser');
+                var message = 'getNormalizedTopElementInfo: ' + (actionName ? R.get('targetElementOfAction') + " [" + actionName + "]" : R.get('targetElementOfSomeAction')) +
+                    " " + R.get('isNotVisible') + ": " + (el.id ? '#' + el.id : el)
+                
+                if (!this.isElementVisible(el)) 
+                    this.fail(message)
+                else
+                    if (!this.elementIsTop(el, true, offset))
+                        this.warn(message)
+                
             }
 
-            if (!this.valueIsArray(actionTarget)) {
+            if (!targetIsPoint) {
                 var doc     = el.ownerDocument;
+                var R       = Siesta.Resource('Siesta.Test.Browser');
 
                 localXY     = this.getTargetCoordinate(el, true, offset)
                 globalXY    = this.getTargetCoordinate(el, false, offset)
@@ -28678,7 +30090,7 @@ Class('Siesta.Test.Browser', {
                 el          = doc.elementFromPoint(localXY[ 0 ], localXY[ 1 ]) || doc.elementFromPoint(localXY[ 0 ], localXY[ 1 ]) || doc.body;
 
                 if (!el) {
-                    this.fail('findTopDomElement: Could not find any element at [' + localXY + ']');
+                    this.fail('getNormalizedTopElementInfo: ' + R.get('noElementFound') + ' [' + localXY + ']');
                     return; // No point going further
                 }
             }
@@ -28699,6 +30111,7 @@ Class('Siesta.Test.Browser', {
          * @param {Number} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value.
          */
         waitForTextPresent : function (text, callback, scope, timeout) {
+            var R               = Siesta.Resource('Siesta.Test.Browser');
 
             return this.waitFor({
                 method          : function() { return this.$(':contains(' + text + ')').length > 0; },
@@ -28706,7 +30119,7 @@ Class('Siesta.Test.Browser', {
                 scope           : scope,
                 timeout         : timeout,
                 assertionName   : 'waitForTextPresent',
-                description     : ' text "' + text + '" to be present'
+                description     : ' ' + R.get('text') + ' "' + text + '" ' + R.get('toBePresent')
             });
         },
 
@@ -28719,6 +30132,7 @@ Class('Siesta.Test.Browser', {
          * @param {Number} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value.
          */
         waitForTextNotPresent : function (text, callback, scope, timeout) {
+            var R               = Siesta.Resource('Siesta.Test.Browser');
 
             return this.waitFor({
                 method          : function() { return this.$(':contains(' + text + ')').length === 0; },
@@ -28726,7 +30140,7 @@ Class('Siesta.Test.Browser', {
                 scope           : scope,
                 timeout         : timeout,
                 assertionName   : 'waitForTextNotPresent',
-                description     : ' text "' + text + '" to not be present'
+                description     : ' ' + R.get('text') + ' "' + text + '" ' + R.get('toNotBePresent')
             });
         },
 
@@ -28740,16 +30154,104 @@ Class('Siesta.Test.Browser', {
          */
         waitForTarget : function(target, callback, scope, timeout) {
             var me = this;
+            var R  = Siesta.Resource('Siesta.Test.Browser');
 
-            this.waitFor({
+            return this.waitFor({
                 method          : function() { return me.normalizeElement(target, true); },
                 callback        : callback,
                 scope           : scope,
                 timeout         : timeout,
                 assertionName   : 'waitForTarget',
-                description     : ' target "' + target + '" appear'
+                description     : ' ' + R.get('target') + ' "' + target + '" ' + R.get('toAppear')
             });
+        },
+
+        /**
+         * Sets a new size for the test iframe
+         *
+         * @param {Int} width The new width
+         * @param {Int} height The new height
+         */
+        setWindowSize : function(width, height) {
+            this.$(this.scopeProvider.iframe).css({
+                width  : width + 'px',
+                height : height + 'px'
+            });
+        },
+        
+        
+        parseBrowser : function (uaString) {
+            var browser = 'unknown'
+            var version = ''
+            
+            var match
+            
+            if (match = /Firefox\/((?:\d+\.?)+)/.exec(uaString)) {
+                browser     = "Firefox"
+                version     = match[ 1 ]
+            }
+            
+            if (match = /Chrome\/((?:\d+\.?)+)/.exec(uaString)) {
+                browser     = "Chrome"
+                version     = match[ 1 ]
+            }
+            
+            if (match = /MSIE\s*((?:\d+\.?)+)/.exec(uaString)) {
+                browser     = "IE"
+                version     = match[ 1 ]
+            }
+            
+            if (uaString.match(/trident/i) && (match = /rv.(\d\d\.?\d?)/.exec(uaString))) {
+                browser     = "IE"
+                version     = match[ 1 ]
+            }
+            
+            if (match = /Apple.*Version\/((?:\d+\.?)+)\s*(?=Safari\/((?:\d+\.?)+))/.exec(uaString)) {
+                browser     = "Safari"
+                version     = match[ 1 ] + ' (' + match[ 2 ] + ')'
+            }
+            
+            return {
+                name        : browser,
+                version     : version
+            }
+        },
+        
+        
+        getJUnitClass : function () {
+            var browserInfo         = this.getBrowserInfo()
+            
+            browserInfo             = browserInfo.name + browserInfo.version
+            
+            return browserInfo + ':' + this.SUPER()
+        },
+
+        // Returns true if the scope was adjusted to another frame for the target string
+        adjustScope : function(target) {
+
+            if (this.typeOf(target) == 'String') {
+                var mainParts  = target.split('->');
+
+                if (mainParts.length === 2) {
+                    var frameEl = this.$(mainParts[0].trim())[0];
+
+                    if (!frameEl || !frameEl.contentWindow) {
+                        return false;
+                    }
+
+                    this._global = this.global;
+                    this.global = frameEl.contentWindow;
+                    return true;
+                }
+            }
+
+            return false;
+        },
+
+        resetScope : function() {
+            this.global = this._global || this.global;
         }
+        
     }
 });
 ;
@@ -28792,9 +30294,10 @@ Class('Siesta.Test.ExtJS', {
     
     has : {
         globalExtOverrides      : null,
-        
-        extPathRegex1           : /(.*ext(?:js)?-\d\.\d+(?:\.\d+)?.*?)\/ext-all(?:-debug|-dev)?\.js/,
-        extPathRegex2           : /(.*ext(?:js)?\/gpl\/\d\.\d+(?:\.\d+)?.*?)\/ext-all(?:-debug|-dev)?\.js/
+
+        extPathRegex1           : /(.*ext(?:js)?-\d\.\d+(?:\.\d+)?.*?)\/(?:build\/)?ext(?:-all)?(?:-debug|-dev)?\.js/,
+        extPathRegex2           : /(.*ext(?:js)?-\d\.\d+(?:\.\d+)?.*?)\/ext-all(?:-debug|-dev)?\.js/,
+        extPathRegex3           : /(.*ext(?:js)?\/gpl\/\d\.\d+(?:\.\d+)?.*?)\/ext-all(?:-debug|-dev)?\.js/
     },
     
     methods : {
@@ -28807,7 +30310,7 @@ Class('Siesta.Test.ExtJS', {
             while (testDescriptor && !path) {
                 if (testDescriptor.preload) {
                     Joose.A.each(testDescriptor.preload, function (url) {
-                        if (url.match && (url.match(me.extPathRegex1) || url.match(me.extPathRegex2))) {
+                        if (url.match && (url.match(me.extPathRegex1) || url.match(me.extPathRegex2) || me.extPathRegex3.exec(url))) {
                             path    = url;
                             return false;
                         }
@@ -28828,7 +30331,7 @@ Class('Siesta.Test.ExtJS', {
             while (testDescriptor && !folder) {
                 if (testDescriptor.preload) {
                     Joose.A.each(testDescriptor.preload, function (url) {
-                        var match = me.extPathRegex1.exec(url) || me.extPathRegex2.exec(url);
+                        var match = me.extPathRegex1.exec(url) || me.extPathRegex2.exec(url) || me.extPathRegex3.exec(url);
 
                         if (match) folder = match[1];
                         
@@ -28853,7 +30356,7 @@ Class('Siesta.Test.ExtJS', {
                 var extjsBundleURL  = me.getExtBundlePath()
     
                 if (!extjsBundleURL) {
-                    me.fail("Can'me find ExtJS bundle url");
+                    me.fail(Siesta.Resource('Siesta.Test.ExtJS', 'bundleUrlNotFound'));
                     callback && callback.call(me, null, null)
                     return;
                 }
@@ -28861,15 +30364,15 @@ Class('Siesta.Test.ExtJS', {
                 // For IE
                 this.expectGlobal('0');
 
-                var frame           = Ext.core.DomHelper.append(Ext.getBody(), { 
+                var frame           = Ext.core.DomHelper.append(Ext.getBody(), {
                     tag     : "iframe",
                     style   : 'display:none'
                 }, false);
-                
+
                 var freshWin        = frame.contentWindow;
     
                 freshWin.document.open();
-    
+
                 freshWin.document.write(
                     '<html><head><script type="text/javascript" src="' + extjsBundleURL + '"></script></head><body></body></html>'
                 );
@@ -28895,6 +30398,7 @@ Class('Siesta.Test.ExtJS', {
                     var diff    = []
 
                     for (var p in dirtyObj) {
+
                         try {
                             if (dirtyObj.hasOwnProperty(p)) {
                                 // Check if the object exists on the clean window and also do a string comparison
@@ -28923,7 +30427,7 @@ Class('Siesta.Test.ExtJS', {
                         // Check for native class augmentations
                         Ext.iterate(Ext.ClassManager.classes, function (item) {
                             if (!item.match(/^Ext\./)) return;
-        
+
                             var freshItem   = resolveObject(freshWin, item);
                             var dirtyItem   = resolveObject(dirtyWin, item);
         
@@ -28942,7 +30446,9 @@ Class('Siesta.Test.ExtJS', {
                         });
                         
                         me.globalExtOverrides   = overrides
-                        
+
+                        Ext.destroy(frame);
+
                         callback && callback.call(me, overrides.length, overrides)
                     }
                 )
@@ -28973,27 +30479,34 @@ Class('Siesta.Test.ExtJS', {
          *
          * @param {String} [description] The description for the assertion
          */
-        assertNoGlobalExtOverrides : function (description) {
+        assertNoGlobalExtOverrides : function (description, cb) {
             this.getNumberOfGlobalExtOverrides(function (length, overrides) {
+                var R = Siesta.Resource('Siesta.Test.ExtJS');
+
                 if (length == null) {
-                    this.fail("Was not able to find the ExtJS bundle URL in the `assertNoGlobalExtOverrides` assertion")
-                    return
+                    this.fail(R.get('assertNoGlobalExtOverridesInvalid'))
+                } else {
+
+                    if (length) {
+                        this.fail(description, {
+                            assertionName   : 'assertNoGlobalExtOverrides',
+                            descTpl         : R.get('assertNoGlobalExtOverridesPassTpl'),
+
+                            got             : length,
+                            gotDesc         : R.get('assertNoGlobalExtOverridesGotDesc'),
+
+                            annotation      : R.get('foundOverridesFor') + ': `' + overrides.join('`, `') + '`'
+                        })
+                    } else {
+                        this.pass(description, {
+                            descTpl             : R.get('assertNoGlobalExtOverridesPassTpl')
+                        })
+                    }
+
+                    // For testing only
+                    cb && cb.call(this);
                 }
-                
-                if (length) {
-                    this.fail(description, {
-                        assertionName   : 'assertNoGlobalExtOverrides',
-                        descTpl         : 'No global Ext overrides found',
-                        
-                        got             : length,
-                        gotDesc         : "Number of overrides found",
-                        
-                        annotation      : "Found overrides for: `" + overrides.join('`, `') + '`'
-                    })
-                } else
-                    this.pass(description, {
-                        descTpl             : 'No global Ext overrides found'
-                    })
+
             })
         },
 
@@ -29011,28 +30524,35 @@ Class('Siesta.Test.ExtJS', {
          * @param {Number} maxNumber The maximum number of Ext JS overrides allowed
          * @param {String} [description] The description for the assertion
          */
-        assertMaxNumberOfGlobalExtOverrides : function (maxNumber, description) {
+        assertMaxNumberOfGlobalExtOverrides : function (maxNumber, description, cb) {
+            var R   = Siesta.Resource('Siesta.Test.ExtJS');
+
             this.getNumberOfGlobalExtOverrides(function (length, overrides) {
                 if (length == null) {
-                    this.fail("Was not able to find the ExtJS bundle URL in the `assertMaxNumberOfGlobalExtOverrides` assertion")
-                    return
+                    this.fail(R.get("extOverridesInvalid"));
+                } else {
+
+                    if (length > maxNumber) {
+                        this.fail(description, {
+                            assertionName   : 'assertNoGlobalExtOverrides',
+                            descTpl         : R.get('foundLessOrEqualThan') + ' ' + maxNumber + ' ' + R.get('globalOverrides'),
+
+                            got             : length,
+                            gotDesc         : R.get('nbrOverridesFound'),
+
+                            annotation      : R.get('foundOverridesFor') + ': `' + overrides.join('`, `') + '`'
+                        })
+                    } else {
+                        this.pass(description, {
+                            descTpl             : R.get('foundLessOrEqualThan') + ' ' + maxNumber + ' ' + R.get('globalOverrides'),
+                            annotation          : R.get('nbrOverridesFound') + ': ' + length
+                        })
+                    }
+
+                    // For testing only
+                    cb && cb.call(this)
                 }
-                
-                if (length > maxNumber) {
-                    this.fail(description, {
-                        assertionName   : 'assertNoGlobalExtOverrides',
-                        descTpl         : 'Found less or equal than ' + maxNumber + ' ext global overrides',
-                        
-                        got             : length,
-                        gotDesc         : "Number of overrides found",
-                        
-                        annotation      : "Found overrides for: `" + overrides.join('`, `') + '`'
-                    })
-                } else
-                    this.pass(description, {
-                        descTpl             : 'Found less or equal than ' + maxNumber + ' ext global overrides',
-                        annotation          : "Number of overrides found: " + length
-                    })
+
             })
         },
 
@@ -29073,14 +30593,15 @@ Class('Siesta.Test.ExtJS', {
          */
         waitForAnimations: function (callback, scope, timeout) {
             var Ext = this.Ext();
+            var R   = Siesta.Resource('Siesta.Test.ExtJS');
 
-            this.waitFor({
+            return this.waitFor({
                 method          : function () { return !Ext.fx.Manager.items || Ext.fx.Manager.items.getCount() === 0; },
                 callback        : callback,
                 scope           : scope,
                 timeout         : timeout,
                 assertionName   : 'waitForAnimations',
-                description     : ' animations to finalize'
+                description     : ' ' + R.get('animationsToFinalize')
             });
         }
     }
@@ -29125,13 +30646,14 @@ Class('Siesta.Test.SenchaTouch', {
     override : {
         
         isReady : function () {
-            var result = this.SUPERARG(arguments);
+            var result  = this.SUPERARG(arguments);
+            var R       = Siesta.Resource('Siesta.Test.SenchaTouch');
 
             if (!result.ready) return result;
 
             if (!this.parent && this.performSetup && !this.isSTSetupDone) return {
                 ready       : false,
-                reason      : "Waiting for Ext.setup took too long - some dependency can't be loaded? Check the `Net` tab in Firebug"
+                reason      : R.get('STSetupFailed')
             }
             
             return {
@@ -29165,19 +30687,19 @@ Class('Siesta.Test.SenchaTouch', {
                         Ext.event.publisher.TouchGesture.prototype.handledEvents.push('mousedown', 'mousemove', 'mouseup');
                     } else {
                         Ext.event.publisher.TouchGesture.override({
-                            moveEventName: 'mousemove',
+                            moveEventName       : 'mousemove',
 
                             map: {
                                 mouseToTouch: {
-                                    mousedown: 'touchstart',
-                                    mousemove: 'touchmove',
-                                    mouseup: 'touchend'
+                                    mousedown   : 'touchstart',
+                                    mousemove   : 'touchmove',
+                                    mouseup     : 'touchend'
                                 },
 
                                 touchToMouse: {
-                                    touchstart: 'mousedown',
-                                    touchmove: 'mousemove',
-                                    touchend: 'mouseup'
+                                    touchstart  : 'mousedown',
+                                    touchmove   : 'mousemove',
+                                    touchend    : 'mouseup'
                                 }
                             },
 
@@ -29469,8 +30991,9 @@ Class('Siesta.Test.SenchaTouch', {
                 return;
             }
 
-            var Ext = this.Ext();
-            
+            var Ext     = this.Ext();
+            var R       = Siesta.Resource('Siesta.Test.SenchaTouch');
+
             var box = Ext.fly(target).getBox(),
                 start,
                 end,
@@ -29513,7 +31036,7 @@ Class('Siesta.Test.SenchaTouch', {
                 break;
 
                 default: 
-                    throw 'Invalid swipe direction: ' + direction;
+                    throw R.get('invalidSwipeDir') + ': ' + direction;
             }
 
             this.dragTo(start, end, callback, scope);
@@ -29540,7 +31063,8 @@ Class('Siesta.Test.SenchaTouch', {
         */
         moveFingerBy : function(delta, callback, scope) {
             if (!delta) {
-                throw 'Trying to call moveFingerBy without relative distances';
+                var R = Siesta.Resource('Siesta.Test.SenchaTouch');
+                throw R.get('moveFingerByInvalidInput');
             }
 
             this.moveCursorBy.apply(this, arguments);
@@ -29570,9 +31094,11 @@ Class('Siesta.Test.SenchaTouch', {
 //        * @param {Object} scope (optional) the scope for the callback
 //        */
         scrollUntil : function(target, direction, checkerFn, callback, scope) {
-            var me = this,
-                startDate = new Date(),
-                dir = direction;
+            var me          = this,
+                startDate   = new Date(),
+                dir         = direction;
+
+            var R = Siesta.Resource('Siesta.Test.SenchaTouch');
 
             // Invert direction, Scroll up => Swipe down
             switch(dir) {
@@ -29597,7 +31123,7 @@ Class('Siesta.Test.SenchaTouch', {
                 break;
 
                 default: 
-                    throw 'Invalid swipe direction: ' + direction;
+                    throw R.get('invalidSwipeDir') + ': ' + direction;
             }
 
             var inner = function() {
@@ -29614,7 +31140,7 @@ Class('Siesta.Test.SenchaTouch', {
                                 inner(); 
                             }, 1000); 
                         } else {
-                            me.fail('scrollUntil failed to achieve its mission');
+                            me.fail(R.get('scrollUntilFailed'));
                         }
                     });
                 }
@@ -29634,8 +31160,11 @@ Class('Siesta.Test.SenchaTouch', {
          */
         scrollUntilElementVisible : function(scrollable, direction, actionTarget, callback, scope) {
             var me = this;
+
             if (!actionTarget || !scrollable) {
-                this.fail('scrollUntilElementVisible: target or scrollable not provided');
+                var R = Siesta.Resource('Siesta.Test.SenchaTouch');
+                this.fail(R.get('scrollUntilElementVisibleInvalid'));
+
                 return;
             }
 
@@ -29658,7 +31187,7 @@ Class('Siesta.Test.SenchaTouch', {
          * @param {Int} timeout The maximum amount of time to wait for the condition to be fulfilled. Defaults to the {@link Siesta.Test.ExtJS#waitForTimeout} value. 
          */
         waitForScrollerPosition: function(scroller, pos, callback, scope, timeout) {
-            this.waitFor({
+            return this.waitFor({
                 method          : function() { 
                     return (!('x' in pos) || pos.x === scroller.position.x) && (!('y' in pos) || pos.y === scroller.position.y);
                 }, 
@@ -29666,7 +31195,7 @@ Class('Siesta.Test.SenchaTouch', {
                 scope           : scope, 
                 timeout         : timeout,
                 assertionName   : 'waitForScrollerPosition',
-                description     : ' scroller to reach position "' + Siesta.Util.Serializer.stringify(pos)
+                description     : ' ' + Siesta.Resource('Siesta.Test.SenchaTouch', 'scrollerReachPos') + ' '+ Siesta.Util.Serializer.stringify(pos)
             });
         },
 
@@ -29680,13 +31209,13 @@ Class('Siesta.Test.SenchaTouch', {
         waitForAnimations: function (callback, scope, timeout) {
             var Ext = this.Ext();
 
-            this.waitFor({
+            return this.waitFor({
                 method          : function () { return !Ext.AnimationQueue.isRunning; },
                 callback        : callback,
                 scope           : scope,
                 timeout         : timeout,
                 assertionName   : 'waitForAnimations',
-                description     : ' animations to finalize'
+                description     : Siesta.Resource('Siesta.Test.ExtJS', 'animationsToFinalize')
             });
         }
     }
@@ -29724,8 +31253,8 @@ Class('Siesta.Test.jQuery', {
             return this.global.$;
         },
 
-        normalizeElement : function(el) {
-            return el.jquery ? el.get(0) : this.SUPER(el);
+        normalizeElement : function (el) {
+            return el.jquery ? el.get(0) : this.SUPERARG(arguments);
         }
     }
 })
@@ -29887,7 +31416,12 @@ Class('Siesta.Harness.Browser', {
              * improving the speed of test. Default value is `false`.   
              */
             breakOnFail             : false,
-            activateDebuggerOnFail  : false,
+            
+            /**
+             * @cfg {Boolean} debuggerOnFail When set to `true`, harness will issue a `debugger` statement after detecting a failed assertion, allowing you
+             * to inspect the internal state of the test in the browser's debugger. Default value is `false`.   
+             */
+            debuggerOnFail          : false,
 
             contentManagerClass : Siesta.Content.Manager.Browser,
             scopeProvider       : 'Scope.Provider.IFrame',
@@ -29982,7 +31516,7 @@ Class('Siesta.Harness.Browser', {
              * 
              * Valid values are "dispatchEvent" and "fireEvent".
              * 
-             * The framework specific adapters (like {@link Siesta.Test.ExtJS} and like {@link Siesta.Test.jQuery}) chooses the most appropriate value 
+             * The framework specific adapters (like {@link Siesta.Test.ExtJS} and like {@link Siesta.Test.jQuery}) choose the most appropriate value
              * automatically (unless explicitly configured). 
              */
             simulateEventsWith  : {
@@ -29996,12 +31530,30 @@ Class('Siesta.Harness.Browser', {
             /**
              * @cfg {Boolean} autoScrollElementsIntoView
              * 
-             * With this option enabled Siesta will try to scroll the invisible action targets into the view automatically, before performing the
-             * action. 
+             * With this option enabled Siesta will try to scroll invisible action targets into the view automatically, before performing an
+             * action (such as click etc).
              * 
              * This option can also be specified in the test file descriptor.
              */
             autoScrollElementsIntoView  : true,
+            
+            /**
+             * @cfg {Boolean} enableUnreachableClickWarning When this option is set to `true` (default) Siesta will generate warnings
+             * when click happens in the unreachable point of some element. For example, imagine the following situation: you have
+             * a 10x10px "div" element with "overflow : hidden", and inside of it, another inner "div" 10x50px. Then you ask Siesta
+             * to click on the inner div (by default it clicks in the center). The center of inner div is hidden by the outer div,
+             * so click will happen on some other element and a warning will be issued.
+             * 
+             * Usually this behaviour is what you want, since it protects you from various mistakes, but sometimes you may want
+             * to disable it, for example if you want to write your clicks like this: `{ click : someEl, offset : [ "50%", "100%+10" ] }`
+             * (which means - click 10px to the right from right edge of the `someEl`).
+             * 
+             * Note, that warning won't be issued if in the click point there's some child element of the target element.
+             * 
+             * This option can also be specified in the test file descriptor.
+             */
+            enableUnreachableClickWarning   : true,
+            
             
             /**
              * @cfg {Boolean} maintainViewportSize
@@ -30285,6 +31837,7 @@ Class('Siesta.Harness.Browser', {
                 
                 config.forceDOMVisible              = this.getDescriptorConfig(desc, 'forceDOMVisible')
                 config.autoScrollElementsIntoView   = this.getDescriptorConfig(desc, 'autoScrollElementsIntoView')
+                config.enableUnreachableClickWarning = this.getDescriptorConfig(desc, 'enableUnreachableClickWarning')
                 
                 return config
             },
@@ -30413,6 +31966,8 @@ Singleton('Siesta.Harness.Browser.FeatureSupport', {
     has     : {
         supports    : Joose.I.Object,
         
+        simulator   : null,
+        
         tests       : {
             init        : [
                 {
@@ -30513,6 +32068,25 @@ Singleton('Siesta.Harness.Browser.FeatureSupport', {
 
                         form.remove();
                         return result;
+                    }
+                },
+                // remove after https://bugzilla.mozilla.org/show_bug.cgi?id=959992 will be fixed
+                {
+                    id : "imageWithIdCreatesGlobalEnumerable",
+                    fn : function () {
+                        var img     = $('<img id="test_img_id"/>');
+                        
+                        $('body').append(img);
+                        
+                        var hasImgId    = false
+                        
+                        for (var i in window) {
+                            if (i == 'test_img_id') hasImgId = true
+                        }
+
+                        img.remove();
+                        
+                        return hasImgId;
                     }
                 }
             ]
@@ -30771,6 +32345,14 @@ Class('Siesta.Harness.Browser.ExtJS', {
              * True to show a version picker to swiftly change which Ext JS version is used in the test suite.
              */
             allowExtVersionChange   : false,
+
+            /**
+             * @cfg {Boolean} failOnMultipleComponentMatches
+             *
+             * True to fail when providing a Component Query matching multiple components. False to warn only.
+             * Component Queries should ideally always be unique to identify only one target in the DOM.
+             */
+            failOnMultipleComponentMatches   : false,
             
             extVersionRegExp        : /ext(?:js)?-(\d\.\d+\.\d+.*?)\//,
             
@@ -30794,7 +32376,7 @@ Class('Siesta.Harness.Browser.ExtJS', {
                             })
                         }
                     For some reason, Ext performs "isFunction" check on the callback value and only calls it if this check passes
-                    (assuming programming does not know what he is doing)
+                    (assuming programmer does not know what he is doing)
                     "isFunction" check in turn relies on the presence of this property in the Function prototype
                     
                     This line can be removed once "isFunction" in Ext will become cross-context or Ext will stop
@@ -31983,6 +33565,8 @@ Ext.define('Siesta.Harness.Browser.UI.TreeFilterField', {
     
     triggerLeafCls      : 'tr-filter-trigger-leaf',
     triggerGroupCls     : 'tr-filter-trigger-group',
+    
+    tipText             : null,
 
     
     initComponent : function () {
@@ -32014,6 +33598,8 @@ Ext.define('Siesta.Harness.Browser.UI.TreeFilterField', {
     
     afterRender : function () {
         this.callParent(arguments)
+        
+        this.tipText && this.inputEl.set({ title : this.tipText })
         
         if (this.filterGroups) {
             this.triggerEl.item(1).addCls(this.triggerGroupCls)
@@ -32065,7 +33651,17 @@ Ext.define('Siesta.Harness.Browser.UI.TreeFilterField', {
     onFilterChange : function (field, newValue) {
         if (newValue || this.hasAndCheck && this.hasAndCheck()) {
             var field           = this.filterField
-            var parts           = newValue.split(/\s*\|\s*/);
+            
+            var parts, groupFilter
+            var filterGroups    = this.filterGroups
+            
+            if (!filterGroups) {
+                parts           = newValue.split(/\s*\>\s*/)
+                groupFilter     = parts.length > 1 ? parts[ 0 ] : ''
+                newValue        = parts.length > 1 ? parts[ 1 ] : parts[ 0 ]
+            }
+            
+            parts               = newValue.split(/\s*\|\s*/);
             var regexps         = []
             var lengths         = []
             
@@ -32079,12 +33675,32 @@ Ext.define('Siesta.Harness.Browser.UI.TreeFilterField', {
                 }
             }
             
+            var groupFilterRegex    = groupFilter && new RegExp(Ext.String.escapeRegex(groupFilter), 'i')
+            
             var andChecker      = this.andChecker
             var andCheckerScope = this.andCheckerScope || this
             
             this.store.filterTreeBy({
                 filter  : function (node) {
                     if (andChecker && !andChecker.call(andCheckerScope, node)) return false
+                    
+                    if (!filterGroups && groupFilter) {
+                        var currentNode     = node
+                        var isInGroup       = false
+                        
+                        while (currentNode && currentNode.parentNode) {
+                            var parent      = currentNode.parentNode
+                            
+                            if (groupFilterRegex.test(parent.get(field))) {
+                                isInGroup   = true
+                                break
+                            }
+                            
+                            currentNode     = parent
+                        }
+                        
+                        if (!isInGroup) return false
+                    }
                     
                     var title       = node.get(field)
                     
@@ -32101,9 +33717,10 @@ Ext.define('Siesta.Harness.Browser.UI.TreeFilterField', {
                         if (groupMatch) return true
                     }
                         
-                    return false
+                    // if there's no name filtering regexps - return true (show all elements)
+                    return !regexps.length
                 },
-                fullMathchingParents    : this.filterGroups
+                fullMathchingParents    : filterGroups
             })
         } else {
             this.store.clearTreeFilter()
@@ -32136,7 +33753,7 @@ Ext.define('Siesta.Harness.Browser.UI.CanFillAssertionsStore', {
             Ext.resumeLayouts()
         }
         
-        if (result.isPassed && !result.isPassed()) alreadyInTheStore.ensureVisible()
+        if (result.isPassed && !result.isPassed() || result.isWarning) alreadyInTheStore.ensureVisible()
         
         alreadyInTheStore.updateFolderStatus()
     },
@@ -32154,6 +33771,7 @@ Ext.define('Siesta.Harness.Browser.UI.CanFillAssertionsStore', {
 Ext.define('Siesta.Harness.Browser.UI.DomContainer', {
     extend : 'Ext.Panel',
     alias  : 'widget.domcontainer',
+
     cls    : 'siesta-domcontainer',
 
     test          : null,
@@ -32164,11 +33782,13 @@ Ext.define('Siesta.Harness.Browser.UI.DomContainer', {
     canManageDOM            : true,
     suspendAfterLayoutAlign : false,
     padding                 : 10,
-    title                   : 'DOM Panel',
+
     inspecting              : false,
 
     initComponent : function () {
         this.testListeners = []
+
+        this.title = Siesta.Resource('Siesta.Harness.Browser.UI.DomContainer', 'title');
 
         this.addEvents(
             'startinspection',
@@ -32223,11 +33843,11 @@ Ext.define('Siesta.Harness.Browser.UI.DomContainer', {
                     var frame = this.getIFrame();
                     try {
                         var retVal = frame.contentWindow.eval(val);
-                        if (console) {
+                        if (window.console) {
                             console.log(retVal);
                         }
                     } catch (e) {
-                        console.log(e.message);
+                        window.console && console.log(e.message);
                     }
                 }
             },
@@ -32354,6 +33974,9 @@ Ext.define('Siesta.Harness.Browser.UI.DomContainer', {
 
 
     destroy                 : function () {
+        Ext.destroy(this.boxIndicator);
+        this.boxIndicator   = null;
+        
         // just in case
         this.hideIFrame()
 
@@ -32361,7 +33984,7 @@ Ext.define('Siesta.Harness.Browser.UI.DomContainer', {
             listener.remove()
         })
 
-        this.test = null
+        this.test           = null
 
         this.callParent(arguments)
     },
@@ -32370,6 +33993,9 @@ Ext.define('Siesta.Harness.Browser.UI.DomContainer', {
     // -----------------------------
     inspectedComponent      : null,
     inspectedComponentXType : null,
+    boxIndicator            : null,
+    
+    inspecting              : false,
 
     toggleInspectionMode : function (on) {
         if (!this.test) return;
@@ -32384,21 +34010,21 @@ Ext.define('Siesta.Harness.Browser.UI.DomContainer', {
     startInspection : function (showConsole) {
         if (!this.test) return;
 
-        var frame = this.test.scopeProvider.iframe;
-        var _Ext = frame.contentWindow.Ext;
+        var frame   = this.test.scopeProvider.iframe;
+        var _Ext    = frame.contentWindow.Ext;
 
         // This is only relevant for frames containing 'Ext'
-        if (!_Ext) return;
+        if (!_Ext || !_Ext.getBody) return;
 
-        var me = this;
-        var wrap = Ext.get(this.getIFrameWrapper());
+        var me      = this;
+        var wrap    = Ext.get(this.getIFrameWrapper());
 
         me.boxIndicator = me.boxIndicator || wrap.createChild({
-            cls      : 'cmp-inspector-box',
-            children : {
-                tag    : 'a',
-                cls    : 'cmp-inspector-label',
-                target : '_blank'
+            cls         : 'cmp-inspector-box',
+            children    : {
+                tag     : 'a',
+                cls     : 'cmp-inspector-label',
+                target  : '_blank'
             }
         });
 
@@ -32418,17 +34044,17 @@ Ext.define('Siesta.Harness.Browser.UI.DomContainer', {
         this.inspecting = true;
     },
 
+    
     stopInspection : function (suppressEvent) {
-
         if (!this.inspecting) return;
 
         this.inspecting = false;
 
-        var wrap = Ext.get(this.getIFrameWrapper());
-        var frame = this.test.scopeProvider.iframe;
-        var _Ext = frame.contentWindow.Ext;
+        var wrap        = Ext.get(this.getIFrameWrapper());
+        var frame       = this.test.scopeProvider.iframe;
+        var _Ext        = frame.contentWindow.Ext;
 
-        if (!_Ext) return;
+        if (!_Ext || !_Ext.getBody) return;
 
         Ext.destroy(this.boxIndicator);
         this.boxIndicator = null;
@@ -32444,29 +34070,32 @@ Ext.define('Siesta.Harness.Browser.UI.DomContainer', {
         }
 
         this.toggleMouseMoveListener(false);
-        _Ext && _Ext.getBody().un('click', this.onInspectionClick, this);
+        _Ext.getBody().un('click', this.onInspectionClick, this);
 
         this.inspectedComponent = this.inspectedComponentXType = null;
     },
 
+    
     onMouseLeave            : function (e, t) {
         if (!this.el.contains(e.relatedTarget) && !Ext.fly(this.getIFrameWrapper()).contains(e.relatedTarget)) {
             this.stopInspection();
         }
     },
 
+    
     // Listen for mousemove in the frame and any direct iframe children too
     toggleMouseMoveListener : function (enabled) {
-        var frame = this.test.scopeProvider.iframe;
-        var _Ext = frame.contentWindow.Ext;
-        var frames = _Ext.getBody().select('iframe');
-        var fn = enabled ? 'on' : 'un';
+        var frame   = this.test.scopeProvider.iframe;
+        var _Ext    = frame.contentWindow.Ext;
+        var frames  = _Ext.getBody().select('iframe');
+        var fn      = enabled ? 'on' : 'un';
 
-        _Ext.getBody()[fn]('mousemove', this.onMouseMove, this, { buffer : 30 });
+        _Ext.getBody()[ fn ]('mousemove', this.onMouseMove, this, { buffer : 30 });
 
         for (var i = 0; i < frames.getCount(); i++) {
             var innerExt = frames.item(i).dom.contentWindow.Ext;
-            innerExt && innerExt.getBody()[fn]('mousemove', this.onMouseMove, this, { buffer : 30 });
+            
+            innerExt && innerExt.getBody && innerExt.getBody()[ fn ]('mousemove', this.onMouseMove, this, { buffer : 30 });
         }
     },
 
@@ -32483,19 +34112,19 @@ Ext.define('Siesta.Harness.Browser.UI.DomContainer', {
         }
     },
 
+    
     onMouseMove : function (e, t) {
         if (e.synthetic || !this.boxIndicator) return;
 
-        var cmp = this.findComponentByTarget(t);
+        var me      = this;
+        var cmp     = this.findComponentByTarget(t);
 
         if (!cmp || cmp === this.inspectedComponent) return;
 
-        var me = this;
+        var xtype   = this.resolveComponentXtype(cmp);
 
-        var xtype = this.resolveComponentXtype(cmp);
-
-        this.inspectedComponent = cmp;
-        this.inspectedComponentXType = xtype;
+        this.inspectedComponent         = cmp;
+        this.inspectedComponentXType    = xtype;
 
         me.highlightTarget(cmp.el);
         me.updateHighlightContent(cmp, xtype);
@@ -32503,57 +34132,60 @@ Ext.define('Siesta.Harness.Browser.UI.DomContainer', {
         this.fireEvent('componenthover', this, this.inspectedComponent, this.inspectedComponentXType);
     },
 
+    
     resolveComponentXtype : function(cmp) {
         var xtype = (cmp.getXType && cmp.getXType()) || cmp.xtype;
 
         // If the found component doesn't have an own xtype, look up the superclass chain to find one
         if (!xtype) {
-            var cls = cmp;
+            var cls     = cmp;
             for (var i = 0; i < 10 && !xtype; i++) {
-                cls = cmp.superclass;
-                xtype = cls.xtype;
+                cls     = cmp.superclass;
+                xtype   = cls.xtype;
             }
         }
 
         return xtype;
     },
 
+    
     updateHighlightContent : function (cmp, xtype) {
         var html;
-        var link = {
+        
+        var link    = {
             tag    : 'a',
             cls    : 'cmp-inspector-label',
             href   : '#'
         };
 
         if (typeof cmp === 'string') {
-            html = cmp;
+            html    = cmp;
         } else if (Ext.ClassManager) {
-
             // If recorder is visible, let's add some targeting suggestions
-            var recorder = Ext.ComponentQuery.query('recorderpanel')[0];
+            var recorderPanel       = Ext.ComponentQuery.query('recorderpanel')[ 0 ];
 
-            if (recorder && recorder.isVisible()) {
-                html = '>>' + (recorder.extractor.getOptimalCQForComponent(cmp) || xtype);
+            if (recorderPanel && recorderPanel.isVisible()) {
+                var cq              = recorderPanel.recorder.extractor.findComponentQueryFor(cmp);
+                html                = '>>' + ((cq && cq.query) || xtype);
             } else {
-                var clsName = this.findExtAncestorClassName(cmp);
+                var clsName         = this.findExtAncestorClassName(cmp);
 
                 if (clsName) {
-                    var docsPath = 'http://docs.sencha.com/{0}/#!/api/{1}';
+                    var docsPath    = Siesta.Resource('Siesta.Harness.Browser.UI.DomContainer', 'docsUrlText');
                     var framework;
 
                     if (Ext.versions.touch) {
-                        framework = 'touch';
+                        framework   = 'touch';
                     } else {
-                        framework = 'extjs';
+                        framework   = 'extjs';
                     }
 
-                    link.target = '_blank';
-                    link.href = Ext.String.format(docsPath, framework, clsName);
-                    link.title = 'View documentation for ' + clsName;
-
-                    html = xtype;
+                    link.target     = '_blank';
+                    link.href       = Ext.String.format(docsPath, framework, clsName);
+                    link.title      = Siesta.Resource('Siesta.Harness.Browser.UI.DomContainer', 'viewDocsText') + clsName;
                 }
+
+                html            = xtype;
             }
         }
 
@@ -32563,21 +34195,21 @@ Ext.define('Siesta.Harness.Browser.UI.DomContainer', {
         }
     },
 
+    
     highlightTarget : function (target, content) {
         if (!this.inspecting) {
             this.startInspection();
         }
 
-        var me = this;
-        var el = Ext.get(this.test.normalizeElement(target));
-        var node = el.dom;
-        var boxStyle = me.boxIndicator.dom.style;
-        var offsets = this.getOffsets(node);
+        var el          = Ext.get(this.test.normalizeElement(target));
+        var node        = el.dom;
+        var boxStyle    = this.boxIndicator.dom.style;
+        var offsets     = this.getOffsets(node);
 
         // Regular getWidth/getHeight doesn't work if another iframe is on the page
-        boxStyle.left = (el.getX() - 1 + offsets[0]) + 'px';
-        boxStyle.top = (el.getY() - 1 + offsets[1]) + 'px';
-        boxStyle.width = ((el.getWidth() || (parseInt(node.style.width.substring(0, node.style.width.length - 2), 10))) + 2) + 'px';
+        boxStyle.left   = (el.getX() - 1 + offsets[0]) + 'px';
+        boxStyle.top    = (el.getY() - 1 + offsets[1]) + 'px';
+        boxStyle.width  = ((el.getWidth() || (parseInt(node.style.width.substring(0, node.style.width.length - 2), 10))) + 2) + 'px';
         boxStyle.height = ((el.getHeight() || (parseInt(node.style.height.substring(0, node.style.height.length - 2), 10))) + 2) + 'px';
 
         if (content) {
@@ -32585,68 +34217,65 @@ Ext.define('Siesta.Harness.Browser.UI.DomContainer', {
         }
     },
 
+    
     clearHighlight : function () {
         this.stopInspection();
     },
 
+    
     findComponentByTarget : function (t) {
-        var test = this.test;
-        var Ext = test.getExt();
+        var test    = this.test;
+        var Ext     = test.getExt();
         var testDoc = test.global.document;
         var cmp;
 
         // Handle potentially having another Ext copy loaded in another frame
         if (t.ownerDocument !== testDoc) {
-            var innerFrame = (t.ownerDocument.parentWindow || t.ownerDocument.defaultView).frameElement;
-            Ext = innerFrame.contentWindow.Ext;
+            var innerFrame  = (t.ownerDocument.parentWindow || t.ownerDocument.defaultView).frameElement;
+            Ext             = innerFrame.contentWindow.Ext;
         }
 
         while (!cmp && t && t.nodeName !== 'BODY') {
-            cmp = Ext.getCmp(t.id);
-            t = t.parentNode;
+            cmp     = Ext.getCmp(t.id);
+            t       = t.parentNode;
         }
 
         return cmp;
     },
 
+    
     getOffsets : function (node) {
-        var testDoc = this.test.global.document;
-        var offsets = [0, 0];
+        var testDoc     = this.test.global.document;
+        var offsets     = [ 0, 0 ];
 
         if (node.ownerDocument !== testDoc) {
-            var innerFrame = (node.ownerDocument.parentWindow || node.ownerDocument.defaultView).frameElement;
+            var innerFrame  = (node.ownerDocument.parentWindow || node.ownerDocument.defaultView).frameElement;
 
-            offsets = Ext.fly(innerFrame).getXY();
-            offsets[0] -= node.ownerDocument.body.scrollLeft;
-            offsets[1] -= node.ownerDocument.body.scrollTop;
+            offsets         = Ext.fly(innerFrame).getXY();
+            offsets[ 0 ]    -= node.ownerDocument.body.scrollLeft;
+            offsets[ 1 ]    -= node.ownerDocument.body.scrollTop;
         }
 
         return offsets;
     },
+    
 
     findExtAncestorClassName : function (cmp) {
         while (cmp) {
-            var name = Ext.ClassManager.getName(cmp);
-            if (name.match(/^Ext./)) {
-                return name;
-            }
+            var name    = Ext.ClassManager.getName(cmp);
+            
+            if (name.match(/^Ext./)) return name;
 
-            cmp = cmp.superclass;
+            cmp         = cmp.superclass;
         }
 
         return '';
-    },
+    }
 
     // END Inspection related code
     // -----------------------------
-
-    onDestroy : function() {
-        Ext.destroy(this.boxIndicator);
-        this.boxIndicator = null;
-
-        this.callParent(arguments);
-    }
 });;
+// Internal class visualizing the cursor position, only used in good browsers (!== IE)
 Ext.define('Siesta.Harness.Browser.UI.MouseVisualizer', {
 
     cursorEl                    : null,
@@ -32911,7 +34540,7 @@ Ext.define('Siesta.Harness.Browser.UI.AssertionGrid', {
 
     initComponent : function() {
         var me = this;
-        
+
         this.testListeners  = []
         
         if (!this.store) this.store = new Siesta.Harness.Browser.Model.AssertionTreeStore({
@@ -32940,9 +34569,8 @@ Ext.define('Siesta.Harness.Browser.UI.AssertionGrid', {
                     },
                     getAnnotation : function (data) {
                         var annotation = data.result.annotation
-                        
                         if (annotation) {
-                            return '<pre style="margin-left:' + data.depth * 16 + 'px" class="tr-assert-row-annontation">' + Ext.String.htmlEncode(annotation) + '</pre>'
+                            return '<pre title="' + annotation.replace(/"/g, "'") +'" style="margin-left:' + data.depth * 16 + 'px" class="tr-assert-row-annontation">' + Ext.String.htmlEncode(annotation) + '</pre>'
                         } else
                             return '';
                     }
@@ -32981,8 +34609,8 @@ Ext.define('Siesta.Harness.Browser.UI.AssertionGrid', {
                     var val             = Ext.tree.View.prototype.onAdd.apply(this, arguments);
                     this.refreshSize    = Ext.tree.View.prototype.refreshSize;
                     
-                    // Scroll to bottom
-                    if (me.autoScrollToBottom) {
+                    // Scroll to bottom when test is running
+                    if (!me.test.isFinished() && me.autoScrollToBottom) {
                         var el          = this.getEl().dom;
                         el.scrollTop    = el.scrollHeight;
                     }
@@ -33067,36 +34695,36 @@ Ext.define('Siesta.Harness.Browser.UI.AssertionGrid', {
         
         Ext.suspendLayouts()
 
-        if (assertionsStore) 
+        if (assertionsStore)
             this.reconfigure(assertionsStore)
         else
             this.store.removeAll()
-            
+
         Ext.resumeLayouts()
     },
 
-    
+
     onTestUpdate : function (event, test, result, parentResult) {
         this.processNewResult(this.store, test, result, parentResult)
     },
-    
-    
-    // is bubbling and thus triggered for all tests (including sub-tests) 
+
+
+    // is bubbling and thus triggered for all tests (including sub-tests)
     onEveryTestEnd : function (event, test) {
         this.processEveryTestEnd(this.store, test)
     },
-          
-    
+
+
     resultRenderer : function (value, metaData, record, rowIndex, colIndex, store) {
         return this.resultTpl.apply(record.data);
     },
-    
-    
+
+
     bindStore : function (treeStore, isInitial, prop) {
         this.callParent(arguments)
-        
+
         this.store    = treeStore;
-        
+
         if (treeStore && treeStore.nodeStore) {
             this.getView().dataSource   = treeStore.nodeStore
             // passing the tree store instance to the underlying `filterabletreeview`
@@ -33104,29 +34732,23 @@ Ext.define('Siesta.Harness.Browser.UI.AssertionGrid', {
             this.getView().bindStore(treeStore, isInitial, prop)
         }
     },
-    
-    
+
+
     destroy : function () {
         Joose.A.each(this.testListeners, function (listener) { listener.remove() })
-        
+
         this.testListeners  = []
-        
+
         this.test           = null
-        
+
         this.callParent(arguments)
     },
-    
+
     
     clear : function () {
-        Ext.suspendLayouts()
-        
-        this.store.removeAll();
-
-        this.getView().getEl().update('<div class="assertiongrid-initializing">Initializing test...</div>');
-        
-        Ext.resumeLayouts(true)
+        this.getView().getEl().update('<div class="assertiongrid-initializing">' + Siesta.Resource('Siesta.Harness.Browser.UI.AssertionGrid', 'initializingText') + '</div>');
     }
-    
+
 })
 ;
 Ext.define('Siesta.Harness.Browser.UI.TreeColumn', {
@@ -33220,18 +34842,17 @@ Ext.define('Siesta.Harness.Browser.UI.TestGrid', {
     ],
 
     // TODO seems there's 4.2.0 bug related to stateful
-    stateful    : false,
-    forceFit    : true,
-    rootVisible : false,
-    header      : false,
-    rowLines    : false,
+    stateful            : false,
+    forceFit            : true,
+    rootVisible         : false,
+    header              : false,
+    rowLines            : false,
 
     cls                 : 'tr-testgrid',
     width               : 300,
     lines               : false,
     filter              : null,
     enableColumnMove    : false,
-    title               : 'Double click a test to run it',
     filterGroups        : false,
     viewType            : 'filterabletreeview',
     resultSummary       : null,
@@ -33239,14 +34860,14 @@ Ext.define('Siesta.Harness.Browser.UI.TestGrid', {
     stateConfig         : null,
     
     expanded            : true,
-    coverageReportButton    : null,
-
+    coverageReportButton: null,
 
     initComponent : function () {
         var me = this;
-
+        var R = Siesta.Resource('Siesta.Harness.Browser.UI.TestGrid');
+        
         Ext.apply(this, {
-
+            title      : R.get('title'),
             viewConfig : {
                 store               : this.store.nodeStore,
                 enableTextSelection : true,
@@ -33267,7 +34888,7 @@ Ext.define('Siesta.Harness.Browser.UI.TestGrid', {
             columns : [
                 {
                     xtype    : 'treecolumn',
-                    header   : 'Name',
+                    header   : R.get('nameText'),
                     sortable : false,
 
                     dataIndex    : 'title',
@@ -33277,8 +34898,8 @@ Ext.define('Siesta.Harness.Browser.UI.TestGrid', {
                     tdCls        : 'test-name-column',
                     scope        : this
                 },
-                { header : 'Pass', width : 30, sortable : false, tdCls : 'x-unselectable', menuDisabled : true, dataIndex : 'passCount', align : 'center', renderer : this.passedColumnRenderer, scope : this },
-                { header : 'Fail', width : 30, sortable : false, tdCls : 'x-unselectable', menuDisabled : true, dataIndex : 'failCount', align : 'center', renderer : this.failedColumnRenderer, scope : this }
+                { header : R.get('passText'), width : 30, sortable : false, tdCls : 'x-unselectable', menuDisabled : true, dataIndex : 'passCount', align : 'center', renderer : this.passedColumnRenderer, scope : this },
+                { header : R.get('failText'), width : 30, sortable : false, tdCls : 'x-unselectable', menuDisabled : true, dataIndex : 'failCount', align : 'center', renderer : this.failedColumnRenderer, scope : this }
 //                { header : 'Time', width : 50, sortable : false, dataIndex : 'time', align : 'center', hidden : true }
             ],
 
@@ -33289,7 +34910,7 @@ Ext.define('Siesta.Harness.Browser.UI.TestGrid', {
                 items  : [
                     {
                         xtype           : 'treefilter',
-                        emptyText       : 'Filter tests',
+                        emptyText       : R.get('filterTestsText'),
                         
                         itemId          : 'trigger',
                         filterGroups    : this.filterGroups,
@@ -33302,18 +34923,20 @@ Ext.define('Siesta.Harness.Browser.UI.TestGrid', {
                         cls             : 'filterfield',
                         height          : 30,
                         flex            : 1,
+                        
+                        tipText         : R.get('filterFieldTooltip'),
 
                         trigger1Cls     : 'icon-close',
                         triggerLeafCls  : 'icon-file-2',
                         triggerGroupCls : 'icon-folder'
                     },
                     {
-                        width       : 14,
-                        cls         : 'toggle-expand',
-                        tooltip     : 'Expand / Collapse all',
-                        tooltipType : 'title',
-                        scope       : this,
-                        margin      : '0 0 0 1',
+                        width           : 14,
+                        cls             : 'toggle-expand',
+                        tooltip         : R.get('expandCollapseAllText'),
+                        tooltipType     : 'title',
+                        scope           : this,
+                        margin          : '0 0 0 1',
 
                         handler : function () {
                             this.expanded = !this.expanded;
@@ -33347,28 +34970,28 @@ Ext.define('Siesta.Harness.Browser.UI.TestGrid', {
                             {
                                 cls        : 'tr-icon-run-checked',
                                 iconCls    : 'icon-play',
-                                tooltip    : 'Run checked',
+                                tooltip    : R.get('runCheckedText'),
                                 actionName : 'run-checked',
                                 scope      : this,
                                 handler    : this.onBtnClicked
                             },
                             {
                                 iconCls    : 'icon-forward tr-icon-run-all',
-                                tooltip    : 'Run all',
+                                tooltip    : R.get('runAllText'),
                                 actionName : 'run-all',
                                 scope      : this,
                                 handler    : this.onBtnClicked
                             },
                             {
                                 iconCls    : 'icon-play tr-icon-run-failed',
-                                tooltip    : 'Run failed',
+                                tooltip    : R.get('runFailedText'),
                                 actionName : 'run-failed',
                                 scope      : this,
                                 handler    : this.onBtnClicked
                             },
                             '->',
                             {
-                                tooltip         : 'Show coverage report',
+                                tooltip         : R.get('showCoverageReportText'),
                                 action          : 'show-coverage',
                                 iconCls         : 'icon-book',
                                 width           : 24,
@@ -33377,7 +35000,7 @@ Ext.define('Siesta.Harness.Browser.UI.TestGrid', {
                                 handler         : this.onShowCoverageReport
                             },
                             {
-                                tooltip : 'Options...',
+                                tooltip : R.get('optionsText'),
                                 cls     : 'tr-icon-options',
                                 iconCls : 'icon-cog',
                                 width   : 38,
@@ -33486,7 +35109,8 @@ Ext.define('Siesta.Harness.Browser.UI.TestGrid', {
                     cls = 'icon-file-2'
             }
         } else {
-            cls = (testFile.data.expanded ? 'icon-folder-open' : 'icon-folder') + ' tr-folder-' + testFile.get('folderStatus')
+            var status = testFile.get('folderStatus');
+            cls = (testFile.data.expanded ? 'icon-folder-open' : 'icon-folder') + (status == 'working' ? ' icon-busy ' : '') + ' tr-folder-' + status
         }
         return '<span class="test-icon ' + cls + '"></span>' + value;
     },
@@ -33496,7 +35120,7 @@ Ext.define('Siesta.Harness.Browser.UI.TestGrid', {
         if (!record.isLeaf()) return ''
 
         if (record.data.todoPassCount > 0) {
-            value += ' <span title="' + record.data.todoPassCount + ' todo assertion(s) passed" class="tr-test-todo tr-test-todo-pass">+ ' + record.data.todoPassCount + '</span>';
+            value += ' <span title="' + record.data.todoPassCount + ' ' + Siesta.Resource('Siesta.Harness.Browser.UI.TestGrid', 'todoPassedText') + '" class="tr-test-todo tr-test-todo-pass">+ ' + record.data.todoPassCount + '</span>';
         }
         return value;
     },
@@ -33506,7 +35130,7 @@ Ext.define('Siesta.Harness.Browser.UI.TestGrid', {
         if (!record.isLeaf()) return ''
 
         if (record.data.todoFailCount > 0) {
-            value += ' <span title="' + record.data.todoFailCount + ' todo assertion(s) failed" class="tr-test-todo tr-test-todo-fail">+ ' + record.data.todoFailCount + '</span>';
+            value += ' <span title="' + record.data.todoFailCount + ' ' + Siesta.Resource('Siesta.Harness.Browser.UI.TestGrid', 'todoFailedText') + '" class="tr-test-todo tr-test-todo-fail">+ ' + record.data.todoFailCount + '</span>';
         }
         return value;
     },
@@ -33528,53 +35152,59 @@ Ext.define('Siesta.Harness.Browser.UI.TestGrid', {
     // Add menu items lazily
     addMenuItems   : function () {
         var state = this.stateConfig;
+        var R = Siesta.Resource('Siesta.Harness.Browser.UI.TestGrid');
 
         this.down('#tool-menu').add([
             {
-                text    : 'View DOM',
+                text    : R.get('viewDomText'),
                 option  : 'viewDOM',
                 checked : state.viewDOM
             },
             {
-                text    : 'Transparent exceptions',
+                text    : R.get('transparentExText'),
                 option  : 'transparentEx',
                 checked : state.transparentEx
             },
             {
-                text    : 'Cache preloads',
+                text    : R.get('cachePreloadsText'),
                 option  : 'cachePreload',
                 checked : state.cachePreload
             },
             {
-                text    : 'Auto launch',
+                text    : R.get('autoLaunchText'),
                 option  : 'autoRun',
                 checked : state.autoRun
             },
             {
-                text    : 'Keep results',
+                text    : R.get('keepResultsText'),
                 option  : 'keepResults',
                 checked : state.keepResults
             },
             {
-                text    : 'Speed run',
+                text    : R.get('speedRunText'),
                 option  : 'speedRun',
                 checked : state.speedRun
             },
             {
-                text    : 'Break on fail',
+                text    : R.get('breakOnFailText'),
                 option  : 'breakOnFail',
                 checked : state.breakOnFail
             },
+            {
+                text    : R.get('debuggerOnFailText'),
+                option  : 'debuggerOnFail',
+                checked : state.debuggerOnFail
+            },
             { xtype : 'menuseparator' },
             {
-                text    : 'About Siesta',
+                text    : R.get('aboutText'),
                 handler : function () {
                     new Siesta.Harness.Browser.UI.AboutWindow().show();
                 }
             },
             {
-                text       : 'Siesta Documentation',
-                href       : 'http://bryntum.com/docs/siesta',
+                text       : R.get('documentationText'),
+                href       : R.get('siestaDocsUrl'),
                 hrefTarget : '_blank'
             }
         ]);
@@ -33640,10 +35270,10 @@ Ext.define('Siesta.Harness.Browser.UI.ResultPanel', {
     filterButton            : null,
     inspectionButton        : null,
     recorderPanel           : null,
-    
 
     initComponent : function () {
         var me = this;
+        var R = Siesta.Resource('Siesta.Harness.Browser.UI.ResultPanel');
 
         this.addEvents('viewdomchange');
 
@@ -33686,7 +35316,7 @@ Ext.define('Siesta.Harness.Browser.UI.ResultPanel', {
                                 },
                                 items    : !this.showToolbar ? null : [
                                     {
-                                        text    : 'Re-run test',
+                                        text    : R.get('rerunText'),
                                         height  : 28,
                                         margin  : '0 5 0 10',
                                         cls     : 'green-button',
@@ -33696,14 +35326,14 @@ Ext.define('Siesta.Harness.Browser.UI.ResultPanel', {
                                     '->',
 
                                     {
-                                        tooltip : 'Toggle DOM visible',
+                                        tooltip : R.get('toggleDomVisibleText'),
                                         iconCls : 'icon-screen',
                                         handler : function (btn) {
                                             this.setViewDOM(!this.viewDOM);
                                         }
                                     },
                                     this.sourceButton = new Ext.Button({
-                                        tooltip      : 'View source',
+                                        tooltip      : R.get('viewSourceText'),
                                         action       : 'view-source',
                                         iconCls      : 'icon-file',
                                         tooltipType  : 'title',
@@ -33717,7 +35347,7 @@ Ext.define('Siesta.Harness.Browser.UI.ResultPanel', {
                                         }
                                     }),
                                     this.filterButton = new Ext.Button({
-                                        tooltip     : 'Show only failed',
+                                        tooltip     : R.get('showFailedOnlyText'),
                                         iconCls     : 'icon-bug',
                                         tooltipType : 'title',
 
@@ -33726,7 +35356,7 @@ Ext.define('Siesta.Harness.Browser.UI.ResultPanel', {
                                     }),
                                     this.inspectionButton = new Ext.Button({
                                         iconCls      : 'icon-search',
-                                        tooltip      : 'Toggle Ext Dom Inspector',
+                                        tooltip      : R.get('domInspectorText'),
                                         tooltipType  : 'title',
                                         handler      : this.toggleInspectionMode,
                                         enableToggle : true
@@ -33736,7 +35366,7 @@ Ext.define('Siesta.Harness.Browser.UI.ResultPanel', {
                                         iconCls  : 'icon-camera',
                                         action   : 'show-recorder',
                                         disabled : !Siesta.Recorder || Ext.isIE9m,
-                                        tooltip  : 'Event Recorder',
+                                        tooltip  : R.get('eventRecorderText'),
                                         handler  : this.onRecorderClick
                                     }
                                 ]
@@ -33757,7 +35387,7 @@ Ext.define('Siesta.Harness.Browser.UI.ResultPanel', {
                                         floating        : true,
                                         width           : 80,
                                         style           : 'z-index:2;left:auto !important;right:20px !important;top:5px !important;',
-                                        text            : 'Close',
+                                        text            : Siesta.Resource('Siesta.Harness.Browser.UI.ResultPanel', 'closeText'),
                                         handler         : function (btn) {
                                             me.hideSource();
                                         }
@@ -33914,7 +35544,6 @@ Ext.define('Siesta.Harness.Browser.UI.ResultPanel', {
 
 
     showTest : function (test, assertionsStore) {
-
         var recorder = this.slots.recorderPanel;
 
         this.slots.source.__filled__ = false;
@@ -33992,21 +35621,22 @@ Ext.define('Siesta.Harness.Browser.UI.ResultPanel', {
         }
     },
 
+    
     toggleInspectionMode : function (btn) {
         this.slots.domContainer.toggleInspectionMode(btn.pressed);
     },
+    
 
     onRecorderClick : function () {
-
         var cardContainer = this.slots.cardContainer
 
         if (!this.recorderPanel) {
-            this.recorderPanel = new Siesta.Recorder.RecorderPanel({
+            this.recorderPanel = new Siesta.Recorder.UI.RecorderPanel({
                 slot        : 'recorderPanel',
                 harness     : this.harness,
                 domContainer: this.slots.domContainer,
                 closeButton : {
-                    text    : 'Close',
+                    text    : Siesta.Resource('Siesta.Harness.Browser.UI.ResultPanel', 'closeText'),
                     handler : function () {
                         cardContainer.layout.setActiveItem(0);
                     }
@@ -34035,8 +35665,8 @@ Ext.dd.DragTracker.override({
 });;
 Ext.define('Siesta.Harness.Browser.UI.AboutWindow', {
     extend      : 'Ext.Window',
+
     id          : 'aboutwindow',
-    title       : 'ABOUT SIESTA (v.' + (Siesta.meta.VERSION || '1.0.0') + ')',
     bodyPadding : 20,
     modal       : true,
     width       : 500,
@@ -34045,52 +35675,49 @@ Ext.define('Siesta.Harness.Browser.UI.AboutWindow', {
     bodyStyle   : 'background: #fff',
     autoScroll  : true,
 
-    html : '<img height="35" src="http://www.bryntum.com/bryntum-logo.png"/>\
-         <p>Siesta is a JavaScript unit and functional test tool made by <a target="_blank" href="http://www.bryntum.com">Bryntum</a>. You can test any web page or JavaScript code, including Ext JS, jQuery or NodeJS. \
-         \Siesta comes in two versions: <strong>Lite</strong> and <strong>Standard</strong>. With Lite, you can launch your tests in the browser UI. \
-         \With the Standard version, you can also automate your tests and use the automation scripts together with tools like PhantomJS or Selenium WebDriver. </p>\
-         Siesta would not be possible without these awesome products & libraries: <br>\
-                 \<ul style="padding:0 0 0 30px">\
-                 \  <li><a href="http://sencha.com/extjs">Ext JS</a></li> \
-                 \  <li><a href="http://jquery.com">jQuery</a></li> \
-                 \  <li><a href="http://http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></li> \
-                 \  <li><a href="http://joose.it/">Joose</a></li> \
-                 \  <li><a href="https://github.com/gotwarlost/istanbul">Istanbul</a></li> \
-                </ul>',
+    initComponent : function() {
 
-    buttons : {
-        padding : '10 13',
-        style   : 'background: transparent',
+        this.title = Siesta.Resource('Siesta.Harness.Browser.UI.AboutWindow', 'titleText').replace('{VERSION}', Siesta.meta.VERSION || '1.0.0');
+        this.html = Siesta.Resource('Siesta.Harness.Browser.UI.AboutWindow', 'bodyText');
 
-        items : [
-            {
-                hidden  : !Siesta.Harness.Browser.Automation,
-                text    : 'Upgrade to Siesta Standard',
-                handler : function () {
-                    window.open('http://bryntum.com/store/siesta');
+        this.buttons = {
+            padding : '10 13',
+            style   : 'background: transparent',
+
+            items   : [
+                {
+                    hidden  : !Siesta.Harness.Browser.Automation,
+                    text    : Siesta.Resource('Siesta.Harness.Browser.UI.AboutWindow', 'upgradeText'),
+                    handler : function () {
+                        window.open('http://bryntum.com/store/siesta');
+                    }
+                },
+                {
+                    text    : Siesta.Resource('Siesta.Harness.Browser.UI.AboutWindow', 'closeText'),
+                    handler : function () {
+                        this.up('window').close();
+                    }
                 }
-            },
-            {
-                text    : 'Close',
-                handler : function () {
-                    this.up('window').close();
-                }
-            }
-        ]
+            ]
+        };
+
+        this.callParent(arguments);
     }
-});;
+});
+
+;
 Ext.define('Siesta.Harness.Browser.UI.VersionChecker', {
-    extend      : 'Ext.AbstractPlugin',
+    extend                  : 'Ext.AbstractPlugin',
 
-    renderTo    : null,
+    renderTo                : null,
 
-    init : function(viewport) {
-        if (Siesta.meta.VERSION) {
+    init                    : function(viewport) {
+        if (Siesta.meta.VERSION && !window.location.href.match('^https')) {
             viewport.on('render', this.onViewportRender, this, { delay : 3000 });
         }
     },
 
-    onViewportRender : function() {
+    onViewportRender        : function() {
 
         Ext.data.JsonP.request({
             url         : 'http://bryntum.com/siesta_version',
@@ -34100,7 +35727,7 @@ Ext.define('Siesta.Harness.Browser.UI.VersionChecker', {
         });
     },
 
-    onRequestCompleted : function(success, data) {
+    onRequestCompleted       : function(success, data) {
         if (success &&
             data &&
             data.name &&
@@ -34109,7 +35736,7 @@ Ext.define('Siesta.Harness.Browser.UI.VersionChecker', {
             var btn = new Ext.Button({
                 renderTo    : this.renderTo,
                 style       : 'opacity:0;transition:opacity 1s;',
-                text        : 'New Update Available...',
+                text        : Siesta.Resource('Siesta.Harness.Browser.UI.VersionChecker', 'newUpdateText'),
                 cls         : 'light-button',
                 action      : 'upgrade-siesta',
                 handler     : function() { this.showWindow(data.name) },
@@ -34123,9 +35750,12 @@ Ext.define('Siesta.Harness.Browser.UI.VersionChecker', {
     },
 
     showWindow : function (latestVersion) {
+        var me = this;
+        var R = Siesta.Resource('Siesta.Harness.Browser.UI.VersionChecker');
+
         var win = new Ext.Window({
             cls         : 'changelog-window',
-            title       : 'New version available for download! Current version: ' + (Siesta.meta.VERSION || '1.0.0'),
+            title       : R.get('updateWindowTitleText') + (Siesta.meta.VERSION || '1.0.0'),
             bodyPadding : 5,
             modal       : true,
             width       : 500,
@@ -34143,26 +35773,26 @@ Ext.define('Siesta.Harness.Browser.UI.VersionChecker', {
                         href        : 'http://www.bryntum.com/products/siesta/download-lite',
                         hrefTarget  : '_blank',
                         scale       : 'medium',
-                        text        : 'Download v' + latestVersion + ' (Lite)'
+                        text        : R.get('downloadText') + latestVersion + R.get('liteText')
                     },
                     {
                         cls         : 'light-button',
                         href        : 'http://bryntum.com/customerzone',
                         hrefTarget  : '_blank',
                         scale       : 'medium',
-                        text        : 'Download v' + latestVersion + ' (Standard)'
+                        text        : R.get('downloadText') + latestVersion + R.get('standardText')
                     },
                     {
-                        text    : 'Cancel',
+                        text        : R.get('cancelText'),
                         scale       : 'medium',
-                        handler : function() { this.up('window').close(); }
+                        handler     : function() { this.up('window').close(); }
                     }
                 ]
             }
         })
 
         win.show();
-        win.body.mask('Loading changelog...');
+        win.body.mask(R.get('loadingChangelogText'));
         Ext.data.Connection.prototype.useDefaultXhrHeader = false;
 
         Ext.Ajax.request({
@@ -34173,7 +35803,7 @@ Ext.define('Siesta.Harness.Browser.UI.VersionChecker', {
                 if (success && response && response.responseText) {
                     win.body.update(response.responseText);
                 } else {
-                    win.body.update('Bummer! Failed to fetch changelog.');
+                    win.body.update(Siesta.Resource('Siesta.Harness.Browser.UI.ResultPanel', 'changelogLoadFailedText'));
                 }
             }
         })
@@ -34224,10 +35854,12 @@ Ext.define('Siesta.Harness.Browser.UI.Viewport', {
     collapsedNodes  : null,
 
     initComponent : function () {
+        Ext.getBody().addCls('siesta')
+        
         Ext.state.Manager.setProvider(Ext.supports.LocalStorage ? new Ext.state.LocalStorageProvider() : new Ext.state.CookieProvider())
 
         this.selection      = {}
-    
+
         if (this.harness.stateful) this.applyState(this.loadState())
 
         var testsStore      = this.testsStore = new Siesta.Harness.Browser.Model.FilterableTreeStore({
@@ -34388,6 +36020,12 @@ Ext.define('Siesta.Harness.Browser.UI.Viewport', {
         this.harness.on('hassomecoverageinfo', this.onHasSomeCoverageInfo, this)
         this.harness.on('nocoverageinfo', this.onNoCoverageInfo, this)
         this.harness.on('testsuitelaunch', this.onTestSuiteLaunch, this)
+
+        if (window.location.href.match('^file:///')) {
+            var R = Siesta.Resource('Siesta.Harness.Browser.UI.Viewport');
+
+            Ext.Msg.alert(R.get('httpWarningTitle'), R.get('httpWarningDesc'))
+        }
     },
 
     
@@ -34854,6 +36492,7 @@ Ext.define('Siesta.Harness.Browser.UI.Viewport', {
             cachePreload    : this.getOption('cachePreload'),
             transparentEx   : this.getOption('transparentEx'),
             breakOnFail     : this.getOption('breakOnFail'),
+            debuggerOnFail  : this.getOption('debuggerOnFail'),
         
             // UI configs
             selectedURL     : this.selectedURL,
@@ -34953,6 +36592,8 @@ Ext.define('Siesta.Harness.Browser.UI.Viewport', {
     },
     
     buildContextMenu : function () {
+        var R = Siesta.Resource('Siesta.Harness.Browser.UI.Viewport');
+
         return new Ext.menu.Menu({
         
             renderTo    : Ext.getBody(),
@@ -34963,19 +36604,19 @@ Ext.define('Siesta.Harness.Browser.UI.Viewport', {
         
             items       : [
                 {
-                    text        : 'Uncheck others (and check this)',
+                    text        : R.get('uncheckOthersText'),
                     handler     : this.uncheckOthersHandler
                 },
                 {
-                    text        : 'Uncheck all',
+                    text        : R.get('uncheckAllText'),
                     handler     : this.uncheckAllHandler
                 },
                 {
-                    text        : 'Check all',
+                    text        : R.get('checkAllText'),
                     handler     : this.checkAllHandler
                 },
                 {
-                    text        : 'Run this',
+                    text        : R.get('runThisText'),
                     handler     : this.runThisFileHandler
                 }
             ]
@@ -35048,10 +36689,9 @@ Ext.define('Siesta.Harness.Browser.UI.Viewport', {
     
     launchTest : function (testFile) {
         var resultPanel     = this.slots.resultPanel
-        
-        if (testFile.data.leaf && (testFile.get('test') == resultPanel.test || !resultPanel.test)) {
-            // clear the content of the result panel, but only in case we are launching a currently shown test
-            // (we could be also launching some other test)
+
+        // clear the content of the result panel when launching a single test
+        if (testFile.data.leaf) {
             // assertions of the tests being launched will be cleared in the `onTestSuiteStart` method
             resultPanel.clear();
         }
@@ -35117,6 +36757,8 @@ Ext.define('Siesta.Harness.Browser.UI.Viewport', {
     },
 
     afterRender : function() {
+        var R = Siesta.Resource('Siesta.Harness.Browser.UI.Viewport');
+
         this.callParent(arguments);
 
         Ext.getBody().createChild([
@@ -35124,13 +36766,10 @@ Ext.define('Siesta.Harness.Browser.UI.Viewport', {
                 tag     : 'a',
                 cls     : "logo-link",
                 href    : "#",
-                cn      : [{
-                    tag     : 'img',
-                    src     : Ext.BLANK_IMAGE_URL
-                },
+                cn      : [
                 {
                     tag  : 'span',
-                    html : 'v.' + (Siesta.meta.VERSION || "1.0.0"),
+                    html : (Siesta.meta.VERSION || "1.0.0"),
                     cls  : 'tr-version-indicator'
                 },
                 {
@@ -35149,7 +36788,7 @@ Ext.define('Siesta.Harness.Browser.UI.Viewport', {
                     {
                         tag     : 'li',
                         style   : 'margin-top:3px',
-                        html    : '<a href="http://bryntum.com/docs/siesta" target="_blank">API Documentation</a>'
+                        html    : '<a href="' + R.get('apiLinkUrl') + '" target="_blank">' + R.get('apiLinkText') + '</a>'
                     }
                 ]
             },
@@ -35199,6 +36838,12 @@ Ext.define('Siesta.Harness.Browser.UI.Viewport', {
     }
 })
 //eof Siesta.Harness.Browser.UI.Viewport
+
+// Temp hack for Ext 4.2 with IE11
+if (window.Ext && navigator.userAgent.match(/trident/i) && navigator.userAgent.match(/rv.\d\d/)) {
+    Ext.isIE        = true;
+    Ext.ieVersion   = 11;
+}
 ;
 Ext.define('Siesta.Harness.Browser.UI.ExtViewport', {
 

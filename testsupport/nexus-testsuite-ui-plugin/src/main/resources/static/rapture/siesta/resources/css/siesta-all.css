@@ -1,7 +1,7 @@
 /*
 
-Siesta 2.0.5
-Copyright(c) 2009-2013 Bryntum AB
+Siesta 2.0.8
+Copyright(c) 2009-2014 Bryntum AB
 http://bryntum.com/contact
 http://bryntum.com/products/siesta/license
 
@@ -38,11 +38,10 @@ body.x-gecko .x-menu-item-text,
 body.x-gecko .x-toolbar .x-toolbar-item,
 body.x-webkit .x-toolbar .x-toolbar-item,
 body.x-webkit input,
-body.x-gecko input
-{
-    font-size:13px;
-    font-family: 'Source Sans Pro', sans-serif  !important;
-    font: 400 normal 'Source Sans Pro', sans-serif !important;
+body.x-gecko input {
+    font-size   : 13px;
+    font-family : 'Source Sans Pro', sans-serif !important;
+    font        : 400 normal 'Source Sans Pro', sans-serif !important;
 }
 
 .light-button {
@@ -55,9 +54,8 @@ body.x-gecko input
 }
 
 .x-nlg .light-button,
-.x-nlg .green-button
-{
-    background-image: none !important;
+.x-nlg .green-button {
+    background-image : none !important;
 }
 
 .light-button:hover {
@@ -76,39 +74,39 @@ body.x-gecko input
     background-image : linear-gradient(to bottom, e8e8e8, #c6c6c6);
 }
 
-
-.green-button
-{
-    background: #59d152;
-    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #59d152), color-stop(100%, #74a23a));
-    background-image: -webkit-linear-gradient(#59d152, #74a23a);
-    background-image: -moz-linear-gradient(#59d152, #74a23a);
-    background-image: -o-linear-gradient(#59d152, #74a23a);
-    background-image: linear-gradient(#59d152, #74a23a);
-    border: 1px solid #607822;
-    border-radius:2px;
-    box-shadow: 0 3px 1px -2px #94f648 inset;
+.green-button {
+    background-image : -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #59d152), color-stop(100%, #74a23a));
+    background-image : -webkit-linear-gradient(#59d152, #74a23a);
+    background-image : -moz-linear-gradient(#59d152, #74a23a);
+    background-image : -o-linear-gradient(#59d152, #74a23a);
+    background-image : linear-gradient(#59d152, #74a23a);
+    border           : 1px solid #607822;
+    border-radius    : 2px;
+    box-shadow       : 0 3px 1px -2px #94f648 inset;
 }
 
-.green-button .x-btn-inner
-{
-    text-shadow: 0 1px 0 #607822;
-    color: #fff;
+.x-nlg .green-button {
+    background : #59d152;
+    border     : 1px solid #607822 !important;
 }
 
-.green-button:hover
-{
-    background: #77982c;
-    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #59b152), color-stop(100%, #74a23a));
-    background-image: -webkit-linear-gradient(#59b152, #74a23a);
-    background-image: -moz-linear-gradient(#59b152, #74a23a);
-    background-image: -o-linear-gradient(#59b152, #74a23a);
-    background-image: linear-gradient(#59b152, #74a23a);
+.green-button .x-btn-inner {
+    text-shadow : 0 1px 0 #607822;
+    color       : #fff;
+}
+
+.green-button:hover {
+    background       : #77982c;
+    background-image : -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #59b152), color-stop(100%, #74a23a));
+    background-image : -webkit-linear-gradient(#59b152, #74a23a);
+    background-image : -moz-linear-gradient(#59b152, #74a23a);
+    background-image : -o-linear-gradient(#59b152, #74a23a);
+    background-image : linear-gradient(#59b152, #74a23a);
 }
 
 .x-panel,
 .x-tree-panel {
-    border-color     : #999 !important;
+    border-color : #999 !important;
 }
 
 .x-tree-panel .x-grid-header-ct {
@@ -133,7 +131,7 @@ body.x-gecko input
 }
 
 .x-tree-panel .x-grid-row-selected .x-grid-cell,
-.x-grid-cell-selected{
+.x-grid-cell-selected {
     background-color : #ffd0a9 !important;
 }
 
@@ -156,7 +154,6 @@ body.x-gecko input
     margin      : 3px 0;
     white-space : nowrap;
 }
-
 
 .filterfield .x-form-text {
     padding-left : 5px;
@@ -186,6 +183,10 @@ body.x-gecko input
 .filterfield .x-trigger-cell {
     width : 23px !important;
 }
+
+.x-btn-default-toolbar-small-disabled-mc .x-btn-icon-el {
+    color : #666;
+}
 /*
 
 Play icons from:
@@ -195,16 +196,16 @@ License :	Creative Commons Attribution 3.0 License
 
 */
 
-body {
+body.siesta {
     padding-top : 57px !important;
 }
 
-body,
+body.siesta,
 .x-border-layout-ct {
     background-color : rgb(105, 191, 210) !important;
 }
 
-body > .x-splitter {
+body.siesta > .x-splitter {
     background : transparent;
 }
 
@@ -239,8 +240,8 @@ a.logo-link {
     background-size : contain;
 }
 
-.x-ie a.logo-link img {
-    background : transparent url(../images/logo_small3.png) no-repeat 0 0;
+.x-ie9m a.logo-link {
+    background      : transparent url(../images/logo_small3.png) no-repeat 0 0;
 }
 
 .tr-version-indicator {
@@ -248,12 +249,12 @@ a.logo-link {
     color     : #eee;
     font-size : 10px;
     right     : 0 !important;
-    bottom    : -1px !important;
+    bottom    : -4px !important;
     font-size : 9px;
 }
 
-.x-ie9p .tr-version-indicator {
-    bottom : -2px !important;
+.x-ie9m .tr-version-indicator {
+    bottom : -5px !important;
 }
 
 .meta-info {
@@ -360,6 +361,10 @@ a.logo-link {
 
 .testsuite-running .tr-progress-indicator {
     opacity : 1;
+}
+
+.x-ie8m .tr-progress-indicator {
+    display : none;
 }
 
 .right-top-area {
@@ -731,8 +736,8 @@ td.tr-td-vertical-align {
     font-size : 0.6em;
 }
 .resultPanel-panel {
-    margin-top  : -25px;
-    border      : 0 none;
+    margin-top : -25px;
+    border     : 0 none;
 }
 
 .resultPanel-panel .x-panel-body {
@@ -746,8 +751,8 @@ td.tr-td-vertical-align {
     border-bottom           : 0 none;
 }
 
-.siesta-assertion-grid .light-button .x-btn-button{
-    overflow:visible;
+.siesta-assertion-grid .light-button .x-btn-button {
+    overflow : visible;
 }
 
 .resultPanel-panel .resultpanel-toolbar {
@@ -756,17 +761,17 @@ td.tr-td-vertical-align {
 }
 
 .resultpanel-toolbar .light-button {
-    border       : 0 none;
-    background   : none;
-    color        : rgb(7, 89, 133);
+    border     : 0 none;
+    background : none;
+    color      : rgb(7, 89, 133);
 }
 
 .resultpanel-toolbar .light-button:hover {
-    color        : #222;
+    color : #222;
 }
 
 .resultpanel-toolbar .light-button.x-pressed {
-    color        : blue;
+    color : blue;
 }
 
 .resultpanel-toolbar .icon-play {
@@ -811,7 +816,10 @@ td.tr-td-vertical-align {
     border-radius : 3px;
     border        : 1px solid #999;
 }
-/*=======================================================================================================================================================================================================================
+
+.x-ie8m .resultpanel-toolbar .x-btn-icon-el {
+    top : 3px;
+}/*=======================================================================================================================================================================================================================
     Common and unsorted
 */
 
@@ -1965,24 +1973,6 @@ li.L1, li.L3, li.L5, li.L7, li.L9 { background : #eee }
     color       : #555;
 }
 
-.eventview-offsetcolumn > .x-grid-cell-inner {
-    position : relative;
-    color    : #777;
-}
-
-.eventview-clearoffset {
-    position : absolute;
-    width    : 11px;
-    height   : 11px;
-    right    : 4px;
-    top      : 0px;
-    cursor   : pointer;
-}
-
-.x-grid-row-over .eventview-clearoffset {
-    background : transparent url(../images/bullet_delete.png) no-repeat left center !important;
-}
-
 @keyframes blink {
     0% { opacity : 0; }
     100% { opacity : 1; }
@@ -2000,9 +1990,23 @@ li.L1, li.L3, li.L5, li.L7, li.L9 { background : #eee }
     -webkit-animation-timing-function : cubic-bezier(1.0, 0, 0, 1.0);
     -webkit-animation-direction       : alternate;
     animation-direction               : alternate;
+}.eventview-offsetcolumn > .x-grid-cell-inner {
+    position : relative;
+    color    : #777;
 }
 
-.siesta-recorder-codeeditor .CodeMirror {
+.eventview-clearoffset {
+    position : absolute;
+    width    : 11px;
+    height   : 11px;
+    right    : 4px;
+    top      : 0px;
+    cursor   : pointer;
+}
+
+.x-grid-row-over .eventview-clearoffset {
+    background : transparent url(../images/bullet_delete.png) no-repeat left center !important;
+}.siesta-recorder-codeeditor .CodeMirror {
     background-image    : url(../images/ok.png);
     background-repeat   : no-repeat;
     background-position : right top;
