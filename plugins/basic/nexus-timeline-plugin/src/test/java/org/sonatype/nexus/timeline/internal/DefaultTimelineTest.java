@@ -22,7 +22,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
-import org.sonatype.nexus.internal.orient.DatabaseManagerImpl;
+import org.sonatype.nexus.internal.orient.MemoryDatabaseManager;
+import org.sonatype.nexus.internal.orient.OrientBootstrap;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
@@ -41,7 +42,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeZone;
@@ -64,10 +64,6 @@ import static org.mockito.Mockito.when;
 public class DefaultTimelineTest
     extends TestSupport
 {
-  static {
-    OGlobalConfiguration.STORAGE_KEEP_OPEN.setValue(false);
-  }
-
   @Rule
   public TestName testName = new TestName();
 
@@ -77,14 +73,13 @@ public class DefaultTimelineTest
   @Mock
   private EventBus eventBus;
 
+  protected OrientBootstrap orientBootstrap;
+
   private DefaultTimeline defaultNexusTimeline;
 
   @Before
   public void prepare() throws Exception {
     final File timelineWorkdir = util.resolveFile("target/workdir/");
-    // final File timelineWorkdir = util.resolveFile("target/workdir/" + testName.getMethodName());
-    // DirSupport.deleteIfExists(timelineWorkdir.toPath());
-    timelineWorkdir.mkdirs();
     when(applicationDirectories.getWorkDirectory(anyString())).thenReturn(timelineWorkdir);
 
     final Module testModule = new AbstractModule()
@@ -93,13 +88,15 @@ public class DefaultTimelineTest
       protected void configure() {
         bind(EventBus.class).toInstance(eventBus);
         bind(ApplicationDirectories.class).toInstance(applicationDirectories);
-        // TODO: Use in-memory
-        // bind(DatabaseManager.class).to(MemoryDatabaseManager.class);
-        bind(DatabaseManager.class).to(DatabaseManagerImpl.class);
+        bind(DatabaseManager.class).to(MemoryDatabaseManager.class).asEagerSingleton();
         bind(Timeline.class).to(DefaultTimeline.class).asEagerSingleton();
       }
     };
-    final Injector injector = Guice.createInjector(testModule); // , new TimelineModule());
+    final Injector injector = Guice.createInjector(testModule);
+
+    orientBootstrap = new OrientBootstrap(applicationDirectories, false);
+    orientBootstrap.start();
+
     defaultNexusTimeline = (DefaultTimeline) injector.getInstance(Timeline.class);
     defaultNexusTimeline.start();
     defaultNexusTimeline.purgeOlderThan(0);
@@ -108,6 +105,7 @@ public class DefaultTimelineTest
   @After
   public void cleanup() throws Exception {
     defaultNexusTimeline.stop();
+    orientBootstrap.stop();
   }
 
   // ==
