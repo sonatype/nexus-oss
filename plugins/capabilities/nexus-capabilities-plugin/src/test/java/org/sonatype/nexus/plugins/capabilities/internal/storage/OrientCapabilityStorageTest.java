@@ -15,7 +15,8 @@ package org.sonatype.nexus.plugins.capabilities.internal.storage;
 import java.io.File;
 import java.util.Map;
 
-import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.internal.orient.DatabaseManagerImpl;
+import org.sonatype.nexus.internal.orient.HexRecordIdObfuscator;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -29,9 +30,6 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.plugins.capabilities.internal.storage.OrientCapabilityStorage.DB_LOCATION;
 
 /**
  * Tests for {@link OrientCapabilityStorage}.
@@ -43,11 +41,12 @@ public class OrientCapabilityStorageTest
 
   @Before
   public void setUp() throws Exception {
-    ApplicationDirectories applicationDirectories = mock(ApplicationDirectories.class);
     File dir = util.createTempDir("testdb");
-    when(applicationDirectories.getWorkDirectory(DB_LOCATION)).thenReturn(dir);
 
-    this.underTest = new OrientCapabilityStorage(applicationDirectories);
+    // TODO: Replace with in-memory manager impl
+    DatabaseManagerImpl databaseManager = new DatabaseManagerImpl(dir);
+
+    this.underTest = new OrientCapabilityStorage(databaseManager, new HexRecordIdObfuscator());
     underTest.start();
   }
 
