@@ -217,7 +217,6 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
           me.sortNode(node);
           node.cascadeBy(function(child) {
             child.set('inIndex', true);
-            child.set('name'); // this will force name conversion
             if (child.get('processed')) {
               child.set('indexLoaded', true);
             }
@@ -253,7 +252,6 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
               nodeChild = node.appendChild(child);
             }
             nodeChild.set('inStorage', true);
-            nodeChild.set('name'); // this will force name conversion
           });
           me.sortNode(node);
           Ext.resumeLayouts(true);
