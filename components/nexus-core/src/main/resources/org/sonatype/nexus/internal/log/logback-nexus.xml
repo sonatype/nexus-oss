@@ -38,6 +38,10 @@
 
   <appender name="metrics" class="org.sonatype.nexus.pax.logging.InstrumentedAppender"/>
 
+  <logger name="org.apache.aries" level="WARN"/>
+  <logger name="org.apache.felix" level="WARN"/>
+  <logger name="org.apache.karaf" level="WARN"/>
+
   <root level="${root.level}">
     <appender-ref ref="osgi"/>
     <appender-ref ref="console"/>
