@@ -11,21 +11,39 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Browse Managed Repository feature panel.
+ * Browse Standard Repository feature panel.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repositorybrowse.BrowseManagedRepositoryFeature', {
-  extend: 'NX.view.masterdetail.Panel',
-  alias: 'widget.nx-coreui-repositorybrowse-managed-feature',
+Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryFeature', {
+  extend: 'Ext.panel.Panel',
+  alias: 'widget.nx-coreui-repositorybrowse-feature',
 
-  list: 'nx-coreui-repositorybrowse-managed-list',
+  layout: 'border',
 
-  iconName: 'repository-managed',
+  initComponent: function() {
+    var me = this;
 
-  tabs: [
-    { xtype: 'nx-coreui-repositorybrowse-storage', title: 'Storage' },
-    { xtype: 'nx-coreui-repositorybrowse-index', title: 'Index' }
-  ]
+    me.items = [
+      {
+        xtype: 'nx-coreui-repositorybrowse-tree',
+        region: 'center',
+        repositoryStore: me.repositoryStore
+      },
+      {
+        xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
+        region: 'south',
+        split: true,
+        flex: 1,
+        header: false,
+        collapsible: true,
+        collapsed: false,
+        collapseMode: 'mini',
+        hidden: false
+      }
+    ];
+
+    me.callParent(arguments);
+  }
 
 });
