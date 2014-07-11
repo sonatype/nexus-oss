@@ -13,27 +13,16 @@
 package org.sonatype.nexus.orient;
 
 import com.orientechnologies.orient.core.id.ORID;
-import com.orientechnologies.orient.core.id.ORecordId;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
 
 /**
  * {@link ORID} obfuscation helper.
  *
  * @since 3.0
  */
-public class RecordIdObfuscator
+public interface RecordIdObfuscator
 {
-  // TODO: replace with fast encrypt/decrypt
+  String encode(OClass type, ORID rid);
 
-  public static String encode(final ORID rid) {
-    checkNotNull(rid);
-    return Hex.encode(rid.toStream());
-  }
-
-  public static ORID decode(final String encoded) {
-    checkNotNull(encoded);
-    byte[] decoded = Hex.decode(encoded);
-    return new ORecordId().fromStream(decoded);
-  }
+  ORID decode(OClass type, String encoded);
 }

@@ -18,7 +18,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent.Ready;
-import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageConverter;
+import org.sonatype.nexus.plugins.capabilities.internal.storage.LegacyCapabilityStorageConverter;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.OrientCapabilityStorage;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
@@ -46,25 +46,28 @@ public class CapabilityRegistryBooter
 
   private final Provider<OrientCapabilityStorage> capabilityStorageProvider;
 
-  private final Provider<CapabilityStorageConverter> storageConverterProvider;
+  private final Provider<LegacyCapabilityStorageConverter> legacyCapabilityStorageConverterProvider;
 
   @Inject
   public CapabilityRegistryBooter(final EventBus eventBus,
                                   final Provider<DefaultCapabilityRegistry> capabilityRegistryProvider,
                                   final Provider<OrientCapabilityStorage> capabilityStorageProvider,
-                                  final Provider<CapabilityStorageConverter> storageConverterProvider)
+                                  final Provider<LegacyCapabilityStorageConverter> legacyCapabilityStorageConverterProvider)
   {
     this.eventBus = checkNotNull(eventBus);
     this.capabilityRegistryProvider = checkNotNull(capabilityRegistryProvider);
     this.capabilityStorageProvider = checkNotNull(capabilityStorageProvider);
-    this.storageConverterProvider = checkNotNull(storageConverterProvider);
+    this.legacyCapabilityStorageConverterProvider = checkNotNull(legacyCapabilityStorageConverterProvider);
   }
 
   @Subscribe
   public void handle(final NexusInitializedEvent event) {
     try {
       capabilityStorageProvider.get().start();
-      storageConverterProvider.get().convertToKazukiIfNecessary();
+
+      // maybe upgrade from legacy xml configuration
+      legacyCapabilityStorageConverterProvider.get().maybeConvert();
+
       DefaultCapabilityRegistry registry = capabilityRegistryProvider.get();
       registry.load();
 
