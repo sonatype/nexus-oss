@@ -20,6 +20,8 @@ import javax.inject.Named;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.plugins.capabilities.internal.ActivationConditionHandlerFactory;
 import org.sonatype.nexus.plugins.capabilities.internal.ValidityConditionHandlerFactory;
+import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
+import org.sonatype.nexus.plugins.capabilities.internal.storage.XmlCapabilityStorage;
 import org.sonatype.nexus.plugins.capabilities.internal.validator.ValidatorFactory;
 
 import com.google.inject.AbstractModule;
@@ -34,7 +36,7 @@ import io.kazuki.v0.store.lifecycle.LifecycleModule;
 import io.kazuki.v0.store.sequence.SequenceServiceConfiguration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.plugins.capabilities.internal.storage.DefaultCapabilityStorage.CAPABILITY_SCHEMA;
+import static org.sonatype.nexus.plugins.capabilities.internal.storage.KazukiCapabilityStorage.CAPABILITY_SCHEMA;
 
 /**
  * Capabilities plugin Guice module.
@@ -45,9 +47,10 @@ import static org.sonatype.nexus.plugins.capabilities.internal.storage.DefaultCa
 public class GuiceModule
     extends AbstractModule
 {
-
   @Override
   protected void configure() {
+    bind(CapabilityStorage.class).to(XmlCapabilityStorage.class);
+
     install(new FactoryModuleBuilder().build(ActivationConditionHandlerFactory.class));
     install(new FactoryModuleBuilder().build(ValidityConditionHandlerFactory.class));
     install(new FactoryModuleBuilder().build(ValidatorFactory.class));

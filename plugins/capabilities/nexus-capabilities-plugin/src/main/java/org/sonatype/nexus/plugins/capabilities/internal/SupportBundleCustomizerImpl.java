@@ -12,21 +12,17 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.atlas.GeneratedContentSourceSupport;
+import org.sonatype.nexus.atlas.FileContentSourceSupport;
 import org.sonatype.nexus.atlas.SupportBundle;
 import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type;
 import org.sonatype.nexus.atlas.SupportBundleCustomizer;
-import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Writer;
-import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageConverter;
+import org.sonatype.nexus.plugins.capabilities.internal.storage.XmlCapabilityStorage;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -42,11 +38,11 @@ public class SupportBundleCustomizerImpl
     extends ComponentSupport
     implements SupportBundleCustomizer
 {
-  private final CapabilityStorageConverter converter;
+  private final XmlCapabilityStorage capabilityStorage;
 
   @Inject
-  public SupportBundleCustomizerImpl(final CapabilityStorageConverter converter) {
-    this.converter = checkNotNull(converter);
+  public SupportBundleCustomizerImpl(final XmlCapabilityStorage capabilityStorage) {
+    this.capabilityStorage = checkNotNull(capabilityStorage);
   }
 
   /**
@@ -54,17 +50,14 @@ public class SupportBundleCustomizerImpl
    */
   @Override
   public void customize(final SupportBundle supportBundle) {
-    // TODO : replace bellow with direct export from for Kazuki/H2 store
-    // for now we generate an capabilities.xml out of kazuki
-    supportBundle.add(new GeneratedContentSourceSupport(Type.CONFIG, "work/conf/capabilities.xml")
-    {
-      @Override
-      protected void generate(final File file) throws Exception {
-        try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
-          new NexusCapabilitiesConfigurationXpp3Writer().write(out, converter.convertFromKazuki());
-        }
-      }
-    });
-  }
+    File file = capabilityStorage.getConfigurationFile();
+    if (!file.exists()) {
+      log.debug("skipping non-existent file: {}", file);
+    }
 
+    // capabilities.xml
+    supportBundle.add(
+        new FileContentSourceSupport(Type.CONFIG, "work/conf/" + file.getName(), file)
+    );
+  }
 }

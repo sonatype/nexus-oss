@@ -15,8 +15,8 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageConverter;
-import org.sonatype.nexus.plugins.capabilities.internal.storage.DefaultCapabilityStorage;
+import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
+import org.sonatype.nexus.plugins.capabilities.internal.storage.KazukiCapabilityStorageConverter;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -38,15 +38,15 @@ public class CapabilityRegistryBooter
 {
   private final Provider<DefaultCapabilityRegistry> capabilityRegistry;
 
-  private final DefaultCapabilityStorage capabilityStorage;
+  private final Provider<CapabilityStorage> capabilityStorage;
 
-  private final CapabilityStorageConverter storageConverter;
+  private final Provider<KazukiCapabilityStorageConverter> storageConverter;
 
   @Inject
-  public CapabilityRegistryBooter(final Provider<DefaultCapabilityRegistry> capabilityRegistry,
-                                  final DefaultCapabilityStorage capabilityStorage,
-                                  final EventBus eventBus,
-                                  final CapabilityStorageConverter storageConverter)
+  public CapabilityRegistryBooter(final EventBus eventBus,
+                                  final Provider<DefaultCapabilityRegistry> capabilityRegistry,
+                                  final Provider<CapabilityStorage> capabilityStorage,
+                                  final Provider<KazukiCapabilityStorageConverter> storageConverter)
   {
     this.capabilityRegistry = capabilityRegistry;
     this.capabilityStorage = checkNotNull(capabilityStorage);
@@ -57,8 +57,10 @@ public class CapabilityRegistryBooter
   @Subscribe
   public void handle(final NexusInitializedEvent event) {
     try {
-      capabilityStorage.start();
-      storageConverter.convertToKazukiIfNecessary();
+      capabilityStorage.get().start();
+
+      storageConverter.get().maybeConvert();
+
       capabilityRegistry.get().load();
     }
     catch (final Exception e) {
@@ -69,7 +71,7 @@ public class CapabilityRegistryBooter
   @Subscribe
   public void handle(final NexusStoppingEvent event) {
     try {
-      capabilityStorage.stop();
+      capabilityStorage.get().stop();
     }
     catch (final Exception e) {
       throw new RuntimeException("Could not shutdown", e);
