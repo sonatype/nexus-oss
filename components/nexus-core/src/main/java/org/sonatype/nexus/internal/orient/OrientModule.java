@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.internal.orient;
 
+import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
 
 import com.google.inject.AbstractModule;
@@ -26,6 +27,8 @@ public class OrientModule
 {
   @Override
   protected void configure() {
+    bind(DatabaseManager.class).to(DatabaseManagerImpl.class);
+
     // TODO: Change to encrypted impl once we have a performance profile for its usage
     bind(RecordIdObfuscator.class).to(HexRecordIdObfuscator.class);
     //bind(RecordIdObfuscator.class).to(EncryptedRecordIdObfuscator.class);
