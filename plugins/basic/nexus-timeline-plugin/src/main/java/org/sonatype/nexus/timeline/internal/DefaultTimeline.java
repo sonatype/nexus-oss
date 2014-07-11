@@ -132,7 +132,7 @@ public class DefaultTimeline
         type.createProperty(P_TIMESTAMP, OType.LONG);
         type.createProperty(P_TYPE, OType.STRING);
         type.createProperty(P_SUBTYPE, OType.STRING);
-        type.createProperty(P_DATA, OType.EMBEDDEDMAP);
+        type.createProperty(P_DATA, OType.EMBEDDEDMAP, OType.STRING);
         type.createIndex(I_TYPE, INDEX_TYPE.NOTUNIQUE_HASH_INDEX, P_TYPE);
         type.createIndex(I_SUBTYPE, INDEX_TYPE.NOTUNIQUE_HASH_INDEX, P_SUBTYPE);
 
