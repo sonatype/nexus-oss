@@ -44,48 +44,38 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
         ]
       },
       {
-        xtype: 'panel',
+        xtype: 'grid',
         region: 'center',
-        layout: 'border',
-        items: [
+        allowDeselect: true,
+        viewConfig: {
+          emptyText: 'No results',
+          deferEmptyText: false
+        },
+        store: 'SearchResult',
+        columns: [
+          { header: 'Component', dataIndex: 'uri', flex: 1 },
+          { header: 'Version', dataIndex: 'version', flex: 1 },
+          { header: 'Repository', dataIndex: 'repositoryId', flex: 1 }
+        ],
+        dockedItems: [
           {
-            xtype: 'grid',
-
-            region: 'center',
-            collapsible: true,
-            headerPosition: 'left',
-            header: false,
-
-            allowDeselect: true,
-            viewConfig: {
-              emptyText: 'No results',
-              deferEmptyText: false
-            },
+            xtype: 'pagingtoolbar',
             store: 'SearchResult',
-            columns: [
-              { header: 'Component', dataIndex: 'uri', flex: 1 },
-              { header: 'Version', dataIndex: 'version', flex: 1 },
-              { header: 'Repository', dataIndex: 'repositoryId', flex: 1 }
-            ],
-            dockedItems: [
-              {
-                xtype: 'pagingtoolbar',
-                store: 'SearchResult',
-                dock: 'top',
-                displayInfo: true
-              }
-            ]
-          },
-          {
-            xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
-            region: 'east',
-            collapsible: true,
-            split: true,
-            width: '50%',
-            headerPosition: 'right',
-            hidden: true
+            dock: 'top',
+            displayInfo: true
           }
         ]
+      },
+      {
+        xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
+        region: 'south',
+        split: true,
+        flex: 1,
+        header: false,
+        collapsible: true,
+        collapsed: false,
+        collapseMode: 'mini',
+        hidden: true
       }
     ];
 

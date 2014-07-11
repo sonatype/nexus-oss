@@ -67,7 +67,7 @@ public class SiestaLiteUiITSupport
   }
 
   public SiestaLiteUiITSupport(final WebDriverFactory driverFactory) {
-    super("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle");
+    super("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip");
     this.driverFactory = driverFactory;
   }
 

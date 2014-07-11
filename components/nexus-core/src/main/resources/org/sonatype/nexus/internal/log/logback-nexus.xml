@@ -16,6 +16,8 @@
 <included>
   <jmxConfigurator/>
 
+  <appender name="osgi" class="org.ops4j.pax.logging.logback.appender.PaxAppenderDelegate"/>
+
   <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>${appender.pattern}</pattern>
@@ -34,9 +36,14 @@
     </rollingPolicy>
   </appender>
 
-  <appender name="metrics" class="org.sonatype.nexus.bootstrap.log.InstrumentedAppender"/>
+  <appender name="metrics" class="org.sonatype.nexus.pax.logging.InstrumentedAppender"/>
+
+  <logger name="org.apache.aries" level="WARN"/>
+  <logger name="org.apache.felix" level="WARN"/>
+  <logger name="org.apache.karaf" level="WARN"/>
 
   <root level="${root.level}">
+    <appender-ref ref="osgi"/>
     <appender-ref ref="console"/>
     <appender-ref ref="logfile"/>
     <appender-ref ref="metrics"/>
