@@ -10,27 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.internal.orient;
 
-import org.sonatype.nexus.orient.DatabaseManager;
-import org.sonatype.nexus.orient.RecordIdObfuscator;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import com.google.inject.AbstractModule;
+import org.sonatype.nexus.orient.DatabaseManager;
 
 /**
- * Orient module.
+ * In-memory {@link DatabaseManager} implementation.
  *
  * @since 3.0
  */
-public class OrientModule
-  extends AbstractModule
+@Named("memory")
+@Singleton
+public class MemoryDatabaseManager
+    extends DatabaseManagerSupport
 {
   @Override
-  protected void configure() {
-    bind(DatabaseManager.class).to(DatabaseManagerImpl.class);
-
-    // TODO: Change to encrypted impl once we have a performance profile for its usage
-    bind(RecordIdObfuscator.class).to(HexRecordIdObfuscator.class);
-    //bind(RecordIdObfuscator.class).to(EncryptedRecordIdObfuscator.class);
+  protected String connectionUri(final String name) {
+    return "memory:" + name;
   }
 }
