@@ -24,7 +24,42 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
   },
 
   rootVisible: false,
-  displayField: 'name',
+
+  columns: [
+    {
+      xtype: 'treecolumn',
+      text: 'Storage File',
+      flex: 2,
+      sortable: true,
+      dataIndex: 'text'
+    },
+    {
+      xtype: 'nx-iconcolumn',
+      dataIndex: 'inStorage',
+      text: 'Storage',
+      sortable: false,
+      menuDisabled: true,
+      width: 80,
+      iconNamePrefix: 'repositorybrowse-',
+      iconVariant: 'x16',
+      iconName: function(value, meta, record) {
+        return value && record.get('path') !== '/' ? 'inStorage' : undefined;
+      }
+    },
+    {
+      xtype: 'nx-iconcolumn',
+      dataIndex: 'inIndex',
+      text: 'Index',
+      sortable: false,
+      menuDisabled: true,
+      width: 80,
+      iconNamePrefix: 'repositorybrowse-',
+      iconVariant: 'x16',
+      iconName: function(value, meta, record) {
+        return value && record.get('path') !== '/' ? 'inIndex' : undefined;
+      }
+    }
+  ],
 
   /**
    * @override

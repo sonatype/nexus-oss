@@ -42,8 +42,8 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
     me.getApplication().getIconController().addIcons({
       'repository-managed': { file: 'database_yellow.png', variants: ['x16', 'x32'] },
-      'repositorybrowse-inIndex': { file: 'database_yellow.png', variants: ['x16'] },
-      'repositorybrowse-inStorage': { file: 'database.png', variants: ['x16'] },
+      'repositorybrowse-inIndex': { file: 'tick.png', variants: ['x16'] },
+      'repositorybrowse-inStorage': { file: 'tick.png', variants: ['x16'] },
       'repository-item-type-default': { file: 'file_extension_default.png', variants: ['x16', 'x24', 'x32'] },
       'repository-item-type-md5': { file: 'file_extension_checksum.png', variants: ['x16', 'x32'] },
       'repository-item-type-jar': { file: 'file_extension_jar.png', variants: ['x16', 'x32'] },
