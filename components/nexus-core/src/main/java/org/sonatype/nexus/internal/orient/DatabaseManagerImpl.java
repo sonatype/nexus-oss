@@ -49,20 +49,9 @@ import static com.google.common.base.Preconditions.checkState;
 @Named
 @Singleton
 public class DatabaseManagerImpl
-    extends ComponentSupport
-    implements DatabaseManager
+    extends DatabaseManagerSupport
 {
   public static final String WORK_PATH = "db";
-
-  public static final String SYSTEM_USER = "admin";
-
-  public static final String SYSTEM_PASSWORD = "admin";
-
-  public static final int BACKUP_BUFFER_SIZE = 16 * 1024;
-
-  public static final int IMPORT_BUFFER_SIZE = 16 * 1024;
-
-  public static final int BACKUP_COMPRESSION_LEVEL = 9;
 
   private final File databasesDirectory;
 
@@ -86,10 +75,8 @@ public class DatabaseManagerImpl
     return new File(databasesDirectory, name);
   }
 
-  /**
-   * Build connection URI for given named database.  This will create the database directory if needed.
-   */
-  private String connectionUri(final String name) {
+  @Override
+  protected String connectionUri(final String name) {
     try {
       File dir = directory(name);
       DirSupport.mkdir(dir);
@@ -100,153 +87,14 @@ public class DatabaseManagerImpl
     }
   }
 
-  @Override
-  public ODatabaseDocumentTx connect(final String name, final boolean create) {
-    checkNotNull(name);
-
-    String uri = connectionUri(name);
-    ODatabaseDocumentTx db = new ODatabaseDocumentTx(uri);
-
-    if (db.exists()) {
-      db.open(SYSTEM_USER, SYSTEM_PASSWORD);
-      log.debug("Opened database: {} -> {}", name, db);
-    }
-    else {
-      if (create) {
-        db.create();
-        log.debug("Created database: {} -> {}", name, db);
-
-        // Attempt to import previously exported database
-        try {
-          maybeImport(name, db);
-        }
-        catch (IOException e) {
-          throw Throwables.propagate(e);
-        }
-      }
-      else {
-        log.debug("Database does not exist: {}", name);
-      }
-    }
-
-    return db;
-  }
-
-  @Override
-  public ODatabaseDocumentPool pool(final String name) {
-    checkNotNull(name);
-
-    String uri = connectionUri(name);
-    ODatabaseDocumentPool pool = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
-    pool.setName(String.format("%s-database-pool", name));
-    pool.setup(1, 25);
-    log.debug("Created database pool: {} -> {}", name, pool);
-
-    return pool;
-  }
-
-  /**
-   * Helper to log prefixed command output messages.
-   */
-  private class LoggingCommandOutputListener
-      implements OCommandOutputListener
-  {
-    private final String prefix;
-
-    private LoggingCommandOutputListener(final String prefix) {
-      this.prefix = prefix;
-    }
-
-    @Override
-    public void onMessage(final String text) {
-      if (log.isDebugEnabled()) {
-        log.debug("{}: {}", prefix, text.trim());
-      }
-    }
-  }
-
-  @Override
-  public void backup(final String name, final OutputStream output) throws IOException {
-    checkNotNull(name);
-    checkNotNull(output);
-
-    log.debug("Backup database: {}", name);
-
-    try (ODatabaseDocumentTx db = connect(name, false)) {
-      checkState(db.exists(), "Database does not exist: %s", name);
-
-      log.debug("Starting backup");
-      db.backup(output, null, null, new LoggingCommandOutputListener("BACKUP"),
-          BACKUP_COMPRESSION_LEVEL, BACKUP_BUFFER_SIZE);
-      log.debug("Completed backup");
-    }
-  }
-
-  @Override
-  public void restore(final String name, final InputStream input) throws IOException {
-    checkNotNull(name);
-    checkNotNull(input);
-
-    log.debug("Restoring database: {}", name);
-
-    try (ODatabaseDocumentTx db = connect(name, false)) {
-      checkState(!db.exists(), "Database already exists: %s", name);
-      db.create();
-
-      log.debug("Starting restore");
-      db.restore(input, null, null, new LoggingCommandOutputListener("RESTORE"));
-      log.debug("Completed import");
-    }
-  }
-
-  @Override
-  public void export(final String name, final OutputStream output) throws IOException {
-    checkNotNull(name);
-    checkNotNull(output);
-
-    log.debug("Exporting database: {}", name);
-
-    try (ODatabaseDocumentTx db = connect(name, false)) {
-      checkState(db.exists(), "Database does not exist: %s", name);
-
-      log.debug("Starting export");
-      ODatabaseExport exporter = new ODatabaseExport(db, output, new LoggingCommandOutputListener("EXPORT"));
-      exporter.exportDatabase();
-      log.debug("Completed export");
-    }
-  }
-
-  @Override
-  public void import_(final String name, final InputStream input) throws IOException {
-    checkNotNull(name);
-    checkNotNull(input);
-
-    log.debug("Importing database: {}", name);
-
-    try (ODatabaseDocumentTx db = connect(name, false)) {
-      checkState(!db.exists(), "Database already exists: %s", name);
-      db.create();
-
-      import_(db, input);
-    }
-  }
-
-  private void import_(final ODatabaseDocumentTx db, final InputStream input) throws IOException {
-    checkNotNull(input);
-
-    log.debug("Starting import");
-    ODatabaseImport importer = new ODatabaseImport(db, input, new LoggingCommandOutputListener("IMPORT"));
-    importer.importDatabase();
-    log.debug("Completed import");
-  }
-
   /**
    * Maybe import the database if there is an export file in the standard location.
    *
    * @see #EXPORT_FILENAME
    * @see #EXPORT_GZ_FILENAME
    */
-  private void maybeImport(final String name, final ODatabaseDocumentTx db) throws IOException {
+  @Override
+  protected void created(final ODatabaseDocumentTx db, final String name) throws Exception {
     InputStream input = null;
 
     File dir = directory(name);
