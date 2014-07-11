@@ -330,8 +330,13 @@
                 <copy todir="${project.build.directory}/assembly" overwrite="true">
                   <fileset dir="${basedir}/src/main/overlaid-resources" />
                 </copy>
-                <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg"
-                  token=",management" value=",nexus-oss-edition" />
+                <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg">
+                  <!-- trim out various enterprise/deployment features we don't need at the moment -->
+                  <replacefilter token=",region,package,kar,ssh,management" value=",nexus-oss-edition" />
+                  <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.1/xml/features" />
+                  <replacefilter token=",mvn:org.ops4j.pax.web/pax-web-features/3.1.0/xml/features" />
+                  <replacefilter token=",mvn:org.apache.karaf.features/spring/3.0.1/xml/features" />
+                </replace>
                 <replace file="${project.build.directory}/assembly/etc/startup.properties"
                   token="${mvn:pax-logging-service}" value="${mvn:metrics-core} = 8${line.separator}${mvn:metrics-logback} = 8${line.separator}${mvn:pax-logging-metrics} = 8${line.separator}${mvn:pax-logging-logback}" />
                 <move todir="${project.build.directory}/assembly/plugin-repository" flatten="true">
