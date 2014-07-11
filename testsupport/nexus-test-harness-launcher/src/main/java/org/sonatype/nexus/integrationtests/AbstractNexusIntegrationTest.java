@@ -661,14 +661,30 @@ public abstract class AbstractNexusIntegrationTest
 
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
+    long mark = System.currentTimeMillis();
     try {
       getNexusStatusUtil().start(getTestId());
+
+      // booting is now asynchronous, so have to wait for Nexus
+      Thread.sleep(10000);
+      for (int i = 0; i < 100; i++) {
+        try {
+          if (getNexusStatusUtil().isNexusRunning()) {
+            return;
+          }
+        }
+        catch (Exception ignore) {
+          log.debug("Nexus is still booting, retrying...", ignore);
+        }
+        Thread.sleep(1000);
+      }
     }
     catch (Exception e) {
       log.error(e.toString(), e);
       e.printStackTrace();
       throw e;
     }
+    throw new RuntimeException("Nexus did not boot after " + (System.currentTimeMillis() - mark) / 1000 + "s!");
   }
 
   protected static void stopNexus() throws Exception {

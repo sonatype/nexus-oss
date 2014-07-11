@@ -54,7 +54,7 @@ public class SSLMutualTrustIT
   public static Collection<Object[]> data() {
     return firstAvailableTestParameters(
         systemTestParameters(),
-        testParameters($("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle"))
+        testParameters($("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip"))
     ).load();
   }
 

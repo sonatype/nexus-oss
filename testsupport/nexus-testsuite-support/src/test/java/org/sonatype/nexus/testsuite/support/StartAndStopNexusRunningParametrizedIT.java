@@ -53,7 +53,7 @@ public class StartAndStopNexusRunningParametrizedIT
   // @Parameterized.Parameters
   public static Collection<Object[]> hardcodedParameters() {
     return Arrays.asList(new Object[][]{
-        {"org.sonatype.nexus.assemblies:nexus-bundle-template:zip:bundle:${project.version}"},
+        {"org.sonatype.nexus.assemblies:nexus-base-template:zip:${project.version}"},
     });
   }
 
@@ -63,7 +63,7 @@ public class StartAndStopNexusRunningParametrizedIT
     return firstAvailableTestParameters(
         systemTestParameters(),
         testParameters(
-            $("org.sonatype.nexus.assemblies:nexus-bundle-template:zip:bundle:${project.version}")
+            $("org.sonatype.nexus.assemblies:nexus-base-template:zip:${project.version}")
         )
     ).load();
   }

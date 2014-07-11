@@ -251,7 +251,13 @@ public class DefaultLdapContextFactory
   }
 
   public LdapContext getLdapContext(String username, String password, boolean systemContext) throws NamingException {
-    return new InitialLdapContext(getSetupEnvironment(username, password, systemContext), null);
+    ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+      return new InitialLdapContext(getSetupEnvironment(username, password, systemContext), null);
+    } finally {
+      Thread.currentThread().setContextClassLoader(tccl);
+    }
   }
 
   @VisibleForTesting
