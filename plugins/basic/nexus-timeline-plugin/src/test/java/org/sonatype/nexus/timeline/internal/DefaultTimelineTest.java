@@ -22,6 +22,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.internal.orient.DatabaseManagerImpl;
+import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
 import org.sonatype.nexus.timeline.Timeline;
@@ -89,8 +91,11 @@ public class DefaultTimelineTest
     {
       @Override
       protected void configure() {
-        bind(ApplicationDirectories.class).toInstance(applicationDirectories);
         bind(EventBus.class).toInstance(eventBus);
+        bind(ApplicationDirectories.class).toInstance(applicationDirectories);
+        // TODO: Use in-memory
+        // bind(DatabaseManager.class).to(MemoryDatabaseManager.class);
+        bind(DatabaseManager.class).to(DatabaseManagerImpl.class);
         bind(Timeline.class).to(DefaultTimeline.class).asEagerSingleton();
       }
     };

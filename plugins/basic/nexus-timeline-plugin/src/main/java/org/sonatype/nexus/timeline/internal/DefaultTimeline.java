@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.timeline.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.timeline.Entry;
@@ -34,23 +33,19 @@ import org.sonatype.nexus.timeline.TimelineCallback;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
-import com.google.common.collect.Maps;
-
-import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
-import com.orientechnologies.orient.core.metadata.schema.OClassImpl;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.core.metadata.schema.clusterselection.ODefaultClusterSelectionStrategy;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OResultSet;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
@@ -58,6 +53,7 @@ import com.orientechnologies.orient.core.storage.OStorage.CLUSTER_TYPE;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -71,7 +67,7 @@ public class DefaultTimeline
     extends LifecycleSupport
     implements Timeline
 {
-  private static final String DB_LOCATION = "db/timeline";
+  private static final String DB_NAME = "timeline";
 
   @VisibleForTesting
   static final String DB_CLASS = "entryrecord";
@@ -91,14 +87,13 @@ public class DefaultTimeline
 
   private static final String I_SUBTYPE = DB_CLASS + "." + P_SUBTYPE;
 
-  private final File databaseDirectory;
+  private final DatabaseManager databaseManager;
 
   private ODatabaseDocumentPool pool;
 
   @Inject
-  public DefaultTimeline(final EventBus eventBus, final ApplicationDirectories applicationDirectories) {
-    checkNotNull(applicationDirectories);
-    this.databaseDirectory = applicationDirectories.getWorkDirectory(DB_LOCATION);
+  public DefaultTimeline(final EventBus eventBus, final DatabaseManager databaseManager) {
+    this.databaseManager = checkNotNull(databaseManager);
     eventBus.register(this);
   }
 
@@ -128,17 +123,7 @@ public class DefaultTimeline
 
   @Override
   public void doStart() throws Exception {
-    final String dbUri = "plocal:" + databaseDirectory.getAbsolutePath();
-
-    try (ODatabaseDocumentTx db = new ODatabaseDocumentTx(dbUri)) {
-      if (!db.exists()) {
-        db.create();
-        log.info("Created database: {}", databaseDirectory);
-      }
-      else {
-        db.open("admin", "admin");
-        log.info("Opened database: {}", db);
-      }
+    try (ODatabaseDocumentTx db = databaseManager.connect(DB_NAME, true)) {
 
       // entities
       final OSchema schema = db.getMetadata().getSchema();
@@ -148,28 +133,19 @@ public class DefaultTimeline
         type.createProperty(P_TYPE, OType.STRING);
         type.createProperty(P_SUBTYPE, OType.STRING);
         type.createProperty(P_DATA, OType.EMBEDDEDMAP);
-        // TODO: not using indexes as they break with dropped clusters
-        // See https://groups.google.com/forum/#!topic/orient-database/HYMUAaMq4y8
-        // type.createIndex(I_TYPE, INDEX_TYPE.NOTUNIQUE_HASH_INDEX, P_TYPE);
-        // type.createIndex(I_SUBTYPE, INDEX_TYPE.NOTUNIQUE_HASH_INDEX, P_SUBTYPE);
-
-        // make sure cluster selection is set, as we rely on clustering
-        type.setClusterSelection(ODefaultClusterSelectionStrategy.NAME);
+        type.createIndex(I_TYPE, INDEX_TYPE.NOTUNIQUE_HASH_INDEX, P_TYPE);
+        type.createIndex(I_SUBTYPE, INDEX_TYPE.NOTUNIQUE_HASH_INDEX, P_SUBTYPE);
 
         schema.save();
         log.info("Created schema: {}, properties: {}", type, type.properties());
       }
     }
 
-    pool = new ODatabaseDocumentPool(dbUri, "admin", "admin");
-    pool.setName("timeline-database-pool");
-    pool.setup(1, 10);
-    log.info("Created pool: {}", pool);
+    this.pool = databaseManager.pool(DB_NAME);
   }
 
   @Override
   public void doStop() throws Exception {
-    log.info("Closing pool: {}", pool);
     pool.close();
     pool = null;
   }
@@ -350,16 +326,10 @@ public class DefaultTimeline
             OClass type = schema.getClass(DB_CLASS);
             type.removeClusterId(cid);
             schema.save();
-            ((OClassImpl) type).fromStream(); // workaround for OrientDB polymorphicClusterId bug
             db.dropCluster(cid, true);
           }
         }
       }
-      // Not using indexes, as they seems broken with clusters being dropped
-      // See https://groups.google.com/forum/#!topic/orient-database/HYMUAaMq4y8
-      // log.info("Rebuilding indexes...");
-      // db.command(new OCommandSQL("REBUILD INDEX " + I_TYPE)).execute();
-      // db.command(new OCommandSQL("REBUILD INDEX " + I_SUBTYPE)).execute();
     }
   }
 }
