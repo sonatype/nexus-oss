@@ -22,80 +22,90 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.internal.orient.MemoryDatabaseManager;
+import org.sonatype.nexus.internal.orient.OrientBootstrap;
+import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
 import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.nexus.timeline.TimelineCallback;
-import org.sonatype.nexus.timeline.TimelinePlugin;
-import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.Time;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Key;
 import com.google.inject.Module;
-import com.google.inject.name.Names;
-import io.kazuki.v0.store.journal.JournalStore;
-import io.kazuki.v0.store.journal.PartitionInfoSnapshot;
-import io.kazuki.v0.store.keyvalue.KeyValueIterable;
-import org.hamcrest.MatcherAssert;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.mockito.Mock;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 public class DefaultTimelineTest
     extends TestSupport
 {
+  @Rule
+  public TestName testName = new TestName();
+
   @Mock
   private ApplicationDirectories applicationDirectories;
 
   @Mock
   private EventBus eventBus;
 
-  private DefaultTimeline defaultNexusTimeline;
+  protected OrientBootstrap orientBootstrap;
 
-  private JournalStore journalStore;
+  private DefaultTimeline defaultNexusTimeline;
 
   @Before
   public void prepare() throws Exception {
-    final File timelineWorkdir = util.resolveFile("target/workdir");
-    DirSupport.deleteIfExists(timelineWorkdir.toPath());
-    timelineWorkdir.mkdirs();
+    final File timelineWorkdir = util.resolveFile("target/workdir/");
     when(applicationDirectories.getWorkDirectory(anyString())).thenReturn(timelineWorkdir);
 
     final Module testModule = new AbstractModule()
     {
       @Override
       protected void configure() {
-        bind(ApplicationDirectories.class).toInstance(applicationDirectories);
         bind(EventBus.class).toInstance(eventBus);
+        bind(ApplicationDirectories.class).toInstance(applicationDirectories);
+        bind(DatabaseManager.class).to(MemoryDatabaseManager.class).asEagerSingleton();
         bind(Timeline.class).to(DefaultTimeline.class).asEagerSingleton();
       }
     };
-    final Injector injector = Guice.createInjector(testModule, new TimelineModule());
+    final Injector injector = Guice.createInjector(testModule);
+
+    orientBootstrap = new OrientBootstrap(applicationDirectories, false);
+    orientBootstrap.start();
+
     defaultNexusTimeline = (DefaultTimeline) injector.getInstance(Timeline.class);
-    journalStore = injector.getInstance(Key.get(JournalStore.class, Names.named(TimelinePlugin.ARTIFACT_ID)));
     defaultNexusTimeline.start();
+    defaultNexusTimeline.purgeOlderThan(0);
   }
 
   @After
   public void cleanup() throws Exception {
     defaultNexusTimeline.stop();
+    orientBootstrap.stop();
   }
 
   // ==
@@ -190,34 +200,33 @@ public class DefaultTimelineTest
 
   @Test
   public void partitioningByDay() throws Exception {
-    final long now = System.currentTimeMillis();
-    defaultNexusTimeline.add(new EntryRecord(now, "TEST", "1", ImmutableMap.of("day", "1")));
-    defaultNexusTimeline.add(new EntryRecord(now, "TEST", "2", ImmutableMap.of("day", "1")));
-    defaultNexusTimeline.add(new EntryRecord(now + TimeUnit.DAYS.toMillis(1), "TEST", "1",
-        ImmutableMap.of("day", "2")));
-    defaultNexusTimeline.add(new EntryRecord(now + TimeUnit.DAYS.toMillis(1), "TEST", "2",
-        ImmutableMap.of("day", "2")));
-    defaultNexusTimeline.add(new EntryRecord(now + TimeUnit.DAYS.toMillis(2), "TEST", "1",
-        ImmutableMap.of("day", "3")));
-    defaultNexusTimeline.add(new EntryRecord(now + TimeUnit.DAYS.toMillis(2), "TEST", "2",
-        ImmutableMap.of("day", "3")));
+    final long now = new DateMidnight(DateTimeZone.UTC).getMillis();
+    defaultNexusTimeline
+        .add(new EntryRecord(now - TimeUnit.DAYS.toMillis(2), "TEST", "1", ImmutableMap.of("day", "1")));
+    defaultNexusTimeline
+        .add(new EntryRecord(now - TimeUnit.DAYS.toMillis(2), "TEST", "2", ImmutableMap.of("day", "1")));
+    defaultNexusTimeline
+        .add(new EntryRecord(now - TimeUnit.DAYS.toMillis(1), "TEST", "1", ImmutableMap.of("day", "2")));
+    defaultNexusTimeline
+        .add(new EntryRecord(now - TimeUnit.DAYS.toMillis(1), "TEST", "2", ImmutableMap.of("day", "2")));
+    defaultNexusTimeline.add(new EntryRecord(now, "TEST", "1", ImmutableMap.of("day", "3")));
+    defaultNexusTimeline.add(new EntryRecord(now, "TEST", "2", ImmutableMap.of("day", "3")));
 
     List<String> partitionsPostAppend;
     List<String> partitionsPostPurge1;
     List<String> partitionsPostPurge2;
     List<String> partitionsPostPurge3;
-    try (final KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
-      partitionsPostAppend = Lists
-          .newArrayList(Iterables.transform(partitions, new Function<PartitionInfoSnapshot, String>()
-          {
-            @Override
-            public String apply(final PartitionInfoSnapshot input) {
-              return input.getPartitionId();
-            }
-          }));
+    try (ODatabaseDocumentTx db = defaultNexusTimeline.db()) {
+      partitionsPostAppend = Lists.newArrayList(Collections2.filter(db.getClusterNames(), new Predicate<String>()
+      {
+        @Override
+        public boolean apply(String input) {
+          return input.startsWith(DefaultTimeline.DB_CLUSTER_PREFIX);
+        }
+      }));
+      assertThat(db.countClass(DefaultTimeline.DB_CLASS), equalTo(6L));
     }
 
-    assertThat(journalStore.approximateSize(), equalTo(6L));
     defaultNexusTimeline.purgeOlderThan(2);
     // ensure 1st returned entry is the latest (and still exists on timeline)
     defaultNexusTimeline.retrieve(0, 1, null, null, null, new TimelineCallback()
@@ -230,18 +239,17 @@ public class DefaultTimelineTest
       }
     });
 
-    try (final KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
-      partitionsPostPurge1 = Lists
-          .newArrayList(Iterables.transform(partitions, new Function<PartitionInfoSnapshot, String>()
-          {
-            @Override
-            public String apply(final PartitionInfoSnapshot input) {
-              return input.getPartitionId();
-            }
-          }));
+    try (ODatabaseDocumentTx db = defaultNexusTimeline.db()) {
+      partitionsPostPurge1 = Lists.newArrayList(Collections2.filter(db.getClusterNames(), new Predicate<String>()
+      {
+        @Override
+        public boolean apply(String input) {
+          return input.startsWith(DefaultTimeline.DB_CLUSTER_PREFIX);
+        }
+      }));
+      assertThat(db.countClass(DefaultTimeline.DB_CLASS), equalTo(4L));
     }
 
-    assertThat(journalStore.approximateSize(), equalTo(4L));
     defaultNexusTimeline.purgeOlderThan(1);
     // ensure 1st returned entry is the latest (and still exists on timeline)
     defaultNexusTimeline.retrieve(0, 1, null, null, null, new TimelineCallback()
@@ -254,18 +262,17 @@ public class DefaultTimelineTest
       }
     });
 
-    try (final KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
-      partitionsPostPurge2 = Lists
-          .newArrayList(Iterables.transform(partitions, new Function<PartitionInfoSnapshot, String>()
-          {
-            @Override
-            public String apply(final PartitionInfoSnapshot input) {
-              return input.getPartitionId();
-            }
-          }));
+    try (ODatabaseDocumentTx db = defaultNexusTimeline.db()) {
+      partitionsPostPurge2 = Lists.newArrayList(Collections2.filter(db.getClusterNames(), new Predicate<String>()
+      {
+        @Override
+        public boolean apply(String input) {
+          return input.startsWith(DefaultTimeline.DB_CLUSTER_PREFIX);
+        }
+      }));
+      assertThat(db.countClass(DefaultTimeline.DB_CLASS), equalTo(2L));
     }
 
-    assertThat(journalStore.approximateSize(), equalTo(2L));
     defaultNexusTimeline.purgeOlderThan(0);
     // ensure that timeline is empty, callback should not be called
     defaultNexusTimeline.retrieve(0, 1, null, null, null, new TimelineCallback()
@@ -276,18 +283,16 @@ public class DefaultTimelineTest
       }
     });
 
-    try (final KeyValueIterable<PartitionInfoSnapshot> partitions = journalStore.getAllPartitions()) {
-      partitionsPostPurge3 = Lists
-          .newArrayList(Iterables.transform(partitions, new Function<PartitionInfoSnapshot, String>()
-          {
-            @Override
-            public String apply(final PartitionInfoSnapshot input) {
-              return input.getPartitionId();
-            }
-          }));
+    try (ODatabaseDocumentTx db = defaultNexusTimeline.db()) {
+      partitionsPostPurge3 = Lists.newArrayList(Collections2.filter(db.getClusterNames(), new Predicate<String>()
+      {
+        @Override
+        public boolean apply(String input) {
+          return input.startsWith(DefaultTimeline.DB_CLUSTER_PREFIX);
+        }
+      }));
+      assertThat(db.countClass(DefaultTimeline.DB_CLASS), equalTo(0L));
     }
-
-    assertThat(journalStore.approximateSize(), equalTo(0L));
     assertThat(partitionsPostAppend, hasSize(3));
     assertThat(partitionsPostPurge1, hasSize(2));
     assertThat(partitionsPostPurge2, hasSize(1));
@@ -300,8 +305,8 @@ public class DefaultTimelineTest
    * Handy method that does what was done before: keeps all in memory, but this is usable for small amount of data,
    * like these in UT. This should NOT be used in production code, unless you want app that kills itself with OOM.
    */
-  protected List<Entry> asList(int fromItem, int count, Set<String> types, Set<String> subTypes,
-                               Predicate<Entry> filter) throws Exception
+  protected List<Entry> asList(int fromItem, int count, Set<String> types, Set<String> subTypes, Predicate<Entry> filter)
+      throws Exception
   {
     final EntryListCallback result = new EntryListCallback();
     defaultNexusTimeline.retrieve(fromItem, count, types, subTypes, filter, result);
