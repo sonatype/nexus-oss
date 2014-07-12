@@ -38,9 +38,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-capabilities-plugin');
       }
     },
-    'NX.coreui.controller.BrowseIndex',
     'NX.coreui.controller.BrowseRepositories',
-    'NX.coreui.controller.BrowseStorage',
     'NX.coreui.controller.FeatureGroups',
     'NX.coreui.controller.Feeds',
     'NX.coreui.controller.HttpSettings',

@@ -21,6 +21,7 @@ import org.apache.maven.index.ArtifactInfo
 import org.apache.maven.index.IteratorSearchResponse
 import org.apache.maven.index.MAVEN
 import org.apache.maven.index.SearchType
+import org.apache.maven.index.artifact.GavCalculator
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.PagedResponse
@@ -45,7 +46,11 @@ extends DirectComponentSupport
 {
 
   @Inject
-  IndexerManager indexerManager;
+  IndexerManager indexerManager
+
+  @Inject
+  @Named('maven2')
+  GavCalculator gavCalculator
 
   @DirectMethod
   PagedResponse<SearchResultXO> read(final @Nullable StoreLoadParameters parameters) {
@@ -123,7 +128,8 @@ extends DirectComponentSupport
       results << new SearchResultXO(
           repositoryId: info.repository,
           uri: 'maven:' + info.groupId + ':' + info.artifactId,
-          version: info.version
+          version: info.version,
+          path: gavCalculator.gavToPath(info.calculateGav())
       )
     }
 
