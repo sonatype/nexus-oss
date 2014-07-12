@@ -19,5 +19,18 @@ package org.sonatype.nexus.blobstore.file;
  */
 public enum BlobState
 {
-  CREATING, ALIVE, MARKED_FOR_DELETION
+  /**
+   * State for blobs that are in process of being created.
+   */
+  CREATING,
+
+  /**
+   * State for blobs that have finished being created.
+   */
+  ALIVE,
+
+  /**
+   * State for blobs that are marked for deletion.
+   */
+  MARKED_FOR_DELETION
 }

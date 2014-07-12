@@ -10,23 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.blobstore.file.utils;
+package org.sonatype.nexus.blobstore.file;
 
-import java.util.regex.Pattern;
+import org.sonatype.nexus.blobstore.api.BlobId;
 
 /**
- * Helps convert Strings to filenames safely.
+ * Strategy determines the location of a blob file in a store.
+ *
+ * Implementations might use algorithms to divide files up into multiple directories for easier management.
  *
  * @since 3.0
  */
-public class FilenameEscaper
+public interface LocationStrategy
 {
-  private static Pattern UNSAFE_TOKENS = Pattern.compile("[.\\\\:/]");
-
   /**
-   * Escapes a string to make it suitable for use as a filename.
+   * Returns the location where blob file should exist.
    */
-  public static String escapeFilename(final String value) {
-    return UNSAFE_TOKENS.matcher(value).replaceAll("-");
-  }
+  String location(BlobId blobId);
 }

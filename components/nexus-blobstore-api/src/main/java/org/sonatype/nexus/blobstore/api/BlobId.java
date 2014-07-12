@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.blobstore.api;
 
+import java.io.Serializable;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -20,12 +22,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class BlobId
+  implements Serializable, Comparable<BlobId>
 {
   private final String id;
 
   public BlobId(final String id) {
-    checkNotNull(id);
-    this.id = id;
+    this.id = checkNotNull(id);
   }
 
   public String getId() {
@@ -34,7 +36,7 @@ public class BlobId
 
   @Override
   public String toString() {
-    return "BlobId[" + id + "]";
+    return getClass().getSimpleName() + "[" + id + "]";
   }
 
   @Override
@@ -54,5 +56,10 @@ public class BlobId
   @Override
   public int hashCode() {
     return id.hashCode();
+  }
+
+  @Override
+  public int compareTo(final BlobId o) {
+    return id.compareTo(o.id);
   }
 }

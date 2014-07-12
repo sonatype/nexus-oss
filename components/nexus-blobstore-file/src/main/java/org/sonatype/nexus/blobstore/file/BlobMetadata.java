@@ -31,7 +31,7 @@ public class BlobMetadata
 
   private BlobMetrics metrics;
 
-  public BlobMetadata(BlobState blobState, final Map<String, String> headers) {
+  public BlobMetadata(final BlobState blobState, final Map<String, String> headers) {
     this.blobState = checkNotNull(blobState);
     this.headers = checkNotNull(headers);
   }
@@ -62,8 +62,8 @@ public class BlobMetadata
 
   @Override
   public String toString() {
-    return "BlobMetadata{" +
-        ", state=" + blobState +
+    return getClass().getSimpleName() + "{" +
+        "blobState=" + blobState +
         ", headers=" + headers +
         ", metrics=" + metrics +
         '}';

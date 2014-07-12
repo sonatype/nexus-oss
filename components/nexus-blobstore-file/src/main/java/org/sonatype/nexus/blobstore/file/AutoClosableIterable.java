@@ -13,24 +13,12 @@
 package org.sonatype.nexus.blobstore.file;
 
 /**
+ * {@link AutoCloseable} {@link Iterable}.
+ *
  * @since 3.0
  */
-class StreamMetrics
+public interface AutoClosableIterable<T>
+  extends AutoCloseable, Iterable<T>
 {
-  private long size;
-
-  private String SHA1;
-
-  StreamMetrics(final long size, final String SHA1) {
-    this.size = size;
-    this.SHA1 = SHA1;
-  }
-
-  public long getSize() {
-    return size;
-  }
-
-  public String getSHA1() {
-    return SHA1;
-  }
+  // empty
 }
