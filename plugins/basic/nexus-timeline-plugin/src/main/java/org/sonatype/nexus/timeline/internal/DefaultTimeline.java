@@ -187,10 +187,9 @@ public class DefaultTimeline
     if (records.isEmpty()) {
       return; // spare resources from getting DB for nothing
     }
-
-    try (ODatabaseDocumentTx db = db()) {
-      // this must be synced to prevent purge drop cluster being created
-      synchronized (this) {
+    // this must be synced to prevent purge drop cluster being created
+    synchronized (this) {
+      try (ODatabaseDocumentTx db = db()) {
         // 1st pass (no TX, DDL): add clusters needed by records
         final Map<Long, String> timestampToClusterMap = Maps.newHashMap();
         for (EntryRecord record : records) {
