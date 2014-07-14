@@ -1,3 +1,4 @@
+@echo off
 @REM
 @REM Sonatype Nexus (TM) Open Source Version
 @REM Copyright (c) 2007-2014 Sonatype, Inc.
@@ -11,65 +12,66 @@
 @REM Eclipse Foundation. All other trademarks are the property of their respective owners.
 @REM
 
-@if "%WRAPPER_DEBUG%" == "" @echo off
+if not "%ECHO%" == "" echo %ECHO%
 
-if "%OS%"=="Windows_NT" goto begin
-echo Unsupported Windows version: %OS%
-pause
-goto :eof
-
-:begin
-setlocal enableextensions
-
+setlocal
 set DIRNAME=%~dp0%
-if "%DIRNAME%" == "" set DIRNAME=.\
 set PROGNAME=%~nx0%
 
-for /F %%v in ('echo %1^|findstr "^console$ ^start$ ^stop$ ^restart$ ^status$ ^dump"') do call :exec set COMMAND=%%v
+SET KARAF_TITLE=Sonatype Nexus
 
-if "%COMMAND%" == "" (
-    echo Usage: %PROGNAME% { console : start : stop : restart : status : dump }
-    pause
-    goto end
-) else (
+goto BEGIN
+
+:USAGE
+    echo "%PROGNAME% { console | start | stop | restart | status }"
+goto :EOF
+
+:BEGIN
+
+rem # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+:RUN
+    SET SHIFT=false
+    if "%1" == "console" goto :EXECUTE_CONSOLE
+    if "%1" == "start" goto :EXECUTE_START
+    if "%1" == "stop" goto :EXECUTE_STOP
+    if "%1" == "restart" goto :EXECUTE_RESTART
+    if "%1" == "status" goto :EXECUTE_STATUS
+    goto :USAGE
+
+:EXECUTE_CONSOLE
     shift
-)
+    "%DIRNAME%karaf.bat" %1 %2 %3 %4 %5 %6 %7 %8
+    goto :EOF
 
-call :%COMMAND%
-if errorlevel 1 pause
-goto end
+:EXECUTE_START
+    shift
+    "%DIRNAME%start.bat" %1 %2 %3 %4 %5 %6 %7 %8
+    goto :EOF
 
-:console
-%DIRNAME%\karaf
-goto :eof
+:EXECUTE_STOP
+    shift
+    "%DIRNAME%stop.bat" %1 %2 %3 %4 %5 %6 %7 %8
+    goto :EOF
 
-:start
-%DIRNAME%\start
-goto :eof
+:EXECUTE_RESTART
+    shift
+    call "%DIRNAME%stop.bat" 2>NUL
+    "%DIRNAME%start.bat" %1 %2 %3 %4 %5 %6 %7 %8
+    goto :EOF
 
-:stop
-%DIRNAME%\stop
-goto :eof
+:EXECUTE_STATUS
+    shift
+    "%DIRNAME%status.bat" %1 %2 %3 %4 %5 %6 %7 %8
+    goto :EOF
 
-:status
-%DIRNAME%\status
-goto :eof
+rem # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-:dump
-echo Not yet implemented
-goto :eof
+:END
 
-:restart
-call :stop
-call :start
-goto :eof
-
-:exec
-%*
-goto :eof
-
-:end
 endlocal
 
-:finish
-cmd /C exit /B %ERRORLEVEL%
+if not "%PAUSE%" == "" pause
+
+:END_NO_PAUSE
+
