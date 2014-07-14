@@ -10,34 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.rapture;
-
-import org.junit.Test;
-
 /**
+ * Tests that login/logout works.
+ *
  * @since 2.8
  */
-public class RepositoryUiIT
-    extends SiestaLiteUiITSupport
-{
+StartTest(function (t) {
 
-  public RepositoryUiIT(final WebDriverFactory driverFactory) {
-    super(driverFactory);
-  }
+  t.chain(
+      { waitFor: 'stateReceived' },
+      { waitFor: 'userToBeLoggedOut' },
 
-  @Test
-  public void repository_directjengine() throws Exception {
-    run("tests/repository/directjengine.js");
-  }
+      { waitFor: 'CQVisible', args: 'nx-header-login' },
+      { click: '>>nx-header-login' },
+      { waitFor: 'CQVisible', args: 'nx-login' },
+      { type: 'admin[TAB]' },
+      { type: 'admin123' },
+      { waitFor: 'CQVisible', args: 'nx-login button[action=login][disabled=false]' },
+      { type: '[ENTER]' },
+      { waitFor: 'CQVisible', args: 'nx-header-logout' },
+      { click: '>>nx-header-logout' },
+      { waitFor: 'CQVisible', args: 'nx-header-login' }
+  );
 
-  @Test
-  public void repository_sanity() throws Exception {
-    run("tests/repository/sanity.js");
-  }
-
-  @Test
-  public void remove_repository() throws Exception {
-    run("tests/repository/remove-repository.js");
-  }
-
-}
+});

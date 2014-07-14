@@ -33,16 +33,16 @@ Harness.start(
           group: 'Functional',
           hostPageUrl: '/nexus',
           items: [
-            { url: 'tests/framework/functional/Bookmarking.js' },
-            { url: 'tests/framework/functional/LoginLogout.js' },
-            { url: 'tests/framework/functional/ModeButtons.js' },
-            { url: 'tests/framework/functional/UnsupportedBrowser.js' }
+            { url: 'framework/Bookmarking.js' },
+            { url: 'framework/LoginLogout.js' },
+            { url: 'framework/ModeButtons.js' },
+            { url: 'framework/UnsupportedBrowser.js' }
           ]
         },
         {
-          group: 'State',
+          group: 'UT',
           items: [
-            { url: 'tests/framework/state/StateChangeEvent.js' }
+            { url: 'framework/StateChangeEvent.js' }
           ]
         }
       ]
@@ -55,33 +55,10 @@ Harness.start(
           group: 'Functional',
           hostPageUrl: '/nexus',
           items: [
-            { url: 'tests/repositorytarget/RepositoryTargetCRUD.js' }
+            { url: 'repositorytarget/RepositoryTargetCRUD.js' }
           ]
-        },
-        { url: 'tests/repositorytarget/RepositoryTargetExtDirectRead.js' },
-        { url: 'tests/repositorytarget/RepositoryTargetExtDirectCreate.js' },
-        { url: 'tests/repositorytarget/RepositoryTargetExtDirectCreateValidation.js' }
+        }
       ]
     }
 
-    //{
-    //  group: 'Capability',
-    //  items: [
-    //    'tests/capability/direct.js',
-    //    'tests/capability/list.js',
-    //    'tests/capability/sanity.js'
-    //  ]
-    //},
-    //{
-    //  group: 'Repository',
-    //  items: [
-    //    'tests/repository/direct.js',
-    //    'tests/repository/sanity.js',
-    //    {
-    //      preload: [],
-    //      hostPageUrl: '/nexus/rapture.html',
-    //      url: 'tests/repository/remove-repository.js'
-    //    }
-    //  ]
-    //}
 );

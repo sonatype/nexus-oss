@@ -27,14 +27,16 @@ StartTest(function (t) {
       { waitFor: 'stateReceived' },
       { waitFor: 'userToBeLoggedIn' },
 
-      { click: '>>nx-header-browse-mode' },
-      { waitFor: 'bookmark', args: 'browse/components' },
-
-      { click: '>>nx-header-search-mode' },
-      { waitFor: 'CQVisible', args: 'nx-search' },
-      { waitFor: 'bookmark', args: 'search/search'},
-
-      { click: '>>nx-header-admin-mode' },
+      function (next) {
+        t.navigateTo('browse/welcome');
+        next();
+      },
+      { waitFor: 'bookmark', args: 'browse/welcome' },
+      function (next) {
+        t.navigateTo('admin/repository');
+        next();
+      },
+      { waitFor: 'bookmark', args: 'admin/repository' },
       function (next) {
         t.navigateTo('admin/repository/repositories');
         next();
@@ -51,7 +53,7 @@ StartTest(function (t) {
         next();
       },
       function (next) {
-        t.waitForBookmark('admin/repository/repositories:' + selected0Id + ':summary', next);
+        t.waitForBookmark('admin/repository/repositories:' + selected0Id + ':settings', next);
       },
 
       function (next) {
@@ -63,7 +65,7 @@ StartTest(function (t) {
         next();
       },
       function (next) {
-        t.waitForBookmark('admin/repository/repositories:' + selected2Id + ':summary', next);
+        t.waitForBookmark('admin/repository/repositories:' + selected2Id + ':settings', next);
       },
 
       function (next) {
@@ -76,7 +78,7 @@ StartTest(function (t) {
       t.do(goBack),
       { waitFor: 'rowsVisible', args: 'nx-coreui-repository-list' },
       function (next) {
-        t.waitForBookmark('admin/repository/repositories:' + selected2Id + ':summary', next);
+        t.waitForBookmark('admin/repository/repositories:' + selected2Id + ':settings', next);
       },
       function (next) {
         var grid = t.cq1('nx-coreui-repository-list'),
@@ -89,7 +91,7 @@ StartTest(function (t) {
 
       t.do(goBack),
       function (next) {
-        t.waitForBookmark('admin/repository/repositories:' + selected0Id + ':summary', next);
+        t.waitForBookmark('admin/repository/repositories:' + selected0Id + ':settings', next);
       },
       function (next) {
         var grid = t.cq1('nx-coreui-repository-list'),
@@ -108,11 +110,7 @@ StartTest(function (t) {
       { waitFor: 'bookmark', args: 'admin/repository' },
 
       t.do(goBack),
-      { waitFor: 'CQVisible', args: 'nx-search' },
-      { waitFor: 'bookmark', args: 'search/search' },
-
-      t.do(goBack),
-      { waitFor: 'bookmark', args: 'browse/components' }
+      { waitFor: 'bookmark', args: 'browse/welcome' }
   );
 
 });

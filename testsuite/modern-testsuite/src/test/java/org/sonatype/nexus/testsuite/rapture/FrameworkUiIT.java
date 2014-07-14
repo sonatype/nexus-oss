@@ -29,22 +29,22 @@ public class FrameworkUiIT
 
   @Test
   public void framework_Bookmarking() throws Exception {
-    run("tests/framework/functional/Bookmarking.js");
+    run("framework/Bookmarking.js");
   }
 
   @Test
   public void framework_LoginLogout() throws Exception {
-    run("tests/framework/functional/LoginLogout.js");
+    run("framework/LoginLogout.js");
   }
 
   @Test
   public void framework_ModeButtons() throws Exception {
-    run("tests/framework/functional/ModeButtons.js");
+    run("framework/ModeButtons.js");
   }
 
   @Test
   public void framework_UnsupportedBrowser() throws Exception {
-    run("tests/framework/functional/UnsupportedBrowser.js");
+    run("framework/UnsupportedBrowser.js");
   }
 
 }

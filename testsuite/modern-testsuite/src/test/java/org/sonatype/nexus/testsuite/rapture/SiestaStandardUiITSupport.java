@@ -70,10 +70,8 @@ public class SiestaStandardUiITSupport
 
   @Override
   protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
-    return configuration.addPlugins(
-        artifactResolver().resolvePluginFromDependencyManagement(
-            "org.sonatype.nexus", "nexus-testsuite-ui-plugin"
-        )
+    return configuration.setSystemProperty(
+        "nexus.resource.dirs", util.resolveFile("src/test/ft-resources").getAbsolutePath()
     );
   }
 
@@ -125,7 +123,7 @@ public class SiestaStandardUiITSupport
 
     List<String> command = Lists.newArrayList();
     command.add(new File(siestaDir, executable + (Os.isFamily(Os.FAMILY_WINDOWS) ? ".bat" : "")).getAbsolutePath());
-    command.add(nexus().getUrl() + "static/rapture/nexus-ui-tests.html");
+    command.add(nexus().getUrl() + "test/harness.html");
     if (options != null) {
       Collections.addAll(command, options);
     }

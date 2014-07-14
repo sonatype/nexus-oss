@@ -29,12 +29,7 @@ public class RepositoryTargetUiIT
 
   @Test
   public void repositorytarget_RepositoryTargetCRUD() throws Exception {
-    run("tests/repositorytarget/RepositoryTargetCRUD.js");
-  }
-
-  @Test
-  public void repositorytarget_RepositoryTargetExtDirect() throws Exception {
-    run("tests/repositorytarget/RepositoryTargetExtDirect.js");
+    run("repositorytarget/RepositoryTargetCRUD.js");
   }
 
 }

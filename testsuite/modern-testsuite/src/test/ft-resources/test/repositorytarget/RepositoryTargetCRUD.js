@@ -34,8 +34,12 @@ StartTest(function (t) {
       // create and check selected model to have correct values
       { click: '>>nx-coreui-repositorytarget-list button[action=new]' },
       { waitFor: 'CQVisible', args: 'nx-coreui-repositorytarget-add' },
-      { type: name + '[TAB]' },
-      { type: 'maven2[ENTER][TAB]' },
+      { type: name },
+      function (next) {
+        t.cq1('nx-coreui-repositorytarget-add field[name=format]').setValue('maven2');
+        next();
+      },
+      { click: '>>nx-coreui-repositorytarget-add field[inputFor=patterns]' },
       { type: '.*maven-metadata\\.xml.*[ENTER]' },
       { type: '.*-sources.*[ENTER]' },
       { click: '>>nx-coreui-repositorytarget-add button[action=add]' },

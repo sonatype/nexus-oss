@@ -29,7 +29,7 @@ roots.split(',').each { root ->
   def dir = new File(root)
   if (dir.exists()) {
     dir.eachDirRecurse {
-      if (it.path.endsWith('src/main/resources/static')) {
+      if (it.path.endsWith('src/main/resources/static') || it.path.endsWith('src/test/ft-resources/test')) {
         dirs << it.parentFile.canonicalPath
       }
     }

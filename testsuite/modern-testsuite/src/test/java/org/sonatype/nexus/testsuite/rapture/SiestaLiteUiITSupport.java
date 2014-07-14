@@ -37,7 +37,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -73,10 +72,8 @@ public class SiestaLiteUiITSupport
 
   @Override
   protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
-    return configuration.addPlugins(
-        artifactResolver().resolvePluginFromDependencyManagement(
-            "org.sonatype.nexus", "nexus-testsuite-ui-plugin"
-        )
+    return configuration.setSystemProperty(
+        "nexus.resource.dirs", util.resolveFile("src/test/ft-resources").getAbsolutePath()
     );
   }
 
@@ -140,7 +137,7 @@ public class SiestaLiteUiITSupport
   }
 
   private void loadTestHarness(final WebDriver driver) {
-    driver.navigate().to(nexus().getUrl() + "static/rapture/nexus-ui-tests.html");
+    driver.navigate().to(nexus().getUrl() + "test/harness.html");
     driverWait(driver).until(elementToBeClickable(By.cssSelector(".x-btn a[title='Run checked']")));
   }
 
