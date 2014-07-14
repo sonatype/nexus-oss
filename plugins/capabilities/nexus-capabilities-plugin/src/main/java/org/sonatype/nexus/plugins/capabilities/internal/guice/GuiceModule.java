@@ -110,7 +110,7 @@ public class GuiceModule
 
       builder.withJdbcDriver("org.h2.Driver");
 
-      File dir = directories.getWorkDirectory("db/capabilities");
+      File dir = directories.getWorkDirectory("db/capabilities", false);
       File file = new File(dir, dir.getName());
       builder.withJdbcUrl("jdbc:h2:" + file.getAbsolutePath());
 
