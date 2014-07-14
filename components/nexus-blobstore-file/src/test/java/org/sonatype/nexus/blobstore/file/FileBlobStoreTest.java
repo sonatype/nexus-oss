@@ -21,6 +21,7 @@ import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.api.BlobStore;
+import org.sonatype.nexus.blobstore.file.FileOperations.StreamMetrics;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableMap;
@@ -30,6 +31,7 @@ import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -37,48 +39,56 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests for {@link FileBlobStore}.
+ */
 public class FileBlobStoreTest
     extends TestSupport
 {
-  private FilePathPolicy pathPolicy;
+  private LocationStrategy locationStrategy;
 
   private FileOperations fileOps;
 
   private BlobMetadataStore metadataStore;
 
-  private FileBlobStore fileBlobStore;
+  private Path root;
+
+  private FileBlobStore underTest;
 
   @Before
-  public void initMocks() {
-    pathPolicy = mock(FilePathPolicy.class);
+  public void setUp() throws Exception {
+    locationStrategy = mock(LocationStrategy.class);
     fileOps = mock(FileOperations.class);
     metadataStore = mock(BlobMetadataStore.class);
 
-    fileBlobStore = new FileBlobStore("testStore", pathPolicy, fileOps, metadataStore);
+    root = util.createTempDir().toPath();
+    underTest = new FileBlobStore(root, locationStrategy, fileOps, metadataStore);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void createRequiresHeaders() {
     final ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[100]);
     final HashMap<String, String> headers = new HashMap<>();
-    fileBlobStore.create(inputStream, headers);
+    underTest.create(inputStream, headers);
   }
 
   @Test
   public void successfulCreation() throws Exception {
     final BlobId fakeId = new BlobId("testId");
-    final Path fakePath = mock(Path.class);
     final long contentSize = 200L;
     final String fakeSHA1 = "3757y5abc234cfgg";
     final InputStream inputStream = mock(InputStream.class);
-    final ImmutableMap<String, String> headers = ImmutableMap
-        .of(BlobStore.BLOB_NAME_HEADER, "my blob", BlobStore.CREATED_BY_HEADER, "John did this");
+    final ImmutableMap<String, String> headers = ImmutableMap.of(
+        BlobStore.BLOB_NAME_HEADER, "my blob",
+        BlobStore.CREATED_BY_HEADER, "John did this"
+    );
 
     when(metadataStore.add(any(BlobMetadata.class))).thenReturn(fakeId);
-    when(pathPolicy.forContent(fakeId)).thenReturn(fakePath);
+    when(locationStrategy.location(fakeId)).thenReturn("fakePath");
+    final Path fakePath = root.resolve("fakePath" + FileBlobStore.BLOB_CONTENT_SUFFIX);
     when(fileOps.create(fakePath, inputStream)).thenReturn(new StreamMetrics(contentSize, fakeSHA1));
 
-    final Blob blob = fileBlobStore.create(inputStream, headers);
+    final Blob blob = underTest.create(inputStream, headers);
 
     final BlobMetrics metrics = blob.getMetrics();
 
@@ -91,20 +101,20 @@ public class FileBlobStoreTest
 
   @Test
   public void getExistingBlob() throws Exception {
-
     final BlobId fakeId = new BlobId("fakeId");
     final BlobMetadata metadata = mock(BlobMetadata.class);
     when(metadataStore.get(fakeId)).thenReturn(metadata);
     when(metadata.isAlive()).thenReturn(true);
     when(metadata.getMetrics()).thenReturn(mock(BlobMetrics.class));
 
-    final Path fakePath = mock(Path.class);
-    when(pathPolicy.forContent(fakeId)).thenReturn(fakePath);
+    when(locationStrategy.location(fakeId)).thenReturn("fakePath");
+    final Path fakePath = root.resolve("fakePath" + FileBlobStore.BLOB_CONTENT_SUFFIX);
     when(fileOps.exists(fakePath)).thenReturn(true);
 
     when(fileOps.openInputStream(fakePath)).thenReturn(mock(InputStream.class));
 
-    final Blob blob = fileBlobStore.get(fakeId);
+    final Blob blob = underTest.get(fakeId);
+    assertThat(blob, notNullValue());
     assertThat(blob.getId(), is(equalTo(fakeId)));
   }
 
@@ -117,7 +127,7 @@ public class FileBlobStoreTest
     // The blob isn't already deleted
     when(metadata.isAlive()).thenReturn(true);
 
-    final boolean deleted = fileBlobStore.delete(fakeId);
+    final boolean deleted = underTest.delete(fakeId);
     assertThat(deleted, is(equalTo(true)));
 
     verify(metadata).setBlobState(BlobState.MARKED_FOR_DELETION);
@@ -125,13 +135,12 @@ public class FileBlobStoreTest
 
   @Test
   public void secondDeletionRedundant() {
-
     final BlobId fakeId = new BlobId("testId");
     final BlobMetadata metadata = mock(BlobMetadata.class);
     when(metadataStore.get(fakeId)).thenReturn(metadata);
     when(metadata.isAlive()).thenReturn(false);
 
-    final boolean deleted = fileBlobStore.delete(fakeId);
+    final boolean deleted = underTest.delete(fakeId);
     assertThat(deleted, is(equalTo(false)));
   }
 }

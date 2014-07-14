@@ -15,8 +15,6 @@ package org.sonatype.nexus.blobstore.file;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 
 /**
  * A wrapper around file operations to make mocking easier.
@@ -25,24 +23,40 @@ import java.util.Date;
  */
 public interface FileOperations
 {
+  class StreamMetrics
+  {
+    private final long size;
+
+    private final String SHA1;
+
+    public StreamMetrics(final long size, final String SHA1) {
+      this.size = size;
+      this.SHA1 = SHA1;
+    }
+
+    public long getSize() {
+      return size;
+    }
+
+    public String getSHA1() {
+      return SHA1;
+    }
+  }
+
   /**
    * Creates a file (and its containing directories, if necessary) and populates it from the
-   * InputStream, which gets closed.  Returns some basic metrics about the stream.
+   * InputStream, which gets closed.
+   *
+   * @return Basic metrics about the stream.
    */
-  StreamMetrics create(Path path, InputStream data) throws IOException, NoSuchAlgorithmException;
+  StreamMetrics create(Path path, InputStream data) throws IOException;
 
   boolean exists(Path path);
 
   InputStream openInputStream(Path path) throws IOException;
 
-  Date fileCreationDate(Path path) throws IOException;
-
-  String computeSha1Hash(Path path) throws IOException;
-
   /**
    * Returns true if the file existed before deletion, false otherwise.
    */
   boolean delete(Path path) throws IOException;
-
-  long fileSize(Path path) throws IOException;
 }

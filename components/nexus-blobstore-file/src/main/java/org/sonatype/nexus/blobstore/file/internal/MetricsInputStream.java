@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.blobstore.file;
+package org.sonatype.nexus.blobstore.file.internal;
 
 import java.io.FilterInputStream;
 import java.io.InputStream;
@@ -18,8 +18,10 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.sonatype.nexus.blobstore.file.utils.DigesterUtils;
+import org.sonatype.nexus.blobstore.file.FileOperations.StreamMetrics;
+import org.sonatype.nexus.orient.Hex;
 
+import com.google.common.base.Throwables;
 import com.google.common.io.CountingInputStream;
 
 /**
@@ -30,15 +32,12 @@ import com.google.common.io.CountingInputStream;
 public class MetricsInputStream
     extends FilterInputStream
 {
-  private MessageDigest messageDigest;
+  private final MessageDigest messageDigest;
 
-  private CountingInputStream countingInputStream;
+  private final CountingInputStream countingInputStream;
 
-  public static MetricsInputStream metricsInputStream(final InputStream wrappedStream, final String algorithm)
-      throws NoSuchAlgorithmException
-  {
-    final MessageDigest digest = MessageDigest.getInstance(algorithm);
-    return new MetricsInputStream(new CountingInputStream(wrappedStream), digest);
+  public MetricsInputStream(final InputStream input) {
+    this(new CountingInputStream(input), createSha1());
   }
 
   private MetricsInputStream(final CountingInputStream countingStream, final MessageDigest messageDigest) {
@@ -48,10 +47,24 @@ public class MetricsInputStream
   }
 
   public String getMessageDigest() {
-    return DigesterUtils.getDigestAsString(messageDigest.digest());
+    return Hex.encode(messageDigest.digest());
   }
 
   public long getSize() {
     return countingInputStream.getCount();
+  }
+
+  public StreamMetrics getMetrics() {
+    return new StreamMetrics(getSize(), getMessageDigest());
+  }
+
+  private static MessageDigest createSha1() {
+    try {
+      return MessageDigest.getInstance("SHA1");
+    }
+    catch (NoSuchAlgorithmException e) {
+      // should never happen
+      throw Throwables.propagate(e);
+    }
   }
 }

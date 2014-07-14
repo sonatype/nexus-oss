@@ -10,27 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.blobstore.file;
+package org.sonatype.nexus.blobstore.file.internal;
 
-import org.sonatype.nexus.configuration.application.ApplicationDirectories;
-import org.sonatype.nexus.configuration.application.ApplicationDirectoriesImpl;
+import java.io.File;
 
-import com.google.common.io.Files;
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import org.junit.Test;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
 
 /**
- * A simple Guice module that hooks the test up to temp directories.
+ * Trials of MapDB
  */
-public class TempDirectoryModule
-    extends AbstractModule
+public class MapdbTrial
+  extends TestSupport
 {
-  @Override
-  protected void configure() {
-  }
-
-  @Provides
-  public ApplicationDirectories applicationDirectories() {
-    return new ApplicationDirectoriesImpl(Files.createTempDir(), Files.createTempDir(), Files.createTempDir());
+  @Test
+  public void createDatabase() throws Exception {
+    File file = util.createTempFile("db");
+    DB db = DBMaker.newFileDB(file).make();
+    try {
+      log("Database: {}, file: {}", db, file);
+    }
+    finally {
+      db.close();
+    }
   }
 }

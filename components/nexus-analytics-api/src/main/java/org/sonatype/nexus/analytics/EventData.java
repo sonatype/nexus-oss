@@ -24,16 +24,39 @@ import com.google.common.collect.Maps;
  */
 public class EventData
 {
+  /**
+   * Event type.
+   */
   private String type;
 
+  /**
+   * Event timestamp in milliseconds.
+   */
   private Long timestamp;
 
+  /**
+   * Event sequence (rolling) to distinguish events which have the same timestamp.
+   */
+  private Long sequence;
+
+  /**
+   * Event duration in nanoseconds.
+   */
   private Long duration;
 
+  /**
+   * Event user-id.
+   */
   private String userId;
 
+  /**
+   * Event session-id.
+   */
   private String sessionId;
 
+  /**
+   * Event attributes.
+   */
   private final Map<String, String> attributes = Maps.newHashMap();
 
   public String getType() {
@@ -50,6 +73,14 @@ public class EventData
 
   public void setTimestamp(final Long timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public Long getSequence() {
+    return sequence;
+  }
+
+  public void setSequence(final Long sequence) {
+    this.sequence = sequence;
   }
 
   public Long getDuration() {
@@ -85,6 +116,7 @@ public class EventData
     return getClass().getSimpleName() + "{" +
         "type='" + type + '\'' +
         ", timestamp=" + timestamp +
+        ", sequence=" + sequence +
         ", duration=" + duration +
         ", userId='" + userId + '\'' +
         ", sessionId='" + sessionId + '\'' +
