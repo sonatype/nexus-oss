@@ -25,11 +25,7 @@
     </encoder>
   </appender>
 
-  <logger name="Sisu" level="${test.log.level.Sisu:-INFO}"/>
-  <logger name="org.apache.commons.httpclient" level="ERROR"/>
-  <logger name="org.apache.http" level="${test.log.level.org.apache.http:-INFO}"/>
-
-  <logger name="org.sonatype.nexus.blobstore" level="TRACE"/>
+  <logger name="org.sonatype.nexus.blobstore.file" level="DEBUG"/>
 
   <root level="${test.log.level:-INFO}">
     <appender-ref ref="CONSOLE"/>

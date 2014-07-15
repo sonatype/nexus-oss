@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.proxy.storage.remote;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.inject.Provider;
 
@@ -64,14 +64,14 @@ public abstract class AbstractHTTPRemoteRepositoryStorage
       throws RemoteStorageException
   {
     try {
-      URL u = new URL(url);
+      URI u = new URI(url);
 
-      if (!"http".equals(u.getProtocol().toLowerCase()) && !"https".equals(u.getProtocol().toLowerCase())) {
+      if (!"http".equals(u.getScheme().toLowerCase()) && !"https".equals(u.getScheme().toLowerCase())) {
         throw new RemoteStorageException("Unsupported protocol, only HTTP/HTTPS protocols are supported: "
-            + u.getProtocol().toLowerCase());
+            + u.getScheme().toLowerCase());
       }
     }
-    catch (MalformedURLException e) {
+    catch (URISyntaxException e) {
       throw new RemoteStorageException("Malformed URL", e);
     }
   }

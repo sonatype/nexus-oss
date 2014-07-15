@@ -107,7 +107,7 @@ public class DefaultNexusBundleConfiguration
 
   /**
    * Sets number of seconds to wait for Nexus to boot. If injected will use the timeout bounded to
-   * {@link #START_TIMEOUT} with a default of {@link #START_TIMEOUT_DEFAULT} seconds.
+   * {@link #START_TIMEOUT} with a default of 100 seconds.
    * <p/>
    * {@inheritDoc}
    *
@@ -115,7 +115,7 @@ public class DefaultNexusBundleConfiguration
    */
   @Inject
   protected void configureNexusStartTimeout(
-      final @Nullable @Named("${" + START_TIMEOUT + "}") Integer startTimeout)
+      final @Nullable @Named("${" + START_TIMEOUT + ":-100}") Integer startTimeout)
   {
     if (startTimeout != null) {
       super.setStartTimeout(startTimeout);

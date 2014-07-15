@@ -27,11 +27,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class EventDataBuilder
 {
+  private static final RollingCounter counter = new RollingCounter(999_999_999_999_999L);
+
   private final EventData data = new EventData();
+
+  private final long started;
 
   public EventDataBuilder(final String type) {
     data.setType(type);
-    data.setTimestamp(System.nanoTime());
+    data.setTimestamp(System.currentTimeMillis());
+    data.setSequence(counter.next());
 
     // capture the user and session ids if we can
     Subject subject = SecurityUtils.getSubject();
@@ -46,6 +51,9 @@ public class EventDataBuilder
         data.setSessionId(session.getId().toString());
       }
     }
+
+    // track started time in nanoseconds for duration calculation
+    started = System.nanoTime();
   }
 
   public EventDataBuilder set(final String name, final @Nullable Object value) {
@@ -60,7 +68,7 @@ public class EventDataBuilder
   }
 
   public EventData build() {
-    data.setDuration(System.nanoTime() - data.getTimestamp());
+    data.setDuration(System.nanoTime() - started);
     return data;
   }
 }

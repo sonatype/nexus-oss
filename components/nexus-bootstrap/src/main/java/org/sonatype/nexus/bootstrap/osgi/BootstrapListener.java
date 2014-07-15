@@ -31,6 +31,7 @@ import org.sonatype.nexus.bootstrap.ConfigurationHolder;
 import org.sonatype.nexus.bootstrap.EnvironmentVariables;
 import org.sonatype.nexus.bootstrap.LockFile;
 
+import ch.qos.logback.classic.LoggerContext;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -42,6 +43,7 @@ import org.osgi.framework.startlevel.FrameworkStartLevel;
 import org.osgi.framework.wiring.BundleRevision;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.impl.StaticLoggerBinder;
 
 /**
  * {@link ServletContextListener} that bootstraps an OSGi-based application.
@@ -171,6 +173,9 @@ public class BootstrapListener
     BundleContext bundleContext = framework.getBundleContext();
     FrameworkStartLevel startLevel = framework.adapt(FrameworkStartLevel.class);
     startLevel.setStartLevel(1);
+
+    LoggerContext loggerContext = (LoggerContext) StaticLoggerBinder.getSingleton().getLoggerFactory();
+    loggerContext.putObject("org.ops4j.pax.logging.logback.bundlecontext", bundleContext);
 
     startLevel.setInitialBundleStartLevel(80);
 

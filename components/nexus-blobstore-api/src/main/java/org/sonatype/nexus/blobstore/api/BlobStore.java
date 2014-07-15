@@ -20,8 +20,8 @@ import javax.annotation.Nullable;
 /**
  * A generic storage bin for binary objects of all sizes.
  *
- * In general, most methods can throw BlobStoreException for conditions such as network connectivity problems, or
- * file IO issues, blob store misconfiguration, or internal corruption.
+ * In general, most methods can throw {@link BlobStoreException} for conditions such as network connectivity problems,
+ * or file IO issues, blob store misconfiguration, or internal corruption.
  *
  * @since 3.0
  */
@@ -72,11 +72,6 @@ public interface BlobStore
    * @return {@code true} if the blob has been deleted, {@code false} if no blob was found by that ID.
    */
   boolean deleteHard(BlobId blobId);
-
-  /**
-   * Returns an identifier to differentiate this blob store from other stores.
-   */
-  String getName();
 
   /**
    * Provides metrics about the BlobStore's usage.

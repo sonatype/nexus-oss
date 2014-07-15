@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.blobstore.file;
 
-import java.util.Iterator;
-
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
@@ -38,9 +36,15 @@ public interface BlobMetadataStore
   void delete(BlobId blobId);
 
   /**
-   * This iterator may produce nulls.
+   * Returns iterable with all blob-ids in the given state.
+   *
+   * @return Iterable handle must be closed when finished using it.
    */
-  Iterator<BlobId> findWithState(BlobState blobState);
+  AutoClosableIterable<BlobId> findWithState(BlobState state);
 
-  MetadataMetrics getMetadataMetrics();
+  long getBlobCount();
+
+  long getTotalSize();
+
+  void compact();
 }
