@@ -294,9 +294,7 @@ Ext.define('NX.coreui.controller.Search', {
       path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
       mode: 'browse',
       view: { xtype: 'nx-searchfeature', searchFilter: model },
-      iconConfig: {
-        name: 'search-saved'
-      },
+      iconName: 'search-saved',
       description: model.get('description'),
       authenticationRequired: false
     });
@@ -336,7 +334,7 @@ Ext.define('NX.coreui.controller.Search', {
     if (!searchFeature || (searchFeature.searchFilter.getId() !== 'keyword')) {
       if (searchValue) {
         NX.Bookmarks.navigateTo(
-            NX.Bookmarks.fromSegments(['browse/search/keyword', 'keyword=' + encodeURIComponent(searchValue)]),
+            NX.Bookmarks.fromSegments(['browse/search', 'keyword=' + encodeURIComponent(searchValue)]),
             me
         );
       }
