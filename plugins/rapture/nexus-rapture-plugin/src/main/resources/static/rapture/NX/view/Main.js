@@ -86,12 +86,12 @@ Ext.define('NX.view.Main', {
     me.callParent();
 
     me.down('nx-header-panel>toolbar').add([
-      '->',
+      ' ',
       { xtype: 'nx-header-dashboard-mode' },
       { xtype: 'nx-header-search-mode' },
       { xtype: 'nx-header-browse-mode' },
       { xtype: 'nx-header-admin-mode' },
-      '->',
+      ' ',
       { xtype: 'nx-header-quicksearch' },
       '->',
       { xtype: 'nx-header-messages', ui: 'header' },
