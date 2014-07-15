@@ -19,6 +19,6 @@ Ext.define('NX.view.header.Messages', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-messages',
 
-  glyph: 'xf0f3@FontAwesome',
+  glyph: 'xf0f3@FontAwesome', // # fa-bell
   tooltip: 'Toggle messages display'
 });
