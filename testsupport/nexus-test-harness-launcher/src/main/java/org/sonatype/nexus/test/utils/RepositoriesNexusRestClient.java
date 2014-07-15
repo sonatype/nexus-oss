@@ -102,7 +102,11 @@ public class RepositoriesNexusRestClient
     return responseResource;
   }
 
-  public RepositoryBaseResource getRepository(String repoId)
+  public void removeRepository(final String repoId) throws IOException {
+    nexusRestClient.doDelete(SERVICE_PART + "/" + repoId);
+  }
+
+  public RepositoryBaseResource getRepository(final String repoId)
       throws IOException
   {
     // accepted return codes: OK or redirect
