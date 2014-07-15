@@ -62,6 +62,14 @@ Ext.define('NX.coreui.controller.Search', {
       'search-default': {
         file: 'magnifier.png',
         variants: ['x16', 'x32']
+      },
+      'search-folder': {
+        file: 'folder_search.png',
+        variants: ['x16', 'x32']
+      },
+      'search-saved': {
+        file: 'magnifier.png',
+        variants: ['x16', 'x32']
       }
     });
 
@@ -69,7 +77,7 @@ Ext.define('NX.coreui.controller.Search', {
       path: '/Search/Saved',
       mode: 'browse',
       group: true,
-      iconName: 'search-default',
+      iconName: 'search-folder',
       weight: 500
     });
 
@@ -78,7 +86,7 @@ Ext.define('NX.coreui.controller.Search', {
         mode: 'browse',
         path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
         view: { xtype: 'nx-searchfeature', searchFilter: model },
-        iconName: model.get('iconName') ? model.get('iconName') : 'search-default',
+        iconName: 'search-default',
         description: model.get('description'),
         authenticationRequired: false
       });
@@ -94,10 +102,7 @@ Ext.define('NX.coreui.controller.Search', {
         description: 'Search repositories',
         group: true,
         view: { xtype: 'nx-searchfeature', searchFilter: mainSearch },
-        iconConfig: {
-          file: 'magnifier.png',
-          variants: ['x16', 'x32']
-        },
+        iconName: 'search-default',
         weight: 20,
         expanded: false
       });
@@ -290,7 +295,7 @@ Ext.define('NX.coreui.controller.Search', {
       mode: 'browse',
       view: { xtype: 'nx-searchfeature', searchFilter: model },
       iconConfig: {
-        name: model.get('iconName') ? model.get('iconName') : 'search-default'
+        name: 'search-saved'
       },
       description: model.get('description'),
       authenticationRequired: false
