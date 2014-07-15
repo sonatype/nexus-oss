@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
@@ -28,7 +27,7 @@ public interface DatabaseManager
 {
   ODatabaseDocumentTx connect(String name, boolean create);
 
-  ODatabaseDocumentPool pool(String name);
+  DatabasePool pool(String name);
 
   //
   // Backup and Restore

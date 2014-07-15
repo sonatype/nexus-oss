@@ -25,6 +25,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.DatabaseManager;
+import org.sonatype.nexus.orient.DatabasePool;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.timeline.Entry;
@@ -40,7 +41,6 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
@@ -89,7 +89,7 @@ public class DefaultTimeline
 
   private final DatabaseManager databaseManager;
 
-  private ODatabaseDocumentPool pool;
+  private DatabasePool pool;
 
   @Inject
   public DefaultTimeline(final EventBus eventBus, final DatabaseManager databaseManager) {
@@ -151,7 +151,7 @@ public class DefaultTimeline
   }
 
   @VisibleForTesting
-  ODatabaseDocumentTx db() {
+  ODatabaseDocumentTx openDb() {
     ensureStarted();
     return pool.acquire();
   }
@@ -160,6 +160,7 @@ public class DefaultTimeline
 
   @Override
   public void add(long timestamp, String type, String subType, Map<String, String> data) {
+    // events may be added before started unfortunately, ignore them
     if (!isStarted()) {
       return;
     }
@@ -168,6 +169,7 @@ public class DefaultTimeline
 
   @Override
   public void add(final Entry... records) {
+    // events may be added before started unfortunately, ignore them
     if (!isStarted()) {
       return;
     }
@@ -189,7 +191,7 @@ public class DefaultTimeline
     }
     // this must be synced to prevent purge drop cluster being created
     synchronized (this) {
-      try (ODatabaseDocumentTx db = db()) {
+      try (ODatabaseDocumentTx db = openDb()) {
         // 1st pass (no TX, DDL): add clusters needed by records
         final Map<Long, String> timestampToClusterMap = Maps.newHashMap();
         for (EntryRecord record : records) {
@@ -251,7 +253,7 @@ public class DefaultTimeline
     if (!isStarted() || count == 0) {
       return;
     }
-    try (ODatabaseDocumentTx db = db()) {
+    try (ODatabaseDocumentTx db = openDb()) {
       db.begin();
       try {
         final StringBuilder sb = new StringBuilder();
@@ -307,7 +309,7 @@ public class DefaultTimeline
     if (!isStarted()) {
       return;
     }
-    try (ODatabaseDocumentTx db = db()) {
+    try (ODatabaseDocumentTx db = openDb()) {
       final DateMidnight nowDm = new DateMidnight(DateTimeZone.UTC);
       final int prefixLen = DB_CLUSTER_PREFIX.length();
       final int[] cids = db.getMetadata().getSchema().getClass(DB_CLASS).getClusterIds();

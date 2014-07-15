@@ -20,12 +20,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.DatabaseManager;
+import org.sonatype.nexus.orient.DatabasePool;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Maps;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
@@ -55,7 +55,7 @@ public class OrientCapabilityStorage
 
   private OClass entityType;
 
-  private ODatabaseDocumentPool databasePool;
+  private DatabasePool databasePool;
 
   @Inject
   public OrientCapabilityStorage(final DatabaseManager databaseManager,

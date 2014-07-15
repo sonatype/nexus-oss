@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.sonatype.nexus.orient.DatabaseManager;
+import org.sonatype.nexus.orient.DatabasePool;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
@@ -91,16 +92,32 @@ public abstract class DatabaseManagerSupport
   }
 
   @Override
-  public ODatabaseDocumentPool pool(final String name) {
+  public DatabasePool pool(final String name) {
     checkNotNull(name);
 
     String uri = connectionUri(name);
-    ODatabaseDocumentPool pool = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
+    final ODatabaseDocumentPool pool = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
     pool.setName(String.format("%s-database-pool", name));
     pool.setup(1, 25);
     log.debug("Created database pool: {} -> {}", name, pool);
 
-    return pool;
+    return new DatabasePool()
+    {
+      @Override
+      public ODatabaseDocumentTx acquire() {
+        return pool.acquire();
+      }
+
+      @Override
+      public void close() {
+        pool.close();
+      }
+
+      @Override
+      public String toString() {
+        return pool.toString();
+      }
+    };
   }
 
   /**
