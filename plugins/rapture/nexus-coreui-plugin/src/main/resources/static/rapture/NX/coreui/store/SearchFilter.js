@@ -51,7 +51,7 @@ Ext.define('NX.coreui.store.SearchFilter', {
       criterias: [
         { id: 'format', value: 'p2', hidden: true },
         { id: 'symbolicname' },
-        { id: 'version' },
+        { id: 'version' }
       ]
     },
     {
@@ -88,6 +88,5 @@ Ext.define('NX.coreui.store.SearchFilter', {
       readOnly: true
     }
   ]
-
 
 });
