@@ -49,6 +49,15 @@ Ext.define('NX.view.header.Panel', {
             'color': '#FFFFFF',
             'font-size': '20px'
           }
+        },
+        {
+          xtype: 'label',
+          text: NX.State.getValue('status')['edition'] + ' ' +
+              NX.State.getValue('status')['version'],
+          style: {
+            'color': '#FFFFFF',
+            'font-size': '10px'
+          }
         }
       ]
     }
