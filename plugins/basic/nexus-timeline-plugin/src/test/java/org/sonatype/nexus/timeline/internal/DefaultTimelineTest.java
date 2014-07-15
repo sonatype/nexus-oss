@@ -216,7 +216,7 @@ public class DefaultTimelineTest
     List<String> partitionsPostPurge1;
     List<String> partitionsPostPurge2;
     List<String> partitionsPostPurge3;
-    try (ODatabaseDocumentTx db = defaultNexusTimeline.db()) {
+    try (ODatabaseDocumentTx db = defaultNexusTimeline.openDb()) {
       partitionsPostAppend = Lists.newArrayList(Collections2.filter(db.getClusterNames(), new Predicate<String>()
       {
         @Override
@@ -239,7 +239,7 @@ public class DefaultTimelineTest
       }
     });
 
-    try (ODatabaseDocumentTx db = defaultNexusTimeline.db()) {
+    try (ODatabaseDocumentTx db = defaultNexusTimeline.openDb()) {
       partitionsPostPurge1 = Lists.newArrayList(Collections2.filter(db.getClusterNames(), new Predicate<String>()
       {
         @Override
@@ -262,7 +262,7 @@ public class DefaultTimelineTest
       }
     });
 
-    try (ODatabaseDocumentTx db = defaultNexusTimeline.db()) {
+    try (ODatabaseDocumentTx db = defaultNexusTimeline.openDb()) {
       partitionsPostPurge2 = Lists.newArrayList(Collections2.filter(db.getClusterNames(), new Predicate<String>()
       {
         @Override
@@ -283,7 +283,7 @@ public class DefaultTimelineTest
       }
     });
 
-    try (ODatabaseDocumentTx db = defaultNexusTimeline.db()) {
+    try (ODatabaseDocumentTx db = defaultNexusTimeline.openDb()) {
       partitionsPostPurge3 = Lists.newArrayList(Collections2.filter(db.getClusterNames(), new Predicate<String>()
       {
         @Override
