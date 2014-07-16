@@ -19,7 +19,10 @@ Ext.define('NX.ext.form.field.Url', {
   extend: 'Ext.form.field.Text',
   alias: 'widget.nx-url',
 
-  urlRegEx: /(((^https?)|(^ftp)):\/\/((([\-\w]+\.)+\w{1,3}(\/[%\-\w]+(\.\w{1,})?)*(([\w\-\.\?\\\/+@&#;`~=%!]*)(\.\w{1,})?)*)|(localhost|LOCALHOST))\/?)/i,
+  // NOTE: The default 'url' vtype uses nearly same pattern, but misses ending $ which allows invalid urls like "http://foo.bar /"
+  // FIXME: Figure out how to properly override Ext.form.field.VTypes.url with this fix and let vtype: 'url' work w/o this customization
+
+  urlRegEx: /(((^https?)|(^ftp)):\/\/((([\-\w]+\.)+\w{1,3}(\/[%\-\w]+(\.\w{1,})?)*(([\w\-\.\?\\\/+@&#;`~=%!]*)(\.\w{1,})?)*)|(localhost|LOCALHOST))\/?$)/i,
 
   validator: function (value) {
     if (this.urlRegEx.test(value)) {
