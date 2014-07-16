@@ -22,6 +22,6 @@ Ext.define('NX.view.header.BrowseMode', {
   mode: 'browse',
   title: 'Browse',
   tooltip: 'Browse server contents',
-  glyph: 'xf0e8@FontAwesome' /* fa-sitemap */
+  glyph: 'xf1b2@FontAwesome' /* fa-cube */
 
 });
