@@ -51,7 +51,8 @@ Ext.define('NX.coreui.store.SearchCriteria', {
     {
       id: 'groupid',
       config: {
-        fieldLabel: 'Group ID'
+        fieldLabel: 'Group ID',
+        width: 250
       }
     },
     {
