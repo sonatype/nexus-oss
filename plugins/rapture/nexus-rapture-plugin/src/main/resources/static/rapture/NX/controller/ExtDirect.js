@@ -17,11 +17,14 @@
  */
 Ext.define('NX.controller.ExtDirect', {
   extend: 'Ext.app.Controller',
+  mixins: [
+    'NX.LogAware'
+  ],
   requires: [
     'NX.Security'
   ],
 
-  init: function () {
+  init: function() {
     var me = this;
 
     me.listen({
@@ -38,31 +41,38 @@ Ext.define('NX.controller.ExtDirect', {
    * Checks Ext.Direct response and automatically show warning messages if an error occurred.
    * If response specifies that authentication is required, will show the login window.
    */
-  checkResponse: function (provider, transaction) {
+  checkResponse: function(provider, transaction) {
     var me = this,
-        result = transaction.result;
+        result = transaction.result,
+        message;
 
-    if (Ext.isDefined(result)
-        && Ext.isDefined(result.success) && result.success === false) {
+    if (Ext.isDefined(result)) {
+      if (Ext.isDefined(result.success) && result.success === false) {
 
-      if (Ext.isDefined(result.authenticationRequired) && result.authenticationRequired === true) {
-        NX.Messages.add({text: result.message, type: 'warning'});
-        NX.Security.askToAuthenticate();
-      }
-      else if (Ext.isDefined(result.message)) {
-        NX.Messages.add({ text: result.message, type: 'warning' });
-      }
-      else if (Ext.isDefined(result.messages)) {
-        var message = Ext.Array.from(result.messages).join('<br/>');
-        if (message) {
-          NX.Messages.add({ text: message, type: 'warning' });
+        if (Ext.isDefined(result.authenticationRequired) && result.authenticationRequired === true) {
+          message = result.message;
+          NX.Security.askToAuthenticate();
+        }
+        else if (Ext.isDefined(result.message)) {
+          message = result.message;
+        }
+        else if (Ext.isDefined(result.messages)) {
+          message = Ext.Array.from(result.messages).join('<br/>');
         }
       }
+
+      if (Ext.isDefined(transaction.serverException)) {
+        message = transaction.serverException.exception.message;
+      }
+    }
+    else {
+      message = 'Operation failed as server could not be contacted';
     }
 
-    if (Ext.isDefined(transaction.serverException)) {
-      NX.Messages.add({ text: transaction.serverException.exception.message, type: 'warning' });
+    if (message) {
+      NX.Messages.add({text: message, type: 'warning'});
     }
+    me.logDebug(transaction.action + ':' + transaction.method + " -> " + (message ? 'Failed: ' + message : 'OK'));
   }
 
 });
