@@ -10,29 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.internal.kazuki;
+package org.sonatype.nexus.orient;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.log.LogConfigurationCustomizer;
-
-import static org.sonatype.nexus.log.LoggerLevel.DEFAULT;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
- * Kazuki {@link LogConfigurationCustomizer}.
+ * Database pool.
  *
  * @since 3.0
  */
-@Named
-@Singleton
-public class LogConfigurationCustomizerImpl
-    implements LogConfigurationCustomizer
+public interface DatabasePool
 {
-  @Override
-  public void customize(final Configuration config) {
-    config.setLoggerLevel("io.kazuki", DEFAULT);
-    config.setLoggerLevel("org.skife.jdbi", DEFAULT);
-    config.setLoggerLevel("org.antlr.stringtemplate", DEFAULT);
-  }
+  ODatabaseDocumentTx acquire();
+
+  void close();
 }

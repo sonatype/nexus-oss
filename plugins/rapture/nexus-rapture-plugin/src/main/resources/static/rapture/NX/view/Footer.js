@@ -29,8 +29,6 @@ Ext.define('NX.view.Footer', {
     {
       xtype: 'container',
       html: 'Sonatype Nexus&trade; ' +
-          NX.State.getValue('status')['edition'] + ' ' +
-          NX.State.getValue('status')['version'] + ' ' +
           '&copy; Copyright Sonatype, Inc.',
       style: {
         'color': '#C6C6C6',

@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 #
 # Sonatype Nexus (TM) Open Source Version
 # Copyright (c) 2007-2014 Sonatype, Inc.
@@ -15,37 +15,42 @@
 DIRNAME=`dirname $0`
 PROGNAME=`basename $0`
 
-case "$1" in
-
-  'console')
-    $DIRNAME/karaf
-    ;;
-
-  'start')
-    $DIRNAME/start
-    ;;
-
-  'stop')
-    $DIRNAME/stop
-    ;;
-
-  'restart')
-    $DIRNAME/stop
-    $DIRNAME/start
-    ;;
-
-  'status')
-    $DIRNAME/status
-    ;;
-
-  'dump')
-    echo "Not yet implemented"
-    ;;
-
-  *)
-    echo "Usage: $PROGNAME { console | start | stop | restart | status | dump }"
+usage() {
+    echo "${PROGNAME} { console | start | stop | restart | status }"
     exit 1
-    ;;
-esac
+}
 
-exit 0
+if [ "x$1" == "x" ]; then
+    usage
+fi
+
+run() {
+    case $1 in
+        'console')
+            shift
+            exec "${DIRNAME}/karaf" "$@"
+            ;;
+        'start')
+            shift
+            exec "${DIRNAME}/start" "$@"
+            ;;
+        'stop')
+            shift
+            exec "${DIRNAME}/stop" "$@"
+            ;;
+        'restart')
+            shift
+            "${DIRNAME}/stop" 2>/dev/null
+            exec "${DIRNAME}/start" "$@"
+            ;;
+        'status')
+            shift
+            exec "${DIRNAME}/status" "$@"
+            ;;
+        *)
+            usage
+            ;;
+    esac
+}
+
+run "$@"

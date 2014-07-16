@@ -45,6 +45,8 @@ public class RequestFacade
 
   public static final String SERVICE_LOCAL = "service/local/";
 
+  public static final String SERVICE_SIESTA = "service/siesta/";
+
   private static final NexusRestClient nexusRestClient;
 
   static {

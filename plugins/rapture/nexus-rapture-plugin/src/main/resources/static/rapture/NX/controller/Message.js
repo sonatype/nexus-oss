@@ -94,6 +94,9 @@ Ext.define('NX.controller.Message', {
         },
         'nx-message-panel button[action=clear]': {
           click: me.clearMessages
+        },
+        'nx-message-panel button[action=close]': {
+          click: me.toggleMessages
         }
       }
     });

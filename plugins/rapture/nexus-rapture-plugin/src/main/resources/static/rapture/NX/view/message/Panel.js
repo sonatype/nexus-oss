@@ -28,7 +28,18 @@ Ext.define('NX.view.message.Panel', {
   layout: 'fit',
 
   tbar: [
-    { xtype: 'button', text: 'Clear', action: 'clear'},
+    {
+      xtype: 'button',
+      text: 'Clear',
+      glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
+      action: 'clear'
+    },
+    {
+      xtype: 'button',
+      text: 'Close',
+      glyph: 'xf057@FontAwesome' /* fa-times-circle */,
+      action: 'close'
+    }
   ],
 
   items: [

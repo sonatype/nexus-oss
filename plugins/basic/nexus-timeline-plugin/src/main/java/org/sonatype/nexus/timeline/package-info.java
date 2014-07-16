@@ -14,13 +14,13 @@
 /**
  * Timeline plugin.
  * <p/>
- * This plugin introduces the Kazuki backed {@link org.sonatype.nexus.timeline.Timeline} implementation, along
+ * This plugin introduces the OrientDB backed {@link org.sonatype.nexus.timeline.Timeline} implementation, along
  * with some maintenance tasks, and a complete RSS/2.0 and Atom/1.0 capable feed endpoints and feed related API.
  * <p/>
  * Subpackages of this package are:
  * <ul>
  *   <li>tasks - where the Timeline maintenance tasks are</li>
- *   <li>internal - the implementation and Guice module</li>
+ *   <li>internal - the implementation</li>
  *   <li>feeds - where the Feed related event recorder and API is</li>
  * </ul>
  *
