@@ -170,7 +170,7 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
 
     NX.direct.coreui_RepositoryTarget.delete(model.getId(), function (response) {
       me.loadStore();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'Target deleted: ' + description, type: 'success' });
       }
     });

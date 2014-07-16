@@ -210,7 +210,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       node.set('indexLoaded', true);
       tree.getEl().mask('Loading...');
       NX.direct.coreui_BrowseIndex.readChildren(node.get('repositoryId'), node.get('path'), function(response) {
-        if (Ext.isDefined(response) && response.success && response.data && response.data.length) {
+        if (Ext.isObject(response) && response.success && response.data && response.data.length) {
           Ext.suspendLayouts();
           node.removeAll();
           node.appendChild(response.data);
@@ -244,7 +244,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       node.set('storageLoaded', true);
       tree.getEl().mask('Loading...');
       NX.direct.coreui_RepositoryStorage.readChildren(node.get('repositoryId'), node.get('path'), function(response) {
-        if (Ext.isDefined(response) && response.success && response.data && response.data.length) {
+        if (Ext.isObject(response) && response.success && response.data && response.data.length) {
           Ext.suspendLayouts();
           Ext.Array.each(response.data, function(child) {
             var nodeChild = node.findChild('text', child['text']);
@@ -354,7 +354,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
    */
   expireCache: function(repository, path) {
     NX.direct.coreui_Repository.clearCache(repository.getId(), path, function(response) {
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: 'Started expiring caches of "' + repository.get('name') + '", path "' + path + '"',
           type: 'success'
@@ -371,7 +371,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
    */
   rebuildMavenMetadata: function(repository, path) {
     NX.direct.coreui_Maven.rebuildMetadata(repository.getId(), path, function(response) {
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: 'Started rebuilding metadata of "' + repository.get('name') + '", path "' + path + '"',
           type: 'success'
@@ -414,7 +414,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
         'Delete the selected "' + path + '" ' + (node.isLeaf() ? 'file' : 'folder'),
         function() {
           NX.direct.coreui_RepositoryStorage.delete(repository.getId(), path, function(response) {
-            if (Ext.isDefined(response) && response.success) {
+            if (Ext.isObject(response) && response.success) {
               node.parentNode.removeChild(node);
               NX.Messages.add({
                 text: 'Deleted "' + repository.get('name') + '", path "' + path + '"',

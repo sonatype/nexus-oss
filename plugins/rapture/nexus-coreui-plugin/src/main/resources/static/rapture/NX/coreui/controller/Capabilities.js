@@ -404,7 +404,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
         values = form.getValues();
 
     NX.direct.capability_Capability.create(values, function (response) {
-      if (Ext.isDefined(response)) {
+      if (Ext.isObject(response)) {
         if (response.success) {
           win.close();
           NX.Messages.add({
@@ -430,7 +430,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
         values = form.getValues();
 
     NX.direct.capability_Capability.update(values, function (response) {
-      if (Ext.isDefined(response)) {
+      if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
             text: 'Capability updated: ' + me.getDescription(me.getCapabilityModel().create(response.data)),
@@ -456,7 +456,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
 
     NX.direct.capability_Capability.delete(model.getId(), function (response) {
       me.loadStore();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: 'Capability deleted: ' + description, type: 'success'
         });
@@ -476,7 +476,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
 
     NX.direct.capability_Capability.enable(model.getId(), function (response) {
       me.loadStore();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: 'Capability enabled: ' + description, type: 'success'
         });
@@ -496,7 +496,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
 
     NX.direct.capability_Capability.disable(model.getId(), function (response) {
       me.loadStore();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: 'Capability disabled: ' + description, type: 'success'
         });

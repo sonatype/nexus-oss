@@ -122,7 +122,7 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
     panel.getEl().mask('Loading certificate...');
     NX.direct.ssl_Certificate.retrieveFromHost(host, port, undefined, function (response) {
       panel.getEl().unmask();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         sslCertificates.showCertificateDetails(response.data)
       }
     });

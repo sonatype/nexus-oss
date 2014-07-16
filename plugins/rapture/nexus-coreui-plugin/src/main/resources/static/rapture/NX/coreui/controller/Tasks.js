@@ -311,7 +311,7 @@ Ext.define('NX.coreui.controller.Tasks', {
 
     NX.direct.coreui_Task.delete(model.getId(), function (response) {
       me.loadStore();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: 'Task deleted: ' + description, type: 'success'
         });
@@ -333,7 +333,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       NX.Dialogs.askConfirmation('Confirm?', 'Run ' + description + ' task?', function () {
         NX.direct.coreui_Task.run(model.getId(), function (response) {
           me.loadStore();
-          if (Ext.isDefined(response) && response.success) {
+          if (Ext.isObject(response) && response.success) {
             NX.Messages.add({
               text: 'Task started: ' + description, type: 'success'
             });
@@ -357,7 +357,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       NX.Dialogs.askConfirmation('Confirm?', 'Stop ' + description + ' task?', function () {
         NX.direct.coreui_Task.stop(model.getId(), function (response) {
           me.loadStore();
-          if (Ext.isDefined(response) && response.success) {
+          if (Ext.isObject(response) && response.success) {
             NX.Messages.add({
               text: 'Task stopped: ' + description, type: 'success'
             });

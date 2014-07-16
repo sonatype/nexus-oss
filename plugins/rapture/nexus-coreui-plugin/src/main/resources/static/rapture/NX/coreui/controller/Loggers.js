@@ -183,7 +183,7 @@ Ext.define('NX.coreui.controller.Loggers', {
       NX.Dialogs.askConfirmation('Confirm deletion?', selection[0].get('name'), function () {
         NX.direct.logging_Loggers.delete(selection[0].getId(), function (response) {
           me.loadStore();
-          if (Ext.isDefined(response) && response.success) {
+          if (Ext.isObject(response) && response.success) {
             NX.Messages.add({ text: 'Logger deleted: ' + selection[0].get('name'), type: 'success' });
           }
         });
@@ -201,7 +201,7 @@ Ext.define('NX.coreui.controller.Loggers', {
     NX.Dialogs.askConfirmation('Confirm reset?', 'Reset loggers to their default levels', function () {
       NX.direct.logging_Loggers.reset(function (response) {
         me.loadStore();
-        if (Ext.isDefined(response) && response.success) {
+        if (Ext.isObject(response) && response.success) {
           NX.Messages.add({ text: 'Loggers had been reset', type: 'success' });
         }
       });

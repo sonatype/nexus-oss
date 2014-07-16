@@ -253,7 +253,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
 
     NX.direct.ldap_LdapServer.delete(model.getId(), function (response) {
       me.loadStore();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'LDAP server deleted: ' + description, type: 'success' });
       }
     });
@@ -269,7 +269,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
         order = button.up('form').down('nx-itemorderer').getValue();
 
     NX.direct.ldap_LdapServer.changeOrder(order, function (response) {
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         me.loadStore();
         win.close();
         NX.Messages.add({ text: 'LDAP server order changed', type: 'success' });
@@ -283,7 +283,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
    */
   clearCache: function (button) {
     NX.direct.ldap_LdapServer.clearCache(function (response) {
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'LDAP cache has been cleared', type: 'success' });
       }
     });
@@ -302,7 +302,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
 
     NX.direct.ldap_LdapServer.verifyConnection(values, function (response) {
       form.getEl().unmask();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'Connection to LDAP server verified: ' + url, type: 'success' });
       }
     });
@@ -321,7 +321,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
 
     NX.direct.ldap_LdapServer.verifyUserMapping(values, function (response) {
       form.getEl().unmask();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'LDAP server user mapping verified: ' + url, type: 'success' });
         Ext.widget('nx-coreui-ldapserver-userandgroup-testresults', { mappedUsers: response.data });
       }
@@ -355,7 +355,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
 
     NX.direct.ldap_LdapServer.verifyLogin(values, userName, userPass, function (response) {
       form.getEl().unmask();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         win.close();
         NX.Messages.add({ text: 'LDAP login completed successfully on: ' + url, type: 'success' });
       }

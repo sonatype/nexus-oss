@@ -96,7 +96,7 @@ Ext.define('NX.coreui.controller.SmtpSettings', {
 
     NX.direct.coreui_SmtpSettings.verifyConnection(smtpSettings, email, function (response) {
       panel.unmask();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'SMTP configuration validated successfully, check your inbox', type: 'success' });
       }
     });

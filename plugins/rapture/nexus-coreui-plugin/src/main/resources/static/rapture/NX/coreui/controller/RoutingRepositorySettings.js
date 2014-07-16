@@ -155,7 +155,7 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
         panel = me.getProxyPanel();
 
     NX.direct.coreui_RoutingRepositorySettings.updatePrefixFile(panel.getRepository().getId(), function(response) {
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: 'Discovery started for: ' + panel.getRepository().get('name'), type: 'success'
         });

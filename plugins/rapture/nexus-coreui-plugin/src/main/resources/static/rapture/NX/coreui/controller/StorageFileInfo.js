@@ -53,7 +53,7 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
       var info = {},
           repositories = [];
 
-      if (Ext.isDefined(response) && response.success && response.data) {
+      if (Ext.isObject(response) && response.success && response.data) {
         info = {
           'Path': NX.util.Url.asLink(
               NX.util.Url.urlOf('content/repositories/' + repositoryId + response.data['path']),
