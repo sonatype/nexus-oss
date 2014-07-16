@@ -125,7 +125,7 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
       NX.direct.analytics_Events.clear(function (response) {
         me.getList().getEl().unmask();
         me.load();
-        if (Ext.isDefined(response) && response.success) {
+        if (Ext.isObject(response) && response.success) {
           NX.Messages.add({ text: 'Event data has been cleared', type: 'success' });
         }
       });
@@ -144,7 +144,7 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
           me.getList().getEl().mask('Exporting event data...');
           NX.direct.analytics_Events.export(function (response) {
             me.getList().getEl().unmask();
-            if (Ext.isDefined(response) && response.success) {
+            if (Ext.isObject(response) && response.success) {
               Ext.widget('nx-coreui-analytics-eventszipcreated').setValues(response.data);
             }
           });
@@ -183,7 +183,7 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
           {
             success: function (authToken) {
               NX.direct.analytics_Events.submit(authToken, function (response) {
-                if (Ext.isDefined(response) && response.success) {
+                if (Ext.isObject(response) && response.success) {
                   NX.Messages.add({ text: 'Event data submission in progress', type: 'success' });
                 }
               });

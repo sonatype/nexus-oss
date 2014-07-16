@@ -46,7 +46,7 @@ Ext.define('NX.coreui.controller.StorageFileMavenInfo', {
       var panel = container.down('nx-coreui-repositorybrowse-storagefilemaveninfo'),
           info;
 
-      if (Ext.isDefined(response) && response.success && response.data) {
+      if (Ext.isObject(response) && response.success && response.data) {
         if (!panel) {
           panel = container.add({ xtype: 'nx-coreui-repositorybrowse-storagefilemaveninfo' });
         }

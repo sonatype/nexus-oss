@@ -158,7 +158,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     if (list) {
       me.getRepositoryTemplateStore().load();
       NX.direct.coreui_Repository.readStatus(true, function(response) {
-        if (Ext.isDefined(response) && response.success) {
+        if (Ext.isObject(response) && response.success) {
           me.updateRepositoryModels(response.data);
         }
       });
@@ -229,7 +229,7 @@ Ext.define('NX.coreui.controller.Repositories', {
 
     NX.direct.coreui_Repository.delete(model.getId(), function(response) {
       me.loadStore();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: 'Repository deleted: ' + description, type: 'success'
         });

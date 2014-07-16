@@ -87,7 +87,7 @@ Ext.define('NX.coreui.controller.SysInfo', {
       panel.getEl().mask('Loading...');
       NX.direct.atlas_SystemInformation.read(function (response) {
         panel.getEl().unmask();
-        if (Ext.isDefined(response) && response.success) {
+        if (Ext.isObject(response) && response.success) {
           panel.setInfo(response.data);
         }
       });

@@ -162,7 +162,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     win.getEl().mask('Loading certificate...');
     NX.direct.ssl_Certificate.details({ value: pem }, function (response) {
       win.getEl().unmask();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         win.close();
         me.showCertificateDetails(response.data)
       }
@@ -181,7 +181,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     win.getEl().mask('Loading certificate...');
     NX.direct.ssl_Certificate.retrieveFromHost(parsed[0], parsed[1], undefined, function (response) {
       win.getEl().unmask();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         win.close();
         me.showCertificateDetails(response.data)
       }
@@ -226,7 +226,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         description = me.getDescription(model);
 
     NX.direct.ssl_TrustStore.create({ value: model.get('pem') }, function (response) {
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         win.close();
         me.loadStore();
         NX.Messages.add({ text: 'SSL Certificate created: ' + description, type: 'success' });
@@ -246,7 +246,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         description = me.getDescription(model);
 
     NX.direct.ssl_TrustStore.delete(model.getId(), function (response) {
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         win.close();
         me.loadStore();
         NX.Messages.add({ text: 'SSL Certificate deleted: ' + description, type: 'success' });
@@ -266,7 +266,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
 
     NX.direct.ssl_TrustStore.delete(model.getId(), function (response) {
       me.loadStore();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'SSL Certificate deleted: ' + description, type: 'success' });
       }
     });

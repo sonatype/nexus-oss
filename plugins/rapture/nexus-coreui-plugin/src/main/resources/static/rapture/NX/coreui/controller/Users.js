@@ -351,7 +351,7 @@ Ext.define('NX.coreui.controller.Users', {
 
     NX.direct.coreui_User.delete(model.getId(), model.get('realm'), function (response) {
       me.loadStore();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: 'User deleted: ' + description, type: 'success'
         });
@@ -385,7 +385,7 @@ Ext.define('NX.coreui.controller.Users', {
         password = button.up('form').down('#password').getValue();
 
     NX.direct.coreui_User.changePassword(win.authToken, password, function (response) {
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         win.close();
         NX.Messages.add({ text: 'Password changed', type: 'success' });
       }

@@ -55,8 +55,7 @@ Ext.define('NX.coreui.controller.Search', {
    * @override
    */
   init: function() {
-    var me = this,
-        mainSearch;
+    var me = this;
 
     me.getApplication().getIconController().addIcons({
       'search-default': {
@@ -82,31 +81,29 @@ Ext.define('NX.coreui.controller.Search', {
     });
 
     me.getSearchFilterStore().each(function(model) {
-      me.getApplication().getFeaturesController().registerFeature({
-        mode: 'browse',
-        path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
-        view: { xtype: 'nx-searchfeature', searchFilter: model },
-        iconName: 'search-default',
-        description: model.get('description'),
-        authenticationRequired: false
-      });
-      if (!mainSearch && model.getId() === 'keyword') {
-        mainSearch = model;
+      if (model.getId() === 'keyword') {
+        me.getApplication().getFeaturesController().registerFeature({
+          mode: 'browse',
+          path: '/Search',
+          description: 'Search repositories',
+          group: true,
+          view: { xtype: 'nx-searchfeature', searchFilter: model },
+          iconName: 'search-default',
+          weight: 20,
+          expanded: false
+        });
+      }
+      else {
+        me.getApplication().getFeaturesController().registerFeature({
+          mode: 'browse',
+          path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
+          view: { xtype: 'nx-searchfeature', searchFilter: model },
+          iconName: 'search-default',
+          description: model.get('description'),
+          authenticationRequired: false
+        });
       }
     });
-
-    if (mainSearch) {
-      me.getApplication().getFeaturesController().registerFeature({
-        mode: 'browse',
-        path: '/Search',
-        description: 'Search repositories',
-        group: true,
-        view: { xtype: 'nx-searchfeature', searchFilter: mainSearch },
-        iconName: 'search-default',
-        weight: 20,
-        expanded: false
-      });
-    }
 
     me.listen({
       component: {

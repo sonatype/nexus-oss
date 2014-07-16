@@ -60,7 +60,7 @@ Ext.define('NX.coreui.controller.Outreach', {
         welcomePage.remove(outreachContent);
       }
       NX.direct.outreach_Outreach.readStatus(function (response) {
-        if (Ext.isDefined(response) && response.success) {
+        if (Ext.isObject(response) && response.success) {
           welcomePage.add({
             xtype: 'box',
             itemId: 'outreach',

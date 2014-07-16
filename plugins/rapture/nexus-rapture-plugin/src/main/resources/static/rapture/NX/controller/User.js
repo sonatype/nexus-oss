@@ -215,7 +215,7 @@ Ext.define('NX.controller.User', {
 
     NX.direct.rapture_Security.login(userName, userPass, values.remember === 'on', function (response) {
       win.getEl().unmask();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.State.setUser(response.data);
         win.close();
         if (win.options && Ext.isFunction(win.options.success)) {
@@ -255,7 +255,7 @@ Ext.define('NX.controller.User', {
 
     NX.direct.rapture_Security.authenticate(userName, userPass, function (response) {
       win.getEl().unmask();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.State.setUser(response.data);
         win.close();
         if (win.options && Ext.isFunction(win.options.success)) {
@@ -283,7 +283,7 @@ Ext.define('NX.controller.User', {
 
     NX.direct.rapture_Security.authenticationToken(userName, userPass, function (response) {
       win.getEl().unmask();
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         win.close();
         if (win.options && Ext.isFunction(win.options.success)) {
           win.options.success.call(win.options.scope, response.data, win.options);
@@ -301,7 +301,7 @@ Ext.define('NX.controller.User', {
     me.logDebug('Logout...');
 
     NX.direct.rapture_Security.logout(function (response) {
-      if (Ext.isDefined(response) && response.success) {
+      if (Ext.isObject(response) && response.success) {
         NX.State.setUser(undefined);
       }
     });
