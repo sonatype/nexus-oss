@@ -147,10 +147,18 @@ public class Launcher
   }
 
   public void start() throws Exception {
+    start(true);
+  }
+
+  public void startAsync() throws Exception {
+    start(false);
+  }
+
+  private void start(boolean waitForServer) throws Exception {
     maybeEnableCommandMonitor();
     maybeEnableShutdownIfNotAlive();
 
-    server.start();
+    server.start(waitForServer);
   }
 
   private String getProperty(final String name, final String defaultValue) {

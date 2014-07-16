@@ -36,12 +36,14 @@ public class LauncherActivator
 
     MDC.put("userId", SYSTEM_USERID);
     server = new Launcher(basePath, null, null, args.split(","));
-    server.start();
+    server.startAsync();
   }
 
   public void stop(BundleContext bundleContext) throws Exception {
     try {
-      server.stop();
+      if (server != null) {
+        server.stop();
+      }
     }
     finally {
       server = null;

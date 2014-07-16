@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Jetty server.
- *
+ * 
  * @since 2.8
  */
 public class JettyServer
@@ -80,7 +80,7 @@ public class JettyServer
     throw new Error(e);
   }
 
-  public synchronized void start() throws Exception {
+  public synchronized void start(final boolean waitForServer) throws Exception {
     final ClassLoader cl = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(classLoader);
 
@@ -90,7 +90,7 @@ public class JettyServer
       {
         public Object run() {
           try {
-            doStart();
+            doStart(waitForServer);
           }
           catch (Exception e) {
             exception.set(e);
@@ -110,7 +110,7 @@ public class JettyServer
     }
   }
 
-  private void doStart() throws Exception {
+  private void doStart(boolean waitForServer) throws Exception {
     if (thread != null) {
       throw new IllegalStateException("Already started");
     }
@@ -157,9 +157,7 @@ public class JettyServer
 
     thread = new JettyMainThread(components);
     thread.setContextClassLoader(classLoader);
-    thread.startComponents();
-
-    log.info("Started");
+    thread.startComponents(waitForServer);
   }
 
   public synchronized void stop() throws Exception {
@@ -207,7 +205,7 @@ public class JettyServer
 
   /**
    * Jetty thread used to start components, wait for the server's threads to join and stop components.
-   *
+   * 
    * Needed so that once {@link JettyServer#stop()} returns that we know that the server has actually stopped,
    * which is required for embedding.
    */
@@ -239,7 +237,7 @@ public class JettyServer
           for (LifeCycle component : components) {
             // capture the server reference
             if (component instanceof Server) {
-              server = (Server)component;
+              server = (Server) component;
             }
 
             if (!component.isRunning()) {
@@ -256,7 +254,7 @@ public class JettyServer
         }
 
         if (server != null) {
-          log.info("Running");
+          log.info("Started");
           server.join();
         }
       }
@@ -268,9 +266,12 @@ public class JettyServer
       }
     }
 
-    public void startComponents() throws Exception {
+    public void startComponents(boolean waitForServer) throws Exception {
       start();
-      started.await();
+
+      if (waitForServer) {
+        started.await();
+      }
 
       if (exception != null) {
         throw exception;
@@ -279,6 +280,10 @@ public class JettyServer
 
     public void stopComponents() throws Exception {
       Collections.reverse(components);
+
+      if (started.getCount() > 0) {
+        interrupt(); // if Jetty thread is still waiting for a component to start, this should unblock it
+      }
 
       for (LifeCycle component : components) {
         if (component.isRunning()) {
