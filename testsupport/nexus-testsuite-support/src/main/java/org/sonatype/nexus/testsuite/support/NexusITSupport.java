@@ -13,8 +13,6 @@
 package org.sonatype.nexus.testsuite.support;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
@@ -31,7 +29,6 @@ import org.sonatype.sisu.bl.support.resolver.BundleResolver;
 import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
-import org.sonatype.sisu.goodies.common.Properties2;
 import org.sonatype.sisu.litmus.testsupport.TestData;
 import org.sonatype.sisu.litmus.testsupport.TestIndex;
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
@@ -40,7 +37,6 @@ import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
 
-import com.google.common.base.Throwables;
 import com.google.inject.Binder;
 import org.codehaus.plexus.util.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -51,10 +47,9 @@ import org.junit.Rule;
 import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.client.rest.BaseUrl.baseUrlFrom;
 import static org.sonatype.nexus.testsuite.support.NexusITFilter.contextEntry;
-import static org.sonatype.nexus.testsuite.support.filters.TestProjectFilter.TEST_PROJECT_POM_FILE;
+import static org.sonatype.nexus.testsuite.support.filters.TestProjectFilterSupport.TEST_PROJECT_POM_FILE;
 
 /**
  * Base class for Nexus Integration Tests.
@@ -348,22 +343,7 @@ public abstract class NexusITSupport
       checkNotNull(nexus).getConfiguration().setLogLevel(logLevel);
     }
 
-    final URL pomUrl = getClass().getResource(
-        "/META-INF/maven/org.sonatype.nexus/nexus-testsuite-support/pom.properties"
-    );
-
-    checkState(pomUrl != null, "Missing pom.properties for org.sonatype.nexus:nexus-testsuite-support");
-
-    try {
-      final Properties props = Properties2.load(pomUrl);
-      final String version = props.getProperty("version");
-      nexus.getConfiguration().addPlugins(
-          artifactResolver().resolveArtifact("org.sonatype.nexus:nexus-it-helper-plugin:jar:" + version)
-      );
-    }
-    catch (final IOException e) {
-      throw Throwables.propagate(e);
-    }
+    nexus.getConfiguration().addFeatures("nexus-it-helper-plugin");
 
     return nexus;
   }

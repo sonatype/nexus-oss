@@ -36,6 +36,11 @@
     Selects version of maven used to deploy, etc. in ITs
     -->
     <maven-version>2.2.1</maven-version>
+
+    <!--
+    Location of unpacked Nexus distribution.
+    -->
+    <nexus.dir>${project.build.directory}/nexus/${it.nexus.bundle.artifactId}-${it.nexus.bundle.version}</nexus.dir>
   </properties>
 
   <dependencies>
@@ -134,6 +139,37 @@
       <artifactId>nexus-ssl-client</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!--
+    Additional plugin/helper features
+    -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-it-helper-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-p2-bridge-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-p2-repository-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
   </dependencies>
 
   <profiles>
@@ -271,31 +307,30 @@
                   </artifactItems>
                 </configuration>
               </execution>
+            </executions>
+          </plugin>
+          <!--
+          Install additional features required by legacy ITs (test helper + P2)
+          -->
+          <plugin>
+            <groupId>org.apache.karaf.tooling</groupId>
+            <artifactId>karaf-maven-plugin</artifactId>
+            <executions>
               <execution>
                 <id>install-plugins</id>
                 <phase>pre-integration-test</phase>
                 <goals>
-                  <goal>copy</goal>
+                  <goal>install-kars</goal>
                 </goals>
                 <configuration>
-                  <outputDirectory>${project.build.directory}/nexus/${it.nexus.bundle.artifactId}-${it.nexus.bundle.version}/plugin-repository</outputDirectory>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>org.sonatype.nexus</groupId>
-                      <artifactId>nexus-it-helper-plugin</artifactId>
-                      <version>${nexus.version}</version>
-                    </artifactItem>
-                    <artifactItem>
-                      <groupId>org.sonatype.nexus.plugins</groupId>
-                      <artifactId>nexus-p2-bridge-plugin</artifactId>
-                      <version>${nexus.version}</version>
-                    </artifactItem>
-                    <artifactItem>
-                      <groupId>org.sonatype.nexus.plugins</groupId>
-                      <artifactId>nexus-p2-repository-plugin</artifactId>
-                      <version>${nexus.version}</version>
-                    </artifactItem>
-                  </artifactItems>
+                  <featuresCfgFile>${nexus.dir}/etc/org.apache.karaf.features.cfg</featuresCfgFile>
+                  <startupPropertiesFile>${nexus.dir}/etc/startup.properties</startupPropertiesFile>
+                  <systemDirectory>${nexus.dir}/system</systemDirectory>
+                  <bootFeatures>
+                    <feature>nexus-it-helper-plugin</feature>
+                    <feature>nexus-p2-bridge-plugin</feature>
+                    <feature>nexus-p2-repository-plugin</feature>
+                  </bootFeatures>
                 </configuration>
               </execution>
             </executions>

@@ -75,11 +75,7 @@ public class YumITSupport
   protected NexusBundleConfiguration configureNexus(NexusBundleConfiguration configuration) {
     return configuration
         .setLogLevel("org.sonatype.nexus.yum", "TRACE")
-        .addPlugins(
-            artifactResolver().resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins", "nexus-yum-repository-plugin"
-            )
-        );
+        .addFeatures("nexus-yum-repository-plugin");
   }
 
   @BeforeClass

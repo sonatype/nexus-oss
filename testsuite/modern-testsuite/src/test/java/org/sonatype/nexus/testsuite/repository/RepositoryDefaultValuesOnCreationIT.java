@@ -65,8 +65,7 @@ public class RepositoryDefaultValuesOnCreationIT
 
   @Override
   protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
-    configuration.addPlugins(artifactResolver().resolvePluginFromDependencyManagement(
-        "org.sonatype.nexus.plugins", "nexus-restlet1x-testsupport-plugin"));
+    configuration.addFeatures("nexus-restlet1x-testsupport-plugin");
 
     return configuration;
   }

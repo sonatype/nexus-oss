@@ -12,12 +12,8 @@
  */
 package org.sonatype.nexus.extender;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Filter;
@@ -44,7 +40,10 @@ import org.eclipse.sisu.space.SpaceModule;
 import org.eclipse.sisu.wire.WireModule;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.startlevel.FrameworkStartLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,10 +57,15 @@ import static java.util.Collections.singletonMap;
  */
 public class NexusContextListener
     extends GuiceServletContextListener
+    implements FrameworkListener
 {
+  private static final int NEXUS_PLUGIN_START_LEVEL = 200;
+
   private static final Logger log = LoggerFactory.getLogger(NexusContextListener.class);
 
   private final NexusBundleExtender extender;
+
+  private BundleContext bundleContext;
 
   private ServletContext servletContext;
 
@@ -81,7 +85,7 @@ public class NexusContextListener
   public void contextInitialized(final ServletContextEvent event) {
     SharedMetricRegistries.getOrCreate("nexus");
 
-    final BundleContext ctx = extender.getBundleContext();
+    bundleContext = extender.getBundleContext();
 
     servletContext = event.getServletContext();
     Map<?, ?> variables = (Map<?, ?>) servletContext.getAttribute("nexus.properties");
@@ -89,7 +93,7 @@ public class NexusContextListener
       variables = System.getProperties();
     }
 
-    final ClassSpace coreSpace = new BundleClassSpace(ctx.getBundle());
+    final ClassSpace coreSpace = new BundleClassSpace(bundleContext.getBundle());
     injector = Guice.createInjector(
         new WireModule(
             new CoreModule(servletContext, variables),
@@ -110,20 +114,34 @@ public class NexusContextListener
 
       log.info("Activating locally installed plugins...");
 
-      startNexusPlugins(ctx, new File(variables.get("nexus-app") + "/plugin-repository"));
-      startNexusPlugins(ctx, new File(variables.get("nexus-work") + "/plugin-repository"));
+      final Bundle systemBundle = bundleContext.getBundle(0);
 
-      application.start();
+      // raising the start level will activate Nexus plugins - after it's done we get a callback
+      systemBundle.adapt(FrameworkStartLevel.class).setStartLevel(NEXUS_PLUGIN_START_LEVEL, this);
     }
     catch (final Exception e) {
-      log.error("Failed to start application", e);
+      log.error("Failed to lookup application", e);
       Throwables.propagate(e);
     }
+  }
 
-    // register our dynamic filter with the surrounding bootstrap code
-    final Filter filter = injector.getInstance(NexusGuiceFilter.class);
-    final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "nexus"));
-    registration = ctx.registerService(Filter.class, filter, properties);
+  public void frameworkEvent(final FrameworkEvent event) {
+    if (event.getType() == FrameworkEvent.STARTLEVEL_CHANGED) {
+      // any local Nexus plugins have now been activated
+
+      try {
+        application.start();
+      }
+      catch (final Exception e) {
+        log.error("Failed to start application", e);
+        Throwables.propagate(e);
+      }
+  
+      // register our dynamic filter with the surrounding bootstrap code
+      final Filter filter = injector.getInstance(NexusGuiceFilter.class);
+      final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "nexus"));
+      registration = bundleContext.registerService(Filter.class, filter, properties);
+    }
   }
 
   @Override
@@ -170,29 +188,5 @@ public class NexusContextListener
 
   private <T> T lookup(final Class<T> clazz) {
     return injector.getInstance(BeanLocator.class).locate(Key.get(clazz)).iterator().next().getValue();
-  }
-
-  private static void startNexusPlugins(final BundleContext ctx, File pluginRepository) {
-    File[] pluginFiles = pluginRepository.listFiles();
-    if (pluginFiles != null && pluginFiles.length > 0) {
-      Arrays.sort(pluginFiles); // TEMP: provide deterministic start ordering during transition
-      List<Bundle> plugins = new ArrayList<>();
-      for (File file : pluginFiles) {
-        try {
-          plugins.add(ctx.installBundle("reference:" + file.toURI()));
-        }
-        catch (Exception e) {
-          log.warn("Problem installing: {}", file, e);
-        }
-      }
-      for (Bundle plugin : plugins) {
-        try {
-          plugin.start();
-        }
-        catch (Exception e) {
-          log.warn("Problem starting: {}", plugin, e);
-        }
-      }
-    }
   }
 }
