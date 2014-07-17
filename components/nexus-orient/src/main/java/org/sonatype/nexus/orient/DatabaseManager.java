@@ -29,6 +29,8 @@ public interface DatabaseManager
 
   DatabasePool pool(String name);
 
+  DatabaseInstance instance(String name);
+
   //
   // Backup and Restore
   //
