@@ -57,14 +57,20 @@
       <script type="text/javascript" src="$src"></script>
     #end
 
-    ## Load core application first
+    ## Load core extjs framework
     #message("Loading baseapp...")
     #script("$raptureUrl/baseapp-${baseappMode}.js")
 
-    ## Then load extensions and the main application
-    #message("Initializing...")
+    ## Load extensions
+    #message("Loading extensions...")
     #script("$raptureUrl/extdirect-${baseappMode}.js")
+
+    ## Load application
+    #message("Loading application...")
     #script("$raptureUrl/app.js")
+
+    ## Finished
+    #message("Initialzing...")
   </div>
 </div>
 
