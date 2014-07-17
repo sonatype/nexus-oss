@@ -355,7 +355,7 @@ extends DirectComponentSupport
                   final String path)
   {
     // validate repository id
-    repositoryRegistry.getRepository(id)
+    protectedRepositoryRegistry.getRepository(id)
     ExpireCacheTask task = nexusScheduler.createTaskInstance(ExpireCacheTask)
     task.setRepositoryId(id)
     task.setResourceStorePath(path)
