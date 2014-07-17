@@ -16,8 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.plexus.components.cipher.PlexusCipher;
-import org.sonatype.plexus.components.cipher.PlexusCipherException;
+import org.sonatype.sisu.goodies.crypto.PasswordCipher;
 
 import com.google.common.base.Preconditions;
 
@@ -28,54 +27,44 @@ public class PasswordHelper
 
   private static final String ENC = "CMMDwoV";
 
-  private final PlexusCipher plexusCipher;
+  private final PasswordCipher passwordCipher;
 
   @Inject
-  public PasswordHelper(final PlexusCipher plexusCipher) {
-    this.plexusCipher = Preconditions.checkNotNull(plexusCipher, "plexusCipher");
+  public PasswordHelper(final PasswordCipher passwordCipher) {
+    this.passwordCipher = Preconditions.checkNotNull(passwordCipher, "passwordCipher");
   }
 
   public String encrypt(String password)
-      throws PlexusCipherException
   {
     return encrypt(password, ENC);
   }
 
   public String encrypt(String password, String encoding)
-      throws PlexusCipherException
   {
     // check if the password is encrypted
-    if (plexusCipher.isEncryptedString(password)) {
+    if (passwordCipher.isPasswordCipher(password)) {
       return password;
     }
-
     if (password != null) {
-      synchronized (plexusCipher) {
-        return plexusCipher.encryptAndDecorate(password, encoding);
-      }
+        return passwordCipher.encrypt(password, encoding);
     }
-
     return null;
   }
 
   public String decrypt(String encodedPassword)
-      throws PlexusCipherException
   {
     return decrypt(encodedPassword, ENC);
   }
 
   public String decrypt(String encodedPassword, String encoding)
-      throws PlexusCipherException
   {
     // check if the password is encrypted
-    if (!plexusCipher.isEncryptedString(encodedPassword)) {
+    if (!passwordCipher.isPasswordCipher(encodedPassword)) {
       return encodedPassword;
     }
 
     if (encodedPassword != null) {
-      synchronized (plexusCipher) {
-        return plexusCipher.decryptDecorated(encodedPassword, encoding);
-      }
+      return passwordCipher.decrypt(encodedPassword, encoding);
     }
     return null;
   }

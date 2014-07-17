@@ -16,8 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.security.ldap.upgrade.cipher.PlexusCipher;
-import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
+import org.sonatype.sisu.goodies.crypto.PasswordCipher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -30,28 +29,26 @@ public class DefaultPasswordHelper
 
   private static final String ENC = "CMMDwoV";
 
-  private final PlexusCipher plexusCipher;
+  private final PasswordCipher passwordCipher;
 
   @Inject
-  public DefaultPasswordHelper(final PlexusCipher plexusCipher) {
-    this.plexusCipher = checkNotNull(plexusCipher);
+  public DefaultPasswordHelper(final PasswordCipher passwordCipher) {
+    this.passwordCipher = checkNotNull(passwordCipher);
   }
 
   public String encrypt(String password)
-      throws PlexusCipherException
   {
     if (password != null) {
 
-      return plexusCipher.encrypt(password, ENC);
+      return passwordCipher.encrypt(password, ENC);
     }
     return null;
   }
 
   public String decrypt(String encodedPassword)
-      throws PlexusCipherException
   {
     if (encodedPassword != null) {
-      return plexusCipher.decrypt(encodedPassword, ENC);
+      return passwordCipher.decrypt(encodedPassword, ENC);
     }
     return null;
   }

@@ -14,13 +14,13 @@ package org.sonatype.nexus.configuration;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
+import org.sonatype.sisu.goodies.crypto.internal.CryptoHelperImpl;
+import org.sonatype.sisu.goodies.crypto.internal.DefaultPasswordCipher;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.base.Throwables;
 import org.junit.Before;
 import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -36,7 +36,7 @@ public class PasswordHelperTest
 
   @Before
   public void init() throws Exception {
-    helper = new PasswordHelper(new DefaultPlexusCipher());
+    helper = new PasswordHelper(new DefaultPasswordCipher(new CryptoHelperImpl()));
   }
 
   @Test

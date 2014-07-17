@@ -17,8 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.plexus.components.cipher.PlexusCipher;
-import org.sonatype.plexus.components.cipher.PlexusCipherException;
+import org.sonatype.sisu.goodies.crypto.PasswordCipher;
 
 /**
  * FIXME This needs to be abstracted, as this is just a copy of the class in nexus. The problem is if we move this to
@@ -31,45 +30,41 @@ public class PasswordHelper
 {
   private static final String ENC = "CMMDwoV";
 
-  private final PlexusCipher plexusCipher;
+  private final PasswordCipher passwordCipher;
 
   @Inject
-  public PasswordHelper(PlexusCipher plexusCipher) {
-    this.plexusCipher = plexusCipher;
+  public PasswordHelper(PasswordCipher passwordCipher) {
+    this.passwordCipher = passwordCipher;
   }
 
   public String encrypt(String password)
-      throws PlexusCipherException
   {
     return encrypt(password, ENC);
   }
 
   public String encrypt(String password, String encoding)
-      throws PlexusCipherException
   {
     if (password != null) {
-      return plexusCipher.encryptAndDecorate(password, encoding);
+      return passwordCipher.encrypt(password, encoding);
     }
 
     return null;
   }
 
   public String decrypt(String encodedPassword)
-      throws PlexusCipherException
   {
     return decrypt(encodedPassword, ENC);
   }
 
   public String decrypt(String encodedPassword, String encoding)
-      throws PlexusCipherException
   {
     // check if the password is encrypted
-    if (!plexusCipher.isEncryptedString(encodedPassword)) {
+    if (!passwordCipher.isPasswordCipher(encodedPassword)) {
       return encodedPassword;
     }
 
     if (encodedPassword != null) {
-      return plexusCipher.decryptDecorated(encodedPassword, encoding);
+      return passwordCipher.decrypt(encodedPassword, encoding);
     }
     return null;
   }

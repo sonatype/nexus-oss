@@ -12,15 +12,11 @@
  */
 package org.sonatype.security.ldap.realms.persist;
 
-import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
-
 public interface PasswordHelper
 {
 
-  public String encrypt(String password)
-      throws PlexusCipherException;
+  public String encrypt(String password);
 
-  public String decrypt(String encodedPassword)
-      throws PlexusCipherException;
+  public String decrypt(String encodedPassword);
 
 }
