@@ -13,13 +13,13 @@
 package org.sonatype.nexus.atlas.internal
 
 import com.google.common.io.CountingOutputStream
-import org.sonatype.nexus.atlas.SupportBundle
-import org.sonatype.nexus.atlas.SupportBundle.ContentSource
-import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type
-import org.sonatype.nexus.atlas.SupportBundleCustomizer
-import org.sonatype.nexus.atlas.SupportZipGenerator
-import org.sonatype.nexus.atlas.SupportZipGenerator.Request
-import org.sonatype.nexus.atlas.SupportZipGenerator.Result
+import org.sonatype.nexus.supportzip.SupportBundle
+import org.sonatype.nexus.supportzip.SupportBundle.ContentSource
+import org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type
+import org.sonatype.nexus.supportzip.SupportBundleCustomizer
+import org.sonatype.nexus.supportzip.SupportZipGenerator
+import org.sonatype.nexus.supportzip.SupportZipGenerator.Request
+import org.sonatype.nexus.supportzip.SupportZipGenerator.Result
 import org.sonatype.nexus.wonderland.DownloadService
 import org.sonatype.sisu.goodies.common.ByteSize
 import org.sonatype.sisu.goodies.common.ComponentSupport
@@ -31,12 +31,12 @@ import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 
 import static com.google.common.base.Preconditions.checkNotNull
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.CONFIG
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.LOG
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.METRICS
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.SECURITY
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.SYSINFO
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.THREAD
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.CONFIG
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.LOG
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.METRICS
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.SECURITY
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.SYSINFO
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.THREAD
 
 /**
  * Default {@link SupportZipGenerator}.
