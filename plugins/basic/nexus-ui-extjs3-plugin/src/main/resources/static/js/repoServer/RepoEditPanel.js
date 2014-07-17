@@ -15,7 +15,7 @@
  */
 
 define('repoServer/RepoEditPanel',['Sonatype/all', 'Sonatype/strings'], function(Sonatype, Strings){
-var REPO_REMOTE_STORAGE_REGEXP =  /(((^https?)|(^ftp)):\/\/((([\-\w]+\.)+\w{1,3}(\/[%\-\w]+(\.\w{1,})?)*(([\w\-\.\?\\\/+@&#;`~=%!]*)(\.\w{1,})?)*)|(localhost|LOCALHOST))\/?$)/i;
+var REPO_REMOTE_STORAGE_REGEXP =  /^(((https?)|(ftps?)):\/\/((\w)+(\.|\-|\w)*(:[0-9]{1,5})?)(\/(\.|\-|\w)*)*\/(\.|\-|\w)*$)/i;
 
 Sonatype.repoServer.AbstractRepositoryEditor = function(config) {
   var config = config || {};

@@ -26,9 +26,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.configuration.validation.ValidationMessage;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.application.RepositoryDependentException;
+import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
@@ -184,7 +189,14 @@ public class RepositoryPlexusResource
             if (repository.getRepositoryKind().isFacetAvailable(ProxyRepository.class)) {
               ProxyRepository proxyRepo = repository.adaptToFacet(ProxyRepository.class);
 
-              proxyRepo.setRemoteUrl(model.getRemoteStorage().getRemoteStorageUrl());
+              try {
+                proxyRepo.setRemoteUrl(model.getRemoteStorage().getRemoteStorageUrl());
+              } catch (RemoteStorageException e) {
+                ValidationResponse vr = new ApplicationValidationResponse();
+                ValidationMessage error = new ValidationMessage("remoteStorageUrl", e.getMessage(), e.getMessage());
+                vr.addValidationError(error);
+                throw new InvalidConfigurationException(vr);
+              }
               String oldPasswordForRemoteStorage = null;
               if (proxyRepo.getRemoteAuthenticationSettings() != null
                   && UsernamePasswordRemoteAuthenticationSettings.class.isInstance(proxyRepo
