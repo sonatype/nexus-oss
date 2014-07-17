@@ -26,6 +26,7 @@ import org.sonatype.nexus.atlas.SupportBundle;
 import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type;
 import org.sonatype.nexus.atlas.SupportBundleCustomizer;
 import org.sonatype.nexus.internal.orient.DatabaseManagerImpl;
+import org.sonatype.nexus.orient.DatabaseExternalizer;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.OrientCapabilityStorage;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -55,7 +56,7 @@ public class SupportBundleCustomizerImpl
     String path = String.format("work/%s/%s/%s",
         DatabaseManagerImpl.WORK_PATH,
         OrientCapabilityStorage.DB_NAME,
-        DatabaseManager.EXPORT_FILENAME
+        DatabaseExternalizer.EXPORT_FILENAME
     );
     supportBundle.add(new GeneratedContentSourceSupport(Type.CONFIG, path)
     {
@@ -68,7 +69,8 @@ public class SupportBundleCustomizerImpl
       protected void generate(final File file) throws Exception {
         // output non-compressed, no need to double compress contents
         try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
-          databaseManager.export(OrientCapabilityStorage.DB_NAME, out);
+          DatabaseExternalizer externalizer = databaseManager.externalizer(OrientCapabilityStorage.DB_NAME);
+          externalizer.export(out);
         }
       }
     });

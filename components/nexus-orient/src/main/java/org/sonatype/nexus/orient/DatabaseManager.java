@@ -12,10 +12,6 @@
  */
 package org.sonatype.nexus.orient;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
@@ -25,55 +21,23 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
  */
 public interface DatabaseManager
 {
+  /**
+   * Open a non-pooled connection to the named database.
+   *
+   * @param name    The name of the database to open.
+   * @param create  {@code true} to create the database if it does not exist.
+   */
   ODatabaseDocumentTx connect(String name, boolean create);
 
+  /**
+   * Open a pooled connection to the named database.
+   */
   DatabasePool pool(String name);
 
   DatabaseInstance instance(String name);
 
-  //
-  // Backup and Restore
-  //
-
   /**
-   * Backup database.  Output format is a compressed ZIP file.
-   *
-   * @see #restore(String, InputStream)
+   * Access the {@link DatabaseExternalizer} for a named database.
    */
-  void backup(String name, OutputStream output) throws IOException;
-
-  /**
-   * Restore database.
-   *
-   * @see #backup(String, OutputStream)
-   */
-  void restore(String name, InputStream input) throws IOException;
-
-  //
-  // Export and Import
-  //
-
-  /**
-   * Standard file name inside of database export in instance-specific database directory.
-   */
-  String EXPORT_FILENAME = "export.json";
-
-  /**
-   * Compressed variant of {@link #EXPORT_FILENAME}.
-   */
-  String EXPORT_GZ_FILENAME = EXPORT_FILENAME + ".gz";
-
-  /**
-   * Export database.  Output format is a JSON file.
-   *
-   * @see #import_(String, InputStream)
-   */
-  void export(String name, OutputStream output) throws IOException;
-
-  /**
-   * Import database.
-   *
-   * @see #export(String, OutputStream)
-   */
-  void import_(String name, InputStream input) throws IOException;
+  DatabaseExternalizer externalizer(String name);
 }

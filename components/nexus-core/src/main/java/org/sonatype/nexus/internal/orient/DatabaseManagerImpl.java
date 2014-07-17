@@ -13,13 +13,8 @@
 
 package org.sonatype.nexus.internal.orient;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.zip.GZIPInputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,18 +23,12 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.util.file.DirSupport;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
-import com.orientechnologies.orient.core.command.OCommandOutputListener;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.db.tool.ODatabaseExport;
-import com.orientechnologies.orient.core.db.tool.ODatabaseImport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Default {@link DatabaseManager} implementation.
@@ -87,39 +76,10 @@ public class DatabaseManagerImpl
     }
   }
 
-  /**
-   * Maybe import the database if there is an export file in the standard location.
-   *
-   * @see #EXPORT_FILENAME
-   * @see #EXPORT_GZ_FILENAME
-   */
   @Override
   protected void created(final ODatabaseDocumentTx db, final String name) throws Exception {
-    InputStream input = null;
-
     File dir = directory(name);
-    File file = new File(dir, EXPORT_FILENAME);
-    if (file.exists()) {
-      input = new BufferedInputStream(new FileInputStream(file), IMPORT_BUFFER_SIZE);
-    }
-    else {
-      file = new File(dir, EXPORT_GZ_FILENAME);
-      if (file.exists()) {
-        input = new GZIPInputStream(new FileInputStream(file), IMPORT_BUFFER_SIZE);
-      }
-    }
-
-    if (input != null) {
-      log.debug("Importing database: {} from: {}", name, file);
-
-      try {
-        import_(db, input);
-      }
-      finally {
-        input.close();
-      }
-
-      // TODO: Rename file now that its processed?  Or maybe delete it?
-    }
+    DatabaseExternalizerImpl externalizer = externalizer(name);
+    externalizer.maybeImportFromStandardLocation(db, dir);
   }
 }

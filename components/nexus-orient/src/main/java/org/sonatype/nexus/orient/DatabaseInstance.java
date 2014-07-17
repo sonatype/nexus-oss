@@ -12,10 +12,6 @@
  */
 package org.sonatype.nexus.orient;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
@@ -25,17 +21,23 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
  */
 public interface DatabaseInstance
 {
+  /**
+   * Returns the name of this database instance.
+   */
   String getName();
 
+  /**
+   * Open a non-pooled connection to the database.
+   */
   ODatabaseDocumentTx connect();
 
-  DatabasePool pool();
+  /**
+   * Attempt to open a pooled connection to the database.
+   */
+  ODatabaseDocumentTx acquire();
 
-  void backup(OutputStream output) throws IOException;
-
-  void restore(InputStream input) throws IOException;
-
-  void export(OutputStream output) throws IOException;
-
-  void import_(InputStream input) throws IOException;
+  /**
+   * Access the {@link DatabaseExternalizer} for this database.
+   */
+  DatabaseExternalizer externalizer();
 }
