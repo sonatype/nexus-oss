@@ -78,13 +78,14 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.base.Throwables;
+
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -664,6 +665,7 @@ public class DefaultNexusConfiguration
       return instantiateRepository(configuration, klazz, repositoryModel.getProviderHint(), repositoryModel);
     }
     catch (Exception e) {
+      Throwables.propagateIfInstanceOf(e, ConfigurationException.class);
       throw new ConfigurationException("Cannot instantiate repository " + repositoryModel.getProviderRole() + ":"
           + repositoryModel.getProviderHint(), e);
     }
