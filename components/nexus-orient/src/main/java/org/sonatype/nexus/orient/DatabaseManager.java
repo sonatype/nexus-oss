@@ -34,10 +34,10 @@ public interface DatabaseManager
    */
   DatabasePool pool(String name);
 
-  DatabaseInstance instance(String name);
-
   /**
    * Access the {@link DatabaseExternalizer} for a named database.
    */
   DatabaseExternalizer externalizer(String name);
+
+  DatabaseInstance instance(String name);
 }

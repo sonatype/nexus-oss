@@ -37,7 +37,7 @@ public interface DatabaseInstance
   ODatabaseDocumentTx acquire();
 
   /**
-   * Access the {@link DatabaseExternalizer} for this database.
+   * Access the {@link DatabaseExternalizer} for the database.
    */
   DatabaseExternalizer externalizer();
 }

@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.internal.orient;
 
+import org.sonatype.nexus.orient.DatabaseExternalizer;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.orient.DatabasePool;
@@ -109,18 +110,49 @@ public abstract class DatabaseManagerSupport
     };
   }
 
-  @Override
-  public DatabaseInstance instance(final String name) {
-    checkNotNull(name);
-    // TODO:
-    return null;
-  }
-
   // NOTE: Exposing impl type here for sub-classes
 
   @Override
   public DatabaseExternalizerImpl externalizer(final String name) {
     checkNotNull(name);
     return new DatabaseExternalizerImpl(this, name);
+  }
+
+  @Override
+  public DatabaseInstance instance(final String name) {
+    checkNotNull(name);
+
+    log.debug("Creating database instance: {}", name);
+
+    // ensure database exists
+    ODatabaseDocumentTx db = connect(name, true);
+    db.close();
+
+    // setup the pool for instance
+    final DatabasePool pool = pool(name);
+    // TODO: How do we close this?
+
+    return new DatabaseInstance()
+    {
+      @Override
+      public String getName() {
+        return name;
+      }
+
+      @Override
+      public ODatabaseDocumentTx connect() {
+        return DatabaseManagerSupport.this.connect(name, false);
+      }
+
+      @Override
+      public ODatabaseDocumentTx acquire() {
+        return pool.acquire();
+      }
+
+      @Override
+      public DatabaseExternalizer externalizer() {
+        return DatabaseManagerSupport.this.externalizer(name);
+      }
+    };
   }
 }
