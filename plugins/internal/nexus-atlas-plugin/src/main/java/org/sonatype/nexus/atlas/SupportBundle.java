@@ -87,17 +87,17 @@ public class SupportBundle
     /**
      * Content bytes. Valid after {@link #prepare()} has been called.
      */
-    InputStream getContent();
+    InputStream getContent() throws Exception;
 
     /**
      * Prepare content.
      */
-    void prepare();
+    void prepare() throws Exception;
 
     /**
      * Cleanup content.
      */
-    void cleanup();
+    void cleanup() throws Exception;
   }
 
   private final List<ContentSource> sources = Lists.newArrayList();

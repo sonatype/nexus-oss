@@ -10,47 +10,53 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.atlas
+package org.sonatype.nexus.atlas;
 
-import static com.google.common.base.Preconditions.checkNotNull
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Support for including existing files as {@link SupportBundle.ContentSource}.
  *
  * @since 2.7
  */
-class FileContentSourceSupport
+public class FileContentSourceSupport
     extends ContentSourceSupport
 {
-  private final File file
+  private final File file;
 
-  FileContentSourceSupport(final SupportBundle.ContentSource.Type type, final String path, final File file) {
-    super(type, path)
-    this.file = checkNotNull(file)
+  public FileContentSourceSupport(final SupportBundle.ContentSource.Type type, final String path, final File file) {
+    super(type, path);
+    this.file = checkNotNull(file);
   }
 
   @Override
-  void prepare() {
-    assert file.exists()
+  public void prepare() throws Exception {
+    checkState(file.exists());
     // TODO: Should we copy the file to temp location to ensure it exists?
     // TODO: May have to if we have to obfuscate the file with a generic mechanism?
   }
 
   @Override
-  long getSize() {
-    assert file.exists()
-    return file.length()
+  public long getSize() {
+    checkState(file.exists());
+    return file.length();
   }
 
   @Override
-  InputStream getContent() {
-    assert file.exists()
-    log.debug 'Reading: {}', file
-    return file.newInputStream()
+  public InputStream getContent() throws Exception {
+    checkState(file.exists());
+    log.debug("Reading: {}", file);
+    return new BufferedInputStream(new FileInputStream(file));
   }
 
   @Override
-  void cleanup() {
+  public void cleanup() throws Exception {
     // nothing
   }
 }

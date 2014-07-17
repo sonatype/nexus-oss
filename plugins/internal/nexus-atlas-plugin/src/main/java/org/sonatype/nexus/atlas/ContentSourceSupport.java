@@ -10,56 +10,64 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.atlas
+package org.sonatype.nexus.atlas;
 
-import org.sonatype.nexus.atlas.SupportBundle.ContentSource
-import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority
-import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type
-import org.sonatype.sisu.goodies.common.ComponentSupport
+import org.sonatype.nexus.atlas.SupportBundle.ContentSource;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import static com.google.common.base.Preconditions.checkNotNull
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.DEFAULT
+import com.google.common.primitives.Ints;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.DEFAULT;
 
 /**
  * Support for {@link ContentSource} implementations.
  *
  * @since 2.7
  */
-abstract class ContentSourceSupport
+public abstract class ContentSourceSupport
     extends ComponentSupport
     implements ContentSource
 {
-  public static final String PASSWORD_TOKEN = '****'
+  public static final String PASSWORD_TOKEN = "****";
 
-  public static final String EMAIL_TOKEN = 'user@domain'
+  public static final String EMAIL_TOKEN = "user@domain";
 
-  private final Type type
+  private final Type type;
 
-  private final String path
+  private final String path;
 
-  Priority priority = DEFAULT
+  private Priority priority = DEFAULT;
 
-  ContentSourceSupport(final Type type, final String path) {
-    this.type = checkNotNull(type)
-    this.path = checkNotNull(path)
+  public ContentSourceSupport(final Type type, final String path) {
+    this.type = checkNotNull(type);
+    this.path = checkNotNull(path);
   }
 
   @Override
-  Type getType() {
-    return type
+  public Type getType() {
+    return type;
   }
 
   @Override
-  String getPath() {
-    return path
+  public String getPath() {
+    return path;
+  }
+
+  public Priority getPriority() {
+    return priority;
+  }
+
+  public void setPriority(final Priority priority) {
+    this.priority = checkNotNull(priority);
   }
 
   /**
    * Compare by priority order.
    */
   @Override
-  int compareTo(final ContentSource obj) {
-    priority.order <=> obj.priority.order
+  public int compareTo(final ContentSource obj) {
+    return Ints.compare(priority.order, obj.getPriority().order);
   }
 
   @Override
