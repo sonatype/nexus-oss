@@ -13,10 +13,10 @@
 package org.sonatype.nexus.atlas.internal.customizers
 
 import groovy.json.JsonOutput
-import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
-import org.sonatype.nexus.atlas.SupportBundle
-import org.sonatype.nexus.atlas.SupportBundleCustomizer
 import org.sonatype.nexus.atlas.SystemInformationGenerator
+import org.sonatype.nexus.supportzip.GeneratedContentSourceSupport
+import org.sonatype.nexus.supportzip.SupportBundle
+import org.sonatype.nexus.supportzip.SupportBundleCustomizer
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
 import javax.inject.Inject
@@ -24,8 +24,8 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.REQUIRED
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.SYSINFO
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority.REQUIRED
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.SYSINFO
 
 /**
  * Adds system information report to support bundle.

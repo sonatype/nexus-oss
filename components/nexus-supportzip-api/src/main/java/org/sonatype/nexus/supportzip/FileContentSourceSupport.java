@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.atlas;
+package org.sonatype.nexus.supportzip;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -38,8 +38,6 @@ public class FileContentSourceSupport
   @Override
   public void prepare() throws Exception {
     checkState(file.exists());
-    // TODO: Should we copy the file to temp location to ensure it exists?
-    // TODO: May have to if we have to obfuscate the file with a generic mechanism?
   }
 
   @Override
