@@ -36,6 +36,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsGroup', {
     ]);
 
     me.items = [
+      { xtype: 'hidden', name: 'browseable', value: true },
       {
         xtype: 'checkbox',
         name: 'exposed',
