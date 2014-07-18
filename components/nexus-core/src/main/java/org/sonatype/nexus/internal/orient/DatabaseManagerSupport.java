@@ -89,8 +89,9 @@ public abstract class DatabaseManagerSupport
     underlying.setName(String.format("%s-database-pool", name));
     underlying.setup(1, 25);
 
-    log.debug("Created database pool: {} -> {}", name, underlying);
-    return new DatabasePoolImpl(underlying, name);
+    DatabasePoolImpl pool = new DatabasePoolImpl(underlying, name);
+    log.debug("Created database pool: {}", pool);
+    return pool;
   }
 
   // NOTE: Exposing impl type here for sub-classes
