@@ -23,21 +23,21 @@ import org.sonatype.nexus.orient.DatabaseManager;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Shared {@code configuration} {@link DatabaseInstance} provider.
+ * Shared {@code config} {@link DatabaseInstance} provider.
  *
  * @since 3.0
  */
-@Named(ConfigurationDatabaseInstanceProvider.NAME)
+@Named(ConfigDatabaseInstanceProvider.NAME)
 @Singleton
-public class ConfigurationDatabaseInstanceProvider
+public class ConfigDatabaseInstanceProvider
   implements Provider<DatabaseInstance>
 {
-  public static final String NAME = "configuration";
+  public static final String NAME = "config";
 
   private final DatabaseManager databaseManager;
 
   @Inject
-  public ConfigurationDatabaseInstanceProvider(final DatabaseManager databaseManager) {
+  public ConfigDatabaseInstanceProvider(final DatabaseManager databaseManager) {
     this.databaseManager = checkNotNull(databaseManager);
   }
 
