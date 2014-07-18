@@ -91,15 +91,6 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-crypto-plugin</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-groovy-plugin</artifactId>
       <version>${nexus.version}</version>
       <classifier>features</classifier>
@@ -390,7 +381,6 @@
             <feature>nexus-oss-edition</feature>
             <feature>nexus-content-plugin</feature>
             <feature>nexus-webresources-plugin</feature>
-            <feature>nexus-crypto-plugin</feature>
             <feature>nexus-groovy-plugin</feature>
             <feature>nexus-restlet1x-plugin</feature>
             <feature>nexus-siesta-plugin</feature>
