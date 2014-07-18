@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.internal.orient;
 
-import org.sonatype.nexus.orient.DatabaseExternalizer;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.orient.DatabasePool;
@@ -128,31 +127,6 @@ public abstract class DatabaseManagerSupport
     ODatabaseDocumentTx db = connect(name, true);
     db.close();
 
-    // setup the pool for instance
-    final DatabasePool pool = pool(name);
-    // TODO: How do we close this?
-
-    return new DatabaseInstance()
-    {
-      @Override
-      public String getName() {
-        return name;
-      }
-
-      @Override
-      public ODatabaseDocumentTx connect() {
-        return DatabaseManagerSupport.this.connect(name, false);
-      }
-
-      @Override
-      public ODatabaseDocumentTx acquire() {
-        return pool.acquire();
-      }
-
-      @Override
-      public DatabaseExternalizer externalizer() {
-        return DatabaseManagerSupport.this.externalizer(name);
-      }
-    };
+    return new DatabaseInstanceImpl(this, name);
   }
 }
