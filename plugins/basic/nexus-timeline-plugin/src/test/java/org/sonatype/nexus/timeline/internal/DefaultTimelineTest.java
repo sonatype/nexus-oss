@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.internal.orient.MemoryDatabaseManager;
-import org.sonatype.nexus.internal.orient.OrientBootstrap;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
@@ -42,6 +41,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeZone;
@@ -73,8 +73,6 @@ public class DefaultTimelineTest
   @Mock
   private EventBus eventBus;
 
-  protected OrientBootstrap orientBootstrap;
-
   private DefaultTimeline defaultNexusTimeline;
 
   @Before
@@ -94,8 +92,8 @@ public class DefaultTimelineTest
     };
     final Injector injector = Guice.createInjector(testModule);
 
-    orientBootstrap = new OrientBootstrap(applicationDirectories, false);
-    orientBootstrap.start();
+    Orient.instance().startup();
+    Orient.instance().removeShutdownHook();
 
     defaultNexusTimeline = (DefaultTimeline) injector.getInstance(Timeline.class);
     defaultNexusTimeline.start();
@@ -105,7 +103,8 @@ public class DefaultTimelineTest
   @After
   public void cleanup() throws Exception {
     defaultNexusTimeline.stop();
-    orientBootstrap.stop();
+
+    Orient.instance().shutdown();
   }
 
   // ==
