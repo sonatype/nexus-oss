@@ -106,8 +106,6 @@ public abstract class DatabaseManagerSupport
   public DatabaseInstance instance(final String name) {
     checkNotNull(name);
 
-    log.debug("Creating database instance: {}", name);
-
     // ensure database exists
     ODatabaseDocumentTx db = connect(name, true);
     db.close();
