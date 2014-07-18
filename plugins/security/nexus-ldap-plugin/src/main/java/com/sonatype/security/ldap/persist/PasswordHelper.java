@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.sisu.goodies.crypto.PasswordCipher;
+import org.sonatype.sisu.goodies.crypto.MavenCipher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -27,11 +27,11 @@ public class PasswordHelper
 
   private static final String ENC = "8GpOXa";
 
-  private final PasswordCipher passwordCipher;
+  private final MavenCipher mavenCipher;
 
   @Inject
-  public PasswordHelper(final PasswordCipher passwordCipher) {
-    this.passwordCipher = checkNotNull(passwordCipher);
+  public PasswordHelper(final MavenCipher mavenCipher) {
+    this.mavenCipher = checkNotNull(mavenCipher);
   }
 
   public String encrypt(String password)
@@ -42,12 +42,12 @@ public class PasswordHelper
   public String encrypt(String password, String encoding)
   {
     // check if the password is encrypted
-    if (passwordCipher.isPasswordCipher(password)) {
+    if (mavenCipher.isPasswordCipher(password)) {
       return password;
     }
 
     if (password != null) {
-      return passwordCipher.encrypt(password, encoding);
+      return mavenCipher.encrypt(password, encoding);
     }
 
     return null;
@@ -61,17 +61,17 @@ public class PasswordHelper
   public String decrypt(String encodedPassword, String encoding)
   {
     // check if the password is encrypted
-    if (!passwordCipher.isPasswordCipher(encodedPassword)) {
+    if (!mavenCipher.isPasswordCipher(encodedPassword)) {
       return encodedPassword;
     }
 
     if (encodedPassword != null) {
-      return passwordCipher.decrypt(encodedPassword, encoding);
+      return mavenCipher.decrypt(encodedPassword, encoding);
     }
     return null;
   }
 
   public boolean isEncoded(String encodedPassword) {
-    return passwordCipher.isPasswordCipher(encodedPassword);
+    return mavenCipher.isPasswordCipher(encodedPassword);
   }
 }

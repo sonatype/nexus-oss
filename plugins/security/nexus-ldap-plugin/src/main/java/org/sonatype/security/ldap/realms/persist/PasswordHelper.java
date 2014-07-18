@@ -12,6 +12,12 @@
  */
 package org.sonatype.security.ldap.realms.persist;
 
+/**
+ * This is "legacy" component to be used in upgrades only.
+ * 
+ * @deprecated To be used in configuration upgrades only.
+ */
+@Deprecated
 public interface PasswordHelper
 {
 

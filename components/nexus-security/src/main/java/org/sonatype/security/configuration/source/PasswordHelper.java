@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.sisu.goodies.crypto.PasswordCipher;
+import org.sonatype.sisu.goodies.crypto.MavenCipher;
 
 /**
  * FIXME This needs to be abstracted, as this is just a copy of the class in nexus. The problem is if we move this to
@@ -30,10 +30,10 @@ public class PasswordHelper
 {
   private static final String ENC = "CMMDwoV";
 
-  private final PasswordCipher passwordCipher;
+  private final MavenCipher passwordCipher;
 
   @Inject
-  public PasswordHelper(PasswordCipher passwordCipher) {
+  public PasswordHelper(final MavenCipher passwordCipher) {
     this.passwordCipher = passwordCipher;
   }
 

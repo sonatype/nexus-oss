@@ -16,11 +16,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.sisu.goodies.crypto.PasswordCipher;
+import org.sonatype.sisu.goodies.crypto.internal.PasswordCipherMavenLegacyImpl;
 
+import com.google.common.base.Charsets;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-
+/**
+ * This is "legacy" component to be used in upgrades only.
+ * 
+ * @deprecated To be used in configuration upgrades only.
+ */
+@Deprecated
 @Singleton
 @Named
 public class DefaultPasswordHelper
@@ -29,18 +35,17 @@ public class DefaultPasswordHelper
 
   private static final String ENC = "CMMDwoV";
 
-  private final PasswordCipher passwordCipher;
+  private final PasswordCipherMavenLegacyImpl mavenCipher;
 
   @Inject
-  public DefaultPasswordHelper(final PasswordCipher passwordCipher) {
-    this.passwordCipher = checkNotNull(passwordCipher);
+  public DefaultPasswordHelper(final PasswordCipherMavenLegacyImpl mavenCipher) {
+    this.mavenCipher = checkNotNull(mavenCipher);
   }
 
   public String encrypt(String password)
   {
     if (password != null) {
-
-      return passwordCipher.encrypt(password, ENC);
+      return new String(mavenCipher.encrypt(password.getBytes(Charsets.UTF_8), ENC), Charsets.UTF_8);
     }
     return null;
   }
@@ -48,7 +53,7 @@ public class DefaultPasswordHelper
   public String decrypt(String encodedPassword)
   {
     if (encodedPassword != null) {
-      return passwordCipher.decrypt(encodedPassword, ENC);
+      return new String(mavenCipher.decrypt(encodedPassword.getBytes(Charsets.UTF_8), ENC), Charsets.UTF_8);
     }
     return null;
   }
