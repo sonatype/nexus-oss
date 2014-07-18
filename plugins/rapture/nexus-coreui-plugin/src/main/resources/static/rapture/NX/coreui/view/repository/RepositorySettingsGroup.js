@@ -38,6 +38,13 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsGroup', {
     me.items = [
       {
         xtype: 'checkbox',
+        name: 'browseable',
+        fieldLabel: 'Allow file browsing',
+        helpText: 'This controls if users can browse the contents of the repository via their web browser.',
+        value: true
+      },
+      {
+        xtype: 'checkbox',
         name: 'exposed',
         fieldLabel: 'Publish URL',
         helpText: 'This controls if the group is published on a URL, if this field is false you will not be able to access this group remotely.',
