@@ -132,11 +132,8 @@ public class BootstrapListener
       filterTracker = new FilterTracker(bundleContext, "nexus");
       filterTracker.open();
 
-      if (containingBundle == null) {
-        // wait for embedded framework
-        listenerTracker.waitForService(0);
-        filterTracker.waitForService(0);
-      }
+      listenerTracker.waitForService(0);
+      filterTracker.waitForService(0);
     }
     catch (Exception e) {
       log.error("Failed to start Nexus", e);

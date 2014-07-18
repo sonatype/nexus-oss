@@ -12,12 +12,12 @@
  */
 package org.sonatype.nexus.atlas.internal.customizers
 
-import org.sonatype.nexus.atlas.FileContentSourceSupport
-import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
-import org.sonatype.nexus.atlas.SupportBundle
-import org.sonatype.nexus.atlas.SupportBundleCustomizer
 import org.sonatype.nexus.configuration.application.ApplicationDirectories
 import org.sonatype.nexus.log.LogManager
+import org.sonatype.nexus.supportzip.FileContentSourceSupport
+import org.sonatype.nexus.supportzip.GeneratedContentSourceSupport
+import org.sonatype.nexus.supportzip.SupportBundle
+import org.sonatype.nexus.supportzip.SupportBundleCustomizer
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
 import javax.inject.Inject
@@ -26,9 +26,9 @@ import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
 import static groovy.io.FileType.FILES
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.LOW
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.CONFIG
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.LOG
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority.LOW
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.CONFIG
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.LOG
 
 /**
  * Adds nexus.log and logging configuration files to support bundle.

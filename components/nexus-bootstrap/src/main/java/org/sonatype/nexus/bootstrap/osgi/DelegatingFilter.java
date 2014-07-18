@@ -20,6 +20,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Filter that delegates to a cached (static) instance populated by {@link FilterTracker}.
@@ -70,6 +71,12 @@ public final class DelegatingFilter
     Filter filter = delegate;
     if (filter != null) {
       filter.doFilter(request, response, chain);
+    }
+    else if (response instanceof HttpServletResponse) {
+      ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+    }
+    else {
+      chain.doFilter(request, response);
     }
   }
 

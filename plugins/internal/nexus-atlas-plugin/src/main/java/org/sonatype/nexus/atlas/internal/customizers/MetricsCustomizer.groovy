@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.atlas.internal.customizers
 
 import com.codahale.metrics.Clock
@@ -19,9 +20,9 @@ import com.codahale.metrics.json.HealthCheckModule
 import com.codahale.metrics.json.MetricsModule
 import com.codahale.metrics.jvm.ThreadDump
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
-import org.sonatype.nexus.atlas.SupportBundle
-import org.sonatype.nexus.atlas.SupportBundleCustomizer
+import org.sonatype.nexus.supportzip.GeneratedContentSourceSupport
+import org.sonatype.nexus.supportzip.SupportBundle
+import org.sonatype.nexus.supportzip.SupportBundleCustomizer
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
 import javax.inject.Inject
@@ -31,11 +32,11 @@ import java.lang.management.ManagementFactory
 import java.util.concurrent.TimeUnit
 
 import static com.google.common.base.Preconditions.checkNotNull
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.HIGH
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.OPTIONAL
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.METRICS
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.SYSINFO
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.THREAD
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority.HIGH
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority.OPTIONAL
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.METRICS
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.SYSINFO
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.THREAD
 
 /**
  * Adds metrics (threads,metrics,healthcheck) to support bundle.

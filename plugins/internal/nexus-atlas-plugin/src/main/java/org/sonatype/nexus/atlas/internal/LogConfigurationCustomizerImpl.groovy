@@ -32,6 +32,7 @@ class LogConfigurationCustomizerImpl
 {
   @Override
   void customize(LogConfigurationCustomizer.Configuration configuration) {
-    configuration.setLoggerLevel('org.sonatype.nexus.atlas', LoggerLevel.DEFAULT);
+    configuration.setLoggerLevel('org.sonatype.nexus.supportzip', LoggerLevel.DEFAULT)
+    configuration.setLoggerLevel('org.sonatype.nexus.atlas', LoggerLevel.DEFAULT)
   }
 }
