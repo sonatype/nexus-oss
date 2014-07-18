@@ -383,14 +383,7 @@ extends DirectComponentSupport
 
   def RepositoryXO create(RepositoryXO repositoryXO, Closure... createClosures) {
     def template = templateManager.templates.getTemplateById(repositoryXO.template) as RepositoryTemplate
-    ConfigurableRepository configurable = template.configurableRepository.with {
-      id = repositoryXO.id
-      name = repositoryXO.name
-      exposed = repositoryXO.exposed
-      localStatus = LocalStatus.IN_SERVICE
-      return it
-    }
-    CRepository configuration = configurable.getCurrentConfiguration(true)
+    CRepository configuration = template.configurableRepository.getCurrentConfiguration(true)
     createClosures.each { createClosure ->
       createClosure(configuration, repositoryXO)
     }
@@ -400,11 +393,7 @@ extends DirectComponentSupport
 
   def <T extends Repository> RepositoryXO update(RepositoryXO repositoryXO, Class<T> repoType, Closure... updateClosures) {
     if (repositoryXO.id) {
-      T updated = protectedRepositoryRegistry.getRepositoryWithFacet(repositoryXO.id, repoType).with {
-        name = repositoryXO.name
-        exposed = repositoryXO.exposed
-        return it
-      }
+      T updated = protectedRepositoryRegistry.getRepositoryWithFacet(repositoryXO.id, repoType)
       updateClosures.each { updateClosure ->
         updateClosure(updated, repositoryXO)
       }
@@ -415,6 +404,13 @@ extends DirectComponentSupport
   }
 
   def static doCreate = { CRepository repo, RepositoryXO repositoryXO ->
+    repo.with {
+      id = repositoryXO.id
+      name = repositoryXO.name
+      browseable = repositoryXO.browseable
+      exposed = repositoryXO.exposed
+      localStatus = LocalStatus.IN_SERVICE
+    }
     if (repositoryXO.overrideLocalStorageUrl && !repositoryXO.overrideLocalStorageUrl.trim().empty) {
       if (!repo.localStorage) {
         repo.localStorage = new CLocalStorage()
@@ -428,6 +424,11 @@ extends DirectComponentSupport
   }
 
   def static doUpdate = { Repository repo, RepositoryXO repositoryXO ->
+    repo.with {
+      name = repositoryXO.name
+      browseable = repositoryXO.browseable
+      exposed = repositoryXO.exposed
+    }
     if (repositoryXO.overrideLocalStorageUrl && !repositoryXO.overrideLocalStorageUrl.trim().empty) {
       repo.localUrl = repositoryXO.overrideLocalStorageUrl
     }
@@ -448,12 +449,10 @@ extends DirectComponentSupport
   }
 
   def static doCreateHosted = { CRepository repo, RepositoryHostedXO repositoryXO ->
-    repo.browseable = repositoryXO.browseable
     repo.writePolicy = repositoryXO.writePolicy
   }
 
   def static doUpdateHosted = { HostedRepository repo, RepositoryHostedXO repositoryXO ->
-    repo.browseable = repositoryXO.browseable
     repo.writePolicy = repositoryXO.writePolicy
   }
 
@@ -478,7 +477,6 @@ extends DirectComponentSupport
     if (!repo.remoteStorage) {
       repo.remoteStorage = new CRemoteStorage()
     }
-    repo.browseable = repositoryXO.browseable
     repo.remoteStorage.url = repositoryXO.remoteStorageUrl
     repo.remoteStorage.provider = remoteProviderHintFactory.getDefaultRoleHint(repositoryXO.remoteStorageUrl)
     exConf.autoBlockActive = repositoryXO.autoBlockActive
@@ -511,7 +509,6 @@ extends DirectComponentSupport
       validator.validate(repositoryXO, RepositoryProxyXO.HttpRequestSettings)
     }
 
-    repo.browseable = repositoryXO.browseable
     try {
       repo.remoteUrl = repositoryXO.remoteStorageUrl
     }

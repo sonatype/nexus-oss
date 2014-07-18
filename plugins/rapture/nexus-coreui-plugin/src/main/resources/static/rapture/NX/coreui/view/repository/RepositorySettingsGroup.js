@@ -36,7 +36,13 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsGroup', {
     ]);
 
     me.items = [
-      { xtype: 'hidden', name: 'browseable', value: true },
+      {
+        xtype: 'checkbox',
+        name: 'browseable',
+        fieldLabel: 'Allow file browsing',
+        helpText: 'This controls if users can browse the contents of the repository via their web browser.',
+        value: true
+      },
       {
         xtype: 'checkbox',
         name: 'exposed',
