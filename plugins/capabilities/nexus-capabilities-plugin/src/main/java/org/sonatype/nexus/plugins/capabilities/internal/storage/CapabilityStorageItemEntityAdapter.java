@@ -12,9 +12,9 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.storage;
 
-import java.util.Locale;
 import java.util.Map;
 
+import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class CapabilityStorageItemEntityAdapter
   extends ComponentSupport
 {
-  public static final String DB_CLASS = CapabilityStorageItem.class.getSimpleName().toLowerCase(Locale.US);
+  public static final String DB_CLASS = new OClassNameBuilder().type(CapabilityStorageItem.class).build();
 
   public static final String P_VERSION = "version";
 
