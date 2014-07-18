@@ -112,6 +112,8 @@ public abstract class DatabaseManagerSupport
     ODatabaseDocumentTx db = connect(name, true);
     db.close();
 
-    return new DatabaseInstanceImpl(this, name);
+    DatabaseInstanceImpl instance = new DatabaseInstanceImpl(this, name);
+    log.debug("Created database instance: {}", instance);
+    return instance;
   }
 }
