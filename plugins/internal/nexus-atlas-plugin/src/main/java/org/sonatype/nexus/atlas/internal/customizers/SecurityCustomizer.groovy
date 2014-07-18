@@ -12,10 +12,10 @@
  */
 package org.sonatype.nexus.atlas.internal.customizers
 
-import org.sonatype.nexus.atlas.GeneratedContentSourceSupport
-import org.sonatype.nexus.atlas.SupportBundle
-import org.sonatype.nexus.atlas.SupportBundleCustomizer
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration
+import org.sonatype.nexus.supportzip.GeneratedContentSourceSupport
+import org.sonatype.nexus.supportzip.SupportBundle
+import org.sonatype.nexus.supportzip.SupportBundleCustomizer
 import org.sonatype.security.model.source.SecurityModelConfigurationSource
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
@@ -24,8 +24,8 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Priority.HIGH
-import static org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type.SECURITY
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority.HIGH
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.SECURITY
 
 /**
  * Adds system security files to support bundle.

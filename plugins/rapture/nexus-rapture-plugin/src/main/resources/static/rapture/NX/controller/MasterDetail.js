@@ -233,6 +233,7 @@ Ext.define('NX.controller.MasterDetail', {
         store = list.getStore();
         model = store.getById(modelId);
         if (model) {
+          list.getSelectionModel().deselectAll(true);
           list.getSelectionModel().select(model, false, true);
           list.getView().focusRow(model);
           me.onModelChanged(model);

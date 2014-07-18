@@ -21,13 +21,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.atlas.GeneratedContentSourceSupport;
-import org.sonatype.nexus.atlas.SupportBundle;
-import org.sonatype.nexus.atlas.SupportBundle.ContentSource.Type;
-import org.sonatype.nexus.atlas.SupportBundleCustomizer;
 import org.sonatype.nexus.internal.orient.DatabaseManagerImpl;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.OrientCapabilityStorage;
+import org.sonatype.nexus.supportzip.GeneratedContentSourceSupport;
+import org.sonatype.nexus.supportzip.SupportBundle;
+import org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type;
+import org.sonatype.nexus.supportzip.SupportBundleCustomizer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
