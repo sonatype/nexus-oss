@@ -50,7 +50,7 @@ public interface NexusBundle
   File getNexusLog();
 
   /**
-   * Returns launcher log file (wrapper.log).
+   * Returns launcher log file (karaf.log).
    *
    * @return launcher log file. Never null.
    */

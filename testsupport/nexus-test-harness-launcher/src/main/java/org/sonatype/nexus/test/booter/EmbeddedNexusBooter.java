@@ -102,6 +102,10 @@ public class EmbeddedNexusBooter
     overrides.put("karaf.instances", base + File.separatorChar + "instances");
     overrides.put("karaf.startLocalConsole", "false");
     overrides.put("karaf.startRemoteShell", "false");
+    overrides.put("karaf.clean.cache", "true");
+
+    // move tmp under sonatype-work to avoid contamination between tests
+    overrides.put("java.io.tmpdir", new File(workDir, "tmp").getPath());
 
     log.info("Overrides:");
     for (Entry<String,String> entry : overrides.entrySet()) {
@@ -178,6 +182,10 @@ public class EmbeddedNexusBooter
 
     try {
       System.getProperties().putAll(overrides);
+
+      // capture boot/launcher logging per-test
+      File karafLog = new File(installDir, "../../logs/" + testId + "/karaf.log");
+      System.setProperty("karaf.log", karafLog.getCanonicalPath());
 
       log.info("Starting Nexus[{}]", testId);
       launcher = launcherFactory.newInstance((Object) args);
