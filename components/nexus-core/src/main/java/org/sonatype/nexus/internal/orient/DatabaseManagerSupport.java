@@ -85,12 +85,12 @@ public abstract class DatabaseManagerSupport
     // TODO: refine more control over how pool settings are configured per-database or globally
 
     String uri = connectionUri(name);
-    final ODatabaseDocumentPool pool = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
-    pool.setName(String.format("%s-database-pool", name));
-    pool.setup(1, 25);
+    ODatabaseDocumentPool underlying = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
+    underlying.setName(String.format("%s-database-pool", name));
+    underlying.setup(1, 25);
 
-    log.debug("Created database pool: {} -> {}", name, pool);
-    return new DatabasePoolImpl(pool, name);
+    log.debug("Created database pool: {} -> {}", name, underlying);
+    return new DatabasePoolImpl(underlying, name);
   }
 
   // NOTE: Exposing impl type here for sub-classes
