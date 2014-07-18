@@ -37,6 +37,7 @@
     <module>nexus-componentmetadata</module>
     <module>nexus-configuration-model</module>
     <module>nexus-core</module>
+    <module>nexus-crypto</module>
     <module>nexus-ehcache</module>
     <module>nexus-extender</module>
     <module>nexus-httpclient-api</module>

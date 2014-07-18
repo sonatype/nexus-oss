@@ -10,10 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.bcprov.internal;
+package org.sonatype.nexus.internal.crypto;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 
+import javax.crypto.Cipher;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -21,10 +23,11 @@ import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.base.Throwables;
+
 import com.google.common.eventbus.Subscribe;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.eclipse.sisu.EagerSingleton;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -32,8 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * component is marked as {@code EagerSingleton} to be created (and hence to have registration happen) as early as
  * possible, even before any wiring happens in plugins.
  *
- * @author cstamas
- * @since 2.4
+ * @since 3.0
  */
 @Named
 @EagerSingleton
@@ -41,7 +43,7 @@ public class BCPluginEventHandler
   extends ComponentSupport
 {
   private final boolean registered;
-
+  
   /**
    * Default constructor.
    *
@@ -50,6 +52,17 @@ public class BCPluginEventHandler
   @Inject
   public BCPluginEventHandler(final EventBus eventBus) {
     checkNotNull(eventBus);
+
+    // log if no unlimited strength cipher detected
+    try {
+      if (Cipher.getMaxAllowedKeyLength("AES") == Integer.MAX_VALUE) {
+        log.info("Unlimited strength JCE policy detected");
+      }
+    }
+    catch (NoSuchAlgorithmException e) {
+      throw Throwables.propagate(e);
+    }
+    // TODO: Add specific warnings for algorithms we know specifically may affect NX behavior negatively if low strength/default policy is in place
 
     // register BC and nag if already installed
     registered = Security.addProvider(new BouncyCastleProvider()) != -1;
