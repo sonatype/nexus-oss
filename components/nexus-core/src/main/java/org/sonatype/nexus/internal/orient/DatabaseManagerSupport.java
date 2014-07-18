@@ -88,25 +88,9 @@ public abstract class DatabaseManagerSupport
     final ODatabaseDocumentPool pool = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
     pool.setName(String.format("%s-database-pool", name));
     pool.setup(1, 25);
+
     log.debug("Created database pool: {} -> {}", name, pool);
-
-    return new DatabasePool()
-    {
-      @Override
-      public ODatabaseDocumentTx acquire() {
-        return pool.acquire();
-      }
-
-      @Override
-      public void close() {
-        pool.close();
-      }
-
-      @Override
-      public String toString() {
-        return pool.toString();
-      }
-    };
+    return new DatabasePoolImpl(pool, name);
   }
 
   // NOTE: Exposing impl type here for sub-classes
