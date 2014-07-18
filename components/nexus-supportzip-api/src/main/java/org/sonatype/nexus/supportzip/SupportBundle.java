@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.atlas;
+package org.sonatype.nexus.supportzip;
 
 import java.io.InputStream;
 import java.util.List;
@@ -87,17 +87,17 @@ public class SupportBundle
     /**
      * Content bytes. Valid after {@link #prepare()} has been called.
      */
-    InputStream getContent();
+    InputStream getContent() throws Exception;
 
     /**
      * Prepare content.
      */
-    void prepare();
+    void prepare() throws Exception;
 
     /**
      * Cleanup content.
      */
-    void cleanup();
+    void cleanup() throws Exception;
   }
 
   private final List<ContentSource> sources = Lists.newArrayList();
