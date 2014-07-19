@@ -189,4 +189,11 @@ public class DatabaseExternalizerImpl
       // TODO: Rename file now that its processed?  Or maybe delete it?
     }
   }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "name='" + name + '\'' +
+        '}';
+  }
 }
