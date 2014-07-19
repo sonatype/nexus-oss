@@ -13,16 +13,21 @@
 
 package org.sonatype.nexus.internal.orient;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.orient.DatabasePool;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Support for {@link DatabaseManager} implementations.
@@ -30,18 +35,79 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public abstract class DatabaseManagerSupport
-    extends ComponentSupport
+    extends LifecycleSupport
     implements DatabaseManager
 {
   public static final String SYSTEM_USER = "admin";
 
   public static final String SYSTEM_PASSWORD = "admin";
 
+  private final Map<String,DatabasePoolImpl> pools = Maps.newHashMap();
+
+  private final Map<String,DatabaseInstanceImpl> instances = Maps.newHashMap();
+
+  @Override
+  protected void doStart() throws Exception {
+    checkState(pools.isEmpty());
+    checkState(instances.isEmpty());
+
+    // HACK:
+    log.info("Started: {}", this);
+  }
+
+  @Override
+  protected void doStop() throws Exception {
+    // NOTE: Lifecycle lock and use of ensureStarted avoids need to synchronize around collections.
+
+    // stop all instances
+    if (!instances.isEmpty()) {
+      log.info("Stopping {} instances", instances.size());
+
+      Iterator<DatabaseInstanceImpl> iter = instances.values().iterator();
+      while (iter.hasNext()) {
+        DatabaseInstanceImpl instance = iter.next();
+
+        log.info("Stopping instance: {}", instance);
+        try {
+          // TODO:
+          //instance.stop();
+        }
+        catch (Exception e) {
+          log.warn("Failed to stop database instance: {}", instance, e);
+        }
+        iter.remove();
+      }
+    }
+
+    // close all pools
+    if (!pools.isEmpty()) {
+      log.info("Closing {} pools", pools.size());
+
+      Iterator<DatabasePoolImpl> iter = pools.values().iterator();
+      while (iter.hasNext()) {
+        DatabasePoolImpl pool = iter.next();
+
+        log.info("Closing pool: {}", pool);
+        try {
+          pool.close();
+        }
+        catch (Exception e) {
+          log.warn("Failed to close database pool: {}", pool, e);
+        }
+        iter.remove();
+      }
+    }
+
+    // HACK:
+    log.info("Stopped: {}", this);
+  }
+
   protected abstract String connectionUri(final String name);
 
   @Override
   public ODatabaseDocumentTx connect(final String name, final boolean create) {
     checkNotNull(name);
+    ensureStarted();
 
     String uri = connectionUri(name);
     ODatabaseDocumentTx db = new ODatabaseDocumentTx(uri);
@@ -81,37 +147,56 @@ public abstract class DatabaseManagerSupport
   @Override
   public DatabasePool pool(final String name) {
     checkNotNull(name);
+    ensureStarted();
 
-    // TODO: refine more control over how pool settings are configured per-database or globally
+    synchronized (pools) {
+      DatabasePoolImpl pool = pools.get(name);
+      if (pool == null) {
+        // TODO: refine more control over how pool settings are configured per-database or globally
 
-    String uri = connectionUri(name);
-    ODatabaseDocumentPool underlying = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
-    underlying.setName(String.format("%s-database-pool", name));
-    underlying.setup(1, 25);
+        String uri = connectionUri(name);
+        ODatabaseDocumentPool underlying = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
+        underlying.setName(String.format("%s-database-pool", name));
+        underlying.setup(1, 25);
 
-    DatabasePoolImpl pool = new DatabasePoolImpl(underlying, name);
-    log.debug("Created database pool: {}", pool);
-    return pool;
+        pool = new DatabasePoolImpl(underlying, name);
+        log.debug("Created database pool: {}", pool);
+
+        // TODO: pool.start()
+
+        pools.put(name, pool);
+      }
+      return pool;
+    }
   }
 
-  // NOTE: Exposing impl type here for sub-classes
-
+  /**
+   * Exposing impl type here for sub-classes.
+   */
   @Override
   public DatabaseExternalizerImpl externalizer(final String name) {
     checkNotNull(name);
+    ensureStarted();
+
     return new DatabaseExternalizerImpl(this, name);
   }
 
   @Override
   public DatabaseInstance instance(final String name) {
     checkNotNull(name);
+    ensureStarted();
 
-    // ensure database exists
-    ODatabaseDocumentTx db = connect(name, true);
-    db.close();
+    synchronized (instances) {
+      DatabaseInstanceImpl instance = instances.get(name);
+      if (instance == null) {
+        instance = new DatabaseInstanceImpl(this, name);
+        log.debug("Created database instance: {}", instance);
 
-    DatabaseInstanceImpl instance = new DatabaseInstanceImpl(this, name);
-    log.debug("Created database instance: {}", instance);
-    return instance;
+        // TODO: instance.start()
+
+        instances.put(name, instance);
+      }
+      return instance;
+    }
   }
 }

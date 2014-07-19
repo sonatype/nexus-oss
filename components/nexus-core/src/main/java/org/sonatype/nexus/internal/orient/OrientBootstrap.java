@@ -17,6 +17,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.orient.DatabaseManager;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -31,20 +33,33 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class OrientBootstrap
     extends LifecycleSupport
 {
-  private final Provider<OrientServer> serverProvider;
+  private final Provider<OrientServer> server;
+
+  private final Provider<DatabaseManager> databaseManager;
 
   @Inject
-  public OrientBootstrap(final Provider<OrientServer> serverProvider) {
-    this.serverProvider = checkNotNull(serverProvider);
+  public OrientBootstrap(final Provider<OrientServer> server,
+                         final Provider<DatabaseManager> databaseManager)
+  {
+    this.server = checkNotNull(server);
+    this.databaseManager = checkNotNull(databaseManager);
   }
 
   @Override
   protected void doStart() throws Exception {
-    serverProvider.get().start();
+    server.get().start();
+
+    if (databaseManager.get() instanceof Lifecycle) {
+      ((Lifecycle)databaseManager.get()).start();
+    }
   }
 
   @Override
   protected void doStop() throws Exception {
-    serverProvider.get().stop();
+    if (databaseManager.get() instanceof Lifecycle) {
+      ((Lifecycle)databaseManager.get()).stop();
+    }
+
+    server.get().stop();
   }
 }
