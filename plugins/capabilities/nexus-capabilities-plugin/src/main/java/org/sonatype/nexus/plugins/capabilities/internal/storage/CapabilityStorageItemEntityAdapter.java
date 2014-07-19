@@ -66,7 +66,6 @@ public class CapabilityStorageItemEntityAdapter
       type.createProperty(P_NOTES, OType.STRING);
       type.createProperty(P_PROPERTIES, OType.EMBEDDEDMAP);
 
-      schema.save();
       log.info("Created schema: {}, properties: {}", type, type.properties());
     }
     return type;
