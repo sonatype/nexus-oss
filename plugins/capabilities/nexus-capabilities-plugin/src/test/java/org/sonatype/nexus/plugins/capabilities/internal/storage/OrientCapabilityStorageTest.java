@@ -14,7 +14,6 @@ package org.sonatype.nexus.plugins.capabilities.internal.storage;
 
 import java.util.Map;
 
-import org.sonatype.nexus.internal.orient.DatabaseInstanceImpl;
 import org.sonatype.nexus.internal.orient.HexRecordIdObfuscator;
 import org.sonatype.nexus.internal.orient.MemoryDatabaseManager;
 import org.sonatype.nexus.orient.DatabaseInstance;
@@ -40,6 +39,8 @@ import static org.hamcrest.Matchers.notNullValue;
 public class OrientCapabilityStorageTest
   extends TestSupport
 {
+  private MemoryDatabaseManager databaseManager;
+
   private OrientCapabilityStorage underTest;
 
   @Before
@@ -47,8 +48,11 @@ public class OrientCapabilityStorageTest
     Orient.instance().startup();
     Orient.instance().removeShutdownHook();
 
-    MemoryDatabaseManager databaseManager = new MemoryDatabaseManager();
-    DatabaseInstance databaseInstance = new DatabaseInstanceImpl(databaseManager, "test");
+    this.databaseManager = new MemoryDatabaseManager();
+    databaseManager.start();
+
+    DatabaseInstance databaseInstance = databaseManager.instance("test");
+
     this.underTest = new OrientCapabilityStorage(Providers.of(databaseInstance), new HexRecordIdObfuscator());
     underTest.start();
   }
@@ -57,6 +61,12 @@ public class OrientCapabilityStorageTest
   public void tearDown() throws Exception {
     if (underTest != null) {
       underTest.stop();
+      underTest = null;
+    }
+
+    if (databaseManager != null) {
+      databaseManager.stop();
+      databaseManager = null;
     }
 
     Orient.instance().shutdown();
