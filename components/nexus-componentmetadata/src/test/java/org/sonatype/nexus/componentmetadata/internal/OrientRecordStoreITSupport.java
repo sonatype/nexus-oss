@@ -120,7 +120,10 @@ public class OrientRecordStoreITSupport
 
   @After
   public void tearDown() throws Exception {
-    store.stop();
+    if (store != null) {
+      store.stop();
+      store = null;
+    }
 
     if (databaseManager != null) {
       databaseManager.stop();
