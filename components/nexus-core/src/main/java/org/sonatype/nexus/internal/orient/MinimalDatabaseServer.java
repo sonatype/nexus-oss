@@ -19,6 +19,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.orient.DatabaseServer;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
+import com.orientechnologies.orient.core.OConstants;
 import com.orientechnologies.orient.core.Orient;
 
 /**
@@ -32,6 +33,10 @@ public class MinimalDatabaseServer
     extends LifecycleSupport
     implements DatabaseServer
 {
+  public MinimalDatabaseServer() {
+    log.info("OrientDB version: {}", OConstants.getVersion());
+  }
+
   @Override
   protected void doStart() throws Exception {
     Orient.instance().startup();
