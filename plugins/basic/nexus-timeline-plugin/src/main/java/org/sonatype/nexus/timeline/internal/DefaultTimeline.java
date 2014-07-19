@@ -94,10 +94,6 @@ public class DefaultTimeline
   @Inject
   public DefaultTimeline(final EventBus eventBus, final DatabaseManager databaseManager) {
     this.databaseManager = checkNotNull(databaseManager);
-
-    // HACK:
-    log.info("DB manager: {}", databaseManager);
-
     eventBus.register(this);
   }
 

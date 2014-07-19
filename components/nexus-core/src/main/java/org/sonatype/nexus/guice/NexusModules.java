@@ -78,7 +78,6 @@ public class NexusModules
         }
       });
       install(new ValidationModule());
-      install(new OrientModule());
     }
   }
 
@@ -125,6 +124,8 @@ public class NexusModules
       install(new MetricsModule());
 
       install(new SecurityWebModule(servletContext, true));
+
+      install(new OrientModule());
     }
   }
 
