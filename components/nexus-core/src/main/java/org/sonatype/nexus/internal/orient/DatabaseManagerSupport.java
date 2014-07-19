@@ -61,6 +61,8 @@ public abstract class DatabaseManagerSupport
 
   /**
    * Stop all instances and stop tracking.
+   *
+   * Usage is protected by lifecycle lock, and use of ensureStarted.
    */
   private void stopAllInstances() {
     if (instances.isEmpty()) {
@@ -92,6 +94,8 @@ public abstract class DatabaseManagerSupport
 
   /**
    * Stop all pools and stop tracking.
+   *
+   * Usage is protected by lifecycle lock, and use of ensureStarted.
    */
   private void stopAllPools() {
     if (pools.isEmpty()) {
@@ -121,6 +125,9 @@ public abstract class DatabaseManagerSupport
     }
   }
 
+  /**
+   * Returns the OrientDB connection URI string for the given database name.
+   */
   protected abstract String connectionUri(final String name);
 
   @Override
@@ -184,7 +191,6 @@ public abstract class DatabaseManagerSupport
       if (pool == null) {
         pool = createPool(name);
         log.debug("Created database pool: {}", pool);
-        Lifecycles.start(pool);
         pools.put(name, pool);
       }
       return pool;
@@ -195,11 +201,13 @@ public abstract class DatabaseManagerSupport
     // TODO: refine more control over how pool settings are configured per-database or globally
 
     String uri = connectionUri(name);
-    ODatabaseDocumentPool pool = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
-    pool.setName(String.format("%s-database-pool", name));
-    pool.setup(1, 25);
+    ODatabaseDocumentPool underlying = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
+    underlying.setName(String.format("%s-database-pool", name));
+    underlying.setup(1, 25);
 
-    return new DatabasePoolImpl(pool, name);
+    DatabasePoolImpl pool = new DatabasePoolImpl(underlying, name);
+    Lifecycles.start(pool);
+    return pool;
   }
 
   @Override
@@ -211,9 +219,7 @@ public abstract class DatabaseManagerSupport
       DatabaseInstanceImpl instance = instances.get(name);
       if (instance == null) {
         instance = createInstance(name);
-        Lifecycles.start(instance);
         log.debug("Created database instance: {}", instance);
-
         instances.put(name, instance);
       }
       return instance;
@@ -221,6 +227,8 @@ public abstract class DatabaseManagerSupport
   }
 
   private DatabaseInstanceImpl createInstance(final String name) {
-    return new DatabaseInstanceImpl(this, name);
+    DatabaseInstanceImpl instance = new DatabaseInstanceImpl(this, name);
+    Lifecycles.start(instance);
+    return instance;
   }
 }

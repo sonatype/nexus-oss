@@ -32,7 +32,7 @@ public class ConfigDatabase
   public static final String NAME = "config";
 
   /**
-   * Instance provider.
+   * Shared {@code config} database instance provider.
    */
   @Named(NAME)
   @Singleton
@@ -53,7 +53,7 @@ public class ConfigDatabase
   }
 
   /**
-   * Includes export of the database in support-zip.
+   * Includes export of the {@code config} database in support-zip.
    */
   @Named
   @Singleton

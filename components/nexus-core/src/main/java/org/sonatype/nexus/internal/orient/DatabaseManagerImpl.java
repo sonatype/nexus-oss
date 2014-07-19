@@ -69,6 +69,8 @@ public class DatabaseManagerImpl
     try {
       File dir = directory(name);
       DirSupport.mkdir(dir);
+
+      // FIXME: update this to work on winblows
       return "plocal:" + dir.getCanonicalPath();
     }
     catch (IOException e) {
