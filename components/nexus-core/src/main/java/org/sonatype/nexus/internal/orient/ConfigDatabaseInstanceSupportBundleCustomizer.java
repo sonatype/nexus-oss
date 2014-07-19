@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal;
+package org.sonatype.nexus.internal.orient;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -19,12 +19,11 @@ import java.io.OutputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.internal.orient.DatabaseManagerImpl;
 import org.sonatype.nexus.orient.DatabaseExternalizer;
-import org.sonatype.nexus.orient.DatabaseManager;
-import org.sonatype.nexus.plugins.capabilities.internal.storage.OrientCapabilityStorage;
+import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.supportzip.GeneratedContentSourceSupport;
 import org.sonatype.nexus.supportzip.SupportBundle;
 import org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type;
@@ -34,43 +33,42 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Capabilities {@link SupportBundleCustomizer} to include exported capability database in support-zips.
+ * Includes export of {@code config} database in support-zip.
  *
- * @since 2.7
+ * @since 3.0
  */
 @Named
 @Singleton
-public class SupportBundleCustomizerImpl
+public class ConfigDatabaseInstanceSupportBundleCustomizer
     extends ComponentSupport
     implements SupportBundleCustomizer
 {
-  private final DatabaseManager databaseManager;
+  private final Provider<DatabaseInstance> databaseInstance;
 
   @Inject
-  public SupportBundleCustomizerImpl(final DatabaseManager databaseManager) {
-    this.databaseManager = checkNotNull(databaseManager);
+  public ConfigDatabaseInstanceSupportBundleCustomizer(final @Named("config") Provider<DatabaseInstance> databaseInstance) {
+    this.databaseInstance = checkNotNull(databaseInstance);
   }
 
   @Override
   public void customize(final SupportBundle supportBundle) {
     String path = String.format("work/%s/%s/%s",
         DatabaseManagerImpl.WORK_PATH,
-        OrientCapabilityStorage.DB_NAME,
+        databaseInstance.get().getName(),
         DatabaseExternalizer.EXPORT_FILENAME
     );
     supportBundle.add(new GeneratedContentSourceSupport(Type.CONFIG, path)
     {
       {
-        // capabilities are critical to system operation, ensure this always gets into the zip
         setPriority(Priority.REQUIRED);
       }
 
       @Override
       protected void generate(final File file) throws Exception {
         // output non-compressed, no need to double compress contents
-        try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
-          DatabaseExternalizer externalizer = databaseManager.externalizer(OrientCapabilityStorage.DB_NAME);
-          externalizer.export(out);
+        try (OutputStream output = new BufferedOutputStream(new FileOutputStream(file))) {
+          DatabaseExternalizer externalizer = databaseInstance.get().externalizer();
+          externalizer.export(output);
         }
       }
     });

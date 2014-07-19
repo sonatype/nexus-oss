@@ -17,10 +17,10 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.orient.DatabaseManager;
-import org.sonatype.nexus.orient.DatabasePool;
+import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
@@ -45,9 +45,7 @@ public class OrientCapabilityStorage
     extends LifecycleSupport
     implements CapabilityStorage
 {
-  public static final String DB_NAME = "capability";
-
-  private final DatabaseManager databaseManager;
+  private final Provider<DatabaseInstance> databaseInstance;
 
   private final RecordIdObfuscator recordIdObfuscator;
 
@@ -55,32 +53,24 @@ public class OrientCapabilityStorage
 
   private OClass entityType;
 
-  private DatabasePool databasePool;
-
   @Inject
-  public OrientCapabilityStorage(final DatabaseManager databaseManager,
+  public OrientCapabilityStorage(final Provider<DatabaseInstance> databaseInstance,
                                  final RecordIdObfuscator recordIdObfuscator)
   {
-    this.databaseManager = checkNotNull(databaseManager);
+    this.databaseInstance = checkNotNull(databaseInstance);
     this.recordIdObfuscator = checkNotNull(recordIdObfuscator);
   }
 
   @Override
   protected void doStart() throws Exception {
-    // create database
-    try (ODatabaseDocumentTx db = databaseManager.connect(DB_NAME, true)) {
+    try (ODatabaseDocumentTx db = databaseInstance.get().connect()) {
       // register schema
       entityType = entityAdapter.register(db);
     }
-
-    // setup the database connection pool
-    this.databasePool = databaseManager.pool(DB_NAME);
   }
 
   @Override
   protected void doStop() throws Exception {
-    databasePool.close();
-    databasePool = null;
     entityType = null;
   }
 
@@ -89,7 +79,7 @@ public class OrientCapabilityStorage
    */
   private ODatabaseDocumentTx openDb() {
     ensureStarted();
-    return databasePool.acquire();
+    return databaseInstance.get().acquire();
   }
 
   private CapabilityIdentity convert(final ORID rid) {

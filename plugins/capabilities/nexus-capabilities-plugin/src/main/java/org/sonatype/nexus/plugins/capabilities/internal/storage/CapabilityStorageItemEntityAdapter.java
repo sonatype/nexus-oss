@@ -33,7 +33,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class CapabilityStorageItemEntityAdapter
   extends ComponentSupport
 {
-  public static final String DB_CLASS = new OClassNameBuilder().type(CapabilityStorageItem.class).build();
+  public static final String DB_PREFIX = "capability";
+
+  public static final String DB_CLASS = new OClassNameBuilder()
+      .prefix(DB_PREFIX)
+      .type(CapabilityStorageItem.class)
+      .build();
 
   public static final String P_VERSION = "version";
 

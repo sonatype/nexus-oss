@@ -12,15 +12,18 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.storage;
 
-import java.io.File;
 import java.util.Map;
 
-import org.sonatype.nexus.internal.orient.DatabaseManagerImpl;
+import org.sonatype.nexus.internal.orient.DatabaseInstanceImpl;
 import org.sonatype.nexus.internal.orient.HexRecordIdObfuscator;
+import org.sonatype.nexus.internal.orient.MemoryDatabaseManager;
+import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Maps;
+import com.google.inject.util.Providers;
+import com.orientechnologies.orient.core.Orient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,12 +44,12 @@ public class OrientCapabilityStorageTest
 
   @Before
   public void setUp() throws Exception {
-    File dir = util.createTempDir("testdb");
+    Orient.instance().startup();
+    Orient.instance().removeShutdownHook();
 
-    // TODO: Replace with in-memory manager impl
-    DatabaseManagerImpl databaseManager = new DatabaseManagerImpl(dir);
-
-    this.underTest = new OrientCapabilityStorage(databaseManager, new HexRecordIdObfuscator());
+    MemoryDatabaseManager databaseManager = new MemoryDatabaseManager();
+    DatabaseInstance databaseInstance = new DatabaseInstanceImpl(databaseManager, "test");
+    this.underTest = new OrientCapabilityStorage(Providers.of(databaseInstance), new HexRecordIdObfuscator());
     underTest.start();
   }
 
@@ -55,6 +58,8 @@ public class OrientCapabilityStorageTest
     if (underTest != null) {
       underTest.stop();
     }
+
+    Orient.instance().shutdown();
   }
 
   @Test

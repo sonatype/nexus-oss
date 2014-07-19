@@ -16,6 +16,8 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+// TODO: Rename CapabilityStorageItem -> StorageItem?
+
 public class CapabilityStorageItem
 {
   private int version;

@@ -50,7 +50,7 @@ public class DatabaseInstanceImpl
 
   @Override
   public ODatabaseDocumentTx connect() {
-    return databaseManager.connect(name, false);
+    return databaseManager.connect(name, true);
   }
 
   @Override
