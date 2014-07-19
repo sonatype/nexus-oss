@@ -55,10 +55,16 @@ public class DatabaseInstanceImpl
   }
 
   @Override
+  protected void doStart() throws Exception {
+    // ensure the database is created
+    databaseManager.connect(name, true).close();
+  }
+
+  @Override
   public ODatabaseDocumentTx connect() {
     ensureStarted();
 
-    return databaseManager.connect(name, true);
+    return databaseManager.connect(name, false);
   }
 
   @Override
