@@ -180,14 +180,10 @@ public class DefaultTimelineTest
   @Test
   public void partitioningByDay() throws Exception {
     final long now = new DateMidnight(DateTimeZone.UTC).getMillis();
-    underTest
-        .add(new EntryRecord(now - TimeUnit.DAYS.toMillis(2), "TEST", "1", ImmutableMap.of("day", "1")));
-    underTest
-        .add(new EntryRecord(now - TimeUnit.DAYS.toMillis(2), "TEST", "2", ImmutableMap.of("day", "1")));
-    underTest
-        .add(new EntryRecord(now - TimeUnit.DAYS.toMillis(1), "TEST", "1", ImmutableMap.of("day", "2")));
-    underTest
-        .add(new EntryRecord(now - TimeUnit.DAYS.toMillis(1), "TEST", "2", ImmutableMap.of("day", "2")));
+    underTest.add(new EntryRecord(now - TimeUnit.DAYS.toMillis(2), "TEST", "1", ImmutableMap.of("day", "1")));
+    underTest.add(new EntryRecord(now - TimeUnit.DAYS.toMillis(2), "TEST", "2", ImmutableMap.of("day", "1")));
+    underTest.add(new EntryRecord(now - TimeUnit.DAYS.toMillis(1), "TEST", "1", ImmutableMap.of("day", "2")));
+    underTest.add(new EntryRecord(now - TimeUnit.DAYS.toMillis(1), "TEST", "2", ImmutableMap.of("day", "2")));
     underTest.add(new EntryRecord(now, "TEST", "1", ImmutableMap.of("day", "3")));
     underTest.add(new EntryRecord(now, "TEST", "2", ImmutableMap.of("day", "3")));
 
