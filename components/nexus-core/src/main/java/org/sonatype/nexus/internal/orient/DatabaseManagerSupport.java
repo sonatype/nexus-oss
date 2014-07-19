@@ -74,16 +74,16 @@ public abstract class DatabaseManagerSupport
       DatabaseInstanceImpl instance = iter.next();
 
       if (instance.isStarted()) {
-        log.info("Stopping instance: {}", instance);
+        log.info("Stopping instance: {}", instance.getName());
         try {
           instance.stop();
         }
         catch (Exception e) {
-          log.warn("Failed to stop instance: {}", instance, e);
+          log.warn("Failed to stop instance: {}", instance.getName(), e);
         }
       }
       else {
-        log.info("Instance already stopped: {}", instance);
+        log.info("Instance already stopped: {}", instance.getName());
       }
 
       iter.remove();
@@ -105,16 +105,16 @@ public abstract class DatabaseManagerSupport
       DatabasePoolImpl pool = iter.next();
 
       if (pool.isStarted()) {
-        log.info("Stopping pool: {}", pool);
+        log.info("Stopping pool: {}", pool.getName());
         try {
           pool.stop();
         }
         catch (Exception e) {
-          log.warn("Failed to stop pool: {}", pool, e);
+          log.warn("Failed to stop pool: {}", pool.getName(), e);
         }
       }
       else {
-        log.info("Pool already stopped: {}", pool);
+        log.info("Pool already stopped: {}", pool.getName());
       }
 
       iter.remove();

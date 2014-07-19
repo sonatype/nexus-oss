@@ -39,6 +39,7 @@ public class DatabasePoolImpl
     this.name = checkNotNull(name);
   }
 
+  @Override
   public String getName() {
     return name;
   }

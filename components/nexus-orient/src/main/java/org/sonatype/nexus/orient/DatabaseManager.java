@@ -15,7 +15,7 @@ package org.sonatype.nexus.orient;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
- * Orient database manager.
+ * Database manager.
  *
  * @since 3.0
  */

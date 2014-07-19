@@ -17,7 +17,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Orient database externalizer.
+ * Database externalizer.
  *
  * Exposes backup/restore and import/export functionality for a named database.
  *
