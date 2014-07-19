@@ -64,21 +64,6 @@
         <version>2.2.0</version>
       </dependency>
 
-      <!--
-      @deprecated: use goodies-testsupport.
-      -->
-      <dependency>
-        <groupId>org.sonatype.sisu.litmus</groupId>
-        <artifactId>litmus-testsupport</artifactId>
-        <version>1.9</version>
-        <exclusions>
-          <exclusion>
-            <groupId>com.thoughtworks.xstream</groupId>
-            <artifactId>xstream</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail</artifactId>
