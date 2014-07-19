@@ -14,8 +14,8 @@ package org.sonatype.nexus.internal.orient;
 
 import org.sonatype.nexus.orient.DatabasePool;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycles;
 
-import com.google.common.base.Throwables;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
@@ -57,12 +57,7 @@ public class DatabasePoolImpl
 
   @Override
   public void close() {
-    try {
-      stop();
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+    Lifecycles.stop(this);
   }
 
   @Override
