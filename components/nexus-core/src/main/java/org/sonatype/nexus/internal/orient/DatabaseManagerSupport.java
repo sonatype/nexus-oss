@@ -50,56 +50,63 @@ public abstract class DatabaseManagerSupport
   protected void doStart() throws Exception {
     checkState(pools.isEmpty());
     checkState(instances.isEmpty());
-
-    // HACK:
-    log.info("Started: {}", this);
   }
 
   @Override
   protected void doStop() throws Exception {
-    // NOTE: Lifecycle lock and use of ensureStarted avoids need to synchronize around collections.
+    stopAllInstances();
+    closeAllPools();
+  }
 
-    // stop all instances
-    if (!instances.isEmpty()) {
-      log.info("Stopping {} instances", instances.size());
-
-      Iterator<DatabaseInstanceImpl> iter = instances.values().iterator();
-      while (iter.hasNext()) {
-        DatabaseInstanceImpl instance = iter.next();
-
-        log.info("Stopping instance: {}", instance);
-        try {
-          // TODO:
-          //instance.stop();
-        }
-        catch (Exception e) {
-          log.warn("Failed to stop database instance: {}", instance, e);
-        }
-        iter.remove();
-      }
+  /**
+   * Stop all instances and stop tracking.
+   */
+  private void stopAllInstances() {
+    if (instances.isEmpty()) {
+      return;
     }
 
-    // close all pools
-    if (!pools.isEmpty()) {
-      log.info("Closing {} pools", pools.size());
+    log.info("Stopping {} instances", instances.size());
 
-      Iterator<DatabasePoolImpl> iter = pools.values().iterator();
-      while (iter.hasNext()) {
-        DatabasePoolImpl pool = iter.next();
+    Iterator<DatabaseInstanceImpl> iter = instances.values().iterator();
+    while (iter.hasNext()) {
+      DatabaseInstanceImpl instance = iter.next();
 
-        log.info("Closing pool: {}", pool);
-        try {
-          pool.close();
-        }
-        catch (Exception e) {
-          log.warn("Failed to close database pool: {}", pool, e);
-        }
-        iter.remove();
+      log.info("Stopping instance: {}", instance);
+      try {
+        // TODO:
+        //instance.stop();
       }
+      catch (Exception e) {
+        log.warn("Failed to stop database instance: {}", instance, e);
+      }
+      iter.remove();
+    }
+  }
+
+  /**
+   * Close all pools and stop tracking.
+   */
+  private void closeAllPools() {
+    if (pools.isEmpty()) {
+      return;
     }
 
-    // HACK:
-    log.info("Stopped: {}", this);
+    log.info("Closing {} pools", pools.size());
+
+    Iterator<DatabasePoolImpl> iter = pools.values().iterator();
+    while (iter.hasNext()) {
+      DatabasePoolImpl pool = iter.next();
+
+      log.info("Closing pool: {}", pool);
+      try {
+        pool.close();
+      }
+      catch (Exception e) {
+        log.warn("Failed to close database pool: {}", pool, e);
+      }
+      iter.remove();
+    }
   }
 
   protected abstract String connectionUri(final String name);
@@ -152,22 +159,24 @@ public abstract class DatabaseManagerSupport
     synchronized (pools) {
       DatabasePoolImpl pool = pools.get(name);
       if (pool == null) {
-        // TODO: refine more control over how pool settings are configured per-database or globally
-
-        String uri = connectionUri(name);
-        ODatabaseDocumentPool underlying = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
-        underlying.setName(String.format("%s-database-pool", name));
-        underlying.setup(1, 25);
-
-        pool = new DatabasePoolImpl(underlying, name);
+        pool = createPool(name);
         log.debug("Created database pool: {}", pool);
-
         // TODO: pool.start()
-
         pools.put(name, pool);
       }
       return pool;
     }
+  }
+
+  private DatabasePoolImpl createPool(final String name) {
+    // TODO: refine more control over how pool settings are configured per-database or globally
+
+    String uri = connectionUri(name);
+    ODatabaseDocumentPool pool = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
+    pool.setName(String.format("%s-database-pool", name));
+    pool.setup(1, 25);
+
+    return new DatabasePoolImpl(pool, name);
   }
 
   /**
@@ -189,14 +198,16 @@ public abstract class DatabaseManagerSupport
     synchronized (instances) {
       DatabaseInstanceImpl instance = instances.get(name);
       if (instance == null) {
-        instance = new DatabaseInstanceImpl(this, name);
+        instance = createInstance(name);
         log.debug("Created database instance: {}", instance);
-
         // TODO: instance.start()
-
         instances.put(name, instance);
       }
       return instance;
     }
+  }
+
+  private DatabaseInstanceImpl createInstance(final String name) {
+    return new DatabaseInstanceImpl(this, name);
   }
 }
