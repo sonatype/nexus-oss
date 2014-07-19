@@ -13,8 +13,9 @@
 package org.sonatype.nexus.internal.orient;
 
 import org.sonatype.nexus.orient.DatabasePool;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
+import com.google.common.base.Throwables;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
@@ -26,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class DatabasePoolImpl
-  extends ComponentSupport
+  extends LifecycleSupport
   implements DatabasePool
 {
   private final String name;
@@ -38,14 +39,30 @@ public class DatabasePoolImpl
     this.name = checkNotNull(name);
   }
 
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  protected void doStop() throws Exception {
+    delegate.close();
+  }
+
   @Override
   public ODatabaseDocumentTx acquire() {
+    ensureStarted();
+
     return delegate.acquire();
   }
 
   @Override
   public void close() {
-    delegate.close();
+    try {
+      stop();
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override

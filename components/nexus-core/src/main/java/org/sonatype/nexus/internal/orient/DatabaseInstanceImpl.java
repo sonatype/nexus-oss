@@ -16,7 +16,7 @@ import org.sonatype.nexus.orient.DatabaseExternalizer;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.orient.DatabasePool;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class DatabaseInstanceImpl
-  extends ComponentSupport
+  extends LifecycleSupport
   implements DatabaseInstance
 {
   private final DatabaseManager databaseManager;
@@ -50,16 +50,22 @@ public class DatabaseInstanceImpl
 
   @Override
   public ODatabaseDocumentTx connect() {
+    ensureStarted();
+
     return databaseManager.connect(name, true);
   }
 
   @Override
   public ODatabaseDocumentTx acquire() {
+    ensureStarted();
+
     return pool.acquire();
   }
 
   @Override
   public DatabaseExternalizer externalizer() {
+    ensureStarted();
+
     return databaseManager.externalizer(name);
   }
 

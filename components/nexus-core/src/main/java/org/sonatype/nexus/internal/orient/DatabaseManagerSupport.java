@@ -20,6 +20,7 @@ import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.orient.DatabasePool;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycles;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
@@ -55,7 +56,7 @@ public abstract class DatabaseManagerSupport
   @Override
   protected void doStop() throws Exception {
     stopAllInstances();
-    closeAllPools();
+    stopAllPools();
   }
 
   /**
@@ -74,36 +75,35 @@ public abstract class DatabaseManagerSupport
 
       log.info("Stopping instance: {}", instance);
       try {
-        // TODO:
-        //instance.stop();
+        instance.stop();
       }
       catch (Exception e) {
-        log.warn("Failed to stop database instance: {}", instance, e);
+        log.warn("Failed to stop instance: {}", instance, e);
       }
       iter.remove();
     }
   }
 
   /**
-   * Close all pools and stop tracking.
+   * Stop all pools and stop tracking.
    */
-  private void closeAllPools() {
+  private void stopAllPools() {
     if (pools.isEmpty()) {
       return;
     }
 
-    log.info("Closing {} pools", pools.size());
+    log.info("Stopping {} pools", pools.size());
 
     Iterator<DatabasePoolImpl> iter = pools.values().iterator();
     while (iter.hasNext()) {
       DatabasePoolImpl pool = iter.next();
 
-      log.info("Closing pool: {}", pool);
+      log.info("Stopping pool: {}", pool);
       try {
-        pool.close();
+        pool.stop();
       }
       catch (Exception e) {
-        log.warn("Failed to close database pool: {}", pool, e);
+        log.warn("Failed to stop pool: {}", pool, e);
       }
       iter.remove();
     }
@@ -161,7 +161,7 @@ public abstract class DatabaseManagerSupport
       if (pool == null) {
         pool = createPool(name);
         log.debug("Created database pool: {}", pool);
-        // TODO: pool.start()
+        Lifecycles.start(pool);
         pools.put(name, pool);
       }
       return pool;
@@ -199,8 +199,9 @@ public abstract class DatabaseManagerSupport
       DatabaseInstanceImpl instance = instances.get(name);
       if (instance == null) {
         instance = createInstance(name);
+        Lifecycles.start(instance);
         log.debug("Created database instance: {}", instance);
-        // TODO: instance.start()
+
         instances.put(name, instance);
       }
       return instance;

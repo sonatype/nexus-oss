@@ -18,8 +18,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.DatabaseManager;
-import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycles;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -49,16 +49,12 @@ public class OrientBootstrap
   protected void doStart() throws Exception {
     server.get().start();
 
-    if (databaseManager.get() instanceof Lifecycle) {
-      ((Lifecycle)databaseManager.get()).start();
-    }
+    Lifecycles.start(databaseManager.get());
   }
 
   @Override
   protected void doStop() throws Exception {
-    if (databaseManager.get() instanceof Lifecycle) {
-      ((Lifecycle)databaseManager.get()).stop();
-    }
+    Lifecycles.stop(databaseManager.get());
 
     server.get().stop();
   }
