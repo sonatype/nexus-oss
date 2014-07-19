@@ -22,7 +22,7 @@ import org.sonatype.nexus.componentmetadata.RecordType;
 import org.sonatype.nexus.internal.orient.DatabaseManagerSupport;
 import org.sonatype.nexus.internal.orient.HexRecordIdObfuscator;
 import org.sonatype.nexus.internal.orient.MemoryDatabaseManager;
-import org.sonatype.nexus.orient.DatabaseManager;
+import org.sonatype.nexus.internal.orient.MinimalDatabaseServer;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.orientechnologies.common.log.OLogManager;
@@ -43,6 +43,10 @@ public class OrientRecordStoreITSupport
   protected static final Long longValue = Long.MAX_VALUE;
   protected static final Short shortValue = Short.MAX_VALUE;
   protected static final String stringValue = "stringValue";
+
+  private MinimalDatabaseServer databaseServer;
+
+  private MemoryDatabaseManager databaseManager;
 
   protected OrientRecordStore store;
 
@@ -77,7 +81,11 @@ public class OrientRecordStoreITSupport
 
   @Before
   public void setUp() throws Exception {
-    DatabaseManager databaseManager = new MemoryDatabaseManager();
+    this.databaseServer = new MinimalDatabaseServer();
+    databaseServer.start();
+
+    this.databaseManager = new MemoryDatabaseManager();
+    databaseManager.start();
 
     // uncomment to use a pre-existing db named 'test' listening on localhost
     //databaseManager = new LocalTestDatabaseManager();
@@ -118,6 +126,16 @@ public class OrientRecordStoreITSupport
   @After
   public void tearDown() throws Exception {
     store.stop();
+
+    if (databaseManager != null) {
+      databaseManager.stop();
+      databaseManager = null;
+    }
+
+    if (databaseServer != null) {
+      databaseServer.stop();
+      databaseServer = null;
+    }
   }
 
   private static class LocalTestDatabaseManager
