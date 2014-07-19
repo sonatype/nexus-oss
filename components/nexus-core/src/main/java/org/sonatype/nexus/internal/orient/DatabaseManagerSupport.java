@@ -163,6 +163,17 @@ public abstract class DatabaseManagerSupport
     // nop
   }
 
+  /**
+   * Exposing impl type here for sub-classes.
+   */
+  @Override
+  public DatabaseExternalizerImpl externalizer(final String name) {
+    checkNotNull(name);
+    ensureStarted();
+
+    return new DatabaseExternalizerImpl(this, name);
+  }
+
   @Override
   public DatabasePool pool(final String name) {
     checkNotNull(name);
@@ -189,17 +200,6 @@ public abstract class DatabaseManagerSupport
     pool.setup(1, 25);
 
     return new DatabasePoolImpl(pool, name);
-  }
-
-  /**
-   * Exposing impl type here for sub-classes.
-   */
-  @Override
-  public DatabaseExternalizerImpl externalizer(final String name) {
-    checkNotNull(name);
-    ensureStarted();
-
-    return new DatabaseExternalizerImpl(this, name);
   }
 
   @Override

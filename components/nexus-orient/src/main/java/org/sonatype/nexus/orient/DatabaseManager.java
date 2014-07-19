@@ -30,14 +30,21 @@ public interface DatabaseManager
   ODatabaseDocumentTx connect(String name, boolean create);
 
   /**
-   * Open a pooled connection to the named database.
+   * Access externalizer for a named database.
+   */
+  DatabaseExternalizer externalizer(String name);
+
+  /**
+   * Access named database pool.
+   *
+   * If the pool does not already exist it will be created.
    */
   DatabasePool pool(String name);
 
   /**
-   * Access the {@link DatabaseExternalizer} for a named database.
+   * Access named database instance.
+   *
+   * If the instance does not already exist it will be created.
    */
-  DatabaseExternalizer externalizer(String name);
-
   DatabaseInstance instance(String name);
 }
