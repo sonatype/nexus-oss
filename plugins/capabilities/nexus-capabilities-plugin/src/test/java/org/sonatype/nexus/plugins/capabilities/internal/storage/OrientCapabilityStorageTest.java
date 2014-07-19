@@ -16,13 +16,13 @@ import java.util.Map;
 
 import org.sonatype.nexus.internal.orient.HexRecordIdObfuscator;
 import org.sonatype.nexus.internal.orient.MemoryDatabaseManager;
+import org.sonatype.nexus.internal.orient.MinimalDatabaseServer;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Maps;
 import com.google.inject.util.Providers;
-import com.orientechnologies.orient.core.Orient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,14 +39,16 @@ import static org.hamcrest.Matchers.notNullValue;
 public class OrientCapabilityStorageTest
   extends TestSupport
 {
+  private MinimalDatabaseServer databaseServer;
+
   private MemoryDatabaseManager databaseManager;
 
   private OrientCapabilityStorage underTest;
 
   @Before
   public void setUp() throws Exception {
-    Orient.instance().startup();
-    Orient.instance().removeShutdownHook();
+    this.databaseServer = new MinimalDatabaseServer();
+    databaseServer.start();
 
     this.databaseManager = new MemoryDatabaseManager();
     databaseManager.start();
@@ -69,7 +71,10 @@ public class OrientCapabilityStorageTest
       databaseManager = null;
     }
 
-    Orient.instance().shutdown();
+    if (databaseServer != null) {
+      databaseServer.stop();
+      databaseServer = null;
+    }
   }
 
   @Test

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.internal.orient;
 
 import java.io.File;
@@ -21,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.orient.DatabaseServer;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Lists;
@@ -42,14 +44,15 @@ import org.apache.commons.io.output.WriterOutputStream;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Orient server.
- * 
+ * Default {@link DatabaseServer} implementation.
+ *
  * @since 3.0
  */
 @Named
 @Singleton
-public class OrientServer
+public class DatabaseServerImpl
     extends LifecycleSupport
+    implements DatabaseServer
 {
   private final ApplicationDirectories applicationDirectories;
 
@@ -58,8 +61,8 @@ public class OrientServer
   private OServer server;
 
   @Inject
-  public OrientServer(final ApplicationDirectories applicationDirectories,
-                      final @Named("${nexus.orient.listenerEnabled:-false}") boolean listenerEnabled)
+  public DatabaseServerImpl(final ApplicationDirectories applicationDirectories,
+                            final @Named("${nexus.orient.listenerEnabled:-false}") boolean listenerEnabled)
   {
     this.applicationDirectories = checkNotNull(applicationDirectories);
     this.listenerEnabled = listenerEnabled;
@@ -105,7 +108,7 @@ public class OrientServer
     config.location = "DYNAMIC-CONFIGURATION";
 
     File databaseDir = applicationDirectories.getWorkDirectory("db");
-    config.properties = new OServerEntryConfiguration[] {
+    config.properties = new OServerEntryConfiguration[]{
         new OServerEntryConfiguration("server.database.path", databaseDir.getPath())
     };
 
@@ -131,9 +134,9 @@ public class OrientServer
       log.info("Listener enabled: {}:[{}]", binaryListener.ipAddress, binaryListener.portRange);
     }
 
-    config.storages = new OServerStorageConfiguration[] {};
+    config.storages = new OServerStorageConfiguration[]{};
 
-    config.users = new OServerUserConfiguration[] {
+    config.users = new OServerUserConfiguration[]{
         new OServerUserConfiguration("admin", "admin", "*")
     };
 

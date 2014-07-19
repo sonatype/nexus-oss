@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.sonatype.nexus.internal.orient.MemoryDatabaseManager;
+import org.sonatype.nexus.internal.orient.MinimalDatabaseServer;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
 import org.sonatype.nexus.timeline.TimelineCallback;
@@ -33,7 +34,6 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeZone;
@@ -55,14 +55,16 @@ import static org.mockito.Mockito.mock;
 public class DefaultTimelineTest
     extends TestSupport
 {
+  private MinimalDatabaseServer databaseServer;
+
   private MemoryDatabaseManager databaseManager;
 
   private DefaultTimeline underTest;
 
   @Before
   public void prepare() throws Exception {
-    Orient.instance().startup();
-    Orient.instance().removeShutdownHook();
+    this.databaseServer = new MinimalDatabaseServer();
+    databaseServer.start();
 
     this.databaseManager = new MemoryDatabaseManager();
     databaseManager.start();
@@ -84,7 +86,10 @@ public class DefaultTimelineTest
       databaseManager = null;
     }
 
-    Orient.instance().shutdown();
+    if (databaseServer != null) {
+      databaseServer.stop();
+      databaseServer = null;
+    }
   }
 
   // ==
