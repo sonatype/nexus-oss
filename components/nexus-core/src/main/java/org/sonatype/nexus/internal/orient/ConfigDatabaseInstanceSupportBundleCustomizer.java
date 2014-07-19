@@ -26,6 +26,7 @@ import org.sonatype.nexus.orient.DatabaseExternalizer;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.supportzip.GeneratedContentSourceSupport;
 import org.sonatype.nexus.supportzip.SupportBundle;
+import org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority;
 import org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type;
 import org.sonatype.nexus.supportzip.SupportBundleCustomizer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -57,12 +58,8 @@ public class ConfigDatabaseInstanceSupportBundleCustomizer
         databaseInstance.get().getName(),
         DatabaseExternalizer.EXPORT_FILENAME
     );
-    supportBundle.add(new GeneratedContentSourceSupport(Type.CONFIG, path)
+    supportBundle.add(new GeneratedContentSourceSupport(Type.CONFIG, path, Priority.REQUIRED)
     {
-      {
-        setPriority(Priority.REQUIRED);
-      }
-
       @Override
       protected void generate(final File file) throws Exception {
         // output non-compressed, no need to double compress contents

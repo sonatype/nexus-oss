@@ -32,8 +32,15 @@ public abstract class GeneratedContentSourceSupport
 {
   private File file;
 
-  public GeneratedContentSourceSupport(final SupportBundle.ContentSource.Type type, final String path) {
+  public GeneratedContentSourceSupport(final Type type, final String path) {
     super(type, path);
+  }
+
+  /**
+   * @since 3.0
+   */
+  public GeneratedContentSourceSupport(final Type type, final String path, final Priority priority) {
+    super(type, path, priority);
   }
 
   @Override
