@@ -43,6 +43,12 @@ public class DatabasePoolImpl
     return name;
   }
 
+  // promote to public
+  @Override
+  public boolean isStarted() {
+    return super.isStarted();
+  }
+
   @Override
   protected void doStop() throws Exception {
     delegate.close();

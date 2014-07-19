@@ -48,6 +48,12 @@ public class DatabaseInstanceImpl
     return name;
   }
 
+  // promote to public
+  @Override
+  public boolean isStarted() {
+    return super.isStarted();
+  }
+
   @Override
   public ODatabaseDocumentTx connect() {
     ensureStarted();
