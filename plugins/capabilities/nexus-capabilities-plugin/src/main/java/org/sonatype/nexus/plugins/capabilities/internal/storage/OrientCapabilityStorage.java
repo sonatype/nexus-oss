@@ -54,7 +54,7 @@ public class OrientCapabilityStorage
   private OClass entityType;
 
   @Inject
-  public OrientCapabilityStorage(final Provider<DatabaseInstance> databaseInstance,
+  public OrientCapabilityStorage(final @Named("config") Provider<DatabaseInstance> databaseInstance,
                                  final RecordIdObfuscator recordIdObfuscator)
   {
     this.databaseInstance = checkNotNull(databaseInstance);
