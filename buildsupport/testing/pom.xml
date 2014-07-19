@@ -64,6 +64,9 @@
         <version>2.2.0</version>
       </dependency>
 
+      <!--
+      @deprecated: use goodies-testsupport.
+      -->
       <dependency>
         <groupId>org.sonatype.sisu.litmus</groupId>
         <artifactId>litmus-testsupport</artifactId>
