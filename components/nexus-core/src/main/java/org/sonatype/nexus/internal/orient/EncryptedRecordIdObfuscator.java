@@ -62,6 +62,7 @@ public class EncryptedRecordIdObfuscator
                                      final @Named(CPREFIX + ".iv:-0123456789ABCDEF}") String iv)
       throws Exception
   {
+    checkNotNull(crypto);
     this.cipher = crypto.createCipher("DES/CBC/NoPadding");
 
     checkNotNull(iv);
