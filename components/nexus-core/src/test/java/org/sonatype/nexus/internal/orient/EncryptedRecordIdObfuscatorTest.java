@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.internal.orient;
 
+import org.sonatype.sisu.goodies.crypto.internal.CryptoHelperImpl;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.orientechnologies.orient.core.id.ORID;
@@ -36,7 +37,7 @@ public class EncryptedRecordIdObfuscatorTest
 
   @Before
   public void setUp() throws Exception {
-    this.underTest = new EncryptedRecordIdObfuscator("password", "salt", "0123456789ABCDEF");
+    this.underTest = new EncryptedRecordIdObfuscator(new CryptoHelperImpl(), "password", "salt", "0123456789ABCDEF");
   }
 
   @Test
