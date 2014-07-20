@@ -49,6 +49,7 @@ import org.sonatype.sisu.goodies.common.Time;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
+import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.taskdefs.condition.Os;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -391,8 +392,16 @@ public class DefaultNexusBundle
           );
         }
       }
+
       terminateRemoteNexus(commandMonitorPort);
 
+      try {
+        // clear transient cache to avoid filesystem bloat when running ITs
+        FileUtils.deleteDirectory(new File(getNexusDirectory(), "data/cache"));
+      }
+      catch (IOException e) {
+        // couldn't delete directory, too bad
+      }
     }
     finally {
       // Stop the launcher-controller-side monitor thread if there is one
@@ -573,8 +582,8 @@ public class DefaultNexusBundle
         }
       }
 
-      onDirectory(getConfiguration().getTargetDirectory()).apply(
-          fileTaskBuilder.properties(path("nexus/conf/nexus-test.properties"))
+      onDirectory(getNexusDirectory()).apply(
+          fileTaskBuilder.properties(path("conf/nexus-test.properties"))
               .properties(nexusProperties)
       );
     }

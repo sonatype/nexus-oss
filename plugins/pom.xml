@@ -118,14 +118,6 @@
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
-      <!-- crypto -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-crypto-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
       <!-- groovy -->
 
       <dependency>
