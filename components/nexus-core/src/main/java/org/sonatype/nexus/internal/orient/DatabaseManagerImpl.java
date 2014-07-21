@@ -60,8 +60,8 @@ public class DatabaseManagerImpl
   /**
    * Returns the directory for the given named database.  Directory may or may not exist.
    */
-  private File directory(final String name) {
-    return new File(databasesDirectory, name);
+  private File directory(final String name) throws IOException {
+    return new File(databasesDirectory, name).getCanonicalFile();
   }
 
   @Override
@@ -70,8 +70,7 @@ public class DatabaseManagerImpl
       File dir = directory(name);
       DirSupport.mkdir(dir);
 
-      // FIXME: update this to work on winblows
-      return "plocal:" + dir.getCanonicalPath();
+      return "plocal:" + dir.toURI().getPath();
     }
     catch (IOException e) {
       throw Throwables.propagate(e);
