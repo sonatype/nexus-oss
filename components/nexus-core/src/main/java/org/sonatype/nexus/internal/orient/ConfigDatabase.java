@@ -39,6 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
+@SuppressWarnings("UnusedDeclaration")
 public class ConfigDatabase
 {
   public static final String NAME = "config";
