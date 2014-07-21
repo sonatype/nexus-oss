@@ -21,6 +21,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.orient.DatabaseExternalizer;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.util.file.DirSupport;
 
@@ -77,6 +78,13 @@ public class DatabaseManagerImpl
     }
   }
 
+  /**
+   * When the database is being created, maybe import from the standard export location.
+   *
+   * @see DatabaseExternalizer#EXPORT_FILENAME
+   * @see DatabaseExternalizer#EXPORT_GZ_FILENAME
+   * @see DatabaseExternalizerImpl#maybeImportFromStandardLocation(ODatabaseDocumentTx, File)
+   */
   @Override
   protected void created(final ODatabaseDocumentTx db, final String name) throws Exception {
     File dir = directory(name);
