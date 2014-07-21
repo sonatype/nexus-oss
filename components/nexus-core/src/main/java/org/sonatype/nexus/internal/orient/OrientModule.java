@@ -28,10 +28,9 @@ public class OrientModule
 {
   @Override
   protected void configure() {
+    // configure default implementations
     bind(DatabaseServer.class).to(DatabaseServerImpl.class);
     bind(DatabaseManager.class).to(DatabaseManagerImpl.class);
-
-    //bind(RecordIdObfuscator.class).to(HexRecordIdObfuscator.class);
     bind(RecordIdObfuscator.class).to(EncryptedRecordIdObfuscator.class);
   }
 }
