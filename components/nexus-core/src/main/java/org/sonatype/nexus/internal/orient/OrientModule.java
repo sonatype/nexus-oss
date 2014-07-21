@@ -31,8 +31,7 @@ public class OrientModule
     bind(DatabaseServer.class).to(DatabaseServerImpl.class);
     bind(DatabaseManager.class).to(DatabaseManagerImpl.class);
 
-    // TODO: Change to encrypted impl once we have a performance profile for its usage
-    bind(RecordIdObfuscator.class).to(HexRecordIdObfuscator.class);
-    //bind(RecordIdObfuscator.class).to(EncryptedRecordIdObfuscator.class);
+    //bind(RecordIdObfuscator.class).to(HexRecordIdObfuscator.class);
+    bind(RecordIdObfuscator.class).to(EncryptedRecordIdObfuscator.class);
   }
 }
