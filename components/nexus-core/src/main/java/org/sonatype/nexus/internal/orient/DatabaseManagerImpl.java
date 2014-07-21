@@ -32,7 +32,7 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Default {@link DatabaseManager} implementation.
+ * Default {@code plocal} {@link DatabaseManager} implementation.
  *
  * @since 3.0
  */
