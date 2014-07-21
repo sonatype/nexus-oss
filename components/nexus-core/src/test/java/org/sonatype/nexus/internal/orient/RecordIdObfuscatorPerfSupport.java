@@ -44,7 +44,7 @@ public abstract class RecordIdObfuscatorPerfSupport
 
   @Before
   public void setUp() throws Exception {
-    this.underTest = createRecordIdObfuscator();
+    this.underTest = createTestSubject();
 
     this.rid = new ORecordId("#9:1");
 
@@ -52,7 +52,7 @@ public abstract class RecordIdObfuscatorPerfSupport
     when(type.getClusterIds()).thenReturn(new int[] { rid.getClusterId() });
   }
 
-  protected abstract RecordIdObfuscator createRecordIdObfuscator() throws Exception;
+  protected abstract RecordIdObfuscator createTestSubject() throws Exception;
 
   @Test
   @PerfTest(invocations = 10000, rampUp = 1000)

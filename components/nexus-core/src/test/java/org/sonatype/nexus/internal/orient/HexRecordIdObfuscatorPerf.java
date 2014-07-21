@@ -25,7 +25,7 @@ public class HexRecordIdObfuscatorPerf
   extends RecordIdObfuscatorPerfSupport
 {
   @Override
-  protected RecordIdObfuscator createRecordIdObfuscator() throws Exception {
+  protected RecordIdObfuscator createTestSubject() throws Exception {
     return new HexRecordIdObfuscator();
   }
 }
