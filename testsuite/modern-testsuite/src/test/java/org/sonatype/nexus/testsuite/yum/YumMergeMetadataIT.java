@@ -76,7 +76,6 @@ public class YumMergeMetadataIT
   {
     final GroupRepository groupRepo = givenAYumGroupRepoWith2RPMs();
     groupRepo.removeMember(repositoryIdForTest("1")).save();
-    groupRepo.removeMember(repositoryIdForTest("2")).save();
 
     waitForNexusToSettleDown();
 
