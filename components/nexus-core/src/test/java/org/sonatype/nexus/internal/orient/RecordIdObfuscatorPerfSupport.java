@@ -50,12 +50,17 @@ public abstract class RecordIdObfuscatorPerfSupport
 
     this.type = mock(OClass.class);
     when(type.getClusterIds()).thenReturn(new int[] { rid.getClusterId() });
+
+    // prime jvm byte code optimization (maybe, we hope)
+    for (int i=0; i<1000; i++) {
+      encodeAndDecode();
+    }
   }
 
   protected abstract RecordIdObfuscator createTestSubject() throws Exception;
 
   @Test
-  @PerfTest(invocations = 10000, rampUp = 1000)
+  @PerfTest(invocations = 100000)
   public void encodeAndDecode() throws Exception {
     String encoded = underTest.encode(type, rid);
     ORID decoded = underTest.decode(type, encoded);
