@@ -96,6 +96,10 @@ public class MergeMetadataTask
         final List<File> memberReposBaseDirs = getBaseDirsOfMemberRepositories();
         if (memberReposBaseDirs.size() > 0) {
           log.debug("Merging repository group '{}' out of {}", groupRepository.getId(), memberReposBaseDirs);
+          if (memberReposBaseDirs.size() == 1) {
+            // HACK: merge repo with itself when only one repo, so the urls are correctly generated
+            memberReposBaseDirs.add(memberReposBaseDirs.get(0));
+          }
           commandLineExecutor.exec(buildCommand(repoBaseDir, memberReposBaseDirs));
           log.debug("Group repository '{}' merged", groupRepository.getId());
         }
