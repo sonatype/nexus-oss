@@ -94,9 +94,19 @@ public class MergeMetadataTask
         groupRepoMdUid.getLock().lock(Action.update);
 
         final List<File> memberReposBaseDirs = getBaseDirsOfMemberRepositories();
-        log.debug("Merging repository group '{}' out of {}", groupRepository.getId(), memberReposBaseDirs);
-        commandLineExecutor.exec(buildCommand(repoBaseDir, memberReposBaseDirs));
-        log.debug("Group repository '{}' merged", groupRepository.getId());
+        if (memberReposBaseDirs.size() > 0) {
+          log.debug("Merging repository group '{}' out of {}", groupRepository.getId(), memberReposBaseDirs);
+          commandLineExecutor.exec(buildCommand(repoBaseDir, memberReposBaseDirs));
+          log.debug("Group repository '{}' merged", groupRepository.getId());
+        }
+        else {
+          log.debug(
+              "Remove group repository {} Yum metadata, because there is only one member with Yum metadata",
+              groupRepository.getId()
+          );
+          // delete without using group repository API as group repositories does not allow delete (read only)
+          deleteQuietly(new File(repoBaseDir, "repodata"));
+        }
       }
       finally {
         groupRepoMdUid.getLock().unlock();
