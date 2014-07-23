@@ -84,11 +84,7 @@ public abstract class ObrITSupport
 
   @Override
   protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
-    return configuration.addPlugins(
-        artifactResolver().resolvePluginFromDependencyManagement(
-            "org.sonatype.nexus.plugins", "nexus-obr-plugin"
-        )
-    );
+    return configuration.addFeatures("nexus-obr-plugin");
   }
 
   protected Repositories repositories() {

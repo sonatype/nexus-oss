@@ -70,12 +70,7 @@ public class SSLITSupport
         .setLogLevel("org.sonatype.siesta", "TRACE")
         .setLogLevel("com.sonatype.nexus.ssl", "DEBUG")
         .setLogLevel("org.sonatype.sisu.goodies.ssl", "DEBUG")
-        .setLogLevel("org.sonatype.licensing", "TRACE")
-        .addPlugins(
-            artifactResolver().resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins", "nexus-ssl-plugin"
-            )
-        );
+        .setLogLevel("org.sonatype.licensing", "TRACE");
   }
 
   public static String uniqueName(final String prefix) {

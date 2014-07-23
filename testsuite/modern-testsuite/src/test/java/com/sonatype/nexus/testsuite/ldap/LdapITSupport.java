@@ -69,15 +69,7 @@ public class LdapITSupport
         .setLogLevel("org.sonatype.sisu.goodies.ssl", "DEBUG")
         .setLogLevel("com.sonatype.nexus.ssl", "DEBUG")
         .setLogLevel("com.sonatype.nexus.ldap", "DEBUG")
-        .setLogLevel("com.sonatype.security.ldap", "DEBUG")
-        .addPlugins(
-            artifactResolver().resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins", "nexus-ssl-plugin"
-            ),
-            artifactResolver().resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins", "nexus-ldap-plugin"
-            )
-        );
+        .setLogLevel("com.sonatype.security.ldap", "DEBUG");
   }
 
   public static String uniqueName(final String prefix) {

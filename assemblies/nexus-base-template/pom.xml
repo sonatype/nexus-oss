@@ -91,15 +91,6 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-crypto-plugin</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-groovy-plugin</artifactId>
       <version>${nexus.version}</version>
       <classifier>features</classifier>
@@ -335,14 +326,11 @@
                   <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.1/xml/features" />
                   <replacefilter token=",mvn:org.ops4j.pax.web/pax-web-features/3.1.0/xml/features" />
                   <replacefilter token=",mvn:org.apache.karaf.features/spring/3.0.1/xml/features" />
-                  <replacefilter token=",kar,ssh,management" value=",nexus-oss-edition" />
+                  <replacefilter token=",kar,ssh,management" />
                   <replacefilter token=",region" />
                 </replace>
                 <replace file="${project.build.directory}/assembly/etc/startup.properties"
                   token="${mvn:pax-logging-service}" value="${mvn:metrics-core} = 8${line.separator}${mvn:metrics-logback} = 8${line.separator}${mvn:pax-logging-metrics} = 8${line.separator}${mvn:pax-logging-logback}" />
-                <move todir="${project.build.directory}/assembly/plugin-repository" flatten="true">
-                  <fileset dir="${project.build.directory}/assembly/system" includes="**/nexus-*-plugin-*.jar" />
-                </move>
               </target>
             </configuration>
           </execution>
@@ -384,13 +372,10 @@
             <feature>config</feature>
             <feature>standard</feature>
             <feature>package</feature>
-          </bootFeatures>
-          <installedFeatures>
             <feature>nexus-base-feature</feature>
             <feature>nexus-oss-edition</feature>
             <feature>nexus-content-plugin</feature>
             <feature>nexus-webresources-plugin</feature>
-            <feature>nexus-crypto-plugin</feature>
             <feature>nexus-groovy-plugin</feature>
             <feature>nexus-restlet1x-plugin</feature>
             <feature>nexus-siesta-plugin</feature>
@@ -411,7 +396,7 @@
             <feature>nexus-rapture-plugin</feature>
             <feature>nexus-extdirect-plugin</feature>
             <feature>nexus-coreui-plugin</feature>
-          </installedFeatures>
+	  </bootFeatures>
         </configuration>
       </plugin>
     </plugins>

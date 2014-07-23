@@ -56,11 +56,7 @@ public abstract class CapabilitiesITSupport
         .setLogLevel("org.sonatype.nexus.plugins.capabilities", "DEBUG")
         .setLogLevel("org.sonatype.sisu.goodies.eventbus", "DEBUG")
         .setSystemProperty("guava.eventBus", "default")
-        .addPlugins(
-            artifactResolver().resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins", "nexus-capabilities-testsuite-helper"
-            )
-        );
+        .addFeatures("nexus-capabilities-testsuite-helper");
   }
 
   protected void removeAllMessageCapabilities() {

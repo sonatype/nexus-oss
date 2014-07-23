@@ -70,11 +70,7 @@ public class SiestaStandardUiITSupport
 
   @Override
   protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
-    return configuration.addPlugins(
-        artifactResolver().resolvePluginFromDependencyManagement(
-            "org.sonatype.nexus", "nexus-testsuite-ui-plugin"
-        )
-    );
+    return configuration.addFeatures("nexus-testsuite-ui-plugin");
   }
 
   protected void run(final String test) throws Exception {

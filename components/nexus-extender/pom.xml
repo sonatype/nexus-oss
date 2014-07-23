@@ -125,12 +125,12 @@
               org.sonatype.nexus.extender.NexusBundleExtender
             </Bundle-Activator>
             <Embed-Dependency>
-              *;scope=compile
+              *;scope=compile;artifactId=!bcprov*
             </Embed-Dependency>
             <Embed-Directory>lib</Embed-Directory>
             <Embed-Transitive>true</Embed-Transitive>
             <_exportcontents>
-              !com.google.inject.internal.*,
+              !com.google.inject.internal.*,!*-*,
               com.*|eu.*|javax.*|net.*|org.*|io.*
             </_exportcontents>
           </instructions>

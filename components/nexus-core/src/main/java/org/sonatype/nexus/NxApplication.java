@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.crypto.Cipher;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -110,6 +111,10 @@ public class NxApplication
 
   @Override
   protected void doStart() throws Exception {
+    if (Cipher.getMaxAllowedKeyLength("AES") == Integer.MAX_VALUE) {
+      log.info("Unlimited strength JCE policy detected");
+    }
+
     // register core and plugin contributed subscribers, start dispatching events to them
     eventSubscriberHost.start();
 
