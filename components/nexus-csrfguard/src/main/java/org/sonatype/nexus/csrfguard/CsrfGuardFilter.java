@@ -56,9 +56,16 @@ public class CsrfGuardFilter
 
   private static final Logger log = LoggerFactory.getLogger(CsrfGuard.class);
 
+  public static final boolean PROTECTION_ENABLED = getBoolean(CsrfGuardFilter.class.getName() + ".enabled", true);
+
   public static final String SKIP_VALIDATION = CsrfGuardFilter.class.getSimpleName() + ".skipValidation";
 
   private static final String LAST_SENT_CSRF_TOKEN = CsrfGuardFilter.class.getSimpleName() + ".lastSentCsrfToken";
+
+  public CsrfGuardFilter(){
+    setEnabled(PROTECTION_ENABLED);
+    log.info("CSRF protection enabled: {}", PROTECTION_ENABLED);
+  }
 
   @Override
   protected boolean preHandle(final ServletRequest request, final ServletResponse response) throws Exception {
@@ -109,5 +116,15 @@ public class CsrfGuardFilter
       }
     }
     super.executeChain(request, wrappedResponse, chain);
+  }
+
+  private static boolean getBoolean(final String key, final boolean defaultValue) {
+    final String value = System.getProperty(key);
+
+    if (value == null || value.trim().length() == 0) {
+      return defaultValue;
+    }
+
+    return Boolean.valueOf(value);
   }
 }
