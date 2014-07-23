@@ -56,14 +56,15 @@ public class CsrfGuardFilter
 
   private static final Logger log = LoggerFactory.getLogger(CsrfGuard.class);
 
-  public static final boolean ENABLED = getBoolean(CsrfGuardFilter.class.getName() + ".enabled", true);
+  public static final boolean PROTECTION_ENABLED = getBoolean(CsrfGuardFilter.class.getName() + ".enabled", true);
 
   public static final String SKIP_VALIDATION = CsrfGuardFilter.class.getSimpleName() + ".skipValidation";
 
   private static final String LAST_SENT_CSRF_TOKEN = CsrfGuardFilter.class.getSimpleName() + ".lastSentCsrfToken";
 
   public CsrfGuardFilter(){
-    setEnabled(ENABLED);
+    setEnabled(PROTECTION_ENABLED);
+    log.info("CSRF protection enabled: {}", PROTECTION_ENABLED);
   }
 
   @Override
