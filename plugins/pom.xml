@@ -548,6 +548,7 @@
                   org.eclipse.sisu.plexus|
                   org.osgi.compendium|
                   org.osgi.core|
+                  plexus-cipher|
                   plexus-classworlds|
                   plexus-component-annotations|
                   plexus-interpolation|
