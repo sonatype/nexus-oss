@@ -56,7 +56,7 @@ public class CsrfGuardFilter
 
   private static final Logger log = LoggerFactory.getLogger(CsrfGuard.class);
 
-  public static final boolean PROTECTION_ENABLED = getBoolean(CsrfGuardFilter.class.getName() + ".enabled", true);
+  public static final boolean PROTECTION_ENABLED = getBoolean(CsrfGuardFilter.class.getName() + ".enabled", false);
 
   public static final String SKIP_VALIDATION = CsrfGuardFilter.class.getSimpleName() + ".skipValidation";
 
