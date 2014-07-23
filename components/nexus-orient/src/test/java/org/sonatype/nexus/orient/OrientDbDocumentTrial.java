@@ -180,7 +180,6 @@ public class OrientDbDocumentTrial
       eventData.createProperty("userId", OType.STRING);
       eventData.createProperty("sessionId", OType.STRING);
       eventData.createProperty("attributes", OType.EMBEDDEDMAP);
-      schema.save();
 
       log("Class: {}", eventData);
       log("Properties: {}", eventData.properties());

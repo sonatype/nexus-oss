@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.orient.Hex;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.nexus.orient.RecordIdObfuscatorSupport;
+import org.sonatype.sisu.goodies.crypto.CryptoHelper;
 
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
@@ -55,17 +56,19 @@ public class EncryptedRecordIdObfuscator
   private final SecretKey secretKey;
 
   @Inject
-  public EncryptedRecordIdObfuscator(final @Named(CPREFIX + ".password:-changeme}") String password,
+  public EncryptedRecordIdObfuscator(final CryptoHelper crypto,
+                                     final @Named(CPREFIX + ".password:-changeme}") String password,
                                      final @Named(CPREFIX + ".salt:-changeme}") String salt,
                                      final @Named(CPREFIX + ".iv:-0123456789ABCDEF}") String iv)
       throws Exception
   {
-    this.cipher = Cipher.getInstance("DES/CBC/NoPadding");
+    checkNotNull(crypto);
+    this.cipher = crypto.createCipher("DES/CBC/NoPadding");
 
     checkNotNull(iv);
     this.paramSpec = new IvParameterSpec(Hex.decode(iv));
 
-    SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+    SecretKeyFactory factory = crypto.createSecretKeyFactory("PBKDF2WithHmacSHA1");
     checkNotNull(password);
     checkNotNull(salt);
     KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 1024, 64);

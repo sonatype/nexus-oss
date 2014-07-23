@@ -59,7 +59,6 @@ public class OrientDbClusterTrial
       OClass type = schema.createClass("Message");
       type.setClusterSelection(ODefaultClusterSelectionStrategy.NAME);
       type.createProperty("text", OType.STRING);
-      schema.save();
     }
 
     try (ODatabaseDocumentTx db = openDatabase()) {
@@ -78,7 +77,6 @@ public class OrientDbClusterTrial
         int newClusterId = db.getClusterIdByName(newClusterName);
         type.setDefaultClusterId(newClusterId);
         log("New cluster; id: {}, name: {}", newClusterId, newClusterName);
-        schema.save();
 
         log(" * create records");
         for (int i = 0; i < 1; i++) {
@@ -124,7 +122,6 @@ public class OrientDbClusterTrial
       OClass type = schema.createClass("Message");
       type.setClusterSelection(ODefaultClusterSelectionStrategy.NAME);
       type.createProperty("text", OType.STRING);
-      schema.save();
     }
 
     for (int c = 0; c < 4; c++) {
@@ -139,7 +136,6 @@ public class OrientDbClusterTrial
         int newClusterId = db.getClusterIdByName(newClusterName);
         type.setDefaultClusterId(newClusterId);
         log("New cluster; id: {}, name: {}", newClusterId, newClusterName);
-        schema.save();
       }
 
       log(" * create records");

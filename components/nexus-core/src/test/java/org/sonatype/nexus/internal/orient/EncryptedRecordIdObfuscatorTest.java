@@ -12,60 +12,17 @@
  */
 package org.sonatype.nexus.internal.orient;
 
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
-
-import com.orientechnologies.orient.core.id.ORID;
-import com.orientechnologies.orient.core.id.ORecordId;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.sonatype.nexus.orient.RecordIdObfuscator;
+import org.sonatype.sisu.goodies.crypto.internal.CryptoHelperImpl;
 
 /**
  * Tests for {@link EncryptedRecordIdObfuscator}.
  */
 public class EncryptedRecordIdObfuscatorTest
-  extends TestSupport
+  extends RecordIdObfuscatorTestSupport
 {
-  private EncryptedRecordIdObfuscator underTest;
-
-  @Before
-  public void setUp() throws Exception {
-    this.underTest = new EncryptedRecordIdObfuscator("password", "salt", "0123456789ABCDEF");
-  }
-
-  @Test
-  public void encodeAndDecode() {
-    ORID rid = new ORecordId("#9:1");
-    OClass type = mock(OClass.class);
-    when(type.getClusterIds()).thenReturn(new int[] { rid.getClusterId() });
-    log("RID: {}", rid);
-    String encoded = underTest.encode(type, rid);
-    log("Encoded: {}", encoded);
-    ORID decoded = underTest.decode(type, encoded);
-    log("Decoded: {}", decoded);
-    assertThat(decoded.toString(), is("#9:1"));
-  }
-
-  @Test
-  public void verifyIdTypeMismatchFails() {
-    ORID rid = new ORecordId("#9:1");
-    OClass type = mock(OClass.class);
-    when(type.getClusterIds()).thenReturn(new int[] { 1 });
-    String encoded = underTest.encode(type, rid);
-
-    // this should fail since the cluster-id of the RID is not a member of the given type
-    try {
-      underTest.decode(type, encoded);
-      fail();
-    }
-    catch (IllegalArgumentException e) {
-      // expected
-    }
+  @Override
+  protected RecordIdObfuscator createTestSubject() throws Exception {
+    return new EncryptedRecordIdObfuscator(new CryptoHelperImpl(), "password", "salt", "0123456789ABCDEF");
   }
 }

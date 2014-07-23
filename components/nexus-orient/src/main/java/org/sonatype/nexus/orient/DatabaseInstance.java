@@ -15,36 +15,29 @@ package org.sonatype.nexus.orient;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
- * Database manager.
+ * Database instance.
  *
  * @since 3.0
  */
-public interface DatabaseManager
+public interface DatabaseInstance
 {
   /**
-   * Open a non-pooled connection to the named database.
-   *
-   * @param name    The name of the database to open.
-   * @param create  {@code true} to create the database if it does not exist.
+   * Returns the name of this database instance.
    */
-  ODatabaseDocumentTx connect(String name, boolean create);
+  String getName();
 
   /**
-   * Access externalizer for a named database.
+   * Open a non-pooled connection to the database.
    */
-  DatabaseExternalizer externalizer(String name);
+  ODatabaseDocumentTx connect();
 
   /**
-   * Access named database pool.
-   *
-   * If the pool does not already exist it will be created.
+   * Attempt to open a pooled connection to the database.
    */
-  DatabasePool pool(String name);
+  ODatabaseDocumentTx acquire();
 
   /**
-   * Access named database instance.
-   *
-   * If the instance does not already exist it will be created.
+   * Access the {@link DatabaseExternalizer} for the database.
    */
-  DatabaseInstance instance(String name);
+  DatabaseExternalizer externalizer();
 }

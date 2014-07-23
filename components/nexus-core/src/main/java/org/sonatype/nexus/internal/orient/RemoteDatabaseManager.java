@@ -10,53 +10,55 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.internal.orient;
 
-import javax.inject.Inject;
+import javax.annotation.Nullable;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.DatabaseManager;
-import org.sonatype.nexus.orient.DatabaseServer;
-import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
-import org.sonatype.sisu.goodies.lifecycle.Lifecycles;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Orient bootstrap.
- * 
+ * Remote {@link DatabaseManager} implementation.
+ *
  * @since 3.0
  */
-@Named
+@Named("remote")
 @Singleton
-public class OrientBootstrap
-    extends LifecycleSupport
+public class RemoteDatabaseManager
+    extends DatabaseManagerSupport
 {
-  private final Provider<DatabaseServer> databaseServer;
+  private final String hostname;
 
-  private final Provider<DatabaseManager> databaseManager;
+  private final Integer port;
 
-  @Inject
-  public OrientBootstrap(final Provider<DatabaseServer> databaseServer,
-                         final Provider<DatabaseManager> databaseManager)
-  {
-    this.databaseServer = checkNotNull(databaseServer);
-    this.databaseManager = checkNotNull(databaseManager);
+  public RemoteDatabaseManager(final String hostname, final @Nullable Integer port) {
+    this.hostname = checkNotNull(hostname);
+    this.port = port;
+    log.debug("Hostname: {}", hostname);
+    log.debug("Port: {}", port);
+  }
+
+  public String getHostname() {
+    return hostname;
+  }
+
+  @Nullable
+  public Integer getPort() {
+    return port;
   }
 
   @Override
-  protected void doStart() throws Exception {
-    databaseServer.get().start();
-
-    Lifecycles.start(databaseManager.get());
-  }
-
-  @Override
-  protected void doStop() throws Exception {
-    Lifecycles.stop(databaseManager.get());
-
-    databaseServer.get().stop();
+  protected String connectionUri(final String name) {
+    StringBuilder buff = new StringBuilder();
+    buff.append("remote:").append(hostname);
+    if (port != null) {
+      buff.append(":").append(port);
+    }
+    buff.append("/").append(name);
+    return buff.toString();
   }
 }

@@ -12,39 +12,15 @@
  */
 package org.sonatype.nexus.orient;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
- * Database manager.
+ * Database server.
  *
  * @since 3.0
  */
-public interface DatabaseManager
+public interface DatabaseServer
+  extends Lifecycle
 {
-  /**
-   * Open a non-pooled connection to the named database.
-   *
-   * @param name    The name of the database to open.
-   * @param create  {@code true} to create the database if it does not exist.
-   */
-  ODatabaseDocumentTx connect(String name, boolean create);
-
-  /**
-   * Access externalizer for a named database.
-   */
-  DatabaseExternalizer externalizer(String name);
-
-  /**
-   * Access named database pool.
-   *
-   * If the pool does not already exist it will be created.
-   */
-  DatabasePool pool(String name);
-
-  /**
-   * Access named database instance.
-   *
-   * If the instance does not already exist it will be created.
-   */
-  DatabaseInstance instance(String name);
+  // empty
 }

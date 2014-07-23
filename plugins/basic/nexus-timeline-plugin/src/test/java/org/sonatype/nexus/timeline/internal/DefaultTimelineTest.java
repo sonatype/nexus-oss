@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.timeline.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -21,13 +20,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.internal.orient.MemoryDatabaseManager;
-import org.sonatype.nexus.internal.orient.OrientBootstrap;
-import org.sonatype.nexus.orient.DatabaseManager;
+import org.sonatype.nexus.internal.orient.MinimalDatabaseServer;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
-import org.sonatype.nexus.timeline.Timeline;
 import org.sonatype.nexus.timeline.TimelineCallback;
 import org.sonatype.sisu.goodies.common.Time;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -38,19 +34,12 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
-import org.mockito.Mock;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -58,54 +47,49 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
 
+/**
+ * Tests for {@link DefaultTimeline}.
+ */
 public class DefaultTimelineTest
     extends TestSupport
 {
-  @Rule
-  public TestName testName = new TestName();
+  private MinimalDatabaseServer databaseServer;
 
-  @Mock
-  private ApplicationDirectories applicationDirectories;
+  private MemoryDatabaseManager databaseManager;
 
-  @Mock
-  private EventBus eventBus;
-
-  protected OrientBootstrap orientBootstrap;
-
-  private DefaultTimeline defaultNexusTimeline;
+  private DefaultTimeline underTest;
 
   @Before
   public void prepare() throws Exception {
-    final File timelineWorkdir = util.resolveFile("target/workdir/");
-    when(applicationDirectories.getWorkDirectory(anyString())).thenReturn(timelineWorkdir);
+    this.databaseServer = new MinimalDatabaseServer();
+    databaseServer.start();
 
-    final Module testModule = new AbstractModule()
-    {
-      @Override
-      protected void configure() {
-        bind(EventBus.class).toInstance(eventBus);
-        bind(ApplicationDirectories.class).toInstance(applicationDirectories);
-        bind(DatabaseManager.class).to(MemoryDatabaseManager.class).asEagerSingleton();
-        bind(Timeline.class).to(DefaultTimeline.class).asEagerSingleton();
-      }
-    };
-    final Injector injector = Guice.createInjector(testModule);
+    this.databaseManager = new MemoryDatabaseManager();
+    databaseManager.start();
 
-    orientBootstrap = new OrientBootstrap(applicationDirectories, false);
-    orientBootstrap.start();
-
-    defaultNexusTimeline = (DefaultTimeline) injector.getInstance(Timeline.class);
-    defaultNexusTimeline.start();
-    defaultNexusTimeline.purgeOlderThan(0);
+    underTest = new DefaultTimeline(mock(EventBus.class), databaseManager);
+    underTest.start();
+    underTest.purgeOlderThan(0);
   }
 
   @After
   public void cleanup() throws Exception {
-    defaultNexusTimeline.stop();
-    orientBootstrap.stop();
+    if (underTest != null) {
+      underTest.stop();
+      underTest = null;
+    }
+
+    if (databaseManager != null) {
+      databaseManager.stop();
+      databaseManager = null;
+    }
+
+    if (databaseServer != null) {
+      databaseServer.stop();
+      databaseServer = null;
+    }
   }
 
   // ==
@@ -114,9 +98,9 @@ public class DefaultTimelineTest
   public void simpleTimestamp() throws Exception {
     final Map<String, String> data = Maps.newHashMap();
     data.put("a", "a");
-    defaultNexusTimeline.add(new EntryRecord(System.currentTimeMillis() - Time.hours(1).toMillis(), "TEST", "1", data));
+    underTest.add(new EntryRecord(System.currentTimeMillis() - Time.hours(1).toMillis(), "TEST", "1", data));
     data.put("b", "b");
-    defaultNexusTimeline.add(new EntryRecord(System.currentTimeMillis() - Time.hours(1).toMillis(), "TEST", "2", data));
+    underTest.add(new EntryRecord(System.currentTimeMillis() - Time.hours(1).toMillis(), "TEST", "2", data));
 
     List<Entry> res;
 
@@ -141,9 +125,9 @@ public class DefaultTimelineTest
   public void simpleItem() throws Exception {
     final Map<String, String> data = Maps.newHashMap();
     data.put("a", "a");
-    defaultNexusTimeline.add(new EntryRecord(System.currentTimeMillis() - Time.hours(1).toMillis(), "TEST", "1", data));
+    underTest.add(new EntryRecord(System.currentTimeMillis() - Time.hours(1).toMillis(), "TEST", "1", data));
     data.put("b", "b");
-    defaultNexusTimeline.add(new EntryRecord(System.currentTimeMillis() - Time.hours(1).toMillis(), "TEST", "2", data));
+    underTest.add(new EntryRecord(System.currentTimeMillis() - Time.hours(1).toMillis(), "TEST", "2", data));
 
     List<Entry> res;
 
@@ -186,9 +170,9 @@ public class DefaultTimelineTest
   public void order() throws Exception {
     final Map<String, String> data = Maps.newHashMap();
     data.put("place", "2nd");
-    defaultNexusTimeline.add(new EntryRecord(System.currentTimeMillis() - Time.hours(2).toMillis(), "TEST", "1", data));
+    underTest.add(new EntryRecord(System.currentTimeMillis() - Time.hours(2).toMillis(), "TEST", "1", data));
     data.put("place", "1st");
-    defaultNexusTimeline.add(new EntryRecord(System.currentTimeMillis() - Time.hours(1).toMillis(), "TEST", "1", data));
+    underTest.add(new EntryRecord(System.currentTimeMillis() - Time.hours(1).toMillis(), "TEST", "1", data));
 
     final List<Entry> res = asList(0, 10, Collections.singleton("TEST"), null, null);
 
@@ -201,22 +185,18 @@ public class DefaultTimelineTest
   @Test
   public void partitioningByDay() throws Exception {
     final long now = new DateMidnight(DateTimeZone.UTC).getMillis();
-    defaultNexusTimeline
-        .add(new EntryRecord(now - TimeUnit.DAYS.toMillis(2), "TEST", "1", ImmutableMap.of("day", "1")));
-    defaultNexusTimeline
-        .add(new EntryRecord(now - TimeUnit.DAYS.toMillis(2), "TEST", "2", ImmutableMap.of("day", "1")));
-    defaultNexusTimeline
-        .add(new EntryRecord(now - TimeUnit.DAYS.toMillis(1), "TEST", "1", ImmutableMap.of("day", "2")));
-    defaultNexusTimeline
-        .add(new EntryRecord(now - TimeUnit.DAYS.toMillis(1), "TEST", "2", ImmutableMap.of("day", "2")));
-    defaultNexusTimeline.add(new EntryRecord(now, "TEST", "1", ImmutableMap.of("day", "3")));
-    defaultNexusTimeline.add(new EntryRecord(now, "TEST", "2", ImmutableMap.of("day", "3")));
+    underTest.add(new EntryRecord(now - TimeUnit.DAYS.toMillis(2), "TEST", "1", ImmutableMap.of("day", "1")));
+    underTest.add(new EntryRecord(now - TimeUnit.DAYS.toMillis(2), "TEST", "2", ImmutableMap.of("day", "1")));
+    underTest.add(new EntryRecord(now - TimeUnit.DAYS.toMillis(1), "TEST", "1", ImmutableMap.of("day", "2")));
+    underTest.add(new EntryRecord(now - TimeUnit.DAYS.toMillis(1), "TEST", "2", ImmutableMap.of("day", "2")));
+    underTest.add(new EntryRecord(now, "TEST", "1", ImmutableMap.of("day", "3")));
+    underTest.add(new EntryRecord(now, "TEST", "2", ImmutableMap.of("day", "3")));
 
     List<String> partitionsPostAppend;
     List<String> partitionsPostPurge1;
     List<String> partitionsPostPurge2;
     List<String> partitionsPostPurge3;
-    try (ODatabaseDocumentTx db = defaultNexusTimeline.openDb()) {
+    try (ODatabaseDocumentTx db = underTest.openDb()) {
       partitionsPostAppend = Lists.newArrayList(Collections2.filter(db.getClusterNames(), new Predicate<String>()
       {
         @Override
@@ -227,9 +207,9 @@ public class DefaultTimelineTest
       assertThat(db.countClass(DefaultTimeline.DB_CLASS), equalTo(6L));
     }
 
-    defaultNexusTimeline.purgeOlderThan(2);
+    underTest.purgeOlderThan(2);
     // ensure 1st returned entry is the latest (and still exists on timeline)
-    defaultNexusTimeline.retrieve(0, 1, null, null, null, new TimelineCallback()
+    underTest.retrieve(0, 1, null, null, null, new TimelineCallback()
     {
       public boolean processNext(final Entry rec) throws IOException {
         assertThat(rec.getType(), equalTo("TEST"));
@@ -239,7 +219,7 @@ public class DefaultTimelineTest
       }
     });
 
-    try (ODatabaseDocumentTx db = defaultNexusTimeline.openDb()) {
+    try (ODatabaseDocumentTx db = underTest.openDb()) {
       partitionsPostPurge1 = Lists.newArrayList(Collections2.filter(db.getClusterNames(), new Predicate<String>()
       {
         @Override
@@ -250,9 +230,9 @@ public class DefaultTimelineTest
       assertThat(db.countClass(DefaultTimeline.DB_CLASS), equalTo(4L));
     }
 
-    defaultNexusTimeline.purgeOlderThan(1);
+    underTest.purgeOlderThan(1);
     // ensure 1st returned entry is the latest (and still exists on timeline)
-    defaultNexusTimeline.retrieve(0, 1, null, null, null, new TimelineCallback()
+    underTest.retrieve(0, 1, null, null, null, new TimelineCallback()
     {
       public boolean processNext(final Entry rec) throws IOException {
         assertThat(rec.getType(), equalTo("TEST"));
@@ -262,7 +242,7 @@ public class DefaultTimelineTest
       }
     });
 
-    try (ODatabaseDocumentTx db = defaultNexusTimeline.openDb()) {
+    try (ODatabaseDocumentTx db = underTest.openDb()) {
       partitionsPostPurge2 = Lists.newArrayList(Collections2.filter(db.getClusterNames(), new Predicate<String>()
       {
         @Override
@@ -273,9 +253,9 @@ public class DefaultTimelineTest
       assertThat(db.countClass(DefaultTimeline.DB_CLASS), equalTo(2L));
     }
 
-    defaultNexusTimeline.purgeOlderThan(0);
+    underTest.purgeOlderThan(0);
     // ensure that timeline is empty, callback should not be called
-    defaultNexusTimeline.retrieve(0, 1, null, null, null, new TimelineCallback()
+    underTest.retrieve(0, 1, null, null, null, new TimelineCallback()
     {
       public boolean processNext(final Entry rec) throws IOException {
         assertThat("Timeline should be empty. callback should not be invoked!", false);
@@ -283,7 +263,7 @@ public class DefaultTimelineTest
       }
     });
 
-    try (ODatabaseDocumentTx db = defaultNexusTimeline.openDb()) {
+    try (ODatabaseDocumentTx db = underTest.openDb()) {
       partitionsPostPurge3 = Lists.newArrayList(Collections2.filter(db.getClusterNames(), new Predicate<String>()
       {
         @Override
@@ -309,7 +289,7 @@ public class DefaultTimelineTest
       throws Exception
   {
     final EntryListCallback result = new EntryListCallback();
-    defaultNexusTimeline.retrieve(fromItem, count, types, subTypes, filter, result);
+    underTest.retrieve(fromItem, count, types, subTypes, filter, result);
     return result.getEntries();
   }
 }

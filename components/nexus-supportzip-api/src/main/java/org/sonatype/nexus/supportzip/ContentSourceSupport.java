@@ -40,9 +40,17 @@ public abstract class ContentSourceSupport
 
   private Priority priority = Priority.DEFAULT;
 
-  public ContentSourceSupport(final Type type, final String path) {
+  /**
+   * @since 3.0
+   */
+  public ContentSourceSupport(final Type type, final String path, final Priority priority) {
     this.type = checkNotNull(type);
     this.path = checkNotNull(path);
+    setPriority(priority);
+  }
+
+  public ContentSourceSupport(final Type type, final String path) {
+    this(type, path, Priority.DEFAULT);
   }
 
   @Override

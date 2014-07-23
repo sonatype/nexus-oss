@@ -12,51 +12,65 @@
  */
 package org.sonatype.nexus.internal.orient;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.orient.DatabaseManager;
-import org.sonatype.nexus.orient.DatabaseServer;
+import org.sonatype.nexus.orient.DatabasePool;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycles;
+
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Orient bootstrap.
- * 
+ * Default {@link DatabasePool} implementation.
+ *
  * @since 3.0
  */
-@Named
-@Singleton
-public class OrientBootstrap
-    extends LifecycleSupport
+public class DatabasePoolImpl
+  extends LifecycleSupport
+  implements DatabasePool
 {
-  private final Provider<DatabaseServer> databaseServer;
+  private final String name;
 
-  private final Provider<DatabaseManager> databaseManager;
+  private final ODatabaseDocumentPool delegate;
 
-  @Inject
-  public OrientBootstrap(final Provider<DatabaseServer> databaseServer,
-                         final Provider<DatabaseManager> databaseManager)
-  {
-    this.databaseServer = checkNotNull(databaseServer);
-    this.databaseManager = checkNotNull(databaseManager);
+  public DatabasePoolImpl(final ODatabaseDocumentPool pool, final String name) {
+    this.delegate = checkNotNull(pool);
+    this.name = checkNotNull(name);
   }
 
   @Override
-  protected void doStart() throws Exception {
-    databaseServer.get().start();
+  public String getName() {
+    return name;
+  }
 
-    Lifecycles.start(databaseManager.get());
+  // promote to public
+  @Override
+  public boolean isStarted() {
+    return super.isStarted();
   }
 
   @Override
   protected void doStop() throws Exception {
-    Lifecycles.stop(databaseManager.get());
+    delegate.close();
+  }
 
-    databaseServer.get().stop();
+  @Override
+  public ODatabaseDocumentTx acquire() {
+    ensureStarted();
+
+    return delegate.acquire();
+  }
+
+  @Override
+  public void close() {
+    Lifecycles.stop(this);
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "name='" + name + '\'' +
+        '}';
   }
 }

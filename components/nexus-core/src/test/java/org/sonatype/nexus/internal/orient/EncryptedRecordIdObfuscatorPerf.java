@@ -12,25 +12,21 @@
  */
 package org.sonatype.nexus.internal.orient;
 
-import org.sonatype.nexus.orient.DatabaseManager;
-import org.sonatype.nexus.orient.DatabaseServer;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
+import org.sonatype.sisu.goodies.crypto.internal.CryptoHelperImpl;
+import org.sonatype.sisu.litmus.testsupport.group.Perf;
 
-import com.google.inject.AbstractModule;
+import org.junit.experimental.categories.Category;
 
 /**
- * Orient module.
- *
- * @since 3.0
+ * Performance tests for {@link EncryptedRecordIdObfuscator}.
  */
-public class OrientModule
-  extends AbstractModule
+@Category(Perf.class)
+public class EncryptedRecordIdObfuscatorPerf
+  extends RecordIdObfuscatorPerfSupport
 {
   @Override
-  protected void configure() {
-    // configure default implementations
-    bind(DatabaseServer.class).to(DatabaseServerImpl.class);
-    bind(DatabaseManager.class).to(DatabaseManagerImpl.class);
-    bind(RecordIdObfuscator.class).to(EncryptedRecordIdObfuscator.class);
+  protected RecordIdObfuscator createTestSubject() throws Exception {
+    return new EncryptedRecordIdObfuscator(new CryptoHelperImpl(), "changeme", "changeme", "0123456789ABCDEF");
   }
 }
