@@ -260,7 +260,7 @@ public class HttpClientRemoteStorageTest
       throws Exception
   {
     final HttpClientRemoteStorage underTest =
-        new HttpClientRemoteStorage(Providers.of(mock(SystemStatus.class)),
+        new HttpClientRemoteStorage(mock(ApplicationStatusSource.class),
             mock(MimeSupport.class), mock(QueryStringBuilder.class), mock(HttpClientManager.class))
         {
           @Override
