@@ -13,12 +13,10 @@
 package org.sonatype.nexus.testsuite.plugin.nexus2810;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
@@ -30,19 +28,6 @@ import static org.hamcrest.Matchers.hasItems;
 public class Nexus2810PluginConsoleIT
     extends AbstractPluginConsoleIT
 {
-
-  @Override
-  protected void copyTestResources()
-      throws IOException
-  {
-    super.copyTestResources();
-
-    File source = this.getTestFile("broken-plugin");
-
-    File desti = new File(this.getNexusBaseDir(), RELATIVE_PLUGIN_REPOSITORY_DIR);
-
-    FileUtils.copyDirectory(source, desti);
-  }
 
   @Ignore("FIXME: replace plugin console")
   @Test

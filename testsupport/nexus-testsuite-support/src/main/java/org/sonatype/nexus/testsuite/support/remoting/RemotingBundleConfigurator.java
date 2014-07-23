@@ -44,11 +44,6 @@ public class RemotingBundleConfigurator
     return config.setLogLevel("org.sonatype.nexus.groovyremote", "DEBUG")
         // configure port for groovy-remote plugin
         .setSystemProperty("nexus.groovyremote.port", String.valueOf(port))
-        .addPlugins(
-            // install groovy-remote plugin
-            test.artifactResolver().resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins", "nexus-groovyremote-plugin"
-            )
-        );
+        .addFeatures("nexus-groovyremote-plugin");
   }
 }

@@ -49,13 +49,6 @@ public abstract class TimelineITSupport
     super(nexusBundleCoordinates);
   }
 
-  @Override
-  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
-    return super.configureNexus(configuration).addPlugins(
-        artifactResolver().resolvePluginFromDependencyManagement("org.sonatype.nexus.plugins",
-            "nexus-timeline-plugin"));
-  }
-
   protected Scheduler scheduler() {
     return client().getSubsystem(Scheduler.class);
   }

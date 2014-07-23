@@ -15,7 +15,6 @@ package org.sonatype.nexus.integrationtests;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -110,11 +109,6 @@ public abstract class AbstractNexusIntegrationTest
   protected static boolean NEEDS_INIT = false;
 
   public static final String REPOSITORY_RELATIVE_URL = "content/repositories/";
-
-  /**
-   * relative path from {@link #nexusBaseDir} to plugin-repository
-   */
-  public static final String RELATIVE_PLUGIN_REPOSITORY_DIR = "plugin-repository";
 
   public static final String GROUP_REPOSITORY_RELATIVE_URL = "content/groups/";
 
@@ -474,16 +468,8 @@ public abstract class AbstractNexusIntegrationTest
     // check for 'target' and not allow any '..'
     if (workDir.getAbsolutePath().lastIndexOf("target") != -1
         && workDir.getAbsolutePath().lastIndexOf("..") == -1) {
-      // we cannot delete the plugin-repository or the tests will fail
 
-      File[] filesToDelete = workDir.listFiles(new FilenameFilter()
-      {
-        public boolean accept(File dir, String name) {
-          // anything but the plugin-repository directory
-          return (!name.contains("plugin-repository"));
-        }
-      });
-
+      File[] filesToDelete = workDir.listFiles();
       if (filesToDelete != null) {
         for (File fileToDelete : filesToDelete) {
           // delete work dir

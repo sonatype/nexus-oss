@@ -56,11 +56,7 @@ public abstract class SiteRepositoryITSupport
 
   @Override
   protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
-    return configuration.addPlugins(
-        artifactResolver().resolvePluginFromDependencyManagement(
-            "org.sonatype.nexus.plugins", "nexus-site-repository-plugin"
-        )
-    );
+    return configuration.addFeatures("nexus-site-repository-plugin");
   }
 
   protected Repositories repositories() {

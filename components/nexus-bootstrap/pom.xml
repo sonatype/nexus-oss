@@ -123,29 +123,6 @@
             </Embed-Dependency>
           </instructions>
         </configuration>
-        <executions>
-          <execution>
-            <id>manifest</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>manifest</goal>
-            </goals>
-            <configuration>
-              <manifestLocation>
-                ${project.build.outputDirectory}/BOOT-INF
-              </manifestLocation>
-              <instructions>
-                <Embed-Dependency>
-                  *;scope=compile;inline=true
-                </Embed-Dependency>
-                <Embed-Transitive>true</Embed-Transitive>
-                <_exportcontents>
-                  javax.*|ch.*|com.*|org.*
-                </_exportcontents>
-              </instructions>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
