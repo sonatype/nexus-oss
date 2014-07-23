@@ -74,11 +74,7 @@ public class RutAuthITSupport
         .setLogLevel("org.apache.shiro", "DEBUG")
         .setLogLevel("org.sonatype.nexus.security.filter.authc", "DEBUG")
         .setLogLevel("org.sonatype.nexus.rutauth", "TRACE")
-        .addPlugins(
-            artifactResolver().resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins", "nexus-rutauth-plugin"
-            )
-        );
+        .addFeatures("nexus-rutauth-plugin");
   }
 
   void configureSecurityRealms() {

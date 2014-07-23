@@ -35,6 +35,7 @@
   </properties>
 
   <dependencies>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-testsuite-support</artifactId>
@@ -122,6 +123,109 @@
       <artifactId>selenium-support</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!--
+    Additional plugin/helper features
+    -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-it-helper-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-testsuite-ui-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-groovyremote-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-capabilities-testsuite-helper</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restlet1x-testsupport-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-kenai-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-obr-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-rutauth-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-site-repository-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-unpack-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-yum-repository-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -231,6 +335,41 @@
                       <version>3.2.2</version>
                     </artifactItem>
                   </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!--
+          Generate test feature configuration (see DefaultNexusBundleConfiguration.getOverlays)
+          -->
+          <plugin>
+            <groupId>org.apache.karaf.tooling</groupId>
+            <artifactId>karaf-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>install-plugins</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>install-kars</goal>
+                </goals>
+                <configuration>
+                  <featuresCfgFile>${project.build.testOutputDirectory}/org.apache.karaf.features.cfg</featuresCfgFile>
+                  <startupPropertiesFile>${project.build.testOutputDirectory}/startup.properties</startupPropertiesFile>
+                  <systemDirectory>${project.build.directory}/test-features</systemDirectory>
+                  <bootFeatures>
+                    <feature>nexus-it-helper-plugin</feature>
+                    <feature>nexus-testsuite-ui-plugin</feature>
+                    <feature>nexus-groovyremote-plugin</feature>
+                    <feature>nexus-capabilities-testsuite-helper</feature>
+                    <feature>nexus-restlet1x-testsupport-plugin</feature>
+                    <feature>nexus-kenai-plugin</feature>
+                    <feature>nexus-obr-plugin</feature>
+                    <feature>nexus-rutauth-plugin</feature>
+                    <feature>nexus-site-repository-plugin</feature>
+                    <feature>nexus-unpack-plugin</feature>
+                    <feature>nexus-yum-repository-plugin</feature>
+                  </bootFeatures>
                 </configuration>
               </execution>
             </executions>

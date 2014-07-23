@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.bundle.launcher;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -28,47 +27,39 @@ public interface NexusBundleConfiguration
 {
 
   /**
-   * Returns additional plugins to be installed in Nexus.
-   * <p/>
-   * Plugins can be zips/jars/tars to be unpacked or directories to be copied
+   * Returns additional features to be installed in Nexus.
    *
-   * @return Nexus plugins to be installed
-   * @since 2.0
+   * @return Nexus features to be installed
+   * @since 3.0
    */
-  List<File> getPlugins();
+  List<String> getFeatures();
 
   /**
-   * Sets plugins to be installed in Nexus. Provided plugins will overwrite existing configured plugins.
-   * <p/>
-   * Plugins can be zips/jars/tars to be unpacked or directories to be copied
+   * Sets additional features to be installed in Nexus.
    *
-   * @param plugins Nexus plugins to be installed. Can be null, case when an empty list will be used
+   * @param features Nexus features to be installed. Can be null, case when an empty list will be used
    * @return itself, for usage in fluent api
-   * @since 2.0
+   * @since 3.0
    */
-  NexusBundleConfiguration setPlugins(List<File> plugins);
+  NexusBundleConfiguration setFeatures(List<String> features);
 
   /**
-   * Sets plugins to be installed in Nexus. Provided plugins will overwrite existing configured plugins.
-   * <p/>
-   * Plugins can be zips/jars/tars to be unpacked or directories to be copied
+   * Sets additional features to be installed in Nexus.
    *
-   * @param plugins Nexus plugins to be installed
+   * @param features Nexus features to be installed.
    * @return itself, for usage in fluent api
-   * @since 2.0
+   * @since 3.0
    */
-  NexusBundleConfiguration setPlugins(File... plugins);
+  NexusBundleConfiguration setFeatures(String... features);
 
   /**
-   * Append plugins to existing set of plugins.
-   * <p/>
-   * Plugins can be zips/jars/tars to be unpacked or directories to be copied
+   * Adds additional features to existing set of features.
    *
-   * @param plugins Nexus plugins to be installed
+   * @param features Nexus features to be installed
    * @return itself, for usage in fluent api
-   * @since 2.0
+   * @since 3.0
    */
-  NexusBundleConfiguration addPlugins(File... plugins);
+  NexusBundleConfiguration addFeatures(String... features);
 
   /**
    * Sets log level.

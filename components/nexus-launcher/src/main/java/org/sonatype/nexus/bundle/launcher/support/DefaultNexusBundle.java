@@ -13,16 +13,12 @@
 package org.sonatype.nexus.bundle.launcher.support;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -46,16 +42,11 @@ import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
 import org.sonatype.sisu.goodies.common.Time;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
+import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.taskdefs.condition.Os;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
 import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
-import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
 import static org.sonatype.sisu.goodies.common.SimpleFormat.format;
 
@@ -70,22 +61,11 @@ public class DefaultNexusBundle
     implements NexusBundle
 {
 
-  private static final Logger log = LoggerFactory.getLogger(DefaultNexusBundle.class);
-
-  private static final String USE_BUNDLE_PLUGINS_IF_PRESENT = "useBundlePluginsIfPresent";
-
   /**
    * File task builder.
    * Cannot be null.
    */
   private final FileTaskBuilder fileTaskBuilder;
-
-  /**
-   * Whether plugins installed in "sonatype-work/nexus/plugin-repository" should not be used in case they are present
-   * in "plugin-repository". This is mainly used by tests that wish to test against a bundle that already contains
-   * the plugins installed by tests.
-   */
-  private final Boolean useBundlePluginsIfPresent;
 
   /**
    * Port on which Nexus Command Monitor is running. 0 (zero) if application is not running.
@@ -108,16 +88,13 @@ public class DefaultNexusBundle
   public DefaultNexusBundle(final Provider<NexusBundleConfiguration> configurationProvider,
                             final RunningBundles runningBundles,
                             final FileTaskBuilder fileTaskBuilder,
-                            final PortReservationService portReservationService,
-                            final @Named("${" + USE_BUNDLE_PLUGINS_IF_PRESENT
-                                + ":-false}") Boolean useBundlePluginsIfPresent)
+                            final PortReservationService portReservationService)
   {
     super("nexus", configurationProvider, runningBundles, fileTaskBuilder, portReservationService);
     this.fileTaskBuilder = fileTaskBuilder;
-    this.useBundlePluginsIfPresent = useBundlePluginsIfPresent;
   }
 
-  private static void installStopShutdownHook(final int commandPort) {
+  private void installStopShutdownHook(final int commandPort) {
     Thread stopShutdownHook = new Thread("Nexus Sanity Stopper")
     {
       @Override
@@ -130,7 +107,7 @@ public class DefaultNexusBundle
     log.debug("Installed stop shutdown hook");
   }
 
-  private static void sendStopToNexus(final int commandPort) {
+  private void sendStopToNexus(final int commandPort) {
     log.debug("Sending stop command to Nexus");
     try {
       // FIXME HOSTNAME should be configurable
@@ -145,7 +122,7 @@ public class DefaultNexusBundle
   }
 
   // FIXME accept host to terminate
-  private static void terminateRemoteNexus(final int commandPort) {
+  private void terminateRemoteNexus(final int commandPort) {
     log.debug("attempting to terminate gracefully at {}", commandPort);
 
     // First attempt graceful shutdown
@@ -192,7 +169,7 @@ public class DefaultNexusBundle
     }
   }
 
-  private static void sendStopToKeepAlive(final int commandPort) {
+  private void sendStopToKeepAlive(final int commandPort) {
     log.debug("Sending stop command to keep alive thread");
     try {
       // FIXME replace LOCALHOST with getHostName
@@ -391,8 +368,16 @@ public class DefaultNexusBundle
           );
         }
       }
+
       terminateRemoteNexus(commandMonitorPort);
 
+      try {
+        // clear transient cache to avoid filesystem bloat when running ITs
+        FileUtils.deleteDirectory(new File(getNexusDirectory(), "data/cache"));
+      }
+      catch (IOException e) {
+        // couldn't delete directory, too bad
+      }
     }
     finally {
       // Stop the launcher-controller-side monitor thread if there is one
@@ -414,82 +399,12 @@ public class DefaultNexusBundle
     return RequestUtils.isNexusRESTStarted(getUrl().toExternalForm());
   }
 
-  @Override
-  public void doPrepare() {
-    super.doPrepare();
-    if (useBundlePluginsIfPresent) {
-      removePluginsPresentInBundle();
-    }
-  }
-
-  private void removePluginsPresentInBundle() {
-    final Map<String, File> workDirPlugins = listPlugins(
-        new File(getWorkDirectory(), "plugin-repository")
-    );
-    if (workDirPlugins.size() > 0) {
-      final Map<String, File> bundlePlugins = listPlugins(
-          new File(getNexusDirectory(), "plugin-repository")
-      );
-      for (final Map.Entry<String, File> entry : workDirPlugins.entrySet()) {
-        if (bundlePlugins.containsKey(entry.getKey())) {
-          log.info(
-              "{} ({}) removing plugin '{}' already present in extracted bundle", getName(), getConfiguration().getId(),
-              entry.getValue().getName()
-          );
-          fileTaskBuilder.delete().file(file(entry.getValue())).run();
-        }
-      }
-    }
-  }
-
-  private Map<String, File> listPlugins(final File pluginsDir) {
-    final Map<String, File> plugins = Maps.newHashMap();
-    final File[] foundPlugins = pluginsDir.listFiles(new FileFilter()
-    {
-      @Override
-      public boolean accept(final File file) {
-        return file.getName().endsWith(".jar");
-      }
-    });
-    if (foundPlugins != null && foundPlugins.length > 0) {
-      for (final File plugin : foundPlugins) {
-        final Optional<String> gaCoordinates = getPluginGACoordinates(plugin);
-        if (gaCoordinates.isPresent()) {
-          plugins.put(gaCoordinates.get(), plugin);
-        }
-      }
-    }
-    return plugins;
-  }
-
-  private Optional<String> getPluginGACoordinates(final File plugin) {
-    try {
-      final ZipFile jarFile = new ZipFile(plugin);
-      final Enumeration<? extends ZipEntry> entries = jarFile.entries();
-      if (entries != null) {
-        while (entries.hasMoreElements()) {
-          final ZipEntry zipEntry = entries.nextElement();
-          if (zipEntry.getName().startsWith("META-INF/maven")
-              && zipEntry.getName().endsWith("pom.properties")) {
-            final Properties props = new Properties();
-            props.load(jarFile.getInputStream(zipEntry));
-            return Optional.of(props.getProperty("groupId") + ":" + props.getProperty("artifactId"));
-          }
-        }
-      }
-    }
-    catch (IOException e) {
-      throw Throwables.propagate(e);
-    }
-    return Optional.absent();
-  }
-
   /**
    * Configure Nexus properties using provided configuration strategy.
    *
    * @param strategy configuration strategy
    */
-  private void configureNexusProperties(final ConfigurationStrategy strategy) {
+  private static void configureNexusProperties(final ConfigurationStrategy strategy) {
     strategy.configureNexus();
   }
 
@@ -573,8 +488,8 @@ public class DefaultNexusBundle
         }
       }
 
-      onDirectory(getConfiguration().getTargetDirectory()).apply(
-          fileTaskBuilder.properties(path("nexus/conf/nexus-test.properties"))
+      onDirectory(getNexusDirectory()).apply(
+          fileTaskBuilder.properties(path("conf/nexus-test.properties"))
               .properties(nexusProperties)
       );
     }

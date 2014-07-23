@@ -73,11 +73,7 @@ public class KenaiITSupport
   protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
     return super.configureNexus(configuration)
         .setLogLevel("org.sonatype.security.realms.kenai", "DEBUG")
-        .addPlugins(
-            artifactResolver().resolvePluginFromDependencyManagement(
-                "org.sonatype.nexus.plugins", "nexus-kenai-plugin"
-            )
-        )
+        .addFeatures("nexus-kenai-plugin")
         .addOverlays(
             fileTaskBuilder.copy()
                 .directory(file(testData().resolveFile("preset-nexus")))

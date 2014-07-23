@@ -72,4 +72,33 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+        <!--
+        Generate test feature configuration (see DefaultNexusBundleConfiguration.getOverlays)
+        -->
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>install-plugins</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>install-kars</goal>
+            </goals>
+            <configuration>
+              <featuresCfgFile>${project.build.testOutputDirectory}/org.apache.karaf.features.cfg</featuresCfgFile>
+              <startupPropertiesFile>${project.build.testOutputDirectory}/startup.properties</startupPropertiesFile>
+              <systemDirectory>${project.build.directory}/test-features</systemDirectory>
+              <bootFeatures>
+                <feature>nexus-it-helper-plugin</feature>
+              </bootFeatures>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
