@@ -571,7 +571,6 @@
               </Embed-Dependency>
               <Embed-Directory>lib</Embed-Directory>
               <Embed-Transitive>true</Embed-Transitive>
-              <Private-Package>!*;-split-package:=first</Private-Package>
               <DynamicImport-Package>javassist.*</DynamicImport-Package>
               <_exportcontents>
                 ![A-Z]*|lib*|static*|docs*|*-*|.*,*
@@ -607,6 +606,10 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>sisu-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

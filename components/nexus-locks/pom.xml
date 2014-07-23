@@ -26,6 +26,7 @@
 
   <artifactId>nexus-locks</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>

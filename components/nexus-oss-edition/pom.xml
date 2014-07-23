@@ -36,18 +36,17 @@
 
   <build>
     <plugins>
-      <!--
-      Generate OSGi metadata.
-      -->
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
+            <!-- merge OSS edition at runtime with nexus-extender -->
             <Fragment-Host>org.sonatype.nexus.extender</Fragment-Host>
           </instructions>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>

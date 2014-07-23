@@ -632,6 +632,7 @@
               <_removeheaders>
                 Embed*,Include-Resource,Private-Package
               </_removeheaders>
+              <Private-Package>!*;-split-package:=first</Private-Package>
               <Import-Package>
                 *;resolution:=optional
               </Import-Package>
