@@ -99,7 +99,8 @@ public class Nexus4383LogoutResourceIT
     authCache.put(targetHost, basicAuth);
     localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
 
-    String owaspQueryParams = null;
+    // HACK: Disable CSRFGuard support for now, its too problematic
+    //String owaspQueryParams = null;
     HttpGet getMethod = new HttpGet(url);
     getMethod.addHeader(userAgentHeader);
     try {
@@ -122,7 +123,9 @@ public class Nexus4383LogoutResourceIT
 
     // now with just the cookie
     httpClient.getCookieStore().addCookie(sessionCookie);
-    getMethod = new HttpGet(url + owaspQueryParams);
+    // HACK: Disable CSRFGuard support for now, its too problematic
+    //getMethod = new HttpGet(url + owaspQueryParams);
+    getMethod = new HttpGet(url);
     try {
       Assert.assertEquals(httpClient.execute(getMethod).getStatusLine().getStatusCode(), 200);
     }
@@ -131,7 +134,9 @@ public class Nexus4383LogoutResourceIT
     }
 
     // do logout
-    HttpGet logoutGetMethod = new HttpGet(logoutUrl + owaspQueryParams);
+    // HACK: Disable CSRFGuard support for now, its too problematic
+    //HttpGet logoutGetMethod = new HttpGet(logoutUrl + owaspQueryParams);
+    HttpGet logoutGetMethod = new HttpGet(logoutUrl);
     try {
       final HttpResponse response = httpClient.execute(logoutGetMethod);
       Assert.assertEquals(response.getStatusLine().getStatusCode(), 200);
@@ -164,7 +169,5 @@ public class Nexus4383LogoutResourceIT
     }
 
     return null;
-
   }
-
 }

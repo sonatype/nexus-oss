@@ -13,14 +13,13 @@
 
 package org.sonatype.nexus.web.internal;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.csrfguard.CsrfGuardServlet;
 import org.sonatype.nexus.guice.FilterChainModule;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
+
+// HACK: Disable CSRFGuard support for now, its too problematic
+//import org.sonatype.nexus.csrfguard.CsrfGuardServlet;
 
 /**
  * CSRF Guard Guice module.
@@ -38,7 +37,8 @@ public class CsrfGuardModule
     {
       @Override
       protected void configureServlets() {
-        serve(MOUNT_POINT).with(CsrfGuardServlet.class);
+        // HACK: Disable CSRFGuard support for now, its too problematic
+        //serve(MOUNT_POINT).with(CsrfGuardServlet.class);
         filter(MOUNT_POINT).through(SecurityFilter.class);
       }
     });

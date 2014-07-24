@@ -65,8 +65,9 @@ public class CoreLogConfigurationCustomizer
     configuration.setLoggerLevel("org.sonatype.nexus.threads", LoggerLevel.DEFAULT);
 
     // nexus-csrfguard loggers
-    configuration.setLoggerLevel("org.sonatype.nexus.csrfguard", LoggerLevel.DEFAULT);
-    configuration.setLoggerLevel("org.owasp.csrfguard", LoggerLevel.DEFAULT);
+    // HACK: Disable CSRFGuard support for now, its too problematic
+    //configuration.setLoggerLevel("org.sonatype.nexus.csrfguard", LoggerLevel.DEFAULT);
+    //configuration.setLoggerLevel("org.owasp.csrfguard", LoggerLevel.DEFAULT);
   }
 
 }

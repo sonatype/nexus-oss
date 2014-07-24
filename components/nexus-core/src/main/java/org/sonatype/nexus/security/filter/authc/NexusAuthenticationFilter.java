@@ -19,14 +19,15 @@ import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.sonatype.nexus.csrfguard.CsrfGuardFilter;
-
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+// HACK: Disable CSRFGuard support for now, its too problematic
+//import org.sonatype.nexus.csrfguard.CsrfGuardFilter;
 
 /**
  * {@link AuthenticatingFilter} that delegates token creation to {@link AuthenticationTokenFactory}s before falling
@@ -52,7 +53,8 @@ public class NexusAuthenticationFilter
                                     final Object mappedValue)
   {
     if (isLoginAttempt(request, response)) {
-      request.setAttribute(CsrfGuardFilter.SKIP_VALIDATION, Boolean.TRUE);
+      // HACK: Disable CSRFGuard support for now, its too problematic
+      //request.setAttribute(CsrfGuardFilter.SKIP_VALIDATION, Boolean.TRUE);
       try {
         return executeLogin(request, response) && super.isAccessAllowed(request, response, mappedValue);
       }
