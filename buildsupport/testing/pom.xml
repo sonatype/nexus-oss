@@ -27,10 +27,6 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
-  <properties>
-    <selenium.version>2.38.0</selenium.version>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
 
@@ -74,49 +70,6 @@
             <artifactId>activation</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.seleniumhq.selenium</groupId>
-        <artifactId>selenium-firefox-driver</artifactId>
-        <version>${selenium.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.seleniumhq.selenium</groupId>
-        <artifactId>selenium-chrome-driver</artifactId>
-        <version>${selenium.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.seleniumhq.selenium</groupId>
-        <artifactId>selenium-htmlunit-driver</artifactId>
-        <version>${selenium.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.seleniumhq.selenium</groupId>
-        <artifactId>selenium-support</artifactId>
-        <version>${selenium.version}</version>
-        <scope>test</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>com.saucelabs</groupId>
-        <artifactId>sauce-connect</artifactId>
-        <version>3.0.18</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.saucelabs</groupId>
-        <artifactId>saucerest</artifactId>
-        <version>1.0.0</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.saucelabs</groupId>
-        <artifactId>sauce_junit</artifactId>
-        <version>1.0.19</version>
       </dependency>
 
       <dependency>
