@@ -17,6 +17,7 @@ import java.lang.annotation.ElementType;
 import javax.inject.Singleton;
 import javax.validation.Path;
 import javax.validation.Path.Node;
+import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -27,7 +28,7 @@ import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.matcher.Matchers;
 import org.aopalliance.intercept.MethodInterceptor;
-import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver;
+import org.hibernate.validator.HibernateValidator;
 
 /**
  * {@link Module} that provides {@link Validator}s and enables validation of methods annotated with {@link Validate}.
@@ -47,9 +48,17 @@ public class ValidationModule
   @Provides
   @Singleton
   ValidatorFactory validatorFactory() {
-    return Validation.byDefaultProvider().configure() // start with default configuration
-        .traversableResolver(new AlwaysTraversableResolver()) // disable JPA reachability
-        .buildValidatorFactory();
+    ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(HibernateValidator.class.getClassLoader());
+
+      return Validation.byDefaultProvider().configure() // start with default configuration
+          .traversableResolver(new AlwaysTraversableResolver()) // disable JPA reachability
+          .buildValidatorFactory();
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(tccl);
+    }
   }
 
   @Provides
@@ -65,16 +74,14 @@ public class ValidationModule
   }
 
   static class AlwaysTraversableResolver
-      extends DefaultTraversableResolver
+      implements TraversableResolver
   {
-    @Override
     public boolean isCascadable(final Object traversableObject, final Node traversableProperty,
         final Class<?> rootBeanType, final Path pathToTraversableObject, final ElementType elementType)
     {
       return true;
     }
 
-    @Override
     public boolean isReachable(final Object traversableObject, final Node traversableProperty,
         final Class<?> rootBeanType, final Path pathToTraversableObject, final ElementType elementType)
     {

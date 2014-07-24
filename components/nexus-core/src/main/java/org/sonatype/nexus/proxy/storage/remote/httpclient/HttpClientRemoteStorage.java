@@ -70,11 +70,10 @@ import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.utils.DateUtils;
 import org.apache.http.conn.ConnectionPoolTimeoutException;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.impl.cookie.DateParseException;
-import org.apache.http.impl.cookie.DateUtils;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.plexus.util.StringUtils;
@@ -411,9 +410,15 @@ public class HttpClientRemoteStorage
     else {
       // non relaxed check is strict, and will select only the OK response
       if (statusCode == HttpStatus.SC_OK) {
-        // we have it
-        // we have newer if this below is true
-        return makeDateFromHeader(httpResponse.getFirstHeader("last-modified")) > newerThen;
+        // we have it OK
+        if (newerThen > 0) {
+          // we have newer if this below is true
+          return makeDateFromHeader(httpResponse.getFirstHeader("last-modified")) > newerThen;
+        } 
+        else {
+          // say true as we don't care about actual timestamp
+          return true;
+        }
       }
       else if ((statusCode >= HttpStatus.SC_MULTIPLE_CHOICES && statusCode < HttpStatus.SC_BAD_REQUEST)
           || statusCode == HttpStatus.SC_NOT_FOUND) {
@@ -632,11 +637,8 @@ public class HttpClientRemoteStorage
       try {
         result = DateUtils.parseDate(date.getValue()).getTime();
       }
-      catch (DateParseException ex) {
+      catch (Exception ex) {
         log.warn("Could not parse date '{}', using system current time as item creation time.", date, ex);
-      }
-      catch (NullPointerException ex) {
-        log.warn("Parsed date is null, using system current time as item creation time.");
       }
     }
     return result;
