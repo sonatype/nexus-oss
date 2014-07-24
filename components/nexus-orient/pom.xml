@@ -25,6 +25,7 @@
 
   <artifactId>nexus-orient</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -49,6 +50,11 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-lifecycle</artifactId>
     </dependency>
 
     <dependency>
@@ -93,8 +99,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu.litmus</groupId>
-      <artifactId>litmus-testsupport</artifactId>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
 

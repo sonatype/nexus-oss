@@ -12,66 +12,39 @@
  */
 package org.sonatype.nexus.orient;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
- * Orient database manager.
+ * Database manager.
  *
  * @since 3.0
  */
 public interface DatabaseManager
 {
+  /**
+   * Open a non-pooled connection to the named database.
+   *
+   * @param name    The name of the database to open.
+   * @param create  {@code true} to create the database if it does not exist.
+   */
   ODatabaseDocumentTx connect(String name, boolean create);
 
+  /**
+   * Access externalizer for a named database.
+   */
+  DatabaseExternalizer externalizer(String name);
+
+  /**
+   * Access named database pool.
+   *
+   * If the pool does not already exist it will be created.
+   */
   DatabasePool pool(String name);
 
-  //
-  // Backup and Restore
-  //
-
   /**
-   * Backup database.  Output format is a compressed ZIP file.
+   * Access named database instance.
    *
-   * @see #restore(String, InputStream)
+   * If the instance does not already exist it will be created.
    */
-  void backup(String name, OutputStream output) throws IOException;
-
-  /**
-   * Restore database.
-   *
-   * @see #backup(String, OutputStream)
-   */
-  void restore(String name, InputStream input) throws IOException;
-
-  //
-  // Export and Import
-  //
-
-  /**
-   * Standard file name inside of database export in instance-specific database directory.
-   */
-  String EXPORT_FILENAME = "export.json";
-
-  /**
-   * Compressed variant of {@link #EXPORT_FILENAME}.
-   */
-  String EXPORT_GZ_FILENAME = EXPORT_FILENAME + ".gz";
-
-  /**
-   * Export database.  Output format is a JSON file.
-   *
-   * @see #import_(String, InputStream)
-   */
-  void export(String name, OutputStream output) throws IOException;
-
-  /**
-   * Import database.
-   *
-   * @see #export(String, OutputStream)
-   */
-  void import_(String name, InputStream input) throws IOException;
+  DatabaseInstance instance(String name);
 }

@@ -40,6 +40,12 @@
         <groupId>org.apache.felix</groupId>
         <artifactId>org.osgi.service.obr</artifactId>
         <version>1.0.2</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.core</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>

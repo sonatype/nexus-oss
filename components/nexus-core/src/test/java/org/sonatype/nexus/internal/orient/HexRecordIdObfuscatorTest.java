@@ -12,60 +12,16 @@
  */
 package org.sonatype.nexus.internal.orient;
 
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
-
-import com.orientechnologies.orient.core.id.ORID;
-import com.orientechnologies.orient.core.id.ORecordId;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.sonatype.nexus.orient.RecordIdObfuscator;
 
 /**
  * Tests for {@link HexRecordIdObfuscator}.
  */
 public class HexRecordIdObfuscatorTest
-  extends TestSupport
+  extends RecordIdObfuscatorTestSupport
 {
-  private HexRecordIdObfuscator underTest;
-
-  @Before
-  public void setUp() throws Exception {
-    this.underTest = new HexRecordIdObfuscator();
-  }
-
-  @Test
-  public void encodeAndDecode() {
-    ORID rid = new ORecordId("#9:1");
-    OClass type = mock(OClass.class);
-    when(type.getClusterIds()).thenReturn(new int[] { rid.getClusterId() });
-    log("RID: {}", rid);
-    String encoded = underTest.encode(type, rid);
-    log("Encoded: {}", encoded);
-    ORID decoded = underTest.decode(type, encoded);
-    log("Decoded: {}", decoded);
-    assertThat(decoded.toString(), is("#9:1"));
-  }
-
-  @Test
-  public void verifyIdTypeMismatchFails() {
-    ORID rid = new ORecordId("#9:1");
-    OClass type = mock(OClass.class);
-    when(type.getClusterIds()).thenReturn(new int[] { 1 });
-    String encoded = underTest.encode(type, rid);
-
-    // this should fail since the cluster-id of the RID is not a member of the given type
-    try {
-      underTest.decode(type, encoded);
-      fail();
-    }
-    catch (IllegalArgumentException e) {
-      // expected
-    }
+  @Override
+  protected RecordIdObfuscator createTestSubject() throws Exception {
+    return new HexRecordIdObfuscator();
   }
 }
