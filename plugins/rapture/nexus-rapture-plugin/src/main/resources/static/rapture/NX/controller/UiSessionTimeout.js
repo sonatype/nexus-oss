@@ -107,7 +107,7 @@ Ext.define('NX.controller.UiSessionTimeout', {
       me.activityMonitor = Ext.create('Ext.ux.ActivityMonitor', {
         interval: 1000, // check every second,
         maxInactive: ((sessionTimeout * 60) - me.SECONDS_TO_EXPIRE) * 1000,
-        isInactive: me.showExpirationWindow.bind(me)
+        isInactive: Ext.bind(me.showExpirationWindow, me)
       });
       me.activityMonitor.start();
     }
