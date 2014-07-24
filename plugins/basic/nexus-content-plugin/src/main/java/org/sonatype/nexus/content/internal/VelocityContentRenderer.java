@@ -36,7 +36,6 @@ import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundReason;
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.Attributes;
-import org.sonatype.nexus.proxy.attributes.DefaultAttributes;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageCompositeItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -124,7 +123,7 @@ public class VelocityContentRenderer
     if (item != null) {
       dataModel.put("item", item);
       dataModel.put("itemContext", filterItemContext(item.getItemContext()).flatten());
-      dataModel.put("itemAttributes", filterItemAttributes(item.getRepositoryItemAttributes()).asMap());
+      dataModel.put("itemAttributes", filterItemAttributes(item.getRepositoryItemAttributes()));
       if (item instanceof StorageCompositeItem) {
         final StorageCompositeItem compositeItem = (StorageCompositeItem) item;
         final List<String> sources = Lists.newArrayList();
@@ -156,16 +155,16 @@ public class VelocityContentRenderer
     return filtered;
   }
 
-  private Attributes filterItemAttributes(final Attributes itemAttributes) {
-    final DefaultAttributes filtered = new DefaultAttributes();
-    filtered.overlayAttributes(itemAttributes);
+  private Map<String, String> filterItemAttributes(final Attributes itemAttributes) {
+    final Map<String, String> filtered = Maps.newHashMap();
+    filtered.putAll(itemAttributes.asMap());
     final String remoteUrl = filtered.get("storageItem-remoteUrl");
     
     // strip params from secure central remote urls
     if (remoteUrl != null && remoteUrl.startsWith("https://secure.central.sonatype.com/")) {
       int qpIdx = remoteUrl.indexOf("?");
       if (qpIdx > -1) {
-        filtered.setRemoteUrl(remoteUrl.substring(0, qpIdx) + "?truncated");
+        filtered.put("storageItem-remoteUrl", remoteUrl.substring(0, qpIdx) + "?truncated");
       }
     }
     return filtered;
