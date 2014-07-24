@@ -124,6 +124,8 @@
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
+          <!-- model classes will be merged in as a fragment at runtime 
+          <excludeDependencies>nexus-indexer-lucene-model</excludeDependencies> -->
           <instructions>
             <Require-Bundle>
               org.sonatype.nexus.plugins.nexus-restlet1x-plugin

@@ -117,7 +117,7 @@ public abstract class NexusRunningITSupport
       if (nexus.isRunning()) {
         logRemoteThatTestIs("FINISHED");
       }
-      testIndex().recordAndCopyLink("wrapper.log", new File(nexus.getNexusDirectory(), "logs/wrapper.log"));
+      testIndex().recordAndCopyLink("karaf.log", new File(nexus.getNexusDirectory(), "data/log/karaf.log"));
       testIndex().recordAndCopyLink("nexus.log", new File(nexus.getWorkDirectory(), "logs/nexus.log"));
     }
 

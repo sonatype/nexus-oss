@@ -25,6 +25,7 @@
 
   <artifactId>nexus-webresources-api</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
@@ -44,8 +45,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.sisu.litmus</groupId>
-      <artifactId>litmus-testsupport</artifactId>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

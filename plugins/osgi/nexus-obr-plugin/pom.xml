@@ -66,47 +66,6 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <artifactSet>
-                <includes>
-                  <include>org.apache.felix:org.osgi.service.obr</include>
-                  <include>org.osgi:org.osgi.core</include>
-                </includes>
-              </artifactSet>
-              <filters>
-                <filter>
-                  <artifact>org.apache.felix:org.osgi.service.obr</artifact>
-                  <includes>
-                    <include>org/osgi/service/obr/*.class</include>
-                  </includes>
-                </filter>
-                <filter>
-                  <artifact>org.osgi:org.osgi.core</artifact>
-                  <includes>
-                    <include>org/osgi/framework/Version.class</include>
-                  </includes>
-                </filter>
-              </filters>
-              <relocations>
-                <relocation>
-                  <pattern>org.osgi.framework</pattern>
-                  <shadedPattern>org.sonatype.nexus.obr.util</shadedPattern>
-                </relocation>
-              </relocations>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
       </plugin>

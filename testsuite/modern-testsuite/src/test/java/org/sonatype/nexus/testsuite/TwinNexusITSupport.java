@@ -83,7 +83,7 @@ public abstract class TwinNexusITSupport
       logRemoteThatTestIs(remoteRemoteLogger(), "FINISHED");
 
       testIndex.recordAndCopyLink(
-          "master wrapper.log", new File(remote.getNexusDirectory(), "logs/wrapper.log")
+          "master karaf.log", new File(remote.getNexusDirectory(), "data/log/karaf.log")
       );
       testIndex.recordAndCopyLink(
           "master nexus.log", new File(remote.getWorkDirectory(), "logs/nexus.log")
@@ -93,7 +93,7 @@ public abstract class TwinNexusITSupport
       logRemoteThatTestIs(localRemoteLogger(), "FINISHED");
 
       testIndex.recordAndCopyLink(
-          "slave wrapper.log", new File(local.getNexusDirectory(), "logs/wrapper.log")
+          "slave karaf.log", new File(local.getNexusDirectory(), "data/log/karaf.log")
       );
       testIndex.recordAndCopyLink(
           "slave nexus.log", new File(local.getWorkDirectory(), "logs/nexus.log")

@@ -19,14 +19,12 @@ import org.sonatype.nexus.componentmetadata.FieldDefinition;
 import org.sonatype.nexus.componentmetadata.RecordStoreSchema;
 import org.sonatype.nexus.componentmetadata.RecordStoreSession;
 import org.sonatype.nexus.componentmetadata.RecordType;
-import org.sonatype.nexus.internal.orient.DatabaseManagerSupport;
 import org.sonatype.nexus.internal.orient.HexRecordIdObfuscator;
 import org.sonatype.nexus.internal.orient.MemoryDatabaseManager;
-import org.sonatype.nexus.orient.DatabaseManager;
+import org.sonatype.nexus.internal.orient.MinimalDatabaseServer;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.orientechnologies.common.log.OLogManager;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -43,6 +41,10 @@ public class OrientRecordStoreITSupport
   protected static final Long longValue = Long.MAX_VALUE;
   protected static final Short shortValue = Short.MAX_VALUE;
   protected static final String stringValue = "stringValue";
+
+  private MinimalDatabaseServer databaseServer;
+
+  private MemoryDatabaseManager databaseManager;
 
   protected OrientRecordStore store;
 
@@ -77,10 +79,11 @@ public class OrientRecordStoreITSupport
 
   @Before
   public void setUp() throws Exception {
-    DatabaseManager databaseManager = new MemoryDatabaseManager();
+    this.databaseServer = new MinimalDatabaseServer();
+    databaseServer.start();
 
-    // uncomment to use a pre-existing db named 'test' listening on localhost
-    //databaseManager = new LocalTestDatabaseManager();
+    this.databaseManager = new MemoryDatabaseManager();
+    databaseManager.start();
 
     // initialize store
     store = new OrientRecordStore(databaseManager, new HexRecordIdObfuscator());
@@ -117,22 +120,19 @@ public class OrientRecordStoreITSupport
 
   @After
   public void tearDown() throws Exception {
-    store.stop();
-  }
-
-  private static class LocalTestDatabaseManager
-      extends DatabaseManagerSupport {
-
-    private static final String URI = "remote:localhost/test";
-
-    @Override
-    protected String connectionUri(final String name) {
-      return URI;
+    if (store != null) {
+      store.stop();
+      store = null;
     }
 
-    @Override
-    public ODatabaseDocumentTx connect(final String name, final boolean create) {
-      return new ODatabaseDocumentTx(URI);
+    if (databaseManager != null) {
+      databaseManager.stop();
+      databaseManager = null;
+    }
+
+    if (databaseServer != null) {
+      databaseServer.stop();
+      databaseServer = null;
     }
   }
 }

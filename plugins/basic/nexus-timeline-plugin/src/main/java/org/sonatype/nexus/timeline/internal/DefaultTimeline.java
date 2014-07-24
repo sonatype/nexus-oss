@@ -136,7 +136,6 @@ public class DefaultTimeline
         type.createIndex(I_TYPE, INDEX_TYPE.NOTUNIQUE_HASH_INDEX, P_TYPE);
         type.createIndex(I_SUBTYPE, INDEX_TYPE.NOTUNIQUE_HASH_INDEX, P_SUBTYPE);
 
-        schema.save();
         log.info("Created schema: {}, properties: {}", type, type.properties());
       }
     }
@@ -237,7 +236,6 @@ public class DefaultTimeline
       final OSchema schema = db.getMetadata().getSchema();
       final OClass type = schema.getClass(DB_CLASS);
       type.addClusterId(cid);
-      schema.save();
       log.info("Created new journal cluster; id: {}, name: {}", cid, name);
     }
     else {
@@ -326,7 +324,6 @@ public class DefaultTimeline
             OSchema schema = db.getMetadata().getSchema();
             OClass type = schema.getClass(DB_CLASS);
             type.removeClusterId(cid);
-            schema.save();
             db.dropCluster(cid, true);
           }
         }

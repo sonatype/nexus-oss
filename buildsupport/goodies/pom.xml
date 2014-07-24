@@ -100,6 +100,18 @@
         <version>${goodies.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.sisu.goodies</groupId>
+        <artifactId>goodies-testsupport</artifactId>
+        <version>${goodies.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 

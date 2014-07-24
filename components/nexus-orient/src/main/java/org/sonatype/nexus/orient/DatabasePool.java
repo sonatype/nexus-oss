@@ -21,7 +21,18 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
  */
 public interface DatabasePool
 {
+  /**
+   * Returns the name of this database pool.
+   */
+  String getName();
+
+  /**
+   * Attempt to open a connection to the database.
+   */
   ODatabaseDocumentTx acquire();
 
+  /**
+   * Close the database pool.
+   */
   void close();
 }

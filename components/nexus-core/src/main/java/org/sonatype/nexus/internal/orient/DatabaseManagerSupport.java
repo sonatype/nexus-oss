@@ -13,20 +13,19 @@
 
 package org.sonatype.nexus.internal.orient;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.Iterator;
+import java.util.Map;
 
+import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.orient.DatabasePool;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycles;
 
 import com.google.common.base.Throwables;
-import com.orientechnologies.orient.core.command.OCommandOutputListener;
+import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.db.tool.ODatabaseExport;
-import com.orientechnologies.orient.core.db.tool.ODatabaseImport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -37,24 +36,104 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 3.0
  */
 public abstract class DatabaseManagerSupport
-    extends ComponentSupport
+    extends LifecycleSupport
     implements DatabaseManager
 {
   public static final String SYSTEM_USER = "admin";
 
   public static final String SYSTEM_PASSWORD = "admin";
 
-  public static final int BACKUP_BUFFER_SIZE = 16 * 1024;
+  private final Map<String,DatabasePoolImpl> pools = Maps.newHashMap();
 
-  public static final int IMPORT_BUFFER_SIZE = 16 * 1024;
+  private final Map<String,DatabaseInstanceImpl> instances = Maps.newHashMap();
 
-  public static final int BACKUP_COMPRESSION_LEVEL = 9;
+  @Override
+  protected void doStart() throws Exception {
+    checkState(pools.isEmpty());
+    checkState(instances.isEmpty());
+  }
 
+  @Override
+  protected void doStop() throws Exception {
+    stopAllInstances();
+    stopAllPools();
+  }
+
+  /**
+   * Stop all instances and stop tracking.
+   *
+   * Usage is protected by lifecycle lock, and use of ensureStarted.
+   */
+  private void stopAllInstances() {
+    if (instances.isEmpty()) {
+      return;
+    }
+
+    log.info("Stopping {} instances", instances.size());
+
+    Iterator<DatabaseInstanceImpl> iter = instances.values().iterator();
+    while (iter.hasNext()) {
+      DatabaseInstanceImpl instance = iter.next();
+
+      if (instance.isStarted()) {
+        log.info("Stopping instance: {}", instance.getName());
+        try {
+          instance.stop();
+        }
+        catch (Exception e) {
+          log.warn("Failed to stop instance: {}", instance.getName(), e);
+        }
+      }
+      else {
+        log.info("Instance already stopped: {}", instance.getName());
+      }
+
+      iter.remove();
+    }
+  }
+
+  /**
+   * Stop all pools and stop tracking.
+   *
+   * Usage is protected by lifecycle lock, and use of ensureStarted.
+   */
+  private void stopAllPools() {
+    if (pools.isEmpty()) {
+      return;
+    }
+
+    log.info("Stopping {} pools", pools.size());
+
+    Iterator<DatabasePoolImpl> iter = pools.values().iterator();
+    while (iter.hasNext()) {
+      DatabasePoolImpl pool = iter.next();
+
+      if (pool.isStarted()) {
+        log.info("Stopping pool: {}", pool.getName());
+        try {
+          pool.stop();
+        }
+        catch (Exception e) {
+          log.warn("Failed to stop pool: {}", pool.getName(), e);
+        }
+      }
+      else {
+        log.info("Pool already stopped: {}", pool.getName());
+      }
+
+      iter.remove();
+    }
+  }
+
+  /**
+   * Returns the OrientDB connection URI string for the given database name.
+   */
   protected abstract String connectionUri(final String name);
 
   @Override
   public ODatabaseDocumentTx connect(final String name, final boolean create) {
     checkNotNull(name);
+    ensureStarted();
 
     String uri = connectionUri(name);
     ODatabaseDocumentTx db = new ODatabaseDocumentTx(uri);
@@ -91,127 +170,65 @@ public abstract class DatabaseManagerSupport
     // nop
   }
 
+  /**
+   * Exposing impl type here for sub-classes.
+   */
+  @Override
+  public DatabaseExternalizerImpl externalizer(final String name) {
+    checkNotNull(name);
+    ensureStarted();
+
+    return new DatabaseExternalizerImpl(this, name);
+  }
+
   @Override
   public DatabasePool pool(final String name) {
     checkNotNull(name);
+    ensureStarted();
+
+    synchronized (pools) {
+      DatabasePoolImpl pool = pools.get(name);
+      if (pool == null) {
+        pool = createPool(name);
+        log.debug("Created database pool: {}", pool);
+        pools.put(name, pool);
+      }
+      return pool;
+    }
+  }
+
+  private DatabasePoolImpl createPool(final String name) {
+    // TODO: refine more control over how pool settings are configured per-database or globally
 
     String uri = connectionUri(name);
-    final ODatabaseDocumentPool pool = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
-    pool.setName(String.format("%s-database-pool", name));
-    pool.setup(1, 25);
-    log.debug("Created database pool: {} -> {}", name, pool);
+    ODatabaseDocumentPool underlying = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
+    underlying.setName(String.format("%s-database-pool", name));
+    underlying.setup(1, 25);
 
-    return new DatabasePool()
-    {
-      @Override
-      public ODatabaseDocumentTx acquire() {
-        return pool.acquire();
-      }
-
-      @Override
-      public void close() {
-        pool.close();
-      }
-
-      @Override
-      public String toString() {
-        return pool.toString();
-      }
-    };
-  }
-
-  /**
-   * Helper to log prefixed command output messages.
-   */
-  private class LoggingCommandOutputListener
-      implements OCommandOutputListener
-  {
-    private final String prefix;
-
-    private LoggingCommandOutputListener(final String prefix) {
-      this.prefix = prefix;
-    }
-
-    @Override
-    public void onMessage(final String text) {
-      if (log.isDebugEnabled()) {
-        log.debug("{}: {}", prefix, text.trim());
-      }
-    }
+    DatabasePoolImpl pool = new DatabasePoolImpl(underlying, name);
+    Lifecycles.start(pool);
+    return pool;
   }
 
   @Override
-  public void backup(final String name, final OutputStream output) throws IOException {
+  public DatabaseInstance instance(final String name) {
     checkNotNull(name);
-    checkNotNull(output);
+    ensureStarted();
 
-    log.debug("Backup database: {}", name);
-
-    try (ODatabaseDocumentTx db = connect(name, false)) {
-      checkState(db.exists(), "Database does not exist: %s", name);
-
-      log.debug("Starting backup");
-      db.backup(output, null, null, new LoggingCommandOutputListener("BACKUP"),
-          BACKUP_COMPRESSION_LEVEL, BACKUP_BUFFER_SIZE);
-      log.debug("Completed backup");
+    synchronized (instances) {
+      DatabaseInstanceImpl instance = instances.get(name);
+      if (instance == null) {
+        instance = createInstance(name);
+        log.debug("Created database instance: {}", instance);
+        instances.put(name, instance);
+      }
+      return instance;
     }
   }
 
-  @Override
-  public void restore(final String name, final InputStream input) throws IOException {
-    checkNotNull(name);
-    checkNotNull(input);
-
-    log.debug("Restoring database: {}", name);
-
-    try (ODatabaseDocumentTx db = connect(name, false)) {
-      checkState(!db.exists(), "Database already exists: %s", name);
-      db.create();
-
-      log.debug("Starting restore");
-      db.restore(input, null, null, new LoggingCommandOutputListener("RESTORE"));
-      log.debug("Completed import");
-    }
-  }
-
-  @Override
-  public void export(final String name, final OutputStream output) throws IOException {
-    checkNotNull(name);
-    checkNotNull(output);
-
-    log.debug("Exporting database: {}", name);
-
-    try (ODatabaseDocumentTx db = connect(name, false)) {
-      checkState(db.exists(), "Database does not exist: %s", name);
-
-      log.debug("Starting export");
-      ODatabaseExport exporter = new ODatabaseExport(db, output, new LoggingCommandOutputListener("EXPORT"));
-      exporter.exportDatabase();
-      log.debug("Completed export");
-    }
-  }
-
-  @Override
-  public void import_(final String name, final InputStream input) throws IOException {
-    checkNotNull(name);
-    checkNotNull(input);
-
-    log.debug("Importing database: {}", name);
-
-    try (ODatabaseDocumentTx db = connect(name, false)) {
-      checkState(!db.exists(), "Database already exists: %s", name);
-      db.create();
-
-      import_(db, input);
-    }
-  }
-
-  protected void import_(final ODatabaseDocumentTx db, final InputStream input) throws IOException {
-    checkNotNull(input);
-
-    log.debug("Starting import");
-    ODatabaseImport importer = new ODatabaseImport(db, input, new LoggingCommandOutputListener("IMPORT"));
-    importer.importDatabase();
-    log.debug("Completed import");
+  private DatabaseInstanceImpl createInstance(final String name) {
+    DatabaseInstanceImpl instance = new DatabaseInstanceImpl(this, name);
+    Lifecycles.start(instance);
+    return instance;
   }
 }

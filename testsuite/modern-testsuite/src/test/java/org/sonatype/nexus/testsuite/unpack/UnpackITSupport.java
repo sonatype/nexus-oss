@@ -70,11 +70,7 @@ public abstract class UnpackITSupport
 
   @Override
   protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
-    return configuration.addPlugins(
-        artifactResolver().resolvePluginFromDependencyManagement(
-            "org.sonatype.nexus.plugins", "nexus-unpack-plugin"
-        )
-    );
+    return configuration.addFeatures("nexus-unpack-plugin");
   }
 
   protected Repositories repositories() {

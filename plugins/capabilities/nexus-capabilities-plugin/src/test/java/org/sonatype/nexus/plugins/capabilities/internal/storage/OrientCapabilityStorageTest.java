@@ -12,15 +12,17 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.storage;
 
-import java.io.File;
 import java.util.Map;
 
-import org.sonatype.nexus.internal.orient.DatabaseManagerImpl;
 import org.sonatype.nexus.internal.orient.HexRecordIdObfuscator;
+import org.sonatype.nexus.internal.orient.MemoryDatabaseManager;
+import org.sonatype.nexus.internal.orient.MinimalDatabaseServer;
+import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Maps;
+import com.google.inject.util.Providers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,16 +39,23 @@ import static org.hamcrest.Matchers.notNullValue;
 public class OrientCapabilityStorageTest
   extends TestSupport
 {
+  private MinimalDatabaseServer databaseServer;
+
+  private MemoryDatabaseManager databaseManager;
+
   private OrientCapabilityStorage underTest;
 
   @Before
   public void setUp() throws Exception {
-    File dir = util.createTempDir("testdb");
+    this.databaseServer = new MinimalDatabaseServer();
+    databaseServer.start();
 
-    // TODO: Replace with in-memory manager impl
-    DatabaseManagerImpl databaseManager = new DatabaseManagerImpl(dir);
+    this.databaseManager = new MemoryDatabaseManager();
+    databaseManager.start();
 
-    this.underTest = new OrientCapabilityStorage(databaseManager, new HexRecordIdObfuscator());
+    DatabaseInstance databaseInstance = databaseManager.instance("test");
+
+    this.underTest = new OrientCapabilityStorage(Providers.of(databaseInstance), new HexRecordIdObfuscator());
     underTest.start();
   }
 
@@ -54,6 +63,17 @@ public class OrientCapabilityStorageTest
   public void tearDown() throws Exception {
     if (underTest != null) {
       underTest.stop();
+      underTest = null;
+    }
+
+    if (databaseManager != null) {
+      databaseManager.stop();
+      databaseManager = null;
+    }
+
+    if (databaseServer != null) {
+      databaseServer.stop();
+      databaseServer = null;
     }
   }
 

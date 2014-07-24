@@ -26,6 +26,7 @@
 
   <artifactId>nexus-capabilities-model</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
