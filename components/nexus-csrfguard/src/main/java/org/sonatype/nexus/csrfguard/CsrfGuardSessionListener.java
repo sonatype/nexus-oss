@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.csrfguard;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListenerAdapter;
 import org.owasp.csrfguard.CsrfGuard;
@@ -30,12 +27,12 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.9
  */
-@Named
-@Singleton
+// HACK: Disable CSRFGuard support for now, its too problematic
+//@Named
+//@Singleton
 public class CsrfGuardSessionListener
     extends SessionListenerAdapter
 {
-
   private static final Logger log = LoggerFactory.getLogger(CsrfGuard.class);
 
   @Override
@@ -47,11 +44,8 @@ public class CsrfGuardSessionListener
       log.debug("Assigned token {} to session {}", token, session.getId());
     }
     catch (Exception e) {
-      throw new RuntimeException(String.format("unable to generate the random token - %s", e.getLocalizedMessage()), e);
+      throw new RuntimeException("unable to generate the random token - " + e.getLocalizedMessage(), e);
     }
-
-
   }
-
 }
 

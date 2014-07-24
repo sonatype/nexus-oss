@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.csrfguard.CsrfGuardFilter;
 import org.sonatype.nexus.security.filter.authc.NexusApiKeyAuthenticationFilter;
 import org.sonatype.nexus.security.filter.authc.NexusAuthenticationFilter;
 import org.sonatype.nexus.security.filter.authz.FailureLoggingHttpMethodPermissionFilter;
@@ -47,7 +46,8 @@ public class NexusSecurityFilterModule
 
     bind(filterKey("authcApiKey")).toProvider(AuthcApiKeyFilterProvider.class);
 
-    bind(filterKey("csrfToken")).to(CsrfGuardFilter.class).in(Singleton.class);
+    // HACK: Disable CSRFGuard support for now, its too problematic
+    //bind(filterKey("csrfToken")).to(CsrfGuardFilter.class).in(Singleton.class);
   }
 
   @Singleton

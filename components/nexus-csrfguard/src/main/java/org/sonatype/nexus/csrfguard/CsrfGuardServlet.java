@@ -39,8 +39,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -66,8 +64,9 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @since 2.9
  */
-@Named
-@Singleton
+// HACK: Disable CSRFGuard support for now, its too problematic
+//@Named
+//@Singleton
 public final class CsrfGuardServlet
     extends HttpServlet
 {

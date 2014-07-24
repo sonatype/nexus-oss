@@ -16,7 +16,6 @@ package org.sonatype.nexus.plugins.siesta;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.csrfguard.CsrfGuardFilter;
 import org.sonatype.nexus.guice.FilterChainModule;
 import org.sonatype.nexus.web.internal.SecurityFilter;
 import org.sonatype.sisu.siesta.common.Resource;
@@ -91,7 +90,11 @@ public class SiestaModule
     {
       @Override
       protected void configure() {
-        addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic,csrfToken");
+        addFilterChain(MOUNT_POINT + "/**",
+            // HACK: Disable CSRFGuard support for now, its too problematic
+            //"noSessionCreation,authcBasic,csrfToken"
+            "noSessionCreation,authcBasic"
+        );
       }
 
     });

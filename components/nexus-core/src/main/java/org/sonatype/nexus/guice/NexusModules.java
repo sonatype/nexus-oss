@@ -103,7 +103,7 @@ public class NexusModules
 
       install(new SecurityWebModule(servletContext, true));
 
-      // HACK: Disable CSRF support completely for now, its too problematic
+      // HACK: Disable CSRFGuard support for now, its too problematic
       //install(new CsrfGuardModule());
     }
   }

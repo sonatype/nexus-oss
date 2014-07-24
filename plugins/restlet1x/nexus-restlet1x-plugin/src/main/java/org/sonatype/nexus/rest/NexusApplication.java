@@ -129,7 +129,10 @@ public class NexusApplication
 
     // protecting service resources with "wall" permission
     this.protectedPathManager.addProtectedResource("/service/local/**",
-        "noSessionCreation,authcBasic,csrfToken,perms[nexus:permToCatchAllUnprotecteds]");
+        // HACK: Disable CSRFGuard support for now, its too problematic
+        //"noSessionCreation,authcBasic,csrfToken,perms[nexus:permToCatchAllUnprotecteds]"
+        "noSessionCreation,authcBasic,perms[nexus:permToCatchAllUnprotecteds]"
+    );
   }
 
   @Override
@@ -159,10 +162,12 @@ public class NexusApplication
       // don't create session unless the user logs in from the UI
       filterExpression = "noSessionCreation," + filterExpression;
     }
-    if (filterExpression != null
-        && (filterExpression.contains("authcBasic") || filterExpression.contains("authcNxBasic"))) {
-      filterExpression += ",csrfToken";
-    }
+
+    // HACK: Disable CSRFGuard support for now, its too problematic
+    //if (filterExpression != null
+    //    && (filterExpression.contains("authcBasic") || filterExpression.contains("authcNxBasic"))) {
+    //  filterExpression += ",csrfToken";
+    //}
 
     this.protectedPathManager.addProtectedResource("/service/local" + descriptor.getPathPattern(), filterExpression);
   }

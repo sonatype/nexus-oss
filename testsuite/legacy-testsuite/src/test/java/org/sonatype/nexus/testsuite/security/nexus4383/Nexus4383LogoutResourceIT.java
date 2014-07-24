@@ -43,10 +43,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-
 /**
  * Tests to make sure the session is removed when the logout resource is called.
  */
@@ -108,9 +104,10 @@ public class Nexus4383LogoutResourceIT
     getMethod.addHeader(userAgentHeader);
     try {
       CloseableHttpResponse response = httpClient.execute(getMethod, localcontext);
-      Header owaspCsrfToken = response.getFirstHeader("OWASP_CSRFTOKEN");
-      assertThat(owaspCsrfToken, is(notNullValue()));
-      owaspQueryParams = "?" + owaspCsrfToken.getName() + "=" + owaspCsrfToken.getValue();
+      // HACK: Disable CSRFGuard support for now, its too problematic
+      //Header owaspCsrfToken = response.getFirstHeader("OWASP_CSRFTOKEN");
+      //assertThat(owaspCsrfToken, is(notNullValue()));
+      //owaspQueryParams = "?" + owaspCsrfToken.getName() + "=" + owaspCsrfToken.getValue();
       Assert.assertEquals(response.getStatusLine().getStatusCode(), 200);
     }
     finally {
