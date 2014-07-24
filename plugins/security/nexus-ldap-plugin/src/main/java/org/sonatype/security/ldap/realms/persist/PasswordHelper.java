@@ -13,7 +13,8 @@
 package org.sonatype.security.ldap.realms.persist;
 
 /**
- * This is "legacy" component to be used in upgrades only.
+ * This is "legacy" component to be used in upgrades only. Originally, OSS LDAP plugin was using this to store
+ * passwords.
  * 
  * @deprecated To be used in configuration upgrades only.
  */

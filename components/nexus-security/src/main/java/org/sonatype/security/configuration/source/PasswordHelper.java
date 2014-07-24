@@ -17,7 +17,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.sisu.goodies.crypto.MavenCipher;
+import org.sonatype.sisu.goodies.crypto.CryptoHelper;
+import org.sonatype.sisu.goodies.crypto.maven.MavenCipher;
+import org.sonatype.sisu.goodies.crypto.maven.PasswordCipherMavenImpl;
 
 /**
  * FIXME This needs to be abstracted, as this is just a copy of the class in nexus. The problem is if we move this to
@@ -30,11 +32,11 @@ public class PasswordHelper
 {
   private static final String ENC = "CMMDwoV";
 
-  private final MavenCipher passwordCipher;
+  private final MavenCipher mavenCipher;
 
   @Inject
-  public PasswordHelper(final MavenCipher passwordCipher) {
-    this.passwordCipher = passwordCipher;
+  public PasswordHelper(final CryptoHelper cryptoHelper) {
+    this.mavenCipher = new MavenCipher(new PasswordCipherMavenImpl(cryptoHelper));
   }
 
   public String encrypt(String password)
@@ -45,7 +47,7 @@ public class PasswordHelper
   public String encrypt(String password, String encoding)
   {
     if (password != null) {
-      return passwordCipher.encrypt(password, encoding);
+      return mavenCipher.encrypt(password, encoding);
     }
 
     return null;
@@ -59,12 +61,12 @@ public class PasswordHelper
   public String decrypt(String encodedPassword, String encoding)
   {
     // check if the password is encrypted
-    if (!passwordCipher.isPasswordCipher(encodedPassword)) {
+    if (!mavenCipher.isPasswordCipher(encodedPassword)) {
       return encodedPassword;
     }
 
     if (encodedPassword != null) {
-      return passwordCipher.decrypt(encodedPassword, encoding);
+      return mavenCipher.decrypt(encodedPassword, encoding);
     }
     return null;
   }

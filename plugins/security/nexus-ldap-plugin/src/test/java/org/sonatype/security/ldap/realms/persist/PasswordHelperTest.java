@@ -14,7 +14,6 @@
 package org.sonatype.security.ldap.realms.persist;
 
 import org.sonatype.sisu.goodies.crypto.internal.CryptoHelperImpl;
-import org.sonatype.sisu.goodies.crypto.internal.PasswordCipherMavenLegacyImpl;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
@@ -30,7 +29,7 @@ public class PasswordHelperTest
   public PasswordHelper getPasswordHelper()
       throws Exception
   {
-    return new DefaultPasswordHelper(new PasswordCipherMavenLegacyImpl(new CryptoHelperImpl()));
+    return new DefaultPasswordHelper(new CryptoHelperImpl());
   }
 
   @Test

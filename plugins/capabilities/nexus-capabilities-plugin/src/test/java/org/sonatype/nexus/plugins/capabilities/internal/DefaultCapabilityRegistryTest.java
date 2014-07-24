@@ -36,8 +36,6 @@ import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageItem;
 import org.sonatype.sisu.goodies.crypto.internal.CryptoHelperImpl;
-import org.sonatype.sisu.goodies.crypto.internal.MavenCipherImpl;
-import org.sonatype.sisu.goodies.crypto.internal.PasswordCipherMavenImpl;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -147,7 +145,7 @@ public class DefaultCapabilityRegistryTest
         eventBus,
         achf,
         vchf,
-        passwordHelper = new PasswordHelper(new MavenCipherImpl(new PasswordCipherMavenImpl(new CryptoHelperImpl())))
+        passwordHelper = new PasswordHelper(new CryptoHelperImpl())
     );
 
     rec = ArgumentCaptor.forClass(CapabilityEvent.class);

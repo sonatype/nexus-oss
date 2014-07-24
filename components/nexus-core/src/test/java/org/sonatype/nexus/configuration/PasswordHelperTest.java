@@ -15,14 +15,11 @@ package org.sonatype.nexus.configuration;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.sonatype.sisu.goodies.crypto.internal.CryptoHelperImpl;
-import org.sonatype.sisu.goodies.crypto.internal.MavenCipherImpl;
-import org.sonatype.sisu.goodies.crypto.internal.PasswordCipherMavenImpl;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.base.Throwables;
 import org.junit.Before;
 import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -38,7 +35,7 @@ public class PasswordHelperTest
 
   @Before
   public void init() throws Exception {
-    helper = new PasswordHelper(new MavenCipherImpl(new PasswordCipherMavenImpl(new CryptoHelperImpl())));
+    helper = new PasswordHelper(new CryptoHelperImpl());
   }
 
   @Test

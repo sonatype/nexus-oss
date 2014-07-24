@@ -16,7 +16,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.sisu.goodies.crypto.MavenCipher;
+import org.sonatype.sisu.goodies.crypto.CryptoHelper;
+import org.sonatype.sisu.goodies.crypto.maven.MavenCipher;
+import org.sonatype.sisu.goodies.crypto.maven.PasswordCipherMavenImpl;
 
 import com.google.common.base.Preconditions;
 
@@ -30,8 +32,9 @@ public class PasswordHelper
   private final MavenCipher mavenCipher;
 
   @Inject
-  public PasswordHelper(final MavenCipher mavenCipher) {
-    this.mavenCipher = Preconditions.checkNotNull(mavenCipher, "mavenCipher");
+  public PasswordHelper(final CryptoHelper cryptoHelper) {
+    Preconditions.checkNotNull(cryptoHelper, "mavenCipher");
+    this.mavenCipher = new MavenCipher(new PasswordCipherMavenImpl(cryptoHelper));
   }
 
   public String encrypt(String password)
