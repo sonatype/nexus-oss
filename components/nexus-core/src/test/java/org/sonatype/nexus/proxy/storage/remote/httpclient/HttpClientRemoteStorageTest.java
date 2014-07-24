@@ -34,16 +34,20 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
-import junit.framework.Assert;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import static org.hamcrest.Matchers.is;
+import org.apache.http.message.BasicHeader;
+import com.google.inject.util.Providers;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ConnectionPoolTimeoutException;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -243,6 +247,44 @@ public class HttpClientRemoteStorageTest
       }
       unsetParameters();
     }
+  }
+
+  /**
+   * When checking for repository remote availability (newerThen is 0), we should neglect response carried 
+   * last-modified time as we are not interested in it.
+   * 
+   * @see https://issues.sonatype.org/browse/NEXUS-6701
+   */
+  @Test
+  public void checkRepositoryRemoteAvailabilityNeglectLastModified()
+      throws Exception
+  {
+    final HttpClientRemoteStorage underTest =
+        new HttpClientRemoteStorage(mock(ApplicationStatusSource.class),
+            mock(MimeSupport.class), mock(QueryStringBuilder.class), mock(HttpClientManager.class))
+        {
+          @Override
+          HttpResponse executeRequest(final ProxyRepository repository, final ResourceStoreRequest request,
+                                      final HttpUriRequest httpRequest, final String baseUrl, final boolean contentRelated)
+              throws RemoteStorageException
+          {
+            final HttpResponse httpResponse = mock(HttpResponse.class);
+            when(httpResponse.getFirstHeader("last-modified")).thenReturn(new BasicHeader("last-modified", "Thu, 01 Jan 1970 00:00:00 GMT"));
+            final StatusLine statusLine = mock(StatusLine.class);
+            when(httpResponse.getStatusLine()).thenReturn(statusLine);
+            when(statusLine.getStatusCode()).thenReturn(200);
+            when(httpResponse.getEntity()).thenReturn(mock(HttpEntity.class));
+            return httpResponse;
+          }
+        };
+
+    final ProxyRepository proxyMock = mock(ProxyRepository.class);
+    when(proxyMock.getId()).thenReturn("foo");
+    when(proxyMock.getRemoteUrl()).thenReturn("http://repo1.maven.org/maven2/");
+    when(proxyMock.getRemoteStorageContext()).thenReturn(new DefaultRemoteStorageContext(null));
+    
+    assertThat(underTest.checkRemoteAvailability(0, proxyMock, new ResourceStoreRequest("/"), false), is(true));
+    assertThat(underTest.checkRemoteAvailability(System.currentTimeMillis(), proxyMock, new ResourceStoreRequest("/"), false), is(false));
   }
 
   protected void setParameters() {
