@@ -20,7 +20,6 @@ import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.nexus.web.WebResourceBundle;
 import org.sonatype.nexus.web.internal.BaseUrlHolderFilter;
 import org.sonatype.nexus.web.internal.CommonHeadersFilter;
-import org.sonatype.nexus.web.internal.CsrfGuardModule;
 import org.sonatype.nexus.web.internal.ErrorPageFilter;
 import org.sonatype.nexus.web.internal.ErrorPageServlet;
 import org.sonatype.security.SecuritySystem;
@@ -103,7 +102,9 @@ public class NexusModules
       });
 
       install(new SecurityWebModule(servletContext, true));
-      install(new CsrfGuardModule());
+
+      // HACK: Disable CSRF support completely for now, its too problematic
+      //install(new CsrfGuardModule());
     }
   }
 
