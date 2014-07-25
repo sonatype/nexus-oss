@@ -206,7 +206,8 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
    * @param columns new columns
    */
   onReconfigure: function (grid, store, columns) {
-    var me = this;
+    var me = this,
+        store = store || me.grid.getStore();
 
     me.logDebug('Grid ' + grid.id + ' reconfigured, binding to new store');
     me.reconfigureStore(store, me.extractColumnsWithDataIndex(columns));
