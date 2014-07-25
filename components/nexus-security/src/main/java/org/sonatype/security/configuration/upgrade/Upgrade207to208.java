@@ -67,6 +67,7 @@ public class Upgrade207to208
   
     newc.setVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
 
+    // rename NexusLdapAuthenticationRealm to LdapAuthenticatingRealm
     List<String> realms = Lists.newArrayList();
     for (String realm : newc.getRealms()) {
       if ("NexusLdapAuthenticationRealm".equals(realm)) {

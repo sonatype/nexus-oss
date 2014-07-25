@@ -63,14 +63,14 @@ public class Upgrade205to207
         new org.sonatype.security.configuration.model.v2_0_7.upgrade.BasicVersionUpgrade()
             .upgradeSecurityConfiguration(oldc);
 
-    newc.setVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
+    newc.setVersion(org.sonatype.security.configuration.model.v2_0_7.SecurityConfiguration.MODEL_VERSION);
 
     // NEXUS-5899: Security cannot be disabled anymore
     if (!oldc.isEnabled()) {
       log.warn("Security has been enabled. Disabled security is no longer supported");
     }
 
-    message.setModelVersion(org.sonatype.security.configuration.model.SecurityConfiguration.MODEL_VERSION);
+    message.setModelVersion(org.sonatype.security.configuration.model.v2_0_7.SecurityConfiguration.MODEL_VERSION);
     message.setConfiguration(newc);
   }
 
