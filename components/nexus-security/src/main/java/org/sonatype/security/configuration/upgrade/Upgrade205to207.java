@@ -59,7 +59,7 @@ public class Upgrade205to207
     org.sonatype.security.configuration.model.v2_0_5.SecurityConfiguration oldc =
         (org.sonatype.security.configuration.model.v2_0_5.SecurityConfiguration) message.getConfiguration();
 
-    org.sonatype.security.configuration.model.SecurityConfiguration newc =
+    org.sonatype.security.configuration.model.v2_0_7.SecurityConfiguration newc =
         new org.sonatype.security.configuration.model.v2_0_7.upgrade.BasicVersionUpgrade()
             .upgradeSecurityConfiguration(oldc);
 

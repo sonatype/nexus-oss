@@ -5,7 +5,7 @@
   <anonymousUsername>anonymous-user</anonymousUsername>
   <anonymousPassword>anonymous-pass</anonymousPassword>
   <realms>
-      <realm>NexusLdapAuthenticationRealm</realm>
+      <realm>LdapAuthenticatingRealm</realm>
       <realm>XmlAuthenticatingRealm</realm>
       <realm>XmlAuthorizingRealm</realm>
   </realms>

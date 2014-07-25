@@ -13,23 +13,23 @@
 
 -->
 <model xsd.namespace="http://www.sonatype.com/xsd/security-configuration-2.0.3"
-    xsd.targetNamespace="http://www.sonatype.com/xsd/security-configuration-2.0.3">
+       xsd.targetNamespace="http://www.sonatype.com/xsd/security-configuration-2.0.3">
 
   <id>security</id>
 
   <name>SecurityConfiguration</name>
 
   <description>
-      <![CDATA[
+    <![CDATA[
       <p>XML Based Security Configuration.</p>
       ]]>
   </description>
 
   <defaults>
-      <default>
-          <key>package</key>
-          <value>org.sonatype.security.configuration.model</value>
-      </default>
+    <default>
+      <key>package</key>
+      <value>org.sonatype.security.configuration.model</value>
+    </default>
   </defaults>
 
   <classes>
@@ -62,7 +62,8 @@
           <type>boolean</type>
           <description>
             If enabled, the users will be able to access DAV resources unauthenticated, if Realm allows. To
-            set rights for unauthenticated users, use "anonymous" username.</description>
+            set rights for unauthenticated users, use "anonymous" username.
+          </description>
           <required>true</required>
         </field>
         <field>
@@ -71,7 +72,8 @@
           <type>String</type>
           <description>
             The username used to log in as anonymous user. The account should be enabled and existing according to
-            the used JSecurity realm!</description>
+            the used JSecurity realm!
+          </description>
           <required>true</required>
         </field>
         <field>
@@ -80,7 +82,8 @@
           <type>String</type>
           <description>
             The username used to log in as anonymous user. The account should be enabled and existing according to
-            the used JSecurity realm!</description>
+            the used JSecurity realm!
+          </description>
           <required>true</required>
         </field>
         <field>
@@ -106,24 +109,24 @@
           <type>int</type>
           <description>The id of a security manager to be used by default security system.</description>
           <required>true</required>
-        </field>        
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>
-            <version>2.0.3</version>
-            <code><![CDATA[
+          <version>2.0.3</version>
+          <code><![CDATA[
     public static final String MODEL_VERSION = "2.0.3";
 ]]></code>
         </codeSegment>
         <codeSegment>
-            <version>2.0.4</version>
-            <code><![CDATA[
+          <version>2.0.4</version>
+          <code><![CDATA[
     public static final String MODEL_VERSION = "2.0.4";
 ]]></code>
         </codeSegment>
         <codeSegment>
-            <version>2.0.5</version>
-            <code><![CDATA[
+          <version>2.0.5</version>
+          <code><![CDATA[
     public static final String MODEL_VERSION = "2.0.5";
 ]]></code>
         </codeSegment>
@@ -133,8 +136,14 @@
     public static final String MODEL_VERSION = "2.0.7";
 ]]></code>
         </codeSegment>
-    </codeSegments>
+        <codeSegment>
+          <version>2.0.8</version>
+          <code><![CDATA[
+    public static final String MODEL_VERSION = "2.0.8";
+]]></code>
+        </codeSegment>
+      </codeSegments>
     </class>
-    
-    </classes>
+
+  </classes>
 </model>
