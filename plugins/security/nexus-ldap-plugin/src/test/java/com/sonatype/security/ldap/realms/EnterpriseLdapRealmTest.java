@@ -27,7 +27,7 @@ public class EnterpriseLdapRealmTest
   public void testSuccessfulAuthentication()
       throws Exception
   {
-    final Realm realm = this.lookup(Realm.class, "NexusLdapAuthenticationRealm");
+    final Realm realm = this.lookup(Realm.class, "LdapAuthenticatingRealm");
     final UsernamePasswordToken upToken = new UsernamePasswordToken("brianf", "brianf123");
     final AuthenticationInfo ai = realm.getAuthenticationInfo(upToken);
     assertEquals("brianf123".toCharArray(), ai.getCredentials());
