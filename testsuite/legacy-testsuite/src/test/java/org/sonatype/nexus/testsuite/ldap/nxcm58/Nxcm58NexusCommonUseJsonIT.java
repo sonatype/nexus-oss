@@ -152,7 +152,7 @@ public class Nxcm58NexusCommonUseJsonIT
 
     // enable ldap realms
     GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
-    globalConfig.addSecurityRealm("NexusLdapAuthenticationRealm");
+    globalConfig.addSecurityRealm("LdapAuthenticatingRealm");
     Status status = SettingsMessageUtil.save(globalConfig);
     Assert.assertTrue(status.isSuccess());
 

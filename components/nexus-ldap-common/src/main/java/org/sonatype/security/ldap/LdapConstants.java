@@ -28,7 +28,7 @@ public final class LdapConstants
    * The LDAP realm name. Shiro will consider this string as only and solely to perform authorization
    * using LDAP realm, so any principal should use this string when constructing principals.
    */
-  public static final String REALM_NAME = "NexusLdapAuthenticationRealm";
+  public static final String REALM_NAME = "LdapAuthenticatingRealm";
 
   /**
    * String marking the source of users when looked up thru user manager that uses LDAP.
