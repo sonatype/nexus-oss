@@ -13,7 +13,11 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<ehcache updateCheck="false">
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+    updateCheck="false" monitoring="off"
+    dynamicConfig="true">
+
     <!--
     DiskStore configuration
 
@@ -29,7 +33,66 @@
 
     Subdirectories can be specified below the property e.g. java.io.tmpdir/one
     -->
-    <diskStore path="java.io.tmpdir"/>
+    <diskStore path="java.io.tmpdir/nexus-ehcache"/>
+
+    <!-- all created caches shares these defaults
+            memoryStoreEvictionPolicy= ("LRU"|"LFU"|"FIFO")
+              LRU - least recently used
+              LFU - least frequently used
+              FIFO - first in first out
+    -->
+    <defaultCache
+            maxElementsInMemory="1000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="false"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LFU"
+            />
+
+    <!-- Nexus NFC -->
+    <cache name="nx-repository-path-cache" 
+            maxElementsInMemory="100000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="false"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LFU"
+            />
+
+    <!-- Shiro cache used by EnterpriseCacheSessionDAO must NOT loose sessions, EHCache must not remove entries based on timeout, eviction etc. -->
+    <!-- Only way how session should be removed is via Shiro's own org.apache.shiro.session.mgt.AbstractValidatingSessionManager (called from dedicated thread started by Shiro)  -->
+    <!-- See http://shiro.apache.org/session-management.html#SessionManagement-EHCacheSessionDAO -->
+    <!-- Configuration bits copied from https://github.com/apache/shiro/blob/trunk/support/ehcache/src/main/resources/org/apache/shiro/cache/ehcache/ehcache.xml#L75 -->
+    <cache name="shiro-activeSessionCache"
+           maxElementsInMemory="10000"
+           overflowToDisk="true"
+           eternal="true"
+           timeToLiveSeconds="0"
+           timeToIdleSeconds="0"
+           diskPersistent="true"
+           diskExpiryThreadIntervalSeconds="600"/>
+
+    <!--
+    DiskStore configuration
+
+    Sets the path to the directory where cache files are created.
+
+    If the path is a Java System Property it is replaced by its value in the
+    running VM.
+
+    The following properties are translated:
+    * user.home - User's home directory
+    * user.dir - User's current working directory
+    * java.io.tmpdir - Default temp file path
+
+    Subdirectories can be specified below the property e.g. java.io.tmpdir/one
+    <diskStore path="java.io.tmpdir/nexus-ehcache"/>
+    -->
 
     <!--
     Specifies a CacheManagerEventListenerFactory, be used to create a CacheManagerPeerProvider,
@@ -199,9 +262,9 @@
     maxElementsInMemory:
     Sets the maximum number of objects that will be created in memory
 
-	maxElementsOnDisk:
+    maxElementsOnDisk:
     Sets the maximum number of objects that will be maintained in the DiskStore
-	The default value is zero, meaning unlimited.
+    The default value is zero, meaning unlimited.
 
     eternal:
     Sets whether elements are eternal. If eternal,  timeouts are ignored and the
@@ -248,7 +311,7 @@
       put, remove, update, and expire.
 
     * bootstrapCacheLoaderFactory - Specifies a BootstrapCacheLoader, which is called by a
-      cache on initialisation to prepopulate itself.
+      cache on initialisation to pre-populate itself.
 
     Each cache that will be distributed needs to set a cache event listener which replicates
     messages to the other CacheManager peers. For the built-in RMI implementation this is done
@@ -303,11 +366,9 @@
 
     -->
 
-
     <!--
     Mandatory Default Cache configuration. These settings will be applied to caches
-    created programmtically using CacheManager.add(String cacheName)
-    -->
+    created programmatically using CacheManager.add(String cacheName)
     <defaultCache
             maxElementsInMemory="10000"
             eternal="false"
@@ -319,4 +380,5 @@
             diskExpiryThreadIntervalSeconds="120"
             memoryStoreEvictionPolicy="LRU"
             />
+    -->
 </ehcache>
