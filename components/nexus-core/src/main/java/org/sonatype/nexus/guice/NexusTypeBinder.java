@@ -19,7 +19,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import com.google.inject.Binder;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.sisu.space.QualifiedTypeBinder;
 import org.eclipse.sisu.space.QualifiedTypeListener;
 import org.eclipse.sisu.space.QualifiedTypeVisitor;
@@ -27,10 +27,11 @@ import org.eclipse.sisu.space.SpaceModule;
 import org.eclipse.sisu.space.SpaceVisitor;
 
 /**
- * Adapts the usual Plexus binding process to handle Nexus {@link RepositoryType} semantics.
+ * Adapts Sisu's default binding process to handle Nexus {@link RepositoryType} semantics.
  * 
  * @since 2.8
  */
+@SuppressWarnings("deprecation")
 public final class NexusTypeBinder
     implements QualifiedTypeListener
 {
@@ -59,9 +60,11 @@ public final class NexusTypeBinder
 
   /**
    * @param binder Guice binder
-   * @param delegate Original Plexus listener
+   * @param delegate Original listener
    */
   NexusTypeBinder(final Binder binder, final QualifiedTypeListener delegate) {
+    binder.requireExplicitBindings();
+
     this.binder = binder;
     this.delegate = delegate;
   }

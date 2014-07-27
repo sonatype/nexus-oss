@@ -12,39 +12,16 @@
  */
 package org.sonatype.nexus.extender;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.sonatype.nexus.guice.AbstractInterceptorModule;
-import org.sonatype.nexus.guice.NexusModules.PluginModule;
-import org.sonatype.nexus.guice.NexusTypeBinder;
-
-import org.osgi.framework.Constants;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Key;
-import com.google.inject.Module;
 import org.eclipse.sisu.inject.BindingPublisher;
-import org.eclipse.sisu.inject.DefaultRankingFunction;
-import org.eclipse.sisu.inject.InjectorPublisher;
 import org.eclipse.sisu.inject.MutableBeanLocator;
-import org.eclipse.sisu.inject.RankingFunction;
 import org.eclipse.sisu.launch.BundlePlan;
 import org.eclipse.sisu.launch.SisuTracker;
-import org.eclipse.sisu.plexus.PlexusSpaceModule;
-import org.eclipse.sisu.space.BeanScanning;
-import org.eclipse.sisu.space.BundleClassSpace;
-import org.eclipse.sisu.space.ClassSpace;
-import org.eclipse.sisu.space.SpaceModule;
-import org.eclipse.sisu.wire.EntryListAdapter;
-import org.eclipse.sisu.wire.ParameterKeys;
-import org.eclipse.sisu.wire.WireModule;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
@@ -61,79 +38,24 @@ public class NexusBundleTracker
 {
   private static final Logger log = LoggerFactory.getLogger(NexusBundleTracker.class);
 
-  private final AtomicInteger pluginRank = new AtomicInteger(1);
-
-  private final Map<?, ?> variables;
-
-  private final List<AbstractInterceptorModule> interceptorModules;
-
   public NexusBundleTracker(final BundleContext context, final MutableBeanLocator locator) {
     super(context, Bundle.STARTING | Bundle.ACTIVE, locator);
+  }
 
-    variables = lookup(ParameterKeys.PROPERTIES);
-    interceptorModules = new EntryListAdapter<>(locator.locate(Key.get(AbstractInterceptorModule.class)));
+  @Override
+  protected List<BundlePlan> discoverPlans() {
+    return Collections.<BundlePlan> singletonList(new NexusBundlePlan(locator));
   }
 
   @Override
   public BindingPublisher prepare(final Bundle bundle) {
     if (isNexusPlugin(bundle)) {
       preparePluginDependencies(bundle);
-      return prepareNexusPlugin(bundle);
     }
     return super.prepare(bundle);
   }
 
-  @Override
-  protected List<BundlePlan> discoverPlans() {
-    return Collections.emptyList();
-  }
-
-  private BindingPublisher prepareNexusPlugin(final Bundle bundle) {
-    log.info("ACTIVATING {}", bundle);
-    try {
-      final ClassSpace pluginSpace = new BundleClassSpace(bundle);
-
-      final boolean hasPlexus = bundle.getResource("META-INF/plexus/components.xml") != null;
-
-      // Assemble plugin components and resources
-      final List<Module> modules = new ArrayList<Module>();
-      modules.add(new PluginModule());
-      modules.addAll(interceptorModules);
-      if (!hasPlexus) {
-        modules.add(new SpaceModule(pluginSpace, BeanScanning.GLOBAL_INDEX).with(NexusTypeBinder.STRATEGY));
-      }
-      else {
-        modules.add(new PlexusSpaceModule(pluginSpace, BeanScanning.GLOBAL_INDEX));
-      }
-      modules.add(new AbstractModule()
-      {
-        @Override
-        protected void configure() {
-          if (!hasPlexus) {
-            binder().requireExplicitBindings();
-          }
-          bind(MutableBeanLocator.class).toInstance(locator);
-          bind(RankingFunction.class).toInstance(new DefaultRankingFunction(pluginRank.incrementAndGet()));
-          bind(ParameterKeys.PROPERTIES).toInstance(variables);
-        }
-      });
-
-      final BindingPublisher publisher = new InjectorPublisher(Guice.createInjector(new WireModule(modules)));
-
-      log.info("ACTIVATED {}", bundle);
-      return publisher;
-    }
-    catch (Exception e) {
-      log.warn("BROKEN {}", bundle);
-      throw e;
-    }
-  }
-
-  private <T> T lookup(final Key<T> key) {
-    return locator.locate(key).iterator().next().getValue();
-  }
-
-  private static boolean isNexusPlugin(final Bundle bundle) {
+  static boolean isNexusPlugin(final Bundle bundle) {
     if (null == bundle.getHeaders().get(Constants.FRAGMENT_HOST)) {
       final String symbolicName = bundle.getSymbolicName();
       return null != symbolicName && (symbolicName.endsWith("-plugin") || symbolicName.endsWith("-helper"));

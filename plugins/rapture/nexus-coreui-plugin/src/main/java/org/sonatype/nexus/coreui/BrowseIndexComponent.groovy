@@ -20,10 +20,10 @@ import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.index.IndexerManager
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNodeFactory
+import org.sonatype.nexus.validation.Validate
 
 import javax.inject.Inject
 import javax.inject.Named

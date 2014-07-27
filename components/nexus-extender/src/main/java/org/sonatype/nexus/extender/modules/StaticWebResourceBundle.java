@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.guice;
+package org.sonatype.nexus.extender.modules;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,6 +27,11 @@ import org.sonatype.nexus.webresources.WebResourceBundle;
 
 import org.eclipse.sisu.space.ClassSpace;
 
+/**
+ * {@link WebResourceBundle} that exposes any bundle resources found under /static.
+ * 
+ * @since 3.0
+ */
 @Singleton
 public class StaticWebResourceBundle
     implements WebResourceBundle

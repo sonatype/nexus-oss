@@ -22,7 +22,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.sonatype.nexus.NxApplication;
-import org.sonatype.nexus.guice.NexusModules.CoreModule;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.web.NexusGuiceFilter;
 
@@ -96,7 +95,7 @@ public class NexusContextListener
     final ClassSpace coreSpace = new BundleClassSpace(bundleContext.getBundle());
     injector = Guice.createInjector(
         new WireModule(
-            new CoreModule(servletContext, variables),
+            new NexusCoreModule(servletContext, variables),
             new SpaceModule(coreSpace, BeanScanning.GLOBAL_INDEX)));
     log.debug("Injector: {}", injector);
 
@@ -136,7 +135,7 @@ public class NexusContextListener
         log.error("Failed to start application", e);
         Throwables.propagate(e);
       }
-  
+
       // register our dynamic filter with the surrounding bootstrap code
       final Filter filter = injector.getInstance(NexusGuiceFilter.class);
       final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "nexus"));
