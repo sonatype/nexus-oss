@@ -13,12 +13,9 @@
 package org.sonatype.nexus.extender;
 
 import com.google.inject.Module;
-import org.eclipse.sisu.inject.BindingPublisher;
 import org.eclipse.sisu.inject.MutableBeanLocator;
 import org.eclipse.sisu.launch.SisuBundlePlan;
 import org.osgi.framework.Bundle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Adapts Sisu's default plan to use {@link NexusBundleModule} for configuration.
@@ -28,33 +25,18 @@ import org.slf4j.LoggerFactory;
 public class NexusBundlePlan
     extends SisuBundlePlan
 {
-  private static final Logger log = LoggerFactory.getLogger(NexusBundlePlan.class);
-
   public NexusBundlePlan(final MutableBeanLocator locator) {
     super(locator);
   }
 
-  @Override
-  protected boolean appliesTo(Bundle bundle) {
+  public static boolean hasComponents(Bundle bundle) {
     return bundle.getResource("META-INF/sisu/javax.inject.Named") != null
         || bundle.getResource("META-INF/plexus/components.xml") != null;
   }
 
   @Override
-  public BindingPublisher prepare(Bundle bundle) {
-    if (NexusBundleTracker.isNexusPlugin(bundle)) {
-      log.info("ACTIVATING {}", bundle);
-      try {
-        BindingPublisher publisher = super.prepare(bundle);
-        log.info("ACTIVATED {}", bundle);
-        return publisher;
-      }
-      catch (Exception e) {
-        log.warn("BROKEN {}", bundle);
-        throw e;
-      }
-    }
-    return null;
+  protected boolean appliesTo(Bundle bundle) {
+    return hasComponents(bundle);
   }
 
   @Override

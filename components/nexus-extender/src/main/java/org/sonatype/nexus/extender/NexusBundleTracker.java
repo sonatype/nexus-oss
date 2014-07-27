@@ -21,12 +21,13 @@ import org.eclipse.sisu.launch.BundlePlan;
 import org.eclipse.sisu.launch.SisuTracker;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.sonatype.nexus.extender.NexusBundlePlan.hasComponents;
 
 /**
  * {@link Bundle} tracker that tracks and binds bundles with Nexus components.
@@ -49,29 +50,32 @@ public class NexusBundleTracker
 
   @Override
   public BindingPublisher prepare(final Bundle bundle) {
-    if (isNexusPlugin(bundle)) {
-      preparePluginDependencies(bundle);
+    if (bundle.getBundleContext() != context && hasComponents(bundle)) {
+      prepareDependencies(bundle);
+      try {
+        log.info("ACTIVATING {}", bundle);
+        BindingPublisher publisher = super.prepare(bundle);
+        log.info("ACTIVATED {}", bundle);
+        return publisher;
+      }
+      catch (Exception e) {
+        log.warn("BROKEN {}", bundle);
+        throw e;
+      }
     }
-    return super.prepare(bundle);
+    return null;
   }
 
-  static boolean isNexusPlugin(final Bundle bundle) {
-    if (null == bundle.getHeaders().get(Constants.FRAGMENT_HOST)) {
-      final String symbolicName = bundle.getSymbolicName();
-      return null != symbolicName && (symbolicName.endsWith("-plugin") || symbolicName.endsWith("-helper"));
-    }
-    return false;
-  }
-
-  private void preparePluginDependencies(final Bundle bundle) {
+  private void prepareDependencies(final Bundle bundle) {
     final BundleWiring wiring = bundle.adapt(BundleWiring.class);
     final List<BundleWire> wires = wiring.getRequiredWires(BundleRevision.PACKAGE_NAMESPACE);
     if (wires != null) {
       for (BundleWire wire : wires) {
         try {
           final Bundle dependency = wire.getCapability().getRevision().getBundle();
-          if ((dependency.getState() & (Bundle.STARTING | Bundle.ACTIVE)) == 0 && isNexusPlugin(dependency)) {
+          if (notYetStarted(dependency) && hasComponents(dependency)) {
             dependency.start();
+
             // pseudo-event to trigger bundle activation
             addingBundle(dependency, null /* unused */);
           }
@@ -81,5 +85,9 @@ public class NexusBundleTracker
         }
       }
     }
+  }
+
+  private static boolean notYetStarted(final Bundle bundle) {
+    return (bundle.getState() & (Bundle.STARTING | Bundle.ACTIVE)) == 0;
   }
 }
