@@ -15,8 +15,8 @@ package org.sonatype.security.authorization;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.Authorizer;
@@ -40,19 +40,23 @@ public class ExceptionCatchingModularRealmAuthorizer
 {
   private static final Logger logger = LoggerFactory.getLogger(ExceptionCatchingModularRealmAuthorizer.class);
 
+  private Provider<RolePermissionResolver> rolePermissionResolverProvider;
+
   public ExceptionCatchingModularRealmAuthorizer(Collection<Realm> realms) {
     super(realms);
   }
 
   @Inject
   public ExceptionCatchingModularRealmAuthorizer(Collection<Realm> realms,
-                                                 @Nullable RolePermissionResolver rolePermissionResolver)
+      Provider<RolePermissionResolver> rolePermissionResolverProvider)
   {
-    super(realms);
+    this.rolePermissionResolverProvider = rolePermissionResolverProvider;
+    setRealms(realms);
+  }
 
-    if (null != rolePermissionResolver) {
-      setRolePermissionResolver(rolePermissionResolver);
-    }
+  @Override
+  public RolePermissionResolver getRolePermissionResolver() {
+    return rolePermissionResolverProvider != null ? rolePermissionResolverProvider.get() : null;
   }
 
   // Authorization

@@ -13,29 +13,22 @@
 package org.sonatype.nexus.extender.modules;
 
 import org.sonatype.nexus.web.SecurityFilter;
-import org.sonatype.nexus.web.TemplateRenderer;
-import org.sonatype.security.SecuritySystem;
 
 import com.google.inject.AbstractModule;
-import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 
 /**
- * Miscellaneous plugin bindings (to be reviewed/culled).
+ * SecurityFilter support bindings.
  * 
  * @since 3.0
  */
-public class MiscellaneousModule
+public class SecurityFilterModule
     extends AbstractModule
 {
-  // handle some edge-cases for commonly used servlet-based components which need a bit more configuration
-  // so that sisu/guice can find the correct bindings inside of plugins
+  // handle some edge-cases for commonly used filter-based components which need a bit
+  // more configuration so that sisu/guice can find the correct bindings inside of plugins
 
   @Override
   protected void configure() {
     bind(SecurityFilter.class);
-
-    requireBinding(SecuritySystem.class);
-    requireBinding(FilterChainResolver.class);
-    requireBinding(TemplateRenderer.class);
   }
 }

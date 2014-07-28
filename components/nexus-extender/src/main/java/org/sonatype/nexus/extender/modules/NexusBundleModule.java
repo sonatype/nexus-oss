@@ -10,17 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.extender;
+package org.sonatype.nexus.extender.modules;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.sonatype.nexus.extender.modules.InstrumentationModule;
-import org.sonatype.nexus.extender.modules.MiscellaneousModule;
-import org.sonatype.nexus.extender.modules.RankingModule;
-import org.sonatype.nexus.extender.modules.ValidationModule;
-import org.sonatype.nexus.extender.modules.WebResourcesModule;
 import org.sonatype.nexus.guice.AbstractInterceptorModule;
 import org.sonatype.nexus.guice.NexusTypeBinder;
 
@@ -46,17 +41,17 @@ import org.osgi.framework.Constants;
 public class NexusBundleModule
     extends BundleModule
 {
-  private static final InstrumentationModule instrumentationModule = new InstrumentationModule();
-
-  private static final MiscellaneousModule miscellaneousModule = new MiscellaneousModule();
-
-  private static final RankingModule rankingModule = new RankingModule();
-
   private static final ShiroAopModule shiroAopModule = new ShiroAopModule();
+
+  private static final SecurityFilterModule securityFilterModule = new SecurityFilterModule();
+
+  private static final InstrumentationModule instrumentationModule = new InstrumentationModule();
 
   private static final ValidationModule validationModule = new ValidationModule();
 
   private static final WebResourcesModule webResourcesModule = new WebResourcesModule();
+
+  private static final RankingModule rankingModule = new RankingModule();
 
   private final List<AbstractInterceptorModule> interceptorModules;
 
@@ -77,14 +72,11 @@ public class NexusBundleModule
     List<Module> modules = new ArrayList<>();
 
     maybeAddShiroAOP(modules);
+    maybeAddSecurityFilter(modules);
     maybeAddInstrumentation(modules);
     maybeAddValidation(modules);
     maybeAddWebResources(modules);
     maybeAddInterceptors(modules);
-
-    // TODO: make this conditional?
-    modules.add(miscellaneousModule);
-
     modules.addAll(super.modules());
     modules.add(rankingModule);
 
@@ -104,15 +96,21 @@ public class NexusBundleModule
     return new SpaceModule(space, BeanScanning.GLOBAL_INDEX).with(NexusTypeBinder.STRATEGY);
   }
 
-  private void maybeAddInstrumentation(List<Module> modules) {
-    if (imports.contains("com.codahale.metrics.annotation")) {
-      modules.add(instrumentationModule);
-    }
-  }
-
   private void maybeAddShiroAOP(List<Module> modules) {
     if (imports.contains("org.apache.shiro.authz.annotation")) {
       modules.add(shiroAopModule);
+    }
+  }
+
+  private void maybeAddSecurityFilter(List<Module> modules) {
+    if (imports.contains("org.sonatype.nexus.web")) {
+      modules.add(securityFilterModule);
+    }
+  }
+
+  private void maybeAddInstrumentation(List<Module> modules) {
+    if (imports.contains("com.codahale.metrics.annotation")) {
+      modules.add(instrumentationModule);
     }
   }
 

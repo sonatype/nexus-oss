@@ -15,7 +15,6 @@ package org.sonatype.nexus.web;
 import java.io.IOException;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -38,7 +37,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2.8
  */
-@Named
 @Singleton
 public class SecurityFilter
     extends AbstractShiroFilter

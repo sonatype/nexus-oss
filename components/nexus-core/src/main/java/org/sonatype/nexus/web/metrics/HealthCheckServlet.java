@@ -13,7 +13,6 @@
 package org.sonatype.nexus.web.metrics;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import com.codahale.metrics.health.HealthCheckRegistry;
@@ -23,7 +22,6 @@ import com.codahale.metrics.health.HealthCheckRegistry;
  *
  * @since 3.0
  */
-@Named
 @Singleton
 public class HealthCheckServlet
   extends com.codahale.metrics.servlets.HealthCheckServlet

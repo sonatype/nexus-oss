@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.extender;
 
+import org.sonatype.nexus.extender.modules.NexusBundleModule;
+
 import com.google.inject.Module;
 import org.eclipse.sisu.inject.MutableBeanLocator;
 import org.eclipse.sisu.launch.SisuBundlePlan;

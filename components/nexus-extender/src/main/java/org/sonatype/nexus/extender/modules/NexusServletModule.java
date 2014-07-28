@@ -10,17 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.extender;
+package org.sonatype.nexus.extender.modules;
 
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.sonatype.nexus.extender.modules.InstrumentationModule;
-import org.sonatype.nexus.extender.modules.ValidationModule;
 import org.sonatype.nexus.internal.orient.OrientModule;
 import org.sonatype.nexus.web.NexusGuiceFilter;
-import org.sonatype.nexus.web.SecurityFilter;
 import org.sonatype.nexus.web.internal.BaseUrlHolderFilter;
 import org.sonatype.nexus.web.internal.CommonHeadersFilter;
 import org.sonatype.nexus.web.internal.ErrorPageFilter;
@@ -30,7 +27,6 @@ import org.sonatype.security.web.guice.SecurityWebModule;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
-import org.apache.shiro.guice.aop.ShiroAopModule;
 import org.eclipse.sisu.inject.DefaultRankingFunction;
 import org.eclipse.sisu.inject.RankingFunction;
 import org.eclipse.sisu.wire.ParameterKeys;
@@ -39,18 +35,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.inject.name.Names.named;
 
 /**
- * Nexus core guice module.
+ * Core Nexus servlet bindings.
  * 
  * @since 3.0
  */
-public class NexusCoreModule
+public class NexusServletModule
     extends AbstractModule
 {
   private final ServletContext servletContext;
 
   private final Map<?, ?> properties;
 
-  public NexusCoreModule(final ServletContext servletContext, final Map<?, ?> properties) {
+  public NexusServletModule(final ServletContext servletContext, final Map<?, ?> properties) {
     this.servletContext = checkNotNull(servletContext);
     this.properties = checkNotNull(properties);
   }
@@ -61,23 +57,23 @@ public class NexusCoreModule
 
     bind(NexusGuiceFilter.class);
 
-    // HACK: Re-bind servlet-context instance with a name to avoid backwards-compat warnings from guice-servlet
+    // re-bind context with name to avoid backwards-compat warnings from guice-servlet
     bind(ServletContext.class).annotatedWith(named("nexus")).toInstance(servletContext);
     bind(ParameterKeys.PROPERTIES).toInstance(properties);
-
-    bind(SecurityFilter.class);
-
-    install(new ShiroAopModule());
-    install(new InstrumentationModule());
-    install(new ValidationModule());
 
     install(new ServletModule()
     {
       @Override
       protected void configureServlets() {
+        bind(BaseUrlHolderFilter.class);
+        bind(ErrorPageFilter.class);
+        bind(CommonHeadersFilter.class);
+
         filter("/*").through(BaseUrlHolderFilter.class);
         filter("/*").through(ErrorPageFilter.class);
         filter("/*").through(CommonHeadersFilter.class);
+
+        bind(ErrorPageServlet.class);
 
         serve("/error.html").with(ErrorPageServlet.class);
 

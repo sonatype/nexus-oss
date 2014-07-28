@@ -37,9 +37,6 @@ public class Restlet1xModule
   protected void configure() {
     install(new RestletServletModule());
 
-    // FIXME: Unsure why this is needed
-    requireBinding(FilterChainResolver.class);
-
     bind(filterKey("trperms")).toProvider(TargetRepositoryFilterProvider.class);
     bind(filterKey("tiperms")).toProvider(TargetRepositoryIndexFilterProvider.class);
     bind(filterKey("tgperms")).toProvider(TargetGroupFilterProvider.class);

@@ -50,11 +50,17 @@ public class NexusBundleTracker
 
   @Override
   public BindingPublisher prepare(final Bundle bundle) {
-    if (bundle.getBundleContext() != context && hasComponents(bundle)) {
+    if (hasComponents(bundle)) {
       prepareDependencies(bundle);
       try {
+        BindingPublisher publisher;
         log.info("ACTIVATING {}", bundle);
-        BindingPublisher publisher = super.prepare(bundle);
+        if (bundle.getBundleContext() != context) {
+          publisher = super.prepare(bundle);
+        }
+        else {
+          publisher = plans.get(0).prepare(bundle);
+        }
         log.info("ACTIVATED {}", bundle);
         return publisher;
       }
@@ -73,11 +79,12 @@ public class NexusBundleTracker
       for (BundleWire wire : wires) {
         try {
           final Bundle dependency = wire.getCapability().getRevision().getBundle();
-          if (notYetStarted(dependency) && hasComponents(dependency)) {
+          if (!live(dependency) && hasComponents(dependency)) {
             dependency.start();
-
-            // pseudo-event to trigger bundle activation
-            addingBundle(dependency, null /* unused */);
+            if (live(dependency)) {
+              // pseudo-event to trigger bundle activation
+              addingBundle(dependency, null /* unused */);
+            }
           }
         }
         catch (Exception e) {
@@ -87,7 +94,7 @@ public class NexusBundleTracker
     }
   }
 
-  private static boolean notYetStarted(final Bundle bundle) {
-    return (bundle.getState() & (Bundle.STARTING | Bundle.ACTIVE)) == 0;
+  private static boolean live(final Bundle bundle) {
+    return (bundle.getState() & (Bundle.STARTING | Bundle.ACTIVE)) != 0;
   }
 }

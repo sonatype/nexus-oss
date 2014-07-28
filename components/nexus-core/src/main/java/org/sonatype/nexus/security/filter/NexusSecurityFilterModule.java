@@ -35,9 +35,6 @@ public class NexusSecurityFilterModule
 {
   @Override
   protected void configure() {
-    // FIXME: Unsure why this is needed
-    requireBinding(FilterChainResolver.class);
-
     bind(filterKey("authcBasic")).toProvider(AuthcBasicFilterProvider.class);
     bind(filterKey("authcNxBasic")).toProvider(AuthcNxBasicFilterProvider.class);
 
