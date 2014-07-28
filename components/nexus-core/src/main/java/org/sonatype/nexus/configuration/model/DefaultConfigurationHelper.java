@@ -19,7 +19,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.PasswordHelper;
-import org.sonatype.plexus.components.cipher.PlexusCipherException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.thoughtworks.xstream.XStream;
@@ -109,7 +108,7 @@ public class DefaultConfigurationHelper
       try {
         return passwordHelper.encrypt(password);
       }
-      catch (PlexusCipherException e) {
+      catch (Exception e) {
         log.error("Failed to encrypt password in nexus.xml.", e);
       }
     }
@@ -117,7 +116,7 @@ public class DefaultConfigurationHelper
       try {
         return passwordHelper.decrypt(password);
       }
-      catch (PlexusCipherException e) {
+      catch (Exception e) {
         log.error("Failed to decrypt password in nexus.xml.", e);
       }
     }

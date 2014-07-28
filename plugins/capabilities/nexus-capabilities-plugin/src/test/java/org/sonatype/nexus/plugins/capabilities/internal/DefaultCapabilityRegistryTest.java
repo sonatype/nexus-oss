@@ -35,7 +35,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageItem;
-import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
+import org.sonatype.sisu.goodies.crypto.internal.CryptoHelperImpl;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -50,7 +50,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -146,7 +145,7 @@ public class DefaultCapabilityRegistryTest
         eventBus,
         achf,
         vchf,
-        passwordHelper = new PasswordHelper(new DefaultPlexusCipher())
+        passwordHelper = new PasswordHelper(new CryptoHelperImpl())
     );
 
     rec = ArgumentCaptor.forClass(CapabilityEvent.class);
