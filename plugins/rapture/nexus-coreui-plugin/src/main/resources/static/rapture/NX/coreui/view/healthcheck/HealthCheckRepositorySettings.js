@@ -29,8 +29,8 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckRepositorySettings', {
       xtype: 'nx-settingsform',
       paramOrder: ['repositoryId'],
       api: {
-        load: 'NX.direct.healthcheck_RepositorySettings.read',
-        submit: 'NX.direct.healthcheck_RepositorySettings.update'
+        load: 'NX.direct.healthcheck_Status.readForRepository',
+        submit: 'NX.direct.healthcheck_Status.update'
       },
       settingsFormSuccessMessage: 'Health Check Repository Settings $action',
       editableCondition: NX.Conditions.isPermitted('nexus:healthcheck', 'update'),

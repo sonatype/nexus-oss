@@ -18,13 +18,20 @@
 Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
   extend: 'Ext.app.Controller',
 
+  models: [
+    'HealthCheckRepositoryStatus'
+  ],
+  stores: [
+    'HealthCheckRepositoryStatus'
+  ],
   views: [
     'healthcheck.HealthCheckRepositorySettings',
     'healthcheck.HealthCheckEula'
   ],
   refs: [
     { ref: 'feature', selector: 'nx-coreui-repository-feature' },
-    { ref: 'panel', selector: 'nx-coreui-healthcheck-repository-settings' }
+    { ref: 'panel', selector: 'nx-coreui-healthcheck-repository-settings' },
+    { ref: 'list', selector: 'nx-coreui-repository-list' },
   ],
 
   /**
@@ -34,8 +41,18 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
     var me = this;
 
     me.listen({
+      controller: {
+        '#Permissions': {
+          changed: me.refreshHealthCheckColumn
+        },
+        '#Refresh': {
+          refresh: me.loadHealthCheckStatus
+        }
+      },
       component: {
         'nx-coreui-repository-list': {
+          beforerender: me.loadHealthCheckStatus,
+          afterrender: me.bindHealthCheckColumn,
           selection: me.onSelection
         },
         'nx-coreui-healthcheck-repository-settings': {
@@ -125,6 +142,78 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
     win.close();
     form.getForm().setValues({ eulaAccepted: true });
     saveButton.fireEvent('click', saveButton);
+  },
+
+  loadHealthCheckStatus: function() {
+    var me = this,
+        list = me.getList();
+
+    if (list) {
+      me.getHealthCheckRepositoryStatusStore().load();
+    }
+  },
+
+  bindHealthCheckColumn: function(grid) {
+    var me = this;
+    grid.mon(
+        NX.Conditions.and(
+            NX.Conditions.isPermitted("nexus:healthcheck", "read")
+        ),
+        {
+          satisfied: Ext.pass(me.addHealthCheckColumn, grid),
+          unsatisfied: Ext.pass(me.removeHealthCheckColumn, grid),
+          scope: me
+        }
+    );
+  },
+
+  addHealthCheckColumn: function(grid) {
+    var me = this,
+        column = grid.healthCheckColumn;
+
+    if (!column) {
+      column = grid.healthCheckColumn = Ext.create('Ext.grid.column.Column', {
+        header: 'Health Check',
+        width: 120,
+        renderer: Ext.bind(me.renderHealthCheckColumn, me)
+      });
+      grid.headerCt.insert(2, column);
+      grid.getView().refresh();
+    }
+  },
+
+  removeHealthCheckColumn: function(grid) {
+    var column = grid.healthCheckColumn;
+    if (column) {
+      grid.headerCt.remove(column);
+      grid.getView().refresh();
+      delete grid.healthCheckColumn;
+    }
+  },
+
+  renderHealthCheckColumn: function(value, metadata, record) {
+    var me = this,
+        status = me.getHealthCheckRepositoryStatusStore().getById(record.getId());
+
+    if (status) {
+      if (status.get('enabled')) {
+        return '<div><img src="' + me.imageUrl('security-alert.png') + '">&nbsp;'
+            + status.get('securityIssueCount') + '&nbsp;&nbsp;<img src="' + me.imageUrl('license-alert.png')
+            + '" style="margin-left:10px">&nbsp;' + status.get('licenseIssueCount') + '</div>';
+      }
+      else if (NX.Permissions.check('nexus:healthcheck', 'update')) {
+        return '<div><img src="' + me.imageUrl('analyze.png') + '"></div>';
+      }
+    }
+    return '<div><img src="' + me.imageUrl('analyze_disabled.png') + '"></div>';
+  },
+
+  refreshHealthCheckColumn: function() {
+    this.getList().getView().refresh();
+  },
+
+  imageUrl: function(name) {
+    return NX.util.Url.urlOf('static/rapture/resources/images/' + name);
   }
 
 });
