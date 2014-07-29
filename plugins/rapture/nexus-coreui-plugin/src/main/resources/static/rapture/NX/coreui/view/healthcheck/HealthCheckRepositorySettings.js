@@ -140,5 +140,4 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckRepositorySettings', {
     return repositoryModel;
   }
 
-})
-;
+});
