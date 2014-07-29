@@ -227,16 +227,35 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
         fn: function(buttonName) {
           if (buttonName === 'yes' || buttonName === 'ok') {
             if (status.get('eulaAccepted')) {
-
+              me.enableAnalysis(buttonName === 'yes' ? status.getId() : undefined);
             }
             else {
-              Ext.widget('nx-coreui-healthcheck-eula');
+              Ext.widget('nx-coreui-healthcheck-eula', {
+                acceptFn: function() {
+                  me.enableAnalysis(buttonName === 'yes' ? status.getId() : undefined);
+                }
+              });
             }
           }
         }
       });
     }
     return false;
+  },
+
+  enableAnalysis: function(repositoryId) {
+    var me = this;
+
+    if (repositoryId) {
+      NX.direct.healthcheck_Status.update(
+          { repositoryId: repositoryId, enabled: true, eulaAccepted: true },
+          function(response) {
+            if (Ext.isObject(response) && response.success) {
+              me.getHealthCheckRepositoryStatusStore().load();
+            }
+          }
+      );
+    }
   },
 
   imageUrl: function(name) {

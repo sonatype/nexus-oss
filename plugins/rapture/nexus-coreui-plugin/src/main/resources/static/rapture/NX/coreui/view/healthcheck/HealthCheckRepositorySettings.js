@@ -74,7 +74,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckRepositorySettings', {
   /**
    * @override
    */
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.callParent(arguments);
@@ -83,7 +83,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckRepositorySettings', {
        * @override
        * Block Ext.Direct load call if we do not have a repository id.
        */
-      load: function () {
+      load: function() {
         var me = this;
         if (me.getForm().baseParams.repositoryId) {
           me.callParent(arguments);
@@ -93,13 +93,20 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckRepositorySettings', {
        * @override
        * Block Ext.Direct submit call if EULA is not accepted & show EULA window.
        */
-      submit: function () {
+      submit: function() {
         var me = this;
         if (me.getForm().getFieldValues().eulaAccepted) {
           me.callParent(arguments);
         }
         else {
-          Ext.widget('nx-coreui-healthcheck-eula');
+          Ext.widget('nx-coreui-healthcheck-eula', {
+            acceptFn: function() {
+              var saveButton = me.down('button[action=save]');
+
+              me.getForm().setValues({ eulaAccepted: true });
+              saveButton.fireEvent('click', saveButton);
+            }
+          });
         }
       }
     });
@@ -109,7 +116,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckRepositorySettings', {
        * @override
        * Show status when settings form is updated.
        */
-      setValues: function (values) {
+      setValues: function(values) {
         var statusForm = me.down('#statusForm');
 
         this.callParent(arguments);
@@ -129,7 +136,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckRepositorySettings', {
    * @private
    * Preset form base params to repository id.
    */
-  applyRepository: function (repositoryModel) {
+  applyRepository: function(repositoryModel) {
     var me = this,
         form = me.down('nx-settingsform');
 

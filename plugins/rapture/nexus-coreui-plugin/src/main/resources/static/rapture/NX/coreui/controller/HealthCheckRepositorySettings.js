@@ -47,9 +47,6 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
         },
         'nx-coreui-healthcheck-repository-settings form': {
           submitted: me.onSettingsSubmitted
-        },
-        'nx-coreui-healthcheck-eula button[action=agree]': {
-          click: me.onAgree
         }
       }
     });
@@ -116,21 +113,6 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
     if (panel.active) {
       form.fireEvent('load', form);
     }
-  },
-
-  /**
-   * @private
-   * Show EULA if not already accepted.
-   */
-  onAgree: function(button) {
-    var me = this,
-        win = button.up('window'),
-        form = me.getPanel().down('nx-settingsform'),
-        saveButton = form.down('button[action=save]');
-
-    win.close();
-    form.getForm().setValues({ eulaAccepted: true });
-    saveButton.fireEvent('click', saveButton);
   },
 
   onSettingsSubmitted: function() {
