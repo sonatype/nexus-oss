@@ -93,7 +93,10 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
         id: 'healthCheckColumn',
         header: 'Health Check',
         width: 120,
-        renderer: Ext.bind(me.renderHealthCheckColumn, me)
+        renderer: Ext.bind(me.renderHealthCheckColumn, me),
+        listeners: {
+          click: Ext.bind(me.maybeAskToEnable, me)
+        }
       });
       grid.headerCt.insert(2, column);
       view.refresh();
@@ -127,7 +130,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
 
     if (status) {
       if (status.get('enabled')) {
-        if(status.get('status')){
+        if (status.get('status')) {
           return status.get('status');
         }
         return '<div><img src="' + me.imageUrl('security-alert.png') + '">&nbsp;'
@@ -144,37 +147,39 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
   updateHealthCheckColumnTooltip: function(tip) {
     var me = this,
         view = me.getList().getView(),
-        repository = view.getRecord(tip.triggerElement.parentNode),
-        status, html, cell;
+        repository, status, html, cell;
 
-    if (repository) {
-      status = me.getHealthCheckRepositoryStatusStore().getById(repository.getId());
-      if (status) {
-        if (status.get('enabled')) {
-          cell = view.getCell(repository, me.getList().healthCheckColumn);
-          Ext.defer(me.showSummary, 0, me, [status, cell.getX(), cell.getY()]);
-          return false;
-        }
-        else if (NX.Permissions.check('nexus:healthcheck', 'update')) {
-          html = '<span><h2>Repository Health Check Analysis</h2>Click this button to request a Repository Health Check (RHC) ' +
-              'by the Sonatype CLM service.  The process is non-invasive and non-disruptive.  Sonatype CLM ' +
-              'will return actionable quality, security, and licensing information about the open source components in the repository.' +
-              '<br><br><a href="http://links.sonatype.com/products/clm/rhc/home" ' +
-              'target="_blank">How the Sonatype CLM Repository Health Check can help you make better software faster</a></span>';
+    if (tip.triggerElement) {
+      repository = view.getRecord(tip.triggerElement.parentNode)
+      if (repository) {
+        status = me.getHealthCheckRepositoryStatusStore().getById(repository.getId());
+        if (status) {
+          if (status.get('enabled')) {
+            cell = view.getCell(repository, me.getList().healthCheckColumn);
+            Ext.defer(me.showSummary, 0, me, [status, cell.getX(), cell.getY()]);
+            return false;
+          }
+          else if (NX.Permissions.check('nexus:healthcheck', 'update')) {
+            html = '<span><h2>Repository Health Check Analysis</h2>Click this button to request a Repository Health Check (RHC) ' +
+                'by the Sonatype CLM service.  The process is non-invasive and non-disruptive.  Sonatype CLM ' +
+                'will return actionable quality, security, and licensing information about the open source components in the repository.' +
+                '<br><br><a href="http://links.sonatype.com/products/clm/rhc/home" ' +
+                'target="_blank">How the Sonatype CLM Repository Health Check can help you make better software faster</a></span>';
+          }
+          else {
+            html = '<span><h2>Insufficient Permissions to Analyze a Repository</h2>' +
+                'To analyze a repository your user account must have permissions to start analysis.</span>';
+          }
         }
         else {
-          html = '<span><h2>Insufficient Permissions to Analyze a Repository</h2>' +
-              'To analyze a repository your user account must have permissions to start analysis.</span>';
+          html = '<span><h2>Repository Health Check Unavailable</h2>A Repository Health Check (RHC) ' +
+              'cannot be performed by the Sonatype CLM service on this repository, because it is an unsupported type or out of service.<br><br>' +
+              '<a href="http://links.sonatype.com/products/clm/rhc/home" ' +
+              'target="_blank">How the Sonatype CLM Repository Health Check can help you make better software faster</a></span>';
         }
+        tip.update(html);
+        return true;
       }
-      else {
-        html = '<span><h2>Repository Health Check Unavailable</h2>A Repository Health Check (RHC) ' +
-            'cannot be performed by the Sonatype CLM service on this repository, because it is an unsupported type or out of service.<br><br>' +
-            '<a href="http://links.sonatype.com/products/clm/rhc/home" ' +
-            'target="_blank">How the Sonatype CLM Repository Health Check can help you make better software faster</a></span>';
-      }
-      tip.update(html);
-      return true;
     }
     return false;
   },
@@ -202,6 +207,36 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
         statusModel: status
       });
     }
+  },
+
+  maybeAskToEnable: function(gridView, cell, row, col, event, record) {
+    var me = this,
+        list = me.getList(),
+        status = me.getHealthCheckRepositoryStatusStore().getById(record.getId());
+
+    if (status && !status.get('enabled') && NX.Permissions.check('nexus:healthcheck', 'update')) {
+      list.healthCheckTooltip.hide();
+      Ext.Msg.show({
+        title: 'Analyze Repository',
+        msg: 'Do you want to analyze the repository ' + Ext.util.Format.htmlEncode(record.get('name'))
+            + ' and others for security vulnerabilities and license issues?',
+        buttons: 7, // OKYESNO
+        buttonText: { ok: 'Yes, all repositories', yes: 'Yes, only this repository' },
+        icon: Ext.MessageBox.QUESTION,
+        closeable: false,
+        fn: function(buttonName) {
+          if (buttonName === 'yes' || buttonName === 'ok') {
+            if (status.get('eulaAccepted')) {
+
+            }
+            else {
+              Ext.widget('nx-coreui-healthcheck-eula');
+            }
+          }
+        }
+      });
+    }
+    return false;
   },
 
   imageUrl: function(name) {
