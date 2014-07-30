@@ -60,6 +60,10 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     });
   },
 
+  /**
+   * @private
+   * Load Health Check status store if repository grid is active.
+   */
   loadHealthCheckStatus: function() {
     var me = this,
         list = me.getList();
@@ -69,6 +73,11 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     }
   },
 
+  /**
+   * @private
+   * Add/Remove Health Check column based on nexus:healthcheck:read permission.
+   * @param {NX.coreui.view.repository.RepositoryList} grid repository grid
+   */
   bindHealthCheckColumn: function(grid) {
     var me = this;
     grid.mon(
@@ -83,6 +92,11 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     );
   },
 
+  /**
+   * @private
+   * Add Health Check column to repository grid.
+   * @param {NX.coreui.view.repository.RepositoryList} grid repository grid
+   */
   addHealthCheckColumn: function(grid) {
     var me = this,
         view = grid.getView(),
@@ -114,6 +128,11 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     }
   },
 
+  /**
+   * @private
+   * Remove Health Check column from repository grid.
+   * @param {NX.coreui.view.repository.RepositoryList} grid repository grid
+   */
   removeHealthCheckColumn: function(grid) {
     var column = grid.healthCheckColumn;
     if (column) {
@@ -124,18 +143,26 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     }
   },
 
-  renderHealthCheckColumn: function(value, metadata, record) {
+  /**
+   * @private
+   * Render Health Check column based on corresponding {NX.coreui.model.HealthCheckRepositoryStatus}.
+   * @param value (not used)
+   * @param metadata Health Check column metadata
+   * @param {NX.coreui.model.Repository} repositoryModel repository model
+   * @returns {string} Health Check column content
+   */
+  renderHealthCheckColumn: function(value, metadata, repositoryModel) {
     var me = this,
-        status = me.getHealthCheckRepositoryStatusStore().getById(record.getId());
+        statusModel = me.getHealthCheckRepositoryStatusStore().getById(repositoryModel.getId());
 
-    if (status) {
-      if (status.get('enabled')) {
-        if (status.get('analyzing')) {
+    if (statusModel) {
+      if (statusModel.get('enabled')) {
+        if (statusModel.get('analyzing')) {
           return 'Analyzing...';
         }
         return '<div><img src="' + me.imageUrl('security-alert.png') + '">&nbsp;'
-            + status.get('securityIssueCount') + '&nbsp;&nbsp;<img src="' + me.imageUrl('license-alert.png')
-            + '" style="margin-left:10px">&nbsp;' + status.get('licenseIssueCount') + '</div>';
+            + statusModel.get('securityIssueCount') + '&nbsp;&nbsp;<img src="' + me.imageUrl('license-alert.png')
+            + '" style="margin-left:10px">&nbsp;' + statusModel.get('licenseIssueCount') + '</div>';
       }
       else if (NX.Permissions.check('nexus:healthcheck', 'update')) {
         return '<div><img src="' + me.imageUrl('analyze.png') + '"></div>';
@@ -147,6 +174,12 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     return 'Loading...';
   },
 
+  /**
+   * @private
+   * Update Health Check column tooltip based on {NX.coreui.model.HealthCheckRepositoryStatus}.
+   * @param {Ext.Tooltip} tip
+   * @returns {boolean} true if tooltip should be shown
+   */
   updateHealthCheckColumnTooltip: function(tip) {
     var me = this,
         view = me.getList().getView(),
@@ -199,6 +232,10 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     return false;
   },
 
+  /**
+   * @private
+   * Refresh repository grid view (when Health Check status changes).
+   */
   refreshHealthCheckColumn: function() {
     var me = this,
         list = me.getList();
@@ -208,7 +245,13 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     }
   },
 
-  showSummary: function(status, x, y) {
+  /**
+   * Show Health Check summary window
+   * @param NX.coreui.model.HealthCheckRepositoryStatus status Health Check status model
+   * @param x where summary window should be shown
+   * @param y where summary window should be shown
+   */
+  showSummary: function(statusModel, x, y) {
     var me = this,
         summary = me.getSummary(),
         docks;
@@ -218,9 +261,9 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
         xtype: 'nx-coreui-healthcheck-summary',
         x: x,
         y: y,
-        height: status.get('iframeHeight') + 8,
-        width: status.get('iframeWidth') + 8,
-        statusModel: status
+        height: statusModel.get('iframeHeight') + 8,
+        width: statusModel.get('iframeWidth') + 8,
+        statusModel: statusModel
       });
       docks = summary.getDockedItems('toolbar[dock="bottom"]');
       Ext.each(docks, function(dock) {
@@ -229,16 +272,20 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     }
   },
 
-  maybeAskToEnable: function(gridView, cell, row, col, event, record) {
+  /**
+   * @private
+   * Ask user if Health Check should be enabled, if applicable and not already enabled.
+   */
+  maybeAskToEnable: function(gridView, cell, row, col, event, repositoryModel) {
     var me = this,
         list = me.getList(),
-        status = me.getHealthCheckRepositoryStatusStore().getById(record.getId());
+        status = me.getHealthCheckRepositoryStatusStore().getById(repositoryModel.getId());
 
     if (status && !status.get('enabled') && NX.Permissions.check('nexus:healthcheck', 'update')) {
       list.healthCheckTooltip.hide();
       Ext.Msg.show({
         title: 'Analyze Repository',
-        msg: 'Do you want to analyze the repository ' + Ext.util.Format.htmlEncode(record.get('name'))
+        msg: 'Do you want to analyze the repository ' + Ext.util.Format.htmlEncode(repositoryModel.get('name'))
             + ' and others for security vulnerabilities and license issues?',
         buttons: 7, // OKYESNO
         buttonText: { ok: 'Yes, all repositories', yes: 'Yes, only this repository' },
@@ -263,6 +310,11 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     return false;
   },
 
+  /**
+   * @private
+   * Enable Health Check for specified repository or all if repository not specified.
+   * @param {string} repositoryId to enable Health Check for, or undefined if to enable for all repositories.
+   */
   enableAnalysis: function(repositoryId) {
     var me = this;
 
@@ -288,6 +340,12 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     }
   },
 
+  /**
+   * @private
+   * Calculate image url.
+   * @param name of image
+   * @returns {string} image url
+   */
   imageUrl: function(name) {
     return NX.util.Url.urlOf('static/rapture/resources/images/' + name);
   }

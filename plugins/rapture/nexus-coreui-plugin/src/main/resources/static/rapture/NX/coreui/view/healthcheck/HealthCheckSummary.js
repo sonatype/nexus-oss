@@ -33,6 +33,9 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckSummary', {
   resizable: false,
   mouseIsOver: true,
 
+  /**
+   * @override
+   */
   initComponent: function() {
     var me = this;
 
@@ -49,6 +52,10 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckSummary', {
   },
 
   listeners: {
+
+    /**
+     * Hook into hoovering over summary window in order to auto close it if mouse is out.
+     */
     afterrender: function(){
       var me = this;
 
@@ -71,6 +78,9 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckSummary', {
     }
   },
 
+  /**
+   * Auto close window if mouse is out for summary window.
+   */
   doAutoClose: function () {
     var me = this;
 
