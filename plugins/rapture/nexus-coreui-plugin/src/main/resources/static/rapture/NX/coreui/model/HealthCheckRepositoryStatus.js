@@ -27,6 +27,7 @@ Ext.define('NX.coreui.model.HealthCheckRepositoryStatus', {
     'iframeWidth',
     'securityIssueCount',
     'licenseIssueCount',
-    'summaryUrl'
+    'summaryUrl',
+    'detailUrl'
   ]
 });

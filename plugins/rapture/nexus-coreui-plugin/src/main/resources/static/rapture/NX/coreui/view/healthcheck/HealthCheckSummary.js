@@ -19,6 +19,11 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckSummary', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-healthcheck-summary',
 
+  /**
+   * @cfg {NX.coreui.model.HealthCheckRepositoryStatus} model corresponding to this summary report
+   */
+  statusModel: undefined,
+
   layout: 'fit',
   header: false,
   closable: false,
