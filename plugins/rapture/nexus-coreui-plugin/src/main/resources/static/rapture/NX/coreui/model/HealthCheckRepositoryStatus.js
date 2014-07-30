@@ -21,7 +21,7 @@ Ext.define('NX.coreui.model.HealthCheckRepositoryStatus', {
     'repositoryId',
     'enabled',
     'eulaAccepted',
-    'status',
+    'analyzing',
     'detailedReportSupported',
     'iframeHeight',
     'iframeWidth',

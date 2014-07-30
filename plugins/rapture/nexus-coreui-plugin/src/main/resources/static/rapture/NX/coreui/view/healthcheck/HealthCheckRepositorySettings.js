@@ -121,8 +121,8 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckRepositorySettings', {
 
         this.callParent(arguments);
 
-        if (values && values.enabled && values.status) {
-          statusForm.getForm().setValues(values);
+        if (values && values['enabled'] && values['analyzing']) {
+          statusForm.getForm().setValues(Ext.apply(values, { status: 'Analyzing...' }));
           statusForm.show();
         }
         else {

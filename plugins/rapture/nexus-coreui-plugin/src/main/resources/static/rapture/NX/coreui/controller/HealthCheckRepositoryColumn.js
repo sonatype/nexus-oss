@@ -130,8 +130,8 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
 
     if (status) {
       if (status.get('enabled')) {
-        if (status.get('status')) {
-          return status.get('status');
+        if (status.get('analyzing')) {
+          return 'Analyzing...';
         }
         return '<div><img src="' + me.imageUrl('security-alert.png') + '">&nbsp;'
             + status.get('securityIssueCount') + '&nbsp;&nbsp;<img src="' + me.imageUrl('license-alert.png')
@@ -155,9 +155,17 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
         status = me.getHealthCheckRepositoryStatusStore().getById(repository.getId());
         if (status) {
           if (status.get('enabled')) {
-            cell = view.getCell(repository, me.getList().healthCheckColumn);
-            Ext.defer(me.showSummary, 0, me, [status, cell.getX(), cell.getY()]);
-            return false;
+            if (status.get('analyzing')) {
+              html = '<span><h2>The Analysis is Under Way</h2>The contents of your repository are being analyzed.  ' +
+                  'This process should only take a few minutes.<br><br>When complete, the ANALYZING button will be ' +
+                  'replaced by a set of icons that indicate how many security and licensing issues were discovered.' +
+                  '<br><br>Hover your mouse over these icons to see additional information about the issues that were found.</span>';
+            }
+            else {
+              cell = view.getCell(repository, me.getList().healthCheckColumn);
+              Ext.defer(me.showSummary, 0, me, [status, cell.getX(), cell.getY()]);
+              return false;
+            }
           }
           else if (NX.Permissions.check('nexus:healthcheck', 'update')) {
             html = '<span><h2>Repository Health Check Analysis</h2>Click this button to request a Repository Health Check (RHC) ' +
