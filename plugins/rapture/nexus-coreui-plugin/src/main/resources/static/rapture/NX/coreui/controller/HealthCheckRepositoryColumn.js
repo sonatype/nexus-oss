@@ -203,16 +203,21 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
 
   showSummary: function(status, x, y) {
     var me = this,
-        summary = me.getSummary();
+        summary = me.getSummary(),
+        docks;
 
     if (!summary) {
-      Ext.widget({
+      summary = Ext.widget({
         xtype: 'nx-coreui-healthcheck-summary',
         x: x,
         y: y,
         height: status.get('iframeHeight') + 8,
         width: status.get('iframeWidth') + 8,
         statusModel: status
+      });
+      docks = summary.getDockedItems('toolbar[dock="bottom"]');
+      Ext.each(docks, function(dock) {
+        summary.setHeight(summary.getHeight() + dock.getHeight());
       });
     }
   },
