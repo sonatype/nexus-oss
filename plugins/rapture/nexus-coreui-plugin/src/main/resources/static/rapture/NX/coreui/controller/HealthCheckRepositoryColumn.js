@@ -162,9 +162,13 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
                   '<br><br>Hover your mouse over these icons to see additional information about the issues that were found.</span>';
             }
             else {
-              cell = view.getCell(repository, me.getList().healthCheckColumn);
-              Ext.defer(me.showSummary, 0, me, [status, cell.getX(), cell.getY()]);
-              return false;
+              if (NX.Permissions.check('nexus:healthchecksummary', 'read')) {
+                cell = view.getCell(repository, me.getList().healthCheckColumn);
+                Ext.defer(me.showSummary, 0, me, [status, cell.getX(), cell.getY()]);
+                return false;
+              }
+              html = '<span><h2>Insufficient Permissions to View Summary Report</h2>' +
+                  'To view healthcheck summary report for a repository your user account must have the necessary permissions.</span>';
             }
           }
           else if (NX.Permissions.check('nexus:healthcheck', 'update')) {
