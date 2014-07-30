@@ -38,7 +38,10 @@ Ext.define('NX.coreui.store.HealthCheckRepositoryStatus', {
   },
 
   listeners: {
-    load: function(){
+    beforeload: function() {
+      this.loaded = false;
+    },
+    load: function() {
       this.loaded = true;
     }
   }
