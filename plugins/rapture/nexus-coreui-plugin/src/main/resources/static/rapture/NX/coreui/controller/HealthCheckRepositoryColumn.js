@@ -276,6 +276,16 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
           }
       );
     }
+    else {
+      NX.direct.healthcheck_Status.enableAll(
+          true, // eula accepted
+          function(response) {
+            if (Ext.isObject(response) && response.success) {
+              me.getHealthCheckRepositoryStatusStore().load();
+            }
+          }
+      );
+    }
   },
 
   imageUrl: function(name) {
