@@ -19,6 +19,8 @@ Ext.define('NX.coreui.store.HealthCheckRepositoryStatus', {
   extend: 'Ext.data.Store',
   model: 'NX.coreui.model.HealthCheckRepositoryStatus',
 
+  loaded: false,
+
   proxy: {
     type: 'direct',
     paramsAsHash: false,
@@ -32,6 +34,12 @@ Ext.define('NX.coreui.store.HealthCheckRepositoryStatus', {
       root: 'data',
       idProperty: 'repositoryId',
       successProperty: 'success'
+    }
+  },
+
+  listeners: {
+    load: function(){
+      this.loaded = true;
     }
   }
 

@@ -141,7 +141,10 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
         return '<div><img src="' + me.imageUrl('analyze.png') + '"></div>';
       }
     }
-    return '<div><img src="' + me.imageUrl('analyze_disabled.png') + '"></div>';
+    else if (me.getHealthCheckRepositoryStatusStore().loaded) {
+      return '<div><img src="' + me.imageUrl('analyze_disabled.png') + '"></div>';
+    }
+    return 'Loading...';
   },
 
   updateHealthCheckColumnTooltip: function(tip) {
@@ -150,7 +153,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
         repository, status, html, cell;
 
     if (tip.triggerElement) {
-      repository = view.getRecord(tip.triggerElement.parentNode)
+      repository = view.getRecord(tip.triggerElement.parentNode);
       if (repository) {
         status = me.getHealthCheckRepositoryStatusStore().getById(repository.getId());
         if (status) {
@@ -183,7 +186,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
                 'To analyze a repository your user account must have permissions to start analysis.</span>';
           }
         }
-        else {
+        else if (me.getHealthCheckRepositoryStatusStore().loaded) {
           html = '<span><h2>Repository Health Check Unavailable</h2>A Repository Health Check (RHC) ' +
               'cannot be performed by the Sonatype CLM service on this repository, because it is an unsupported type or out of service.<br><br>' +
               '<a href="http://links.sonatype.com/products/clm/rhc/home" ' +
