@@ -215,6 +215,17 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <!-- attach security components to nexus-core -->
+            <Fragment-Host>org.sonatype.nexus.core</Fragment-Host>
+          </instructions>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 

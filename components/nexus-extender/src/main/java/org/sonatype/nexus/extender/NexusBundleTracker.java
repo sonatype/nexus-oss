@@ -79,8 +79,10 @@ public class NexusBundleTracker
       for (BundleWire wire : wires) {
         try {
           final Bundle dependency = wire.getCapability().getRevision().getBundle();
-          if (!live(dependency) && hasComponents(dependency)) {
-            dependency.start();
+          if (hasComponents(dependency)) {
+            if (!live(dependency)) {
+              dependency.start();
+            }
             if (live(dependency)) {
               // pseudo-event to trigger bundle activation
               addingBundle(dependency, null /* unused */);

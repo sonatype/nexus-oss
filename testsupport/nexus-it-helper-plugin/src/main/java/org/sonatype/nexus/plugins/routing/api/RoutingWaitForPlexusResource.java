@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugins.routing.api;
 
+import java.lang.reflect.Method;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -47,9 +49,12 @@ public class RoutingWaitForPlexusResource
 
   private final Manager manager;
 
+  private final Method isUpdatePrefixFileJobRunning;
+
   @Inject
-  public RoutingWaitForPlexusResource(final Manager manager) {
+  public RoutingWaitForPlexusResource(final Manager manager) throws NoSuchMethodException {
     this.manager = checkNotNull(manager);
+    isUpdatePrefixFileJobRunning = manager.getClass().getMethod("isUpdatePrefixFileJobRunning");
   }
 
   @Override
@@ -75,7 +80,7 @@ public class RoutingWaitForPlexusResource
     try {
       final long startTime = System.currentTimeMillis();
       while (System.currentTimeMillis() - startTime <= timeout) {
-        if (!((ManagerImpl) manager).isUpdatePrefixFileJobRunning()) {
+        if (!(boolean)isUpdatePrefixFileJobRunning.invoke(manager)) {
           response.setStatus(Status.SUCCESS_OK);
           return "Ok";
         }
@@ -84,6 +89,9 @@ public class RoutingWaitForPlexusResource
     }
     catch (final InterruptedException ignore) {
       // ignore
+    }
+    catch (final Exception e) {
+      throw new ResourceException(e);
     }
     response.setStatus(Status.SUCCESS_ACCEPTED);
     return "Still munching on them...";

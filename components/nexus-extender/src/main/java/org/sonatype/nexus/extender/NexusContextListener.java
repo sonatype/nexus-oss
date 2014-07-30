@@ -22,9 +22,9 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.sonatype.nexus.NxApplication;
-import org.sonatype.nexus.extender.modules.NexusServletModule;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.web.NexusGuiceFilter;
+import org.sonatype.nexus.web.NexusServletModule;
 
 import com.codahale.metrics.SharedMetricRegistries;
 import com.google.common.base.Throwables;

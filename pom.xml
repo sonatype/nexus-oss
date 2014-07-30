@@ -634,14 +634,6 @@
               <Include-Resource>
                 /=${project.build.outputDirectory},{maven-resources}
               </Include-Resource>
-              <!-- remove build-only headers from final manifest -->
-              <_removeheaders>
-                Embed*,Include-Resource,Private-Package
-              </_removeheaders>
-              <Private-Package>!*;-split-package:=first</Private-Package>
-              <Import-Package>
-                *;resolution:=optional
-              </Import-Package>
             </instructions>
           </configuration>
         </plugin>
@@ -654,6 +646,39 @@
           <artifactId>karaf-maven-plugin</artifactId>
           <version>3.0.1</version>
           <extensions>true</extensions>
+          <configuration>
+            <excludedArtifactIds>
+              <!--
+              Covered by platform/other bundles
+              -->
+              <id>org.osgi.core</id>
+              <id>org.osgi.compendium</id>
+              <id>org.eclipse.osgi</id>
+              <id>javax.annotation</id>
+              <id>javax.annotation-api</id>
+              <id>jsr250-api</id>
+              <id>jsr305</id>
+              <id>slf4j-api</id>
+              <id>jul-to-slf4j</id>
+              <id>jcl-over-slf4j</id>
+              <id>log4j-over-slf4j</id>
+              <id>logback-core</id>
+              <id>logback-classic</id>
+              <id>pax-logging-api</id>
+              <!--
+              Need special wrapping/fragments
+              -->
+              <id>hibernate-validator</id>
+              <id>httpcore</id>
+              <id>httpclient</id>
+              <id>maven-model</id>
+              <id>maven-model-builder</id>
+              <id>xmlpull</id>
+              <id>xpp3_min</id>
+              <id>shiro-guice</id>
+              <id>xstream</id>
+            </excludedArtifactIds>
+          </configuration>
         </plugin>
 
         <plugin>
