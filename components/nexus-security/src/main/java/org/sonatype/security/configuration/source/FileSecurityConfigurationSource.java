@@ -28,7 +28,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.plexus.components.cipher.PlexusCipherException;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.configuration.upgrade.SecurityConfigurationUpgrader;
@@ -170,7 +169,7 @@ public class FileSecurityConfigurationSource
       try {
         configuration.setAnonymousPassword(this.passwordHelper.decrypt(encryptedPassword));
       }
-      catch (PlexusCipherException e) {
+      catch (Exception e) {
         this.getLogger().error(
             "Failed to decrypt anonymous user's password in security-configuration.xml, password might be encrypted in memory.",
             e);
@@ -211,9 +210,9 @@ public class FileSecurityConfigurationSource
         try {
           configuration.setAnonymousPassword(this.passwordHelper.decrypt(encryptedPassword));
         }
-        catch (PlexusCipherException e) {
+        catch (Exception e) {
           this.getLogger().error(
-              "Failed to decrype anonymous user's password in security-configuration.xml, password might be encrypted in memory.",
+              "Failed to decrypt anonymous user's password in security-configuration.xml, password might be encrypted in memory.",
               e);
         }
       }
@@ -278,9 +277,9 @@ public class FileSecurityConfigurationSource
     try {
       configuration.setAnonymousPassword(passwordHelper.encrypt(clearPassword));
     }
-    catch (PlexusCipherException e) {
+    catch (Exception e) {
       getLogger().warn(
-          "Filed to encrypte the anonymous users password, storing configuration with cleartext password!", e);
+          "Failed to encrypt the anonymous users password, storing configuration with cleartext password!", e);
     }
 
     try {

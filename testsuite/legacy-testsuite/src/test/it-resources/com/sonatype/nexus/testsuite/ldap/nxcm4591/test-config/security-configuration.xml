@@ -15,7 +15,7 @@
   <anonymousUsername>anonymous</anonymousUsername>
   <anonymousPassword>{ucPRpYSZVskHrd+ZiR28HtnUPnFukPJlkjvJLiXD7k4=}</anonymousPassword>
   <realms>
-    <realm>NexusLdapAuthenticationRealm</realm>
+    <realm>LdapAuthenticatingRealm</realm>
     <realm>XmlAuthenticatingRealm</realm>
     <realm>XmlAuthorizingRealm</realm>
   </realms>

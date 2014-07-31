@@ -41,7 +41,6 @@ import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelReader;
 import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelUpgrader;
 import org.sonatype.nexus.configuration.ModelloUtils.ModelloModelWriter;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.plexus.components.cipher.PlexusCipherException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
@@ -160,7 +159,7 @@ public class DefaultLdapConfigurationSource
               .setSystemPassword(
                   legacyPasswordHelper.decrypt(ossConfiguration.getConnectionInfo().getSystemPassword()));
         }
-        catch (org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException e) {
+        catch (Exception e) {
           throw new CorruptModelException("Could not decrypt legacy encrypted LDAP password during upgrade", e);
         }
       }
@@ -175,7 +174,7 @@ public class DefaultLdapConfigurationSource
           newServerConfig.getConnectionInfo().setSystemPassword(
               passwordHelper.encrypt(newServerConfig.getConnectionInfo().getSystemPassword()));
         }
-        catch (PlexusCipherException e) {
+        catch (Exception e) {
           // this means JRE does not have needed JCE stuff? Die hard
           throw Throwables.propagate(e);
         }
@@ -321,7 +320,7 @@ public class DefaultLdapConfigurationSource
           ldapServer.getConnectionInfo().setSystemPassword(
               passwordHelper.encrypt(ldapServer.getConnectionInfo().getSystemPassword()));
         }
-        catch (PlexusCipherException e) {
+        catch (Exception e) {
           throw Throwables.propagate(e);
         }
       }
@@ -336,7 +335,7 @@ public class DefaultLdapConfigurationSource
           ldapServer.getConnectionInfo().setSystemPassword(
               passwordHelper.decrypt(ldapServer.getConnectionInfo().getSystemPassword()));
         }
-        catch (PlexusCipherException e) {
+        catch (Exception e) {
           log.warn("Failed to LDAP decrypt passwords, loading them as plain text.", e);
         }
       }

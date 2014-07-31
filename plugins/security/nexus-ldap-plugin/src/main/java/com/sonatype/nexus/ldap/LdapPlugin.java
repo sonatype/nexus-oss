@@ -63,7 +63,7 @@ public class LdapPlugin
   /**
    * LDAP realm name.
    */
-  public static final String REALM_NAME = "NexusLdapAuthenticationRealm";
+  public static final String REALM_NAME = "LdapAuthenticatingRealm";
 
   /**
    * LDAP user source name.

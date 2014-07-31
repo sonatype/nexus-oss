@@ -40,6 +40,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-crypto</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>javax.enterprise</groupId>
       <artifactId>cdi-api</artifactId>
     </dependency>
@@ -62,11 +67,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>base-configuration</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-cipher</artifactId>
     </dependency>
 
     <dependency>
@@ -175,7 +175,7 @@
               <goal>xpp3-writer</goal>
             </goals>
             <configuration>
-              <version>2.0.7</version>
+              <version>2.0.8</version>
               <models>
                 <model>src/main/mdo/security-configuration.xml</model>
               </models>
@@ -183,6 +183,7 @@
                 <packagedVersion>2.0.3</packagedVersion>
                 <packagedVersion>2.0.4</packagedVersion>
                 <packagedVersion>2.0.5</packagedVersion>
+                <packagedVersion>2.0.7</packagedVersion>
               </packagedVersions>
               <packageWithVersion>false</packageWithVersion>
             </configuration>
@@ -199,7 +200,7 @@
               <goal>upgrade</goal>
             </goals>
             <configuration>
-              <version>2.0.7</version>
+              <version>2.0.8</version>
               <models>
                 <model>src/main/mdo/security-configuration.xml</model>
               </models>
@@ -207,6 +208,7 @@
                 <packagedVersion>2.0.3</packagedVersion>
                 <packagedVersion>2.0.4</packagedVersion>
                 <packagedVersion>2.0.5</packagedVersion>
+                <packagedVersion>2.0.7</packagedVersion>
               </packagedVersions>
               <packageWithVersion>false</packageWithVersion>
             </configuration>

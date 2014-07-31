@@ -48,7 +48,6 @@ import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageItem;
-import org.sonatype.plexus.components.cipher.PlexusCipherException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -479,7 +478,7 @@ public class DefaultCapabilityRegistry
             try {
               encrypted.put(formField.getId(), passwordHelper.encrypt(value));
             }
-            catch (PlexusCipherException e) {
+            catch (Exception e) {
               throw new IOException(
                   "Could not encrypt value of '" + formField.getType() + "' due to " + e.getMessage(), e
               );
@@ -512,7 +511,7 @@ public class DefaultCapabilityRegistry
             try {
               decrypted.put(formField.getId(), passwordHelper.decrypt(value));
             }
-            catch (PlexusCipherException e) {
+            catch (Exception e) {
               throw new IOException(
                   "Could not decrypt value of '" + formField.getType() + "' due to " + e.getMessage(), e
               );
