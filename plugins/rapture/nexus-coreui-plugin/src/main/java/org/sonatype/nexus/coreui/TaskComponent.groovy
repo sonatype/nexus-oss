@@ -175,7 +175,7 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasks:update')
-  @Validate(groups = [Update.class, Default.class])
+  @Validate(groups = [Schedule.class, Default.class])
   TaskXO updateSchedule(final @NotNull(message = '[taskXO] may not be null') @Valid TaskXO taskXO) {
     ScheduledTask task = nexusScheduler.getTaskById(taskXO.id);
     validateState(task)
