@@ -18,6 +18,9 @@
 Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
   extend: 'Ext.app.Controller',
 
+  stores: [
+    'HealthCheckRepositoryStatus'
+  ],
   views: [
     'healthcheck.HealthCheckRepositorySettings',
     'healthcheck.HealthCheckEula'
@@ -42,8 +45,8 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
           activate: me.onActivate,
           deactivate: me.onDeactivate
         },
-        'nx-coreui-healthcheck-eula button[action=agree]': {
-          click: me.onAgree
+        'nx-coreui-healthcheck-repository-settings form': {
+          submitted: me.onSettingsSubmitted
         }
       }
     });
@@ -112,19 +115,8 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
     }
   },
 
-  /**
-   * @private
-   * Show EULA if not already accepted.
-   */
-  onAgree: function(button) {
-    var me = this,
-        win = button.up('window'),
-        form = me.getPanel().down('nx-settingsform'),
-        saveButton = form.down('button[action=save]');
-
-    win.close();
-    form.getForm().setValues({ eulaAccepted: true });
-    saveButton.fireEvent('click', saveButton);
+  onSettingsSubmitted: function() {
+    this.getHealthCheckRepositoryStatusStore().load();
   }
 
 });
