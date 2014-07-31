@@ -654,6 +654,7 @@
               <id>org.osgi.core</id>
               <id>org.osgi.compendium</id>
               <id>org.eclipse.osgi</id>
+              <id>activation</id>
               <id>javax.annotation</id>
               <id>javax.annotation-api</id>
               <id>jsr250-api</id>
