@@ -16,8 +16,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.plexus.components.cipher.PlexusCipher;
-import org.sonatype.plexus.components.cipher.PlexusCipherException;
+import org.sonatype.sisu.goodies.crypto.CryptoHelper;
+import org.sonatype.sisu.goodies.crypto.maven.MavenCipher;
+import org.sonatype.sisu.goodies.crypto.maven.PasswordCipherMavenImpl;
 
 import com.google.common.base.Preconditions;
 
@@ -28,54 +29,45 @@ public class PasswordHelper
 
   private static final String ENC = "CMMDwoV";
 
-  private final PlexusCipher plexusCipher;
+  private final MavenCipher mavenCipher;
 
   @Inject
-  public PasswordHelper(final PlexusCipher plexusCipher) {
-    this.plexusCipher = Preconditions.checkNotNull(plexusCipher, "plexusCipher");
+  public PasswordHelper(final CryptoHelper cryptoHelper) {
+    Preconditions.checkNotNull(cryptoHelper, "mavenCipher");
+    this.mavenCipher = new MavenCipher(new PasswordCipherMavenImpl(cryptoHelper));
   }
 
   public String encrypt(String password)
-      throws PlexusCipherException
   {
     return encrypt(password, ENC);
   }
 
   public String encrypt(String password, String encoding)
-      throws PlexusCipherException
   {
     // check if the password is encrypted
-    if (plexusCipher.isEncryptedString(password)) {
+    if (mavenCipher.isPasswordCipher(password)) {
       return password;
     }
-
     if (password != null) {
-      synchronized (plexusCipher) {
-        return plexusCipher.encryptAndDecorate(password, encoding);
-      }
+        return mavenCipher.encrypt(password, encoding);
     }
-
     return null;
   }
 
   public String decrypt(String encodedPassword)
-      throws PlexusCipherException
   {
     return decrypt(encodedPassword, ENC);
   }
 
   public String decrypt(String encodedPassword, String encoding)
-      throws PlexusCipherException
   {
     // check if the password is encrypted
-    if (!plexusCipher.isEncryptedString(encodedPassword)) {
+    if (!mavenCipher.isPasswordCipher(encodedPassword)) {
       return encodedPassword;
     }
 
     if (encodedPassword != null) {
-      synchronized (plexusCipher) {
-        return plexusCipher.decryptDecorated(encodedPassword, encoding);
-      }
+      return mavenCipher.decrypt(encodedPassword, encoding);
     }
     return null;
   }

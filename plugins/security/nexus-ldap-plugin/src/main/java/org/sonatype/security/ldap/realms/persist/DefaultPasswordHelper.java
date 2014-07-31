@@ -16,12 +16,19 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.security.ldap.upgrade.cipher.PlexusCipher;
-import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
+import org.sonatype.sisu.goodies.crypto.CryptoHelper;
+import org.sonatype.sisu.goodies.crypto.maven.PasswordCipherMavenLegacyImpl;
 
+import com.google.common.base.Charsets;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-
+/**
+ * This is "legacy" component to be used in upgrades only. This component uses non-"shielded" PasswordCipher directly of
+ * legacy PlexusCipher.
+ * 
+ * @deprecated To be used in configuration upgrades only.
+ */
+@Deprecated
 @Singleton
 @Named
 public class DefaultPasswordHelper
@@ -30,28 +37,26 @@ public class DefaultPasswordHelper
 
   private static final String ENC = "CMMDwoV";
 
-  private final PlexusCipher plexusCipher;
+  private final PasswordCipherMavenLegacyImpl mavenLegacyPasswordCipher;
 
   @Inject
-  public DefaultPasswordHelper(final PlexusCipher plexusCipher) {
-    this.plexusCipher = checkNotNull(plexusCipher);
+  public DefaultPasswordHelper(final CryptoHelper cryptoHelper) {
+    checkNotNull(cryptoHelper, "cryptoHelper");
+    this.mavenLegacyPasswordCipher = new PasswordCipherMavenLegacyImpl(cryptoHelper);
   }
 
   public String encrypt(String password)
-      throws PlexusCipherException
   {
     if (password != null) {
-
-      return plexusCipher.encrypt(password, ENC);
+      return new String(mavenLegacyPasswordCipher.encrypt(password.getBytes(Charsets.UTF_8), ENC), Charsets.UTF_8);
     }
     return null;
   }
 
   public String decrypt(String encodedPassword)
-      throws PlexusCipherException
   {
     if (encodedPassword != null) {
-      return plexusCipher.decrypt(encodedPassword, ENC);
+      return new String(mavenLegacyPasswordCipher.decrypt(encodedPassword.getBytes(Charsets.UTF_8), ENC), Charsets.UTF_8);
     }
     return null;
   }

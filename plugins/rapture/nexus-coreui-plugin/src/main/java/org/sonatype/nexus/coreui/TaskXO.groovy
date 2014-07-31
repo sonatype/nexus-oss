@@ -27,23 +27,20 @@ import org.sonatype.scheduling.TaskState
 @ToString(includePackage = false, includeNames = true)
 class TaskXO
 {
-  @NotEmpty(groups = Update.class)
+  @NotEmpty(groups = [Update, Schedule])
   String id
 
   Boolean enabled
 
-  @NotEmpty
+  @NotEmpty(groups = [Create, Update])
   String name
 
-  @NotEmpty(groups = Create.class)
+  @NotEmpty(groups = Create)
   String typeId
 
   String typeName
   TaskState status
   String statusDescription
-
-  @NotEmpty
-  String schedule
 
   Date nextRun
   Date lastRun
@@ -54,7 +51,14 @@ class TaskXO
   String alertEmail
 
   Map<String, String> properties
+
+  @NotEmpty(groups = Create)
+  String schedule
+
   Date startDate
   Integer[] recurringDays
   String cronExpression
+
+  public interface Schedule
+  {}
 }

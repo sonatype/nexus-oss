@@ -12,15 +12,18 @@
  */
 package org.sonatype.security.ldap.realms.persist;
 
-import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
-
+/**
+ * This is "legacy" component to be used in upgrades only. Originally, OSS LDAP plugin was using this to store
+ * passwords.
+ * 
+ * @deprecated To be used in configuration upgrades only.
+ */
+@Deprecated
 public interface PasswordHelper
 {
 
-  public String encrypt(String password)
-      throws PlexusCipherException;
+  public String encrypt(String password);
 
-  public String decrypt(String encodedPassword)
-      throws PlexusCipherException;
+  public String decrypt(String encodedPassword);
 
 }

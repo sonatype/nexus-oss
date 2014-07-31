@@ -13,14 +13,14 @@
 
 package org.sonatype.security.ldap.realms.persist;
 
-import org.sonatype.security.ldap.upgrade.cipher.DefaultPlexusCipher;
-import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
+import org.sonatype.sisu.goodies.crypto.internal.CryptoHelperImpl;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import junit.framework.Assert;
 import org.junit.Test;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.fail;
 
 public class PasswordHelperTest
     extends TestSupport
@@ -29,7 +29,7 @@ public class PasswordHelperTest
   public PasswordHelper getPasswordHelper()
       throws Exception
   {
-    return new DefaultPasswordHelper(new DefaultPlexusCipher());
+    return new DefaultPasswordHelper(new CryptoHelperImpl());
   }
 
   @Test
@@ -67,9 +67,9 @@ public class PasswordHelperTest
 
     try {
       ph.decrypt("clear-text-password");
-      fail("Expected: PlexusCipherException");
+      fail("Expected: IllegalArgumentException");
     }
-    catch (PlexusCipherException e) {
+    catch (IllegalArgumentException e) {
       // expected
     }
 
