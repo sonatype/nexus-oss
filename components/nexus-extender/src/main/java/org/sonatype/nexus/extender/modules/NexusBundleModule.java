@@ -64,7 +64,7 @@ public class NexusBundleModule
 
     interceptorModules = new EntryListAdapter<>(locator.locate(Key.get(AbstractInterceptorModule.class)));
     imports = Strings.nullToEmpty(bundle.getHeaders().get(Constants.IMPORT_PACKAGE));
-    hasPlexus = bundle.getEntry("META-INF/plexus/components.xml") != null;
+    hasPlexus = bundle.getResource("META-INF/plexus/components.xml") != null;
   }
 
   @Override
