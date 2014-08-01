@@ -136,12 +136,25 @@ Ext.define('NX.coreui.controller.Tasks', {
    */
   onSelection: function(list, model) {
     var me = this,
-        schedule = me.getSchedule();
+        settings = me.getSettings(),
+        schedule = me.getSchedule(),
+        taskTypeModel;
 
     if (Ext.isDefined(model)) {
       me.showSummary(model);
-      me.showSettings(model);
-      if (model.get('schedule') !== 'internal') {
+      taskTypeModel = me.getTaskTypeStore().getById(model.get('typeId'));
+      if (taskTypeModel) {
+        if (!settings) {
+          me.getFeature().addTab({ xtype: 'nx-coreui-task-settings', title: 'Settings' });
+        }
+        me.showSettings(model);
+      }
+      else {
+        if (settings) {
+          me.getFeature().removeTab(settings);
+        }
+      }
+      if (taskTypeModel && model.get('schedule') !== 'internal') {
         if (!schedule) {
           me.getFeature().addTab({ xtype: 'nx-coreui-task-schedule', title: 'Schedule' });
         }
