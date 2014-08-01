@@ -34,7 +34,7 @@ import com.google.common.collect.ImmutableList;
 public class PurgeTimelineTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
-  public static final String ID = "PurgeTimeline";
+  public static final String ID = "PurgeTimelineTask";
 
   public static final String OLDER_THAN_FIELD_ID = "purgeOlderThan";
 
