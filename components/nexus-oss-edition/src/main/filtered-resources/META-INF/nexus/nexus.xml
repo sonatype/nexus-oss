@@ -75,7 +75,7 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <url>http://repository.apache.org/snapshots/</url>
+        <url>https://repository.apache.org/snapshots/</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -102,7 +102,7 @@
       <indexable>true</indexable>
       <searchable>true</searchable>
       <remoteStorage>
-        <url>http://nexus.codehaus.org/snapshots/</url>
+        <url>https://nexus.codehaus.org/snapshots/</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
