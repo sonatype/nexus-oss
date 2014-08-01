@@ -54,7 +54,7 @@ Ext.define('NX.coreui.controller.Repositories', {
   refs: [
     { ref: 'list', selector: 'nx-coreui-repository-list' },
     { ref: 'settings', selector: 'nx-coreui-repository-feature nx-coreui-repository-settings-tab' },
-    { ref: 'selectTemplate', selector: 'nx-coreui-repository-selecttemplate' },
+    { ref: 'selectTemplate', selector: 'nx-coreui-repository-selecttemplate' }
   ],
   icons: {
     'repository-default': {
@@ -104,6 +104,9 @@ Ext.define('NX.coreui.controller.Repositories', {
         'nx-coreui-repository-list button[action=new]': {
           click: me.showSelectTemplateWindow
         },
+        'nx-coreui-repository-list button[action=more]': {
+          afterrender: me.bindMoreButton
+        },
         'nx-coreui-repository-settings': {
           submitted: me.onSettingsSubmitted
         },
@@ -127,9 +130,11 @@ Ext.define('NX.coreui.controller.Repositories', {
    */
   onSelection: function(list, model) {
     var me = this,
+        moreButton = list.down('button[action=more]'),
         settingsTab, settingsForm;
 
     if (Ext.isDefined(model)) {
+      me.fillMoreButtonMenu(moreButton, model);
       settingsForm = me.createComponent(
           'settings',
           {
@@ -144,6 +149,96 @@ Ext.define('NX.coreui.controller.Repositories', {
         settingsTab.add(settingsForm);
         settingsForm.loadRecord(model);
       }
+    }
+  },
+
+  /**
+   * Add menu entries to 'More' button, based on current selected repository.
+   * @param {Ext.button.Button} button 'More' button
+   * @param {NX.coreui.model.Repository} model repository model
+   */
+  fillMoreButtonMenu: function(button, model) {
+    var me = this,
+        type = model.get('type'),
+        provider = model.get('provider'),
+        localStatus = model.get('localStatus'),
+        proxyMode = model.get('proxyMode'),
+        userManaged = model.get('userManaged');
+
+    me.removeMenuItem(button, 'expirecache');
+    if (NX.Conditions.isPermitted("nexus:cache", "delete")
+        && type !== 'virtual' && localStatus === 'IN_SERVICE' && userManaged) {
+      button.menu.add({
+        text: 'Expire Cache', action: 'expirecache', handler: Ext.bind(me.expireCache, me, [model])
+      });
+    }
+
+    me.removeMenuItem(button, 'rebuildmetadata');
+    if (NX.Conditions.isPermitted("nexus:metadata", "delete")
+        && (provider === 'maven2' || provider === 'maven1')
+        && (type === 'hosted' || type === 'group') && localStatus === 'IN_SERVICE' && userManaged) {
+      button.menu.add({
+        text: 'Rebuild Metadata', action: 'rebuildmetadata', handler: Ext.bind(me.rebuildMavenMetadata, me, [model])
+      });
+    }
+
+    me.removeMenuItem(button, 'blockproxy');
+    if (NX.Conditions.isPermitted("nexus:repostatus", "update")
+        && type === 'proxy' && proxyMode === 'ALLOW') {
+      button.menu.add({
+        text: 'Block Proxy', action: 'blockproxy', handler: Ext.bind(me.blockProxy, me, [model])
+      });
+    }
+
+    me.removeMenuItem(button, 'allowproxy');
+    if (NX.Conditions.isPermitted("nexus:repostatus", "update")
+        && type === 'proxy' && proxyMode !== 'ALLOW') {
+      button.menu.add({
+        text: 'Allow Proxy', action: 'allowproxy', handler: Ext.bind(me.allowProxy, me, [model])
+      });
+    }
+
+    me.removeMenuItem(button, 'putoutofservice');
+    if (NX.Conditions.isPermitted("nexus:repostatus", "update")
+        && type !== 'group' && localStatus === 'IN_SERVICE') {
+      button.menu.add({
+        text: 'Put Out of Service', action: 'putoutofservice', handler: Ext.bind(me.putOutOfService, me, [model])
+      });
+    }
+
+    me.removeMenuItem(button, 'putinservice');
+    if (NX.Conditions.isPermitted("nexus:repostatus", "update")
+        && type !== 'group' && localStatus !== 'IN_SERVICE') {
+      button.menu.add({
+        text: 'Put in Service', action: 'putinservice', handler: Ext.bind(me.putInService, me, [model])
+      });
+    }
+
+    me.removeMenuItem(button, 'repairindex');
+    me.removeMenuItem(button, 'updateindex');
+    if (NX.Conditions.isPermitted("nexus:index", "delete")
+        && (provider === 'maven2' || provider === 'maven1')
+        && type !== 'virtual') {
+      button.menu.add({
+        text: 'Repair Index', action: 'repairindex', handler: Ext.bind(me.repairIndex, me, [model])
+      });
+      button.menu.add({
+        text: 'Update Index', action: 'updateindex', handler: Ext.bind(me.updateIndex, me, [model])
+      });
+    }
+  },
+
+  /**
+   * Removes from 'More' button, if present, menu item with specified action.
+   * @param {Ext.button.Button} button 'More' button
+   * @param actionName menu item action name to be removed
+   */
+  removeMenuItem: function(button, actionName) {
+    var menuItem;
+
+    menuItem = button.down('menuitem[action=' + actionName + ']');
+    if (menuItem) {
+      button.menu.remove(menuItem);
     }
   },
 
@@ -168,7 +263,7 @@ Ext.define('NX.coreui.controller.Repositories', {
   /**
    * @private
    */
-  showSelectTemplateWindow: function(menu) {
+  showSelectTemplateWindow: function() {
     Ext.widget('nx-coreui-repository-selecttemplate');
   },
 
@@ -317,6 +412,24 @@ Ext.define('NX.coreui.controller.Repositories', {
   },
 
   /**
+   * @protected
+   * Enable 'More' when user has selected a repository.
+   */
+  bindMoreButton: function(button) {
+    var me = this;
+    button.mon(
+        NX.Conditions.and(
+            NX.Conditions.gridHasSelection(me.list)
+        ),
+        {
+          satisfied: button.enable,
+          unsatisfied: button.disable,
+          scope: button
+        }
+    );
+  },
+
+  /**
    * @private
    * Navigate to same repository in browse mode.
    */
@@ -327,6 +440,138 @@ Ext.define('NX.coreui.controller.Repositories', {
     NX.Bookmarks.navigateTo(NX.Bookmarks.fromSegments([
       'browse/repository/standard', list.getSelectionModel().getSelection()[0].getId()
     ]));
+  },
+
+  /**
+   * Expire cache for repository.
+   * @param {NX.coreui.model.Repository} model repository model
+   */
+  expireCache: function(model) {
+    NX.direct.coreui_Repository.clearCache(model.getId(), '/', function(response) {
+      if (Ext.isObject(response) && response.success) {
+        NX.Messages.add({
+          text: 'Started expiring caches of "' + model.get('name'),
+          type: 'success'
+        });
+      }
+    });
+  },
+
+  /**
+   * Rebuild metadata for repository.
+   * @param {NX.coreui.model.Repository} model repository model
+   */
+  rebuildMavenMetadata: function(model) {
+    NX.direct.coreui_Maven.rebuildMetadata(model.getId(), '/', function(response) {
+      if (Ext.isObject(response) && response.success) {
+        NX.Messages.add({
+          text: 'Started rebuilding metadata of "' + model.get('name'),
+          type: 'success'
+        });
+      }
+    });
+  },
+
+  /**
+   * Block proxy-ing for selected repository.
+   * @param {NX.coreui.model.Repository} model repository model
+   */
+  blockProxy: function(model) {
+    var me = this;
+
+    NX.direct.coreui_Repository.updateStatus(model.getId(), undefined, 'BLOCKED_MANUAL', function(response) {
+      if (Ext.isObject(response) && response.success) {
+        me.loadStore();
+        NX.Messages.add({
+          text: 'Blocked proxy on "' + model.get('name'),
+          type: 'success'
+        });
+      }
+    });
+  },
+
+  /**
+   * Allow proxy-ing for selected repository.
+   * @param {NX.coreui.model.Repository} model repository model
+   */
+  allowProxy: function(model) {
+    var me = this;
+
+    NX.direct.coreui_Repository.updateStatus(model.getId(), undefined, 'ALLOW', function(response) {
+      if (Ext.isObject(response) && response.success) {
+        me.loadStore();
+        NX.Messages.add({
+          text: 'Allowed proxy on "' + model.get('name'),
+          type: 'success'
+        });
+      }
+    });
+  },
+
+  /**
+   * Put selected repository out of service.
+   * @param {NX.coreui.model.Repository} model repository model
+   */
+  putOutOfService: function(model) {
+    var me = this;
+
+    NX.direct.coreui_Repository.updateStatus(model.getId(), 'OUT_OF_SERVICE', undefined, function(response) {
+      if (Ext.isObject(response) && response.success) {
+        me.loadStore();
+        NX.Messages.add({
+          text: 'Repository "' + model.get('name') + ' was put out of service',
+          type: 'success'
+        });
+      }
+    });
+  },
+
+  /**
+   * Put selected repository in service.
+   * @param {NX.coreui.model.Repository} model repository model
+   */
+  putInService: function(model) {
+    var me = this;
+
+    NX.direct.coreui_Repository.updateStatus(model.getId(), 'IN_SERVICE', undefined, function(response) {
+      if (Ext.isObject(response) && response.success) {
+        me.loadStore();
+        NX.Messages.add({
+          text: 'Repository "' + model.get('name') + ' was put in service',
+          type: 'success'
+        });
+      }
+    });
+  },
+
+  /**
+   * Repair index for selected repository.
+   * @param {NX.coreui.model.Repository} model repository model
+   */
+  repairIndex: function(model) {
+    NX.direct.indexerLucene_Index.repair(model.getId(), '/', function(response) {
+      if (Ext.isObject(response) && response.success) {
+        NX.Messages.add({
+          text: 'Started repairing index of "' + model.get('name'),
+          type: 'success'
+        });
+      }
+    });
+  },
+
+  /**
+   * Update index for selected repository.
+   * @param {NX.coreui.model.Repository} model repository model
+   */
+  updateIndex: function(model) {
+    NX.direct.indexerLucene_Index.update(model.getId(), '/', function(response) {
+      if (Ext.isObject(response) && response.success) {
+        NX.Messages.add({
+          text: 'Started updating index of "' + model.get('name'),
+          type: 'success'
+        });
+      }
+    });
   }
 
 });

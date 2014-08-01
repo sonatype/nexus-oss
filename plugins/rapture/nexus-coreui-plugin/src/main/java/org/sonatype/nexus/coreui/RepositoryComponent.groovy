@@ -381,6 +381,39 @@ extends DirectComponentSupport
     nexusScheduler.submit("Clear cache ${id}:${path}", task)
   }
 
+  /**
+   * Update local status/proxy mode of a repository. It also updates local status of any dependant shadow repository.
+   * @param id of repository
+   * @param localStatus new local status (can be null)
+   * @param proxyMode new proxy mode (can be null)
+   */
+  @DirectMethod
+  @RequiresAuthentication
+  @RequiresPermissions('nexus:repostatus:update')
+  @Validate
+  void updateStatus(final @NotEmpty(message = '[id] may not be empty') String id,
+                    final @Nullable LocalStatus localStatus,
+                    final @Nullable ProxyMode proxyMode)
+  {
+    Repository repository = protectedRepositoryRegistry.getRepository(id)
+    if (localStatus || proxyMode) {
+      if (localStatus) {
+        repository.localStatus = localStatus
+        protectedRepositoryRegistry.getRepositoriesWithFacet(ShadowRepository).each { shadowRepository ->
+          if (repository.id == shadowRepository.masterRepository.id) {
+            shadowRepository.localStatus = localStatus
+          }
+        }
+      }
+      if (proxyMode) {
+        if (repository.repositoryKind.isFacetAvailable(ProxyRepository)) {
+          repository.adaptToFacet(ProxyRepository).proxyMode = proxyMode
+        }
+      }
+      nexusConfiguration.saveConfiguration()
+    }
+  }
+
   def RepositoryXO create(RepositoryXO repositoryXO, Closure... createClosures) {
     def template = templateManager.templates.getTemplateById(repositoryXO.template) as RepositoryTemplate
     CRepository configuration = template.configurableRepository.getCurrentConfiguration(true)
