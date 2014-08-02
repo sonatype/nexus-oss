@@ -27,8 +27,6 @@ import org.osgi.framework.wiring.BundleWiring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.sonatype.nexus.extender.NexusBundlePlan.hasComponents;
-
 /**
  * {@link Bundle} tracker that tracks and binds bundles with Nexus components.
  * 
@@ -55,12 +53,7 @@ public class NexusBundleTracker
       try {
         BindingPublisher publisher;
         log.info("ACTIVATING {}", bundle);
-        if (bundle.getBundleContext() != context) {
-          publisher = super.prepare(bundle);
-        }
-        else {
-          publisher = plans.get(0).prepare(bundle);
-        }
+        publisher = super.prepare(bundle);
         log.info("ACTIVATED {}", bundle);
         return publisher;
       }
@@ -68,6 +61,10 @@ public class NexusBundleTracker
         log.warn("BROKEN {}", bundle);
         throw e;
       }
+    }
+    // make sure we have everything we need to start
+    else if (bundle.getBundleContext() == context) {
+      prepareDependencies(bundle);
     }
     return null;
   }
@@ -94,6 +91,11 @@ public class NexusBundleTracker
         }
       }
     }
+  }
+
+  private static boolean hasComponents(Bundle bundle) {
+    return bundle.getResource("META-INF/sisu/javax.inject.Named") != null
+        || bundle.getResource("META-INF/plexus/components.xml") != null;
   }
 
   private static boolean live(final Bundle bundle) {

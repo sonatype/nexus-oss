@@ -31,14 +31,9 @@ public class NexusBundlePlan
     super(locator);
   }
 
-  public static boolean hasComponents(Bundle bundle) {
-    return bundle.getResource("META-INF/sisu/javax.inject.Named") != null
-        || bundle.getResource("META-INF/plexus/components.xml") != null;
-  }
-
   @Override
   protected boolean appliesTo(Bundle bundle) {
-    return hasComponents(bundle);
+    return true; // our custom tracker pre-filters the bundles
   }
 
   @Override
