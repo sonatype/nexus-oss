@@ -31,8 +31,7 @@ Ext.define('NX.coreui.view.system.PluginList', {
       }
     },
     {header: 'Name', dataIndex: 'name', flex: 1},
-    {header: 'Version', dataIndex: 'version', flex: 1},
-    {header: 'Description', dataIndex: 'description', flex: 1}
+    {header: 'Version', dataIndex: 'version', flex: 1}
   ],
 
   plugins: [
