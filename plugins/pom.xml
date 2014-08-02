@@ -203,14 +203,6 @@
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
-      <!-- lvo -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-lvo-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
       <!-- maven -->
 
       <dependency>

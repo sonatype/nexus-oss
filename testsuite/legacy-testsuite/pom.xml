@@ -76,12 +76,6 @@
       <artifactId>nexus-security-realms</artifactId>
     </dependency>
 
-    <!-- NEXUS-2490 -->
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-lvo-plugin</artifactId>
-    </dependency>
-
     <!-- NEXUS-2810 references this -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
