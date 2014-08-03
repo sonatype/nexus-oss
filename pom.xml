@@ -144,6 +144,12 @@
         <type>zip</type>
       </dependency>
 
+      <dependency>
+        <groupId>org.sonatype.nexus.assemblies</groupId>
+        <artifactId>nexus-karaf-branding</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
       <!-- components -->
 
       <dependency>

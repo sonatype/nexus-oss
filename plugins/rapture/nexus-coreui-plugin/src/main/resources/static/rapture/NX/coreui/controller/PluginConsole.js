@@ -75,11 +75,11 @@ Ext.define('NX.coreui.controller.PluginConsole', {
       info = {
         'Name': model.get('name'),
         'Version': model.get('version'),
-        'Status': model.get('status'),
-        'Description': model.get('description'),
-        'SCM Version': model.get('scmVersion'),
-        'SCM Timestamp': model.get('scmTimestamp'),
-        'Site': NX.util.Url.asLink(model.get('site'))
+        'Status': model.get('status')
+        //'Description': model.get('description'),
+        //'SCM Version': model.get('scmVersion'),
+        //'SCM Timestamp': model.get('scmTimestamp'),
+        //'Site': NX.util.Url.asLink(model.get('site'))
       };
       if (Ext.isDefined(model.get('documentation'))) {
         Ext.each(model.get('documentation'), function (doc) {

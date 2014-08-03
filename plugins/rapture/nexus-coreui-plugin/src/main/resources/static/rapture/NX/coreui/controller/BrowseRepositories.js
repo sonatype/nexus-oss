@@ -42,6 +42,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
     me.getApplication().getIconController().addIcons({
       'repository-managed': { file: 'database_yellow.png', variants: ['x16', 'x32'] },
+      'repository-out-of-service': { file: 'warning.png', variants: ['x16'] },
       'repositorybrowse-inIndex': { file: 'tick.png', variants: ['x16'] },
       'repositorybrowse-inStorage': { file: 'tick.png', variants: ['x16'] },
       'repository-item-type-default': { file: 'file_extension_default.png', variants: ['x16', 'x24', 'x32'] },
@@ -160,13 +161,16 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
           Ext.suspendLayouts();
           rootNode.removeAll();
           store.each(function(model) {
+            var inService = model.get('localStatus') === 'IN_SERVICE';
             rootNode.appendChild({
               repositoryId: model.getId(),
               path: '/',
-              inIndex: true,
-              inStorage: true,
+              inIndex: inService,
+              inStorage: inService,
               text: model.get('name'),
-              iconCls: NX.Icons.cls('repository-default', 'x16')
+              qtip: inService ? undefined : 'Out of Service',
+              leaf: !inService,
+              iconCls: NX.Icons.cls(inService ? 'repository-default' : 'repository-out-of-service', 'x16')
             });
           });
           Ext.resumeLayouts(true);
