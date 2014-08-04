@@ -48,9 +48,7 @@
             <!--
             Merge with logback at runtime so its configurator can find our InstrumentedAppender
             -->
-            <Fragment-Host>
-              org.ops4j.pax.logging.pax-logging-logback
-            </Fragment-Host>
+            <Fragment-Host>org.ops4j.pax.logging.pax-logging-logback</Fragment-Host>
             <!--
             Expose the various logback packages embedded in pax-logging for use by Nexus LogManager
             (include 'org.apache.coyote' as a workaround for http://jira.qos.ch/browse/LOGBACK-949)
