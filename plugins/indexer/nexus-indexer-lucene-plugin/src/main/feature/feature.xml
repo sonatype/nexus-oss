@@ -15,5 +15,10 @@
 <features>
   <feature name="${project.artifactId}" description="${pluginDescription}">
     <bundle start-level="200">mvn:${project.groupId}/${project.artifactId}/${project.version}</bundle>
+    <!--
+    Wrappers that require use of fragments
+    -->
+    <bundle>wrap:${mvn:lucene-core}$Bundle-SymbolicName=lucene-core</bundle>
+    <bundle>wrap:${mvn:lucene-queries}$Bundle-SymbolicName=lucene-queries&amp;Fragment-Host=lucene-core</bundle>
   </feature>
 </features>

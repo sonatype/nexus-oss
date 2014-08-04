@@ -53,8 +53,33 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Embed-Directory>lib</Embed-Directory>
+            <Embed-Dependency>
+              directjngine,gson
+            </Embed-Dependency>
+            <Private-Package/>
+            <_exportcontents>
+              org.sonatype.nexus.extdirect.*,
+              com.softwarementors.extjs.*,
+              com.google.gson
+            </_exportcontents>
+            <Import-Package>
+              com.yahoo.*|org.mozilla.*;resolution:=optional,*
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
+        <configuration>
+          <addBundlesToPrimaryFeature>false</addBundlesToPrimaryFeature>
+        </configuration>
       </plugin>
     </plugins>
   </build>
