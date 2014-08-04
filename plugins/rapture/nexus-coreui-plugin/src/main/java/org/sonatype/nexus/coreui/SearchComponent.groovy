@@ -127,7 +127,7 @@ extends DirectComponentSupport
     for (ArtifactInfo info : iterator) {
       results << new SearchResultXO(
           repositoryId: info.repository,
-          uri: 'maven:' + info.groupId + ':' + info.artifactId,
+          uri: "maven:${info.groupId}:${info.artifactId}" + (info.classifier ? ":${info.classifier}" : ''),
           version: info.version,
           path: gavCalculator.gavToPath(info.calculateGav())
       )
