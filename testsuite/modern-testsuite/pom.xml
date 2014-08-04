@@ -102,43 +102,12 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>com.saucelabs</groupId>
-      <artifactId>sauce_junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-firefox-driver</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-chrome-driver</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-support</artifactId>
-      <scope>test</scope>
-    </dependency>
-
     <!--
     Additional plugin/helper features
     -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-it-helper-plugin</artifactId>
-      <version>${nexus.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-testsuite-ui-plugin</artifactId>
       <version>${nexus.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -359,7 +328,6 @@
                   <systemDirectory>${project.build.directory}/test-features</systemDirectory>
                   <bootFeatures>
                     <feature>nexus-it-helper-plugin</feature>
-                    <feature>nexus-testsuite-ui-plugin</feature>
                     <feature>nexus-groovyremote-plugin</feature>
                     <feature>nexus-capabilities-testsuite-helper</feature>
                     <feature>nexus-restlet1x-testsupport-plugin</feature>
