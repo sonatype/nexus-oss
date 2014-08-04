@@ -344,6 +344,13 @@
                 <copy todir="${project.build.directory}/assembly" overwrite="true">
                   <fileset dir="${basedir}/src/main/overlaid-resources" />
                 </copy>
+                <dependencyfilesets prefix="mvn:"/>
+                <copy todir="${project.build.directory}/assembly/lib" overwrite="true">
+                  <fileset refid="mvn:javax.annotation:javax.annotation-api:jar"/>
+                  <fileset refid="mvn:com.google.code.findbugs:jsr305:jar"/>
+                </copy>
+                <replace file="${project.build.directory}/assembly/etc/config.properties"
+                  token="packages.extra=" value="packages.extra=sun.misc,javax.annotation.security;version=1.2," />
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg">
                   <!-- trim out various enterprise/deployment features we don't need at the moment -->
                   <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.1/xml/features" />

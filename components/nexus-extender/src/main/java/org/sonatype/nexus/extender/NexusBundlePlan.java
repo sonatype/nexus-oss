@@ -10,24 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.web.metrics;
+package org.sonatype.nexus.extender;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import org.sonatype.nexus.extender.modules.NexusBundleModule;
 
-import com.codahale.metrics.health.HealthCheckRegistry;
+import com.google.inject.Module;
+import org.eclipse.sisu.inject.MutableBeanLocator;
+import org.eclipse.sisu.launch.SisuBundlePlan;
+import org.osgi.framework.Bundle;
 
 /**
- * Customized {@link com.codahale.metrics.servlets.HealthCheckServlet} to support injection.
- *
+ * Adapts Sisu's default plan to use {@link NexusBundleModule} for configuration.
+ * 
  * @since 3.0
  */
-@Singleton
-public class HealthCheckServlet
-  extends com.codahale.metrics.servlets.HealthCheckServlet
+public class NexusBundlePlan
+    extends SisuBundlePlan
 {
-  @Inject
-  public HealthCheckServlet(HealthCheckRegistry registry) {
-    super(registry);
+  public NexusBundlePlan(final MutableBeanLocator locator) {
+    super(locator);
+  }
+
+  @Override
+  protected boolean appliesTo(Bundle bundle) {
+    return true; // our custom tracker pre-filters the bundles
+  }
+
+  @Override
+  protected Module compose(Bundle bundle) {
+    return new NexusBundleModule(bundle, locator);
   }
 }

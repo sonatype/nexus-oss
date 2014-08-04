@@ -10,24 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.web.metrics;
+package org.sonatype.nexus.extender.modules;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import com.codahale.metrics.health.HealthCheckRegistry;
+import com.google.inject.AbstractModule;
+import org.eclipse.sisu.inject.DefaultRankingFunction;
+import org.eclipse.sisu.inject.RankingFunction;
 
 /**
- * Customized {@link com.codahale.metrics.servlets.HealthCheckServlet} to support injection.
- *
+ * Provides ranking policy that gives more recent plugins priority over older plugins.
+ * 
  * @since 3.0
  */
-@Singleton
-public class HealthCheckServlet
-  extends com.codahale.metrics.servlets.HealthCheckServlet
+public class RankingModule
+    extends AbstractModule
 {
-  @Inject
-  public HealthCheckServlet(HealthCheckRegistry registry) {
-    super(registry);
+  private final AtomicInteger rank = new AtomicInteger(1);
+
+  @Override
+  protected void configure() {
+    bind(RankingFunction.class).toInstance(new DefaultRankingFunction(rank.incrementAndGet()));
   }
 }

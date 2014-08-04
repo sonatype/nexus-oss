@@ -62,4 +62,19 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <!-- attach custom mimetypes to the tika bundle -->
+            <Fragment-Host>org.apache.tika.core</Fragment-Host>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

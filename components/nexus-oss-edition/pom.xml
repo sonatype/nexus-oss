@@ -41,8 +41,8 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <!-- merge OSS edition at runtime with nexus-extender -->
-            <Fragment-Host>org.sonatype.nexus.extender</Fragment-Host>
+            <!-- merge OSS edition at runtime with nexus-core -->
+            <Fragment-Host>org.sonatype.nexus.core</Fragment-Host>
           </instructions>
         </configuration>
       </plugin>

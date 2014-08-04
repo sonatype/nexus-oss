@@ -10,24 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.web.metrics;
+package org.sonatype.nexus.validation;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import com.codahale.metrics.health.HealthCheckRegistry;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Customized {@link com.codahale.metrics.servlets.HealthCheckServlet} to support injection.
- *
+ * Identifies methods whose arguments and return value require validation.
+ * 
  * @since 3.0
  */
-@Singleton
-public class HealthCheckServlet
-  extends com.codahale.metrics.servlets.HealthCheckServlet
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.METHOD })
+public @interface Validate
 {
-  @Inject
-  public HealthCheckServlet(HealthCheckRegistry registry) {
-    super(registry);
-  }
+  Class<?>[] groups() default {};
 }

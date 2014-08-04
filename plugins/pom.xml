@@ -543,6 +543,7 @@
                   logback-core|
                   mail|
                   maven-model|
+                  maven-model-builder|
                   maven-repository-metadata|
                   org.eclipse.sisu.inject|
                   org.eclipse.sisu.plexus|
@@ -575,6 +576,14 @@
               <_exportcontents>
                 ![A-Z]*|lib*|static*|docs*|*-*|.*,*
               </_exportcontents>
+              <!-- remove build-only headers from final manifest -->
+              <_removeheaders>
+                Embed*,Include-Resource,Private-Package
+              </_removeheaders>
+              <Private-Package>!*;-split-package:=first</Private-Package>
+              <Import-Package>
+                *;resolution:=optional
+              </Import-Package>
             </instructions>
           </configuration>
         </plugin>

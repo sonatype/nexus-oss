@@ -32,7 +32,6 @@ import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
-import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.proxy.RemoteStorageException
 import org.sonatype.nexus.proxy.ResourceStoreRequest
 import org.sonatype.nexus.proxy.item.RepositoryItemUid
@@ -57,6 +56,7 @@ import org.sonatype.nexus.templates.repository.RepositoryTemplate
 import org.sonatype.nexus.templates.repository.maven.AbstractMavenRepositoryTemplate
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
+import org.sonatype.nexus.validation.Validate
 
 import javax.annotation.Nullable
 import javax.inject.Inject

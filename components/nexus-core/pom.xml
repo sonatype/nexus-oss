@@ -201,6 +201,11 @@
 
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model-builder</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-repository-metadata</artifactId>
     </dependency>
 
@@ -431,8 +436,8 @@
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
-          <!-- model classes will be merged in as a fragment at runtime 
-          <excludeDependencies>nexus-configuration-model</excludeDependencies> -->
+          <!-- model classes will be merged in as a fragment at runtime -->
+          <excludeDependencies>nexus-configuration-model</excludeDependencies>
           <instructions>
             <!-- include the OSGi JDBC compendium package as it's needed by H2 -->
             <Export-Package>{local-packages},org.osgi.service.jdbc</Export-Package>

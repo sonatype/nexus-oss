@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.guice;
+package org.sonatype.nexus.extender.modules;
 
 import java.lang.annotation.ElementType;
 
@@ -23,15 +23,16 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.executable.ExecutableValidator;
 
+import org.sonatype.nexus.validation.Validate;
+
 import com.google.inject.AbstractModule;
-import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.matcher.Matchers;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.hibernate.validator.HibernateValidator;
 
 /**
- * {@link Module} that provides {@link Validator}s and enables validation of methods annotated with {@link Validate}.
+ * Provides validation of methods annotated with {@link Validate}.
  * 
  * @since 3.0
  */
