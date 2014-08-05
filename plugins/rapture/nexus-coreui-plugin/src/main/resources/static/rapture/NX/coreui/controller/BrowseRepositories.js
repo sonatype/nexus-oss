@@ -97,7 +97,6 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
           beforerender: me.loadRepositories,
           select: me.onNodeSelected,
           beforeitemexpand: me.loadChildrenFromIndex,
-          itemclick: me.onItemClick,
           beforeitemcontextmenu: me.showContextMenu,
           beforecontextmenushow: me.fillContextMenu
         },
@@ -190,16 +189,6 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
         node.get('repositoryId'),
         node.isLeaf() ? node.get('path') : undefined
     );
-  },
-
-  /**
-   * @private
-   * Auto expand nodes on click.
-   */
-  onItemClick: function(tree, node) {
-    if (!node.isLeaf() && !node.expanded) {
-      this.getTree().expandNode(node);
-    }
   },
 
   /**
