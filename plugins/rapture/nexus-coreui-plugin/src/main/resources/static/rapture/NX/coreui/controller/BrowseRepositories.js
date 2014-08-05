@@ -187,7 +187,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     var me = this;
     me.getStorageFileContainer().showStorageFile(
         node.get('repositoryId'),
-        node.isLeaf() ? node.get('path') : undefined
+        (node.isLeaf() && node.get('path') !== '/') ? node.get('path') : undefined
     );
   },
 
