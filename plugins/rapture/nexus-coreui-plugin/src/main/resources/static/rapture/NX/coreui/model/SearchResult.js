@@ -18,9 +18,6 @@
 Ext.define('NX.coreui.model.SearchResult', {
   extend: 'Ext.data.Model',
   fields: [
-    'repositoryId',
-    'uri',
-    'version',
-    'path'
+    'id'
   ]
 });

@@ -33,6 +33,7 @@ Ext.define('NX.coreui.store.SearchResult', {
     }
   },
 
+  pageSize: 100,
   remoteFilter: true,
   sortOnLoad: true,
   sorters: { property: 'uri', direction: 'ASC' }

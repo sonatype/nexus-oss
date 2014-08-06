@@ -22,7 +22,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
 
   layout: 'border',
 
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = [
@@ -45,27 +45,8 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
         //]
       },
       {
-        xtype: 'grid',
-        region: 'center',
-        allowDeselect: true,
-        viewConfig: {
-          emptyText: 'No results',
-          deferEmptyText: false
-        },
-        store: 'SearchResult',
-        columns: [
-          { header: 'Component', dataIndex: 'uri', flex: 1 },
-          { header: 'Version', dataIndex: 'version', flex: 1 },
-          { header: 'Repository', dataIndex: 'repositoryId', flex: 1 }
-        ],
-        dockedItems: [
-          {
-            xtype: 'pagingtoolbar',
-            store: 'SearchResult',
-            dock: 'top',
-            displayInfo: true
-          }
-        ]
+        xtype: 'nx-coreui-search-tree',
+        region: 'center'
       },
       {
         xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',

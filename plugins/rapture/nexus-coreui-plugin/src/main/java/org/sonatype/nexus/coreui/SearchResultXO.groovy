@@ -23,8 +23,21 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class SearchResultXO
 {
-  String repositoryId
-  String uri
-  String version
-  String path
+  String id
+  List<VersionXO> versions
+
+  static class VersionXO
+  {
+    String version
+    List<ItemXO> items
+  }
+
+  static class ItemXO
+  {
+    String repositoryId
+    String path
+    String name
+    String type
+  }
+
 }

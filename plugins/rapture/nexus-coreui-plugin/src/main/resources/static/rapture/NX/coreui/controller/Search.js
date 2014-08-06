@@ -32,23 +32,16 @@ Ext.define('NX.coreui.controller.Search', {
 
   views: [
     'search.SearchFeature',
+    'search.SearchTree',
     'search.TextSearchCriteria',
     'search.SaveSearchFilter'
   ],
 
   refs: [
-    {
-      ref: 'searchFeature',
-      selector: 'nx-searchfeature'
-    },
-    {
-      ref: 'quickSearch',
-      selector: 'nx-header-panel #quicksearch'
-    },
-    {
-      ref: 'storageFileContainer',
-      selector: 'nx-coreui-repositorybrowse-storagefilecontainer'
-    }
+    { ref: 'searchFeature', selector: 'nx-searchfeature' },
+    { ref: 'searchTree', selector: 'nx-coreui-search-tree' },
+    { ref: 'quickSearch', selector: 'nx-header-panel #quicksearch' },
+    { ref: 'storageFileContainer', selector: 'nx-coreui-repositorybrowse-storagefilecontainer' }
   ],
 
   /**
@@ -106,6 +99,12 @@ Ext.define('NX.coreui.controller.Search', {
     });
 
     me.listen({
+      store: {
+        '#SearchResult': {
+          beforeload: me.onSearchResultBeforeLoad,
+          load: me.onSearchResultLoad
+        }
+      },
       component: {
         'nx-searchfeature': {
           afterrender: me.initCriterias
@@ -117,8 +116,9 @@ Ext.define('NX.coreui.controller.Search', {
           search: me.onSearchCriteriaChange,
           searchcleared: me.onSearchCriteriaChange
         },
-        'nx-searchfeature grid': {
-          selectionchange: me.onSelectionChange
+        'nx-coreui-search-tree': {
+          select: me.onNodeSelected,
+          beforeitemexpand: me.loadVersions,
         },
         'nx-searchfeature button[action=save]': {
           click: me.showSaveSearchFilterWindow
@@ -233,7 +233,7 @@ Ext.define('NX.coreui.controller.Search', {
     }
     else {
       // TODO code bellow is a workaround stores not removing filters when remoteFilter = true
-      // store.removeFilter(searchCriteria.criteriaId);
+      store.removeFilter(searchCriteria.criteriaId);
       if (store.filters.removeAtKey(searchCriteria.criteriaId) && apply) {
         if (store.filters.length) {
           store.filter();
@@ -248,16 +248,80 @@ Ext.define('NX.coreui.controller.Search', {
     me.bookmarkFilters();
   },
 
-  onSelectionChange: function(selectionModel, selected) {
+  onSearchResultBeforeLoad: function(store) {
     var me = this,
-        result = selected[0];
+        tree = me.getSearchTree();
 
-    if (result) {
-      me.getStorageFileContainer().showStorageFile(result.get('repositoryId'), result.get('path'));
+    if (tree) {
+      tree.getEl().mask('Searching...');
     }
-    else {
-      me.getStorageFileContainer().showStorageFile(undefined, undefined);
+  },
+
+  onSearchResultLoad: function(store) {
+    var me = this,
+        tree = me.getSearchTree(),
+        root;
+
+    if (tree) {
+      root = tree.getRootNode();
+      Ext.suspendLayouts();
+      root.removeAll();
+      store.each(function(searchResultModel) {
+        root.appendChild({ text: searchResultModel.getId(), leaf: false });
+      });
+      Ext.resumeLayouts(true);
+      tree.getEl().unmask();
     }
+  },
+
+  loadVersions: function(node) {
+    var me = this,
+        tree = me.getSearchTree();
+
+    if (!node.childNodes.length) {
+      tree.getEl().mask('Searching...');
+      NX.direct.coreui_Search.readVersions(node.get('text'), function(response) {
+        if (Ext.isObject(response) && response.success && response.data && response.data.versions) {
+          Ext.suspendLayouts();
+          node.appendChild(me.versionsAsNodes(response.data.versions))
+          Ext.resumeLayouts(true);
+        }
+        tree.getEl().unmask();
+      });
+    }
+  },
+
+  versionsAsNodes: function(versions) {
+    var nodes;
+
+    if (versions) {
+      nodes = []
+      Ext.Array.each(versions, function(version) {
+        var versionNode = {
+          text: version['version'],
+          children: []
+        };
+        Ext.Array.each(version['items'], function(item) {
+          versionNode.children.push({
+            text: item['name'],
+            repositoryId: item['repositoryId'],
+            path: item['path'],
+            type: item['type'],
+            leaf: true
+          });
+        });
+        nodes.push(versionNode);
+      });
+    }
+    return nodes;
+  },
+
+  onNodeSelected: function(tree, node) {
+    var me = this;
+    me.getStorageFileContainer().showStorageFile(
+        node.get('repositoryId'),
+        node.get('path')
+    );
   },
 
   showSaveSearchFilterWindow: function() {
