@@ -342,12 +342,13 @@ Ext.define('NX.coreui.controller.Search', {
   },
 
   versionsAsNodes: function(versions) {
-    var nodes, itemsPerRepo = {}, nrOfRepos = 0;
+    var nodes;
 
     if (versions) {
       nodes = []
       Ext.Array.each(versions, function(version) {
-        var versionNode = { text: version['version'], children: [] };
+        var versionNode = { text: version['version'], children: [] },
+            itemsPerRepo = {}, nrOfRepos = 0;
 
         Ext.Array.each(version['items'], function(item) {
           if (!itemsPerRepo[item['repositoryId']]) {
