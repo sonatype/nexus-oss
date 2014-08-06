@@ -35,6 +35,7 @@ class SearchResultXO
   static class ItemXO
   {
     String repositoryId
+    String repositoryName
     String path
     String name
     String type

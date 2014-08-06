@@ -335,24 +335,30 @@ Ext.define('NX.coreui.controller.Search', {
   },
 
   versionsAsNodes: function(versions) {
-    var nodes;
+    var nodes, itemsPerRepo = {}, nrOfRepos = 0;
 
     if (versions) {
       nodes = []
       Ext.Array.each(versions, function(version) {
-        var versionNode = {
-          text: version['version'],
-          children: []
-        };
+        var versionNode = { text: version['version'], children: [] };
+
         Ext.Array.each(version['items'], function(item) {
-          versionNode.children.push({
-            text: item['name'],
-            repositoryId: item['repositoryId'],
-            path: item['path'],
-            type: item['type'],
-            leaf: true
-          });
+          if (!itemsPerRepo[item['repositoryId']]) {
+            nrOfRepos++;
+            itemsPerRepo[item['repositoryId']] = [];
+          }
+          itemsPerRepo[item['repositoryId']].push(Ext.apply({ text: item['name'], leaf: true }, item));
         });
+
+        Ext.Object.each(itemsPerRepo, function(repository, items) {
+          if (nrOfRepos == 1) {
+            versionNode.children = items;
+          }
+          else {
+            versionNode.children.push({ text: items[0]['repositoryName'], children: items });
+          }
+        });
+
         nodes.push(versionNode);
       });
     }

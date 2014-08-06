@@ -27,6 +27,8 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.PagedResponse
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
 import org.sonatype.nexus.index.IndexerManager
+import org.sonatype.nexus.proxy.NoSuchRepositoryException
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -51,6 +53,9 @@ extends DirectComponentSupport
   @Inject
   @Named('maven2')
   GavCalculator gavCalculator
+
+  @Inject
+  RepositoryRegistry repositoryRegistry
 
   @DirectMethod
   PagedResponse<SearchResultXO> read(final @Nullable StoreLoadParameters parameters) {
@@ -116,8 +121,16 @@ extends DirectComponentSupport
         }
         String path = gavCalculator.gavToPath(ai.calculateGav())
         String name = new File(path).getName()
+        String repositoryName = ai.repository
+        try {
+          repositoryName = repositoryRegistry.getRepository(ai.repository).name
+        }
+        catch (NoSuchRepositoryException e) {
+          // ignore, will use repo id
+        }
         items.put("${ai.repository}:${path}", new SearchResultXO.ItemXO(
             repositoryId: ai.repository,
+            repositoryName: repositoryName,
             path: path,
             name: name,
             type: FilenameUtils.getExtension(name)
