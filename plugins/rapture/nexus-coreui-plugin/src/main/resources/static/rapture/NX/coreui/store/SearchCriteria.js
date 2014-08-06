@@ -86,14 +86,17 @@ Ext.define('NX.coreui.store.SearchCriteria', {
         fieldLabel: 'Class name',
         width: 250
       }
-    },
-    {
-      id: 'symbolicname',
-      config: {
-        fieldLabel: 'Symbolic name'
-      }
     }
-  ]
+    // TODO Comment for now as we do not yet support symbolic name search
+    //{
+    //  id: 'symbolicname',
+    //  config: {
+    //    fieldLabel: 'Symbolic name'
+    //  }
+    //}
+  ],
 
+  sortOnLoad: true,
+  sorters: { property: 'id', direction: 'ASC' }
 
 });
