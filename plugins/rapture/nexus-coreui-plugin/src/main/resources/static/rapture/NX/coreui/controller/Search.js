@@ -149,9 +149,11 @@ Ext.define('NX.coreui.controller.Search', {
         addCriteriaMenu = [],
         bookmarkSegments = NX.Bookmarks.getBookmark().segments,
         bookmarkValues = {},
+        criterias = {},
         searchCriteria;
 
-    if (bookmarkSegments && bookmarkSegments.length > 1) {
+    if (bookmarkSegments && (bookmarkSegments.length > 1)
+        && Ext.String.endsWith(NX.Bookmarks.getBookmark().segments[0], '/' + searchFilter.get('id'))) {
       Ext.Array.each(Ext.Array.slice(bookmarkSegments, 1), function(segment) {
         var split = segment.split('=');
         if (split.length == 2) {
@@ -165,25 +167,38 @@ Ext.define('NX.coreui.controller.Search', {
     me.getSearchResultStore().clearFilter(true);
 
     if (searchFilter && searchFilter.get('criterias')) {
-      Ext.Array.each(Ext.Array.from(searchFilter.get('criterias')), function(criteriaRef) {
-        var criteria = searchCriteriaStore.getById(criteriaRef.id);
-
-        if (criteria) {
-          var cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-' + criteria.getId());
-          if (!cmpClass) {
-            cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-text');
-          }
-          searchCriteria = searchCriteriaPanel.add(cmpClass.create(Ext.apply(criteria.get('config'), {
-            criteriaId: criteria.getId(),
-            value: bookmarkValues[criteria.getId()] || criteriaRef.value,
-            hidden: criteriaRef.hidden
-          })));
-          if (searchCriteria.value) {
-            me.applyFilter(searchCriteria, false);
-          }
-        }
+      Ext.Array.each(Ext.Array.from(searchFilter.get('criterias')), function(criteria) {
+        criterias[criteria['id']] = { value: criteria['value'], hidden: criteria['hidden'] };
       });
     }
+    Ext.Object.each(bookmarkValues, function(key, value) {
+      var existingCriteria = criterias[key];
+      if (existingCriteria) {
+        existingCriteria['value'] = value;
+      }
+      else {
+        criterias[key] = { value: value };
+      }
+    });
+
+    Ext.Object.each(criterias, function(id, criteria) {
+      var criteriaModel = searchCriteriaStore.getById(id);
+
+      if (criteriaModel) {
+        var cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-' + criteriaModel.getId());
+        if (!cmpClass) {
+          cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-text');
+        }
+        searchCriteria = searchCriteriaPanel.add(cmpClass.create(Ext.apply(criteriaModel.get('config'), {
+          criteriaId: criteriaModel.getId(),
+          value: criteria['value'],
+          hidden: criteria['hidden']
+        })));
+        if (searchCriteria.value) {
+          me.applyFilter(searchCriteria, false);
+        }
+      }
+    });
 
     searchCriteriaStore.each(function(criteria) {
       addCriteriaMenu.push({
@@ -251,7 +266,9 @@ Ext.define('NX.coreui.controller.Search', {
       }
     }
 
-    me.bookmarkFilters();
+    if (apply) {
+      me.bookmarkFilters();
+    }
   },
 
   onSearchResultBeforeLoad: function(store) {
