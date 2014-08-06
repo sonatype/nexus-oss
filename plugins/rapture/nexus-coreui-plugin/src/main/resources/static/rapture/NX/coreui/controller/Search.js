@@ -267,7 +267,9 @@ Ext.define('NX.coreui.controller.Search', {
       Ext.suspendLayouts();
       root.removeAll();
       store.each(function(searchResultModel) {
-        root.appendChild({ text: searchResultModel.getId(), leaf: false });
+        root.appendChild({
+          text: searchResultModel.getId(), leaf: false, children: me.versionsAsNodes(searchResultModel.get('versions'))
+        });
       });
       Ext.resumeLayouts(true);
       tree.getEl().unmask();
@@ -283,7 +285,7 @@ Ext.define('NX.coreui.controller.Search', {
       NX.direct.coreui_Search.readVersions(node.get('text'), function(response) {
         if (Ext.isObject(response) && response.success && response.data && response.data.versions) {
           Ext.suspendLayouts();
-          node.appendChild(me.versionsAsNodes(response.data.versions))
+          node.appendChild(me.versionsAsNodes(response.data.versions));
           Ext.resumeLayouts(true);
         }
         tree.getEl().unmask();
