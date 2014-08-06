@@ -99,6 +99,11 @@ Ext.define('NX.coreui.controller.Search', {
     });
 
     me.listen({
+      controller: {
+        '#Bookmarking': {
+          navigate: me.initCriterias
+        }
+      },
       store: {
         '#SearchResult': {
           beforeload: me.onSearchResultBeforeLoad,
@@ -155,6 +160,7 @@ Ext.define('NX.coreui.controller.Search', {
       });
     }
 
+    searchCriteriaPanel.removeAll();
     me.getSearchResultStore().removeAll();
     me.getSearchResultStore().clearFilter(true);
 
