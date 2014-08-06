@@ -43,17 +43,18 @@ Ext.define('NX.coreui.store.SearchFilter', {
         { id: 'packaging' }
       ]
     },
-    {
-      id: 'p2',
-      name: 'P2',
-      description: 'Search P2 repositories',
-      readOnly: true,
-      criterias: [
-        { id: 'format', value: 'p2', hidden: true },
-        { id: 'symbolicname' },
-        { id: 'version' }
-      ]
-    },
+    // TODO Comment for now as we do not yet support P2 search
+    //{
+    //  id: 'p2',
+    //  name: 'P2',
+    //  description: 'Search P2 repositories',
+    //  readOnly: true,
+    //  criterias: [
+    //    { id: 'format', value: 'p2', hidden: true },
+    //    { id: 'symbolicname' },
+    //    { id: 'version' }
+    //  ]
+    //},
     {
       id: 'keyword',
       name: 'Keyword',
