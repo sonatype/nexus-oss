@@ -101,7 +101,7 @@ Ext.define('NX.coreui.controller.Search', {
     me.listen({
       controller: {
         '#Bookmarking': {
-          navigate: me.initCriterias
+          navigate: me.navigateTo
         }
       },
       store: {
@@ -137,7 +137,14 @@ Ext.define('NX.coreui.controller.Search', {
         }
       }
     });
+  },
 
+  navigateTo: function() {
+    var me = this;
+
+    if (me.getSearchFeature()) {
+      me.initCriterias();
+    }
   },
 
   initCriterias: function() {
