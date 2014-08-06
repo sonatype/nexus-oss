@@ -80,7 +80,7 @@ Ext.define('NX.coreui.controller.Search', {
           path: '/Search',
           description: 'Search repositories',
           group: true,
-          view: { xtype: 'nx-searchfeature', searchFilter: model },
+          view: { xtype: 'nx-searchfeature', searchFilter: model, bookmarkEnding: '' },
           iconName: 'search-default',
           weight: 20,
           expanded: false
@@ -90,7 +90,7 @@ Ext.define('NX.coreui.controller.Search', {
         me.getApplication().getFeaturesController().registerFeature({
           mode: 'browse',
           path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
-          view: { xtype: 'nx-searchfeature', searchFilter: model },
+          view: { xtype: 'nx-searchfeature', searchFilter: model, bookmarkEnding: '/' + model.getId() },
           iconName: 'search-default',
           description: model.get('description'),
           authenticationRequired: false
@@ -160,7 +160,7 @@ Ext.define('NX.coreui.controller.Search', {
         searchCriteria;
 
     if (bookmarkSegments && (bookmarkSegments.length > 1)
-        && Ext.String.endsWith(NX.Bookmarks.getBookmark().segments[0], '/' + searchFilter.get('id'))) {
+        && Ext.String.endsWith(NX.Bookmarks.getBookmark().segments[0], 'search' + searchPanel.bookmarkEnding)) {
       Ext.Array.each(Ext.Array.slice(bookmarkSegments, 1), function(segment) {
         var split = segment.split('=');
         if (split.length == 2) {
