@@ -54,7 +54,89 @@ extends DirectComponentSupport
 
   @DirectMethod
   PagedResponse<SearchResultXO> read(final @Nullable StoreLoadParameters parameters) {
+    BooleanQuery bq = buildQuery(parameters)
+    Set<String> gas = []
+    IteratorSearchResponse iterator = null
+    try {
+      iterator = indexerManager.searchQueryIterator(
+          bq, null, null, null, null, false, null
+      )
 
+      gas = iterator.collect { info ->
+        return "${info.groupId}:${info.artifactId}" as String
+      } as SortedSet
+
+      log.info('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
+    }
+    finally {
+      iterator?.close()
+    }
+
+    List<SearchResultXO> results = []
+    int i = 0;
+    for (String ga : gas) {
+      i++
+      if (i <= parameters.start) {
+        continue
+      }
+      if (i > parameters.start + parameters.limit) {
+        break
+      }
+      results << new SearchResultXO(
+          id: ga
+      )
+    }
+
+    return new PagedResponse<SearchResultXO>(gas.size(), results)
+  }
+
+  @DirectMethod
+  SearchResultXO readVersions(final @Nullable StoreLoadParameters parameters) {
+    BooleanQuery bq = buildQuery(parameters)
+    IteratorSearchResponse iterator = null
+    try {
+      iterator = indexerManager.searchQueryIterator(
+          bq, null, null, null, null, false, null
+      )
+      log.info('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
+      SearchResultXO searchResultXO = null
+      Map<GenericVersion, Map<String, SearchResultXO.ItemXO>> versions = new TreeMap()
+      iterator.each { ai ->
+        if (!searchResultXO) {
+          searchResultXO = new SearchResultXO(
+              id: "${ai.groupId}:${ai.artifactId}",
+              versions: []
+          )
+        }
+        GenericVersion gv = new GenericVersion(ai.version)
+        def items = versions[gv]
+        if (!items) {
+          items = new TreeMap()
+          versions.put(gv, items)
+        }
+        String path = gavCalculator.gavToPath(ai.calculateGav())
+        String name = new File(path).getName()
+        items.put("${ai.repository}:${path}", new SearchResultXO.ItemXO(
+            repositoryId: ai.repository,
+            path: path,
+            name: name,
+            type: FilenameUtils.getExtension(name)
+        ))
+      }
+      versions.each { version, items ->
+        searchResultXO.versions << new SearchResultXO.VersionXO(
+            version: version,
+            items: items.collect { it.value }
+        )
+      }
+      return searchResultXO
+    }
+    finally {
+      iterator?.close()
+    }
+  }
+
+  private BooleanQuery buildQuery(final StoreLoadParameters parameters) {
     BooleanQuery bq = new BooleanQuery()
     def keywordOccur = BooleanClause.Occur.SHOULD
 
@@ -118,95 +200,7 @@ extends DirectComponentSupport
         );
       }
     }
-
-    Set<String> gas = []
-    IteratorSearchResponse iterator = null
-    try {
-      iterator = indexerManager.searchQueryIterator(
-          bq, null, null, null, null, false, null
-      )
-
-      gas = iterator.collect { info ->
-        return "${info.groupId}:${info.artifactId}" as String
-      } as SortedSet
-
-      log.info('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
-    }
-    finally {
-      iterator?.close()
-    }
-
-    List<SearchResultXO> results = []
-    int i = 0;
-    for (String ga : gas) {
-      i++
-      if (i <= parameters.start) {
-        continue
-      }
-      if (i > parameters.start + parameters.limit) {
-        break
-      }
-      results << new SearchResultXO(
-          id: ga
-      )
-    }
-
-    return new PagedResponse<SearchResultXO>(gas.size(), results)
-  }
-
-  @DirectMethod
-  SearchResultXO readVersions(final String id) {
-    String[] segments = id.split(':')
-    String groupId = segments[0]
-    String artifactId = segments[1]
-
-    BooleanQuery bq = new BooleanQuery()
-    bq.add(
-        indexerManager.constructQuery(MAVEN.GROUP_ID, groupId, SearchType.EXACT),
-        BooleanClause.Occur.MUST
-    );
-    bq.add(
-        indexerManager.constructQuery(MAVEN.ARTIFACT_ID, artifactId, SearchType.EXACT),
-        BooleanClause.Occur.MUST
-    );
-    IteratorSearchResponse iterator = null
-    try {
-      iterator = indexerManager.searchQueryIterator(
-          bq, null, null, null, null, false, null
-      )
-      log.info('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
-      SearchResultXO searchResultXO = new SearchResultXO(
-          id: "${groupId}:${artifactId}",
-          versions: []
-      )
-      Map<GenericVersion, Map<String, SearchResultXO.ItemXO>> versions = new TreeMap()
-      iterator.each { ai ->
-        GenericVersion gv = new GenericVersion(ai.version)
-        def items = versions[gv]
-        if (!items) {
-          items = new TreeMap()
-          versions.put(gv, items)
-        }
-        String path = gavCalculator.gavToPath(ai.calculateGav())
-        String name = new File(path).getName()
-        items.put("${ai.repository}:${path}", new SearchResultXO.ItemXO(
-            repositoryId: ai.repository,
-            path: path,
-            name: name,
-            type: FilenameUtils.getExtension(name)
-        ))
-      }
-      versions.each { version, items ->
-        searchResultXO.versions << new SearchResultXO.VersionXO(
-            version: version,
-            items: items.collect { it.value }
-        )
-      }
-      return searchResultXO
-    }
-    finally {
-      iterator?.close()
-    }
+    return bq
   }
 
 }

@@ -278,11 +278,29 @@ Ext.define('NX.coreui.controller.Search', {
 
   loadVersions: function(node) {
     var me = this,
-        tree = me.getSearchTree();
+        tree = me.getSearchTree(),
+        searchResultStore = me.getSearchResultStore(),
+        filters = [],
+        segments = node.get('text').split(':');
 
     if (!node.childNodes.length) {
+      filters.push({
+        property: 'groupid',
+        value: segments[0]
+      });
+      filters.push({
+        property: 'artifactid',
+        value: segments[1]
+      });
+      if (searchResultStore.filters.length) {
+        searchResultStore.filters.each(function(filter) {
+          if (filter.property !== 'groupid' && filter.property !== 'artifactid') {
+            filters.push({ property: filter.property, value: filter.value });
+          }
+        });
+      }
       tree.getEl().mask('Searching...');
-      NX.direct.coreui_Search.readVersions(node.get('text'), function(response) {
+      NX.direct.coreui_Search.readVersions({ filter: filters }, function(response) {
         if (Ext.isObject(response) && response.success && response.data && response.data.versions) {
           Ext.suspendLayouts();
           node.appendChild(me.versionsAsNodes(response.data.versions));
