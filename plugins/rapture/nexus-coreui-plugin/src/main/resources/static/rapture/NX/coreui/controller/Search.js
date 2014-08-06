@@ -172,7 +172,7 @@ Ext.define('NX.coreui.controller.Search', {
             value: bookmarkValues[criteria.getId()] || criteriaRef.value,
             hidden: criteriaRef.hidden
           })));
-          if (criteriaRef.value) {
+          if (searchCriteria.value) {
             me.applyFilter(searchCriteria, false);
           }
         }
