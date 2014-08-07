@@ -21,6 +21,8 @@ Ext.define('NX.coreui.view.search.SearchComponentVersionList', {
 
   store: 'SearchComponentVersion',
 
+  allowDeselect: true,
+
   columns: [
     { header: 'Version', dataIndex: 'version', flex: 1 }
   ]
