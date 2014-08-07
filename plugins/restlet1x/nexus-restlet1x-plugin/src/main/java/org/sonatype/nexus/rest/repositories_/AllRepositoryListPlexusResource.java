@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.rest.index.repositories;
+package org.sonatype.nexus.rest.repositories_;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -18,8 +18,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
-import org.sonatype.nexus.rest.indextreeview_.AbstractIndexContentPlexusResource;
+import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 import org.restlet.Context;
@@ -29,23 +28,26 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
 /**
- * Repository index content resource.
+ * A resource list for Repository list.
  *
- * @author dip
+ * @author cstamas
  */
 @Named
 @Singleton
-@Path(RepositoryIndexContentPlexusResource.RESOURCE_URI)
+@Path(AllRepositoryListPlexusResource.RESOURCE_URI)
 @Produces({"application/xml", "application/json"})
-public class RepositoryIndexContentPlexusResource
-    extends AbstractIndexContentPlexusResource
+public class AllRepositoryListPlexusResource
+    extends AbstractRepositoryPlexusResource
 {
-  public static final String REPOSITORY_ID_KEY = "repositoryId";
+  public static final String RESOURCE_URI = "/all_repositories";
 
-  public static final String RESOURCE_URI = "/repositories/{" + REPOSITORY_ID_KEY + "}/index_content";
+  public AllRepositoryListPlexusResource() {
+    this.setModifiable(false);
+  }
 
-  public RepositoryIndexContentPlexusResource() {
-    setRequireStrictChecking(false);
+  @Override
+  public Object getPayloadInstance() {
+    return null;
   }
 
   @Override
@@ -55,25 +57,18 @@ public class RepositoryIndexContentPlexusResource
 
   @Override
   public PathProtectionDescriptor getResourceProtection() {
-    return new PathProtectionDescriptor("/repositories/*/index_content/**", "authcBasic,tiperms");
-  }
-
-  @Override
-  protected String getRepositoryId(Request request) {
-    return String.valueOf(request.getAttributes().get(REPOSITORY_ID_KEY));
+    return new PathProtectionDescriptor(getResourceUri(), "authcBasic,perms[nexus:repositories]");
   }
 
   /**
-   * Get the index content from the specified repository. at the specified path (path is appended to the end of the
-   * uri).
-   *
-   * @param repositoryId The repository to retrieve the index content for.
+   * Retrieve the list of all repositories in nexus, regardless if user or nexus managed.
    */
   @Override
   @GET
-  public IndexBrowserTreeViewResponseDTO get(Context context, Request request, Response response, Variant variant)
+  public RepositoryListResourceResponse get(Context context, Request request, Response response, Variant variant)
       throws ResourceException
   {
-    return super.get(context, request, response, variant);
+    return listRepositories(request, true, true);
   }
+
 }

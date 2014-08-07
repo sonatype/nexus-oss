@@ -89,9 +89,8 @@
         <configuration>
           <excludeDependencies>nexus-restlet1x-model</excludeDependencies>
           <instructions>
-            <!-- merge model classes with the indexer plugin at runtime -->
-            <Fragment-Host>org.sonatype.nexus.plugins.nexus-indexer-lucene-plugin</Fragment-Host>
-            <_exportcontents>!org.sonatype.nexus.rest.model,*</_exportcontents>
+            <!-- merge indexer model classes with restlet1x model classes at runtime -->
+            <Fragment-Host>org.sonatype.nexus.plugins.nexus-restlet1x-model</Fragment-Host>
           </instructions>
         </configuration>
       </plugin>
