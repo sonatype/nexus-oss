@@ -58,7 +58,7 @@ extends DirectComponentSupport
   RepositoryRegistry repositoryRegistry
 
   @DirectMethod
-  PagedResponse<SearchResultXO> read(final @Nullable StoreLoadParameters parameters) {
+  PagedResponse<SearchComponentXO> read(final @Nullable StoreLoadParameters parameters) {
     BooleanQuery bq = buildQuery(parameters)
     Set<String> gas = []
     IteratorSearchResponse iterator = null
@@ -77,7 +77,7 @@ extends DirectComponentSupport
       iterator?.close()
     }
 
-    List<SearchResultXO> results = []
+    List<SearchComponentXO> results = []
     int i = 0;
     for (String ga : gas) {
       i++
@@ -87,16 +87,20 @@ extends DirectComponentSupport
       if (i > parameters.start + parameters.limit) {
         break
       }
-      results << new SearchResultXO(
-          id: ga
+      def segments = ga.split(':')
+      results << new SearchComponentXO(
+          id: ga,
+          group: segments[0],
+          name: segments[1],
+          format: 'Maven2'
       )
     }
 
-    return new PagedResponse<SearchResultXO>(gas.size(), results)
+    return new PagedResponse<SearchComponentXO>(gas.size(), results)
   }
 
   @DirectMethod
-  SearchResultXO readVersions(final @Nullable StoreLoadParameters parameters) {
+  List<SearchComponentVersionXO> readVersions(final @Nullable StoreLoadParameters parameters) {
     BooleanQuery bq = buildQuery(parameters)
     IteratorSearchResponse iterator = null
     try {
@@ -104,15 +108,8 @@ extends DirectComponentSupport
           bq, null, null, null, null, false, null
       )
       log.info('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
-      SearchResultXO searchResultXO = null
-      Map<GenericVersion, Map<String, SearchResultXO.ItemXO>> versions = new TreeMap()
+      Map<GenericVersion, Map<String, SearchComponentVersionXO.ItemXO>> versions = new TreeMap()
       iterator.each { ai ->
-        if (!searchResultXO) {
-          searchResultXO = new SearchResultXO(
-              id: "${ai.groupId}:${ai.artifactId}",
-              versions: []
-          )
-        }
         GenericVersion gv = new GenericVersion(ai.version)
         def items = versions[gv]
         if (!items) {
@@ -128,7 +125,7 @@ extends DirectComponentSupport
         catch (NoSuchRepositoryException e) {
           // ignore, will use repo id
         }
-        items.put("${ai.repository}:${path}", new SearchResultXO.ItemXO(
+        items.put("${ai.repository}:${path}", new SearchComponentVersionXO.ItemXO(
             repositoryId: ai.repository,
             repositoryName: repositoryName,
             path: path,
@@ -136,13 +133,14 @@ extends DirectComponentSupport
             type: FilenameUtils.getExtension(name)
         ))
       }
+      List<SearchComponentVersionXO> versionXOs = []
       versions.each { version, items ->
-        searchResultXO.versions << new SearchResultXO.VersionXO(
+        versionXOs << new SearchComponentVersionXO(
             version: version,
             items: items.collect { it.value }
         )
       }
-      return searchResultXO
+      return versionXOs
     }
     finally {
       iterator?.close()

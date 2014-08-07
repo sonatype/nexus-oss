@@ -42,22 +42,69 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
         // disable saving for now
         //tbar: [
         //  { xtype: 'button', text: 'Save', glyph: 'xf0c7@FontAwesome' /* fa-save */, action: 'save' },
-        //]
+        //],
       },
       {
-        xtype: 'nx-coreui-search-tree',
-        region: 'center'
-      },
-      {
-        xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
-        region: 'south',
-        split: true,
-        flex: 1,
-        header: false,
-        collapsible: true,
-        collapsed: false,
-        collapseMode: 'mini',
-        hidden: true
+        xtype: 'panel',
+        region: 'center',
+        layout: 'border',
+        items: [
+          {
+            xtype: 'nx-coreui-search-component-list',
+            region: 'center',
+            flex: 0.3
+          },
+          {
+            xtype: 'panel',
+            itemId: 'rightPanel',
+            region: 'east',
+            layout: 'border',
+            flex: 0.7,
+            header: false,
+            split: true,
+            collapsible: true,
+            collapsed: false,
+            collapseMode: 'mini',
+            hidden: true,
+            items: [
+              {
+                xtype: 'panel',
+                region: 'center',
+                flex: 0.5,
+                items: [
+                  {
+                    type: 'panel',
+                    region: 'center',
+                    layout: {
+                      type: 'vbox',
+                      align: 'stretch',
+                      pack: 'start'
+                    },
+                    items: [
+                      {
+                        xtype: 'nx-coreui-search-component-details'
+                      },
+                      {
+                        xtype: 'nx-coreui-search-component-version-list'
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
+                region: 'south',
+                split: true,
+                flex: 0.5,
+                header: false,
+                collapsible: true,
+                collapsed: false,
+                collapseMode: 'mini',
+                hidden: true
+              }
+            ]
+          }
+        ]
       }
     ];
 

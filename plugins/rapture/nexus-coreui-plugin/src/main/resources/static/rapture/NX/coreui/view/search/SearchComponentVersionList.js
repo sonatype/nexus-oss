@@ -11,31 +11,18 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Search Result store.
+ * Browse repository storage tree panel.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.store.SearchResult', {
-  extend: 'Ext.data.Store',
-  model: 'NX.coreui.model.SearchResult',
+Ext.define('NX.coreui.view.search.SearchComponentVersionList', {
+  extend: 'Ext.grid.Panel',
+  alias: 'widget.nx-coreui-search-component-version-list',
 
-  proxy: {
-    type: 'direct',
+  store: 'SearchComponentVersion',
 
-    api: {
-      read: 'NX.direct.coreui_Search.read'
-    },
-
-    reader: {
-      type: 'json',
-      root: 'data',
-      successProperty: 'success'
-    }
-  },
-
-  pageSize: 100,
-  remoteFilter: true,
-  sortOnLoad: true,
-  sorters: { property: 'uri', direction: 'ASC' }
+  columns: [
+    { header: 'Version', dataIndex: 'version', flex: 1 }
+  ]
 
 });

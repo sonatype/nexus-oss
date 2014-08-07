@@ -24,24 +24,28 @@ Ext.define('NX.coreui.controller.Search', {
   stores: [
     'SearchFilter',
     'SearchCriteria',
-    'SearchResult'
+    'SearchComponent',
+    'SearchComponentVersion'
   ],
   models: [
     'SearchFilter'
   ],
 
   views: [
+    'search.SearchComponentDetails',
+    'search.SearchComponentList',
+    'search.SearchComponentVersionList',
     'search.SearchFeature',
-    'search.SearchTree',
     'search.TextSearchCriteria',
     'search.SaveSearchFilter'
   ],
 
   refs: [
     { ref: 'searchFeature', selector: 'nx-searchfeature' },
-    { ref: 'searchTree', selector: 'nx-coreui-search-tree' },
-    { ref: 'quickSearch', selector: 'nx-header-panel #quicksearch' },
-    { ref: 'storageFileContainer', selector: 'nx-coreui-repositorybrowse-storagefilecontainer' }
+    { ref: 'searchComponent', selector: 'nx-coreui-search-component-list' },
+    { ref: 'searchComponentDetails', selector: 'nx-coreui-search-component-details' },
+    { ref: 'storageFileContainer', selector: 'nx-searchfeature nx-coreui-repositorybrowse-storagefilecontainer' },
+    { ref: 'quickSearch', selector: 'nx-header-panel #quicksearch' }
   ],
 
   /**
@@ -104,12 +108,6 @@ Ext.define('NX.coreui.controller.Search', {
           navigate: me.navigateTo
         }
       },
-      store: {
-        '#SearchResult': {
-          beforeload: me.onSearchResultBeforeLoad,
-          load: me.onSearchResultLoad
-        }
-      },
       component: {
         'nx-searchfeature': {
           afterrender: me.initCriterias
@@ -121,9 +119,11 @@ Ext.define('NX.coreui.controller.Search', {
           search: me.onSearchCriteriaChange,
           searchcleared: me.onSearchCriteriaChange
         },
-        'nx-coreui-search-tree': {
-          select: me.onNodeSelected,
-          beforeitemexpand: me.loadVersions,
+        'nx-coreui-search-component-list': {
+          selectionchange: me.onComponentSelectionChange
+        },
+        'nx-coreui-search-component-version-list': {
+          selectionchange: me.onComponentVersionSelectionChange
         },
         'nx-searchfeature button[action=save]': {
           click: me.showSaveSearchFilterWindow
@@ -170,8 +170,8 @@ Ext.define('NX.coreui.controller.Search', {
     }
 
     searchCriteriaPanel.removeAll();
-    me.getSearchResultStore().removeAll();
-    me.getSearchResultStore().clearFilter(true);
+    me.getSearchComponentStore().removeAll();
+    me.getSearchComponentStore().clearFilter(true);
 
     if (searchFilter && searchFilter.get('criterias')) {
       Ext.Array.each(Ext.Array.from(searchFilter.get('criterias')), function(criteria) {
@@ -223,7 +223,7 @@ Ext.define('NX.coreui.controller.Search', {
       menu: addCriteriaMenu
     });
 
-    me.getSearchResultStore().filter();
+    me.getSearchComponentStore().filter();
   },
 
   addCriteria: function(menuitem) {
@@ -249,8 +249,9 @@ Ext.define('NX.coreui.controller.Search', {
 
   applyFilter: function(searchCriteria, apply) {
     var me = this,
-        store = me.getSearchResultStore(),
-        filter = searchCriteria.filter;
+        store = me.getSearchComponentStore(),
+        filter = searchCriteria.filter,
+        searchComponent = me.getSearchComponent();
 
     if (filter && Ext.isFunction(filter) && !(filter instanceof Ext.util.Filter)) {
       filter = searchCriteria.filter();
@@ -274,111 +275,58 @@ Ext.define('NX.coreui.controller.Search', {
     }
 
     if (apply) {
+      searchComponent.getSelectionModel().deselectAll();
       me.bookmarkFilters();
     }
   },
 
-  onSearchResultBeforeLoad: function(store) {
+  onComponentSelectionChange: function(selectionModel, selected) {
     var me = this,
-        tree = me.getSearchTree();
+        component = selected[0],
+        rightPanel = me.getSearchFeature().down('#rightPanel'),
+        componentDetails = me.getSearchComponentDetails(),
+        componentVersionStore = me.getSearchComponentVersionStore(),
+        segments;
 
-    if (tree) {
-      tree.getEl().mask('Searching...');
-    }
-  },
-
-  onSearchResultLoad: function(store) {
-    var me = this,
-        tree = me.getSearchTree(),
-        root;
-
-    if (tree) {
-      root = tree.getRootNode();
-      Ext.suspendLayouts();
-      root.removeAll();
-      store.each(function(searchResultModel) {
-        root.appendChild({
-          text: searchResultModel.getId(), leaf: false, children: me.versionsAsNodes(searchResultModel.get('versions'))
-        });
+    if (component) {
+      segments = component.getId().split(':');
+      componentDetails.showInfo({
+        'Group': component.get('group'),
+        'Name': component.get('name'),
+        'Format': component.get('format')
       });
-      Ext.resumeLayouts(true);
-      tree.getEl().unmask();
-    }
-  },
-
-  loadVersions: function(node) {
-    var me = this,
-        tree = me.getSearchTree(),
-        searchResultStore = me.getSearchResultStore(),
-        filters = [],
-        segments = node.get('text').split(':');
-
-    if (!node.childNodes.length) {
-      filters.push({
-        property: 'groupid',
-        value: segments[0]
-      });
-      filters.push({
-        property: 'artifactid',
-        value: segments[1]
-      });
-      if (searchResultStore.filters.length) {
-        searchResultStore.filters.each(function(filter) {
-          if (filter.property !== 'groupid' && filter.property !== 'artifactid') {
-            filters.push({ property: filter.property, value: filter.value });
-          }
-        });
-      }
-      tree.getEl().mask('Searching...');
-      NX.direct.coreui_Search.readVersions({ filter: filters }, function(response) {
-        if (Ext.isObject(response) && response.success && response.data && response.data.versions) {
-          Ext.suspendLayouts();
-          node.appendChild(me.versionsAsNodes(response.data.versions));
-          Ext.resumeLayouts(true);
+      rightPanel.show();
+      componentVersionStore.clearFilter(true);
+      componentVersionStore.addFilter(me.getSearchComponentStore().filters.items, false);
+      componentVersionStore.addFilter([
+        {
+          property: 'groupid',
+          value: segments[0]
+        },
+        {
+          property: 'artifactid',
+          value: segments[1]
         }
-        tree.getEl().unmask();
-      });
+      ]);
+    }
+    else {
+      rightPanel.hide();
     }
   },
 
-  versionsAsNodes: function(versions) {
-    var nodes;
+  onComponentVersionSelectionChange: function(selectionModel, selected) {
+    var me = this,
+        componentVersion = selected[0],
+        storageFileContainer = me.getStorageFileContainer(),
+        firstItem;
 
-    if (versions) {
-      nodes = []
-      Ext.Array.each(versions, function(version) {
-        var versionNode = { text: version['version'], children: [] },
-            itemsPerRepo = {}, nrOfRepos = 0;
-
-        Ext.Array.each(version['items'], function(item) {
-          if (!itemsPerRepo[item['repositoryId']]) {
-            nrOfRepos++;
-            itemsPerRepo[item['repositoryId']] = [];
-          }
-          itemsPerRepo[item['repositoryId']].push(Ext.apply({ text: item['name'], leaf: true }, item));
-        });
-
-        Ext.Object.each(itemsPerRepo, function(repository, items) {
-          if (nrOfRepos == 1) {
-            versionNode.children = items;
-          }
-          else {
-            versionNode.children.push({ text: items[0]['repositoryName'], children: items });
-          }
-        });
-
-        nodes.push(versionNode);
-      });
+    if (componentVersion) {
+      firstItem = componentVersion.get('items')[0];
+      storageFileContainer.showStorageFile(firstItem['repositoryId'], firstItem['path']);
     }
-    return nodes;
-  },
-
-  onNodeSelected: function(tree, node) {
-    var me = this;
-    me.getStorageFileContainer().showStorageFile(
-        node.get('repositoryId'),
-        node.get('path')
-    );
+    else {
+      storageFileContainer.showStorageFile(undefined, undefined);
+    }
   },
 
   showSaveSearchFilterWindow: function() {
