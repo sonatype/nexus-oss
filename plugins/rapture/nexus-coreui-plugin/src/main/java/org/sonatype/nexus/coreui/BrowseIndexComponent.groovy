@@ -22,7 +22,7 @@ import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.index.IndexerManager
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
-import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNodeFactory
+import org.sonatype.nexus.rest.indextreeview_.IndexBrowserTreeNodeFactory
 import org.sonatype.nexus.validation.Validate
 
 import javax.inject.Inject

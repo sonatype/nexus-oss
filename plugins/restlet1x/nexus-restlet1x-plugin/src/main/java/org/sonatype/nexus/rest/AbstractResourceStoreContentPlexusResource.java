@@ -60,7 +60,7 @@ import org.sonatype.nexus.rest.model.ContentListDescribeResponseResource;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.rest.model.NotFoundReasoning;
-import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
+import org.sonatype.nexus.rest.repositories_.AbstractRepositoryPlexusResource;
 import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
