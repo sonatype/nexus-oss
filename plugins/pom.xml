@@ -483,6 +483,107 @@
               <Bundle-Name>${pluginName}</Bundle-Name>
               <Bundle-Description>${pluginDescription}</Bundle-Description>
               <Bundle-DocURL>http://links.sonatype.com/products/nexus/oss/home</Bundle-DocURL>
+              <!--
+              Global ban on embedded dependencies already in core
+              -->
+              <Embed-Dependency>
+                *;scope=compile|runtime;artifactId=!
+                  activation|
+                  aether-api|
+                  aether-spi|
+                  aether-util|
+                  annotations|
+                  aopalliance|
+                  bcprov-jdk15on|
+                  cdi-api|
+                  commons-beanutils|
+                  commons-codec|
+                  commons-collections|
+                  commons-fileupload|
+                  commons-io|
+                  commons-lang|
+                  commons-lang3|
+                  geronimo-jta_1.0.1B_spec|
+                  goodies-common|
+                  goodies-eventbus|
+                  goodies-i18n|
+                  goodies-inject|
+                  goodies-lifecycle|
+                  goodies-template|
+                  gossip-bootstrap|
+                  gossip-support|
+                  guava|
+                  guice-assistedinject|
+                  guice-multibindings|
+                  guice-servlet|
+                  hibernate-validator|
+                  httpclient|
+                  httpcore|
+                  jackson-annotations|
+                  jackson-core|
+                  jackson-databind|
+                  javax.annotation-api|
+                  javax.el-api|
+                  javax.el|
+                  javax.inject|
+                  javax.servlet|
+                  javax.ws.rs|
+                  jaxb-api|
+                  jboss-annotations-api_1.1_spec|
+                  jcl-over-slf4j|
+                  joda-time|
+                  jsoup|
+                  jsr173_api|
+                  jsr250-api|
+                  jsr305|
+                  jul-to-slf4j|
+                  log4j-over-slf4j|
+                  logback-access|
+                  logback-classic|
+                  logback-core|
+                  mail|
+                  maven-model|
+                  maven-model-builder|
+                  maven-repository-metadata|
+                  org.eclipse.sisu.inject|
+                  org.eclipse.sisu.plexus|
+                  org.osgi.compendium|
+                  org.osgi.core|
+                  plexus-cipher|
+                  plexus-classworlds|
+                  plexus-component-annotations|
+                  plexus-interpolation|
+                  plexus-slf4j-logging|
+                  plexus-utils|
+                  shiro-core|
+                  shiro-ehcache|
+                  shiro-guice|
+                  shiro-web|
+                  sisu-guice|
+                  sisu-mailer|
+                  sisu-resource-scanner|
+                  slf4j-api|
+                  tika-core|
+                  validation-api|
+                  velocity|
+                  xmlpull|
+                  xpp3_min|
+                  xstream
+              </Embed-Dependency>
+              <Embed-Directory>lib</Embed-Directory>
+              <Embed-Transitive>true</Embed-Transitive>
+              <DynamicImport-Package>javassist.*</DynamicImport-Package>
+              <_exportcontents>
+                ![A-Z]*|lib*|static*|docs*|*-*|.*,*
+              </_exportcontents>
+              <!-- remove build-only headers from final manifest -->
+              <_removeheaders>
+                Embed*,Include-Resource,Private-Package
+              </_removeheaders>
+              <Private-Package>!*;-split-package:=first</Private-Package>
+              <Import-Package>
+                *;resolution:=optional
+              </Import-Package>
             </instructions>
           </configuration>
         </plugin>
@@ -501,6 +602,8 @@
                 Standard template for nexus plugin feature (relative path from plugin projects)
                 -->
                 <inputFile>${project.basedir}/../../feature.xml</inputFile>
+                <includeTransitiveDependency>false</includeTransitiveDependency>
+                <addBundlesToPrimaryFeature>false</addBundlesToPrimaryFeature>
               </configuration>
             </execution>
           </executions>

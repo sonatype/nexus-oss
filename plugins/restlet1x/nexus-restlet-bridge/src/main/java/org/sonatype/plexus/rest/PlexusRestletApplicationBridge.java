@@ -27,7 +27,6 @@ import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 import org.sonatype.sisu.goodies.common.Loggers;
 
-import com.noelios.restlet.Engine;
 import com.noelios.restlet.application.Encoder;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
@@ -214,15 +213,8 @@ public abstract class PlexusRestletApplicationBridge
   protected final void recreateRoot(boolean isStarted) {
     // reboot?
     if (root != null) {
-      // create a new root router (force TCCL to avoid potential StackOverflow)
-      final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-      Thread.currentThread().setContextClassLoader(Engine.class.getClassLoader());
-      try {
-        rootRouter = new Router(getContext());
-      }
-      finally {
-        Thread.currentThread().setContextClassLoader(tccl);
-      }
+      // create a new root router
+      rootRouter = new Router(getContext());
 
       applicationRouter = initializeRouter(rootRouter, isStarted);
 
