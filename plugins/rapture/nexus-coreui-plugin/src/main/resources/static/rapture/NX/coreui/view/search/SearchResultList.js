@@ -40,7 +40,7 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
     {
       xtype: 'pagingtoolbar',
       store: 'SearchResult',
-      dock: 'bottom',
+      dock: 'top',
       displayInfo: false
     }
   ]
