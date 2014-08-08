@@ -25,6 +25,19 @@ Ext.define('NX.coreui.view.search.SearchResultVersionList', {
   emptyText: 'No versions found',
 
   columns: [
+    {
+      xtype: 'nx-iconcolumn',
+      dataIndex: 'type',
+      width: 36,
+      iconVariant: 'x16',
+      iconNamePrefix: 'repository-item-type-',
+      iconName: function(value) {
+        if (NX.getApplication().getIconController().findIcon('repository-item-type-' + value, 'x16')) {
+          return value;
+        }
+        return 'default';
+      }
+    },
     { header: 'Version', dataIndex: 'version', flex: 1 },
     { header: 'Repository', dataIndex: 'repositoryName', flex: 1 },
     { header: 'Name', dataIndex: 'name', flex: 2 }
