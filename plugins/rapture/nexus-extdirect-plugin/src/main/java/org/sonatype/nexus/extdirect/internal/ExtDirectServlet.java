@@ -226,7 +226,7 @@ public class ExtDirectServlet
       }
 
       private Response handleException(final RegisteredMethod method, final Throwable e) {
-        log.error("Failed to invoke action method: {}, java-method: {}", method.getFullName(), method.getFullJavaMethodName(), e);
+        log.debug("Failed to invoke action method: {}, java-method: {}", method.getFullName(), method.getFullJavaMethodName(), e);
 
         if (e instanceof InvalidConfigurationException) {
           InvalidConfigurationException cause = (InvalidConfigurationException) e;
