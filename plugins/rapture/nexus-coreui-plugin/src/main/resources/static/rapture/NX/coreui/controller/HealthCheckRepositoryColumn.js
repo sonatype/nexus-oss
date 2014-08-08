@@ -112,7 +112,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
           click: Ext.bind(me.maybeAskToEnable, me)
         }
       });
-      grid.headerCt.insert(2, column);
+      grid.headerCt.add(column);
       view.refresh();
       grid.healthCheckTooltip = Ext.create('Ext.ToolTip', {
         target: view.getEl(),
