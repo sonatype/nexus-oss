@@ -73,7 +73,7 @@ public abstract class LdapTestSupport
       this.interpolateLdapXml(sourceLdapXml, ldapRealmConfig);
     }
     else {
-      this.interpolateLdapXml("/test-conf/conf/ldap.xml", ldapRealmConfig);
+      this.interpolateLdapXml("/test-conf/etc/ldap.xml", ldapRealmConfig);
     }
   }
 

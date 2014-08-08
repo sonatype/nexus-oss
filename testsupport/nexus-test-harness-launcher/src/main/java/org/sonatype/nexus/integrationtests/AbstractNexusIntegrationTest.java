@@ -124,7 +124,7 @@ public abstract class AbstractNexusIntegrationTest
 
   public static final String nexusWorkDir;
 
-  public static final String RELATIVE_CONF_DIR = "../sonatype-work/nexus/conf";
+  public static final String RELATIVE_CONF_DIR = "../sonatype-work/nexus/etc";
 
   public static final String WORK_CONF_DIR;
 
@@ -164,7 +164,7 @@ public abstract class AbstractNexusIntegrationTest
     nexusControlPort = TestProperties.getInteger("nexus.control.port");
     nexusBaseDir = TestProperties.getString("nexus.base.dir");
     nexusWorkDir = TestProperties.getString("nexus.work.dir");
-    WORK_CONF_DIR = nexusWorkDir + "/conf";
+    WORK_CONF_DIR = nexusWorkDir + "/etc";
     nexusLogDir = TestProperties.getString("nexus.log.dir");
     nexusBaseUrl = TestProperties.getString("nexus.base.url");
 

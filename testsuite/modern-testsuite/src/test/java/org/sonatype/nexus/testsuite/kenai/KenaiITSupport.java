@@ -78,7 +78,7 @@ public class KenaiITSupport
             fileTaskBuilder.copy()
                 .directory(file(testData().resolveFile("preset-nexus")))
                 .filterUsing("mock-kenai-port", String.valueOf(server.getPort()))
-                .to().directory(path("sonatype-work/nexus/conf"))
+                .to().directory(path("sonatype-work/nexus/etc"))
         );
   }
 

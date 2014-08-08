@@ -98,8 +98,8 @@ public class Launcher
     builder.set("nexus-base", baseDir.getPath());
     if (basePath != null) {
       // look for configuration relative to the base
-      builder.properties(new File(baseDir, "conf/nexus.properties"), true);
-      builder.properties(new File(baseDir, "conf/nexus-test.properties"), false);
+      builder.properties(new File(baseDir, "etc/nexus.properties"), true);
+      builder.properties(new File(baseDir, "etc/nexus-test.properties"), false);
     }
     else {
       // search the classpath for the configuration

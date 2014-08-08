@@ -49,8 +49,8 @@ public class LdapUserManagerIT
       throws Exception
   {
     super.setUp();
-    copyResourceToFile("/test-conf/conf/security-users-in-both-realms.xml", getNexusSecurityConfiguration());
-    copyResourceToFile("/test-conf/conf/security-configuration.xml", getSecurityConfiguration());
+    copyResourceToFile("/test-conf/etc/security-users-in-both-realms.xml", getNexusSecurityConfiguration());
+    copyResourceToFile("/test-conf/etc/security-configuration.xml", getSecurityConfiguration());
   }
 
   private SecuritySystem getSecuritySystem()
@@ -194,7 +194,7 @@ public class LdapUserManagerIT
   public void testOrderOfUserSearch()
       throws Exception
   {
-    IOUtils.copy(getClass().getResourceAsStream("/test-conf/conf/security-users-in-both-realms.xml"),
+    IOUtils.copy(getClass().getResourceAsStream("/test-conf/etc/security-users-in-both-realms.xml"),
         new FileOutputStream(getNexusSecurityConfiguration()));
 
     SecuritySystem securitySystem = this.getSecuritySystem();

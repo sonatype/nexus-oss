@@ -67,7 +67,7 @@ public abstract class AbstractSecurityRestTest
     ThreadContext.remove();
     super.setUp();
 
-    FileUtils.copyFile(new File(TEST_CONFIG), new File(WORK_DIR, "/conf/security.xml"));
+    FileUtils.copyFile(new File(TEST_CONFIG), new File(WORK_DIR, "/etc/security.xml"));
     eventBus = lookup(EventBus.class);
 
     // start security
@@ -96,7 +96,7 @@ public abstract class AbstractSecurityRestTest
     super.customizeContext(context);
 
     context.put("nexus-work", WORK_DIR);
-    context.put("security-xml-file", WORK_DIR + "/conf/security.xml");
-    context.put("application-conf", WORK_DIR + "/conf/");
+    context.put("security-xml-file", WORK_DIR + "/etc/security.xml");
+    context.put("application-conf", WORK_DIR + "/etc/");
   }
 }

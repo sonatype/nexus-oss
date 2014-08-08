@@ -276,7 +276,7 @@ public abstract class ObrITSupport
   {
     final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     final DocumentBuilder db = dbf.newDocumentBuilder();
-    final Document doc = db.parse(new File(nexus().getWorkDirectory(), "conf/nexus.xml"));
+    final Document doc = db.parse(new File(nexus().getWorkDirectory(), "etc/nexus.xml"));
 
     final XPath xpath = XPathFactory.newInstance().newXPath();
 

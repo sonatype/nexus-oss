@@ -267,7 +267,7 @@ public class DefaultNexusBundleConfiguration
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
       overlays.add(
           fileTaskBuilder.replace()
-              .inFile(path("nexus/conf/jetty.xml"))
+              .inFile(path("nexus/etc/jetty.xml"))
               .replace(
                   "org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector",
                   "org.eclipse.jetty.server.nio.BlockingChannelConnector"
@@ -278,7 +278,7 @@ public class DefaultNexusBundleConfiguration
 
     if (getLogLevel() != null || getLogPattern() != null) {
       overlays.add(
-          fileTaskBuilder.properties(path("sonatype-work/nexus/conf/logback.properties"))
+          fileTaskBuilder.properties(path("sonatype-work/nexus/etc/logback.properties"))
               .property("root.level", getLogLevel() == null ? DEFAULT_LOG_LEVEL : getLogLevel())
               .property("appender.pattern", getLogPattern() == null ? DEFAULT_LOG_PATTERN : getLogPattern())
               .property("appender.file", "${nexus.log-config-dir}/../logs/nexus.log")
@@ -299,7 +299,7 @@ public class DefaultNexusBundleConfiguration
         writer.println("</included>");
         writer.flush();
         overlays.add(
-            fileTaskBuilder.create().file(path("sonatype-work/nexus/conf/logback-test.xml"))
+            fileTaskBuilder.create().file(path("sonatype-work/nexus/etc/logback-test.xml"))
                 .containing(baos.toString("UTF-8"))
                 .encodedAs("UTF-8")
         );

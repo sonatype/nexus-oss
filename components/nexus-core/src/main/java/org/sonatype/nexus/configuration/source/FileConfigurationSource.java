@@ -93,7 +93,7 @@ public class FileConfigurationSource
   public FileConfigurationSource(final ApplicationInterpolatorProvider interpolatorProvider,
                                  final EventBus eventBus,
                                  final Provider<SystemStatus> systemStatusProvider,
-                                 final @Named("${nexus-work}/conf/nexus.xml") File configurationFile,
+                                 final @Named("${nexus-work}/etc/nexus.xml") File configurationFile,
                                  final ApplicationConfigurationValidator configurationValidator,
                                  final ApplicationConfigurationUpgrader configurationUpgrader,
                                  final @Named("static") ApplicationConfigurationSource nexusDefaults,

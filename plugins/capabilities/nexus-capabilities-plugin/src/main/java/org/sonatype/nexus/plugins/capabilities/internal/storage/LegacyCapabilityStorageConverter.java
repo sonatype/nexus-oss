@@ -39,7 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Converts legacy XML {@code conf/capabilities.xml} configuration to current storage implementation.
+ * Converts legacy XML {@code etc/capabilities.xml} configuration to current storage implementation.
  *
  * @since 2.8
  */
@@ -61,7 +61,7 @@ public class LegacyCapabilityStorageConverter
   }
 
   public void maybeConvert() throws Exception {
-    File dir = applicationDirectories.getWorkDirectory("conf");
+    File dir = applicationDirectories.getWorkDirectory("etc");
     File file = new File(dir, "capabilities.xml");
     if (file.exists()) {
       log.info("Importing legacy capability entities from: {}", file);

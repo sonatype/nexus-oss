@@ -489,7 +489,7 @@ public class DefaultNexusBundle
       }
 
       onDirectory(getNexusDirectory()).apply(
-          fileTaskBuilder.properties(path("conf/nexus-test.properties"))
+          fileTaskBuilder.properties(path("etc/nexus-test.properties"))
               .properties(nexusProperties)
       );
     }

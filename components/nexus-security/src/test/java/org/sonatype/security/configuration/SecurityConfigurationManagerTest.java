@@ -36,7 +36,7 @@ public class SecurityConfigurationManagerTest
 
   private File PLEXUS_HOME = util.createTempDir("plexus-home");
 
-  private File APP_CONF = new File(PLEXUS_HOME, "conf");
+  private File APP_CONF = new File(PLEXUS_HOME, "etc");
 
   @Override
   public void configure(Properties properties) {

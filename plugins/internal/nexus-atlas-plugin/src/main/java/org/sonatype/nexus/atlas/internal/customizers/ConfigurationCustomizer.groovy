@@ -75,8 +75,8 @@ class ConfigurationCustomizer
     def installDir = applicationConfiguration.installDirectory
     if (installDir) {
       // could be null
-      maybeIncludeFile new File(installDir, 'conf/jetty.xml'), 'install/conf', HIGH
-      maybeIncludeFile new File(installDir, 'conf/nexus.properties'), 'install/conf', HIGH
+      maybeIncludeFile new File(installDir, 'etc/jetty.xml'), 'install/etc', HIGH
+      maybeIncludeFile new File(installDir, 'etc/nexus.properties'), 'install/etc', HIGH
       //TODO: KARAF include karaf configuration
     }
   }
@@ -88,7 +88,7 @@ class ConfigurationCustomizer
       extends GeneratedContentSourceSupport
   {
     NexusXmlContentSource() {
-      super(CONFIG, 'work/conf/nexus.xml')
+      super(CONFIG, 'work/etc/nexus.xml')
       this.priority = REQUIRED
     }
 

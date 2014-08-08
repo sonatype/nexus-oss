@@ -46,7 +46,7 @@ public abstract class AbstractSecurityTestCase
 
   protected File PLEXUS_HOME = new File("./target/plexus_home");
 
-  protected File CONFIG_DIR = new File(PLEXUS_HOME, "conf");
+  protected File CONFIG_DIR = new File(PLEXUS_HOME, "etc");
 
   @Inject
   private Map<String, Realm> realmMap;
