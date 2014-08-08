@@ -40,8 +40,8 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
         }
       },
       { header: 'Format', dataIndex: 'formatName' },
-      { header: 'Repository Status', renderer: me.renderStatus, flex: 1 },
-      { header: 'Repository URL', dataIndex: 'url', xtype: 'nx-linkcolumn', flex: 2 }
+      { header: 'Status', renderer: me.renderStatus, flex: 1 },
+      { header: 'URL', dataIndex: 'url', xtype: 'nx-linkcolumn', flex: 2 }
     ];
 
     me.callParent(arguments);
