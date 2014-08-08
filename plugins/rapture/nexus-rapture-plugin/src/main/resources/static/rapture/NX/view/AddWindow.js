@@ -24,6 +24,7 @@ Ext.define('NX.view.AddWindow', {
   modal: true,
   constrain: true,
   width: 630,
+  minWidth: 630,
 
   initComponent: function () {
     var me = this;
