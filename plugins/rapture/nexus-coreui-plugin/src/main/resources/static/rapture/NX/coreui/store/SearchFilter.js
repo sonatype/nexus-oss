@@ -32,7 +32,7 @@ Ext.define('NX.coreui.store.SearchFilter', {
     {
       id: 'maven2',
       name: 'Maven',
-      description: 'Search Maven repositories by GAV',
+      description: 'Search for components by Maven coordinates',
       readOnly: true,
       criterias: [
         { id: 'format', value: 'maven2', hidden: true },
@@ -47,7 +47,7 @@ Ext.define('NX.coreui.store.SearchFilter', {
     //{
     //  id: 'p2',
     //  name: 'P2',
-    //  description: 'Search P2 repositories',
+    //  description: 'Search for components P2 symbolic-name',
     //  readOnly: true,
     //  criterias: [
     //    { id: 'format', value: 'p2', hidden: true },
@@ -58,7 +58,7 @@ Ext.define('NX.coreui.store.SearchFilter', {
     {
       id: 'keyword',
       name: 'Keyword',
-      description: 'Search by keyword',
+      description: 'Search for components by keyword',
       readOnly: true,
       criterias: [
         { id: 'keyword' }
@@ -67,7 +67,7 @@ Ext.define('NX.coreui.store.SearchFilter', {
     {
       id: 'sha-1',
       name: 'SHA-1',
-      description: 'Search by sha-1',
+      description: 'Search for components by SHA-1',
       readOnly: true,
       criterias: [
         { id: 'sha-1' }
@@ -76,7 +76,7 @@ Ext.define('NX.coreui.store.SearchFilter', {
     {
       id: 'classname',
       name: 'Class Name',
-      description: 'Search by class name',
+      description: 'Search for components by class-name',
       readOnly: true,
       criterias: [
         { id: 'classname' }
@@ -85,7 +85,7 @@ Ext.define('NX.coreui.store.SearchFilter', {
     {
       id: 'custom',
       name: 'Custom',
-      description: 'Build your own',
+      description: 'Search for components by custom criteria',
       readOnly: true
     }
   ]

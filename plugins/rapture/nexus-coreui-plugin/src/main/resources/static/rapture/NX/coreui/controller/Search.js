@@ -87,7 +87,7 @@ Ext.define('NX.coreui.controller.Search', {
         me.getApplication().getFeaturesController().registerFeature({
           mode: 'browse',
           path: '/Search',
-          description: 'Search repositories',
+          description: 'Search for components',
           group: true,
           view: { xtype: 'nx-searchfeature', searchFilter: model, bookmarkEnding: '' },
           iconName: 'search-default',
