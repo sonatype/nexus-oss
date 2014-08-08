@@ -19,7 +19,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
   extend: 'Ext.ux.form.ItemSelector',
   alias: 'widget.nx-itemselector',
 
-  width: 600,
+  width: 600 - (Ext.isWindows ? 20 : 0),
   height: 253,
 
   /**
