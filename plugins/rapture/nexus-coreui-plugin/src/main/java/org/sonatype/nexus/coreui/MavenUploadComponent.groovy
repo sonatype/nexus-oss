@@ -35,7 +35,6 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy
 import org.sonatype.nexus.proxy.maven.gav.Gav
 import org.sonatype.nexus.proxy.maven.gav.GavCalculator
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
-import org.sonatype.nexus.rest.RepositoryURLBuilder
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.web.RemoteIPFinder
 
@@ -57,9 +56,6 @@ import java.security.cert.X509Certificate
 class MavenUploadComponent
 extends DirectComponentSupport
 {
-
-  @Inject
-  RepositoryURLBuilder repositoryURLBuilder
 
   @Inject
   @Named("protected") RepositoryRegistry protectedRepositoryRegistry

@@ -47,7 +47,6 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry
 import org.sonatype.nexus.proxy.repository.*
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory
 import org.sonatype.nexus.rapture.TrustStoreKeys
-import org.sonatype.nexus.rest.RepositoryURLBuilder
 import org.sonatype.nexus.scheduling.NexusScheduler
 import org.sonatype.nexus.tasks.ExpireCacheTask
 import org.sonatype.nexus.templates.TemplateManager
@@ -57,6 +56,7 @@ import org.sonatype.nexus.templates.repository.maven.AbstractMavenRepositoryTemp
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.nexus.validation.Validate
+import org.sonatype.nexus.web.BaseUrlHolder
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -91,7 +91,7 @@ extends DirectComponentSupport
   RepositoryTypeRegistry repositoryTypeRegistry
 
   @Inject
-  RepositoryURLBuilder repositoryURLBuilder
+  UrlBuilder urlBuilder
 
   @Inject
   TemplateManager templateManager
@@ -750,7 +750,7 @@ extends DirectComponentSupport
         browseable = repo.browseable
         exposed = repo.exposed
         localStatus = repo.localStatus
-        url = repositoryURLBuilder.getExposedRepositoryContentUrl(repo)
+        url = urlBuilder.getExposedRepositoryContentUrl(repo)
         userManaged = repo.userManaged
       }
       if (repo instanceof AbstractRepository) {
