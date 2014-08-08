@@ -44,12 +44,8 @@ extends ComponentSupport
    */
   @Nullable
   String getRepositoryContentUrl(final Repository repository) {
-    def baseUrl = BaseUrlHolder.get()
-    if (!baseUrl.endsWith('/')) {
-      baseUrl += '/'
-    }
     def descriptor = repositoryTypeRegistry.getRepositoryTypeDescriptor(repository.providerRole, repository.providerHint)
-    return "${baseUrl}content/${descriptor.prefix}/${repository.pathPrefix}"
+    return "${BaseUrlHolder.get()}/content/${descriptor.prefix}/${repository.pathPrefix}"
   }
 
   /**
