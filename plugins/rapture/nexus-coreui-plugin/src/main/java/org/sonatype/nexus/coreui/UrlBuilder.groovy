@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.coreui
 
-import org.apache.commons.lang.StringUtils
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry
 import org.sonatype.nexus.proxy.repository.Repository
 import org.sonatype.nexus.web.BaseUrlHolder
@@ -39,9 +37,6 @@ extends ComponentSupport
   @Inject
   RepositoryTypeRegistry repositoryTypeRegistry
 
-  @Inject
-  GlobalRestApiSettings globalRestApiSettings
-
   /**
    * @param repository get get content url for
    * @return repository content url, or null if nexus url cannot be determined from request and global api settings
@@ -49,7 +44,7 @@ extends ComponentSupport
    */
   @Nullable
   String getRepositoryContentUrl(final Repository repository) {
-    def baseUrl = globalRestApiSettings.baseUrl ?: BaseUrlHolder.get()
+    def baseUrl = BaseUrlHolder.get()
     if (!baseUrl.endsWith('/')) {
       baseUrl += '/'
     }
