@@ -26,7 +26,6 @@ import org.sonatype.nexus.proxy.maven.MavenRepository
 import org.sonatype.nexus.proxy.maven.routing.*
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.proxy.repository.Repository
-import org.sonatype.nexus.rest.RepositoryURLBuilder
 import org.sonatype.nexus.validation.Validate
 
 import javax.inject.Inject
@@ -56,7 +55,7 @@ extends DirectComponentSupport
   RepositoryRegistry repositoryRegistry
 
   @Inject
-  RepositoryURLBuilder repositoryURLBuilder
+  UrlBuilder urlBuilder
 
   /**
    * Retrieve routing repository settings.
@@ -89,7 +88,7 @@ extends DirectComponentSupport
     if (PublishingStatus.PStatus.PUBLISHED == pstatus.status) {
       repositorySettingsXO.publishTimestamp = pstatus.lastPublishedTimestamp ? new Date(pstatus.lastPublishedTimestamp) : null
       if (mavenRepository.exposed && pstatus.lastPublishedFilePath) {
-        String repositoryUrl = repositoryURLBuilder.getExposedRepositoryContentUrl(mavenRepository)
+        String repositoryUrl = urlBuilder.getExposedRepositoryContentUrl(mavenRepository)
         if (repositoryUrl) {
           repositorySettingsXO.publishUrl = repositoryUrl + pstatus.lastPublishedFilePath
         }
