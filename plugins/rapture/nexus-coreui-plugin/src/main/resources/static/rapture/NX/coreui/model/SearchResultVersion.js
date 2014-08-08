@@ -11,16 +11,18 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Search result model.
+ * Versions / search result version model.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.model.SearchResult', {
+Ext.define('NX.coreui.model.SearchResultVersion', {
   extend: 'Ext.data.Model',
   fields: [
-    'id',
-    'group',
+    'version',
+    'repositoryId',
+    'repositoryName',
+    'path',
     'name',
-    'format'
+    'type'
   ]
 });

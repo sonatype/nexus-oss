@@ -11,8 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Search panel.
- * TODO implement
+ * Search feature.
  *
  * @since 3.0
  */
@@ -22,7 +21,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
 
   layout: 'border',
 
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = [
@@ -42,41 +41,82 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
         // disable saving for now
         //tbar: [
         //  { xtype: 'button', text: 'Save', glyph: 'xf0c7@FontAwesome' /* fa-save */, action: 'save' },
-        //]
+        //],
       },
       {
-        xtype: 'grid',
+        xtype: 'panel',
         region: 'center',
-        allowDeselect: true,
-        viewConfig: {
-          emptyText: 'No results',
-          deferEmptyText: false
-        },
-        store: 'SearchResult',
-        columns: [
-          { header: 'Component', dataIndex: 'uri', flex: 1 },
-          { header: 'Version', dataIndex: 'version', flex: 1 },
-          { header: 'Repository', dataIndex: 'repositoryId', flex: 1 }
-        ],
-        dockedItems: [
+        layout: 'border',
+        items: [
           {
-            xtype: 'pagingtoolbar',
-            store: 'SearchResult',
-            dock: 'top',
-            displayInfo: true
+            xtype: 'nx-coreui-search-result-list',
+            region: 'center',
+            flex: 0.3
+          },
+          {
+            xtype: 'panel',
+            itemId: 'rightPanel',
+            region: 'east',
+            layout: 'border',
+            flex: 0.7,
+            header: false,
+            split: true,
+            collapsible: true,
+            collapsed: false,
+            collapseMode: 'mini',
+            items: [
+              {
+                xtype: 'panel',
+                region: 'center',
+                flex: 0.5,
+                items: [
+                  {
+                    type: 'panel',
+                    region: 'center',
+                    layout: {
+                      type: 'vbox',
+                      align: 'stretch',
+                      pack: 'start'
+                    },
+                    items: [
+                      {
+                        itemId: 'searchResultDetails',
+                        xtype: 'panel',
+                        layout: {
+                          type: 'vbox'
+                        },
+                        items: [
+                          {
+                            html: '<div class="x-grid-empty">Select a component from search results to view details</div>'
+                          },
+                          {
+                            xtype: 'nx-coreui-search-result-details',
+                            hidden: true
+                          }
+                        ]
+                      },
+                      {
+                        xtype: 'nx-coreui-search-result-version-list',
+                        hidden: true
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
+                region: 'south',
+                split: true,
+                flex: 0.5,
+                header: false,
+                collapsible: true,
+                collapsed: false,
+                collapseMode: 'mini',
+                hidden: true
+              }
+            ]
           }
         ]
-      },
-      {
-        xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
-        region: 'south',
-        split: true,
-        flex: 1,
-        header: false,
-        collapsible: true,
-        collapsed: false,
-        collapseMode: 'mini',
-        hidden: true
       }
     ];
 

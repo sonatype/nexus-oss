@@ -11,16 +11,14 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Search result model.
+ * Search result details panel.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.model.SearchResult', {
-  extend: 'Ext.data.Model',
-  fields: [
-    'id',
-    'group',
-    'name',
-    'format'
-  ]
+Ext.define('NX.coreui.view.search.SearchResultDetails', {
+  extend: 'NX.view.info.Panel',
+  alias: 'widget.nx-coreui-search-result-details',
+
+  title: undefined
+
 });

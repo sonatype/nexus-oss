@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Search Result store.
+ * Search result store.
  *
  * @since 3.0
  */
@@ -33,8 +33,7 @@ Ext.define('NX.coreui.store.SearchResult', {
     }
   },
 
-  remoteFilter: true,
-  sortOnLoad: true,
-  sorters: { property: 'uri', direction: 'ASC' }
+  pageSize: 100,
+  remoteFilter: true
 
 });

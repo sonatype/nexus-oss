@@ -23,8 +23,8 @@ import groovy.transform.ToString
 @ToString(includePackage = false, includeNames = true)
 class SearchResultXO
 {
-  String repositoryId
-  String uri
-  String version
-  String path
+  String id
+  String group
+  String name
+  String format
 }

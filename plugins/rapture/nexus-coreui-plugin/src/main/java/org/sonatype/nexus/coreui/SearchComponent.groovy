@@ -15,18 +15,21 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import org.apache.commons.io.FilenameUtils
 import org.apache.lucene.search.BooleanClause
 import org.apache.lucene.search.BooleanQuery
-import org.apache.maven.index.ArtifactInfo
 import org.apache.maven.index.IteratorSearchResponse
 import org.apache.maven.index.MAVEN
 import org.apache.maven.index.SearchType
 import org.apache.maven.index.artifact.GavCalculator
+import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.PagedResponse
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
 import org.sonatype.nexus.index.IndexerManager
+import org.sonatype.nexus.proxy.NoSuchRepositoryException
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -52,9 +55,109 @@ extends DirectComponentSupport
   @Named('maven2')
   GavCalculator gavCalculator
 
-  @DirectMethod
-  PagedResponse<SearchResultXO> read(final @Nullable StoreLoadParameters parameters) {
+  @Inject
+  RepositoryRegistry repositoryRegistry
 
+  /**
+   * Search based on configured filters and return search results grouped on GA level.
+   *
+   * @param parameters store parameters
+   * @return paged search results
+   */
+  @DirectMethod
+  @RequiresPermissions('nexus:repositories:read')
+  PagedResponse<SearchResultXO> read(final @Nullable StoreLoadParameters parameters) {
+    BooleanQuery bq = buildQuery(parameters)
+    Set<String> gas = []
+    IteratorSearchResponse iterator = null
+    try {
+      iterator = indexerManager.searchQueryIterator(
+          bq, null, null, null, null, false, null
+      )
+
+      gas = iterator.collect { info ->
+        return "${info.groupId}:${info.artifactId}" as String
+      } as SortedSet
+
+      log.info('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
+    }
+    finally {
+      iterator?.close()
+    }
+
+    List<SearchResultXO> results = []
+    int i = 0;
+    for (String ga : gas) {
+      i++
+      if (i <= parameters.start) {
+        continue
+      }
+      if (i > parameters.start + parameters.limit) {
+        break
+      }
+      def segments = ga.split(':')
+      results << new SearchResultXO(
+          id: ga,
+          group: segments[0],
+          name: segments[1],
+          format: 'Maven2'
+      )
+    }
+
+    return new PagedResponse<SearchResultXO>(gas.size(), results)
+  }
+
+  /**
+   * Search based on configured filters and return versions / search result.
+   * Search filters are expected to contain filters for groupid / artifactid.
+   *
+   * @param parameters store parameters
+   * @return version / search result
+   */
+  @DirectMethod
+  @RequiresPermissions('nexus:repositories:read')
+  List<SearchResultVersionXO> readVersions(final @Nullable StoreLoadParameters parameters) {
+    BooleanQuery bq = buildQuery(parameters)
+    IteratorSearchResponse iterator = null
+    try {
+      iterator = indexerManager.searchQueryIterator(
+          bq, null, null, null, null, false, null
+      )
+      log.info('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
+      def versions = [] as SortedSet
+      iterator.each { ai ->
+        String path = gavCalculator.gavToPath(ai.calculateGav())
+        String name = new File(path).getName()
+        String repositoryName = ai.repository
+        try {
+          repositoryName = repositoryRegistry.getRepository(ai.repository).name
+        }
+        catch (NoSuchRepositoryException e) {
+          // ignore, will use repo id
+        }
+        versions << new SearchResultVersionXO(
+            version: ai.version,
+            repositoryId: ai.repository,
+            repositoryName: repositoryName,
+            path: path,
+            name: name,
+            type: FilenameUtils.getExtension(name)
+        )
+      }
+      return versions as List
+    }
+    finally {
+      iterator?.close()
+    }
+  }
+
+  /**
+   * Builds a Lucene query based on configured filters.
+   *
+   * @param parameters store parameters
+   * @return Lucene query
+   */
+  private BooleanQuery buildQuery(final StoreLoadParameters parameters) {
     BooleanQuery bq = new BooleanQuery()
     def keywordOccur = BooleanClause.Occur.SHOULD
 
@@ -118,26 +221,7 @@ extends DirectComponentSupport
         );
       }
     }
-
-    IteratorSearchResponse iterator = indexerManager.searchQueryIterator(
-        bq, null, parameters.start, parameters.limit, null, false, null
-    )
-
-    List<SearchResultXO> results = [];
-    for (ArtifactInfo info : iterator) {
-      results << new SearchResultXO(
-          repositoryId: info.repository,
-          uri: 'maven:' + info.groupId + ':' + info.artifactId,
-          version: info.version,
-          path: gavCalculator.gavToPath(info.calculateGav())
-      )
-    }
-
-    log.info('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
-
-    iterator.close()
-
-    return new PagedResponse<SearchResultXO>(iterator.totalHitsCount, results)
+    return bq
   }
 
 }
