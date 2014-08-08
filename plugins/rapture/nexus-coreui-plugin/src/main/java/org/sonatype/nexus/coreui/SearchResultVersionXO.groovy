@@ -21,8 +21,8 @@ import groovy.transform.ToString
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
-class SearchComponentVersionXO
-implements Comparable<SearchComponentVersionXO>
+class SearchResultVersionXO
+implements Comparable<SearchResultVersionXO>
 {
   String version
   String repositoryId
@@ -35,7 +35,7 @@ implements Comparable<SearchComponentVersionXO>
     if (this.is(o)) return true
     if (getClass() != o.class) return false
 
-    SearchComponentVersionXO that = (SearchComponentVersionXO) o
+    SearchResultVersionXO that = (SearchResultVersionXO) o
 
     if (path != that.path) return false
     if (repositoryId != that.repositoryId) return false
@@ -53,7 +53,7 @@ implements Comparable<SearchComponentVersionXO>
   }
 
   @Override
-  int compareTo(final SearchComponentVersionXO o) {
+  int compareTo(final SearchResultVersionXO o) {
     def result = repositoryName.compareTo(o.repositoryName)
     if (result == 0) {
       result = new GenericVersion(version).compareTo(new GenericVersion(o.version))

@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Save filter window.
+ * Save search filter window.
  *
  * @since 3.0
  */

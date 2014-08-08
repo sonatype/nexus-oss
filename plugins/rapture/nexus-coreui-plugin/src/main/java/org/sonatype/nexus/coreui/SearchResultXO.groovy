@@ -10,30 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
+package org.sonatype.nexus.coreui
+
+import groovy.transform.ToString
+
 /**
- * Search Result store.
+ * Search result exchange object.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.store.SearchComponent', {
-  extend: 'Ext.data.Store',
-  model: 'NX.coreui.model.SearchComponent',
-
-  proxy: {
-    type: 'direct',
-
-    api: {
-      read: 'NX.direct.coreui_Search.read'
-    },
-
-    reader: {
-      type: 'json',
-      root: 'data',
-      successProperty: 'success'
-    }
-  },
-
-  pageSize: 100,
-  remoteFilter: true
-
-});
+@ToString(includePackage = false, includeNames = true)
+class SearchResultXO
+{
+  String id
+  String group
+  String name
+  String format
+}

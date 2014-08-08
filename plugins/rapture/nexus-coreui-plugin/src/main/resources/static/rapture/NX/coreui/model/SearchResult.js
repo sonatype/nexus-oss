@@ -11,14 +11,16 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Browse repository storage tree panel.
+ * Search result model.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.search.SearchComponentDetails', {
-  extend: 'NX.view.info.Panel',
-  alias: 'widget.nx-coreui-search-component-details',
-
-  title: undefined
-
+Ext.define('NX.coreui.model.SearchResult', {
+  extend: 'Ext.data.Model',
+  fields: [
+    'id',
+    'group',
+    'name',
+    'format'
+  ]
 });

@@ -24,27 +24,27 @@ Ext.define('NX.coreui.controller.Search', {
   stores: [
     'SearchFilter',
     'SearchCriteria',
-    'SearchComponent',
-    'SearchComponentVersion'
+    'SearchResult',
+    'SearchResultVersion'
   ],
   models: [
     'SearchFilter'
   ],
 
   views: [
-    'search.SearchComponentDetails',
-    'search.SearchComponentList',
-    'search.SearchComponentVersionList',
     'search.SearchFeature',
+    'search.SearchResultDetails',
+    'search.SearchResultList',
+    'search.SearchResultVersionList',
     'search.TextSearchCriteria',
     'search.SaveSearchFilter'
   ],
 
   refs: [
     { ref: 'searchFeature', selector: 'nx-searchfeature' },
-    { ref: 'searchComponent', selector: 'nx-coreui-search-component-list' },
-    { ref: 'searchComponentDetails', selector: 'nx-searchfeature #componentDetails' },
-    { ref: 'searchComponentVersion', selector: 'nx-coreui-search-component-version-list' },
+    { ref: 'searchResult', selector: 'nx-coreui-search-result-list' },
+    { ref: 'searchResultDetails', selector: 'nx-searchfeature #searchResultDetails' },
+    { ref: 'searchResultVersion', selector: 'nx-coreui-search-result-version-list' },
     { ref: 'storageFileContainer', selector: 'nx-searchfeature nx-coreui-repositorybrowse-storagefilecontainer' },
     { ref: 'quickSearch', selector: 'nx-header-panel #quicksearch' }
   ],
@@ -120,11 +120,11 @@ Ext.define('NX.coreui.controller.Search', {
           search: me.onSearchCriteriaChange,
           searchcleared: me.onSearchCriteriaChange
         },
-        'nx-coreui-search-component-list': {
-          selectionchange: me.onComponentSelectionChange
+        'nx-coreui-search-result-list': {
+          selectionchange: me.onSearchResultSelectionChange
         },
-        'nx-coreui-search-component-version-list': {
-          selectionchange: me.onComponentVersionSelectionChange
+        'nx-coreui-search-result-version-list': {
+          selectionchange: me.onSearchResultVersionSelectionChange
         },
         'nx-searchfeature button[action=save]': {
           click: me.showSaveSearchFilterWindow
@@ -140,6 +140,10 @@ Ext.define('NX.coreui.controller.Search', {
     });
   },
 
+  /**
+   * @private
+   * Initialize search criterias (filters) on navigation.
+   */
   navigateTo: function() {
     var me = this;
 
@@ -148,6 +152,10 @@ Ext.define('NX.coreui.controller.Search', {
     }
   },
 
+  /**
+   * @private
+   * Initialize search criterias (filters) based on filter definition and (eventual) bookmarked criterias.
+   */
   initCriterias: function() {
     var me = this,
         searchPanel = me.getSearchFeature(),
@@ -171,8 +179,8 @@ Ext.define('NX.coreui.controller.Search', {
     }
 
     searchCriteriaPanel.removeAll();
-    me.getSearchComponentStore().removeAll();
-    me.getSearchComponentStore().clearFilter(true);
+    me.getSearchResultStore().removeAll();
+    me.getSearchResultStore().clearFilter(true);
 
     if (searchFilter && searchFilter.get('criterias')) {
       Ext.Array.each(Ext.Array.from(searchFilter.get('criterias')), function(criteria) {
@@ -224,9 +232,14 @@ Ext.define('NX.coreui.controller.Search', {
       menu: addCriteriaMenu
     });
 
-    me.getSearchComponentStore().filter();
+    me.getSearchResultStore().filter();
   },
 
+  /**
+   * @private
+   * Add a criteria.
+   * @param menuitem selected criteria menu item
+   */
   addCriteria: function(menuitem) {
     var me = this,
         searchPanel = me.getSearchFeature(),
@@ -243,16 +256,26 @@ Ext.define('NX.coreui.controller.Search', {
     searchCriteria.add(addButton);
   },
 
+  /**
+   * @private
+   * Start searching on criteria value changed.
+   * @param searchCriteria changed criteria
+   */
   onSearchCriteriaChange: function(searchCriteria) {
     var me = this;
     me.applyFilter(searchCriteria, true);
   },
 
+  /**
+   * @private
+   * Synchronize store filters with search criteria.
+   * @param searchCriteria criteria to be synced
+   * @param apply if filter should be applied on store ( = remote call)
+   */
   applyFilter: function(searchCriteria, apply) {
     var me = this,
-        store = me.getSearchComponentStore(),
-        filter = searchCriteria.filter,
-        searchComponent = me.getSearchComponent();
+        store = me.getSearchResultStore(),
+        filter = searchCriteria.filter;
 
     if (filter && Ext.isFunction(filter) && !(filter instanceof Ext.util.Filter)) {
       filter = searchCriteria.filter();
@@ -276,33 +299,39 @@ Ext.define('NX.coreui.controller.Search', {
     }
 
     if (apply) {
-      me.onComponentSelectionChange(me.getSearchComponent().getSelectionModel(), []);
+      me.onSearchResultSelectionChange(me.getSearchResult().getSelectionModel(), []);
       me.bookmarkFilters();
     }
   },
 
-  onComponentSelectionChange: function(selectionModel, selected) {
+  /**
+   * @private
+   * Show details and load version of selected search result.
+   * @param selectionModel search result grid selection model
+   * @param selected selected search result
+   */
+  onSearchResultSelectionChange: function(selectionModel, selected) {
     var me = this,
-        component = selected[0],
-        componentVersion = me.getSearchComponentVersion(),
-        componentDetails = me.getSearchComponentDetails(),
-        componentVersionStore = me.getSearchComponentVersionStore(),
+        searchResultModel = selected[0],
+        searchResultVersion = me.getSearchResultVersion(),
+        searchResultDetails = me.getSearchResultDetails(),
+        searchResultVersionStore = me.getSearchResultVersionStore(),
         segments;
 
-    me.onComponentVersionSelectionChange(me.getSearchComponentVersion().getSelectionModel(), []);
-    if (component) {
-      segments = component.getId().split(':');
-      componentDetails.items.get(0).hide();
-      componentDetails.items.get(1).show();
-      componentDetails.items.get(1).showInfo({
-        'Group': component.get('group'),
-        'Name': component.get('name'),
-        'Format': component.get('format')
+    me.onSearchResultVersionSelectionChange(me.getSearchResultVersion().getSelectionModel(), []);
+    if (searchResultModel) {
+      segments = searchResultModel.getId().split(':');
+      searchResultDetails.items.get(0).hide();
+      searchResultDetails.items.get(1).show();
+      searchResultDetails.items.get(1).showInfo({
+        'Group': searchResultModel.get('group'),
+        'Name': searchResultModel.get('name'),
+        'Format': searchResultModel.get('format')
       });
-      componentVersion.show();
-      componentVersionStore.clearFilter(true);
-      componentVersionStore.addFilter(me.getSearchComponentStore().filters.items, false);
-      componentVersionStore.addFilter([
+      searchResultVersion.show();
+      searchResultVersionStore.clearFilter(true);
+      searchResultVersionStore.addFilter(me.getSearchResultStore().filters.items, false);
+      searchResultVersionStore.addFilter([
         {
           property: 'groupid',
           value: segments[0]
@@ -314,29 +343,46 @@ Ext.define('NX.coreui.controller.Search', {
       ]);
     }
     else {
-      componentDetails.items.get(0).show();
-      componentDetails.items.get(1).hide();
-      componentVersion.hide();
+      searchResultDetails.items.get(0).show();
+      searchResultDetails.items.get(1).hide();
+      searchResultVersion.hide();
     }
   },
 
-  onComponentVersionSelectionChange: function(selectionModel, selected) {
+  /**
+   * @private
+   * Show storage file of selected version of search result.
+   * @param selectionModel search result grid selection model
+   * @param selected selected search result
+   */
+  onSearchResultVersionSelectionChange: function(selectionModel, selected) {
     var me = this,
-        componentVersion = selected[0],
+        searchResultVersionModel = selected[0],
         storageFileContainer = me.getStorageFileContainer();
 
-    if (componentVersion) {
-      storageFileContainer.showStorageFile(componentVersion.get('repositoryId'), componentVersion.get('path'));
+    if (searchResultVersionModel) {
+      storageFileContainer.showStorageFile(
+          searchResultVersionModel.get('repositoryId'), searchResultVersionModel.get('path')
+      );
     }
     else {
       storageFileContainer.showStorageFile(undefined, undefined);
     }
   },
 
+  /**
+   * @private
+   * Show "Save Search Filter" window.
+   */
   showSaveSearchFilterWindow: function() {
     Ext.widget('nx-coreui-search-save');
   },
 
+  /**
+   * @private
+   * Save a search filter.
+   * @param {Ext.button.Button} button 'Add' button from "Save Search Filter"
+   */
   saveSearchFilter: function(button) {
     var me = this,
         win = button.up('window'),

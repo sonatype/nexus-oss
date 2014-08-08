@@ -11,30 +11,14 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Browse repository storage tree panel.
+ * Search result details panel.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.search.SearchComponentList', {
-  extend: 'Ext.grid.Panel',
-  alias: 'widget.nx-coreui-search-component-list',
+Ext.define('NX.coreui.view.search.SearchResultDetails', {
+  extend: 'NX.view.info.Panel',
+  alias: 'widget.nx-coreui-search-result-details',
 
-  store: 'SearchComponent',
-
-  emptyText: 'No results',
-
-  columns: [
-    { header: 'Component', dataIndex: 'id', flex: 1 },
-    { header: 'Format', dataIndex: 'format' }
-  ],
-
-  dockedItems: [
-    {
-      xtype: 'pagingtoolbar',
-      store: 'SearchComponent',
-      dock: 'bottom',
-      displayInfo: false
-    }
-  ]
+  title: undefined
 
 });

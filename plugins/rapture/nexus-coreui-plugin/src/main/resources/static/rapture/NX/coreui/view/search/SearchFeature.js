@@ -11,8 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Search panel.
- * TODO implement
+ * Search feature.
  *
  * @since 3.0
  */
@@ -50,7 +49,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
         layout: 'border',
         items: [
           {
-            xtype: 'nx-coreui-search-component-list',
+            xtype: 'nx-coreui-search-result-list',
             region: 'center',
             flex: 0.3
           },
@@ -81,23 +80,23 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
                     },
                     items: [
                       {
-                        itemId: 'componentDetails',
+                        itemId: 'searchResultDetails',
                         xtype: 'panel',
                         layout: {
                           type: 'vbox'
                         },
                         items: [
                           {
-                            html: '<div class="x-grid-empty">Select a component to view details</div>'
+                            html: '<div class="x-grid-empty">Select a component from search results to view details</div>'
                           },
                           {
-                            xtype: 'nx-coreui-search-component-details',
+                            xtype: 'nx-coreui-search-result-details',
                             hidden: true
                           }
                         ]
                       },
                       {
-                        xtype: 'nx-coreui-search-component-version-list',
+                        xtype: 'nx-coreui-search-result-version-list',
                         hidden: true
                       }
                     ]

@@ -22,6 +22,7 @@ import org.apache.maven.index.IteratorSearchResponse
 import org.apache.maven.index.MAVEN
 import org.apache.maven.index.SearchType
 import org.apache.maven.index.artifact.GavCalculator
+import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.PagedResponse
@@ -57,8 +58,15 @@ extends DirectComponentSupport
   @Inject
   RepositoryRegistry repositoryRegistry
 
+  /**
+   * Search based on configured filters and return search results grouped on GA level.
+   *
+   * @param parameters store parameters
+   * @return paged search results
+   */
   @DirectMethod
-  PagedResponse<SearchComponentXO> read(final @Nullable StoreLoadParameters parameters) {
+  @RequiresPermissions('nexus:repositories:read')
+  PagedResponse<SearchResultXO> read(final @Nullable StoreLoadParameters parameters) {
     BooleanQuery bq = buildQuery(parameters)
     Set<String> gas = []
     IteratorSearchResponse iterator = null
@@ -77,7 +85,7 @@ extends DirectComponentSupport
       iterator?.close()
     }
 
-    List<SearchComponentXO> results = []
+    List<SearchResultXO> results = []
     int i = 0;
     for (String ga : gas) {
       i++
@@ -88,7 +96,7 @@ extends DirectComponentSupport
         break
       }
       def segments = ga.split(':')
-      results << new SearchComponentXO(
+      results << new SearchResultXO(
           id: ga,
           group: segments[0],
           name: segments[1],
@@ -96,11 +104,19 @@ extends DirectComponentSupport
       )
     }
 
-    return new PagedResponse<SearchComponentXO>(gas.size(), results)
+    return new PagedResponse<SearchResultXO>(gas.size(), results)
   }
 
+  /**
+   * Search based on configured filters and return versions / search result.
+   * Search filters are expected to contain filters for groupid / artifactid.
+   *
+   * @param parameters store parameters
+   * @return version / search result
+   */
   @DirectMethod
-  List<SearchComponentVersionXO> readVersions(final @Nullable StoreLoadParameters parameters) {
+  @RequiresPermissions('nexus:repositories:read')
+  List<SearchResultVersionXO> readVersions(final @Nullable StoreLoadParameters parameters) {
     BooleanQuery bq = buildQuery(parameters)
     IteratorSearchResponse iterator = null
     try {
@@ -119,7 +135,7 @@ extends DirectComponentSupport
         catch (NoSuchRepositoryException e) {
           // ignore, will use repo id
         }
-        versions << new SearchComponentVersionXO(
+        versions << new SearchResultVersionXO(
             version: ai.version,
             repositoryId: ai.repository,
             repositoryName: repositoryName,
@@ -135,6 +151,12 @@ extends DirectComponentSupport
     }
   }
 
+  /**
+   * Builds a Lucene query based on configured filters.
+   *
+   * @param parameters store parameters
+   * @return Lucene query
+   */
   private BooleanQuery buildQuery(final StoreLoadParameters parameters) {
     BooleanQuery bq = new BooleanQuery()
     def keywordOccur = BooleanClause.Occur.SHOULD

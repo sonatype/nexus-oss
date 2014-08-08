@@ -11,15 +11,15 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Browse repository storage tree panel.
+ * Versions / search results grid.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.search.SearchComponentVersionList', {
+Ext.define('NX.coreui.view.search.SearchResultVersionList', {
   extend: 'Ext.grid.Panel',
-  alias: 'widget.nx-coreui-search-component-version-list',
+  alias: 'widget.nx-coreui-search-result-version-list',
 
-  store: 'SearchComponentVersion',
+  store: 'SearchResultVersion',
 
   allowDeselect: true,
   emptyText: 'No versions found',

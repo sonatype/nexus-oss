@@ -11,13 +11,13 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Search Result store.
+ * Versions / search result store.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.store.SearchComponentVersion', {
+Ext.define('NX.coreui.store.SearchResultVersion', {
   extend: 'Ext.data.Store',
-  model: 'NX.coreui.model.SearchComponentVersion',
+  model: 'NX.coreui.model.SearchResultVersion',
 
   proxy: {
     type: 'direct',

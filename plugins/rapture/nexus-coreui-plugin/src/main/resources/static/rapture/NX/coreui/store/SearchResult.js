@@ -11,18 +11,29 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Search result model.
+ * Search result store.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.model.SearchComponentVersion', {
-  extend: 'Ext.data.Model',
-  fields: [
-    'version',
-    'repositoryId',
-    'repositoryName',
-    'path',
-    'name',
-    'type'
-  ]
+Ext.define('NX.coreui.store.SearchResult', {
+  extend: 'Ext.data.Store',
+  model: 'NX.coreui.model.SearchResult',
+
+  proxy: {
+    type: 'direct',
+
+    api: {
+      read: 'NX.direct.coreui_Search.read'
+    },
+
+    reader: {
+      type: 'json',
+      root: 'data',
+      successProperty: 'success'
+    }
+  },
+
+  pageSize: 100,
+  remoteFilter: true
+
 });
