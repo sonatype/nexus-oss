@@ -420,7 +420,7 @@ Ext.define('NX.coreui.controller.Search', {
     });
 
     me.getController('Menu').refreshTree();
-    NX.Bookmarks.navigateTo(NX.Bookmarks.fromToken('browse/search/saved/' + model.get('name')))
+    NX.Bookmarks.navigateTo(NX.Bookmarks.fromToken('browse/search/saved/' + model.get('name')));
 
     win.close();
   },
