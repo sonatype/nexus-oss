@@ -108,14 +108,8 @@ extends DirectComponentSupport
           bq, null, null, null, null, false, null
       )
       log.info('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
-      Map<GenericVersion, Map<String, SearchComponentVersionXO.ItemXO>> versions = new TreeMap()
+      def versions = [] as SortedSet
       iterator.each { ai ->
-        GenericVersion gv = new GenericVersion(ai.version)
-        def items = versions[gv]
-        if (!items) {
-          items = new TreeMap()
-          versions.put(gv, items)
-        }
         String path = gavCalculator.gavToPath(ai.calculateGav())
         String name = new File(path).getName()
         String repositoryName = ai.repository
@@ -125,22 +119,16 @@ extends DirectComponentSupport
         catch (NoSuchRepositoryException e) {
           // ignore, will use repo id
         }
-        items.put("${ai.repository}:${path}", new SearchComponentVersionXO.ItemXO(
+        versions << new SearchComponentVersionXO(
+            version: ai.version,
             repositoryId: ai.repository,
             repositoryName: repositoryName,
             path: path,
             name: name,
             type: FilenameUtils.getExtension(name)
-        ))
-      }
-      List<SearchComponentVersionXO> versionXOs = []
-      versions.each { version, items ->
-        versionXOs << new SearchComponentVersionXO(
-            version: version,
-            items: items.collect { it.value }
         )
       }
-      return versionXOs
+      return versions as List
     }
     finally {
       iterator?.close()

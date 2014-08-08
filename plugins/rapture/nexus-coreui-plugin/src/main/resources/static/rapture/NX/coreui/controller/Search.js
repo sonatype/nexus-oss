@@ -317,12 +317,10 @@ Ext.define('NX.coreui.controller.Search', {
   onComponentVersionSelectionChange: function(selectionModel, selected) {
     var me = this,
         componentVersion = selected[0],
-        storageFileContainer = me.getStorageFileContainer(),
-        firstItem;
+        storageFileContainer = me.getStorageFileContainer();
 
     if (componentVersion) {
-      firstItem = componentVersion.get('items')[0];
-      storageFileContainer.showStorageFile(firstItem['repositoryId'], firstItem['path']);
+      storageFileContainer.showStorageFile(componentVersion.get('repositoryId'), componentVersion.get('path'));
     }
     else {
       storageFileContainer.showStorageFile(undefined, undefined);

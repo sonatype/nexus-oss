@@ -20,7 +20,9 @@ Ext.define('NX.coreui.view.search.SearchComponentList', {
   alias: 'widget.nx-coreui-search-component-list',
 
   store: 'SearchComponent',
+
   allowDeselect: true,
+  emptyText: 'No results',
 
   columns: [
     { header: 'Component', dataIndex: 'id', flex: 1 },

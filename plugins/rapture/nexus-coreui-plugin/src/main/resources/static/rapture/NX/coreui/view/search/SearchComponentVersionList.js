@@ -22,9 +22,19 @@ Ext.define('NX.coreui.view.search.SearchComponentVersionList', {
   store: 'SearchComponentVersion',
 
   allowDeselect: true,
+  emptyText: 'No versions found',
 
   columns: [
-    { header: 'Version', dataIndex: 'version', flex: 1 }
+    { header: 'Version', dataIndex: 'version', flex: 1 },
+    { header: 'Repository', dataIndex: 'repositoryName', flex: 1 },
+    { header: 'Name', dataIndex: 'name', flex: 2 }
+  ],
+
+  features: [
+    {
+      ftype: 'grouping',
+      groupHeaderTpl: '{[values.name === "" ? "No " + values.columnName : values.name + " " + values.columnName]}'
+    }
   ]
 
 });

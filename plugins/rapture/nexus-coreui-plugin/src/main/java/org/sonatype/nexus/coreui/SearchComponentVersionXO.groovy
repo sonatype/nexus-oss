@@ -22,17 +22,46 @@ import groovy.transform.ToString
  */
 @ToString(includePackage = false, includeNames = true)
 class SearchComponentVersionXO
+implements Comparable<SearchComponentVersionXO>
 {
   String version
-  List<ItemXO> items
+  String repositoryId
+  String repositoryName
+  String path
+  String name
+  String type
 
-  static class ItemXO
-  {
-    String repositoryId
-    String repositoryName
-    String path
-    String name
-    String type
+  boolean equals(final o) {
+    if (this.is(o)) return true
+    if (getClass() != o.class) return false
+
+    SearchComponentVersionXO that = (SearchComponentVersionXO) o
+
+    if (path != that.path) return false
+    if (repositoryId != that.repositoryId) return false
+    if (version != that.version) return false
+
+    return true
+  }
+
+  int hashCode() {
+    int result
+    result = version.hashCode()
+    result = 31 * result + repositoryId.hashCode()
+    result = 31 * result + path.hashCode()
+    return result
+  }
+
+  @Override
+  int compareTo(final SearchComponentVersionXO o) {
+    def result = repositoryName.compareTo(o.repositoryName)
+    if (result == 0) {
+      result = new GenericVersion(version).compareTo(new GenericVersion(o.version))
+      if (result == 0) {
+        result = path.compareTo(o.path)
+      }
+    }
+    return result
   }
 
 }

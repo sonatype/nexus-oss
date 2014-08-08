@@ -19,6 +19,10 @@ Ext.define('NX.coreui.model.SearchComponentVersion', {
   extend: 'Ext.data.Model',
   fields: [
     'version',
-    'items'
+    'repositoryId',
+    'repositoryName',
+    'path',
+    'name',
+    'type'
   ]
 });
