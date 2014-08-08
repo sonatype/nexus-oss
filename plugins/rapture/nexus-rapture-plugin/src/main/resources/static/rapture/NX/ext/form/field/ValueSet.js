@@ -32,7 +32,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
     }
   },
 
-  width: 600,
+  width: 600 - (Ext.isWindows ? 20 : 0),
 
   /**
    * @cfg {Number} [minValues=0] Minimum number of selections allowed.
