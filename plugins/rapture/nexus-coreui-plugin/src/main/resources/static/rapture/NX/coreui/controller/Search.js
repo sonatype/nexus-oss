@@ -289,6 +289,7 @@ Ext.define('NX.coreui.controller.Search', {
         componentVersionStore = me.getSearchComponentVersionStore(),
         segments;
 
+    me.onComponentVersionSelectionChange(me.getSearchComponentVersion().getSelectionModel(), []);
     if (component) {
       segments = component.getId().split(':');
       componentDetails.items.get(0).hide();
