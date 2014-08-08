@@ -60,6 +60,10 @@ Ext.define('NX.coreui.controller.Search', {
         file: 'magnifier.png',
         variants: ['x16', 'x32']
       },
+      'search-result-default': {
+        file: 'magnifier.png',
+        variants: ['x16']
+      },
       'search-folder': {
         file: 'folder_search.png',
         variants: ['x16', 'x32']

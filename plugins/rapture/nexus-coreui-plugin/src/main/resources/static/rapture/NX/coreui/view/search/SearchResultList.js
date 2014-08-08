@@ -24,8 +24,16 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
   emptyText: 'No results',
 
   columns: [
+    {
+      xtype: 'nx-iconcolumn',
+      width: 36,
+      iconVariant: 'x16',
+      iconName: function () {
+        return 'search-result-default';
+      }
+    },
     { header: 'Component', dataIndex: 'id', flex: 1 },
-    { header: 'Format', dataIndex: 'format' }
+    { header: 'Format', dataIndex: 'format', width: 70 }
   ],
 
   dockedItems: [
