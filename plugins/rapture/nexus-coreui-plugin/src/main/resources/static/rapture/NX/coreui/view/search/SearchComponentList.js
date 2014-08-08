@@ -21,7 +21,6 @@ Ext.define('NX.coreui.view.search.SearchComponentList', {
 
   store: 'SearchComponent',
 
-  allowDeselect: true,
   emptyText: 'No results',
 
   columns: [

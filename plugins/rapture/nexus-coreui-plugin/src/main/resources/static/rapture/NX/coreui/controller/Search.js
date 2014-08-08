@@ -43,7 +43,8 @@ Ext.define('NX.coreui.controller.Search', {
   refs: [
     { ref: 'searchFeature', selector: 'nx-searchfeature' },
     { ref: 'searchComponent', selector: 'nx-coreui-search-component-list' },
-    { ref: 'searchComponentDetails', selector: 'nx-coreui-search-component-details' },
+    { ref: 'searchComponentDetails', selector: 'nx-searchfeature #componentDetails' },
+    { ref: 'searchComponentVersion', selector: 'nx-coreui-search-component-version-list' },
     { ref: 'storageFileContainer', selector: 'nx-searchfeature nx-coreui-repositorybrowse-storagefilecontainer' },
     { ref: 'quickSearch', selector: 'nx-header-panel #quicksearch' }
   ],
@@ -275,7 +276,7 @@ Ext.define('NX.coreui.controller.Search', {
     }
 
     if (apply) {
-      searchComponent.getSelectionModel().deselectAll();
+      me.onComponentSelectionChange(me.getSearchComponent().getSelectionModel(), []);
       me.bookmarkFilters();
     }
   },
@@ -283,19 +284,21 @@ Ext.define('NX.coreui.controller.Search', {
   onComponentSelectionChange: function(selectionModel, selected) {
     var me = this,
         component = selected[0],
-        rightPanel = me.getSearchFeature().down('#rightPanel'),
+        componentVersion = me.getSearchComponentVersion(),
         componentDetails = me.getSearchComponentDetails(),
         componentVersionStore = me.getSearchComponentVersionStore(),
         segments;
 
     if (component) {
       segments = component.getId().split(':');
-      componentDetails.showInfo({
+      componentDetails.items.get(0).hide();
+      componentDetails.items.get(1).show();
+      componentDetails.items.get(1).showInfo({
         'Group': component.get('group'),
         'Name': component.get('name'),
         'Format': component.get('format')
       });
-      rightPanel.show();
+      componentVersion.show();
       componentVersionStore.clearFilter(true);
       componentVersionStore.addFilter(me.getSearchComponentStore().filters.items, false);
       componentVersionStore.addFilter([
@@ -310,7 +313,9 @@ Ext.define('NX.coreui.controller.Search', {
       ]);
     }
     else {
-      rightPanel.hide();
+      componentDetails.items.get(0).show();
+      componentDetails.items.get(1).hide();
+      componentVersion.hide();
     }
   },
 

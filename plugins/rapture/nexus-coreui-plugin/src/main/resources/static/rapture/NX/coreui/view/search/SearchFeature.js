@@ -65,7 +65,6 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
             collapsible: true,
             collapsed: false,
             collapseMode: 'mini',
-            hidden: true,
             items: [
               {
                 xtype: 'panel',
@@ -82,10 +81,24 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
                     },
                     items: [
                       {
-                        xtype: 'nx-coreui-search-component-details'
+                        itemId: 'componentDetails',
+                        xtype: 'panel',
+                        layout: {
+                          type: 'vbox'
+                        },
+                        items: [
+                          {
+                            html: '<div class="x-grid-empty">Select a component to view details</div>'
+                          },
+                          {
+                            xtype: 'nx-coreui-search-component-details',
+                            hidden: true
+                          }
+                        ]
                       },
                       {
-                        xtype: 'nx-coreui-search-component-version-list'
+                        xtype: 'nx-coreui-search-component-version-list',
+                        hidden: true
                       }
                     ]
                   }
