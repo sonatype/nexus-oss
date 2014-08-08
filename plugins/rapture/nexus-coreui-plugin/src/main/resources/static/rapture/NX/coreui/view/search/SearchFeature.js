@@ -89,7 +89,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
                         },
                         items: [
                           {
-                            html: '<div class="x-grid-empty">Select a component from search results to view details</div>'
+                            html: '<div class="x-grid-empty">Select a component to view details</div>'
                           },
                           {
                             xtype: 'nx-coreui-search-result-details',
