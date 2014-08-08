@@ -32,6 +32,10 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
         region: 'north',
         header: false,
 
+        style: {
+          'border-bottom': '1px solid #000000'
+        },
+
         layout: {
           type: 'hbox',
           align: 'bottom'
@@ -61,9 +65,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
             flex: 0.7,
             header: false,
             split: true,
-            collapsible: true,
-            collapsed: false,
-            collapseMode: 'mini',
+            collapsible: false,
             items: [
               {
                 xtype: 'panel',
