@@ -30,13 +30,6 @@
 
   <properties>
     <copyright.year>2013</copyright.year>
-
-    <!-- yuicompressor defaults; debug friendly, see 'optimize' profile -->
-    <maven.yuicompressor.jswarn>true</maven.yuicompressor.jswarn>
-    <maven.yuicompressor.nocompress>true</maven.yuicompressor.nocompress>
-    <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
-    <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
-    <maven.yuicompressor.linebreakpos>0<!-- preserve linebreaks --></maven.yuicompressor.linebreakpos>
   </properties>
 
   <modules>
@@ -210,14 +203,6 @@
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
-      <!-- lvo -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-lvo-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
       <!-- maven -->
 
       <dependency>
@@ -372,14 +357,6 @@
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
-      <!-- ui -->
-
-      <dependency>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-ui-extjs3-plugin</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
       <!-- unpack -->
 
       <dependency>
@@ -422,56 +399,6 @@
   <build>
     <pluginManagement>
       <plugins>
-
-        <!--
-        Support for Nexus plugins which provide a UI.
-        -->
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>yuicompressor-maven-plugin</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <!--
-            FIXME: Sort this out, jslint is *very helpful*
-            yuicompressor warns when code is not in a shape that's optimized for minifying.
-            ATM this only pollutes the log (~9400 warnings)
-            -->
-            <jswarn>false</jswarn>
-            <nominify>${maven.yuicompressor.nocompress}</nominify>
-            <nomunge>${maven.yuicompressor.nomunge}</nomunge>
-            <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
-            <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
-            <sourceDirectory>${project.build.sourceDirectory}/../resources/static</sourceDirectory>
-            <jslintOptions>
-              <white>true</white>
-              <sloppy>true</sloppy>
-            </jslintOptions>
-          </configuration>
-          <executions>
-            <execution>
-              <id>js</id>
-              <goals>
-                <goal>aggregate</goal>
-              </goals>
-              <configuration>
-                <output>${project.build.outputDirectory}/static/js/${project.artifactId}-all.js</output>
-                <sourceDirectory>${project.build.sourceDirectory}/../resources/static/js</sourceDirectory>
-              </configuration>
-            </execution>
-            <execution>
-              <id>css</id>
-              <goals>
-                <goal>aggregate-css</goal>
-              </goals>
-              <configuration>
-                <output>${project.build.outputDirectory}/static/css/${project.artifactId}-all.css</output>
-                <sourceDirectory>${project.build.sourceDirectory}/../resources/static/css</sourceDirectory>
-                <required>false</required>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
@@ -622,24 +549,5 @@
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <!--
-    Optimize javascript & css files, for use on production/release builds.
-    -->
-    <profile>
-      <id>optimize</id>
-      <properties>
-        <!--
-        'munge' means obfuscating the code by replacing variable names with short one-letter names. This makes
-        understanding reported UI errors harder and the size increase is only 4%, so let's turn this off for now.
-        -->
-        <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
-        <maven.yuicompressor.nocompress>false</maven.yuicompressor.nocompress>
-        <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
-        <maven.yuicompressor.linebreakpos>-1<!-- do not preserve linebreaks --></maven.yuicompressor.linebreakpos>
-      </properties>
-    </profile>
-  </profiles>
 
 </project>

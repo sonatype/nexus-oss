@@ -53,12 +53,6 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-ui-extjs3-plugin</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-model</artifactId>
       <exclusions>
         <exclusion>
@@ -133,11 +127,6 @@
         <configuration>
           <compilerId>groovy-eclipse-compiler</compilerId>
         </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
       </plugin>
 
       <plugin>

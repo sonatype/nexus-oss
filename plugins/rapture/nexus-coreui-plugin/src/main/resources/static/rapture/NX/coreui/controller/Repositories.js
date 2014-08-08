@@ -89,6 +89,9 @@ Ext.define('NX.coreui.controller.Repositories', {
       controller: {
         '#Refresh': {
           refresh: me.loadRelatedStores
+        },
+        '#State': {
+          receivingchanged: me.onStateReceivingChanged
         }
       },
       component: {
@@ -371,6 +374,21 @@ Ext.define('NX.coreui.controller.Repositories', {
       me.statusProvider.disconnect();
     }
     me.logDebug('Repository status pooling stopped');
+  },
+
+  /**
+   * Start / Stop status pooling when server is diconnected/connected.
+   * @param receiving if we are receiving or not status from server (server connected/diconnected)
+   */
+  onStateReceivingChanged: function(receiving) {
+    var me = this;
+
+    if (receiving) {
+      me.startStatusPolling();
+    }
+    else {
+      me.stopStatusPolling();
+    }
   },
 
   /**

@@ -85,6 +85,7 @@ Ext.define('NX.controller.State', {
         !Ext.isIE || (Ext.isIE9p && Ext.isIE11m)
     );
     NX.State.setValue('debug', NX.app.debug);
+    NX.State.setValue('receiving', false);
     NX.State.setValues(NX.app.state);
   },
 
@@ -296,6 +297,8 @@ Ext.define('NX.controller.State', {
       NX.Messages.add({text: 'Server reconnected', type: 'success' });
     }
 
+    NX.State.setValue('receiving', true);
+
     // propagate event data
     state = event.data.data;
 
@@ -329,6 +332,9 @@ Ext.define('NX.controller.State', {
 
         // we appear to have lost the server connection
         me.disconnectedTimes++;
+
+        NX.State.setValue('receiving', false);
+
         if (me.disconnectedTimes <= me.maxDisconnectWarnings) {
           NX.Messages.add({ text: 'Server disconnected', type: 'warning' });
         }
