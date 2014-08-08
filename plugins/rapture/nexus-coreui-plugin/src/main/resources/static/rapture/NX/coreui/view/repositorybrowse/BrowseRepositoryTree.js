@@ -61,6 +61,12 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
     }
   ],
 
+  tbar: [
+    { xtype: 'button', text: 'More...', glyph: 'xf0ae@FontAwesome' /* fa-tasks */, action: 'more', disabled: true,
+      menu: []
+    }
+  ],
+
   /**
    * @override
    */
@@ -104,17 +110,6 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
     });
 
     me.callParent(arguments);
-
-    me.addEvents(
-        /**
-         * @event beforecontextmenushow
-         * Fires before showing the context menu.
-         * @param {Ext.menu.Menu} to be shown
-         * @param {NX.coreui.model.Repository} repository
-         * param {Ext.data.NodeInterface} clicked node
-         */
-        'beforecontextmenushow'
-    );
   }
 
 });

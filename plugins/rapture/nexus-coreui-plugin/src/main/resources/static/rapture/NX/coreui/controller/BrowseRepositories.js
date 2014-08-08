@@ -96,9 +96,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
         'nx-coreui-repositorybrowse-tree': {
           beforerender: me.loadRepositories,
           select: me.onNodeSelected,
-          beforeitemexpand: me.loadChildrenFromIndex,
-          beforeitemcontextmenu: me.showContextMenu,
-          beforecontextmenushow: me.fillContextMenu
+          beforeitemexpand: me.loadChildrenFromIndex
         },
         'nx-coreui-repositorybrowse-list button[action=admin]': {
           afterrender: me.bindAdminButton,
@@ -184,7 +182,16 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
    * When a node gets selected, refresh storage file in right-side container.
    */
   onNodeSelected: function(tree, node) {
-    var me = this;
+    var me = this,
+        treePanel = me.getTree(),
+        moreButton = treePanel.down('button[action=more]'),
+        repositoryModel = me.getStore(treePanel.repositoryStore).getById(node.get('repositoryId'));
+
+    moreButton.enable();
+    me.fillMoreButtonMenu(moreButton, repositoryModel, node);
+    if (moreButton.menu.items.length == 0) {
+      moreButton.disable();
+    }
     me.getStorageFileContainer().showStorageFile(
         node.get('repositoryId'),
         (node.isLeaf() && node.get('path') !== '/') ? node.get('path') : undefined
@@ -273,69 +280,78 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
   /**
    * @private
-   * Show context menu.
+   * Add menu entries to 'More' button, based on current selected node.
+   * @param {Ext.button.Button} button 'More' button
+   * @param {NX.coreui.model.Repository} repository repository model
+   * @param {Ext.data.NodeInterface} node selected node
    */
-  showContextMenu: function(view, node, item, index, event) {
+  fillMoreButtonMenu: function(button, repository, node) {
     var me = this,
-        tree = me.getTree(),
-        menu = Ext.create('Ext.menu.Menu'),
-        repository = me.getStore(tree.repositoryStore).getById(node.get('repositoryId'));
+        menu = button.menu;
 
-    tree.fireEvent('beforecontextmenushow', menu, repository, node);
-    event.stopEvent();
-    if (menu.items.length) {
-      menu.showAt(event.getXY());
-      return false;
-    }
-    return true;
-  },
-
-  /**
-   * @private
-   * Fill context menu with default menu items.
-   */
-  fillContextMenu: function(menu, repository, node) {
-    var me = this;
-
+    me.removeMenuItem(button, 'expirecache');
     if (NX.Permissions.check('nexus:cache', 'delete')
         && repository.get('type') !== 'virtual' && repository.get('userManaged')) {
       menu.add({
-        text: 'Expire Cache',
+        text: 'Expire Cache', action: 'expirecache',
         handler: Ext.bind(me.expireCache, me, [repository, node.get('path')])
       });
     }
+
+    me.removeMenuItem(button, 'rebuildmetadata');
     if (NX.Permissions.check('nexus:metadata', 'delete')
         && (repository.get('format') === 'maven1' || repository.get('format') === 'maven2' )
         && (repository.get('type') === 'hosted' || repository.get('type') === 'group' )
         && repository.get('userManaged')) {
       menu.add({
-        text: 'Rebuild Metadata',
+        text: 'Rebuild Metadata', action: 'rebuildmetadata',
         handler: Ext.bind(me.rebuildMavenMetadata, me, [repository, node.get('path')])
       });
     }
+
+    me.removeMenuItem(button, 'downloadfromremote');
     if (node.isLeaf() && repository.get('type') === 'proxy') {
       menu.add({
-        text: 'Download From Remote',
+        text: 'Download From Remote', action: 'downloadfromremote',
         handler: Ext.bind(me.downloadPath, me, [repository.get('remoteStorageUrl'), node.get('path')])
       });
     }
+
+    me.removeMenuItem(button, 'viewremote');
     if (!node.isRoot() && !node.isLeaf() && repository.get('type') === 'proxy') {
       menu.add({
-        text: 'View Remote',
+        text: 'View Remote', action: 'viewremote',
         handler: Ext.bind(me.downloadPath, me, [repository.get('remoteStorageUrl'), node.get('path')])
       });
     }
+
+    me.removeMenuItem(button, 'download');
     if (node.isLeaf()) {
       menu.add({
-        text: 'Download',
+        text: 'Download', action: 'download',
         handler: Ext.bind(me.downloadStorageFile, me, [repository.getId(), node.get('path')])
       });
     }
+
+    me.removeMenuItem(button, 'delete');
     if ((node.get('path') !== '/') && (repository.get('type') !== 'group')) {
       menu.add({
-        text: 'Delete',
+        text: 'Delete', action: 'delete',
         handler: Ext.bind(me.deleteStorageFile, me, [repository, node])
       });
+    }
+  },
+
+  /**
+   * @private
+   * Removes from 'More' button, if present, menu item with specified action.
+   * @param {Ext.button.Button} button 'More' button
+   * @param actionName menu item action name to be removed
+   */
+  removeMenuItem: function(button, actionName) {
+    var menuItem = button.down('menuitem[action=' + actionName + ']');
+    if (menuItem) {
+      button.menu.remove(menuItem);
     }
   },
 
