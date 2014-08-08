@@ -50,10 +50,6 @@ extends ComponentSupport
   @Nullable
   String getRepositoryContentUrl(final Repository repository) {
     def baseUrl = globalRestApiSettings.baseUrl ?: BaseUrlHolder.get()
-    if (StringUtils.isBlank(baseUrl)) {
-      log.warn "Not able to build content URL of the repository ${repository.id}, base url not set!"
-      return null
-    }
     if (!baseUrl.endsWith('/')) {
       baseUrl += '/'
     }
