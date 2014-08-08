@@ -87,10 +87,9 @@
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
-          <excludeDependencies>nexus-restlet1x-model</excludeDependencies>
           <instructions>
-            <!-- merge indexer model classes with restlet1x model classes at runtime -->
-            <Fragment-Host>org.sonatype.nexus.plugins.nexus-restlet1x-model</Fragment-Host>
+            <!-- merge model classes with the indexer plugin at runtime -->
+            <Fragment-Host>org.sonatype.nexus.plugins.nexus-indexer-lucene-plugin</Fragment-Host>
           </instructions>
         </configuration>
       </plugin>
