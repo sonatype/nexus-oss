@@ -120,7 +120,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
         maxWidth: 500,
         mouseOffset: [0, 0],
         renderTo: document.body,
-        hideDelay: 5000,
+        dismissDelay: 60000,
         listeners: {
           beforeshow: Ext.bind(me.updateHealthCheckColumnTooltip, me)
         }
