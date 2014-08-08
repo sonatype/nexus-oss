@@ -33,7 +33,7 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
       }
     },
     { header: 'Component', dataIndex: 'id', flex: 1 },
-    { header: 'Format', dataIndex: 'format', width: 70 }
+    { header: 'Format', dataIndex: 'format', width: 70, hidden: true }
   ],
 
   dockedItems: [
