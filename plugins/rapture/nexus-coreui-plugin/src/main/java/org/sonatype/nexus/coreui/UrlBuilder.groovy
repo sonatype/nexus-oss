@@ -13,9 +13,12 @@
 
 package org.sonatype.nexus.coreui
 
+import org.apache.commons.lang.StringUtils
+import org.sonatype.nexus.configuration.application.GlobalRestApiSettings
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry
 import org.sonatype.nexus.proxy.repository.Repository
 import org.sonatype.nexus.web.BaseUrlHolder
+import org.sonatype.sisu.goodies.common.ComponentSupport
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -30,22 +33,32 @@ import javax.inject.Singleton
 @Named
 @Singleton
 class UrlBuilder
+extends ComponentSupport
 {
 
   @Inject
   RepositoryTypeRegistry repositoryTypeRegistry
 
+  @Inject
+  GlobalRestApiSettings globalRestApiSettings
+
   /**
    * @param repository get get content url for
-   * @return repository content url
+   * @return repository content url, or null if nexus url cannot be determined from request and global api settings
+   * base url is null
    */
+  @Nullable
   String getRepositoryContentUrl(final Repository repository) {
-    def url = BaseUrlHolder.get()
-    if (!url.endsWith('/')) {
-      url += '/'
+    def baseUrl = globalRestApiSettings.baseUrl ?: BaseUrlHolder.get()
+    if (StringUtils.isBlank(baseUrl)) {
+      log.warn "Not able to build content URL of the repository ${repository.id}, base url not set!"
+      return null
+    }
+    if (!baseUrl.endsWith('/')) {
+      baseUrl += '/'
     }
     def descriptor = repositoryTypeRegistry.getRepositoryTypeDescriptor(repository.providerRole, repository.providerHint)
-    return "${url}content/${descriptor.prefix}/${repository.pathPrefix}"
+    return "${baseUrl}content/${descriptor.prefix}/${repository.pathPrefix}"
   }
 
   /**
