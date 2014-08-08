@@ -14,6 +14,7 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.sonatype.aether.util.version.GenericVersionScheme
 
 /**
  * Search result exchange object.
@@ -24,6 +25,8 @@ import groovy.transform.ToString
 class SearchResultVersionXO
 implements Comparable<SearchResultVersionXO>
 {
+  private static final versionScheme = new GenericVersionScheme()
+
   String version
   String repositoryId
   String repositoryName
@@ -56,7 +59,7 @@ implements Comparable<SearchResultVersionXO>
   int compareTo(final SearchResultVersionXO o) {
     def result = repositoryName.compareTo(o.repositoryName)
     if (result == 0) {
-      result = new GenericVersion(version).compareTo(new GenericVersion(o.version))
+      result = versionScheme.parseVersion(version).compareTo(versionScheme.parseVersion(o.version))
       if (result == 0) {
         result = path.compareTo(o.path)
       }
