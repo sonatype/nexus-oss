@@ -116,12 +116,6 @@
             <DynamicImport-Package>
               org.eclipse.jetty.*,ch.qos.logback.access.jetty
             </DynamicImport-Package>
-            <_exportcontents>
-              org.*
-            </_exportcontents>
-            <Embed-Dependency>
-              plexus-interpolation;inline=true
-            </Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>

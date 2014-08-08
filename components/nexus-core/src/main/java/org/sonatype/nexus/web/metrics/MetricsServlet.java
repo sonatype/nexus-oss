@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +36,6 @@ import static com.codahale.metrics.MetricRegistry.name;
  *
  * @since 3.0
  */
-@Named
 @Singleton
 public class MetricsServlet
   extends com.codahale.metrics.servlets.MetricsServlet

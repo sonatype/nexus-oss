@@ -194,7 +194,7 @@ public class Hc4MethodCall
   public Series<Parameter> getResponseHeaders() {
     final Series<Parameter> result = super.getResponseHeaders();
 
-    if (!this.responseHeadersAdded) {
+    if (!this.responseHeadersAdded && getHttpResponse() != null) {
       for (final Header header : getHttpResponse().getAllHeaders()) {
         result.add(header.getName(), header.getValue());
       }
@@ -296,7 +296,7 @@ public class Hc4MethodCall
       httpResponse = this.clientHelper.getHttpClient().execute(getHttpMethod());
       result = new Status(getStatusCode(), null, getReasonPhrase(), null);
       // If there is no response body, immediately release the connection
-      if (getHttpResponse().getEntity() == null) {
+      if (httpResponse == null || getHttpResponse().getEntity() == null) {
         getHttpMethod().releaseConnection();
       }
     }

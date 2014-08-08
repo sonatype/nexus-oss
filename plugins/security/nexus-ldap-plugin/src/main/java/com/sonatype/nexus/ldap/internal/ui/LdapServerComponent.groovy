@@ -32,11 +32,11 @@ import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
-import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.rapture.TrustStoreKeys
 import org.sonatype.nexus.util.Tokens
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
+import org.sonatype.nexus.validation.Validate
 import org.sonatype.security.ldap.dao.LdapConnectionTester
 import org.sonatype.security.ldap.dao.LdapUser
 import org.sonatype.security.ldap.realms.DefaultLdapContextFactory

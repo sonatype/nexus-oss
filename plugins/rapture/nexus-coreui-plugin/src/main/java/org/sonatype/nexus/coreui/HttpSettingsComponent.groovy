@@ -24,8 +24,8 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
-import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.proxy.repository.*
+import org.sonatype.nexus.validation.Validate
 
 import javax.inject.Inject
 import javax.inject.Named

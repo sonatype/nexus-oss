@@ -20,7 +20,6 @@ import javax.servlet.ServletContextListener;
 import org.eclipse.sisu.inject.MutableBeanLocator;
 import org.eclipse.sisu.launch.SisuExtender;
 import org.eclipse.sisu.launch.SisuTracker;
-import org.eclipse.sisu.space.BeanScanning;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
@@ -34,10 +33,6 @@ import static java.util.Collections.singletonMap;
 public class NexusBundleExtender
     extends SisuExtender
 {
-  static {
-    System.setProperty(BeanScanning.class.getName(), BeanScanning.INDEX.name());
-  }
-
   private BundleContext context;
 
   private NexusContextListener listener;

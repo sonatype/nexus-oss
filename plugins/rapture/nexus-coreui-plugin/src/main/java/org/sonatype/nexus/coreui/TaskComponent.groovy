@@ -24,13 +24,13 @@ import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.formfields.Selectable
-import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.scheduling.NexusScheduler
 import org.sonatype.nexus.scheduling.NexusTask
 import org.sonatype.nexus.scheduling.TaskUtils
 import org.sonatype.nexus.tasks.ScheduledTaskDescriptor
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
+import org.sonatype.nexus.validation.Validate
 import org.sonatype.scheduling.ScheduledTask
 import org.sonatype.scheduling.TaskState
 import org.sonatype.scheduling.schedules.*

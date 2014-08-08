@@ -23,7 +23,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.rest.index.AbstractIndexerNexusPlexusResource;
+import org.sonatype.nexus.rest.index_.AbstractIndexerNexusPlexusResource;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 

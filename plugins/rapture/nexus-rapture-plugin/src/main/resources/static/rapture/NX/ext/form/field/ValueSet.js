@@ -123,7 +123,8 @@ Ext.define('NX.ext.form.field.ValueSet', {
       submitValue: false,
       isFormField: false,
       preventMark: true,
-      flex: 1
+      flex: 1,
+      inputFor: me.name
     });
     if (me.emptyText) {
       me.input.emptyText = me.emptyText;

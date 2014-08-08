@@ -21,8 +21,8 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.validation.Create
+import org.sonatype.nexus.validation.Validate
 
 import javax.inject.Inject
 import javax.inject.Named

@@ -19,13 +19,13 @@ import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask
 import org.sonatype.nexus.proxy.maven.MavenRepository
 import org.sonatype.nexus.proxy.maven.gav.Gav
 import org.sonatype.nexus.proxy.maven.gav.GavCalculator
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.scheduling.NexusScheduler
+import org.sonatype.nexus.validation.Validate
 
 import javax.inject.Inject
 import javax.inject.Named

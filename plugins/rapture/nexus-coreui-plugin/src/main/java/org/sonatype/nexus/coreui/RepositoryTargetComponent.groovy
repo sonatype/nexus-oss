@@ -25,12 +25,12 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
-import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry
 import org.sonatype.nexus.proxy.targets.Target
 import org.sonatype.nexus.proxy.targets.TargetRegistry
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
+import org.sonatype.nexus.validation.Validate
 
 import javax.annotation.Nullable
 import javax.inject.Inject

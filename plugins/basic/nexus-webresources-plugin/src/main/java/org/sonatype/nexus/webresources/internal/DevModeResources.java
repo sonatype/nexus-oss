@@ -31,6 +31,9 @@ public class DevModeResources
 
   private static List<File> initializeResourceLocations() {
     String directoriesToSearchProperty = System.getenv("NEXUS_RESOURCE_DIRS");
+    if (directoriesToSearchProperty == null) {
+      directoriesToSearchProperty = System.getProperty("nexus.resource.dirs");
+    }
     if (directoriesToSearchProperty != null) {
       List<File> directoriesToSearch = Lists.newArrayList();
       String[] segments = directoriesToSearchProperty.split(",");

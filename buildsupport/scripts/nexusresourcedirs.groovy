@@ -19,7 +19,7 @@
 //
 // Aggregate projects using 'roots' property, from parent of project directories:
 //
-//     export NEXUS_RESOURCE_DIRS=`groovy -Droots=nexus-oss,nexus-pro nexus-oss/buildsupport/scripts/nexusresourcedirs.groovy`
+//     export NEXUS_RESOURCE_DIRS=`groovy -Droots=nexus-oss,nexus-pro,nexus-bundles nexus-oss/buildsupport/scripts/nexusresourcedirs.groovy`
 //
 
 def roots = System.getProperty('roots', '.')
@@ -29,7 +29,7 @@ roots.split(',').each { root ->
   def dir = new File(root)
   if (dir.exists()) {
     dir.eachDirRecurse {
-      if (it.path.endsWith('src/main/resources/static')) {
+      if (it.path.endsWith('src/main/resources/static') || it.path.endsWith('src/test/ft-resources/test')) {
         dirs << it.parentFile.canonicalPath
       }
     }

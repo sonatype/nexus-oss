@@ -25,8 +25,13 @@ Ext.define('NX.coreui.view.task.TaskSettings', {
   settingsFormSuccessMessage: function (data) {
     return 'Task updated: ' + data['name'] + ' (' + data['typeName'] + ')';
   },
-  editableCondition: NX.Conditions.isPermitted('nexus:tasks', 'update'),
-  editableMarker: 'You do not have permission to update tasks',
+  editableCondition: NX.Conditions.and(
+      NX.Conditions.isPermitted('nexus:tasks', 'update'),
+      NX.Conditions.formHasRecord('nx-coreui-task-settings', function(model) {
+        return model.get('schedule') !== 'internal';
+      })
+  ),
+  editableMarker: 'You do not have permission to update tasks or task is not user manageable',
 
   items: [
     {

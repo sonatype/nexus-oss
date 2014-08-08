@@ -22,9 +22,9 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.sonatype.nexus.NxApplication;
-import org.sonatype.nexus.guice.NexusModules.CoreModule;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.web.NexusGuiceFilter;
+import org.sonatype.nexus.web.NexusServletModule;
 
 import com.codahale.metrics.SharedMetricRegistries;
 import com.google.common.base.Throwables;
@@ -33,10 +33,6 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.servlet.GuiceServletContextListener;
 import org.eclipse.sisu.inject.BeanLocator;
-import org.eclipse.sisu.space.BeanScanning;
-import org.eclipse.sisu.space.BundleClassSpace;
-import org.eclipse.sisu.space.ClassSpace;
-import org.eclipse.sisu.space.SpaceModule;
 import org.eclipse.sisu.wire.WireModule;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -93,11 +89,7 @@ public class NexusContextListener
       variables = System.getProperties();
     }
 
-    final ClassSpace coreSpace = new BundleClassSpace(bundleContext.getBundle());
-    injector = Guice.createInjector(
-        new WireModule(
-            new CoreModule(servletContext, variables),
-            new SpaceModule(coreSpace, BeanScanning.GLOBAL_INDEX)));
+    injector = Guice.createInjector(new WireModule(new NexusServletModule(servletContext, variables)));
     log.debug("Injector: {}", injector);
 
     super.contextInitialized(event);
@@ -136,7 +128,7 @@ public class NexusContextListener
         log.error("Failed to start application", e);
         Throwables.propagate(e);
       }
-  
+
       // register our dynamic filter with the surrounding bootstrap code
       final Filter filter = injector.getInstance(NexusGuiceFilter.class);
       final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "nexus"));

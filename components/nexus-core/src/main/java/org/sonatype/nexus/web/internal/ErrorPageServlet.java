@@ -16,7 +16,6 @@ package org.sonatype.nexus.web.internal;
 import java.io.IOException;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,7 +32,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2.8
  */
-@Named
 @Singleton
 public class ErrorPageServlet
     extends HttpServlet

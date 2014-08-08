@@ -27,7 +27,6 @@ import org.sonatype.configuration.validation.ValidationMessage
 import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.guice.Validate
 import org.sonatype.nexus.proxy.access.AccessManager
 import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository
@@ -37,6 +36,7 @@ import org.sonatype.nexus.proxy.maven.gav.Gav
 import org.sonatype.nexus.proxy.maven.gav.GavCalculator
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.rest.RepositoryURLBuilder
+import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.web.RemoteIPFinder
 
 import javax.inject.Inject

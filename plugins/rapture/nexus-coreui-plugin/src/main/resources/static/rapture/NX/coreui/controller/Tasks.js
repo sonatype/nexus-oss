@@ -41,6 +41,7 @@ Ext.define('NX.coreui.controller.Tasks', {
     'formfield.SettingsFieldSet'
   ],
   refs: [
+    { ref: 'feature', selector: 'nx-coreui-task-feature' },
     { ref: 'list', selector: 'nx-coreui-task-list' },
     { ref: 'info', selector: 'nx-coreui-task-feature nx-info-panel' },
     { ref: 'schedule', selector: 'nx-coreui-task-schedule' },
@@ -61,7 +62,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       file: 'time.png',
       variants: ['x16', 'x32']
     },
-    visible: function () {
+    visible: function() {
       return NX.Permissions.check('nexus:tasks', 'read');
     }
   },
@@ -70,7 +71,7 @@ Ext.define('NX.coreui.controller.Tasks', {
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.callParent();
@@ -123,7 +124,7 @@ Ext.define('NX.coreui.controller.Tasks', {
    * Returns a description of task suitable to be displayed.
    * @param {NX.coreui.model.Task} model selected model
    */
-  getDescription: function (model) {
+  getDescription: function(model) {
     return model.get('name') + ' (' + model.get('typeName') + ')';
   },
 
@@ -133,13 +134,37 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @param {NX.coreui.view.task.TaskList} list task grid
    * @param {NX.coreui.model.Task} model selected model
    */
-  onSelection: function (list, model) {
-    var me = this;
+  onSelection: function(list, model) {
+    var me = this,
+        settings = me.getSettings(),
+        schedule = me.getSchedule(),
+        taskTypeModel;
 
     if (Ext.isDefined(model)) {
       me.showSummary(model);
-      me.showSettings(model);
-      me.showSchedule(model);
+      taskTypeModel = me.getTaskTypeStore().getById(model.get('typeId'));
+      if (taskTypeModel) {
+        if (!settings) {
+          me.getFeature().addTab({ xtype: 'nx-coreui-task-settings', title: 'Settings' });
+        }
+        me.showSettings(model);
+      }
+      else {
+        if (settings) {
+          me.getFeature().removeTab(settings);
+        }
+      }
+      if (taskTypeModel && model.get('schedule') !== 'internal') {
+        if (!schedule) {
+          me.getFeature().addTab({ xtype: 'nx-coreui-task-schedule', title: 'Schedule' });
+        }
+        me.showSchedule(model);
+      }
+      else {
+        if (schedule) {
+          me.getFeature().removeTab(schedule);
+        }
+      }
     }
   },
 
@@ -148,7 +173,7 @@ Ext.define('NX.coreui.controller.Tasks', {
    * Displays task summary.
    * @param {NX.coreui.model.Task} model task model
    */
-  showSummary: function (model) {
+  showSummary: function(model) {
     var me = this;
     me.getInfo().showInfo({
       'Id': model.get('id'),
@@ -166,7 +191,7 @@ Ext.define('NX.coreui.controller.Tasks', {
    * Displays task settings.
    * @param {NX.coreui.model.Task} model task model
    */
-  showSettings: function (model) {
+  showSettings: function(model) {
     this.getSettings().loadRecord(model);
   },
 
@@ -175,14 +200,14 @@ Ext.define('NX.coreui.controller.Tasks', {
    * Displays task schedule.
    * @param {NX.coreui.model.Task} model task model
    */
-  showSchedule: function (model) {
+  showSchedule: function(model) {
     this.getSchedule().loadRecord(model);
   },
 
   /**
    * @private
    */
-  showAddWindow: function () {
+  showAddWindow: function() {
     Ext.widget('nx-coreui-task-add', {
       taskTypeStore: this.getTaskTypeStore()
     });
@@ -193,7 +218,7 @@ Ext.define('NX.coreui.controller.Tasks', {
    * Change settings according to selected task type (in add window).
    * @combo {Ext.form.field.ComboBox} combobox task type combobox
    */
-  changeTaskType: function (combobox) {
+  changeTaskType: function(combobox) {
     var win = combobox.up('window'),
         taskTypeModel;
 
@@ -205,7 +230,7 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @private
    * (Re)load task type store && reset all cached combo stores.
    */
-  onRefresh: function () {
+  onRefresh: function() {
     var me = this,
         list = me.getList();
 
@@ -218,7 +243,7 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @private
    * When task type store re-loads, reselect current selected task if any.
    */
-  onTaskTypeLoad: function () {
+  onTaskTypeLoad: function() {
     var me = this;
     me.reselect();
   },
@@ -226,7 +251,7 @@ Ext.define('NX.coreui.controller.Tasks', {
   /**
    * @private
    */
-  onSettingsSubmitted: function (form, action) {
+  onSettingsSubmitted: function(form, action) {
     var me = this,
         win = form.up('nx-coreui-task-add');
 
@@ -244,7 +269,7 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @protected
    * Enable 'New' when user has 'create' permission and there is at least one task type.
    */
-  bindNewButton: function (button) {
+  bindNewButton: function(button) {
     button.mon(
         NX.Conditions.and(
             NX.Conditions.isPermitted('nexus:tasks', 'create'),
@@ -263,11 +288,11 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @private
    * Enable 'Run' when user has 'read' permission and task is 'runnable'.
    */
-  bindRunButton: function (button) {
+  bindRunButton: function(button) {
     button.mon(
         NX.Conditions.and(
             NX.Conditions.isPermitted('nexus:tasksrun', 'read'),
-            NX.Conditions.gridHasSelection('nx-coreui-task-list', function (model) {
+            NX.Conditions.gridHasSelection('nx-coreui-task-list', function(model) {
               return model.get('runnable');
             })
         ),
@@ -284,11 +309,11 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @private
    * Enable 'Stop' when user has 'delete' permission and task is 'stoppable'.
    */
-  bindStopButton: function (button) {
+  bindStopButton: function(button) {
     button.mon(
         NX.Conditions.and(
             NX.Conditions.isPermitted('nexus:tasksrun', 'delete'),
-            NX.Conditions.gridHasSelection('nx-coreui-task-list', function (model) {
+            NX.Conditions.gridHasSelection('nx-coreui-task-list', function(model) {
               return model.get('stoppable');
             })
         ),
@@ -305,11 +330,11 @@ Ext.define('NX.coreui.controller.Tasks', {
    * Delete task.
    * @param model task to be deleted
    */
-  deleteModel: function (model) {
+  deleteModel: function(model) {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.coreui_Task.delete(model.getId(), function (response) {
+    NX.direct.coreui_Task.delete(model.getId(), function(response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
@@ -323,15 +348,15 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @override
    * Run selected task.
    */
-  runTask: function () {
+  runTask: function() {
     var me = this,
         model = me.selectedModel(),
         description;
 
     if (model) {
       description = me.getDescription(model);
-      NX.Dialogs.askConfirmation('Confirm?', 'Run ' + description + ' task?', function () {
-        NX.direct.coreui_Task.run(model.getId(), function (response) {
+      NX.Dialogs.askConfirmation('Confirm?', 'Run ' + description + ' task?', function() {
+        NX.direct.coreui_Task.run(model.getId(), function(response) {
           me.loadStore();
           if (Ext.isObject(response) && response.success) {
             NX.Messages.add({
@@ -347,15 +372,15 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @override
    * Stop selected task.
    */
-  stopTask: function () {
+  stopTask: function() {
     var me = this,
         model = me.selectedModel(),
         description;
 
     if (model) {
       description = me.getDescription(model);
-      NX.Dialogs.askConfirmation('Confirm?', 'Stop ' + description + ' task?', function () {
-        NX.direct.coreui_Task.stop(model.getId(), function (response) {
+      NX.Dialogs.askConfirmation('Confirm?', 'Stop ' + description + ' task?', function() {
+        NX.direct.coreui_Task.stop(model.getId(), function(response) {
           me.loadStore();
           if (Ext.isObject(response) && response.success) {
             NX.Messages.add({

@@ -15,7 +15,6 @@ package org.sonatype.nexus.web.internal;
 import java.io.IOException;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -37,7 +36,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2.8
  */
-@Named
 @Singleton
 public class CommonHeadersFilter
     implements Filter

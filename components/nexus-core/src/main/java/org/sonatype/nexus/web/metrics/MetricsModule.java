@@ -27,18 +27,18 @@ import org.slf4j.LoggerFactory;
 
 /**
  * <a href="http://metrics.codahale.com">Codahale Metrics</a> guice configuration.
- *
+ * 
  * Installs servlet endpoints:
- *
+ * 
  * <ul>
  * <li>/internal/ping</li>
  * <li>/internal/threads</li>
  * <li>/internal/metrics</li>
  * <li>/internal/healthcheck</li>
  * </ul>
- *
+ * 
  * Protected by {@code nexus:metrics-endpoints} permission.
- *
+ * 
  * @since 2.5
  */
 public class MetricsModule
@@ -62,16 +62,18 @@ public class MetricsModule
     {
       @Override
       protected void configureServlets() {
+        bind(MetricsServlet.class);
+        bind(HealthCheckServlet.class);
+
         serve(MOUNT_POINT + "/ping").with(new PingServlet());
-
         serve(MOUNT_POINT + "/threads").with(new ThreadDumpServlet());
-
         serve(MOUNT_POINT + "/metrics").with(MetricsServlet.class);
-
         serve(MOUNT_POINT + "/healthcheck").with(HealthCheckServlet.class);
 
         // record metrics for all webapp access
         filter("/*").through(new InstrumentedFilter());
+
+        bind(SecurityFilter.class);
 
         // configure security
         filter(MOUNT_POINT + "/*").through(SecurityFilter.class);

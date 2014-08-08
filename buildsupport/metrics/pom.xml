@@ -55,6 +55,12 @@
         <groupId>com.codahale.metrics</groupId>
         <artifactId>metrics-jetty8</artifactId>
         <version>${metrics.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>

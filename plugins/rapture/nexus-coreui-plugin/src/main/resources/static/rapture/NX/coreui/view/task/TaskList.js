@@ -30,7 +30,7 @@ Ext.define('NX.coreui.view.task.TaskList', {
         return 'task-default';
       }
     },
-    { header: 'Name', dataIndex: 'name' },
+    { header: 'Name', dataIndex: 'name', flex: 1 },
     { header: 'Type', dataIndex: 'typeName', flex: 1 },
     { header: 'Status', dataIndex: 'statusDescription' },
     { header: 'Schedule', dataIndex: 'schedule' },

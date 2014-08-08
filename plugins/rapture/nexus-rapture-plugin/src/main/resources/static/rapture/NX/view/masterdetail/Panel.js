@@ -52,7 +52,7 @@ Ext.define('NX.view.masterdetail.Panel', {
           align: 'stretch',
           pack: 'start'
         },
-        tabs: me.tabs
+        tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs)
       }
     ];
 

@@ -84,8 +84,8 @@ public class EmbeddedNexusBooter
     // force bootstrap logback configuration
     overrides.put("logback.configurationFile", new File(installDir, "conf/logback.xml").getPath());
 
-    // guice finalizer
-    overrides.put("guice.executor.class", "NONE");
+    // Make sure H2 uses TCCL for Java deserialization
+    overrides.put("h2.useThreadContextClassLoader", "true");
 
     // Making MI integration in Nexus behave in-sync
     overrides.put("org.sonatype.nexus.events.IndexerManagerEventInspector.async", Boolean.FALSE.toString());
