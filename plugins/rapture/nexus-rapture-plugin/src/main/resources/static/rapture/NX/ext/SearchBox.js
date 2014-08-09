@@ -76,6 +76,11 @@ Ext.define('NX.ext.SearchBox', {
         scope: me,
         defaultEventAction: false
       },
+      enter: {
+        handler: me.onEnter,
+        scope: me,
+        defaultEventAction: false
+      },
       scope: me,
       forceKeyDown: true
     });
@@ -89,6 +94,16 @@ Ext.define('NX.ext.SearchBox', {
     var me = this;
 
     me.clearSearch();
+  },
+
+  /**
+   * @private
+   * Search on ENTER.
+   */
+  onEnter: function () {
+    var me = this;
+
+    me.search(me.getValue());
   },
 
   /**
