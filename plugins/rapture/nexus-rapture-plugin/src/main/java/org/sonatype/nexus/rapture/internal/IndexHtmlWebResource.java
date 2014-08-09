@@ -54,11 +54,14 @@ public class IndexHtmlWebResource
 
   @Override
   protected byte[] generate() throws IOException {
+    String baseUrl = BaseUrlHolder.get();
+    log.trace("Base URL: {}", baseUrl);
+
     boolean debug = isDebug();
     log.trace("Debug: {}", debug);
 
     return render("index.vm", new TemplateParameters()
-        .set("baseUrl", BaseUrlHolder.get())
+        .set("baseUrl", baseUrl)
         .set("debug", debug)
     );
   }
