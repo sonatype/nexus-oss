@@ -23,6 +23,16 @@ When updating baseapp/ext need to be aware there are directories named 'target':
 
 May completely revisit this solution later.
 
+## Configuration
+
+Some relevant configuration in the mess of Sencha CMD muck:
+
+* src/main/baseapp/.sencha/app/defaults.properties
+* src/main/baseapp/.sencha/app/build.properties
+* src/main/baseapp/.sencha/app/production.properties
+* src/main/baseapp/.sencha/app/testing.properties
+* src/main/baseapp/packages/rapture-theme
+
 ## Regenerating
 
     mvn clean install -Pregenerate

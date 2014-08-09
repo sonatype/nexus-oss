@@ -51,6 +51,7 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
       <id>watch</id>
       <build>
