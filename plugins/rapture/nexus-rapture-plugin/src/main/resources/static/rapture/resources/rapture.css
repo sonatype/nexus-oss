@@ -10,10 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 /**
  * Font-awesome
  */
-@import url('fonts/font-awesome-4.1.0/css/font-awesome.css');
+@import url('fonts/font-awesome-4.1.0/css/font-awesome.min.css');
 
 /**
  * @namespace NX.view.info
