@@ -109,6 +109,9 @@ Ext.define('NX.coreui.controller.Search', {
 
     me.listen({
       controller: {
+        '#Refresh': {
+          refresh: me.onRefresh
+        },
         '#Bookmarking': {
           navigate: me.navigateTo
         }
@@ -285,6 +288,15 @@ Ext.define('NX.coreui.controller.Search', {
   onSearchCriteriaChange: function(searchCriteria) {
     var me = this;
     me.applyFilter(searchCriteria, true);
+  },
+
+  /**
+   * @private
+   * Search on refresh.
+   */
+  onRefresh: function() {
+    var me = this;
+    me.getSearchResultStore().filter();
   },
 
   /**
