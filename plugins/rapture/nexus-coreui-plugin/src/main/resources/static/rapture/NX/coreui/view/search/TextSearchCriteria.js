@@ -22,6 +22,11 @@ Ext.define('NX.coreui.view.search.TextSearchCriteria', {
     searchCriteria: 'NX.coreui.view.search.SearchCriteria'
   },
 
+  /**
+   * @cfg [removable=false] If seearch criteria should be removable.
+   */
+  removable: false,
+
   emptyText: 'any',
 
   padding: '0 5 0 0',
@@ -30,12 +35,40 @@ Ext.define('NX.coreui.view.search.TextSearchCriteria', {
   labelSeparator: '',
   searchDelay: 1000,
 
-  filter: function () {
+  filter: function() {
     var me = this;
     if (me.value) {
       return { property: me.criteriaId, value: me.value };
     }
     return undefined;
+  },
+
+  initComponent: function() {
+    var me = this;
+
+    if (me.removable) {
+      me.trigger2Cls = Ext.baseCSSPrefix + 'form-search-trigger';
+    }
+
+    me.callParent(arguments);
+
+    me.addEvents(
+        /**
+         * @event removed
+         * Fires when search criteria is removed.
+         */
+        'removed'
+    );
+  },
+
+  /**
+   * @private
+   * Fire event about user removing the search criteria.
+   */
+  onTrigger2Click: function() {
+    var me = this;
+
+    me.fireEvent('removed', me);
   }
 
 });

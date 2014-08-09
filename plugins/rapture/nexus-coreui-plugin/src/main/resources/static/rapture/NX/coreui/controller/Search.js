@@ -122,7 +122,8 @@ Ext.define('NX.coreui.controller.Search', {
         },
         'nx-searchfeature component[searchCriteria=true]': {
           search: me.onSearchCriteriaChange,
-          searchcleared: me.onSearchCriteriaChange
+          searchcleared: me.onSearchCriteriaChange,
+          removed: me.removeCriteria
         },
         'nx-coreui-search-result-list': {
           selectionchange: me.onSearchResultSelectionChange
@@ -247,17 +248,33 @@ Ext.define('NX.coreui.controller.Search', {
   addCriteria: function(menuitem) {
     var me = this,
         searchPanel = me.getSearchFeature(),
-        searchCriteria = searchPanel.down('#criteria'),
-        addButton = searchCriteria.down('#addButton'),
+        searchCriteriaPanel = searchPanel.down('#criteria'),
+        addButton = searchCriteriaPanel.down('#addButton'),
         criteria = menuitem.criteria,
         cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-' + criteria.getId());
 
     if (!cmpClass) {
       cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-text');
     }
-    searchCriteria.remove(addButton, false);
-    searchCriteria.add(cmpClass.create(Ext.apply(criteria.get('config'), { criteriaId: criteria.getId() })));
-    searchCriteria.add(addButton);
+    searchCriteriaPanel.remove(addButton, false);
+    searchCriteriaPanel.add(cmpClass.create(
+        Ext.apply(criteria.get('config'), { criteriaId: criteria.getId(), removable: true })
+    ));
+    searchCriteriaPanel.add(addButton);
+  },
+
+  /**
+   * @private
+   * Remove a criteria.
+   * @param searchCriteria removed search criteria
+   */
+  removeCriteria: function(searchCriteria) {
+    var me = this,
+        searchPanel = me.getSearchFeature(),
+        searchCriteriaPanel = searchPanel.down('#criteria');
+
+    me.applyFilter({ criteriaId: searchCriteria.criteriaId }, true);
+    searchCriteriaPanel.remove(searchCriteria);
   },
 
   /**

@@ -28,7 +28,7 @@ Ext.define('NX.ext.SearchBox', {
   searchDelay: 200,
 
   // TODO: Only show clear trigger if we have text
-  triggerCls: Ext.baseCSSPrefix + 'form-clear-trigger',
+  trigger1Cls: Ext.baseCSSPrefix + 'form-clear-trigger',
 
   /**
    * @override
@@ -85,7 +85,7 @@ Ext.define('NX.ext.SearchBox', {
    * @private
    * Clear search.
    */
-  onTriggerClick: function () {
+  onTrigger1Click: function () {
     var me = this;
 
     me.clearSearch();
