@@ -20,6 +20,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 
@@ -35,10 +36,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class IndexHtmlWebResource
     extends TemplateWebResource
 {
+  private final Provider<SystemStatus> systemStatusProvider;
+
   private final Provider<HttpServletRequest> servletRequestProvider;
 
   @Inject
-  public IndexHtmlWebResource(final Provider<HttpServletRequest> servletRequestProvider) {
+  public IndexHtmlWebResource(final Provider<SystemStatus> systemStatusProvider,
+                              final Provider<HttpServletRequest> servletRequestProvider)
+  {
+    this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.servletRequestProvider = checkNotNull(servletRequestProvider);
   }
 
@@ -60,10 +66,29 @@ public class IndexHtmlWebResource
     boolean debug = isDebug();
     log.trace("Debug: {}", debug);
 
+    String urlSuffix = generateUrlSuffix();
+    log.trace("URL suffix: {}", urlSuffix);
+
     return render("index.vm", new TemplateParameters()
-        .set("baseUrl", baseUrl)
-        .set("debug", debug)
+            .set("baseUrl", baseUrl)
+            .set("debug", debug)
+            .set("urlSuffix", urlSuffix)
     );
+  }
+
+  /**
+   * Generate URL suffix to use on all requests when loading the index.
+   */
+  private String generateUrlSuffix() {
+    StringBuilder buff = new StringBuilder();
+    String version = systemStatusProvider.get().getVersion();
+    buff.append("_v=").append(version);
+
+    // if version is a SNAPSHOT, then append additional timestamp to disable cache
+    if (version.endsWith("SNAPSHOT")) {
+      buff.append("&_dc=").append(System.currentTimeMillis());
+    }
+    return buff.toString();
   }
 
   /**
