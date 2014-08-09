@@ -29,7 +29,7 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
       width: 36,
       iconVariant: 'x16',
       iconName: function () {
-        return 'search-result-default';
+        return 'search-component';
       }
     },
     { header: 'Component', dataIndex: 'id', flex: 1 },
