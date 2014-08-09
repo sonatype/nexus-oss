@@ -122,3 +122,10 @@
   word-wrap: normal;
   overflow-x: scroll;
 }
+
+/**
+ * Custom Ext.form.field.Trigger art.
+ */
+.nx-form-fa-minus-circle-trigger {
+  background-image: url(images/form/fa-minus-circle-trigger.png);
+}

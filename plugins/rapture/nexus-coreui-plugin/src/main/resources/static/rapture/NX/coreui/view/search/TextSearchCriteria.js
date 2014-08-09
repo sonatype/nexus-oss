@@ -46,7 +46,7 @@ Ext.define('NX.coreui.view.search.TextSearchCriteria', {
     var me = this;
 
     if (me.removable) {
-      me.trigger2Cls = Ext.baseCSSPrefix + 'form-search-trigger';
+      me.trigger2Cls = 'nx-form-fa-minus-circle-trigger';
     }
 
     me.callParent(arguments);
