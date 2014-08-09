@@ -29,13 +29,13 @@
   ## force browser to behave, IE=edge seems to have issues on IE 11 setting stylesheets (maybe other shit too)
   <meta http-equiv="X-UA-Compatible" content="IE=9,chrome=1"/>
 
-  <link rel="icon" type="image/png" href="$raptureUrl/resources/favicon.png"/>
+  <link rel="icon" type="image/png" href="$raptureUrl/resources/favicon.png?$urlSuffix"/>
   <!--[if IE]>
-  <link rel="SHORTCUT ICON" href="$raptureUrl/resources/favicon.ico"/>
+  <link rel="SHORTCUT ICON" href="$raptureUrl/resources/favicon.ico?$urlSuffix"/>
   <![endif]-->
 
   #macro(style $src)
-    <link rel="stylesheet" type="text/css" href="$src">
+    <link rel="stylesheet" type="text/css" href="$src?$urlSuffix">
   #end
 
   #style("$raptureUrl/resources/baseapp-${baseappMode}.css")
@@ -46,20 +46,25 @@
 
 <div id="loading-mask"></div>
 <div id="loading">
+  #macro(image $id $src)
+    <img id="$id" src="$src?$urlSuffix"/>
+  #end
+
   <div class="loading-indicator">
-    <img id="loading-image" src="$raptureUrl/resources/images/loading.png"/>
+    #image("loading-image" "$raptureUrl/resources/images/loading.png")
     <br/>
     <div style="text-align: center;">
-      <img id="loading-spinner" src="$raptureUrl/resources/images/loading-spinner.gif"/>
+      #image("loading-spinner" "$raptureUrl/resources/images/loading-spinner.gif")
       <span id="loading-msg">Loading...</span>
     </div>
   </div>
+
   <div id="code-load" class="x-hide-display">
     #macro(message $text)
       <script type="text/javascript">document.getElementById('loading-msg').innerHTML = '$text';</script>
     #end
     #macro(script $src)
-      <script type="text/javascript" src="$src"></script>
+      <script type="text/javascript" src="$src?$urlSuffix"></script>
     #end
 
     ## Load core extjs framework
