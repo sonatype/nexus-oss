@@ -28,7 +28,8 @@ Ext.define('NX.ext.SearchBox', {
   searchDelay: 1000,
 
   // TODO: Only show clear trigger if we have text
-  trigger1Cls: Ext.baseCSSPrefix + 'form-clear-trigger',
+  // use custom (x) trigger art, so that custom (-) in search ui looks okay next to it
+  trigger1Cls: 'nx-form-fa-times-circle-trigger',
 
   /**
    * @override
