@@ -377,13 +377,13 @@ Ext.define('NX.coreui.controller.Repositories', {
   },
 
   /**
-   * Start / Stop status pooling when server is diconnected/connected.
-   * @param receiving if we are receiving or not status from server (server connected/diconnected)
+   * Start / Stop status pooling when server is disconnected/connected.
+   * @param receiving if we are receiving or not status from server (server connected/disconnected)
    */
   onStateReceivingChanged: function(receiving) {
     var me = this;
 
-    if (receiving) {
+    if (me.getList() && receiving) {
       me.startStatusPolling();
     }
     else {
