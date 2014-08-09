@@ -33,7 +33,6 @@ Ext.define('NX.coreui.view.search.TextSearchCriteria', {
   width: 100,
   labelAlign: 'top',
   labelSeparator: '',
-  searchDelay: 1000,
 
   filter: function() {
     var me = this;

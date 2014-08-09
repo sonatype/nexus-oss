@@ -23,9 +23,9 @@ Ext.define('NX.ext.SearchBox', {
   submitValue: false,
 
   /**
-   * @cfg {int} number of milliseconds to trigger searching (defaults to 200)
+   * @cfg {int} number of milliseconds to trigger searching (defaults to 1000)
    */
-  searchDelay: 200,
+  searchDelay: 1000,
 
   // TODO: Only show clear trigger if we have text
   trigger1Cls: Ext.baseCSSPrefix + 'form-clear-trigger',
