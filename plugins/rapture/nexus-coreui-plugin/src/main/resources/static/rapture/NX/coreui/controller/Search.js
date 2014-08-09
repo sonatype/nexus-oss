@@ -368,6 +368,7 @@ Ext.define('NX.coreui.controller.Search', {
       storageFileContainer.showStorageFile(
           searchResultVersionModel.get('repositoryId'), searchResultVersionModel.get('path')
       );
+      storageFileContainer.expand();
     }
     else {
       storageFileContainer.showStorageFile(undefined, undefined);
