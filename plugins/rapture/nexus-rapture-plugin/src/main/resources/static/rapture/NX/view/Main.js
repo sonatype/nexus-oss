@@ -92,7 +92,7 @@ Ext.define('NX.view.Main', {
       { xtype: 'nx-header-browse-mode' },
       { xtype: 'nx-header-admin-mode' },
       ' ',
-      { xtype: 'nx-header-quicksearch' },
+      { xtype: 'nx-header-quicksearch', hidden: true },
       '->',
       { xtype: 'nx-header-messages', ui: 'header' },
       { xtype: 'nx-header-refresh', ui: 'header' },

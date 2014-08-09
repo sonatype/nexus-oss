@@ -150,11 +150,27 @@ Ext.define('NX.coreui.controller.Search', {
           click: me.saveSearchFilter
         },
         'nx-main #quicksearch': {
+          afterrender: me.bindQuickSearch,
           search: me.onQuickSearch,
           searchcleared: me.onQuickSearch
         }
       }
     });
+  },
+
+  /**
+   * @private
+   * Show quick search when user has 'nexus:repositories:read' permission.
+   */
+  bindQuickSearch: function (quickSearch) {
+    quickSearch.up('panel').mon(
+        NX.Conditions.isPermitted('nexus:repositories', 'read'),
+        {
+          satisfied: quickSearch.show,
+          unsatisfied: quickSearch.hide,
+          scope: quickSearch
+        }
+    );
   },
 
   /**
