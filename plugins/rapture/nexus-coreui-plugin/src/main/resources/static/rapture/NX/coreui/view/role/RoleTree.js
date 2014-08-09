@@ -19,6 +19,8 @@ Ext.define('NX.coreui.view.role.RoleTree', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-role-tree',
 
+  layout: 'fit',
+
   /**
    * @override
    */
