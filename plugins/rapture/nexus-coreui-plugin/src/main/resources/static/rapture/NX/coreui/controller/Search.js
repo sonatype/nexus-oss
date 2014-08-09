@@ -240,6 +240,8 @@ Ext.define('NX.coreui.controller.Search', {
       menu: addCriteriaMenu
     });
 
+    // HACK: fire a fake event to force paging toolbar to refresh
+    me.getSearchResultStore().fireEvent('load', me);
     me.getSearchResultStore().filter();
   },
 
