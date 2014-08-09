@@ -70,6 +70,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
               {
                 xtype: 'panel',
                 region: 'center',
+                layout: 'fit',
                 flex: 0.5,
                 items: [
                   {
@@ -85,7 +86,9 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
                         itemId: 'searchResultDetails',
                         xtype: 'panel',
                         layout: {
-                          type: 'vbox'
+                          type: 'vbox',
+                          align: 'stretch',
+                          pack: 'start'
                         },
                         items: [
                           {
@@ -99,7 +102,8 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
                       },
                       {
                         xtype: 'nx-coreui-search-result-version-list',
-                        hidden: true
+                        hidden: true,
+                        flex: 1
                       }
                     ]
                   }
