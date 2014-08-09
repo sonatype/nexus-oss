@@ -79,7 +79,10 @@ Ext.define('NX.coreui.controller.Search', {
       mode: 'browse',
       group: true,
       iconName: 'search-folder',
-      weight: 500
+      weight: 500,
+      visible: function() {
+        return NX.Permissions.check('nexus:repositories', 'read');
+      }
     });
 
     me.getSearchFilterStore().each(function(model) {
@@ -92,7 +95,10 @@ Ext.define('NX.coreui.controller.Search', {
           view: { xtype: 'nx-searchfeature', searchFilter: model, bookmarkEnding: '' },
           iconName: 'search-default',
           weight: 20,
-          expanded: false
+          expanded: false,
+          visible: function() {
+            return NX.Permissions.check('nexus:repositories', 'read');
+          }
         });
       }
       else {
@@ -102,7 +108,10 @@ Ext.define('NX.coreui.controller.Search', {
           view: { xtype: 'nx-searchfeature', searchFilter: model, bookmarkEnding: '/' + model.getId() },
           iconName: 'search-default',
           description: model.get('description'),
-          authenticationRequired: false
+          authenticationRequired: false,
+          visible: function() {
+            return NX.Permissions.check('nexus:repositories', 'read');
+          }
         });
       }
     });
