@@ -46,7 +46,7 @@ Ext.define('NX.coreui.view.search.SearchResultVersionList', {
   features: [
     {
       ftype: 'grouping',
-      groupHeaderTpl: '{[values.name === "" ? "No " + values.columnName : values.name + " " + values.columnName]}'
+      groupHeaderTpl: '{columnName}: {name}'
     }
   ]
 
