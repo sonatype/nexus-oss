@@ -14,11 +14,16 @@ package org.sonatype.nexus.rapture.internal;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Provides {@code /index.html}.
@@ -30,6 +35,13 @@ import org.sonatype.sisu.goodies.template.TemplateParameters;
 public class IndexHtmlWebResource
     extends TemplateWebResource
 {
+  private final Provider<HttpServletRequest> servletRequestProvider;
+
+  @Inject
+  public IndexHtmlWebResource(final Provider<HttpServletRequest> servletRequestProvider) {
+    this.servletRequestProvider = checkNotNull(servletRequestProvider);
+  }
+
   @Override
   public String getPath() {
     return "/index.html";
@@ -42,8 +54,33 @@ public class IndexHtmlWebResource
 
   @Override
   protected byte[] generate() throws IOException {
+    boolean debug = isDebug();
+    log.trace("Debug: {}", debug);
+
     return render("index.vm", new TemplateParameters()
         .set("baseUrl", BaseUrlHolder.get())
+        .set("debug", debug)
     );
+  }
+
+  /**
+   * Check if ?debug parameter is given on the request.
+   */
+  private boolean isDebug() {
+    HttpServletRequest request = servletRequestProvider.get();
+    String value = request.getParameter("debug");
+
+    // not set
+    if (value == null) {
+      return false;
+    }
+
+    // ?debug
+    if (value.trim().length() == 0) {
+      return true;
+    }
+
+    // ?debug=<flag>
+    return Boolean.parseBoolean(value);
   }
 }

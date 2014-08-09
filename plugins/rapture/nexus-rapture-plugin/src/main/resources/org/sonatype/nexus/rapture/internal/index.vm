@@ -11,7 +11,12 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  *###
 #set($raptureUrl="$baseUrl/static/rapture")
-#set($baseappMode="debug") ## or "prod"
+
+#if($debug)
+  #set($baseappMode="debug")
+#else
+  #set($baseappMode="prod")
+#end
 
 <!DOCTYPE html>
 <html>
