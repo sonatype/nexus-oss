@@ -16,9 +16,23 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.search.SearchResultDetails', {
-  extend: 'NX.view.info.Panel',
+  extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-search-result-details',
 
-  title: undefined
+  layout: {
+    type: 'hbox',
+    align: 'stretch'
+  },
+
+  items: [
+    {
+      xtype: 'component',
+      margin: '10 0 0 10',
+      html: NX.Icons.img('search-result-default', 'x32')
+    },
+    {
+      xtype: 'nx-info'
+    }
+  ]
 
 });

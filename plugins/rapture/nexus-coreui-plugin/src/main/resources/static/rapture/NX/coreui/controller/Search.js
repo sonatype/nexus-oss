@@ -327,7 +327,7 @@ Ext.define('NX.coreui.controller.Search', {
       segments = searchResultModel.getId().split(':');
       searchResultDetails.items.get(0).hide();
       searchResultDetails.items.get(1).show();
-      searchResultDetails.items.get(1).showInfo({
+      searchResultDetails.items.get(1).items.get(1).showInfo({
         'Group': searchResultModel.get('group'),
         'Name': searchResultModel.get('name'),
         'Format': searchResultModel.get('format')
