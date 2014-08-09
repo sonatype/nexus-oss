@@ -34,6 +34,9 @@ Ext.define('NX.coreui.view.search.TextSearchCriteria', {
   labelAlign: 'top',
   labelSeparator: '',
 
+  // use custom (x) trigger art, so that custom (-) looks okay next to it
+  trigger1Cls: 'nx-form-fa-times-circle-trigger',
+
   filter: function() {
     var me = this;
     if (me.value) {
@@ -46,6 +49,7 @@ Ext.define('NX.coreui.view.search.TextSearchCriteria', {
     var me = this;
 
     if (me.removable) {
+      // (-)
       me.trigger2Cls = 'nx-form-fa-minus-circle-trigger';
     }
 
