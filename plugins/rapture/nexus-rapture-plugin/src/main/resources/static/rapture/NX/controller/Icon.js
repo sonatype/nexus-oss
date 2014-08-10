@@ -23,7 +23,7 @@ Ext.define('NX.controller.Icon', {
     'Ext.Error',
     'Ext.util.CSS',
     'NX.util.Url',
-    'NX.Icons',
+    'NX.Icons'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -170,10 +170,10 @@ Ext.define('NX.controller.Icon', {
 
     // complain if height/width are missing as this could cause the image not to display
     if (!icon.height) {
-      me.logWarn('Icon missing height: ' + icon.css)
+      me.logWarn('Icon missing height: ' + icon.css);
     }
     if (!icon.width) {
-      me.logWarn('Icon missing width: ' + icon.css)
+      me.logWarn('Icon missing width: ' + icon.css);
     }
 
     // TODO: complain if we are overwriting an icon
