@@ -19,8 +19,8 @@ Ext.define('NX.coreui.model.SearchResult', {
   extend: 'Ext.data.Model',
   fields: [
     'id',
-    'group',
-    'name',
+    'groupId',
+    'artifactId',
     'format'
   ]
 });

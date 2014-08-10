@@ -27,6 +27,8 @@ implements Comparable<SearchResultVersionXO>
 {
   private static final versionScheme = new GenericVersionScheme()
 
+  String groupId
+  String artifactId
   String version
   String repositoryId
   String repositoryName

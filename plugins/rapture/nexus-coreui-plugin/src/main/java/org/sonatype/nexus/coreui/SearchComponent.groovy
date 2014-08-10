@@ -98,8 +98,8 @@ extends DirectComponentSupport
       def segments = ga.split(':')
       results << new SearchResultXO(
           id: ga,
-          group: segments[0],
-          name: segments[1],
+          groupId: segments[0],
+          artifactId: segments[1],
           format: 'Maven2'
       )
     }
@@ -136,6 +136,8 @@ extends DirectComponentSupport
           // ignore, will use repo id
         }
         versions << new SearchResultVersionXO(
+            groupId: ai.groupId,
+            artifactId: ai.artifactId,
             version: ai.version,
             repositoryId: ai.repository,
             repositoryName: repositoryName,

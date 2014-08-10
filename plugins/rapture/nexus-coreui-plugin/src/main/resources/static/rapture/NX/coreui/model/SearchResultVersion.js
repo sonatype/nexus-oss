@@ -18,6 +18,8 @@
 Ext.define('NX.coreui.model.SearchResultVersion', {
   extend: 'Ext.data.Model',
   fields: [
+    'groupId',
+    'artifactId',
     'version',
     'repositoryId',
     'repositoryName',
