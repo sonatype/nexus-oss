@@ -67,7 +67,7 @@ Ext.define('NX.controller.dev.Permissions', {
           click: me.add
         },
         'nx-dev-permissions button[action=delete]': {
-          click: me.delete
+          click: me.delete_
         }
       }
     });
@@ -90,7 +90,7 @@ Ext.define('NX.controller.dev.Permissions', {
   /**
    * @private
    */
-  delete: function () {
+  delete_ : function () {
     var me = this,
         grid = me.getGrid(),
         editor = grid.getPlugin('editor');
