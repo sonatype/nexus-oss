@@ -82,19 +82,8 @@
     #message("Loading application...")
     #script("$raptureUrl/app.js")
 
-    ## Load plugin scripts
-    #if(!$debug)
-      #foreach($path in $preloadScripts)
-        #message("Loading plugin ${path}...")
-        #script("$baseUrl/$path")
-      #end
-    #end
-
     ## Finished
     #message("Initializing...")
-    <script type="text/javascript">
-      Ext.application('NX.app.Application');
-    </script>
   </div>
 </div>
 
