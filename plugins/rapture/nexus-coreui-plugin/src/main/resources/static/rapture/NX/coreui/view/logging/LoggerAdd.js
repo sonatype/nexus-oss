@@ -15,7 +15,7 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.search.LoggerAdd', {
+Ext.define('NX.coreui.view.logging.LoggerAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-logger-add',
 

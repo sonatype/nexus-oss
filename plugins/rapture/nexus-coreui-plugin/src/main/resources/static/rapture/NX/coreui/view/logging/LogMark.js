@@ -15,7 +15,7 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.search.LogMark', {
+Ext.define('NX.coreui.view.logging.LogMark', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-log-mark',
   requires: [

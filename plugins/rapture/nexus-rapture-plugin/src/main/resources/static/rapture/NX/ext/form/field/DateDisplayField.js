@@ -15,7 +15,7 @@
  *
  * @since 3.0
  */
-Ext.define('NX.ext.form.field.Timestamp', {
+Ext.define('NX.ext.form.field.DateDisplayField', {
   extend: 'Ext.form.field.Display',
   alias: 'widget.nx-datedisplayfield',
 
