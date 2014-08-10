@@ -17,6 +17,10 @@
  */
 Ext.define('NX.coreui.controller.AnalyticsEvents', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.util.Url',
+    'NX.util.DownloadHelper'
+  ],
 
   stores: [
     'AnalyticsEvent'

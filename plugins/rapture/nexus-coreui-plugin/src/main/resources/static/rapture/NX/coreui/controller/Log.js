@@ -20,6 +20,10 @@ Ext.define('NX.coreui.controller.Log', {
   mixins: {
     logAware: 'NX.LogAware'
   },
+  requires: [
+    'NX.util.Url',
+    'NX.util.DownloadHelper'
+  ],
 
   views: [
     'logging.LogViewer',
