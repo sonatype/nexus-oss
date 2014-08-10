@@ -115,7 +115,7 @@ Ext.define('NX.controller.MasterDetail', {
     var me = this;
 
     if (modelId) {
-      me.bookmarkAt(modelId)
+      me.bookmarkAt(modelId);
     }
 
     me.loadStore();
@@ -192,7 +192,7 @@ Ext.define('NX.controller.MasterDetail', {
     if (selected.length == 1) {
       modelId = selected[0].getId();
     }
-    me.bookmarkAt(modelId)
+    me.bookmarkAt(modelId);
   },
 
   /**
@@ -258,7 +258,7 @@ Ext.define('NX.controller.MasterDetail', {
     if (Ext.isDefined(selection) && selection.length > 0) {
       description = me.getDescription(selection[0]);
       NX.Dialogs.askConfirmation('Confirm deletion?', description, function () {
-        me.deleteModel(selection[0])
+        me.deleteModel(selection[0]);
       }, {scope: me});
     }
   },

@@ -39,7 +39,7 @@ Ext.define('NX.util.condition.WatchState', {
       if (!Ext.isDefined(me.fn)) {
         me.fn = function (value) {
           return value;
-        }
+        };
       }
       controller = NX.getApplication().getController('State');
       listeners = { scope: me };

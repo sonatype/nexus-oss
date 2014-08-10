@@ -343,7 +343,7 @@ Ext.define('NX.app.Application', {
         if (Ext.isBoolean(fn)) {
           fn = function () {
             return fn;
-          }
+          };
         }
         else if (Ext.isString(fn)) {
           var parts = fn.split('.'),
@@ -383,7 +383,7 @@ Ext.define('NX.app.Application', {
                 managedControllers.add({
                   id: controller,
                   active: NX.app.Application.defaultActivation
-                })
+                });
               }
               else if (Ext.isObject(controller) && Ext.isString(controller.id) && controller.id.length > 0) {
                 custom[key].push(controller.id);

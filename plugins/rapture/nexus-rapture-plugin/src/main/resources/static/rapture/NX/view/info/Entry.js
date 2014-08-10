@@ -44,7 +44,7 @@ Ext.define('NX.view.info.Entry', {
               name: key,
               value: value
             }
-        )
+        );
       }
     });
     if (this.getEl()) {

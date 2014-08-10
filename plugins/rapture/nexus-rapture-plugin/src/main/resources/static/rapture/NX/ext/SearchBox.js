@@ -120,7 +120,7 @@ Ext.define('NX.ext.SearchBox', {
       me.search(value);
     }
     else {
-      me.clearSearch()
+      me.clearSearch();
     }
   },
 

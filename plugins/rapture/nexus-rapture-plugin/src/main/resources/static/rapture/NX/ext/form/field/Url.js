@@ -41,7 +41,7 @@ Ext.define('NX.ext.form.field.Url', {
         url: field
       };
     }
-    return undefined
+    return undefined;
   }
 
 });

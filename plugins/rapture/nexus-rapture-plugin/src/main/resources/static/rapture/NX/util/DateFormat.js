@@ -93,7 +93,7 @@ Ext.define('NX.util.DateFormat', {
   timestampRenderer: function (format) {
     return function (value) {
       return NX.util.DateFormat.timestamp(value, format);
-    }
+    };
   },
 
   /**

@@ -131,7 +131,7 @@ Ext.define('NX.controller.State', {
           model.set('value', value);
         }
         if (!Ext.Object.equals(hash, model.get('hash'))) {
-          model.set('hash', hash)
+          model.set('hash', hash);
         }
       }
       else {

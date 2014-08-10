@@ -95,7 +95,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
           searchcleared: me.onSearchCleared,
           scope: me
         }
-      }
+      };
     }
 
     return Ext.create('Ext.ux.form.MultiSelect', {
@@ -155,7 +155,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
         return stringValue.toLowerCase().indexOf(value.toLowerCase()) != -1;
       }
       return false;
-    }})
+    }});
   },
 
   /**

@@ -98,7 +98,7 @@ Ext.define('NX.Permissions', {
     if (!Ext.isDefined(value)) {
       return me.ALL;
     }
-    return Ext.isNumber(value) ? value : me[value.toUpperCase()]
+    return Ext.isNumber(value) ? value : me[value.toUpperCase()];
   }
 
 });

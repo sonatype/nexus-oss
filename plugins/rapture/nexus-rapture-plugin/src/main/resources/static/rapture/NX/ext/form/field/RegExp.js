@@ -28,7 +28,7 @@ Ext.define('NX.ext.form.field.RegExp', {
     catch (err) {
       return err.message;
     }
-    return true
+    return true;
   }
 
 });

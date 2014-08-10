@@ -157,7 +157,7 @@ Ext.define('NX.controller.Message', {
         store = me.getMessageStore();
 
     if (!message.type) {
-      message.type = 'default'
+      message.type = 'default';
     }
 
     message.timestamp = new Date();
