@@ -13,7 +13,11 @@
 
 -->
 <features name="nexus">
-  <feature name="${project.artifactId}" description="Nexus base installation">
+  <feature name="${project.artifactId}" description="Nexus base installation" start-level="50">
+    <!--
+    Start extender after everything else
+    -->
+    <bundle start-level="100">${mvn:nexus-extender}</bundle>
     <!--
     Wrappers that require use of fragments
     -->
