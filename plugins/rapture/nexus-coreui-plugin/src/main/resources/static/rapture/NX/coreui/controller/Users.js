@@ -349,7 +349,7 @@ Ext.define('NX.coreui.controller.Users', {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.coreui_User.delete(model.getId(), model.get('realm'), function (response) {
+    NX.direct.coreui_User.delete_(model.getId(), model.get('realm'), function (response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({

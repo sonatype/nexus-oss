@@ -142,7 +142,7 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
     NX.Dialogs.askConfirmation('Export events',
         'Export and download analytics event data?<br/>No data will be sent to Sonatype.', function () {
           me.getList().getEl().mask('Exporting event data...');
-          NX.direct.analytics_Events.export(function (response) {
+          NX.direct.analytics_Events.export_(function (response) {
             me.getList().getEl().unmask();
             if (Ext.isObject(response) && response.success) {
               Ext.widget('nx-coreui-analytics-eventszipcreated').setValues(response.data);

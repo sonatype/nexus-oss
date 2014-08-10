@@ -272,7 +272,7 @@ Ext.define('NX.coreui.controller.Roles', {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.coreui_Role.delete(model.getId(), function (response) {
+    NX.direct.coreui_Role.delete_(model.getId(), function (response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({

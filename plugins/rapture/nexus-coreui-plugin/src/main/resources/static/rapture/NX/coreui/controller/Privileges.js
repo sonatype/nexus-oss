@@ -207,7 +207,7 @@ Ext.define('NX.coreui.controller.Privileges', {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.coreui_Privilege.delete(model.getId(), function (response) {
+    NX.direct.coreui_Privilege.delete_(model.getId(), function (response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({

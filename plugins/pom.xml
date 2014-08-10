@@ -536,8 +536,49 @@
           </executions>
         </plugin>
 
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>yuicompressor-maven-plugin</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <jswarn>false</jswarn>
+            <nominify>false</nominify>
+            <nomunge>false</nomunge>
+            <disableOptimizations>false</disableOptimizations>
+            <linebreakpos>-1</linebreakpos>
+            <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
+            <jslintOptions>
+              <white>true</white>
+              <sloppy>true</sloppy>
+            </jslintOptions>
+          </configuration>
+          <executions>
+            <execution>
+              <id>js</id>
+              <goals>
+                <goal>aggregate</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/rapture/${project.artifactId}-prod.js</output>
+                <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
+              </configuration>
+            </execution>
+            <execution>
+              <id>css</id>
+              <goals>
+                <goal>aggregate-css</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/rapture/${project.artifactId}-prod.css</output>
+                <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
+                <required>false</required>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
+
     <plugins>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
