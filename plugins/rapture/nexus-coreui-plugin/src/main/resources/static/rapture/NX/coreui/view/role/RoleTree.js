@@ -22,6 +22,8 @@ Ext.define('NX.coreui.view.role.RoleTree', {
     'NX.Icons'
   ],
 
+  layout: 'fit',
+
   /**
    * @override
    */
