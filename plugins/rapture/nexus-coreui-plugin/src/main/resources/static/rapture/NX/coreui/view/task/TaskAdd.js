@@ -68,7 +68,7 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
                 mode: 'local',
                 triggerAction: 'all',
                 emptyText: 'Select...',
-                selectOnFocus: false,
+                selectOnFocus: false
               },
               {
                 xtype: 'checkbox',

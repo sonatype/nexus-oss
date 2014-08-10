@@ -38,7 +38,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
     { header: 'Name', dataIndex: 'subjectCommonName', flex: 1 },
     { header: 'Issued To', dataIndex: 'issuerCommonName', flex: 1 },
     { header: 'Issued By', dataIndex: 'issuerCommonName', flex: 1 },
-    { header: 'Fingerprint', dataIndex: 'fingerprint', flex: 1 },
+    { header: 'Fingerprint', dataIndex: 'fingerprint', flex: 1 }
   ],
 
   emptyText: 'No SSL certificates',

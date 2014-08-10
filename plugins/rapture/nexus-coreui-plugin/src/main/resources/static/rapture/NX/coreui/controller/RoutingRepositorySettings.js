@@ -164,6 +164,6 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
         me.loadSettings(panel);
       }
     });
-  },
+  }
 
 });

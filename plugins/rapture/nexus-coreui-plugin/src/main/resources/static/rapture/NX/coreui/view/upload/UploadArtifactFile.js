@@ -50,7 +50,7 @@ Ext.define('NX.coreui.view.upload.UploadArtifactFile', {
               text: undefined, glyph: 'xf016@FontAwesome' /* fa-file-o */
             }
           },
-          { xtype: 'button', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete' },
+          { xtype: 'button', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete' }
         ]
       },
       {

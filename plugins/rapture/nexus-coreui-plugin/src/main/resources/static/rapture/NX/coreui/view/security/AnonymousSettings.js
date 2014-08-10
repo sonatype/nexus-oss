@@ -82,7 +82,7 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
                 allowBlank: false
               }
             ]
-          },
+          }
         ]
       }
     ];
