@@ -72,7 +72,7 @@ Ext.define('NX.app.Application', {
   appProperty: 'application',
 
   /**
-   * Relative to /rapture.html
+   * Relative to /index.html
    */
   appFolder: 'static/rapture/NX',
 
