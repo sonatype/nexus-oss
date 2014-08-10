@@ -75,14 +75,14 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
                   port: form.down('#port')
                 };
               }
-              return undefined
+              return undefined;
             }
           },
           {
             name: 'host',
             itemId: 'host',
             fieldLabel: 'Hostname',
-            helpText: 'The host name of an SMTP server.',
+            helpText: 'The host name of an SMTP server.'
           },
           {
             xtype: 'numberfield',
@@ -99,7 +99,7 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
             name: 'username',
             allowBlank: true,
             fieldLabel: 'Username',
-            helpText: 'The username used to access the SMTP server.',
+            helpText: 'The username used to access the SMTP server.'
           },
           {
             xtype: 'nx-password',

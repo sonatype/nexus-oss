@@ -79,14 +79,14 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         xtype: 'checkbox',
         name: 'fileTypeValidation',
         fieldLabel: 'File Content Validation',
-        helpText: 'Flag to check the remote file\'s content to see if it is valid. (e.g. not html error page), handy when you cannot enable strict checksum checking.',
+        helpText: 'Flag to check the remote file contents to see if it is valid. (e.g. not html error page), handy when you cannot enable strict checksum checking.',
         value: true
       },
       {
         xtype: 'combo',
         name: 'checksumPolicy',
         fieldLabel: 'Checksum Policy',
-        helpText: 'The checksum policy for this repository: Ignore: Don\'t check remote checksums. Warn: Log a warning if the checksum is bad but serve the artifact anyway. (Default...there are currently known checksum errors on Central). StrictIfExists: Do not serve the artifact if the checksum exists but is invalid. Strict: Require that a checksum exists on the remote repository and that it is valid.',
+        helpText: 'The checksum policy for this repository: Ignore: Do not check remote checksums. Warn: Log a warning if the checksum is bad but serve the artifact anyway. (Default...there are currently known checksum errors on Central). StrictIfExists: Do not serve the artifact if the checksum exists but is invalid. Strict: Require that a checksum exists on the remote repository and that it is valid.',
         emptyText: 'select a policy',
         editable: false,
         store: [

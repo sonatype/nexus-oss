@@ -115,7 +115,7 @@ Ext.define('NX.coreui.controller.Metrics', {
 
         // return gauge value
         function gv(name) {
-          return data.gauges[name].value
+          return data.gauges[name].value;
         }
 
         // update memory charts

@@ -462,7 +462,7 @@ Ext.define('NX.coreui.controller.Search', {
         id: cmp.criteriaId,
         value: cmp.getValue(),
         hidden: cmp.hidden
-      })
+      });
     });
 
     model = me.getSearchFilterModel().create(Ext.apply(values, {

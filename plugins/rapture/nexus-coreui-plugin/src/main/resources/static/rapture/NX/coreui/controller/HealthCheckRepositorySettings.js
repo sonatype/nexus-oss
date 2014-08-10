@@ -94,7 +94,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
         panel = me.getPanel();
       }
       panel.setRepository(model);
-      me.loadSettings()
+      me.loadSettings();
     }
     else {
       if (panel) {

@@ -55,7 +55,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxy', {
         xtype: 'checkbox',
         name: 'fileTypeValidation',
         fieldLabel: 'File Content Validation',
-        helpText: 'Flag to check the remote file\'s content to see if it is valid. (e.g. not html error page), handy when you cannot enable strict checksum checking.',
+        helpText: 'Flag to check the remote file contents to see if it is valid. (e.g. not html error page), handy when you cannot enable strict checksum checking.',
         value: true
       },
       {

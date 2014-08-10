@@ -97,7 +97,7 @@ Ext.define('NX.coreui.controller.SupportZip', {
             NX.util.DownloadHelper.downloadUrl(NX.util.Url.urlOf(
                 'service/siesta/wonderland/download/' + fileName + '?t=' + NX.util.Base64.encode(authToken)
             ));
-            win.close()
+            win.close();
           }
         }
     );

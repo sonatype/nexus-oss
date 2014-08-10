@@ -95,7 +95,7 @@ Ext.define('NX.coreui.view.support.SysInfo', {
         props.push({
           name: key,
           value: value
-        })
+        });
       });
       return props;
     }
@@ -144,7 +144,7 @@ Ext.define('NX.coreui.view.support.SysInfo', {
               nested.push({
                 name: key,
                 props: objectToProperties(value)
-              })
+              });
             });
 
             return me.nestedSectionTpl.apply({

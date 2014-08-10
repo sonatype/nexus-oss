@@ -60,7 +60,7 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
         queryMode: 'local',
         displayField: 'name',
         valueField: 'id'
-      }
+      };
     }
     else {
       idField = {

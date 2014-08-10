@@ -166,7 +166,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
       win.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         win.close();
-        me.showCertificateDetails(response.data)
+        me.showCertificateDetails(response.data);
       }
     });
   },
@@ -185,7 +185,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
       win.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         win.close();
-        me.showCertificateDetails(response.data)
+        me.showCertificateDetails(response.data);
       }
     });
   },

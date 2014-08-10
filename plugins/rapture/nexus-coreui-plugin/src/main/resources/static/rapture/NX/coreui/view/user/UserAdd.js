@@ -65,7 +65,7 @@ Ext.define('NX.coreui.view.user.UserAdd', {
         submitValue: false,
         validator: function () {
           var me = this;
-          return (me.up('form').down('#password').getValue() === me.getValue()) ? true : 'Passwords don\'t match';
+          return (me.up('form').down('#password').getValue() === me.getValue()) ? true : 'Passwords do not match';
         }
       }
     ]);

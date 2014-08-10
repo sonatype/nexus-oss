@@ -55,7 +55,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
             port: form.down('#port')
           };
         }
-        return undefined
+        return undefined;
       }
     },
     {
