@@ -98,7 +98,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
                 xtype: 'nx-valueset',
                 name: 'nonProxyHosts',
                 fieldLabel: 'Non Proxy Hosts',
-                helpText: 'List of host names to exclude from http proxy. Regular expressions are supported, e.g. \'.*\\.somecompany\\.com\'.',
+                helpText: "List of host names to exclude from http proxy. Regular expressions are supported, e.g. '.*\\.somecompany\\.com'.",
                 emptyText: 'enter a hostname',
                 sorted: true
               }

@@ -32,7 +32,7 @@ Ext.define('NX.coreui.view.HttpRequestSettings', {
       xtype: 'textfield',
       name: 'urlParameters',
       fieldLabel: 'URL parameters',
-      helpText: 'These are additional parameters sent along with the HTTP request. They are appended to the url along with a \'?\'. So \'foo=bar&foo2=bar2\' becomes \'HTTP://myurl?foo=bar&foo2=bar2\''
+      helpText: "Additional parameters to append to requests after '?'"
     },
     {
       xtype: 'numberfield',

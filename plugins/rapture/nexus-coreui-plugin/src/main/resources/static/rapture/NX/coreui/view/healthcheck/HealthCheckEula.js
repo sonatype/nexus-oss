@@ -64,7 +64,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckEula', {
               win.acceptFn.call();
             }
           }},
-          { xtype: 'button', text: 'I Don\'t Agree', handler: function() {
+          { xtype: 'button', text: 'I Do Not Agree', handler: function() {
             this.up('window').close();
           }},
           '->',
