@@ -21,6 +21,8 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
   extend: 'NX.controller.MasterDetail',
   requires: [
     'NX.Dialogs',
+    'NX.Messages',
+    'NX.Permissions'
   ],
 
   list: 'nx-coreui-repositoryroute-list',
