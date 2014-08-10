@@ -18,10 +18,11 @@
 Ext.define('NX.coreui.view.feed.FeedEntryList', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-coreui-feedentry-list',
+  requires: [
+    'NX.Icons'
+  ],
 
   store: 'FeedEntry',
-
-  iconCls: NX.Icons.cls('feed-default', 'x16'),
 
   viewConfig: {
     emptyText: 'No entries',
@@ -49,6 +50,16 @@ Ext.define('NX.coreui.view.feed.FeedEntryList', {
           '<p>{content}</p>'
       )
     }
-  ]
+  ],
 
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
+
+    me.iconCls = NX.Icons.cls('feed-default', 'x16');
+
+    me.callParent();
+  }
 });

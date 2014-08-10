@@ -18,6 +18,9 @@
 Ext.define('NX.coreui.view.ldap.LdapServerConnection', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-ldapserver-connection',
+  requires: [
+    'NX.Conditions'
+  ],
 
   api: {
     submit: 'NX.direct.ldap_LdapServer.update'
@@ -25,7 +28,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnection', {
   settingsFormSuccessMessage: function (data) {
     return 'LDAP server updated: ' + data['name'];
   },
-  editableCondition: NX.Conditions.isPermitted('security:ldapconfig', 'update'),
+
   editableMarker: 'You do not have permission to update LDAP servers',
 
   items: { xtype: 'nx-coreui-ldapserver-connection-fieldset' },
@@ -35,6 +38,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnection', {
    */
   initComponent: function () {
     var me = this;
+
+    me.editableCondition = NX.Conditions.isPermitted('security:ldapconfig', 'update');
 
     me.callParent(arguments);
 

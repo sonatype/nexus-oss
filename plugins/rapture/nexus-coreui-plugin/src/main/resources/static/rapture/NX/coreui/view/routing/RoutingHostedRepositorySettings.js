@@ -18,6 +18,9 @@
 Ext.define('NX.coreui.view.routing.RoutingHostedRepositorySettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-routing-hosted-repository-settings',
+  requires: [
+    'NX.util.Url'
+  ],
 
   config: {
     active: false,

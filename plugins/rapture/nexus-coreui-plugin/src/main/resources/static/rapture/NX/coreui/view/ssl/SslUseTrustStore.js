@@ -51,9 +51,8 @@ Ext.define('NX.coreui.view.ssl.SslUseTrustStore', {
           margin: '0 0 0 5'
         }
       ]
-    }
+    };
 
     me.callParent(arguments);
   }
-
 });

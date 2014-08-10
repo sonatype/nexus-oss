@@ -43,4 +43,4 @@ if (window.location.search === '?debug') {
   }
 }
 
-Ext.application('NX.app.Application');
+##Ext.application('NX.app.Application');

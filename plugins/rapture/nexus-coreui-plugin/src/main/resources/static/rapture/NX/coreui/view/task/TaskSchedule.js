@@ -18,6 +18,9 @@
 Ext.define('NX.coreui.view.task.TaskSchedule', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-task-schedule',
+  requires: [
+    'NX.Conditions'
+  ],
 
   api: {
     submit: 'NX.direct.coreui_Task.updateSchedule'
@@ -25,7 +28,7 @@ Ext.define('NX.coreui.view.task.TaskSchedule', {
   settingsFormSuccessMessage: function (data) {
     return 'Task rescheduled: ' + data['name'] + ' (' + data['typeName'] + ')';
   },
-  editableCondition: NX.Conditions.isPermitted('nexus:tasks', 'update'),
+
   editableMarker: 'You do not have permission to update tasks',
 
   items: [
@@ -41,6 +44,8 @@ Ext.define('NX.coreui.view.task.TaskSchedule', {
    */
   initComponent: function () {
     var me = this;
+
+    me.editableCondition = NX.Conditions.isPermitted('nexus:tasks', 'update');
 
     me.callParent(arguments);
 

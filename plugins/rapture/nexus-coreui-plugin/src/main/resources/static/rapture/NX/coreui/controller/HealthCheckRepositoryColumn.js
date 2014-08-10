@@ -17,6 +17,10 @@
  */
 Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Conditions',
+    'NX.util.Url'
+  ],
 
   models: [
     'HealthCheckRepositoryStatus'

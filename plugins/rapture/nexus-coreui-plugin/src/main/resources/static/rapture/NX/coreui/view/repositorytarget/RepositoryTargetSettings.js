@@ -18,6 +18,9 @@
 Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettings', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-repositorytarget-settings',
+  requires: [
+    'NX.Conditions'
+  ],
 
   api: {
     submit: 'NX.direct.coreui_RepositoryTarget.update'
@@ -25,11 +28,13 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettings', {
   settingsFormSuccessMessage: function (data) {
     return 'Repository target updated: ' + data['name'];
   },
-  editableCondition: NX.Conditions.isPermitted('nexus:targets', 'update'),
+
   editableMarker: 'You do not have permission to update targets',
 
   initComponent: function () {
     var me = this;
+
+    me.editableCondition = NX.Conditions.isPermitted('nexus:targets', 'update');
 
     me.items = [
       {
@@ -72,5 +77,4 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettings', {
 
     me.callParent(arguments);
   }
-
 });

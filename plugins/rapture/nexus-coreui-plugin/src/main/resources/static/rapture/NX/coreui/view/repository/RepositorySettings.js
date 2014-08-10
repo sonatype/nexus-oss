@@ -18,12 +18,16 @@
 Ext.define('NX.coreui.view.repository.RepositorySettings', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-repository-settings',
+  requires: [
+    'NX.Conditions'
+  ],
 
-  editableCondition: NX.Conditions.isPermitted('nexus:repositories', 'update'),
   editableMarker: 'You do not have permission to update repositories',
 
   initComponent: function () {
     var me = this;
+
+    me.editableCondition = NX.Conditions.isPermitted('nexus:repositories', 'update');
 
     me.items = me.items || [];
     Ext.Array.insert(me.items, 0, [

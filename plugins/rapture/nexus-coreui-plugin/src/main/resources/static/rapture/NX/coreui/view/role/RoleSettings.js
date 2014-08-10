@@ -18,6 +18,9 @@
 Ext.define('NX.coreui.view.role.RoleSettings', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-role-settings',
+  requires: [
+    'NX.Conditions'
+  ],
 
   api: {
     submit: 'NX.direct.coreui_Role.update'
@@ -25,18 +28,20 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
   settingsFormSuccessMessage: function (data) {
     return 'Role updated: ' + data['name'];
   },
-  editableCondition: NX.Conditions.and(
-      NX.Conditions.isPermitted('security:roles', 'update'),
-      NX.Conditions.formHasRecord('nx-coreui-role-settings', function (model) {
-        return !model.get('readOnly');
-      })
-  ),
+
   editableMarker: 'You do not have permission to update roles or role is readonly',
 
   initComponent: function () {
     var me = this,
         idField,
         roleStore = Ext.create('NX.coreui.store.Role');
+
+    me.editableCondition = NX.Conditions.and(
+        NX.Conditions.isPermitted('security:roles', 'update'),
+        NX.Conditions.formHasRecord('nx-coreui-role-settings', function (model) {
+          return !model.get('readOnly');
+        })
+    );
 
     roleStore.load();
 

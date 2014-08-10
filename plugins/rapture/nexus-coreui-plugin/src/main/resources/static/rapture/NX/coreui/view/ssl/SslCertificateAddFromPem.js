@@ -18,39 +18,51 @@
 Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-sslcertificate-add-from-pem',
+  requires: [
+    'NX.Icons'
+  ],
 
   title: 'Paste certificate as PEM',
   defaultFocus: 'pem',
 
-  items: {
-    xtype: 'nx-settingsform',
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
 
-    items: [
-      {
-        xtype: 'panel',
-        margin: '0 0 10 0',
-        layout: {
-          type: 'hbox'
+    me.items = {
+      xtype: 'nx-settingsform',
+
+      items: [
+        {
+          xtype: 'panel',
+          margin: '0 0 10 0',
+          layout: {
+            type: 'hbox'
+          },
+          items: [
+            { xtype: 'container', html: NX.Icons.img('sslcertificate-add-by-pem', 'x32') },
+            { xtype: 'container', html: 'Please paste a SSL certificate in PEM format.' }
+          ]
         },
-        items: [
-          { xtype: 'container', html: NX.Icons.img('sslcertificate-add-by-pem', 'x32') },
-          { xtype: 'container', html: 'Please paste a SSL certificate in PEM format.' }
-        ]
-      },
-      {
-        xtype: 'textareafield',
-        anchor: '100%',
-        name: 'pem',
-        itemId: 'pem'
-      }
-    ],
+        {
+          xtype: 'textareafield',
+          anchor: '100%',
+          name: 'pem',
+          itemId: 'pem'
+        }
+      ],
 
-    buttons: [
-      { text: 'Load Certificate', action: 'load', formBind: true, ui: 'primary' },
-      { text: 'Cancel', handler: function () {
-        this.up('window').close();
-      }}
-    ]
+      buttons: [
+        { text: 'Load Certificate', action: 'load', formBind: true, ui: 'primary' },
+        { text: 'Cancel', handler: function () {
+          this.up('window').close();
+        }}
+      ]
+    };
+
+    me.callParent();
   }
 
 });

@@ -18,7 +18,13 @@
 Ext.define('NX.coreui.view.task.TaskScheduleWeekly', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-task-schedule-weekly',
+  requires: [
+    'NX.util.DateFormat'
+  ],
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this,
         weekDays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],

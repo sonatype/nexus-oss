@@ -18,6 +18,9 @@
 Ext.define('NX.coreui.view.healthcheck.HealthCheckEula', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-healthcheck-eula',
+  requires: [
+      'NX.util.Url'
+  ],
 
   title: 'CLM Terms of Use',
 
@@ -28,40 +31,48 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckEula', {
   width: 640,
   height: 500,
 
-  items: {
-    xtype: 'box',
-    autoEl: {
-      tag: 'iframe',
-      src: NX.util.Url.urlOf('/static/healthcheck-tos.html')
-    }
-  },
-
   acceptFn: undefined,
 
-  dockedItems: [
-    {
-      xtype: 'toolbar',
-      dock: 'bottom',
-      ui: 'footer',
-      items: [
-        { xtype: 'button', text: 'I Agree', action: 'agree', formBind: true, ui: 'primary', handler: function() {
-          var me = this,
-              win = me.up('window');
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
 
-          win.close();
-          if (win.acceptFn) {
-            win.acceptFn.call();
+    me.items = {
+      xtype: 'box',
+          autoEl: {
+        tag: 'iframe',
+            src: NX.util.Url.urlOf('/static/healthcheck-tos.html')
+      }
+    };
+
+    me.dockedItems = [
+      {
+        xtype: 'toolbar',
+        dock: 'bottom',
+        ui: 'footer',
+        items: [
+          { xtype: 'button', text: 'I Agree', action: 'agree', formBind: true, ui: 'primary', handler: function() {
+            var me = this,
+                win = me.up('window');
+
+            win.close();
+            if (win.acceptFn) {
+              win.acceptFn.call();
+            }
+          }},
+          { xtype: 'button', text: 'I Don\'t Agree', handler: function() {
+            this.up('window').close();
+          }},
+          '->',
+          { xtype: 'component', html: '<a href="' + NX.util.Url.urlOf('/static/healthcheck-tos.html') +
+              '" target="_new">Download a copy of the license.</a>'
           }
-        }},
-        { xtype: 'button', text: 'I Don\'t Agree', handler: function() {
-          this.up('window').close();
-        }},
-        '->',
-        { xtype: 'component', html: '<a href="' + NX.util.Url.urlOf('/static/healthcheck-tos.html') +
-            '" target="_new">Download a copy of the license.</a>'
-        }
-      ]
-    }
-  ]
+        ]
+      }
+    ];
 
+    me.callParent();
+  }
 });

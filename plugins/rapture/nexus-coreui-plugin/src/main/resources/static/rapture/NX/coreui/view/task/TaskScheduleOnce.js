@@ -18,7 +18,13 @@
 Ext.define('NX.coreui.view.task.TaskScheduleOnce', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-task-schedule-once',
+  requires: [
+    'NX.util.DateFormat'
+  ],
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this;
 

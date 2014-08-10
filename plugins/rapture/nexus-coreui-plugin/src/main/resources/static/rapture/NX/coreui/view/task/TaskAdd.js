@@ -18,6 +18,9 @@
 Ext.define('NX.coreui.view.task.TaskAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-task-add',
+  requires: [
+      'NX.Conditions'
+  ],
 
   title: 'Create new task',
 
@@ -126,5 +129,4 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
       }
     });
   }
-
 });

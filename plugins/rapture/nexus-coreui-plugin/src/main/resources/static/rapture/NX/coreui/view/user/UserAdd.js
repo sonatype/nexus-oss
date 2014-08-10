@@ -18,24 +18,30 @@
 Ext.define('NX.coreui.view.user.UserAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-user-add',
+  requires: [
+    'NX.Conditions'
+  ],
 
   title: 'Create new user',
   defaultFocus: 'id',
 
-  items: {
-    xtype: 'nx-coreui-user-settings',
-    api: {
-      submit: 'NX.direct.coreui_User.create'
-    },
-    settingsFormSuccessMessage: function (data) {
-      return 'User created: ' + data['id'];
-    },
-    editableCondition: NX.Conditions.isPermitted('security:users', 'create'),
-    editableMarker: 'You do not have permission to create users'
-  },
-
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this;
+
+    me.items = {
+      xtype: 'nx-coreui-user-settings',
+      api: {
+        submit: 'NX.direct.coreui_User.create'
+      },
+      settingsFormSuccessMessage: function (data) {
+        return 'User created: ' + data['id'];
+      },
+      editableCondition: NX.Conditions.isPermitted('security:users', 'create'),
+      editableMarker: 'You do not have permission to create users'
+    };
 
     me.callParent(arguments);
 

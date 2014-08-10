@@ -18,6 +18,9 @@
 Ext.define('NX.coreui.view.search.LogMark', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-log-mark',
+  requires: [
+    'NX.Conditions'
+  ],
 
   title: 'Mark log',
   defaultFocus: 'message',
@@ -29,7 +32,6 @@ Ext.define('NX.coreui.view.search.LogMark', {
     },
     settingsFormSuccessMessage: 'Log has been marked',
     settingsFormSubmitOnEnter: true,
-    editableCondition: NX.Conditions.isPermitted('nexus:logconfig', 'update'),
     editableMarker: 'You do not have permission to mark the log',
     items: [
       {
@@ -41,6 +43,16 @@ Ext.define('NX.coreui.view.search.LogMark', {
         emptyText: 'enter a marker text'
       }
     ]
-  }
+  },
 
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
+
+    me.editableCondition = NX.Conditions.isPermitted('nexus:logconfig', 'update');
+
+    me.callParent();
+  }
 });

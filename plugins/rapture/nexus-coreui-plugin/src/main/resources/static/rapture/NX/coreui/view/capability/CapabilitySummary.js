@@ -18,56 +18,69 @@
 Ext.define('NX.coreui.view.capability.CapabilitySummary', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-capability-summary',
+  requires: [
+    'NX.Conditions',
+    'NX.Icons'
+  ],
 
   title: 'Summary',
 
-  items: [
-    {
-      layout: 'column',
-      items: [
-        {
-          xtype: 'nx-info',
-          columnWidth: 1
-        },
-        {
-          margin: '10 20 0 10',
-          items: [
-            { itemId: 'stateImage' },
-            { itemId: 'stateLabel', margin: '5 0 0 0' }
-          ]
-        }
-      ]
-    },
-    {
-      xtype: 'nx-settingsform',
-      api: {
-        submit: 'NX.direct.capability_Capability.updateNotes'
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
+
+    me.items = [
+      {
+        layout: 'column',
+        items: [
+          {
+            xtype: 'nx-info',
+            columnWidth: 1
+          },
+          {
+            margin: '10 20 0 10',
+            items: [
+              { itemId: 'stateImage' },
+              { itemId: 'stateLabel', margin: '5 0 0 0' }
+            ]
+          }
+        ]
       },
-      settingsFormSuccessMessage: function (data) {
-        var description = 'Capability updated: ' + data['typeName'];
-        if (data['description']) {
-          description += ' - ' + data['description'];
-        }
-        return description;
-      },
-      editableCondition: NX.Conditions.isPermitted('nexus:capabilities', 'update'),
-      editableMarker: 'You do not have permission to update capabilities',
-      items: [
-        {
-          xtype: 'hiddenfield',
-          name: 'id'
+      {
+        xtype: 'nx-settingsform',
+        api: {
+          submit: 'NX.direct.capability_Capability.updateNotes'
         },
-        {
-          xtype: 'textarea',
-          fieldLabel: 'Notes',
-          helpText: "Optional notes about configured capability.",
-          name: 'notes',
-          allowBlank: true,
-          anchor: '100%'
-        }
-      ]
-    }
-  ],
+        settingsFormSuccessMessage: function (data) {
+          var description = 'Capability updated: ' + data['typeName'];
+          if (data['description']) {
+            description += ' - ' + data['description'];
+          }
+          return description;
+        },
+        editableCondition: NX.Conditions.isPermitted('nexus:capabilities', 'update'),
+        editableMarker: 'You do not have permission to update capabilities',
+        items: [
+          {
+            xtype: 'hiddenfield',
+            name: 'id'
+          },
+          {
+            xtype: 'textarea',
+            fieldLabel: 'Notes',
+            helpText: "Optional notes about configured capability.",
+            name: 'notes',
+            allowBlank: true,
+            anchor: '100%'
+          }
+        ]
+      }
+    ];
+
+    me.callParent();
+  },
 
   /**
    * @public

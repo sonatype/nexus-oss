@@ -61,7 +61,10 @@
 
   <div id="code-load" class="x-hide-display">
     #macro(message $text)
-      <script type="text/javascript">document.getElementById('loading-msg').innerHTML = '$text';</script>
+      <script type="text/javascript">
+        console.log('$text');
+        document.getElementById('loading-msg').innerHTML = '$text';
+      </script>
     #end
     #macro(script $src)
       <script type="text/javascript" src="$src?$urlSuffix"></script>
@@ -79,8 +82,19 @@
     #message("Loading application...")
     #script("$raptureUrl/app.js")
 
+    ## Load plugin scripts
+    #if(!$debug)
+      #foreach($path in $preloadScripts)
+        #message("Loading plugin ${path}...")
+        #script("$baseUrl/$path")
+      #end
+    #end
+
     ## Finished
     #message("Initializing...")
+    <script type="text/javascript">
+      Ext.application('NX.app.Application');
+    </script>
   </div>
 </div>
 

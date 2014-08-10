@@ -542,10 +542,10 @@
           <version>1.0.0</version>
           <configuration>
             <jswarn>false</jswarn>
-            <nominify>false</nominify>
-            <nomunge>false</nomunge>
-            <disableOptimizations>false</disableOptimizations>
-            <linebreakpos>-1</linebreakpos>
+            <nominify>true</nominify>
+            <nomunge>true</nomunge>
+            <disableOptimizations>true</disableOptimizations>
+            <linebreakpos>0</linebreakpos>
             <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
             <jslintOptions>
               <white>true</white>

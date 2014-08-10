@@ -18,8 +18,20 @@
 Ext.define('NX.coreui.view.analytics.EventsZipCreated', {
   extend: 'NX.coreui.view.support.FileCreated',
   alias: 'widget.nx-coreui-analytics-eventszipcreated',
+  requires: [
+    'NX.Icons'
+  ],
 
   fileType: 'Events ZIP',
-  fileIcon: NX.Icons.img('analyticsevent-zip', 'x32')
 
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
+
+    me.fileIcon = NX.Icons.img('analyticsevent-zip', 'x32');
+
+    me.callParent();
+  }
 });

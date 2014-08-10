@@ -44,5 +44,4 @@ Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
       me.hide();
     }
   }
-
 });

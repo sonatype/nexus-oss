@@ -18,21 +18,32 @@
 Ext.define('NX.coreui.view.search.SearchResultDetails', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-search-result-details',
+  requires: [
+    'NX.Icons'
+  ],
 
   layout: {
     type: 'hbox',
     align: 'stretch'
   },
 
-  items: [
-    {
-      xtype: 'component',
-      margin: '10 0 0 10',
-      html: NX.Icons.img('search-component-detail', 'x32')
-    },
-    {
-      xtype: 'nx-info'
-    }
-  ]
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
 
+    me.items = [
+      {
+        xtype: 'component',
+        margin: '10 0 0 10',
+        html: NX.Icons.img('search-component-detail', 'x32')
+      },
+      {
+        xtype: 'nx-info'
+      }
+    ];
+
+    me.callParent();
+  }
 });

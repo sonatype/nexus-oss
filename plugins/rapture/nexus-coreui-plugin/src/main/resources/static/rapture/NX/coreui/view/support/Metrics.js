@@ -213,5 +213,4 @@ Ext.define('NX.coreui.view.support.Metrics', {
   setThreadStatesData: function (data) {
     this.down('panel #threadStates').getStore().loadData(data);
   }
-
 });

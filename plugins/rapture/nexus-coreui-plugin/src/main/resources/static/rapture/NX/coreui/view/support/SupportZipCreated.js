@@ -18,15 +18,19 @@
 Ext.define('NX.coreui.view.support.SupportZipCreated', {
   extend: 'NX.coreui.view.support.FileCreated',
   alias: 'widget.nx-coreui-support-supportzipcreated',
+  requires: [
+      'NX.Icons'
+  ],
 
   fileType: 'Support ZIP',
-  fileIcon: NX.Icons.img('supportzip-zip', 'x32'),
 
   /**
    * @override
    */
   initComponent: function () {
     var me = this;
+
+    me.fileIcon = NX.Icons.img('supportzip-zip', 'x32');
 
     me.callParent(arguments);
 
@@ -67,5 +71,4 @@ Ext.define('NX.coreui.view.support.SupportZipCreated', {
       me.truncatedWarning.show();
     }
   }
-
 });

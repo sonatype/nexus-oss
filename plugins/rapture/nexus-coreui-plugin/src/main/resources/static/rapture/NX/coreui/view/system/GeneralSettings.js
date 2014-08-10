@@ -18,47 +18,60 @@
 Ext.define('NX.coreui.view.system.GeneralSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-system-general-settings',
+  requires: [
+    'NX.Conditions',
+    'NX.util.Url'
+  ],
 
-  items: [
-    {
-      xtype: 'nx-settingsform',
-      settingsFormSuccessMessage: 'General system settings $action',
-      api: {
-        load: 'NX.direct.coreui_GeneralSettings.read',
-        submit: 'NX.direct.coreui_GeneralSettings.update'
-      },
-      editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
-      editableMarker: 'You do not have permission to configure general settings',
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
 
-      items: [
-        {
-          xtype: 'label',
-          html: '<p>Set the base URL for the server.  This is primarily used when generating email notifications.</p>'
+    me.items = [
+      {
+        xtype: 'nx-settingsform',
+        settingsFormSuccessMessage: 'General system settings $action',
+        api: {
+          load: 'NX.direct.coreui_GeneralSettings.read',
+          submit: 'NX.direct.coreui_GeneralSettings.update'
         },
-        {
-          xtype: 'textfield',
-          name: 'baseUrl',
-          itemId: 'baseUrl',
-          fieldLabel: 'Base URL',
-          helpText: 'This is the Base URL of the Nexus web application.  i.e. http://localhost:8081/nexus',
-          allowBlank: true,
-          vtype: 'url',
-          emptyText: NX.util.Url.baseUrl
-        },
-        {
-          xtype: 'label',
-          html: '<p>Optionally force the base URL which will be used by all server responses.</p>' +
-              '<p>This is an advanced feature and only is applicable to rare cases.  Improper usage of this setting could negatively impact users of the system.</p>'
-        },
-        {
-          xtype: 'checkbox',
-          name: 'forceBaseUrl',
-          itemId: 'forceBaseUrl',
-          boxLabel: 'Force base URL',
-          disabled: true
-        }
-      ]
-    }
-  ]
+        editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
+        editableMarker: 'You do not have permission to configure general settings',
+
+        items: [
+          {
+            xtype: 'label',
+            html: '<p>Set the base URL for the server.  This is primarily used when generating email notifications.</p>'
+          },
+          {
+            xtype: 'textfield',
+            name: 'baseUrl',
+            itemId: 'baseUrl',
+            fieldLabel: 'Base URL',
+            helpText: 'This is the Base URL of the Nexus web application.  i.e. http://localhost:8081/nexus',
+            allowBlank: true,
+            vtype: 'url',
+            emptyText: NX.util.Url.baseUrl
+          },
+          {
+            xtype: 'label',
+            html: '<p>Optionally force the base URL which will be used by all server responses.</p>' +
+                '<p>This is an advanced feature and only is applicable to rare cases.  Improper usage of this setting could negatively impact users of the system.</p>'
+          },
+          {
+            xtype: 'checkbox',
+            name: 'forceBaseUrl',
+            itemId: 'forceBaseUrl',
+            boxLabel: 'Force base URL',
+            disabled: true
+          }
+        ]
+      }
+    ];
+
+    me.callParent();
+  }
 
 });

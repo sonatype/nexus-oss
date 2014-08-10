@@ -18,6 +18,9 @@
 Ext.define('NX.coreui.view.ssl.SslCertificateDetailsWindow', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-sslcertificate-details-window',
+  requires: [
+    'NX.Conditions'
+  ],
 
   title: 'Certificate Details',
 

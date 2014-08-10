@@ -18,6 +18,9 @@
 Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-repositoryroute-settings',
+  requires: [
+    'NX.Conditions'
+  ],
 
   api: {
     submit: 'NX.direct.coreui_RepositoryRoute.update'
@@ -25,7 +28,6 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
   settingsFormSuccessMessage: function (data) {
     return 'Repository route updated: ' + data['pattern'];
   },
-  editableCondition: NX.Conditions.isPermitted('nexus:routes', 'update'),
   editableMarker: 'You do not have permission to update routes',
 
   models: [
@@ -34,6 +36,8 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
 
   initComponent: function () {
     var me = this;
+
+    me.editableCondition = NX.Conditions.isPermitted('nexus:routes', 'update');
 
     me.groupStore = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
     me.mon(me.groupStore, 'load', function (store) {
@@ -102,5 +106,4 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
 
     me.callParent(arguments);
   }
-
 });

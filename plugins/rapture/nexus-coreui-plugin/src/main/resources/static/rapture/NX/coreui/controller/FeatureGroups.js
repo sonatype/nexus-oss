@@ -90,5 +90,4 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       }
     ]);
   }
-
 });

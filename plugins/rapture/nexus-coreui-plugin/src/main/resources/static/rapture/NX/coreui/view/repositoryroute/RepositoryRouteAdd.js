@@ -18,20 +18,31 @@
 Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-repositoryroute-add',
+  requires: [
+    'NX.Conditions'
+  ],
 
   title: 'Create new route',
   defaultFocus: 'name',
 
-  items: {
-    xtype: 'nx-coreui-repositoryroute-settings',
-    api: {
-      submit: 'NX.direct.coreui_RepositoryRoute.create'
-    },
-    settingsFormSuccessMessage: function (data) {
-      return 'Repository route created: ' + data['pattern'];
-    },
-    editableCondition: NX.Conditions.isPermitted('nexus:routes', 'create'),
-    editableMarker: 'You do not have permission to create routes'
-  }
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
 
+    me.items = {
+      xtype: 'nx-coreui-repositoryroute-settings',
+      api: {
+        submit: 'NX.direct.coreui_RepositoryRoute.create'
+      },
+      settingsFormSuccessMessage: function (data) {
+        return 'Repository route created: ' + data['pattern'];
+      },
+      editableCondition: NX.Conditions.isPermitted('nexus:routes', 'create'),
+      editableMarker: 'You do not have permission to create routes'
+    };
+
+    me.callParent();
+  }
 });

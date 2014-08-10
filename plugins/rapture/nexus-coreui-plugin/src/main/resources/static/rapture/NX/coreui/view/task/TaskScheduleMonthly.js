@@ -18,7 +18,13 @@
 Ext.define('NX.coreui.view.task.TaskScheduleMonthly', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-task-schedule-monthly',
+  requires: [
+    'NX.util.DateFormat'
+  ],
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this,
         columns = [];

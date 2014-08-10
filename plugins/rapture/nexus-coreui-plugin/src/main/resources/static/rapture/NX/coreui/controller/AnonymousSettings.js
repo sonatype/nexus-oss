@@ -19,7 +19,7 @@ Ext.define('NX.coreui.controller.AnonymousSettings', {
   extend: 'Ext.app.Controller',
 
   views: [
-    'security.AnonymousSettings',
+    'security.AnonymousSettings'
   ],
 
   /**

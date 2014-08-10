@@ -17,6 +17,11 @@
  */
 Ext.define('NX.coreui.controller.Feeds', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Permissions',
+    'NX.Bookmarks',
+    'NX.Conditions'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },

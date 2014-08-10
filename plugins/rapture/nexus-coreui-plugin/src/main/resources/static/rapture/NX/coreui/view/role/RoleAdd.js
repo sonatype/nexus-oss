@@ -18,6 +18,9 @@
 Ext.define('NX.coreui.view.role.RoleAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-role-add',
+  requires: [
+    'NX.Conditions'
+  ],
 
   title: 'Create new role',
   defaultFocus: 'id',

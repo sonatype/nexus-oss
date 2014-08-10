@@ -18,6 +18,9 @@
 Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
   extend: 'Ext.tree.Panel',
   alias: 'widget.nx-coreui-repositorybrowse-tree',
+  requires: [
+    'NX.Icons'
+  ],
 
   viewConfig: {
     markDirty: false
@@ -111,5 +114,4 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
 
     me.callParent(arguments);
   }
-
 });

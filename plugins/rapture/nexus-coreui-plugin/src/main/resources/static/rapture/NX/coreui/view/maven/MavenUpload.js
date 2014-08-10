@@ -46,5 +46,4 @@ Ext.define('NX.coreui.view.maven.MavenUpload', {
       }
     ]);
   }
-
 });

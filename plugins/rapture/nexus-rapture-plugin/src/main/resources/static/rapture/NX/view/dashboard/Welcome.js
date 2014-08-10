@@ -19,6 +19,9 @@
 Ext.define('NX.view.dashboard.Welcome', {
   extend: 'Ext.Panel',
   alias: 'widget.nx-dashboard-welcome',
+  requires: [
+    'NX.State'
+  ],
 
   layout: {
     type: 'vbox',
@@ -26,28 +29,37 @@ Ext.define('NX.view.dashboard.Welcome', {
     pack: 'start'
   },
 
-  items: [
-    {
-      xtype: 'image',
-      cls: 'nx-icon-nexus-x100',
-      style: {
-        margin: '100px 0 0 0'
-      }
-    },
-    {
-      xtype: 'label',
-      html: '<code>' +
-          'Nexus <em>' + NX.State.getValue('status')['edition'] + '</em> ' +
-          NX.State.getValue('status')['version'] +
-          '</code>',
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
 
-      style: {
-        'color': '#000000',
-        'font-size': '20px',
-        'font-weight': 'bold',
-        'text-align': 'center',
-        'padding': '20px'
+    me.items = [
+      {
+        xtype: 'image',
+        cls: 'nx-icon-nexus-x100',
+        style: {
+          margin: '100px 0 0 0'
+        }
+      },
+      {
+        xtype: 'label',
+        html: '<code>' +
+            'Nexus <em>' + NX.State.getValue('status')['edition'] + '</em> ' +
+            NX.State.getValue('status')['version'] +
+            '</code>',
+
+        style: {
+          'color': '#000000',
+          'font-size': '20px',
+          'font-weight': 'bold',
+          'text-align': 'center',
+          'padding': '20px'
+        }
       }
-    }
-  ]
+    ];
+
+    me.callParent();
+  }
 });
