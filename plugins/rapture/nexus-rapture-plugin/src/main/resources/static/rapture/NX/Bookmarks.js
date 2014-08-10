@@ -71,7 +71,7 @@ Ext.define('NX.Bookmarks', {
   fromSegments: function (segments) {
     var token;
     if (Ext.isDefined(segments)) {
-      token = Ext.Array.from(segments).join(':')
+      token = Ext.Array.from(segments).join(':');
     }
     return Ext.create('NX.Bookmark', { token: token });
   },
