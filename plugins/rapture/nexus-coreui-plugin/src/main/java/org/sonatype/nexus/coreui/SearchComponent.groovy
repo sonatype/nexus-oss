@@ -124,7 +124,7 @@ extends DirectComponentSupport
           bq, null, null, null, null, false, null
       )
       log.info('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
-      def versions = [] as SortedSet
+      def versions = [] as SortedSet<SearchResultVersionXO>
       iterator.each { ai ->
         String path = gavCalculator.gavToPath(ai.calculateGav())
         String name = new File(path).getName()
@@ -146,7 +146,11 @@ extends DirectComponentSupport
             type: FilenameUtils.getExtension(name)
         )
       }
-      return versions as List
+      def versionOrder = 0
+      return versions.collect { version ->
+        version.versionOrder = versionOrder++
+        return version
+      }
     }
     finally {
       iterator?.close()

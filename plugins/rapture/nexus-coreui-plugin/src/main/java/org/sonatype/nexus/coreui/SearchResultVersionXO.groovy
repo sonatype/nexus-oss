@@ -30,6 +30,7 @@ implements Comparable<SearchResultVersionXO>
   String groupId
   String artifactId
   String version
+  Integer versionOrder
   String repositoryId
   String repositoryName
   String path

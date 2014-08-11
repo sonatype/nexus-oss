@@ -22,6 +22,7 @@ Ext.define('NX.coreui.model.SearchResultVersion', {
     'groupId',
     'artifactId',
     'version',
+    'versionOrder',
     'repositoryId',
     'repositoryName',
     'path',
