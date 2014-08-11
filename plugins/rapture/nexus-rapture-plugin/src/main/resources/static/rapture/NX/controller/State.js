@@ -209,11 +209,11 @@ Ext.define('NX.controller.State', {
     oldUiSettings = oldUiSettings || {};
 
     if (uiSettings.debugAllowed !== oldUiSettings.debugAllowed) {
-      NX.State.setValue('debug', uiSettings.debugAllowed && (window.location.search === '?debug'));
+      NX.State.setValue('debug', uiSettings.debugAllowed && (NX.global.location.search === '?debug'));
     }
 
     if (uiSettings.title !== oldUiSettings.title) {
-      document.title = document.title.replace(oldUiSettings.title, uiSettings.title);
+      NX.global.document.title = NX.global.document.title.replace(oldUiSettings.title, uiSettings.title);
     }
 
     if (me.statusProvider) {
@@ -396,7 +396,7 @@ Ext.define('NX.controller.State', {
           'Application will be reloaded as server has been restarted',
           {
             fn: function () {
-              window.location.reload();
+              NX.global.location.reload();
             }
           }
       );

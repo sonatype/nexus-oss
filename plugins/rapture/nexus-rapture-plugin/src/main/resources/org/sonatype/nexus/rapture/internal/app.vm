@@ -10,12 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  *###
+
+Ext.ns('NX);
+
 Ext.Loader.setConfig({
   enabled: true,
   paths: {
     NX: 'static/rapture/NX' ## relative to /index.html
   }
 });
+
+## Define global object reference
+NX.global = (function() {
+  if (window !== undefined) {
+    return window;
+  }
+  if (global !== undefined) {
+    return global;
+  }
+  throw new Error('Unable to determine global object');
+}());
 
 Ext.ns('NX.app');
 
@@ -43,4 +57,5 @@ if (window.location.search === '?debug') {
   }
 }
 
+## Create and start application
 Ext.application('NX.app.Application');

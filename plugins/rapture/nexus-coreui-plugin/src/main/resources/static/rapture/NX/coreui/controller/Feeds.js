@@ -197,7 +197,7 @@ Ext.define('NX.coreui.controller.Feeds', {
         selection = me.getList().getSelectionModel().getSelection();
 
     if (selection.length) {
-      window.open(selection[0].get('url'));
+      NX.global.open(selection[0].get('url'));
     }
   },
 

@@ -20,7 +20,8 @@
 Ext.define('NX.coreui.controller.SupportRequest', {
   extend: 'Ext.app.Controller',
   requires: [
-      'NX.State'
+    'NX.State',
+    'NX.Messages'
   ],
 
   views: [
@@ -63,9 +64,9 @@ Ext.define('NX.coreui.controller.SupportRequest', {
    * Open sonatype support in a new browser window/tab.
    */
   makeRequest: function () {
-    var win = window.open('http://links.sonatype.com/products/nexus/pro/support-request');
+    var win = NX.global.open('http://links.sonatype.com/products/nexus/pro/support-request');
     if (win == null) {
-      alert('Window pop-up was blocked!');
+      NX.Messages.add({text: 'Window pop-up was blocked!', type: 'danger'});
     }
   }
 

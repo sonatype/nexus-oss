@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext*/
+/*global Ext, NX*/
 
 /**
  * Helper to facilitate browser-based file downloads.
@@ -19,6 +19,9 @@
  */
 Ext.define('NX.util.DownloadHelper', {
   singleton: true,
+  requires: [
+    'NX.Messages'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },
@@ -81,12 +84,13 @@ Ext.define('NX.util.DownloadHelper', {
     // TODO: Form method could be handy to GET/POST w/params vs link to just GET?
 
     // open new window in hidden download-from to initiate download
-    win = window.open(url, me.windowName);
+    win = NX.global.open(url, me.windowName);
     if (win == null) {
-      alert('Download window pop-up was blocked!');
+      NX.Messages.add({text: 'Download window pop-up was blocked!', type: 'danger'});
       return false;
     }
     else {
+      NX.Messages.add({text: 'Download initiated', type: 'info'});
       return true;
     }
   }

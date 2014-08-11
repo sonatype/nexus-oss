@@ -126,7 +126,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
         delegate: view.getCellSelector(column),
         maxWidth: 500,
         mouseOffset: [0, 0],
-        renderTo: document.body,
+        renderTo: NX.global.document.body,
         dismissDelay: 60000,
         listeners: {
           beforeshow: Ext.bind(me.updateHealthCheckColumnTooltip, me)

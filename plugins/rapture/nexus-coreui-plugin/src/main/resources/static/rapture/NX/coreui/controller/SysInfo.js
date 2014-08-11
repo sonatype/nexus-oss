@@ -117,7 +117,7 @@ Ext.define('NX.coreui.controller.SysInfo', {
         panel = me.getSysInfo(),
         win;
 
-    win = window.open('', '', 'width=640,height=480');
+    win = NX.global.open('', '', 'width=640,height=480');
     if (win == null) {
       NX.Messages.add({ text: 'Print window pop-up was blocked!', type: 'warning' });
       return;

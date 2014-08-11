@@ -398,7 +398,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
    * @param path to download
    */
   downloadPath: function(url, path) {
-    window.open(url + path);
+    NX.global.open(url + path);
   },
 
   /**
