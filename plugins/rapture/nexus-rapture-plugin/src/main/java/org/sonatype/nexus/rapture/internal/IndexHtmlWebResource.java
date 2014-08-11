@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.web.BaseUrlHolder;
-import org.sonatype.nexus.webresources.WebResourceService;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -41,16 +40,12 @@ public class IndexHtmlWebResource
 
   private final Provider<HttpServletRequest> servletRequestProvider;
 
-  private final Provider<WebResourceService> webResourceServiceProvider;
-
   @Inject
   public IndexHtmlWebResource(final Provider<SystemStatus> systemStatusProvider,
-                              final Provider<HttpServletRequest> servletRequestProvider,
-                              final Provider<WebResourceService> webResourceServiceProvider)
+                              final Provider<HttpServletRequest> servletRequestProvider)
   {
     this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.servletRequestProvider = checkNotNull(servletRequestProvider);
-    this.webResourceServiceProvider = checkNotNull(webResourceServiceProvider);
   }
 
   @Override
