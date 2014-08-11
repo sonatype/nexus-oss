@@ -327,7 +327,10 @@ Ext.define('NX.coreui.controller.Search', {
    */
   onRefresh: function() {
     var me = this;
-    me.getSearchResultStore().filter();
+
+    if (me.getSearchFeature()) {
+      me.getSearchResultStore().filter();
+    }
   },
 
   /**
