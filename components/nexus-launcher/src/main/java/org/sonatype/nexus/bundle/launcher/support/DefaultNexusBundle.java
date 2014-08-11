@@ -555,22 +555,7 @@ public class DefaultNexusBundle
    * @return configuration strategy. Never null.
    */
   private ConfigurationStrategy determineConfigurationStrategy() {
-    final File libDir = new File(getConfiguration().getTargetDirectory(), "nexus/lib");
-    // nexus-bootstrap-<version>.jar is only present starting with version 2.1
-    final String[] nexusBootstrapJarsBiggerThen2Dot1 = libDir.list(new FilenameFilter()
-    {
-      @Override
-      public boolean accept(final File dir, final String name) {
-        return name.startsWith("nexus-")
-            && name.endsWith(".jar")
-            && !name.startsWith("nexus-bootstrap-2.1");
-      }
-
-    });
-    if (nexusBootstrapJarsBiggerThen2Dot1 != null && nexusBootstrapJarsBiggerThen2Dot1.length > 0) {
-      return new CS22AndAbove();
-    }
-    return new CS21AndBellow();
+    return new CS22AndAbove();
   }
 
   @Override
