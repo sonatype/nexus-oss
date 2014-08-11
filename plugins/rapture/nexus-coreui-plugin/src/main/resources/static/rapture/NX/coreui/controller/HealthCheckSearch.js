@@ -27,7 +27,8 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     'SearchResultVersion'
   ],
   refs: [
-    { ref: 'searchResultVersion', selector: 'nx-coreui-search-result-version-list' }
+    { ref: 'searchResultVersion', selector: 'nx-coreui-search-result-version-list' },
+    { ref: 'searchResultDetails', selector: 'nx-coreui-search-result-details' }
   ],
 
   /**
@@ -72,6 +73,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
    */
   loadHealthCheckSearchResultVersion: function() {
     var me = this,
+        searchResultDetails = me.getSearchResultDetails().down('#secondaryInfo'),
         searchResultModel,
         groupId = undefined, artifactId = undefined, versions = [];
 
@@ -87,13 +89,17 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
         searchResultModel = me.getSearchResultStore().getById(groupId + ':' + artifactId);
         searchResultModel.set('healthCheckLoading', true);
         searchResultModel.commit();
+        searchResultDetails.showInfo({ 'Most popular version': me.renderMostPopularVersion(searchResultModel) });
+        me.getSearchResultVersion().getView().refresh();
         NX.direct.healthcheck_Search.read(groupId, artifactId, versions, function(response) {
           searchResultModel.set('healthCheckLoading', false);
           if (Ext.isObject(response) && response.success) {
             searchResultModel.set('healthCheckCapped', response.data['capped']);
             searchResultModel.set('healthCheckDisabled', response.data['disabled']);
             searchResultModel.set('healthCheckError', response.data['error']);
+            searchResultModel.set('healthCheckMostPopularVersion', response.data['mostPopularVersion']);
             searchResultModel.commit();
+            searchResultDetails.showInfo({ 'Most popular version': me.renderMostPopularVersion(searchResultModel) });
             Ext.Object.each(response.data.versions, function(key, value) {
               var searchResultVersionModel = me.getSearchResultVersionStore().getById(key);
               if (searchResultVersionModel) {
@@ -172,6 +178,20 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     }
   },
 
+  renderMostPopularVersion: function(searchResultModel) {
+    var me = this,
+        result;
+
+    result = me.buildCommonText(searchResultModel, false);
+    if (!result) {
+      result = searchResultModel.get('healthCheckMostPopularVersion');
+      if (!result) {
+        result = me.notAvailable();
+      }
+    }
+    return result;
+  },
+
   renderAgeColumn: function(value, metadata, searchResultVersionModel) {
     var me = this,
         result, age, dayAge;
@@ -221,10 +241,10 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     return result;
   },
 
-  buildCommonText: function(searchResultVersionModel, alerts) {
+  buildCommonText: function(model, alerts) {
     var me = this,
         searchResultModel = me.getSearchResultStore().getById(
-            searchResultVersionModel.get('groupId') + ':' + searchResultVersionModel.get('artifactId')
+            model.get('groupId') + ':' + model.get('artifactId')
         );
 
     if (alerts && !me.rhcAlertData) {
@@ -240,7 +260,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
       return '<img class="opaqueWarning" src="' + me.imageUrl('exclamation.gif') + '">';
     }
     else if (searchResultModel.get('healthCheckCapped')
-        || (searchResultVersionModel && searchResultVersionModel.get(alerts ? 'cappedAlerts' : 'capped'))) {
+        || (model && model.get(alerts ? 'cappedAlerts' : 'capped'))) {
       return '<img class="opaqueWarning" src="' + me.imageUrl('warning.gif') + '">';
     }
     return undefined;
