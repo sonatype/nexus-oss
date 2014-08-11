@@ -192,7 +192,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     var me = this,
         result, metadata = {};
 
-    result = me.buildCommonText(searchResultModel, false, metadata);
+    result = me.buildCommonText(searchResultModel, metadata);
     if (!result) {
       result = searchResultModel.get('healthCheckMostPopularVersion');
       if (!result) {
@@ -206,7 +206,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     var me = this,
         result, age, dayAge;
 
-    result = me.buildCommonText(searchResultVersionModel, false, metadata);
+    result = me.buildCommonText(searchResultVersionModel, metadata);
     if (!result) {
       age = searchResultVersionModel.get('healthCheckAge');
       if (age === 0 || age > 0) {
@@ -231,7 +231,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     var me = this,
         result, popularity;
 
-    result = me.buildCommonText(searchResultVersionModel, false, metadata);
+    result = me.buildCommonText(searchResultVersionModel, metadata);
     if (!result) {
       popularity = searchResultVersionModel.get('healthCheckPopularity');
       if (popularity === 0 || popularity > 0) {
@@ -251,17 +251,13 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     return result;
   },
 
-  buildCommonText: function(model, alerts, metadata) {
+  buildCommonText: function(model, metadata) {
     var me = this,
         searchResultModel = me.getSearchResultStore().getById(
             model.get('groupId') + ':' + model.get('artifactId')
         );
 
-    if (alerts && !me.rhcAlertData) {
-      metadata.tdAttr = 'data-qtip=""';
-      return '<img src="' + me.imageUrl('locked.png') + '">';
-    }
-    else if (searchResultModel.get('healthCheckLoading')) {
+    if (searchResultModel.get('healthCheckLoading')) {
       return 'Loading...';
     }
     else if (searchResultModel.get('healthCheckDisabled')) {
@@ -273,7 +269,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
       return '<img class="opaqueWarning" src="' + me.imageUrl('exclamation.gif') + '">';
     }
     else if (searchResultModel.get('healthCheckCapped')
-        || (model && model.get(alerts ? 'cappedAlerts' : 'capped'))) {
+        || (model && model.get('capped'))) {
       metadata.tdAttr = 'data-qtip="The query limit for age and popularity data has been reached. Contact Sonatype support to extend current quota limits."';
       return '<img class="opaqueWarning" src="' + me.imageUrl('warning.gif') + '">';
     }
