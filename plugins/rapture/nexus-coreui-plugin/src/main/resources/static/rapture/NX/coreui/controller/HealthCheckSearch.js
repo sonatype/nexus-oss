@@ -94,15 +94,17 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
         NX.direct.healthcheck_Search.read(groupId, artifactId, versions, function(response) {
           searchResultModel.set('healthCheckLoading', false);
           if (Ext.isObject(response) && response.success) {
+            searchResultModel.beginEdit();
             searchResultModel.set('healthCheckCapped', response.data['capped']);
             searchResultModel.set('healthCheckDisabled', response.data['disabled']);
             searchResultModel.set('healthCheckError', response.data['error']);
             searchResultModel.set('healthCheckMostPopularVersion', response.data['mostPopularVersion']);
-            searchResultModel.commit();
+            searchResultModel.endEdit();
             searchResultDetails.showInfo({ 'Most popular version': me.renderMostPopularVersion(searchResultModel) });
             Ext.Object.each(response.data.versions, function(key, value) {
               var searchResultVersionModel = me.getSearchResultVersionStore().getById(key);
               if (searchResultVersionModel) {
+                searchResultVersionModel.beginEdit();
                 searchResultVersionModel.set('healthCheckAge', value['age']);
                 searchResultVersionModel.set('healthCheckPopularity', value['popularity']);
                 searchResultVersionModel.set('healthCheckSecurityAlerts', value['securityAlerts']);
@@ -111,7 +113,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
                 searchResultVersionModel.set('healthCheckModerateSecurityAlerts', value['moderateSecurityAlerts']);
                 searchResultVersionModel.set('healthCheckLicenseThreat', value['licenseThreat']);
                 searchResultVersionModel.set('healthCheckLicenseThreatName', value['licenseThreatName']);
-                searchResultVersionModel.commit();
+                searchResultVersionModel.endEdit(true);
               }
             });
           }
