@@ -20,7 +20,7 @@
 Ext.define('NX.controller.State', {
   extend: 'Ext.app.Controller',
   requires: [
-    'Ext.Direct',
+    'Ext.direct.Manager',
     'NX.Dialogs'
   ],
   mixins: {
@@ -231,7 +231,7 @@ Ext.define('NX.controller.State', {
           me.statusProvider.disconnect();
           me.receiving = false;
         }
-        me.statusProvider = Ext.Direct.addProvider({
+        me.statusProvider = Ext.direct.Manager.addProvider({
           type: 'polling',
           url: NX.direct.api.POLLING_URLS.rapture_State_get,
           interval: newStatusInterval * 1000,

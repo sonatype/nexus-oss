@@ -347,7 +347,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     if (me.statusProvider) {
       me.statusProvider.disconnect();
     }
-    me.statusProvider = Ext.Direct.addProvider({
+    me.statusProvider = Ext.direct.Manager.addProvider({
       type: 'polling',
       url: NX.direct.api.POLLING_URLS.coreui_Repository_readStatus,
       interval: 5000,

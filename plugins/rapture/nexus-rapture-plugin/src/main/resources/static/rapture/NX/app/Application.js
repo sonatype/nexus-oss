@@ -23,7 +23,7 @@ Ext.define('NX.app.Application', {
   requires: [
     'Ext.Ajax',
     'Ext.Error',
-    'Ext.Direct',
+    'Ext.direct.Manager',
     'Ext.state.Manager',
     'Ext.state.LocalStorageProvider',
     'Ext.util.LocalStorage',
@@ -214,7 +214,7 @@ Ext.define('NX.app.Application', {
   initDirect: function () {
     var me = this;
 
-    Ext.Direct.addProvider(NX.direct.api.REMOTING_API);
+    Ext.direct.Manager.addProvider(NX.direct.api.REMOTING_API);
     me.logDebug('Configured Ext.Direct');
   },
 
