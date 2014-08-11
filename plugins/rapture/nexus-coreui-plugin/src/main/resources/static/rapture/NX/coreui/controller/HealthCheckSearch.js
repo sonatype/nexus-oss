@@ -188,25 +188,39 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     }
   },
 
+  /**
+   * @private
+   * Render most popular version field.
+   * @param {NX.coreui.model.SearchResult} searchResultModel search result model
+   * @returns {string} rendered value
+   */
   renderMostPopularVersion: function(searchResultModel) {
     var me = this,
         result, metadata = {};
 
-    result = me.buildCommonText(searchResultModel, metadata);
+    result = me.renderPreconditions(searchResultModel, metadata);
     if (!result) {
       result = searchResultModel.get('healthCheckMostPopularVersion');
       if (!result) {
-        result = me.notAvailable(metadata);
+        result = me.renderNotAvailable(metadata);
       }
     }
     return '<div ' + (metadata.tdAttr ? metadata.tdAttr : '') + '>' + result + '</div>';
   },
 
+  /**
+   * @private
+   * Render age column.
+   * @param {number} value age
+   * @param metadata column metadata
+   * @param {NX.coreui.model.SearchResultVersion} searchResultVersionModel search result version model
+   * @returns {string} rendered value
+   */
   renderAgeColumn: function(value, metadata, searchResultVersionModel) {
     var me = this,
         result, age, dayAge;
 
-    result = me.buildCommonText(searchResultVersionModel, metadata);
+    result = me.renderPreconditions(searchResultVersionModel, metadata);
     if (!result) {
       age = searchResultVersionModel.get('healthCheckAge');
       if (age === 0 || age > 0) {
@@ -221,17 +235,25 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
         }
       }
       if (!result) {
-        result = me.notAvailable(metadata);
+        result = me.renderNotAvailable(metadata);
       }
     }
     return result;
   },
 
+  /**
+   * @private
+   * Render popularity column.
+   * @param {number} value popularity
+   * @param metadata column metadata
+   * @param {NX.coreui.model.SearchResultVersion} searchResultVersionModel search result version model
+   * @returns {string} rendered value
+   */
   renderPopularityColumn: function(value, metadata, searchResultVersionModel) {
     var me = this,
         result, popularity;
 
-    result = me.buildCommonText(searchResultVersionModel, metadata);
+    result = me.renderPreconditions(searchResultVersionModel, metadata);
     if (!result) {
       popularity = searchResultVersionModel.get('healthCheckPopularity');
       if (popularity === 0 || popularity > 0) {
@@ -245,13 +267,20 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
             + '" style="vertical-align: middle;"/>';
       }
       if (!result) {
-        result = me.notAvailable(metadata);
+        result = me.renderNotAvailable(metadata);
       }
     }
     return result;
   },
 
-  buildCommonText: function(model, metadata) {
+  /**
+   * @private
+   * Render value based on preconditions.
+   * @param {NX.coreui.model.SearchResult|NX.coreui.model.SearchResultVersion} model search result / version model
+   * @param metadata column metadata
+   * @returns {*} rendered value
+   */
+  renderPreconditions: function(model, metadata) {
     var me = this,
         searchResultModel = me.getSearchResultStore().getById(
             model.get('groupId') + ':' + model.get('artifactId')
@@ -268,15 +297,20 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
       metadata.tdAttr = 'data-qtip="Error retrieving data from Sonatype CLM"';
       return '<img class="opaqueWarning" src="' + me.imageUrl('exclamation.gif') + '">';
     }
-    else if (searchResultModel.get('healthCheckCapped')
-        || (model && model.get('capped'))) {
+    else if (searchResultModel.get('healthCheckCapped') || (model && model.get('capped'))) {
       metadata.tdAttr = 'data-qtip="The query limit for age and popularity data has been reached. Contact Sonatype support to extend current quota limits."';
       return '<img class="opaqueWarning" src="' + me.imageUrl('warning.gif') + '">';
     }
     return undefined;
   },
 
-  notAvailable: function(metadata) {
+  /**
+   * @private
+   * Render a not available value (no data).
+   * @param metadata column metadata
+   * @returns {string} rendered value
+   */
+  renderNotAvailable: function(metadata) {
     var me = this;
     metadata.tdAttr = 'data-qtip="CLM data is not available for this artifact. Note that internal artifacts are not covered in Sonatype CLM."';
     return '<img class="opaqueWarning" src="' + me.imageUrl('na.png') + '">';
