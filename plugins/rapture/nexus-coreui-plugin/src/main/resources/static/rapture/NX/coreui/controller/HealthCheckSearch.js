@@ -112,6 +112,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
           else {
             searchResultModel.set('healthCheckError', true);
           }
+          me.getSearchResultVersion().getView().refresh();
         });
       }
     }
@@ -180,23 +181,23 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
 
   renderMostPopularVersion: function(searchResultModel) {
     var me = this,
-        result;
+        result, metadata = {};
 
-    result = me.buildCommonText(searchResultModel, false);
+    result = me.buildCommonText(searchResultModel, false, metadata);
     if (!result) {
       result = searchResultModel.get('healthCheckMostPopularVersion');
       if (!result) {
-        result = me.notAvailable();
+        result = me.notAvailable(metadata);
       }
     }
-    return result;
+    return '<div ' + (metadata.tdAttr ? metadata.tdAttr : '') + '>' + result + '</div>';
   },
 
   renderAgeColumn: function(value, metadata, searchResultVersionModel) {
     var me = this,
         result, age, dayAge;
 
-    result = me.buildCommonText(searchResultVersionModel, false);
+    result = me.buildCommonText(searchResultVersionModel, false, metadata);
     if (!result) {
       age = searchResultVersionModel.get('healthCheckAge');
       if (age === 0 || age > 0) {
@@ -211,7 +212,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
         }
       }
       if (!result) {
-        result = me.notAvailable();
+        result = me.notAvailable(metadata);
       }
     }
     return result;
@@ -221,7 +222,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     var me = this,
         result, popularity;
 
-    result = me.buildCommonText(searchResultVersionModel, false);
+    result = me.buildCommonText(searchResultVersionModel, false, metadata);
     if (!result) {
       popularity = searchResultVersionModel.get('healthCheckPopularity');
       if (popularity === 0 || popularity > 0) {
@@ -235,39 +236,44 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
             + '" style="vertical-align: middle;"/>';
       }
       if (!result) {
-        result = me.notAvailable();
+        result = me.notAvailable(metadata);
       }
     }
     return result;
   },
 
-  buildCommonText: function(model, alerts) {
+  buildCommonText: function(model, alerts, metadata) {
     var me = this,
         searchResultModel = me.getSearchResultStore().getById(
             model.get('groupId') + ':' + model.get('artifactId')
         );
 
     if (alerts && !me.rhcAlertData) {
+      metadata.tdAttr = 'data-qtip=""';
       return '<img src="' + me.imageUrl('locked.png') + '">';
     }
     else if (searchResultModel.get('healthCheckLoading')) {
       return 'Loading...';
     }
     else if (searchResultModel.get('healthCheckDisabled')) {
+      metadata.tdAttr = 'data-qtip="The age and popularity data is only available once Repository Health Check (RHC) has been enabled."';
       return '<img class="opaqueWarning" src="' + me.imageUrl('information.png') + '">';
     }
     else if (searchResultModel.get('healthCheckError')) {
+      metadata.tdAttr = 'data-qtip="Error retrieving data from Sonatype CLM"';
       return '<img class="opaqueWarning" src="' + me.imageUrl('exclamation.gif') + '">';
     }
     else if (searchResultModel.get('healthCheckCapped')
         || (model && model.get(alerts ? 'cappedAlerts' : 'capped'))) {
+      metadata.tdAttr = 'data-qtip="The query limit for age and popularity data has been reached. Contact Sonatype support to extend current quota limits."';
       return '<img class="opaqueWarning" src="' + me.imageUrl('warning.gif') + '">';
     }
     return undefined;
   },
 
-  notAvailable: function() {
+  notAvailable: function(metadata) {
     var me = this;
+    metadata.tdAttr = 'data-qtip="CLM data is not available for this artifact. Note that internal artifacts are not covered in Sonatype CLM."';
     return '<img class="opaqueWarning" src="' + me.imageUrl('na.png') + '">';
   },
 
