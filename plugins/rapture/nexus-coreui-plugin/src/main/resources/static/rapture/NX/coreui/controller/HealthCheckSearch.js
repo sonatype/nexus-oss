@@ -170,6 +170,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
         })
       ];
       grid.headerCt.add(grid.healthCheckColumns);
+      grid.fireEvent('healthcheckcolumnsadded', grid);
       view.refresh();
     }
   },
