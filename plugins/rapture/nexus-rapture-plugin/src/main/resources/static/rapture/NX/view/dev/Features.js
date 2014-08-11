@@ -39,7 +39,7 @@ Ext.define('NX.view.dev.Features', {
       dataIndex: 'iconName',
       width: 48,
       iconVariant: 'x32'
-    },
+    }
   ],
 
   plugins: [
