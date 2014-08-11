@@ -15,8 +15,9 @@ Ext.ns('NX');
 
 Ext.Loader.setConfig({
   enabled: true,
+  ## relative to /index.html
   paths: {
-    NX: 'static/rapture/NX' ## relative to /index.html
+    NX: 'static/rapture/NX'
   }
 });
 
