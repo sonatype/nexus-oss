@@ -622,6 +622,8 @@
               <Include-Resource>
                 /=${project.build.outputDirectory},{maven-resources}
               </Include-Resource>
+              <!-- clear default to avoid spurious !* warnings -->
+              <Private-Package/>
             </instructions>
           </configuration>
         </plugin>
@@ -645,6 +647,7 @@
               <id>activation</id>
               <id>javax.annotation</id>
               <id>javax.annotation-api</id>
+              <id>javax.ws.rs</id>
               <id>jsr250-api</id>
               <id>jsr305</id>
               <id>slf4j-api</id>

@@ -18,8 +18,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.sonatype.nexus.rest.indextreeview.AbstractIndexContentPlexusResource;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
+import org.sonatype.nexus.rest.indextreeview_.AbstractIndexContentPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 import org.restlet.Context;

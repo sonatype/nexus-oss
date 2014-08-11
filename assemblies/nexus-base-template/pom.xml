@@ -332,7 +332,7 @@
                   <fileset refid="mvn:com.google.code.findbugs:jsr305:jar"/>
                 </copy>
                 <replace file="${project.build.directory}/assembly/etc/config.properties"
-                  token="packages.extra=" value="packages.extra=sun.misc,javax.annotation.security;version=1.2," />
+                  token="packages.extra=" value="packages.extra=sun.misc,com.sun.net.httpserver,javax.annotation.security;version=1.2," />
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg">
                   <!-- trim out various enterprise/deployment features we don't need at the moment -->
                   <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.1/xml/features" />
@@ -384,7 +384,6 @@
             <feature>config</feature>
             <feature>standard</feature>
             <feature>package</feature>
-            <feature>nexus-base-feature</feature>
             <feature>nexus-oss-edition</feature>
             <feature>nexus-content-plugin</feature>
             <feature>nexus-webresources-plugin</feature>

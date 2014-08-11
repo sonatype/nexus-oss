@@ -59,6 +59,7 @@ public class SiestaModule
       protected void configureServlets() {
         log.debug("Mount point: {}", MOUNT_POINT);
 
+        bind(SiestaServlet.class);
         serve(MOUNT_POINT + "/*").with(SiestaServlet.class, ImmutableMap.of(
             "resteasy.servlet.mapping.prefix", MOUNT_POINT
         ));

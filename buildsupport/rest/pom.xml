@@ -90,6 +90,10 @@
             <groupId>org.apache.bval</groupId>
             <artifactId>bval-jsr303</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>jaxrs-api</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
 
