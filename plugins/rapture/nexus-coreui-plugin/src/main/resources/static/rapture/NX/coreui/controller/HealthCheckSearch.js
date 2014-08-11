@@ -105,6 +105,12 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
               if (searchResultVersionModel) {
                 searchResultVersionModel.set('healthCheckAge', value['age']);
                 searchResultVersionModel.set('healthCheckPopularity', value['popularity']);
+                searchResultVersionModel.set('healthCheckSecurityAlerts', value['securityAlerts']);
+                searchResultVersionModel.set('healthCheckCriticalSecurityAlerts', value['criticalSecurityAlerts']);
+                searchResultVersionModel.set('healthCheckSevereSecurityAlerts', value['severeSecurityAlerts']);
+                searchResultVersionModel.set('healthCheckModerateSecurityAlerts', value['moderateSecurityAlerts']);
+                searchResultVersionModel.set('healthCheckLicenseThreat', value['licenseThreat']);
+                searchResultVersionModel.set('healthCheckLicenseThreatName', value['licenseThreatName']);
                 searchResultVersionModel.commit();
               }
             });
