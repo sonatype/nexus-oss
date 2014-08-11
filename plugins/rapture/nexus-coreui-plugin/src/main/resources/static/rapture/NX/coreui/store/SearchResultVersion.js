@@ -35,6 +35,6 @@ Ext.define('NX.coreui.store.SearchResultVersion', {
 
   remoteFilter: true,
   sortOnLoad: true,
-  sorters: { property: 'versionOrder', direction: 'ASC' }
+  sorters: { property: 'versionOrder', direction: 'DESC' }
 
 });
