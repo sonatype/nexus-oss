@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  *###
 
-Ext.ns('NX);
+Ext.ns('NX');
 
 Ext.Loader.setConfig({
   enabled: true,
