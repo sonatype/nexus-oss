@@ -90,7 +90,7 @@ Ext.define('NX.util.DownloadHelper', {
       return false;
     }
     else {
-      NX.Messages.add({text: 'Download initiated', type: 'info'});
+      NX.Messages.add({text: 'Download initiated: ' + url, type: 'info'});
       return true;
     }
   }
