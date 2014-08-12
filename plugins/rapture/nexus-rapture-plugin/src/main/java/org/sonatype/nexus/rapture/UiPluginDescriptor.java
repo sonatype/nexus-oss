@@ -41,7 +41,7 @@ public interface UiPluginDescriptor
   String getPluginId();
 
   /**
-   * Extjs MVC plugin namespace.
+   * Extjs application plugin namespace.
    */
   @Nullable
   String getNamespace();
