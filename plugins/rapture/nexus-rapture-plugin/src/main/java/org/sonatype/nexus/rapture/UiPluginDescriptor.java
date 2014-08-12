@@ -36,6 +36,7 @@ public interface UiPluginDescriptor
 {
   /**
    * The plugin identifier.  This is normally the POM artifactId.
+   * This is used to generate references to Javascript and CSS sources.
    */
   String getPluginId();
 
