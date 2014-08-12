@@ -34,11 +34,20 @@ import javax.annotation.Nullable;
  */
 public interface UiPluginDescriptor
 {
+  /**
+   * The plugin identifier.  This is normally the POM artifactId.
+   */
   String getPluginId();
 
+  /**
+   * Extjs MVC plugin namespace.
+   */
   @Nullable
   String getNamespace();
 
+  /**
+   * The Extjs class name of the {@code PluginConfig} for the plugin.
+   */
   String getConfigClassName();
 
   // TODO: Consider allowing additional scripts, sources, head and body contributions
