@@ -46,7 +46,7 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
         panel = container.down('nx-coreui-repositorybrowse-storagefileinfo');
 
     if (!panel) {
-      panel = container.add({ xtype: 'nx-coreui-repositorybrowse-storagefileinfo' });
+      panel = container.add({ xtype: 'nx-coreui-repositorybrowse-storagefileinfo', weight: 10 });
     }
 
     NX.direct.coreui_RepositoryStorage.readInfo(repositoryId, path, function(response) {

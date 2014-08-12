@@ -48,7 +48,7 @@ Ext.define('NX.coreui.controller.StorageFileMavenInfo', {
 
       if (Ext.isObject(response) && response.success && response.data) {
         if (!panel) {
-          panel = container.add({ xtype: 'nx-coreui-repositorybrowse-storagefilemaveninfo' });
+          panel = container.add({ xtype: 'nx-coreui-repositorybrowse-storagefilemaveninfo', weight: 20 });
         }
         info = {
           'Group': response.data['groupId'],

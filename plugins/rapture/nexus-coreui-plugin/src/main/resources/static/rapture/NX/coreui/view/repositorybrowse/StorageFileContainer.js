@@ -16,7 +16,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
-  extend: 'Ext.tab.Panel',
+  extend: 'NX.ext.tab.SortedPanel',
   alias: 'widget.nx-coreui-repositorybrowse-storagefilecontainer',
 
   plain: true,
