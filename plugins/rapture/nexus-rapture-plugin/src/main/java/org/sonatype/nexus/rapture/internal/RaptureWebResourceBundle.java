@@ -89,12 +89,7 @@ public class RaptureWebResourceBundle
     this.servletRequestProvider = checkNotNull(servletRequestProvider);
     this.stateComponentProvider = checkNotNull(stateComponentProvider);
     this.templateEngine = checkNotNull(templateEngine);
-
     this.pluginDescriptors = checkNotNull(pluginDescriptors);
-    log.info("UI plugin descriptors:");
-    for (UiPluginDescriptor descriptor : pluginDescriptors) {
-      log.info("  {}", descriptor.getPluginId());
-    }
 
     // FIXME: Should be updated to use Jackson?
     gson = new GsonBuilder().setPrettyPrinting().create();
