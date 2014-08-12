@@ -543,6 +543,7 @@
           <configuration>
             <jswarn>false</jswarn>
             <!--HACK: for now us non-optimized, just to aggregate -->
+            <!--HACK: add profile to set non-optimized, optimiz by default -->
             <nominify>true</nominify>
             <nomunge>true</nomunge>
             <disableOptimizations>true</disableOptimizations>
@@ -574,9 +575,11 @@
                 <goal>aggregate-css</goal>
               </goals>
               <configuration>
-                <output>${project.build.outputDirectory}/static/rapture/${project.artifactId}-prod.css</output>
-                <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
-                <required>false</required>
+                <output>${project.build.outputDirectory}/static/rapture/resources/${project.artifactId}-prod.css</output>
+                <sourceDirectory>${project.basedir}/src/main/resources/static/rapture/resources</sourceDirectory>
+                <includes>
+                  <include>${project.artifactId}-debug.css</include>
+                </includes>
               </configuration>
             </execution>
           </executions>

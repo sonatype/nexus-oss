@@ -255,6 +255,19 @@
               </includes>
             </configuration>
           </execution>
+          <execution>
+            <id>loading-css</id>
+            <goals>
+              <goal>aggregate-css</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.outputDirectory}/static/rapture/resources/loading-prod.css</output>
+              <sourceDirectory>${project.basedir}/src/main/resources/static/rapture/resources</sourceDirectory>
+              <includes>
+                <include>loading-debug.css</include>
+              </includes>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
 

@@ -17,9 +17,9 @@
 ## TODO but load extjs/baseapp debug resources seperatly for debugging optimized mode
 ## TODO potentially even move all css/js list generation into java code and simply render them asis here?
 #if($debug)
-  #set($baseappMode="debug")
+  #set($resourceMode="debug")
 #else
-  #set($baseappMode="prod")
+  #set($resourceMode="prod")
 #end
 
 <!DOCTYPE html>
@@ -42,11 +42,12 @@
     <link rel="stylesheet" type="text/css" href="$src?$urlSuffix">
   #end
 
-  #style("$raptureUrl/resources/loading.css")
-  #style("$raptureUrl/resources/baseapp-${baseappMode}.css")
-  #style("$raptureUrl/resources/rapture.css")
+  #style("$raptureUrl/resources/loading-${resourceMode}.css")
+  #style("$raptureUrl/resources/baseapp-${resourceMode}.css")
 
   ## TODO: load optimized/debug CSS for plugins
+  #style("$raptureUrl/resources/nexus-rapture-plugin-${resourceMode}.css")
+  #style("$raptureUrl/resources/nexus-coreui-plugin-${resourceMode}.css")
 </head>
 <body class="x-border-box">
 
@@ -78,17 +79,20 @@
 
     ## Load core extjs framework
     #message("Loading baseapp...")
-    #script("$raptureUrl/baseapp-${baseappMode}.js")
+    #script("$raptureUrl/baseapp-${resourceMode}.js")
 
     ## Load extensions
     #message("Loading extensions...")
-    #script("$raptureUrl/extdirect-${baseappMode}.js")
+    #script("$raptureUrl/extdirect-${resourceMode}.js")
 
     ## Load bootstrap
     #message("Loading bootstrap...")
     #script("$raptureUrl/bootstrap.js")
 
     ## TODO: load optimized shit
+    ###message("Loading plugins...")
+    ###script("$raptureUrl/nexus-rapture-plugin-${resourceMode}.js")
+    ###script("$raptureUrl/nexus-coreui-plugin-${resourceMode}.js")
 
     ## Load application
     #message("Loading application...")
