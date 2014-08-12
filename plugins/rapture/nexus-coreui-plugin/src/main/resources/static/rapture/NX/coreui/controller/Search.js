@@ -382,17 +382,15 @@ Ext.define('NX.coreui.controller.Search', {
         searchResultModel = selected[0],
         searchResultVersion = me.getSearchResultVersion(),
         searchResultDetails = me.getSearchResultDetails(),
-        searchResultVersionStore = me.getSearchResultVersionStore(),
-        segments;
+        searchResultVersionStore = me.getSearchResultVersionStore();
 
     me.onSearchResultVersionSelectionChange(me.getSearchResultVersion().getSelectionModel(), []);
     if (searchResultModel) {
-      segments = searchResultModel.getId().split(':');
       searchResultDetails.items.get(0).hide();
       searchResultDetails.items.get(1).show();
       searchResultDetails.items.get(1).items.get(1).showInfo({
-        'Group': searchResultModel.get('group'),
-        'Name': searchResultModel.get('name'),
+        'Group': searchResultModel.get('groupId'),
+        'Name': searchResultModel.get('artifactId'),
         'Format': searchResultModel.get('format')
       });
       searchResultVersion.show();
@@ -401,11 +399,11 @@ Ext.define('NX.coreui.controller.Search', {
       searchResultVersionStore.addFilter([
         {
           property: 'groupid',
-          value: segments[0]
+          value: searchResultModel.get('groupId')
         },
         {
           property: 'artifactid',
-          value: segments[1]
+          value: searchResultModel.get('artifactId')
         }
       ]);
     }

@@ -135,3 +135,72 @@
 .nx-form-fa-times-circle-trigger {
   background-image: url(images/form/fa-times-circle-trigger.png);
 }
+
+/* CLM / Healthcheck */
+
+.nx-clm-chiclet, .nx-clm-chiclet-small, .nx-clm-bar {
+  text-align: center;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.nx-clm-chiclet, .nx-clm-chiclet-small {
+  display: inline-block;
+  color: #FFF;
+  vertical-align: middle;
+  background-color: #E8E8E8;
+}
+
+.nx-clm-chiclet-small {
+  width: 20px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  font-size: 10px;
+  margin-right: 2px;
+  height: 17px;
+  line-height: 17px;
+}
+
+.nx-clm-chiclet {
+  width: 25px;
+  padding: 4px 6px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.nx-clm-bar {
+  border-left-style: solid;
+  border-left-width: 10px;
+  padding: 3px 0 3px 5px;
+}
+
+.nx-clm-chiclet-small.critical, .nx-clm-chiclet.critical {
+  background-color: #DB2852;
+}
+
+.nx-clm-chiclet-small.severe, .nx-clm-chiclet.severe {
+  background-color: #F7941E;
+}
+
+.nx-clm-chiclet-small.moderate, .nx-clm-chiclet.moderate {
+  color: #444;
+  background-color: #F5C649;
+}
+
+.nx-clm-bar.severe {
+  border-left-color: #F7941E;
+}
+
+.nx-clm-bar.critical {
+  border-left-color: #DB2852;
+}
+
+.nx-clm-bar.moderate {
+  border-left-color: #F5C649;
+}
+
+.nx-clm-bar.none {
+  border-left-color: #0047b2;
+}
