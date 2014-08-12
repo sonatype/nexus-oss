@@ -32,7 +32,7 @@
     <copyright.year>2013</copyright.year>
 
     <!--
-    Default YUI compresor settings to generated optimized "prod" aggregate sources.
+    Default YUI compressor settings to generated optimized "prod" aggregate sources.
     -->
     <maven.yuicompressor.nomunge>false</maven.yuicompressor.nomunge>
     <maven.yuicompressor.nocompress>false</maven.yuicompressor.nocompress>
