@@ -31,22 +31,43 @@ Ext.define('NX.app.PluginConfig', {
     'UiSessionTimeout',
     'User',
 
-    { id: 'Unlicensed',
+    {
+      id: 'Unlicensed',
       active: function () {
         return NX.app.Application.supportedBrowser() && NX.app.Application.unlicensed();
       }
     },
-    { id: 'UnsupportedBrowser',
+    {
+      id: 'UnsupportedBrowser',
       active: function () {
         return NX.app.Application.unsupportedBrowser();
       }
     },
 
     // dev controllers (visible when ?debug and rapture capability debugAllowed = true)
-    { id: 'dev.Conditions', active: 'NX.app.Application.debugMode' },
-    { id: 'dev.Developer', active: 'NX.app.Application.debugMode'},
-    { id: 'dev.Permissions', active: 'NX.app.Application.debugMode'},
-    { id: 'dev.Stores', active: 'NX.app.Application.debugMode'}
+    {
+      id: 'dev.Conditions',
+      active: function () {
+        return NX.app.Application.debugMode;
+      }
+    },
+    {
+      id: 'dev.Developer',
+      active: function () {
+        return NX.app.Application.debugMode;
+      }
+    },
+    {
+      id: 'dev.Permissions',
+      active: function () {
+        return NX.app.Application.debugMode;
+      }
+    },
+    {
+      id: 'dev.Stores',
+      active: function () {
+        return NX.app.Application.debugMode;
+      }
+    }
   ]
-
 });
