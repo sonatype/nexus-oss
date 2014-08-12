@@ -79,7 +79,7 @@ extends DirectComponentSupport
         return "${info.groupId}:${info.artifactId}" as String
       } as SortedSet
 
-      log.info('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
+      log.debug('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
     }
     finally {
       iterator?.close()
@@ -123,7 +123,7 @@ extends DirectComponentSupport
       iterator = indexerManager.searchQueryIterator(
           bq, null, null, null, null, false, null
       )
-      log.info('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
+      log.debug('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
       def versions = [] as SortedSet<SearchResultVersionXO>
       iterator.each { ai ->
         String path = gavCalculator.gavToPath(ai.calculateGav())
