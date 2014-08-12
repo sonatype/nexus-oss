@@ -19,6 +19,17 @@ import javax.annotation.Nullable;
  *
  * Using component priority to determine inclusion order.  Ordering is important to properly load the UI.
  *
+ * Plugins are required to define these resources for "debug" mode:
+ * <ul>
+ *   <li>/static/rapture/resources/<em>plugin-id</em>-debug.css</li>
+ * </ul>
+ *
+ * ... and for "prod" mode:
+ * <ul>
+ *   <li>/static/rapture/<em>plugin-id</em>-prod.js</li>
+ *   <li>/static/rapture/resources/<em>plugin-id</em>-prod.css</li>
+ * </ul>
+ *
  * @since 3.0
  */
 public interface UiPluginDescriptor
