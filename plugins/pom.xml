@@ -562,7 +562,7 @@
           </configuration>
           <executions>
             <execution>
-              <id>js</id>
+              <id>plugin-js</id>
               <goals>
                 <goal>aggregate</goal>
               </goals>
@@ -572,7 +572,7 @@
               </configuration>
             </execution>
             <execution>
-              <id>css</id>
+              <id>plugin-css</id>
               <goals>
                 <goal>aggregate-css</goal>
               </goals>
