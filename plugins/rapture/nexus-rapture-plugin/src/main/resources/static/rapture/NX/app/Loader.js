@@ -44,8 +44,8 @@ Ext.define('NX.app.Loader', {
     me.logDebug('Loading');
 
     // sanity check config
-    if (!Ext.isArray(config.plugins)) {
-      Ext.Error.raise("Invalid config property 'plugins' (expected array): " + config.plugins);
+    if (!Ext.isArray(config.pluginConfigs)) {
+      Ext.Error.raise("Invalid config property 'pluginConfigs' (expected array): " + config.pluginConfigs);
     }
     if (!Ext.isObject(config.state)) {
       Ext.Error.raise("Invalid config property: 'state' (expected object): " + config.state);
@@ -65,9 +65,9 @@ Ext.define('NX.app.Loader', {
     }
 
     // apply all plugin configurations
-    me.logDebug('Plugins: ' + config.plugins);
-    Ext.each(config.plugins, function (className) {
-      me.applyPlugin(className);
+    me.logDebug('Plugin configs: ' + config.pluginConfigs);
+    Ext.each(config.pluginConfigs, function (className) {
+      me.applyPluginConfig(className);
     });
 
     // launch the application
@@ -89,11 +89,11 @@ Ext.define('NX.app.Loader', {
    * @private
    * @param className
    */
-  applyPlugin: function (className) {
+  applyPluginConfig: function (className) {
     var me = this,
         config;
 
-    me.logDebug('Applying plugin: ' + className);
+    me.logDebug('Applying plugin config: ' + className);
     config = Ext.create(className);
 
     // find all controllers
@@ -107,7 +107,7 @@ Ext.define('NX.app.Loader', {
     // resolve all controllers
     if (me.controllers) {
 
-      me.logDebug(me.controllers.getCount() + ' Controllers:');
+      me.logDebug(me.controllers.getCount() + ' plugin controllers:');
       me.controllers.each(function (controller) {
         // attach full class-name to controller defs
         controller.type = Ext.app.Controller.getFullName(controller.id, 'controller', 'NX').absoluteName;

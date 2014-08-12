@@ -40,6 +40,6 @@ NX.global = (function() {
   Ext.Error.raise('Unable to determine global object');
 }());
 
-## HACK: Needed by NX.util.Url in class-def
+## HACK: Needed by NX.util.Url in class-def, should update that to reference dynamically and move this to loader state config
 Ext.ns('NX.app');
 NX.app.baseUrl = '$baseUrl';

@@ -19,7 +19,7 @@
 ## load the application
 Ext.require('NX.app.Loader', function(Loader) {
   new Loader().load({
-    plugins: [
+    pluginConfigs: [
       #foreach($pluginConfig in $pluginConfigs)
         '$pluginConfig'#if($foreach.hasNext),#end
       #end
