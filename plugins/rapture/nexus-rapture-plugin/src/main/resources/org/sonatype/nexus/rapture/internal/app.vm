@@ -11,52 +11,19 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  *###
 
-Ext.ns('NX');
+## require all plugins
+#foreach($pluginConfig in $pluginConfigs)
+  Ext.require('$pluginConfig');
+#end
 
-Ext.Loader.setConfig({
-  enabled: true,
-  ## relative to /index.html
-  paths: {
-    NX: 'static/rapture/NX'
-  }
-});
-
-## Define global object reference
-NX.global = (function() {
-  if (window !== undefined) {
-    return window;
-  }
-  if (global !== undefined) {
-    return global;
-  }
-  throw new Error('Unable to determine global object');
-}());
-
-Ext.ns('NX.app');
-
-## Configure application plugin muck
-NX.app.pluginConfigClassNames = [$pluginConfigClassNames];
-Ext.each(NX.app.pluginConfigClassNames, function(className) {
-  Ext.require(className);
-});
-
-## configure basics
-NX.app.baseUrl = '$baseUrl';
-
-## initial state
-NX.app.state = $state;
-
-## Set the debug flag if allowed
-NX.app.debug = false;
-if (window.location.search === '?debug') {
-  if (NX.app.state.uiSettings.value.debugAllowed) {
-    console.log('Debug mode enabled');
-    NX.app.debug = true;
-  }
-  else {
-    console.warn('Debug mode disallowed');
-  }
-}
-
-## Create and start application
-Ext.application('NX.app.Application');
+## load the application
+Ext.require('NX.app.Loader', function(Loader) {
+  new Loader().load({
+    plugins: [
+      #foreach($pluginConfig in $pluginConfigs)
+        '$pluginConfig'#if($foreach.hasNext),#end
+      #end
+    ],
+    state: $state
+  });
+})

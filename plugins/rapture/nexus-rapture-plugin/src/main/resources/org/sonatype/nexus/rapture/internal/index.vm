@@ -10,8 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  *###
+
 #set($raptureUrl="$baseUrl/static/rapture")
 
+## TODO Consider adding a way to load prod app resources
+## TODO but load extjs/baseapp debug resources seperatly for debugging optimized mode
+## TODO potentially even move all css/js list generation into java code and simply render them asis here?
 #if($debug)
   #set($baseappMode="debug")
 #else
@@ -38,9 +42,11 @@
     <link rel="stylesheet" type="text/css" href="$src?$urlSuffix">
   #end
 
+  #style("$raptureUrl/resources/loading.css")
   #style("$raptureUrl/resources/baseapp-${baseappMode}.css")
   #style("$raptureUrl/resources/rapture.css")
-  #style("$raptureUrl/resources/loading.css")
+
+  ## TODO: load optimized/debug CSS for plugins
 </head>
 <body class="x-border-box">
 
@@ -77,6 +83,12 @@
     ## Load extensions
     #message("Loading extensions...")
     #script("$raptureUrl/extdirect-${baseappMode}.js")
+
+    ## Load bootstrap
+    #message("Loading bootstrap...")
+    #script("$raptureUrl/bootstrap.js")
+
+    ## TODO: load optimized shit
 
     ## Load application
     #message("Loading application...")
