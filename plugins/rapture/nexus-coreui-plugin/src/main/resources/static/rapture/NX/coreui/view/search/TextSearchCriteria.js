@@ -25,7 +25,7 @@ Ext.define('NX.coreui.view.search.TextSearchCriteria', {
   },
 
   /**
-   * @cfg [removable=false] If seearch criteria should be removable.
+   * @cfg [removable=false] If search criteria should be removable.
    */
   removable: false,
 
@@ -48,7 +48,6 @@ Ext.define('NX.coreui.view.search.TextSearchCriteria', {
     var me = this;
 
     if (me.removable) {
-      // (-)
       me.trigger2Cls = 'nx-form-fa-minus-circle-trigger';
     }
 
