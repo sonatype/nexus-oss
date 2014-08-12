@@ -30,6 +30,14 @@
 
   <properties>
     <copyright.year>2013</copyright.year>
+
+    <!--
+    Default YUI compresor settings to generated optimized "prod" aggregate sources.
+    -->
+    <maven.yuicompressor.nomunge>false</maven.yuicompressor.nomunge>
+    <maven.yuicompressor.nocompress>false</maven.yuicompressor.nocompress>
+    <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
+    <maven.yuicompressor.linebreakpos>-1</maven.yuicompressor.linebreakpos>
   </properties>
 
   <modules>
@@ -184,7 +192,7 @@
       </dependency>
 
       <!-- ssl -->
-      
+
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-ssl-client</artifactId>
@@ -542,16 +550,10 @@
           <version>1.0.0</version>
           <configuration>
             <jswarn>false</jswarn>
-            <!--HACK: for now us non-optimized, just to aggregate -->
-            <!--HACK: add profile to set non-optimized, optimiz by default -->
-            <nominify>true</nominify>
-            <nomunge>true</nomunge>
-            <disableOptimizations>true</disableOptimizations>
-            <linebreakpos>0</linebreakpos>
-            <!--<nominify>false</nominify>-->
-            <!--<nomunge>false</nomunge>-->
-            <!--<disableOptimizations>false</disableOptimizations>-->
-            <!--<linebreakpos>-1</linebreakpos>-->
+            <nominify>${maven.yuicompressor.nocompress}</nominify>
+            <nomunge>${maven.yuicompressor.nomunge}</nomunge>
+            <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
+            <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
             <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
             <jslintOptions>
               <white>true</white>
@@ -598,5 +600,20 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <!--
+    Disable YUI optimization for "prod" aggregate sources.
+    -->
+    <profile>
+      <id>disable-optimize</id>
+      <properties>
+        <maven.yuicompressor.nocompress>true</maven.yuicompressor.nocompress>
+        <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
+        <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
+        <maven.yuicompressor.linebreakpos>0</maven.yuicompressor.linebreakpos>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>
