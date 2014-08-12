@@ -10,9 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rapture.internal;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -24,16 +27,18 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.rapture.UiPluginDescriptor;
 import org.sonatype.nexus.rapture.internal.ui.StateComponent;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.webresources.GeneratedWebResource;
 import org.sonatype.nexus.webresources.WebResource;
 import org.sonatype.nexus.webresources.WebResourceBundle;
-import org.sonatype.nexus.webresources.WebResourceService;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.template.TemplateAccessible;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -48,9 +53,9 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * Provides resources:
  * <ul>
- *   <li>{@code /index.html}</li>
- *   <li>{@code /static/rapture/bootstrap.js}</li>
- *   <li>{@code /static/rapture/app.js}</li>
+ * <li>{@code /index.html}</li>
+ * <li>{@code /static/rapture/bootstrap.js}</li>
+ * <li>{@code /static/rapture/app.js}</li>
  * </ul>
  *
  * @since 3.0
@@ -65,30 +70,40 @@ public class RaptureWebResourceBundle
 
   private final Provider<HttpServletRequest> servletRequestProvider;
 
-  private final Provider<WebResourceService> webResourceServiceProvider;
-
   private final Provider<StateComponent> stateComponentProvider;
 
   private final TemplateEngine templateEngine;
+
+  private final List<UiPluginDescriptor> pluginDescriptors;
 
   private final Gson gson;
 
   @Inject
   public RaptureWebResourceBundle(final Provider<SystemStatus> systemStatusProvider,
                                   final Provider<HttpServletRequest> servletRequestProvider,
-                                  final Provider<WebResourceService> webResourceServiceProvider,
                                   final Provider<StateComponent> stateComponentProvider,
-                                  final TemplateEngine templateEngine)
+                                  final TemplateEngine templateEngine,
+                                  final List<UiPluginDescriptor> pluginDescriptors)
   {
     this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.servletRequestProvider = checkNotNull(servletRequestProvider);
-    this.webResourceServiceProvider = checkNotNull(webResourceServiceProvider);
     this.stateComponentProvider = checkNotNull(stateComponentProvider);
     this.templateEngine = checkNotNull(templateEngine);
+
+    this.pluginDescriptors = checkNotNull(pluginDescriptors);
+    log.info("UI plugin descriptors:");
+    for (UiPluginDescriptor descriptor : pluginDescriptors) {
+      log.info("  {}", descriptor.getPluginId());
+    }
 
     // FIXME: Should be updated to use Jackson?
     gson = new GsonBuilder().setPrettyPrinting().create();
   }
+
+  //
+  // FIXME: optimize so that we dont duplicate things like isDebug() over and over each request
+  // FIXME: for now we simply do a bit more work than is needed :-(
+  //
 
   @Override
   public List<WebResource> getResources() {
@@ -114,6 +129,19 @@ public class RaptureWebResourceBundle
     }
   }
 
+  @TemplateAccessible
+  public static class TemplateHelper
+  {
+    /**
+     * Helper to return the filename for a URI.
+     */
+    public String fileName(final URI uri) {
+      String path = uri.getPath();
+      int i = path.lastIndexOf("/");
+      return path.substring(i + 1, path.length());
+    }
+  }
+
   /**
    * The index.html resource.
    */
@@ -136,6 +164,9 @@ public class RaptureWebResourceBundle
                 .set("baseUrl", BaseUrlHolder.get())
                 .set("debug", isDebug())
                 .set("urlSuffix", generateUrlSuffix())
+                .set("styles", getStyles())
+                .set("scripts", getScripts())
+                .set("helper", new TemplateHelper())
         );
       }
     };
@@ -245,26 +276,14 @@ public class RaptureWebResourceBundle
     return stateComponentProvider.get().getValues(Maps.<String, String>newHashMap());
   }
 
-  private static final String NS_PREFIX = "/static/rapture/NX/";
-
-  private static final String PLUGIN_CONFIG_SUFFIX = "/app/PluginConfig.js";
-
   /**
    * Find all plugin configs.
    */
   private List<String> getPluginConfigs() {
     List<String> classNames = Lists.newArrayList();
-
-    for (String path : webResourceServiceProvider.get().getPaths()) {
-      if (path.startsWith(NS_PREFIX) && path.endsWith(PLUGIN_CONFIG_SUFFIX)) {
-        // rebuild the class name which has NX. prefix and minus the .js suffix
-        String name = path.substring(NS_PREFIX.length() - "NX/".length(), path.length() - ".js".length());
-        // convert path to class-name
-        name = name.replace("/", ".");
-        classNames.add(name);
-      }
+    for (UiPluginDescriptor descriptor : pluginDescriptors) {
+      classNames.add(descriptor.getConfigClassName());
     }
-
     return classNames;
   }
 
@@ -273,14 +292,71 @@ public class RaptureWebResourceBundle
    */
   private List<String> getNamespaces() {
     List<String> namespaces = Lists.newArrayList();
-    for (String className : getPluginConfigs()) {
-      int i = className.indexOf(".app.PluginConfig");
-      String ns = className.substring(0, i);
-      if (!ns.equals("NX")) {
-        // add namespace if its not the default
+    for (UiPluginDescriptor descriptor : pluginDescriptors) {
+      String ns = descriptor.getNamespace();
+      if (ns != null) {
         namespaces.add(ns);
       }
     }
     return namespaces;
+  }
+
+  /**
+   * Replaces "{mode}" in given path with either "prod" or "debug".
+   */
+  private String mode(final String path) {
+    String mode = isDebug() ? "debug" : "prod";
+    return path.replaceAll("\\{mode\\}", mode);
+  }
+
+  /**
+   * Generate a URI for the given path.
+   */
+  private URI uri(String path) {
+    try {
+      return new URI(String.format("%s/static/rapture/%s", BaseUrlHolder.get(), path));
+    }
+    catch (URISyntaxException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  /**
+   * Generate the list of CSS styles to include in the index.html.
+   */
+  private List<URI> getStyles() {
+    List<URI> styles = Lists.newArrayList();
+    styles.add(uri(mode("resources/loading-{mode}.css")));
+    styles.add(uri(mode("resources/baseapp-{mode}.css")));
+
+    // add all plugin styles
+    for (UiPluginDescriptor descriptor : pluginDescriptors) {
+      String path = String.format("resources/%s-{mode}.css", descriptor.getPluginId());
+      styles.add(uri(mode(path)));
+    }
+
+    return styles;
+  }
+
+  /**
+   * Generate the list of javascript sources to include in the index.html.
+   */
+  private List<URI> getScripts() {
+    List<URI> scripts = Lists.newArrayList();
+
+    scripts.add(uri(mode("baseapp-{mode}.js")));
+    scripts.add(uri(mode("extdirect-{mode}.js")));
+    scripts.add(uri("bootstrap.js"));
+
+    // add all "prod" plugin scripts if debug is not enabled
+    if (!isDebug()) {
+      for (UiPluginDescriptor descriptor : pluginDescriptors) {
+        String path = String.format("%s-prod.js", descriptor.getPluginId());
+        scripts.add(uri(path));
+      }
+    }
+
+    scripts.add(uri("app.js"));
+    return scripts;
   }
 }
