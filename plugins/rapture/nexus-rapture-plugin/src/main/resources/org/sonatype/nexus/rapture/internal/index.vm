@@ -80,7 +80,7 @@
     #end
 
     ## Finished
-    #message("Ready!")
+    #message("Initializing")
   </div>
 </div>
 
