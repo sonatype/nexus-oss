@@ -192,14 +192,29 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
   /**
    * @private
-   * When a node gets selected, refresh storage file in right-side container.
+   * When a node gets selected, refresh storage file in right-side container and bookmark.
    */
   onNodeSelected: function(tree, node) {
     var me = this,
+        bookmark = NX.Bookmarks.fromToken(NX.Bookmarks.getBookmark().getSegment(0));
+
+    me.showStorageFile(tree, node);
+    bookmark.appendSegments([
+      encodeURIComponent(node.get('repositoryId')),
+      encodeURIComponent(node.get('path')).replace(/%2F/g, '/')
+    ]);
+    NX.Bookmarks.bookmark(bookmark, me);
+  },
+
+  /**
+   * @private
+   * When a node gets selected, refresh storage file in right-side container.
+   */
+  showStorageFile: function(tree, node) {
+    var me = this,
         treePanel = me.getTree(),
         moreButton = treePanel.down('button[action=more]'),
-        repositoryModel = me.getStore(treePanel.repositoryStore).getById(node.get('repositoryId')),
-        bookmark = NX.Bookmarks.fromToken(NX.Bookmarks.getBookmark().getSegment(0));
+        repositoryModel = me.getStore(treePanel.repositoryStore).getById(node.get('repositoryId'));
 
     moreButton.enable();
     me.fillMoreButtonMenu(moreButton, repositoryModel, node);
@@ -210,11 +225,6 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
         node.get('repositoryId'),
         (node.isLeaf() && node.get('path') !== '/') ? node.get('path') : undefined
     );
-    bookmark.appendSegments([
-      encodeURIComponent(node.get('repositoryId')),
-      encodeURIComponent(node.get('path')).replace(/%2F/g, '/')
-    ]);
-    NX.Bookmarks.bookmark(bookmark, me);
   },
 
   /**
@@ -362,7 +372,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       if (childNode) {
         tree.getSelectionModel().select(childNode, false, true);
         tree.getView().focusRow(childNode);
-        me.onNodeSelected(tree, childNode);
+        me.showStorageFile(tree, node);
         if (segments.length > 1) {
           childNode.expandFn = Ext.bind(me.expandNode, me, [childPath.substring(childName.length)], true);
           childNode.expand();
