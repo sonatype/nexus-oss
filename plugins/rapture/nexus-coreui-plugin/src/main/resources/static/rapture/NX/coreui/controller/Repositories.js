@@ -456,7 +456,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         list = me.getList();
 
     NX.Bookmarks.navigateTo(NX.Bookmarks.fromSegments([
-      'browse/repository/standard', list.getSelectionModel().getSelection()[0].getId()
+      'browse/repository/standard', list.getSelectionModel().getSelection()[0].getId(), '/'
     ]));
   },
 
