@@ -509,7 +509,25 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
    * @param path to download
    */
   downloadStorageFile: function(repositoryId, path) {
-    this.downloadPath(NX.util.Url.urlOf('content/repositories/' + repositoryId), path);
+    var me = this,
+        repositoryNode, itemNode,
+        setInStorage = function(nodeToSet) {
+          if (!nodeToSet.get('inStorage')) {
+            nodeToSet.set('inStorage', true);
+            if (nodeToSet.parentNode && !(nodeToSet.get('path') === '/')) {
+              setInStorage(nodeToSet.parentNode);
+            }
+          }
+        };
+
+    me.downloadPath(NX.util.Url.urlOf('content/repositories/' + repositoryId), path);
+    repositoryNode = me.getTree().getRootNode().findChild('repositoryId', repositoryId);
+    if (repositoryNode) {
+      itemNode = repositoryNode.findChild('path', path, true);
+      if (itemNode) {
+        setInStorage(itemNode);
+      }
+    }
   },
 
   /**
