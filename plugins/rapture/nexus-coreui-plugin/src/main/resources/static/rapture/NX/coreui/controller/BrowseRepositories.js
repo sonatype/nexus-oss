@@ -145,6 +145,9 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     ]));
   },
 
+  /**
+   * Load available repositories into tree.
+   */
   loadRepositories: function() {
     var me = this,
         tree = me.getTree(),
