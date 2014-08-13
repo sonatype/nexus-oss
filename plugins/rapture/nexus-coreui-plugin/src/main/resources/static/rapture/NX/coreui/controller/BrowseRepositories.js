@@ -341,6 +341,12 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     }
   },
 
+  /**
+   * @private
+   * Expand & select a child path.
+   * @param node containing the child path
+   * @param childPath child path to expand
+   */
   expandNode: function(node, childPath) {
     var me = this,
         tree = me.getTree(),
