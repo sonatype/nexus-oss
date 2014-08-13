@@ -30,6 +30,7 @@
 
   <modules>
     <module>nexus-karaf-branding</module>
+    <module>nexus-boot-feature</module>
     <module>nexus-base-feature</module>
     <module>nexus-base-template</module>
   </modules>

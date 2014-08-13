@@ -320,11 +320,11 @@
                   <featuresCfgFile>${nexus.dir}/etc/org.apache.karaf.features.cfg</featuresCfgFile>
                   <startupPropertiesFile>${nexus.dir}/etc/startup.properties</startupPropertiesFile>
                   <systemDirectory>${nexus.dir}/system</systemDirectory>
-                  <bootFeatures>
+                  <installedFeatures>
                     <feature>nexus-it-helper-plugin</feature>
                     <feature>nexus-p2-bridge-plugin</feature>
                     <feature>nexus-p2-repository-plugin</feature>
-                  </bootFeatures>
+                  </installedFeatures>
                 </configuration>
               </execution>
             </executions>

@@ -55,9 +55,9 @@ public class NexusBundleTracker
       prepareDependencies(bundle);
       try {
         BindingPublisher publisher;
-        log.info("ACTIVATING {}", bundle);
+        log.debug("ACTIVATING {}", bundle);
         publisher = super.prepare(bundle);
-        log.info("ACTIVATED {}", bundle);
+        log.debug("ACTIVATED {}", bundle);
         return publisher;
       }
       catch (Exception e) {

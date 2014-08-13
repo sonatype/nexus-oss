@@ -14,13 +14,11 @@ package org.sonatype.nexus.bootstrap.osgi;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.EnumSet;
 import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.jar.Manifest;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -31,19 +29,18 @@ import org.sonatype.nexus.bootstrap.ConfigurationHolder;
 import org.sonatype.nexus.bootstrap.EnvironmentVariables;
 import org.sonatype.nexus.bootstrap.LockFile;
 
-import ch.qos.logback.classic.LoggerContext;
+import org.apache.karaf.features.Feature;
+import org.apache.karaf.features.FeaturesService;
+import org.apache.karaf.features.FeaturesService.Option;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.launch.Framework;
-import org.osgi.framework.launch.FrameworkFactory;
-import org.osgi.framework.startlevel.FrameworkStartLevel;
-import org.osgi.framework.wiring.BundleRevision;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.StaticLoggerBinder;
+
+import static org.apache.karaf.features.FeaturesService.Option.ContinueBatchOnFailure;
+import static org.apache.karaf.features.FeaturesService.Option.NoAutoRefreshBundles;
+import static org.apache.karaf.features.FeaturesService.Option.NoCleanIfFailure;
 
 /**
  * {@link ServletContextListener} that bootstraps an OSGi-based application.
@@ -56,8 +53,6 @@ public class BootstrapListener
   private static final Logger log = LoggerFactory.getLogger(BootstrapListener.class);
 
   private LockFile lockFile;
-
-  private Framework framework;
 
   private ListenerTracker listenerTracker;
 
@@ -121,8 +116,12 @@ public class BootstrapListener
         bundleContext = containingBundle.getBundleContext();
       }
       else {
-        bundleContext = launchFramework(workDir, properties);
+        // when we support running in embedded mode this is where it'll go
+        throw new UnsupportedOperationException("Missing OSGi container");
       }
+
+      // bootstrap our chosen Nexus edition
+      installNexusEdition(bundleContext, properties.get("nexus-edition"));
 
       // watch out for the real Nexus listener
       listenerTracker = new ListenerTracker(bundleContext, "nexus", servletContext);
@@ -143,59 +142,19 @@ public class BootstrapListener
     log.info("Initialized");
   }
 
-  private BundleContext launchFramework(File workDir, Map<String, String> properties) throws IOException,
-      BundleException
-  {
-    StringBuilder exports = new StringBuilder("com.sun.net.httpserver,");
-    InputStream is = getClass().getResourceAsStream("/BOOT-INF/MANIFEST.MF");
-    try {
-      exports.append(new Manifest(is).getMainAttributes().getValue(Constants.EXPORT_PACKAGE));
-    }
-    finally {
-      is.close();
-    }
+  private static void installNexusEdition(final BundleContext ctx, final String editionName) throws Exception {
+    if (editionName != null && editionName.length() > 0) {
+      log.info("Installing {}", editionName);
 
-    // export additional core (non-plugin) packages from system bundle
-    properties.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, exports.toString());
+      // edition might already be installed in the cache; if so then skip installation
+      FeaturesService featuresService = ctx.getService(ctx.getServiceReference(FeaturesService.class));
+      Feature editionFeature = featuresService.getFeature(editionName);
 
-    properties.put(Constants.FRAMEWORK_STORAGE, workDir + "/felix-cache");
-    properties.put(Constants.FRAMEWORK_STORAGE_CLEAN, Constants.FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
-    properties.put(Constants.FRAMEWORK_BOOTDELEGATION, "sun.*");
-
-    framework = ServiceLoader.load(FrameworkFactory.class).iterator().next().newFramework(properties);
-
-    framework.init();
-    framework.start();
-
-    BundleContext bundleContext = framework.getBundleContext();
-    FrameworkStartLevel startLevel = framework.adapt(FrameworkStartLevel.class);
-    startLevel.setStartLevel(1);
-
-    LoggerContext loggerContext = (LoggerContext) StaticLoggerBinder.getSingleton().getLoggerFactory();
-    loggerContext.putObject("org.ops4j.pax.logging.logback.bundlecontext", bundleContext);
-
-    startLevel.setInitialBundleStartLevel(80);
-
-    File[] bundleFiles = new File(properties.get("nexus-app") + "/bundles").listFiles();
-
-    // auto-install anything in the bundles repository
-    if (bundleFiles != null && bundleFiles.length > 0) {
-      for (File file : bundleFiles) {
-        try {
-          Bundle bundle = bundleContext.installBundle("reference:" + file.toURI());
-          BundleRevision revision = bundle.adapt(BundleRevision.class);
-          if (revision != null && (revision.getTypes() & BundleRevision.TYPE_FRAGMENT) == 0) {
-            bundle.start(); // only need to start non-fragment bundles
-          }
-        }
-        catch (Exception e) {
-          log.warn("Problem installing: {}", file, e);
-        }
+      if (!featuresService.isInstalled(editionFeature)) {
+        EnumSet<Option> options = EnumSet.of(ContinueBatchOnFailure, NoCleanIfFailure, NoAutoRefreshBundles);
+        featuresService.installFeature(editionFeature, options);
       }
     }
-
-    startLevel.setStartLevel(80); // activate all installed bundles
-    return bundleContext;
   }
 
   private static void requireProperty(final Map<String, String> properties, final String name) {
@@ -229,17 +188,6 @@ public class BootstrapListener
     if (listenerTracker != null) {
       listenerTracker.close();
       listenerTracker = null;
-    }
-
-    if (framework != null) {
-      try {
-        framework.stop();
-        framework.waitForStop(0);
-      }
-      catch (Exception e) {
-        log.error("Failed to stop Nexus", e);
-      }
-      framework = null;
     }
 
     if (lockFile != null) {

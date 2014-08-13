@@ -52,6 +52,15 @@
     -->
     <dependency>
       <groupId>org.sonatype.nexus.assemblies</groupId>
+      <artifactId>nexus-boot-feature</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.assemblies</groupId>
       <artifactId>nexus-base-feature</artifactId>
       <version>${nexus.version}</version>
       <classifier>features</classifier>
@@ -390,6 +399,10 @@
             <feature>config</feature>
             <feature>standard</feature>
             <feature>package</feature>
+            <feature>nexus-boot-feature</feature>
+          </bootFeatures>
+          <installedFeatures>
+            <feature>management</feature>
             <feature>nexus-oss-edition</feature>
             <feature>nexus-content-plugin</feature>
             <feature>nexus-webresources-plugin</feature>
@@ -411,10 +424,7 @@
             <feature>nexus-rapture-plugin</feature>
             <feature>nexus-extdirect-plugin</feature>
             <feature>nexus-coreui-plugin</feature>
-	  </bootFeatures>
-	  <installedFeatures>
-            <feature>management</feature>
-	  </installedFeatures>
+          </installedFeatures>
         </configuration>
       </plugin>
     </plugins>
