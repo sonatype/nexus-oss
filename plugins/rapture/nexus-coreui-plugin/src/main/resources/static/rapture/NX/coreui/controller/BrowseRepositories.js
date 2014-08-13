@@ -17,6 +17,12 @@
  */
 Ext.define('NX.coreui.controller.BrowseRepositories', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Bookmarks'
+  ],
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
 
   list: 'nx-coreui-repositorybrowse-list',
 
@@ -90,6 +96,9 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       controller: {
         '#Refresh': {
           refresh: me.loadRepositories
+        },
+        '#Bookmarking': {
+          navigate: me.navigateTo
         }
       },
       component: {
@@ -175,6 +184,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
           });
           Ext.resumeLayouts(true);
           me.getStorageFileContainer().showStorageFile(undefined, undefined);
+          me.navigateTo(NX.Bookmarks.getBookmark());
         }
       });
     }
@@ -188,7 +198,8 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     var me = this,
         treePanel = me.getTree(),
         moreButton = treePanel.down('button[action=more]'),
-        repositoryModel = me.getStore(treePanel.repositoryStore).getById(node.get('repositoryId'));
+        repositoryModel = me.getStore(treePanel.repositoryStore).getById(node.get('repositoryId')),
+        bookmark = NX.Bookmarks.fromToken(NX.Bookmarks.getBookmark().getSegment(0));
 
     moreButton.enable();
     me.fillMoreButtonMenu(moreButton, repositoryModel, node);
@@ -199,6 +210,11 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
         node.get('repositoryId'),
         (node.isLeaf() && node.get('path') !== '/') ? node.get('path') : undefined
     );
+    bookmark.appendSegments([
+      encodeURIComponent(node.get('repositoryId')),
+      encodeURIComponent(node.get('path')).replace(/%2F/g, '/')
+    ]);
+    NX.Bookmarks.bookmark(bookmark, me);
   },
 
   /**
@@ -259,8 +275,18 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
           me.sortNode(node);
           Ext.resumeLayouts(true);
         }
+        if (node.expandFn) {
+          node.expandFn(node);
+          delete node.expandFn;
+        }
         tree.getEl().unmask();
       });
+    }
+    else {
+      if (node.expandFn) {
+        node.expandFn(node);
+        delete node.expandFn;
+      }
     }
   },
 
@@ -279,6 +305,63 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       }
       return t1.localeCompare(t2);
     }, true);
+  },
+
+  /**
+   * @private
+   * @param {NX.Bookmark} bookmark to navigate to
+   */
+  navigateTo: function(bookmark) {
+    var me = this,
+        tree = me.getTree(),
+        store, repositoryId, path, node;
+
+    if (tree && bookmark) {
+      repositoryId = bookmark.getSegment(1);
+      path = bookmark.getSegment(2);
+      tree.collapseAll(function() {
+        if (repositoryId) {
+          repositoryId = decodeURIComponent(repositoryId);
+          me.logDebug('Navigate to: ' + repositoryId + path);
+          store = tree.getStore();
+          node = store.getRootNode().findChild('repositoryId', repositoryId);
+          if (node) {
+            tree.getSelectionModel().select(node, false, true);
+            tree.getView().focusRow(node);
+            if (path) {
+              node.expandFn = Ext.bind(me.expandNode, me, [path], true);
+              node.expand();
+            }
+          }
+        }
+        else {
+          tree.getSelectionModel().deselectAll();
+        }
+      });
+    }
+  },
+
+  expandNode: function(node, childPath) {
+    var me = this,
+        tree = me.getTree(),
+        childNode, childName, segments;
+
+    if (childPath > '/') {
+      segments = childPath.substring(1).split('/');
+      childName = segments[0];
+      if (segments.length > 1) {
+        childName += '/';
+      }
+      childNode = node.findChild('path', node.get('path') + childName);
+      if (childNode) {
+        tree.getSelectionModel().select(childNode, false, true);
+        tree.getView().focusRow(childNode);
+        if (segments.length > 1) {
+          childNode.expandFn = Ext.bind(me.expandNode, me, [childPath.substring(childName.length)], true);
+          childNode.expand();
+        }
+      }
+    }
   },
 
   /**
