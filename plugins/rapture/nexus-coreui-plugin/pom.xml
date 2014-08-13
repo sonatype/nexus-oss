@@ -99,7 +99,7 @@
           <execution>
             <id>plugin-js</id>
             <goals>
-              <goal>aggregate</goal>
+              <goal>aggregate-js</goal>
             </goals>
             <configuration>
               <output>${project.build.outputDirectory}/static/rapture/${project.artifactId}-prod.js</output>
