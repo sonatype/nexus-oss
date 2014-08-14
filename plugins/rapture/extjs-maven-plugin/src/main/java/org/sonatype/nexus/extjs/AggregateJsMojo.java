@@ -55,6 +55,9 @@ public class AggregateJsMojo
   @Parameter(required = true)
   private File outputFile;
 
+  @Parameter(required = true)
+  private String namespace;
+
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     try {
@@ -78,6 +81,7 @@ public class AggregateJsMojo
     files.addDefaultExcludes();
 
     ClassDefScanner scanner = new ClassDefScanner();
+    scanner.setNamespace(namespace);
     List<ClassDef> classes = scanner.scan(files);
 
     Writer output = new BufferedWriter(new FileWriter(outputFile));

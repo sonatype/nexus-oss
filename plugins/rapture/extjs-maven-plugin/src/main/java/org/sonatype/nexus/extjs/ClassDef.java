@@ -41,6 +41,14 @@ public class ClassDef
 
   private List<String> uses;
 
+  private List<String> mvcControllers;
+
+  private List<String> mvcModels;
+
+  private List<String> mvcStores;
+
+  private List<String> mvcViews;
+
   public ClassDef(final String name, final File source) {
     this.name = name;
     this.source = source;
@@ -101,5 +109,41 @@ public class ClassDef
   public void setUses(final List<String> uses) {
     this.uses = uses;
     dependencies.addAll(uses);
+  }
+
+  //
+  // Custom handling for MVC support
+  //
+
+  public List<String> getMvcControllers() {
+    return mvcControllers;
+  }
+
+  public void setMvcControllers(final List<String> mvcControllers) {
+    this.mvcControllers = mvcControllers;
+  }
+
+  public List<String> getMvcModels() {
+    return mvcModels;
+  }
+
+  public void setMvcModels(final List<String> mvcModels) {
+    this.mvcModels = mvcModels;
+  }
+
+  public List<String> getMvcStores() {
+    return mvcStores;
+  }
+
+  public void setMvcStores(final List<String> mvcStores) {
+    this.mvcStores = mvcStores;
+  }
+
+  public List<String> getMvcViews() {
+    return mvcViews;
+  }
+
+  public void setMvcViews(final List<String> mvcViews) {
+    this.mvcViews = mvcViews;
   }
 }

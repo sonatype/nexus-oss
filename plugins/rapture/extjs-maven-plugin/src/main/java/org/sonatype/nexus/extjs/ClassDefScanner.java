@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.extjs;
 
 import java.io.BufferedReader;
@@ -52,7 +53,17 @@ public class ClassDefScanner
 {
   private final CompilerEnvirons env = new CompilerEnvirons();
 
-  private final Map<String,ClassDef> classes = Maps.newHashMap();
+  private final Map<String, ClassDef> classes = Maps.newHashMap();
+
+  private String namespace;
+
+  public String getNamespace() {
+    return namespace;
+  }
+
+  public void setNamespace(final String namespace) {
+    this.namespace = namespace;
+  }
 
   /**
    * Scan a set of files and return a list of class definitions in dependency order.
@@ -70,6 +81,11 @@ public class ClassDefScanner
     for (String path : included) {
       File file = new File(files.getBasedir(), path);
       scan(file);
+    }
+
+    // Resolve all references
+    for (ClassDef def : classes.values()) {
+      resolve(def);
     }
 
     // build the graph
@@ -109,7 +125,7 @@ public class ClassDefScanner
   }
 
   private class DependencyAccumulator
-    implements NodeVisitor
+      implements NodeVisitor
   {
     private final File source;
 
@@ -173,6 +189,9 @@ public class ClassDefScanner
       for (ObjectProperty prop : obj.getElements()) {
         String name = nameOf(prop.getLeft());
         switch (name) {
+
+          // ExtJS core class def
+
           case "extend":
             // string literal only
             current.setExtend(stringLiteral(prop.getRight()));
@@ -211,27 +230,54 @@ public class ClassDefScanner
             current.setMixins(mixins);
             break;
           }
+        }
 
-          // ExtJS MVC support
+        // Additional shit we have to detect for ExtJS MVC support
 
-          case "models":
-            break;
+        if (isMvcClass("controller")) {
+          // class looks like a controller, process more fields
+          switch (name) {
+            case "models":
+              // array of string literals only
+              current.setMvcModels(arrayStringLiteral(prop.getRight()));
+              break;
 
-          case "stores":
-            break;
+            case "stores":
+              // array of string literals only
+              current.setMvcStores(arrayStringLiteral(prop.getRight()));
+              break;
 
-          case "views":
-            break;
+            case "views":
+              // array of string literals only
+              current.setMvcViews(arrayStringLiteral(prop.getRight()));
+              break;
+          }
+        }
+        else if (isMvcClass("store")) {
+          // class looks like a store, process more fields
+          switch (name) {
+            case "model":
+              // string literal only
+              current.getDependencies().add(stringLiteral(prop.getRight()));
+              break;
+          }
         }
       }
 
       return false; // don't process children
     }
 
+    /**
+     * Highly hackish means to determine given class-name is a MVC type.
+     */
+    private boolean isMvcClass(final String type) {
+      return current.getName().contains(String.format(".%s.", type));
+    }
+
     private String stringLiteral(final AstNode node) {
       checkState(node instanceof StringLiteral);
       //noinspection ConstantConditions
-      StringLiteral string = (StringLiteral)node;
+      StringLiteral string = (StringLiteral) node;
       return string.getValue();
     }
 
@@ -244,6 +290,45 @@ public class ClassDefScanner
         result.add(stringLiteral(element));
       }
       return result;
+    }
+  }
+
+  /**
+   * Resolve all references.
+   */
+  private void resolve(final ClassDef def) {
+    checkState(namespace != null);
+
+    if (def.getMvcControllers() != null) {
+      for (String name : def.getMvcControllers()) {
+        appendMvcDependency(def, "controller", name);
+      }
+    }
+    if (def.getMvcModels() != null) {
+      for (String name : def.getMvcModels()) {
+        appendMvcDependency(def, "model", name);
+      }
+    }
+    if (def.getMvcStores() != null) {
+      for (String name : def.getMvcStores()) {
+        appendMvcDependency(def, "store", name);
+      }
+    }
+    if (def.getMvcViews() != null) {
+      for (String name : def.getMvcViews()) {
+        appendMvcDependency(def, "view", name);
+      }
+    }
+  }
+
+  private void appendMvcDependency(final ClassDef def, final String type, final String name) {
+    if (classes.containsKey(name)) {
+      // already qualified name
+      def.getDependencies().add(name);
+    }
+    else {
+      // TODO: cope with name@NS defs, use NS instead of namespace
+      def.getDependencies().add(String.format("%s.%s.%s", namespace, type, name));
     }
   }
 }
