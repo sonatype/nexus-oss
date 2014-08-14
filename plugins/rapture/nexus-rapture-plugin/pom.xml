@@ -107,6 +107,7 @@
               <goal>aggregate-js</goal>
             </goals>
             <configuration>
+              <namespace>NX</namespace>
               <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
               <outputFile>${project.build.outputDirectory}/static/rapture/${project.artifactId}-prod.js</outputFile>
             </configuration>

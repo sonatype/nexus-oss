@@ -102,6 +102,7 @@
               <goal>aggregate-js</goal>
             </goals>
             <configuration>
+              <namespace>NX.coreui</namespace>
               <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
               <outputFile>${project.build.outputDirectory}/static/rapture/${project.artifactId}-prod.js</outputFile>
             </configuration>
@@ -109,9 +110,9 @@
         </executions>
       </plugin>
 
-      <!--<plugin>-->
-        <!--<groupId>org.sonatype.plugins</groupId>-->
-        <!--<artifactId>yuicompressor-maven-plugin</artifactId>-->
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
         <!--<executions>-->
           <!--<execution>-->
             <!--<id>plugin-js</id>-->
@@ -360,7 +361,7 @@
             <!--</configuration>-->
           <!--</execution>-->
         <!--</executions>-->
-      <!--</plugin>-->
+      </plugin>
 
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>

@@ -63,7 +63,17 @@ Ext.define('NX.app.Application', {
     'NX.ext.grid.column.Icon',
     'NX.ext.grid.column.Link',
     'NX.ext.tree.View',
-    'NX.Conditions'
+    'NX.Conditions',
+
+    // HACK: optimization work-around
+    'NX.controller.State',
+    'NX.controller.Bookmarking',
+    'NX.controller.ExtDirect',
+    'NX.controller.Features',
+    'NX.controller.Icon',
+    'NX.controller.KeyNav',
+    'NX.controller.Message',
+    'NX.controller.Permissions'
   ],
 
   name: 'NX',
