@@ -341,8 +341,10 @@
                   <replacefilter token=",kar,ssh,management" />
                   <replacefilter token=",region" />
                 </replace>
-                <replace file="${project.build.directory}/assembly/etc/startup.properties"
-                  token="${mvn:pax-logging-service}" value="${mvn:metrics-core} = 8${line.separator}${mvn:metrics-logback} = 8${line.separator}${mvn:pax-logging-metrics} = 8${line.separator}${mvn:pax-logging-logback}" />
+                <replace file="${project.build.directory}/assembly/etc/startup.properties">
+                  <replacefilter token="${mvn:pax-logging-service}" value="${mvn:metrics-core} = 8${line.separator}${mvn:metrics-logback} = 8${line.separator}${mvn:pax-logging-metrics} = 8${line.separator}${mvn:pax-logging-logback}" />
+                  <replacefilter token="mvn\:org.ops4j.pax.swissbox/pax-swissbox-bnd/1.7.0" value="${mvn:pax-swissbox-bnd}" />
+                </replace>
               </target>
             </configuration>
           </execution>

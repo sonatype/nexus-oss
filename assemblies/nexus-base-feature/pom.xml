@@ -33,6 +33,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.ops4j.pax.swissbox</groupId>
+      <artifactId>pax-swissbox-bnd</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.codahale.metrics</groupId>
       <artifactId>metrics-core</artifactId>
     </dependency>

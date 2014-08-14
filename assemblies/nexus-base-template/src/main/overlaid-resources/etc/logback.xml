@@ -44,8 +44,6 @@
   <logger name="org.apache.felix" level="WARN"/>
   <logger name="org.apache.karaf" level="WARN"/>
 
-  <logger name="org.ops4j.pax.swissbox.bnd.BndUtils" level="ERROR"/>
-
   <root level="${nexus.log.level:-INFO}">
     <appender-ref ref="osgi"/>
     <appender-ref ref="console"/>
