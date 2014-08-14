@@ -13,6 +13,7 @@
 package org.sonatype.nexus.extjs;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -30,29 +31,75 @@ public class ClassDef
 
   private final Set<String> dependencies = Sets.newHashSet();
 
+  private String extend;
+
+  private String override;
+
+  private List<String> requires;
+
+  private List<String> mixins;
+
+  private List<String> uses;
+
   public ClassDef(final String name, final File source) {
     this.name = name;
     this.source = source;
   }
 
-  /**
-   * The name of the ExtJS class.
-   */
   public String getName() {
     return name;
   }
 
-  /**
-   * The file the ExtJS class is defined in.
-   */
   public File getSource() {
     return source;
   }
 
-  /**
-   * A list of all ExtJS classes which this class depends on.
-   */
   public Set<String> getDependencies() {
     return dependencies;
+  }
+
+  public String getExtend() {
+    return extend;
+  }
+
+  public void setExtend(final String extend) {
+    this.extend = extend;
+    dependencies.add(extend);
+  }
+
+  public String getOverride() {
+    return override;
+  }
+
+  public void setOverride(final String override) {
+    this.override = override;
+    dependencies.add(override);
+  }
+
+  public List<String> getRequires() {
+    return requires;
+  }
+
+  public void setRequires(final List<String> requires) {
+    this.requires = requires;
+    dependencies.addAll(requires);
+  }
+
+  public List<String> getMixins() {
+    return mixins;
+  }
+
+  public void setMixins(final List<String> mixins) {
+    this.mixins = mixins;
+    dependencies.addAll(mixins);
+  }
+
+  public List<String> getUses() {
+    return uses;
+  }
+
+  public void setUses(final List<String> uses) {
+    this.uses = uses;
+    dependencies.addAll(uses);
   }
 }

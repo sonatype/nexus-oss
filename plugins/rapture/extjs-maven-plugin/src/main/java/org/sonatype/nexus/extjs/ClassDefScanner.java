@@ -175,71 +175,75 @@ public class ClassDefScanner
         switch (name) {
           case "extend":
             // string literal only
-            dependencyStringLiteral(prop.getRight());
+            current.setExtend(stringLiteral(prop.getRight()));
             break;
 
           case "override":
             // string literal only
-            dependencyStringLiteral(prop.getRight());
+            current.setOverride(stringLiteral(prop.getRight()));
             break;
 
           case "requires":
             // array of string literals only
-            dependenciesArrayStringLiteral(prop.getRight());
+            current.setRequires(arrayStringLiteral(prop.getRight()));
             break;
 
           case "uses":
             // array of string literals only
-            dependenciesArrayStringLiteral(prop.getRight());
+            current.setUses(arrayStringLiteral(prop.getRight()));
             break;
 
           case "mixins": {
             // array of strings, or object
+            List<String> mixins = Lists.newArrayList();
             if (prop.getRight() instanceof ArrayLiteral) {
-              dependenciesArrayStringLiteral(prop.getRight());
+              mixins.addAll(arrayStringLiteral(prop.getRight()));
             }
             else if (prop.getRight() instanceof ObjectLiteral) {
               ObjectLiteral child = (ObjectLiteral) prop.getRight();
               for (ObjectProperty element : child.getElements()) {
-                dependencyStringLiteral(element.getRight());
+                mixins.add(stringLiteral(element.getRight()));
               }
             }
             else {
               throw new IllegalStateException();
             }
+            current.setMixins(mixins);
             break;
           }
 
-          // TODO: process MVC properties? though we have to work harder to resolve the real class-names
-          // TODO: controllers: models, stores, views
-          // TODO: stores: model
-          // TODO: models: ???
+          // ExtJS MVC support
+
+          case "models":
+            break;
+
+          case "stores":
+            break;
+
+          case "views":
+            break;
         }
       }
 
       return false; // don't process children
     }
 
-    /**
-     * Add a dependency on the current class-def for the given string literal node value.
-     */
-    private void dependencyStringLiteral(final AstNode node) {
+    private String stringLiteral(final AstNode node) {
       checkState(node instanceof StringLiteral);
       //noinspection ConstantConditions
       StringLiteral string = (StringLiteral)node;
-      current.getDependencies().add(string.getValue());
+      return string.getValue();
     }
 
-    /**
-     * Add dependencies on the current class-def for the given array node of string literals.
-     */
-    private void dependenciesArrayStringLiteral(final AstNode node) {
+    private List<String> arrayStringLiteral(final AstNode node) {
       checkState(node instanceof ArrayLiteral);
+      List<String> result = Lists.newArrayList();
       //noinspection ConstantConditions
       ArrayLiteral array = (ArrayLiteral) node;
       for (AstNode element : array.getElements()) {
-        dependencyStringLiteral(element);
+        result.add(stringLiteral(element));
       }
+      return result;
     }
   }
 }
