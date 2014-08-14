@@ -365,7 +365,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       if (childNode) {
         tree.getSelectionModel().select(childNode, false, true);
         tree.getView().focusRow(childNode);
-        me.showStorageFile(tree, node);
+        me.showStorageFile(tree, childNode);
         if (segments.length > 1) {
           childNode.expandFn = Ext.bind(me.expandNode, me, [childPath.substring(childName.length)], true);
           childNode.expand();
