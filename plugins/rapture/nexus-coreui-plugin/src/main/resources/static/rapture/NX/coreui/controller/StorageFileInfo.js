@@ -63,7 +63,7 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
         if (response.data['inLocalStorage']) {
           Ext.Array.each(response.data['repositories'], function(repository) {
             repositories.push(NX.util.Url.asLink(
-                NX.util.Url.urlOf('#browse/repository/standard:' + repository['id'] + ':storage'),
+                NX.util.Url.urlOf('#browse/repository/standard:' + repository['id'] + ':' + path),
                 repository['name'],
                 '_self'
             ));

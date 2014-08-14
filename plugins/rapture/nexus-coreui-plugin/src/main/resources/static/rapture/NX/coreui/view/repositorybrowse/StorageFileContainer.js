@@ -18,24 +18,62 @@
 Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
   extend: 'NX.ext.tab.SortedPanel',
   alias: 'widget.nx-coreui-repositorybrowse-storagefilecontainer',
+  requires: [
+    'NX.Icons'
+  ],
 
+  title: '',
   plain: true,
+
+  tools: [
+    { type: 'maximize', tooltip: 'Maximize' }
+  ],
+
+  /**
+   * Repository of currently shown file.
+   */
+  repositoryId: undefined,
+
+  /**
+   * Path of currently shown file.
+   */
+  path: undefined,
+
+  /**
+   * Type of currently shown file.
+   */
+  type: undefined,
 
   /**
    * @public
    * Shows a file in container.
    *
-   * @param repositoryId containing the file to be shown
-   * @param path of file to be shown
+   * @param [repositoryId] containing the file to be shown
+   * @param [path] of file to be shown
+   * @param [type] of file to be shown
    */
-  showStorageFile: function(repositoryId, path) {
-    var me = this;
+  showStorageFile: function(repositoryId, path, type) {
+    var me = this,
+        iconName = 'repository-item-type-default',
+        segments;
+
+    me.repositoryId = repositoryId;
+    me.path = path;
+    me.type = type;
 
     if (repositoryId && path) {
       if (me.hidden) {
         me.show();
       }
+      if (NX.getApplication().getIconController().findIcon('repository-item-type-' + type, 'x16')) {
+        iconName = 'repository-item-type-' + type;
+      }
+      me.setIconCls(NX.Icons.cls(iconName, 'x16'));
+      segments = path.split('/');
+      me.setTitle(segments[segments.length - 1]);
+
       me.fireEvent('updated', me, repositoryId, path);
+
       if (!me.getActiveTab()) {
         me.setActiveTab(0);
       }

@@ -32,8 +32,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
   ],
   views: [
     'repositorybrowse.BrowseRepositoryFeature',
-    'repositorybrowse.BrowseRepositoryTree',
-    'repositorybrowse.StorageFileContainer'
+    'repositorybrowse.BrowseRepositoryTree'
   ],
   refs: [
     { ref: 'tree', selector: 'nx-coreui-repositorybrowse-tree' },
@@ -50,14 +49,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       'repository-managed': { file: 'database_yellow.png', variants: ['x16', 'x32'] },
       'repository-out-of-service': { file: 'warning.png', variants: ['x16'] },
       'repositorybrowse-inIndex': { file: 'tick.png', variants: ['x16'] },
-      'repositorybrowse-inStorage': { file: 'tick.png', variants: ['x16'] },
-      'repository-item-type-default': { file: 'file_extension_default.png', variants: ['x16', 'x24', 'x32'] },
-      'repository-item-type-md5': { file: 'file_extension_checksum.png', variants: ['x16', 'x32'] },
-      'repository-item-type-jar': { file: 'file_extension_jar.png', variants: ['x16', 'x32'] },
-      'repository-item-type-pom': { file: 'file_extension_xml.png', variants: ['x16', 'x32'] },
-      'repository-item-type-sha1': { file: 'file_extension_checksum.png', variants: ['x16', 'x32'] },
-      'repository-item-type-xml': { file: 'file_extension_xml.png', variants: ['x16', 'x32'] },
-      'repository-item-type-zip': { file: 'file_extension_zip.png', variants: ['x16', 'x32'] }
+      'repositorybrowse-inStorage': { file: 'tick.png', variants: ['x16'] }
     });
 
     me.getApplication().getFeaturesController().registerFeature([
@@ -183,7 +175,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
             });
           });
           Ext.resumeLayouts(true);
-          me.getStorageFileContainer().showStorageFile(undefined, undefined);
+          me.getStorageFileContainer().showStorageFile();
           me.navigateTo(NX.Bookmarks.getBookmark());
         }
       });
@@ -223,7 +215,8 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     }
     me.getStorageFileContainer().showStorageFile(
         node.get('repositoryId'),
-        (node.isLeaf() && node.get('path') !== '/') ? node.get('path') : undefined
+        (node.isLeaf() && node.get('path') !== '/') ? node.get('path') : undefined,
+        (node.isLeaf() && node.get('path') !== '/') ? node.get('type') : undefined
     );
   },
 

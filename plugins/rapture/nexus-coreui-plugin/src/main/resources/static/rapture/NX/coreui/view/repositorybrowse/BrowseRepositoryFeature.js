@@ -35,7 +35,6 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryFeature', {
         region: 'south',
         split: true,
         flex: 1,
-        header: false,
         collapsible: true,
         collapsed: false,
         collapseMode: 'mini',

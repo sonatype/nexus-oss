@@ -166,7 +166,7 @@ Ext.define('NX.coreui.controller.Search', {
    * @private
    * Show quick search when user has 'nexus:repositories:read' permission.
    */
-  bindQuickSearch: function (quickSearch) {
+  bindQuickSearch: function(quickSearch) {
     quickSearch.up('panel').mon(
         NX.Conditions.isPermitted('nexus:repositories', 'read'),
         {
@@ -427,12 +427,14 @@ Ext.define('NX.coreui.controller.Search', {
 
     if (searchResultVersionModel) {
       storageFileContainer.showStorageFile(
-          searchResultVersionModel.get('repositoryId'), searchResultVersionModel.get('path')
+          searchResultVersionModel.get('repositoryId'),
+          searchResultVersionModel.get('path'),
+          searchResultVersionModel.get('type')
       );
       storageFileContainer.expand();
     }
     else {
-      storageFileContainer.showStorageFile(undefined, undefined);
+      storageFileContainer.showStorageFile();
     }
   },
 

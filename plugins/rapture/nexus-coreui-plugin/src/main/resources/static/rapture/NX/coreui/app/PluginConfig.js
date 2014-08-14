@@ -95,6 +95,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.RealmSettings',
     'NX.coreui.controller.RoutingRepositorySettings',
     'NX.coreui.controller.Roles',
+    'NX.coreui.controller.StorageFileContainer',
     'NX.coreui.controller.Search',
     'NX.coreui.controller.SmtpSettings',
     { id: 'NX.coreui.controller.SslCertificates',
