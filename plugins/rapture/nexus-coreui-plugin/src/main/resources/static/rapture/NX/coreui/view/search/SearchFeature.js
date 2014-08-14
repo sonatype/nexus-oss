@@ -114,7 +114,6 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
                 region: 'south',
                 split: true,
                 flex: 0.5,
-                header: false,
                 collapsible: true,
                 collapsed: false,
                 collapseMode: 'mini',
