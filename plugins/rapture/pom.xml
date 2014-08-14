@@ -29,6 +29,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>extjs-maven-plugin</module>
     <module>nexus-coreui-plugin</module>
     <module>nexus-extdirect-plugin</module>
     <module>nexus-rapture-baseapp</module>

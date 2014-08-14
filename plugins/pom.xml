@@ -561,16 +561,16 @@
             </jslintOptions>
           </configuration>
           <executions>
-            <execution>
-              <id>plugin-js</id>
-              <goals>
-                <goal>aggregate-js</goal>
-              </goals>
-              <configuration>
-                <output>${project.build.outputDirectory}/static/rapture/${project.artifactId}-prod.js</output>
-                <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
-              </configuration>
-            </execution>
+            <!--<execution>-->
+              <!--<id>plugin-js</id>-->
+              <!--<goals>-->
+                <!--<goal>aggregate-js</goal>-->
+              <!--</goals>-->
+              <!--<configuration>-->
+                <!--<output>${project.build.outputDirectory}/static/rapture/${project.artifactId}-prod.js</output>-->
+                <!--<sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>-->
+              <!--</configuration>-->
+            <!--</execution>-->
             <execution>
               <id>plugin-css</id>
               <goals>
