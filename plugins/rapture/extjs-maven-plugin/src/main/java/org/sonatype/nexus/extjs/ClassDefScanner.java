@@ -65,6 +65,7 @@ public class ClassDefScanner
     this.log = checkNotNull(log);
   }
 
+  @Nullable
   public String getNamespace() {
     return namespace;
   }
