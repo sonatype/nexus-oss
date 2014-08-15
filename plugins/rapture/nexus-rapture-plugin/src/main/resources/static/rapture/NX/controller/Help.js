@@ -97,7 +97,7 @@ Ext.define('NX.controller.Help', {
    */
   onFeatureHelp: function() {
     // TODO: redirect user to feature help page in book, for now just provide feedback this feature is not ready yet
-    NX.Messages.add({ text: 'Not yet implemented, try again in later release', type: 'warning' });
+    NX.Messages.add({ text: 'Not yet implemented', type: 'warning' });
   },
 
   /**
