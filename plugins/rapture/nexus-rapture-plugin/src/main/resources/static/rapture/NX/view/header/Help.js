@@ -45,18 +45,18 @@ Ext.define('NX.view.header.Help', {
       { text: 'Feature', action: 'feature' },
       '-',
       {
-        text: 'About',
+        text: 'About Sonatype Nexus',
         iconCls: 'nx-icon-nexus-x16',
         action: 'about'
       },
       {
-        text: 'Product Manual',
+        text: 'Documentation',
         iconCls: 'nx-icon-help-manual-x16',
         href: manualUrl,
         hrefTarget: manualUrl
       },
       {
-        text: 'Product Support',
+        text: 'Support',
         iconCls: 'nx-icon-help-support-x16',
         href: supportUrl,
         hrefTarget: supportUrl
