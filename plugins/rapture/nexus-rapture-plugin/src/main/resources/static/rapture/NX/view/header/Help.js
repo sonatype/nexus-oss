@@ -34,34 +34,40 @@ Ext.define('NX.view.header.Help', {
    * @override
    */
   initComponent: function () {
-    var me = this;
+    var me = this,
+        edition = NX.State.getValue('status')['edition'].toLowerCase(),
+        linkBase = 'http://links.sonatype.com/products/nexus/',
+        issuesUrl = linkBase + edition + '/issues',
+        manualUrl = linkBase + edition + '/docs',
+        supportUrl = linkBase + edition + '/support';
 
     me.menu = [
       { text: 'Feature', action: 'feature' },
       '-',
       {
         text: 'About Sonatype Nexus '
-            + NX.State.getValue('status')['edition'] + ' ' + NX.State.getValue('status')['version'],
+            + NX.State.getValue('status')['edition']
+            + ' ' + NX.State.getValue('status')['version'],
         iconCls: 'nx-icon-nexus-x16',
         action: 'about'
       },
       {
-        text: 'Browse Issue Tracker',
-        iconCls: 'nx-icon-help-support-x16',
-        href: 'https://issues.sonatype.org/browse/NEXUS/',
-        hrefTarget: 'https://issues.sonatype.org/browse/NEXUS/'
-      },
-      {
         text: 'Product Manual',
         iconCls: 'nx-icon-help-manual-x16',
-        href: 'http://www.sonatype.com/resources/books/repository-management-with-nexus',
-        hrefTarget: 'http://www.sonatype.com/resources/books/repository-management-with-nexus'
+        href: manualUrl,
+        hrefTarget: manualUrl
       },
       {
         text: 'Product Support',
         iconCls: 'nx-icon-help-support-x16',
-        href: 'https://support.sonatype.com/home',
-        hrefTarget: 'https://support.sonatype.com/home'
+        href: supportUrl,
+        hrefTarget: supportUrl
+      },
+      {
+        text: 'Issue Tracker',
+        iconCls: 'nx-icon-help-issuetracker-x16',
+        href: issuesUrl,
+        hrefTarget: issuesUrl
       }
     ];
 

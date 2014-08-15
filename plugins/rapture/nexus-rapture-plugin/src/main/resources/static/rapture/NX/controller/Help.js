@@ -45,6 +45,10 @@ Ext.define('NX.controller.Help', {
         file: 'support.png',
         variants: ['x16', 'x32']
       },
+      'help-issuetracker': {
+        file: 'bug.png',
+        variants: ['x16', 'x32']
+      },
       'help-manual': {
         file: 'book_picture.png',
         variants: ['x16', 'x32']
