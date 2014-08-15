@@ -28,6 +28,9 @@ Ext.define('NX.view.AddWindow', {
   width: 630,
   minWidth: 630,
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this;
 

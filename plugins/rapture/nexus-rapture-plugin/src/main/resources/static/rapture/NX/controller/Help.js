@@ -27,7 +27,8 @@ Ext.define('NX.controller.Help', {
   },
 
   views: [
-    'header.Help'
+    'header.Help',
+    'AboutWindow'
   ],
 
   refs: [
@@ -63,6 +64,11 @@ Ext.define('NX.controller.Help', {
         '#Menu': {
           featureselected: me.onFeatureSelected
         }
+      },
+      component: {
+        'nx-header-help menuitem[action=about]': {
+          click: me.onAbout
+        }
       }
     });
   },
@@ -80,6 +86,14 @@ Ext.define('NX.controller.Help', {
 
     featureHelp.setText('Help for: ' + text);
     featureHelp.setIconCls(NX.Icons.cls(iconName, 'x16'));
-  }
+  },
 
+  /**
+   * @private
+   */
+  onAbout: function() {
+    var me = this;
+
+    Ext.widget('nx-aboutwindow');
+  }
 });
