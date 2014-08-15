@@ -89,7 +89,14 @@ public class RaptureWebResourceBundle
     this.servletRequestProvider = checkNotNull(servletRequestProvider);
     this.stateComponentProvider = checkNotNull(stateComponentProvider);
     this.templateEngine = checkNotNull(templateEngine);
+
     this.pluginDescriptors = checkNotNull(pluginDescriptors);
+
+    // HACK: bring back logging to help sort out why dynamic collection isn't including the impl from this plugin
+    log.info("UI plugin descriptors:");
+    for (UiPluginDescriptor descriptor : pluginDescriptors) {
+      log.info("  {}", descriptor.getPluginId());
+    }
 
     // FIXME: Should be updated to use Jackson?
     gson = new GsonBuilder().setPrettyPrinting().create();
