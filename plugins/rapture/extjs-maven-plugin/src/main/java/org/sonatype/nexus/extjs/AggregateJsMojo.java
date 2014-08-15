@@ -55,7 +55,7 @@ public class AggregateJsMojo
   @Parameter(required = true)
   private File outputFile;
 
-  @Parameter(required = true)
+  @Parameter
   private String namespace;
 
   @Override
@@ -80,8 +80,13 @@ public class AggregateJsMojo
     files.setExcludes(excludes);
     files.addDefaultExcludes();
 
-    ClassDefScanner scanner = new ClassDefScanner();
-    scanner.setNamespace(namespace);
+    ClassDefScanner scanner = new ClassDefScanner(getLog());
+    if (namespace == null) {
+      getLog().warn("Namespace is not set, will be unable to detect and resolve MVC references");
+    }
+    else {
+      scanner.setNamespace(namespace);
+    }
     List<ClassDef> classes = scanner.scan(files);
 
     Writer output = new BufferedWriter(new FileWriter(outputFile));

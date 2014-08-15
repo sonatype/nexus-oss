@@ -23,11 +23,14 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.Scanner;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
 import org.mozilla.javascript.CompilerEnvirons;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.Parser;
 import org.mozilla.javascript.ast.ArrayLiteral;
 import org.mozilla.javascript.ast.AstNode;
@@ -41,7 +44,6 @@ import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.StringLiteral;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static org.mozilla.javascript.Token.CALL;
 
 /**
@@ -51,11 +53,15 @@ import static org.mozilla.javascript.Token.CALL;
  */
 public class ClassDefScanner
 {
-  private final CompilerEnvirons env = new CompilerEnvirons();
-
   private final Map<String, ClassDef> classes = Maps.newHashMap();
 
+  private final Log log;
+
   private String namespace;
+
+  public ClassDefScanner(final Log log) {
+    this.log = checkNotNull(log);
+  }
 
   public String getNamespace() {
     return namespace;
@@ -74,10 +80,13 @@ public class ClassDefScanner
 
     // reset and scan for files
     classes.clear();
+
+    log.debug("Finding files to scan...");
     files.scan();
 
     // scan each file
     String[] included = files.getIncludedFiles();
+    log.debug("Scanning " + included.length + " files...");
     for (String path : included) {
       File file = new File(files.getBasedir(), path);
       scan(file);
@@ -99,13 +108,17 @@ public class ClassDefScanner
 
     // result sorted list of class definitions
     List<ClassDef> results = Lists.newArrayList();
+    log.debug("Ordered classes:");
+    // the graph contains many references, only include those which are class defs
     for (String className : TopologicalSorter.sort(graph)) {
       ClassDef def = classes.get(className);
       if (def != null) {
         results.add(def);
+        log.debug("  " + def.getName());
       }
     }
 
+    log.debug("Found " + results.size() + " classes");
     return results;
   }
 
@@ -113,7 +126,14 @@ public class ClassDefScanner
    * Scan the given file for class definitions and accumulate dependencies.
    */
   private void scan(final File source) throws IOException {
-    Parser parser = new Parser(env);
+    log.debug("Scanning: " + source);
+
+    ErrorReporter errorReporter = new LogErrorReporter(log);
+
+    CompilerEnvirons env = new CompilerEnvirons();
+    env.setErrorReporter(errorReporter);
+
+    Parser parser = new Parser(env, errorReporter);
     Reader reader = new BufferedReader(new FileReader(source));
     try {
       AstRoot root = parser.parse(reader, source.getAbsolutePath(), 0);
@@ -133,6 +153,27 @@ public class ClassDefScanner
 
     private DependencyAccumulator(final File source) {
       this.source = source;
+    }
+
+    /**
+     * Helper to report error for given node position in ast tree.
+     */
+    private void reportError(final AstNode node, final String message, Object... params) {
+      throw Context.reportRuntimeError(String.format(message, params),
+          source.getAbsolutePath(),
+          node.getLineno(), // seems to always be the line before?
+          node.debugPrint(),
+          0 // line-offset is unknown?
+      );
+    }
+
+    /**
+     * Helper to check state and report error for given node position in ast tree.
+     */
+    private void checkState(boolean expression, final AstNode node, final String message, Object... params) {
+      if (!expression) {
+        reportError(node, message, params);
+      }
     }
 
     @Override
@@ -174,17 +215,18 @@ public class ClassDefScanner
      */
     private boolean processClassDef(final FunctionCall node) {
       List<AstNode> args = node.getArguments();
-      checkState(args.size() >= 2); // simple def or def with callback
+      checkState(args.size() >= 2, node,
+          "Invalid number of arguments for Ext.define"); // simple def or def with callback
 
       // class-name
-      checkState(args.get(0) instanceof StringLiteral);
+      checkState(args.get(0) instanceof StringLiteral, node, "Ext.define arg[0] must be string");
       String className = nameOf(args.get(0));
 
       current = new ClassDef(className, source);
       classes.put(className, current);
 
       // class def object
-      checkState(args.get(1) instanceof ObjectLiteral);
+      checkState(args.get(1) instanceof ObjectLiteral, node, "Ext.define arg[1] must be object");
       ObjectLiteral obj = (ObjectLiteral) args.get(1);
       for (ObjectProperty prop : obj.getElements()) {
         String name = nameOf(prop.getLeft());
@@ -225,16 +267,40 @@ public class ClassDefScanner
               }
             }
             else {
-              throw new IllegalStateException();
+              reportError(prop.getRight(), "Expected array or object literal only");
             }
             current.setMixins(mixins);
             break;
           }
         }
 
-        // Additional shit we have to detect for ExtJS MVC support
+        // Additional stuff we have to detect for ExtJS MVC support
 
-        if (isMvcClass("controller")) {
+        if (isExtends("Ext.app.Application")) {
+          // class looks like an application, process more fields
+          switch (name) {
+            case "controllers":
+              // array of string literals only
+              current.setMvcControllers(arrayStringLiteral(prop.getRight()));
+              break;
+
+            case "models":
+              // array of string literals only
+              current.setMvcModels(arrayStringLiteral(prop.getRight()));
+              break;
+
+            case "stores":
+              // array of string literals only
+              current.setMvcStores(arrayStringLiteral(prop.getRight()));
+              break;
+
+            case "views":
+              // array of string literals only
+              current.setMvcViews(arrayStringLiteral(prop.getRight()));
+              break;
+          }
+        }
+        else if (isMvcClass("controller")) {
           // class looks like a controller, process more fields
           switch (name) {
             case "models":
@@ -269,20 +335,29 @@ public class ClassDefScanner
 
     /**
      * Highly hackish means to determine given class-name is a MVC type.
+     * Requires namespace to be configured.
      */
     private boolean isMvcClass(final String type) {
-      return current.getName().contains(String.format(".%s.", type));
+      return namespace != null && current.getName().startsWith(String.format("%s.%s.", namespace, type));
+    }
+
+    /**
+     * Check if current class extends (directly) given class-name.
+     */
+    private boolean isExtends(final String className) {
+      String superClass = current.getExtend();
+      return superClass != null && superClass.equals(className);
     }
 
     private String stringLiteral(final AstNode node) {
-      checkState(node instanceof StringLiteral);
+      checkState(node instanceof StringLiteral, node, "Expected string literal only");
       //noinspection ConstantConditions
       StringLiteral string = (StringLiteral) node;
       return string.getValue();
     }
 
     private List<String> arrayStringLiteral(final AstNode node) {
-      checkState(node instanceof ArrayLiteral);
+      checkState(node instanceof ArrayLiteral, node, "Expected array literal only");
       List<String> result = Lists.newArrayList();
       //noinspection ConstantConditions
       ArrayLiteral array = (ArrayLiteral) node;
@@ -297,26 +372,27 @@ public class ClassDefScanner
    * Resolve all references.
    */
   private void resolve(final ClassDef def) {
-    checkState(namespace != null);
-
-    if (def.getMvcControllers() != null) {
-      for (String name : def.getMvcControllers()) {
-        appendMvcDependency(def, "controller", name);
+    // resolve mvc references if namespace is set
+    if (namespace != null) {
+      if (def.getMvcControllers() != null) {
+        for (String name : def.getMvcControllers()) {
+          appendMvcDependency(def, "controller", name);
+        }
       }
-    }
-    if (def.getMvcModels() != null) {
-      for (String name : def.getMvcModels()) {
-        appendMvcDependency(def, "model", name);
+      if (def.getMvcModels() != null) {
+        for (String name : def.getMvcModels()) {
+          appendMvcDependency(def, "model", name);
+        }
       }
-    }
-    if (def.getMvcStores() != null) {
-      for (String name : def.getMvcStores()) {
-        appendMvcDependency(def, "store", name);
+      if (def.getMvcStores() != null) {
+        for (String name : def.getMvcStores()) {
+          appendMvcDependency(def, "store", name);
+        }
       }
-    }
-    if (def.getMvcViews() != null) {
-      for (String name : def.getMvcViews()) {
-        appendMvcDependency(def, "view", name);
+      if (def.getMvcViews() != null) {
+        for (String name : def.getMvcViews()) {
+          appendMvcDependency(def, "view", name);
+        }
       }
     }
   }
