@@ -17,11 +17,13 @@ import java.util.List;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -36,12 +38,13 @@ public class ClassDefScannerTest
 
   @Before
   public void setUp() throws Exception {
-    this.scanner = new ClassDefScanner();
+    this.scanner = new ClassDefScanner(new SystemStreamLog());
   }
 
   @Test
   public void basicOrder() throws Exception {
     File basedir = util.resolveFile("src/test/resources/basic");
+
     DirectoryScanner files = new DirectoryScanner();
     files.setBasedir(basedir);
     files.setIncludes(new String[]{"**/*.js"});
@@ -63,5 +66,29 @@ public class ClassDefScannerTest
 
     assertThat(classes.get(1).getDependencies(), contains("Baz"));
     assertThat(classes.get(2).getDependencies(), contains("Bar"));
+  }
+
+  @Test
+  public void mvcOrder() throws Exception {
+    File basedir = util.resolveFile("src/test/resources/mvc");
+    scanner.setNamespace("Test");
+
+    DirectoryScanner files = new DirectoryScanner();
+    files.setBasedir(basedir);
+    files.setIncludes(new String[]{"**/*.js"});
+
+    List<ClassDef> classes = scanner.scan(files);
+    log("Classes:");
+    for (ClassDef def : classes) {
+      log("  {}", def.getName());
+      for (String dep : def.getDependencies()) {
+        log("    + {}", dep);
+      }
+    }
+
+    assertThat(classes, hasSize(5));
+
+    assertThat(classes.get(4).getName(), is("Test.Application"));
+    assertThat(classes.get(4).getDependencies(), containsInAnyOrder("Ext.app.Application", "Test.controller.Fun"));
   }
 }
