@@ -57,6 +57,12 @@ Ext.define('NX.coreui.app.PluginConfig', {
             || NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-clm-plugin');
       }
     },
+    { id: 'NX.coreui.controller.HealthCheckSearch',
+      active: function () {
+        return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-healthcheck-oss-plugin')
+            || NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-clm-plugin');
+      }
+    },
     { id: 'NX.coreui.controller.LdapServers',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-ldap-plugin');
@@ -91,6 +97,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.RealmSettings',
     'NX.coreui.controller.RoutingRepositorySettings',
     'NX.coreui.controller.Roles',
+    'NX.coreui.controller.StorageFileContainer',
     'NX.coreui.controller.Search',
     'NX.coreui.controller.SmtpSettings',
     { id: 'NX.coreui.controller.SslCertificates',

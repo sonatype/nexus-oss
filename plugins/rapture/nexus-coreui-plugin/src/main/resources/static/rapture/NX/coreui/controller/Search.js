@@ -168,7 +168,7 @@ Ext.define('NX.coreui.controller.Search', {
    * @private
    * Show quick search when user has 'nexus:repositories:read' permission.
    */
-  bindQuickSearch: function (quickSearch) {
+  bindQuickSearch: function(quickSearch) {
     quickSearch.up('panel').mon(
         NX.Conditions.isPermitted('nexus:repositories', 'read'),
         {
@@ -329,7 +329,10 @@ Ext.define('NX.coreui.controller.Search', {
    */
   onRefresh: function() {
     var me = this;
-    me.getSearchResultStore().filter();
+
+    if (me.getSearchFeature()) {
+      me.getSearchResultStore().filter();
+    }
   },
 
   /**
@@ -381,17 +384,15 @@ Ext.define('NX.coreui.controller.Search', {
         searchResultModel = selected[0],
         searchResultVersion = me.getSearchResultVersion(),
         searchResultDetails = me.getSearchResultDetails(),
-        searchResultVersionStore = me.getSearchResultVersionStore(),
-        segments;
+        searchResultVersionStore = me.getSearchResultVersionStore();
 
     me.onSearchResultVersionSelectionChange(me.getSearchResultVersion().getSelectionModel(), []);
     if (searchResultModel) {
-      segments = searchResultModel.getId().split(':');
       searchResultDetails.items.get(0).hide();
       searchResultDetails.items.get(1).show();
       searchResultDetails.items.get(1).items.get(1).showInfo({
-        'Group': searchResultModel.get('group'),
-        'Name': searchResultModel.get('name'),
+        'Group': searchResultModel.get('groupId'),
+        'Name': searchResultModel.get('artifactId'),
         'Format': searchResultModel.get('format')
       });
       searchResultVersion.show();
@@ -400,11 +401,11 @@ Ext.define('NX.coreui.controller.Search', {
       searchResultVersionStore.addFilter([
         {
           property: 'groupid',
-          value: segments[0]
+          value: searchResultModel.get('groupId')
         },
         {
           property: 'artifactid',
-          value: segments[1]
+          value: searchResultModel.get('artifactId')
         }
       ]);
     }
@@ -428,12 +429,14 @@ Ext.define('NX.coreui.controller.Search', {
 
     if (searchResultVersionModel) {
       storageFileContainer.showStorageFile(
-          searchResultVersionModel.get('repositoryId'), searchResultVersionModel.get('path')
+          searchResultVersionModel.get('repositoryId'),
+          searchResultVersionModel.get('path'),
+          searchResultVersionModel.get('type')
       );
       storageFileContainer.expand();
     }
     else {
-      storageFileContainer.showStorageFile(undefined, undefined);
+      storageFileContainer.showStorageFile();
     }
   },
 

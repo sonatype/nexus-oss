@@ -44,7 +44,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 
-import static org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY;
+import static org.sonatype.nexus.rest.repositories_.AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY;
 
 /**
  * A REST Resource that accepts upload (zip file), and it simply explodes it in the root of the given repository.

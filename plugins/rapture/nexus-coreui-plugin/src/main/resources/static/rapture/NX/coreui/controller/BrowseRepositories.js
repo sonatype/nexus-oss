@@ -19,6 +19,12 @@
  */
 Ext.define('NX.coreui.controller.BrowseRepositories', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Bookmarks'
+  ],
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
 
   list: 'nx-coreui-repositorybrowse-list',
 
@@ -28,8 +34,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
   ],
   views: [
     'repositorybrowse.BrowseRepositoryFeature',
-    'repositorybrowse.BrowseRepositoryTree',
-    'repositorybrowse.StorageFileContainer'
+    'repositorybrowse.BrowseRepositoryTree'
   ],
   refs: [
     { ref: 'tree', selector: 'nx-coreui-repositorybrowse-tree' },
@@ -46,14 +51,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       'repository-managed': { file: 'database_yellow.png', variants: ['x16', 'x32'] },
       'repository-out-of-service': { file: 'warning.png', variants: ['x16'] },
       'repositorybrowse-inIndex': { file: 'tick.png', variants: ['x16'] },
-      'repositorybrowse-inStorage': { file: 'tick.png', variants: ['x16'] },
-      'repository-item-type-default': { file: 'file_extension_default.png', variants: ['x16', 'x24', 'x32'] },
-      'repository-item-type-md5': { file: 'file_extension_checksum.png', variants: ['x16', 'x32'] },
-      'repository-item-type-jar': { file: 'file_extension_jar.png', variants: ['x16', 'x32'] },
-      'repository-item-type-pom': { file: 'file_extension_xml.png', variants: ['x16', 'x32'] },
-      'repository-item-type-sha1': { file: 'file_extension_checksum.png', variants: ['x16', 'x32'] },
-      'repository-item-type-xml': { file: 'file_extension_xml.png', variants: ['x16', 'x32'] },
-      'repository-item-type-zip': { file: 'file_extension_zip.png', variants: ['x16', 'x32'] }
+      'repositorybrowse-inStorage': { file: 'tick.png', variants: ['x16'] }
     });
 
     me.getApplication().getFeaturesController().registerFeature([
@@ -92,6 +90,9 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       controller: {
         '#Refresh': {
           refresh: me.loadRepositories
+        },
+        '#Bookmarking': {
+          navigate: me.navigateTo
         }
       },
       component: {
@@ -147,6 +148,9 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     ]));
   },
 
+  /**
+   * Load available repositories into tree.
+   */
   loadRepositories: function() {
     var me = this,
         tree = me.getTree(),
@@ -173,7 +177,8 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
             });
           });
           Ext.resumeLayouts(true);
-          me.getStorageFileContainer().showStorageFile(undefined, undefined);
+          me.getStorageFileContainer().showStorageFile();
+          me.navigateTo(NX.Bookmarks.getBookmark());
         }
       });
     }
@@ -181,9 +186,25 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
   /**
    * @private
-   * When a node gets selected, refresh storage file in right-side container.
+   * When a node gets selected, refresh storage file in right-side container and bookmark.
    */
   onNodeSelected: function(tree, node) {
+    var me = this,
+        bookmark = NX.Bookmarks.fromToken(NX.Bookmarks.getBookmark().getSegment(0));
+
+    me.showStorageFile(tree, node);
+    bookmark.appendSegments([
+      encodeURIComponent(node.get('repositoryId')),
+      encodeURIComponent(node.get('path')).replace(/%2F/g, '/')
+    ]);
+    NX.Bookmarks.bookmark(bookmark, me);
+  },
+
+  /**
+   * @private
+   * When a node gets selected, refresh storage file in right-side container.
+   */
+  showStorageFile: function(tree, node) {
     var me = this,
         treePanel = me.getTree(),
         moreButton = treePanel.down('button[action=more]'),
@@ -196,7 +217,8 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     }
     me.getStorageFileContainer().showStorageFile(
         node.get('repositoryId'),
-        (node.isLeaf() && node.get('path') !== '/') ? node.get('path') : undefined
+        (node.isLeaf() && node.get('path') !== '/') ? node.get('path') : undefined,
+        (node.isLeaf() && node.get('path') !== '/') ? node.get('type') : undefined
     );
   },
 
@@ -258,8 +280,18 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
           me.sortNode(node);
           Ext.resumeLayouts(true);
         }
+        if (node.expandFn) {
+          node.expandFn(node);
+          delete node.expandFn;
+        }
         tree.getEl().unmask();
       });
+    }
+    else {
+      if (node.expandFn) {
+        node.expandFn(node);
+        delete node.expandFn;
+      }
     }
   },
 
@@ -278,6 +310,70 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       }
       return t1.localeCompare(t2);
     }, true);
+  },
+
+  /**
+   * @private
+   * @param {NX.Bookmark} bookmark to navigate to
+   */
+  navigateTo: function(bookmark) {
+    var me = this,
+        tree = me.getTree(),
+        store, repositoryId, path, node;
+
+    if (tree && bookmark) {
+      repositoryId = bookmark.getSegment(1);
+      path = bookmark.getSegment(2);
+      tree.collapseAll(function() {
+        if (repositoryId) {
+          repositoryId = decodeURIComponent(repositoryId);
+          me.logDebug('Navigate to: ' + repositoryId + path);
+          store = tree.getStore();
+          node = store.getRootNode().findChild('repositoryId', repositoryId);
+          if (node) {
+            tree.getSelectionModel().select(node, false, true);
+            tree.getView().focusRow(node);
+            if (path) {
+              node.expandFn = Ext.bind(me.expandNode, me, [path], true);
+              node.expand();
+            }
+          }
+        }
+        else {
+          tree.getSelectionModel().deselectAll();
+        }
+      });
+    }
+  },
+
+  /**
+   * @private
+   * Expand & select a child path.
+   * @param node containing the child path
+   * @param childPath child path to expand
+   */
+  expandNode: function(node, childPath) {
+    var me = this,
+        tree = me.getTree(),
+        childNode, childName, segments;
+
+    if (childPath > '/') {
+      segments = childPath.substring(1).split('/');
+      childName = segments[0];
+      if (segments.length > 1) {
+        childName += '/';
+      }
+      childNode = node.findChild('path', node.get('path') + childName);
+      if (childNode) {
+        tree.getSelectionModel().select(childNode, false, true);
+        tree.getView().focusRow(childNode);
+        me.showStorageFile(tree, childNode);
+        if (segments.length > 1) {
+          childNode.expandFn = Ext.bind(me.expandNode, me, [childPath.substring(childName.length)], true);
+          childNode.expand();
+        }
+      }
+    }
   },
 
   /**
@@ -408,7 +504,25 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
    * @param path to download
    */
   downloadStorageFile: function(repositoryId, path) {
-    this.downloadPath(NX.util.Url.urlOf('content/repositories/' + repositoryId), path);
+    var me = this,
+        repositoryNode, itemNode,
+        setInStorage = function(nodeToSet) {
+          if (!nodeToSet.get('inStorage')) {
+            nodeToSet.set('inStorage', true);
+            if (nodeToSet.parentNode && !(nodeToSet.get('path') === '/')) {
+              setInStorage(nodeToSet.parentNode);
+            }
+          }
+        };
+
+    me.downloadPath(NX.util.Url.urlOf('content/repositories/' + repositoryId), path);
+    repositoryNode = me.getTree().getRootNode().findChild('repositoryId', repositoryId);
+    if (repositoryNode) {
+      itemNode = repositoryNode.findChild('path', path, true);
+      if (itemNode) {
+        setInStorage(itemNode);
+      }
+    }
   },
 
   /**

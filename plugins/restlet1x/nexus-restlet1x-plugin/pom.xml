@@ -83,15 +83,6 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <!-- model classes will be merged in as a fragment at runtime 
-          <excludeDependencies>nexus-restlet1x-model</excludeDependencies> -->
-        </configuration>
-      </plugin>
-
-      <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
       </plugin>

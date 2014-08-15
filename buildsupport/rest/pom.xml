@@ -30,8 +30,8 @@
   <properties>
     <siesta1.version>1.7</siesta1.version>
     <siesta2.version>2.0.1</siesta2.version>
-    <jersey1.version>1.17.1</jersey1.version>
-    <jackson2.version>2.3.3</jackson2.version>
+    <jersey1.version>1.18.1</jersey1.version>
+    <jackson2.version>2.4.1</jackson2.version>
   </properties>
 
   <dependencyManagement>
@@ -89,6 +89,10 @@
           <exclusion>
             <groupId>org.apache.bval</groupId>
             <artifactId>bval-jsr303</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>jaxrs-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -160,6 +164,42 @@
       <!--
       Siesta 1.x (for legacy REST client based on Jersey 1.x)
       -->
+
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-client</artifactId>
+        <version>${jersey1.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-core</artifactId>
+        <version>${jersey1.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-server</artifactId>
+        <version>${jersey1.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-servlet</artifactId>
+        <version>${jersey1.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-apache-client4</artifactId>
+        <version>${jersey1.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-multipart</artifactId>
+        <version>${jersey1.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>org.sonatype.sisu.siesta</groupId>

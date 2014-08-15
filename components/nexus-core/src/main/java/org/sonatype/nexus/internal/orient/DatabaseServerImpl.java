@@ -144,6 +144,10 @@ public class DatabaseServerImpl
     config.security.users = Lists.newArrayList();
     config.security.resources = Lists.newArrayList();
 
+    // latest advice is to disable DB compression as it doesn't buy much,
+    // also snappy has issues with use of native lib (unpacked under tmp)
+    OGlobalConfiguration.STORAGE_COMPRESSION_METHOD.setValue("nothing");
+
     return config;
   }
 

@@ -24,7 +24,7 @@ import groovy.transform.ToString
 class SearchResultXO
 {
   String id
-  String group
-  String name
+  String groupId
+  String artifactId
   String format
 }

@@ -79,7 +79,7 @@ extends DirectComponentSupport
         return "${info.groupId}:${info.artifactId}" as String
       } as SortedSet
 
-      log.info('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
+      log.debug('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
     }
     finally {
       iterator?.close()
@@ -98,8 +98,8 @@ extends DirectComponentSupport
       def segments = ga.split(':')
       results << new SearchResultXO(
           id: ga,
-          group: segments[0],
-          name: segments[1],
+          groupId: segments[0],
+          artifactId: segments[1],
           format: 'Maven2'
       )
     }
@@ -123,8 +123,8 @@ extends DirectComponentSupport
       iterator = indexerManager.searchQueryIterator(
           bq, null, null, null, null, false, null
       )
-      log.info('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
-      def versions = [] as SortedSet
+      log.debug('Query: {}, Hits: {}', bq, iterator.totalHitsCount)
+      def versions = [] as SortedSet<SearchResultVersionXO>
       iterator.each { ai ->
         String path = gavCalculator.gavToPath(ai.calculateGav())
         String name = new File(path).getName()
@@ -136,6 +136,8 @@ extends DirectComponentSupport
           // ignore, will use repo id
         }
         versions << new SearchResultVersionXO(
+            groupId: ai.groupId,
+            artifactId: ai.artifactId,
             version: ai.version,
             repositoryId: ai.repository,
             repositoryName: repositoryName,
@@ -144,7 +146,11 @@ extends DirectComponentSupport
             type: FilenameUtils.getExtension(name)
         )
       }
-      return versions as List
+      def versionOrder = 0
+      return versions.collect { version ->
+        version.versionOrder = versionOrder++
+        return version
+      }
     }
     finally {
       iterator?.close()
