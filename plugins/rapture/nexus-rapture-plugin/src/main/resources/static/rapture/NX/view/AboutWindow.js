@@ -45,6 +45,11 @@ Ext.define('NX.view.AboutWindow', {
   initComponent: function () {
     var me = this;
 
+    //
+    // TODO: Make more eclipse-like, with details about product/edition/version
+    // TODO: ... add license, etc.
+    //
+
     me.items = [
       {
         xtype: 'image',
