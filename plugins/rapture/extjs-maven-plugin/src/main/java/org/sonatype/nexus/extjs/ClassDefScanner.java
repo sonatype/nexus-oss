@@ -222,6 +222,9 @@ public class ClassDefScanner
       checkState(args.get(0) instanceof StringLiteral, node, "Ext.define arg[0] must be string");
       String className = nameOf(args.get(0));
 
+      // try and avoid file-name/class-name mismatches early
+      sanityCheckClassName(className);
+
       current = new ClassDef(className, source);
       classes.put(className, current);
 
@@ -331,6 +334,17 @@ public class ClassDefScanner
       }
 
       return false; // don't process children
+    }
+
+    /**
+     * Complain if classes are defined with wrong names, or in wrong files.
+     */
+    private void sanityCheckClassName(final String className) {
+      String found = source.toURI().getPath();
+      String expected = className.replace('.', '/') + ".js";
+      if (!found.endsWith(expected)) {
+        log.warn("Expected class '" + className + "' to be defined in filename '" + expected + "', but was defined in: " + found);
+      }
     }
 
     /**
