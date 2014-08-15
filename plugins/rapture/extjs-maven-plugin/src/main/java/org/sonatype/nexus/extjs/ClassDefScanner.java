@@ -111,13 +111,16 @@ public class ClassDefScanner
 
     // result sorted list of class definitions
     List<ClassDef> results = Lists.newArrayList();
-    log.debug("Ordered classes:");
+    log.debug("Classes:");
     // the graph contains many references, only include those which are class defs
     for (String className : TopologicalSorter.sort(graph)) {
       ClassDef def = classes.get(className);
       if (def != null) {
         results.add(def);
         log.debug("  " + def.getName());
+        for (String dep : def.getDependencies()) {
+          log.debug("    + " + dep);
+        }
       }
     }
 
@@ -420,8 +423,14 @@ public class ClassDefScanner
       def.getDependencies().add(name);
     }
     else {
-      // TODO: cope with name@NS defs, use NS instead of namespace
-      def.getDependencies().add(String.format("%s.%s.%s", namespace, type, name));
+      if (name.contains("@")) {
+        // namespace is embedded: <name>@<namespace>
+        String[] parts = name.split("@", 2);
+        def.getDependencies().add(String.format("%s.%s", parts[1], parts[0]));
+      }
+      else {
+        def.getDependencies().add(String.format("%s.%s.%s", namespace, type, name));
+      }
     }
   }
 }
