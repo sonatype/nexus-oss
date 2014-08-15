@@ -545,6 +545,23 @@
         </plugin>
 
         <plugin>
+          <groupId>org.sonatype.nexus.plugins</groupId>
+          <artifactId>extjs-maven-plugin</artifactId>
+          <version>${nexus.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>aggregate-js</goal>
+              </goals>
+              <configuration>
+                <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
+                <outputFile>${project.build.outputDirectory}/static/rapture/${project.artifactId}-debug.js</outputFile>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>1.1.0-SNAPSHOT</version>
@@ -554,23 +571,25 @@
             <nomunge>${maven.yuicompressor.nomunge}</nomunge>
             <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
             <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
-            <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
             <jslintOptions>
               <white>true</white>
               <sloppy>true</sloppy>
             </jslintOptions>
           </configuration>
           <executions>
-            <!--<execution>-->
-              <!--<id>plugin-js</id>-->
-              <!--<goals>-->
-                <!--<goal>aggregate-js</goal>-->
-              <!--</goals>-->
-              <!--<configuration>-->
-                <!--<output>${project.build.outputDirectory}/static/rapture/${project.artifactId}-prod.js</output>-->
-                <!--<sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>-->
-              <!--</configuration>-->
-            <!--</execution>-->
+            <execution>
+              <id>plugin-js</id>
+              <goals>
+                <goal>aggregate-js</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/rapture/${project.artifactId}-prod.js</output>
+                <sourceDirectory>${project.build.outputDirectory}/static/rapture</sourceDirectory>
+                <includes>
+                  <include>${project.artifactId}-debug.js</include>
+                </includes>
+              </configuration>
+            </execution>
             <execution>
               <id>plugin-css</id>
               <goals>

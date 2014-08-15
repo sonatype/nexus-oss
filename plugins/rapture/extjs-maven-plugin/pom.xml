@@ -47,22 +47,17 @@
       <version>3.0.16</version>
     </dependency>
 
-    <!--<dependency>-->
-    <!--<groupId>org.codehaus.groovy</groupId>-->
-    <!--<artifactId>groovy-all</artifactId>-->
-    <!--</dependency>-->
-
     <dependency>
       <groupId>org.mozilla</groupId>
       <artifactId>rhino</artifactId>
       <version>1.7R4</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.google.javascript</groupId>
-      <artifactId>closure-compiler</artifactId>
-      <version>v20140730</version>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.google.javascript</groupId>-->
+      <!--<artifactId>closure-compiler</artifactId>-->
+      <!--<version>v20140730</version>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
@@ -74,14 +69,6 @@
 
   <build>
     <plugins>
-      <!--<plugin>-->
-      <!--<groupId>org.apache.maven.plugins</groupId>-->
-      <!--<artifactId>maven-compiler-plugin</artifactId>-->
-      <!--<configuration>-->
-      <!--<compilerId>groovy-eclipse-compiler</compilerId>-->
-      <!--</configuration>-->
-      <!--</plugin>-->
-
       <!--
       NOTE: Seems like only version 3.1 of m-p-p works properly :-\
       -->
