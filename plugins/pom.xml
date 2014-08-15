@@ -468,6 +468,8 @@
             <nomunge>${maven.yuicompressor.nomunge}</nomunge>
             <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
             <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
+            <!-- jslint support -->
+            <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
             <jslintOptions>
               <white>true</white>
               <sloppy>true</sloppy>
