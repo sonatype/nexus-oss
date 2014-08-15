@@ -20,7 +20,8 @@
 Ext.define('NX.controller.Help', {
   extend: 'Ext.app.Controller',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.Messages'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -66,6 +67,9 @@ Ext.define('NX.controller.Help', {
         }
       },
       component: {
+        'nx-header-help menuitem[action=feature]': {
+          click: me.onFeatureHelp
+        },
         'nx-header-help menuitem[action=about]': {
           click: me.onAbout
         }
@@ -91,9 +95,15 @@ Ext.define('NX.controller.Help', {
   /**
    * @private
    */
-  onAbout: function() {
-    var me = this;
+  onFeatureHelp: function() {
+    // TODO: redirect user to feature help page in book, for now just provide feedback this feature is not ready yet
+    NX.Messages.add({ text: 'Not yet implemented, try again in later release', type: 'warning' });
+  },
 
+  /**
+   * @private
+   */
+  onAbout: function() {
     Ext.widget('nx-aboutwindow');
   }
 });
