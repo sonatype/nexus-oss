@@ -21,6 +21,8 @@ import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.maven.plugin.logging.Log;
@@ -67,7 +69,7 @@ public class ClassDefScanner
     return namespace;
   }
 
-  public void setNamespace(final String namespace) {
+  public void setNamespace(final @Nullable String namespace) {
     this.namespace = namespace;
   }
 
