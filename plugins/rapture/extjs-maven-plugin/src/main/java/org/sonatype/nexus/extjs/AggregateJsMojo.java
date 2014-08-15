@@ -33,7 +33,7 @@ import org.codehaus.plexus.util.IOUtil;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.PROCESS_RESOURCES;
 
 /**
- * Aggregate javascript resources.
+ * Aggregate javascript sources in order as required by ExtJS.
  *
  * @since 3.0
  */
@@ -82,7 +82,7 @@ public class AggregateJsMojo
 
     ClassDefScanner scanner = new ClassDefScanner(getLog());
     if (namespace == null) {
-      getLog().warn("Namespace is not set, will be unable to detect and resolve MVC references");
+      getLog().warn("Namespace is not configured; will be unable to detect and resolve MVC references");
     }
     else {
       scanner.setNamespace(namespace);
