@@ -11,6 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global Ext, NX*/
+/*jslint plusplus:true, bitwise:true*/
 
 /**
  * Base64 related utils.
@@ -85,10 +86,10 @@ Ext.define('NX.util.Base64', {
 
       output = output + String.fromCharCode(chr1);
 
-      if (enc3 != 64) {
+      if (enc3 !== 64) {
         output = output + String.fromCharCode(chr2);
       }
-      if (enc4 != 64) {
+      if (enc4 !== 64) {
         output = output + String.fromCharCode(chr3);
       }
     }
