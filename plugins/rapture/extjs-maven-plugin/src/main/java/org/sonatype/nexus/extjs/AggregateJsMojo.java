@@ -58,6 +58,9 @@ public class AggregateJsMojo
   @Parameter
   private String namespace;
 
+  @Parameter(property = "extjs.warnings", defaultValue = "false")
+  private boolean warnings;
+
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     try {
@@ -81,6 +84,7 @@ public class AggregateJsMojo
     files.addDefaultExcludes();
 
     ClassDefScanner scanner = new ClassDefScanner(getLog());
+    scanner.setWarnings(warnings);
     if (namespace == null) {
       getLog().warn("Namespace is not configured; will be unable to detect and resolve MVC references");
     }

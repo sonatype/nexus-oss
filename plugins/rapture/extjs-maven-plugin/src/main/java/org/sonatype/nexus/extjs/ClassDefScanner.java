@@ -34,11 +34,13 @@ import org.mozilla.javascript.CompilerEnvirons;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.Parser;
+import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.ArrayLiteral;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.Name;
+import org.mozilla.javascript.ast.NewExpression;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.ObjectLiteral;
 import org.mozilla.javascript.ast.ObjectProperty;
@@ -59,10 +61,21 @@ public class ClassDefScanner
 
   private final Log log;
 
+  private boolean warnings = false;
+
   private String namespace;
+
 
   public ClassDefScanner(final Log log) {
     this.log = checkNotNull(log);
+  }
+
+  public boolean isWarnings() {
+    return warnings;
+  }
+
+  public void setWarnings(final boolean warnings) {
+    this.warnings = warnings;
   }
 
   @Nullable
@@ -187,13 +200,37 @@ public class ClassDefScanner
       int type = node.getType();
 
       switch (type) {
-        case CALL:
+        case CALL: {
           FunctionCall call = (FunctionCall) node;
           String name = nameOf(call.getTarget());
+
+          // if we can not determine the function name, skip
+          if (name == null) {
+            break;
+          }
+
           if (name.equals("Ext.define")) {
-            return processClassDef(call);
+            processClassDef(call);
+            return true; // process children
+          }
+          else if (name.equals("Ext.create")) {
+            // complain if we have references to classes with Ext.create() and missing requires
+            if (!call.getArguments().isEmpty() && call.getArguments().get(0) instanceof StringLiteral) {
+              String className = nameOf(call.getArguments().get(0));
+              maybeWarnMissingRequires(className, "Ext.create");
+            }
+            return false; // ignore children
           }
           break;
+        }
+
+        case Token.NEW: {
+          // complain if we have references to classes with 'new' and missing requires
+          NewExpression expr = (NewExpression) node;
+          String className = nameOf(expr.getTarget());
+          maybeWarnMissingRequires(className, "new");
+          break;
+        }
       }
 
       return true; // process children
@@ -202,6 +239,7 @@ public class ClassDefScanner
     /**
      * Find the textual name of the given node.
      */
+    @Nullable
     private String nameOf(final AstNode node) {
       if (node instanceof Name) {
         return ((Name) node).getIdentifier();
@@ -217,9 +255,45 @@ public class ClassDefScanner
     }
 
     /**
+     * Return string literal value.
+     */
+    private String stringLiteral(final AstNode node) {
+      checkState(node instanceof StringLiteral, node, "Expected string literal only");
+      //noinspection ConstantConditions
+      StringLiteral string = (StringLiteral) node;
+      return string.getValue();
+    }
+
+    /**
+     * Returns string array literal values.
+     */
+    private List<String> arrayStringLiteral(final AstNode node) {
+      checkState(node instanceof ArrayLiteral, node, "Expected array literal only");
+      List<String> result = Lists.newArrayList();
+      //noinspection ConstantConditions
+      ArrayLiteral array = (ArrayLiteral) node;
+      for (AstNode element : array.getElements()) {
+        result.add(stringLiteral(element));
+      }
+      return result;
+    }
+
+    /**
+     * Maybe warn if a needed class has not been required.
+     */
+    private void maybeWarnMissingRequires(final String className, final String usage) {
+      if (warnings) {
+        if (!current.getDependencies().contains(className)) {
+          log.warn(String.format("Class '%s' missing requires for '%s' usage of: %s",
+              current.getName(), usage, className));
+        }
+      }
+    }
+
+    /**
      * Process an {@code Ext.define} class definition.
      */
-    private boolean processClassDef(final FunctionCall node) {
+    private void processClassDef(final FunctionCall node) {
       List<AstNode> args = node.getArguments();
       checkState(args.size() >= 2, node,
           "Invalid number of arguments for Ext.define"); // simple def or def with callback
@@ -281,6 +355,8 @@ public class ClassDefScanner
             current.setMixins(mixins);
             break;
           }
+
+          // TODO: Consider adding support for alias, alternateClassName, xtype and widget references?
         }
 
         // Additional stuff we have to detect for ExtJS MVC support
@@ -338,8 +414,6 @@ public class ClassDefScanner
           }
         }
       }
-
-      return false; // don't process children
     }
 
     /**
@@ -349,7 +423,9 @@ public class ClassDefScanner
       String found = source.toURI().getPath();
       String expected = className.replace('.', '/') + ".js";
       if (!found.endsWith(expected)) {
-        log.warn("Expected class '" + className + "' to be defined in filename '" + expected + "', but was defined in: " + found);
+        log.warn(
+            "Expected class '" + className + "' to be defined in filename '" + expected + "', but was defined in: " +
+                found);
       }
     }
 
@@ -367,24 +443,6 @@ public class ClassDefScanner
     private boolean isExtends(final String className) {
       String superClass = current.getExtend();
       return superClass != null && superClass.equals(className);
-    }
-
-    private String stringLiteral(final AstNode node) {
-      checkState(node instanceof StringLiteral, node, "Expected string literal only");
-      //noinspection ConstantConditions
-      StringLiteral string = (StringLiteral) node;
-      return string.getValue();
-    }
-
-    private List<String> arrayStringLiteral(final AstNode node) {
-      checkState(node instanceof ArrayLiteral, node, "Expected array literal only");
-      List<String> result = Lists.newArrayList();
-      //noinspection ConstantConditions
-      ArrayLiteral array = (ArrayLiteral) node;
-      for (AstNode element : array.getElements()) {
-        result.add(stringLiteral(element));
-      }
-      return result;
     }
   }
 
