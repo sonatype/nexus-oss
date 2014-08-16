@@ -15,6 +15,7 @@ package org.sonatype.nexus.extender.modules;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Binding;
 import org.eclipse.sisu.inject.DefaultRankingFunction;
 import org.eclipse.sisu.inject.RankingFunction;
 
@@ -30,6 +31,22 @@ public class RankingModule
 
   @Override
   protected void configure() {
-    bind(RankingFunction.class).toInstance(new DefaultRankingFunction(rank.incrementAndGet()));
+    /*
+     * Workaround Sisu issue where DefaultRankingFunction doesn't take account potential @Priority values
+     * when calculating the maximum potential rank contained in a given Injector - this heuristic is used
+     * to decide the optimal time to merge in new results when iterating over a dynamic collection.
+     */
+    bind(RankingFunction.class).toInstance(new RankingFunction()
+    {
+      private final RankingFunction function = new DefaultRankingFunction(rank.incrementAndGet());
+
+      public <T> int rank(Binding<T> binding) {
+        return function.rank(binding);
+      }
+
+      public int maxRank() {
+        return Integer.MAX_VALUE; // potential max rank could be as high as MAX_VALUE if @Priority is used
+      }
+    });
   }
 }
