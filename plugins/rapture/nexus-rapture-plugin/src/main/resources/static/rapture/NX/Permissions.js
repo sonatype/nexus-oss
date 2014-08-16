@@ -11,6 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /*global Ext*/
+/*jslint bitwise: true*/
 
 /**
  * Permissions helper.
@@ -87,7 +88,7 @@ Ext.define('NX.Permissions', {
       });
     }
 
-    return ((p & pVal) == p);
+    return ((p & pVal) === p);
   },
 
   /**

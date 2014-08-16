@@ -212,7 +212,7 @@ Ext.define('NX.app.Application', {
    * Ext.Error.toString() assumes instance, but raise(String) makes anonymous object.
    */
   errorAsString: function (error) {
-    var className = error.sourceClass ? error.sourceClass : '',
+    var className = error.sourceClass || '',
         methodName = error.sourceMethod ? '.' + error.sourceMethod + '(): ' : '',
         msg = error.msg || '(No description provided)';
     return className + methodName + msg;
@@ -256,7 +256,7 @@ Ext.define('NX.app.Application', {
    * Starts the application.
    */
   start: function () {
-    var me = this;
+    var me = this, hideMask;
 
     me.logDebug('Starting');
 
@@ -272,7 +272,7 @@ Ext.define('NX.app.Application', {
     });
 
     // hide the loading mask after we have loaded
-    var hideMask = function () {
+    hideMask = function () {
       Ext.get('loading').remove();
       Ext.fly('loading-mask').animate({ opacity: 0, remove: true });
     };

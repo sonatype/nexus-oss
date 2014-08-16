@@ -131,7 +131,7 @@ Ext.define('NX.ext.SearchBox', {
   search: function (value) {
     var me = this;
 
-    if (value != me.getValue()) {
+    if (value !== me.getValue()) {
       me.setValue(value);
     }
     else {

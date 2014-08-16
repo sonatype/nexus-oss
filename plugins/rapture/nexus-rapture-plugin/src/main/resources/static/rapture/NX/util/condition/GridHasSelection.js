@@ -71,7 +71,7 @@ Ext.define('NX.util.condition.GridHasSelection', {
         if (selection.length) {
           satisfied = true;
           if (Ext.isFunction(me.fn)) {
-            satisfied = me.fn(selection.length == 1 ? selection[0] : selection) === true;
+            satisfied = me.fn(selection.length === 1 ? selection[0] : selection) === true;
           }
         }
       }

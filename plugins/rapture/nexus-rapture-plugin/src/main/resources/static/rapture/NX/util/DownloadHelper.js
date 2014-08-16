@@ -85,7 +85,7 @@ Ext.define('NX.util.DownloadHelper', {
 
     // open new window in hidden download-from to initiate download
     win = NX.global.open(url, me.windowName);
-    if (win == null) {
+    if (win === null) {
       NX.Messages.add({text: 'Download window pop-up was blocked!', type: 'danger'});
       return false;
     }

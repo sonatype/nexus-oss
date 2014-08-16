@@ -154,7 +154,7 @@ Ext.define('NX.controller.UiSessionTimeout', {
     me.expirationTicker = Ext.util.TaskManager.newTask({
       run: function (count) {
         win.down('label').setText('Session will expire in ' + (me.SECONDS_TO_EXPIRE - count) + ' seconds');
-        if (count == me.SECONDS_TO_EXPIRE) {
+        if (count === me.SECONDS_TO_EXPIRE) {
           win.close();
           NX.Messages.add({
             text: 'Session expired after being inactive for '

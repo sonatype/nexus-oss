@@ -439,7 +439,7 @@ Ext.define('NX.controller.Menu', {
     me.getFeatureStore().each(function (rec) {
       feature = rec.getData();
       // iterate only visible features
-      if ((me.mode == feature.mode) && feature.visible()) {
+      if ((me.mode === feature.mode) && feature.visible()) {
         segments = feature.path.split('/');
         parent = me.getFeatureMenuStore().getRootNode();
         for (var i = 2; i < segments.length; i++) {

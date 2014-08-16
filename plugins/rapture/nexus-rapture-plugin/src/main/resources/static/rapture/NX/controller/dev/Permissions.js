@@ -131,7 +131,7 @@ Ext.define('NX.controller.dev.Permissions', {
     var value = NX.Permissions.NONE;
 
     Ext.each(['CREATE', 'READ', 'UPDATE', 'DELETE'], function (perm) {
-      if (context.newValues[perm.toLowerCase()] == true) {
+      if (context.newValues[perm.toLowerCase()] === true) {
         value += NX.Permissions[perm];
       }
     });

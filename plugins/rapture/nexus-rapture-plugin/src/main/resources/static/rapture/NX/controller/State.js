@@ -334,7 +334,7 @@ Ext.define('NX.controller.State', {
         me.receiving = false;
 
         // we appear to have lost the server connection
-        me.disconnectedTimes++;
+        me.disconnectedTimes = me.disconnectedTimes + 1;
 
         NX.State.setValue('receiving', false);
 

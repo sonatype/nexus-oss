@@ -50,7 +50,8 @@ Ext.define('NX.util.condition.Conjunction', {
 
     if (me.bounded) {
       Ext.each(me.conditions, function (condition) {
-        return satisfied = condition.satisfied;
+        satisfied = condition.satisfied;
+        return satisfied;
       });
       me.setSatisfied(satisfied);
     }

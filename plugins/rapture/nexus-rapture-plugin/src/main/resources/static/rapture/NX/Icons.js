@@ -19,7 +19,9 @@
  */
 Ext.define('NX.Icons', {
   singleton: true,
-
+  requires: [
+    'NX.util.Url'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },
@@ -64,7 +66,7 @@ Ext.define('NX.Icons', {
     var me = this,
         file = name;
 
-    if (ext == undefined) {
+    if (ext === undefined) {
       ext = 'png';
     }
     file += '.' + ext;

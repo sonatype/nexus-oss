@@ -47,7 +47,7 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
     if (valueToBeMatched) {
       stringValue = valueToBeMatched.toString();
       if (stringValue) {
-        return stringValue.toLowerCase().indexOf(filterValue.toLowerCase()) != -1;
+        return stringValue.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1;
       }
     }
     return false;

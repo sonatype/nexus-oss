@@ -161,7 +161,7 @@ Ext.define('NX.controller.MasterDetail', {
   onSelectionChange: function (selectionModel, selected) {
     var me = this;
 
-    me.onModelChanged(selected.length == 1 ? selected[0] : undefined);
+    me.onModelChanged(selected.length === 1 ? selected[0] : undefined);
     me.bookmark();
   },
 
@@ -191,7 +191,7 @@ Ext.define('NX.controller.MasterDetail', {
         selected = me.getList().getSelectionModel().getSelection(),
         modelId;
 
-    if (selected.length == 1) {
+    if (selected.length === 1) {
       modelId = selected[0].getId();
     }
     me.bookmarkAt(modelId);

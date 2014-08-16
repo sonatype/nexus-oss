@@ -44,7 +44,7 @@ Ext.define('NX.view.dev.Buttons', {
     Ext.each(['default', 'primary', 'danger', 'warning', 'success', 'plain'], function (ui) {
       // pick a different glyph for each style of button
       var glyph = 'xf00' + i + '@FontAwesome';
-      i++;
+      i = i + 1;
 
       me.items.push({
         xtype: 'container',
@@ -57,7 +57,7 @@ Ext.define('NX.view.dev.Buttons', {
           width: 100
         },
         items: [
-          { xtype: 'label', text: 'ui: \'' + ui + '\''},
+          { xtype: 'label', text: "ui: '" + ui + "'"},
           { xtype: 'button', text: 'normal', glyph: glyph, ui: ui },
           { xtype: 'button', text: 'disabled', glyph: glyph,  ui: ui, disabled: true },
           {

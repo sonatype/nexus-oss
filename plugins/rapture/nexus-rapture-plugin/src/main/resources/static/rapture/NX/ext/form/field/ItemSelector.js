@@ -152,7 +152,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
       var stringValue = model.get(me.displayField);
       if (stringValue) {
         stringValue = stringValue.toString();
-        return stringValue.toLowerCase().indexOf(value.toLowerCase()) != -1;
+        return stringValue.toLowerCase().indexOf(value.toLowerCase()) !== -1;
       }
       return false;
     }});

@@ -39,7 +39,7 @@ Ext.define('NX.app.Loader', {
    * @public
    */
   load: function (config) {
-    var me = this;
+    var me = this, App;
 
     me.logDebug('Loading');
 
@@ -71,7 +71,7 @@ Ext.define('NX.app.Loader', {
     });
 
     // launch the application
-    var App = Ext.ClassManager.get('NX.app.Application');
+    App = Ext.ClassManager.get('NX.app.Application');
     Ext.onReady(function () {
       me.logDebug('Received ready event');
       Ext.app.Application.instance = new App({
@@ -152,7 +152,7 @@ Ext.define('NX.app.Loader', {
       var flag = config.active;
       config.active = function() {
         return flag;
-      }
+      };
     }
     else if (!Ext.isFunction(config.active)) {
       Ext.Error.raise('Invalid controller definition: ' + config.id + '; required property: active (boolean or function)');
