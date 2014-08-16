@@ -20,6 +20,9 @@
 Ext.define('NX.view.dev.Stores', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-dev-stores',
+  requires: [
+    'Ext.data.Store'
+  ],
 
   title: 'Stores',
 

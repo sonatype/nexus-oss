@@ -20,24 +20,36 @@
 Ext.define('NX.view.info.Entry', {
   extend: 'Ext.Component',
   alias: 'widget.nx-info',
+  requires: [
+    'Ext.XTemplate'
+  ],
 
-  tpl: Ext.create('Ext.XTemplate', [
-    '<div class="nx-info">',
-    '<table>',
-    '<tpl for=".">',
-    '<tr class="nx-info-entry">',
-    '<td class="nx-info-entry-name">{name}</td>',
-    '<td class="nx-info-entry-value">{value}</td>',
-    '</tr>',
-    '</tpl>',
-    '</tr>',
-    '</table>',
-    '</div>'
-  ]),
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
 
-  showInfo: function(info) {
+    me.tpl = Ext.create('Ext.XTemplate', [
+      '<div class="nx-info">',
+      '<table>',
+      '<tpl for=".">',
+      '<tr class="nx-info-entry">',
+      '<td class="nx-info-entry-name">{name}</td>',
+      '<td class="nx-info-entry-value">{value}</td>',
+      '</tr>',
+      '</tpl>',
+      '</tr>',
+      '</table>',
+      '</div>'
+    ]);
+
+    me.callParent(arguments);
+  },
+
+  showInfo: function (info) {
     var entries = [];
-    Ext.Object.each(info, function(key, value) {
+    Ext.Object.each(info, function (key, value) {
       if (!Ext.isEmpty(value)) {
         entries.push(
             {

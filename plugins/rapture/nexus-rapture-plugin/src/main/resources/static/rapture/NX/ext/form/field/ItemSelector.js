@@ -20,6 +20,9 @@
 Ext.define('NX.ext.form.field.ItemSelector', {
   extend: 'Ext.ux.form.ItemSelector',
   alias: 'widget.nx-itemselector',
+  requires: [
+    'Ext.ux.form.MultiSelect'
+  ],
 
   width: 600,
   height: 253,

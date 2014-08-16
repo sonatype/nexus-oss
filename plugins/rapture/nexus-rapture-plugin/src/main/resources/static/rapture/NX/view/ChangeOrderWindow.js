@@ -34,6 +34,9 @@ Ext.define('NX.view.ChangeOrderWindow', {
   displayField: 'name',
   valueField: 'id',
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this;
 

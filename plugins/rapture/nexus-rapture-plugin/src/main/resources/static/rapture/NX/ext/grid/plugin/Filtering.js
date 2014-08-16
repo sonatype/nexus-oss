@@ -20,6 +20,9 @@
 Ext.define('NX.ext.grid.plugin.Filtering', {
   extend: 'Ext.AbstractPlugin',
   alias: 'plugin.gridfiltering',
+  requires: [
+    'Ext.util.Filter'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },

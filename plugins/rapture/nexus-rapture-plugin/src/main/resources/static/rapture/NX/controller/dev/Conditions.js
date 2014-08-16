@@ -19,6 +19,9 @@
  */
 Ext.define('NX.controller.dev.Conditions', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'Ext.util.Filter'
+  ],
 
   stores: [
     'NX.store.dev.Condition'

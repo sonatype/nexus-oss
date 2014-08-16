@@ -19,6 +19,9 @@
  */
 Ext.define('NX.controller.KeyNav', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'Ext.util.KeyNav'
+  ],
 
   /**
    * @override

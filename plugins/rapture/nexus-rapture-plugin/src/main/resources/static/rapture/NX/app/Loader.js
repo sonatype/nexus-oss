@@ -19,9 +19,9 @@
  */
 Ext.define('NX.app.Loader', {
   requires: [
-    'NX.app.Application'
+    'NX.app.Application',
+    'Ext.util.MixedCollection'
   ],
-
   mixins: {
     logAware: 'NX.LogAware'
   },
@@ -31,7 +31,7 @@ Ext.define('NX.app.Loader', {
    *
    * @private
    */
-  controllers: new Ext.util.MixedCollection(),
+  controllers: undefined,
 
   /**
    * Load the application.
@@ -50,6 +50,8 @@ Ext.define('NX.app.Loader', {
     if (!Ext.isObject(config.state)) {
       Ext.Error.raise("Invalid config property: 'state' (expected object): " + config.state);
     }
+
+    me.controllers = Ext.create('Ext.util.MixedCollection');
 
     // attach initial application state
     NX.app.state = config.state;

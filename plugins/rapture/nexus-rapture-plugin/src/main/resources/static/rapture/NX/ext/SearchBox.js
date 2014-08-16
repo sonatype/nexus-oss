@@ -20,6 +20,9 @@
 Ext.define('NX.ext.SearchBox', {
   extend: 'Ext.form.field.Trigger',
   alias: 'widget.nx-searchbox',
+  requires: [
+    'Ext.util.KeyNav'
+  ],
 
   emptyText: 'search',
   submitValue: false,
