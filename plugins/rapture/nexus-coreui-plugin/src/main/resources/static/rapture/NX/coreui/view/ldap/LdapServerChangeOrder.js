@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.ldap.LdapServerChangeOrder', {
   extend: 'NX.view.ChangeOrderWindow',
   alias: 'widget.nx-coreui-ldapserver-changeorder',
+  requires: [
+    'NX.coreui.store.LdapServer'
+  ],
 
   title: 'Change LDAP Servers ordering',
 

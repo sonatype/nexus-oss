@@ -21,6 +21,8 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-privilege-trace',
   requires: [
+    'Ext.data.TreeStore',
+    'Ext.util.MixedCollection',
     'NX.Icons',
     'NX.coreui.store.Role',
     'NX.coreui.store.Privilege'

@@ -23,7 +23,8 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
   requires: [
     'NX.Conditions',
     'NX.coreui.store.RepositoryReference',
-    'NX.coreui.store.RepositoryTarget'
+    'NX.coreui.store.RepositoryTarget',
+    'NX.coreui.model.Reference'
   ],
 
   title: 'Create new Repository Target Privilege',

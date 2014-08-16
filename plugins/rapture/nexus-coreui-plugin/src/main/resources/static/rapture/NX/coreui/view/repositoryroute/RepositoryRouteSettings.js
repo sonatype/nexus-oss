@@ -21,7 +21,9 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-repositoryroute-settings',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.coreui.store.RepositoryReference',
+    'NX.coreui.model.Reference'
   ],
 
   api: {

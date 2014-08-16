@@ -28,14 +28,14 @@ Ext.define('NX.coreui.view.formfield.factory.FormfieldComboFactory', {
     'nx.formfield.factory.repo-or-group',
     'nx.formfield.factory.repo-target'
   ],
-
+  requires: [
+    'Ext.data.Store',
+    'Ext.form.ComboBox',
+    'NX.util.Url'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },
-
-  requires: [
-    'NX.util.Url'
-  ],
 
   /**
    * Creates a combo.

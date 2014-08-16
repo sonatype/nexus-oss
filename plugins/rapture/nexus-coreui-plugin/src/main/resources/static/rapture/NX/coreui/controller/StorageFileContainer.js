@@ -19,6 +19,9 @@
  */
 Ext.define('NX.coreui.controller.StorageFileContainer', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'Ext.window.Window'
+  ],
 
   views: [
     'repositorybrowse.StorageFileContainer'
@@ -63,7 +66,7 @@ Ext.define('NX.coreui.controller.StorageFileContainer', {
 
     storageFileContainer.up('container').remove(storageFileContainer, false);
     storageFileContainer.getHeader().hide();
-    win = new Ext.window.Window({
+    win = Ext.create('Ext.window.Window', {
       maximized: true,
       autoScroll: true,
       closable: false,

@@ -21,7 +21,10 @@ Ext.define('NX.coreui.view.role.RoleTree', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-role-tree',
   requires: [
-    'NX.Icons'
+    'Ext.data.TreeStore',
+    'NX.Icons',
+    'NX.coreui.store.Role',
+    'NX.coreui.store.Privilege'
   ],
 
   layout: 'fit',

@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repository.RepositorySettingsVirtual', {
   extend: 'NX.coreui.view.repository.RepositorySettings',
   alias: 'widget.nx-repository-settings-virtual',
+  requires: [
+    'NX.coreui.store.RepositoryReference'
+  ],
 
   api: {
     submit: 'NX.direct.coreui_Repository.updateVirtual'

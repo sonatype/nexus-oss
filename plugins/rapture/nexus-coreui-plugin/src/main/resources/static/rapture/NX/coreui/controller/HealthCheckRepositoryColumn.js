@@ -20,6 +20,8 @@
 Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
   extend: 'Ext.app.Controller',
   requires: [
+    'Ext.grid.column.Column',
+    'Ext.ToolTip',
     'NX.Conditions',
     'NX.Permissions',
     'NX.util.Url'

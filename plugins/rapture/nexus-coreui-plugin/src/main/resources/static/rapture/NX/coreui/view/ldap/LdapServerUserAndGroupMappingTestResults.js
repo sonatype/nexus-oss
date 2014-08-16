@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupMappingTestResults', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-ldapserver-userandgroup-testresults',
+  requires: [
+    'Ext.data.JsonStore'
+  ],
 
   title: 'User Mapping Test Results',
 

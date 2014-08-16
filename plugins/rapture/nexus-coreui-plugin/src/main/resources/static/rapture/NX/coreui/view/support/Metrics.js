@@ -22,7 +22,8 @@ Ext.define('NX.coreui.view.support.Metrics', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-support-metrics',
   requires: [
-    'Ext.chart.Chart'
+    'Ext.chart.Chart',
+    'Ext.data.ArrayStore'
   ],
 
   autoScroll: true,

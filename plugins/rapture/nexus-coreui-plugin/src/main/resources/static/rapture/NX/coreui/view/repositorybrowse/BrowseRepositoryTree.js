@@ -21,6 +21,7 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
   extend: 'Ext.tree.Panel',
   alias: 'widget.nx-coreui-repositorybrowse-tree',
   requires: [
+    'Ext.data.TreeStore',
     'NX.Icons'
   ],
 
