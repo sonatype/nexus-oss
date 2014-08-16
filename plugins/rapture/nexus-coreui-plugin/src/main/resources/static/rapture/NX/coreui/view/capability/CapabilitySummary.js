@@ -21,8 +21,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-capability-summary',
   requires: [
-    'NX.Conditions',
-    'NX.Icons'
+    'NX.Conditions'
   ],
 
   title: 'Summary',
@@ -40,13 +39,6 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
           {
             xtype: 'nx-info',
             columnWidth: 1
-          },
-          {
-            margin: '10 20 0 10',
-            items: [
-              { itemId: 'stateImage' },
-              { itemId: 'stateLabel', margin: '5 0 0 0' }
-            ]
           }
         ]
       },
@@ -91,18 +83,5 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
    */
   showInfo: function (info) {
     this.down('nx-info').showInfo(info);
-  },
-
-  /**
-   * @public
-   * Shows state image and text.
-   * @param {String} state capability state
-   */
-  showState: function (state) {
-    var me = this;
-
-    me.down('#stateImage').update(NX.Icons.img('capability-' + state, 'x32'));
-    me.down('#stateLabel').update('<b>' + Ext.String.capitalize(state) + '</b>');
   }
-
 });

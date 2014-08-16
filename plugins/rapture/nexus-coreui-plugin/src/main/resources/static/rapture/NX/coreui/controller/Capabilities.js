@@ -202,7 +202,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
     var summary = this.getSummary(),
         info = {
           'Type': model.get('typeName'),
-          'Description': model.get('description')
+          'Description': model.get('description'),
+          'State': Ext.String.capitalize(model.get('state'))
         };
 
     if (Ext.isDefined(model.get('tags'))) {
@@ -210,7 +211,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
     }
 
     summary.showInfo(info);
-    summary.showState(model.get('state'));
     summary.down('form').loadRecord(model);
   },
 
