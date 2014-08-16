@@ -24,18 +24,21 @@ Ext.define('NX.coreui.app.PluginConfig', {
   ],
 
   controllers: [
-    { id: 'NX.coreui.controller.AnalyticsSettings',
+    {
+      id: 'NX.coreui.controller.AnalyticsSettings',
       active: function () {
         return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-analytics-plugin');
       }
     },
-    { id: 'NX.coreui.controller.AnalyticsEvents',
+    {
+      id: 'NX.coreui.controller.AnalyticsEvents',
       active: function () {
         return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-analytics-plugin');
       }
     },
     'NX.coreui.controller.AnonymousSettings',
-    { id: 'NX.coreui.controller.Capabilities',
+    {
+      id: 'NX.coreui.controller.Capabilities',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-capabilities-plugin');
       }
@@ -45,47 +48,55 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.Feeds',
     'NX.coreui.controller.HttpSettings',
     'NX.coreui.controller.GeneralSettings',
-    { id: 'NX.coreui.controller.HealthCheckRepositorySettings',
+    {
+      id: 'NX.coreui.controller.HealthCheckRepositorySettings',
       active: function () {
         return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-healthcheck-oss-plugin')
             || NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-clm-plugin');
       }
     },
-    { id: 'NX.coreui.controller.HealthCheckRepositoryColumn',
+    {
+      id: 'NX.coreui.controller.HealthCheckRepositoryColumn',
       active: function () {
         return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-healthcheck-oss-plugin')
             || NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-clm-plugin');
       }
     },
-    { id: 'NX.coreui.controller.HealthCheckSearch',
+    {
+      id: 'NX.coreui.controller.HealthCheckSearch',
       active: function () {
         return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-healthcheck-oss-plugin')
             || NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-clm-plugin');
       }
     },
-    { id: 'NX.coreui.controller.LdapServers',
+    {
+      id: 'NX.coreui.controller.LdapServers',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-ldap-plugin');
       }
     },
-    { id: 'NX.coreui.controller.Log',
+    {
+      id: 'NX.coreui.controller.Log',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-logging-plugin');
       }
     },
-    { id: 'NX.coreui.controller.Loggers',
+    {
+      id: 'NX.coreui.controller.Loggers',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-logging-plugin');
       }
     },
     'NX.coreui.controller.MavenUpload',
     'NX.coreui.controller.Metrics',
-    { id: 'NX.coreui.controller.Outreach',
+    {
+      id: 'NX.coreui.controller.Outreach',
       active: function () {
         return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-outreach-plugin');
       }
     },
-    { id: 'NX.coreui.controller.PluginConsole',
+    {
+      id: 'NX.coreui.controller.PluginConsole',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-plugin-console-plugin');
       }
@@ -100,12 +111,14 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.StorageFileContainer',
     'NX.coreui.controller.Search',
     'NX.coreui.controller.SmtpSettings',
-    { id: 'NX.coreui.controller.SslCertificates',
+    {
+      id: 'NX.coreui.controller.SslCertificates',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-ssl-plugin');
       }
     },
-    { id: 'NX.coreui.controller.SslTrustStore',
+    {
+      id: 'NX.coreui.controller.SslTrustStore',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-ssl-plugin');
       }
@@ -113,12 +126,14 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui.controller.StorageFileInfo',
     'NX.coreui.controller.StorageFileMavenInfo',
     'NX.coreui.controller.SupportRequest',
-    { id: 'NX.coreui.controller.SupportZip',
+    {
+      id: 'NX.coreui.controller.SupportZip',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-atlas-plugin');
       }
     },
-    { id: 'NX.coreui.controller.SysInfo',
+    {
+      id: 'NX.coreui.controller.SysInfo',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-atlas-plugin');
       }
