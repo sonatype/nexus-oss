@@ -27,6 +27,9 @@ Ext.define('NX.view.feature.NotVisible', {
     pack: 'center'
   },
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this;
 
