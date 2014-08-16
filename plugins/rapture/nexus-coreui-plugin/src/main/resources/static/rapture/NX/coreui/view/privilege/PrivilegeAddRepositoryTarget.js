@@ -20,6 +20,11 @@
 Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-privilege-add-repositorytarget',
+  requires: [
+    'NX.Conditions',
+    'NX.coreui.store.RepositoryReference',
+    'NX.coreui.store.RepositoryTarget'
+  ],
 
   title: 'Create new Repository Target Privilege',
   defaultFocus: 'name',
