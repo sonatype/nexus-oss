@@ -19,6 +19,13 @@
  */
 Ext.define('NX.coreui.controller.Users', {
   extend: 'NX.controller.MasterDetail',
+  requires: [
+    'NX.State',
+    'NX.Permissions',
+    'NX.Security',
+    'NX.Icons',
+    'NX.Messages'
+  ],
 
   list: 'nx-coreui-user-list',
 
@@ -330,7 +337,7 @@ Ext.define('NX.coreui.controller.Users', {
             NX.Conditions.isPermitted(me.permission, 'delete'),
             NX.Conditions.gridHasSelection(me.list, function (model) {
               var userId = model.getId();
-              return (userId !== NX.State.getUser().id) && (userId != NX.State.getValue('anonymousUsername'));
+              return (userId !== NX.State.getUser().id) && (userId !== NX.State.getValue('anonymousUsername'));
             })
         ),
         {

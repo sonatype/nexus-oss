@@ -22,7 +22,8 @@ Ext.define('NX.coreui.controller.SysInfo', {
   requires: [
     'NX.Permissions',
     'NX.util.Url',
-    'NX.util.DownloadHelper'
+    'NX.util.DownloadHelper',
+    'NX.Messages'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -118,7 +119,7 @@ Ext.define('NX.coreui.controller.SysInfo', {
         win;
 
     win = NX.global.open('', '', 'width=640,height=480');
-    if (win == null) {
+    if (win === null) {
       NX.Messages.add({ text: 'Print window pop-up was blocked!', type: 'warning' });
       return;
     }

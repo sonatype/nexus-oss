@@ -65,7 +65,7 @@ Ext.define('NX.coreui.controller.SupportRequest', {
    */
   makeRequest: function () {
     var win = NX.global.open('http://links.sonatype.com/products/nexus/pro/support-request');
-    if (win == null) {
+    if (win === null) {
       NX.Messages.add({text: 'Window pop-up was blocked!', type: 'danger'});
     }
   }

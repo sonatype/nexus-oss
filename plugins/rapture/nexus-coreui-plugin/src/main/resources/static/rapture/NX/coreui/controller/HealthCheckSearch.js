@@ -87,7 +87,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
       me.getSearchResultVersionStore().each(function(searchResultVersionModel) {
         groupId = searchResultVersionModel.get('groupId');
         artifactId = searchResultVersionModel.get('artifactId');
-        if (versions.indexOf(searchResultVersionModel.get('version')) == -1) {
+        if (versions.indexOf(searchResultVersionModel.get('version')) === -1) {
           versions.push(searchResultVersionModel.get('version'));
         }
       });
@@ -211,7 +211,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
         result = me.renderNotAvailable(metadata);
       }
     }
-    return '<div ' + (metadata.tdAttr ? metadata.tdAttr : '') + '>' + result + '</div>';
+    return '<div ' + (metadata.tdAttr || '') + '>' + result + '</div>';
   },
 
   /**

@@ -212,7 +212,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
     moreButton.enable();
     me.fillMoreButtonMenu(moreButton, repositoryModel, node);
-    if (moreButton.menu.items.length == 0) {
+    if (moreButton.menu.items.length === 0) {
       moreButton.disable();
     }
     me.getStorageFileContainer().showStorageFile(
