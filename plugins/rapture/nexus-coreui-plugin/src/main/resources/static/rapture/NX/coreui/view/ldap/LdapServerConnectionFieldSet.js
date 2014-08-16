@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
-  extend: 'Ext.Panel',
+  extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-ldapserver-connection-fieldset',
 
   defaults: {
