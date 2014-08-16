@@ -19,9 +19,8 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.support.Metrics', {
-  extend: 'Ext.Panel',
+  extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-support-metrics',
-
   requires: [
     'Ext.chart.Chart'
   ],
@@ -180,8 +179,8 @@ Ext.define('NX.coreui.view.support.Metrics', {
               tips: {
                 trackMouse: true,
                 renderer: function (storeItem, item) {
-                  var p = Math.round(storeItem.get('data') * 100);
-                  this.setTitle(storeItem.get('name') + ': ' + p + '%');
+                  var count = storeItem.get('data');
+                  this.setTitle(storeItem.get('name') + ': ' + count);
                 }
               }
             }

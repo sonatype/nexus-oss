@@ -20,13 +20,14 @@
  */
 Ext.define('NX.coreui.controller.Metrics', {
   extend: 'Ext.app.Controller',
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
   requires: [
+    'NX.Permissions',
     'NX.util.Url',
     'NX.util.DownloadHelper'
   ],
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
 
   views: [
     'support.Metrics'
