@@ -29,7 +29,6 @@ Ext.define('NX.Messages', {
    * @param message
    */
   add: function(message) {
-    var me = this;
     NX.getApplication().getMessageController().addMessage(message);
   }
 
