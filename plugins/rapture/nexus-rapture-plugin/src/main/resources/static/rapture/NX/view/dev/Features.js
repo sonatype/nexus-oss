@@ -12,6 +12,11 @@
  */
 /*global Ext*/
 
+/**
+ * List of all known features.
+ *
+ * @since 3.0
+ */
 Ext.define('NX.view.dev.Features', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-dev-features',

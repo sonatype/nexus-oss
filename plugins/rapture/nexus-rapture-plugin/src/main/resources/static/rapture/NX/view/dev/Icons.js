@@ -12,6 +12,11 @@
  */
 /*global Ext*/
 
+/**
+ * List of all known icons.
+ *
+ * @since 3.0
+ */
 Ext.define('NX.view.dev.Icons', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-dev-icons',

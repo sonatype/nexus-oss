@@ -12,6 +12,11 @@
  */
 /*global Ext*/
 
+/**
+ * List of permissions.
+ *
+ * @since 3.0
+ */
 Ext.define('NX.view.dev.Permissions', {
   extend: 'Ext.grid.Panel',
   requires: [

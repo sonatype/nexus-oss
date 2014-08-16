@@ -12,6 +12,11 @@
  */
 /*global Ext*/
 
+/**
+ * List of current state.
+ *
+ * @since 3.0
+ */
 Ext.define('NX.view.dev.State', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-dev-state',

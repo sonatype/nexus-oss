@@ -12,6 +12,11 @@
  */
 /*global Ext*/
 
+/**
+ * Shows examples of buttons in various styles.
+ *
+ * @since 3.0
+ */
 Ext.define('NX.view.dev.Buttons', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-dev-buttons',

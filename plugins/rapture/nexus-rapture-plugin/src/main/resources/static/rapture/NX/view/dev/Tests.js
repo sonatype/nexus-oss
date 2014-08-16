@@ -12,6 +12,11 @@
  */
 /*global Ext*/
 
+/**
+ * Contains various buttons to execute actions for development/testing.
+ *
+ * @since 3.0
+ */
 Ext.define('NX.view.dev.Tests', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-dev-tests',

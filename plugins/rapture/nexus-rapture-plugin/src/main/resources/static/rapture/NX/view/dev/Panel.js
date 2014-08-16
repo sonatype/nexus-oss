@@ -12,6 +12,11 @@
  */
 /*global Ext*/
 
+/**
+ * The developer panel.
+ *
+ * @since 3.0
+ */
 Ext.define('NX.view.dev.Panel', {
   extend: 'Ext.panel.Panel',
   requires: [
