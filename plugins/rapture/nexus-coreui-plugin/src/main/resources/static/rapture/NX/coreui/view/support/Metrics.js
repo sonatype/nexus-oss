@@ -179,8 +179,8 @@ Ext.define('NX.coreui.view.support.Metrics', {
               tips: {
                 trackMouse: true,
                 renderer: function (storeItem, item) {
-                  var count = storeItem.get('data');
-                  this.setTitle(storeItem.get('name') + ': ' + count);
+                  // name: count
+                  this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data'));
                 }
               }
             }
