@@ -34,7 +34,7 @@ Ext.define('NX.coreui.controller.StorageFileContainer', {
     var me = this;
 
     me.getApplication().getIconController().addIcons({
-      'repository-item-type-default': { file: 'file_extension_default.png', variants: ['x16', 'x24', 'x32'] },
+      'repository-item-type-default': { file: 'file_extension_default.png', variants: ['x16', 'x32'] },
       'repository-item-type-md5': { file: 'file_extension_checksum.png', variants: ['x16', 'x32'] },
       'repository-item-type-jar': { file: 'file_extension_jar.png', variants: ['x16', 'x32'] },
       'repository-item-type-pom': { file: 'file_extension_xml.png', variants: ['x16', 'x32'] },
