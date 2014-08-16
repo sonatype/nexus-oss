@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
-  extend: 'Ext.Window',
+  extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-system-verifysmtpconnection',
   requires: [
     'NX.Icons'

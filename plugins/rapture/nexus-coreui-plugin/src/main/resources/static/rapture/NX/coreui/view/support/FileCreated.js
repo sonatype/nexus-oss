@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.support.FileCreated', {
-  extend: 'Ext.Window',
+  extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-support-filecreated',
 
   /**
