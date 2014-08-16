@@ -63,9 +63,10 @@ Ext.define('NX.controller.Features', {
           feature.view = 'NX.view.feature.Group';
         }
 
+        // complain if there is no view configuration
         if (!feature.view && !feature.href) {
-          me.logWarn('Using default view for feature at path: ' + feature.path);
-          feature.view = 'NX.view.feature.TODO';
+          me.logError('Missing view configuration for feature at path: ' + feature.path);
+          // TODO: Maybe raise an error instead?
         }
 
         if (feature.href && !feature.hrefTarget) {
