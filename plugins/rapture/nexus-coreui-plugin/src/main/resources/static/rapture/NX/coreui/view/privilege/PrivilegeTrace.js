@@ -20,6 +20,11 @@
 Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-privilege-trace',
+  requires: [
+    'NX.Icons',
+    'NX.coreui.store.Role',
+    'NX.coreui.store.Privilege'
+  ],
 
   layout: {
     type: 'hbox',
