@@ -20,6 +20,9 @@
  */
 Ext.define('NX.controller.SettingsForm', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Messages'
+  ],
 
   /**
    * @override

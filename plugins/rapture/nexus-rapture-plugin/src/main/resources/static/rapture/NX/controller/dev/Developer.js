@@ -19,6 +19,10 @@
  */
 Ext.define('NX.controller.dev.Developer', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.State',
+    'NX.Messages'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },

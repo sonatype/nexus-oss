@@ -19,6 +19,9 @@
  */
 Ext.define('NX.controller.UnsupportedBrowser', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.State'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },

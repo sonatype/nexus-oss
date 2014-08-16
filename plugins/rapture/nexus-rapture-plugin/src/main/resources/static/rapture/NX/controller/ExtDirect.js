@@ -23,7 +23,8 @@ Ext.define('NX.controller.ExtDirect', {
     'NX.LogAware'
   ],
   requires: [
-    'NX.Security'
+    'NX.Security',
+    'NX.Messages'
   ],
 
   init: function() {

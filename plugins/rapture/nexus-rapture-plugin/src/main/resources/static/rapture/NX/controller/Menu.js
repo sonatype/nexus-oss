@@ -21,7 +21,11 @@ Ext.define('NX.controller.Menu', {
   extend: 'Ext.app.Controller',
   requires: [
     'NX.Bookmarks',
-    'NX.controller.User'
+    'NX.controller.User',
+    'NX.controller.Features',
+    'NX.Permissions',
+    'NX.Security',
+    'NX.State'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -29,7 +33,6 @@ Ext.define('NX.controller.Menu', {
 
   views: [
     'feature.Menu',
-    'feature.TODO',
     'feature.NotFound',
     'feature.NotVisible',
     'header.DashboardMode',

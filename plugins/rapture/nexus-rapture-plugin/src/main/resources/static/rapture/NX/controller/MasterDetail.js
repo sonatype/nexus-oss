@@ -22,7 +22,9 @@ Ext.define('NX.controller.MasterDetail', {
   requires: [
     // many impls use this
     'NX.view.info.Panel',
-    'NX.view.info.Entry'
+    'NX.view.info.Entry',
+    'NX.Conditions',
+    'NX.Dialogs'
   ],
   mixins: {
     logAware: 'NX.LogAware'

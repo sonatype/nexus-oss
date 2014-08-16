@@ -21,7 +21,8 @@ Ext.define('NX.controller.State', {
   extend: 'Ext.app.Controller',
   requires: [
     'Ext.direct.Manager',
-    'NX.Dialogs'
+    'NX.Dialogs',
+    'NX.Messages'
   ],
   mixins: {
     logAware: 'NX.LogAware'

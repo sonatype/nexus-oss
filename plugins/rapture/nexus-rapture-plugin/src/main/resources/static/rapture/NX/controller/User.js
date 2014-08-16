@@ -20,7 +20,9 @@
 Ext.define('NX.controller.User', {
   extend: 'Ext.app.Controller',
   requires: [
-    'NX.util.Base64'
+    'NX.util.Base64',
+    'NX.Messages',
+    'NX.State'
   ],
   mixins: {
     logAware: 'NX.LogAware'

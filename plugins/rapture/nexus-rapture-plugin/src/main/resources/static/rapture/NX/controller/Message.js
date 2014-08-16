@@ -20,6 +20,7 @@
 Ext.define('NX.controller.Message', {
   extend: 'Ext.app.Controller',
   requires: [
+    'NX.Icons',
     'NX.Messages'
   ],
 
