@@ -473,6 +473,7 @@
             <jslintOptions>
               <white>true</white>
               <sloppy>true</sloppy>
+              <todo>true</todo>
             </jslintOptions>
           </configuration>
           <executions>
