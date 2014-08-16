@@ -468,13 +468,6 @@
             <nomunge>${maven.yuicompressor.nomunge}</nomunge>
             <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
             <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
-            <!-- jslint support -->
-            <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
-            <jslintOptions>
-              <white>true</white>
-              <sloppy>true</sloppy>
-              <todo>true</todo>
-            </jslintOptions>
           </configuration>
           <executions>
             <execution>
@@ -496,7 +489,8 @@
                 <goal>aggregate-css</goal>
               </goals>
               <configuration>
-                <output>${project.build.outputDirectory}/static/rapture/resources/${project.artifactId}-prod.css</output>
+                <output>${project.build.outputDirectory}/static/rapture/resources/${project.artifactId}-prod.css
+                </output>
                 <sourceDirectory>${project.basedir}/src/main/resources/static/rapture/resources</sourceDirectory>
                 <includes>
                   <include>${project.artifactId}-debug.css</include>
@@ -532,6 +526,42 @@
         <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
         <maven.yuicompressor.linebreakpos>0</maven.yuicompressor.linebreakpos>
       </properties>
+    </profile>
+
+    <!--
+    Execute jslint on javascript sources.
+    -->
+    <profile>
+      <id>jslint</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>yuicompressor-maven-plugin</artifactId>
+            <configuration>
+              <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
+              <jslintOptions>
+                <!-- ignore whitespace rules -->
+                <white>true</white>
+                <!-- do not require 'use strict' -->
+                <sloppy>true</sloppy>
+                <!-- allow to do comments -->
+                <todo>true</todo>
+                <!-- allow subscript notation -->
+                <sub>true</sub>
+              </jslintOptions>
+            </configuration>
+            <executions>
+              <execution>
+                <id>plugin-jslint</id>
+                <goals>
+                  <goal>jslint</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 
