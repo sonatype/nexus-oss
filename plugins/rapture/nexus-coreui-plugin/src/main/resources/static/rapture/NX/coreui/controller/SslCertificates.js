@@ -52,11 +52,11 @@ Ext.define('NX.coreui.controller.SslCertificates', {
       variants: ['x16', 'x32']
     },
     'sslcertificate-add-by-pem': {
-      file: 'ssl_addbypem.png',
+      file: 'server_add.png',
       variants: ['x16', 'x32']
     },
     'sslcertificate-add-by-server': {
-      file: 'ssl_addbyserver.png',
+      file: 'server_connect.png',
       variants: ['x16', 'x32']
     }
   },
