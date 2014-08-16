@@ -68,7 +68,6 @@ Ext.define('NX.util.DownloadHelper', {
   /**
    * @public
    * @param {String} url URL to download
-   * @return {Boolean} false if download was blocked, else true
    */
   downloadUrl: function (url) {
     var me = this;
@@ -85,8 +84,6 @@ Ext.define('NX.util.DownloadHelper', {
     // open new window in hidden download-from to initiate download
     if (NX.Windows.open(url, me.windowName) !== null) {
       NX.Messages.add({text: 'Download initiated', type: 'success'});
-      return true;
     }
-    return false;
   }
 });
