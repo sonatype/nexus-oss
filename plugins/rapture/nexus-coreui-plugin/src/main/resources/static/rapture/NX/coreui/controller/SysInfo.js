@@ -23,7 +23,8 @@ Ext.define('NX.coreui.controller.SysInfo', {
     'NX.Permissions',
     'NX.util.Url',
     'NX.util.DownloadHelper',
-    'NX.Messages'
+    'NX.Messages',
+    'NX.Windows'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -118,23 +119,19 @@ Ext.define('NX.coreui.controller.SysInfo', {
         panel = me.getSysInfo(),
         win;
 
-    win = NX.global.open('', '', 'width=640,height=480');
-    if (win === null) {
-      NX.Messages.add({ text: 'Print window pop-up was blocked!', type: 'warning' });
-      return;
+    win = NX.Windows.open('', '', 'width=640,height=480');
+    if (win !== null) {
+      win.document.write('<html><head>');
+      win.document.write('<title>System Information</title>');
+
+      // FIXME: Ideally want some of the style in here
+      // FIXME: ... but unsure how to resolve that URL (since it could change for debug, etc)
+      // FIXME: See for more details http://stackoverflow.com/questions/5939456/how-to-print-extjs-component
+
+      win.document.write('</head><body>');
+      win.document.write(panel.body.dom.innerHTML);
+      win.document.write('</body></html>');
+      win.print();
     }
-
-    win.document.write('<html><head>');
-    win.document.write('<title>System Information</title>');
-
-    // FIXME: Ideally want some of the style in here
-    // FIXME: ... but unsure how to resolve that URL (since it could change for debug, etc)
-    // FIXME: See for more details http://stackoverflow.com/questions/5939456/how-to-print-extjs-component
-
-    win.document.write('</head><body>');
-    win.document.write(panel.body.dom.innerHTML);
-    win.document.write('</body></html>');
-    win.print();
   }
-
 });

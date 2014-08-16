@@ -22,7 +22,8 @@ Ext.define('NX.coreui.controller.Feeds', {
   requires: [
     'NX.Permissions',
     'NX.Bookmarks',
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.Windows'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -197,7 +198,7 @@ Ext.define('NX.coreui.controller.Feeds', {
         selection = me.getList().getSelectionModel().getSelection();
 
     if (selection.length) {
-      NX.global.open(selection[0].get('url'));
+      NX.Windows.open(selection[0].get('url'));
     }
   },
 

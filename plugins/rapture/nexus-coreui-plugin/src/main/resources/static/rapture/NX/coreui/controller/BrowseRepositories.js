@@ -20,7 +20,8 @@
 Ext.define('NX.coreui.controller.BrowseRepositories', {
   extend: 'Ext.app.Controller',
   requires: [
-    'NX.Bookmarks'
+    'NX.Bookmarks',
+    'NX.Windows'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -494,7 +495,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
    * @param path to download
    */
   downloadPath: function(url, path) {
-    NX.global.open(url + path);
+    NX.Windows.open(url + path);
   },
 
   /**

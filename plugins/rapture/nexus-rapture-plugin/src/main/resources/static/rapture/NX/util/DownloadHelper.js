@@ -20,7 +20,8 @@
 Ext.define('NX.util.DownloadHelper', {
   singleton: true,
   requires: [
-    'NX.Messages'
+    'NX.Messages',
+    'NX.Windows'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -70,28 +71,22 @@ Ext.define('NX.util.DownloadHelper', {
    * @return {Boolean} false if download was blocked, else true
    */
   downloadUrl: function (url) {
-    var me = this,
-        frame,
-        win;
+    var me = this;
 
     me.logDebug('Downloading URL: ' + url);
 
     // resolve the download frame
-    frame = me.getFrame();
+    me.getFrame();
 
     // TODO: Consider changing this to a dynamic form or 'a' link and automatically submit/click
     // TODO: ... to make use of html5 download attribute and avoid needing to _open_ more windows
     // TODO: Form method could be handy to GET/POST w/params vs link to just GET?
 
     // open new window in hidden download-from to initiate download
-    win = NX.global.open(url, me.windowName);
-    if (win === null) {
-      NX.Messages.add({text: 'Download window pop-up was blocked!', type: 'danger'});
-      return false;
-    }
-    else {
+    if (NX.Windows.open(url, me.windowName) !== null) {
       NX.Messages.add({text: 'Download initiated', type: 'success'});
       return true;
     }
+    return false;
   }
 });
