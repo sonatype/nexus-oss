@@ -37,7 +37,6 @@ import org.mozilla.javascript.CompilerEnvirons;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.Parser;
-import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.ArrayLiteral;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
@@ -52,6 +51,7 @@ import org.mozilla.javascript.ast.StringLiteral;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mozilla.javascript.Token.CALL;
+import static org.mozilla.javascript.Token.NEW;
 
 /**
  * ExtJS 4+ class definition scanner.
@@ -311,7 +311,7 @@ public class ClassDefScanner
           break;
         }
 
-        case Token.NEW: {
+        case NEW: {
           // complain if we have references to classes with 'new' and missing requires
           NewExpression expr = (NewExpression) node;
           String className = nameOf(expr.getTarget());
