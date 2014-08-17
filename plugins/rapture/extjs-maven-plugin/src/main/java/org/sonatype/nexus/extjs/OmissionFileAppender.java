@@ -32,11 +32,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class OmissionFileAppender
 {
-  public static final String OMIT_START_PREFIX = "//<if ";
+  public static final String IF_START_PREFIX = "//<if ";
 
-  public static final String OMIT_START_SUFFIX = ">";
+  public static final String IF_START_SUFFIX = ">";
 
-  public static final String OMIT_STOP = "//</if>";
+  public static final String IF_END = "//</if>";
 
   private final Log log;
 
@@ -77,7 +77,7 @@ public class OmissionFileAppender
           String trimmedLine = line.trim();
           if (isOmitStart(trimmedLine)) {
             if (omit) {
-              // complain if already in omit mode and we found a start token
+              // complain if already in omit mode and we found a start token (nesting is not allowed)
               log.warn("Unexpected omit start token: " + source + "#" + lineno);
             }
             omit = true;
@@ -110,8 +110,8 @@ public class OmissionFileAppender
 
   private boolean isOmitStart(final String line) {
     // assumes line is trimmed
-    if (line.startsWith(OMIT_START_PREFIX) && line.endsWith(OMIT_START_SUFFIX)) {
-      String flagName = line.substring(OMIT_START_PREFIX.length(), line.length() - OMIT_START_SUFFIX.length());
+    if (line.startsWith(IF_START_PREFIX) && line.endsWith(IF_START_SUFFIX)) {
+      String flagName = line.substring(IF_START_PREFIX.length(), line.length() - IF_START_SUFFIX.length());
       Boolean flag = flags.get(flagName);
       return flag != null && flag;
     }
@@ -120,6 +120,6 @@ public class OmissionFileAppender
 
   private boolean isOmitStop(final String line) {
     // assumes line is trimmed
-    return line.equals(OMIT_STOP);
+    return line.equals(IF_END);
   }
 }
