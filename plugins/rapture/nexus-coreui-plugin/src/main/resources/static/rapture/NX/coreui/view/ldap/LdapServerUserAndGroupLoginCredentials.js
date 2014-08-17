@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * LDAP Server User & Group login credentials window.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-ldapserver-userandgroup-login-credentials',
+  requires: [
+    'NX.Icons'
+  ],
 
   title: 'Login Credentials',
 

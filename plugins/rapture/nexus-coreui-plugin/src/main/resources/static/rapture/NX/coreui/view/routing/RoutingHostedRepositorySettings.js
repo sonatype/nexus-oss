@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Routing hosted repository settings form.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.coreui.view.routing.RoutingHostedRepositorySettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-routing-hosted-repository-settings',
+  requires: [
+    'NX.util.Url'
+  ],
 
   config: {
     active: false,

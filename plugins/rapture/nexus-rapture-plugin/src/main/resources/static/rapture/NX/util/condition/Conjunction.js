@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext*/
+
 /**
  * A {@link NX.util.condition.Condition} that is satisfied when all AND-ed {@link NX.util.condition.Condition}s
  * are satisfied.
@@ -48,7 +50,8 @@ Ext.define('NX.util.condition.Conjunction', {
 
     if (me.bounded) {
       Ext.each(me.conditions, function (condition) {
-        return satisfied = condition.satisfied;
+        satisfied = condition.satisfied;
+        return satisfied;
       });
       me.setSatisfied(satisfied);
     }

@@ -23,7 +23,13 @@ import org.slf4j.LoggerFactory
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.formfields.Selectable
-import org.sonatype.nexus.plugins.capabilities.*
+import org.sonatype.nexus.plugins.capabilities.Capability
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry
+import org.sonatype.nexus.plugins.capabilities.CapabilityReference
+import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry
+import org.sonatype.nexus.plugins.capabilities.Tag
+import org.sonatype.nexus.plugins.capabilities.Taggable
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
@@ -168,7 +174,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:capabilities:delete')
   @Validate
-  void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void delete_(final @NotEmpty(message = '[id] may not be empty') String id) {
     capabilityRegistry.remove(capabilityIdentity(id))
   }
 

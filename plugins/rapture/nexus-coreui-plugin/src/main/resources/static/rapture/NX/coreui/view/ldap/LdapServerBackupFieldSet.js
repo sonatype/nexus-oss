@@ -10,13 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * LDAP Server "Backup Mirror" field set.
  *
  * @since 3.0
  */
 Ext.define('NX.coreui.view.ldap.LdapServerBackupFieldSet', {
-  extend: 'Ext.Panel',
+  extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-ldapserver-backup-fieldset',
 
   defaults: {

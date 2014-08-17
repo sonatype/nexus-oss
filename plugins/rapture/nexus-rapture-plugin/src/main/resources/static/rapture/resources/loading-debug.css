@@ -1,4 +1,4 @@
-/*
+/**
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -10,41 +10,41 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 /**
- * Panel shown in case no feature panel was configured.
- * FIXME: remove me
- *
- * @since 3.0
+ * Styles for app loading indicator.
  */
-Ext.define('NX.view.feature.TODO', {
-  extend: 'Ext.Panel',
-  alias: 'widget.nx-feature-todo',
 
-  layout: {
-    type: 'vbox',
-    align: 'stretch',
-    pack: 'start'
-  },
+#loading-mask {
+  background-color: black;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 20000;
+}
 
-  items: [
-    {
-      xtype: 'label',
-      text: 'TODO',
-      style: {
-        'color': '#000000',
-        'font-size': '20px',
-        'font-weight': 'bold',
-        'text-align': 'center',
-        'padding': '20px'
-      }
-    },
-    {
-      xtype: 'label',
-      text: 'Something more useful to be placed here in the future',
-      style: {
-        'text-align': 'center'
-      }
-    }
-  ]
+#loading {
+  height: auto;
+  position: absolute;
+  top:50%;
+  left:50%;
+  padding: 2px;
+  margin:-360px 0 0 -425px;
+  z-index: 20001;
+}
 
-});
+#loading .loading-indicator {
+  background: black;
+  color: #444;
+  font: bold 12px arial, tahoma, verdana, helvetica, sans-serif;
+  height: auto;
+  margin: 0;
+  padding: 10px;
+}
+
+#loading-msg {
+  font-size: 18px;
+  font-weight: normal;
+}

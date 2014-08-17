@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Nexus application.
  *
@@ -21,7 +23,7 @@ Ext.define('NX.app.Application', {
   requires: [
     'Ext.Ajax',
     'Ext.Error',
-    'Ext.Direct',
+    'Ext.direct.Manager',
     'Ext.state.Manager',
     'Ext.state.LocalStorageProvider',
     'Ext.util.LocalStorage',
@@ -43,6 +45,10 @@ Ext.define('NX.app.Application', {
     'NX.ext.SearchBox'
   ],
 
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
+
   uses: [
     'NX.ext.grid.plugin.FilterBox',
     'NX.ext.grid.plugin.Filtering',
@@ -60,10 +66,6 @@ Ext.define('NX.app.Application', {
     'NX.Conditions'
   ],
 
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
-
   name: 'NX',
 
   /**
@@ -72,7 +74,7 @@ Ext.define('NX.app.Application', {
   appProperty: 'application',
 
   /**
-   * Relative to /rapture.html
+   * Relative to /index.html
    */
   appFolder: 'static/rapture/NX',
 
@@ -134,7 +136,10 @@ Ext.define('NX.app.Application', {
   init: function (app) {
     var me = this;
 
-    me.logDebug('Initializing application ...');
+    //<if debug>
+    me.logDebug('Initializing');
+    me.logDebug(me.managedControllers.getCount() + ' managed controllers');
+    //</if>
 
     // Configure blank image URL
     Ext.BLANK_IMAGE_URL = NX.util.Url.baseUrl + '/static/rapture/resources/images/s.gif';
@@ -156,7 +161,7 @@ Ext.define('NX.app.Application', {
    */
   initErrorHandler: function () {
     var me = this,
-        originalOnError = window.onerror;
+        originalOnError = NX.global.onerror;
 
     // FIXME: This needs further refinement, seems like javascript errors are lost in Firefox (but show up fine in Chrome)
 
@@ -167,16 +172,18 @@ Ext.define('NX.app.Application', {
 
     // FIXME: This will catch more errors, but duplicates messages for ext errors
     // FIXME: Without this however some javascript errors will go unhandled
-    window.onerror = function (msg, url, line) {
+    NX.global.onerror = function (msg, url, line) {
       me.handleError({ msg: msg + ' (' + url + ':' + line + ')' });
 
-      // maybe delegate to original window.onerror handler
+      // maybe delegate to original onerror handler?
       if (originalOnError) {
         originalOnError(msg, url, line);
       }
     };
 
+    //<if debug>
     me.logDebug('Configured error handling');
+    //</if>
   },
 
   /**
@@ -192,14 +199,13 @@ Ext.define('NX.app.Application', {
   },
 
   /**
+   * @private
    * Customize error to-string handling.
    *
    * Ext.Error.toString() assumes instance, but raise(String) makes anonymous object.
-   *
-   * @private
    */
   errorAsString: function (error) {
-    var className = error.sourceClass ? error.sourceClass : '',
+    var className = error.sourceClass || '',
         methodName = error.sourceMethod ? '.' + error.sourceMethod + '(): ' : '',
         msg = error.msg || '(No description provided)';
     return className + methodName + msg;
@@ -212,8 +218,11 @@ Ext.define('NX.app.Application', {
   initDirect: function () {
     var me = this;
 
-    Ext.Direct.addProvider(NX.direct.api.REMOTING_API);
+    Ext.direct.Manager.addProvider(NX.direct.api.REMOTING_API);
+
+    //<if debug>
     me.logDebug('Configured Ext.Direct');
+    //</if>
   },
 
   /**
@@ -226,10 +235,14 @@ Ext.define('NX.app.Application', {
     // If local storage is supported install state provider
     if (Ext.util.LocalStorage.supported) {
       Ext.state.Manager.setProvider(Ext.create('Ext.state.LocalStorageProvider'));
+      //<if debug>
       me.logDebug('Configured state provider: local');
+      //</if>
     }
     else {
+      //<if debug>
       me.logWarn('Local storage not supported; state management not supported');
+      //</if>
     }
 
     // HACK: for debugging
@@ -243,10 +256,11 @@ Ext.define('NX.app.Application', {
    * Starts the application.
    */
   start: function () {
-    var me = this;
-    me.logDebug('Starting ...');
+    var me = this, hideMask;
 
-    me.managedControllers = NX.app.pluginConfig.managedControllers;
+    //<if debug>
+    me.logDebug('Starting');
+    //</if>
 
     Ext.create('NX.view.Viewport');
 
@@ -260,7 +274,7 @@ Ext.define('NX.app.Application', {
     });
 
     // hide the loading mask after we have loaded
-    var hideMask = function () {
+    hideMask = function () {
       Ext.get('loading').remove();
       Ext.fly('loading-mask').animate({ opacity: 0, remove: true });
     };
@@ -271,6 +285,7 @@ Ext.define('NX.app.Application', {
   },
 
   /**
+   * @private
    * Create / Destroy managed controllers based on their active status.
    */
   syncManagedControllers: function () {
@@ -278,7 +293,9 @@ Ext.define('NX.app.Application', {
         ref, initializedControllers = [],
         changes = false;
 
+    //<if debug>
     me.logDebug('Refreshing controllers');
+    //</if>
 
     // destroy all controllers that are become inactive
     me.managedControllers.eachKey(function (key) {
@@ -286,7 +303,11 @@ Ext.define('NX.app.Application', {
       if (!ref.active()) {
         if (ref.controller) {
           changes = true;
+
+          //<if debug>
           me.logDebug('Destroying controller: ' + key);
+          //</if>
+
           ref.controller.eventbus.unlisten(ref.controller.id);
           if (Ext.isFunction(ref.controller.onDestroy)) {
             ref.controller.onDestroy();
@@ -307,7 +328,11 @@ Ext.define('NX.app.Application', {
       if (ref.active()) {
         if (!ref.controller) {
           changes = true;
+
+          //<if debug>
           me.logDebug('Initializing controller: ' + key);
+          //</if>
+
           ref.controller = me.getController(key);
           initializedControllers.push(ref.controller);
         }
@@ -328,110 +353,4 @@ Ext.define('NX.app.Application', {
       me.getIconController().installStylesheet();
     }
   }
-
-}, function () {
-  var managedControllers = new Ext.util.MixedCollection(),
-      requires = [],
-      custom = {
-        namespaces: [],
-        controllers: []
-      },
-      keys = Object.keys(custom),
-      parseFunction = function (fn) {
-        if (Ext.isBoolean(fn)) {
-          fn = function () {
-            return fn;
-          }
-        }
-        else if (Ext.isString(fn)) {
-          var parts = fn.split('.'),
-              i = 0,
-              len = parts.length,
-              current = Ext.global;
-
-          while (current && i < len) {
-            current = current[parts[i]];
-            ++i;
-          }
-
-          fn = Ext.isFunction(current) ? current : null;
-        }
-        return fn || null;
-      },
-      pluginConfig;
-
-  NX.Log.debug('[NX.app.Application]', 'Processing plugins for customizations: ' + keys);
-
-  Ext.each(NX.app.pluginConfigClassNames, function (className) {
-    NX.Log.debug('[NX.app.Application]', 'Processing ' + className);
-
-    pluginConfig = Ext.create(className);
-
-    // Detect customizations, these are simply fields defined on the plugin object
-    // supported types are Array and String only
-    Ext.each(keys, function (key) {
-      var value = pluginConfig[key];
-      if (value) {
-        NX.Log.debug('[NX.app.Application]', ' |-' + key + ': ' + (Ext.isArray(value) ? value.join(', ') : value));
-        if (Ext.isArray(value) || Ext.isString(value)) {
-          if ('controllers' === key) {
-            Ext.each(Ext.Array.from(value), function (controller) {
-              if (Ext.isString(controller)) {
-                custom[key].push(controller);
-                managedControllers.add({
-                  id: controller,
-                  active: NX.app.Application.defaultActivation
-                })
-              }
-              else if (Ext.isObject(controller) && Ext.isString(controller.id) && controller.id.length > 0) {
-                custom[key].push(controller.id);
-                managedControllers.add(Ext.apply(controller, { active: parseFunction(controller.active) }));
-                if (!Ext.isFunction(managedControllers.get(controller.id).active)) {
-                  Ext.Error.raise(
-                      'Invalid customization; class: ' + className + ', property: controllers, value: ' +
-                          controller.id
-                          + ' active: must be a function that returns a boolean, a boolean'
-                          + ' or a string reference to the fully qualified name of the function'
-                  );
-                }
-              }
-              else {
-                Ext.Error.raise(
-                    'Invalid customization; class: ' + className + ', property: controllers, value: ' + controller
-                );
-              }
-            });
-          }
-          else {
-            custom[key] = custom[key].concat(Ext.Array.from(value));
-          }
-        }
-        else {
-          Ext.Error.raise('Invalid customization; class: ' + className + ', property: ' + key);
-        }
-      }
-    });
-
-    pluginConfig.destroy();
-  });
-
-  // Have to manually add namespaces, this is done by onClassExtended in super not in parent call
-  Ext.app.addNamespaces(custom.namespaces);
-
-  // Define a class to require all controllers
-  Ext.each(custom.controllers, function (name) {
-    requires.push(Ext.app.Controller.getFullName(name, 'controller', 'NX').absoluteName);
-  });
-  NX.Log.debug('[NX.app.Application]', 'Required controllers: ' + requires.join(', '));
-
-  NX.app.pluginConfig = Ext.apply(custom, {
-    managedControllers: managedControllers,
-    requires: requires
-  });
-
-  // Require all classes we need and finally start
-  Ext.syncRequire(requires, function () {
-    NX.getApplication().start();
-  });
-
 });

@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Header help controller.
  *
@@ -17,12 +19,17 @@
  */
 Ext.define('NX.controller.Help', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Icons',
+    'NX.Messages'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },
 
   views: [
-    'header.Help'
+    'header.Help',
+    'AboutWindow'
   ],
 
   refs: [
@@ -43,6 +50,10 @@ Ext.define('NX.controller.Help', {
         file: 'support.png',
         variants: ['x16', 'x32']
       },
+      'help-issuetracker': {
+        file: 'bug.png',
+        variants: ['x16', 'x32']
+      },
       'help-manual': {
         file: 'book_picture.png',
         variants: ['x16', 'x32']
@@ -53,6 +64,14 @@ Ext.define('NX.controller.Help', {
       controller: {
         '#Menu': {
           featureselected: me.onFeatureSelected
+        }
+      },
+      component: {
+        'nx-header-help menuitem[action=feature]': {
+          click: me.onFeatureHelp
+        },
+        'nx-header-help menuitem[action=about]': {
+          click: me.onAbout
         }
       }
     });
@@ -71,6 +90,20 @@ Ext.define('NX.controller.Help', {
 
     featureHelp.setText('Help for: ' + text);
     featureHelp.setIconCls(NX.Icons.cls(iconName, 'x16'));
-  }
+  },
 
+  /**
+   * @private
+   */
+  onFeatureHelp: function() {
+    // TODO: redirect user to feature help page in book, for now just provide feedback this feature is not ready yet
+    NX.Messages.add({ text: 'Not yet implemented', type: 'warning' });
+  },
+
+  /**
+   * @private
+   */
+  onAbout: function() {
+    Ext.widget('nx-aboutwindow');
+  }
 });

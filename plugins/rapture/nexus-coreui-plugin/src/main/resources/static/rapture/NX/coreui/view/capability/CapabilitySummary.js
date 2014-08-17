@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Capability "Summary" panel.
  *
@@ -18,56 +20,61 @@
 Ext.define('NX.coreui.view.capability.CapabilitySummary', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-capability-summary',
+  requires: [
+    'NX.Conditions'
+  ],
 
   title: 'Summary',
 
-  items: [
-    {
-      layout: 'column',
-      items: [
-        {
-          xtype: 'nx-info',
-          columnWidth: 1
-        },
-        {
-          margin: '10 20 0 10',
-          items: [
-            { itemId: 'stateImage' },
-            { itemId: 'stateLabel', margin: '5 0 0 0' }
-          ]
-        }
-      ]
-    },
-    {
-      xtype: 'nx-settingsform',
-      api: {
-        submit: 'NX.direct.capability_Capability.updateNotes'
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
+
+    me.items = [
+      {
+        layout: 'column',
+        items: [
+          {
+            xtype: 'nx-info',
+            columnWidth: 1
+          }
+        ]
       },
-      settingsFormSuccessMessage: function (data) {
-        var description = 'Capability updated: ' + data['typeName'];
-        if (data['description']) {
-          description += ' - ' + data['description'];
-        }
-        return description;
-      },
-      editableCondition: NX.Conditions.isPermitted('nexus:capabilities', 'update'),
-      editableMarker: 'You do not have permission to update capabilities',
-      items: [
-        {
-          xtype: 'hiddenfield',
-          name: 'id'
+      {
+        xtype: 'nx-settingsform',
+        api: {
+          submit: 'NX.direct.capability_Capability.updateNotes'
         },
-        {
-          xtype: 'textarea',
-          fieldLabel: 'Notes',
-          helpText: "Optional notes about configured capability.",
-          name: 'notes',
-          allowBlank: true,
-          anchor: '100%'
-        }
-      ]
-    }
-  ],
+        settingsFormSuccessMessage: function (data) {
+          var description = 'Capability updated: ' + data['typeName'];
+          if (data['description']) {
+            description += ' - ' + data['description'];
+          }
+          return description;
+        },
+        editableCondition: NX.Conditions.isPermitted('nexus:capabilities', 'update'),
+        editableMarker: 'You do not have permission to update capabilities',
+        items: [
+          {
+            xtype: 'hiddenfield',
+            name: 'id'
+          },
+          {
+            xtype: 'textarea',
+            fieldLabel: 'Notes',
+            helpText: "Optional notes about configured capability.",
+            name: 'notes',
+            allowBlank: true,
+            anchor: '100%'
+          }
+        ]
+      }
+    ];
+
+    me.callParent();
+  },
 
   /**
    * @public
@@ -76,18 +83,5 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
    */
   showInfo: function (info) {
     this.down('nx-info').showInfo(info);
-  },
-
-  /**
-   * @public
-   * Shows state image and text.
-   * @param {String} state capability state
-   */
-  showState: function (state) {
-    var me = this;
-
-    me.down('#stateImage').update(NX.Icons.img('capability-' + state, 'x32'));
-    me.down('#stateLabel').update('<b>' + Ext.String.capitalize(state) + '</b>');
   }
-
 });

@@ -10,14 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Verify SMTP connection window.
  *
  * @since 3.0
  */
 Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
-  extend: 'Ext.Window',
+  extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-system-verifysmtpconnection',
+  requires: [
+    'NX.Icons'
+  ],
 
   title: 'Verify SMTP connection',
   defaultFocus: 'email',
@@ -30,57 +35,64 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
   border: false,
   modal: true,
 
-  items: [
-    {
-      xtype: 'form',
-      bodyPadding: 10,
-      defaults: {
-        labelSeparator: '',
-        labelWidth: 40,
-        labelAlign: 'right',
-        anchor: '100%'
-      },
-      items: [
-        {
-          xtype: 'panel',
-          layout: 'hbox',
-          style: {
-            marginBottom: '10px'
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
+
+    me.items = [
+      {
+        xtype: 'form',
+        bodyPadding: 10,
+        defaults: {
+          labelSeparator: '',
+          labelWidth: 40,
+          labelAlign: 'right',
+          anchor: '100%'
+        },
+        items: [
+          {
+            xtype: 'panel',
+            layout: 'hbox',
+            style: {
+              marginBottom: '10px'
+            },
+            items: [
+              { xtype: 'component', html: NX.Icons.img('verifysmtpconnection', 'x32') },
+              { xtype: 'label', html: 'Please enter an email address which will receive the test email message.',
+                margin: '0 0 0 5'
+              }
+            ]
           },
-          // TODO Style
-          items: [
-            { xtype: 'component', html: NX.Icons.img('verifysmtpconnection', 'x32') },
-            { xtype: 'label', html: 'Please enter an email address which will receive the test email message.',
-              margin: '0 0 0 5'
-            }
-          ]
-        },
-        {
-          xtype: 'nx-email',
-          name: 'email',
-          itemId: 'email',
-          fieldLabel: 'E-mail'
-        }
-      ],
-
-      buttonAlign: 'left',
-      buttons: [
-        {
-          text: 'Verify',
-          action: 'verify',
-          formBind: true,
-          bindToEnter: true,
-          ui: 'primary',
-          glyph: 'xf003@FontAwesome' /* fa-envelope-o */
-        },
-        {
-          text: 'Cancel',
-          handler: function(){
-            this.up('window').close();
+          {
+            xtype: 'nx-email',
+            name: 'email',
+            itemId: 'email',
+            fieldLabel: 'E-mail'
           }
-        }
-      ]
-    }
-  ]
+        ],
 
+        buttonAlign: 'left',
+        buttons: [
+          {
+            text: 'Verify',
+            action: 'verify',
+            formBind: true,
+            bindToEnter: true,
+            ui: 'primary',
+            glyph: 'xf003@FontAwesome' /* fa-envelope-o */
+          },
+          {
+            text: 'Cancel',
+            handler: function () {
+              this.up('window').close();
+            }
+          }
+        ]
+      }
+    ];
+
+    me.callParent();
+  }
 });

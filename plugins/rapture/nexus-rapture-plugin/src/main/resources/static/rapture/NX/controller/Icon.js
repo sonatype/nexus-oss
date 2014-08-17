@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX, Image*/
+
 /**
  * Main uber mode controller.
  *
@@ -21,7 +23,7 @@ Ext.define('NX.controller.Icon', {
     'Ext.Error',
     'Ext.util.CSS',
     'NX.util.Url',
-    'NX.Icons',
+    'NX.Icons'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -64,7 +66,10 @@ Ext.define('NX.controller.Icon', {
     var me = this,
         img;
 
+    //<if debug>
     me.logDebug('Preloading: ' + url);
+    //</if>
+
     img = new Image();
     img.src = url;
   },
@@ -78,7 +83,9 @@ Ext.define('NX.controller.Icon', {
     var me = this,
         styles = [];
 
+    //<if debug>
     me.logDebug('Installing stylesheet');
+    //</if>
 
     // build styles for each icon in store
     me.getIconStore().each(function (record) {
@@ -96,7 +103,10 @@ Ext.define('NX.controller.Icon', {
     // NOTE: This has issues on IE 11, forced compat via X-UA-Compatible meta tag
     // NOTE: ... but may be better off rendering this server side?
     me.stylesheet = Ext.util.CSS.createStyleSheet(styles.join(' '), 'nx-icons');
+
+    //<if debug>
     me.logDebug('Stylesheet installed with ' + me.stylesheet.cssRules.length + ' rules');
+    //</if>
   },
 
   /**
@@ -168,10 +178,10 @@ Ext.define('NX.controller.Icon', {
 
     // complain if height/width are missing as this could cause the image not to display
     if (!icon.height) {
-      me.logWarn('Icon missing height: ' + icon.css)
+      me.logWarn('Icon missing height: ' + icon.css);
     }
     if (!icon.width) {
-      me.logWarn('Icon missing width: ' + icon.css)
+      me.logWarn('Icon missing width: ' + icon.css);
     }
 
     // TODO: complain if we are overwriting an icon

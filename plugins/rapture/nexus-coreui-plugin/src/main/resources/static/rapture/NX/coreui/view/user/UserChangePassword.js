@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Chnage password window.
  *
@@ -18,44 +20,55 @@
 Ext.define('NX.coreui.view.user.UserChangePassword', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-user-changepassword',
+  requires: [
+    'NX.Conditions'
+  ],
 
   title: 'Change Password',
   defaultFocus: 'password',
 
-  items: {
-    xtype: 'nx-settingsform',
-    editableCondition: NX.Conditions.isPermitted('security:userschangepw', 'create'),
-    editableMarker: 'You do not have permission to change your password',
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
 
-    items: [
-      {
-        xtype: 'nx-password',
-        name: 'password',
-        itemId: 'password',
-        fieldLabel: 'Password',
-        helpText: 'The new password required to you into the system.',
-        emptyText: 'enter a password'
-      },
-      {
-        xtype: 'nx-password',
-        allowBlank: true,
-        fieldLabel: 'Confirm Password',
-        helpText: 'Re-enter the password to validate entry.',
-        emptyText: 'confirm above password',
-        submitValue: false,
-        validator: function () {
-          var me = this;
-          return (me.up('form').down('#password').getValue() === me.getValue()) ? true : 'Passwords don\'t match';
+    me.items = {
+      xtype: 'nx-settingsform',
+      editableCondition: NX.Conditions.isPermitted('security:userschangepw', 'create'),
+      editableMarker: 'You do not have permission to change your password',
+
+      items: [
+        {
+          xtype: 'nx-password',
+          name: 'password',
+          itemId: 'password',
+          fieldLabel: 'Password',
+          helpText: 'The new password required to you into the system.',
+          emptyText: 'enter a password'
+        },
+        {
+          xtype: 'nx-password',
+          allowBlank: true,
+          fieldLabel: 'Confirm Password',
+          helpText: 'Re-enter the password to validate entry.',
+          emptyText: 'confirm above password',
+          submitValue: false,
+          validator: function () {
+            var me = this;
+            return (me.up('form').down('#password').getValue() === me.getValue()) ? true : 'Passwords do not match';
+          }
         }
-      }
-    ],
+      ],
 
-    buttons: [
-      { text: 'Change password', action: 'changepassword', formBind: true, ui: 'primary' },
-      { text: 'Cancel', handler: function () {
-        this.up('window').close();
-      }}
-    ]
+      buttons: [
+        { text: 'Change password', action: 'changepassword', formBind: true, ui: 'primary' },
+        { text: 'Cancel', handler: function () {
+          this.up('window').close();
+        }}
+      ]
+    };
+
+    me.callParent();
   }
-
 });

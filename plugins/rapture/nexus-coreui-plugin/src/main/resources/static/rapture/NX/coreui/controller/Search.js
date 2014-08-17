@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Search controller.
  *
@@ -209,7 +211,7 @@ Ext.define('NX.coreui.controller.Search', {
         && Ext.String.endsWith(NX.Bookmarks.getBookmark().segments[0], 'search' + searchPanel.bookmarkEnding)) {
       Ext.Array.each(Ext.Array.slice(bookmarkSegments, 1), function(segment) {
         var split = segment.split('=');
-        if (split.length == 2) {
+        if (split.length === 2) {
           bookmarkValues[split[0]] = decodeURIComponent(split[1]);
         }
       });
@@ -463,7 +465,7 @@ Ext.define('NX.coreui.controller.Search', {
         id: cmp.criteriaId,
         value: cmp.getValue(),
         hidden: cmp.hidden
-      })
+      });
     });
 
     model = me.getSearchFilterModel().create(Ext.apply(values, {

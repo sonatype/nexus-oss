@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Helpers to interact with Icon controller.
  *
@@ -17,7 +19,9 @@
  */
 Ext.define('NX.Icons', {
   singleton: true,
-
+  requires: [
+    'NX.util.Url'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },
@@ -62,7 +66,7 @@ Ext.define('NX.Icons', {
     var me = this,
         file = name;
 
-    if (ext == undefined) {
+    if (ext === undefined) {
       ext = 'png';
     }
     file += '.' + ext;

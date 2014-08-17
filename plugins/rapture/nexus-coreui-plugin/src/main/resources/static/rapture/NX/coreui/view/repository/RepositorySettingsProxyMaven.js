@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Maven proxy repository settings form.
  *
@@ -77,14 +79,14 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         xtype: 'checkbox',
         name: 'fileTypeValidation',
         fieldLabel: 'File Content Validation',
-        helpText: 'Flag to check the remote file\'s content to see if it is valid. (e.g. not html error page), handy when you cannot enable strict checksum checking.',
+        helpText: 'Flag to check the remote file contents to see if it is valid. (e.g. not html error page), handy when you cannot enable strict checksum checking.',
         value: true
       },
       {
         xtype: 'combo',
         name: 'checksumPolicy',
         fieldLabel: 'Checksum Policy',
-        helpText: 'The checksum policy for this repository: Ignore: Don\'t check remote checksums. Warn: Log a warning if the checksum is bad but serve the artifact anyway. (Default...there are currently known checksum errors on Central). StrictIfExists: Do not serve the artifact if the checksum exists but is invalid. Strict: Require that a checksum exists on the remote repository and that it is valid.',
+        helpText: 'The checksum policy for this repository: Ignore: Do not check remote checksums. Warn: Log a warning if the checksum is bad but serve the artifact anyway. (Default...there are currently known checksum errors on Central). StrictIfExists: Do not serve the artifact if the checksum exists but is invalid. Strict: Require that a checksum exists on the remote repository and that it is valid.',
         emptyText: 'select a policy',
         editable: false,
         store: [
@@ -124,7 +126,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         xtype: 'numberfield',
         name: 'artifactMaxAge',
         fieldLabel: 'Artifact Max Age',
-        helpText: 'This controls how long to cache the artifacts in the repository before rechecking the remote repository. In a release repository, this value should be -1 (infinite) as release artifacts shouldn\'t change.',
+        helpText: 'This controls how long to cache the artifacts in the repository before rechecking the remote repository. In a release repository, this value should be -1 (infinite) as release artifacts should not change.',
         minValue: -1,
         maxValue: 511000,
         allowDecimals: false,
@@ -135,7 +137,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         xtype: 'numberfield',
         name: 'metadataMaxAge',
         fieldLabel: 'Metadata Max Age',
-        helpText: 'This controls how long to cache the metadata in the repository before rechecking the remote repository. Unlike artifact max age, this value should not be infinite or Maven won\'t discover new artifact releases.',
+        helpText: 'This controls how long to cache the metadata in the repository before rechecking the remote repository. Unlike artifact max age, this value should not be infinite or Maven will not discover new artifact releases.',
         minValue: -1,
         maxValue: 511000,
         allowDecimals: false,

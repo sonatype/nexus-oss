@@ -10,6 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext*/
+
+/**
+ * Shows examples of buttons in various styles.
+ *
+ * @since 3.0
+ */
 Ext.define('NX.view.dev.Buttons', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-dev-buttons',
@@ -37,7 +44,7 @@ Ext.define('NX.view.dev.Buttons', {
     Ext.each(['default', 'primary', 'danger', 'warning', 'success', 'plain'], function (ui) {
       // pick a different glyph for each style of button
       var glyph = 'xf00' + i + '@FontAwesome';
-      i++;
+      i = i + 1;
 
       me.items.push({
         xtype: 'container',
@@ -50,7 +57,7 @@ Ext.define('NX.view.dev.Buttons', {
           width: 100
         },
         items: [
-          { xtype: 'label', text: 'ui: \'' + ui + '\''},
+          { xtype: 'label', text: "ui: '" + ui + "'"},
           { xtype: 'button', text: 'normal', glyph: glyph, ui: ui },
           { xtype: 'button', text: 'disabled', glyph: glyph,  ui: ui, disabled: true },
           {

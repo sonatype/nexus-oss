@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Ssl Certificate detail window.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.coreui.view.ssl.SslCertificateDetailsWindow', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-sslcertificate-details-window',
+  requires: [
+    'NX.Conditions'
+  ],
 
   title: 'Certificate Details',
 

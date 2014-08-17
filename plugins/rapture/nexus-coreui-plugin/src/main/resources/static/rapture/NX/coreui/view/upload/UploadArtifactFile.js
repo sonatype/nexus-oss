@@ -10,13 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Upload artifact file panel.
  *
  * @since 3.0
  */
 Ext.define('NX.coreui.view.upload.UploadArtifactFile', {
-  extend: 'Ext.Panel',
+  extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-upload-artifact-file',
 
   initComponent: function() {
@@ -48,7 +50,7 @@ Ext.define('NX.coreui.view.upload.UploadArtifactFile', {
               text: undefined, glyph: 'xf016@FontAwesome' /* fa-file-o */
             }
           },
-          { xtype: 'button', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete' },
+          { xtype: 'button', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete' }
         ]
       },
       {

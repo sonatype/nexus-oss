@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Bookmarking controller.
  *
@@ -76,7 +78,7 @@ Ext.define('NX.controller.Bookmarking', {
       return;
     }
 
-    if (bookmark && oldValue != bookmark.getToken()) {
+    if (bookmark && oldValue !== bookmark.getToken()) {
       me.logDebug('Bookmark: ' + bookmark.getToken() + (caller ? ' (' + caller.self.getName() + ')' : ''));
       Ext.History.bookmark = bookmark.getToken();
       Ext.History.add(bookmark.getToken());
@@ -123,7 +125,7 @@ Ext.define('NX.controller.Bookmarking', {
   onNavigate: function (token) {
     var me = this;
 
-    if (token != Ext.History.bookmark) {
+    if (token !== Ext.History.bookmark) {
       delete Ext.History.bookmark;
       me.navigateTo(NX.Bookmarks.fromToken(token), me);
     }

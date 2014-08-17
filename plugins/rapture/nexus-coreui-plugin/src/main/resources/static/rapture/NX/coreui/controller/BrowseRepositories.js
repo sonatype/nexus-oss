@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Browse repositories controller.
  *
@@ -18,7 +20,8 @@
 Ext.define('NX.coreui.controller.BrowseRepositories', {
   extend: 'Ext.app.Controller',
   requires: [
-    'NX.Bookmarks'
+    'NX.Bookmarks',
+    'NX.Windows'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -210,7 +213,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
     moreButton.enable();
     me.fillMoreButtonMenu(moreButton, repositoryModel, node);
-    if (moreButton.menu.items.length == 0) {
+    if (moreButton.menu.items.length === 0) {
       moreButton.disable();
     }
     me.getStorageFileContainer().showStorageFile(
@@ -492,7 +495,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
    * @param path to download
    */
   downloadPath: function(url, path) {
-    window.open(url + path);
+    NX.Windows.open(url + path);
   },
 
   /**
@@ -536,7 +539,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
         'Delete Repository Item',
         'Delete the selected "' + path + '" ' + (node.isLeaf() ? 'file' : 'folder'),
         function() {
-          NX.direct.coreui_RepositoryStorage.delete(repository.getId(), path, function(response) {
+          NX.direct.coreui_RepositoryStorage.delete_(repository.getId(), path, function(response) {
             if (Ext.isObject(response) && response.success) {
               node.parentNode.removeChild(node);
               NX.Messages.add({

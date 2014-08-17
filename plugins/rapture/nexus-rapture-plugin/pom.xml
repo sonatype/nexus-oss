@@ -86,10 +86,60 @@
       </plugin>
 
       <plugin>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>extjs-maven-plugin</artifactId>
+        <configuration>
+          <namespace>NX</namespace>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>loading-css</id>
+            <goals>
+              <goal>aggregate-css</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.outputDirectory}/static/rapture/resources/loading-prod.css</output>
+              <sourceDirectory>${project.basedir}/src/main/resources/static/rapture/resources</sourceDirectory>
+              <includes>
+                <include>loading-debug.css</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
 
+  <profiles>
+    <!--
+    Exclude third-party Ext extensions.
+    -->
+    <profile>
+      <id>jslint</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>yuicompressor-maven-plugin</artifactId>
+            <configuration>
+              <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
+              <excludes>
+                <exclude>Ext/ux/**</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

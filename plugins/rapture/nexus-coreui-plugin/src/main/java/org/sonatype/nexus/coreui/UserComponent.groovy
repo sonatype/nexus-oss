@@ -32,7 +32,11 @@ import org.sonatype.nexus.validation.Update
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.wonderland.AuthTicketService
 import org.sonatype.security.SecuritySystem
-import org.sonatype.security.usermanagement.*
+import org.sonatype.security.usermanagement.DefaultUser
+import org.sonatype.security.usermanagement.RoleIdentifier
+import org.sonatype.security.usermanagement.User
+import org.sonatype.security.usermanagement.UserManager
+import org.sonatype.security.usermanagement.UserSearchCriteria
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager
 
 import javax.annotation.Nullable
@@ -213,7 +217,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:users:delete')
   @Validate
-  void delete(final @NotEmpty(message = '[id] may not be empty') String id,
+  void delete_(final @NotEmpty(message = '[id] may not be empty') String id,
               final @NotEmpty(message = '[source] may not be empty') String source)
   {
     // TODO check if source is required or we always delete from default realm

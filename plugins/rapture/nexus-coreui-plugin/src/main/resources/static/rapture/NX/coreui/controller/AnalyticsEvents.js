@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Analytics Events controller.
  *
@@ -17,6 +19,10 @@
  */
 Ext.define('NX.coreui.controller.AnalyticsEvents', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.util.Url',
+    'NX.util.DownloadHelper'
+  ],
 
   stores: [
     'AnalyticsEvent'
@@ -142,7 +148,7 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
     NX.Dialogs.askConfirmation('Export events',
         'Export and download analytics event data?<br/>No data will be sent to Sonatype.', function () {
           me.getList().getEl().mask('Exporting event data...');
-          NX.direct.analytics_Events.export(function (response) {
+          NX.direct.analytics_Events.export_(function (response) {
             me.getList().getEl().unmask();
             if (Ext.isObject(response) && response.success) {
               Ext.widget('nx-coreui-analytics-eventszipcreated').setValues(response.data);
@@ -166,7 +172,7 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
             NX.util.DownloadHelper.downloadUrl(NX.util.Url.urlOf(
                 'service/siesta/wonderland/download/' + fileName + '?t=' + NX.util.Base64.encode(authToken)
             ));
-            win.close()
+            win.close();
           }
         }
     );

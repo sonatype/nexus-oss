@@ -133,7 +133,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:privileges:delete')
   @Validate
-  void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void delete_(final @NotEmpty(message = '[id] may not be empty') String id) {
     AuthorizationManager authorizationManager = securitySystem.getAuthorizationManager(DEFAULT_SOURCE)
     if (authorizationManager.getPrivilege(id)?.isReadOnly()) {
       throw new IllegalAccessException("Privilege [${id}] is readonly and cannot be deleted")

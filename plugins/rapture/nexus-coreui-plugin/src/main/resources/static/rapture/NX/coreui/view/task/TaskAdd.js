@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Add task window.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.coreui.view.task.TaskAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-task-add',
+  requires: [
+      'NX.Conditions'
+  ],
 
   title: 'Create new task',
 
@@ -63,7 +68,7 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
                 mode: 'local',
                 triggerAction: 'all',
                 emptyText: 'Select...',
-                selectOnFocus: false,
+                selectOnFocus: false
               },
               {
                 xtype: 'checkbox',
@@ -126,5 +131,4 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
       }
     });
   }
-
 });

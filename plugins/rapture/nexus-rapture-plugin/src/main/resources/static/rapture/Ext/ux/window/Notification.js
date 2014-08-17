@@ -1,4 +1,5 @@
 // NOTE: Electing MIT license
+/*global Ext*/
 
 /*
  *	Notification extension for Ext JS 4.0.2+

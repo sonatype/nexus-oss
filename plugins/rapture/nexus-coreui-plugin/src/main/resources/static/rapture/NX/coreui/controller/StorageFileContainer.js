@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Storage File Container controller.
  *
@@ -17,6 +19,9 @@
  */
 Ext.define('NX.coreui.controller.StorageFileContainer', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'Ext.window.Window'
+  ],
 
   views: [
     'repositorybrowse.StorageFileContainer'
@@ -32,7 +37,7 @@ Ext.define('NX.coreui.controller.StorageFileContainer', {
     var me = this;
 
     me.getApplication().getIconController().addIcons({
-      'repository-item-type-default': { file: 'file_extension_default.png', variants: ['x16', 'x24', 'x32'] },
+      'repository-item-type-default': { file: 'file_extension_default.png', variants: ['x16', 'x32'] },
       'repository-item-type-md5': { file: 'file_extension_checksum.png', variants: ['x16', 'x32'] },
       'repository-item-type-jar': { file: 'file_extension_jar.png', variants: ['x16', 'x32'] },
       'repository-item-type-pom': { file: 'file_extension_xml.png', variants: ['x16', 'x32'] },
@@ -61,7 +66,7 @@ Ext.define('NX.coreui.controller.StorageFileContainer', {
 
     storageFileContainer.up('container').remove(storageFileContainer, false);
     storageFileContainer.getHeader().hide();
-    win = new Ext.window.Window({
+    win = Ext.create('Ext.window.Window', {
       maximized: true,
       autoScroll: true,
       closable: false,

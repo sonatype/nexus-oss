@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Message controller.
  *
@@ -18,6 +20,7 @@
 Ext.define('NX.controller.Message', {
   extend: 'Ext.app.Controller',
   requires: [
+    'NX.Icons',
     'NX.Messages'
   ],
 
@@ -155,7 +158,7 @@ Ext.define('NX.controller.Message', {
         store = me.getMessageStore();
 
     if (!message.type) {
-      message.type = 'default'
+      message.type = 'default';
     }
 
     message.timestamp = new Date();

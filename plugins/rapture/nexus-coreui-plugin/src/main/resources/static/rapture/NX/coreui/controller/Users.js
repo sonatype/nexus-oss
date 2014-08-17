@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Users controller.
  *
@@ -17,6 +19,13 @@
  */
 Ext.define('NX.coreui.controller.Users', {
   extend: 'NX.controller.MasterDetail',
+  requires: [
+    'NX.State',
+    'NX.Permissions',
+    'NX.Security',
+    'NX.Icons',
+    'NX.Messages'
+  ],
 
   list: 'nx-coreui-user-list',
 
@@ -328,7 +337,7 @@ Ext.define('NX.coreui.controller.Users', {
             NX.Conditions.isPermitted(me.permission, 'delete'),
             NX.Conditions.gridHasSelection(me.list, function (model) {
               var userId = model.getId();
-              return (userId !== NX.State.getUser().id) && (userId != NX.State.getValue('anonymousUsername'));
+              return (userId !== NX.State.getUser().id) && (userId !== NX.State.getValue('anonymousUsername'));
             })
         ),
         {
@@ -349,7 +358,7 @@ Ext.define('NX.coreui.controller.Users', {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.coreui_User.delete(model.getId(), model.get('realm'), function (response) {
+    NX.direct.coreui_User.delete_(model.getId(), model.get('realm'), function (response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({

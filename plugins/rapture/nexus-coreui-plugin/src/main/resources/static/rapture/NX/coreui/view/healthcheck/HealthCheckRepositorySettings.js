@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Health Check repository settings form.
  *
@@ -18,64 +20,67 @@
 Ext.define('NX.coreui.view.healthcheck.HealthCheckRepositorySettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-healthcheck-repository-settings',
+  requires: [
+    'NX.Conditions'
+  ],
 
   config: {
     active: false,
     repository: undefined
   },
 
-  items: [
-    {
-      xtype: 'nx-settingsform',
-      paramOrder: ['repositoryId'],
-      api: {
-        load: 'NX.direct.healthcheck_Status.readForRepository',
-        submit: 'NX.direct.healthcheck_Status.update'
-      },
-      settingsFormSuccessMessage: 'Health Check Repository Settings $action',
-      editableCondition: NX.Conditions.isPermitted('nexus:healthcheck', 'update'),
-      editableMarker: 'You do not have permission to update health check repository settings',
-
-      items: [
-        {
-          xtype: 'hiddenfield',
-          name: 'repositoryId'
-        },
-        {
-          xtype: 'checkbox',
-          name: 'eulaAccepted',
-          hidden: true
-        },
-        {
-          xtype: 'checkbox',
-          name: 'enabled',
-          fieldLabel: 'Enable',
-          helpText: 'Enable analysis of this repository for security vulnerabilities and license issues.'
-        }
-      ]
-    },
-    {
-      xtype: 'form',
-      itemId: 'statusForm',
-      title: 'Status',
-      frame: true,
-      hidden: true,
-
-      bodyPadding: 10,
-      margin: 10,
-
-      items: {
-        xtype: 'displayfield',
-        name: 'status'
-      }
-    }
-  ],
-
   /**
    * @override
    */
   initComponent: function() {
     var me = this;
+
+    me.items = [
+      {
+        xtype: 'nx-settingsform',
+        paramOrder: ['repositoryId'],
+        api: {
+          load: 'NX.direct.healthcheck_Status.readForRepository',
+          submit: 'NX.direct.healthcheck_Status.update'
+        },
+        settingsFormSuccessMessage: 'Health Check Repository Settings $action',
+        editableCondition: NX.Conditions.isPermitted('nexus:healthcheck', 'update'),
+        editableMarker: 'You do not have permission to update health check repository settings',
+
+        items: [
+          {
+            xtype: 'hiddenfield',
+            name: 'repositoryId'
+          },
+          {
+            xtype: 'checkbox',
+            name: 'eulaAccepted',
+            hidden: true
+          },
+          {
+            xtype: 'checkbox',
+            name: 'enabled',
+            fieldLabel: 'Enable',
+            helpText: 'Enable analysis of this repository for security vulnerabilities and license issues.'
+          }
+        ]
+      },
+      {
+        xtype: 'form',
+        itemId: 'statusForm',
+        title: 'Status',
+        frame: true,
+        hidden: true,
+
+        bodyPadding: 10,
+        margin: 10,
+
+        items: {
+          xtype: 'displayfield',
+          name: 'status'
+        }
+      }
+    ];
 
     me.callParent(arguments);
     Ext.override(me.down('nx-settingsform'), {

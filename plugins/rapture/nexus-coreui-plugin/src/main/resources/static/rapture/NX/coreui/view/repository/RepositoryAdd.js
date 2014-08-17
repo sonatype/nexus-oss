@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Add repository window.
  *
@@ -18,14 +20,18 @@
 Ext.define('NX.coreui.view.repository.RepositoryAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-repository-add',
+  requires: [
+    'NX.Conditions'
+  ],
 
-  editableCondition: NX.Conditions.isPermitted('nexus:repositories', 'create'),
   editableMarker: 'You do not have permission to create repositories',
 
   defaultFocus: 'id',
 
   initComponent: function () {
     var me = this;
+
+    me.editableCondition = NX.Conditions.isPermitted('nexus:repositories', 'create');
 
     me.callParent(arguments);
 
@@ -37,6 +43,4 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
       value: me.template.id
     });
   }
-
-
 });

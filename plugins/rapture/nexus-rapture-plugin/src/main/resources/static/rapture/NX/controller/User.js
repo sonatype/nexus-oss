@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Logged in user controller.
  *
@@ -18,7 +20,9 @@
 Ext.define('NX.controller.User', {
   extend: 'Ext.app.Controller',
   requires: [
-    'NX.util.Base64'
+    'NX.util.Base64',
+    'NX.Messages',
+    'NX.State'
   ],
   mixins: {
     logAware: 'NX.LogAware'

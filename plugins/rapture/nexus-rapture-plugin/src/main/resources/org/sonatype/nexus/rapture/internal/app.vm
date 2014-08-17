@@ -10,37 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  *###
-Ext.Loader.setConfig({
-  enabled: true,
-  paths: {
-    NX: 'static/rapture/NX' ## relative to /index.html
-  }
-});
 
-Ext.ns('NX.app');
+## require all plugins
+#foreach($pluginConfig in $pluginConfigs)
+  Ext.require('$pluginConfig');
+#end
 
-## Configure application plugin muck
-NX.app.pluginConfigClassNames = [$pluginConfigClassNames];
-Ext.each(NX.app.pluginConfigClassNames, function(className) {
-  Ext.require(className);
-});
-
-## configure basics
-NX.app.baseUrl = '$baseUrl';
-
-## initial state
-NX.app.state = $state;
-
-## Set the debug flag if allowed
-NX.app.debug = false;
-if (window.location.search === '?debug') {
-  if (NX.app.state.uiSettings.value.debugAllowed) {
-    console.log('Debug mode enabled');
-    NX.app.debug = true;
-  }
-  else {
-    console.warn('Debug mode disallowed');
-  }
-}
-
-Ext.application('NX.app.Application');
+## load the application
+Ext.require('NX.app.Loader', function(Loader) {
+  new Loader().load({
+    pluginConfigs: [
+      #foreach($pluginConfig in $pluginConfigs)
+        '$pluginConfig'#if($foreach.hasNext),#end
+      #end
+    ],
+    state: $state
+  });
+})

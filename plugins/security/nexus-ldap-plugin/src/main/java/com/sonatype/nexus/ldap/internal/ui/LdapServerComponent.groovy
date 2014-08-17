@@ -146,7 +146,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:ldapconfig:delete')
   @Validate
-  void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void delete_(final @NotEmpty(message = '[id] may not be empty') String id) {
     ldapConfigurationManager.deleteLdapServerConfiguration(id)
   }
 

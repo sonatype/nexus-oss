@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -10,40 +10,33 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+package org.sonatype.nexus.coreui.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.coreui.CoreUiPlugin;
+import org.sonatype.nexus.rapture.UiPluginDescriptor;
+import org.sonatype.nexus.rapture.UiPluginDescriptorSupport;
+
+import org.eclipse.sisu.Priority;
+
 /**
- * Styles for app loading indicator.
+ * Rapture {@link UiPluginDescriptor} for {@code nexus-coreui-plugin}.
+ *
+ * @since 3.0
  */
-
-#loading-mask {
-  background-color: black;
-  height: 100%;
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  z-index: 20000;
-}
-
-#loading {
-  height: auto;
-  position: absolute;
-  top:50%;
-  left:50%;
-  padding: 2px;
-  margin:-360px 0 0 -425px;
-  z-index: 20001;
-}
-
-#loading .loading-indicator {
-  background: black;
-  color: #444;
-  font: bold 12px arial, tahoma, verdana, helvetica, sans-serif;
-  height: auto;
-  margin: 0;
-  padding: 10px;
-}
-
-#loading-msg {
-  font-size: 18px;
-  font-weight: normal;
+@Named
+@Singleton
+@Priority(Integer.MAX_VALUE - 100) // after nexus-rapture-plugin
+public class UiPluginDescriptorImpl
+  extends UiPluginDescriptorSupport
+{
+  @Inject
+  public UiPluginDescriptorImpl(final CoreUiPlugin owner) {
+    super(owner);
+    setNamespace("NX.coreui");
+    setConfigClassName("NX.coreui.app.PluginConfig");
+  }
 }

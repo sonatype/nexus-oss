@@ -10,6 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext*/
+/*jslint bitwise: true*/
+
 /**
  * Permissions helper.
  *
@@ -85,7 +88,7 @@ Ext.define('NX.Permissions', {
       });
     }
 
-    return ((p & pVal) == p);
+    return ((p & pVal) === p);
   },
 
   /**
@@ -96,7 +99,7 @@ Ext.define('NX.Permissions', {
     if (!Ext.isDefined(value)) {
       return me.ALL;
     }
-    return Ext.isNumber(value) ? value : me[value.toUpperCase()]
+    return Ext.isNumber(value) ? value : me[value.toUpperCase()];
   }
 
 });

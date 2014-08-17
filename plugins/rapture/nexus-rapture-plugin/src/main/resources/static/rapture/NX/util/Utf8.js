@@ -10,6 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext*/
+/*jslint bitwise: true, plusplus: true*/
+
 /**
  * UTF8 related utils.
  *
@@ -23,11 +26,12 @@ Ext.define('NX.util.Utf8', {
    */
   encode: function (string) {
     var utftext = "",
-        c;
+        c,
+        n;
 
     string = string.replace(/\r\n/g, "\n");
 
-    for (var n = 0; n < string.length; n++) {
+    for (n = 0; n < string.length; n++) {
       c = string.charCodeAt(n);
 
       if (c < 128) {

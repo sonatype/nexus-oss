@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * HealthCheck search contribution controller.
  *
@@ -18,6 +20,7 @@
 Ext.define('NX.coreui.controller.HealthCheckSearch', {
   extend: 'Ext.app.Controller',
   requires: [
+    'Ext.grid.column.Column',
     'NX.Conditions',
     'NX.util.Url'
   ],
@@ -85,7 +88,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
       me.getSearchResultVersionStore().each(function(searchResultVersionModel) {
         groupId = searchResultVersionModel.get('groupId');
         artifactId = searchResultVersionModel.get('artifactId');
-        if (versions.indexOf(searchResultVersionModel.get('version')) == -1) {
+        if (versions.indexOf(searchResultVersionModel.get('version')) === -1) {
           versions.push(searchResultVersionModel.get('version'));
         }
       });
@@ -209,7 +212,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
         result = me.renderNotAvailable(metadata);
       }
     }
-    return '<div ' + (metadata.tdAttr ? metadata.tdAttr : '') + '>' + result + '</div>';
+    return '<div ' + (metadata.tdAttr || '') + '>' + result + '</div>';
   },
 
   /**

@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Task Schedule Once field set.
  *
@@ -18,7 +20,13 @@
 Ext.define('NX.coreui.view.task.TaskScheduleOnce', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-task-schedule-once',
+  requires: [
+    'NX.util.DateFormat'
+  ],
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this;
 

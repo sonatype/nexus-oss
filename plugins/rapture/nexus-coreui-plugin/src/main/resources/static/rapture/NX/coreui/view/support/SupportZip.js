@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Support Zip panel.
  *
@@ -18,99 +20,110 @@
 Ext.define('NX.coreui.view.support.SupportZip', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-support-supportzip',
+  requires: [
+    'NX.Conditions'
+  ],
 
-  items: {
-    xtype: 'nx-settingsform',
-    settingsFormSubmitMessage: 'Creating support ZIP...',
-    settingsFormSuccessMessage: 'Support ZIP created',
-    api: {
-      submit: 'NX.direct.atlas_SupportZip.create'
-    },
-    editableCondition: NX.Conditions.isPermitted('nexus:atlas', 'create'),
-    editableMarker: 'You do not have permission to create a support ZIP',
-    items: [
-      {
-        xtype: 'label',
-        html: '<div>No information will be sent to Sonatype when creating the support ZIP file.' +
-            '<br/><br/>Select the contents and options for support ZIP creation:<br/><br/></div>'
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
+
+    me.items = {
+      xtype: 'nx-settingsform',
+      settingsFormSubmitMessage: 'Creating support ZIP...',
+      settingsFormSuccessMessage: 'Support ZIP created',
+      api: {
+        submit: 'NX.direct.atlas_SupportZip.create'
       },
-      {
-        xtype: 'checkboxgroup',
-        fieldLabel: 'Contents',
-        columns: 1,
-        allowBlank: false,
-        items: [
-          {
-            xtype: 'checkbox',
-            name: 'systemInformation',
-            boxLabel: 'Includes system information report',
-            checked: true
-          },
-          {
-            xtype: 'checkbox',
-            name: 'threadDump',
-            boxLabel: 'Include a JVM thread-dump',
-            checked: true
-          },
-          {
-            xtype: 'checkbox',
-            name: 'configuration',
-            boxLabel: 'Include configuration files',
-            checked: true
-          },
-          {
-            xtype: 'checkbox',
-            name: 'security',
-            boxLabel: 'Include security configuration files',
-            checked: true
-          },
-          {
-            xtype: 'checkbox',
-            name: 'log',
-            boxLabel: 'Include log files',
-            checked: true
-          },
-          {
-            xtype: 'checkbox',
-            name: 'metrics',
-            boxLabel: 'Includes system and component metrics',
-            checked: true
-          }
-        ]
-      },
-      {
-        xtype: 'checkboxgroup',
-        fieldLabel: 'Options',
-        allowBlank: true,
-        columns: 1,
-        items: [
-          {
-            xtype: 'checkbox',
-            name: 'limitFileSizes',
-            boxLabel: 'Limit the size of files included in the support ZIP to no more than 30 MB each.',
-            checked: true
-          },
-          {
-            xtype: 'checkbox',
-            name: 'limitZipSize',
-            boxLabel: 'Limit the maximum size of the support ZIP file to no more than 20 MB.',
-            checked: true
-          }
-        ]
-      }
-    ],
+      editableCondition: NX.Conditions.isPermitted('nexus:atlas', 'create'),
+      editableMarker: 'You do not have permission to create a support ZIP',
+      items: [
+        {
+          xtype: 'label',
+          html: '<div>No information will be sent to Sonatype when creating the support ZIP file.' +
+              '<br/><br/>Select the contents and options for support ZIP creation:<br/><br/></div>'
+        },
+        {
+          xtype: 'checkboxgroup',
+          fieldLabel: 'Contents',
+          columns: 1,
+          allowBlank: false,
+          items: [
+            {
+              xtype: 'checkbox',
+              name: 'systemInformation',
+              boxLabel: 'Includes system information report',
+              checked: true
+            },
+            {
+              xtype: 'checkbox',
+              name: 'threadDump',
+              boxLabel: 'Include a JVM thread-dump',
+              checked: true
+            },
+            {
+              xtype: 'checkbox',
+              name: 'configuration',
+              boxLabel: 'Include configuration files',
+              checked: true
+            },
+            {
+              xtype: 'checkbox',
+              name: 'security',
+              boxLabel: 'Include security configuration files',
+              checked: true
+            },
+            {
+              xtype: 'checkbox',
+              name: 'log',
+              boxLabel: 'Include log files',
+              checked: true
+            },
+            {
+              xtype: 'checkbox',
+              name: 'metrics',
+              boxLabel: 'Includes system and component metrics',
+              checked: true
+            }
+          ]
+        },
+        {
+          xtype: 'checkboxgroup',
+          fieldLabel: 'Options',
+          allowBlank: true,
+          columns: 1,
+          items: [
+            {
+              xtype: 'checkbox',
+              name: 'limitFileSizes',
+              boxLabel: 'Limit the size of files included in the support ZIP to no more than 30 MB each.',
+              checked: true
+            },
+            {
+              xtype: 'checkbox',
+              name: 'limitZipSize',
+              boxLabel: 'Limit the maximum size of the support ZIP file to no more than 20 MB.',
+              checked: true
+            }
+          ]
+        }
+      ],
 
-    buttonAlign: 'left',
+      buttonAlign: 'left',
 
-    buttons: [
-      {
-        text: 'Create',
-        formBind: true,
-        glyph: 'xf019@FontAwesome' /* fa-download */,
-        action: 'save',
-        ui: 'primary'
-      }
-    ]
+      buttons: [
+        {
+          text: 'Create',
+          formBind: true,
+          glyph: 'xf019@FontAwesome' /* fa-download */,
+          action: 'save',
+          ui: 'primary'
+        }
+      ]
+    };
+
+    me.callParent();
   }
-
 });

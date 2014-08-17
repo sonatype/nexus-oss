@@ -10,6 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+/*jslint plusplus: true*/
+
 /**
  * @since 3.0
  */
@@ -64,6 +67,11 @@ Ext.define('NX.util.condition.Condition', {
          */
         'unsatisfied'
     );
+  },
+
+  // HACK: comment the following lines to let debug messages flow
+  logDebug: function () {
+    // empty
   },
 
   /**
@@ -180,9 +188,4 @@ Ext.define('NX.util.condition.Condition', {
       me.unbind();
     }
   }
-
-  // comment the following lines to let debug messages flow
-  , logDebug: function () {
-  }
-
 });

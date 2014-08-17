@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Menu controller.
  *
@@ -19,7 +21,11 @@ Ext.define('NX.controller.Menu', {
   extend: 'Ext.app.Controller',
   requires: [
     'NX.Bookmarks',
-    'NX.controller.User'
+    'NX.controller.User',
+    'NX.controller.Features',
+    'NX.Permissions',
+    'NX.Security',
+    'NX.State'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -27,7 +33,6 @@ Ext.define('NX.controller.Menu', {
 
   views: [
     'feature.Menu',
-    'feature.TODO',
     'feature.NotFound',
     'feature.NotVisible',
     'header.DashboardMode',
@@ -161,7 +166,10 @@ Ext.define('NX.controller.Menu', {
     if ((path !== me.currentSelectedPath) || featureMenuModel.get('group')) {
       me.currentSelectedPath = path;
 
+      //<if debug>
       me.logDebug('Selected feature: ' + path);
+      //</if>
+
       if (!featureMenuModel.get('href')) {
         me.selectFeature(me.getFeatureStore().getById(featureMenuModel.get('path')));
         me.populateFeatureGroupStore(featureMenuModel);
@@ -217,7 +225,10 @@ Ext.define('NX.controller.Menu', {
 
     if (bookmark) {
       menuBookmark = bookmark.getSegment(0);
+
+      //<if debug>
       me.logDebug('Navigate to: ' + menuBookmark);
+      //</if>
 
       mode = me.getMode(bookmark);
       // if we are navigating to a new mode, sync it
@@ -236,7 +247,10 @@ Ext.define('NX.controller.Menu', {
           me.refreshModes();
         }
         node = me.getFeatureMenuStore().getRootNode().firstChild;
+
+        //<if debug>
         me.logDebug('Automatically selected: ' + node.get('bookmark'));
+        //</if>
       }
       // select the bookmarked feature in menu, if available
       if (node) {
@@ -255,7 +269,9 @@ Ext.define('NX.controller.Menu', {
         me.getFeatureMenu().getSelectionModel().deselectAll();
         if (feature) {
           if (feature.get('authenticationRequired') && NX.Permissions.available()) {
+            //<if debug>
             me.logDebug('Asking user to authenticate as feature exists but is not visible');
+            //</if>
             NX.Security.askToAuthenticate();
           }
           me.selectFeature(me.createNotAvailableFeature(feature));
@@ -315,7 +331,9 @@ Ext.define('NX.controller.Menu', {
   refreshMenu: function () {
     var me = this;
 
+    //<if debug>
     me.logDebug('Refreshing menu (mode ' + me.mode + ')');
+    //</if>
 
     me.refreshVisibleModes();
     me.refreshTree();
@@ -340,7 +358,9 @@ Ext.define('NX.controller.Menu', {
       }
     });
 
+    //<if debug>
     me.logDebug('Visible modes: ' + visibleModes);
+    //</if>
 
     Ext.each(me.availableModes, function (button) {
       button.toggle(false, true);
@@ -418,7 +438,9 @@ Ext.define('NX.controller.Menu', {
         groupsToRemove = [],
         feature, segments, parent, child, modeButton;
 
+    //<if debug>
     me.logDebug('Refreshing tree (mode ' + me.mode + ')');
+    //</if>
 
     Ext.suspendLayouts();
 
@@ -434,7 +456,7 @@ Ext.define('NX.controller.Menu', {
     me.getFeatureStore().each(function (rec) {
       feature = rec.getData();
       // iterate only visible features
-      if ((me.mode == feature.mode) && feature.visible()) {
+      if ((me.mode === feature.mode) && feature.visible()) {
         segments = feature.path.split('/');
         parent = me.getFeatureMenuStore().getRootNode();
         for (var i = 2; i < segments.length; i++) {
@@ -542,7 +564,10 @@ Ext.define('NX.controller.Menu', {
   changeMode: function (mode) {
     var me = this;
 
+    //<if debug>
     me.logDebug('Mode changed: ' + mode);
+    //</if>
+
     me.mode = mode;
     me.refreshTree();
     me.toggleMenu();
@@ -579,7 +604,10 @@ Ext.define('NX.controller.Menu', {
       }
       return true;
     });
+
+    //<if debug>
     me.logDebug('Auto selecting mode: ' + me.mode);
+    //</if>
   },
 
   refreshModes: function () {

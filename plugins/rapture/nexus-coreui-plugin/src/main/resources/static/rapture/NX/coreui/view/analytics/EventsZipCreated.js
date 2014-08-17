@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Events ZIP created window.
  *
@@ -18,8 +20,20 @@
 Ext.define('NX.coreui.view.analytics.EventsZipCreated', {
   extend: 'NX.coreui.view.support.FileCreated',
   alias: 'widget.nx-coreui-analytics-eventszipcreated',
+  requires: [
+    'NX.Icons'
+  ],
 
   fileType: 'Events ZIP',
-  fileIcon: NX.Icons.img('analyticsevent-zip', 'x32')
 
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
+
+    me.fileIcon = NX.Icons.img('analyticsevent-zip', 'x32');
+
+    me.callParent();
+  }
 });

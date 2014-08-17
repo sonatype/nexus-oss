@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Add user window.
  *
@@ -18,24 +20,30 @@
 Ext.define('NX.coreui.view.user.UserAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-user-add',
+  requires: [
+    'NX.Conditions'
+  ],
 
   title: 'Create new user',
   defaultFocus: 'id',
 
-  items: {
-    xtype: 'nx-coreui-user-settings',
-    api: {
-      submit: 'NX.direct.coreui_User.create'
-    },
-    settingsFormSuccessMessage: function (data) {
-      return 'User created: ' + data['id'];
-    },
-    editableCondition: NX.Conditions.isPermitted('security:users', 'create'),
-    editableMarker: 'You do not have permission to create users'
-  },
-
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this;
+
+    me.items = {
+      xtype: 'nx-coreui-user-settings',
+      api: {
+        submit: 'NX.direct.coreui_User.create'
+      },
+      settingsFormSuccessMessage: function (data) {
+        return 'User created: ' + data['id'];
+      },
+      editableCondition: NX.Conditions.isPermitted('security:users', 'create'),
+      editableMarker: 'You do not have permission to create users'
+    };
 
     me.callParent(arguments);
 
@@ -57,7 +65,7 @@ Ext.define('NX.coreui.view.user.UserAdd', {
         submitValue: false,
         validator: function () {
           var me = this;
-          return (me.up('form').down('#password').getValue() === me.getValue()) ? true : 'Passwords don\'t match';
+          return (me.up('form').down('#password').getValue() === me.getValue()) ? true : 'Passwords do not match';
         }
       }
     ]);

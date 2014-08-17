@@ -1,3 +1,5 @@
+/*global Ext, window*/
+
 /**
  * @class Ext.ux.ActivityMonitor
  * @author Arthur Kay (http://www.akawebdesign.com)

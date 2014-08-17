@@ -165,7 +165,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:roles:delete')
   @Validate
-  void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void delete_(final @NotEmpty(message = '[id] may not be empty') String id) {
     securitySystem.getAuthorizationManager(DEFAULT_SOURCE).deleteRole(id)
   }
 

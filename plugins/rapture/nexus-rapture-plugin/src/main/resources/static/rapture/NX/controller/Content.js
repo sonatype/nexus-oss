@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Content (features area) controller.
  *
@@ -80,7 +82,7 @@ Ext.define('NX.controller.Content', {
     content.setIconCls(NX.Icons.cls(iconName, 'x32'));
 
     // set browser title
-    document.title = text + ' - ' + NX.State.getValue('uiSettings').title;
+    NX.global.document.title = text + ' - ' + NX.State.getValue('uiSettings').title;
 
     // update description
     if (description === undefined) {

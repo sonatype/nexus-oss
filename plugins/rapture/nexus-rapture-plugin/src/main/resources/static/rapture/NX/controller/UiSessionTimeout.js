@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * UI Session Timeout controller.
  *
@@ -19,7 +21,9 @@ Ext.define('NX.controller.UiSessionTimeout', {
   extend: 'Ext.app.Controller',
   requires: [
     'Ext.ux.ActivityMonitor',
-    'NX.Security'
+    'NX.Messages',
+    'NX.Security',
+    'NX.State'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -150,7 +154,7 @@ Ext.define('NX.controller.UiSessionTimeout', {
     me.expirationTicker = Ext.util.TaskManager.newTask({
       run: function (count) {
         win.down('label').setText('Session will expire in ' + (me.SECONDS_TO_EXPIRE - count) + ' seconds');
-        if (count == me.SECONDS_TO_EXPIRE) {
+        if (count === me.SECONDS_TO_EXPIRE) {
           win.close();
           NX.Messages.add({
             text: 'Session expired after being inactive for '

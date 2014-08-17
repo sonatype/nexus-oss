@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext*/
+
 /**
  * A search box.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.ext.SearchBox', {
   extend: 'Ext.form.field.Trigger',
   alias: 'widget.nx-searchbox',
+  requires: [
+    'Ext.util.KeyNav'
+  ],
 
   emptyText: 'search',
   submitValue: false,
@@ -28,7 +33,6 @@ Ext.define('NX.ext.SearchBox', {
   searchDelay: 1000,
 
   // TODO: Only show clear trigger if we have text
-  // use custom (x) trigger art, so that custom (-) in search ui looks okay next to it
   trigger1Cls: 'nx-form-fa-times-circle-trigger',
 
   /**
@@ -118,7 +122,7 @@ Ext.define('NX.ext.SearchBox', {
       me.search(value);
     }
     else {
-      me.clearSearch()
+      me.clearSearch();
     }
   },
 
@@ -130,7 +134,7 @@ Ext.define('NX.ext.SearchBox', {
   search: function (value) {
     var me = this;
 
-    if (value != me.getValue()) {
+    if (value !== me.getValue()) {
       me.setValue(value);
     }
     else {

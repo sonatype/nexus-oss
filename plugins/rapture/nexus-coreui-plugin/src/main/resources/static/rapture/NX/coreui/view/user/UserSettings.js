@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * User settings form.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.coreui.view.user.UserSettings', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-user-settings',
+  requires: [
+    'NX.Conditions'
+  ],
 
   api: {
     submit: 'NX.direct.coreui_User.update'
@@ -25,11 +30,13 @@ Ext.define('NX.coreui.view.user.UserSettings', {
   settingsFormSuccessMessage: function (data) {
     return 'User updated: ' + data['id'];
   },
-  editableCondition: NX.Conditions.isPermitted('security:users', 'update'),
+
   editableMarker: 'You do not have permission to update users',
 
   initComponent: function () {
     var me = this;
+
+    me.editableCondition = NX.Conditions.isPermitted('security:users', 'update');
 
     me.items = [
       {

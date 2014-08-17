@@ -126,7 +126,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:targets:delete')
   @Validate
-  void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void delete_(final @NotEmpty(message = '[id] may not be empty') String id) {
     targetRegistry.removeRepositoryTarget(id)
     nexusConfiguration.saveConfiguration()
   }

@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Routing proxy repository settings form.
  *
@@ -18,139 +20,143 @@
 Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-routing-proxy-repository-settings',
+  require: [
+    'NX.Conditions',
+    'NX.util.Url'
+  ],
 
   config: {
     active: false,
     repository: undefined
   },
 
-  items: [
-    {
-      xtype: 'nx-settingsform',
-      paramOrder: ['repositoryId'],
-      api: {
-        load: 'NX.direct.coreui_RoutingRepositorySettings.read',
-        submit: 'NX.direct.coreui_RoutingRepositorySettings.update'
-      },
-      settingsFormSuccessMessage: 'Routing Repository Settings $action',
-      editableCondition: NX.Conditions.isPermitted('nexus:repositories', 'update'),
-      editableMarker: 'You do not have permission to update routing repository settings',
-
-      items: [
-        {
-          xtype: 'hiddenfield',
-          name: 'repositoryId'
-        },
-        {
-          xtype: 'checkbox',
-          name: 'discoveryEnabled',
-          itemId: 'discoveryEnabled',
-          fieldLabel: 'Enable discovery',
-          helpText: 'Enable routing discovery.',
-          value: true
-        },
-        {
-          xtype: 'combo',
-          name: 'discoveryInterval',
-          itemId: 'discoveryInterval',
-          fieldLabel: 'Update interval',
-          helpText: 'Interval between routing discovery runs.',
-          emptyText: 'Select...',
-          editable: false,
-          value: 24,
-          store: [
-            [1, '1 hr'],
-            [2, '2 hr'],
-            [3, '3 hr'],
-            [6, '6 hr'],
-            [9, '9 hr'],
-            [12, '12 hr'],
-            [24, 'Daily'],
-            [168, 'Weekly']
-          ],
-          queryMode: 'local'
-        }
-      ]
-    },
-    {
-      xtype: 'form',
-      itemId: 'publishStatusForm',
-      title: 'Publish Status',
-      frame: true,
-      hidden: true,
-
-      bodyPadding: 10,
-      margin: 10,
-
-      items: [
-        {
-          xtype: 'displayfield',
-          name: 'publishStatus',
-          hideIfUndefined: true,
-          hidden: true
-        },
-        {
-          xtype: 'displayfield',
-          name: 'publishMessage',
-          hideIfUndefined: true,
-          hidden: true
-        },
-        {
-          xtype: 'nx-datedisplayfield',
-          name: 'publishTimestamp',
-          fieldLabel: 'Published On',
-          helpText: 'Time when routing data was published.',
-          hideIfUndefined: true,
-          hidden: true
-        },
-        {
-          xtype: 'displayfield',
-          name: 'publishUrl',
-          hideIfUndefined: true,
-          hidden: true
-        }
-      ]
-    },
-    {
-      xtype: 'form',
-      itemId: 'discoveryStatusForm',
-      title: 'Discovery Status',
-      frame: true,
-      hidden: true,
-
-      bodyPadding: 10,
-      margin: 10,
-
-      items: [
-        {
-          xtype: 'displayfield',
-          name: 'discoveryStatus',
-          hideIfUndefined: true,
-          hidden: true
-        },
-        {
-          xtype: 'displayfield',
-          name: 'discoveryMessage',
-          hideIfUndefined: true,
-          hidden: true
-        },
-        {
-          xtype: 'nx-datedisplayfield',
-          name: 'discoveryTimestamp',
-          fieldLabel: 'Last Run',
-          helpText: 'Time when discovery process was last run.',
-          hideIfUndefined: true,
-          hidden: true
-        }
-      ]
-    }
-  ],
-
   /**
    * @override
    */
   initComponent: function () {
     var me = this;
+
+    me.items = [
+      {
+        xtype: 'nx-settingsform',
+        paramOrder: ['repositoryId'],
+        api: {
+          load: 'NX.direct.coreui_RoutingRepositorySettings.read',
+          submit: 'NX.direct.coreui_RoutingRepositorySettings.update'
+        },
+        settingsFormSuccessMessage: 'Routing Repository Settings $action',
+        editableCondition: NX.Conditions.isPermitted('nexus:repositories', 'update'),
+        editableMarker: 'You do not have permission to update routing repository settings',
+
+        items: [
+          {
+            xtype: 'hiddenfield',
+            name: 'repositoryId'
+          },
+          {
+            xtype: 'checkbox',
+            name: 'discoveryEnabled',
+            itemId: 'discoveryEnabled',
+            fieldLabel: 'Enable discovery',
+            helpText: 'Enable routing discovery.',
+            value: true
+          },
+          {
+            xtype: 'combo',
+            name: 'discoveryInterval',
+            itemId: 'discoveryInterval',
+            fieldLabel: 'Update interval',
+            helpText: 'Interval between routing discovery runs.',
+            emptyText: 'Select...',
+            editable: false,
+            value: 24,
+            store: [
+              [1, '1 hr'],
+              [2, '2 hr'],
+              [3, '3 hr'],
+              [6, '6 hr'],
+              [9, '9 hr'],
+              [12, '12 hr'],
+              [24, 'Daily'],
+              [168, 'Weekly']
+            ],
+            queryMode: 'local'
+          }
+        ]
+      },
+      {
+        xtype: 'form',
+        itemId: 'publishStatusForm',
+        title: 'Publish Status',
+        frame: true,
+        hidden: true,
+
+        bodyPadding: 10,
+        margin: 10,
+
+        items: [
+          {
+            xtype: 'displayfield',
+            name: 'publishStatus',
+            hideIfUndefined: true,
+            hidden: true
+          },
+          {
+            xtype: 'displayfield',
+            name: 'publishMessage',
+            hideIfUndefined: true,
+            hidden: true
+          },
+          {
+            xtype: 'nx-datedisplayfield',
+            name: 'publishTimestamp',
+            fieldLabel: 'Published On',
+            helpText: 'Time when routing data was published.',
+            hideIfUndefined: true,
+            hidden: true
+          },
+          {
+            xtype: 'displayfield',
+            name: 'publishUrl',
+            hideIfUndefined: true,
+            hidden: true
+          }
+        ]
+      },
+      {
+        xtype: 'form',
+        itemId: 'discoveryStatusForm',
+        title: 'Discovery Status',
+        frame: true,
+        hidden: true,
+
+        bodyPadding: 10,
+        margin: 10,
+
+        items: [
+          {
+            xtype: 'displayfield',
+            name: 'discoveryStatus',
+            hideIfUndefined: true,
+            hidden: true
+          },
+          {
+            xtype: 'displayfield',
+            name: 'discoveryMessage',
+            hideIfUndefined: true,
+            hidden: true
+          },
+          {
+            xtype: 'nx-datedisplayfield',
+            name: 'discoveryTimestamp',
+            fieldLabel: 'Last Run',
+            helpText: 'Time when discovery process was last run.',
+            hideIfUndefined: true,
+            hidden: true
+          }
+        ]
+      }
+    ];
 
     me.callParent(arguments);
 
