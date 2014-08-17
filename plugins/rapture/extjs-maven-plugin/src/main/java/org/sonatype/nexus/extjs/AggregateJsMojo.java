@@ -93,6 +93,7 @@ public class AggregateJsMojo
     }
     List<ClassDef> classes = scanner.scan(files);
 
+    getLog().info("Writing: " + outputFile);
     Writer output = new BufferedWriter(new FileWriter(outputFile));
     try {
       for (ClassDef def : classes) {
@@ -105,6 +106,7 @@ public class AggregateJsMojo
   }
 
   private void write(final File source, final Writer output) throws IOException {
+    getLog().debug("Including: " + source);
     Reader input = new BufferedReader(new FileReader(source));
     try {
       IOUtil.copy(input, output);
