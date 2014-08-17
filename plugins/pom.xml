@@ -32,8 +32,10 @@
     <copyright.year>2013</copyright.year>
 
     <!--
-    Default YUI compressor settings to generated optimized "prod" aggregate sources.
+    Default optimization settings for optimized "prod" aggregate sources.
     -->
+    <extjs.noomit>false</extjs.noomit>
+    <extjs.omit.debug>true</extjs.omit.debug>
     <maven.yuicompressor.nomunge>false</maven.yuicompressor.nomunge>
     <maven.yuicompressor.nominify>false</maven.yuicompressor.nominify>
     <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
@@ -453,6 +455,9 @@
               <configuration>
                 <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
                 <outputFile>${project.build.outputDirectory}/static/rapture/${project.artifactId}-debug.js</outputFile>
+                <omitFlags>
+                  <debug>${extjs.omit.debug}</debug>
+                </omitFlags>
               </configuration>
             </execution>
           </executions>
@@ -512,11 +517,12 @@
 
   <profiles>
     <!--
-    Disable YUI optimization for "prod" aggregate sources.
+    Disable optimization for "prod" aggregate sources.
     -->
     <profile>
       <id>disable-optimize</id>
       <properties>
+        <extjs.noomit>true</extjs.noomit>
         <maven.yuicompressor.nominify>true</maven.yuicompressor.nominify>
         <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
         <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>

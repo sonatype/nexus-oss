@@ -12,14 +12,12 @@
  */
 package org.sonatype.nexus.extjs;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -63,10 +61,16 @@ public class AggregateJsMojo
   private boolean warnings;
 
   /**
-   * Disable omission of lines surrounded by {@code //<debug>} and {@code //</debug>}.
+   * Disable omission of lines surrounded by {@code //<if flag>} and {@code //</if>}.
    */
   @Parameter(property = "extjs.noomit", defaultValue = "true")
   private boolean noomit;
+
+  /**
+   * Omission flags.  When named flag is enabled, sections matching those omission tokens will be commented out.
+   */
+  @Parameter
+  private Map<String,String> omitFlags;
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
@@ -79,6 +83,7 @@ public class AggregateJsMojo
   }
 
   private void doExecute() throws Exception {
+    // build scanner to find files to aggregate
     DirectoryScanner files = new DirectoryScanner();
     files.setBasedir(sourceDirectory);
     if (includes == null || includes.length == 0) {
@@ -90,6 +95,7 @@ public class AggregateJsMojo
     files.setExcludes(excludes);
     files.addDefaultExcludes();
 
+    // build the list of ordered classes to include
     ClassDefScanner scanner = new ClassDefScanner(getLog());
     scanner.setWarnings(warnings);
     if (namespace == null) {
@@ -100,61 +106,21 @@ public class AggregateJsMojo
     }
     List<ClassDef> classes = scanner.scan(files);
 
+    // aggregate all class sources
     getLog().info("Writing: " + outputFile);
     Writer output = new BufferedWriter(new FileWriter(outputFile));
     try {
+      OmissionFileAppender appender = new OmissionFileAppender(getLog(), output, !noomit);
+      if (omitFlags != null) {
+        appender.parseFlags(omitFlags);
+      }
+
       for (ClassDef def : classes) {
-        write(def.getSource(), output);
+        appender.append(def.getSource());
       }
     }
     finally {
       output.close();
     }
-  }
-
-  private void write(final File source, final Writer output) throws IOException {
-    getLog().debug("Including: " + source);
-
-    BufferedReader input = new BufferedReader(new FileReader(source));
-    try {
-      String line;
-      long lineno = 0;
-      boolean omit = false;
-
-      while ((line = input.readLine()) != null) {
-        lineno++;
-
-        // check for omission start and stop tokens
-        if (!noomit) {
-          String token = line.trim();
-          if (token.equals("//<debug>")) {
-            if (omit) {
-              // complain if already in omit mode and we found a start token
-              getLog().warn("Unexpected omit start token: " + source + "#" + lineno);
-            }
-            omit = true;
-          }
-          else if (token.equals("//</debug>")) {
-            if (!omit) {
-              // complain if not in omit mode and we found a stop token
-              getLog().warn("Unexpected omit stop token: " + source + "#" + lineno);
-            }
-            omit = false;
-          }
-          else if (omit) {
-            // if omission enabled, then comment the line (include for reference, compressor will optimize out)
-            line = "//" + line;
-          }
-        }
-
-        output.write(line);
-        output.write('\n');
-      }
-    }
-    finally {
-      input.close();
-    }
-
-    output.write('\n');
   }
 }
