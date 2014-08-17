@@ -12,18 +12,16 @@
  */
 package org.sonatype.nexus.extjs;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Maps;
 import org.apache.maven.plugin.logging.Log;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Omission token aware file appender.
@@ -31,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class OmissionFileAppender
+  extends FileAppender
 {
   public static final String IF_START_PREFIX = "//<if ";
 
@@ -38,32 +37,23 @@ public class OmissionFileAppender
 
   public static final String IF_END = "//</if>";
 
-  private final Log log;
-
-  private final Writer output;
-
-  private boolean enabled = true;
-
   private final Map<String,Boolean> flags = Maps.newHashMap();
 
-  public OmissionFileAppender(final Log log, final Writer output) {
-    this.log = checkNotNull(log);
-    this.output = checkNotNull(output);
-  }
-
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  public void setEnabled(final boolean enabled) {
-    this.enabled = enabled;
+  public OmissionFileAppender(final Log log,
+                              final Writer output,
+                              final @Nullable Map<String,String> rawFlags)
+  {
+    super(log, output);
+    if (rawFlags != null) {
+      parseFlags(rawFlags);
+    }
   }
 
   public Map<String, Boolean> getFlags() {
     return flags;
   }
 
-  public void parseFlags(final Map<String,String> rawFlags) {
+  private void parseFlags(final Map<String,String> rawFlags) {
     for (Entry<String,String> entry : rawFlags.entrySet()) {
       boolean flag = Boolean.parseBoolean(entry.getValue());
       flags.put(entry.getKey(), flag);
@@ -71,52 +61,40 @@ public class OmissionFileAppender
     log.debug("Omit flags: " + flags);
   }
 
+
+  private boolean omit;
+
+  @Override
   public void append(final File source) throws IOException {
-    log.debug("Appending: " + source);
+    this.omit = false;
 
-    BufferedReader input = new BufferedReader(new FileReader(source));
-    try {
-      String line;
-      long lineno = 0;
-      boolean omit = false;
+    super.append(source);
 
-      while ((line = input.readLine()) != null) {
-        lineno++;
+    // complain if still in omit mode at the end of the file
+    if (omit) {
+      log.warn("Missing omit end token: " + source);
+    }
+  }
 
-        // check for omission start and stop tokens
-        if (enabled) {
-          String trimmedLine = line.trim();
-          if (isOmitStart(trimmedLine)) {
-            if (omit) {
-              // complain if already in omit mode and we found a start token (nesting is not allowed)
-              log.warn("Unexpected omit start token: " + source + "#" + lineno);
-            }
-            omit = true;
-          }
-          else if (isOmitStop(trimmedLine)) {
-            // unable to detect dangling stop token
-            omit = false;
-          }
-          else if (omit) {
-            // if omission enabled, then comment the line (include for reference, compressor will optimize out)
-            line = "//" + line;
-          }
-        }
-
-        output.write(line);
-        output.write('\n');
-      }
-
-      // complain if still in omit mode at the end of the file
+  @Override
+  protected void append(final String line) throws IOException {
+    // check for omission start and stop tokens
+    String trimmedLine = line.trim();
+    if (isOmitStart(trimmedLine)) {
+      // complain if already in omit mode and we found a start token (nesting is not allowed)
       if (omit) {
-        log.warn("Missing omit end token: " + source);
+        log.warn("Unexpected omit start token: " + source + "#" + linenum);
       }
+      omit = true;
     }
-    finally {
-      input.close();
+    else if (isOmitStop(trimmedLine)) {
+      omit = false;
+    }
+    else if (omit) {
+      output.write("//");
     }
 
-    output.write('\n');
+    super.append(line);
   }
 
   private boolean isOmitStart(final String line) {

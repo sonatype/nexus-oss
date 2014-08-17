@@ -34,7 +34,7 @@
     <!--
     Default optimization settings for optimized "prod" aggregate sources.
     -->
-    <extjs.noomit>false</extjs.noomit>
+    <extjs.omit>true</extjs.omit>
     <extjs.omit.debug>true</extjs.omit.debug>
     <maven.yuicompressor.nomunge>false</maven.yuicompressor.nomunge>
     <maven.yuicompressor.nominify>false</maven.yuicompressor.nominify>
@@ -522,7 +522,7 @@
     <profile>
       <id>disable-optimize</id>
       <properties>
-        <extjs.noomit>true</extjs.noomit>
+        <extjs.omit>false</extjs.omit>
         <maven.yuicompressor.nominify>true</maven.yuicompressor.nominify>
         <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
         <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>

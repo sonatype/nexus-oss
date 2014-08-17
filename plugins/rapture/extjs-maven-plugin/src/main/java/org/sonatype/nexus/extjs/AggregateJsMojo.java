@@ -61,10 +61,10 @@ public class AggregateJsMojo
   private boolean warnings;
 
   /**
-   * Disable omission of lines surrounded by {@code //<if flag>} and {@code //</if>}.
+   * Enable omission (auto-commenting) of lines surrounded by {@code //<if flag>} and {@code //</if>}.
    */
-  @Parameter(property = "extjs.noomit", defaultValue = "true")
-  private boolean noomit;
+  @Parameter(property = "extjs.omit", defaultValue = "false")
+  private boolean omit;
 
   /**
    * Omission flags.  When named flag is enabled, sections matching those omission tokens will be commented out.
@@ -110,10 +110,12 @@ public class AggregateJsMojo
     getLog().info("Writing: " + outputFile);
     Writer output = new BufferedWriter(new FileWriter(outputFile));
     try {
-      OmissionFileAppender appender = new OmissionFileAppender(getLog(), output);
-      appender.setEnabled(!noomit);
-      if (omitFlags != null) {
-        appender.parseFlags(omitFlags);
+      FileAppender appender;
+      if (omit) {
+        appender = new OmissionFileAppender(getLog(), output, omitFlags);
+      }
+      else {
+        appender = new FileAppender(getLog(), output);
       }
 
       for (ClassDef def : classes) {
