@@ -29,7 +29,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.Scanner;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
 import org.codehaus.plexus.util.dag.Vertex;
@@ -93,7 +92,7 @@ public class ClassDefScanner
    * Scan a set of files and return a list of class definitions in dependency order.
    * ie. Foo extends Bar, Bar will be before Foo.
    */
-  public List<ClassDef> scan(final Scanner files) throws IOException, CycleDetectedException {
+  public List<ClassDef> scan(final Scanner files) throws Exception {
     checkNotNull(files);
 
     final boolean debug = log.isDebugEnabled();
@@ -243,7 +242,13 @@ public class ClassDefScanner
     Reader reader = new BufferedReader(new FileReader(source));
     try {
       AstRoot root = parser.parse(reader, source.getAbsolutePath(), 0);
-      root.visit(new DependencyAccumulator(source));
+      DependencyAccumulator visitor = new DependencyAccumulator(source);
+      root.visit(visitor);
+
+      // complain if no def was found in this source
+      if (visitor.current == null) {
+        log.warn("No class definition was found while processing: " + source);
+      }
     }
     finally {
       reader.close();
@@ -297,6 +302,10 @@ public class ClassDefScanner
           }
 
           if (name.equals("Ext.define")) {
+            // complain if we found more than one class
+            if (current != null) {
+              log.warn("Found duplicate class definition in source: " + source);
+            }
             processClassDef(call);
             return true; // process children
           }
