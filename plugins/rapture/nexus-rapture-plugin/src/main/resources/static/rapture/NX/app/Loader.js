@@ -41,7 +41,9 @@ Ext.define('NX.app.Loader', {
   load: function (config) {
     var me = this, App;
 
+    //<if debug>
     me.logDebug('Loading');
+    //</if>
 
     // sanity check config
     if (!Ext.isArray(config.pluginConfigs)) {
@@ -59,7 +61,10 @@ Ext.define('NX.app.Loader', {
     if (NX.global.location.search === '?debug') {
       if (NX.app.state.uiSettings.value.debugAllowed) {
         NX.app.debug = true;
+
+        //<if debug>
         me.logDebug('Debug mode enabled');
+        //</if>
       }
       else {
         me.logWarn('Debug mode disallowed');
@@ -67,7 +72,10 @@ Ext.define('NX.app.Loader', {
     }
 
     // apply all plugin configurations
+    //<if debug>
     me.logDebug('Plugin configs: ' + config.pluginConfigs);
+    //</if>
+
     Ext.each(config.pluginConfigs, function (className) {
       me.applyPluginConfig(className);
     });
@@ -75,13 +83,23 @@ Ext.define('NX.app.Loader', {
     // launch the application
     App = Ext.ClassManager.get('NX.app.Application');
     Ext.onReady(function () {
+      //<if debug>
       me.logDebug('Received ready event');
+      //</if>
+
       Ext.app.Application.instance = new App({
         managedControllers: me.controllers
       });
+
+      //<if debug>
       me.logDebug('Application loaded');
+      //</if>
+
       Ext.app.Application.instance.start();
+
+      //<if debug>
       me.logDebug('Application started');
+      //</if>
     });
   },
 
@@ -95,7 +113,10 @@ Ext.define('NX.app.Loader', {
     var me = this,
         config;
 
+    //<if debug>
     me.logDebug('Applying plugin config: ' + className);
+    //</if>
+
     config = Ext.create(className);
 
     // find all controllers
@@ -108,7 +129,6 @@ Ext.define('NX.app.Loader', {
 
     // resolve all controllers
     if (me.controllers) {
-
       //<if debug>
       me.logDebug(me.controllers.getCount() + ' plugin controllers:');
       //</if>
