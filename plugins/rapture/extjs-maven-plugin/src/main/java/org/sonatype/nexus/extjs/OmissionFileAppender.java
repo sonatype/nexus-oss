@@ -42,14 +42,25 @@ public class OmissionFileAppender
 
   private final Writer output;
 
-  private final boolean enabled;
+  private boolean enabled = true;
 
   private final Map<String,Boolean> flags = Maps.newHashMap();
 
-  public OmissionFileAppender(final Log log, final Writer output, final boolean enabled) {
+  public OmissionFileAppender(final Log log, final Writer output) {
     this.log = checkNotNull(log);
     this.output = checkNotNull(output);
+  }
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(final boolean enabled) {
     this.enabled = enabled;
+  }
+
+  public Map<String, Boolean> getFlags() {
+    return flags;
   }
 
   public void parseFlags(final Map<String,String> rawFlags) {

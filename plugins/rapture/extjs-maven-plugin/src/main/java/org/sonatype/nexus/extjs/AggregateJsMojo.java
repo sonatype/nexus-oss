@@ -110,7 +110,8 @@ public class AggregateJsMojo
     getLog().info("Writing: " + outputFile);
     Writer output = new BufferedWriter(new FileWriter(outputFile));
     try {
-      OmissionFileAppender appender = new OmissionFileAppender(getLog(), output, !noomit);
+      OmissionFileAppender appender = new OmissionFileAppender(getLog(), output);
+      appender.setEnabled(!noomit);
       if (omitFlags != null) {
         appender.parseFlags(omitFlags);
       }
