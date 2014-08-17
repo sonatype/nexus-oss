@@ -35,7 +35,7 @@
     Default YUI compressor settings to generated optimized "prod" aggregate sources.
     -->
     <maven.yuicompressor.nomunge>false</maven.yuicompressor.nomunge>
-    <maven.yuicompressor.nocompress>false</maven.yuicompressor.nocompress>
+    <maven.yuicompressor.nominify>false</maven.yuicompressor.nominify>
     <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
     <maven.yuicompressor.linebreakpos>-1</maven.yuicompressor.linebreakpos>
   </properties>
@@ -464,10 +464,6 @@
           <version>1.1.0-SNAPSHOT</version>
           <configuration>
             <jswarn>false</jswarn>
-            <nominify>${maven.yuicompressor.nocompress}</nominify>
-            <nomunge>${maven.yuicompressor.nomunge}</nomunge>
-            <disableOptimizations>${maven.yuicompressor.disableOptimizations}</disableOptimizations>
-            <linebreakpos>${maven.yuicompressor.linebreakpos}</linebreakpos>
           </configuration>
           <executions>
             <execution>
@@ -521,7 +517,7 @@
     <profile>
       <id>disable-optimize</id>
       <properties>
-        <maven.yuicompressor.nocompress>true</maven.yuicompressor.nocompress>
+        <maven.yuicompressor.nominify>true</maven.yuicompressor.nominify>
         <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
         <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
         <maven.yuicompressor.linebreakpos>0</maven.yuicompressor.linebreakpos>
