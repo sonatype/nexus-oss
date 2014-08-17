@@ -63,17 +63,7 @@ Ext.define('NX.app.Application', {
     'NX.ext.grid.column.Icon',
     'NX.ext.grid.column.Link',
     'NX.ext.tree.View',
-    'NX.Conditions',
-
-    // HACK: optimization work-around
-    'NX.controller.State',
-    'NX.controller.Bookmarking',
-    'NX.controller.ExtDirect',
-    'NX.controller.Features',
-    'NX.controller.Icon',
-    'NX.controller.KeyNav',
-    'NX.controller.Message',
-    'NX.controller.Permissions'
+    'NX.Conditions'
   ],
 
   name: 'NX',
@@ -185,7 +175,7 @@ Ext.define('NX.app.Application', {
     NX.global.onerror = function (msg, url, line) {
       me.handleError({ msg: msg + ' (' + url + ':' + line + ')' });
 
-      // maybe delegate to original window.onerror handler
+      // maybe delegate to original onerror handler?
       if (originalOnError) {
         originalOnError(msg, url, line);
       }
