@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 
@@ -28,7 +27,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.IOUtil;
 
 import static org.apache.maven.plugins.annotations.LifecyclePhase.PROCESS_RESOURCES;
 
@@ -58,8 +56,17 @@ public class AggregateJsMojo
   @Parameter
   private String namespace;
 
+  /**
+   * Enables extra warnings which may hint at problems.
+   */
   @Parameter(property = "extjs.warnings", defaultValue = "false")
   private boolean warnings;
+
+  /**
+   * Disable omission of lines surrounded by {@code //<debug>} and {@code //</debug>}.
+   */
+  @Parameter(property = "extjs.noomit", defaultValue = "true")
+  private boolean noomit;
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
@@ -107,13 +114,47 @@ public class AggregateJsMojo
 
   private void write(final File source, final Writer output) throws IOException {
     getLog().debug("Including: " + source);
-    Reader input = new BufferedReader(new FileReader(source));
+
+    BufferedReader input = new BufferedReader(new FileReader(source));
     try {
-      IOUtil.copy(input, output);
+      String line;
+      long lineno = 0;
+      boolean omit = false;
+
+      while ((line = input.readLine()) != null) {
+        lineno++;
+
+        // check for omission start and stop tokens
+        if (!noomit) {
+          String token = line.trim();
+          if (token.equals("//<debug>")) {
+            if (omit) {
+              // complain if already in omit mode and we found a start token
+              getLog().warn("Unexpected omit start token: " + source + "#" + lineno);
+            }
+            omit = true;
+          }
+          else if (token.equals("//</debug>")) {
+            if (!omit) {
+              // complain if not in omit mode and we found a stop token
+              getLog().warn("Unexpected omit stop token: " + source + "#" + lineno);
+            }
+            omit = false;
+          }
+          else if (omit) {
+            // if omission enabled, then comment the line (include for reference, compressor will optimize out)
+            line = "//" + line;
+          }
+        }
+
+        output.write(line);
+        output.write('\n');
+      }
     }
     finally {
       input.close();
     }
+
     output.write('\n');
   }
 }
