@@ -109,11 +109,17 @@ Ext.define('NX.app.Loader', {
     // resolve all controllers
     if (me.controllers) {
 
+      //<if debug>
       me.logDebug(me.controllers.getCount() + ' plugin controllers:');
+      //</if>
+
       me.controllers.each(function (controller) {
         // attach full class-name to controller defs
         controller.type = Ext.app.Controller.getFullName(controller.id, 'controller', 'NX').absoluteName;
+
+        //<if debug>
         me.logDebug('  + ' + controller.id + (controller.id !== controller.type ? ' (' + controller.type + ')' : ''));
+        //</if>
 
         // require all controllers, to avoid warning in console
         Ext.require(controller.type);

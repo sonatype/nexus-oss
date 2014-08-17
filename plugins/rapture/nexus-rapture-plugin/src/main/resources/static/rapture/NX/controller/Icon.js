@@ -66,7 +66,10 @@ Ext.define('NX.controller.Icon', {
     var me = this,
         img;
 
+    //<if debug>
     me.logDebug('Preloading: ' + url);
+    //</if>
+
     img = new Image();
     img.src = url;
   },
@@ -80,7 +83,9 @@ Ext.define('NX.controller.Icon', {
     var me = this,
         styles = [];
 
+    //<if debug>
     me.logDebug('Installing stylesheet');
+    //</if>
 
     // build styles for each icon in store
     me.getIconStore().each(function (record) {
@@ -98,7 +103,10 @@ Ext.define('NX.controller.Icon', {
     // NOTE: This has issues on IE 11, forced compat via X-UA-Compatible meta tag
     // NOTE: ... but may be better off rendering this server side?
     me.stylesheet = Ext.util.CSS.createStyleSheet(styles.join(' '), 'nx-icons');
+
+    //<if debug>
     me.logDebug('Stylesheet installed with ' + me.stylesheet.cssRules.length + ' rules');
+    //</if>
   },
 
   /**

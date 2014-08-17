@@ -146,9 +146,10 @@ Ext.define('NX.app.Application', {
   init: function (app) {
     var me = this;
 
+    //<if debug>
     me.logDebug('Initializing');
-
     me.logDebug(me.managedControllers.getCount() + ' managed controllers');
+    //</if>
 
     // Configure blank image URL
     Ext.BLANK_IMAGE_URL = NX.util.Url.baseUrl + '/static/rapture/resources/images/s.gif';
@@ -190,7 +191,9 @@ Ext.define('NX.app.Application', {
       }
     };
 
+    //<if debug>
     me.logDebug('Configured error handling');
+    //</if>
   },
 
   /**
@@ -226,7 +229,10 @@ Ext.define('NX.app.Application', {
     var me = this;
 
     Ext.direct.Manager.addProvider(NX.direct.api.REMOTING_API);
+
+    //<if debug>
     me.logDebug('Configured Ext.Direct');
+    //</if>
   },
 
   /**
@@ -239,10 +245,14 @@ Ext.define('NX.app.Application', {
     // If local storage is supported install state provider
     if (Ext.util.LocalStorage.supported) {
       Ext.state.Manager.setProvider(Ext.create('Ext.state.LocalStorageProvider'));
+      //<if debug>
       me.logDebug('Configured state provider: local');
+      //</if>
     }
     else {
+      //<if debug>
       me.logWarn('Local storage not supported; state management not supported');
+      //</if>
     }
 
     // HACK: for debugging
@@ -258,7 +268,9 @@ Ext.define('NX.app.Application', {
   start: function () {
     var me = this, hideMask;
 
+    //<if debug>
     me.logDebug('Starting');
+    //</if>
 
     Ext.create('NX.view.Viewport');
 
@@ -291,7 +303,9 @@ Ext.define('NX.app.Application', {
         ref, initializedControllers = [],
         changes = false;
 
+    //<if debug>
     me.logDebug('Refreshing controllers');
+    //</if>
 
     // destroy all controllers that are become inactive
     me.managedControllers.eachKey(function (key) {
@@ -299,7 +313,11 @@ Ext.define('NX.app.Application', {
       if (!ref.active()) {
         if (ref.controller) {
           changes = true;
+
+          //<if debug>
           me.logDebug('Destroying controller: ' + key);
+          //</if>
+
           ref.controller.eventbus.unlisten(ref.controller.id);
           if (Ext.isFunction(ref.controller.onDestroy)) {
             ref.controller.onDestroy();
@@ -320,7 +338,11 @@ Ext.define('NX.app.Application', {
       if (ref.active()) {
         if (!ref.controller) {
           changes = true;
+
+          //<if debug>
           me.logDebug('Initializing controller: ' + key);
+          //</if>
+
           ref.controller = me.getController(key);
           initializedControllers.push(ref.controller);
         }
