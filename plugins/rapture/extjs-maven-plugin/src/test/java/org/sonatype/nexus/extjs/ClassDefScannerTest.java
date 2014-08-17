@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.junit.Before;
@@ -38,13 +39,17 @@ public class ClassDefScannerTest
 
   @Before
   public void setUp() throws Exception {
-    this.scanner = new ClassDefScanner(new SystemStreamLog());
+    Log log = new SystemStreamLog()
+    {
+      @Override
+      public boolean isDebugEnabled() {
+        return true;
+      }
+    };
+    this.scanner = new ClassDefScanner(log);
   }
 
-  @Test
-  public void basicOrder() throws Exception {
-    File basedir = util.resolveFile("src/test/resources/basic");
-
+  private List<ClassDef> scan(final File basedir) throws Exception {
     DirectoryScanner files = new DirectoryScanner();
     files.setBasedir(basedir);
     files.setIncludes(new String[]{"**/*.js"});
@@ -57,34 +62,54 @@ public class ClassDefScannerTest
         log("    + {}", dep);
       }
     }
+    return classes;
+  }
+
+  @Test
+  public void basicOrder() throws Exception {
+    File basedir = util.resolveFile("src/test/resources/basic");
+    List<ClassDef> classes = scan(basedir);
 
     assertThat(classes, hasSize(3));
 
-    assertThat(classes.get(0).getName(), is("Baz"));
-    assertThat(classes.get(1).getName(), is("Bar"));
-    assertThat(classes.get(2).getName(), is("Foo"));
+    ClassDef baz = classes.get(0);
+    assertThat(baz.getName(), is("Baz"));
 
-    assertThat(classes.get(1).getDependencies(), contains("Baz"));
-    assertThat(classes.get(2).getDependencies(), contains("Bar"));
+    ClassDef bar = classes.get(1);
+    assertThat(bar.getName(), is("Bar"));
+    assertThat(bar.getDependencies(), contains("Baz"));
+
+    ClassDef foo = classes.get(2);
+    assertThat(foo.getName(), is("Foo"));
+    assertThat(foo.getDependencies(), contains("Bar"));
+  }
+
+  @Test
+  public void altClassNameOrder() throws Exception {
+    File basedir = util.resolveFile("src/test/resources/altclassname");
+    List<ClassDef> classes = scan(basedir);
+
+    assertThat(classes, hasSize(3));
+
+    ClassDef baz = classes.get(0);
+    assertThat(baz.getName(), is("Baz"));
+
+    ClassDef bar = classes.get(1);
+    assertThat(bar.getName(), is("Bar"));
+    assertThat(bar.getAlternateClassName(), containsInAnyOrder("Test.Bar", "Other.Bar"));
+    assertThat(bar.getDependencies(), contains("Baz"));
+
+    ClassDef foo = classes.get(2);
+    assertThat(foo.getName(), is("Foo"));
+    assertThat(foo.getAlternateClassName(), containsInAnyOrder("Test.Foo"));
+    assertThat(foo.getDependencies(), contains("Test.Bar"));
   }
 
   @Test
   public void mvcOrder() throws Exception {
     File basedir = util.resolveFile("src/test/resources/mvc");
     scanner.setNamespace("Test");
-
-    DirectoryScanner files = new DirectoryScanner();
-    files.setBasedir(basedir);
-    files.setIncludes(new String[]{"**/*.js"});
-
-    List<ClassDef> classes = scanner.scan(files);
-    log("Classes:");
-    for (ClassDef def : classes) {
-      log("  {}", def.getName());
-      for (String dep : def.getDependencies()) {
-        log("    + {}", dep);
-      }
-    }
+    List<ClassDef> classes = scan(basedir);
 
     assertThat(classes, hasSize(5));
 

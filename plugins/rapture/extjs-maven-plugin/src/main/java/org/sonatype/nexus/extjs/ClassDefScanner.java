@@ -20,16 +20,19 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.Scanner;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
+import org.codehaus.plexus.util.dag.Vertex;
 import org.mozilla.javascript.CompilerEnvirons;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ErrorReporter;
@@ -65,7 +68,6 @@ public class ClassDefScanner
 
   private String namespace;
 
-
   public ClassDefScanner(final Log log) {
     this.log = checkNotNull(log);
   }
@@ -94,6 +96,8 @@ public class ClassDefScanner
   public List<ClassDef> scan(final Scanner files) throws IOException, CycleDetectedException {
     checkNotNull(files);
 
+    final boolean debug = log.isDebugEnabled();
+
     // reset and scan for files
     classes.clear();
 
@@ -108,37 +112,120 @@ public class ClassDefScanner
       scan(file);
     }
 
-    // Resolve all references
+    // TODO: Sort out how/if we want to resolve aliases, ATM this data is collected by not used
+
+    // Resolve all references and build map with all class defs (including aliases/alts)
+    Map<String,ClassDef> allClasses = Maps.newHashMap();
     for (ClassDef def : classes.values()) {
+      allClasses.put(def.getName(), def);
+      for (String alt : def.getAlternateClassName()) {
+        allClasses.put(alt, def);
+      }
       resolve(def);
+    }
+
+    if (debug) {
+      log.debug("All classes:");
+      for (String className : allClasses.keySet()) {
+        log.debug("  " + className);
+      }
     }
 
     // build the graph
     DAG graph = new DAG();
-    for (ClassDef def : classes.values()) {
+    for (ClassDef def : allClasses.values()) {
       graph.addVertex(def.getName());
-      for (String dep : def.getDependencies()) {
-        graph.addEdge(def.getName(), dep);
+      for (String name : def.getDependencies()) {
+        // resolve dependencies which have class defs to primary class name
+        ClassDef dep = allClasses.get(name);
+        if (dep != null) {
+          name = dep.getName();
+        }
+        graph.addEdge(def.getName(), name);
       }
     }
 
-    // result sorted list of class definitions
-    List<ClassDef> results = Lists.newArrayList();
-    log.debug("Classes:");
-    // the graph contains many references, only include those which are class defs
-    for (String className : TopologicalSorter.sort(graph)) {
-      ClassDef def = classes.get(className);
-      if (def != null) {
-        results.add(def);
-        log.debug("  " + def.getName());
-        for (String dep : def.getDependencies()) {
-          log.debug("    + " + dep);
+    // display some debug information about the graph
+    if (debug) {
+      log.debug("Vertices:");
+      for (Vertex v : graph.getVerticies()) {
+        log.debug("  " + v.getLabel());
+        if (!v.getParents().isEmpty()) {
+          log.debug("    parents:");
+          for (Vertex parent : v.getParents()) {
+            log.debug("      " + parent.getLabel());
+          }
+        }
+        if (!v.getChildren().isEmpty()) {
+          log.debug("    children:");
+          for (Vertex child : v.getChildren()) {
+            log.debug("      " + child.getLabel());
+          }
         }
       }
     }
 
+    // result sorted list of class definitions
+    Set<ClassDef> results = Sets.newLinkedHashSet();
+    log.debug("Ordered classes:");
+    // the graph contains many references, only include those which are class defs
+    for (String className : TopologicalSorter.sort(graph)) {
+      ClassDef def = allClasses.get(className);
+      // skip duplicates (due to alt/aliases)
+      if (def != null && !results.contains(def)) {
+        log.debug("  " + def.getName());
+        results.add(def);
+      }
+    }
+
     log.debug("Found " + results.size() + " classes");
-    return results;
+    return Lists.newArrayList(results);
+  }
+
+  /**
+   * Resolve all references.
+   */
+  private void resolve(final ClassDef def) {
+    // resolve mvc references if namespace is set
+    if (namespace != null) {
+      if (def.getMvcControllers() != null) {
+        for (String name : def.getMvcControllers()) {
+          appendMvcDependency(def, "controller", name);
+        }
+      }
+      if (def.getMvcModels() != null) {
+        for (String name : def.getMvcModels()) {
+          appendMvcDependency(def, "model", name);
+        }
+      }
+      if (def.getMvcStores() != null) {
+        for (String name : def.getMvcStores()) {
+          appendMvcDependency(def, "store", name);
+        }
+      }
+      if (def.getMvcViews() != null) {
+        for (String name : def.getMvcViews()) {
+          appendMvcDependency(def, "view", name);
+        }
+      }
+    }
+  }
+
+  private void appendMvcDependency(final ClassDef def, final String type, final String name) {
+    if (classes.containsKey(name)) {
+      // already qualified name
+      def.getDependencies().add(name);
+    }
+    else {
+      if (name.contains("@")) {
+        // namespace is embedded: <name>@<namespace>
+        String[] parts = name.split("@", 2);
+        def.getDependencies().add(String.format("%s.%s", parts[1], parts[0]));
+      }
+      else {
+        def.getDependencies().add(String.format("%s.%s.%s", namespace, type, name));
+      }
+    }
   }
 
   /**
@@ -177,7 +264,7 @@ public class ClassDefScanner
     /**
      * Helper to report error for given node position in ast tree.
      */
-    private void reportError(final AstNode node, final String message, Object... params) {
+    private RuntimeException reportError(final AstNode node, final String message, Object... params) {
       throw Context.reportRuntimeError(String.format(message, params),
           source.getAbsolutePath(),
           node.getLineno(), // seems to always be the line before?
@@ -191,7 +278,7 @@ public class ClassDefScanner
      */
     private void checkState(boolean expression, final AstNode node, final String message, Object... params) {
       if (!expression) {
-        reportError(node, message, params);
+        throw reportError(node, message, params);
       }
     }
 
@@ -279,6 +366,25 @@ public class ClassDefScanner
     }
 
     /**
+     * Returns string literal or array of string literals.
+     *
+     * @see #stringLiteral(AstNode)
+     * @see #arrayStringLiteral(AstNode)
+     */
+    private List<String> stringLiterals(final AstNode node) {
+      // string literal or array of string literals
+      if (node instanceof StringLiteral) {
+        return Lists.newArrayList(stringLiteral(node));
+      }
+      else if (node instanceof ArrayLiteral) {
+        return arrayStringLiteral(node);
+      }
+      else {
+        throw reportError(node, "Expected string literal or array of string literal only");
+      }
+    }
+
+    /**
      * Maybe warn if a needed class has not been required.
      */
     private void maybeWarnMissingRequires(final String className, final String usage) {
@@ -337,6 +443,24 @@ public class ClassDefScanner
             current.setUses(arrayStringLiteral(prop.getRight()));
             break;
 
+          case "alternateClassName": {
+            // string literal or array of string literals
+            current.getAlternateClassName().addAll(stringLiterals(prop.getRight()));
+            break;
+          }
+
+          case "alias": {
+            // string literal or array of string literals
+            current.getAlias().addAll(stringLiterals(prop.getRight()));
+            break;
+          }
+
+          case "xtype": {
+            // string literal only
+            current.getAlias().add("widget." + stringLiteral(prop.getRight()));
+            break;
+          }
+
           case "mixins": {
             // array of strings, or object
             List<String> mixins = Lists.newArrayList();
@@ -350,13 +474,11 @@ public class ClassDefScanner
               }
             }
             else {
-              reportError(prop.getRight(), "Expected array or object literal only");
+              throw reportError(prop.getRight(), "Expected array or object literal only");
             }
             current.setMixins(mixins);
             break;
           }
-
-          // TODO: Consider adding support for alias, alternateClassName, xtype and widget references?
         }
 
         // Additional stuff we have to detect for ExtJS MVC support
@@ -423,9 +545,8 @@ public class ClassDefScanner
       String found = source.toURI().getPath();
       String expected = className.replace('.', '/') + ".js";
       if (!found.endsWith(expected)) {
-        log.warn(
-            "Expected class '" + className + "' to be defined in filename '" + expected + "', but was defined in: " +
-                found);
+        log.warn(String.format("Expected class '%s' to be defined in filename '%s', but was defined in: %s",
+            className, expected, found));
       }
     }
 
@@ -443,52 +564,6 @@ public class ClassDefScanner
     private boolean isExtends(final String className) {
       String superClass = current.getExtend();
       return superClass != null && superClass.equals(className);
-    }
-  }
-
-  /**
-   * Resolve all references.
-   */
-  private void resolve(final ClassDef def) {
-    // resolve mvc references if namespace is set
-    if (namespace != null) {
-      if (def.getMvcControllers() != null) {
-        for (String name : def.getMvcControllers()) {
-          appendMvcDependency(def, "controller", name);
-        }
-      }
-      if (def.getMvcModels() != null) {
-        for (String name : def.getMvcModels()) {
-          appendMvcDependency(def, "model", name);
-        }
-      }
-      if (def.getMvcStores() != null) {
-        for (String name : def.getMvcStores()) {
-          appendMvcDependency(def, "store", name);
-        }
-      }
-      if (def.getMvcViews() != null) {
-        for (String name : def.getMvcViews()) {
-          appendMvcDependency(def, "view", name);
-        }
-      }
-    }
-  }
-
-  private void appendMvcDependency(final ClassDef def, final String type, final String name) {
-    if (classes.containsKey(name)) {
-      // already qualified name
-      def.getDependencies().add(name);
-    }
-    else {
-      if (name.contains("@")) {
-        // namespace is embedded: <name>@<namespace>
-        String[] parts = name.split("@", 2);
-        def.getDependencies().add(String.format("%s.%s", parts[1], parts[0]));
-      }
-      else {
-        def.getDependencies().add(String.format("%s.%s.%s", namespace, type, name));
-      }
     }
   }
 }

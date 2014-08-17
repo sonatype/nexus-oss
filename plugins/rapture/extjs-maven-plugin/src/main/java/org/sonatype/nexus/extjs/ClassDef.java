@@ -16,7 +16,12 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * ExtJS class definition record.
@@ -30,6 +35,10 @@ public class ClassDef
   private final File source;
 
   private final Set<String> dependencies = Sets.newHashSet();
+
+  private final List<String> alternateClassName = Lists.newArrayList();
+
+  private final List<String> alias = Lists.newArrayList();
 
   private String extend;
 
@@ -50,8 +59,8 @@ public class ClassDef
   private List<String> mvcViews;
 
   public ClassDef(final String name, final File source) {
-    this.name = name;
-    this.source = source;
+    this.name = checkNotNull(name);
+    this.source = checkNotNull(source);
   }
 
   public String getName() {
@@ -66,48 +75,61 @@ public class ClassDef
     return dependencies;
   }
 
+  public List<String> getAlternateClassName() {
+    return alternateClassName;
+  }
+
+  public List<String> getAlias() {
+    return alias;
+  }
+
+  @Nullable
   public String getExtend() {
     return extend;
   }
 
   public void setExtend(final String extend) {
-    this.extend = extend;
+    this.extend = checkNotNull(extend);
     dependencies.add(extend);
   }
 
+  @Nullable
   public String getOverride() {
     return override;
   }
 
   public void setOverride(final String override) {
-    this.override = override;
+    this.override = checkNotNull(override);
     dependencies.add(override);
   }
 
+  @Nullable
   public List<String> getRequires() {
     return requires;
   }
 
   public void setRequires(final List<String> requires) {
-    this.requires = requires;
+    this.requires = checkNotNull(requires);
     dependencies.addAll(requires);
   }
 
+  @Nullable
   public List<String> getMixins() {
     return mixins;
   }
 
   public void setMixins(final List<String> mixins) {
-    this.mixins = mixins;
+    this.mixins = checkNotNull(mixins);
     dependencies.addAll(mixins);
   }
 
+  @Nullable
   public List<String> getUses() {
     return uses;
   }
 
   public void setUses(final List<String> uses) {
-    this.uses = uses;
+    this.uses = checkNotNull(uses);
     dependencies.addAll(uses);
   }
 
@@ -115,35 +137,39 @@ public class ClassDef
   // Custom handling for MVC support
   //
 
+  @Nullable
   public List<String> getMvcControllers() {
     return mvcControllers;
   }
 
   public void setMvcControllers(final List<String> mvcControllers) {
-    this.mvcControllers = mvcControllers;
+    this.mvcControllers = checkNotNull(mvcControllers);
   }
 
+  @Nullable
   public List<String> getMvcModels() {
     return mvcModels;
   }
 
   public void setMvcModels(final List<String> mvcModels) {
-    this.mvcModels = mvcModels;
+    this.mvcModels = checkNotNull(mvcModels);
   }
 
+  @Nullable
   public List<String> getMvcStores() {
     return mvcStores;
   }
 
   public void setMvcStores(final List<String> mvcStores) {
-    this.mvcStores = mvcStores;
+    this.mvcStores = checkNotNull(mvcStores);
   }
 
+  @Nullable
   public List<String> getMvcViews() {
     return mvcViews;
   }
 
   public void setMvcViews(final List<String> mvcViews) {
-    this.mvcViews = mvcViews;
+    this.mvcViews = checkNotNull(mvcViews);
   }
 }
