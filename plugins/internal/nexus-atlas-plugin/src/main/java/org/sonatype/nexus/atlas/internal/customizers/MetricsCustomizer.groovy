@@ -71,7 +71,7 @@ class MetricsCustomizer
   @Override
   void customize(final SupportBundle supportBundle) {
     // add thread-dump
-    supportBundle << new GeneratedContentSourceSupport(THREAD, 'threads.txt', HIGH) {
+    supportBundle << new GeneratedContentSourceSupport(THREAD, 'metrics/threads.txt', HIGH) {
       @Override
       protected void generate(final File file) {
         file.withOutputStream {
@@ -81,7 +81,7 @@ class MetricsCustomizer
     }
 
     // add healthchecks
-    supportBundle << new GeneratedContentSourceSupport(SYSINFO, 'healthcheck.json', OPTIONAL) {
+    supportBundle << new GeneratedContentSourceSupport(SYSINFO, 'metrics/healthcheck.json', OPTIONAL) {
       @Override
       protected void generate(final File file) {
         def results = healthCheckRegistry.runHealthChecks()
@@ -93,7 +93,7 @@ class MetricsCustomizer
     }
 
     // add metrics
-    supportBundle << new GeneratedContentSourceSupport(METRICS, 'metrics.json', OPTIONAL) {
+    supportBundle << new GeneratedContentSourceSupport(METRICS, 'metrics/metrics.json', OPTIONAL) {
       @Override
       protected void generate(final File file) {
         def mapper = new ObjectMapper().registerModule(new MetricsModule(
