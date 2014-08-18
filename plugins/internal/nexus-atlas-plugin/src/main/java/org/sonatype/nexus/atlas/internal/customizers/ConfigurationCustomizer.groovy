@@ -74,9 +74,13 @@ class ConfigurationCustomizer
     // include installation configuration files
     def installDir = applicationDirectories.installDirectory
     if (installDir) {
-      // could be null
-      maybeIncludeFile new File(installDir, 'etc/jetty.xml'), 'install/etc', HIGH
+      // include all jetty configuration files
+      new File(installDir, 'etc').eachFileMatch(~'jetty.*xml') {
+        maybeIncludeFile it, 'install/etc', HIGH
+      }
+
       maybeIncludeFile new File(installDir, 'etc/nexus.properties'), 'install/etc', HIGH
+
       //TODO: KARAF include karaf configuration
     }
   }
