@@ -75,6 +75,7 @@ Ext.define('NX.view.AboutWindow', {
     me.buttons = [
       { text: 'Close', action: 'close', ui: 'primary', handler: function() { me.close(); } }
     ];
+    me.buttonAlign = 'left';
 
     me.callParent(arguments);
   }
