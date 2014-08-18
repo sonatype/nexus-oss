@@ -1,7 +1,0 @@
-//
-// Java security policy
-//
-
-grant {
-   permission java.security.AllPermission;
-};
