@@ -295,6 +295,8 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
             model.get('groupId') + ':' + model.get('artifactId')
         );
 
+    // FIXME: resolve use of undefined "opaqueWarning" css class and potentially replace icons with glyphs
+
     if (searchResultModel.get('healthCheckLoading')) {
       return 'Loading...';
     }
