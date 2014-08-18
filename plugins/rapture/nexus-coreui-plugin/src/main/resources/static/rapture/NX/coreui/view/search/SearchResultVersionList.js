@@ -33,16 +33,21 @@ Ext.define('NX.coreui.view.search.SearchResultVersionList', {
       width: 36,
       iconVariant: 'x16',
       iconNamePrefix: 'repository-item-type-',
-      iconName: function(value) {
+      iconName: function (value) {
         if (NX.getApplication().getIconController().findIcon('repository-item-type-' + value, 'x16')) {
           return value;
         }
         return 'default';
       }
     },
-    { header: 'Version', dataIndex: 'versionOrder', flex: 1, renderer: function(value, metadata, model) {
-      return model.get('version');
-    }},
+    {
+      header: 'Version',
+      dataIndex: 'versionOrder',
+      flex: 1,
+      renderer: function (value, metadata, model) {
+        return model.get('version');
+      }
+    },
     { header: 'Name', dataIndex: 'name', flex: 3 },
     { header: 'Repository', dataIndex: 'repositoryName', flex: 1 }
   ],
