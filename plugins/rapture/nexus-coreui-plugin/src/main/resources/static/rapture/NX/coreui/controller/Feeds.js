@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Feeds controller.
  *
@@ -17,6 +19,12 @@
  */
 Ext.define('NX.coreui.controller.Feeds', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Permissions',
+    'NX.Bookmarks',
+    'NX.Conditions',
+    'NX.Windows'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },
@@ -190,7 +198,7 @@ Ext.define('NX.coreui.controller.Feeds', {
         selection = me.getList().getSelectionModel().getSelection();
 
     if (selection.length) {
-      window.open(selection[0].get('url'));
+      NX.Windows.open(selection[0].get('url'));
     }
   },
 

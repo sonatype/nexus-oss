@@ -10,6 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+/*jslint bitwise: true*/
+
 /**
  * Permission model.
  *
@@ -28,29 +31,29 @@ Ext.define('NX.model.Permission', {
     {
       name: 'create',
       type: 'boolean',
-      convert: function(val, row){
-        return (row.data.value & NX.Permissions.CREATE) == NX.Permissions.CREATE;
+      convert: function (val, row) {
+        return (row.data.value & NX.Permissions.CREATE) === NX.Permissions.CREATE;
       }
     },
     {
       name: 'read',
       type: 'boolean',
-      convert: function(val, row){
-        return (row.data.value & NX.Permissions.READ) == NX.Permissions.READ;
+      convert: function (val, row) {
+        return (row.data.value & NX.Permissions.READ) === NX.Permissions.READ;
       }
     },
     {
       name: 'update',
       type: 'boolean',
-      convert: function(val, row){
-        return (row.data.value & NX.Permissions.UPDATE) == NX.Permissions.UPDATE;
+      convert: function (val, row) {
+        return (row.data.value & NX.Permissions.UPDATE) === NX.Permissions.UPDATE;
       }
     },
     {
       name: 'delete',
       type: 'boolean',
-      convert: function(val, row){
-        return (row.data.value & NX.Permissions.DELETE) == NX.Permissions.DELETE;
+      convert: function (val, row) {
+        return (row.data.value & NX.Permissions.DELETE) === NX.Permissions.DELETE;
       }
     }
   ]

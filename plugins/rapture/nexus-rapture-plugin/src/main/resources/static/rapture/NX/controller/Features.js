@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Features registration controller.
  *
@@ -61,9 +63,10 @@ Ext.define('NX.controller.Features', {
           feature.view = 'NX.view.feature.Group';
         }
 
+        // complain if there is no view configuration
         if (!feature.view && !feature.href) {
-          me.logWarn('Using default view for feature at path: ' + feature.path);
-          feature.view = 'NX.view.feature.TODO';
+          me.logError('Missing view configuration for feature at path: ' + feature.path);
+          // TODO: Maybe raise an error instead?
         }
 
         if (feature.href && !feature.hrefTarget) {

@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Feed Entry grid.
  *
@@ -18,10 +20,12 @@
 Ext.define('NX.coreui.view.feed.FeedEntryList', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-coreui-feedentry-list',
+  requires: [
+    'Ext.XTemplate',
+    'NX.Icons'
+  ],
 
   store: 'FeedEntry',
-
-  iconCls: NX.Icons.cls('feed-default', 'x16'),
 
   viewConfig: {
     emptyText: 'No entries',
@@ -42,13 +46,23 @@ Ext.define('NX.coreui.view.feed.FeedEntryList', {
     }
   ],
 
-  plugins: [
-    {
-      ptype: 'rowexpander',
-      rowBodyTpl: new Ext.XTemplate(
-          '<p>{content}</p>'
-      )
-    }
-  ]
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
 
+    me.iconCls = NX.Icons.cls('feed-default', 'x16');
+
+    me.plugins = [
+      {
+        ptype: 'rowexpander',
+        rowBodyTpl: Ext.create('Ext.XTemplate',
+            '<p>{content}</p>'
+        )
+      }
+    ];
+
+    me.callParent();
+  }
 });

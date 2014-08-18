@@ -10,6 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext*/
+
+/**
+ * Contains various buttons to execute actions for development/testing.
+ *
+ * @since 3.0
+ */
 Ext.define('NX.view.dev.Tests', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-dev-tests',

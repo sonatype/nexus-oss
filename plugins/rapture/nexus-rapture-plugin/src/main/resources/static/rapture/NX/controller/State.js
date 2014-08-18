@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * State controller.
  *
@@ -18,8 +20,9 @@
 Ext.define('NX.controller.State', {
   extend: 'Ext.app.Controller',
   requires: [
-    'Ext.Direct',
-    'NX.Dialogs'
+    'Ext.direct.Manager',
+    'NX.Dialogs',
+    'NX.Messages'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -85,6 +88,7 @@ Ext.define('NX.controller.State', {
         !Ext.isIE || (Ext.isIE9p && Ext.isIE11m)
     );
     NX.State.setValue('debug', NX.app.debug);
+    NX.State.setValue('receiving', false);
     NX.State.setValues(NX.app.state);
   },
 
@@ -128,7 +132,7 @@ Ext.define('NX.controller.State', {
           model.set('value', value);
         }
         if (!Ext.Object.equals(hash, model.get('hash'))) {
-          model.set('hash', hash)
+          model.set('hash', hash);
         }
       }
       else {
@@ -206,11 +210,11 @@ Ext.define('NX.controller.State', {
     oldUiSettings = oldUiSettings || {};
 
     if (uiSettings.debugAllowed !== oldUiSettings.debugAllowed) {
-      NX.State.setValue('debug', uiSettings.debugAllowed && (window.location.search === '?debug'));
+      NX.State.setValue('debug', uiSettings.debugAllowed && (NX.global.location.search === '?debug'));
     }
 
     if (uiSettings.title !== oldUiSettings.title) {
-      document.title = document.title.replace(oldUiSettings.title, uiSettings.title);
+      NX.global.document.title = NX.global.document.title.replace(oldUiSettings.title, uiSettings.title);
     }
 
     if (me.statusProvider) {
@@ -228,7 +232,7 @@ Ext.define('NX.controller.State', {
           me.statusProvider.disconnect();
           me.receiving = false;
         }
-        me.statusProvider = Ext.Direct.addProvider({
+        me.statusProvider = Ext.direct.Manager.addProvider({
           type: 'polling',
           url: NX.direct.api.POLLING_URLS.rapture_State_get,
           interval: newStatusInterval * 1000,
@@ -296,6 +300,8 @@ Ext.define('NX.controller.State', {
       NX.Messages.add({text: 'Server reconnected', type: 'success' });
     }
 
+    NX.State.setValue('receiving', true);
+
     // propagate event data
     state = event.data.data;
 
@@ -328,7 +334,10 @@ Ext.define('NX.controller.State', {
         me.receiving = false;
 
         // we appear to have lost the server connection
-        me.disconnectedTimes++;
+        me.disconnectedTimes = me.disconnectedTimes + 1;
+
+        NX.State.setValue('receiving', false);
+
         if (me.disconnectedTimes <= me.maxDisconnectWarnings) {
           NX.Messages.add({ text: 'Server disconnected', type: 'warning' });
         }
@@ -388,7 +397,7 @@ Ext.define('NX.controller.State', {
           'Application will be reloaded as server has been restarted',
           {
             fn: function () {
-              window.location.reload();
+              NX.global.location.reload();
             }
           }
       );

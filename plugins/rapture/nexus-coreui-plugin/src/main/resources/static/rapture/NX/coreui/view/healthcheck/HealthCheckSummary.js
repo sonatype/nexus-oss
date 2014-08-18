@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Health Check Summary window.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.coreui.view.healthcheck.HealthCheckSummary', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-healthcheck-summary',
+  requires: [
+    'Ext.util.DelayedTask'
+  ],
 
   /**
    * @cfg {NX.coreui.model.HealthCheckRepositoryStatus} model corresponding to this summary report
@@ -73,7 +78,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckSummary', {
           me
       );
 
-      me.task = new Ext.util.DelayedTask(me.doAutoClose, me);
+      me.task = Ext.create('Ext.util.DelayedTask', me.doAutoClose, me);
       me.task.delay(1000);
     }
   },

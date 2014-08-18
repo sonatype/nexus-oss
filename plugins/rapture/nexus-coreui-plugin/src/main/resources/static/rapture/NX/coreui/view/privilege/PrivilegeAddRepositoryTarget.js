@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Privilege add window (for repository target).
  *
@@ -18,6 +20,12 @@
 Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-privilege-add-repositorytarget',
+  requires: [
+    'NX.Conditions',
+    'NX.coreui.store.RepositoryReference',
+    'NX.coreui.store.RepositoryTarget',
+    'NX.coreui.model.Reference'
+  ],
 
   title: 'Create new Repository Target Privilege',
   defaultFocus: 'name',

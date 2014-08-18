@@ -10,8 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  *###
+
 #set($raptureUrl="$baseUrl/static/rapture")
-#set($baseappMode="debug") ## or "prod"
 
 <!DOCTYPE html>
 <html>
@@ -24,53 +24,63 @@
   ## force browser to behave, IE=edge seems to have issues on IE 11 setting stylesheets (maybe other shit too)
   <meta http-equiv="X-UA-Compatible" content="IE=9,chrome=1"/>
 
-  <link rel="icon" type="image/png" href="$raptureUrl/resources/favicon.png"/>
+  <link rel="icon" type="image/png" href="$raptureUrl/resources/favicon.png?$urlSuffix"/>
   <!--[if IE]>
-  <link rel="SHORTCUT ICON" href="$raptureUrl/resources/favicon.ico"/>
+  <link rel="SHORTCUT ICON" href="$raptureUrl/resources/favicon.ico?$urlSuffix"/>
   <![endif]-->
 
   #macro(style $src)
-    <link rel="stylesheet" type="text/css" href="$src">
+    <link rel="stylesheet" type="text/css" href="$src?$urlSuffix">
   #end
 
-  #style("$raptureUrl/resources/baseapp-${baseappMode}.css")
-  #style("$raptureUrl/resources/rapture.css")
-  #style("$raptureUrl/resources/loading.css")
+  ## Load all styles
+  #foreach($uri in $styles)
+    #style("$uri")
+  #end
+
+  ## Loading progress helpers
+  <script type="text/javascript">
+    function progressMessage(msg) {
+      if (console && console.log) {
+        console.log(msg);
+      }
+      document.getElementById('loading-msg').innerHTML=msg;
+    }
+  </script>
+  #macro(message $text)
+    <script type="text/javascript">progressMessage('$text');</script>
+  #end
 </head>
 <body class="x-border-box">
 
 <div id="loading-mask"></div>
 <div id="loading">
+  ## Loading progress indicator
   <div class="loading-indicator">
-    <img id="loading-image" src="$raptureUrl/resources/images/loading.png"/>
+    <img id="loading-image" src="$raptureUrl/resources/images/loading.png?$urlSuffix"/>
     <br/>
     <div style="text-align: center;">
-      <img id="loading-spinner" src="$raptureUrl/resources/images/loading-spinner.gif"/>
+      <img id="loading-spinner" src="$raptureUrl/resources/images/loading-spinner.gif?$urlSuffix"/>
       <span id="loading-msg">Loading...</span>
     </div>
   </div>
+
+  ## Code loading
   <div id="code-load" class="x-hide-display">
-    #macro(message $text)
-      <script type="text/javascript">document.getElementById('loading-msg').innerHTML = '$text';</script>
-    #end
     #macro(script $src)
-      <script type="text/javascript" src="$src"></script>
+      <script type="text/javascript" src="$src?$urlSuffix"></script>
     #end
 
-    ## Load core extjs framework
-    #message("Loading baseapp...")
-    #script("$raptureUrl/baseapp-${baseappMode}.js")
+    #message("Loading...")
 
-    ## Load extensions
-    #message("Loading extensions...")
-    #script("$raptureUrl/extdirect-${baseappMode}.js")
-
-    ## Load application
-    #message("Loading application...")
-    #script("$raptureUrl/app.js")
+    ## Load all scripts
+    #foreach($uri in $scripts)
+      #message("Loading ${helper.fileName($uri)}...")
+      #script("$uri")
+    #end
 
     ## Finished
-    #message("Initializing...")
+    #message("Initializing")
   </div>
 </div>
 

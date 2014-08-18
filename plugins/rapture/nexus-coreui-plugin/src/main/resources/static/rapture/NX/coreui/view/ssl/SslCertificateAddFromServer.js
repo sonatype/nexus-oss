@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Add Ssl Certificate from Server window.
  *
@@ -18,40 +20,51 @@
 Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-sslcertificate-add-from-server',
+  requires: [
+    'NX.Icons'
+  ],
 
   title: 'Load certificate from server',
   defaultFocus: 'server',
 
-  items: {
-    xtype: 'nx-settingsform',
-    settingsFormSubmitOnEnter: true,
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
 
-    items: [
-      {
-        xtype: 'panel',
-        margin: '0 0 10 0',
-        layout: {
-          type: 'hbox'
+    me.items = {
+      xtype: 'nx-settingsform',
+      settingsFormSubmitOnEnter: true,
+
+      items: [
+        {
+          xtype: 'panel',
+          margin: '0 0 10 0',
+          layout: {
+            type: 'hbox'
+          },
+          items: [
+            { xtype: 'container', html: NX.Icons.img('sslcertificate-add-by-server', 'x32') },
+            { xtype: 'container', html: 'Please enter a hostname, hostname:port or a URL to fetch a SSL certificate from.' }
+          ]
         },
-        items: [
-          { xtype: 'container', html: NX.Icons.img('sslcertificate-add-by-server', 'x32') },
-          { xtype: 'container', html: 'Please enter a hostname, hostname:port or a URL to fetch a SSL certificate from.' }
-        ]
-      },
-      {
-        xtype: 'textfield',
-        anchor: '100%',
-        name: 'server',
-        itemId: 'server'
-      }
-    ],
+        {
+          xtype: 'textfield',
+          anchor: '100%',
+          name: 'server',
+          itemId: 'server'
+        }
+      ],
 
-    buttons: [
-      { text: 'Load Certificate', action: 'load', formBind: true, bindToEnter: true, ui: 'primary' },
-      { text: 'Cancel', handler: function () {
-        this.up('window').close();
-      }}
-    ]
+      buttons: [
+        { text: 'Load Certificate', action: 'load', formBind: true, bindToEnter: true, ui: 'primary' },
+        { text: 'Cancel', handler: function () {
+          this.up('window').close();
+        }}
+      ]
+    };
+
+    me.callParent();
   }
-
 });

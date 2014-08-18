@@ -27,7 +27,11 @@ import org.sonatype.configuration.validation.InvalidConfigurationException
 import org.sonatype.configuration.validation.ValidationMessage
 import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.configuration.application.NexusConfiguration
-import org.sonatype.nexus.configuration.model.*
+import org.sonatype.nexus.configuration.model.CLocalStorage
+import org.sonatype.nexus.configuration.model.CRemoteAuthentication
+import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings
+import org.sonatype.nexus.configuration.model.CRemoteStorage
+import org.sonatype.nexus.configuration.model.CRepository
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
@@ -44,10 +48,21 @@ import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfigu
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry
-import org.sonatype.nexus.proxy.repository.*
+import org.sonatype.nexus.proxy.repository.AbstractRepository
+import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings
+import org.sonatype.nexus.proxy.repository.GroupRepository
+import org.sonatype.nexus.proxy.repository.HostedRepository
+import org.sonatype.nexus.proxy.repository.LocalStatus
+import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings
+import org.sonatype.nexus.proxy.repository.ProxyMode
+import org.sonatype.nexus.proxy.repository.ProxyRepository
+import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings
+import org.sonatype.nexus.proxy.repository.RemoteStatus
+import org.sonatype.nexus.proxy.repository.Repository
+import org.sonatype.nexus.proxy.repository.ShadowRepository
+import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory
 import org.sonatype.nexus.rapture.TrustStoreKeys
-import org.sonatype.nexus.rest.RepositoryURLBuilder
 import org.sonatype.nexus.scheduling.NexusScheduler
 import org.sonatype.nexus.tasks.ExpireCacheTask
 import org.sonatype.nexus.templates.TemplateManager
@@ -91,7 +106,7 @@ extends DirectComponentSupport
   RepositoryTypeRegistry repositoryTypeRegistry
 
   @Inject
-  RepositoryURLBuilder repositoryURLBuilder
+  UrlBuilder urlBuilder
 
   @Inject
   TemplateManager templateManager
@@ -362,7 +377,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:delete')
   @Validate
-  void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void delete_(final @NotEmpty(message = '[id] may not be empty') String id) {
     protectedRepositoryRegistry.removeRepository(id)
   }
 
@@ -750,7 +765,7 @@ extends DirectComponentSupport
         browseable = repo.browseable
         exposed = repo.exposed
         localStatus = repo.localStatus
-        url = repositoryURLBuilder.getExposedRepositoryContentUrl(repo)
+        url = urlBuilder.getExposedRepositoryContentUrl(repo)
         userManaged = repo.userManaged
       }
       if (repo instanceof AbstractRepository) {

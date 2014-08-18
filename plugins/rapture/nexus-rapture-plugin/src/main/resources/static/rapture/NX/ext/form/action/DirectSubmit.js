@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * **{@link Ext.form.action.DirectSubmit}** overrides (see inline comments marked with &lt;override/&gt;
  * @see "https://support.sencha.com/index.php#ticket-16118"
@@ -55,7 +57,7 @@ Ext.define('NX.ext.form.action.DirectSubmit', {
     }
 
     //<override> call using field values if direct function formHandler = false
-    //fn.call(window, formInfo.formEl, callback, me, options);
+    //fn.call(NX.global, formInfo.formEl, callback, me, options);
     if (fn.directCfg.method.formHandler) {
       formEl = formInfo.formEl;
     }
@@ -67,7 +69,7 @@ Ext.define('NX.ext.form.action.DirectSubmit', {
         }
       });
     }
-    fn.call(window, formEl, callback, me, options);
+    fn.call(NX.global, formEl, callback, me, options);
     //</override>
     me.cleanup(formInfo);
   }

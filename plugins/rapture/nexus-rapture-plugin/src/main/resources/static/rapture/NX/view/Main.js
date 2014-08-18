@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext*/
+
 /**
  * Main uber mode panel.
  *
@@ -92,7 +94,7 @@ Ext.define('NX.view.Main', {
       { xtype: 'nx-header-browse-mode' },
       { xtype: 'nx-header-admin-mode' },
       ' ',
-      { xtype: 'nx-header-quicksearch' },
+      { xtype: 'nx-header-quicksearch', hidden: true },
       '->',
       { xtype: 'nx-header-messages', ui: 'header' },
       { xtype: 'nx-header-refresh', ui: 'header' },

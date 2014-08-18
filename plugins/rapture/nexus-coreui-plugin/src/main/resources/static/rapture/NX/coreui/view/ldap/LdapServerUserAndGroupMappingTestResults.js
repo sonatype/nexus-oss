@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * LDAP Server User & Group test results window.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupMappingTestResults', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-ldapserver-userandgroup-testresults',
+  requires: [
+    'Ext.data.JsonStore'
+  ],
 
   title: 'User Mapping Test Results',
 

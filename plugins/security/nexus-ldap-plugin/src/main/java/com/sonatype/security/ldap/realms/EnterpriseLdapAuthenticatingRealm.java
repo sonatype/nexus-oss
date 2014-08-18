@@ -26,7 +26,7 @@ import org.eclipse.sisu.Description;
 
 @Named(LdapPlugin.REALM_NAME)
 @Singleton
-@Description("Enterprise LDAP Authentication Realm")
+@Description("LDAP Authentication Realm")
 public class EnterpriseLdapAuthenticatingRealm
     extends AbstractLdapAuthenticatingRealm
 {

@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext*/
+
 /**
  * A search box.
  *
@@ -18,17 +20,20 @@
 Ext.define('NX.ext.SearchBox', {
   extend: 'Ext.form.field.Trigger',
   alias: 'widget.nx-searchbox',
+  requires: [
+    'Ext.util.KeyNav'
+  ],
 
   emptyText: 'search',
   submitValue: false,
 
   /**
-   * @cfg {int} number of milliseconds to trigger searching (defaults to 200)
+   * @cfg {int} number of milliseconds to trigger searching (defaults to 1000)
    */
-  searchDelay: 200,
+  searchDelay: 1000,
 
   // TODO: Only show clear trigger if we have text
-  triggerCls: Ext.baseCSSPrefix + 'form-clear-trigger',
+  trigger1Cls: 'nx-form-fa-times-circle-trigger',
 
   /**
    * @override
@@ -76,6 +81,11 @@ Ext.define('NX.ext.SearchBox', {
         scope: me,
         defaultEventAction: false
       },
+      enter: {
+        handler: me.onEnter,
+        scope: me,
+        defaultEventAction: false
+      },
       scope: me,
       forceKeyDown: true
     });
@@ -85,10 +95,20 @@ Ext.define('NX.ext.SearchBox', {
    * @private
    * Clear search.
    */
-  onTriggerClick: function () {
+  onTrigger1Click: function () {
     var me = this;
 
     me.clearSearch();
+  },
+
+  /**
+   * @private
+   * Search on ENTER.
+   */
+  onEnter: function () {
+    var me = this;
+
+    me.search(me.getValue());
   },
 
   /**
@@ -102,7 +122,7 @@ Ext.define('NX.ext.SearchBox', {
       me.search(value);
     }
     else {
-      me.clearSearch()
+      me.clearSearch();
     }
   },
 
@@ -114,7 +134,7 @@ Ext.define('NX.ext.SearchBox', {
   search: function (value) {
     var me = this;
 
-    if (value != me.getValue()) {
+    if (value !== me.getValue()) {
       me.setValue(value);
     }
     else {

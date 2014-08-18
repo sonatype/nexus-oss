@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Browse repository storage tree panel.
  *
@@ -18,6 +20,10 @@
 Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
   extend: 'Ext.tree.Panel',
   alias: 'widget.nx-coreui-repositorybrowse-tree',
+  requires: [
+    'Ext.data.TreeStore',
+    'NX.Icons'
+  ],
 
   viewConfig: {
     markDirty: false
@@ -37,8 +43,8 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
       xtype: 'nx-iconcolumn',
       dataIndex: 'inStorage',
       text: 'Storage',
+      hideable: true,
       sortable: false,
-      menuDisabled: true,
       width: 80,
       iconNamePrefix: 'repositorybrowse-',
       iconVariant: 'x16',
@@ -50,14 +56,20 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
       xtype: 'nx-iconcolumn',
       dataIndex: 'inIndex',
       text: 'Index',
+      hideable: true,
       sortable: false,
-      menuDisabled: true,
       width: 80,
       iconNamePrefix: 'repositorybrowse-',
       iconVariant: 'x16',
       iconName: function(value, meta, record) {
         return value && record.get('path') !== '/' ? 'inIndex' : undefined;
       }
+    }
+  ],
+
+  tbar: [
+    { xtype: 'button', text: 'More...', glyph: 'xf0ae@FontAwesome' /* fa-tasks */, action: 'more', disabled: true,
+      menu: []
     }
   ],
 
@@ -104,17 +116,5 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
     });
 
     me.callParent(arguments);
-
-    me.addEvents(
-        /**
-         * @event beforecontextmenushow
-         * Fires before showing the context menu.
-         * @param {Ext.menu.Menu} to be shown
-         * @param {NX.coreui.model.Repository} repository
-         * param {Ext.data.NodeInterface} clicked node
-         */
-        'beforecontextmenushow'
-    );
   }
-
 });

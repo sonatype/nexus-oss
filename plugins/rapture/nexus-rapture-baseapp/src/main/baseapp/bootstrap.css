@@ -5,5 +5,5 @@
  * to the most recently built CSS file for the application to allow index.html
  * in the development directory to load properly (i.e., "dev mode").
  */
-@import '../resources/static/rapture/resources/baseapp-debug.css';
+@import '../resources/static/rapture/resources/baseapp-prod.css';
 

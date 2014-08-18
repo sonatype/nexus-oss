@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Task settings form.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.coreui.view.task.TaskSettings', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-task-settings',
+  requires: [
+    'NX.Conditions'
+  ],
 
   api: {
     submit: 'NX.direct.coreui_Task.update'
@@ -25,12 +30,7 @@ Ext.define('NX.coreui.view.task.TaskSettings', {
   settingsFormSuccessMessage: function (data) {
     return 'Task updated: ' + data['name'] + ' (' + data['typeName'] + ')';
   },
-  editableCondition: NX.Conditions.and(
-      NX.Conditions.isPermitted('nexus:tasks', 'update'),
-      NX.Conditions.formHasRecord('nx-coreui-task-settings', function(model) {
-        return model.get('schedule') !== 'internal';
-      })
-  ),
+
   editableMarker: 'You do not have permission to update tasks or task is not user manageable',
 
   items: [
@@ -68,6 +68,13 @@ Ext.define('NX.coreui.view.task.TaskSettings', {
    */
   initComponent: function () {
     var me = this;
+
+    me.editableCondition = NX.Conditions.and(
+        NX.Conditions.isPermitted('nexus:tasks', 'update'),
+        NX.Conditions.formHasRecord('nx-coreui-task-settings', function (model) {
+          return model.get('schedule') !== 'internal';
+        })
+    );
 
     me.callParent(arguments);
 

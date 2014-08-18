@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Abstract Master/Detail controller.
  *
@@ -20,7 +22,9 @@ Ext.define('NX.controller.MasterDetail', {
   requires: [
     // many impls use this
     'NX.view.info.Panel',
-    'NX.view.info.Entry'
+    'NX.view.info.Entry',
+    'NX.Conditions',
+    'NX.Dialogs'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -113,7 +117,7 @@ Ext.define('NX.controller.MasterDetail', {
     var me = this;
 
     if (modelId) {
-      me.bookmarkAt(modelId)
+      me.bookmarkAt(modelId);
     }
 
     me.loadStore();
@@ -157,7 +161,7 @@ Ext.define('NX.controller.MasterDetail', {
   onSelectionChange: function (selectionModel, selected) {
     var me = this;
 
-    me.onModelChanged(selected.length == 1 ? selected[0] : undefined);
+    me.onModelChanged(selected.length === 1 ? selected[0] : undefined);
     me.bookmark();
   },
 
@@ -187,10 +191,10 @@ Ext.define('NX.controller.MasterDetail', {
         selected = me.getList().getSelectionModel().getSelection(),
         modelId;
 
-    if (selected.length == 1) {
+    if (selected.length === 1) {
       modelId = selected[0].getId();
     }
-    me.bookmarkAt(modelId)
+    me.bookmarkAt(modelId);
   },
 
   /**
@@ -256,7 +260,7 @@ Ext.define('NX.controller.MasterDetail', {
     if (Ext.isDefined(selection) && selection.length > 0) {
       description = me.getDescription(selection[0]);
       NX.Dialogs.askConfirmation('Confirm deletion?', description, function () {
-        me.deleteModel(selection[0])
+        me.deleteModel(selection[0]);
       }, {scope: me});
     }
   },

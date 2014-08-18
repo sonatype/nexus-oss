@@ -171,11 +171,14 @@ public class SecurityComponent
     Subject subject = securitySystem.getSubject();
     if (isLoggedIn(subject)) {
       userXO = new UserXO();
+      userXO.setAuthenticated(subject.isAuthenticated());
       Object principal = subject.getPrincipal();
       if (principal != null) {
         userXO.setId(principal.toString());
+        if (securitySystem.isAnonymousAccessEnabled() && userXO.getId().equals(securitySystem.getAnonymousUsername())) {
+          userXO = null;
+        }
       }
-      userXO.setAuthenticated(subject.isAuthenticated());
     }
     return userXO;
   }

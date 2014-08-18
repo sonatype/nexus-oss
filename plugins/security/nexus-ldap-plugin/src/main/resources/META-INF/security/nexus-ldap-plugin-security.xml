@@ -18,7 +18,7 @@
     <roles>
         <role>
             <id>ui-enterprise-ldap-admin</id>
-            <name>UI: Enterprise LDAP Administrator</name>
+            <name>UI: LDAP Administrator</name>
             <description>Gives access to create and edit LDAP Servers.</description>
             <sessionTimeout>60</sessionTimeout>
             <privileges>
@@ -35,7 +35,7 @@
         <privilege>
             <id>enterprise-ldap-create</id>
             <type>method</type>
-            <name>LDAP Enterprise (create,read)</name>
+            <name>LDAP (create,read)</name>
             <description>Give permission to create new LDAP Servers.</description>
             <properties>
                 <property>
@@ -51,7 +51,7 @@
         <privilege>
             <id>enterprise-ldap-read</id>
             <type>method</type>
-            <name>LDAP Enterprise (read)</name>
+            <name>LDAP (read)</name>
             <description>Give permission to read LDAP Server configurations.</description>
             <properties>
                 <property>
@@ -67,7 +67,7 @@
         <privilege>
             <id>enterprise-ldap-update</id>
             <type>method</type>
-            <name>LDAP Enterprise (update,read)</name>
+            <name>LDAP (update,read)</name>
             <description>Give permission to update LDAP Server configurations.</description>
             <properties>
                 <property>
@@ -83,7 +83,7 @@
         <privilege>
             <id>enterprise-ldap-delete</id>
             <type>method</type>
-            <name>LDAP Enterprise (delete,read)</name>
+            <name>LDAP (delete,read)</name>
             <description>Give permission to delete LDAP Servers.</description>
             <properties>
                 <property>

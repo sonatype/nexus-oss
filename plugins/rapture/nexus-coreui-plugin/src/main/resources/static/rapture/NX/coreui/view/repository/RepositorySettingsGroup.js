@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Repository group settings form.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.coreui.view.repository.RepositorySettingsGroup', {
   extend: 'NX.coreui.view.repository.RepositorySettings',
   alias: 'widget.nx-repository-settings-group',
+  requires: [
+    'NX.coreui.store.RepositoryReference'
+  ],
 
   api: {
     submit: 'NX.direct.coreui_Repository.updateGroup'

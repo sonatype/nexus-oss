@@ -96,11 +96,11 @@ of their member repositories. Click *Add* and create a new *Yum: Merge Metadata*
 
 The configuration of the Nexus Yum Plugin can be found in *yum.xml* in the same directory as *nexus.xml* :
 
-	$NEXUS_WORK_DIR/conf/yum.xml
+	$NEXUS_WORK_DIR/etc/yum.xml
 
 default:
 
-	~/sonatype-work/nexus/conf/yum.xml
+	~/sonatype-work/nexus/etc/yum.xml
 
 but shouldn't be edited directly.
 

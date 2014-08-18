@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * A form field that allows managing multiple values.
  *
@@ -19,7 +21,10 @@ Ext.define('NX.ext.form.field.ValueSet', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-valueset',
   requires: [
-    'Ext.data.SequentialIdGenerator'
+    'Ext.data.SequentialIdGenerator',
+    'Ext.data.Store',
+    'Ext.util.KeyNav',
+    'NX.Icons'
   ],
   mixins: {
     field: 'Ext.form.field.Field'
@@ -116,7 +121,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
     if (!Ext.isDefined(me.input)) {
       me.input = {
         xtype: 'textfield'
-      }
+      };
     }
     Ext.apply(me.input, {
       valueFieldId: valueFieldId,
@@ -135,12 +140,12 @@ Ext.define('NX.ext.form.field.ValueSet', {
     if (!me.converter.toValues || !Ext.isFunction(me.converter.toValues)) {
       me.converter.toValues = function (values) {
         return values;
-      }
+      };
     }
     if (!me.converter.fromValues || !Ext.isFunction(me.converter.fromValues)) {
       me.converter.fromValues = function (values) {
         return values;
-      }
+      };
     }
 
     me.items = [
@@ -205,7 +210,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
       Ext.create('Ext.util.KeyNav', me.valueField.el, {
         enter: me.addValue,
         scope: me
-      })
+      });
     });
   },
 

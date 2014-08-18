@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Repository targets controller.
  *
@@ -19,6 +21,8 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
   extend: 'NX.controller.MasterDetail',
   requires: [
     'NX.Dialogs',
+    'NX.Messages',
+    'NX.Permissions'
   ],
 
   list: 'nx-coreui-repositorytarget-list',
@@ -168,7 +172,7 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.coreui_RepositoryTarget.delete(model.getId(), function (response) {
+    NX.direct.coreui_RepositoryTarget.delete_(model.getId(), function (response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'Target deleted: ' + description, type: 'success' });

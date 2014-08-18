@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * An URL **{@link Ext.form.field.Text}**.
  *
@@ -39,7 +41,7 @@ Ext.define('NX.ext.form.field.Url', {
         url: field
       };
     }
-    return undefined
+    return undefined;
   }
 
 });

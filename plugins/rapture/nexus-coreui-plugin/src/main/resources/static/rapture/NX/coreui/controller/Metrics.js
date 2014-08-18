@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 
 /**
  * Metrics controller.
@@ -18,6 +20,11 @@
  */
 Ext.define('NX.coreui.controller.Metrics', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Permissions',
+    'NX.util.Url',
+    'NX.util.DownloadHelper'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },
@@ -109,7 +116,7 @@ Ext.define('NX.coreui.controller.Metrics', {
 
         // return gauge value
         function gv(name) {
-          return data.gauges[name].value
+          return data.gauges[name].value;
         }
 
         // update memory charts

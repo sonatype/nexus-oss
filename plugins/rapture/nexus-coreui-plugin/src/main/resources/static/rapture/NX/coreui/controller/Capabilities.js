@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Capabilities controller.
  *
@@ -200,7 +202,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
     var summary = this.getSummary(),
         info = {
           'Type': model.get('typeName'),
-          'Description': model.get('description')
+          'Description': model.get('description'),
+          'State': Ext.String.capitalize(model.get('state'))
         };
 
     if (Ext.isDefined(model.get('tags'))) {
@@ -208,7 +211,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
     }
 
     summary.showInfo(info);
-    summary.showState(model.get('state'));
     summary.down('form').loadRecord(model);
   },
 
@@ -454,7 +456,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.capability_Capability.delete(model.getId(), function (response) {
+    NX.direct.capability_Capability.delete_(model.getId(), function (response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({

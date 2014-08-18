@@ -34,7 +34,7 @@ public class MECLIPSE0465x01ProxyAuthenticatedP2RepoIT
       throws Exception
   {
     installAndVerifyP2Feature();
-    assertThat(new File(nexusWorkDir + "/conf/eclipse.secure_storage"), exists());
+    assertThat(new File(nexusWorkDir + "/etc/eclipse.secure_storage"), exists());
   }
 
 }

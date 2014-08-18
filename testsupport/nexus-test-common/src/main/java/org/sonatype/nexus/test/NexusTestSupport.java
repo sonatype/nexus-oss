@@ -68,7 +68,7 @@ public abstract class NexusTestSupport
     );
     appsHomeDir = new File(plexusHomeDir, "apps");
     workHomeDir = new File(plexusHomeDir, "nexus-work");
-    confHomeDir = new File(workHomeDir, "conf");
+    confHomeDir = new File(workHomeDir, "etc");
     baseHomeDir = new File(plexusHomeDir, "nexus-base");
     nexusappHomeDir = new File(plexusHomeDir, "nexus-app");
     tempDir = new File(workHomeDir, "tmp");

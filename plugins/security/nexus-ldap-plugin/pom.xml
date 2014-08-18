@@ -27,7 +27,7 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Enterprise LDAP Plugin</pluginName>
+    <pluginName>Nexus LDAP Plugin</pluginName>
     <pluginDescription>Adds an LDAP realm to Nexus.</pluginDescription>
   </properties>
 

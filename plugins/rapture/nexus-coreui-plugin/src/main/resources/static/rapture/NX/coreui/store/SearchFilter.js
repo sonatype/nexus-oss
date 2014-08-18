@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Search Filter store.
  *
@@ -32,7 +34,7 @@ Ext.define('NX.coreui.store.SearchFilter', {
     {
       id: 'maven2',
       name: 'Maven',
-      description: 'Search Maven repositories by GAV',
+      description: 'Search for components by Maven coordinates',
       readOnly: true,
       criterias: [
         { id: 'format', value: 'maven2', hidden: true },
@@ -43,21 +45,22 @@ Ext.define('NX.coreui.store.SearchFilter', {
         { id: 'packaging' }
       ]
     },
-    {
-      id: 'p2',
-      name: 'P2',
-      description: 'Search P2 repositories',
-      readOnly: true,
-      criterias: [
-        { id: 'format', value: 'p2', hidden: true },
-        { id: 'symbolicname' },
-        { id: 'version' }
-      ]
-    },
+    // TODO Comment for now as we do not yet support P2 search
+    //{
+    //  id: 'p2',
+    //  name: 'P2',
+    //  description: 'Search for components P2 symbolic-name',
+    //  readOnly: true,
+    //  criterias: [
+    //    { id: 'format', value: 'p2', hidden: true },
+    //    { id: 'symbolicname' },
+    //    { id: 'version' }
+    //  ]
+    //},
     {
       id: 'keyword',
       name: 'Keyword',
-      description: 'Search by keyword',
+      description: 'Search for components by keyword',
       readOnly: true,
       criterias: [
         { id: 'keyword' }
@@ -66,7 +69,7 @@ Ext.define('NX.coreui.store.SearchFilter', {
     {
       id: 'sha-1',
       name: 'SHA-1',
-      description: 'Search by sha-1',
+      description: 'Search for components by SHA-1',
       readOnly: true,
       criterias: [
         { id: 'sha-1' }
@@ -75,7 +78,7 @@ Ext.define('NX.coreui.store.SearchFilter', {
     {
       id: 'classname',
       name: 'Class Name',
-      description: 'Search by class name',
+      description: 'Search for components by class-name',
       readOnly: true,
       criterias: [
         { id: 'classname' }
@@ -84,7 +87,7 @@ Ext.define('NX.coreui.store.SearchFilter', {
     {
       id: 'custom',
       name: 'Custom',
-      description: 'Build your own',
+      description: 'Search for components by custom criteria',
       readOnly: true
     }
   ]

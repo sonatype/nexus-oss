@@ -82,7 +82,7 @@ public class EmbeddedNexusBooter
     overrides.put("nexus-work", workDir.getPath());
 
     // force bootstrap logback configuration
-    overrides.put("logback.configurationFile", new File(installDir, "conf/logback.xml").getPath());
+    overrides.put("logback.configurationFile", new File(installDir, "etc/logback.xml").getPath());
 
     // Make sure H2 uses TCCL for Java deserialization
     overrides.put("h2.useThreadContextClassLoader", "true");
@@ -125,7 +125,7 @@ public class EmbeddedNexusBooter
   }
 
   private void tamperJettyConfiguration() throws IOException {
-    final File file = new File(installDir, "conf/jetty.xml");
+    final File file = new File(installDir, "etc/jetty.xml");
     String xml = FileUtils.readFileToString(file, "UTF-8");
 
     // Disable the shutdown hook, since it disturbs the embedded work
@@ -151,7 +151,7 @@ public class EmbeddedNexusBooter
   private ClassRealm createBootRealm() throws Exception {
     List<URL> classpath = new ArrayList<>() ;
 
-    File confDir = new File(installDir, "conf");
+    File confDir = new File(installDir, "etc");
     log.info("Boot conf dir: {}", confDir);
     classpath.add(confDir.toURI().toURL());
 

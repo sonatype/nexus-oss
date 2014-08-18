@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext*/
+
 /**
  * Conditions developer panel controller.
  *
@@ -17,6 +19,9 @@
  */
 Ext.define('NX.controller.dev.Conditions', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'Ext.util.Filter'
+  ],
 
   stores: [
     'NX.store.dev.Condition'

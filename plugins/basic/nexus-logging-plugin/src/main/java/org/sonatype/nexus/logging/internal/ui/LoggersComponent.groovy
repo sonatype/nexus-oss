@@ -90,7 +90,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:logconfig:delete')
   @Validate
-  void delete(final @NotEmpty(message = '[name] may not be empty') String name) {
+  void delete_(final @NotEmpty(message = '[name] may not be empty') String name) {
     assert name != ROOT, "${ROOT} logger cannot be removed"
     logManager.unsetLoggerLevel(name)
   }

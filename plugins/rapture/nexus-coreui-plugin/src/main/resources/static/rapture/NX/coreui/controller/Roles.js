@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Roles controller.
  *
@@ -272,7 +274,7 @@ Ext.define('NX.coreui.controller.Roles', {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.coreui_Role.delete(model.getId(), function (response) {
+    NX.direct.coreui_Role.delete_(model.getId(), function (response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({

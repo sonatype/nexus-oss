@@ -22,7 +22,11 @@ import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.index.IndexerManager
-import org.sonatype.nexus.proxy.*
+import org.sonatype.nexus.proxy.AccessDeniedException
+import org.sonatype.nexus.proxy.ItemNotFoundException
+import org.sonatype.nexus.proxy.NoSuchRepositoryException
+import org.sonatype.nexus.proxy.RepositoryNotAvailableException
+import org.sonatype.nexus.proxy.ResourceStoreRequest
 import org.sonatype.nexus.proxy.access.AccessManager
 import org.sonatype.nexus.proxy.item.StorageCollectionItem
 import org.sonatype.nexus.proxy.item.StorageFileItem
@@ -135,8 +139,8 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @Validate
-  void delete(final @NotEmpty(message = '[id] may not be empty') String id,
-              final String path)
+  void delete_(final @NotEmpty(message = '[id] may not be empty') String id,
+               final String path)
   {
     protectedRepositoryRegistry.getRepository(id).deleteItem(new ResourceStoreRequest(path, true))
     log.info "Storage item(s) on path \"${path}\" (and below) were deleted from repository [${id}]"

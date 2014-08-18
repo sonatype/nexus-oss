@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext*/
+
 /**
  * A grid plugins that adds filtering capabilities.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.ext.grid.plugin.Filtering', {
   extend: 'Ext.AbstractPlugin',
   alias: 'plugin.gridfiltering',
+  requires: [
+    'Ext.util.Filter'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },
@@ -45,7 +50,7 @@ Ext.define('NX.ext.grid.plugin.Filtering', {
     if (valueToBeMatched) {
       stringValue = valueToBeMatched.toString();
       if (stringValue) {
-        return stringValue.toLowerCase().indexOf(filterValue.toLowerCase()) != -1;
+        return stringValue.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1;
       }
     }
     return false;

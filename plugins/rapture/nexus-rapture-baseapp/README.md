@@ -23,6 +23,16 @@ When updating baseapp/ext need to be aware there are directories named 'target':
 
 May completely revisit this solution later.
 
+## Configuration
+
+Some relevant configuration in the mess of Sencha CMD muck:
+
+* src/main/baseapp/.sencha/app/defaults.properties
+* src/main/baseapp/.sencha/app/build.properties
+* src/main/baseapp/.sencha/app/production.properties
+* src/main/baseapp/.sencha/app/testing.properties
+* src/main/baseapp/packages/rapture-theme
+
 ## Regenerating
 
     mvn clean install -Pregenerate
@@ -35,4 +45,44 @@ If the content has changed, then the result needs to be committed:
 
     mvn clean install -Pwatch
 
+## Other
+ 
+Various other examples of Sencha CMD usage.
+ 
+### Manual class ordering for yuicompressor-maven-plugin includes
 
+run from nexus-oss/plugins/rapture/nexus-rapture-baseapp/src/main/baseapp
+
+Create template.txt:
+
+    <include>{0}</include>
+
+Generate ordered classes for: nexus-rapture-plugin
+
+    sencha compile \
+        -classpath=../../../../nexus-rapture-plugin/src/main/resources/static/rapture \
+        exclude -file ext/\*\* and \
+        exclude -file app/\*\* and \
+        include -namespace NX and \
+        meta -filenames -tpl @template.txt -out filenames.txt
+    
+Generate ordered classes for: nexus-coreui-plugin
+
+    sencha compile \
+        -classpath=../../../../nexus-rapture-plugin/src/main/resources/static/rapture,../../../../nexus-coreui-plugin/src/main/resources/static/rapture \
+        exclude -file ext/\*\* and \
+        exclude -file app/\*\* and \
+        include -namespace NX and \
+        exclude -file \*\*/nexus-rapture-plugin/\*\* and \
+        meta -filenames -tpl @template.txt -out filenames.txt
+    
+Generate ordered classes for: nexus-proui-plugin
+
+    sencha compile \
+        -classpath=../../../../nexus-rapture-plugin/src/main/resources/static/rapture,../../../../nexus-coreui-plugin/src/main/resources/static/rapture,../../../../../../../nexus-pro/plugins/internal/nexus-proui-plugin/src/main/resources/static/rapture \
+        exclude -file ext/\*\* and \
+        exclude -file app/\*\* and \
+        include -namespace NX and \
+        exclude -file \*\*/nexus-rapture-plugin/\*\* and \
+        exclude -file \*\*/nexus-coreui-plugin/\*\* and \
+        meta -filenames -tpl @template.txt -out filenames.txt

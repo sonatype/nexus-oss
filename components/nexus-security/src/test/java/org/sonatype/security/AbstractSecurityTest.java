@@ -30,7 +30,7 @@ public abstract class AbstractSecurityTest
 
   protected File PLEXUS_HOME = new File("./target/plexus-home/");
 
-  protected File APP_CONF = new File(PLEXUS_HOME, "conf");
+  protected File APP_CONF = new File(PLEXUS_HOME, "etc");
 
   @Override
   public void configure(Properties properties) {

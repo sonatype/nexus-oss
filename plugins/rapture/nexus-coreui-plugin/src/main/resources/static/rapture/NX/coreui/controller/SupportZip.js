@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Support Zip controller.
  *
@@ -20,6 +22,10 @@ Ext.define('NX.coreui.controller.SupportZip', {
   mixins: {
     logAware: 'NX.LogAware'
   },
+  requires: [
+    'NX.util.Url',
+    'NX.util.DownloadHelper'
+  ],
 
   views: [
     'support.SupportZip',
@@ -91,7 +97,7 @@ Ext.define('NX.coreui.controller.SupportZip', {
             NX.util.DownloadHelper.downloadUrl(NX.util.Url.urlOf(
                 'service/siesta/wonderland/download/' + fileName + '?t=' + NX.util.Base64.encode(authToken)
             ));
-            win.close()
+            win.close();
           }
         }
     );

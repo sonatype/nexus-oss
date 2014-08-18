@@ -33,7 +33,16 @@ import org.sonatype.nexus.validation.Update
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.scheduling.ScheduledTask
 import org.sonatype.scheduling.TaskState
-import org.sonatype.scheduling.schedules.*
+import org.sonatype.scheduling.schedules.AbstractSchedule
+import org.sonatype.scheduling.schedules.CronSchedule
+import org.sonatype.scheduling.schedules.DailySchedule
+import org.sonatype.scheduling.schedules.HourlySchedule
+import org.sonatype.scheduling.schedules.ManualRunSchedule
+import org.sonatype.scheduling.schedules.MonthlySchedule
+import org.sonatype.scheduling.schedules.OnceSchedule
+import org.sonatype.scheduling.schedules.RunNowSchedule
+import org.sonatype.scheduling.schedules.Schedule
+import org.sonatype.scheduling.schedules.WeeklySchedule
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -190,7 +199,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasks:delete')
   @Validate
-  void delete(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void delete_(final @NotEmpty(message = '[id] may not be empty') String id) {
     nexusScheduler.getTaskById(id)?.cancel()
   }
 

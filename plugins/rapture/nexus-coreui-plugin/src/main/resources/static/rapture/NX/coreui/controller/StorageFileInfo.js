@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Storage file info controller.
  *
@@ -46,7 +48,7 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
         panel = container.down('nx-coreui-repositorybrowse-storagefileinfo');
 
     if (!panel) {
-      panel = container.add({ xtype: 'nx-coreui-repositorybrowse-storagefileinfo' });
+      panel = container.add({ xtype: 'nx-coreui-repositorybrowse-storagefileinfo', weight: 10 });
     }
 
     NX.direct.coreui_RepositoryStorage.readInfo(repositoryId, path, function(response) {
@@ -63,7 +65,7 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
         if (response.data['inLocalStorage']) {
           Ext.Array.each(response.data['repositories'], function(repository) {
             repositories.push(NX.util.Url.asLink(
-                NX.util.Url.urlOf('#browse/repository/standard:' + repository['id'] + ':storage'),
+                NX.util.Url.urlOf('#browse/repository/standard:' + repository['id'] + ':' + path),
                 repository['name'],
                 '_self'
             ));

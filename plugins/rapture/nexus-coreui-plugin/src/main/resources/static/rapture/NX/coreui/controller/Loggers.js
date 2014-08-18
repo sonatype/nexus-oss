@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Logging configuration controller.
  *
@@ -181,7 +183,7 @@ Ext.define('NX.coreui.controller.Loggers', {
 
     if (selection.length) {
       NX.Dialogs.askConfirmation('Confirm deletion?', selection[0].get('name'), function () {
-        NX.direct.logging_Loggers.delete(selection[0].getId(), function (response) {
+        NX.direct.logging_Loggers.delete_(selection[0].getId(), function (response) {
           me.loadStore();
           if (Ext.isObject(response) && response.success) {
             NX.Messages.add({ text: 'Logger deleted: ' + selection[0].get('name'), type: 'success' });

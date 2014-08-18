@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Task Schedule Monthly field set.
  *
@@ -18,7 +20,13 @@
 Ext.define('NX.coreui.view.task.TaskScheduleMonthly', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-task-schedule-monthly',
+  requires: [
+    'NX.util.DateFormat'
+  ],
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this,
         columns = [];

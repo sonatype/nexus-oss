@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Role grid.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.coreui.view.role.RoleList', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-coreui-role-list',
+  requires: [
+    'NX.Icons'
+  ],
 
   store: 'Role',
 
@@ -37,17 +42,25 @@ Ext.define('NX.coreui.view.role.RoleList', {
 
   emptyText: 'No roles defined',
 
-  tbar: [
-    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
-      menu: [
-        { text: 'Nexus Role', action: 'newrole', iconCls: NX.Icons.cls('role-default', 'x16') }
-      ]
-    },
-    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
-  ],
-
   plugins: [
     { ptype: 'gridfilterbox', emptyText: 'No role matched criteria "$filter"' }
-  ]
+  ],
 
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
+
+    me.tbar = [
+      { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
+        menu: [
+          { text: 'Nexus Role', action: 'newrole', iconCls: NX.Icons.cls('role-default', 'x16') }
+        ]
+      },
+      { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+    ];
+
+    me.callParent();
+  }
 });

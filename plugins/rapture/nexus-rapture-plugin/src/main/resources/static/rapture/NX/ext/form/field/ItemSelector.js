@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext*/
+
 /**
  * Extension of Ext.ux.form.ItemSelector to allow better control over button configurations.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.ext.form.field.ItemSelector', {
   extend: 'Ext.ux.form.ItemSelector',
   alias: 'widget.nx-itemselector',
+  requires: [
+    'Ext.ux.form.MultiSelect'
+  ],
 
   width: 600,
   height: 253,
@@ -93,7 +98,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
           searchcleared: me.onSearchCleared,
           scope: me
         }
-      }
+      };
     }
 
     return Ext.create('Ext.ux.form.MultiSelect', {
@@ -150,10 +155,10 @@ Ext.define('NX.ext.form.field.ItemSelector', {
       var stringValue = model.get(me.displayField);
       if (stringValue) {
         stringValue = stringValue.toString();
-        return stringValue.toLowerCase().indexOf(value.toLowerCase()) != -1;
+        return stringValue.toLowerCase().indexOf(value.toLowerCase()) !== -1;
       }
       return false;
-    }})
+    }});
   },
 
   /**

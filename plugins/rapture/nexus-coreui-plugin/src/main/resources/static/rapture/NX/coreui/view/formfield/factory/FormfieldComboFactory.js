@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /*global NX, Ext, Sonatype*/
 
 /**
@@ -26,14 +28,14 @@ Ext.define('NX.coreui.view.formfield.factory.FormfieldComboFactory', {
     'nx.formfield.factory.repo-or-group',
     'nx.formfield.factory.repo-target'
   ],
-
+  requires: [
+    'Ext.data.Store',
+    'Ext.form.ComboBox',
+    'NX.util.Url'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },
-
-  requires: [
-    'NX.util.Url'
-  ],
 
   /**
    * Creates a combo.

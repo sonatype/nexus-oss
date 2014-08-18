@@ -10,14 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Mark log window.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.search.LogMark', {
+Ext.define('NX.coreui.view.logging.LogMark', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-log-mark',
+  requires: [
+    'NX.Conditions'
+  ],
 
   title: 'Mark log',
   defaultFocus: 'message',
@@ -29,7 +34,6 @@ Ext.define('NX.coreui.view.search.LogMark', {
     },
     settingsFormSuccessMessage: 'Log has been marked',
     settingsFormSubmitOnEnter: true,
-    editableCondition: NX.Conditions.isPermitted('nexus:logconfig', 'update'),
     editableMarker: 'You do not have permission to mark the log',
     items: [
       {
@@ -41,6 +45,16 @@ Ext.define('NX.coreui.view.search.LogMark', {
         emptyText: 'enter a marker text'
       }
     ]
-  }
+  },
 
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
+
+    me.editableCondition = NX.Conditions.isPermitted('nexus:logconfig', 'update');
+
+    me.callParent();
+  }
 });

@@ -37,8 +37,11 @@ public class NexusBundleTracker
 {
   private static final Logger log = LoggerFactory.getLogger(NexusBundleTracker.class);
 
+  private final Bundle systemBundle;
+
   public NexusBundleTracker(final BundleContext context, final MutableBeanLocator locator) {
     super(context, Bundle.STARTING | Bundle.ACTIVE, locator);
+    systemBundle = context.getBundle(0);
   }
 
   @Override
@@ -67,6 +70,12 @@ public class NexusBundleTracker
       prepareDependencies(bundle);
     }
     return null;
+  }
+
+  @Override
+  protected boolean evictBundle(Bundle bundle) {
+    // when system is shutting down we disable eviction of bundles to keep things stable
+    return super.evictBundle(bundle) && (systemBundle.getState() & Bundle.STOPPING) == 0;
   }
 
   private void prepareDependencies(final Bundle bundle) {

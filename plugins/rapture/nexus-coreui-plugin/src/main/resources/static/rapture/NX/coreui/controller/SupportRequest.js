@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Support Request controller.
  *
@@ -18,7 +20,8 @@
 Ext.define('NX.coreui.controller.SupportRequest', {
   extend: 'Ext.app.Controller',
   requires: [
-      'NX.State'
+    'NX.State',
+    'NX.Windows'
   ],
 
   views: [
@@ -61,10 +64,7 @@ Ext.define('NX.coreui.controller.SupportRequest', {
    * Open sonatype support in a new browser window/tab.
    */
   makeRequest: function () {
-    var win = window.open('http://links.sonatype.com/products/nexus/pro/support-request');
-    if (win == null) {
-      alert('Window pop-up was blocked!');
-    }
+    NX.Windows.open('http://links.sonatype.com/products/nexus/pro/support-request');
   }
 
 });

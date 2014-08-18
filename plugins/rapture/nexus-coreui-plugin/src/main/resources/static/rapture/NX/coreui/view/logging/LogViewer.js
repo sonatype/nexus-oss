@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Log Viewer panel.
  *
@@ -23,12 +25,10 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
 
   items: {
     xtype: 'textarea',
+    cls: 'nx-coreui-log-viewer',
     readOnly: true,
     hideLabel: true,
-    emptyText: 'Refresh to display log',
-
-    // HACK: Set style of log content
-    cls: 'nx-coreui-log-viewer'
+    emptyText: 'Refresh to display log'
   },
 
   tbar: [

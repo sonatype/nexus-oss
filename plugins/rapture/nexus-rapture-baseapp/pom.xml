@@ -27,6 +27,20 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>bundle</packaging>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Fragment-Host>org.sonatype.nexus.plugins.nexus-rapture-plugin</Fragment-Host>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
       <id>regenerate</id>
@@ -51,6 +65,7 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
       <id>watch</id>
       <build>

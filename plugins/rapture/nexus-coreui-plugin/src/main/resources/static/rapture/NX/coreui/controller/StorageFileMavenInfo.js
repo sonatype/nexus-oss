@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Storage file Maven info controller.
  *
@@ -48,7 +50,7 @@ Ext.define('NX.coreui.controller.StorageFileMavenInfo', {
 
       if (Ext.isObject(response) && response.success && response.data) {
         if (!panel) {
-          panel = container.add({ xtype: 'nx-coreui-repositorybrowse-storagefilemaveninfo' });
+          panel = container.add({ xtype: 'nx-coreui-repositorybrowse-storagefilemaveninfo', weight: 20 });
         }
         info = {
           'Group': response.data['groupId'],

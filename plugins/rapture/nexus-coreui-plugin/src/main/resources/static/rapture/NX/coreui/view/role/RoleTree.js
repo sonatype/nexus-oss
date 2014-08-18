@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Role tree panel.
  *
@@ -18,6 +20,14 @@
 Ext.define('NX.coreui.view.role.RoleTree', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-role-tree',
+  requires: [
+    'Ext.data.TreeStore',
+    'NX.Icons',
+    'NX.coreui.store.Role',
+    'NX.coreui.store.Privilege'
+  ],
+
+  layout: 'fit',
 
   /**
    * @override
@@ -71,7 +81,7 @@ Ext.define('NX.coreui.view.role.RoleTree', {
             Ext.resumeLayouts(true);
           }
         }
-      },
+      }
     };
 
     me.callParent(arguments);
@@ -178,5 +188,4 @@ Ext.define('NX.coreui.view.role.RoleTree', {
       }
     }
   }
-
 });

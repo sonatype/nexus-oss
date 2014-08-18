@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Ssl Certificate detail panel.
  *
@@ -18,37 +20,48 @@
 Ext.define('NX.coreui.view.ssl.SslCertificateDetails', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-sslcertificate-details',
-
-  items: [
-    {
-      xtype: 'fieldset',
-      title: 'Subject',
-      items: [
-        { xtype: 'displayfield', name: 'subjectCommonName', fieldLabel: 'Common Name' },
-        { xtype: 'displayfield', name: 'subjectOrganization', fieldLabel: 'Organisation' },
-        { xtype: 'displayfield', name: 'subjectOrganizationalUnit', fieldLabel: 'Unit' }
-      ]
-    },
-    {
-      xtype: 'fieldset',
-      title: 'Issuer',
-      items: [
-        { xtype: 'displayfield', name: 'issuerCommonName', fieldLabel: 'Common Name' },
-        { xtype: 'displayfield', name: 'issuerOrganization', fieldLabel: 'Organisation' },
-        { xtype: 'displayfield', name: 'issuerOrganizationalUnit', fieldLabel: 'Unit' }
-      ]
-    },
-    {
-      xtype: 'fieldset',
-      title: 'Certificate',
-      items: [
-        { xtype: 'displayfield', name: 'issuedOn', fieldLabel: 'Issued On', renderer: NX.util.DateFormat.timestampRenderer() },
-        { xtype: 'displayfield', name: 'expiresOn', fieldLabel: 'Valid Until', renderer: NX.util.DateFormat.timestampRenderer() },
-        { xtype: 'displayfield', name: 'fingerprint', fieldLabel: 'Fingerprint' }
-      ]
-    }
+  requires: [
+    'NX.util.DateFormat'
   ],
 
-  buttons: undefined
+  buttons: undefined,
 
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
+
+    me.items = [
+      {
+        xtype: 'fieldset',
+        title: 'Subject',
+        items: [
+          { xtype: 'displayfield', name: 'subjectCommonName', fieldLabel: 'Common Name' },
+          { xtype: 'displayfield', name: 'subjectOrganization', fieldLabel: 'Organisation' },
+          { xtype: 'displayfield', name: 'subjectOrganizationalUnit', fieldLabel: 'Unit' }
+        ]
+      },
+      {
+        xtype: 'fieldset',
+        title: 'Issuer',
+        items: [
+          { xtype: 'displayfield', name: 'issuerCommonName', fieldLabel: 'Common Name' },
+          { xtype: 'displayfield', name: 'issuerOrganization', fieldLabel: 'Organisation' },
+          { xtype: 'displayfield', name: 'issuerOrganizationalUnit', fieldLabel: 'Unit' }
+        ]
+      },
+      {
+        xtype: 'fieldset',
+        title: 'Certificate',
+        items: [
+          { xtype: 'displayfield', name: 'issuedOn', fieldLabel: 'Issued On', renderer: NX.util.DateFormat.timestampRenderer() },
+          { xtype: 'displayfield', name: 'expiresOn', fieldLabel: 'Valid Until', renderer: NX.util.DateFormat.timestampRenderer() },
+          { xtype: 'displayfield', name: 'fingerprint', fieldLabel: 'Fingerprint' }
+        ]
+      }
+    ];
+
+    me.callParent();
+  }
 });

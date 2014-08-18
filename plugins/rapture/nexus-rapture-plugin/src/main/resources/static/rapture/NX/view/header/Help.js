@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Help button.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.view.header.Help', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-help',
+  requires: [
+    'NX.State'
+  ],
 
   tooltip: 'Help',
   glyph: 'xf059@FontAwesome', // fa-question-circle
@@ -25,32 +30,46 @@ Ext.define('NX.view.header.Help', {
   // hide the menu button arrow
   arrowCls: '',
 
-  menu: [
-    { text: 'Feature', action: 'feature' },
-    '-',
-    {
-      text: 'About Sonatype Nexus '
-          + NX.State.getValue('status')['edition'] + ' ' + NX.State.getValue('status')['version'],
-      iconCls: 'nx-icon-nexus-x16',
-      action: 'about'
-    },
-    {
-      text: 'Browse Issue Tracker',
-      iconCls: 'nx-icon-help-support-x16',
-      href: 'https://issues.sonatype.org/browse/NEXUS/',
-      hrefTarget: 'https://issues.sonatype.org/browse/NEXUS/'
-    },
-    {
-      text: 'Product Manual',
-      iconCls: 'nx-icon-help-manual-x16',
-      href: 'http://www.sonatype.com/resources/books/repository-management-with-nexus',
-      hrefTarget: 'http://www.sonatype.com/resources/books/repository-management-with-nexus'
-    },
-    {
-      text: 'Product Support',
-      iconCls: 'nx-icon-help-support-x16',
-      href: 'https://support.sonatype.com/home',
-      hrefTarget: 'https://support.sonatype.com/home'
-    }
-  ]
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this,
+        edition = NX.State.getValue('status')['edition'].toLowerCase(),
+        linkBase = 'http://links.sonatype.com/products/nexus/',
+        issuesUrl = linkBase + edition + '/issues',
+        manualUrl = linkBase + edition + '/docs',
+        supportUrl = linkBase + edition + '/support';
+
+    me.menu = [
+      { text: 'Feature', action: 'feature' },
+      '-',
+      {
+        text: 'About',
+        iconCls: 'nx-icon-nexus-x16',
+        action: 'about'
+      },
+      {
+        text: 'Documentation',
+        iconCls: 'nx-icon-help-manual-x16',
+        href: manualUrl,
+        hrefTarget: manualUrl
+      },
+      {
+        text: 'Support',
+        iconCls: 'nx-icon-help-support-x16',
+        href: supportUrl,
+        hrefTarget: supportUrl
+      },
+      {
+        text: 'Issue Tracker',
+        iconCls: 'nx-icon-help-issuetracker-x16',
+        href: issuesUrl,
+        hrefTarget: issuesUrl
+      }
+    ];
+
+    me.callParent();
+  }
+
 });

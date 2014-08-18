@@ -13,58 +13,93 @@
 //
 // Regenerates the baseapp js/css/images for the current configuration/style.
 //
+// Some whackyness here as we want to keep the Sencha CMD configuration using the target output directory
+// so that dynamic watching works, but when regenerating, we don't want flavor generation to interact with each other
+//
 
 println ''
 println 'Prepare:'
 
-File basedir = project.basedir
+File basedir = project.basedir.canonicalFile
 println "Base directory: $basedir"
 
-File outdir = new File(basedir, 'src/main/resources/static/rapture').canonicalFile
+File outdir = new File(basedir, 'src/main/resources/static/rapture')
 println "Output directory: $outdir"
-
-// Start out clean
-ant.delete() {
-  fileset(dir: outdir) {
-    include(name: '**')
-  }
-}
-
-ant.mkdir(dir: outdir)
 
 // ensure we can execute Sencha CMD
 ant.exec(executable: 'sencha', failonerror: true) {
   arg(line: 'which')
 }
 
-// generate files for production and testing
-[ 'production', 'testing' ].each { flavor ->
-  println ''
-  println "Generating: $flavor"
+// build flavors
+def flavors = [
+  'testing',
+  'production'
+]
 
-  // run 'app build' for each flavor
+// Reset the output directory
+resetOutDir = {
+  if (outdir.exists()) {
+    ant.delete(dir: outdir)
+  }
+  ant.mkdir(dir: outdir)
+}
+
+// display a section banner
+def banner = { message ->
+  println ''
+  println '-' * 79
+  println message
+}
+
+// generate flavor files
+flavors.each { flavor ->
+  banner "Generating: $flavor"
+
+  resetOutDir()
+
+  // run 'app build' for the flavor
   ant.exec(executable: 'sencha', dir: "$basedir/src/main/baseapp", failonerror: true) {
     arg(line: "app build $flavor")
   }
-}
 
-println ''
-println 'Cleaning up:'
-
-// remove some cruft that sencha cmd generates
-ant.delete() {
-  fileset(dir: outdir) {
-    include(name: 'config.rb')
-    include(name: 'index.html')
-    include(name: 'resources/Readme.md')
+  // Copy all flavor build outputs we care about
+  def flavordir = new File(basedir, "target/flavors/$flavor")
+  ant.mkdir(dir: flavordir)
+  ant.copy(todir: flavordir) {
+    fileset(dir: outdir) {
+      include(name: 'baseapp-*.js')
+      include(name: 'resources/baseapp-*.css')
+      include(name: 'resources/images/**')
+    }
   }
 }
 
-println ''
-println 'Changes:'
+// Reset the output directory for installing flavor files
+resetOutDir()
 
+// install flavor files
+flavors.each { flavor ->
+  banner "Installing: $flavor"
+
+  def flavordir = new File(basedir, "target/flavors/$flavor")
+  ant.copy(todir: outdir) {
+    fileset(dir: flavordir) {
+      include(name: '**')
+    }
+  }
+}
+
+// Show all changed files to remind to check-in when ready
+banner 'Changes:'
 ant.exec(executable: 'git') {
-  arg(line: 'status -s .')
+  arg(value: 'add')
+  arg(file: outdir)
+}
+ant.exec(executable: 'git') {
+  arg(value: 'status')
+  arg(value: '-s')
+  arg(file: outdir)
 }
 
 println ''

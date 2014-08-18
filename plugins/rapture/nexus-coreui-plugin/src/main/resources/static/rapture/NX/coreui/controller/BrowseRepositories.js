@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Browse repositories controller.
  *
@@ -17,6 +19,13 @@
  */
 Ext.define('NX.coreui.controller.BrowseRepositories', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Bookmarks',
+    'NX.Windows'
+  ],
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
 
   list: 'nx-coreui-repositorybrowse-list',
 
@@ -26,8 +35,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
   ],
   views: [
     'repositorybrowse.BrowseRepositoryFeature',
-    'repositorybrowse.BrowseRepositoryTree',
-    'repositorybrowse.StorageFileContainer'
+    'repositorybrowse.BrowseRepositoryTree'
   ],
   refs: [
     { ref: 'tree', selector: 'nx-coreui-repositorybrowse-tree' },
@@ -44,14 +52,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       'repository-managed': { file: 'database_yellow.png', variants: ['x16', 'x32'] },
       'repository-out-of-service': { file: 'warning.png', variants: ['x16'] },
       'repositorybrowse-inIndex': { file: 'tick.png', variants: ['x16'] },
-      'repositorybrowse-inStorage': { file: 'tick.png', variants: ['x16'] },
-      'repository-item-type-default': { file: 'file_extension_default.png', variants: ['x16', 'x24', 'x32'] },
-      'repository-item-type-md5': { file: 'file_extension_checksum.png', variants: ['x16', 'x32'] },
-      'repository-item-type-jar': { file: 'file_extension_jar.png', variants: ['x16', 'x32'] },
-      'repository-item-type-pom': { file: 'file_extension_xml.png', variants: ['x16', 'x32'] },
-      'repository-item-type-sha1': { file: 'file_extension_checksum.png', variants: ['x16', 'x32'] },
-      'repository-item-type-xml': { file: 'file_extension_xml.png', variants: ['x16', 'x32'] },
-      'repository-item-type-zip': { file: 'file_extension_zip.png', variants: ['x16', 'x32'] }
+      'repositorybrowse-inStorage': { file: 'tick.png', variants: ['x16'] }
     });
 
     me.getApplication().getFeaturesController().registerFeature([
@@ -90,15 +91,16 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       controller: {
         '#Refresh': {
           refresh: me.loadRepositories
+        },
+        '#Bookmarking': {
+          navigate: me.navigateTo
         }
       },
       component: {
         'nx-coreui-repositorybrowse-tree': {
           beforerender: me.loadRepositories,
           select: me.onNodeSelected,
-          beforeitemexpand: me.loadChildrenFromIndex,
-          beforeitemcontextmenu: me.showContextMenu,
-          beforecontextmenushow: me.fillContextMenu
+          beforeitemexpand: me.loadChildrenFromIndex
         },
         'nx-coreui-repositorybrowse-list button[action=admin]': {
           afterrender: me.bindAdminButton,
@@ -147,6 +149,9 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     ]));
   },
 
+  /**
+   * Load available repositories into tree.
+   */
   loadRepositories: function() {
     var me = this,
         tree = me.getTree(),
@@ -173,7 +178,8 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
             });
           });
           Ext.resumeLayouts(true);
-          me.getStorageFileContainer().showStorageFile(undefined, undefined);
+          me.getStorageFileContainer().showStorageFile();
+          me.navigateTo(NX.Bookmarks.getBookmark());
         }
       });
     }
@@ -181,13 +187,39 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
   /**
    * @private
-   * When a node gets selected, refresh storage file in right-side container.
+   * When a node gets selected, refresh storage file in right-side container and bookmark.
    */
   onNodeSelected: function(tree, node) {
-    var me = this;
+    var me = this,
+        bookmark = NX.Bookmarks.fromToken(NX.Bookmarks.getBookmark().getSegment(0));
+
+    me.showStorageFile(tree, node);
+    bookmark.appendSegments([
+      encodeURIComponent(node.get('repositoryId')),
+      encodeURIComponent(node.get('path')).replace(/%2F/g, '/')
+    ]);
+    NX.Bookmarks.bookmark(bookmark, me);
+  },
+
+  /**
+   * @private
+   * When a node gets selected, refresh storage file in right-side container.
+   */
+  showStorageFile: function(tree, node) {
+    var me = this,
+        treePanel = me.getTree(),
+        moreButton = treePanel.down('button[action=more]'),
+        repositoryModel = me.getStore(treePanel.repositoryStore).getById(node.get('repositoryId'));
+
+    moreButton.enable();
+    me.fillMoreButtonMenu(moreButton, repositoryModel, node);
+    if (moreButton.menu.items.length === 0) {
+      moreButton.disable();
+    }
     me.getStorageFileContainer().showStorageFile(
         node.get('repositoryId'),
-        (node.isLeaf() && node.get('path') !== '/') ? node.get('path') : undefined
+        (node.isLeaf() && node.get('path') !== '/') ? node.get('path') : undefined,
+        (node.isLeaf() && node.get('path') !== '/') ? node.get('type') : undefined
     );
   },
 
@@ -249,8 +281,18 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
           me.sortNode(node);
           Ext.resumeLayouts(true);
         }
+        if (node.expandFn) {
+          node.expandFn(node);
+          delete node.expandFn;
+        }
         tree.getEl().unmask();
       });
+    }
+    else {
+      if (node.expandFn) {
+        node.expandFn(node);
+        delete node.expandFn;
+      }
     }
   },
 
@@ -273,69 +315,142 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
   /**
    * @private
-   * Show context menu.
+   * @param {NX.Bookmark} bookmark to navigate to
    */
-  showContextMenu: function(view, node, item, index, event) {
+  navigateTo: function(bookmark) {
     var me = this,
         tree = me.getTree(),
-        menu = Ext.create('Ext.menu.Menu'),
-        repository = me.getStore(tree.repositoryStore).getById(node.get('repositoryId'));
+        store, repositoryId, path, node;
 
-    tree.fireEvent('beforecontextmenushow', menu, repository, node);
-    event.stopEvent();
-    if (menu.items.length) {
-      menu.showAt(event.getXY());
-      return false;
+    if (tree && bookmark) {
+      repositoryId = bookmark.getSegment(1);
+      path = bookmark.getSegment(2);
+      tree.collapseAll(function() {
+        if (repositoryId) {
+          repositoryId = decodeURIComponent(repositoryId);
+          me.logDebug('Navigate to: ' + repositoryId + path);
+          store = tree.getStore();
+          node = store.getRootNode().findChild('repositoryId', repositoryId);
+          if (node) {
+            tree.getSelectionModel().select(node, false, true);
+            tree.getView().focusRow(node);
+            if (path) {
+              node.expandFn = Ext.bind(me.expandNode, me, [path], true);
+              node.expand();
+            }
+          }
+        }
+        else {
+          tree.getSelectionModel().deselectAll();
+        }
+      });
     }
-    return true;
   },
 
   /**
    * @private
-   * Fill context menu with default menu items.
+   * Expand & select a child path.
+   * @param node containing the child path
+   * @param childPath child path to expand
    */
-  fillContextMenu: function(menu, repository, node) {
-    var me = this;
+  expandNode: function(node, childPath) {
+    var me = this,
+        tree = me.getTree(),
+        childNode, childName, segments;
 
+    if (childPath > '/') {
+      segments = childPath.substring(1).split('/');
+      childName = segments[0];
+      if (segments.length > 1) {
+        childName += '/';
+      }
+      childNode = node.findChild('path', node.get('path') + childName);
+      if (childNode) {
+        tree.getSelectionModel().select(childNode, false, true);
+        tree.getView().focusRow(childNode);
+        me.showStorageFile(tree, childNode);
+        if (segments.length > 1) {
+          childNode.expandFn = Ext.bind(me.expandNode, me, [childPath.substring(childName.length)], true);
+          childNode.expand();
+        }
+      }
+    }
+  },
+
+  /**
+   * @private
+   * Add menu entries to 'More' button, based on current selected node.
+   * @param {Ext.button.Button} button 'More' button
+   * @param {NX.coreui.model.Repository} repository repository model
+   * @param {Ext.data.NodeInterface} node selected node
+   */
+  fillMoreButtonMenu: function(button, repository, node) {
+    var me = this,
+        menu = button.menu;
+
+    me.removeMenuItem(button, 'expirecache');
     if (NX.Permissions.check('nexus:cache', 'delete')
         && repository.get('type') !== 'virtual' && repository.get('userManaged')) {
       menu.add({
-        text: 'Expire Cache',
+        text: 'Expire Cache', action: 'expirecache',
         handler: Ext.bind(me.expireCache, me, [repository, node.get('path')])
       });
     }
+
+    me.removeMenuItem(button, 'rebuildmetadata');
     if (NX.Permissions.check('nexus:metadata', 'delete')
         && (repository.get('format') === 'maven1' || repository.get('format') === 'maven2' )
         && (repository.get('type') === 'hosted' || repository.get('type') === 'group' )
         && repository.get('userManaged')) {
       menu.add({
-        text: 'Rebuild Metadata',
+        text: 'Rebuild Metadata', action: 'rebuildmetadata',
         handler: Ext.bind(me.rebuildMavenMetadata, me, [repository, node.get('path')])
       });
     }
+
+    me.removeMenuItem(button, 'downloadfromremote');
     if (node.isLeaf() && repository.get('type') === 'proxy') {
       menu.add({
-        text: 'Download From Remote',
+        text: 'Download From Remote', action: 'downloadfromremote',
         handler: Ext.bind(me.downloadPath, me, [repository.get('remoteStorageUrl'), node.get('path')])
       });
     }
+
+    me.removeMenuItem(button, 'viewremote');
     if (!node.isRoot() && !node.isLeaf() && repository.get('type') === 'proxy') {
       menu.add({
-        text: 'View Remote',
+        text: 'View Remote', action: 'viewremote',
         handler: Ext.bind(me.downloadPath, me, [repository.get('remoteStorageUrl'), node.get('path')])
       });
     }
+
+    me.removeMenuItem(button, 'download');
     if (node.isLeaf()) {
       menu.add({
-        text: 'Download',
+        text: 'Download', action: 'download',
         handler: Ext.bind(me.downloadStorageFile, me, [repository.getId(), node.get('path')])
       });
     }
+
+    me.removeMenuItem(button, 'delete');
     if ((node.get('path') !== '/') && (repository.get('type') !== 'group')) {
       menu.add({
-        text: 'Delete',
+        text: 'Delete', action: 'delete',
         handler: Ext.bind(me.deleteStorageFile, me, [repository, node])
       });
+    }
+  },
+
+  /**
+   * @private
+   * Removes from 'More' button, if present, menu item with specified action.
+   * @param {Ext.button.Button} button 'More' button
+   * @param actionName menu item action name to be removed
+   */
+  removeMenuItem: function(button, actionName) {
+    var menuItem = button.down('menuitem[action=' + actionName + ']');
+    if (menuItem) {
+      button.menu.remove(menuItem);
     }
   },
 
@@ -380,7 +495,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
    * @param path to download
    */
   downloadPath: function(url, path) {
-    window.open(url + path);
+    NX.Windows.open(url + path);
   },
 
   /**
@@ -390,7 +505,25 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
    * @param path to download
    */
   downloadStorageFile: function(repositoryId, path) {
-    this.downloadPath(NX.util.Url.urlOf('content/repositories/' + repositoryId), path);
+    var me = this,
+        repositoryNode, itemNode,
+        setInStorage = function(nodeToSet) {
+          if (!nodeToSet.get('inStorage')) {
+            nodeToSet.set('inStorage', true);
+            if (nodeToSet.parentNode && !(nodeToSet.get('path') === '/')) {
+              setInStorage(nodeToSet.parentNode);
+            }
+          }
+        };
+
+    me.downloadPath(NX.util.Url.urlOf('content/repositories/' + repositoryId), path);
+    repositoryNode = me.getTree().getRootNode().findChild('repositoryId', repositoryId);
+    if (repositoryNode) {
+      itemNode = repositoryNode.findChild('path', path, true);
+      if (itemNode) {
+        setInStorage(itemNode);
+      }
+    }
   },
 
   /**
@@ -406,7 +539,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
         'Delete Repository Item',
         'Delete the selected "' + path + '" ' + (node.isLeaf() ? 'file' : 'folder'),
         function() {
-          NX.direct.coreui_RepositoryStorage.delete(repository.getId(), path, function(response) {
+          NX.direct.coreui_RepositoryStorage.delete_(repository.getId(), path, function(response) {
             if (Ext.isObject(response) && response.success) {
               node.parentNode.removeChild(node);
               NX.Messages.add({

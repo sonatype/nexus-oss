@@ -202,7 +202,7 @@ public class DefaultNexusConfiguration
     this.uberClassLoader = checkNotNull(uberClassLoader);
     this.applicationDirectories = checkNotNull(applicationDirectories);
 
-    this.configurationDirectory = applicationDirectories.getWorkDirectory("conf");
+    this.configurationDirectory = applicationDirectories.getWorkDirectory("etc");
   }
 
   @Override

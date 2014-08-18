@@ -32,16 +32,16 @@ public class LdapUserManagerNotConfiguredIT
   {
     super.setUp();
 
-    IOUtils.copy(getClass().getResourceAsStream("/test-conf/conf/security-configuration-no-ldap.xml"),
+    IOUtils.copy(getClass().getResourceAsStream("/test-conf/etc/security-configuration-no-ldap.xml"),
         new FileOutputStream(getNexusSecurityConfiguration()));
 
-    IOUtils.copy(getClass().getResourceAsStream("/test-conf/conf/security-configuration.xml"),
+    IOUtils.copy(getClass().getResourceAsStream("/test-conf/etc/security-configuration.xml"),
         new FileOutputStream(getSecurityConfiguration()));
 
     getLdapRealmConfig().delete();
 
     // IOUtil.copy(
-    // getClass().getResourceAsStream( "/test-conf/conf/ldap.xml" ),
+    // getClass().getResourceAsStream( "/test-conf/etc/ldap.xml" ),
     // new FileOutputStream( new File( CONF_HOME, "ldap.xml" ) ) );
   }
 

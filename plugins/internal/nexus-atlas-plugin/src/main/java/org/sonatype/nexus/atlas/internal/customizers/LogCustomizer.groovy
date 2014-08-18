@@ -90,14 +90,14 @@ class LogCustomizer
     def installDir = applicationDirectories.installDirectory
     if (installDir) {
       // could be null
-      maybeIncludeFile CONFIG, new File(installDir, 'conf/logback.xml'), 'install/conf'
+      maybeIncludeFile CONFIG, new File(installDir, 'etc/logback.xml'), 'install/etc'
     }
 
     // include runtime configuration
-    def configDir = applicationDirectories.getWorkDirectory('conf')
+    def configDir = applicationDirectories.getWorkDirectory('etc')
     assert configDir.exists()
     configDir.eachFileMatch FILES, ~/logback.*/, {
-      maybeIncludeFile CONFIG, it, 'work/conf'
+      maybeIncludeFile CONFIG, it, 'work/etc'
     }
   }
 }

@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Helper to facilitate browser-based file downloads.
  *
@@ -17,6 +19,10 @@
  */
 Ext.define('NX.util.DownloadHelper', {
   singleton: true,
+  requires: [
+    'NX.Messages',
+    'NX.Windows'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },
@@ -62,30 +68,22 @@ Ext.define('NX.util.DownloadHelper', {
   /**
    * @public
    * @param {String} url URL to download
-   * @return {Boolean} false if download was blocked, else true
    */
   downloadUrl: function (url) {
-    var me = this,
-        frame,
-        win;
+    var me = this;
 
     me.logDebug('Downloading URL: ' + url);
 
     // resolve the download frame
-    frame = me.getFrame();
+    me.getFrame();
 
     // TODO: Consider changing this to a dynamic form or 'a' link and automatically submit/click
     // TODO: ... to make use of html5 download attribute and avoid needing to _open_ more windows
     // TODO: Form method could be handy to GET/POST w/params vs link to just GET?
 
     // open new window in hidden download-from to initiate download
-    win = window.open(url, me.windowName);
-    if (win == null) {
-      alert('Download window pop-up was blocked!');
-      return false;
-    }
-    else {
-      return true;
+    if (NX.Windows.open(url, me.windowName) !== null) {
+      NX.Messages.add({text: 'Download initiated', type: 'success'});
     }
   }
 });

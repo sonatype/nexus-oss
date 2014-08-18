@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Repository Routes controller.
  *
@@ -19,6 +21,8 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
   extend: 'NX.controller.MasterDetail',
   requires: [
     'NX.Dialogs',
+    'NX.Messages',
+    'NX.Permissions'
   ],
 
   list: 'nx-coreui-repositoryroute-list',
@@ -178,7 +182,7 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.coreui_RepositoryRoute.delete(model.getId(), function (response) {
+    NX.direct.coreui_RepositoryRoute.delete_(model.getId(), function (response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'Route deleted: ' + description, type: 'success' });

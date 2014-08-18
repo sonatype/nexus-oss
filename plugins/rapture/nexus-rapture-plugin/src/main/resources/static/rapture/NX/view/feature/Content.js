@@ -10,13 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext*/
+
 /**
  * Content panel.
  *
  * @since 3.0
  */
 Ext.define('NX.view.feature.Content', {
-  extend: 'Ext.Panel',
+  extend: 'Ext.panel.Panel',
   alias: 'widget.nx-feature-content',
 
   ui: 'feature-content',
@@ -50,12 +52,7 @@ Ext.define('NX.view.feature.Content', {
           'color': '#000000',
           'font-size': '12px'
         }
-      },
-
-      // HACK: Testing what tool-like buttons look like in custom header
-      //'->',
-      //{ xtype: 'button', ui: 'plain', scale: 'medium', glyph: 'xf013@FontAwesome' /* fa-gear */},
-      //{ xtype: 'button', ui: 'plain', scale: 'medium', glyph: 'xf059@FontAwesome' /* fa-question-circle */}
+      }
     ]
   },
 

@@ -10,12 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext*/
+
 /**
  * An **{@link Ext.form.field.Display}** that converts a date in ISO-8601 format to a date before display.
  *
  * @since 3.0
  */
-Ext.define('NX.ext.form.field.Timestamp', {
+Ext.define('NX.ext.form.field.DateDisplayField', {
   extend: 'Ext.form.field.Display',
   alias: 'widget.nx-datedisplayfield',
 

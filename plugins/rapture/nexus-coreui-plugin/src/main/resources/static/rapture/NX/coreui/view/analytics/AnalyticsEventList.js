@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Analytics Event grid.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-coreui-analytics-event-list',
+  requires: [
+    'Ext.XTemplate'
+  ],
 
   store: 'AnalyticsEvent',
 
@@ -26,7 +31,7 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
       xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
-      iconName: function(value, meta, record) {
+      iconName: function (value, meta, record) {
         var type = record.get('type');
         switch (type) {
           case 'REST':
@@ -127,7 +132,7 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
   plugins: [
     {
       ptype: 'rowexpander',
-      rowBodyTpl: new Ext.XTemplate(
+      rowBodyTpl: Ext.create('Ext.XTemplate',
           '<table style="padding: 5px;">',
           '<tpl for="this.attributes(values)">',
           '<tr>',

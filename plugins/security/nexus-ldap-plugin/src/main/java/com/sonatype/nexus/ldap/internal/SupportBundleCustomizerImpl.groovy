@@ -61,7 +61,7 @@ public class SupportBundleCustomizerImpl
   extends GeneratedContentSourceSupport
   {
     LdapXmlContentSource() {
-      super(SECURITY, 'work/conf/ldap.xml')
+      super(SECURITY, 'work/etc/ldap.xml')
       this.priority = HIGH
     }
 

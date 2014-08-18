@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * HealthCheck repository column controller.
  *
@@ -17,6 +19,13 @@
  */
 Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'Ext.grid.column.Column',
+    'Ext.ToolTip',
+    'NX.Conditions',
+    'NX.Permissions',
+    'NX.util.Url'
+  ],
 
   models: [
     'HealthCheckRepositoryStatus'
@@ -112,15 +121,15 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
           click: Ext.bind(me.maybeAskToEnable, me)
         }
       });
-      grid.headerCt.insert(2, column);
+      grid.headerCt.add(column);
       view.refresh();
       grid.healthCheckTooltip = Ext.create('Ext.ToolTip', {
         target: view.getEl(),
         delegate: view.getCellSelector(column),
         maxWidth: 500,
         mouseOffset: [0, 0],
-        renderTo: document.body,
-        hideDelay: 5000,
+        renderTo: NX.global.document.body,
+        dismissDelay: 60000,
         listeners: {
           beforeshow: Ext.bind(me.updateHealthCheckColumnTooltip, me)
         }

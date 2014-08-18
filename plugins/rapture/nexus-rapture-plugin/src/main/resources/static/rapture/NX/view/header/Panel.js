@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Header panel.
  *
@@ -18,6 +20,9 @@
 Ext.define('NX.view.header.Panel', {
   extend: 'Ext.container.Container',
   alias: 'widget.nx-header-panel',
+  requires: [
+    'NX.State'
+  ],
 
   layout: {
     type: 'vbox',
@@ -25,41 +30,50 @@ Ext.define('NX.view.header.Panel', {
     pack: 'start'
   },
 
-  items: [
-    { xtype: 'nx-header-branding', hidden: true },
-    {
-      xtype: 'toolbar',
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
 
-      // TODO replace style with UI
-      style: {
-        backgroundColor: '#000000'
-      },
-      anchor: '100%',
+    me.items = [
+      { xtype: 'nx-header-branding', hidden: true },
+      {
+        xtype: 'toolbar',
 
-      defaults: {
-        scale: 'medium'
-      },
-
-      items: [
-        { xtype: 'nx-header-logo' },
-        {
-          xtype: 'label',
-          text: 'Sonatype Nexus',
-          style: {
-            'color': '#FFFFFF',
-            'font-size': '20px'
-          }
+        // TODO replace style with UI
+        style: {
+          backgroundColor: '#000000'
         },
-        {
-          xtype: 'label',
-          text: NX.State.getValue('status')['edition'] + ' ' +
-              NX.State.getValue('status')['version'],
-          style: {
-            'color': '#CCCCCC',
-            'font-size': '10px'
+        anchor: '100%',
+
+        defaults: {
+          scale: 'medium'
+        },
+
+        items: [
+          { xtype: 'nx-header-logo' },
+          {
+            xtype: 'label',
+            text: 'Sonatype Nexus',
+            style: {
+              'color': '#FFFFFF',
+              'font-size': '20px'
+            }
+          },
+          {
+            xtype: 'label',
+            text: NX.State.getValue('status')['edition'] + ' ' +
+                NX.State.getValue('status')['version'],
+            style: {
+              'color': '#CCCCCC',
+              'font-size': '10px'
+            }
           }
-        }
-      ]
-    }
-  ]
+        ]
+      }
+    ];
+
+    me.callParent();
+  }
 });

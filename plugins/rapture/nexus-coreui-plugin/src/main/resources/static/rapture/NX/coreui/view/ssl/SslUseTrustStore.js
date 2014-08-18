@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Ssl use Nexus Truststore combobox.
  *
@@ -51,9 +53,8 @@ Ext.define('NX.coreui.view.ssl.SslUseTrustStore', {
           margin: '0 0 0 5'
         }
       ]
-    }
+    };
 
     me.callParent(arguments);
   }
-
 });

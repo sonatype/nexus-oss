@@ -30,6 +30,16 @@
 
   <properties>
     <copyright.year>2013</copyright.year>
+    
+    <!--
+    Default optimization settings for optimized "prod" aggregate sources.
+    -->
+    <extjs.omit>true</extjs.omit>
+    <extjs.omit.debug>true</extjs.omit.debug>
+    <maven.yuicompressor.nomunge>false</maven.yuicompressor.nomunge>
+    <maven.yuicompressor.nominify>false</maven.yuicompressor.nominify>
+    <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
+    <maven.yuicompressor.linebreakpos>-1</maven.yuicompressor.linebreakpos>
   </properties>
 
   <modules>
@@ -184,7 +194,7 @@
       </dependency>
 
       <!-- ssl -->
-      
+
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-ssl-client</artifactId>
@@ -410,107 +420,6 @@
               <Bundle-Name>${pluginName}</Bundle-Name>
               <Bundle-Description>${pluginDescription}</Bundle-Description>
               <Bundle-DocURL>http://links.sonatype.com/products/nexus/oss/home</Bundle-DocURL>
-              <!--
-              Global ban on embedded dependencies already in core
-              -->
-              <Embed-Dependency>
-                *;scope=compile|runtime;artifactId=!
-                  activation|
-                  aether-api|
-                  aether-spi|
-                  aether-util|
-                  annotations|
-                  aopalliance|
-                  bcprov-jdk15on|
-                  cdi-api|
-                  commons-beanutils|
-                  commons-codec|
-                  commons-collections|
-                  commons-fileupload|
-                  commons-io|
-                  commons-lang|
-                  commons-lang3|
-                  geronimo-jta_1.0.1B_spec|
-                  goodies-common|
-                  goodies-eventbus|
-                  goodies-i18n|
-                  goodies-inject|
-                  goodies-lifecycle|
-                  goodies-template|
-                  gossip-bootstrap|
-                  gossip-support|
-                  guava|
-                  guice-assistedinject|
-                  guice-multibindings|
-                  guice-servlet|
-                  hibernate-validator|
-                  httpclient|
-                  httpcore|
-                  jackson-annotations|
-                  jackson-core|
-                  jackson-databind|
-                  javax.annotation-api|
-                  javax.el-api|
-                  javax.el|
-                  javax.inject|
-                  javax.servlet|
-                  javax.ws.rs|
-                  jaxb-api|
-                  jboss-annotations-api_1.1_spec|
-                  jcl-over-slf4j|
-                  joda-time|
-                  jsoup|
-                  jsr173_api|
-                  jsr250-api|
-                  jsr305|
-                  jul-to-slf4j|
-                  log4j-over-slf4j|
-                  logback-access|
-                  logback-classic|
-                  logback-core|
-                  mail|
-                  maven-model|
-                  maven-model-builder|
-                  maven-repository-metadata|
-                  org.eclipse.sisu.inject|
-                  org.eclipse.sisu.plexus|
-                  org.osgi.compendium|
-                  org.osgi.core|
-                  plexus-cipher|
-                  plexus-classworlds|
-                  plexus-component-annotations|
-                  plexus-interpolation|
-                  plexus-slf4j-logging|
-                  plexus-utils|
-                  shiro-core|
-                  shiro-ehcache|
-                  shiro-guice|
-                  shiro-web|
-                  sisu-guice|
-                  sisu-mailer|
-                  sisu-resource-scanner|
-                  slf4j-api|
-                  tika-core|
-                  validation-api|
-                  velocity|
-                  xmlpull|
-                  xpp3_min|
-                  xstream
-              </Embed-Dependency>
-              <Embed-Directory>lib</Embed-Directory>
-              <Embed-Transitive>true</Embed-Transitive>
-              <DynamicImport-Package>javassist.*</DynamicImport-Package>
-              <_exportcontents>
-                ![A-Z]*|lib*|static*|docs*|*-*|.*,*
-              </_exportcontents>
-              <!-- remove build-only headers from final manifest -->
-              <_removeheaders>
-                Embed*,Include-Resource,Private-Package
-              </_removeheaders>
-              <Private-Package>!*;-split-package:=first</Private-Package>
-              <Import-Package>
-                *;resolution:=optional
-              </Import-Package>
             </instructions>
           </configuration>
         </plugin>
@@ -529,15 +438,71 @@
                 Standard template for nexus plugin feature (relative path from plugin projects)
                 -->
                 <inputFile>${project.basedir}/../../feature.xml</inputFile>
-                <includeTransitiveDependency>false</includeTransitiveDependency>
-                <addBundlesToPrimaryFeature>false</addBundlesToPrimaryFeature>
               </configuration>
             </execution>
           </executions>
         </plugin>
 
+        <plugin>
+          <groupId>org.sonatype.nexus.plugins</groupId>
+          <artifactId>extjs-maven-plugin</artifactId>
+          <version>${nexus.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>aggregate-js</goal>
+              </goals>
+              <configuration>
+                <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
+                <outputFile>${project.build.outputDirectory}/static/rapture/${project.artifactId}-debug.js</outputFile>
+                <omitFlags>
+                  <debug>${extjs.omit.debug}</debug>
+                </omitFlags>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>yuicompressor-maven-plugin</artifactId>
+          <version>1.1.0-SNAPSHOT</version>
+          <configuration>
+            <jswarn>false</jswarn>
+          </configuration>
+          <executions>
+            <execution>
+              <id>plugin-js</id>
+              <goals>
+                <goal>aggregate-js</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/rapture/${project.artifactId}-prod.js</output>
+                <sourceDirectory>${project.build.outputDirectory}/static/rapture</sourceDirectory>
+                <includes>
+                  <include>${project.artifactId}-debug.js</include>
+                </includes>
+              </configuration>
+            </execution>
+            <execution>
+              <id>plugin-css</id>
+              <goals>
+                <goal>aggregate-css</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/rapture/resources/${project.artifactId}-prod.css
+                </output>
+                <sourceDirectory>${project.basedir}/src/main/resources/static/rapture/resources</sourceDirectory>
+                <includes>
+                  <include>${project.artifactId}-debug.css</include>
+                </includes>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
+
     <plugins>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
@@ -549,5 +514,57 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <!--
+    Disable optimization for "prod" aggregate sources.
+    -->
+    <profile>
+      <id>disable-optimize</id>
+      <properties>
+        <extjs.omit>false</extjs.omit>
+        <maven.yuicompressor.nominify>true</maven.yuicompressor.nominify>
+        <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
+        <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
+        <maven.yuicompressor.linebreakpos>0</maven.yuicompressor.linebreakpos>
+      </properties>
+    </profile>
+
+    <!--
+    Execute jslint on javascript sources.
+    -->
+    <profile>
+      <id>jslint</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>yuicompressor-maven-plugin</artifactId>
+            <configuration>
+              <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
+              <jslintOptions>
+                <!-- ignore whitespace rules -->
+                <white>true</white>
+                <!-- do not require 'use strict' -->
+                <sloppy>true</sloppy>
+                <!-- allow to do comments -->
+                <todo>true</todo>
+                <!-- allow subscript notation -->
+                <sub>true</sub>
+              </jslintOptions>
+            </configuration>
+            <executions>
+              <execution>
+                <id>plugin-jslint</id>
+                <goals>
+                  <goal>jslint</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

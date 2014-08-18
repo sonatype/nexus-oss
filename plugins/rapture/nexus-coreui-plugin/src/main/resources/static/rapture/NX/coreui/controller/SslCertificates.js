@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Ssl Certificates controller.
  *
@@ -50,11 +52,11 @@ Ext.define('NX.coreui.controller.SslCertificates', {
       variants: ['x16', 'x32']
     },
     'sslcertificate-add-by-pem': {
-      file: 'ssl_addbypem.png',
+      file: 'server_add.png',
       variants: ['x16', 'x32']
     },
     'sslcertificate-add-by-server': {
-      file: 'ssl_addbyserver.png',
+      file: 'server_connect.png',
       variants: ['x16', 'x32']
     }
   },
@@ -164,7 +166,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
       win.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         win.close();
-        me.showCertificateDetails(response.data)
+        me.showCertificateDetails(response.data);
       }
     });
   },
@@ -183,7 +185,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
       win.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         win.close();
-        me.showCertificateDetails(response.data)
+        me.showCertificateDetails(response.data);
       }
     });
   },
@@ -245,7 +247,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         model = form.getRecord(),
         description = me.getDescription(model);
 
-    NX.direct.ssl_TrustStore.delete(model.getId(), function (response) {
+    NX.direct.ssl_TrustStore.delete_(model.getId(), function (response) {
       if (Ext.isObject(response) && response.success) {
         win.close();
         me.loadStore();
@@ -264,7 +266,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.ssl_TrustStore.delete(model.getId(), function (response) {
+    NX.direct.ssl_TrustStore.delete_(model.getId(), function (response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'SSL Certificate deleted: ' + description, type: 'success' });

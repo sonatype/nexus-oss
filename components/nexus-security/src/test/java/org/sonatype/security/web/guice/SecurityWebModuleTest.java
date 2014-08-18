@@ -148,7 +148,7 @@ public class SecurityWebModuleTest
       protected void configure() {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("security-xml-file", "target/foo/security.xml");
-        properties.put("application-conf", "target/plexus-home/conf");
+        properties.put("application-conf", "target/plexus-home/etc");
         binder().bind(ParameterKeys.PROPERTIES).toInstance(properties);
       }
     };

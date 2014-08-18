@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Repository route settings form.
  *
@@ -18,6 +20,11 @@
 Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-repositoryroute-settings',
+  requires: [
+    'NX.Conditions',
+    'NX.coreui.store.RepositoryReference',
+    'NX.coreui.model.Reference'
+  ],
 
   api: {
     submit: 'NX.direct.coreui_RepositoryRoute.update'
@@ -25,7 +32,6 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
   settingsFormSuccessMessage: function (data) {
     return 'Repository route updated: ' + data['pattern'];
   },
-  editableCondition: NX.Conditions.isPermitted('nexus:routes', 'update'),
   editableMarker: 'You do not have permission to update routes',
 
   models: [
@@ -34,6 +40,8 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
 
   initComponent: function () {
     var me = this;
+
+    me.editableCondition = NX.Conditions.isPermitted('nexus:routes', 'update');
 
     me.groupStore = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
     me.mon(me.groupStore, 'load', function (store) {
@@ -53,7 +61,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
         xtype: 'nx-regexp',
         name: 'pattern',
         fieldLabel: 'URL pattern',
-        helpText: 'A regular expression used to match the artifact path. The path is everything after /nexus/content/ so it will include the group or repository name. .* is used to specify all paths. \'.*/com/some/company/.*\' will match any artifact with \'com.some.company\' as the group id or artifact id.',
+        helpText: "A regular expression used to match the artifact path. The path is everything after /nexus/content/ so it will include the group or repository name. .* is used to specify all paths. '.*/com/some/company/.*' will match any artifact with 'com.some.company' as the group id or artifact id.",
         emptyText: 'enter a pattern'
       },
       {
@@ -102,5 +110,4 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
 
     me.callParent(arguments);
   }
-
 });

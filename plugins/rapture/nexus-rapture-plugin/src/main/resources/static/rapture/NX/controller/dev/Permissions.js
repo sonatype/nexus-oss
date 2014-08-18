@@ -10,6 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
  * Permissions developer panel controller.
  *
@@ -67,7 +69,7 @@ Ext.define('NX.controller.dev.Permissions', {
           click: me.add
         },
         'nx-dev-permissions button[action=delete]': {
-          click: me.delete
+          click: me.delete_
         }
       }
     });
@@ -90,7 +92,7 @@ Ext.define('NX.controller.dev.Permissions', {
   /**
    * @private
    */
-  delete: function () {
+  delete_ : function () {
     var me = this,
         grid = me.getGrid(),
         editor = grid.getPlugin('editor');
@@ -129,7 +131,7 @@ Ext.define('NX.controller.dev.Permissions', {
     var value = NX.Permissions.NONE;
 
     Ext.each(['CREATE', 'READ', 'UPDATE', 'DELETE'], function (perm) {
-      if (context.newValues[perm.toLowerCase()] == true) {
+      if (context.newValues[perm.toLowerCase()] === true) {
         value += NX.Permissions[perm];
       }
     });

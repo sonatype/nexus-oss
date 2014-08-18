@@ -38,7 +38,7 @@ public class ExternalRoleMappedTest
     extends AbstractSecurityTestCase
 {
 
-  private final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/plexus-home/conf/security.xml";
+  private final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/plexus-home/etc/security.xml";
 
   @Override
   public void configure(Properties properties) {
