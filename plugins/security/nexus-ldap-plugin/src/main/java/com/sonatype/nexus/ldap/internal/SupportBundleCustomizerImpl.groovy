@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package com.sonatype.nexus.ldap.internal
 
 import com.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Reader
@@ -58,7 +59,7 @@ public class SupportBundleCustomizerImpl
    * Source for obfuscated ldap.xml
    */
   private class LdapXmlContentSource
-  extends GeneratedContentSourceSupport
+      extends GeneratedContentSourceSupport
   {
     LdapXmlContentSource() {
       super(SECURITY, 'work/etc/ldap.xml', HIGH)
