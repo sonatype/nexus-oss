@@ -79,7 +79,11 @@ Ext.define('NX.util.DownloadHelper', {
 
     // TODO: Consider changing this to a dynamic form or 'a' link and automatically submit/click
     // TODO: ... to make use of html5 download attribute and avoid needing to _open_ more windows
+    // TODO: ... IE might not like this very much though?
+
     // TODO: Form method could be handy to GET/POST w/params vs link to just GET?
+
+    // FIXME: This may produce js console warnings "Resource interpreted as Document but transferred with MIME type application/zip"
 
     // open new window in hidden download-from to initiate download
     if (NX.Windows.open(url, me.windowName) !== null) {
