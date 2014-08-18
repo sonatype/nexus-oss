@@ -321,8 +321,8 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
    */
   renderNotAvailable: function(metadata) {
     var me = this;
-    metadata.tdAttr = 'data-qtip="CLM data is not available for this artifact. Note that internal artifacts are not covered in Sonatype CLM."';
-    return '<i class="fa fa-ban"/>';
+    metadata.tdAttr = 'data-qtip="CLM data is not available for this component.<br/>Internal components are not covered in Sonatype CLM."';
+    return '<span class="fa fa-ban"/>';
   },
 
   /**
