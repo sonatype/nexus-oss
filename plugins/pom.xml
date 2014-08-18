@@ -30,7 +30,7 @@
 
   <properties>
     <copyright.year>2013</copyright.year>
-
+    
     <!--
     Default optimization settings for optimized "prod" aggregate sources.
     -->
