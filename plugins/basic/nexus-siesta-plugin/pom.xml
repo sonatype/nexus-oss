@@ -64,7 +64,7 @@
             </goals>
             <configuration>
               <source>
-                project.artifactMap.each(){k,v->
+                project.artifactMap.each{k,v->
                   // add 'mvn:artifactId' properties representing Pax-URL path for each transitive artifact
                   project.properties['mvn:'+v.artifactId]='mvn:'+v.groupId+'/'+v.artifactId+'/'+v.version
                 }
