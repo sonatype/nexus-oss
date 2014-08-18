@@ -22,13 +22,13 @@ Ext.define('NX.view.AboutWindow', {
   alias: 'widget.nx-aboutwindow',
   requires: [
     'NX.Icons',
-    'NX.State'
+    'NX.State',
+    'NX.util.Url'
   ],
 
   layout: {
     type: 'vbox',
-    align: 'stretch',
-    pack: 'center'
+    align: 'stretch'
   },
 
   autoShow: true,
@@ -45,39 +45,54 @@ Ext.define('NX.view.AboutWindow', {
   initComponent: function () {
     var me = this;
 
-    //
-    // TODO: Make more eclipse-like, with details about product/edition/version
-    // TODO: ... add license, etc.
-    //
-
     me.items = [
       {
-        xtype: 'image',
-        cls: 'nx-icon-nexus-x100'
+        layout: {
+          type: 'hbox',
+          align: 'stretch'
+        },
+        items: [
+          {
+            xtype: 'component',
+            margin: '10 10 10 10',
+            html: NX.Icons.img('nexus', 'x100')
+          },
+          {
+            xtype: 'nx-info',
+            itemId: 'aboutInfo',
+            flex: 1
+          }
+        ]
       },
       {
-        xtype: 'label',
-        html: '<code>' +
-            'Nexus <em>' + NX.State.getValue('status')['edition'] + '</em> ' +
-            NX.State.getValue('status')['version'] +
-            '</code>',
-
-        style: {
-          'color': '#000000',
-          'font-size': '20px',
-          'font-weight': 'bold',
-          'text-align': 'center',
-          'padding': '20px'
-        }
+        xtype: 'tabpanel',
+        plain: true,
+        flex: 1,
+        items: [
+          {
+            title: 'License',
+            xtype: 'box',
+            autoEl: {
+              tag: 'iframe',
+              src: NX.util.Url.urlOf('/LICENSE.html')
+            }
+          }
+        ]
       }
     ];
 
     me.buttons = [
-      { text: 'Close', action: 'close', ui: 'primary', handler: function() { me.close(); } }
+      { text: 'Close', action: 'close', ui: 'primary', handler: function () { me.close(); }}
     ];
     me.buttonAlign = 'left';
 
     me.callParent(arguments);
+
+    // populate initial details
+    me.down('#aboutInfo').showInfo({
+      'Version': NX.State.getValue('status')['version'],
+      'Edition': NX.State.getValue('status')['edition']
+    });
   }
 
 });
