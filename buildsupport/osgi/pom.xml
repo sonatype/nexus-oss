@@ -94,6 +94,12 @@
         <version>1.7.1</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.apache.karaf.features</groupId>
+        <artifactId>org.apache.karaf.features.core</artifactId>
+        <version>${karaf.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 

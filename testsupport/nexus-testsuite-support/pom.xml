@@ -108,9 +108,9 @@
               <featuresCfgFile>${project.build.testOutputDirectory}/org.apache.karaf.features.cfg</featuresCfgFile>
               <startupPropertiesFile>${project.build.testOutputDirectory}/startup.properties</startupPropertiesFile>
               <systemDirectory>${project.build.directory}/test-features</systemDirectory>
-              <bootFeatures>
+              <installedFeatures>
                 <feature>nexus-it-helper-plugin</feature>
-              </bootFeatures>
+              </installedFeatures>
             </configuration>
           </execution>
         </executions>

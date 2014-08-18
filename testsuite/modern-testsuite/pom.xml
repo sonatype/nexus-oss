@@ -103,7 +103,7 @@
     </dependency>
 
     <!--
-    Additional plugin/helper features
+    Additional plugin features
     -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -125,7 +125,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-capabilities-testsuite-helper</artifactId>
+      <artifactId>nexus-capabilities-testsuite-plugin</artifactId>
       <version>${nexus.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -326,10 +326,10 @@
                   <featuresCfgFile>${project.build.testOutputDirectory}/org.apache.karaf.features.cfg</featuresCfgFile>
                   <startupPropertiesFile>${project.build.testOutputDirectory}/startup.properties</startupPropertiesFile>
                   <systemDirectory>${project.build.directory}/test-features</systemDirectory>
-                  <bootFeatures>
+                  <installedFeatures>
                     <feature>nexus-it-helper-plugin</feature>
                     <feature>nexus-groovyremote-plugin</feature>
-                    <feature>nexus-capabilities-testsuite-helper</feature>
+                    <feature>nexus-capabilities-testsuite-plugin</feature>
                     <feature>nexus-restlet1x-testsupport-plugin</feature>
                     <feature>nexus-kenai-plugin</feature>
                     <feature>nexus-obr-plugin</feature>
@@ -337,7 +337,7 @@
                     <feature>nexus-site-repository-plugin</feature>
                     <feature>nexus-unpack-plugin</feature>
                     <feature>nexus-yum-repository-plugin</feature>
-                  </bootFeatures>
+                  </installedFeatures>
                 </configuration>
               </execution>
             </executions>

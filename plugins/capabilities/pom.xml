@@ -32,7 +32,7 @@
     <module>nexus-capabilities-model</module>
     <module>nexus-capabilities-plugin</module>
     <module>nexus-capabilities-client</module>
-    <module>nexus-capabilities-testsuite-helper</module>
+    <module>nexus-capabilities-testsuite-plugin</module>
   </modules>
 
 </project>

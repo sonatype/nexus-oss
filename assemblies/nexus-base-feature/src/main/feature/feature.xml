@@ -12,12 +12,8 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<features name="nexus">
-  <feature name="${project.artifactId}" description="Nexus base installation" start-level="50">
-    <!--
-    Start extender after everything else
-    -->
-    <bundle start-level="100">${mvn:nexus-extender}</bundle>
+<features>
+  <feature name="${project.artifactId}" description="Nexus base installation">
     <!--
     Wrappers that require use of fragments
     -->

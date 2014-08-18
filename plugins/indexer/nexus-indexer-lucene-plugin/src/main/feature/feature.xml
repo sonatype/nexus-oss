@@ -14,7 +14,7 @@
 -->
 <features>
   <feature name="${project.artifactId}" description="${pluginDescription}">
-    <bundle start-level="200">mvn:${project.groupId}/${project.artifactId}/${project.version}</bundle>
+    <bundle>mvn:${project.groupId}/${project.artifactId}/${project.version}</bundle>
     <!--
     Wrappers that require use of fragments
     -->
