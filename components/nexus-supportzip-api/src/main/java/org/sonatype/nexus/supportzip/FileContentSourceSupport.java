@@ -35,6 +35,9 @@ public class FileContentSourceSupport
     this.file = checkNotNull(file);
   }
 
+  /**
+   * @since 3.0
+   */
   public FileContentSourceSupport(final SupportBundle.ContentSource.Type type,
                                   final String path,
                                   final File file,
