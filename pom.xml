@@ -679,9 +679,9 @@
           <configuration>
             <excludes combine.children="append">
               <!--
-              Exclude appended resources, which are used to tweak settings in the assembly.
+              Exclude nexus-base-template resources, these are all configuration files or simple scripts.
               -->
-              <exclude>**/assemblies/**/appended-resources/**</exclude>
+              <exclude>**/nexus-base-template/src/main/resources/**</exclude>
 
               <!--
               Exclude test resource files, many of these need specific content w/o headers.

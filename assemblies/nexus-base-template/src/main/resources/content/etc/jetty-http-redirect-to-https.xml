@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+
+  <Ref id="HTTPConnector">
+    <Set name="confidentialPort"><Property name="application-port-ssl"/></Set>
+  </Ref>
+
+  <Ref id="NexusWebAppContext">
+    <!-- enforce use of the confidential port -->
+    <Set name="securityHandler">
+      <New class="org.eclipse.jetty.security.ConstraintSecurityHandler">
+        <Call name="addConstraintMapping">
+          <Arg>
+            <New class="org.eclipse.jetty.security.ConstraintMapping">
+              <Set name="pathSpec">/*</Set>
+              <Set name="constraint">
+                <New class="org.eclipse.jetty.util.security.Constraint">
+                  <!-- 2 means CONFIDENTIAL. 1 means INTEGRITY -->
+                  <Set name="dataConstraint">2</Set>
+                </New>
+              </Set>
+            </New>
+          </Arg>
+        </Call>
+      </New>
+    </Set>
+  </Ref>
+
+</Configure>
