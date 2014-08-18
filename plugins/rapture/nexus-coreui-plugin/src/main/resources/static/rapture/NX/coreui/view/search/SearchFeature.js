@@ -56,18 +56,20 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
         items: [
           {
             xtype: 'nx-coreui-search-result-list',
-            region: 'center',
-            flex: 0.3
+            region: 'west',
+            flex: 0.3,
+            header: false,
+            split: true,
+            collapsible: true,
+            collapseMode: 'mini'
           },
           {
             xtype: 'panel',
             itemId: 'rightPanel',
-            region: 'east',
+            region: 'center',
             layout: 'border',
             flex: 0.7,
             header: false,
-            split: true,
-            collapsible: false,
             items: [
               {
                 xtype: 'panel',
