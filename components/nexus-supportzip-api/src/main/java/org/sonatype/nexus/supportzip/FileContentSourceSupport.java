@@ -35,6 +35,15 @@ public class FileContentSourceSupport
     this.file = checkNotNull(file);
   }
 
+  public FileContentSourceSupport(final SupportBundle.ContentSource.Type type,
+                                  final String path,
+                                  final File file,
+                                  final Priority priority)
+  {
+    super(type, path, priority);
+    this.file = checkNotNull(file);
+  }
+
   @Override
   public void prepare() throws Exception {
     checkState(file.exists());

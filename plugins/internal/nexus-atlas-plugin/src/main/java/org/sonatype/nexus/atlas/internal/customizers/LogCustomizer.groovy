@@ -72,7 +72,7 @@ class LogCustomizer
     def maybeIncludeFile = { SupportBundle.ContentSource.Type type, File file, String prefix ->
       if (file.exists()) {
         log.debug 'Including file: {}', file
-        supportBundle << new FileContentSourceSupport(type, "$prefix/${file.name}", file)
+        supportBundle << new FileContentSourceSupport(type, "$prefix/${file.name}", file, LOW)
       }
       else {
         log.debug 'Skipping non-existent file: {}', file
@@ -80,7 +80,9 @@ class LogCustomizer
     }
 
     // include karaf.log
-    maybeIncludeFile LOG, new File(applicationDirectories.installDirectory, 'data/log/karaf.log'), 'log'
+    if (System.properties['karaf.log']) {
+      maybeIncludeFile LOG, new File(System.getProperty('karaf.log')), 'log'
+    }
 
     // include request.log
     maybeIncludeFile LOG, new File(applicationDirectories.workDirectory, 'log/request.log'), 'log'
