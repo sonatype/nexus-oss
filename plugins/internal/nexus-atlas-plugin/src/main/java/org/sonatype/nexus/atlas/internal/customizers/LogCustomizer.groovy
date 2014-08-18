@@ -56,7 +56,7 @@ class LogCustomizer
   @Override
   void customize(final SupportBundle supportBundle) {
     // add source for nexus.log
-    supportBundle << new GeneratedContentSourceSupport(LOG, 'nexus.log', LOW) {
+    supportBundle << new GeneratedContentSourceSupport(LOG, 'log/nexus.log', LOW) {
       @Override
       protected void generate(final File file) {
         def log = logManager.getApplicationLogAsStream('nexus.log', 0, Long.MAX_VALUE)
@@ -79,8 +79,11 @@ class LogCustomizer
       }
     }
 
+    // include karaf.log
+    maybeIncludeFile LOG, new File(applicationDirectories.installDirectory, 'data/log/karaf.log'), 'log'
+
     // include request.log
-    maybeIncludeFile LOG, new File(applicationDirectories.workDirectory, 'logs/request.log'), 'work/logs'
+    maybeIncludeFile LOG, new File(applicationDirectories.workDirectory, 'log/request.log'), 'log'
 
     // include installation configuration
     def installDir = applicationDirectories.installDirectory
