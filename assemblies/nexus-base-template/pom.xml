@@ -332,6 +332,15 @@
                   <fileset dir="${project.basedir}/src/main/resources/content"/>
                 </copy>
 
+                <!-- delete some cruft which karaf includes by default -->
+                <delete>
+                  <fileset dir="${project.build.directory}/assembly">
+                    <include name="etc/distribution.info"/>
+                    <include name="etc/equinox-debug.properties"/>
+                    <include name="regions-config.xml"/>
+                  </fileset>
+                </delete>
+
                 <!-- include a few additional extra packages required by our environment -->
                 <replace file="${project.build.directory}/assembly/etc/config.properties"
                   token="packages.extra="
