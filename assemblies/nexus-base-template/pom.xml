@@ -338,6 +338,10 @@
                     <include name="etc/distribution.info"/>
                     <include name="etc/equinox-debug.properties"/>
                     <include name="etc/regions-config.xml"/>
+                    <include name="etc/org.apache.karaf.features.obr.cfg"/>
+                    <include name="etc/org.apache.karaf.features.repos.cfg"/>
+                    <include name="etc/org.apache.karaf.command.acl.*.cfg"/>
+                    <include name="etc/jmx.acl*.cfg"/>
                   </fileset>
                 </delete>
 
