@@ -21,7 +21,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckEula', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-healthcheck-eula',
   requires: [
-      'NX.util.Url'
+    'NX.util.Url'
   ],
 
   title: 'CLM Terms of Use',
@@ -43,9 +43,9 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckEula', {
 
     me.items = {
       xtype: 'box',
-          autoEl: {
+      autoEl: {
         tag: 'iframe',
-            src: NX.util.Url.urlOf('/static/healthcheck-tos.html')
+        src: NX.util.Url.urlOf('/static/healthcheck-tos.html')
       }
     };
 
@@ -55,7 +55,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckEula', {
         dock: 'bottom',
         ui: 'footer',
         items: [
-          { xtype: 'button', text: 'I Agree', action: 'agree', formBind: true, ui: 'primary', handler: function() {
+          { xtype: 'button', text: 'I Agree', action: 'agree', formBind: true, ui: 'primary', handler: function () {
             var me = this,
                 win = me.up('window');
 
@@ -64,7 +64,7 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckEula', {
               win.acceptFn.call();
             }
           }},
-          { xtype: 'button', text: 'I Do Not Agree', handler: function() {
+          { xtype: 'button', text: 'I Do Not Agree', handler: function () {
             this.up('window').close();
           }},
           '->',
