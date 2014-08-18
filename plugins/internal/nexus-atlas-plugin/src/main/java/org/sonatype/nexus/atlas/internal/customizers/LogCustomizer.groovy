@@ -56,11 +56,7 @@ class LogCustomizer
   @Override
   void customize(final SupportBundle supportBundle) {
     // add source for nexus.log
-    supportBundle << new GeneratedContentSourceSupport(LOG, 'nexus.log') {
-      {
-        this.priority = LOW
-      }
-
+    supportBundle << new GeneratedContentSourceSupport(LOG, 'nexus.log', LOW) {
       @Override
       protected void generate(final File file) {
         def log = logManager.getApplicationLogAsStream('nexus.log', 0, Long.MAX_VALUE)

@@ -88,8 +88,7 @@ class ConfigurationCustomizer
       extends GeneratedContentSourceSupport
   {
     NexusXmlContentSource() {
-      super(CONFIG, 'work/etc/nexus.xml')
-      this.priority = REQUIRED
+      super(CONFIG, 'work/etc/nexus.xml', REQUIRED)
     }
 
     @Override

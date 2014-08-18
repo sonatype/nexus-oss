@@ -67,8 +67,7 @@ class SecurityCustomizer
       extends GeneratedContentSourceSupport
   {
     SecurityXmlContentSource() {
-      super(SECURITY, 'work/etc/security.xml')
-      this.priority = HIGH
+      super(SECURITY, 'work/etc/security.xml', HIGH)
     }
 
     @Override
@@ -104,8 +103,7 @@ class SecurityCustomizer
       extends GeneratedContentSourceSupport
   {
     SecurityConfigurationXmlContentSource() {
-      super(SECURITY, 'work/etc/security-configuration.xml')
-      this.priority = HIGH
+      super(SECURITY, 'work/etc/security-configuration.xml', HIGH)
     }
 
     @Override
