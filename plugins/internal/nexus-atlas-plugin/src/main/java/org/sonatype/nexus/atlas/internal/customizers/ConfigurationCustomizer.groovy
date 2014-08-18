@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.atlas.internal.customizers
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration
+import org.sonatype.nexus.configuration.application.ApplicationDirectories
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer
 import org.sonatype.nexus.supportzip.FileContentSourceSupport
@@ -42,11 +42,11 @@ class ConfigurationCustomizer
     extends ComponentSupport
     implements SupportBundleCustomizer
 {
-  private final ApplicationConfiguration applicationConfiguration
+  private final ApplicationDirectories applicationDirectories
 
   @Inject
-  ConfigurationCustomizer(final ApplicationConfiguration applicationConfiguration) {
-    this.applicationConfiguration = checkNotNull(applicationConfiguration)
+  ConfigurationCustomizer(final ApplicationDirectories applicationDirectories) {
+    this.applicationDirectories = checkNotNull(applicationDirectories)
   }
 
   @Override
@@ -72,7 +72,7 @@ class ConfigurationCustomizer
     }
 
     // include installation configuration files
-    def installDir = applicationConfiguration.installDirectory
+    def installDir = applicationDirectories.installDirectory
     if (installDir) {
       // could be null
       maybeIncludeFile new File(installDir, 'etc/jetty.xml'), 'install/etc', HIGH
@@ -94,7 +94,7 @@ class ConfigurationCustomizer
 
     @Override
     protected void generate(final File file) {
-      def source = new File(applicationConfiguration.configurationDirectory, 'nexus.xml')
+      def source = new File(applicationDirectories.workDirectory, 'etc/nexus.xml')
       if (!source.exists()) {
         log.debug 'Skipping non-existent file: {}', source
         return
