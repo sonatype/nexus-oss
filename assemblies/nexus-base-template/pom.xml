@@ -337,7 +337,7 @@
                   <fileset dir="${project.build.directory}/assembly">
                     <include name="etc/distribution.info"/>
                     <include name="etc/equinox-debug.properties"/>
-                    <include name="regions-config.xml"/>
+                    <include name="etc/regions-config.xml"/>
                   </fileset>
                 </delete>
 
