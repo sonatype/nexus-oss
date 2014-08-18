@@ -48,7 +48,7 @@ Ext.define('NX.coreui.view.search.SearchResultVersionList', {
         return model.get('version');
       }
     },
-    { header: 'Name', dataIndex: 'name', flex: 3 },
+    { header: 'Name', dataIndex: 'name', flex: 2.5 },
     { header: 'Repository', dataIndex: 'repositoryName', flex: 1 }
   ],
 

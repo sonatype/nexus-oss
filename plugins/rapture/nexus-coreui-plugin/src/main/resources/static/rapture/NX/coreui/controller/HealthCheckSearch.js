@@ -322,7 +322,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
   renderNotAvailable: function(metadata) {
     var me = this;
     metadata.tdAttr = 'data-qtip="CLM data is not available for this artifact. Note that internal artifacts are not covered in Sonatype CLM."';
-    return '<img class="opaqueWarning" src="' + me.imageUrl('na.png') + '">';
+    return '<i class="fa fa-ban"/>';
   },
 
   /**
