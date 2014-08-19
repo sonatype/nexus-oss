@@ -66,9 +66,6 @@
       <outputDirectory>sonatype-work</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
-      <excludes>
-        <exclude>**/.placeholder</exclude>
-      </excludes>
     </fileSet>
   </fileSets>
 

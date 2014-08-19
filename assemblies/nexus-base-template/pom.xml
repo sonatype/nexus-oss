@@ -316,6 +316,7 @@
                 <!-- delete some cruft which karaf includes by default -->
                 <delete>
                   <fileset dir="${project.build.directory}/assembly">
+                    <include name="**/README"/>
                     <include name="etc/distribution.info"/>
                     <include name="etc/equinox-debug.properties"/>
                     <include name="etc/regions-config.xml"/>
