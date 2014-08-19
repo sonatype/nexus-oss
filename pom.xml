@@ -679,9 +679,9 @@
           <configuration>
             <excludes combine.children="append">
               <!--
-              Exclude nexus-base-template resources, these are all configuration files or simple scripts.
+              Exclude assembly overlay files
               -->
-              <exclude>**/nexus-base-template/src/main/resources/**</exclude>
+              <exclude>**/assemblies/**/src/main/resources/overlay/**</exclude>
 
               <!--
               Exclude test resource files, many of these need specific content w/o headers.

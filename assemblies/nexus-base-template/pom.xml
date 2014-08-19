@@ -303,9 +303,9 @@
             </goals>
             <configuration>
               <target>
-                <!-- overlay our customizations -->
+                <!-- overlay customizations -->
                 <copy todir="${project.build.directory}/assembly" overwrite="true">
-                  <fileset dir="${project.basedir}/src/main/resources/content"/>
+                  <fileset dir="${project.basedir}/src/main/resources/overlay"/>
                 </copy>
 
                 <!-- install some custom lib/ jar -->
