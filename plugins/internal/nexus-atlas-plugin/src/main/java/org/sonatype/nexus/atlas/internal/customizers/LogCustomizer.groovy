@@ -25,9 +25,9 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
-import static groovy.io.FileType.FILES
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority.DEFAULT
 import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority.LOW
-import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.CONFIG
 import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.LOG
 
 /**
@@ -69,10 +69,10 @@ class LogCustomizer
     }
 
     // helper to include a file
-    def maybeIncludeFile = { SupportBundle.ContentSource.Type type, File file, String prefix ->
+    def maybeIncludeFile = { File file, String prefix, Priority priority = DEFAULT ->
       if (file.exists()) {
         log.debug 'Including file: {}', file
-        supportBundle << new FileContentSourceSupport(type, "$prefix/${file.name}", file, LOW)
+        supportBundle << new FileContentSourceSupport(LOG, "$prefix/${file.name}", file, priority)
       }
       else {
         log.debug 'Skipping non-existent file: {}', file
@@ -81,24 +81,10 @@ class LogCustomizer
 
     // include karaf.log
     if (System.properties['karaf.log']) {
-      maybeIncludeFile LOG, new File(System.getProperty('karaf.log')), 'log'
+      maybeIncludeFile new File(System.getProperty('karaf.log')), 'log', LOW
     }
 
     // include request.log
-    maybeIncludeFile LOG, new File(applicationDirectories.workDirectory, 'log/request.log'), 'log'
-
-    // include installation configuration
-    def installDir = applicationDirectories.installDirectory
-    if (installDir) {
-      // could be null
-      maybeIncludeFile CONFIG, new File(installDir, 'etc/logback.xml'), 'install/etc'
-    }
-
-    // include runtime configuration
-    def configDir = applicationDirectories.getWorkDirectory('etc')
-    assert configDir.exists()
-    configDir.eachFileMatch FILES, ~/logback.*/, {
-      maybeIncludeFile CONFIG, it, 'work/etc'
-    }
+    maybeIncludeFile new File(applicationDirectories.workDirectory, 'log/request.log'), 'log', LOW
   }
 }

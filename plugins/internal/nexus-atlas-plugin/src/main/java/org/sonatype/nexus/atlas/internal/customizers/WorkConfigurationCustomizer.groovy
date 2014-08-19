@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.atlas.internal.customizers
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories
@@ -18,6 +19,7 @@ import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writ
 import org.sonatype.nexus.supportzip.FileContentSourceSupport
 import org.sonatype.nexus.supportzip.GeneratedContentSourceSupport
 import org.sonatype.nexus.supportzip.SupportBundle
+import org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority
 import org.sonatype.nexus.supportzip.SupportBundleCustomizer
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
@@ -26,62 +28,49 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import static com.google.common.base.Preconditions.checkNotNull
-import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority
-import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority.HIGH
+import static groovy.io.FileType.FILES
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority.DEFAULT
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority.LOW
 import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority.REQUIRED
 import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.CONFIG
 
 /**
- * Adds system configuration files to support bundle.
+ * Adds work directory configuration files to support bundle.
  *
  * @since 2.7
  */
 @Named
 @Singleton
-class ConfigurationCustomizer
+class WorkConfigurationCustomizer
     extends ComponentSupport
     implements SupportBundleCustomizer
 {
   private final ApplicationDirectories applicationDirectories
 
   @Inject
-  ConfigurationCustomizer(final ApplicationDirectories applicationDirectories) {
+  WorkConfigurationCustomizer(final ApplicationDirectories applicationDirectories) {
     this.applicationDirectories = checkNotNull(applicationDirectories)
   }
 
   @Override
   void customize(final SupportBundle supportBundle) {
-    // nexus.xml
     supportBundle << new NexusXmlContentSource()
 
     // helper to include a file
-    def maybeIncludeFile = { File file, String prefix, Priority priority = null ->
+    def maybeIncludeFile = { File file, String prefix, Priority priority = DEFAULT ->
       if (file.exists()) {
         log.debug 'Including file: {}', file
-        supportBundle << new FileContentSourceSupport(CONFIG, "$prefix/${file.name}", file) {
-          {
-            if (priority) {
-              this.priority = priority
-            }
-          }
-        }
+        supportBundle << new FileContentSourceSupport(CONFIG, "$prefix/${file.name}", file, priority)
       }
       else {
         log.debug 'Skipping non-existent file: {}', file
       }
     }
 
-    // include installation configuration files
-    def installDir = applicationDirectories.installDirectory
-    if (installDir) {
-      // include all jetty configuration files
-      new File(installDir, 'etc').eachFileMatch(~'jetty.*xml') {
-        maybeIncludeFile it, 'install/etc', HIGH
-      }
-
-      maybeIncludeFile new File(installDir, 'etc/nexus.properties'), 'install/etc', HIGH
-
-      //TODO: KARAF include karaf configuration
+    def configDir = applicationDirectories.getWorkDirectory('etc')
+    assert configDir.exists()
+    configDir.eachFileMatch FILES, ~/logback.*/, {
+      maybeIncludeFile it, 'work/etc', LOW
     }
   }
 
