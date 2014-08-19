@@ -26,7 +26,7 @@ Ext.define('NX.view.masterdetail.Tabs', {
   ],
 
   // HACK: For now make all detail panels light themed while we sort out the overall look of rapture
-  ui: 'feature-detail',
+  //ui: 'feature-detail',
 
   /**
    * @override
