@@ -37,7 +37,7 @@ import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.CON
 /**
  * Adds work directory configuration files to support bundle.
  *
- * @since 2.7
+ * @since 3.0
  */
 @Named
 @Singleton
