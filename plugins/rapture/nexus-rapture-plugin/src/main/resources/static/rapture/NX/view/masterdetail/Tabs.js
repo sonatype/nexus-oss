@@ -20,10 +20,17 @@
 Ext.define('NX.view.masterdetail.Tabs', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-masterdetail-tabs',
+  requires: [
+    'NX.Icons',
+    'NX.Bookmarks'
+  ],
 
   // HACK: For now make all detail panels light themed while we sort out the overall look of rapture
   ui: 'feature-detail',
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this,
         content = me.tabs;

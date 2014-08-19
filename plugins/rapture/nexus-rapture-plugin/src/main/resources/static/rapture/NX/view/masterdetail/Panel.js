@@ -20,8 +20,7 @@
 Ext.define('NX.view.masterdetail.Panel', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-masterdetail-panel',
-
-  require: [
+  requires: [
     'NX.view.Info',
     'NX.view.InfoPanel'
   ],
@@ -32,6 +31,9 @@ Ext.define('NX.view.masterdetail.Panel', {
     xtype: 'nx-info-panel'
   },
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this;
 
