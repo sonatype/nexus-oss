@@ -21,8 +21,7 @@ Ext.define('NX.view.masterdetail.Panel', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-masterdetail-panel',
   requires: [
-    'NX.view.Info',
-    'NX.view.InfoPanel'
+    'NX.Icons'
   ],
 
   layout: 'border',
