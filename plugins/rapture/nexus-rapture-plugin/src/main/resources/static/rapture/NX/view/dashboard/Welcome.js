@@ -21,7 +21,8 @@ Ext.define('NX.view.dashboard.Welcome', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-dashboard-welcome',
   requires: [
-    'NX.State'
+    'NX.State',
+    'NX.util.Url'
   ],
 
   layout: {
@@ -37,10 +38,23 @@ Ext.define('NX.view.dashboard.Welcome', {
     var me = this;
 
     me.items = [
+      //NOTE: Using custom welcome icon for milestones
+      //{
+      //  xtype: 'image',
+      //  cls: 'nx-icon-nexus-x100',
+      //  style: {
+      //    margin: '100px 0 0 0'
+      //  }
+      //},
       {
         xtype: 'image',
-        cls: 'nx-icon-nexus-x100',
+        src: NX.util.Url.urlOf('/static/rapture/resources/images/nexus-milestone.png'), // 160x130
+        height: 130,
+        width: 160,
+        autoEl: 'div',
         style: {
+          'text-align': 'center',
+          'vertical-align': 'middle',
           margin: '100px 0 0 0'
         }
       },
