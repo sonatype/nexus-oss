@@ -35,13 +35,13 @@ public class View
   }
 
   public Response dispatch(final Request request) {
-    final Route route = router.findRoute(request);
+    final RequestMatcher requestMatcher = router.findRoute(request);
 
-    if (route == null) {
+    if (requestMatcher == null) {
       return noRouteHandler.handle(request);
     }
 
-    final String handlerChainName = route.getHandlerName();
+    final String handlerChainName = requestMatcher.getHandlerName();
 
     final Handler handler = handlers.get(handlerChainName);
     if (handler == null) {

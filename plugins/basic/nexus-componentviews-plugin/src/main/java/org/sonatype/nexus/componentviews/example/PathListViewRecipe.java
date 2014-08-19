@@ -6,9 +6,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.componentviews.AlwaysMatchesRoute;
+import org.sonatype.nexus.componentviews.AllRequestMatcher;
 import org.sonatype.nexus.componentviews.Handler;
-import org.sonatype.nexus.componentviews.Route;
+import org.sonatype.nexus.componentviews.RequestMatcher;
 import org.sonatype.nexus.componentviews.Router;
 import org.sonatype.nexus.componentviews.View;
 import org.sonatype.nexus.componentviews.config.UserSuppliedViewConfig;
@@ -33,7 +33,7 @@ public class PathListViewRecipe
 
   @Override
   public View createView(final UserSuppliedViewConfig userSuppliedConfig) {
-    final Router router = new Router(Arrays.asList((Route) new AlwaysMatchesRoute("pathList")));
+    final Router router = new Router(Arrays.asList((RequestMatcher) new AllRequestMatcher("pathList")));
 
     final View view = new View(userSuppliedConfig.getViewName(),
         router,

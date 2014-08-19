@@ -29,6 +29,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>nexus-componentviews-plugin</module>
     <module>nexus-content-plugin</module>
     <module>nexus-groovy-plugin</module>
     <module>nexus-logging-plugin</module>
