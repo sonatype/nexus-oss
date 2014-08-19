@@ -218,5 +218,7 @@ public class NexusContextListener
       EnumSet<Option> options = EnumSet.of(ContinueBatchOnFailure, NoCleanIfFailure, NoAutoRefreshBundles);
       featuresService.installFeatures(features, options);
     }
+
+    log.info("Installed {} features", features.size());
   }
 }
