@@ -31,7 +31,7 @@ import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority
 import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.LOG
 
 /**
- * Adds nexus.log and logging configuration files to support bundle.
+ * Adds log files to support bundle.
  *
  * @since 2.7
  */
