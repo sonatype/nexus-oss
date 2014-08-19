@@ -29,6 +29,12 @@
   <packaging>karaf-assembly</packaging>
 
   <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus.assemblies</groupId>
+      <artifactId>nexus-karaf-branding</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <!--
     Karaf features
     -->
@@ -78,7 +84,7 @@
     </dependency>
 
     <!--
-    Plugin features
+    Nexus Plugin features
     -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
@@ -287,36 +293,6 @@
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/assembly/lib</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>javax.annotation</groupId>
-                  <artifactId>javax.annotation-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.google.code.findbugs</groupId>
-                  <artifactId>jsr305</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.assemblies</groupId>
-                  <artifactId>nexus-karaf-branding</artifactId>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
@@ -332,12 +308,18 @@
                   <fileset dir="${project.basedir}/src/main/resources/content"/>
                 </copy>
 
+                <!-- install some custom lib/ jar -->
+                <copy file="${javax.annotation:javax.annotation-api:jar}" todir="${project.build.directory}/assembly/lib"/>
+                <copy file="${com.google.code.findbugs:jsr305:jar}" todir="${project.build.directory}/assembly/lib"/>
+                <copy file="${org.sonatype.nexus.assemblies:nexus-karaf-branding:jar}" todir="${project.build.directory}/assembly/lib"/>
+
                 <!-- delete some cruft which karaf includes by default -->
                 <delete>
                   <fileset dir="${project.build.directory}/assembly">
                     <include name="etc/distribution.info"/>
                     <include name="etc/equinox-debug.properties"/>
                     <include name="etc/regions-config.xml"/>
+                    <include name="etc/org.apache.karaf.kar.cfg"/>
                     <include name="etc/org.apache.karaf.features.obr.cfg"/>
                     <include name="etc/org.apache.karaf.features.repos.cfg"/>
                     <include name="etc/org.apache.karaf.command.acl.*.cfg"/>
