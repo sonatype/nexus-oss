@@ -70,6 +70,14 @@ Ext.define('NX.view.AboutWindow', {
         flex: 1,
         items: [
           {
+            title: 'Copyright',
+            xtype: 'box',
+            autoEl: {
+              tag: 'iframe',
+              src: NX.util.Url.urlOf('/COPYRIGHT.html')
+            }
+          },
+          {
             title: 'License',
             xtype: 'box',
             autoEl: {
