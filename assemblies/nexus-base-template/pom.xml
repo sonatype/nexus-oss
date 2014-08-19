@@ -350,6 +350,9 @@
                   <!-- update pax-swissbox-bnd from default to version we ship -->
                   <replacefilter token="mvn\:org.ops4j.pax.swissbox/pax-swissbox-bnd/1.7.0"
                                  value="${mvn:pax-swissbox-bnd}"/>
+                  <!-- swap in patched features service that installs by reference -->
+                  <replacefilter token="${mvn:org.apache.karaf.features.core}"
+                                 value="${mvn:nexus-features-service}" />
                 </replace>
               </target>
             </configuration>

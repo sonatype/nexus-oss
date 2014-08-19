@@ -39,6 +39,7 @@
     <module>nexus-core</module>
     <module>nexus-ehcache</module>
     <module>nexus-extender</module>
+    <module>nexus-features-service</module>
     <module>nexus-httpclient-api</module>
     <module>nexus-formfields</module>
     <module>nexus-launcher</module>
