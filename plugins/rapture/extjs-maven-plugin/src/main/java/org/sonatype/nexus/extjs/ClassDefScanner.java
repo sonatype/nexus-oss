@@ -447,6 +447,11 @@ public class ClassDefScanner
             current.setRequires(arrayStringLiteral(prop.getRight()));
             break;
 
+          case "require":
+            // complain if we found 'require' this almost certainly should be 'requires'
+            log.warn(String.format("Found 'require' and probably should be 'requires' in: %s#%s", source, prop.getLineno()));
+            break;
+
           case "uses":
             // array of string literals only
             current.setUses(arrayStringLiteral(prop.getRight()));
