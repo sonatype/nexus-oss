@@ -47,11 +47,7 @@ class SystemInformationCustomizer
 
   @Override
   void customize(final SupportBundle supportBundle) {
-    supportBundle << new GeneratedContentSourceSupport(SYSINFO, 'sysinfo.json') {
-      {
-        this.priority = REQUIRED
-      }
-
+    supportBundle << new GeneratedContentSourceSupport(SYSINFO, 'info/sysinfo.json', REQUIRED) {
       @Override
       protected void generate(final File file) {
         def report = systemInformationGenerator.report()

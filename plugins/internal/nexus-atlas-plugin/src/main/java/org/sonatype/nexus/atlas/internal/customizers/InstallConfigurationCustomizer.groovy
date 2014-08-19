@@ -13,9 +13,7 @@
 package org.sonatype.nexus.atlas.internal.customizers
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories
-import org.sonatype.nexus.log.LogManager
 import org.sonatype.nexus.supportzip.FileContentSourceSupport
-import org.sonatype.nexus.supportzip.GeneratedContentSourceSupport
 import org.sonatype.nexus.supportzip.SupportBundle
 import org.sonatype.nexus.supportzip.SupportBundleCustomizer
 import org.sonatype.sisu.goodies.common.ComponentSupport
@@ -27,64 +25,45 @@ import javax.inject.Singleton
 import static com.google.common.base.Preconditions.checkNotNull
 import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority
 import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority.DEFAULT
-import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority.LOW
-import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.LOG
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Priority.HIGH
+import static org.sonatype.nexus.supportzip.SupportBundle.ContentSource.Type.CONFIG
 
 /**
- * Adds nexus.log and logging configuration files to support bundle.
+ * Adds installation directory configuration files to support bundle.
  *
  * @since 2.7
  */
 @Named
 @Singleton
-class LogCustomizer
+class InstallConfigurationCustomizer
     extends ComponentSupport
     implements SupportBundleCustomizer
 {
-  private final LogManager logManager
-
   private final ApplicationDirectories applicationDirectories
 
   @Inject
-  LogCustomizer(final LogManager logManager,
-                final ApplicationDirectories applicationDirectories)
-  {
-    this.logManager = checkNotNull(logManager)
+  InstallConfigurationCustomizer(final ApplicationDirectories applicationDirectories) {
     this.applicationDirectories = checkNotNull(applicationDirectories)
   }
 
   @Override
   void customize(final SupportBundle supportBundle) {
-    // add source for nexus.log
-    supportBundle << new GeneratedContentSourceSupport(LOG, 'log/nexus.log', LOW) {
-      @Override
-      protected void generate(final File file) {
-        def log = logManager.getApplicationLogAsStream('nexus.log', 0, Long.MAX_VALUE)
-        log.withStream { input ->
-          file.withOutputStream { output ->
-            output << input
-          }
-        }
-      }
-    }
-
     // helper to include a file
     def maybeIncludeFile = { File file, String prefix, Priority priority = DEFAULT ->
       if (file.exists()) {
         log.debug 'Including file: {}', file
-        supportBundle << new FileContentSourceSupport(LOG, "$prefix/${file.name}", file, priority)
+        supportBundle << new FileContentSourceSupport(CONFIG, "$prefix/${file.name}", file, priority)
       }
       else {
         log.debug 'Skipping non-existent file: {}', file
       }
     }
 
-    // include karaf.log
-    if (System.properties['karaf.log']) {
-      maybeIncludeFile new File(System.getProperty('karaf.log')), 'log', LOW
+    def installDir = applicationDirectories.installDirectory
+    if (installDir) {
+      new File(installDir, 'etc').eachFile {
+        maybeIncludeFile it, 'install/etc', HIGH
+      }
     }
-
-    // include request.log
-    maybeIncludeFile new File(applicationDirectories.workDirectory, 'logs/request.log'), 'log', LOW
   }
 }

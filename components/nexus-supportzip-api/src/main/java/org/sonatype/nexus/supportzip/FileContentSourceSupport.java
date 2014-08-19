@@ -30,9 +30,16 @@ public class FileContentSourceSupport
 {
   private final File file;
 
-  public FileContentSourceSupport(final SupportBundle.ContentSource.Type type, final String path, final File file) {
-    super(type, path);
+  /**
+   * @since 3.0
+   */
+  public FileContentSourceSupport(final Type type, final String path, final File file, final Priority priority) {
+    super(type, path, priority);
     this.file = checkNotNull(file);
+  }
+
+  public FileContentSourceSupport(final Type type, final String path, final File file) {
+    this(type, path, file, Priority.DEFAULT);
   }
 
   @Override

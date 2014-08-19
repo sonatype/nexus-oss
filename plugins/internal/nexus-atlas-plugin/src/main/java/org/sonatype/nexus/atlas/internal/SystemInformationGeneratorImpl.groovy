@@ -238,8 +238,7 @@ class SystemInformationGeneratorImpl
         def item = data[coordinates.artifactId] = [
             'groupId': coordinates.groupId,
             'artifactId': coordinates.artifactId,
-            'version': coordinates.version,
-            'successful': 'true'
+            'version': coordinates.version
         ]
       }
       return data

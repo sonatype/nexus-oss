@@ -10,11 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package com.sonatype.nexus.ldap.internal
 
 import com.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Reader
 import com.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Writer
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration
+import org.sonatype.nexus.configuration.application.ApplicationDirectories
 import org.sonatype.nexus.supportzip.GeneratedContentSourceSupport
 import org.sonatype.nexus.supportzip.SupportBundle
 import org.sonatype.nexus.supportzip.SupportBundleCustomizer
@@ -39,11 +40,11 @@ public class SupportBundleCustomizerImpl
     extends ComponentSupport
     implements SupportBundleCustomizer
 {
-  private final ApplicationConfiguration applicationConfiguration
+  private final ApplicationDirectories applicationDirectories
 
   @Inject
-  public SupportBundleCustomizerImpl(final ApplicationConfiguration applicationConfiguration) {
-    this.applicationConfiguration = checkNotNull(applicationConfiguration)
+  public SupportBundleCustomizerImpl(final ApplicationDirectories applicationDirectories) {
+    this.applicationDirectories = checkNotNull(applicationDirectories)
   }
 
   /**
@@ -58,16 +59,15 @@ public class SupportBundleCustomizerImpl
    * Source for obfuscated ldap.xml
    */
   private class LdapXmlContentSource
-  extends GeneratedContentSourceSupport
+      extends GeneratedContentSourceSupport
   {
     LdapXmlContentSource() {
-      super(SECURITY, 'work/etc/ldap.xml')
-      this.priority = HIGH
+      super(SECURITY, 'work/etc/ldap.xml', HIGH)
     }
 
     @Override
     protected void generate(final File file) {
-      File source = new File(applicationConfiguration.configurationDirectory, 'ldap.xml')
+      File source = new File(applicationDirectories.workDirectory, 'etc/ldap.xml')
       if (!source.exists()) {
         log.debug 'Skipping non-existent file: {}', source
         return

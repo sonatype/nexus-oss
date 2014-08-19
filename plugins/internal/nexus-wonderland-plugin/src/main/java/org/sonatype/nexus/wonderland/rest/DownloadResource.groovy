@@ -15,8 +15,8 @@ package org.sonatype.nexus.wonderland.rest
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.sonatype.nexus.util.Tokens
 import org.sonatype.nexus.wonderland.DownloadService
-import org.sonatype.sisu.goodies.common.ComponentSupport
 import org.sonatype.siesta.Resource
+import org.sonatype.sisu.goodies.common.ComponentSupport
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -97,6 +97,7 @@ class DownloadResource
       log.debug 'Sending support ZIP file: {}', file
       return Response.ok(file.newInputStream())
           .header('Content-Disposition', "attachment; filename=\"${fileName}\"")
+          .header('Content-Length', file.length())
           .build()
     }
     catch (IllegalAccessException e) {

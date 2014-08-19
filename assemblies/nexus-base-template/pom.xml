@@ -29,6 +29,12 @@
   <packaging>karaf-assembly</packaging>
 
   <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus.assemblies</groupId>
+      <artifactId>nexus-karaf-branding</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <!--
     Karaf features
     -->
@@ -78,7 +84,7 @@
     </dependency>
 
     <!--
-    Plugin features
+    Nexus Plugin features
     -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
@@ -233,8 +239,6 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- rapture -->
-
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-rapture-plugin</artifactId>
@@ -277,7 +281,7 @@
             </goals>
             <configuration>
               <source>
-                project.artifactMap.each(){k,v->
+                project.artifactMap.each{k,v->
                   // add 'mvn:artifactId' properties representing Pax-URL path for each transitive artifact
                   project.properties['mvn:'+v.artifactId]='mvn\:'+v.groupId+'/'+v.artifactId+'/'+v.baseVersion
                 }
@@ -289,112 +293,77 @@
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.assemblies</groupId>
-                  <artifactId>nexus-karaf-branding</artifactId>
-                  <outputDirectory>${project.build.directory}/assembly/lib</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
-            <id>nexus-branding</id>
+            <id>configure-assembly</id>
             <phase>prepare-package</phase>
             <goals>
               <goal>run</goal>
             </goals>
             <configuration>
               <target>
-                <ac:for param="file" xmlns:ac="antlib:net.sf.antcontrib">
-                  <fileset dir="${basedir}/src/main/appended-resources" />
-                  <sequential>
-                    <local name="rel" />
-                    <property name="rel" value="@{file}" relative="yes"
-                      basedir="${basedir}/src/main/appended-resources" />
-                    <concat destfile="${project.build.directory}/assembly/${rel}" append="true">
-                      <path path="@{file}"/>
-                    </concat>
-                  </sequential>
-                </ac:for>
+                <!-- overlay customizations -->
                 <copy todir="${project.build.directory}/assembly" overwrite="true">
-                  <fileset dir="${basedir}/src/main/overlaid-resources" />
+                  <fileset dir="${project.basedir}/src/main/resources/overlay"/>
                 </copy>
-                <dependencyfilesets prefix="mvn:"/>
-                <copy todir="${project.build.directory}/assembly/lib" overwrite="true">
-                  <fileset refid="mvn:javax.annotation:javax.annotation-api:jar"/>
-                  <fileset refid="mvn:com.google.code.findbugs:jsr305:jar"/>
-                </copy>
+
+                <!-- install some custom lib/ jar -->
+                <copy file="${javax.annotation:javax.annotation-api:jar}" todir="${project.build.directory}/assembly/lib"/>
+                <copy file="${com.google.code.findbugs:jsr305:jar}" todir="${project.build.directory}/assembly/lib"/>
+                <copy file="${org.sonatype.nexus.assemblies:nexus-karaf-branding:jar}" todir="${project.build.directory}/assembly/lib"/>
+
+                <!-- delete some cruft which karaf includes by default -->
+                <delete>
+                  <fileset dir="${project.build.directory}/assembly">
+                    <include name="**/README"/>
+                    <include name="etc/all.policy"/>
+                    <include name="etc/distribution.info"/>
+                    <include name="etc/equinox-debug.properties"/>
+                    <include name="etc/regions-config.xml"/>
+                    <include name="etc/org.apache.karaf.kar.cfg"/>
+                    <include name="etc/org.apache.karaf.features.obr.cfg"/>
+                    <include name="etc/org.apache.karaf.features.repos.cfg"/>
+                    <include name="etc/org.apache.karaf.command.acl.*.cfg"/>
+                    <include name="etc/jmx.acl*.cfg"/>
+                  </fileset>
+                </delete>
+
+                <!-- include a few additional extra packages required by our environment -->
                 <replace file="${project.build.directory}/assembly/etc/config.properties"
-                  token="packages.extra=" value="packages.extra=sun.misc,com.sun.net.httpserver,javax.annotation.security;version=1.2,org.xerial.snappy," />
+                  token="packages.extra="
+                  value="packages.extra=sun.misc,com.sun.net.httpserver,javax.annotation.security;version=1.2,org.xerial.snappy,"/>
+
+                <!-- trim out various enterprise/deployment features we don't need at the moment -->
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg">
-                  <!-- trim out various enterprise/deployment features we don't need at the moment -->
-                  <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.1/xml/features" />
-                  <replacefilter token=",mvn:org.ops4j.pax.web/pax-web-features/3.1.0/xml/features" />
-                  <replacefilter token=",mvn:org.apache.karaf.features/spring/3.0.1/xml/features" />
-                  <replacefilter token=",kar,ssh,management" />
-                  <replacefilter token=",region" />
+                  <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.1/xml/features"/>
+                  <replacefilter token=",mvn:org.ops4j.pax.web/pax-web-features/3.1.0/xml/features"/>
+                  <replacefilter token=",mvn:org.apache.karaf.features/spring/3.0.1/xml/features"/>
+                  <replacefilter token=",kar,ssh,management"/>
+                  <replacefilter token=",region"/>
                 </replace>
+
                 <replace file="${project.build.directory}/assembly/etc/startup.properties">
-                  <replacefilter token="${mvn:pax-logging-service}" value="${mvn:metrics-core} = 8${line.separator}${mvn:metrics-logback} = 8${line.separator}${mvn:pax-logging-metrics} = 8${line.separator}${mvn:pax-logging-logback}" />
-                  <replacefilter token="mvn\:org.ops4j.pax.swissbox/pax-swissbox-bnd/1.7.0" value="${mvn:pax-swissbox-bnd}" />
+                  <!-- pax-logging-service (log4j) with pax-logging-logback plus our metrics support -->
+                  <replacefilter token="${mvn:pax-logging-service}"
+                                 value="${mvn:metrics-core} = 8${line.separator}${mvn:metrics-logback} = 8${line.separator}${mvn:pax-logging-metrics} = 8${line.separator}${mvn:pax-logging-logback}"/>
+                  <!-- update pax-swissbox-bnd from default to version we ship -->
+                  <replacefilter token="mvn\:org.ops4j.pax.swissbox/pax-swissbox-bnd/1.7.0"
+                                 value="${mvn:pax-swissbox-bnd}"/>
                 </replace>
-                <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.management.cfg">
-                  <replacefilter token="rmiRegistryPort = 1099" value="rmiRegistryPort = 8099" />
-                  <replacefilter token="rmiServerPort = 44444" value="rmiServerPort = 8044" />
-                </replace>
-              </target>
-            </configuration>
-          </execution>
-          <execution>
-            <id>sonatype-work</id>
-            <phase>package</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <target>
-                <zip destfile="${project.build.directory}/${project.artifactId}-${project.version}.zip" update="true"
-                  basedir="${basedir}/src/main" includes="sonatype-work/**" excludes="**/.placeholder" />
               </target>
             </configuration>
           </execution>
         </executions>
-        <dependencies>
-          <dependency>
-            <groupId>ant-contrib</groupId>
-            <artifactId>ant-contrib</artifactId>
-            <version>1.0b3</version>
-            <exclusions>
-              <exclusion>
-                <groupId>ant</groupId>
-                <artifactId>ant</artifactId>
-              </exclusion>
-            </exclusions>
-          </dependency>
-        </dependencies>
       </plugin>
 
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
         <configuration>
+          <!-- disable archive generation, will use maven-assembly-plugin -->
           <archiveTarGz>false</archiveTarGz>
+          <archiveZip>false</archiveZip>
           <bootFeatures>
             <feature>config</feature>
             <feature>standard</feature>
@@ -426,6 +395,26 @@
             <feature>nexus-coreui-plugin</feature>
           </installedFeatures>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>bundle</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <appendAssemblyId>false</appendAssemblyId>
+              <descriptors>
+                <descriptor>${project.basedir}/src/main/assembly/bundle.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+
+  <!--
+  ==== HTTPS ====
+  Set the following inside nexus.properties:
+  application-port-ssl: the port to listen for https connections
+  -->
+  <Call name="addConnector">
+    <Arg>
+      <New id="HTTPSConnector" class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSslSelectChannelConnector">
+        <Arg>
+          <New class="org.eclipse.jetty.util.ssl.SslContextFactory">
+            <Set name="keyStore"><Property name="nexus-base"/>/etc/ssl/keystore.jks</Set>
+            <Set name="trustStore"><Property name="nexus-base"/>/etc/ssl/keystore.jks</Set>
+            <Set name="keyStorePassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
+            <Set name="keyManagerPassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
+            <Set name="trustStorePassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
+          </New>
+        </Arg>
+        <Set name="host"><Property name="application-host"/></Set>
+        <Set name="port"><Property name="application-port-ssl"/></Set>
+        <Set name="forwarded">true</Set>
+      </New>
+    </Arg>
+  </Call>
+
+</Configure>

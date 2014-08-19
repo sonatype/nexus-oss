@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+
+  <Set name="threadPool">
+    <New class="org.sonatype.nexus.bootstrap.jetty.InstrumentedQueuedThreadPool"/>
+  </Set>
+
+  <Call name="addConnector">
+    <Arg>
+      <New id="HTTPConnector" class="org.sonatype.nexus.bootstrap.jetty.InstrumentedSelectChannelConnector">
+        <Set name="host"><Property name="application-host"/></Set>
+        <Set name="port"><Property name="application-port"/></Set>
+        <Set name="forwarded">true</Set>
+      </New>
+    </Arg>
+  </Call>
+
+  <New id="NexusHandler" class="org.sonatype.nexus.bootstrap.jetty.InstrumentedHandler">
+    <Arg>
+      <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
+        <Set name="descriptor"><Property name="nexus-base"/>/etc/nexus-web.xml</Set>
+        <Set name="resourceBase"><Property name="nexus-base"/>/public</Set>
+        <Set name="contextPath"><Property name="nexus-context-path"/></Set>
+        <Set name="throwUnavailableOnStartupException">true</Set>
+        <Set name="configurationClasses">
+          <Array type="java.lang.String">
+            <Item>org.eclipse.jetty.webapp.WebXmlConfiguration</Item>
+          </Array>
+        </Set>
+      </New>
+    </Arg>
+  </New>
+
+  <Set name="handler">
+    <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+      <Call name="addHandler">
+        <Arg>
+          <Ref id="NexusHandler"/>
+        </Arg>
+      </Call>
+    </New>
+  </Set>
+
+  <Set name="stopAtShutdown">true</Set>
+  <Set name="sendServerVersion">true</Set>
+  <Set name="sendDateHeader">true</Set>
+  <Set name="gracefulShutdown">1000</Set>
+
+</Configure>

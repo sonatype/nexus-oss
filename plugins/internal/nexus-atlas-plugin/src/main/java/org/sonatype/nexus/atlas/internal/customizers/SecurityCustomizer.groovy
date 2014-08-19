@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.atlas.internal.customizers
 
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration
+import org.sonatype.nexus.configuration.application.ApplicationDirectories
 import org.sonatype.nexus.supportzip.GeneratedContentSourceSupport
 import org.sonatype.nexus.supportzip.SupportBundle
 import org.sonatype.nexus.supportzip.SupportBundleCustomizer
@@ -38,15 +38,15 @@ class SecurityCustomizer
     extends ComponentSupport
     implements SupportBundleCustomizer
 {
-  private final ApplicationConfiguration applicationConfiguration
+  private final ApplicationDirectories applicationDirectories
 
   private final SecurityModelConfigurationSource securityModelConfigurationSource
 
   @Inject
-  SecurityCustomizer(final ApplicationConfiguration applicationConfiguration,
+  SecurityCustomizer(final ApplicationDirectories applicationDirectories,
                      final SecurityModelConfigurationSource securityModelConfigurationSource)
   {
-    this.applicationConfiguration = checkNotNull(applicationConfiguration)
+    this.applicationDirectories = checkNotNull(applicationDirectories)
     this.securityModelConfigurationSource = checkNotNull(securityModelConfigurationSource)
   }
 
@@ -67,13 +67,12 @@ class SecurityCustomizer
       extends GeneratedContentSourceSupport
   {
     SecurityXmlContentSource() {
-      super(SECURITY, 'work/etc/security.xml')
-      this.priority = HIGH
+      super(SECURITY, 'work/etc/security.xml', HIGH)
     }
 
     @Override
     protected void generate(final File file) {
-      def source = new File(applicationConfiguration.configurationDirectory, 'security.xml')
+      def source = new File(applicationDirectories.workDirectory, 'etc/security.xml')
       if (!source.exists()) {
         log.debug 'Skipping non-existent file: {}', source
         return
@@ -104,13 +103,12 @@ class SecurityCustomizer
       extends GeneratedContentSourceSupport
   {
     SecurityConfigurationXmlContentSource() {
-      super(SECURITY, 'work/etc/security-configuration.xml')
-      this.priority = HIGH
+      super(SECURITY, 'work/etc/security-configuration.xml', HIGH)
     }
 
     @Override
     protected void generate(final File file) {
-      def source = new File(applicationConfiguration.configurationDirectory, 'security-configuration.xml')
+      def source = new File(applicationDirectories.workDirectory, 'etc/security-configuration.xml')
       if (!source.exists()) {
         log.debug 'Skipping non-existent file: {}', source
         return

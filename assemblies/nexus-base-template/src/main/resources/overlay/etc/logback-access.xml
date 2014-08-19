@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<configuration>
+  <appender name="request.logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>${nexus-work}/logs/request.log</File>
+    <Append>true</Append>
+    <encoder>
+      <pattern>common</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${nexus-work}/logs/request.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
+      <maxHistory>90</maxHistory>
+    </rollingPolicy>
+  </appender>
+
+  <appender-ref ref="request.logfile"/>
+</configuration>
