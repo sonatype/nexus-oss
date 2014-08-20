@@ -281,9 +281,7 @@ public class JettyServer
     public void stopComponents() throws Exception {
       Collections.reverse(components);
 
-      if (started.getCount() > 0) {
-        interrupt(); // if Jetty thread is still waiting for a component to start, this should unblock it
-      }
+      interrupt(); // if Jetty thread is still waiting for a component to start, this should unblock it
 
       for (LifeCycle component : components) {
         if (component.isRunning()) {
