@@ -21,7 +21,6 @@ Ext.define('NX.coreui.view.feed.FeedEntryList', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-coreui-feedentry-list',
   requires: [
-    'Ext.XTemplate',
     'NX.Icons'
   ],
 
@@ -41,8 +40,17 @@ Ext.define('NX.coreui.view.feed.FeedEntryList', {
     {
       xtype: 'pagingtoolbar',
       store: 'FeedEntry',
-      dock: 'bottom',
+      dock: 'top',
       displayInfo: true
+    }
+  ],
+
+  plugins: [
+    {
+      ptype: 'rowexpander',
+      rowBodyTpl: Ext.create('Ext.XTemplate',
+          '<p>{content}</p>'
+      )
     }
   ],
 
@@ -53,15 +61,6 @@ Ext.define('NX.coreui.view.feed.FeedEntryList', {
     var me = this;
 
     me.iconCls = NX.Icons.cls('feed-default', 'x16');
-
-    me.plugins = [
-      {
-        ptype: 'rowexpander',
-        rowBodyTpl: Ext.create('Ext.XTemplate',
-            '<p>{content}</p>'
-        )
-      }
-    ];
 
     me.callParent();
   }
