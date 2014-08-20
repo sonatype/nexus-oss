@@ -253,7 +253,7 @@ public class JettyServer
           started.countDown();
         }
 
-        if (server != null) {
+        if (server != null && exception == null) {
           log.info("Started");
           server.join();
         }
