@@ -235,14 +235,14 @@ public class JettyServer
         Server server = null;
         try {
           for (LifeCycle component : components) {
-            // capture the server reference
-            if (component instanceof Server) {
-              server = (Server) component;
-            }
-
             if (!component.isRunning()) {
               log.info("Starting: {}", component);
               component.start();
+            }
+
+            // capture the server reference
+            if (component instanceof Server) {
+              server = (Server) component;
             }
           }
         }
