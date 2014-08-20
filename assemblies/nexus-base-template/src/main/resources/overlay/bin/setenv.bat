@@ -44,3 +44,5 @@ rem Enable debug mode
 rem SET KARAF_DEBUG
 
 SET JAVA_MAX_PERM_MEM=256M
+
+SET KARAF_OPTS=-Djava.net.preferIPv4Stack=true
