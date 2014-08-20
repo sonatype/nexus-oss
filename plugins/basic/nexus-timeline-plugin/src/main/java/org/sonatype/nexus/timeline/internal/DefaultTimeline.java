@@ -140,7 +140,7 @@ public class DefaultTimeline
       }
     }
 
-    this.pool = databaseManager.pool(DB_NAME);
+    this.pool = databaseManager.newPool(DB_NAME);
   }
 
   @Override
