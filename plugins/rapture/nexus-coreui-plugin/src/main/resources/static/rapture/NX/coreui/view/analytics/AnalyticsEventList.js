@@ -122,7 +122,7 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
     {
       xtype: 'pagingtoolbar',
       store: 'AnalyticsEvent',
-      dock: 'bottom',
+      dock: 'top',
       displayInfo: true,
       displayMsg: 'Displaying events {0} - {1} of {2}',
       emptyMsg: 'No events to display'
