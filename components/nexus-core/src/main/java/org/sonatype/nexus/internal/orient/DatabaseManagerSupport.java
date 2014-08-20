@@ -199,6 +199,9 @@ public abstract class DatabaseManagerSupport
 
   @Override
   public DatabasePool newPool(final String name) {
+    checkNotNull(name);
+    ensureStarted();
+
     // TODO: Track non-shared pools so that we can attempt to shut them down if users didn't properly do this?
     // TODO: ... or at the very least complain if this happens?
     return createPool(name);
