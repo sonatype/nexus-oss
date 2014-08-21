@@ -115,17 +115,12 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
       glyph: 'xf0ee@FontAwesome' /* fa-cloud-upload */,
       action: 'submit',
       disabled: true
-    }
-  ],
-
-  dockedItems: [
+    },
+    '-',
     {
       xtype: 'pagingtoolbar',
       store: 'AnalyticsEvent',
-      dock: 'top',
-      displayInfo: true,
-      displayMsg: 'Displaying events {0} - {1} of {2}',
-      emptyMsg: 'No events to display'
+      border: false
     }
   ],
 
