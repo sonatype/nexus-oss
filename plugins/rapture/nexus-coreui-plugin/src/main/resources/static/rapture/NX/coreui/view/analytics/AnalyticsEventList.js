@@ -26,6 +26,10 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
 
   store: 'AnalyticsEvent',
 
+  viewConfig: {
+    stripeRows: true
+  },
+
   columns: [
     {
       xtype: 'nx-iconcolumn',
