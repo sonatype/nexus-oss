@@ -43,7 +43,7 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-maven-bridge</artifactId>
-      <version>3.1</version>
+      <version>3.1.1</version>
       <exclusions>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>
