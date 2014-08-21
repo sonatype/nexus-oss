@@ -19,6 +19,10 @@
  */
 Ext.define('NX.coreui.controller.Outreach', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.util.Url',
+    'NX.State'
+  ],
 
   refs: [
     { ref: 'welcomePage', selector: 'nx-dashboard-welcome' }
@@ -67,12 +71,14 @@ Ext.define('NX.coreui.controller.Outreach', {
             xtype: 'box',
             itemId: 'outreach',
             anchor: '100%',
-            height: 700,
+            flex: 1,
             border: false,
             frame: false,
             autoEl: {
               tag: 'iframe',
-              src: NX.util.Url.urlOf('service/outreach/')
+              // include version and edition for iframe request to allow for client-side content templates
+              src: NX.util.Url.urlOf('service/outreach/?version=' + NX.State.getValue('status')['version'] +
+                  '&edition=' + NX.State.getValue('status')['edition'])
             }
           });
         }
