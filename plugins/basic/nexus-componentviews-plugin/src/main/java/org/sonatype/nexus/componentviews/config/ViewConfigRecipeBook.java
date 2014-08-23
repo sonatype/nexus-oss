@@ -1,5 +1,7 @@
 package org.sonatype.nexus.componentviews.config;
 
+import javax.annotation.Nullable;
+
 /**
  * A simple provider of recipes.
  *
@@ -7,5 +9,6 @@ package org.sonatype.nexus.componentviews.config;
  */
 public interface ViewConfigRecipeBook
 {
+  @Nullable
   ViewConfigRecipe getRecipe(String recipeName);
 }

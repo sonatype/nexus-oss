@@ -11,7 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.sonatype.nexus.componentviews.Handler;
 import org.sonatype.nexus.componentviews.Request;
-import org.sonatype.nexus.componentviews.Response;
+import org.sonatype.nexus.componentviews.responses.Response;
+import org.sonatype.nexus.componentviews.responses.StatusResponse;
+import org.sonatype.nexus.componentviews.responses.StringResponse;
 
 /**
  * This example handler is stateful because it uses in-memory persistence; in practice this would be rare or
@@ -50,22 +52,19 @@ public class ExamplePathListHandler
 
         s.append("</body></html>");
 
-        // TODO: Okay, this sucks. Be nice to have a convenience API that knows how to do smarter things with content.
-        // That way I could just return an input stream, a String.
-        return Response.content("text/html", toInputStream(s.toString())).status(200).build();
+        return StringResponse.html(s.toString());
 
       case PUT:
         entries.put(requestPath, new Date());
-        return Response.status(201).build();
+
+        return StatusResponse.created();
 
       case DELETE:
-        final Date remove = entries.remove(requestPath);
-        if (remove != null) {
-          return Response.status(204).build();
+        final Date removed = entries.remove(requestPath);
+        if (removed == null) {
+          return StatusResponse.notFound(null);
         }
-        else {
-          return Response.status(404).build();
-        }
+        return StatusResponse.deleted();
 
       default:
         throw new IllegalArgumentException("This should never happen.");

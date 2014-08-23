@@ -3,6 +3,7 @@ package org.sonatype.nexus.componentviews;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -19,7 +20,10 @@ public class ViewRegistry
 {
   private final ConcurrentHashMap<String, View> activeViews = new ConcurrentHashMap<>();
 
-  private EventBus eventBus;
+  private final EventBus eventBus;
+
+  @Inject
+  public ViewRegistry(final EventBus eventBus) {this.eventBus = eventBus;}
 
   public void registerView(View view) {
     checkNotNull(view);

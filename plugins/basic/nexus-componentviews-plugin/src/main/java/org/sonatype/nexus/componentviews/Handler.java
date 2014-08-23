@@ -1,5 +1,7 @@
 package org.sonatype.nexus.componentviews;
 
+import org.sonatype.nexus.componentviews.responses.Response;
+
 /**
  * @since 3.0
  */

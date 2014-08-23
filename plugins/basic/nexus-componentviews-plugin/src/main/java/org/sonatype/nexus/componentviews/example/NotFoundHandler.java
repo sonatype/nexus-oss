@@ -5,7 +5,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.componentviews.Handler;
 import org.sonatype.nexus.componentviews.Request;
-import org.sonatype.nexus.componentviews.Response;
+import org.sonatype.nexus.componentviews.responses.Response;
+import org.sonatype.nexus.componentviews.responses.StatusResponse;
 
 /**
  * Always returns a 404 'not found' response.
@@ -19,6 +20,6 @@ public class NotFoundHandler
 {
   @Override
   public Response handle(final Request req) {
-    return Response.status(404).statusCodeReason("Not Found").build();
+    return StatusResponse.notFound(null);
   }
 }

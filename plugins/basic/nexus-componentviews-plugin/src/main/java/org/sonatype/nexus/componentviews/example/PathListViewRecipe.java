@@ -11,7 +11,7 @@ import org.sonatype.nexus.componentviews.Handler;
 import org.sonatype.nexus.componentviews.RequestMatcher;
 import org.sonatype.nexus.componentviews.Router;
 import org.sonatype.nexus.componentviews.View;
-import org.sonatype.nexus.componentviews.config.UserSuppliedViewConfig;
+import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewConfigRecipe;
 
 import com.google.common.collect.ImmutableMap;
@@ -32,7 +32,12 @@ public class PathListViewRecipe
   }
 
   @Override
-  public View createView(final UserSuppliedViewConfig userSuppliedConfig) {
+  public String getName() {
+    return "pathList";
+  }
+
+  @Override
+  public View createView(final ViewConfig userSuppliedConfig) {
     final Router router = new Router(Arrays.asList((RequestMatcher) new AllRequestMatcher("pathList")));
 
     final View view = new View(userSuppliedConfig.getViewName(),

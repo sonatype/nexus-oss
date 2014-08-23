@@ -9,5 +9,7 @@ import org.sonatype.nexus.componentviews.View;
  */
 public interface ViewConfigRecipe
 {
-  View createView(UserSuppliedViewConfig userSuppliedConfig);
+  String getName();
+
+  View createView(ViewConfig userSuppliedConfig);
 }
