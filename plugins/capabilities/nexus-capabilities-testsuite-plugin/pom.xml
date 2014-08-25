@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-plugins-capabilities</artifactId>
-    <version>3.0.0-b2014082501</version>
+    <version>3.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-capabilities-testsuite-plugin</artifactId>
