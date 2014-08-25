@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-plugins-security</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0-b2014082501</version>
   </parent>
 
   <artifactId>nexus-ldap-model</artifactId>
