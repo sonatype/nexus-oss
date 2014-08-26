@@ -100,6 +100,12 @@
         <version>${karaf.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.apache.karaf.region</groupId>
+        <artifactId>org.apache.karaf.region.core</artifactId>
+        <version>${karaf.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
