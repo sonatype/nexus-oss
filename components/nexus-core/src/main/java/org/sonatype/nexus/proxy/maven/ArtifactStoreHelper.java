@@ -357,15 +357,15 @@ public class ArtifactStoreHelper
     checkRequest(gavRequest);
 
     // Force classifier to null, as the pom shouldn't have a classifier
-    Gav pomGav =
+    final Gav pomGav =
         new Gav(gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), null, "pom", null,
             null, null, false, null, false, null);
+    final ArtifactStoreRequest pomRequest = new ArtifactStoreRequest(gavRequest.getMavenRepository(), pomGav, false);
+    pomRequest.getRequestContext().setParentContext(gavRequest.getRequestContext());
 
     try {
-      gavRequest.setRequestPath(repository.getGavCalculator().gavToPath(pomGav));
-
       // check for POM existence
-      repository.retrieveItem(false, gavRequest);
+      repository.retrieveItem(false, pomRequest);
     }
     catch (ItemNotFoundException e) {
       if (StringUtils.isBlank(packaging)) {
@@ -394,13 +394,11 @@ public class ArtifactStoreHelper
         // writing to string, not to happen
       }
 
-      gavRequest.setRequestPath(repository.getGavCalculator().gavToPath(pomGav));
-
-      repository.storeItemWithChecksums(gavRequest, new ByteArrayInputStream(sw.toString().getBytes()),
+      repository.storeItemWithChecksums(pomRequest, new ByteArrayInputStream(sw.toString().getBytes()),
           attributes);
 
       try {
-        repository.getMetadataManager().deployArtifact(gavRequest);
+        repository.getMetadataManager().deployArtifact(pomRequest);
       }
       catch (IOException ex) {
         throw new LocalStorageException("Could not maintain metadata!", ex);
@@ -408,12 +406,8 @@ public class ArtifactStoreHelper
 
     }
 
-    Gav artifactGav =
-        new Gav(gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(),
-            gavRequest.getClassifier(), gavRequest.getExtension(), null, null, null, false, null, false, null);
-
-    gavRequest.setRequestPath(repository.getGavCalculator().gavToPath(artifactGav));
-
+    // reset path if anything changed it
+    gavRequest.setRequestPath(repository.getGavCalculator().gavToPath(gavRequest.getGav()));
     repository.storeItemWithChecksums(gavRequest, is, attributes);
   }
 
