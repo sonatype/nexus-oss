@@ -32,25 +32,4 @@ public class StatusResponse
       response.sendError(statusCode);
     }
   }
-
-  public static final StatusResponse created() {
-    return new StatusResponse(HttpServletResponse.SC_CREATED);
-  }
-
-  public static final StatusResponse notFound(String message) {
-    return new StatusResponse(HttpServletResponse.SC_NOT_FOUND, message);
-  }
-
-  public static final StatusResponse unmodified() {
-    return new StatusResponse(HttpServletResponse.SC_NOT_MODIFIED);
-  }
-
-  /**
-   * A simple acknowledgement.
-   */
-  public static final StatusResponse noContent() {
-    return new StatusResponse(HttpServletResponse.SC_NO_CONTENT, null);
-  }
-
-  public static final StatusResponse deleted() {return noContent();}
 }

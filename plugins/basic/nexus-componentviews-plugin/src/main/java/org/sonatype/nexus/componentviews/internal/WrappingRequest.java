@@ -1,5 +1,6 @@
 package org.sonatype.nexus.componentviews.internal;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,6 +53,16 @@ public class WrappingRequest
       default:
         throw new IllegalStateException("Method not allowed.");
     }
+  }
+
+  @Override
+  public String getMimeType() {
+    return request.getContentType();
+  }
+
+  @Override
+  public InputStream getInputStream() {
+    return null;
   }
 
   @Override

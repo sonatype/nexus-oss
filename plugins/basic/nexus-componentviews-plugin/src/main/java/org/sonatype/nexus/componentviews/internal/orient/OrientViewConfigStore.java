@@ -11,8 +11,10 @@ import javax.inject.Provider;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewConfigIdentity;
 import org.sonatype.nexus.componentviews.config.ViewConfigStore;
+import org.sonatype.nexus.componentviews.config.ViewConfigStoreStartedEvent;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Maps;
@@ -41,12 +43,15 @@ public class OrientViewConfigStore
 
   private final UserSuppliedConfigEntityAdapter entityAdapter = new UserSuppliedConfigEntityAdapter();
 
+  private final EventBus eventBus;
+
   private OClass entityType;
 
   @Inject
   public OrientViewConfigStore(final @Named("config") Provider<DatabaseInstance> databaseInstance,
-                               final RecordIdObfuscator recordIdObfuscator)
+                               final RecordIdObfuscator recordIdObfuscator, final EventBus eventBus)
   {
+    this.eventBus = eventBus;
     this.databaseInstance = checkNotNull(databaseInstance);
     this.recordIdObfuscator = checkNotNull(recordIdObfuscator);
   }
@@ -57,6 +62,7 @@ public class OrientViewConfigStore
       // register schema
       entityType = entityAdapter.register(db);
     }
+    eventBus.post(new ViewConfigStoreStartedEvent(this));
   }
 
   @Override

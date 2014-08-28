@@ -1,5 +1,7 @@
 package org.sonatype.nexus.componentviews;
 
+import java.io.InputStream;
+
 import javax.annotation.Nullable;
 
 /**
@@ -23,6 +25,17 @@ public interface Request
    * The HTTP method invoked (e.g. "GET", "PUT").
    */
   public HttpMethod getMethod();
+
+  /**
+   * The MIME type of the content, for PUT and POST requests.
+   */
+  @Nullable
+  public String getMimeType();
+
+  /**
+   * An input stream for the request body.
+   */
+  public InputStream getInputStream();
 
   /**
    * Adds a value to the request context.

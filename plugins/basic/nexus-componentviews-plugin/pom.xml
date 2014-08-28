@@ -28,8 +28,8 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Content Plugin</pluginName>
-    <pluginDescription>Provides access to repository contents.</pluginDescription>
+    <pluginName>Nexus Component Views Plugin</pluginName>
+    <pluginDescription>Framework for format-specific component views.</pluginDescription>
   </properties>
 
   <dependencies>

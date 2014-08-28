@@ -23,11 +23,4 @@ public class RedirectResponse
     super.send(response);
   }
 
-  public static RedirectResponse movedPermanently(String location) {
-    return new RedirectResponse(HttpServletResponse.SC_MOVED_PERMANENTLY, location);
-  }
-
-  public static RedirectResponse movedTemporarily(String location) {
-    return new RedirectResponse(HttpServletResponse.SC_MOVED_TEMPORARILY, location);
-  }
 }

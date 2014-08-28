@@ -63,6 +63,7 @@ public class FileBlobStoreTest
 
     root = util.createTempDir().toPath();
     underTest = new FileBlobStore(root, locationStrategy, fileOps, metadataStore);
+    underTest.start();
   }
 
   @Test(expected = IllegalArgumentException.class)

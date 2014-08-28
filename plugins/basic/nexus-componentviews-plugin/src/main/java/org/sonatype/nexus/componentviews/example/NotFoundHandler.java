@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.componentviews.Handler;
 import org.sonatype.nexus.componentviews.Request;
 import org.sonatype.nexus.componentviews.responses.Response;
+import org.sonatype.nexus.componentviews.responses.Responses;
 import org.sonatype.nexus.componentviews.responses.StatusResponse;
 
 /**
@@ -20,6 +21,6 @@ public class NotFoundHandler
 {
   @Override
   public Response handle(final Request req) {
-    return StatusResponse.notFound(null);
+    return Responses.notFound(null);
   }
 }

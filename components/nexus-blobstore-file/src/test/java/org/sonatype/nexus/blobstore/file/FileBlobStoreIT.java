@@ -63,14 +63,14 @@ public class FileBlobStoreIT
     Path metadata = root.resolve("metadata");
 
     this.metadataStore = new MapdbBlobMetadataStore(metadata.toFile());
-    metadataStore.start();
-
-    this.underTest = new FileBlobStore(content, new VolumeChapterLocationStrategy(), new SimpleFileOperations(), metadataStore);
+    this.underTest = new FileBlobStore(content, new VolumeChapterLocationStrategy(), new SimpleFileOperations(),
+        metadataStore);
+    underTest.start();
   }
 
   @After
   public void tearDown() throws Exception {
-    metadataStore.stop();
+    underTest.stop();
   }
 
   @Test

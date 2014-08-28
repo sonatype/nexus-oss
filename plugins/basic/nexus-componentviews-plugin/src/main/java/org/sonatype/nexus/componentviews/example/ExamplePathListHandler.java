@@ -12,8 +12,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.sonatype.nexus.componentviews.Handler;
 import org.sonatype.nexus.componentviews.Request;
 import org.sonatype.nexus.componentviews.responses.Response;
-import org.sonatype.nexus.componentviews.responses.StatusResponse;
-import org.sonatype.nexus.componentviews.responses.StringResponse;
+import org.sonatype.nexus.componentviews.responses.Responses;
+
+import static org.sonatype.nexus.componentviews.responses.Responses.created;
+import static org.sonatype.nexus.componentviews.responses.Responses.deleted;
+import static org.sonatype.nexus.componentviews.responses.Responses.html;
+import static org.sonatype.nexus.componentviews.responses.Responses.notFound;
 
 /**
  * This example handler is stateful because it uses in-memory persistence; in practice this would be rare or
@@ -52,22 +56,22 @@ public class ExamplePathListHandler
 
         s.append("</body></html>");
 
-        return StringResponse.html(s.toString());
+        return html(s.toString());
 
       case PUT:
         entries.put(requestPath, new Date());
 
-        return StatusResponse.created();
+        return created();
 
       case DELETE:
         final Date removed = entries.remove(requestPath);
         if (removed == null) {
-          return StatusResponse.notFound(null);
+          return notFound(null);
         }
-        return StatusResponse.deleted();
+        return deleted();
 
       default:
-        throw new IllegalArgumentException("This should never happen.");
+        return Responses.methodNotAllowed();
     }
   }
 

@@ -22,11 +22,4 @@ public class StringResponse
     return new ByteArrayInputStream(content.getBytes(Charset.forName("UTF-8")));
   }
 
-  public static StringResponse html(String html) {
-    return new StringResponse(html, "text/html");
-  }
-
-  public static StringResponse xml(String xml) {
-    return new StringResponse(xml, "text/xml");
-  }
 }
