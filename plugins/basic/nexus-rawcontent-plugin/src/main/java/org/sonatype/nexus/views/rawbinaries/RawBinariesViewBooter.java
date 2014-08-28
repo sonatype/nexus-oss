@@ -14,6 +14,7 @@ import org.sonatype.nexus.componentviews.config.ViewConfigStoreStartedEvent;
 import org.sonatype.nexus.componentviews.example.PathListViewRecipe;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
+import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
 
 import com.google.common.eventbus.Subscribe;
@@ -71,7 +72,7 @@ public class RawBinariesViewBooter
   }
 
   @Subscribe
-  public void on(ViewConfigStoreStartedEvent event) throws IOException {
+  public void on(NexusStartedEvent event) throws IOException {
     final ViewConfig viewConfig = viewConfigStore.get(VIEW_NAME);
     if (viewConfig == null) {
       log.info("Force-adding config for /views/{}.", VIEW_NAME);

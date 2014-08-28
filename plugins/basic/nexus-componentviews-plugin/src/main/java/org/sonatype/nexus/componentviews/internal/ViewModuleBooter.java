@@ -63,6 +63,7 @@ public class ViewModuleBooter
   @Subscribe
   public void on(NexusInitializedEvent event) throws Exception {
     viewConfigStore.start();
+    createViews();
   }
 
   @Subscribe
@@ -70,9 +71,9 @@ public class ViewModuleBooter
     viewConfigStore.stop();
   }
 
-  @Subscribe
-  public void on(ViewConfigStoreStartedEvent event) throws IOException {
-    // TODO: Remove this once we have UI facilities for creating views (or as soon as we tire of the example view).
+  private void createViews()
+      throws IOException
+  {// TODO: Remove this once we have UI facilities for creating views (or as soon as we tire of the example view).
     log.info("Force-adding a pathList view definition.");
     final ViewConfig pathListConfig = viewConfigStore.get("pathList");
     if (pathListConfig == null) {

@@ -62,7 +62,7 @@ public class OrientViewConfigStore
       // register schema
       entityType = entityAdapter.register(db);
     }
-    eventBus.post(new ViewConfigStoreStartedEvent(this));
+    //eventBus.post(new ViewConfigStoreStartedEvent(this));
   }
 
   @Override
