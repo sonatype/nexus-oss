@@ -58,17 +58,17 @@ public class BrowserDetector
 
   @Inject
   public BrowserDetector(final @Named("${nexus.browserdetector.disable:-false}") boolean disable,
-                         final @Named("${nexus.browserdetector.exclude}") @Nullable String exclude) {
+                         final @Named("${nexus.browserdetector.excludedUserAgents}") @Nullable String excludedUserAgents) {
     this.disable = disable;
     if (disable) {
       log.info("Browser detector disabled");
     }
 
-    if (exclude != null) {
-      for (String userAgent : Splitter.on(Pattern.compile("\r?\n")).split(exclude)) {
+    if (excludedUserAgents != null) {
+      for (String userAgent : Splitter.on(Pattern.compile("\r?\n")).trimResults().split(excludedUserAgents)) {
         if (userAgent.length() > 0) {
           log.info("Browser detector excluding User-Agent: {}", userAgent);
-          excludedUserAgents.add(userAgent);
+          this.excludedUserAgents.add(userAgent);
         }
       }
     }

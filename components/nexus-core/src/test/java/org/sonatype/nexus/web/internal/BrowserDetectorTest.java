@@ -73,8 +73,8 @@ public class BrowserDetectorTest
   }
 
   @Test
-  public void firefox_whenMultipleExcluded() {
-    underTest = new BrowserDetector(false, "foo\nbar\nMozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:25.0) Gecko/20100101 Firefox/25.0");
+  public void firefox_whenMultipleExcludedWithExtraWhitespace() {
+    underTest = new BrowserDetector(false, "foo\n Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:25.0) Gecko/20100101 Firefox/25.0 \nbar");
     whenUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:25.0) Gecko/20100101 Firefox/25.0");
     assertThat(underTest.isBrowserInitiated(request), is(false));
   }
