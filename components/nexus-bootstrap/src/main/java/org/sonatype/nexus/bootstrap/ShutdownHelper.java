@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.bootstrap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Helper to cope with different mechanisms to shutdown.
  *
@@ -19,6 +22,8 @@ package org.sonatype.nexus.bootstrap;
  */
 public class ShutdownHelper
 {
+  private static final Logger log = LoggerFactory.getLogger(ShutdownHelper.class);
+
   public static interface ShutdownDelegate
   {
     void doExit(int code);
@@ -40,7 +45,25 @@ public class ShutdownHelper
     }
   }
 
-  private static ShutdownDelegate delegate = new JavaShutdownDelegate();
+  public static class NoopShutdownDelegate
+      implements ShutdownDelegate
+  {
+    @Override
+    public void doExit(final int code) {
+      log.warn("Ignoring exit({}) request", code);
+    }
+
+    @Override
+    public void doHalt(final int code) {
+      log.warn("Ignoring halt({}) request", code);
+    }
+  }
+
+  public static final ShutdownDelegate JAVA = new JavaShutdownDelegate();
+
+  public static final ShutdownDelegate NOOP = new NoopShutdownDelegate();
+
+  private static ShutdownDelegate delegate = JAVA;
 
   public static ShutdownDelegate getDelegate() {
     if (delegate == null) {
