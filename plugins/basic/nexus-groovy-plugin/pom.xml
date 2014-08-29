@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Groovy Provider Plugin</pluginName>
     <pluginDescription>Provides access to Groovy runtime.</pluginDescription>
   </properties>
 

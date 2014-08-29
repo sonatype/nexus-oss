@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Unpack Plugin</pluginName>
     <pluginDescription>Automatically unpack deployed bundles.</pluginDescription>
   </properties>
 

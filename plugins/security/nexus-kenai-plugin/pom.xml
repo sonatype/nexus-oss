@@ -29,7 +29,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Kenai Realm Plugin</pluginName>
     <pluginDescription>Adds Kenai realm to Nexus.</pluginDescription>
   </properties>
 

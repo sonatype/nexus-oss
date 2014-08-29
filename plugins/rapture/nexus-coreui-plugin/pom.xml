@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus (Rapture) Core UI Plugin</pluginName>
     <pluginDescription>Provides a Nexus user interface based on Rapture.</pluginDescription>
   </properties>
 

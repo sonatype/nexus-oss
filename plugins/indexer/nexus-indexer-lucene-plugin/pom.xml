@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Indexer Lucene Plugin</pluginName>
     <pluginDescription>Adds search capabilities for repository content.</pluginDescription>
   </properties>
 

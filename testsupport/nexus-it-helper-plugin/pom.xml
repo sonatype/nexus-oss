@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Test Helper Plugin</pluginName>
     <pluginDescription>This plugin injects some extra functionality into Nexus that are used when running ITs.
     </pluginDescription>
   </properties>

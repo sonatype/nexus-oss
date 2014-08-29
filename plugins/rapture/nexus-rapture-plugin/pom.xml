@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Rapture Plugin</pluginName>
     <pluginDescription>Next-gen UI framework.</pluginDescription>
   </properties>
 

@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Wonderland Plugin</pluginName>
     <pluginDescription>Helper plugin for migrating legacy to modern core REST resources</pluginDescription>
   </properties>
 

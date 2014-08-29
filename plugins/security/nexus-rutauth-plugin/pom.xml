@@ -29,7 +29,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus RutAuth Plugin</pluginName>
     <pluginDescription>A HTTP header based (REMOTE_USER) realm.</pluginDescription>
   </properties>
 

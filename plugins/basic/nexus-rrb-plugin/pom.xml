@@ -29,7 +29,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Remote Repository Browsing Plugin</pluginName>
     <pluginDescription>Adds support for browsing proxy repositories remote storage.</pluginDescription>
   </properties>
 

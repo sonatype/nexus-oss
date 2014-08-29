@@ -29,7 +29,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus P2 Repository Plugin</pluginName>
     <pluginDescription>P2 repository support.</pluginDescription>
   </properties>
 

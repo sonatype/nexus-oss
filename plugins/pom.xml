@@ -417,7 +417,7 @@
               <!--
               Nexus plugin default instructions
               -->
-              <Bundle-Name>${pluginName}</Bundle-Name>
+              <Bundle-Name>${project.groupId}.${project.artifactId}</Bundle-Name>
               <Bundle-Description>${pluginDescription}</Bundle-Description>
               <Bundle-DocURL>http://links.sonatype.com/products/nexus/oss/home</Bundle-DocURL>
             </instructions>

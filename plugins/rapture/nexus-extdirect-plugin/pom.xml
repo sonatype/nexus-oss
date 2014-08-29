@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Ext.Direct Plugin</pluginName>
     <pluginDescription>Nexus Ext.Direct implementation.</pluginDescription>
   </properties>
 

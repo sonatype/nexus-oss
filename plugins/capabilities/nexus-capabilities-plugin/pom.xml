@@ -29,7 +29,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Capabilities Plugin</pluginName>
     <pluginDescription>Allows Nexus to define and manage capabilities.</pluginDescription>
   </properties>
 

@@ -29,7 +29,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Yum Repository Plugin</pluginName>
     <pluginDescription>Allows Nexus to create yum repositories for uploaded RPM packages.</pluginDescription>
   </properties>
 
