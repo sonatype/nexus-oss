@@ -37,7 +37,7 @@ public class BrowserDetectorTest
 
   @Before
   public void setUp() throws Exception {
-    underTest = new BrowserDetector(false);
+    underTest = new BrowserDetector(false, null);
   }
 
   private void whenUserAgent(final String userAgent) {
@@ -53,7 +53,7 @@ public class BrowserDetectorTest
 
   @Test
   public void chrome_whenDisabled() {
-    underTest = new BrowserDetector(true);
+    underTest = new BrowserDetector(true, null);
     whenUserAgent("User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_0) " +
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36");
     assertThat(underTest.isBrowserInitiated(request), is(false));
@@ -63,6 +63,20 @@ public class BrowserDetectorTest
   public void firefox() {
     whenUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:25.0) Gecko/20100101 Firefox/25.0");
     assertThat(underTest.isBrowserInitiated(request), is(true));
+  }
+
+  @Test
+  public void firefox_whenExcluded() {
+    underTest = new BrowserDetector(false, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:25.0) Gecko/20100101 Firefox/25.0");
+    whenUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:25.0) Gecko/20100101 Firefox/25.0");
+    assertThat(underTest.isBrowserInitiated(request), is(false));
+  }
+
+  @Test
+  public void firefox_whenMultipleExcludedWithExtraWhitespace() {
+    underTest = new BrowserDetector(false, "foo\n Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:25.0) Gecko/20100101 Firefox/25.0 \nbar");
+    whenUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:25.0) Gecko/20100101 Firefox/25.0");
+    assertThat(underTest.isBrowserInitiated(request), is(false));
   }
 
   @Test
