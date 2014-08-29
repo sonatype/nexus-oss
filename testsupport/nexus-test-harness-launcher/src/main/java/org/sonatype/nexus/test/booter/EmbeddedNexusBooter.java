@@ -112,6 +112,7 @@ public class EmbeddedNexusBooter
       log.info("  {}='{}'", entry.getKey(), entry.getValue());
     }
 
+    tamperKarafConfiguration();
     tamperJettyConfiguration();
 
     world = new ClassWorld();
@@ -122,6 +123,24 @@ public class EmbeddedNexusBooter
 
     launcherFactory = launcherClass.getConstructor(String[].class);
     log.info("Launcher factory: {}", launcherFactory);
+  }
+
+  private void tamperKarafConfiguration() throws IOException {
+    final File file = new File(installDir, "etc/config.properties");
+    String properties = FileUtils.readFileToString(file, "UTF-8");
+
+    // Very rarely the legacy tests attempt to access "mvn:" URLs before the handler has been configured
+    // which causes a startup exception. As a workaround we disable the 'requireConfigAdminConfig' check
+    // so "mvn:" URLs will always work (they'll just use their default config until the proper config is
+    // delivered by configAdmin+fileInstall). So far this has only been observed when running embedded
+    // tests, if it ever occurs with the modern tests then we might want to consider making this change
+    // in our custom distribution.
+    properties = properties.replaceFirst(
+        "(?m)^org.ops4j.pax.url.mvn.requireConfigAdminConfig=true",
+        "#org.ops4j.pax.url.mvn.requireConfigAdminConfig=true"
+    );
+
+    FileUtils.writeStringToFile(file, properties, "UTF-8");
   }
 
   private void tamperJettyConfiguration() throws IOException {

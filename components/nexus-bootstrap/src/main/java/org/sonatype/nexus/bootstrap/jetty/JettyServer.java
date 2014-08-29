@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.sonatype.nexus.bootstrap.PropertyMap;
+import org.sonatype.nexus.bootstrap.ShutdownHelper;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.component.LifeCycle;
@@ -259,8 +260,7 @@ public class JettyServer
         }
         else {
           log.error("Failed to start", exception);
-
-          // FIXME: At this point the server is non-functional and we really should shutdown
+          ShutdownHelper.exit(-1);
         }
       }
       catch (InterruptedException e) {
