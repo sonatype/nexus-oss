@@ -281,8 +281,7 @@ public class Nexus2351DisableRedeployUploadIT
   }
 
   private String createUrl(String targetRepoId) {
-    return "http:////localhost:" + TestProperties.getString("nexus.application.port")
-        + "/nexus/content/repositories/" + targetRepoId;
+    return TestProperties.getString("nexus-base-url") + "content/repositories/" + targetRepoId;
   }
 
   private RepositoryResource setWritePolicy(String repoId, RepositoryWritePolicy policy)
