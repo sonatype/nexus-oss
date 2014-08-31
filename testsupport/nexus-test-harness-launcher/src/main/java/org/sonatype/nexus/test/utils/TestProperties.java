@@ -28,7 +28,8 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkState;
 
 //
-// FIXME: This class is used in many static context in tests, and can fail to locate the "baseTest" bundle (which is installed by the maven-test-environment-maven-plugin).
+// FIXME: This class is used in many static context in tests, and can fail to locate the "baseTest" bundle.
+// FIXME: When run from IDE integration this file may not have fully substituted values either.
 // FIXME: Use of this class in a static context should be avoided.
 //
 
