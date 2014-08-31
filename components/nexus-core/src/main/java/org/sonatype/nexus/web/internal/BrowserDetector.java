@@ -12,20 +12,23 @@
  */
 package org.sonatype.nexus.web.internal;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Sets;
 import eu.bitwalker.useragentutils.UserAgent;
 import org.apache.shiro.web.util.WebUtils;
 
@@ -46,16 +49,28 @@ public class BrowserDetector
 
   private final boolean disable;
 
+  private final Set<String> excludedUserAgents = Sets.newHashSet();
+
   private final Cache<String, UserAgent> cache = CacheBuilder.newBuilder()
       .maximumSize(100)
       .expireAfterWrite(2, TimeUnit.HOURS)
       .build();
 
   @Inject
-  public BrowserDetector(final @Named("${nexus.browserdetector.disable:-false}") boolean disable) {
+  public BrowserDetector(final @Named("${nexus.browserdetector.disable:-false}") boolean disable,
+                         final @Named("${nexus.browserdetector.excludedUserAgents}") @Nullable String excludedUserAgents) {
     this.disable = disable;
     if (disable) {
       log.info("Browser detector disabled");
+    }
+
+    if (excludedUserAgents != null) {
+      for (String userAgent : Splitter.on(Pattern.compile("\r?\n")).trimResults().split(excludedUserAgents)) {
+        if (userAgent.length() > 0) {
+          log.info("Browser detector excluding User-Agent: {}", userAgent);
+          this.excludedUserAgents.add(userAgent);
+        }
+      }
     }
   }
 
@@ -70,8 +85,14 @@ public class BrowserDetector
       return false;
     }
 
-    HttpServletRequest httpRequest = WebUtils.toHttp(request);
-    UserAgent userAgent = parseUserAgent(httpRequest.getHeader(USER_AGENT));
+    String userAgentString = WebUtils.toHttp(request).getHeader(USER_AGENT);
+
+    // skip if excluded
+    if (excludedUserAgents.contains(userAgentString)) {
+      return false;
+    }
+
+    UserAgent userAgent = parseUserAgent(userAgentString);
     if (userAgent != null) {
       switch (userAgent.getBrowser().getBrowserType()) {
         case WEB_BROWSER:

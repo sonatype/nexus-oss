@@ -22,6 +22,9 @@ import org.sonatype.nexus.orient.DatabaseServer;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycles;
 
+import com.orientechnologies.orient.core.compression.OCompression;
+import com.orientechnologies.orient.core.compression.OCompressionFactory;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -40,10 +43,12 @@ public class OrientBootstrap
 
   @Inject
   public OrientBootstrap(final Provider<DatabaseServer> databaseServer,
-                         final Provider<DatabaseManager> databaseManager)
+                         final Provider<DatabaseManager> databaseManager,
+                         final Iterable<OCompression> managedCompressions)
   {
     this.databaseServer = checkNotNull(databaseServer);
     this.databaseManager = checkNotNull(databaseManager);
+    registerCompressions(checkNotNull(managedCompressions));
   }
 
   @Override
@@ -58,5 +63,17 @@ public class OrientBootstrap
     Lifecycles.stop(databaseManager.get());
 
     databaseServer.get().stop();
+  }
+
+  private void registerCompressions(final Iterable<OCompression> compressions) {
+    for (final OCompression compression : compressions) {
+      try {
+        log.debug("Registering OrientDB compression {} as '{}'", compression, compression.name());
+        OCompressionFactory.INSTANCE.register(compression);
+      }
+      catch (final IllegalArgumentException e) {
+        log.debug("An OrientDB compression named '{}' was already registered", compression.name(), e);
+      }
+    }
   }
 }

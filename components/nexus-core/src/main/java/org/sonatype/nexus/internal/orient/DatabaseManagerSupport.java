@@ -197,6 +197,16 @@ public abstract class DatabaseManagerSupport
     }
   }
 
+  @Override
+  public DatabasePool newPool(final String name) {
+    checkNotNull(name);
+    ensureStarted();
+
+    // TODO: Track non-shared pools so that we can attempt to shut them down if users didn't properly do this?
+    // TODO: ... or at the very least complain if this happens?
+    return createPool(name);
+  }
+
   private DatabasePoolImpl createPool(final String name) {
     // TODO: refine more control over how pool settings are configured per-database or globally
 
@@ -205,6 +215,7 @@ public abstract class DatabaseManagerSupport
     underlying.setName(String.format("%s-database-pool", name));
     underlying.setup(1, 25);
 
+    // TODO: Do not allow shared pool() to be closed by users, only by ourselves
     DatabasePoolImpl pool = new DatabasePoolImpl(underlying, name);
     Lifecycles.start(pool);
     return pool;

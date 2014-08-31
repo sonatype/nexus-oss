@@ -29,7 +29,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Maven Archetype Catalog Plugin</pluginName>
     <pluginDescription>Adds a content generator for Maven archetype.xml files.</pluginDescription>
   </properties>
 

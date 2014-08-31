@@ -35,11 +35,16 @@ public interface DatabaseManager
   DatabaseExternalizer externalizer(String name);
 
   /**
-   * Access named database pool.
+   * Access named shared database pool.
    *
    * If the pool does not already exist it will be created.
    */
   DatabasePool pool(String name);
+
+  /**
+   * Create a new (non-shared) pool for the given named configuration.
+   */
+  DatabasePool newPool(String name);
 
   /**
    * Access named database instance.

@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.sonatype.nexus.bootstrap.PropertyMap;
+import org.sonatype.nexus.bootstrap.ShutdownHelper;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.component.LifeCycle;
@@ -235,14 +236,14 @@ public class JettyServer
         Server server = null;
         try {
           for (LifeCycle component : components) {
-            // capture the server reference
-            if (component instanceof Server) {
-              server = (Server) component;
-            }
-
             if (!component.isRunning()) {
               log.info("Starting: {}", component);
               component.start();
+            }
+
+            // capture the server reference
+            if (component instanceof Server) {
+              server = (Server) component;
             }
           }
         }
@@ -256,6 +257,10 @@ public class JettyServer
         if (server != null) {
           log.info("Started");
           server.join();
+        }
+        else {
+          log.error("Failed to start", exception);
+          ShutdownHelper.exit(-1);
         }
       }
       catch (InterruptedException e) {
@@ -281,9 +286,8 @@ public class JettyServer
     public void stopComponents() throws Exception {
       Collections.reverse(components);
 
-      if (started.getCount() > 0) {
-        interrupt(); // if Jetty thread is still waiting for a component to start, this should unblock it
-      }
+      // if Jetty thread is still waiting for a component to start, this should unblock it
+      interrupt();
 
       for (LifeCycle component : components) {
         if (component.isRunning()) {

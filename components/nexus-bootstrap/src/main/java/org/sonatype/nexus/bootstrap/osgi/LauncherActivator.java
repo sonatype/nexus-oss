@@ -13,9 +13,12 @@
 package org.sonatype.nexus.bootstrap.osgi;
 
 import org.sonatype.nexus.bootstrap.Launcher;
+import org.sonatype.nexus.bootstrap.ShutdownHelper;
+import org.sonatype.nexus.bootstrap.ShutdownHelper.ShutdownDelegate;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.launch.Framework;
 import org.slf4j.MDC;
 
 import static org.sonatype.nexus.bootstrap.Launcher.SYSTEM_USERID;
@@ -26,11 +29,16 @@ import static org.sonatype.nexus.bootstrap.Launcher.SYSTEM_USERID;
  * @since 3.0
  */
 public class LauncherActivator
-    implements BundleActivator
+    implements BundleActivator, ShutdownDelegate
 {
+  private Framework framework;
+
   private Launcher server;
 
   public void start(BundleContext bundleContext) throws Exception {
+    framework = (Framework) bundleContext.getBundle(0);
+    ShutdownHelper.setDelegate(this);
+
     final String basePath = bundleContext.getProperty("nexus-base");
     final String args = bundleContext.getProperty("nexus-args");
 
@@ -48,5 +56,25 @@ public class LauncherActivator
     finally {
       server = null;
     }
+  }
+
+  public void doExit(int code) {
+    try {
+      framework.stop();
+      framework.waitForStop(0);
+    }
+    catch (InterruptedException e) {
+      // proceed to exit
+    }
+    catch (Throwable e) {
+      e.printStackTrace();
+    }
+    finally {
+      System.exit(code);
+    }
+  }
+
+  public void doHalt(int code) {
+    Runtime.getRuntime().halt(code);
   }
 }

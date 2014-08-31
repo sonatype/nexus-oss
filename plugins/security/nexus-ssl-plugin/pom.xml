@@ -29,7 +29,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus SSL Plugin</pluginName>
     <pluginDescription>SSL Certificates Validation</pluginDescription>
   </properties>
 

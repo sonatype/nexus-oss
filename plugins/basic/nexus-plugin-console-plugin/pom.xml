@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Plugin Console Plugin</pluginName>
     <pluginDescription>Adds a UI to view installed plugins.</pluginDescription>
   </properties>
 

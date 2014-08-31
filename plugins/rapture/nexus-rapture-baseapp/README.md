@@ -33,6 +33,10 @@ Some relevant configuration in the mess of Sencha CMD muck:
 * src/main/baseapp/.sencha/app/testing.properties
 * src/main/baseapp/packages/rapture-theme
 
+Other references:
+
+* src/main/baseapp/ext/src/version/Version.js
+
 ## Regenerating
 
     mvn clean install -Pregenerate

@@ -29,7 +29,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus OBR Plugin</pluginName>
     <pluginDescription>Adds a repository type for OBR repositories.</pluginDescription>
   </properties>
 

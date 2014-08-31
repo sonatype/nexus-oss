@@ -29,7 +29,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Maven Bridge Plugin</pluginName>
     <pluginDescription>Adds an API to access maven dependency resolution for Nexus plugins.</pluginDescription>
   </properties>
 
@@ -43,7 +42,7 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-maven-bridge</artifactId>
-      <version>3.1</version>
+      <version>3.1.1</version>
       <exclusions>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>

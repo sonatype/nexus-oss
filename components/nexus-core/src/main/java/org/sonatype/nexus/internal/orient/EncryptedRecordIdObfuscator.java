@@ -49,7 +49,9 @@ public class EncryptedRecordIdObfuscator
 {
   private static final String CPREFIX = "${nexus.orient.encryptedRecordIdObfuscator";
 
-  private final Cipher cipher;
+  private static final String TRANSFORMATION = "DES/CBC/NoPadding";
+
+  private final CryptoHelper crypto;
 
   private final AlgorithmParameterSpec paramSpec;
 
@@ -62,8 +64,7 @@ public class EncryptedRecordIdObfuscator
                                      final @Named(CPREFIX + ".iv:-0123456789ABCDEF}") String iv)
       throws Exception
   {
-    checkNotNull(crypto);
-    this.cipher = crypto.createCipher("DES/CBC/NoPadding");
+    this.crypto = checkNotNull(crypto);
 
     checkNotNull(iv);
     this.paramSpec = new IvParameterSpec(Hex.decode(iv));
@@ -79,6 +80,7 @@ public class EncryptedRecordIdObfuscator
 
   @Override
   protected String doEncode(final OClass type, final ORID rid) throws Exception {
+    Cipher cipher = crypto.createCipher(TRANSFORMATION);
     // rid is 10 byte long, need to be in multiples of 8 for cipher
     byte[] plain = ByteBuffer.allocate(16).put(rid.toStream()).array();
     cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
@@ -88,6 +90,7 @@ public class EncryptedRecordIdObfuscator
 
   @Override
   protected ORID doDecode(final OClass type, final String encoded) throws Exception {
+    Cipher cipher = crypto.createCipher(TRANSFORMATION);
     byte[] encrypted = Hex.decode(encoded);
     cipher.init(Cipher.DECRYPT_MODE, secretKey, paramSpec);
     byte[] plain = cipher.doFinal(encrypted);

@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Atlas Plugin</pluginName>
     <pluginDescription>Provides support tools for Nexus</pluginDescription>
   </properties>
 

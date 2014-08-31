@@ -25,4 +25,9 @@ class UserXO
   String id
 
   boolean authenticated
+
+  /**
+   * True if the current user has general administrator privileges (ie. nx-admin role).
+   */
+  boolean administrator
 }
