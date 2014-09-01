@@ -232,7 +232,7 @@ Ext.define('NX.coreui.controller.Search', {
         existingCriteria['value'] = value;
       }
       else {
-        criterias[key] = { value: value };
+        criterias[key] = { value: value, removable: true };
       }
     });
 
@@ -247,7 +247,8 @@ Ext.define('NX.coreui.controller.Search', {
         searchCriteria = searchCriteriaPanel.add(cmpClass.create(Ext.apply(criteriaModel.get('config'), {
           criteriaId: criteriaModel.getId(),
           value: criteria['value'],
-          hidden: criteria['hidden']
+          hidden: criteria['hidden'],
+          removable: criteria['removable']
         })));
         if (searchCriteria.value) {
           me.applyFilter(searchCriteria, false);
@@ -259,7 +260,9 @@ Ext.define('NX.coreui.controller.Search', {
       addCriteriaMenu.push({
         text: criteria.get('config').fieldLabel,
         criteria: criteria,
-        action: 'add'
+        criteriaId: criteria.getId(),
+        action: 'add',
+        hidden: Ext.isDefined(criterias[criteria.getId()])
       });
     });
 
@@ -289,6 +292,7 @@ Ext.define('NX.coreui.controller.Search', {
         criteria = menuitem.criteria,
         cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-' + criteria.getId());
 
+    menuitem.hide();
     if (!cmpClass) {
       cmpClass = Ext.ClassManager.getByAlias('widget.nx-searchcriteria-text');
     }
@@ -311,6 +315,7 @@ Ext.define('NX.coreui.controller.Search', {
 
     me.applyFilter({ criteriaId: searchCriteria.criteriaId }, true);
     searchCriteriaPanel.remove(searchCriteria);
+    searchCriteriaPanel.down('menuitem[criteriaId=' + searchCriteria.criteriaId + ']').show();
   },
 
   /**
