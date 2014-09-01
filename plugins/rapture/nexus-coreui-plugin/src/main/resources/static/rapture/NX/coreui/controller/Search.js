@@ -298,7 +298,7 @@ Ext.define('NX.coreui.controller.Search', {
     }
     searchCriteriaPanel.remove(addButton, false);
     searchCriteriaPanel.add(cmpClass.create(
-        Ext.apply(criteria.get('config'), { criteriaId: criteria.getId(), removable: true })
+        Ext.apply(criteria.get('config'), { criteriaId: criteria.getId(), value: undefined, removable: true })
     ));
     searchCriteriaPanel.add(addButton);
   },
