@@ -31,10 +31,6 @@ public class AbstractMavenNexusIT
     super(testRepositoryId);
   }
 
-  private static MavenVerifierHelper getStaticMavenVerifierHelper() {
-    return mavenVerifierHelper;
-  }
-
   @Deprecated
   public Verifier createVerifier(File mavenProject)
       throws VerificationException, IOException
@@ -59,25 +55,27 @@ public class AbstractMavenNexusIT
   }
 
   @Deprecated
-  public static Verifier createMavenVerifier(File mavenProject, File settings, String testId)
+  public Verifier createMavenVerifier(File mavenProject, File settings, String testId)
       throws VerificationException, IOException
   {
     String logname = "logs/maven-execution/" + testId + "/" + mavenProject.getName() + ".log";
     final File logFile = new File(mavenProject, logname);
     logFile.getParentFile().mkdirs();
+
+    log.info("Creating Maven verifier; testId: {}, project: {},\nsettings: {},\nlog: {}",
+        testId, mavenProject, settings, logFile);
+
     final MavenDeployment mavenDeployment = MavenDeployment.defaultDeployment(logname, settings, mavenProject);
     cleanRepository(mavenDeployment.getLocalRepositoryFile(), testId);
-    return getStaticMavenVerifierHelper().createMavenVerifier(mavenDeployment);
+    return mavenVerifierHelper.createMavenVerifier(mavenDeployment);
   }
 
   /**
    * Remove all artifacts on <code>testId</code> groupId
    */
   @Deprecated
-  public static void cleanRepository(File mavenRepo, String testId)
-      throws IOException
-  {
-    getStaticMavenVerifierHelper().cleanRepository(mavenRepo, testId);
+  public void cleanRepository(File mavenRepo, String testId) throws IOException {
+    mavenVerifierHelper.cleanRepository(mavenRepo, testId);
   }
 
   /**
@@ -87,6 +85,6 @@ public class AbstractMavenNexusIT
   protected void failTest(Verifier verifier)
       throws IOException
   {
-    getStaticMavenVerifierHelper().failTest(verifier);
+    mavenVerifierHelper.failTest(verifier);
   }
 }
