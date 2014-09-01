@@ -187,8 +187,9 @@ extends DirectComponentSupport
   }
 
   /**
-   * Change password of logged in user.
+   * Change password of a specified user.
    * @param authToken authentication token
+   * @param userId id of user to change password for
    * @param password new password
    */
   @DirectMethod
