@@ -299,7 +299,7 @@ public class UserMessageUtil
   public UserResource disableUser(String userId)
       throws IOException
   {
-    UserResource user = getUser("anonymous");
+    UserResource user = getUser(userId);
     user.setStatus("disabled");
     updateUser(user);
     return user;
