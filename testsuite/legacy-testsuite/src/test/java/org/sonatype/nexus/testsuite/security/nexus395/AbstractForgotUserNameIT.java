@@ -18,9 +18,8 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.EmailServerHelper;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
 
 /**
  * @author juven
@@ -28,17 +27,8 @@ import org.junit.BeforeClass;
 public abstract class AbstractForgotUserNameIT
     extends AbstractNexusIntegrationTest
 {
-  private static final EmailServerHelper emailServerHelper = new EmailServerHelper();
-
-  @BeforeClass
-  public static void startEmailServer() {
-    emailServerHelper.startServer();
-  }
-
-  @AfterClass
-  public static void stopEmailServer() {
-    emailServerHelper.stopServer();
-  }
+  @ClassRule
+  public static final EmailServerHelper emailServerHelper = new EmailServerHelper();
 
   protected void assertRecoveredUserName(String expectedUserName)
       throws Exception

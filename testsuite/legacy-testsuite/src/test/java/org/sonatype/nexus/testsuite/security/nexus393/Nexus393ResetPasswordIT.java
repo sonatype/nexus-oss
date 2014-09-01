@@ -19,9 +19,8 @@ import org.sonatype.nexus.integrationtests.EmailServerHelper;
 import org.sonatype.nexus.test.utils.ResetPasswordUtils;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.restlet.data.Response;
 
@@ -31,17 +30,8 @@ import org.restlet.data.Response;
 public class Nexus393ResetPasswordIT
     extends AbstractNexusIntegrationTest
 {
-  private static final EmailServerHelper emailServerHelper = new EmailServerHelper();
-
-  @BeforeClass
-  public static void startEmailServer() {
-    emailServerHelper.startServer();
-  }
-
-  @AfterClass
-  public static void stopEmailServer() {
-    emailServerHelper.stopServer();
-  }
+  @ClassRule
+  public static final EmailServerHelper emailServerHelper = new EmailServerHelper();
 
   @Test
   public void resetPassword()
@@ -72,5 +62,4 @@ public class Nexus393ResetPasswordIT
 
     Assert.assertNotNull(password);
   }
-
 }

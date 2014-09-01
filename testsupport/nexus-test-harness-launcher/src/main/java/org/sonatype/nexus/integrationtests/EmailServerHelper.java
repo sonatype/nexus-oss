@@ -19,12 +19,11 @@ import org.sonatype.nexus.test.utils.TestProperties;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
+import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkState;
-
-// TODO: This might be better off as a JUnit ClassRule to avoid boilerplate @BeforeClass and @AfterClass wiring
 
 /**
  * Helper for tests that require an email server.
@@ -32,10 +31,21 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 3.0
  */
 public class EmailServerHelper
+  extends ExternalResource
 {
   private static final Logger log = LoggerFactory.getLogger(EmailServerHelper.class);
 
   private GreenMail server;
+
+  @Override
+  protected void before() throws Throwable {
+    startServer();
+  }
+
+  @Override
+  protected void after() {
+    stopServer();
+  }
 
   public GreenMail getServer() {
     checkState(server != null, "Server not started");

@@ -25,10 +25,10 @@ import org.sonatype.security.rest.model.UserResource;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -40,17 +40,8 @@ import org.restlet.data.Status;
 public class Nexus450UserCreationIT
     extends AbstractNexusIntegrationTest
 {
-  private static final EmailServerHelper emailServerHelper = new EmailServerHelper();
-
-  @BeforeClass
-  public static void startEmailServer() {
-    emailServerHelper.startServer();
-  }
-
-  @AfterClass
-  public static void stopEmailServer() {
-    emailServerHelper.stopServer();
-  }
+  @ClassRule
+  public static final EmailServerHelper emailServerHelper = new EmailServerHelper();
 
   private UserMessageUtil userUtil;
 
