@@ -87,7 +87,7 @@ public class Nexus2302DeployEncodedFileIT
 
     // direct download
     assertTrue(FileTestingUtils.compareFileSHA1s(file,
-        downloadArtifact(gav, "target/nexus2302/" + gav.getArtifactId() + ".jar")));
+        downloadArtifact(getNexusTestRepoUrl(), gav, "target/nexus2302/" + gav.getArtifactId() + ".jar")));
 
     // redirect download
     assertTrue(FileTestingUtils.compareFileSHA1s(file,

@@ -118,8 +118,8 @@ public abstract class AbstractNexusP2GeneratorIT
       throws IOException
   {
     final File downloadDir = new File("target/downloads/" + this.getClass().getSimpleName());
-    final File p2Artifacts =
-        downloadArtifact(groupId, artifactId, version, "xml", "p2Artifacts", downloadDir.getCanonicalPath());
+    final File p2Artifacts = downloadArtifact(getNexusTestRepoUrl(),
+        groupId, artifactId, version, "xml", "p2Artifacts", downloadDir.getCanonicalPath());
     return p2Artifacts;
   }
 
@@ -127,8 +127,8 @@ public abstract class AbstractNexusP2GeneratorIT
       throws IOException
   {
     final File downloadDir = new File("target/downloads/" + this.getClass().getSimpleName());
-    final File p2Content =
-        downloadArtifact(groupId, artifactId, version, "xml", "p2Content", downloadDir.getCanonicalPath());
+    final File p2Content = downloadArtifact(getNexusTestRepoUrl(),
+        groupId, artifactId, version, "xml", "p2Content", downloadDir.getCanonicalPath());
     return p2Content;
   }
 

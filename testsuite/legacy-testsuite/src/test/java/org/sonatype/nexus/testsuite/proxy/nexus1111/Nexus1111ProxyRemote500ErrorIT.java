@@ -46,7 +46,8 @@ public class Nexus1111ProxyRemote500ErrorIT
       throws Exception
   {
     // first the proxy works
-    downloadArtifact("nexus1111", "artifact", "1.0", "jar", null, "target/downloads");
+    downloadArtifact(getNexusTestRepoUrl(),
+        "nexus1111", "artifact", "1.0", "jar", null, "target/downloads");
 
     // stop the healthy server
     int port = serverResource.getServerProvider().getPort();
@@ -57,7 +58,8 @@ public class Nexus1111ProxyRemote500ErrorIT
 
     // download again
     try {
-      downloadArtifact("nexus1111", "artifact", "1.1", "jar", null, "target/downloads");
+      downloadArtifact(getNexusTestRepoUrl(),
+          "nexus1111", "artifact", "1.1", "jar", null, "target/downloads");
       Assert.fail("Should throw exception coz the remote is in a error status");
     }
     catch (Exception e) {
@@ -91,7 +93,8 @@ public class Nexus1111ProxyRemote500ErrorIT
 
     try {
       // the proxy is now working <- NOT TRUE, it is auto blocked!
-      downloadArtifact("nexus1111", "artifact", "1.1", "jar", null, "target/downloads");
+      downloadArtifact(getNexusTestRepoUrl(),
+          "nexus1111", "artifact", "1.1", "jar", null, "target/downloads");
       Assert.fail("Should fail, since repository is in AutoBlock mode!");
     }
     catch (Exception e) {
@@ -121,6 +124,7 @@ public class Nexus1111ProxyRemote500ErrorIT
     util.updateStatus(status);
 
     // and now, all should go well
-    downloadArtifact("nexus1111", "artifact", "1.1", "jar", null, "target/downloads");
+    downloadArtifact(getNexusTestRepoUrl(),
+        "nexus1111", "artifact", "1.1", "jar", null, "target/downloads");
   }
 }

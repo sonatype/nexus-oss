@@ -50,8 +50,8 @@ public class Nexus262SimpleProxyIT
 
     log.debug("localFile: " + localFile.getAbsolutePath());
 
-    File artifact = this
-        .downloadArtifact("simple.artifact", "simpleXMLArtifact", "1.0.0", "xml", null, "target/downloads");
+    File artifact = this.downloadArtifact(getNexusTestRepoUrl(),
+        "simple.artifact", "simpleXMLArtifact", "1.0.0", "xml", null, "target/downloads");
 
     Assert.assertTrue(FileTestingUtils.compareFileSHA1s(artifact, localFile));
   }

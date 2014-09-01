@@ -76,7 +76,7 @@ public class Nexus4218MetadataModelVersionPerClientIT
         new Gav("org.apache.maven", "apache-maven", "3.0.3", "bin", "tar.gz", null, null, null, false, null,
             false, null);
     File bundle =
-        downloadArtifact(gav, "target/downloads/nexus4218/" + gav.getArtifactId() + "-" + gav.getVersion());
+        downloadArtifact(getNexusTestRepoUrl(), gav, "target/downloads/nexus4218/" + gav.getArtifactId() + "-" + gav.getVersion());
 
     UnArchiver unArchive = TestContainer.getInstance().getPlexusContainer().lookup(ArchiverManager.class).getUnArchiver(bundle);
     unArchive.setSourceFile(bundle);
@@ -130,7 +130,7 @@ public class Nexus4218MetadataModelVersionPerClientIT
         new Gav("org.apache.maven", "apache-maven", "2.0.6", "bin", "tar.gz", null, null, null, false, null,
             false, null);
     File bundle =
-        downloadArtifact(gav, "target/downloads/nexus4218/" + gav.getArtifactId() + "-" + gav.getVersion());
+        downloadArtifact(getNexusTestRepoUrl(), gav, "target/downloads/nexus4218/" + gav.getArtifactId() + "-" + gav.getVersion());
 
     UnArchiver unArchive = TestContainer.getInstance().getPlexusContainer().lookup(ArchiverManager.class).getUnArchiver(bundle);
     unArchive.setSourceFile(bundle);
@@ -179,7 +179,7 @@ public class Nexus4218MetadataModelVersionPerClientIT
         new Gav("org.apache.ivy", "apache-ivy", "2.2.0", "bin", "tar.gz", null, null, null, false, null, false,
             null);
     File bundle =
-        downloadArtifact(gav, "target/downloads/nexus4218/" + gav.getArtifactId() + "-" + gav.getVersion());
+        downloadArtifact(getNexusTestRepoUrl(), gav, "target/downloads/nexus4218/" + gav.getArtifactId() + "-" + gav.getVersion());
 
     UnArchiver unArchive = TestContainer.getInstance().getPlexusContainer().lookup(ArchiverManager.class).getUnArchiver(bundle);
     unArchive.setSourceFile(bundle);

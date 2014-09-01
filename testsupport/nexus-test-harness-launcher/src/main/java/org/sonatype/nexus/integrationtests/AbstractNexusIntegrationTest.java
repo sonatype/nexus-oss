@@ -745,17 +745,8 @@ public abstract class AbstractNexusIntegrationTest
     }
   }
 
-  protected File downloadArtifact(Gav gav, String targetDirectory) throws IOException {
-    return downloadArtifact(
-        gav.getGroupId(),
-        gav.getArtifactId(),
-        gav.getVersion(),
-        gav.getExtension(),
-        gav.getClassifier(),
-        targetDirectory);
-  }
-
-  protected File downloadArtifact(String groupId,
+  protected File downloadArtifact(String baseUrl,
+                                  String groupId,
                                   String artifact,
                                   String version,
                                   String type,
@@ -763,33 +754,10 @@ public abstract class AbstractNexusIntegrationTest
                                   String targetDirectory)
       throws IOException
   {
-    return downloadArtifact(getNexusTestRepoUrl(), groupId, artifact, version, type, classifier, targetDirectory);
-  }
-
-  protected File downloadArtifactFromRepository(String repoId, Gav gav, String targetDirectory)
-      throws IOException
-  {
-    return downloadArtifact(AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + repoId
-        + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
-        targetDirectory);
-  }
-
-  protected File downloadArtifactFromGroup(String groupId, Gav gav, String targetDirectory)
-      throws IOException
-  {
-    return downloadArtifact(AbstractNexusIntegrationTest.nexusBaseUrl + GROUP_REPOSITORY_RELATIVE_URL
-            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
-        gav.getClassifier(), targetDirectory);
-  }
-
-  protected File downloadArtifact(String baseUrl, String groupId, String artifact, String version, String type,
-                                  String classifier, String targetDirectory)
-      throws IOException
-  {
     URL url = new URL(baseUrl + getRelitiveArtifactPath(groupId, artifact, version, type, classifier));
 
     String classifierPart = (classifier != null) ? "-" + classifier : "";
-    return downloadFile(url, targetDirectory + "/" + artifact + "-" + version + classifierPart + "." + type);
+    return RequestFacade.downloadFile(url, targetDirectory + "/" + artifact + "-" + version + classifierPart + "." + type);
   }
 
   /**
@@ -800,8 +768,32 @@ public abstract class AbstractNexusIntegrationTest
     return RequestFacade.downloadFile(url, targetFile);
   }
 
-  protected boolean deleteFromRepository(String groupOrArtifactPath) throws IOException {
-    return deleteFromRepository(getTestRepositoryId(), groupOrArtifactPath);
+  protected File downloadArtifact(String baseUrl, Gav gav, String targetDirectory) throws IOException {
+    return downloadArtifact(
+        baseUrl,
+        gav.getGroupId(),
+        gav.getArtifactId(),
+        gav.getVersion(),
+        gav.getExtension(),
+        gav.getClassifier(),
+        targetDirectory
+    );
+  }
+
+  protected File downloadArtifactFromRepository(String repoId, Gav gav, String targetDirectory)
+      throws IOException
+  {
+    return downloadArtifact(nexusBaseUrl + REPOSITORY_RELATIVE_URL + repoId
+        + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
+        targetDirectory);
+  }
+
+  protected File downloadArtifactFromGroup(String groupId, Gav gav, String targetDirectory)
+      throws IOException
+  {
+    return downloadArtifact(nexusBaseUrl + GROUP_REPOSITORY_RELATIVE_URL
+            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
+        gav.getClassifier(), targetDirectory);
   }
 
   protected boolean deleteFromRepository(String repository, String groupOrArtifactPath) throws IOException {
@@ -813,7 +805,7 @@ public abstract class AbstractNexusIntegrationTest
       return true;
     }
 
-    log.debug("deleting: " + serviceURI);
+    log.debug("deleting: {}", serviceURI);
     status = RequestFacade.doDeleteForStatus(serviceURI, null);
     boolean deleted = status.isSuccess();
 
