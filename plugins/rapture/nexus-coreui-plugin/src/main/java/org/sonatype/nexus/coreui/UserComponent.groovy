@@ -202,6 +202,9 @@ extends DirectComponentSupport
                       final @NotEmpty(message = '[password] may not be empty') String password)
   {
     if (authTickets.redeemTicket(authToken)) {
+      if (isAnonymousUser(userId)) {
+        throw new Exception("Password cannot be changed for user ${userId}, since is marked as the Anonymous user")
+      }
       securitySystem.changePassword(userId, Tokens.decodeBase64String(password))
     }
     else {
@@ -223,6 +226,9 @@ extends DirectComponentSupport
                      final @NotEmpty(message = '[userId] may not be empty') String userId)
   {
     if (authTickets.redeemTicket(authToken)) {
+      if (isAnonymousUser(userId)) {
+        throw new Exception("Password cannot be reset for user ${userId}, since is marked as the Anonymous user")
+      }
       securitySystem.resetPassword(userId)
     }
     else {
@@ -243,6 +249,9 @@ extends DirectComponentSupport
               final @NotEmpty(message = '[source] may not be empty') String source)
   {
     // TODO check if source is required or we always delete from default realm
+    if (isAnonymousUser(id)) {
+      throw new Exception("User ${id} cannot be deleted, since is marked as the Anonymous user")
+    }
     securitySystem.deleteUser(id, source)
   }
 
@@ -259,6 +268,10 @@ extends DirectComponentSupport
           role.roleId
         }
     )
+  }
+
+  private boolean isAnonymousUser(final String userId) {
+    return securitySystem.isAnonymousAccessEnabled() && securitySystem.anonymousUsername == userId
   }
 
 }
