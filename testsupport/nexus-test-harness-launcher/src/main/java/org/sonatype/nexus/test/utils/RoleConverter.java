@@ -18,7 +18,7 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.rest.model.RoleResource;
 
 
-public class RoleConverter
+class RoleConverter
 {
   public static CRole toCRole(RoleResource resource) {
     CRole role = new CRole();
