@@ -848,8 +848,11 @@ public abstract class AbstractNexusIntegrationTest
     return downloadFile(url, targetDirectory + "/" + artifact + "-" + version + classifierPart + "." + type);
   }
 
+  /**
+   * @deprecated Use {@link RequestFacade#downloadFile(URL, String)}
+   */
+  @Deprecated
   protected File downloadFile(URL url, String targetFile) throws IOException {
-    log.info("Downloading {} to: {}", url, targetFile);
     return RequestFacade.downloadFile(url, targetFile);
   }
 
