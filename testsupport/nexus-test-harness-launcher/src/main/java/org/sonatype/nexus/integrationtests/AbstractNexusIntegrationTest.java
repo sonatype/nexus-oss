@@ -105,11 +105,7 @@ public abstract class AbstractNexusIntegrationTest
   @ClassRule
   public static final ProfilerHelper profilerHelper = new ProfilerHelper();
 
-  /**
-   * FIXME: should not need/require this test-instance state here.
-   */
-  @Deprecated
-  public String testRepositoryId;
+  private String testRepositoryId;
 
   public static String nexusBaseDir;
 
@@ -488,8 +484,6 @@ public abstract class AbstractNexusIntegrationTest
     String artifactFileName = model.getArtifactId() + "." + extension;
     File artifactFile = new File(project, artifactFileName);
 
-    log.debug("wow, this is working: " + artifactFile.getName());
-
     final Gav gav = new Gav(
         model.getGroupId(),
         model.getArtifactId(),
@@ -549,7 +543,7 @@ public abstract class AbstractNexusIntegrationTest
       getDeployUtils().deployWithWagon(wagonHint, deployUrl, pom, getRelitivePomPath(gav));
     }
     catch (Exception e) {
-      log.error(getTestId() + " Unable to deploy " + artifactFileName, e);
+      log.error("{} Unable to deploy {}", getTestId(), artifactFileName, e);
       throw e;
     }
   }
@@ -807,7 +801,7 @@ public abstract class AbstractNexusIntegrationTest
   }
 
   protected boolean deleteFromRepository(String groupOrArtifactPath) throws IOException {
-    return deleteFromRepository(testRepositoryId, groupOrArtifactPath);
+    return deleteFromRepository(getTestRepositoryId(), groupOrArtifactPath);
   }
 
   protected boolean deleteFromRepository(String repository, String groupOrArtifactPath) throws IOException {
@@ -815,7 +809,7 @@ public abstract class AbstractNexusIntegrationTest
 
     Status status = RequestFacade.doGetForStatus(serviceURI);
     if (status.equals(Status.CLIENT_ERROR_NOT_FOUND)) {
-      log.debug("Not deleted because it didn't exist: " + serviceURI);
+      log.debug("Not deleted because it didn't exist: {}", serviceURI);
       return true;
     }
 
@@ -824,7 +818,7 @@ public abstract class AbstractNexusIntegrationTest
     boolean deleted = status.isSuccess();
 
     if (!deleted) {
-      log.debug("Failed to delete: " + serviceURI + "  - Status: " + status);
+      log.debug("Failed to delete: {} - Status: {}", serviceURI, status);
     }
 
     // fake it because the artifact doesn't exist
@@ -841,33 +835,31 @@ public abstract class AbstractNexusIntegrationTest
   }
 
   protected String getNexusTestRepoUrl(String repo) {
-    return nexusBaseUrl + REPOSITORY_RELATIVE_URL + repo + "/";
+    return String.format("%s%s%s/", nexusBaseUrl, REPOSITORY_RELATIVE_URL, repo);
   }
 
   protected String getNexusTestRepoUrl() {
-    return getNexusTestRepoUrl(testRepositoryId);
+    return getNexusTestRepoUrl(getTestRepositoryId());
   }
 
   protected String getNexusTestRepoServiceUrl() {
-    return String.format("%sservice/local/repositories/%s/content/", nexusBaseUrl, testRepositoryId);
+    return String.format("%sservice/local/repositories/%s/content/", nexusBaseUrl, getTestRepositoryId());
   }
 
-  @Deprecated
   protected String getTestRepositoryId() {
     return testRepositoryId;
   }
 
-  @Deprecated
   protected void setTestRepositoryId(String repoId) {
     testRepositoryId = repoId;
   }
 
   protected String getRepositoryUrl(String repoId) {
-    return nexusBaseUrl + REPOSITORY_RELATIVE_URL + repoId + "/";
+    return String.format("%s%s%s/", nexusBaseUrl, REPOSITORY_RELATIVE_URL, repoId);
   }
 
   protected String getGroupUrl(String groupId) {
-    return nexusBaseUrl + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/";
+    return String.format("%s%s%s/", nexusBaseUrl, GROUP_REPOSITORY_RELATIVE_URL, groupId);
   }
 
   protected boolean printKnownErrorButDoNotFail(Class<? extends AbstractNexusIntegrationTest> clazz, String... tests) {

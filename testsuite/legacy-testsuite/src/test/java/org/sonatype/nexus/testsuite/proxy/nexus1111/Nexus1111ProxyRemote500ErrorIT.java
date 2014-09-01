@@ -86,7 +86,7 @@ public class Nexus1111ProxyRemote500ErrorIT
     // clear cache, then download
     ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
     prop.setKey("repositoryId");
-    prop.setValue(testRepositoryId);
+    prop.setValue(getTestRepositoryId());
     TaskScheduleUtil.runTask(ExpireCacheTaskDescriptor.ID, prop);
 
     try {
@@ -103,7 +103,7 @@ public class Nexus1111ProxyRemote500ErrorIT
     // not using it and switched back to XML as it is wired in it this util class.
     RepositoryMessageUtil util = new RepositoryMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
 
-    RepositoryStatusResource status = util.getStatus(this.testRepositoryId);
+    RepositoryStatusResource status = util.getStatus(getTestRepositoryId());
 
     Assert.assertEquals("Repository should be auto-blocked", status.getProxyMode(), ProxyMode.BLOCKED_AUTO.name());
 

@@ -120,7 +120,7 @@ public class Nexus1730DeleteRepoIT
     group.setName("nexus1730-group");
 
     RepositoryGroupMemberRepository repo = new RepositoryGroupMemberRepository();
-    repo.setId(testRepositoryId);
+    repo.setId(getTestRepositoryId());
     group.setRepositories(Arrays.asList(repo));
 
     groupUtil.createGroup(group);
