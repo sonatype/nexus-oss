@@ -141,8 +141,14 @@ Ext.define('NX.coreui.controller.Users', {
         'nx-coreui-user-list menuitem[action=filter]': {
           click: me.filterBySource
         },
+        'nx-coreui-user-list button[action=more]': {
+          afterrender: me.bindMoreButton
+        },
+        'nx-coreui-user-list menuitem[action=setpassword]': {
+          click: me.showChangePasswordWindowForSelection
+        },
         'nx-coreui-user-account button[action=changepassword]': {
-          click: me.showChangePasswordWindow,
+          click: me.showChangePasswordWindowForUserAccount,
           afterrender: me.bindChangePasswordButton
         },
         'nx-coreui-user-changepassword button[action=changepassword]': {
@@ -188,12 +194,34 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @private
    */
-  showChangePasswordWindow: function () {
+  showChangePasswordWindowForSelection: function () {
+    var me = this,
+        list = me.getList(),
+        userId = list.getSelectionModel().getSelection()[0].getId();
+
     NX.Security.doWithAuthenticationToken(
         'Changing password requires validation of your credentials.',
         {
           success: function (authToken) {
-            Ext.widget('nx-coreui-user-changepassword', { authToken: authToken });
+            Ext.widget('nx-coreui-user-changepassword', { userId: userId, authToken: authToken });
+          }
+        }
+    );
+  },
+
+  /**
+   * @private
+   */
+  showChangePasswordWindowForUserAccount: function (button) {
+    var userId = button.up('form').down('#id').getValue();
+
+    alert(userId);
+
+    NX.Security.doWithAuthenticationToken(
+        'Changing password requires validation of your credentials.',
+        {
+          success: function (authToken) {
+            Ext.widget('nx-coreui-user-changepassword', { userId: userId, authToken: authToken });
           }
         }
     );
@@ -369,6 +397,25 @@ Ext.define('NX.coreui.controller.Users', {
   },
 
   /**
+   * @protected
+   * Enable 'More' when user has ''security:userschangepw:create.
+   */
+  bindMoreButton: function (button) {
+    var me = this;
+    button.mon(
+        NX.Conditions.and(
+            NX.Conditions.isPermitted('security:userschangepw', 'create'),
+            NX.Conditions.gridHasSelection(me.list)
+        ),
+        {
+          satisfied: button.enable,
+          unsatisfied: button.disable,
+          scope: button
+        }
+    );
+  },
+
+  /**
    * @override
    * @private
    * Enable 'Change Password' when user has 'security:userschangepw:create' permission.
@@ -393,7 +440,7 @@ Ext.define('NX.coreui.controller.Users', {
     var win = button.up('window'),
         password = button.up('form').down('#password').getValue();
 
-    NX.direct.coreui_User.changePassword(win.authToken, password, function (response) {
+    NX.direct.coreui_User.changePassword(win.authToken, win.userId, password, function (response) {
       if (Ext.isObject(response) && response.success) {
         win.close();
         NX.Messages.add({ text: 'Password changed', type: 'success' });

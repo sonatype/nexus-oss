@@ -194,14 +194,14 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresUser
   @RequiresAuthentication
-  @RequiresPermissions('security:userschangepw:update')
+  @RequiresPermissions('security:userschangepw:create')
   @Validate
   void changePassword(final @NotEmpty(message = '[authToken] may not be empty') String authToken,
+                      final @NotEmpty(message = '[userId] may not be empty') String userId,
                       final @NotEmpty(message = '[password] may not be empty') String password)
   {
     if (authTickets.redeemTicket(authToken)) {
-      String currentUserId = securitySystem.getSubject().getPrincipal().toString()
-      securitySystem.changePassword(currentUserId, Tokens.decodeBase64String(password))
+      securitySystem.changePassword(userId, Tokens.decodeBase64String(password))
     }
     else {
       throw new IllegalAccessException('Invalid authentication ticket')
