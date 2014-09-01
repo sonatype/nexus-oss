@@ -27,7 +27,6 @@ import java.util.Properties;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
-import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
@@ -68,6 +67,8 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
+import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
+import static org.sonatype.nexus.test.utils.GavUtil.getRelitivePomPath;
 import static org.sonatype.nexus.test.utils.ResponseMatchers.isRedirecting;
 import static org.sonatype.nexus.test.utils.ResponseMatchers.redirectLocation;
 import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
@@ -717,24 +718,6 @@ public abstract class AbstractNexusIntegrationTest
         fail("Profiler was active, but failed: " + e);
       }
     }
-  }
-
-  protected String getRelitivePomPath(Gav gav) throws FileNotFoundException {
-    return GavUtil.getRelitivePomPath(gav);
-  }
-
-  protected String getRelitiveArtifactPath(Gav gav) throws FileNotFoundException {
-    return GavUtil.getRelitiveArtifactPath(gav);
-  }
-
-  protected String getRelitiveArtifactPath(String groupId,
-                                           String artifactId,
-                                           String version,
-                                           String extension,
-                                           String classifier)
-      throws FileNotFoundException
-  {
-    return GavUtil.getRelitiveArtifactPath(groupId, artifactId, version, extension, classifier);
   }
 
   protected File downloadSnapshotArtifact(String repository, Gav gav, File parentDir) throws IOException {

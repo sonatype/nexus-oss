@@ -38,6 +38,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
 
 public class Nexus2302DeployEncodedFileIT
     extends AbstractNexusIntegrationTest

@@ -34,6 +34,7 @@ import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.not;
 import static org.sonatype.nexus.integrationtests.RequestFacade.clockUrlDownload;
 import static org.sonatype.nexus.test.utils.FileTestingUtils.populate;
+import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
 
 /**
  * Test which makes sure that simultaneous requests for the same artifact are not serialized.
