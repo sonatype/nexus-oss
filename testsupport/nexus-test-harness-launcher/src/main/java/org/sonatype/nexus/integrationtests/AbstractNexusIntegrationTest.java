@@ -38,7 +38,6 @@ import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
-import org.sonatype.nexus.test.utils.WagonDeployer;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.security.rest.model.UserResource;
@@ -46,7 +45,6 @@ import org.sonatype.sisu.goodies.prefs.memory.MemoryPreferencesFactory;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
-import com.google.common.base.Throwables;
 import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -54,7 +52,6 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.wagon.Wagon;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -172,69 +169,39 @@ public abstract class AbstractNexusIntegrationTest
 
   // == instance utils
 
-  private static NexusStatusUtil nexusStatusUtil;
+  private static NexusStatusUtil nexusStatusUtil = new NexusStatusUtil();
 
-  protected static NexusStatusUtil getNexusStatusUtil() throws Exception {
-    if (nexusStatusUtil == null) {
-      nexusStatusUtil = new NexusStatusUtil(nexusApplicationPort);
-    }
+  protected static NexusStatusUtil getNexusStatusUtil() {
     return nexusStatusUtil;
   }
 
-  private NexusConfigUtil nexusConfigUtil;
+  private final NexusConfigUtil nexusConfigUtil = new NexusConfigUtil();
 
   protected NexusConfigUtil getNexusConfigUtil() {
-    if (nexusConfigUtil == null) {
-      nexusConfigUtil = new NexusConfigUtil();
-    }
     return nexusConfigUtil;
   }
 
-  private SecurityConfigUtil securityConfigUtil;
+  private final SecurityConfigUtil securityConfigUtil = new SecurityConfigUtil();
 
   protected SecurityConfigUtil getSecurityConfigUtil() {
-    if (securityConfigUtil == null) {
-      securityConfigUtil = new SecurityConfigUtil();
-    }
     return securityConfigUtil;
   }
 
-  private DeployUtils deployUtils;
+  private final DeployUtils deployUtils = new DeployUtils();
 
   protected DeployUtils getDeployUtils() {
-    if (deployUtils == null) {
-      deployUtils = new DeployUtils(RequestFacade.getNexusRestClient(), new WagonDeployer.Factory()
-      {
-        @Override
-        public Wagon get(final String protocol) {
-          try {
-            return (Wagon) TestContainer.getInstance().getPlexusContainer().lookup(Wagon.ROLE, protocol);
-          }
-          catch (ComponentLookupException e) {
-            throw Throwables.propagate(e);
-          }
-        }
-      });
-    }
-
     return deployUtils;
   }
 
-  private SearchMessageUtil searchMessageUtil;
+  private final SearchMessageUtil searchMessageUtil = new SearchMessageUtil();
 
   protected SearchMessageUtil getSearchMessageUtil() {
-    if (searchMessageUtil == null) {
-      searchMessageUtil = new SearchMessageUtil();
-    }
     return searchMessageUtil;
   }
 
-  private EventInspectorsUtil eventInspectorsUtil;
+  private final EventInspectorsUtil eventInspectorsUtil = new EventInspectorsUtil();
 
   protected EventInspectorsUtil getEventInspectorsUtil() {
-    if (eventInspectorsUtil == null) {
-      eventInspectorsUtil = new EventInspectorsUtil(RequestFacade.getNexusRestClient());
-    }
     return eventInspectorsUtil;
   }
 
@@ -394,7 +361,7 @@ public abstract class AbstractNexusIntegrationTest
 
     try {
       TaskScheduleUtil.waitForAllTasksToStop();
-      new EventInspectorsUtil(RequestFacade.getNexusRestClient()).waitForCalmPeriod();
+      new EventInspectorsUtil().waitForCalmPeriod();
     }
     catch (IOException e) {
       // throw if server is already stopped, not a problem for me

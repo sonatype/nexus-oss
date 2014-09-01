@@ -49,7 +49,7 @@ public class RepositoryMessageUtil
   private static final RepositoriesNexusRestClient REPOSITORY_NRC = new RepositoriesNexusRestClient(
       RequestFacade.getNexusRestClient(),
       new TasksNexusRestClient(RequestFacade.getNexusRestClient()),
-      new EventInspectorsUtil(RequestFacade.getNexusRestClient())
+      new EventInspectorsUtil()
   );
 
   private final RepositoriesNexusRestClient repositoryNRC;
@@ -58,7 +58,7 @@ public class RepositoryMessageUtil
     repositoryNRC = new RepositoriesNexusRestClient(
         RequestFacade.getNexusRestClient(),
         new TasksNexusRestClient(RequestFacade.getNexusRestClient()),
-        new EventInspectorsUtil(RequestFacade.getNexusRestClient()),
+        new EventInspectorsUtil(),
         xstream,
         mediaType
     );
