@@ -19,6 +19,7 @@ import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.apache.shiro.authz.annotation.RequiresUser
+import org.apache.shiro.subject.Subject
 import org.eclipse.sisu.inject.BeanLocator
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
@@ -252,6 +253,9 @@ extends DirectComponentSupport
     if (isAnonymousUser(id)) {
       throw new Exception("User ${id} cannot be deleted, since is marked as the Anonymous user")
     }
+    if (isCurrentUser(id)) {
+      throw new Exception("User ${id} cannot be deleted, since is the user currently logged into the application")
+    }
     securitySystem.deleteUser(id, source)
   }
 
@@ -272,6 +276,14 @@ extends DirectComponentSupport
 
   private boolean isAnonymousUser(final String userId) {
     return securitySystem.isAnonymousAccessEnabled() && securitySystem.anonymousUsername == userId
+  }
+
+  private boolean isCurrentUser(final String userId) {
+    Subject subject = securitySystem.subject
+    if (!subject || !subject.principal) {
+      return false
+    }
+    return subject.principal == userId
   }
 
 }
