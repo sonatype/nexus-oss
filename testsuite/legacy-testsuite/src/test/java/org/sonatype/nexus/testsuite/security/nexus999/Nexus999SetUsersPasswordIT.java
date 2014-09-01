@@ -14,7 +14,7 @@ package org.sonatype.nexus.testsuite.security.nexus999;
 
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.test.utils.ChangePasswordUtils;
+import org.sonatype.nexus.testsuite.security.ChangePasswordUtils;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;

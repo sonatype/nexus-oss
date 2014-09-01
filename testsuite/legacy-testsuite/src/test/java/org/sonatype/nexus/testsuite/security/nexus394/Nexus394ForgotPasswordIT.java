@@ -16,7 +16,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.EmailServerHelper;
-import org.sonatype.nexus.test.utils.ForgotPasswordUtils;
+import org.sonatype.nexus.testsuite.security.ForgotPasswordUtils;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
 import org.junit.Assert;

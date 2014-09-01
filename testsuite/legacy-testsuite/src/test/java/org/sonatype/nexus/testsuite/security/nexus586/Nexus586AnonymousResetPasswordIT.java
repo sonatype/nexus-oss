@@ -13,7 +13,7 @@
 package org.sonatype.nexus.testsuite.security.nexus586;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.ResetPasswordUtils;
+import org.sonatype.nexus.testsuite.security.ResetPasswordUtils;
 
 import org.junit.Assert;
 import org.junit.Test;

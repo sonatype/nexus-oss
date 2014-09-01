@@ -14,9 +14,9 @@ package org.sonatype.nexus.testsuite.security.nxcm897;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.UserAccount;
-import org.sonatype.nexus.test.utils.UserAccountMessageUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
+import org.sonatype.nexus.testsuite.security.UserAccountMessageUtil;
 import org.sonatype.security.rest.model.UserResource;
 
 import org.junit.Assert;

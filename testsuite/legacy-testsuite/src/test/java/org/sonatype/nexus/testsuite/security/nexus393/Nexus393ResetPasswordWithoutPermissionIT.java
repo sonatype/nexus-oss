@@ -14,7 +14,7 @@ package org.sonatype.nexus.testsuite.security.nexus393;
 
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.test.utils.ResetPasswordUtils;
+import org.sonatype.nexus.testsuite.security.ResetPasswordUtils;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;

@@ -14,7 +14,7 @@ package org.sonatype.nexus.testsuite.security.nexus394;
 
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.test.utils.ForgotPasswordUtils;
+import org.sonatype.nexus.testsuite.security.ForgotPasswordUtils;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
