@@ -209,6 +209,27 @@ extends DirectComponentSupport
   }
 
   /**
+   * Resets password of a specified user.
+   * @param authToken authentication token
+   * @param userId id of user to reset password for
+   */
+  @DirectMethod
+  @RequiresUser
+  @RequiresAuthentication
+  @RequiresPermissions('security:usersreset:delete')
+  @Validate
+  void resetPassword(final @NotEmpty(message = '[authToken] may not be empty') String authToken,
+                     final @NotEmpty(message = '[userId] may not be empty') String userId)
+  {
+    if (authTickets.redeemTicket(authToken)) {
+      securitySystem.resetPassword(userId)
+    }
+    else {
+      throw new IllegalAccessException('Invalid authentication ticket')
+    }
+  }
+
+  /**
    * Deletes a user.
    * @param id of user to be deleted
    * @param source of user to be deleted

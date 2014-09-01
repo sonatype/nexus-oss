@@ -24,7 +24,8 @@ Ext.define('NX.coreui.controller.Users', {
     'NX.Permissions',
     'NX.Security',
     'NX.Icons',
-    'NX.Messages'
+    'NX.Messages',
+    'NX.Dialogs'
   ],
 
   list: 'nx-coreui-user-list',
@@ -143,6 +144,9 @@ Ext.define('NX.coreui.controller.Users', {
         },
         'nx-coreui-user-list button[action=more]': {
           afterrender: me.bindMoreButton
+        },
+        'nx-coreui-user-list menuitem[action=resetpassword]': {
+          click: me.resetPassword
         },
         'nx-coreui-user-list menuitem[action=setpassword]': {
           click: me.showChangePasswordWindowForSelection
@@ -398,19 +402,47 @@ Ext.define('NX.coreui.controller.Users', {
 
   /**
    * @protected
-   * Enable 'More' when user has ''security:userschangepw:create.
+   * Enable 'More' when user is not the anonymous user and it has 'security:userschangepw:create' or
+   * 'security:usersreset:delete' permission.
    */
   bindMoreButton: function (button) {
-    var me = this;
+    var me = this,
+        resetMenuItem = button.down('menuitem[action=resetpassword]'),
+        setMenuItem = button.down('menuitem[action=setpassword]');
+
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted('security:userschangepw', 'create'),
-            NX.Conditions.gridHasSelection(me.list)
+            NX.Conditions.or(
+                NX.Conditions.isPermitted('security:userschangepw', 'create'),
+                NX.Conditions.isPermitted('security:usersreset', 'delete')
+            ),
+            NX.Conditions.gridHasSelection(me.list, function (model) {
+              var userId = model.getId();
+              return userId !== NX.State.getValue('anonymousUsername');
+            })
         ),
         {
           satisfied: button.enable,
           unsatisfied: button.disable,
           scope: button
+        }
+    );
+
+    resetMenuItem.mon(
+        NX.Conditions.isPermitted('security:usersreset', 'delete'),
+        {
+          satisfied: resetMenuItem.enable,
+          unsatisfied: resetMenuItem.disable,
+          scope: resetMenuItem
+        }
+    );
+
+    setMenuItem.mon(
+        NX.Conditions.isPermitted('security:userschangepw', 'create'),
+        {
+          satisfied: setMenuItem.enable,
+          unsatisfied: setMenuItem.disable,
+          scope: setMenuItem
         }
     );
   },
@@ -446,6 +478,32 @@ Ext.define('NX.coreui.controller.Users', {
         NX.Messages.add({ text: 'Password changed', type: 'success' });
       }
     });
+  },
+
+  /**
+   * @private
+   * Resets password for currently selected user.
+   */
+  resetPassword: function() {
+    var me = this,
+        list = me.getList(),
+        userModel = list.getSelectionModel().getSelection()[0],
+        userId = userModel.getId();
+
+    NX.Security.doWithAuthenticationToken(
+        'Resetting password requires validation of your credentials.',
+        {
+          success: function(authToken) {
+            NX.Dialogs.askConfirmation('Reset user password', 'Reset the ' + userId + ' user password?', function() {
+              NX.direct.coreui_User.resetPassword(authToken, userId, function(response) {
+                if (Ext.isObject(response) && response.success) {
+                  NX.Messages.add({ text: 'Password reset', type: 'success' });
+                }
+              });
+            });
+          }
+        }
+    );
   }
 
 });
