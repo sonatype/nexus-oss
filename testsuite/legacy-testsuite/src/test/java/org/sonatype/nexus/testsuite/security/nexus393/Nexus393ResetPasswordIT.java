@@ -14,21 +14,34 @@ package org.sonatype.nexus.testsuite.security.nexus393;
 
 import javax.mail.internet.MimeMessage;
 
-import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.EmailServerHelper;
 import org.sonatype.nexus.test.utils.ResetPasswordUtils;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.Response;
-
 
 /**
  * Test password reset.  Check if nexus is sending the e-mail.
  */
 public class Nexus393ResetPasswordIT
-    extends AbstractEmailServerNexusIT
+    extends AbstractNexusIntegrationTest
 {
+  private static final EmailServerHelper emailServerHelper = new EmailServerHelper();
+
+  @BeforeClass
+  public static void startEmailServer() {
+    emailServerHelper.startServer();
+  }
+
+  @AfterClass
+  public static void stopEmailServer() {
+    emailServerHelper.stopServer();
+  }
 
   @Test
   public void resetPassword()
@@ -40,9 +53,9 @@ public class Nexus393ResetPasswordIT
         response.getStatus().isSuccess());
 
     // Need 1 message
-    waitForMail(1);
+    emailServerHelper.waitForMail(1);
 
-    MimeMessage[] msgs = server.getReceivedMessages();
+    MimeMessage[] msgs = emailServerHelper.getReceivedMessages();
     Assert.assertTrue("Expected email.", msgs != null && msgs.length > 0);
     MimeMessage msg = msgs[0];
 

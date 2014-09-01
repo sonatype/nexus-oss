@@ -14,11 +14,14 @@ package org.sonatype.nexus.testsuite.security.nexus394;
 
 import javax.mail.internet.MimeMessage;
 
-import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.EmailServerHelper;
 import org.sonatype.nexus.test.utils.ForgotPasswordUtils;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.Response;
 
@@ -26,8 +29,19 @@ import org.restlet.data.Response;
  * Test forgot password system. Check if nexus is sending the e-mail.
  */
 public class Nexus394ForgotPasswordIT
-    extends AbstractEmailServerNexusIT
+    extends AbstractNexusIntegrationTest
 {
+  private static final EmailServerHelper emailServerHelper = new EmailServerHelper();
+
+  @BeforeClass
+  public static void startEmailServer() {
+    emailServerHelper.startServer();
+  }
+
+  @AfterClass
+  public static void stopEmailServer() {
+    emailServerHelper.stopServer();
+  }
 
   @Test
   public void recoverUserPassword()
@@ -40,9 +54,9 @@ public class Nexus394ForgotPasswordIT
         202);
 
     // Need 1 message
-    waitForMail(1);
+    emailServerHelper.waitForMail(1);
 
-    MimeMessage[] msgs = server.getReceivedMessages();
+    MimeMessage[] msgs = emailServerHelper.getReceivedMessages();
 
     String password = null;
     // Sample body: Your password has been reset. Your new password is: c1r6g4p8l7
