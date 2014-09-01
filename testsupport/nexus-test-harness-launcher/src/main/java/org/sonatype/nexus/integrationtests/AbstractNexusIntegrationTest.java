@@ -17,7 +17,6 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,7 +42,6 @@ import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -56,22 +54,14 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Reference;
-import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
 import static org.sonatype.nexus.test.utils.GavUtil.getRelitivePomPath;
-import static org.sonatype.nexus.test.utils.ResponseMatchers.isRedirecting;
-import static org.sonatype.nexus.test.utils.ResponseMatchers.redirectLocation;
-import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
 
 /**
  * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data START NOTE,
@@ -681,119 +671,39 @@ public abstract class AbstractNexusIntegrationTest
     return file;
   }
 
+  @Deprecated
   protected File downloadSnapshotArtifact(String repository, Gav gav, File parentDir) throws IOException {
-    // @see http://issues.sonatype.org/browse/NEXUS-599
-    // r=<repoId> -- mandatory
-    // g=<groupId> -- mandatory
-    // a=<artifactId> -- mandatory
-    // v=<version> -- mandatory
-    // c=<classifier> -- optional
-    // p=<packaging> -- optional, jar is taken as default
-    // http://localhost:8087/nexus/service/local/artifact/maven/redirect?r=tasks-snapshot-repo&g=nexus&a=artifact&
-    // v=1.0-SNAPSHOT
-    String c = gav.getClassifier() == null ? "" : "&c=" + Reference.encode(gav.getClassifier());
-    String serviceURI =
-        "service/local/artifact/maven/redirect?r=" + repository + "&g=" + gav.getGroupId() + "&a="
-            + gav.getArtifactId() + "&v=" + Reference.encode(gav.getVersion()) + c;
-
-    Response response = null;
-    try {
-      response = RequestFacade.doGetRequest(serviceURI);
-
-      assertThat(response, allOf(
-          isRedirecting(),
-          respondsWithStatusCode(307),
-          redirectLocation(notNullValue(String.class)))
-      );
-
-      serviceURI = response.getLocationRef().toString();
-    }
-    finally {
-      RequestFacade.releaseResponse(response);
-    }
-
-    parentDir.mkdirs();
-    File file = File.createTempFile(gav.getArtifactId(), '.' + gav.getExtension(), parentDir);
-    RequestFacade.downloadFile(new URL(serviceURI), file.getAbsolutePath());
-
-    return file;
+    return new DownloadHelper().downloadSnapshotArtifact(repository, gav, parentDir);
   }
 
-  protected Metadata downloadMetadataFromRepository(Gav gav, String repoId)
-      throws IOException, XmlPullParserException
-  {
-    String url = String.format("%s%s%s/%s/%s/maven-metadata.xml",
-        getBaseNexusUrl(),
-        REPOSITORY_RELATIVE_URL,
-        repoId,
-        gav.getGroupId(),
-        gav.getArtifactId());
-
-    Response response = null;
-    try {
-      response = RequestFacade.sendMessage(new URL(url), Method.GET, null);
-      if (response.getStatus().isError()) {
-        return null;
-      }
-      try (InputStream stream = response.getEntity().getStream()) {
-        MetadataXpp3Reader metadataReader = new MetadataXpp3Reader();
-        return metadataReader.read(stream);
-      }
-    }
-    finally {
-      RequestFacade.releaseResponse(response);
-    }
+  @Deprecated
+  protected Metadata downloadMetadataFromRepository(Gav gav, String repoId) throws IOException, XmlPullParserException {
+    return new DownloadHelper().downloadMetadataFromRepository(gav, repoId);
   }
 
-  protected File downloadArtifact(String baseUrl,
-                                  String groupId,
-                                  String artifact,
-                                  String version,
-                                  String type,
-                                  String classifier,
-                                  String targetDirectory)
-      throws IOException
-  {
-    URL url = new URL(baseUrl + getRelitiveArtifactPath(groupId, artifact, version, type, classifier));
-
-    String classifierPart = (classifier != null) ? "-" + classifier : "";
-    return RequestFacade.downloadFile(url, targetDirectory + "/" + artifact + "-" + version + classifierPart + "." + type);
+  @Deprecated
+  protected File downloadArtifact(String baseUrl, String groupId, String artifact, String version, String type, String classifier, String targetDirectory) throws IOException {
+    return new DownloadHelper().downloadArtifact(baseUrl, groupId, artifact, version, type, classifier, targetDirectory);
   }
 
-  /**
-   * @deprecated Use {@link RequestFacade#downloadFile(URL, String)}
-   */
   @Deprecated
   protected File downloadFile(URL url, String targetFile) throws IOException {
     return RequestFacade.downloadFile(url, targetFile);
   }
 
+  @Deprecated
   protected File downloadArtifact(String baseUrl, Gav gav, String targetDirectory) throws IOException {
-    return downloadArtifact(
-        baseUrl,
-        gav.getGroupId(),
-        gav.getArtifactId(),
-        gav.getVersion(),
-        gav.getExtension(),
-        gav.getClassifier(),
-        targetDirectory
-    );
+    return new DownloadHelper().downloadArtifact(baseUrl, gav, targetDirectory);
   }
 
-  protected File downloadArtifactFromRepository(String repoId, Gav gav, String targetDirectory)
-      throws IOException
-  {
-    return downloadArtifact(nexusBaseUrl + REPOSITORY_RELATIVE_URL + repoId
-        + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
-        targetDirectory);
+  @Deprecated
+  protected File downloadArtifactFromRepository(String repoId, Gav gav, String targetDirectory) throws IOException {
+    return new DownloadHelper().downloadArtifactFromRepository(repoId, gav, targetDirectory);
   }
 
-  protected File downloadArtifactFromGroup(String groupId, Gav gav, String targetDirectory)
-      throws IOException
-  {
-    return downloadArtifact(nexusBaseUrl + GROUP_REPOSITORY_RELATIVE_URL
-            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
-        gav.getClassifier(), targetDirectory);
+  @Deprecated
+  protected File downloadArtifactFromGroup(String groupId, Gav gav, String targetDirectory) throws IOException {
+    return new DownloadHelper().downloadArtifactFromGroup(groupId, gav, targetDirectory);
   }
 
   protected boolean deleteFromRepository(String repository, String groupOrArtifactPath) throws IOException {
