@@ -14,8 +14,12 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.integrationtests.TestContext;
+import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.rest.model.PlexusUserResource;
@@ -299,6 +303,70 @@ public class UserMessageUtil
     user.setStatus("disabled");
     updateUser(user);
     return user;
+  }
+
+  public static final String ADMIN_ROLE = "nx-admin";
+
+  private <T> T invokeAsAdministrator(final Callable<T> callable) throws Exception {
+    final TestContext ctx = TestContainer.getInstance().getTestContext();
+    final String username = ctx.getUsername();
+    final String password = ctx.getPassword();
+    final boolean secure = ctx.isSecureTest();
+    ctx.useAdminForRequests();
+    ctx.setSecureTest(true);
+
+    try {
+      return callable.call();
+    }
+    finally {
+      ctx.setUsername(username);
+      ctx.setPassword(password);
+      ctx.setSecureTest(secure);
+    }
+  }
+
+  public void makeAnonymousAdministrator(final boolean shouldBeAdmin) throws Exception {
+    LOG.info("Making anonymous user administrator: {}", shouldBeAdmin);
+
+    invokeAsAdministrator(new Callable<Object>()
+    {
+      @Override
+      public Object call() throws Exception {
+        final GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
+        if (shouldBeAdmin) {
+          globalConfig.setSecurityAnonymousAccessEnabled(true);
+          SettingsMessageUtil.save(globalConfig);
+        }
+
+        UserResource user = getUser(globalConfig.getSecurityAnonymousUsername());
+
+        if (shouldBeAdmin) {
+          if (!user.getRoles().contains(ADMIN_ROLE)) {
+            user.addRole(ADMIN_ROLE);
+            updateUser(user);
+          }
+        }
+        else {
+          if (user.getRoles().contains(ADMIN_ROLE)) {
+            user.removeRole(ADMIN_ROLE);
+            updateUser(user);
+          }
+        }
+
+        return null;
+      }
+    });
+  }
+
+  public boolean isAnonymousAdministrator() throws Exception {
+    return invokeAsAdministrator(new Callable<Boolean>()
+    {
+      @Override
+      public Boolean call() throws Exception {
+        final GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
+        return getUser(globalConfig.getSecurityAnonymousUsername()).getRoles().contains(ADMIN_ROLE);
+      }
+    });
   }
 
 }

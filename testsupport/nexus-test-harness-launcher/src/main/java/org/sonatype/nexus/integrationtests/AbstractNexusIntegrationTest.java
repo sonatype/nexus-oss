@@ -23,9 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 
-import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
@@ -34,13 +32,11 @@ import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
-import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.security.guice.SecurityModule;
-import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.sisu.goodies.prefs.memory.MemoryPreferencesFactory;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
@@ -99,8 +95,6 @@ public abstract class AbstractNexusIntegrationTest
   public static final String REPO_RELEASE_PROXY_REPO1 = "release-proxy-repo-1";
 
   public static final String REPO_TEST_HARNESS_SHADOW = "nexus-test-harness-shadow";
-
-  public static final String ADMIN_ROLE = "nx-admin";
 
   protected static boolean NEEDS_INIT = false;
 
@@ -276,12 +270,12 @@ public abstract class AbstractNexusIntegrationTest
         // start nexus
         startNexus();
 
+        // set security enabled/disabled as expected by current IT
         final boolean testRequiresSecurityEnabled =
             TestContainer.getInstance().getTestContext().isSecureTest()
                 || Boolean.valueOf(System.getProperty("secure.test"));
-
-        // set security enabled/disabled as expected by current IT
-        makeAnonymousAdministrator(!testRequiresSecurityEnabled);
+        new UserMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML)
+            .makeAnonymousAdministrator(!testRequiresSecurityEnabled);
 
         // deploy artifacts
         deployArtifacts();
@@ -294,56 +288,6 @@ public abstract class AbstractNexusIntegrationTest
 
       getEventInspectorsUtil().waitForCalmPeriod();
     }
-  }
-
-  protected void makeAnonymousAdministrator(final boolean shouldBeAdmin) throws Exception {
-    log.info("Making anonymous user administrator: {}", shouldBeAdmin);
-
-    TestContainer.getInstance().invokeAsAdministrator(new Callable<Object>()
-    {
-      @Override
-      public Object call()
-          throws Exception
-      {
-        final GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
-        if (shouldBeAdmin) {
-          globalConfig.setSecurityAnonymousAccessEnabled(true);
-          SettingsMessageUtil.save(globalConfig);
-        }
-
-        UserMessageUtil userUtil = new UserMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
-        UserResource user = userUtil.getUser(globalConfig.getSecurityAnonymousUsername());
-
-        if (shouldBeAdmin) {
-          if (!user.getRoles().contains(ADMIN_ROLE)) {
-            user.addRole(ADMIN_ROLE);
-            userUtil.updateUser(user);
-          }
-        }
-        else {
-          if (user.getRoles().contains(ADMIN_ROLE)) {
-            user.removeRole(ADMIN_ROLE);
-            userUtil.updateUser(user);
-          }
-        }
-
-        return null;
-      }
-    });
-  }
-
-  protected boolean isAnonymousAdministrator() throws Exception {
-    return TestContainer.getInstance().invokeAsAdministrator(new Callable<Boolean>()
-    {
-      @Override
-      public Boolean call()
-          throws Exception
-      {
-        final GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
-        UserMessageUtil userUtil = new UserMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
-        return userUtil.getUser(globalConfig.getSecurityAnonymousUsername()).getRoles().contains(ADMIN_ROLE);
-      }
-    });
   }
 
   @After
