@@ -21,10 +21,12 @@ import com.google.common.base.Preconditions;
 /**
  * A simple descriptor object describing the maven runtime and maven project you want to run Verifier against.
  *
- * @author cstamas
  * @since 2.1
+ *
+ * @deprecated Only used by {@link MavenVerifierHelper}, avoid any other use.
  */
-public class MavenDeployment
+@Deprecated
+class MavenDeployment
 {
   private final File mavenHomeFile;
 
@@ -36,17 +38,6 @@ public class MavenDeployment
 
   private final File mavenProjectFile;
 
-  /**
-   * Creates a new instance of {@link MavenDeployment}.
-   *
-   * @param testId              the test ID, must not be {@code null}.
-   * @param mavenHomeFile       the maven home, must not be {@code null}.
-   * @param localRepositoryFile the local repository, must not be {@code null}.
-   * @param logFileName         the log file of Verifier, must not be {@code null}. It is a path relative to
-   *                            {@code mavenProjectFile}.
-   * @param settingsXmlFile     settings.xml file, must not be {@code null}.
-   * @param mavenProjectFile    directory containing the project (pom.xml), must not be {@code null}.
-   */
   public MavenDeployment(final File mavenHomeFile, final File localRepositoryFile, final String logFileName,
                          final File settingsXmlFile, final File mavenProjectFile)
   {
@@ -57,54 +48,26 @@ public class MavenDeployment
     this.mavenProjectFile = Preconditions.checkNotNull(mavenProjectFile);
   }
 
-  /**
-   * Returns the Maven Home file (directory) where maven deployment is (unpacked binary distro of Maven).
-   */
   public File getMavenHomeFile() {
     return mavenHomeFile;
   }
 
-  /**
-   * Returns the file (directory) where you want to Maven put it's local repository.
-   */
   public File getLocalRepositoryFile() {
     return localRepositoryFile;
   }
 
-  /**
-   * Returns the logfilename where you want to have Maven console output saved. This is a relative path resolved from
-   * {@link #getMavenProjectFile()} as base.
-   */
   public String getLogFileName() {
     return logFileName;
   }
 
-  /**
-   * Returns the settings.xml file you want to use with Maven.
-   */
   public File getSettingsXmlFile() {
     return settingsXmlFile;
   }
 
-  /**
-   * Retutns the baseDir of maven project you want to run Maven against.
-   */
   public File getMavenProjectFile() {
     return mavenProjectFile;
   }
 
-  // ==
-
-  /**
-   * Returns the default deployment descriptor used throughout ITs. This is just a "handy" quick method that does
-   * things in same was as they happened before (pre 2.1).
-   *
-   * @param logFile         the relative path resolved from mavenProject to save console output of Maven.
-   * @param settingsXmlFile the settings.xml file to use with Maven.
-   * @param mavenProject    the "basedir" of the project to build. It should point to a directory that contains
-   *                        pom.xml
-   *                        and a valid maven project along with it.
-   */
   public static MavenDeployment defaultDeployment(final String logFileName, final File settingsXmlFile,
                                                   final File mavenProject)
   {
