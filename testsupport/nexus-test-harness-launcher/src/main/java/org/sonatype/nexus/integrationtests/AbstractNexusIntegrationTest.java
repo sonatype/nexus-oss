@@ -54,6 +54,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
@@ -66,7 +67,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
 import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
 import static org.sonatype.nexus.test.utils.GavUtil.getRelitivePomPath;
 import static org.sonatype.nexus.test.utils.ResponseMatchers.isRedirecting;
@@ -101,6 +101,9 @@ public abstract class AbstractNexusIntegrationTest
   public static final String REPOSITORY_RELATIVE_URL = "content/repositories/";
 
   public static final String GROUP_REPOSITORY_RELATIVE_URL = "content/groups/";
+
+  @ClassRule
+  public static final ProfilerHelper profilerHelper = new ProfilerHelper();
 
   /**
    * FIXME: should not need/require this test-instance state here.
@@ -217,8 +220,6 @@ public abstract class AbstractNexusIntegrationTest
   public static void staticOncePerClassSetUp() throws Exception {
     staticLog.info("Static setup");
 
-    startProfiler();
-
     // hacky state machine
     NEEDS_INIT = true;
   }
@@ -317,7 +318,7 @@ public abstract class AbstractNexusIntegrationTest
     // stop nexus
     stopNexus();
 
-    takeSnapshot();
+    profilerHelper.captureSnapshot();
 
     // stop per-IT plexus container
     TestContainer.getInstance().stopPlexusContainer();
@@ -684,40 +685,6 @@ public abstract class AbstractNexusIntegrationTest
     //  return null;
     //}
     return file;
-  }
-
-  // profiling with yourkit, activate using -P youtkit-profile
-  private static Object profiler;
-
-  private static void startProfiler() {
-    Class<?> controllerClazz;
-    try {
-      controllerClazz = AbstractNexusIntegrationTest.class.getClassLoader().loadClass("com.yourkit.api.Controller");
-    }
-    catch (Exception e) {
-      staticLog.info("Profiler not present");
-      return;
-    }
-
-    try {
-      profiler = controllerClazz.newInstance();
-      controllerClazz.getMethod("captureMemorySnapshot").invoke(profiler);
-    }
-    catch (Exception e) {
-      fail("Profiler was active, but failed: " + e);
-    }
-  }
-
-  private static void takeSnapshot() {
-    if (profiler != null) {
-      try {
-        profiler.getClass().getMethod("forceGC").invoke(profiler);
-        profiler.getClass().getMethod("captureMemorySnapshot").invoke(profiler);
-      }
-      catch (Exception e) {
-        fail("Profiler was active, but failed: " + e);
-      }
-    }
   }
 
   protected File downloadSnapshotArtifact(String repository, Gav gav, File parentDir) throws IOException {
