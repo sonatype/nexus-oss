@@ -737,7 +737,7 @@ public abstract class AbstractNexusIntegrationTest
     return GavUtil.getRelitiveArtifactPath(groupId, artifactId, version, extension, classifier);
   }
 
-  public File downloadSnapshotArtifact(String repository, Gav gav, File parentDir) throws IOException {
+  protected File downloadSnapshotArtifact(String repository, Gav gav, File parentDir) throws IOException {
     // @see http://issues.sonatype.org/browse/NEXUS-599
     // r=<repoId> -- mandatory
     // g=<groupId> -- mandatory
@@ -848,7 +848,7 @@ public abstract class AbstractNexusIntegrationTest
     return downloadFile(url, targetDirectory + "/" + artifact + "-" + version + classifierPart + "." + type);
   }
 
-  public File downloadFile(URL url, String targetFile) throws IOException {
+  protected File downloadFile(URL url, String targetFile) throws IOException {
     log.info("Downloading {} to: {}", url, targetFile);
     return RequestFacade.downloadFile(url, targetFile);
   }
@@ -883,37 +883,37 @@ public abstract class AbstractNexusIntegrationTest
     return deleted;
   }
 
-  public String getBaseNexusUrl() {
+  protected String getBaseNexusUrl() {
     return nexusBaseUrl;
   }
 
-  public String getNexusTestRepoUrl(String repo) {
+  protected String getNexusTestRepoUrl(String repo) {
     return nexusBaseUrl + REPOSITORY_RELATIVE_URL + repo + "/";
   }
 
-  public String getNexusTestRepoUrl() {
+  protected String getNexusTestRepoUrl() {
     return getNexusTestRepoUrl(testRepositoryId);
   }
 
-  public String getNexusTestRepoServiceUrl() {
+  protected String getNexusTestRepoServiceUrl() {
     return String.format("%sservice/local/repositories/%s/content/", nexusBaseUrl, testRepositoryId);
   }
 
   @Deprecated
-  public String getTestRepositoryId() {
+  protected String getTestRepositoryId() {
     return testRepositoryId;
   }
 
   @Deprecated
-  public void setTestRepositoryId(String repoId) {
+  protected void setTestRepositoryId(String repoId) {
     testRepositoryId = repoId;
   }
 
-  public String getRepositoryUrl(String repoId) {
+  protected String getRepositoryUrl(String repoId) {
     return nexusBaseUrl + REPOSITORY_RELATIVE_URL + repoId + "/";
   }
 
-  public String getGroupUrl(String groupId) {
+  protected String getGroupUrl(String groupId) {
     return nexusBaseUrl + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/";
   }
 
@@ -934,11 +934,11 @@ public abstract class AbstractNexusIntegrationTest
     return true;
   }
 
-  public XStream getXMLXStream() {
+  protected XStream getXMLXStream() {
     return XStreamFactory.getXmlXStream();
   }
 
-  public XStream getJsonXStream() {
+  protected XStream getJsonXStream() {
     return XStreamFactory.getJsonXStream();
   }
 
