@@ -14,7 +14,6 @@ package org.sonatype.nexus.testsuite.security;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.test.utils.ITUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
@@ -24,17 +23,15 @@ import org.restlet.data.Method;
 import org.restlet.data.Status;
 
 public class ForgotUsernameUtils
-    extends ITUtil
 {
   private final XStream xstream;
 
-  public static ForgotUsernameUtils get(AbstractNexusIntegrationTest test) {
-    return new ForgotUsernameUtils(test);
+  @Deprecated
+  public static ForgotUsernameUtils get(AbstractNexusIntegrationTest ignored) {
+    return new ForgotUsernameUtils();
   }
 
-  public ForgotUsernameUtils(AbstractNexusIntegrationTest test) {
-    super(test);
-
+  public ForgotUsernameUtils() {
     xstream = XStreamFactory.getXmlXStream();
   }
 

@@ -185,7 +185,7 @@ public abstract class AbstractNexusIntegrationTest
 
   public NexusConfigUtil getNexusConfigUtil() {
     if (nexusConfigUtil == null) {
-      nexusConfigUtil = new NexusConfigUtil(this);
+      nexusConfigUtil = new NexusConfigUtil();
     }
     return nexusConfigUtil;
   }
@@ -194,7 +194,7 @@ public abstract class AbstractNexusIntegrationTest
 
   public SecurityConfigUtil getSecurityConfigUtil() {
     if (securityConfigUtil == null) {
-      securityConfigUtil = new SecurityConfigUtil(this);
+      securityConfigUtil = new SecurityConfigUtil();
     }
     return securityConfigUtil;
   }
@@ -224,7 +224,7 @@ public abstract class AbstractNexusIntegrationTest
 
   public SearchMessageUtil getSearchMessageUtil() {
     if (searchMessageUtil == null) {
-      searchMessageUtil = new SearchMessageUtil(this);
+      searchMessageUtil = new SearchMessageUtil();
     }
     return searchMessageUtil;
   }
@@ -344,9 +344,7 @@ public abstract class AbstractNexusIntegrationTest
           SettingsMessageUtil.save(globalConfig);
         }
 
-        UserMessageUtil userUtil = new UserMessageUtil(
-            AbstractNexusIntegrationTest.this, getXMLXStream(), MediaType.APPLICATION_XML
-        );
+        UserMessageUtil userUtil = new UserMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
         UserResource user = userUtil.getUser(globalConfig.getSecurityAnonymousUsername());
 
         if (shouldBeAdmin) {
@@ -375,9 +373,7 @@ public abstract class AbstractNexusIntegrationTest
           throws Exception
       {
         final GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
-        UserMessageUtil userUtil = new UserMessageUtil(
-            AbstractNexusIntegrationTest.this, getXMLXStream(), MediaType.APPLICATION_XML
-        );
+        UserMessageUtil userUtil = new UserMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
         return userUtil.getUser(globalConfig.getSecurityAnonymousUsername()).getRoles().contains(ADMIN_ROLE);
       }
     });

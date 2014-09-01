@@ -28,8 +28,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.sonatype.tests.http.server.fluent.Behaviours.content;
 import static org.sonatype.tests.http.server.fluent.Behaviours.error;
 import static org.sonatype.tests.http.server.fluent.Behaviours.get;
@@ -153,7 +153,7 @@ public class Nexus4593NoAutoblockFor403IT
   private RepositoryStatusResource getStatus()
       throws IOException
   {
-    return new RepositoryMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML).getStatus(
+    return new RepositoryMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML).getStatus(
         getTestRepositoryId());
   }
 

@@ -59,7 +59,7 @@ public class Nexus383SearchNGIT
 
   @Before
   public void prepare() {
-    this.groupMessageUtil = new GroupMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    this.groupMessageUtil = new GroupMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @Override

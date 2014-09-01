@@ -43,7 +43,7 @@ public class Nexus156RolesValidationIT
 
   @Before
   public void setUp() {
-    this.messageUtil = new RoleMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    this.messageUtil = new RoleMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
   }
 
   @Test

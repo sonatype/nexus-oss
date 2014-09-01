@@ -44,7 +44,7 @@ public class Nexus142UserCrudJsonIT
   private PasswordService passwordService;
 
   public Nexus142UserCrudJsonIT() {
-    this.messageUtil = new UserMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    this.messageUtil = new UserMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
   }
 
   @Before

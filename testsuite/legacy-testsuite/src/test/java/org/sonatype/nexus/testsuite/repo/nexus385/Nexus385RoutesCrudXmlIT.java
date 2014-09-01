@@ -47,7 +47,7 @@ public class Nexus385RoutesCrudXmlIT
   public void setUp()
       throws IOException
   {
-    this.messageUtil = new RoutesMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    this.messageUtil = new RoutesMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
     RoutesMessageUtil.removeAllRoutes();
   }
 

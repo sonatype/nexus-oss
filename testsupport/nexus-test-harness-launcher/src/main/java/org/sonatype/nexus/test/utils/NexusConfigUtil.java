@@ -46,12 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author cstamas
  */
 public class NexusConfigUtil
-    extends ITUtil
 {
-  public NexusConfigUtil(AbstractNexusIntegrationTest test) {
-    super(test);
-  }
-
   private static Logger log = LoggerFactory.getLogger(NexusConfigUtil.class);
 
   /**

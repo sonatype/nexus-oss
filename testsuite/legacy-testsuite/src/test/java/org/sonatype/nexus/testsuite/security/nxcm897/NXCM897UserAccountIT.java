@@ -32,7 +32,7 @@ public class NXCM897UserAccountIT
   protected UserAccountMessageUtil accountMsgUtil = new UserAccountMessageUtil();
 
   protected UserMessageUtil userMsgUtil =
-      new UserMessageUtil(this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML.APPLICATION_XML);
+      new UserMessageUtil(XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML.APPLICATION_XML);
 
   @Test
   public void userAccountCRU()

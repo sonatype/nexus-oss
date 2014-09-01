@@ -36,7 +36,7 @@ import org.restlet.data.MediaType;
 public class Nexus688ReindexOnRepoAddIT
     extends AbstractNexusIntegrationTest
 {
-  private RepositoryMessageUtil messageUtil = new RepositoryMessageUtil(this, this.getXMLXStream(),
+  private RepositoryMessageUtil messageUtil = new RepositoryMessageUtil(this.getXMLXStream(),
       MediaType.APPLICATION_XML);
 
   // Indexer stopped publishing "old" index for good

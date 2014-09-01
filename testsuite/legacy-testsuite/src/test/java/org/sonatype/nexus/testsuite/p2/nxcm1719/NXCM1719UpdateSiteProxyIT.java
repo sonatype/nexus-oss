@@ -44,7 +44,7 @@ public class NXCM1719UpdateSiteProxyIT
     }
 
     final RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(
-        this, getXMLXStream(), MediaType.APPLICATION_XML
+        getXMLXStream(), MediaType.APPLICATION_XML
     );
     final RepositoryProxyResource repo = (RepositoryProxyResource) repoUtil.getRepository(getTestRepositoryId());
     repo.getRemoteStorage().setRemoteStorageUrl(TestProperties.getString("proxy-repo-base-url") + "nxcm1719/");

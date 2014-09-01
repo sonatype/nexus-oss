@@ -35,7 +35,7 @@ public class Nexus531RepositoryCrudValidationIT
     extends AbstractPrivilegeTest
 {
 
-  private RepositoryMessageUtil messageUtil = new RepositoryMessageUtil(this, this.getXMLXStream(),
+  private RepositoryMessageUtil messageUtil = new RepositoryMessageUtil(this.getXMLXStream(),
       MediaType.APPLICATION_XML);
 
   @BeforeClass

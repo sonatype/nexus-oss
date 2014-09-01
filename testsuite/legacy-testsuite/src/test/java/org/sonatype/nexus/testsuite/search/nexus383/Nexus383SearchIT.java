@@ -54,7 +54,7 @@ public class Nexus383SearchIT
   protected GroupMessageUtil groupMessageUtil;
 
   public Nexus383SearchIT() {
-    this.groupMessageUtil = new GroupMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    this.groupMessageUtil = new GroupMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @Override

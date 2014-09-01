@@ -50,9 +50,9 @@ public class Nexus1730DeleteRepoIT
   public void prepare()
       throws ComponentLookupException
   {
-    privUtil = new PrivilegesMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
-    repoUtil = new RepositoryMessageUtil(this, getJsonXStream(), MediaType.APPLICATION_JSON);
-    groupUtil = new GroupMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
+    privUtil = new PrivilegesMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
+    repoUtil = new RepositoryMessageUtil(getJsonXStream(), MediaType.APPLICATION_JSON);
+    groupUtil = new GroupMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @Test

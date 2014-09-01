@@ -126,7 +126,7 @@ public class NXCM1985UmbrellaContentClassIT
       Assert.fail("Target not found!");
     }
 
-    PrivilegesMessageUtil util = new PrivilegesMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
+    PrivilegesMessageUtil util = new PrivilegesMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
 
     PrivilegeResource resource = new PrivilegeResource();
 

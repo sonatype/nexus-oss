@@ -15,7 +15,6 @@ package org.sonatype.nexus.test.utils;
 import java.io.IOException;
 import java.util.List;
 
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
@@ -38,7 +37,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 public class UserMessageUtil
-    extends ITUtil
 {
   private XStream xstream;
 
@@ -46,8 +44,7 @@ public class UserMessageUtil
 
   private static final Logger LOG = LoggerFactory.getLogger(UserMessageUtil.class);
 
-  public UserMessageUtil(AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType) {
-    super(test);
+  public UserMessageUtil(XStream xstream, MediaType mediaType) {
     this.xstream = xstream;
     this.mediaType = mediaType;
   }
@@ -78,7 +75,7 @@ public class UserMessageUtil
     Assert.assertEquals(responseResource.getEmail(), user.getEmail());
     Assert.assertEquals(user.getRoles(), responseResource.getRoles());
 
-    getTest().getSecurityConfigUtil().verifyUser(user);
+    new SecurityConfigUtil().verifyUser(user);
 
     return user;
   }
@@ -121,7 +118,8 @@ public class UserMessageUtil
     Assert.assertEquals(responseResource.getEmail(), user.getEmail());
     Assert.assertEquals(user.getRoles(), responseResource.getRoles());
 
-    getTest().getSecurityConfigUtil().verifyUser(user);
+    new SecurityConfigUtil().verifyUser(user);
+
     return responseResource;
   }
 

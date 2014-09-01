@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
@@ -56,15 +55,12 @@ import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccess;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 public class SearchMessageUtil
-    extends ITUtil
 {
   private static Logger log = LoggerFactory.getLogger(SearchMessageUtil.class);
 
   private XStream xstream;
 
-  public SearchMessageUtil(AbstractNexusIntegrationTest test) {
-    super(test);
-
+  public SearchMessageUtil() {
     this.xstream = XStreamFactory.getXmlXStream();
   }
 

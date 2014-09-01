@@ -14,7 +14,6 @@ package org.sonatype.nexus.testsuite.security;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.test.utils.ITUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.security.rest.model.UserForgotPasswordRequest;
@@ -32,17 +31,15 @@ import org.restlet.data.Response;
  * @author cstamas
  */
 public class ForgotPasswordUtils
-    extends ITUtil
 {
   private final XStream xstream;
 
-  public static ForgotPasswordUtils get(AbstractNexusIntegrationTest test) {
-    return new ForgotPasswordUtils(test);
+  @Deprecated
+  public static ForgotPasswordUtils get(AbstractNexusIntegrationTest ignored) {
+    return new ForgotPasswordUtils();
   }
 
-  public ForgotPasswordUtils(AbstractNexusIntegrationTest test) {
-    super(test);
-
+  public ForgotPasswordUtils() {
     this.xstream = XStreamFactory.getXmlXStream();
   }
 

@@ -43,12 +43,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.Assert;
 
 public class SecurityConfigUtil
-    extends ITUtil
 {
-  public SecurityConfigUtil(AbstractNexusIntegrationTest test) {
-    super(test);
-  }
-
   public void verifyRole(RoleResource role)
       throws IOException
   {
