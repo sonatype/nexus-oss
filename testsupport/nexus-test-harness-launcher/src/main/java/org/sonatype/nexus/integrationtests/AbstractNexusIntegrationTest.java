@@ -13,6 +13,7 @@
 package org.sonatype.nexus.integrationtests;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,7 +30,6 @@ import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
-import org.sonatype.nexus.test.utils.MavenProjectFileFilter;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
@@ -509,7 +509,12 @@ public abstract class AbstractNexusIntegrationTest
     // we have the parent dir, for each child (one level) we need to grab the pom.xml out of it and parse it,
     // and then deploy the artifact, sounds like fun, right!
 
-    final File[] projectFolders = projectsDir.listFiles(MavenProjectFileFilter.INSTANCE);
+    final File[] projectFolders = projectsDir.listFiles(new FileFilter() {
+      @Override
+      public boolean accept(final File pathname) {
+        return pathname.isDirectory() && new File(pathname, "pom.xml").exists();
+      }
+    });
     if (projectFolders == null) {
       // bail out
       return;
@@ -934,7 +939,7 @@ public abstract class AbstractNexusIntegrationTest
       throws IOException
   {
     return downloadArtifact(AbstractNexusIntegrationTest.nexusBaseUrl + GROUP_REPOSITORY_RELATIVE_URL
-        + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
+            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
         gav.getClassifier(), targetDirectory);
   }
 
@@ -997,10 +1002,6 @@ public abstract class AbstractNexusIntegrationTest
 
   public String getNexusTestRepoServiceUrl() {
     return String.format("%sservice/local/repositories/%s/content/", nexusBaseUrl, testRepositoryId);
-  }
-
-  public String getNexusBaseDir() {
-    return nexusBaseDir;
   }
 
   @Deprecated
