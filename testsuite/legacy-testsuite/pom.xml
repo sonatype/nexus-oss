@@ -207,7 +207,7 @@
           <resource>
             <directory>${basedir}/src/test/it-resources/default-config</directory>
             <targetPath>${project.build.directory}/resources/default-configs</targetPath>
-            <filtering>false</filtering>
+            <filtering>true</filtering>
           </resource>
         </resources>
         <plugins>
