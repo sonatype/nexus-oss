@@ -48,7 +48,6 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.After;
@@ -718,16 +717,6 @@ public abstract class AbstractNexusIntegrationTest
         fail("Profiler was active, but failed: " + e);
       }
     }
-  }
-
-  // FIXME: Change signature to thorws Exception (don't let plexus api leak here)
-
-  protected <E> E lookup(Class<E> role) throws ComponentLookupException {
-    return TestContainer.getInstance().getPlexusContainer().lookup(role);
-  }
-
-  protected <E> E lookup(Class<E> role, String hint) throws ComponentLookupException {
-    return TestContainer.getInstance().getPlexusContainer().lookup(role, hint);
   }
 
   protected String getRelitivePomPath(Gav gav) throws FileNotFoundException {

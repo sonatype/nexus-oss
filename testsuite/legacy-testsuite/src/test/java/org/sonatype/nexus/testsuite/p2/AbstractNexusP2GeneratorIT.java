@@ -58,7 +58,7 @@ public abstract class AbstractNexusP2GeneratorIT
     if (nexusClient == null) {
       try {
         nexusClient = new NexusClientFactoryImpl(
-            Lists.<SubsystemProvider>newArrayList(new GuiceSubsystemProvider(lookup(Injector.class)))
+            Lists.<SubsystemProvider>newArrayList(new GuiceSubsystemProvider(TestContainer.getInstance().getPlexusContainer().lookup(Injector.class)))
         ).createFor(
             BaseUrl.baseUrlFrom(nexusBaseUrl),
             new UsernamePasswordAuthenticationInfo(checkNotNull("admin"), checkNotNull("admin123"))

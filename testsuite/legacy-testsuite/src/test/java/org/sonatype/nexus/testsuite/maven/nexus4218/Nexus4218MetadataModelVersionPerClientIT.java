@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -77,7 +78,7 @@ public class Nexus4218MetadataModelVersionPerClientIT
     File bundle =
         downloadArtifact(gav, "target/downloads/nexus4218/" + gav.getArtifactId() + "-" + gav.getVersion());
 
-    UnArchiver unArchive = lookup(ArchiverManager.class).getUnArchiver(bundle);
+    UnArchiver unArchive = TestContainer.getInstance().getPlexusContainer().lookup(ArchiverManager.class).getUnArchiver(bundle);
     unArchive.setSourceFile(bundle);
     unArchive.setDestDirectory(bundle.getParentFile());
     unArchive.extract();
@@ -131,7 +132,7 @@ public class Nexus4218MetadataModelVersionPerClientIT
     File bundle =
         downloadArtifact(gav, "target/downloads/nexus4218/" + gav.getArtifactId() + "-" + gav.getVersion());
 
-    UnArchiver unArchive = lookup(ArchiverManager.class).getUnArchiver(bundle);
+    UnArchiver unArchive = TestContainer.getInstance().getPlexusContainer().lookup(ArchiverManager.class).getUnArchiver(bundle);
     unArchive.setSourceFile(bundle);
     unArchive.setDestDirectory(bundle.getParentFile());
     unArchive.extract();
@@ -180,7 +181,7 @@ public class Nexus4218MetadataModelVersionPerClientIT
     File bundle =
         downloadArtifact(gav, "target/downloads/nexus4218/" + gav.getArtifactId() + "-" + gav.getVersion());
 
-    UnArchiver unArchive = lookup(ArchiverManager.class).getUnArchiver(bundle);
+    UnArchiver unArchive = TestContainer.getInstance().getPlexusContainer().lookup(ArchiverManager.class).getUnArchiver(bundle);
     unArchive.setSourceFile(bundle);
     unArchive.setDestDirectory(bundle.getParentFile());
     unArchive.extract();

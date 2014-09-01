@@ -44,6 +44,11 @@ public class DeployUtils
 
   private final WagonDeployer.Factory wagonFactory;
 
+  public DeployUtils(NexusRestClient nexusRestClient, WagonDeployer.Factory wagonFactory) {
+    this.nexusRestClient = nexusRestClient;
+    this.wagonFactory = wagonFactory;
+  }
+
   public DeployUtils() {
     this.nexusRestClient = RequestFacade.getNexusRestClient();
     this.wagonFactory = new WagonDeployer.Factory()
