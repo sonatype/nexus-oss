@@ -86,12 +86,26 @@ public class MavenVerifierHelper
     return verifier;
   }
 
+  @Deprecated
+  public Verifier createMavenVerifier(File mavenProject, File settings, String testId)
+      throws VerificationException, IOException
+  {
+    String logname = "logs/maven-execution/" + testId + "/" + mavenProject.getName() + ".log";
+    final File logFile = new File(mavenProject, logname);
+    logFile.getParentFile().mkdirs();
+
+    log.info("Creating Maven verifier; testId: {}, project: {},\nsettings: {},\nlog: {}",
+        testId, mavenProject, settings, logFile);
+
+    final MavenDeployment mavenDeployment = MavenDeployment.defaultDeployment(logname, settings, mavenProject);
+    cleanRepository(mavenDeployment.getLocalRepositoryFile(), testId);
+    return createMavenVerifier(mavenDeployment);
+  }
+
   /**
    * Removes artifacts from passed in local repository that has groupId of testId.
    */
-  protected void cleanRepository(final File mavenRepo, final String testId)
-      throws IOException
-  {
+  private void cleanRepository(final File mavenRepo, final String testId) throws IOException {
     final File testGroupIdFolder = new File(mavenRepo, testId);
     FileUtils.deleteDirectory(testGroupIdFolder);
   }
@@ -105,9 +119,7 @@ public class MavenVerifierHelper
    * @deprecated This method will make huge/confusing output on build execution, and should not be used.
    */
   @Deprecated
-  public void failTest(final Verifier verifier)
-      throws IOException
-  {
+  public void failTest(final Verifier verifier) throws IOException {
     final File logFile = new File(verifier.getLogFileName());
     final String log = FileUtils.readFileToString(logFile);
     Assert.fail(log);

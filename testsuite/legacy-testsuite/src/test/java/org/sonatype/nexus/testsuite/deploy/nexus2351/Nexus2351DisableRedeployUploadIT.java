@@ -18,7 +18,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.MavenVerifierHelper;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
@@ -37,7 +38,7 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 
 public class Nexus2351DisableRedeployUploadIT
-    extends AbstractMavenNexusIT
+    extends AbstractNexusIntegrationTest
 {
 
   private RepositoryMessageUtil repoUtil = null;
@@ -241,11 +242,13 @@ public class Nexus2351DisableRedeployUploadIT
     return dateFormat.parse(lastUpdateString);
   }
 
+  private static final MavenVerifierHelper mavenVerifierHelper = new MavenVerifierHelper();
+
   private void deployWithMavenExpectSuccess(File mavenProject, String targetRepoId)
       throws VerificationException, IOException
   {
     // deploy using maven
-    Verifier verifier = this.createVerifier(mavenProject);
+    Verifier verifier = mavenVerifierHelper.createMavenVerifier(mavenProject, getOverridableFile("settings.xml"), getTestId());
     try {
       verifier.setSystemProperty("altDeploymentRepository", "repo::default::" + createUrl(targetRepoId));
       verifier.executeGoal("deploy");
@@ -257,7 +260,7 @@ public class Nexus2351DisableRedeployUploadIT
       File bkp = new File("./target/logs/nexus2351-bkp");
       bkp.mkdirs();
       FileUtils.copyDirectory(logs, bkp);
-      failTest(verifier);
+      mavenVerifierHelper.failTest(verifier);
     }
   }
 
@@ -265,7 +268,7 @@ public class Nexus2351DisableRedeployUploadIT
       throws VerificationException, IOException
   {
     // deploy using maven
-    Verifier verifier = this.createVerifier(mavenProject);
+    Verifier verifier = mavenVerifierHelper.createMavenVerifier(mavenProject, getOverridableFile("settings.xml"), getTestId());
     try {
       verifier.setSystemProperty("altDeploymentRepository", "repo::default::" + createUrl(targetRepoId));
       verifier.executeGoal("deploy");
