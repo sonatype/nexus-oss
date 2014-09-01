@@ -55,7 +55,6 @@ import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.wagon.Wagon;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -209,7 +208,7 @@ public abstract class AbstractNexusIntegrationTest
         @Override
         public Wagon get(final String protocol) {
           try {
-            return (Wagon) getITPlexusContainer().lookup(Wagon.ROLE, protocol);
+            return (Wagon) TestContainer.getInstance().getPlexusContainer().lookup(Wagon.ROLE, protocol);
           }
           catch (ComponentLookupException e) {
             throw Throwables.propagate(e);
@@ -817,11 +816,11 @@ public abstract class AbstractNexusIntegrationTest
   // FIXME: Change signature to thorws Exception (don't let plexus api leak here)
 
   protected <E> E lookup(Class<E> role) throws ComponentLookupException {
-    return getITPlexusContainer().lookup(role);
+    return TestContainer.getInstance().getPlexusContainer().lookup(role);
   }
 
   protected <E> E lookup(Class<E> role, String hint) throws ComponentLookupException {
-    return getITPlexusContainer().lookup(role, hint);
+    return TestContainer.getInstance().getPlexusContainer().lookup(role, hint);
   }
 
   protected String getRelitivePomPath(Gav gav) throws FileNotFoundException {
@@ -1045,10 +1044,6 @@ public abstract class AbstractNexusIntegrationTest
 
   public XStream getJsonXStream() {
     return XStreamFactory.getJsonXStream();
-  }
-
-  public PlexusContainer getITPlexusContainer() {
-    return TestContainer.getInstance().getPlexusContainer();
   }
 
   protected Map<String, String> getTestProperties() {
