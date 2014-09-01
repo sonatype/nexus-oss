@@ -174,7 +174,7 @@ public abstract class AbstractNexusIntegrationTest
 
   private static NexusStatusUtil nexusStatusUtil;
 
-  public static NexusStatusUtil getNexusStatusUtil() throws Exception {
+  protected static NexusStatusUtil getNexusStatusUtil() throws Exception {
     if (nexusStatusUtil == null) {
       nexusStatusUtil = new NexusStatusUtil(nexusApplicationPort);
     }
@@ -183,7 +183,7 @@ public abstract class AbstractNexusIntegrationTest
 
   private NexusConfigUtil nexusConfigUtil;
 
-  public NexusConfigUtil getNexusConfigUtil() {
+  protected NexusConfigUtil getNexusConfigUtil() {
     if (nexusConfigUtil == null) {
       nexusConfigUtil = new NexusConfigUtil();
     }
@@ -192,7 +192,7 @@ public abstract class AbstractNexusIntegrationTest
 
   private SecurityConfigUtil securityConfigUtil;
 
-  public SecurityConfigUtil getSecurityConfigUtil() {
+  protected SecurityConfigUtil getSecurityConfigUtil() {
     if (securityConfigUtil == null) {
       securityConfigUtil = new SecurityConfigUtil();
     }
@@ -201,7 +201,7 @@ public abstract class AbstractNexusIntegrationTest
 
   private DeployUtils deployUtils;
 
-  public DeployUtils getDeployUtils() {
+  protected DeployUtils getDeployUtils() {
     if (deployUtils == null) {
       deployUtils = new DeployUtils(RequestFacade.getNexusRestClient(), new WagonDeployer.Factory()
       {
@@ -222,7 +222,7 @@ public abstract class AbstractNexusIntegrationTest
 
   private SearchMessageUtil searchMessageUtil;
 
-  public SearchMessageUtil getSearchMessageUtil() {
+  protected SearchMessageUtil getSearchMessageUtil() {
     if (searchMessageUtil == null) {
       searchMessageUtil = new SearchMessageUtil();
     }
@@ -231,7 +231,7 @@ public abstract class AbstractNexusIntegrationTest
 
   private EventInspectorsUtil eventInspectorsUtil;
 
-  public EventInspectorsUtil getEventInspectorsUtil() {
+  protected EventInspectorsUtil getEventInspectorsUtil() {
     if (eventInspectorsUtil == null) {
       eventInspectorsUtil = new EventInspectorsUtil(RequestFacade.getNexusRestClient());
     }
