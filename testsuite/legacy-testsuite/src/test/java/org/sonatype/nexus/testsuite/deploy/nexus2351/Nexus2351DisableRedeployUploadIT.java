@@ -247,7 +247,7 @@ public class Nexus2351DisableRedeployUploadIT
     // deploy using maven
     Verifier verifier = this.createVerifier(mavenProject);
     try {
-      verifier.getCliOptions().add("-DaltDeploymentRepository=repo::default::" + createUrl(targetRepoId));
+      verifier.setSystemProperty("altDeploymentRepository", "repo::default::" + createUrl(targetRepoId));
       verifier.executeGoal("deploy");
       verifier.verifyErrorFreeLog();
     }
@@ -267,7 +267,7 @@ public class Nexus2351DisableRedeployUploadIT
     // deploy using maven
     Verifier verifier = this.createVerifier(mavenProject);
     try {
-      verifier.getCliOptions().add("-DaltDeploymentRepository=repo::default::" + createUrl(targetRepoId));
+      verifier.setSystemProperty("altDeploymentRepository", "repo::default::" + createUrl(targetRepoId));
       verifier.executeGoal("deploy");
 
       verifier.verifyErrorFreeLog();
