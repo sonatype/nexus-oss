@@ -22,6 +22,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class to create Maven Verifier.
@@ -31,26 +33,40 @@ import org.junit.Assert;
  */
 public class MavenVerifierHelper
 {
+  private static final Logger log = LoggerFactory.getLogger(MavenVerifierHelper.class);
+
   /**
    * Creates a Verifier against passed in {@link MavenDeployment}.
    */
   public Verifier createMavenVerifier(final MavenDeployment mavenDeployment)
       throws VerificationException, IOException
   {
+    log.info("Maven home: {}", mavenDeployment.getMavenHomeFile().getAbsolutePath());
     System.setProperty("maven.home", mavenDeployment.getMavenHomeFile().getAbsolutePath());
     Verifier verifier = new Verifier(mavenDeployment.getMavenProjectFile().getAbsolutePath())
     {
       @Override
       public void executeGoals(List<String> goals, Map envVars) throws VerificationException {
+        log.info("Executing goals: {}", goals);
+
         try {
           super.executeGoals(goals, envVars);
         }
         catch (VerificationException e) {
+          // HACK: Log details, to avoid loosing them by hack below
+          log.error("Failed to execute goals", e);
+
           // HACK: Strip out the entire log which is included in the message by default! :-(
           File logFile = new File(getBasedir(), getLogFileName());
-          throw new VerificationException(
-              "Goals execution failed: " + goals + "; see log for more details: " + logFile.getAbsolutePath(),
-              e.getCause());
+          if (logFile.exists()) {
+            throw new VerificationException(
+                "Goals execution failed: " + goals + "; see log for more details: " + logFile.getAbsolutePath(),
+                e.getCause());
+          }
+          else {
+            // HACK: seems like maven-verifier is pretty bad about ensure there is a log file for the execution
+            throw new VerificationException("Goals execution failed: " + goals + "; log file missing!", e.getCause());
+          }
         }
       }
     };
@@ -59,7 +75,11 @@ public class MavenVerifierHelper
     verifier.resetStreams();
 
     List<String> options = new ArrayList<String>();
-    options.add("-X");
+
+    // FIXME: This is way too loud, perhaps we need a system property to turn this on...
+    // FIXME: though we really need to rewrite how we run Maven (or other tools)
+    //options.add("-X");
+
     options.add("-Dmaven.repo.local=" + mavenDeployment.getLocalRepositoryFile().getAbsolutePath());
     options.add("-s " + mavenDeployment.getSettingsXmlFile().getAbsolutePath());
     verifier.setCliOptions(options);
