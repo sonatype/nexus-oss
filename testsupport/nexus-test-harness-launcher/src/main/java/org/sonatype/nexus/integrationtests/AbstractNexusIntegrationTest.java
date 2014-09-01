@@ -13,12 +13,8 @@
 package org.sonatype.nexus.integrationtests;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -37,19 +33,16 @@ import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.goodies.prefs.memory.MemoryPreferencesFactory;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
-import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
 import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -58,10 +51,6 @@ import org.restlet.data.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
-import static org.sonatype.nexus.test.utils.GavUtil.getRelitivePomPath;
 
 /**
  * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data START NOTE,
@@ -378,164 +367,18 @@ public abstract class AbstractNexusIntegrationTest
    * Deploys all the provided files needed before IT actually starts.
    */
   protected void deployArtifacts() throws Exception {
-    // test the test directory
     File projectsDir = getTestResourceAsFile("projects");
-
-    deployArtifacts(projectsDir);
+    new DeployHelper().deployArtifacts(projectsDir);
   }
 
-  /**
-   * This is a "switchboard" to detech HOW to deploy. For now, just using the protocol from POM's
-   * DistributionManagement section and invoking the getWagonHintForDeployProtocol(String protocol) to get the wagon
-   * hint.
-   */
-  protected void deployArtifacts(final File projectsDir) throws Exception {
-    TestContainer.getInstance().getTestContext().useAdminForRequests();
-
-    // skip if nothing to deploy
-    if (projectsDir == null || !projectsDir.isDirectory()) {
-      return;
-    }
-
-    log.info("Deploying artifacts; projects directory: {}", projectsDir);
-
-    // we have the parent dir, for each child (one level) we need to grab the pom.xml out of it and parse it,
-    // and then deploy the artifact, sounds like fun, right!
-
-    final File[] projectFolders = projectsDir.listFiles(new FileFilter() {
-      @Override
-      public boolean accept(final File pathname) {
-        return pathname.isDirectory() && new File(pathname, "pom.xml").exists();
-      }
-    });
-    if (projectFolders == null) {
-      // bail out
-      return;
-    }
-
-    // to achieve same ordering on different OSes
-    Arrays.sort(projectFolders);
-
-    for (File project : projectFolders) {
-      File pom = new File(project, "pom.xml");
-      assertThat(pom, FileMatchers.exists());
-      log.info("Deploying artifacts from project: {}", pom);
-
-      MavenXpp3Reader reader = new MavenXpp3Reader();
-      Model model;
-      try (FileInputStream fis = new FileInputStream(pom)) {
-        model = reader.read(fis);
-      }
-
-      // a helpful note so you don't need to dig into the code to much.
-      if (model.getDistributionManagement() == null || model.getDistributionManagement().getRepository() == null) {
-        Assert.fail("The test artifact is either missing or has an invalid Distribution Management section.");
-      }
-
-      // get the URL to deploy
-      String deployUrl = model.getDistributionManagement().getRepository().getUrl();
-
-      // get the protocol
-      String deployUrlProtocol = deployUrl.substring(0, deployUrl.indexOf(":"));
-
-      // calculate the wagon hint
-      String wagonHint = getWagonHintForDeployProtocol(deployUrlProtocol);
-
-      deployArtifacts(project, wagonHint, deployUrl, model);
-    }
-  }
-
-  /**
-   * This is never overridden, remove.
-   */
   @Deprecated
-  protected String getWagonHintForDeployProtocol(String deployProtocol) {
-    return deployProtocol;
+  protected void deployArtifacts(final File projectsDir) throws Exception {
+    new DeployHelper().deployArtifacts(projectsDir);
   }
 
-  /**
-   * Deploys with given Wagon (hint is provided), to deployUrl. It is caller matter to adjust those two (ie.
-   * deployUrl
-   * with file: protocol to be deployed with file wagon would be error). Model is supplied since it is read before.
-   */
+  @Deprecated
   protected void deployArtifacts(File project, String wagonHint, String deployUrl, Model model) throws Exception {
-    log.info("Deploying project \"{}\" using Wagon:{} to URL=\"{}\".", project.getAbsolutePath(), wagonHint, deployUrl);
-
-    // we already check if the pom.xml was in here.
-    File pom = new File(project, "pom.xml");
-
-    // FIXME, this needs to be fluffed up a little, should add the classifier, etc.
-    String extension = model.getPackaging();
-    // for now, only due to Nexus570IndexArchetypeIT
-    // no other IT specifies other packaging where extension != packaging
-    if ("maven-archetype".equals(extension)) {
-      extension = "jar";
-    }
-    String artifactFileName = model.getArtifactId() + "." + extension;
-    File artifactFile = new File(project, artifactFileName);
-
-    final Gav gav = new Gav(
-        model.getGroupId(),
-        model.getArtifactId(),
-        model.getVersion(),
-        null, // classifer
-        extension,
-        null, // snap #
-        null, // snap ts
-        artifactFile.getName(),
-        false, // hash
-        null,  // hash type
-        false, // sig
-        null   // sig type
-    );
-
-    // the Restlet Client does not support multipart forms:
-    // http://restlet.tigris.org/issues/show_bug.cgi?id=71
-    // int status = DeployUtils.deployUsingPomWithRest( deployUrl, repositoryId, gav, artifactFile, pom );
-
-    if (!"pom".equals(model.getPackaging()) && !artifactFile.isFile()) {
-      throw new FileNotFoundException("File " + artifactFile.getAbsolutePath() + " doesn't exists!");
-    }
-
-    File artifactSha1 = new File(artifactFile.getAbsolutePath() + ".sha1");
-    File artifactMd5 = new File(artifactFile.getAbsolutePath() + ".md5");
-    File artifactAsc = new File(artifactFile.getAbsolutePath() + ".asc");
-
-    File pomSha1 = new File(pom.getAbsolutePath() + ".sha1");
-    File pomMd5 = new File(pom.getAbsolutePath() + ".md5");
-    File pomAsc = new File(pom.getAbsolutePath() + ".asc");
-
-    try {
-      if (artifactSha1.exists()) {
-        getDeployUtils().deployWithWagon(wagonHint, deployUrl, artifactSha1, getRelitiveArtifactPath(gav) + ".sha1");
-      }
-      if (artifactMd5.exists()) {
-        getDeployUtils().deployWithWagon(wagonHint, deployUrl, artifactMd5, getRelitiveArtifactPath(gav) + ".md5");
-      }
-      if (artifactAsc.exists()) {
-        getDeployUtils().deployWithWagon(wagonHint, deployUrl, artifactAsc, getRelitiveArtifactPath(gav) + ".asc");
-      }
-
-      if (artifactFile.exists()) {
-        getDeployUtils().deployWithWagon(wagonHint, deployUrl, artifactFile, getRelitiveArtifactPath(gav));
-      }
-
-      if (pomSha1.exists()) {
-        getDeployUtils().deployWithWagon(wagonHint, deployUrl, pomSha1, getRelitivePomPath(gav) + ".sha1");
-      }
-      if (pomMd5.exists()) {
-        getDeployUtils().deployWithWagon(wagonHint, deployUrl, pomMd5, getRelitivePomPath(gav) + ".md5");
-      }
-      if (pomAsc.exists()) {
-        getDeployUtils().deployWithWagon(wagonHint, deployUrl, pomAsc, getRelitivePomPath(gav) + ".asc");
-      }
-
-      getDeployUtils().deployWithWagon(wagonHint, deployUrl, pom, getRelitivePomPath(gav));
-    }
-    catch (Exception e) {
-      log.error("{} Unable to deploy {}", getTestId(), artifactFileName, e);
-      throw e;
-    }
+    new DeployHelper().deployArtifacts(project, wagonHint, deployUrl, model);
   }
 
   protected void startNexus() throws Exception {

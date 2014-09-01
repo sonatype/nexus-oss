@@ -110,7 +110,7 @@ public abstract class AbstractNexusP2GeneratorIT
   {
     final String deployUrl = getNexusTestRepoUrl(repoId);
     final String deployUrlProtocol = deployUrl.substring(0, deployUrl.indexOf(":"));
-    final String wagonHint = getWagonHintForDeployProtocol(deployUrlProtocol);
+    final String wagonHint = deployUrlProtocol;
     getDeployUtils().deployWithWagon(wagonHint, deployUrl, fileToDeploy, path);
   }
 
