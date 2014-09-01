@@ -75,8 +75,6 @@ public abstract class AbstractNexusIntegrationTest
 
   public static final String REPO_TEST_HARNESS_SHADOW = "nexus-test-harness-shadow";
 
-  protected static boolean NEEDS_INIT = false;
-
   public static final String REPOSITORY_RELATIVE_URL = "content/repositories/";
 
   public static final String GROUP_REPOSITORY_RELATIVE_URL = "content/groups/";
@@ -84,9 +82,11 @@ public abstract class AbstractNexusIntegrationTest
   @ClassRule
   public static final ProfilerHelper profilerHelper = new ProfilerHelper();
 
-  private String testRepositoryId;
+  protected static Logger staticLog = LoggerFactory.getLogger(AbstractNexusIntegrationTest.class);
 
-  public static String nexusBaseDir;
+  private static boolean needsInit = false;
+
+  private static String nexusBaseDir;
 
   public static final String nexusBaseUrl;
 
@@ -101,10 +101,6 @@ public abstract class AbstractNexusIntegrationTest
   public static final int nexusApplicationPort;
 
   protected static final String nexusLogDir;
-
-  protected final Logger log = util.getLog();
-
-  protected static Logger staticLog = LoggerFactory.getLogger(AbstractNexusIntegrationTest.class);
 
   private static Properties systemPropertiesBackup;
 
@@ -125,9 +121,8 @@ public abstract class AbstractNexusIntegrationTest
 
     // NEXUS-5660 test with ipv4 as app runs with this set now
     System.setProperty("java.net.preferIPv4Stack", "true");
-  }
 
-  static {
+    // Bridge configuration from baseTest.properties
     nexusApplicationPort = TestProperties.getInteger("nexus.application.port");
     nexusControlPort = TestProperties.getInteger("nexus.control.port");
     nexusBaseDir = TestProperties.getString("nexus.base.dir");
@@ -135,68 +130,80 @@ public abstract class AbstractNexusIntegrationTest
     WORK_CONF_DIR = nexusWorkDir + "/etc";
     nexusLogDir = TestProperties.getString("nexus.log.dir");
     nexusBaseUrl = TestProperties.getString("nexus.base.url");
-
     TestContainer.getInstance().getTestContext().setNexusUrl(nexusBaseUrl);
   }
 
-  // == instance utils
+  protected final Logger log = util.getLog();
 
-  private static NexusStatusUtil nexusStatusUtil = new NexusStatusUtil();
-
-  protected static NexusStatusUtil getNexusStatusUtil() {
-    return nexusStatusUtil;
-  }
-
-  private final NexusConfigUtil nexusConfigUtil = new NexusConfigUtil();
-
-  protected NexusConfigUtil getNexusConfigUtil() {
-    return nexusConfigUtil;
-  }
-
-  private final SecurityConfigUtil securityConfigUtil = new SecurityConfigUtil();
-
-  protected SecurityConfigUtil getSecurityConfigUtil() {
-    return securityConfigUtil;
-  }
-
-  private final DeployUtils deployUtils = new DeployUtils();
-
-  protected DeployUtils getDeployUtils() {
-    return deployUtils;
-  }
-
-  private final SearchMessageUtil searchMessageUtil = new SearchMessageUtil();
-
-  protected SearchMessageUtil getSearchMessageUtil() {
-    return searchMessageUtil;
-  }
-
-  private final EventInspectorsUtil eventInspectorsUtil = new EventInspectorsUtil();
-
-  protected EventInspectorsUtil getEventInspectorsUtil() {
-    return eventInspectorsUtil;
-  }
-
-  // == Constructors
+  private String testRepositoryId;
 
   protected AbstractNexusIntegrationTest() {
     this("nexus-test-harness-repo");
   }
 
   protected AbstractNexusIntegrationTest(final String testRepositoryId) {
-    // we also need to setup a couple fields, that need to be pulled out of a bundle
     this.testRepositoryId = testRepositoryId;
-    // this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
   }
 
-  // == Test "lifecycle" (@Before/@After...)
+  protected String getTestId() {
+    String packageName = getClass().getPackage().getName();
+    return packageName.substring(packageName.lastIndexOf('.') + 1, packageName.length());
+  }
+
+  protected String getBaseNexusUrl() {
+    return nexusBaseUrl;
+  }
+
+  protected String getNexusTestRepoUrl(String repo) {
+    return String.format("%s%s%s/", nexusBaseUrl, REPOSITORY_RELATIVE_URL, repo);
+  }
+
+  protected String getNexusTestRepoUrl() {
+    return getNexusTestRepoUrl(getTestRepositoryId());
+  }
+
+  protected String getNexusTestRepoServiceUrl() {
+    return String.format("%sservice/local/repositories/%s/content/", nexusBaseUrl, getTestRepositoryId());
+  }
+
+  protected String getTestRepositoryId() {
+    return testRepositoryId;
+  }
+
+  protected void setTestRepositoryId(String repoId) {
+    testRepositoryId = repoId;
+  }
+
+  protected String getRepositoryUrl(String repoId) {
+    return String.format("%s%s%s/", nexusBaseUrl, REPOSITORY_RELATIVE_URL, repoId);
+  }
+
+  protected String getGroupUrl(String groupId) {
+    return String.format("%s%s%s/", nexusBaseUrl, GROUP_REPOSITORY_RELATIVE_URL, groupId);
+  }
+
+  protected XStream getXMLXStream() {
+    return XStreamFactory.getXmlXStream();
+  }
+
+  protected XStream getJsonXStream() {
+    return XStreamFactory.getJsonXStream();
+  }
+
+  protected File getNexusLogFile() {
+    return new File(String.format("%s/%s/nexus.log", nexusLogDir, getTestId()));
+  }
+
+  //
+  // Lifecycle
+  //
 
   @BeforeClass
   public static void staticOncePerClassSetUp() throws Exception {
     staticLog.info("Static setup");
 
     // hacky state machine
-    NEEDS_INIT = true;
+    needsInit = true;
   }
 
   /**
@@ -212,7 +219,7 @@ public abstract class AbstractNexusIntegrationTest
   public void oncePerClassSetUp() throws Exception {
     log.info("Instance setup");
     synchronized (AbstractNexusIntegrationTest.class) {
-      if (NEEDS_INIT) {
+      if (needsInit) {
         log.info("Initializing");
 
         // start per-IT plexus container
@@ -236,8 +243,7 @@ public abstract class AbstractNexusIntegrationTest
         staticLog.info(logMessage);
         staticLog.info(String.format("%1$-" + logMessage.length() + "s", " ").replaceAll(" ", "*"));
 
-        // clean common work dir
-        beforeStartClean();
+        cleanWorkDir();
 
         copyTestResources();
 
@@ -259,11 +265,18 @@ public abstract class AbstractNexusIntegrationTest
         runOnce();
 
         // TODO: we can remove this now that we have the soft restart
-        NEEDS_INIT = false;
+        needsInit = false;
       }
 
       getEventInspectorsUtil().waitForCalmPeriod();
     }
+  }
+
+  /**
+   * Sub-classes override to add logic to execute once per server lifecycle.
+   */
+  protected void runOnce() throws Exception {
+    // must override to happen something
   }
 
   @After
@@ -299,86 +312,6 @@ public abstract class AbstractNexusIntegrationTest
     TestContainer.getInstance().stopPlexusContainer();
 
     System.setProperties(systemPropertiesBackup);
-  }
-
-  protected void runOnce() throws Exception {
-    // must override to happen something
-  }
-
-  protected File getNexusLogFile() {
-    return new File(nexusLogDir + "/" + getTestId() + "/nexus.log");
-  }
-
-  protected void beforeStartClean() throws Exception {
-    cleanWorkDir();
-  }
-
-  protected void copyTestResources() throws IOException {
-    File source = new File(TestProperties.getString("test.resources.source.folder"), getTestResource(null));
-    if (!source.exists()) {
-      return;
-    }
-
-    File destination = new File(TestProperties.getString("test.resources.folder"), getTestResource(null));
-
-    log.info("Copying test resources {} to {}", source, destination);
-
-    FileTestingUtils.interpolationDirectoryCopy(source, destination, getTestProperties());
-  }
-
-  protected void copyConfigFiles() throws IOException {
-    log.info("Copying config files");
-
-    Map<String, String> testProperties = getTestProperties();
-
-    copyConfigFile("nexus.xml", testProperties, WORK_CONF_DIR);
-
-    // copy security config
-    copyConfigFile("security.xml", testProperties, WORK_CONF_DIR);
-    copyConfigFile("security-configuration.xml", testProperties, WORK_CONF_DIR);
-
-    copyConfigFile("logback.properties", testProperties, WORK_CONF_DIR);
-    copyConfigFile("logback-nexus.xml", testProperties, WORK_CONF_DIR);
-  }
-
-  protected static void cleanWorkDir() throws Exception {
-    final File workDir = new File(AbstractNexusIntegrationTest.nexusWorkDir);
-
-    staticLog.info("Cleaning work directory: {}", workDir);
-
-    // to make sure I don't delete all my MP3's and pictures, or totally screw anyone.
-    // check for 'target' and not allow any '..'
-    if (workDir.getAbsolutePath().lastIndexOf("target") != -1
-        && workDir.getAbsolutePath().lastIndexOf("..") == -1) {
-
-      File[] filesToDelete = workDir.listFiles();
-      if (filesToDelete != null) {
-        for (File fileToDelete : filesToDelete) {
-          // delete work dir
-          if (fileToDelete != null) {
-            FileUtils.forceDelete(fileToDelete);
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Deploys all the provided files needed before IT actually starts.
-   */
-  protected void deployArtifacts() throws Exception {
-    File projectsDir = getTestResourceAsFile("projects");
-    new DeployHelper().deployArtifacts(projectsDir);
-  }
-
-  @Deprecated
-  protected void deployArtifacts(final File projectsDir) throws Exception {
-    new DeployHelper().deployArtifacts(projectsDir);
-  }
-
-  @Deprecated
-  protected void deployArtifacts(File project, String wagonHint, String deployUrl, Model model) throws Exception {
-    new DeployHelper().deployArtifacts(project, wagonHint, deployUrl, model);
   }
 
   protected void startNexus() throws Exception {
@@ -423,6 +356,108 @@ public abstract class AbstractNexusIntegrationTest
     startNexus();
   }
 
+  //
+  // Delegates
+  //
+
+  private static NexusStatusUtil nexusStatusUtil = new NexusStatusUtil();
+
+  protected static NexusStatusUtil getNexusStatusUtil() {
+    return nexusStatusUtil;
+  }
+
+  private final NexusConfigUtil nexusConfigUtil = new NexusConfigUtil();
+
+  protected NexusConfigUtil getNexusConfigUtil() {
+    return nexusConfigUtil;
+  }
+
+  private final SecurityConfigUtil securityConfigUtil = new SecurityConfigUtil();
+
+  protected SecurityConfigUtil getSecurityConfigUtil() {
+    return securityConfigUtil;
+  }
+
+  private final DeployUtils deployUtils = new DeployUtils();
+
+  protected DeployUtils getDeployUtils() {
+    return deployUtils;
+  }
+
+  private final SearchMessageUtil searchMessageUtil = new SearchMessageUtil();
+
+  protected SearchMessageUtil getSearchMessageUtil() {
+    return searchMessageUtil;
+  }
+
+  private final EventInspectorsUtil eventInspectorsUtil = new EventInspectorsUtil();
+
+  protected EventInspectorsUtil getEventInspectorsUtil() {
+    return eventInspectorsUtil;
+  }
+
+  //
+  // Test configuration and resources
+  //
+
+  private static File getResource(String resource) {
+    staticLog.debug("Looking for resource: {}", resource);
+    // URL classURL = Thread.currentThread().getContextClassLoader().getResource( resource );
+
+    File rootDir = new File(TestProperties.getString("test.resources.folder"));
+    return new File(rootDir, resource);
+  }
+
+  protected File getTestResourceAsFile(String relativePath) {
+    return getResource(getTestResource(relativePath));
+  }
+
+  protected File getTestFile(String relativePath) {
+    return getTestResourceAsFile("files/" + relativePath);
+  }
+
+  protected String getTestResource(String relativePath) {
+    return getClass().getPackage().getName().replace(".", "/")
+        + (relativePath == null || "/".equals(relativePath.trim()) ? "" : "/" + relativePath);
+  }
+
+  /**
+   * Returns properties used for resource interpolation.
+   *
+   * Package private due to use by AbstractNexusProxyIntegrationTest.
+   */
+  /*package*/ Map<String, String> getTestProperties() {
+    HashMap<String, String> variables = new HashMap<String, String>();
+    variables.putAll(TestProperties.getAll());
+    variables.put("test-id", getTestId());
+    return variables;
+  }
+
+  protected void copyTestResources() throws IOException {
+    File source = new File(TestProperties.getString("test.resources.source.folder"), getTestResource(null));
+    if (!source.exists()) {
+      return;
+    }
+
+    File destination = new File(TestProperties.getString("test.resources.folder"), getTestResource(null));
+
+    log.info("Copying test resources {} to {}", source, destination);
+
+    FileTestingUtils.interpolationDirectoryCopy(source, destination, getTestProperties());
+  }
+
+  protected void copyConfigFiles() throws IOException {
+    log.info("Copying config files");
+
+    Map<String, String> testProperties = getTestProperties();
+
+    copyConfigFile("nexus.xml", testProperties, WORK_CONF_DIR);
+    copyConfigFile("security.xml", testProperties, WORK_CONF_DIR);
+    copyConfigFile("security-configuration.xml", testProperties, WORK_CONF_DIR);
+    copyConfigFile("logback.properties", testProperties, WORK_CONF_DIR);
+    copyConfigFile("logback-nexus.xml", testProperties, WORK_CONF_DIR);
+  }
+
   protected File getOverridableFile(String file) {
     // the test can override the test config.
     File testConfigFile = getTestResourceAsFile("test-config/" + file);
@@ -433,7 +468,7 @@ public abstract class AbstractNexusIntegrationTest
       testConfigFile = getResource("default-configs/" + file);
     }
     else {
-      log.debug("This test is using its own " + file + " " + testConfigFile);
+      log.debug("This test is using its own {} {}", file, testConfigFile);
     }
     return testConfigFile;
   }
@@ -459,8 +494,6 @@ public abstract class AbstractNexusIntegrationTest
 
   }
 
-  // Overloaded helpers
-
   protected void copyConfigFile(String configFile, String path) throws IOException {
     copyConfigFile(configFile, new HashMap<String, String>(), path);
   }
@@ -469,50 +502,32 @@ public abstract class AbstractNexusIntegrationTest
     copyConfigFile(configFile, configFile, variables, path);
   }
 
-  /**
-   * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
-   * "src/test/resourcs/nexusXXX/" folder.
-   *
-   * @param relativePath path relative to the nexusXXX directory.
-   * @return A file specified by the relativePath. or null if it does not exist.
-   */
-  protected File getTestResourceAsFile(String relativePath) {
-    return getResource(getTestResource(relativePath));
-  }
 
-  protected String getTestResource(String relativePath) {
-    return getClass().getPackage().getName().replace(".", "/")
-        + (relativePath == null || "/".equals(relativePath.trim()) ? "" : "/" + relativePath);
-  }
-
-  protected String getTestId() {
-    String packageName = getClass().getPackage().getName();
-    return packageName.substring(packageName.lastIndexOf('.') + 1, packageName.length());
-  }
+  //
+  // Deployment helpers
+  //
 
   /**
-   * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
-   * "src/test/resourcs/nexusXXX/files/" folder.
-   *
-   * @param relativePath path relative to the files directory.
-   * @return A file specified by the relativePath. or null if it does not exist.
+   * Deploys all the provided files needed before IT actually starts.
    */
-  protected File getTestFile(String relativePath) {
-    return getTestResourceAsFile("files/" + relativePath);
+  protected void deployArtifacts() throws Exception {
+    File projectsDir = getTestResourceAsFile("projects");
+    new DeployHelper().deployArtifacts(projectsDir);
   }
 
-  public static File getResource(String resource) {
-    staticLog.debug("Looking for resource: {}", resource);
-    // URL classURL = Thread.currentThread().getContextClassLoader().getResource( resource );
-
-    File rootDir = new File(TestProperties.getString("test.resources.folder"));
-    File file = new File(rootDir, resource);
-
-    //if (!file.exists()) {
-    //  return null;
-    //}
-    return file;
+  @Deprecated
+  protected void deployArtifacts(final File projectsDir) throws Exception {
+    new DeployHelper().deployArtifacts(projectsDir);
   }
+
+  @Deprecated
+  protected void deployArtifacts(File project, String wagonHint, String deployUrl, Model model) throws Exception {
+    new DeployHelper().deployArtifacts(project, wagonHint, deployUrl, model);
+  }
+
+  //
+  // Download helpers
+  //
 
   @Deprecated
   protected File downloadSnapshotArtifact(String repository, Gav gav, File parentDir) throws IOException {
@@ -549,6 +564,32 @@ public abstract class AbstractNexusIntegrationTest
     return new DownloadHelper().downloadArtifactFromGroup(groupId, gav, targetDirectory);
   }
 
+  //
+  // Misc
+  //
+
+  protected static void cleanWorkDir() throws Exception {
+    final File workDir = new File(AbstractNexusIntegrationTest.nexusWorkDir);
+
+    staticLog.info("Cleaning work directory: {}", workDir);
+
+    // to make sure I don't delete all my MP3's and pictures, or totally screw anyone.
+    // check for 'target' and not allow any '..'
+    if (workDir.getAbsolutePath().lastIndexOf("target") != -1
+        && workDir.getAbsolutePath().lastIndexOf("..") == -1) {
+
+      File[] filesToDelete = workDir.listFiles();
+      if (filesToDelete != null) {
+        for (File fileToDelete : filesToDelete) {
+          // delete work dir
+          if (fileToDelete != null) {
+            FileUtils.forceDelete(fileToDelete);
+          }
+        }
+      }
+    }
+  }
+
   protected boolean deleteFromRepository(String repository, String groupOrArtifactPath) throws IOException {
     String serviceURI = String.format("service/local/repositories/%s/content/%s", repository, groupOrArtifactPath);
 
@@ -575,38 +616,6 @@ public abstract class AbstractNexusIntegrationTest
     return deleted;
   }
 
-  protected String getBaseNexusUrl() {
-    return nexusBaseUrl;
-  }
-
-  protected String getNexusTestRepoUrl(String repo) {
-    return String.format("%s%s%s/", nexusBaseUrl, REPOSITORY_RELATIVE_URL, repo);
-  }
-
-  protected String getNexusTestRepoUrl() {
-    return getNexusTestRepoUrl(getTestRepositoryId());
-  }
-
-  protected String getNexusTestRepoServiceUrl() {
-    return String.format("%sservice/local/repositories/%s/content/", nexusBaseUrl, getTestRepositoryId());
-  }
-
-  protected String getTestRepositoryId() {
-    return testRepositoryId;
-  }
-
-  protected void setTestRepositoryId(String repoId) {
-    testRepositoryId = repoId;
-  }
-
-  protected String getRepositoryUrl(String repoId) {
-    return String.format("%s%s%s/", nexusBaseUrl, REPOSITORY_RELATIVE_URL, repoId);
-  }
-
-  protected String getGroupUrl(String groupId) {
-    return String.format("%s%s%s/", nexusBaseUrl, GROUP_REPOSITORY_RELATIVE_URL, groupId);
-  }
-
   protected boolean printKnownErrorButDoNotFail(Class<? extends AbstractNexusIntegrationTest> clazz, String... tests) {
     StringBuilder error = new StringBuilder();
     error.append("*********************************************************************************");
@@ -622,20 +631,5 @@ public abstract class AbstractNexusIntegrationTest
 
     log.info(error.toString());
     return true;
-  }
-
-  protected XStream getXMLXStream() {
-    return XStreamFactory.getXmlXStream();
-  }
-
-  protected XStream getJsonXStream() {
-    return XStreamFactory.getJsonXStream();
-  }
-
-  protected Map<String, String> getTestProperties() {
-    HashMap<String, String> variables = new HashMap<String, String>();
-    variables.putAll(TestProperties.getAll());
-    variables.put("test-id", getTestId());
-    return variables;
   }
 }
