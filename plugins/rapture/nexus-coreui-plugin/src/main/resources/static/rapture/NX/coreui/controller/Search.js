@@ -141,7 +141,7 @@ Ext.define('NX.coreui.controller.Search', {
         'nx-searchfeature component[searchCriteria=true]': {
           search: me.onSearchCriteriaChange,
           searchcleared: me.onSearchCriteriaChange,
-          removed: me.removeCriteria
+          criteriaremoved: me.removeCriteria
         },
         'nx-coreui-search-result-list': {
           selectionchange: me.onSearchResultSelectionChange
@@ -313,9 +313,9 @@ Ext.define('NX.coreui.controller.Search', {
         searchPanel = me.getSearchFeature(),
         searchCriteriaPanel = searchPanel.down('#criteria');
 
-    me.applyFilter({ criteriaId: searchCriteria.criteriaId }, true);
     searchCriteriaPanel.remove(searchCriteria);
     searchCriteriaPanel.down('menuitem[criteriaId=' + searchCriteria.criteriaId + ']').show();
+    me.applyFilter({ criteriaId: searchCriteria.criteriaId }, true);
   },
 
   /**

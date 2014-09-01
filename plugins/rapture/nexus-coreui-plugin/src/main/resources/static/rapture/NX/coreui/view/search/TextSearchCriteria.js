@@ -55,10 +55,10 @@ Ext.define('NX.coreui.view.search.TextSearchCriteria', {
 
     me.addEvents(
         /**
-         * @event removed
+         * @event criteriaremoved
          * Fires when search criteria is removed.
          */
-        'removed'
+        'criteriaremoved'
     );
   },
 
@@ -69,7 +69,7 @@ Ext.define('NX.coreui.view.search.TextSearchCriteria', {
   onTrigger2Click: function() {
     var me = this;
 
-    me.fireEvent('removed', me);
+    me.fireEvent('criteriaremoved', me);
   }
 
 });
