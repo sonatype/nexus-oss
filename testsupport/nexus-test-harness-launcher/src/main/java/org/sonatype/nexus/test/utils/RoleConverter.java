@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import java.util.List;
-
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.rest.model.RoleResource;
 
@@ -29,12 +27,12 @@ class RoleConverter
     role.setSessionTimeout(resource.getSessionTimeout());
 
     role.getRoles().clear();
-    for (String roleId : (List<String>) resource.getRoles()) {
+    for (String roleId : resource.getRoles()) {
       role.addRole(roleId);
     }
 
     role.getPrivileges().clear();
-    for (String privId : (List<String>) resource.getPrivileges()) {
+    for (String privId : resource.getPrivileges()) {
       role.addPrivilege(privId);
     }
 
