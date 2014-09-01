@@ -62,11 +62,11 @@ public class DownloadHelper
     // v=<version> -- mandatory
     // c=<classifier> -- optional
     // p=<packaging> -- optional, jar is taken as default
-    // http://localhost:8087/nexus/service/local/artifact/maven/redirect?r=tasks-snapshot-repo&g=nexus&a=artifact&
-    // v=1.0-SNAPSHOT
+    // http://localhost:8087/nexus/service/local/artifact/maven/redirect?r=tasks-snapshot-repo&g=nexus&a=artifact&v=1.0-SNAPSHOT
+
     String c = gav.getClassifier() == null ? "" : "&c=" + Reference.encode(gav.getClassifier());
-    String serviceURI = "service/local/artifact/maven/redirect?r=" + repository + "&g=" + gav.getGroupId() + "&a="
-        + gav.getArtifactId() + "&v=" + Reference.encode(gav.getVersion()) + c;
+    String serviceURI = String.format("service/local/artifact/maven/redirect?r=%s&g=%s&a=%s&v=%s%s",
+        repository, gav.getGroupId(), gav.getArtifactId(), Reference.encode(gav.getVersion()), c);
 
     Response response = null;
     try {
@@ -123,8 +123,8 @@ public class DownloadHelper
     URL url = new URL(baseUrl + getRelitiveArtifactPath(groupId, artifact, version, type, classifier));
 
     String classifierPart = (classifier != null) ? "-" + classifier : "";
-    return RequestFacade
-        .downloadFile(url, targetDirectory + "/" + artifact + "-" + version + classifierPart + "." + type);
+    return RequestFacade.downloadFile(url,
+        String.format("%s/%s-%s%s.%s", targetDirectory, artifact, version, classifierPart, type));
   }
 
   public File downloadArtifact(String baseUrl, Gav gav, String targetDirectory) throws IOException {
@@ -140,13 +140,13 @@ public class DownloadHelper
   }
 
   public File downloadArtifactFromRepository(String repoId, Gav gav, String targetDirectory) throws IOException {
-    return downloadArtifact(getBaseNexusUrl() + REPOSITORY_RELATIVE_URL + repoId + "/",
+    return downloadArtifact(String.format("%s%s%s/", getBaseNexusUrl(), REPOSITORY_RELATIVE_URL, repoId),
         gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
         targetDirectory);
   }
 
   public File downloadArtifactFromGroup(String groupId, Gav gav, String targetDirectory) throws IOException {
-    return downloadArtifact(getBaseNexusUrl() + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/",
+    return downloadArtifact(String.format("%s%s%s/", getBaseNexusUrl(), GROUP_REPOSITORY_RELATIVE_URL, groupId),
         gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
         gav.getClassifier(), targetDirectory);
   }
