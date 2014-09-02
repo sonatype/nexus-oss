@@ -147,7 +147,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       taskTypeModel = me.getTaskTypeStore().getById(model.get('typeId'));
       if (taskTypeModel) {
         if (!settings) {
-          me.getFeature().addTab({ xtype: 'nx-coreui-task-settings', title: 'Settings' });
+          me.getFeature().addTab({ xtype: 'nx-coreui-task-settings', title: 'Settings', weight: 20 });
         }
         me.showSettings(model);
       }
@@ -158,7 +158,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       }
       if (taskTypeModel && model.get('schedule') !== 'internal') {
         if (!schedule) {
-          me.getFeature().addTab({ xtype: 'nx-coreui-task-schedule', title: 'Schedule' });
+          me.getFeature().addTab({ xtype: 'nx-coreui-task-schedule', title: 'Schedule', weight: 30 });
         }
         me.showSchedule(model);
       }
