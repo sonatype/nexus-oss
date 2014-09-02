@@ -29,7 +29,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>nexus-karaf-branding</module>
+    <module>karaf-nexus-branding</module>
     <module>nexus-boot-feature</module>
     <module>nexus-base-feature</module>
     <module>nexus-base-template</module>
