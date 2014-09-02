@@ -219,8 +219,6 @@ Ext.define('NX.coreui.controller.Users', {
   showChangePasswordWindowForUserAccount: function (button) {
     var userId = button.up('form').down('#id').getValue();
 
-    alert(userId);
-
     NX.Security.doWithAuthenticationToken(
         'Changing password requires validation of your credentials.',
         {
