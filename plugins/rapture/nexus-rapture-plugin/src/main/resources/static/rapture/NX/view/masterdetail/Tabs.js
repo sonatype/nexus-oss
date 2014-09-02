@@ -22,7 +22,8 @@ Ext.define('NX.view.masterdetail.Tabs', {
   alias: 'widget.nx-masterdetail-tabs',
   requires: [
     'NX.Icons',
-    'NX.Bookmarks'
+    'NX.Bookmarks',
+    'NX.ext.tab.SortedPanel'
   ],
 
   // HACK: For now make all detail panels light themed while we sort out the overall look of rapture
@@ -31,18 +32,10 @@ Ext.define('NX.view.masterdetail.Tabs', {
   /**
    * @override
    */
-  initComponent: function () {
-    var me = this,
-        content = me.tabs;
+  initComponent: function() {
+    var me = this;
 
-    if (Ext.isArray(content)) {
-      content = me.getTabsConfig(content);
-    }
-    else {
-      content = Ext.apply({}, content, { title: undefined, flex: 1 });
-    }
-    content = Ext.Array.from(content);
-    Ext.Array.insert(content, 0, [
+    me.items = [
       {
         xtype: 'panel',
         itemId: 'info',
@@ -54,12 +47,16 @@ Ext.define('NX.view.masterdetail.Tabs', {
         itemId: 'warning',
         iconCls: NX.Icons.cls('masterdetail-warning', 'x16'),
         hidden: true
+      },
+      {
+        xtype: 'nx-sorted-tabpanel',
+        itemId: 'tab',
+        activeTab: 0,
+        layoutOnTabChange: true,
+        flex: 1,
+        items: me.tabs
       }
-    ]);
-
-    Ext.apply(me, {
-      items: content
-    });
+    ];
 
     me.description = me.title;
 
@@ -68,22 +65,12 @@ Ext.define('NX.view.masterdetail.Tabs', {
     me.on('afterrender', me.calculateBookmarks, me);
   },
 
-  getTabsConfig: function (items) {
-    return {
-      xtype: 'tabpanel',
-      activeTab: 0,
-      layoutOnTabChange: true,
-      flex: 1,
-      items: items
-    };
-  },
-
-  setDescription: function (description) {
+  setDescription: function(description) {
     this.description = description;
     this.setTitle(description);
   },
 
-  showInfo: function (message) {
+  showInfo: function(message) {
     var me = this,
         infoPanel = me.down('>#info');
 
@@ -91,14 +78,14 @@ Ext.define('NX.view.masterdetail.Tabs', {
     infoPanel.show();
   },
 
-  clearInfo: function () {
+  clearInfo: function() {
     var me = this,
         infoPanel = me.down('>#info');
 
     infoPanel.hide();
   },
 
-  showWarning: function (message) {
+  showWarning: function(message) {
     var me = this,
         warningPanel = me.down('>#warning');
 
@@ -106,42 +93,26 @@ Ext.define('NX.view.masterdetail.Tabs', {
     warningPanel.show();
   },
 
-  clearWarning: function () {
+  clearWarning: function() {
     var me = this,
         warningPanel = me.down('>#warning');
 
     warningPanel.hide();
   },
 
-  addTab: function (tab) {
+  addTab: function(tab) {
     var me = this,
-        content = me.items.get(2);
+        tabPanel = me.down('>#tab');
 
-    if (content.isXType('tabpanel')) {
-      me.tabs.push(tab);
-      content.add(tab);
-    }
-    else {
-      me.tabs = [me.tabs, tab];
-      me.remove(content);
-      me.add(me.getTabsConfig(me.tabs));
-    }
+    tabPanel.add(tab);
     me.calculateBookmarks();
   },
 
-  removeTab: function (tab) {
+  removeTab: function(tab) {
     var me = this,
-        content = me.items.get(2);
+        tabPanel = me.down('>#tab');
 
-    if (content.isXType('tabpanel')) {
-      Ext.Array.remove(me.tabs, tab);
-      content.remove(tab);
-    }
-    if (me.tabs.length === 1) {
-      me.tabs = me.tabs[0];
-      me.remove(content);
-      me.add(me.tab);
-    }
+    tabPanel.remove(tab);
     me.calculateBookmarks();
   },
 
@@ -149,15 +120,11 @@ Ext.define('NX.view.masterdetail.Tabs', {
    * @public
    * @returns {String} bookmark token of selected tab
    */
-  getBookmarkOfSelectedTab: function () {
+  getBookmarkOfSelectedTab: function() {
     var me = this,
-        content = me.items.get(2),
-        selectedItem = content;
+        tabPanel = me.down('>#tab');
 
-    if (content.isXType('tabpanel')) {
-      selectedItem = content.getActiveTab();
-    }
-    return selectedItem.bookmark;
+    return tabPanel.getActiveTab().bookmark;
   },
 
   /**
@@ -165,13 +132,13 @@ Ext.define('NX.view.masterdetail.Tabs', {
    * Finds a tab by bookmark & sets it active (if found).
    * @param {String} bookmark of tab to be activated
    */
-  setActiveTabByBookmark: function (bookmark) {
+  setActiveTabByBookmark: function(bookmark) {
     var me = this,
-        tabpanel = me.down('> tabpanel'),
+        tabPanel = me.down('>#tab'),
         tab = me.down('> tabpanel > panel[bookmark=' + bookmark + ']');
 
-    if (tabpanel && tab) {
-      tabpanel.setActiveTab(tab);
+    if (tabPanel && tab) {
+      tabPanel.setActiveTab(tab);
     }
   },
 
@@ -179,22 +146,15 @@ Ext.define('NX.view.masterdetail.Tabs', {
    * @private
    * Calculates bookmarks of all tabs based on tab title.
    */
-  calculateBookmarks: function () {
+  calculateBookmarks: function() {
     var me = this,
-        content = me.items.get(2);
+        tabPanel = me.down('>#tab');
 
-    if (content.isXType('tabpanel')) {
-      content.items.each(function (tab) {
-        if (tab.title) {
-          tab.bookmark = NX.Bookmarks.encode(tab.title).toLowerCase();
-        }
-      });
-    }
-    else {
-      if (content.title) {
-        content.bookmark = NX.Bookmarks.encode(content.title).toLowerCase();
+    tabPanel.items.each(function(tab) {
+      if (tab.title) {
+        tab.bookmark = NX.Bookmarks.encode(tab.title).toLowerCase();
       }
-    }
+    });
   }
 
 });
