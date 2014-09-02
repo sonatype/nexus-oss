@@ -14,8 +14,9 @@ package org.sonatype.nexus.testsuite.security.nexus1071;
 
 import java.io.File;
 
-import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
+import org.sonatype.nexus.integrationtests.MavenVerifierHelper;
 import org.sonatype.nexus.integrationtests.TestContainer;
 
 import org.apache.maven.it.VerificationException;
@@ -29,8 +30,10 @@ import org.junit.experimental.categories.Category;
  * @author Juven Xu
  */
 public class Nexus1071DeployToRepoAnonCannotAccessIT
-    extends AbstractMavenNexusIT
+    extends AbstractNexusIntegrationTest
 {
+  private static final MavenVerifierHelper mavenVerifierHelper = new MavenVerifierHelper();
+
   @BeforeClass
   public static void setSecureTest() {
     TestContainer.getInstance().getTestContext().setSecureTest(true);
@@ -48,7 +51,7 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
     Verifier verifier1 = null;
 
     try {
-      verifier1 = createVerifier(mavenProject1, settings1);
+      verifier1 = mavenVerifierHelper.createMavenVerifier(mavenProject1, settings1, getTestId());
 
       verifier1.executeGoal("deploy");
 
@@ -56,7 +59,7 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
     }
 
     catch (VerificationException e) {
-      failTest(verifier1);
+      mavenVerifierHelper.failTest(verifier1);
     }
 
     try {
@@ -83,7 +86,7 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
     Verifier verifier = null;
 
     try {
-      verifier = createVerifier(mavenProject, settings);
+      verifier = mavenVerifierHelper.createMavenVerifier(mavenProject, settings, getTestId());
 
       verifier.executeGoal("deploy");
 
@@ -91,7 +94,7 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
     }
 
     catch (VerificationException e) {
-      failTest(verifier);
+      mavenVerifierHelper.failTest(verifier);
     }
   }
 
@@ -107,14 +110,14 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
     Verifier verifier2 = null;
 
     try {
-      verifier2 = createVerifier(mavenProject2, settings2);
+      verifier2 = mavenVerifierHelper.createMavenVerifier(mavenProject2, settings2, getTestId());
 
       verifier2.executeGoal("deploy");
 
       verifier2.verifyErrorFreeLog();
     }
     catch (VerificationException e) {
-      failTest(verifier2);
+      mavenVerifierHelper.failTest(verifier2);
     }
   }
 
@@ -130,7 +133,7 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
     Verifier verifierAnon = null;
 
     try {
-      verifierAnon = createVerifier(mavenProjectAnon, settingsAnon);
+      verifierAnon = mavenVerifierHelper.createMavenVerifier(mavenProjectAnon, settingsAnon, getTestId());
 
       verifierAnon.executeGoal("deploy");
 

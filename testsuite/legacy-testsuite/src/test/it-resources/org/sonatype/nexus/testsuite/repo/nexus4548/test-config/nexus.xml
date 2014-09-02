@@ -7,7 +7,7 @@
     <queryString></queryString>
   </globalConnectionSettings>
   <restApi>
-    <baseUrl>http://localhost:8081/nexus</baseUrl>
+    <baseUrl>http://localhost:8081/</baseUrl>
     <uiTimeout>60000</uiTimeout>
   </restApi>
   <httpProxy>

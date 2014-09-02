@@ -15,7 +15,8 @@ package org.sonatype.nexus.testsuite.maven.nexus502;
 import java.io.File;
 import java.io.IOException;
 
-import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.MavenVerifierHelper;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.UserResource;
@@ -30,8 +31,10 @@ import org.restlet.data.MediaType;
  * Put a bunch of artifacts in a repo, and then run a maven project to download them
  */
 public class Nexus502MavenExecutionIT
-    extends AbstractMavenNexusIT
+    extends AbstractNexusIntegrationTest
 {
+  private static final MavenVerifierHelper mavenVerifierHelper = new MavenVerifierHelper();
+
   @BeforeClass
   public static void setSecureTest() {
     TestContainer.getInstance().getTestContext().setSecureTest(true);
@@ -44,25 +47,25 @@ public class Nexus502MavenExecutionIT
     final File mavenProject = getTestFile("maven-project");
     final File settings = getTestFile("repositories.xml");
     {
-      final Verifier verifier = createVerifier(mavenProject, settings);
+      final Verifier verifier = mavenVerifierHelper.createMavenVerifier(mavenProject, settings, getTestId());
       try {
         verifier.executeGoal("dependency:resolve");
         verifier.verifyErrorFreeLog();
       }
       catch (VerificationException e) {
-        failTest(verifier);
+        mavenVerifierHelper.failTest(verifier);
       }
     }
 
     {
-      final Verifier verifier = createVerifier(mavenProject, settings);
+      final Verifier verifier = mavenVerifierHelper.createMavenVerifier(mavenProject, settings, getTestId());
       // Disable anonymous
       disableUser("anonymous");
 
       try {
         verifier.executeGoal("dependency:resolve");
         verifier.verifyErrorFreeLog();
-        failTest(verifier);
+        mavenVerifierHelper.failTest(verifier);
       }
       catch (VerificationException e) {
         // Expected exception
@@ -76,7 +79,7 @@ public class Nexus502MavenExecutionIT
       File mavenProjectWithauth = getTestFile("maven-project");
       File settingsWithAuth = getTestFile("repositoriesWithAuthentication.xml");
 
-      Verifier verifier = createVerifier(mavenProjectWithauth, settingsWithAuth);
+      Verifier verifier = mavenVerifierHelper.createMavenVerifier(mavenProjectWithauth, settingsWithAuth, getTestId());
       verifier.executeGoal("dependency:resolve");
       verifier.verifyErrorFreeLog();
     }

@@ -14,7 +14,8 @@ package org.sonatype.nexus.testsuite.deploy.nexus511;
 
 import java.io.File;
 
-import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.MavenVerifierHelper;
 import org.sonatype.nexus.integrationtests.TestContainer;
 
 import org.apache.maven.it.VerificationException;
@@ -27,8 +28,9 @@ import org.junit.Test;
  * Tests deploy to nexus using mvn deploy
  */
 public class Nexus511MavenDeployIT
-    extends AbstractMavenNexusIT
+    extends AbstractNexusIntegrationTest
 {
+  private static final MavenVerifierHelper mavenVerifierHelper = new MavenVerifierHelper();
 
   private Verifier verifier;
 
@@ -43,7 +45,7 @@ public class Nexus511MavenDeployIT
   {
     File mavenProject = getTestFile("maven-project");
     File settings = getTestFile("server.xml");
-    verifier = createVerifier(mavenProject, settings);
+    verifier = mavenVerifierHelper.createMavenVerifier(mavenProject, settings, getTestId());
   }
 
   @Test
@@ -55,7 +57,7 @@ public class Nexus511MavenDeployIT
       verifier.verifyErrorFreeLog();
     }
     catch (VerificationException e) {
-      failTest(verifier);
+      mavenVerifierHelper.failTest(verifier);
     }
   }
 
@@ -66,12 +68,12 @@ public class Nexus511MavenDeployIT
     // try to deploy without servers authentication tokens
     File mavenProject = getTestFile("maven-project");
     File settings = getTestFile("serverWithoutAuthentication.xml");
-    verifier = createVerifier(mavenProject, settings);
+    verifier = mavenVerifierHelper.createMavenVerifier(mavenProject, settings, getTestId());
 
     try {
       verifier.executeGoal("deploy");
       verifier.verifyErrorFreeLog();
-      failTest(verifier);
+      mavenVerifierHelper.failTest(verifier);
     }
     catch (VerificationException e) {
       // Expected exception

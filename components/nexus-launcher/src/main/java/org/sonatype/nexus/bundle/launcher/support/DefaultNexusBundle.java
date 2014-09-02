@@ -418,6 +418,11 @@ public class DefaultNexusBundle
   }
 
   @Override
+  protected String composeApplicationURL() {
+    return String.format("http://%s:%s/", getConfiguration().getHostName(), getPort());
+  }
+
+  @Override
   public File getWorkDirectory() {
     return new File(getConfiguration().getTargetDirectory(), "sonatype-work/nexus");
   }
