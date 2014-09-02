@@ -21,8 +21,6 @@ import java.util.Random;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.api.BlobStoreMetrics;
-import org.sonatype.nexus.blobstore.file.internal.MapdbBlobMetadataStore;
-import org.sonatype.nexus.blobstore.file.internal.SimpleFileOperations;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableMap;

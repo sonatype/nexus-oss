@@ -1,4 +1,4 @@
-package org.sonatype.nexus.views.rawbinaries.orientblobstore;
+package org.sonatype.nexus.views.rawbinaries.internal.storage.orientblobstore;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -13,7 +13,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @since 3.0
  */
-@Named
+@Named(OrientDBProvider.NAME)
 @Singleton
 public class OrientDBProvider
     implements Provider<DatabaseInstance>

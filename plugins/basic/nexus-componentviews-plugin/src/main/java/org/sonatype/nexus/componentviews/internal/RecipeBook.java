@@ -9,8 +9,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.componentviews.config.ViewConfigRecipe;
 import org.sonatype.nexus.componentviews.config.ViewConfigRecipeBook;
 
-import org.eclipse.sisu.EagerSingleton;
-
 /**
  * @since 3.0
  */
@@ -22,7 +20,7 @@ public class RecipeBook
   private final Set<ViewConfigRecipe> recipes;
 
   @Inject
-  public RecipeBook(Set<ViewConfigRecipe> recipes) {
+  public RecipeBook(final Set<ViewConfigRecipe> recipes) {
     this.recipes = recipes;
   }
 

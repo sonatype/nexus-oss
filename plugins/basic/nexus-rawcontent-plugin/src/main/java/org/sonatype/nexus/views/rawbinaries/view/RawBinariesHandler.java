@@ -1,18 +1,18 @@
-package org.sonatype.nexus.views.rawbinaries;
+package org.sonatype.nexus.views.rawbinaries.view;
 
+import java.io.IOException;
 import java.util.Formatter;
 import java.util.List;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.componentviews.Handler;
 import org.sonatype.nexus.componentviews.Request;
 import org.sonatype.nexus.componentviews.responses.Response;
 import org.sonatype.nexus.componentviews.responses.Responses;
 import org.sonatype.nexus.componentviews.responses.StatusResponse;
+import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinary;
+import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
 
+import com.google.common.base.Throwables;
 import com.google.common.html.HtmlEscapers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -20,18 +20,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @since 3.0
  */
-@Named
-@Singleton
 public class RawBinariesHandler
     implements Handler
 {
   private final RawBinaryStore binaryStore;
 
-  private final BlobStore blobStore;
-
-  public RawBinariesHandler(@Named("rawBinary") final BlobStore blobStore, final RawBinaryStore binaryStore) {
+  public RawBinariesHandler(final RawBinaryStore binaryStore) {
     this.binaryStore = checkNotNull(binaryStore);
-    this.blobStore = checkNotNull(blobStore);
   }
 
   @Override
@@ -39,13 +34,19 @@ public class RawBinariesHandler
     switch (req.getMethod()) {
 
       case PUT:
-        final boolean result = binaryStore.create(req.getPath(), req.getMimeType(), req.getInputStream());
-        if (result) {
-          return Responses.created();
+        try {
+          final boolean result = binaryStore.create(req.getPath(), req.getMimeType(), req.getInputStream());
+
+          if (result) {
+            return Responses.created();
+          }
+          else {
+            return new StatusResponse(409,
+                "Conflict: binary already exists. To replace it, DELETE it first.");
+          }
         }
-        else {
-          return new StatusResponse(409,
-              "Conflict: binary already exists. To replace it, DELETE it first.");
+        catch (IOException e) {
+          Throwables.propagate(e);
         }
 
       case DELETE:
@@ -55,7 +56,6 @@ public class RawBinariesHandler
         else {
           return Responses.notFound("No artifact to be deleted at that location.");
         }
-
 
       case GET:
         final List<RawBinary> forPath = binaryStore.getForPath(req.getPath());

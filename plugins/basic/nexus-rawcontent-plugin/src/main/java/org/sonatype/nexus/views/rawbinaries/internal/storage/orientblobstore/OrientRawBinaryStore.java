@@ -1,8 +1,10 @@
-package org.sonatype.nexus.views.rawbinaries.orientblobstore;
+package org.sonatype.nexus.views.rawbinaries.internal.storage.orientblobstore;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -13,18 +15,16 @@ import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
-import org.sonatype.nexus.views.rawbinaries.RawBinary;
-import org.sonatype.nexus.views.rawbinaries.RawBinaryStore;
+import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinary;
+import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
-import com.google.common.collect.ImmutableMap;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.core.storage.ORecordMetadata;
-import org.eclipse.sisu.EagerSingleton;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -32,8 +32,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @since 3.0
  */
-@Named
-@EagerSingleton
 public class OrientRawBinaryStore
     extends LifecycleSupport
     implements RawBinaryStore
@@ -54,7 +52,7 @@ public class OrientRawBinaryStore
                               final RecordIdObfuscator recordIdObfuscator,
                               @Named("rawBinaryBlobs") final BlobStore blobStore)
   {
-    this.blobStore = blobStore;
+    this.blobStore = checkNotNull(blobStore);
     this.databaseInstance = checkNotNull(databaseInstance);
     this.recordIdObfuscator = checkNotNull(recordIdObfuscator);
   }
@@ -66,6 +64,7 @@ public class OrientRawBinaryStore
       // register schema
       entityType = entityAdapter.register(db);
     }
+    log.info("OrientRawBinaryStore started.");
   }
 
   @Override
@@ -122,7 +121,12 @@ public class OrientRawBinaryStore
       return false;
     }
 
-    final Blob blob = blobStore.create(inputStream, ImmutableMap.of("path", path, "mimeType", mimeType));
+    Map<String, String> blobMetadata = new HashMap<>();
+    blobMetadata.put(BlobStore.BLOB_NAME_HEADER, path);
+    blobMetadata.put(BlobStore.CREATED_BY_HEADER, "Unknown");
+    blobMetadata.put("mimeType", mimeType);
+
+    final Blob blob = blobStore.create(inputStream, blobMetadata);
 
     final RawBinaryMetadata item = new RawBinaryMetadata(path, blob.getId().getId(), mimeType);
 

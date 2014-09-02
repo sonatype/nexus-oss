@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * @since 3.0
@@ -30,9 +31,7 @@ public class ViewRegistry
 
     final View alreadyBoundView = activeViews.putIfAbsent(view.getName(), view);
 
-    if (alreadyBoundView != null) {
-      throw new IllegalStateException("A view is already bound to name " + view.getName());
-    }
+    checkState(alreadyBoundView == null, "A view is already bound to name %s", view.getName());
 
     eventBus.post(new ViewRegisteredEvent(this, view));
   }

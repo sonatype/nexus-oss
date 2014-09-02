@@ -1,5 +1,6 @@
 package org.sonatype.nexus.componentviews.internal;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,8 +62,8 @@ public class WrappingRequest
   }
 
   @Override
-  public InputStream getInputStream() {
-    return null;
+  public InputStream getInputStream() throws IOException {
+    return request.getInputStream();
   }
 
   @Override

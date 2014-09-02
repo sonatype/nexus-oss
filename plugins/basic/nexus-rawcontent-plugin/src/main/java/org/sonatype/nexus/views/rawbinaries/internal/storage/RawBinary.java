@@ -1,4 +1,4 @@
-package org.sonatype.nexus.views.rawbinaries;
+package org.sonatype.nexus.views.rawbinaries.internal.storage;
 
 import java.io.InputStream;
 import java.util.Date;

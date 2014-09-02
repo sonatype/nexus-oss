@@ -1,4 +1,4 @@
-package org.sonatype.nexus.views.rawbinaries.orientblobstore;
+package org.sonatype.nexus.views.rawbinaries.internal.storage.orientblobstore;
 
 /**
  * I suppose this is a fledgling prototypical component metadata.

@@ -2,6 +2,7 @@ package org.sonatype.nexus.componentviews.internal;
 
 import javax.inject.Named;
 
+import org.sonatype.nexus.componentviews.config.ViewConfigRecipeBook;
 import org.sonatype.nexus.componentviews.config.ViewConfigStore;
 import org.sonatype.nexus.componentviews.internal.orient.OrientViewConfigStore;
 
@@ -25,8 +26,7 @@ public class ViewsModule
   protected void configure() {
     bind(ViewModuleBooter.class).asEagerSingleton();
     bind(ViewConfigStore.class).to(OrientViewConfigStore.class);
-    //bind(ViewConfigRecipeBook.class).to(RecipeBook.class);
-
+    bind(ViewConfigRecipeBook.class).to(RecipeBook.class);
 
     install(new ServletModule()
     {

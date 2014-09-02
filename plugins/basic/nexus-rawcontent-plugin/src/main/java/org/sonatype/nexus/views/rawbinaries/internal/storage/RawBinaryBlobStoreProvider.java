@@ -1,4 +1,4 @@
-package org.sonatype.nexus.views.rawbinaries;
+package org.sonatype.nexus.views.rawbinaries.internal.storage;
 
 import java.nio.file.Path;
 
@@ -7,8 +7,8 @@ import javax.inject.Inject;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.file.FileBlobStore;
 import org.sonatype.nexus.blobstore.file.VolumeChapterLocationStrategy;
-import org.sonatype.nexus.blobstore.file.internal.MapdbBlobMetadataStore;
-import org.sonatype.nexus.blobstore.file.internal.SimpleFileOperations;
+import org.sonatype.nexus.blobstore.file.MapdbBlobMetadataStore;
+import org.sonatype.nexus.blobstore.file.SimpleFileOperations;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 
 import com.google.inject.Provider;

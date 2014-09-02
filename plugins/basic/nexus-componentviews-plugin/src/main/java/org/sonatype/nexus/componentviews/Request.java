@@ -1,5 +1,6 @@
 package org.sonatype.nexus.componentviews;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.annotation.Nullable;
@@ -9,33 +10,33 @@ import javax.annotation.Nullable;
  */
 public interface Request
 {
-  public enum HttpMethod
+  enum HttpMethod
   {
     GET, PUT, DELETE;
   }
 
-  public String getViewName();
+  String getViewName();
 
   /**
    * A path starting with "/" that excludes the view name.
    */
-  public String getPath();
+  String getPath();
 
   /**
    * The HTTP method invoked (e.g. "GET", "PUT").
    */
-  public HttpMethod getMethod();
+  HttpMethod getMethod();
 
   /**
    * The MIME type of the content, for PUT and POST requests.
    */
   @Nullable
-  public String getMimeType();
+  String getMimeType();
 
   /**
    * An input stream for the request body.
    */
-  public InputStream getInputStream();
+  InputStream getInputStream() throws IOException;
 
   /**
    * Adds a value to the request context.

@@ -1,7 +1,7 @@
-package org.sonatype.nexus.views.rawbinaries;
+package org.sonatype.nexus.views.rawbinaries.view;
 
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.sonatype.nexus.componentviews.AllRequestMatcher;
 import org.sonatype.nexus.componentviews.Handler;
@@ -11,20 +11,27 @@ import org.sonatype.nexus.componentviews.View;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewConfigRecipe;
 import org.sonatype.nexus.componentviews.example.NotFoundHandler;
+import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
 
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.sisu.EagerSingleton;
 
 import static java.util.Arrays.asList;
 
 /**
  * @since 3.0
  */
-@Named
-@Singleton
 public class RawBinaryViewRecipe
     implements ViewConfigRecipe
 {
   public static final String RAW_BINARY_RECIPE = "rawBinary";
+
+  private final RawBinaryStore binaryStore;
+
+  @Inject
+  public RawBinaryViewRecipe(final RawBinaryStore binaryStore) {
+    this.binaryStore = binaryStore;
+  }
 
   @Override
   public String getName() {
@@ -37,7 +44,8 @@ public class RawBinaryViewRecipe
 
     final Router router = new Router(asList((RequestMatcher) binariesRequestMatcher));
 
-    final ImmutableMap<String, Handler> handlers = ImmutableMap.of("binaries", (Handler) null);
+    final ImmutableMap<String, Handler> handlers = ImmutableMap
+        .of("binaries", (Handler) new RawBinariesHandler(binaryStore));
 
     return new View(userSuppliedConfig.getViewName(), router, handlers,
         new NotFoundHandler());

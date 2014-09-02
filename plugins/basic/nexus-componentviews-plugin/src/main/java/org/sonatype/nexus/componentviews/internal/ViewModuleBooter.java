@@ -1,17 +1,17 @@
 package org.sonatype.nexus.componentviews.internal;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.componentviews.ViewRegistry;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
+import org.sonatype.nexus.componentviews.config.ViewConfigContributor;
 import org.sonatype.nexus.componentviews.config.ViewConfigRecipe;
 import org.sonatype.nexus.componentviews.config.ViewConfigRecipeBook;
 import org.sonatype.nexus.componentviews.config.ViewConfigStore;
-import org.sonatype.nexus.componentviews.config.ViewConfigStoreStartedEvent;
 import org.sonatype.nexus.componentviews.example.PathListViewRecipe;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
@@ -45,14 +45,18 @@ public class ViewModuleBooter
 
   private final ViewRegistry viewRegistry;
 
+  private final Set<ViewConfigContributor> configContributors;
+
   // TODO: This is a temporary example view
   private final PathListViewRecipe pathListViewRecipe;
 
   @Inject
   public ViewModuleBooter(final EventBus eventBus, final ViewConfigRecipeBook recipeBook,
                           final ViewConfigStore viewConfigStore, final ViewRegistry viewRegistry,
-                          final PathListViewRecipe pathListViewRecipe)
+                          final PathListViewRecipe pathListViewRecipe,
+                          final Set<ViewConfigContributor> configContributors, final Set<ViewConfigRecipe> recipes)
   {
+    this.configContributors = checkNotNull(configContributors);
     this.eventBus = checkNotNull(eventBus);
     this.recipeBook = checkNotNull(recipeBook);
     this.viewConfigStore = checkNotNull(viewConfigStore);
@@ -63,6 +67,9 @@ public class ViewModuleBooter
   @Subscribe
   public void on(NexusInitializedEvent event) throws Exception {
     viewConfigStore.start();
+    for (ViewConfigContributor contrib : configContributors) {
+      contrib.contributeTo(viewConfigStore);
+    }
     createViews();
   }
 
@@ -73,13 +80,7 @@ public class ViewModuleBooter
 
   private void createViews()
       throws IOException
-  {// TODO: Remove this once we have UI facilities for creating views (or as soon as we tire of the example view).
-    log.info("Force-adding a pathList view definition.");
-    final ViewConfig pathListConfig = viewConfigStore.get("pathList");
-    if (pathListConfig == null) {
-      viewConfigStore.add(new ViewConfig("pathList", "pathList", new HashMap<String, Object>()));
-    }
-
+  {
     log.debug("Creating component views.");
     for (ViewConfig config : viewConfigStore.getAll().values()) {
       final ViewConfigRecipe recipe = recipeBook.getRecipe(config.getRecipeName());
