@@ -56,6 +56,8 @@ public class Launcher
 
   private static final boolean HAS_JUL_BRIDGE;
 
+  public static final String IGNORE_SHUTDOWN_HELPER = ShutdownHelper.class.getName() + ".ignore";
+
   // FIXME: Move this to CommandMonitorThread
   public static final String COMMAND_MONITOR_PORT = CommandMonitorThread.class.getName() + ".port";
 
@@ -142,6 +144,11 @@ public class Launcher
     // ensure the temporary directory is sane
     File tmpdir = TemporaryDirectory.get();
     log.info("TMP: {}", tmpdir);
+
+    if (!"false".equalsIgnoreCase(getProperty(IGNORE_SHUTDOWN_HELPER, "false"))) {
+      log.warn("ShutdownHelper requests will be ignored!");
+      ShutdownHelper.setDelegate(ShutdownHelper.NOOP);
+    }
 
     this.server = new JettyServer(cl, props, args);
   }

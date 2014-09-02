@@ -29,7 +29,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus P2 Bridge Plugin</pluginName>
     <pluginDescription>Bridge between Nexus and P2 Eclipse Runtime.</pluginDescription>
   </properties>
 

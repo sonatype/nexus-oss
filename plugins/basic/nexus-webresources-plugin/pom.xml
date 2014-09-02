@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Web Resources Plugin</pluginName>
     <pluginDescription>Provides support for serving web resources.</pluginDescription>
   </properties>
 

@@ -13,7 +13,7 @@
 /*global Ext, NX*/
 
 /**
- * Logged in user controller.
+ * User controller.
  *
  * @since 3.0
  */
@@ -35,6 +35,8 @@ Ext.define('NX.controller.User', {
     'Authenticate',
     'Login'
   ],
+
+  // TODO: normalize use of sign-in/out (replace log-in/out)
 
   refs: [
     {
@@ -97,14 +99,14 @@ Ext.define('NX.controller.User', {
     me.addEvents(
         /**
          * @event login
-         * Fires when a user had been successfully logged in.
+         * Fires when a user had been successfully signed-in.
          * @param {Object} user
          */
         'login',
 
         /**
          * @event logout
-         * Fires when a user had been successfully logged out.
+         * Fires when a user had been successfully signed-out.
          */
         'logout'
     );
@@ -129,7 +131,7 @@ Ext.define('NX.controller.User', {
   },
 
   /**
-   * Returns true if there is a logged in user.
+   * Returns true if there is an authenticated user.
    *
    * @public
    * @return {boolean}
@@ -213,9 +215,9 @@ Ext.define('NX.controller.User', {
         userName = NX.util.Base64.encode(values.username),
         userPass = NX.util.Base64.encode(values.password);
 
-    win.getEl().mask('Logging you in...');
+    me.logDebug('Sign-in user: ' + values.username); // do not log password
 
-    me.logDebug('Logging you in...');
+    win.getEl().mask('Signing in...');
 
     NX.direct.rapture_Security.login(userName, userPass, values.remember === 'on', function (response) {
       win.getEl().unmask();
@@ -302,7 +304,7 @@ Ext.define('NX.controller.User', {
   logout: function () {
     var me = this;
 
-    me.logDebug('Logout...');
+    me.logDebug('Sign-out');
 
     NX.direct.rapture_Security.logout(function (response) {
       if (Ext.isObject(response) && response.success) {
@@ -327,7 +329,7 @@ Ext.define('NX.controller.User', {
       }
       else {
         loginButton.show();
-        userButton.setText('Not logged in');
+        userButton.setText('Not signed in');
         userButton.hide();
         logoutButton.hide();
       }

@@ -29,7 +29,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Logging Plugin</pluginName>
     <pluginDescription>Allows users to control Nexus logging.</pluginDescription>
   </properties>
 

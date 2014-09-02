@@ -29,7 +29,7 @@
 
   <properties>
     <siesta1.version>1.7</siesta1.version>
-    <siesta2.version>2.1-SNAPSHOT</siesta2.version>
+    <siesta2.version>2.0.2</siesta2.version>
     <jersey1.version>1.18.1</jersey1.version>
     <jackson2.version>2.4.1</jackson2.version>
   </properties>

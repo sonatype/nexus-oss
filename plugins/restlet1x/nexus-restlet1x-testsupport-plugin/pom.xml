@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Restlet 1.x Test Support Plugin</pluginName>
     <pluginDescription>Provides helpers for the restlet1x testsuite.</pluginDescription>
   </properties>
 

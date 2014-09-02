@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Timeline Plugin</pluginName>
     <pluginDescription>Adds timeline and feeds based on it.</pluginDescription>
   </properties>
 

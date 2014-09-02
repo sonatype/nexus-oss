@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Content Plugin</pluginName>
     <pluginDescription>Provides access to repository contents.</pluginDescription>
   </properties>
 

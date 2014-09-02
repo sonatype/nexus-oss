@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Core API (Restlet 1.x Plugin)</pluginName>
     <pluginDescription>Provides Nexus Core REST API.</pluginDescription>
   </properties>
 

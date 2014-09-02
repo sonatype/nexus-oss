@@ -29,7 +29,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Maven Bridge Plugin</pluginName>
     <pluginDescription>Adds an API to access maven dependency resolution for Nexus plugins.</pluginDescription>
   </properties>
 

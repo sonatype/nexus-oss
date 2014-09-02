@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Siesta Plugin</pluginName>
     <pluginDescription>Support for JAX-RS REST API.</pluginDescription>
   </properties>
 

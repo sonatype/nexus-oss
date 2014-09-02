@@ -21,7 +21,8 @@ Ext.define('NX.coreui.controller.Outreach', {
   extend: 'Ext.app.Controller',
   requires: [
     'NX.util.Url',
-    'NX.State'
+    'NX.State',
+    'NX.Permissions'
   ],
 
   refs: [
@@ -67,6 +68,17 @@ Ext.define('NX.coreui.controller.Outreach', {
       }
       NX.direct.outreach_Outreach.readStatus(function (response) {
         if (Ext.isObject(response) && response.success) {
+          var status = NX.State.getValue('status'),
+              user = NX.State.getUser(),
+              usertype;
+
+          if (user) {
+            usertype = user.administrator ? 'admin' : 'normal';
+          }
+          else {
+            usertype = 'anonymous';
+          }
+
           welcomePage.add({
             xtype: 'box',
             itemId: 'outreach',
@@ -77,8 +89,9 @@ Ext.define('NX.coreui.controller.Outreach', {
             autoEl: {
               tag: 'iframe',
               // include version and edition for iframe request to allow for client-side content templates
-              src: NX.util.Url.urlOf('service/outreach/?version=' + NX.State.getValue('status')['version'] +
-                  '&edition=' + NX.State.getValue('status')['edition'])
+              src: NX.util.Url.urlOf('service/outreach/?version=' + status.version +
+                  '&edition=' + status.edition +
+                  '&usertype=' + usertype)
             }
           });
         }

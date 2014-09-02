@@ -21,7 +21,7 @@
     <queryString></queryString>
   </globalConnectionSettings>
   <restApi>
-    <baseUrl>http://localhost:${nexus-application-port}/nexus</baseUrl>
+    <baseUrl>${nexus-base-url}</baseUrl>
     <uiTimeout>60000</uiTimeout>
   </restApi>
   <httpProxy>
