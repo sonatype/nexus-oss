@@ -45,6 +45,7 @@ import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.ExtDirectPlugin;
 import org.sonatype.nexus.extdirect.model.Response;
+import org.sonatype.security.SecuritySystem;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -62,6 +63,8 @@ import com.softwarementors.extjs.djn.router.dispatcher.Dispatcher;
 import com.softwarementors.extjs.djn.router.processor.poll.PollRequestProcessor;
 import com.softwarementors.extjs.djn.servlet.DirectJNgineServlet;
 import com.softwarementors.extjs.djn.servlet.ssm.SsmDispatcher;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.inject.BeanLocator;
 import org.slf4j.Logger;
@@ -90,15 +93,19 @@ public class ExtDirectServlet
 
   private final BeanLocator beanLocator;
 
+  private final SecuritySystem securitySystem;
+
   private final EventRecorder eventRecorder;
 
   @Inject
   public ExtDirectServlet(final ApplicationDirectories directories,
                           final BeanLocator beanLocator,
+                          final SecuritySystem securitySystem,
                           final @Nullable EventRecorder eventRecorder)
   {
     this.directories = checkNotNull(directories);
     this.beanLocator = checkNotNull(beanLocator);
+    this.securitySystem = checkNotNull(securitySystem);
     this.eventRecorder = eventRecorder; // null okay
   }
 
@@ -185,7 +192,20 @@ public class ExtDirectServlet
                                     final Object[] parameters) throws Exception
       {
         if (log.isDebugEnabled()) {
-          log.debug("Invoking action method: {}, java-method: {}", method.getFullName(), method.getFullJavaMethodName());
+          log.debug("Invoking action method: {}, java-method: {}", method.getFullName(),
+              method.getFullJavaMethodName());
+        }
+
+        Subject subject = securitySystem.getSubject();
+        if ((subject == null || !subject.isAuthenticated()) && securitySystem.isAnonymousAccessEnabled()) {
+          try {
+            securitySystem.login(new UsernamePasswordToken(
+                securitySystem.getAnonymousUsername(), securitySystem.getAnonymousPassword()
+            ));
+          }
+          catch (Exception e) {
+            log.error("Could not log in anonymous user");
+          }
         }
 
         Response response = null;
@@ -226,7 +246,8 @@ public class ExtDirectServlet
       }
 
       private Response handleException(final RegisteredMethod method, final Throwable e) {
-        log.debug("Failed to invoke action method: {}, java-method: {}", method.getFullName(), method.getFullJavaMethodName(), e);
+        log.debug("Failed to invoke action method: {}, java-method: {}", method.getFullName(),
+            method.getFullJavaMethodName(), e);
 
         if (e instanceof InvalidConfigurationException) {
           InvalidConfigurationException cause = (InvalidConfigurationException) e;
