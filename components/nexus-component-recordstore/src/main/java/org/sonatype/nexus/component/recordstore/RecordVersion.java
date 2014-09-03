@@ -10,56 +10,49 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.blobstore.api;
+package org.sonatype.nexus.component.recordstore;
 
-import java.io.Serializable;
+import com.google.common.base.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A unique identifier for a blob within a specific BlobStore.
+ * Version of a stored record.
  *
  * @since 3.0
  */
-public class BlobId
-  implements Serializable, Comparable<BlobId>
+public final class RecordVersion
 {
-  private final String id;
+  private final String value;
 
-  public BlobId(final String id) {
-    this.id = checkNotNull(id);
+  public RecordVersion(String value) {
+    this.value = checkNotNull(value);
   }
 
-  public String asUniqueString() {
-    return id;
+  /**
+   * Gets the value as a string.
+   */
+  public String getValue() {
+    return value;
   }
 
   @Override
-  public String toString() {
-    return getClass().getSimpleName() + "[" + id + "]";
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    BlobId blobId = (BlobId) o;
-
-    return id.equals(blobId.id);
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (!(obj instanceof RecordVersion)) return false;
+    final RecordVersion other = (RecordVersion) obj;
+    return Objects.equal(getValue(), other.getValue());
   }
 
   @Override
   public int hashCode() {
-    return id.hashCode();
+    return Objects.hashCode(getValue());
   }
 
   @Override
-  public int compareTo(final BlobId o) {
-    return id.compareTo(o.id);
+  public String toString() {
+    return Objects.toStringHelper(RecordVersion.class)
+        .add("value", getValue())
+        .toString();
   }
 }

@@ -146,7 +146,7 @@ public class OrientRawBinaryStore
 
     final Blob blob = blobStore.create(inputStream, blobMetadata);
 
-    final RawBinaryMetadata item = new RawBinaryMetadata(path, blob.getId().getId(), mimeType);
+    final RawBinaryMetadata item = new RawBinaryMetadata(path, blob.getId().asUniqueString(), mimeType);
 
     ORID rid;
     try (ODatabaseDocumentTx db = openDb()) {

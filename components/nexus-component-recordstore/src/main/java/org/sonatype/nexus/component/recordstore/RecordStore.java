@@ -10,17 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.model;
+package org.sonatype.nexus.component.recordstore;
 
 /**
- * Opaque component id in the normalized component system.
- * 
+ * Main API entry point. Provides {@link RecordStoreSession}s for working with the store.
+ *
  * @since 3.0
  */
-public interface ComponentId
+public interface RecordStore
 {
   /**
-   * Gets the id as a unique string.
+   * Opens a session for working with the store.
    */
-  String asUniqueString();
+  RecordStoreSession openSession();
 }

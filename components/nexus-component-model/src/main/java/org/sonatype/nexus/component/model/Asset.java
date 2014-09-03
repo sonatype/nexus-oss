@@ -17,12 +17,10 @@ import java.io.InputStream;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.componentmetadata.Record;
-
 import org.joda.time.DateTime;
 
 /**
- * Represents an identifiable asset of a {@link Component}.
+ * Represents an identifiable asset of a component.
  * 
  * @since 3.0
  */
@@ -32,11 +30,6 @@ public interface Asset
    * @return relative path to this asset in the containing component
    */
   String getPath();
-
-  /**
-   * @return current metadata record for this asset
-   */
-  Record getMetadata();
 
   /**
    * @return length of this asset in bytes, {@code -1} if unknown
