@@ -140,6 +140,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
     },
     'NX.coreui.controller.Tasks',
     'NX.coreui.controller.UploadArtifact',
+    'NX.coreui.controller.UploadFile',
     'NX.coreui.controller.Users'
   ]
 });
