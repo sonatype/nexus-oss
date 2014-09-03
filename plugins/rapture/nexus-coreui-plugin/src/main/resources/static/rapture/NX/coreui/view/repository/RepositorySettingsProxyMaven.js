@@ -132,7 +132,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         xtype: 'numberfield',
         name: 'artifactMaxAge',
         fieldLabel: 'Artifact Max Age',
-        helpText: 'How long to cache the artifacts in the repository before rechecking the remote repository.  Release repository this value should be -1.',
+        helpText: 'How long to cache the artifacts in the repository before rechecking the remote repository.  Release repositories should use -1.',
         minValue: -1,
         maxValue: 511000,
         allowDecimals: false,
