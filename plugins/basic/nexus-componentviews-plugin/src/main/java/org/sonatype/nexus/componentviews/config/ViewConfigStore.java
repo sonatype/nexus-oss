@@ -8,6 +8,9 @@ import javax.annotation.Nullable;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
+ * Persistant storage for view configurations. These will be modified by administrators. When Nexus starts, any
+ * stored configurations will be instantiated as views.
+ *
  * @since 3.0
  */
 public interface ViewConfigStore
@@ -19,8 +22,7 @@ public interface ViewConfigStore
    * @param item to be added
    * @throws IOException IOException If any problem encountered while read/store of config storage
    */
-  public ViewConfigIdentity add(ViewConfig item)
-      throws IOException;
+  public ViewConfigIdentity add(ViewConfig item) throws IOException;
 
   /**
    * Updates stored config if exists.
@@ -28,8 +30,7 @@ public interface ViewConfigStore
    * @param item to be updated
    * @throws IOException If any problem encountered while read/store of config storage
    */
-  public void update(ViewConfigIdentity id, ViewConfig item)
-      throws IOException;
+  public void update(ViewConfigIdentity id, ViewConfig item) throws IOException;
 
   /**
    * Deletes stored config if exists.
@@ -38,8 +39,7 @@ public interface ViewConfigStore
    * @return false if config to be deleted does not exist in storage, true otherwise
    * @throws IOException If any problem encountered while read/store of config storage
    */
-  public void remove(ViewConfigIdentity id)
-      throws IOException;
+  public void remove(ViewConfigIdentity id) throws IOException;
 
   /**
    * Retrieves stored configs.
@@ -47,8 +47,7 @@ public interface ViewConfigStore
    * @return configs (never null)
    * @throws IOException If any problem encountered while read/store of config storage
    */
-  public Map<ViewConfigIdentity, ViewConfig> getAll()
-      throws IOException;
+  public Map<ViewConfigIdentity, ViewConfig> getAll() throws IOException;
 
 
   /**

@@ -7,9 +7,7 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Parameters for a {@link ViewConfigRecipe}, supplied by an end-user administrator.
- *
- * TODO: Revisit this to make it as immutable as it can be, given what we do with them.
+ * Immutable parameters for a {@link ViewFactory}, supplied by an end-user administrator.
  *
  * @since 3.0
  */

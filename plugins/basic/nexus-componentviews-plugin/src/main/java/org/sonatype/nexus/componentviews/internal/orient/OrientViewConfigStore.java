@@ -11,7 +11,6 @@ import javax.inject.Provider;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewConfigIdentity;
 import org.sonatype.nexus.componentviews.config.ViewConfigStore;
-import org.sonatype.nexus.componentviews.config.ViewConfigStoreStartedEvent;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -29,6 +28,8 @@ import org.eclipse.sisu.EagerSingleton;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * A {@link ViewConfigStore} that persists to the "config" OrientDb {@link DatabaseInstance}.
+ *
  * @since 3.0
  */
 @Named
@@ -41,7 +42,7 @@ public class OrientViewConfigStore
 
   private final RecordIdObfuscator recordIdObfuscator;
 
-  private final UserSuppliedConfigEntityAdapter entityAdapter = new UserSuppliedConfigEntityAdapter();
+  private final ViewConfigEntityAdapter entityAdapter = new ViewConfigEntityAdapter();
 
   private final EventBus eventBus;
 
@@ -155,7 +156,7 @@ public class OrientViewConfigStore
     try (ODatabaseDocumentTx db = openDb()) {
 
       OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<ODocument>(
-          "SELECT FROM " + UserSuppliedConfigEntityAdapter.DB_CLASS + " WHERE viewName = ?");
+          "SELECT FROM " + ViewConfigEntityAdapter.DB_CLASS + " WHERE viewName = ?");
 
       final List<ODocument> results = db.command(query).execute(viewName);
 

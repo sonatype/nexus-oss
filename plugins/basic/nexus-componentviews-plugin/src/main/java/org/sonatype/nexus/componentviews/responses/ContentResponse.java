@@ -6,6 +6,8 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.componentviews.ViewResponse;
+
 import com.google.common.io.ByteStreams;
 
 /**
@@ -14,7 +16,7 @@ import com.google.common.io.ByteStreams;
  * @since 3.0
  */
 public abstract class ContentResponse
-    implements Response
+    implements ViewResponse
 {
   private final String mimeType;
 

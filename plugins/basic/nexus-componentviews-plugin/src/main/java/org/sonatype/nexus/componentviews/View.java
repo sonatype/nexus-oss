@@ -3,12 +3,15 @@ package org.sonatype.nexus.componentviews;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.sonatype.nexus.componentviews.responses.Response;
+import org.sonatype.nexus.componentviews.config.ViewConfig;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * A binding between a view name (which is part of the URL), and a list of {@link RequestMatcher request matchers},
+ * each of which can delegate to a chain of {@link Handler}.
+ *
  * @since 3.0
  */
 public class View
@@ -23,11 +26,14 @@ public class View
 
   private final Handler noRouteHandler;
 
+  private final ViewConfig config;
+
   public View(final String name, final Router router, final Map<String, Handler> handlers,
-              final Handler noRouteHandler)
+              final Handler noRouteHandler, final ViewConfig config)
   {
     this.name = name;
     this.router = router;
+    this.config = config;
     this.handlers = new HashMap<>(handlers);
     this.noRouteHandler = noRouteHandler;
   }
@@ -36,7 +42,7 @@ public class View
     return name;
   }
 
-  public Response dispatch(final Request request) {
+  public ViewResponse dispatch(final ViewRequest request) {
     final RequestMatcher requestMatcher = router.findRoute(request);
 
     if (requestMatcher == null) {
@@ -56,5 +62,9 @@ public class View
     // No exception handling here presumes that these will get caught by a global filter and nicely reported as
     // 500 errors.
     return handler.handle(request);
+  }
+
+  public ViewConfig getConfig() {
+    return config;
   }
 }

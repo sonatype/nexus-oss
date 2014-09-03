@@ -5,8 +5,8 @@ import java.util.Formatter;
 import java.util.List;
 
 import org.sonatype.nexus.componentviews.Handler;
-import org.sonatype.nexus.componentviews.Request;
-import org.sonatype.nexus.componentviews.responses.Response;
+import org.sonatype.nexus.componentviews.ViewRequest;
+import org.sonatype.nexus.componentviews.ViewResponse;
 import org.sonatype.nexus.componentviews.responses.Responses;
 import org.sonatype.nexus.componentviews.responses.StatusResponse;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinary;
@@ -30,7 +30,7 @@ public class RawBinariesHandler
   }
 
   @Override
-  public Response handle(final Request req) {
+  public ViewResponse handle(final ViewRequest req) {
     switch (req.getMethod()) {
 
       case PUT:
@@ -86,7 +86,7 @@ public class RawBinariesHandler
     }
   }
 
-  private boolean isSuccesfulRequestForSingleArtifact(final Request req, final List<RawBinary> forPath) {
+  private boolean isSuccesfulRequestForSingleArtifact(final ViewRequest req, final List<RawBinary> forPath) {
     return forPath.size() == 1 && forPath.get(0).getPath().equals(req.getPath());
   }
 }

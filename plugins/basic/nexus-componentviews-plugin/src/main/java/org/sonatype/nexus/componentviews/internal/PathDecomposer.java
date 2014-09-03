@@ -1,6 +1,8 @@
 package org.sonatype.nexus.componentviews.internal;
 
 /**
+ * A utility class for parsing the view name out of a request URI.
+ *
  * @since 3.0
  */
 public class PathDecomposer

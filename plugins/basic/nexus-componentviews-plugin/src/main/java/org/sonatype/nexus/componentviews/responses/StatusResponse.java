@@ -4,11 +4,15 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.componentviews.ViewResponse;
+
 /**
+ * A response primarily built around an HTTP return code.
+ *
  * @since 3.0
  */
 public class StatusResponse
-    implements Response
+    implements ViewResponse
 {
   private final int statusCode;
 

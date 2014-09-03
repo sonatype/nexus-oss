@@ -5,7 +5,7 @@ import org.sonatype.nexus.events.AbstractEvent;
 /**
  * @since 3.0
  */
-public class ViewConfigStoreEvent
+public abstract class ViewConfigStoreEvent
     extends AbstractEvent<ViewConfigStore>
 {
   public ViewConfigStoreEvent(final ViewConfigStore component) {

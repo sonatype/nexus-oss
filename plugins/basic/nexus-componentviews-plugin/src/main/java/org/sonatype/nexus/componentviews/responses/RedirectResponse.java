@@ -5,6 +5,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * A response that redirects the user to another URL.
+ *
  * @since 3.0
  */
 public class RedirectResponse

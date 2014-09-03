@@ -1,6 +1,8 @@
 package org.sonatype.nexus.componentviews;
 
 /**
+ * Matches all requests, regardless of the path or any other details.
+ *
  * @since 3.0
  */
 public class AllRequestMatcher
@@ -13,7 +15,7 @@ public class AllRequestMatcher
   }
 
   @Override
-  public boolean matches(final Request request) {
+  public boolean matches(final ViewRequest request) {
     return true;
   }
 

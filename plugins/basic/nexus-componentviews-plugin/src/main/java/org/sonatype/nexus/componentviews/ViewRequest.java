@@ -5,17 +5,24 @@ import java.io.InputStream;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.componentviews.config.ViewConfig;
+
 /**
+ * The request
+ *
  * @since 3.0
  */
-public interface Request
+public interface ViewRequest
 {
   enum HttpMethod
   {
     GET, PUT, DELETE;
   }
 
-  String getViewName();
+  /**
+   * Provides an immutable version of the view's configuration, useful for shaping queries
+   */
+  ViewConfig getViewConfig();
 
   /**
    * A path starting with "/" that excludes the view name.

@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
+ * A response whose body is defined by a String.
+ *
  * @since 3.0
  */
 public class StringResponse

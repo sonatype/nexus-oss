@@ -13,6 +13,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
+ * An in-memory container for all of the views currently available for handling requests.
+ *
  * @since 3.0
  */
 @Named

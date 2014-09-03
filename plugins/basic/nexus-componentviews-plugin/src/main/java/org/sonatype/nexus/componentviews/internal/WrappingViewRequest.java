@@ -8,34 +8,35 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
-import org.sonatype.nexus.componentviews.Request;
+import org.sonatype.nexus.componentviews.ViewRequest;
+import org.sonatype.nexus.componentviews.config.ViewConfig;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * A simple implementation of {@link ViewRequest} which decorates the {@link HttpServletRequest}.
+ *
  * @since 3.0
  */
-public class WrappingRequest
-    implements Request
+public class WrappingViewRequest
+    implements ViewRequest
 {
   private final HttpServletRequest request;
 
-  private final String viewName;
+  private final ViewConfig viewConfig;
 
   private final String path;
 
   private final Map<String, Object> requestContext = new HashMap<>();
 
-  public WrappingRequest(final HttpServletRequest request, final String viewName, final String path) {
+  public WrappingViewRequest(final HttpServletRequest request, final String viewName, final ViewConfig viewConfig,
+                             final String path)
+  {
+    this.viewConfig = checkNotNull(viewConfig);
     this.request = checkNotNull(request);
-    this.viewName = checkNotNull(viewName);
     this.path = checkNotNull(path);
   }
 
-  @Override
-  public String getViewName() {
-    return viewName;
-  }
 
   @Override
   public String getPath() {
@@ -54,6 +55,11 @@ public class WrappingRequest
       default:
         throw new IllegalStateException("Method not allowed.");
     }
+  }
+
+  @Override
+  public ViewConfig getViewConfig() {
+    return viewConfig;
   }
 
   @Override

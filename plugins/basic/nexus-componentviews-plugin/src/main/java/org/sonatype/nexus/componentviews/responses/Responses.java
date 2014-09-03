@@ -5,12 +5,16 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.componentviews.ViewResponse;
+
 /**
+ * Factory methods for constructing various simple responses.
+ *
  * @since 3.0
  */
 public class Responses
 {
-  public static Response streamResponse(final InputStream inputStream, final String mimeType, final Date modifiedDate) {
+  public static ViewResponse streamResponse(final InputStream inputStream, final String mimeType, final Date modifiedDate) {
     return new ContentStreamResponse(inputStream, mimeType, modifiedDate);
   }
 

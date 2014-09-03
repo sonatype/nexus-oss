@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class UserSuppliedConfigEntityAdapter
+public class ViewConfigEntityAdapter
     extends ComponentSupport
 {
   public static final String DB_PREFIX = "viewConfig";

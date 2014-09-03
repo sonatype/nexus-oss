@@ -10,8 +10,8 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.sonatype.nexus.componentviews.Handler;
-import org.sonatype.nexus.componentviews.Request;
-import org.sonatype.nexus.componentviews.responses.Response;
+import org.sonatype.nexus.componentviews.ViewRequest;
+import org.sonatype.nexus.componentviews.ViewResponse;
 import org.sonatype.nexus.componentviews.responses.Responses;
 
 import static org.sonatype.nexus.componentviews.responses.Responses.created;
@@ -31,7 +31,7 @@ public class ExamplePathListHandler
   private final Map<String, Date> entries = new ConcurrentHashMap<>();
 
   @Override
-  public Response handle(final Request req) {
+  public ViewResponse handle(final ViewRequest req) {
     final String requestPath = req.getPath();
 
     switch (req.getMethod()) {

@@ -12,7 +12,7 @@ import org.sonatype.nexus.componentviews.RequestMatcher;
 import org.sonatype.nexus.componentviews.Router;
 import org.sonatype.nexus.componentviews.View;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
-import org.sonatype.nexus.componentviews.config.ViewConfigRecipe;
+import org.sonatype.nexus.componentviews.config.ViewFactory;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -21,29 +21,27 @@ import com.google.common.collect.ImmutableMap;
  */
 @Named
 @Singleton
-public class PathListViewRecipe
-    implements ViewConfigRecipe
+public class PathListViewFactory
+    implements ViewFactory
 {
   private final NotFoundHandler notFound;
 
   @Inject
-  public PathListViewRecipe(final NotFoundHandler notFound) {
+  public PathListViewFactory(final NotFoundHandler notFound) {
     this.notFound = notFound;
   }
 
   @Override
-  public String getName() {
+  public String getFactoryName() {
     return "pathList";
   }
 
   @Override
-  public View createView(final ViewConfig userSuppliedConfig) {
+  public View createView(final ViewConfig config) {
     final Router router = new Router(Arrays.asList((RequestMatcher) new AllRequestMatcher("pathList")));
 
-    final View view = new View(userSuppliedConfig.getViewName(),
-        router,
-        ImmutableMap.of("pathList", (Handler) new ExamplePathListHandler()),
-        new NotFoundHandler());
+    final View view = new View(config.getViewName(), router,
+        ImmutableMap.of("pathList", (Handler) new ExamplePathListHandler()), new NotFoundHandler(), config);
 
     return view;
   }

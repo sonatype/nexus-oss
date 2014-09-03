@@ -4,10 +4,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.componentviews.Handler;
-import org.sonatype.nexus.componentviews.Request;
-import org.sonatype.nexus.componentviews.responses.Response;
+import org.sonatype.nexus.componentviews.ViewRequest;
+import org.sonatype.nexus.componentviews.ViewResponse;
 import org.sonatype.nexus.componentviews.responses.Responses;
-import org.sonatype.nexus.componentviews.responses.StatusResponse;
 
 /**
  * Always returns a 404 'not found' response.
@@ -20,7 +19,7 @@ public class NotFoundHandler
     implements Handler
 {
   @Override
-  public Response handle(final Request req) {
+  public ViewResponse handle(final ViewRequest req) {
     return Responses.notFound(null);
   }
 }

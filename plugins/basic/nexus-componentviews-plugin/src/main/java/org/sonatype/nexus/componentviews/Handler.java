@@ -1,11 +1,11 @@
 package org.sonatype.nexus.componentviews;
 
-import org.sonatype.nexus.componentviews.responses.Response;
-
 /**
+ * A piece of code that processes a {@link ViewRequest} and returns an appropriate {@link ViewResponse}.
+ *
  * @since 3.0
  */
 public interface Handler
 {
-  Response handle(Request req);
+  ViewResponse handle(ViewRequest req);
 }

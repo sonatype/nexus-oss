@@ -1,6 +1,7 @@
 package org.sonatype.nexus.componentviews;
 
 /**
+ * Fired when the {@link ViewRegistry} registers a new {@link View}.
  * @since 3.0
  */
 public class ViewRegisteredEvent

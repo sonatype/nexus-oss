@@ -3,7 +3,7 @@ package org.sonatype.nexus.views.rawbinaries.view;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.componentviews.config.ViewConfigRecipe;
+import org.sonatype.nexus.componentviews.config.ViewFactory;
 
 import com.google.inject.AbstractModule;
 
@@ -16,6 +16,6 @@ public class RawBinariesViewModule
 {
   @Override
   protected void configure() {
-    bind(ViewConfigRecipe.class).to(RawBinaryViewRecipe.class).in(Singleton.class);
+    bind(ViewFactory.class).to(RawBinaryViewRecipe.class).in(Singleton.class);
   }
 }
