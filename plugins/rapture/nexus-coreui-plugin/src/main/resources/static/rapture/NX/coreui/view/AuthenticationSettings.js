@@ -27,6 +27,9 @@ Ext.define('NX.coreui.view.AuthenticationSettings', {
     xtype: 'textfield'
   },
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this,
         namePrefix = me.namePrefix ? me.namePrefix + 'A' : 'a';
@@ -35,24 +38,24 @@ Ext.define('NX.coreui.view.AuthenticationSettings', {
       {
         name: namePrefix + 'uthUsername',
         fieldLabel: 'Username',
-        helpText: 'The username used for authentication.',
+        helpText: 'User-name for authentication.',
         allowBlank: false
       },
       {
         xtype: 'nx-password',
         name: namePrefix + 'uthPassword',
         fieldLabel: 'Password',
-        helpText: 'The password used for authentication.'
+        helpText: 'User password for authentication.'
       },
       {
         name: namePrefix + 'uthNtlmHost',
         fieldLabel: 'NT LAN Host',
-        helpText: 'The Windows NT Lan Manager for authentication.'
+        helpText: 'Windows NT Lan Manager host-name to authenticate against.'
       },
       {
         name: namePrefix + 'uthNtlmDomain',
         fieldLabel: 'NT LAN Manager Domain',
-        helpText: 'The Windows NT Lan Manager domain for authentication.'
+        helpText: 'Windows NT Lan Manager domain-name to authenticate against.'
       }
     ];
 
