@@ -19,7 +19,10 @@
  */
 Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMaven', {
   extend: 'NX.coreui.view.repository.RepositorySettings',
-  alias: ['widget.nx-repository-settings-hosted-maven1', 'widget.nx-repository-settings-hosted-maven2'],
+  alias: [
+    'widget.nx-repository-settings-hosted-maven1',
+    'widget.nx-repository-settings-hosted-maven2'
+  ],
 
   api: {
     submit: 'NX.direct.coreui_Repository.updateHostedMaven'
@@ -37,7 +40,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMaven', {
         name: 'repositoryPolicy',
         itemId: 'repositoryPolicy',
         fieldLabel: 'Repository Policy',
-        helpText: 'Repositories can store either all Release artifacts or all Snapshot artifacts.',
+        helpText: 'Maven repositories can store either release or snapshot artifacts.',
         emptyText: 'select a policy',
         editable: false,
         store: [
@@ -54,7 +57,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMaven', {
         xtype: 'combo',
         name: 'writePolicy',
         fieldLabel: 'Deployment Policy',
-        helpText: 'This controls if users are allowed to deploy and/or update artifacts in this repository.',
+        helpText: 'Controls if deployments and/or updates to artifacts are allowed.',
         emptyText: 'select a policy',
         editable: false,
         store: [
@@ -68,21 +71,21 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMaven', {
         xtype: 'checkbox',
         name: 'browseable',
         fieldLabel: 'Allow file browsing',
-        helpText: 'This controls if users can browse the contents of the repository via their web browser.',
+        helpText: 'Allow users to browse the contents of the repository.',
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'indexable',
         fieldLabel: 'Include in Search',
-        helpText: 'This controls if the artifacts contained by this repository are indexed and thus searchable.',
+        helpText: 'Include repository in search results.',
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'exposed',
         fieldLabel: 'Publish URL',
-        helpText: 'This controls if the repository is published on a URL, if this field is false you will not be able to access this repository remotely.',
+        helpText: 'Expose the URL of the repository to users.',
         value: true
       }
     ];
