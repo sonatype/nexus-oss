@@ -44,8 +44,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsCommon', {
     {
       name: 'name',
       fieldLabel: 'Name',
-      helpText: 'Repository name',
-      emptyText: 'enter a repository display name'
+      helpText: 'Repository display name',
+      emptyText: 'enter a repository name'
     },
     {
       name: 'providerName',
