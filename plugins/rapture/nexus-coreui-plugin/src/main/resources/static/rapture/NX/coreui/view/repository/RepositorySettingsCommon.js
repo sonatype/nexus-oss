@@ -60,7 +60,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsCommon', {
       name: 'formatName',
       itemId: 'formatName',
       fieldLabel: 'Format',
-      helpText: 'Repository format.',
+      helpText: 'Repository content format.',
       readOnly: true,
       submitValue: false,
       allowBlank: true
