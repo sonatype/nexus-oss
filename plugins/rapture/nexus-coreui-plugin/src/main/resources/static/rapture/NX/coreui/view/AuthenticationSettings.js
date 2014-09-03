@@ -38,24 +38,26 @@ Ext.define('NX.coreui.view.AuthenticationSettings', {
       {
         name: namePrefix + 'uthUsername',
         fieldLabel: 'Username',
-        helpText: 'User-name for authentication.',
         allowBlank: false
       },
       {
         xtype: 'nx-password',
         name: namePrefix + 'uthPassword',
-        fieldLabel: 'Password',
-        helpText: 'User password for authentication.'
+        fieldLabel: 'Password'
+      },
+      {
+        xtype: 'label',
+        html: 'Windows NT Lan Manager options:'
       },
       {
         name: namePrefix + 'uthNtlmHost',
         fieldLabel: 'NT LAN Host',
-        helpText: 'Windows NT Lan Manager host-name to authenticate against.'
+        helpText: 'Lan Manager host-name.'
       },
       {
         name: namePrefix + 'uthNtlmDomain',
         fieldLabel: 'NT LAN Manager Domain',
-        helpText: 'Windows NT Lan Manager domain-name to authenticate against.'
+        helpText: 'Lan Manager domain-name.'
       }
     ];
 
