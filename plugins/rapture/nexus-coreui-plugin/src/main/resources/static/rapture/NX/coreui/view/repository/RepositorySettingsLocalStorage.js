@@ -30,14 +30,14 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsLocalStorage', {
     {
       name: 'defaultLocalStorageUrl',
       fieldLabel: 'Default Local Storage Location',
-      helpText: 'This is the location on the file system used to host the artifacts. It is contained by the Working Directory set in the Server configuration.',
+      helpText: 'Default location to store repository contents.',
       readOnly: true,
       submitValue: false
     },
     {
       name: 'overrideLocalStorageUrl',
       fieldLabel: 'Override Local Storage Location',
-      helpText: 'This is used to override the default local storage. Leave it blank to use the default. Note, file:/{drive-letter}:/ urls are supported in windows.  All other operating systems will use file:// .',
+      helpText: 'Custom location to store repository contents.  Leave blank to use the default.',
       emptyText: 'enter an override url'
     }
   ]
