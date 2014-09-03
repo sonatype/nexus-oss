@@ -31,6 +31,9 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMaven', {
     return 'Repository updated: ' + data['id'];
   },
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this;
 

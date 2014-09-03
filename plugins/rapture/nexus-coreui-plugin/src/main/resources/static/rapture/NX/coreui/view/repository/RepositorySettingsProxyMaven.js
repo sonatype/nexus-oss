@@ -35,6 +35,9 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
     return 'Repository updated: ' + data['id'];
   },
 
+  /**
+   * @override
+   */
   initComponent: function() {
     var me = this;
 
