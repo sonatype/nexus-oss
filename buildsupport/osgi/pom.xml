@@ -30,7 +30,7 @@
   <properties>
     <osgi-spec.version>4.3.1</osgi-spec.version>
     <felix.version>4.4.0</felix.version>
-    <karaf.version>3.0.1</karaf.version>
+    <karaf.version>3.0.2</karaf.version>
   </properties>
 
   <dependencyManagement>
@@ -86,18 +86,6 @@
         <version>${karaf.version}</version>
         <classifier>features</classifier>
         <type>xml</type>
-      </dependency>
-
-      <dependency>
-        <groupId>biz.aQute.bnd</groupId>
-        <artifactId>bndlib</artifactId>
-        <version>2.2.0</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.ops4j.pax.swissbox</groupId>
-        <artifactId>pax-swissbox-bnd</artifactId>
-        <version>1.7.1</version>
       </dependency>
 
       <dependency>

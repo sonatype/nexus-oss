@@ -67,6 +67,12 @@
         <version>1.1.4c</version>
       </dependency>
 
+      <dependency>
+        <groupId>com.sun.xml.fastinfoset</groupId>
+        <artifactId>FastInfoset</artifactId>
+        <version>1.2.13</version>
+      </dependency>
+
       <!--
       Siesta 2.x
       -->
