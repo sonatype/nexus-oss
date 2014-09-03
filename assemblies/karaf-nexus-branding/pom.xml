@@ -24,22 +24,27 @@
     <version>3.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-karaf-branding</artifactId>
+  <!--
+  Module must start with 'karaf', otherwise it won't be added to Karaf's
+  launcher classpath and Karaf won't find our custom lock implementation
+  -->
+  <artifactId>karaf-nexus-branding</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>bundle</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.karaf</groupId>
+      <artifactId>org.apache.karaf.main</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Export-Package>
-              org.apache.karaf.branding
-            </Export-Package>
-          </instructions>
-        </configuration>
       </plugin>
     </plugins>
   </build>

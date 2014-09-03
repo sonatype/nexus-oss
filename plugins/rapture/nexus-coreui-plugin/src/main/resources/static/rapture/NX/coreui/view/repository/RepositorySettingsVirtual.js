@@ -47,14 +47,14 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtual', {
         xtype: 'checkbox',
         name: 'browseable',
         fieldLabel: 'Allow file browsing',
-        helpText: 'This controls if users can browse the contents of the repository via their web browser.',
+        helpText: 'Allow users to browse the contents of the repository.',
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'exposed',
         fieldLabel: 'Publish URL',
-        helpText: 'This controls if the repository is published on a URL, if this field is false you will not be able to access this repository remotely.',
+        helpText: 'Expose the URL of the repository to users.',
         value: true
       },
       {
@@ -62,7 +62,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtual', {
         name: 'shadowOf',
         itemId: 'shadowOf',
         fieldLabel: 'Source repository',
-        helpText: 'This is the id of the physical repository being presented as a logical view by this proxy.',
+        helpText: 'Physical repository being presented as a logical view by the repository.',
         emptyText: 'select a repository',
         editable: false,
         readOnly: true,
@@ -75,7 +75,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtual', {
         xtype: 'checkbox',
         name: 'synchronizeAtStartup',
         fieldLabel: 'Synchronize on Startup',
-        helpText: 'The links are normally updated as changes are made to the repository, if changes may be made while Nexus is offline, the virtual repo should be synchronized at startup.',
+        helpText: 'Rebuild virtual links when the server starts.',
         value: true
       }
     ];

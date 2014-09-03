@@ -79,6 +79,14 @@ Ext.define('NX.Conditions', {
    */
   and: function () {
     return Ext.create('NX.util.condition.Conjunction', { conditions: Array.prototype.slice.call(arguments) });
+  },
+
+  /**
+   * Takes as parameter {NX.util.condition.Condition}s to be OR-ed.
+   * @returns {NX.util.condition.Disjunction}
+   */
+  or: function () {
+    return Ext.create('NX.util.condition.Disjunction', { conditions: Array.prototype.slice.call(arguments) });
   }
 
 });

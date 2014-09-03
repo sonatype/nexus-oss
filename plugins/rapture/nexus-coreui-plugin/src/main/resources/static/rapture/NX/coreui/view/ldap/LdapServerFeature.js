@@ -26,9 +26,9 @@ Ext.define('NX.coreui.view.ldap.LdapServerFeature', {
   iconName: 'ldapserver-default',
 
   tabs: [
-    { xtype: 'nx-coreui-ldapserver-connection', title: 'Connection' },
-    { xtype: 'nx-coreui-ldapserver-backup', title: 'Backup Mirror' },
-    { xtype: 'nx-coreui-ldapserver-userandgroup', title: 'User & Group' }
+    { xtype: 'nx-coreui-ldapserver-connection', title: 'Connection', weight: 10 },
+    { xtype: 'nx-coreui-ldapserver-backup', title: 'Backup Mirror', weight: 20 },
+    { xtype: 'nx-coreui-ldapserver-userandgroup', title: 'User & Group', weight: 30 }
   ]
 
 });

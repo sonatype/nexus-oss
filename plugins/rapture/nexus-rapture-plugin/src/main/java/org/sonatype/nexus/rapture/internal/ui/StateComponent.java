@@ -30,7 +30,6 @@ import org.sonatype.nexus.plugin.PluginIdentity;
 import org.sonatype.nexus.rapture.Rapture;
 import org.sonatype.nexus.rapture.StateContributor;
 import org.sonatype.nexus.util.DigesterUtils;
-import org.sonatype.security.SecuritySystem;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -41,8 +40,6 @@ import com.softwarementors.extjs.djn.config.annotations.DirectPollMethod;
 import com.softwarementors.extjs.djn.servlet.ssm.WebContextManager;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -66,8 +63,6 @@ public class StateComponent
 
   private final List<Provider<StateContributor>> stateContributors;
 
-  private final SecuritySystem securitySystem;
-
   private final static Gson gson = new GsonBuilder().create();
 
   private final static String serverId = String.valueOf(System.nanoTime());
@@ -76,31 +71,17 @@ public class StateComponent
   public StateComponent(final Rapture rapture,
                         final Provider<SystemStatus> systemStatusProvider,
                         final List<PluginIdentity> pluginIdentities,
-                        final List<Provider<StateContributor>> stateContributors,
-                        final SecuritySystem securitySystem)
+                        final List<Provider<StateContributor>> stateContributors)
   {
     this.rapture = checkNotNull(rapture, "rapture");
     this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.pluginIdentities = checkNotNull(pluginIdentities);
     this.stateContributors = checkNotNull(stateContributors);
-    this.securitySystem = checkNotNull(securitySystem);
   }
 
   @DirectPollMethod(event = "rapture_State_get")
   public StateXO get(final Map<String, String> hashes) {
     StateXO stateXO = new StateXO();
-
-    Subject subject = securitySystem.getSubject();
-    if ((subject == null || !subject.isAuthenticated()) && securitySystem.isAnonymousAccessEnabled()) {
-      try {
-        securitySystem.login(new UsernamePasswordToken(
-            securitySystem.getAnonymousUsername(), securitySystem.getAnonymousPassword()
-        ));
-      }
-      catch (Exception e) {
-        log.error("Could not log in anonymous user");
-      }
-    }
 
     stateXO.setValues(getValues(hashes));
     stateXO.setCommands(getCommands());

@@ -23,6 +23,6 @@ Ext.define('NX.view.header.QuickSearch', {
 
   itemId: 'quicksearch',
   width: 200,
-  emptyText: 'quick search',
+  emptyText: 'search',
   inputAttrTpl: "data-qtip='Quick component keyword search'" // field tooltip
 });

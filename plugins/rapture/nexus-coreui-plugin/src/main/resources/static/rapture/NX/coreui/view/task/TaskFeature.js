@@ -26,7 +26,7 @@ Ext.define('NX.coreui.view.task.TaskFeature', {
   iconName: 'task-default',
 
   tabs: [
-    { xtype: 'nx-info-panel' }
+    { xtype: 'nx-info-panel', weight: 10 }
   ]
 
 });
