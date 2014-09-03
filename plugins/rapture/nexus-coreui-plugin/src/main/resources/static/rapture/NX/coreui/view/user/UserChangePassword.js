@@ -28,6 +28,11 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
   defaultFocus: 'password',
 
   /**
+   * @cfg userId to change password for
+   */
+  userId: undefined,
+
+  /**
    * @override
    */
   initComponent: function () {
