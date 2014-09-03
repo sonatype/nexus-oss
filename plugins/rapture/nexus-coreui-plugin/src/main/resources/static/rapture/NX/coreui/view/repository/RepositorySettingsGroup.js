@@ -45,21 +45,21 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsGroup', {
         xtype: 'checkbox',
         name: 'browseable',
         fieldLabel: 'Allow file browsing',
-        helpText: 'This controls if users can browse the contents of the repository via their web browser.',
+        helpText: 'Allow users to browse the contents of the repository.',
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'exposed',
         fieldLabel: 'Publish URL',
-        helpText: 'This controls if the group is published on a URL, if this field is false you will not be able to access this group remotely.',
+        helpText: 'Expose the URL of the repository to users.',
         value: true
       },
       {
         xtype: 'nx-itemselector',
         name: 'memberRepositoryIds',
         fieldLabel: 'Member Repositories',
-        helpText: 'Select the repositories that are member of this group.',
+        helpText: 'Select the repositories that are member of the group.',
         buttons: ['up', 'add', 'remove', 'down'],
         fromTitle: 'Available Repositories',
         toTitle: 'Ordered Member Repositories',
