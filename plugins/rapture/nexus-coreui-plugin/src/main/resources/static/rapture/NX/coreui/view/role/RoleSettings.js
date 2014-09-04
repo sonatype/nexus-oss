@@ -39,7 +39,7 @@ Ext.define('NX.coreui.view.role.RoleSettings', {
         idField,
         roleStore = Ext.create('NX.coreui.store.Role');
 
-    me.editableCondition = NX.Conditions.and(
+    me.editableCondition = me.editableCondition || NX.Conditions.and(
         NX.Conditions.isPermitted('security:roles', 'update'),
         NX.Conditions.formHasRecord('nx-coreui-role-settings', function (model) {
           return !model.get('readOnly');
