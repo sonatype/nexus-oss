@@ -36,13 +36,13 @@ import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NonNls;
 
 /**
- * {@link RaptureSettingsCapability} descriptor.
+ * {@link SettingsCapability} descriptor.
  *
  * @since 3.0
  */
-@Named(RaptureSettingsCapabilityDescriptor.TYPE_ID)
+@Named(SettingsCapabilityDescriptor.TYPE_ID)
 @Singleton
-public class RaptureSettingsCapabilityDescriptor
+public class SettingsCapabilityDescriptor
     extends CapabilityDescriptorSupport
     implements Taggable
 {
@@ -54,7 +54,7 @@ public class RaptureSettingsCapabilityDescriptor
   private static interface Messages
       extends MessageBundle
   {
-    @DefaultMessage("Rapture Settings")
+    @DefaultMessage("UI: Settings")
     String name();
 
     @DefaultMessage("Debug allowed")
@@ -94,34 +94,34 @@ public class RaptureSettingsCapabilityDescriptor
 
   private final List<FormField> formFields;
 
-  public RaptureSettingsCapabilityDescriptor() {
+  public SettingsCapabilityDescriptor() {
     formFields = Lists.<FormField>newArrayList(
         new StringTextFormField(
-            RaptureSettingsCapabilityConfiguration.TITLE,
+            SettingsCapabilityConfiguration.TITLE,
             messages.titleLabel(),
             messages.titleHelp(),
             FormField.MANDATORY
         ).withInitialValue(RaptureSettings.DEFAULT_TITLE),
         new CheckboxFormField(
-            RaptureSettingsCapabilityConfiguration.DEBUG_ALLOWED,
+            SettingsCapabilityConfiguration.DEBUG_ALLOWED,
             messages.debugAllowedLabel(),
             messages.debugAllowedHelp(),
             FormField.OPTIONAL
         ).withInitialValue(RaptureSettings.DEFAULT_DEBUG_ALLOWED),
         new NumberTextFormField(
-            RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_AUTHENTICATED,
+            SettingsCapabilityConfiguration.STATUS_INTERVAL_AUTHENTICATED,
             messages.statusIntervalAuthenticatedLabel(),
             messages.statusIntervalAuthenticatedHelp(),
             FormField.MANDATORY
         ).withInitialValue(RaptureSettings.DEFAULT_STATUS_INTERVAL_AUTHENTICATED),
         new NumberTextFormField(
-            RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_ANONYMOUS,
+            SettingsCapabilityConfiguration.STATUS_INTERVAL_ANONYMOUS,
             messages.statusIntervalAnonymousLabel(),
             messages.statusIntervalAnonymousHelp(),
             FormField.MANDATORY
         ).withInitialValue(RaptureSettings.DEFAULT_STATUS_INTERVAL_ANONYMOUS),
         new NumberTextFormField(
-            RaptureSettingsCapabilityConfiguration.SESSION_TIMEOUT,
+            SettingsCapabilityConfiguration.SESSION_TIMEOUT,
             messages.sessionTimeoutLabel(),
             messages.sessionTimeoutHelp(),
             FormField.MANDATORY
@@ -148,9 +148,9 @@ public class RaptureSettingsCapabilityDescriptor
   public Validator validator() {
     return validators().logical().and(
         validators().capability().uniquePer(TYPE),
-        validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_AUTHENTICATED),
-        validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_ANONYMOUS),
-        validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.SESSION_TIMEOUT)
+        validators().value().isAPositiveInteger(TYPE, SettingsCapabilityConfiguration.STATUS_INTERVAL_AUTHENTICATED),
+        validators().value().isAPositiveInteger(TYPE, SettingsCapabilityConfiguration.STATUS_INTERVAL_ANONYMOUS),
+        validators().value().isAPositiveInteger(TYPE, SettingsCapabilityConfiguration.SESSION_TIMEOUT)
     );
   }
 
@@ -158,9 +158,9 @@ public class RaptureSettingsCapabilityDescriptor
   public Validator validator(final CapabilityIdentity id) {
     return validators().logical().and(
         validators().capability().uniquePerExcluding(id, TYPE),
-        validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_AUTHENTICATED),
-        validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.STATUS_INTERVAL_ANONYMOUS),
-        validators().value().isAPositiveInteger(TYPE, RaptureSettingsCapabilityConfiguration.SESSION_TIMEOUT)
+        validators().value().isAPositiveInteger(TYPE, SettingsCapabilityConfiguration.STATUS_INTERVAL_AUTHENTICATED),
+        validators().value().isAPositiveInteger(TYPE, SettingsCapabilityConfiguration.STATUS_INTERVAL_ANONYMOUS),
+        validators().value().isAPositiveInteger(TYPE, SettingsCapabilityConfiguration.SESSION_TIMEOUT)
     );
   }
 
@@ -171,7 +171,7 @@ public class RaptureSettingsCapabilityDescriptor
 
   @Override
   public Set<Tag> getTags() {
-    return Tag.tags(Tag.categoryTag("Security"));
+    return Tag.tags(Tag.categoryTag("UI"));
   }
 
 }

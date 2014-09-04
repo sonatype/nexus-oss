@@ -52,15 +52,13 @@ public class BrandingCapabilityDescriptor
   private static interface Messages
       extends MessageBundle
   {
-    @DefaultMessage("Branding")
+    @DefaultMessage("UI: Branding")
     String name();
 
     @DefaultMessage("Enable header")
     String headerEnabledLabel();
 
-    @DefaultMessage(
-        "Select this checkbox in order to show the branding header that will include the HTML snipped bellow."
-    )
+    @DefaultMessage("Enable branding header HTML snippet.")
     String headerEnabledHelp();
 
     @DefaultMessage("Header HTML snippet")
@@ -75,9 +73,7 @@ public class BrandingCapabilityDescriptor
     @DefaultMessage("Enable footer")
     String footerEnabledLabel();
 
-    @DefaultMessage(
-        "Select this checkbox in order to show the branding footer that will include the HTML snipped bellow."
-    )
+    @DefaultMessage("Enable branding footer HTML snippet.")
     String footerEnabledHelp();
 
     @DefaultMessage("Footer HTML snippet")

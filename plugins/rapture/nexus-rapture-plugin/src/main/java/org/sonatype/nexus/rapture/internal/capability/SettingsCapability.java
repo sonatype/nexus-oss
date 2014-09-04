@@ -28,35 +28,35 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-@Named(RaptureSettingsCapabilityDescriptor.TYPE_ID)
-public class RaptureSettingsCapability
-    extends CapabilitySupport<RaptureSettingsCapabilityConfiguration>
+@Named(SettingsCapabilityDescriptor.TYPE_ID)
+public class SettingsCapability
+    extends CapabilitySupport<SettingsCapabilityConfiguration>
 {
 
   private final Rapture rapture;
 
   @Inject
-  public RaptureSettingsCapability(final Rapture rapture) {
+  public SettingsCapability(final Rapture rapture) {
     this.rapture = checkNotNull(rapture, "rapture");
   }
 
   @Override
-  protected RaptureSettingsCapabilityConfiguration createConfig(final Map<String, String> properties) {
-    return new RaptureSettingsCapabilityConfiguration(properties);
+  protected SettingsCapabilityConfiguration createConfig(final Map<String, String> properties) {
+    return new SettingsCapabilityConfiguration(properties);
   }
 
   @Override
-  protected void onActivate(final RaptureSettingsCapabilityConfiguration config) throws Exception {
+  protected void onActivate(final SettingsCapabilityConfiguration config) throws Exception {
     rapture.setSettings(config);
   }
 
   @Override
-  protected void onPassivate(final RaptureSettingsCapabilityConfiguration config) throws Exception {
+  protected void onPassivate(final SettingsCapabilityConfiguration config) throws Exception {
     rapture.resetSettings();
   }
 
   @Override
-  protected void onRemove(final RaptureSettingsCapabilityConfiguration config) throws Exception {
+  protected void onRemove(final SettingsCapabilityConfiguration config) throws Exception {
     rapture.resetSettings();
   }
 
