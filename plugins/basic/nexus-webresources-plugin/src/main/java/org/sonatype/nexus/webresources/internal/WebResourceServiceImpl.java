@@ -104,6 +104,10 @@ public class WebResourceServiceImpl
     // make it clear we have DEV mode enabled
     if (DevModeResources.hasResourceLocations()) {
       log.warn("DEV mode resources is ENABLED");
+      // spit out the locations where we will look for resources
+      for (File file : DevModeResources.getResourceLocations()) {
+        log.info("  {}", file);
+      }
     }
   }
 
