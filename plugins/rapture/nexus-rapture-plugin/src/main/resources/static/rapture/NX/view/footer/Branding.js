@@ -13,11 +13,11 @@
 /*global Ext*/
 
 /**
- * Header branding panel.
+ * Footer branding panel.
  *
  * @since 3.0
  */
-Ext.define('NX.view.header.Branding', {
+Ext.define('NX.view.footer.Branding', {
   extend: 'Ext.container.Container',
-  alias: 'widget.nx-header-branding'
+  alias: 'widget.nx-footer-branding'
 });
