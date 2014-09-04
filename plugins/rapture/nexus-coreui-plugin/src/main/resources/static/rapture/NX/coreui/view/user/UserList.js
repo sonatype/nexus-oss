@@ -51,7 +51,7 @@ Ext.define('NX.coreui.view.user.UserList', {
     { xtype: 'button', text: 'More...', glyph: 'xf0ae@FontAwesome' /* fa-tasks */, action: 'more', disabled: true,
       menu: [
         { text: 'Reset Password', glyph: 'xf084@FontAwesome' /* fa-key */, action: 'resetpassword' },
-        { text: 'Set Password', glyph: 'xf084@FontAwesome' /* fa-key */, action: 'setpassword' }
+        { text: 'Change Password', glyph: 'xf084@FontAwesome' /* fa-key */, action: 'setpassword' }
       ]
     }
   ],
