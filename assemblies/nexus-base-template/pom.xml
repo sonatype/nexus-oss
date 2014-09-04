@@ -31,7 +31,7 @@
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus.assemblies</groupId>
-      <artifactId>nexus-karaf-branding</artifactId>
+      <artifactId>karaf-nexus-branding</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -311,7 +311,7 @@
                 <!-- install some custom lib/ jar -->
                 <copy file="${javax.annotation:javax.annotation-api:jar}" todir="${project.build.directory}/assembly/lib"/>
                 <copy file="${com.google.code.findbugs:jsr305:jar}" todir="${project.build.directory}/assembly/lib"/>
-                <copy file="${org.sonatype.nexus.assemblies:nexus-karaf-branding:jar}" todir="${project.build.directory}/assembly/lib"/>
+                <copy file="${org.sonatype.nexus.assemblies:karaf-nexus-branding:jar}" todir="${project.build.directory}/assembly/lib"/>
 
                 <!-- delete some cruft which karaf includes by default -->
                 <delete>

@@ -39,15 +39,16 @@ public abstract class AbstractChecksumContentValidator
       throws LocalStorageException
   {
     ChecksumPolicy checksumPolicy = getChecksumPolicy(proxy, item);
-    if (checksumPolicy == null || !checksumPolicy.shouldCheckChecksum()) {
-      return true;
-    }
 
     final ChecksumPolicy requestChecksumPolicy =
         (ChecksumPolicy) req.getRequestContext().get(ChecksumPolicy.REQUEST_CHECKSUM_POLICY_KEY);
     if (requestChecksumPolicy != null) {
       // found, it overrides the repository-set checksum policy then
       checksumPolicy = requestChecksumPolicy;
+    }
+
+    if (checksumPolicy == null || !checksumPolicy.shouldCheckChecksum()) {
+      return true;
     }
 
     RemoteHashResponse remoteHash = retrieveRemoteHash(item, proxy, baseUrl);

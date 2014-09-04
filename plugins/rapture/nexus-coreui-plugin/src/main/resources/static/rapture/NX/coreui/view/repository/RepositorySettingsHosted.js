@@ -37,7 +37,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHosted', {
         xtype: 'combo',
         name: 'writePolicy',
         fieldLabel: 'Deployment Policy',
-        helpText: 'This controls if users are allowed to deploy and/or update artifacts in this repository.',
+        helpText: 'Controls if deployments and/or updates to artifacts are allowed.',
         emptyText: 'select a policy',
         editable: false,
         store: [
@@ -51,14 +51,14 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHosted', {
         xtype: 'checkbox',
         name: 'browseable',
         fieldLabel: 'Allow file browsing',
-        helpText: 'This controls if users can browse the contents of the repository via their web browser.',
+        helpText: 'Allow users to browse the contents of the repository.',
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'exposed',
         fieldLabel: 'Publish URL',
-        helpText: 'This controls if the repository is published on a URL, if this field is false you will not be able to access this repository remotely.',
+        helpText: 'Expose the URL of the repository to users.',
         value: true
       }
     ];

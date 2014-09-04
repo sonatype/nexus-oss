@@ -19,6 +19,7 @@ import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.apache.shiro.authz.annotation.RequiresUser
+import org.apache.shiro.subject.Subject
 import org.eclipse.sisu.inject.BeanLocator
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
@@ -187,21 +188,49 @@ extends DirectComponentSupport
   }
 
   /**
-   * Change password of logged in user.
+   * Change password of a specified user.
    * @param authToken authentication token
+   * @param userId id of user to change password for
    * @param password new password
    */
   @DirectMethod
   @RequiresUser
   @RequiresAuthentication
-  @RequiresPermissions('security:userschangepw:update')
+  @RequiresPermissions('security:userschangepw:create')
   @Validate
   void changePassword(final @NotEmpty(message = '[authToken] may not be empty') String authToken,
+                      final @NotEmpty(message = '[userId] may not be empty') String userId,
                       final @NotEmpty(message = '[password] may not be empty') String password)
   {
     if (authTickets.redeemTicket(authToken)) {
-      String currentUserId = securitySystem.getSubject().getPrincipal().toString()
-      securitySystem.changePassword(currentUserId, Tokens.decodeBase64String(password))
+      if (isAnonymousUser(userId)) {
+        throw new Exception("Password cannot be changed for user ${userId}, since is marked as the Anonymous user")
+      }
+      securitySystem.changePassword(userId, Tokens.decodeBase64String(password))
+    }
+    else {
+      throw new IllegalAccessException('Invalid authentication ticket')
+    }
+  }
+
+  /**
+   * Resets password of a specified user.
+   * @param authToken authentication token
+   * @param userId id of user to reset password for
+   */
+  @DirectMethod
+  @RequiresUser
+  @RequiresAuthentication
+  @RequiresPermissions('security:usersreset:delete')
+  @Validate
+  void resetPassword(final @NotEmpty(message = '[authToken] may not be empty') String authToken,
+                     final @NotEmpty(message = '[userId] may not be empty') String userId)
+  {
+    if (authTickets.redeemTicket(authToken)) {
+      if (isAnonymousUser(userId)) {
+        throw new Exception("Password cannot be reset for user ${userId}, since is marked as the Anonymous user")
+      }
+      securitySystem.resetPassword(userId)
     }
     else {
       throw new IllegalAccessException('Invalid authentication ticket')
@@ -221,6 +250,12 @@ extends DirectComponentSupport
               final @NotEmpty(message = '[source] may not be empty') String source)
   {
     // TODO check if source is required or we always delete from default realm
+    if (isAnonymousUser(id)) {
+      throw new Exception("User ${id} cannot be deleted, since is marked as the Anonymous user")
+    }
+    if (isCurrentUser(id)) {
+      throw new Exception("User ${id} cannot be deleted, since is the user currently logged into the application")
+    }
     securitySystem.deleteUser(id, source)
   }
 
@@ -237,6 +272,18 @@ extends DirectComponentSupport
           role.roleId
         }
     )
+  }
+
+  private boolean isAnonymousUser(final String userId) {
+    return securitySystem.isAnonymousAccessEnabled() && securitySystem.anonymousUsername == userId
+  }
+
+  private boolean isCurrentUser(final String userId) {
+    Subject subject = securitySystem.subject
+    if (!subject || !subject.principal) {
+      return false
+    }
+    return subject.principal == userId
   }
 
 }

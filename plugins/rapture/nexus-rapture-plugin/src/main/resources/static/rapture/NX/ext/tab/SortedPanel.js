@@ -13,7 +13,7 @@
 /*global Ext, NX*/
 
 /**
- * A tab panel that sorts tabs based on weight and title.
+ * A tab panel that sorts tabs based on weight and title and not show the tab bar if only one tab.
  *
  * @since 3.0
  */
@@ -23,7 +23,10 @@ Ext.define('NX.ext.tab.SortedPanel', {
 
   listeners: {
     /**
+     * @private
      * Reorders tabs sorting them by weight / title.
+     * Show the tab bar in case of more then one tab.
+     *
      * @param me this tab panel
      * @param component added tab
      */
@@ -48,7 +51,37 @@ Ext.define('NX.ext.tab.SortedPanel', {
       });
 
       me.insert(position, component);
+      if (me.rendered && me.items.length > 1) {
+        me.getTabBar().show();
+      }
       me.resumeEvents();
+    },
+
+    /**
+     * @private
+     * Hide tab bar in case of one or less tabs.
+     */
+    remove: function() {
+      var me = this;
+
+      if (me.rendered && me.items.length <= 1) {
+        me.getTabBar().hide();
+      }
+    },
+
+    /**
+     * @private
+     * Hide/Show tab bar based on number of tabs (no tab bar for one or less tabs).
+     */
+    afterrender: function() {
+      var me = this;
+
+      if (me.items.length > 1) {
+        me.getTabBar().show();
+      }
+      else {
+        me.getTabBar().hide();
+      }
     }
   }
 

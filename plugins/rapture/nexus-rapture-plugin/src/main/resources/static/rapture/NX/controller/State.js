@@ -84,12 +84,19 @@ Ext.define('NX.controller.State', {
   },
 
   onLaunch: function () {
+    var uiSettings = NX.app.state['uiSettings'];
+
     NX.State.setBrowserSupported(
         !Ext.isIE || (Ext.isIE9p && Ext.isIE11m)
     );
     NX.State.setValue('debug', NX.app.debug);
     NX.State.setValue('receiving', false);
+
+    // set uiSettings by the end so it does not start state pulling till all initial state hashes are known
+    // this avoids unnecessary sending of state from server
+    delete NX.app.state['uiSettings'];
     NX.State.setValues(NX.app.state);
+    NX.State.setValues({ uiSettings: uiSettings });
   },
 
   /**
@@ -127,7 +134,7 @@ Ext.define('NX.controller.State', {
       }
     }
     else {
-      if (Ext.isDefined(value)) {
+      if (Ext.isDefined(value) && value !== null) {
         if (!Ext.Object.equals(value, model.get('value'))) {
           model.set('value', value);
         }
