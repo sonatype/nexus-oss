@@ -134,7 +134,7 @@ Ext.define('NX.controller.State', {
       }
     }
     else {
-      if (Ext.isDefined(value)) {
+      if (Ext.isDefined(value) && value !== null) {
         if (!Ext.Object.equals(value, model.get('value'))) {
           model.set('value', value);
         }
