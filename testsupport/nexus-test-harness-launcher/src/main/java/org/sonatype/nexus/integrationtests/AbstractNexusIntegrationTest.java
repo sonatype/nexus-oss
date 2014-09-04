@@ -38,7 +38,6 @@ import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.After;
@@ -518,11 +517,6 @@ public abstract class AbstractNexusIntegrationTest
   @Deprecated
   protected void deployArtifacts(final File projectsDir) throws Exception {
     new DeployHelper().deployArtifacts(projectsDir);
-  }
-
-  @Deprecated
-  protected void deployArtifacts(File project, String wagonHint, String deployUrl, Model model) throws Exception {
-    new DeployHelper().deployArtifacts(project, wagonHint, deployUrl, model);
   }
 
   //
