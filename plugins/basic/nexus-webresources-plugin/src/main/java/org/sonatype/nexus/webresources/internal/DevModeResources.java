@@ -17,10 +17,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
 /**
- * Utility related to finding resources when "NEXUS_RESOURCE_DIRS" env var is set.
+ * Utility related to finding resources when {@code NEXUS_RESOURCE_DIRS} environment-variable
+ * or {@code nexus.resource.dirs} system-property is set.
  *
  * @since 2.7
  */
@@ -29,6 +33,7 @@ public class DevModeResources
 
   private static final List<File> resourceLocations = initializeResourceLocations();
 
+  @Nullable
   private static List<File> initializeResourceLocations() {
     String directoriesToSearchProperty = System.getenv("NEXUS_RESOURCE_DIRS");
     if (directoriesToSearchProperty == null) {
@@ -38,9 +43,14 @@ public class DevModeResources
       List<File> directoriesToSearch = Lists.newArrayList();
       String[] segments = directoriesToSearchProperty.split(",");
       for (String segment : segments) {
-        File dir = new File(segment);
-        if (dir.exists() && dir.isDirectory()) {
-          directoriesToSearch.add(dir);
+        try {
+          File dir = new File(segment).getCanonicalFile();
+          if (dir.exists() && dir.isDirectory()) {
+            directoriesToSearch.add(dir);
+          }
+        }
+        catch (Exception e) {
+          throw Throwables.propagate(e);
         }
       }
       if (!directoriesToSearch.isEmpty()) {
@@ -51,16 +61,18 @@ public class DevModeResources
   }
 
   /**
-   * Returns true if there env var "NEXUS_RESOURCE_DIRS" is set and at least one of referenced directories exists.
+   * @since 3.0
    */
+  @Nullable
+  public static List<File> getResourceLocations() {
+    return resourceLocations;
+  }
+
   public static boolean hasResourceLocations() {
     return resourceLocations != null;
   }
 
-  /**
-   * Searches the path in directories specified by "NEXUS_RESOURCE_DIRS" and returns an url to specified path if found,
-   * null otherwise
-   */
+  @Nullable
   public static URL getResourceIfOnFileSystem(final String path) {
     try {
       File file = getFileIfOnFileSystem(path);
@@ -74,10 +86,7 @@ public class DevModeResources
     return null;
   }
 
-  /**
-   * Searches the path in directories specified by "NEXUS_RESOURCE_DIRS" and returns a file to specified path if found,
-   * null otherwise
-   */
+  @Nullable
   public static File getFileIfOnFileSystem(final String path) {
     if (resourceLocations != null) {
       for (File dir : resourceLocations) {
