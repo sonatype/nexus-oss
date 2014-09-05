@@ -62,22 +62,8 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('security:roles:read')
   List<RoleXO> read() {
-    // finding if a role is a mapped role (stupid but that is all nexus allows)
-    Map<String, List<String>> mappings = [:]
-    authorizationManagers.each { manager ->
-      if (manager.source != DEFAULT_SOURCE) {
-        manager.listRoles().each { role ->
-          def sources = mappings[role.roleId]
-          if (!sources) {
-            mappings << [(role.roleId): sources = []]
-          }
-          sources << role.source
-        }
-      }
-    }
     return securitySystem.listRoles(DEFAULT_SOURCE).collect { input ->
-      List<String> mappingsPerRole = mappings[input.roleId]
-      return asRoleXO(input, mappingsPerRole ? mappingsPerRole.join(',') : input.source)
+      return asRoleXO(input)
     }
   }
 
@@ -107,7 +93,7 @@ extends DirectComponentSupport
   @Validate
   List<RoleXO> readFromSource(final @NotEmpty(message = '[source] may not be empty') String source) {
     return securitySystem.listRoles(source).collect { input ->
-      return asRoleXO(input, input.source)
+      return asRoleXO(input)
     }
   }
 
@@ -131,7 +117,7 @@ extends DirectComponentSupport
             privileges: roleXO.privileges,
             roles: roleXO.roles
         )
-    ), roleXO.source)
+    ))
   }
 
   /**
@@ -154,7 +140,7 @@ extends DirectComponentSupport
             privileges: roleXO.privileges,
             roles: roleXO.roles
         )
-    ), roleXO.source)
+    ))
   }
 
   /**
@@ -169,10 +155,10 @@ extends DirectComponentSupport
     securitySystem.getAuthorizationManager(DEFAULT_SOURCE).deleteRole(id)
   }
 
-  private static RoleXO asRoleXO(Role input, String source) {
+  private static RoleXO asRoleXO(Role input) {
     return new RoleXO(
         id: input.roleId,
-        source: (source == DEFAULT_SOURCE || !source) ? 'Nexus' : source,
+        source: (input.source == DEFAULT_SOURCE || !input.source) ? 'Nexus' : input.source,
         name: input.name,
         description: input.description,
         readOnly: input.readOnly,
