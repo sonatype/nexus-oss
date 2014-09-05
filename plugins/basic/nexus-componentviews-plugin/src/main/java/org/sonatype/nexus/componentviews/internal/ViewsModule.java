@@ -36,10 +36,6 @@ public class ViewsModule
 
   @Override
   protected void configure() {
-    bind(ViewModuleBooter.class).asEagerSingleton();
-    bind(ViewConfigStore.class).to(OrientViewConfigStore.class);
-    bind(ViewFactorySource.class).to(InMemoryViewFactorySource.class);
-
     install(new ServletModule()
     {
       @Override

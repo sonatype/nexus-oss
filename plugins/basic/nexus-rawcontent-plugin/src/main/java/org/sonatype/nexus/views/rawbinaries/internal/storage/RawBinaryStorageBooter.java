@@ -14,6 +14,7 @@ package org.sonatype.nexus.views.rawbinaries.internal.storage;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
@@ -32,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 @Named
-@EagerSingleton
+@Singleton
 public class RawBinaryStorageBooter
     implements EventSubscriber
 {

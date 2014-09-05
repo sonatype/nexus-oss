@@ -13,6 +13,8 @@
 package org.sonatype.nexus.views.rawbinaries.view;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.componentviews.AllRequestMatcher;
 import org.sonatype.nexus.componentviews.Handler;
@@ -32,6 +34,8 @@ import static java.util.Arrays.asList;
 /**
  * @since 3.0
  */
+@Named
+@Singleton
 public class RawBinaryViewFactory
     implements ViewFactory
 {

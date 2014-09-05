@@ -19,6 +19,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewConfigIdentity;
@@ -45,7 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 @Named
-@EagerSingleton
+@Singleton
 public class OrientViewConfigStore
     extends LifecycleSupport
     implements ViewConfigStore

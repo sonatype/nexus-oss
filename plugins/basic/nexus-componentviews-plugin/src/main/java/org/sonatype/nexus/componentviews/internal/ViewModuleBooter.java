@@ -17,6 +17,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.componentviews.ViewRegistry;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
@@ -32,7 +33,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
-import org.eclipse.sisu.EagerSingleton;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 @Named
-@EagerSingleton
+@Singleton
 public class ViewModuleBooter
     extends ComponentSupport
     implements EventSubscriber

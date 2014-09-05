@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobId;
@@ -30,6 +31,7 @@ import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinary;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
+
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
@@ -44,6 +46,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @since 3.0
  */
+@Named
+@Singleton
 public class OrientRawBinaryStore
     extends LifecycleSupport
     implements RawBinaryStore

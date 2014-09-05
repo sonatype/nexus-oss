@@ -15,12 +15,14 @@ package org.sonatype.nexus.views.rawbinaries.internal.storage;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.file.FileBlobStore;
-import org.sonatype.nexus.blobstore.file.VolumeChapterLocationStrategy;
 import org.sonatype.nexus.blobstore.file.MapdbBlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.SimpleFileOperations;
+import org.sonatype.nexus.blobstore.file.VolumeChapterLocationStrategy;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 
 import com.google.inject.Provider;
@@ -30,6 +32,8 @@ import com.google.inject.Provider;
  *
  * @since 3.0
  */
+@Named("rawBinaryBlobs")
+@Singleton
 public class RawBinaryBlobStoreProvider
     implements Provider<BlobStore>
 {
