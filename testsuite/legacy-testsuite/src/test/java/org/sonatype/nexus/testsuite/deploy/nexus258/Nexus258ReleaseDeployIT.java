@@ -71,7 +71,7 @@ public class Nexus258ReleaseDeployIT
     }
 
     // download it
-    File artifact = downloadArtifact(gav, "./target/downloaded-jars");
+    File artifact = downloadArtifact(getNexusTestRepoUrl(), gav, "./target/downloaded-jars");
 
     // make sure its here
     assertTrue(artifact.exists());
@@ -110,7 +110,7 @@ public class Nexus258ReleaseDeployIT
     }
 
     // download it
-    File artifact = downloadArtifact(gav, "./target/downloaded-jars");
+    File artifact = downloadArtifact(getNexusTestRepoUrl(), gav, "./target/downloaded-jars");
 
     // make sure its here
     assertTrue(artifact.exists());

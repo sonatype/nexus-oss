@@ -15,7 +15,6 @@ package org.sonatype.nexus.test.utils;
 import java.io.IOException;
 import java.util.List;
 
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.security.rest.model.ExternalRoleMappingListResourceResponse;
@@ -40,7 +39,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 public class RoleMessageUtil
-    extends ITUtil
 {
   private XStream xstream;
 
@@ -48,8 +46,7 @@ public class RoleMessageUtil
 
   private static final Logger LOG = LoggerFactory.getLogger(RoleMessageUtil.class);
 
-  public RoleMessageUtil(AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType) {
-    super(test);
+  public RoleMessageUtil(XStream xstream, MediaType mediaType) {
     this.xstream = xstream;
     this.mediaType = mediaType;
   }
@@ -83,7 +80,7 @@ public class RoleMessageUtil
     Assert.assertEquals(role.getPrivileges(), responseResource.getPrivileges());
     Assert.assertEquals(role.getRoles(), responseResource.getRoles());
 
-    getTest().getSecurityConfigUtil().verifyRole(responseResource);
+    new SecurityConfigUtil().verifyRole(responseResource);
 
     return responseResource;
   }

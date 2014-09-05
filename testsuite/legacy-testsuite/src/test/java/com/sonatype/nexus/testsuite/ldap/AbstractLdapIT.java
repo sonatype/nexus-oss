@@ -18,11 +18,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
-import com.sonatype.security.ldap.api.dto.XStreamInitalizer;
 import com.sonatype.security.ldap.api.dto.LdapConnectionInfoDTO;
 import com.sonatype.security.ldap.api.dto.LdapServerConfigurationDTO;
 import com.sonatype.security.ldap.api.dto.LdapServerRequest;
 import com.sonatype.security.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
+import com.sonatype.security.ldap.api.dto.XStreamInitalizer;
 
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -61,7 +61,7 @@ public abstract class AbstractLdapIT
       this.copyConfigFile("test.ldif", LDIF_DIR);
 
       try {
-        ldapServer = this.lookup(LdapServer.class);
+        ldapServer = TestContainer.getInstance().getPlexusContainer().lookup(LdapServer.class);
         if (!ldapServer.isStarted()) {
           ldapServer.start();
         }

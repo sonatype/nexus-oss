@@ -29,7 +29,7 @@ public class Nexus2996DeleteRepoTargetIT
 {
 
   private PrivilegesMessageUtil privUtil =
-      new PrivilegesMessageUtil(this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
+      new PrivilegesMessageUtil(XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
 
   private static final String TARGET_ID = "1c1fd83a2fd9";
 

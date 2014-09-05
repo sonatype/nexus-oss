@@ -24,6 +24,7 @@ import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import org.sonatype.nexus.test.booter.EmbeddedNexusBooter;
 import org.sonatype.nexus.test.booter.NexusBooter;
 
+import com.google.common.base.Throwables;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
@@ -39,9 +40,15 @@ public class NexusStatusUtil
 
   private final NexusBooter nexusBooter;
 
-  public NexusStatusUtil(final int port) throws Exception {
+  public NexusStatusUtil() {
+    int port = TestProperties.getInteger("nexus.application.port");
     File dir = new File(TestProperties.getAll().get("nexus.base.dir")).getAbsoluteFile();
-    nexusBooter = new EmbeddedNexusBooter(dir, port);
+    try {
+      nexusBooter = new EmbeddedNexusBooter(dir, port);
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   public boolean isNexusRESTStarted()

@@ -45,7 +45,7 @@ public class Nexus1239UserSearchPermissionIT
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-    UserMessageUtil userUtil = new UserMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    UserMessageUtil userUtil = new UserMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
     List<PlexusUserResource> users = userUtil.searchPlexusUsers("default", "admin");
 
     Assert.assertEquals(1, users.size());
@@ -75,7 +75,7 @@ public class Nexus1239UserSearchPermissionIT
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-    UserMessageUtil userUtil = new UserMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    UserMessageUtil userUtil = new UserMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
     List<PlexusUserResource> users = userUtil.searchPlexusUsers("default", "a");
 
     List<String> userIds = new ArrayList<String>();
@@ -99,7 +99,7 @@ public class Nexus1239UserSearchPermissionIT
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
-    UserMessageUtil userUtil = new UserMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    UserMessageUtil userUtil = new UserMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
     List<PlexusUserResource> users = userUtil.searchPlexusUsers("default", "VOID");
     Assert.assertEquals(0, users.size());
   }

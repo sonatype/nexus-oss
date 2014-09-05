@@ -36,9 +36,9 @@ public class Nexus2327RepositoryIdValidationIT
   public Nexus2327RepositoryIdValidationIT()
       throws Exception
   {
-    repositoryMsgUtil = new RepositoryMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    repositoryMsgUtil = new RepositoryMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
 
-    groupMsgUtil = new GroupMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    groupMsgUtil = new GroupMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @Test

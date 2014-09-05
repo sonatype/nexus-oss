@@ -50,7 +50,7 @@ public class Nexus233PrivilegesCrudXMLIT
 
   @Before
   public void setUp() {
-    this.messageUtil = new PrivilegesMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    this.messageUtil = new PrivilegesMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @SuppressWarnings("unchecked")
@@ -403,52 +403,4 @@ public class Nexus233PrivilegesCrudXMLIT
     Assert.assertNull(getSecurityConfigUtil().getCPrivilege(readPrivId));
 
   }
-
-  @SuppressWarnings("unchecked")
-  @Test
-  public void listTest()
-      throws IOException
-  {
-    if (printKnownErrorButDoNotFail(Nexus233PrivilegesCrudXMLIT.class, "listTest")) {
-      return;
-    }
-
-    PrivilegeResource resource = new PrivilegeResource();
-
-    List methods = new ArrayList<String>();
-    methods.add("read");
-    resource.setMethod(methods);
-    resource.setName("listTest");
-    resource.setType(TargetPrivilegeDescriptor.TYPE);
-    resource.setRepositoryTargetId("testTarget");
-
-    // get the Resource object
-    List<PrivilegeStatusResource> statusResources = this.messageUtil.createPrivileges(resource);
-
-    Assert.assertTrue(statusResources.size() == 1);
-
-    // make sure the id != null
-    Assert.assertNotNull(statusResources.get(0).getId());
-
-    Assert.assertEquals("read", getSecurityConfigUtil().getPrivilegeProperty(statusResources.get(0),
-        ApplicationPrivilegeMethodPropertyDescriptor.ID));
-    Assert.assertEquals("listTest - (read)", statusResources.get(0).getName()); // ' - (read)' is
-    // automatically added
-    Assert.assertEquals(TargetPrivilegeDescriptor.TYPE, statusResources.get(0).getType());
-    Assert.assertEquals("testTarget", getSecurityConfigUtil().getPrivilegeProperty(statusResources.get(0),
-        TargetPrivilegeRepositoryTargetPropertyDescriptor.ID));
-
-    getSecurityConfigUtil().verifyPrivileges(statusResources);
-
-    // now we have something in the repo. now lets get it all...
-
-    Response response = this.messageUtil.sendMessage(Method.GET, resource);
-
-    // get the Resource object
-    statusResources = this.messageUtil.getResourceListFromResponse(response);
-
-    getSecurityConfigUtil().verifyPrivileges(statusResources);
-
-  }
-
 }

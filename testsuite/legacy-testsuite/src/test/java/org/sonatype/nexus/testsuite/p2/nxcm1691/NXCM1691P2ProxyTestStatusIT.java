@@ -37,7 +37,7 @@ public class NXCM1691P2ProxyTestStatusIT
       throws Exception
   {
     final RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(
-        this, getXMLXStream(), MediaType.APPLICATION_XML
+        getXMLXStream(), MediaType.APPLICATION_XML
     );
 
     for (String s : P2Constants.METADATA_FILE_PATHS) {

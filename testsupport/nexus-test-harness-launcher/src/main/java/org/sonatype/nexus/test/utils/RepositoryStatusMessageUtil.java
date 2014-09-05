@@ -24,7 +24,7 @@ public class RepositoryStatusMessageUtil
   private static final RepositoriesNexusRestClient REPOSITORY_NRC = new RepositoriesNexusRestClient(
       RequestFacade.getNexusRestClient(),
       new TasksNexusRestClient(RequestFacade.getNexusRestClient()),
-      new EventInspectorsUtil(RequestFacade.getNexusRestClient())
+      new EventInspectorsUtil()
   );
 
   public static Response putOutOfService(String repoId, String repoType)

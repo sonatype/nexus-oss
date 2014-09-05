@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
@@ -42,12 +43,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.Assert;
 
 public class SecurityConfigUtil
-    extends ITUtil
 {
-  public SecurityConfigUtil(AbstractNexusIntegrationTest test) {
-    super(test);
-  }
-
   public void verifyRole(RoleResource role)
       throws IOException
   {
@@ -279,7 +275,7 @@ public class SecurityConfigUtil
       }
 
       List<StaticSecurityResource> resources =
-          getTest().getITPlexusContainer().lookupList(StaticSecurityResource.class);
+          TestContainer.getInstance().getPlexusContainer().lookupList(StaticSecurityResource.class);
       for (StaticSecurityResource resource : resources) {
         addStaticSecurity(configuration, resource.getConfiguration());
       }
@@ -293,7 +289,7 @@ public class SecurityConfigUtil
       addStaticSecurity(configuration, reader, "/META-INF/nexus-rrb-plugin-security.xml");
 
       List<DynamicSecurityResource> dynamic =
-          getTest().getITPlexusContainer().lookupList(DynamicSecurityResource.class);
+          TestContainer.getInstance().getPlexusContainer().lookupList(DynamicSecurityResource.class);
       for (DynamicSecurityResource resource : dynamic) {
         addStaticSecurity(configuration, resource.getConfiguration());
       }

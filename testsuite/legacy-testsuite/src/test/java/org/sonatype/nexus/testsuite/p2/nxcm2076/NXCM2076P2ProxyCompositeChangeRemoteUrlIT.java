@@ -39,7 +39,7 @@ public class NXCM2076P2ProxyCompositeChangeRemoteUrlIT
       throws Exception
   {
     super("nxcm2076");
-    repoUtil = new RepositoryMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
+    repoUtil = new RepositoryMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @Test

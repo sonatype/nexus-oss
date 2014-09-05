@@ -28,8 +28,11 @@ import org.sonatype.tests.http.server.fluent.Server;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.startsWith;
 
 public class Nexus1197CheckUserAgentIT
     extends AbstractNexusIntegrationTest
@@ -68,7 +71,7 @@ public class Nexus1197CheckUserAgentIT
       throws Exception
   {
     try {
-      downloadArtifact("nexus1197", "artifact", "1.0", "pom", null, "target/downloads");
+      downloadArtifact(getNexusTestRepoUrl(), "nexus1197", "artifact", "1.0", "pom", null, "target/downloads");
     }
     catch (FileNotFoundException e) {
       // ok, just ignore

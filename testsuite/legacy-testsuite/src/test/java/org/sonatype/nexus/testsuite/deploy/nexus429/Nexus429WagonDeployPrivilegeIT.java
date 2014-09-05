@@ -90,13 +90,13 @@ public class Nexus429WagonDeployPrivilegeIT
 
     Verifier verifier = null;
 
-    this.deleteFromRepository(this.getTestId());
+    this.deleteFromRepository(getTestRepositoryId(), this.getTestId());
 
     // file to deploy
     File fileToDeploy = this.getTestFile(gav.getArtifactId() + "." + gav.getExtension());
 
     // we need to delete the files...
-    this.deleteFromRepository(this.getTestId() + "/");
+    this.deleteFromRepository(getTestRepositoryId(), this.getTestId() + "/");
 
     // deploy
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);

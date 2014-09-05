@@ -17,9 +17,7 @@ import java.io.File;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
-import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.tests.http.server.api.ServerProvider;
-import org.sonatype.tests.http.server.fluent.Server;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,7 +41,8 @@ public class Nexus1089SecureProxyIT
   {
     File localFile = this.getLocalFile("release-proxy-repo-1", "nexus1089", "artifact", "1.0", "jar");
 
-    File artifact = this.downloadArtifact("nexus1089", "artifact", "1.0", "jar", null, "target/downloads");
+    File artifact = this.downloadArtifact(getNexusTestRepoUrl(),
+        "nexus1089", "artifact", "1.0", "jar", null, "target/downloads");
 
     Assert.assertTrue(FileTestingUtils.compareFileSHA1s(artifact, localFile));
 

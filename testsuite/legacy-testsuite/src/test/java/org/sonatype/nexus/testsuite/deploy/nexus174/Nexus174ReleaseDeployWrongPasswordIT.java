@@ -60,7 +60,7 @@ public class Nexus174ReleaseDeployWrongPasswordIT
     File fileToDeploy = this.getTestFile(gav.getArtifactId() + "." + gav.getExtension());
 
     // we need to delete the files...
-    this.deleteFromRepository(this.getTestId() + "/");
+    this.deleteFromRepository(getTestRepositoryId(), this.getTestId() + "/");
 
     try {
       // DeployUtils.forkDeployWithWagon( this.getContainer(), "http", this.getNexusTestRepoUrl(), fileToDeploy,

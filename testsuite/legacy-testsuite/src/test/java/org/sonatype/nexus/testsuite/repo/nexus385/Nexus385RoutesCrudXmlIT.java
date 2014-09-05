@@ -47,7 +47,7 @@ public class Nexus385RoutesCrudXmlIT
   public void setUp()
       throws IOException
   {
-    this.messageUtil = new RoutesMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    this.messageUtil = new RoutesMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
     RoutesMessageUtil.removeAllRoutes();
   }
 
@@ -112,42 +112,6 @@ public class Nexus385RoutesCrudXmlIT
     RepositoryRouteResource resource = this.runCreateTest("exclusive");
 
     Response response = this.messageUtil.sendMessage(Method.GET, resource);
-
-    if (!response.getStatus().isSuccess()) {
-      String responseText = response.getEntity().getText();
-      Assert.fail("Could not create privilege: " + response.getStatus() + "\nresponse:\n" + responseText);
-    }
-
-    // get the Resource object
-    RepositoryRouteResource resourceResponse = this.messageUtil.getResourceFromResponse(response);
-
-    Assert.assertNotNull(resourceResponse.getId());
-
-    Assert.assertEquals(resourceResponse.getGroupId(), resource.getGroupId());
-    Assert.assertEquals(resourceResponse.getPattern(), resource.getPattern());
-    Assert.assertEquals(resourceResponse.getRuleType(), resource.getRuleType());
-    this.messageUtil.validateSame(resource.getRepositories(), resourceResponse.getRepositories());
-
-    // now check the nexus config
-    this.messageUtil.validateRoutesConfig(resourceResponse);
-
-  }
-
-  @SuppressWarnings("unchecked")
-  @Test
-  public void updateTest()
-      throws IOException
-  {
-    // FIXME: this test is known to fail, but is commented out so the CI builds are useful
-    if (this.printKnownErrorButDoNotFail(this.getClass(), "updateTest")) {
-      return;
-    }
-
-    // create
-    RepositoryRouteResource resource = this.runCreateTest("exclusive");
-    resource.setPattern(".*update.*");
-
-    Response response = this.messageUtil.sendMessage(Method.PUT, resource);
 
     if (!response.getStatus().isSuccess()) {
       String responseText = response.getEntity().getText();

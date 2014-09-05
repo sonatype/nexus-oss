@@ -19,8 +19,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoListResponseDTO;
 import org.sonatype.nexus.rest.model.AliasingListConverter;
-import org.sonatype.nexus.test.utils.XStreamConfigurator;
-import org.sonatype.nexus.test.utils.plugin.XStreamFactory;
+import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -34,21 +33,16 @@ public class PluginConsoleMessageUtil
 {
   private static final String PLUGIN_INFOS_URL = "service/local/plugin_console/plugin_infos";
 
-  private static XStream xmlXstream;
+  private static XStream xstream;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginConsoleMessageUtil.class);
 
   static {
-    xmlXstream = XStreamFactory.getXmlXStream(new XStreamConfigurator()
-    {
-      public void configure(XStream xstream) {
-        xstream.processAnnotations(PluginInfoDTO.class);
-        xstream.processAnnotations(PluginInfoListResponseDTO.class);
-
-        xstream.registerLocalConverter(PluginInfoListResponseDTO.class, "data", new AliasingListConverter(
-            PluginInfoDTO.class, "pluginInfo"));
-      }
-    });
+    xstream = XStreamFactory.getXmlXStream();
+    xstream.processAnnotations(PluginInfoDTO.class);
+    xstream.processAnnotations(PluginInfoListResponseDTO.class);
+    xstream.registerLocalConverter(PluginInfoListResponseDTO.class, "data", new AliasingListConverter(
+        PluginInfoDTO.class, "pluginInfo"));
   }
 
   public List<PluginInfoDTO> listPluginInfos()
@@ -66,7 +60,7 @@ public class PluginConsoleMessageUtil
         LOGGER.debug("Response Text: \n" + responseText);
 
         XStreamRepresentation representation =
-            new XStreamRepresentation(xmlXstream, responseText, MediaType.APPLICATION_XML);
+            new XStreamRepresentation(xstream, responseText, MediaType.APPLICATION_XML);
 
         PluginInfoListResponseDTO responseDTO =
             (PluginInfoListResponseDTO) representation.getPayload(new PluginInfoListResponseDTO());

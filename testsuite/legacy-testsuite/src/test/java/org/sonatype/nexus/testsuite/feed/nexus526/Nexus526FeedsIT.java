@@ -25,6 +25,8 @@ import org.apache.maven.index.artifact.Gav;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
+
 /**
  * Tests for deployment entries in feeds.
  */

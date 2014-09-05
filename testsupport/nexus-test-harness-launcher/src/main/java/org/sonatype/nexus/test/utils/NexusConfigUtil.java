@@ -26,6 +26,7 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
@@ -45,12 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author cstamas
  */
 public class NexusConfigUtil
-    extends ITUtil
 {
-  public NexusConfigUtil(AbstractNexusIntegrationTest test) {
-    super(test);
-  }
-
   private static Logger log = LoggerFactory.getLogger(NexusConfigUtil.class);
 
   /**
@@ -62,7 +58,7 @@ public class NexusConfigUtil
   {
     try {
       NexusConfiguration nexusConfiguration;
-      nexusConfiguration = getTest().getITPlexusContainer().lookup(NexusConfiguration.class);
+      nexusConfiguration = TestContainer.getInstance().getPlexusContainer().lookup(NexusConfiguration.class);
       nexusConfiguration.loadConfiguration(true);
       return nexusConfiguration.getConfigurationModel();
     }

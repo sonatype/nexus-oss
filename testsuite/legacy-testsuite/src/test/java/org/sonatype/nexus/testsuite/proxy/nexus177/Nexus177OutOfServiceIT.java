@@ -58,7 +58,7 @@ public class Nexus177OutOfServiceIT
             "Simple Test Artifact", false, null, false, null);
 
     // download an artifact
-    File originalFile = this.downloadArtifact(gav, "target/downloads/original");
+    File originalFile = this.downloadArtifact(getNexusTestRepoUrl(), gav, "target/downloads/original");
 
     // put proxy out of service
     repositoryUtil.setOutOfServiceProxy(TEST_RELEASE_REPO, true);
@@ -66,7 +66,7 @@ public class Nexus177OutOfServiceIT
     // redownload artifact
     try {
       // download it
-      downloadArtifact(gav, "./target/downloaded-jars");
+      downloadArtifact(getNexusTestRepoUrl(), gav, "./target/downloaded-jars");
       Assert.fail("Out Of Service Command didn't do anything.");
     }
     catch (FileNotFoundException e) {
@@ -76,7 +76,7 @@ public class Nexus177OutOfServiceIT
     repositoryUtil.setOutOfServiceProxy(TEST_RELEASE_REPO, false);
 
     // redownload artifact
-    File newFile = this.downloadArtifact(gav, "target/downloads/original");
+    File newFile = this.downloadArtifact(getNexusTestRepoUrl(), gav, "target/downloads/original");
 
     // compare the files just for kicks
     Assert.assertTrue(FileTestingUtils.compareFileSHA1s(originalFile, newFile));

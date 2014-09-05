@@ -35,7 +35,7 @@ public class Nexus531RepositoryCrudValidationIT
     extends AbstractPrivilegeTest
 {
 
-  private RepositoryMessageUtil messageUtil = new RepositoryMessageUtil(this, this.getXMLXStream(),
+  private RepositoryMessageUtil messageUtil = new RepositoryMessageUtil(this.getXMLXStream(),
       MediaType.APPLICATION_XML);
 
   @BeforeClass
@@ -393,39 +393,6 @@ public class Nexus531RepositoryCrudValidationIT
     resource.setChecksumPolicy(null);
     this.sendAndExpectError(Method.PUT, resource);
     resource.setChecksumPolicy("IGNORE");
-
-    // FIXME: these tests are disabled... NEXUS-741 NEXUS-740
-    if (!this.printKnownErrorButDoNotFail(this.getClass(), "updateValidatioinTest")) {
-
-      // invalid repoType
-      resource.setRepoType("junk");
-      this.sendAndExpectError(Method.PUT, resource);
-      resource.setRepoType("hosted");
-
-      // empty name
-      resource.setName("");
-      this.sendAndExpectError(Method.PUT, resource);
-      resource.setName("Update Test Repo");
-
-      // null name
-      resource.setName(null);
-      this.sendAndExpectError(Method.PUT, resource);
-      resource.setName("Update Test Repo");
-
-      // change id
-      resource.setId("newId");
-
-      response = this.messageUtil.sendMessage(Method.PUT, resource, "updateValidatioinTest");
-      String responseText = response.getEntity().getText();
-
-      Assert.assertFalse("Repo should not have been updated: " + response.getStatus() + "\n" + responseText,
-          response.getStatus().isSuccess());
-      Assert.assertTrue("Response text did not contain an error message. Status: " + response.getStatus()
-          + "\nResponse Text:\n " + responseText,
-          responseText.contains("<errors>"));
-      resource.setId("updateValidatioinTest");
-
-    }
   }
 
   private void sendAndExpectError(Method method, RepositoryBaseResource resource)

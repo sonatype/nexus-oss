@@ -36,7 +36,7 @@ public class Nexus133TargetCrudXmlIT
 
   @Before
   public void setUp() {
-    this.messageUtil = new TargetMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    this.messageUtil = new TargetMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @Test

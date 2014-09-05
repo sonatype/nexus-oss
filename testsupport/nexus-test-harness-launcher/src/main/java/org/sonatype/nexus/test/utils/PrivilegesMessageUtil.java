@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
@@ -41,7 +40,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 public class PrivilegesMessageUtil
-    extends ITUtil
 {
   private XStream xstream;
 
@@ -49,8 +47,7 @@ public class PrivilegesMessageUtil
 
   private static Logger log = LoggerFactory.getLogger(PrivilegesMessageUtil.class);
 
-  public PrivilegesMessageUtil(AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType) {
-    super(test);
+  public PrivilegesMessageUtil(XStream xstream, MediaType mediaType) {
     this.xstream = xstream;
     this.mediaType = mediaType;
   }
@@ -69,7 +66,7 @@ public class PrivilegesMessageUtil
       RequestFacade.releaseResponse(response);
     }
 
-    getTest().getSecurityConfigUtil().verifyPrivileges(statusResources);
+    new SecurityConfigUtil().verifyPrivileges(statusResources);
 
     return statusResources;
   }

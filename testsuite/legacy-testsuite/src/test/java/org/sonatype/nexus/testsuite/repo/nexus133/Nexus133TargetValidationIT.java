@@ -46,7 +46,7 @@ public class Nexus133TargetValidationIT
 
   @Before
   public void setUp() {
-    this.messageUtil = new TargetMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    this.messageUtil = new TargetMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
   }
 
   @Test

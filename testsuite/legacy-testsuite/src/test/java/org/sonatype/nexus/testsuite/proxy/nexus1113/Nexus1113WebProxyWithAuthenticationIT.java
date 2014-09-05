@@ -24,9 +24,7 @@ import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.impl.MonitorableProxyServlet;
 
 import com.google.common.collect.Maps;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -49,13 +47,13 @@ public class Nexus1113WebProxyWithAuthenticationIT
       throws Exception
   {
     File pomFile = this.getLocalFile("release-proxy-repo-1", "nexus1113", "artifact", "1.0", "pom");
-    File pomArtifact =
-        this.downloadArtifact("nexus1113", "artifact", "1.0", "pom", null, "target/downloads/nexus1113");
+    File pomArtifact = this.downloadArtifact(getNexusTestRepoUrl(),
+        "nexus1113", "artifact", "1.0", "pom", null, "target/downloads/nexus1113");
     Assert.assertTrue(FileTestingUtils.compareFileSHA1s(pomArtifact, pomFile));
 
     File jarFile = this.getLocalFile("release-proxy-repo-1", "nexus1113", "artifact", "1.0", "jar");
-    File jarArtifact =
-        this.downloadArtifact("nexus1113", "artifact", "1.0", "jar", null, "target/downloads/nexus1113");
+    File jarArtifact = this.downloadArtifact(getNexusTestRepoUrl(),
+        "nexus1113", "artifact", "1.0", "jar", null, "target/downloads/nexus1113");
     Assert.assertTrue(FileTestingUtils.compareFileSHA1s(jarArtifact, jarFile));
 
     String artifactUrl = baseProxyURL + "release-proxy-repo-1/nexus1113/artifact/1.0/artifact-1.0.jar";

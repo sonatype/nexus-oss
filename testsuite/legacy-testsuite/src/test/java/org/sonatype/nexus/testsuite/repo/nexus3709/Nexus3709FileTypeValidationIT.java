@@ -23,6 +23,8 @@ import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 
+import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
+
 public class Nexus3709FileTypeValidationIT
     extends AbstractNexusProxyIntegrationTest
 {
@@ -36,7 +38,7 @@ public class Nexus3709FileTypeValidationIT
       throws Exception
   {
     String relativePath =
-        this.getRelitiveArtifactPath(new Gav("nexus3709.foo.bar", "goodzip", "1.0.0", null, "zip", null, null,
+        getRelitiveArtifactPath(new Gav("nexus3709.foo.bar", "goodzip", "1.0.0", null, "zip", null, null,
             null, false, null, false, null));
     String url = this.getRepositoryUrl(this.getTestRepositoryId()) + relativePath;
     Response response = RequestFacade.sendMessage(new URL(url), Method.GET, null);
@@ -49,7 +51,7 @@ public class Nexus3709FileTypeValidationIT
       throws Exception
   {
     String relativePath =
-        this.getRelitiveArtifactPath(new Gav("nexus3709.foo.bar", "badzip", "1.0.0", null, "zip", null, null,
+        getRelitiveArtifactPath(new Gav("nexus3709.foo.bar", "badzip", "1.0.0", null, "zip", null, null,
             null, false, null, false, null));
     String url = this.getRepositoryUrl(this.getTestRepositoryId()) + relativePath;
     Response response = RequestFacade.sendMessage(new URL(url), Method.GET, null);
@@ -62,7 +64,7 @@ public class Nexus3709FileTypeValidationIT
       throws Exception
   {
     String relativePath =
-        this.getRelitiveArtifactPath(new Gav("nexus3709.foo.bar", "goodjar", "1.0.0", null, "jar", null, null,
+        getRelitiveArtifactPath(new Gav("nexus3709.foo.bar", "goodjar", "1.0.0", null, "jar", null, null,
             null, false, null, false, null));
     String url = this.getRepositoryUrl(this.getTestRepositoryId()) + relativePath;
     Response response = RequestFacade.sendMessage(new URL(url), Method.GET, null);
@@ -75,7 +77,7 @@ public class Nexus3709FileTypeValidationIT
       throws Exception
   {
     String relativePath =
-        this.getRelitiveArtifactPath(new Gav("nexus3709.foo.bar", "badjar", "1.0.0", null, "jar", null, null,
+        getRelitiveArtifactPath(new Gav("nexus3709.foo.bar", "badjar", "1.0.0", null, "jar", null, null,
             null, false, null, false, null));
     String url = this.getRepositoryUrl(this.getTestRepositoryId()) + relativePath;
     Response response = RequestFacade.sendMessage(new URL(url), Method.GET, null);
@@ -88,7 +90,7 @@ public class Nexus3709FileTypeValidationIT
       throws Exception
   {
     String relativePath =
-        this.getRelitiveArtifactPath(new Gav("nexus3709.foo.bar", "goodpom", "1.0.0", null, "pom", null, null,
+        getRelitiveArtifactPath(new Gav("nexus3709.foo.bar", "goodpom", "1.0.0", null, "pom", null, null,
             null, false, null, false, null));
     String url = this.getRepositoryUrl(this.getTestRepositoryId()) + relativePath;
     Response response = RequestFacade.sendMessage(new URL(url), Method.GET, null);
@@ -101,7 +103,7 @@ public class Nexus3709FileTypeValidationIT
       throws Exception
   {
     String relativePath =
-        this.getRelitiveArtifactPath(new Gav("nexus3709.foo.bar", "badpom", "1.0.0", null, "pom", null, null,
+        getRelitiveArtifactPath(new Gav("nexus3709.foo.bar", "badpom", "1.0.0", null, "pom", null, null,
             null, false, null, false, null));
     String url = this.getRepositoryUrl(this.getTestRepositoryId()) + relativePath;
     Response response = RequestFacade.sendMessage(new URL(url), Method.GET, null);

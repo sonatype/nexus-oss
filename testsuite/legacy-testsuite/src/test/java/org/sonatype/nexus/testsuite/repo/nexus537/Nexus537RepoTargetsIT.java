@@ -37,6 +37,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
 import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
 import static org.sonatype.nexus.test.utils.StatusMatchers.isNotFound;
 
@@ -433,7 +434,7 @@ public class Nexus537RepoTargetsIT
   private void delete(Gav gav, String repoId, boolean shouldDelete)
       throws IOException
   {
-    String url = REPOSITORY_RELATIVE_URL + repoId + "/" + this.getRelitiveArtifactPath(gav);
+    String url = REPOSITORY_RELATIVE_URL + repoId + "/" + getRelitiveArtifactPath(gav);
 
     if (!shouldDelete) {
       RequestFacade.doDelete(url, respondsWithStatusCode(403));

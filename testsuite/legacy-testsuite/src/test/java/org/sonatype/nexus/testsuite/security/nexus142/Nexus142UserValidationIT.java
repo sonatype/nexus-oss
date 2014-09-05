@@ -43,7 +43,7 @@ public class Nexus142UserValidationIT
 
   @Before
   public void setUp() {
-    this.messageUtil = new UserMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    this.messageUtil = new UserMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
   }
 
   @Test

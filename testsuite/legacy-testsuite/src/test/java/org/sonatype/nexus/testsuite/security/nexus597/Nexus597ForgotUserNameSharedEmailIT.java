@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.testsuite.security.nexus597;
 
-import org.sonatype.nexus.test.utils.ForgotUsernameUtils;
+import org.sonatype.nexus.testsuite.security.ForgotUsernameUtils;
 import org.sonatype.nexus.testsuite.security.nexus395.AbstractForgotUserNameIT;
 
 import org.junit.Assert;
