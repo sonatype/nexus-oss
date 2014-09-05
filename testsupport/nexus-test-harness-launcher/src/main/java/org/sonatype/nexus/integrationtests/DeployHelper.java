@@ -43,7 +43,7 @@ public class DeployHelper
 
   private final DeployUtils deployUtils = new DeployUtils();
 
-  protected void deployArtifacts(final File projectsDir) throws Exception {
+  public void deployArtifacts(final File projectsDir) throws Exception {
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // skip if nothing to deploy
@@ -99,12 +99,7 @@ public class DeployHelper
     }
   }
 
-  /**
-   * Deploys with given Wagon (hint is provided), to deployUrl. It is caller matter to adjust those two (ie.
-   * deployUrl
-   * with file: protocol to be deployed with file wagon would be error). Model is supplied since it is read before.
-   */
-  protected void deployArtifacts(File project, String wagonHint, String deployUrl, Model model) throws Exception {
+  private void deployArtifacts(File project, String wagonHint, String deployUrl, Model model) throws Exception {
     log.info("Deploying project \"{}\" using Wagon:{} to URL=\"{}\".", project.getAbsolutePath(), wagonHint, deployUrl);
 
     // we already check if the pom.xml was in here.
